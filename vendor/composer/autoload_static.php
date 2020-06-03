@@ -46,6 +46,11 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         array (
             'phpDocumentor\\Reflection\\' => 25,
         ),
+        'Y' => 
+        array (
+            'Yansongda\\Supports\\' => 19,
+            'Yansongda\\Pay\\' => 14,
+        ),
         'X' => 
         array (
             'XdgBaseDir\\' => 11,
@@ -131,6 +136,10 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
             'League\\CommonMark\\' => 18,
             'Laravel\\Tinker\\' => 15,
         ),
+        'J' => 
+        array (
+            'JPush\\' => 6,
+        ),
         'I' => 
         array (
             'Illuminate\\' => 11,
@@ -190,6 +199,14 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
             1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
             2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+        ),
+        'Yansongda\\Supports\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yansongda/supports/src',
+        ),
+        'Yansongda\\Pay\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yansongda/pay/src',
         ),
         'XdgBaseDir\\' => 
         array (
@@ -410,6 +427,10 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'Laravel\\Tinker\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/tinker/src',
+        ),
+        'JPush\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jpush/jpush/src/JPush',
         ),
         'Illuminate\\' => 
         array (
@@ -2791,6 +2812,18 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'Illuminate\\View\\ViewFinderInterface' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewFinderInterface.php',
         'Illuminate\\View\\ViewName' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewName.php',
         'Illuminate\\View\\ViewServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewServiceProvider.php',
+        'JPush\\AdminClient' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/AdminClient.php',
+        'JPush\\Client' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/Client.php',
+        'JPush\\Config' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/Config.php',
+        'JPush\\DevicePayload' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/DevicePayload.php',
+        'JPush\\Exceptions\\APIConnectionException' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/Exceptions/APIConnectionException.php',
+        'JPush\\Exceptions\\APIRequestException' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/Exceptions/APIRequestException.php',
+        'JPush\\Exceptions\\JPushException' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/Exceptions/JPushException.php',
+        'JPush\\Exceptions\\ServiceNotAvaliable' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/Exceptions/ServiceNotAvaliable.php',
+        'JPush\\Http' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/Http.php',
+        'JPush\\PushPayload' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/PushPayload.php',
+        'JPush\\ReportPayload' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/ReportPayload.php',
+        'JPush\\SchedulePayload' => __DIR__ . '/..' . '/jpush/jpush/src/JPush/SchedulePayload.php',
         'JsonException' => __DIR__ . '/..' . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
         'Laravel\\Tinker\\ClassAliasAutoloader' => __DIR__ . '/..' . '/laravel/tinker/src/ClassAliasAutoloader.php',
         'Laravel\\Tinker\\Console\\TinkerCommand' => __DIR__ . '/..' . '/laravel/tinker/src/Console/TinkerCommand.php',
@@ -5644,6 +5677,63 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'Whoops\\Util\\SystemFacade' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Util/SystemFacade.php',
         'Whoops\\Util\\TemplateHelper' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Util/TemplateHelper.php',
         'XdgBaseDir\\Xdg' => __DIR__ . '/..' . '/dnoegel/php-xdg-base-dir/src/Xdg.php',
+        'Yansongda\\Pay\\Contracts\\GatewayApplicationInterface' => __DIR__ . '/..' . '/yansongda/pay/src/Contracts/GatewayApplicationInterface.php',
+        'Yansongda\\Pay\\Contracts\\GatewayInterface' => __DIR__ . '/..' . '/yansongda/pay/src/Contracts/GatewayInterface.php',
+        'Yansongda\\Pay\\Events' => __DIR__ . '/..' . '/yansongda/pay/src/Events.php',
+        'Yansongda\\Pay\\Events\\ApiRequested' => __DIR__ . '/..' . '/yansongda/pay/src/Events/ApiRequested.php',
+        'Yansongda\\Pay\\Events\\ApiRequesting' => __DIR__ . '/..' . '/yansongda/pay/src/Events/ApiRequesting.php',
+        'Yansongda\\Pay\\Events\\Event' => __DIR__ . '/..' . '/yansongda/pay/src/Events/Event.php',
+        'Yansongda\\Pay\\Events\\MethodCalled' => __DIR__ . '/..' . '/yansongda/pay/src/Events/MethodCalled.php',
+        'Yansongda\\Pay\\Events\\PayStarted' => __DIR__ . '/..' . '/yansongda/pay/src/Events/PayStarted.php',
+        'Yansongda\\Pay\\Events\\PayStarting' => __DIR__ . '/..' . '/yansongda/pay/src/Events/PayStarting.php',
+        'Yansongda\\Pay\\Events\\RequestReceived' => __DIR__ . '/..' . '/yansongda/pay/src/Events/RequestReceived.php',
+        'Yansongda\\Pay\\Events\\SignFailed' => __DIR__ . '/..' . '/yansongda/pay/src/Events/SignFailed.php',
+        'Yansongda\\Pay\\Exceptions\\BusinessException' => __DIR__ . '/..' . '/yansongda/pay/src/Exceptions/BusinessException.php',
+        'Yansongda\\Pay\\Exceptions\\Exception' => __DIR__ . '/..' . '/yansongda/pay/src/Exceptions/Exception.php',
+        'Yansongda\\Pay\\Exceptions\\GatewayException' => __DIR__ . '/..' . '/yansongda/pay/src/Exceptions/GatewayException.php',
+        'Yansongda\\Pay\\Exceptions\\InvalidArgumentException' => __DIR__ . '/..' . '/yansongda/pay/src/Exceptions/InvalidArgumentException.php',
+        'Yansongda\\Pay\\Exceptions\\InvalidConfigException' => __DIR__ . '/..' . '/yansongda/pay/src/Exceptions/InvalidConfigException.php',
+        'Yansongda\\Pay\\Exceptions\\InvalidGatewayException' => __DIR__ . '/..' . '/yansongda/pay/src/Exceptions/InvalidGatewayException.php',
+        'Yansongda\\Pay\\Exceptions\\InvalidSignException' => __DIR__ . '/..' . '/yansongda/pay/src/Exceptions/InvalidSignException.php',
+        'Yansongda\\Pay\\Gateways\\Alipay' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\AppGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/AppGateway.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\Gateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/Gateway.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\MiniGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/MiniGateway.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\PosGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/PosGateway.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\RefundGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/RefundGateway.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\ScanGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/ScanGateway.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\Support' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/Support.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\TransferGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/TransferGateway.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\WapGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/WapGateway.php',
+        'Yansongda\\Pay\\Gateways\\Alipay\\WebGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Alipay/WebGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\AppGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/AppGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\Gateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/Gateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\GroupRedpackGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/GroupRedpackGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\MiniappGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/MiniappGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\MpGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/MpGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\PosGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/PosGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\RedpackGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/RedpackGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\RefundGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/RefundGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\ScanGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/ScanGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\Support' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/Support.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\TransferGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/TransferGateway.php',
+        'Yansongda\\Pay\\Gateways\\Wechat\\WapGateway' => __DIR__ . '/..' . '/yansongda/pay/src/Gateways/Wechat/WapGateway.php',
+        'Yansongda\\Pay\\Listeners\\KernelLogSubscriber' => __DIR__ . '/..' . '/yansongda/pay/src/Listeners/KernelLogSubscriber.php',
+        'Yansongda\\Pay\\Log' => __DIR__ . '/..' . '/yansongda/pay/src/Log.php',
+        'Yansongda\\Pay\\Pay' => __DIR__ . '/..' . '/yansongda/pay/src/Pay.php',
+        'Yansongda\\Supports\\Arr' => __DIR__ . '/..' . '/yansongda/supports/src/Arr.php',
+        'Yansongda\\Supports\\Collection' => __DIR__ . '/..' . '/yansongda/supports/src/Collection.php',
+        'Yansongda\\Supports\\Config' => __DIR__ . '/..' . '/yansongda/supports/src/Config.php',
+        'Yansongda\\Supports\\Log' => __DIR__ . '/..' . '/yansongda/supports/src/Log.php',
+        'Yansongda\\Supports\\Logger' => __DIR__ . '/..' . '/yansongda/supports/src/Logger.php',
+        'Yansongda\\Supports\\Logger\\StdoutHandler' => __DIR__ . '/..' . '/yansongda/supports/src/Logger/StdoutHandler.php',
+        'Yansongda\\Supports\\Str' => __DIR__ . '/..' . '/yansongda/supports/src/Str.php',
+        'Yansongda\\Supports\\Traits\\Accessable' => __DIR__ . '/..' . '/yansongda/supports/src/Traits/Accessable.php',
+        'Yansongda\\Supports\\Traits\\Arrayable' => __DIR__ . '/..' . '/yansongda/supports/src/Traits/Arrayable.php',
+        'Yansongda\\Supports\\Traits\\HasHttpRequest' => __DIR__ . '/..' . '/yansongda/supports/src/Traits/HasHttpRequest.php',
+        'Yansongda\\Supports\\Traits\\Serializable' => __DIR__ . '/..' . '/yansongda/supports/src/Traits/Serializable.php',
+        'Yansongda\\Supports\\Traits\\ShouldThrottle' => __DIR__ . '/..' . '/yansongda/supports/src/Traits/ShouldThrottle.php',
         'phpDocumentor\\Reflection\\DocBlock' => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src/DocBlock.php',
         'phpDocumentor\\Reflection\\DocBlockFactory' => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src/DocBlockFactory.php',
         'phpDocumentor\\Reflection\\DocBlockFactoryInterface' => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src/DocBlockFactoryInterface.php',

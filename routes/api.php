@@ -16,4 +16,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('Api')->group(function(){
    Route::get('index', 'IndexController@index');
+
 });
