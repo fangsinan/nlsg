@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\ColumnOutline;
+use App\Models\Works;
+use App\Models\WorksInfo;
 use http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +18,6 @@ class ColumnController extends Controller
 
     public function index(Request $request)
     {
-
-        //$post = $request->input();
-        $name = $request->input('name',0);
-        if($name) {
-            $field = ['id', 'name', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic'];
-
 
 //            $model = Column::whereHas('user', function ($query) use ($name) {
 //                $query->where('username', $name);
@@ -86,29 +83,74 @@ class ColumnController extends Controller
 //var_dump($email);die;
             return 'hello world';
 
-        }
-
     }
 
     /**
      * 专栏首页列表
      */
-    public function get_column_list(Request $request){
+    public function getColumnList(Request $request){
         //排序
         $order = $request->input('order',1);
         $order_str = 'asc';
         if($order){
             $order_str = 'desc';
         }
-        $list = Column::where("status",'1')->orderBy('sort',$order_str)->get();
-
-//        var_dump($list);
-
-
-        return Response()->json([
-            'code' => '',
-            'msg' => '',
-            'data'=> $list,
-        ]);
+        $field = ['id', 'name', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic'];
+        $list = Column::where("status",'1')->orderBy('sort',$order_str)->get($field);
+        return $this->success($list);
     }
+
+
+
+    public function getColumnDetail(Request $request){
+        //排序
+        $column_user_id = $request->input('column_user_id',0);
+        if( empty($column_user_id) ){
+            return $this->error(0,'column_user_id 不能为空');
+        }
+
+        $field = ['id', 'name', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic'];
+
+        $column = Column::where('user_id',$column_user_id)
+                    ->first($field)->toArray();
+        if( empty($column) ){
+            return $this->error(0,'专栏不存在不能为空');
+        }
+        $works_data= [];
+        $column_outline= [];
+        //多课程
+        if($column['type'] == 1){
+            $works_data = Works::select(['id','type','title','cover_img','detail_img','message','is_pay'])->where('status',4)
+                ->where('status',4)->get();
+
+        }else if($column['type'] == 2){
+            //单课程查询【 多了专栏大纲 】
+            //查询专栏对应的关联大纲表 并查询章节
+            $outline = ColumnOutline::select('id', 'name')->where('column_id',$column['id'])->orderBy('sort','asc')->get()->toArray();
+            $outline_id = array_column($outline, 'id');
+            $works_info = WorksInfo::whereIn('outline_id',$outline_id)->get()->toArray();
+
+            //按照大纲表排序进行数据章节处理
+            foreach ($outline as $key=>$val){
+                $column_outline[$key]['name'] = $val['name'];
+                $column_outline[$key]['works_info'] = [];
+
+                foreach ($works_info as $k=>$v){
+                    if($v['outline_id'] == $val['id']){
+                        //章节信息
+                        $column_outline[$key]['works_info'][] = $v;
+                    }
+                }
+            }
+        }
+        $res = [
+            'column_info'  =>$column,
+            'works_data'   =>$works_data,
+            'outline_data' =>$column_outline,
+        ];
+        return $this->success($res);
+    }
+
+
+
 }
