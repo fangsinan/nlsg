@@ -40,11 +40,7 @@ class Column extends Model
         if($level) return 1;
 
         if($user_id && $target_id && $type ){
-            $where = [
-                'type' => $type,
-                'user_id' => $user_id,  //用户id
-            ];
-
+            $where = ['type' => $type, 'user_id' => $user_id,];
             //处理专栏的关注信息
             if($type == 1){
                 $where['column_id'] = $target_id;
