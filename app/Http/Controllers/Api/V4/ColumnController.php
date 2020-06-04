@@ -93,7 +93,7 @@ class ColumnController extends Controller
     /**
      * 专栏首页列表
      */
-    public function get_list(Request $request){
+    public function get_column_list(Request $request){
         //排序
         $order = $request->input('order',1);
         $order_str = 'asc';
