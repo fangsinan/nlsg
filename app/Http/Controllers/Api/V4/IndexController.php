@@ -23,7 +23,7 @@ class IndexController extends Controller
     public function announce()
     {
         $list = Announce::select('id','content')
-            ->latest()->first()->toArray();
+            ->first()->toArray();
         return $this->success($list);
     }
     /**
@@ -35,10 +35,7 @@ class IndexController extends Controller
      */
     public function banner()
     {
-
     }
-
-
 
 
 }
