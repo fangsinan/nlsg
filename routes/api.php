@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::namespace('Api\V4')->group(function(){
-   Route::get('index', 'IndexController@index');
-
+   Route::get('/v4/index', 'IndexController@index');
+   Route::get('/v4/announce', 'IndexController@announce');
+   Route::get('/v4/banner', 'IndexController@banner');
 });
