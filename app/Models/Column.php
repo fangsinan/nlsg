@@ -41,7 +41,7 @@ class Column extends Model
 
             //处理专栏的关注信息
             if($type == 1){
-                $where['author_user_id'] = $target_id;
+                $where['column_id'] = $target_id;
             }else if($type == 2){
                 $where['works_id'] = $target_id;
             }else if($type == 3){

@@ -126,8 +126,12 @@ class ColumnController extends Controller
         $column_outline= [];
         //多课程
         if($column['type'] == 1){
-            $works_data = Works::select(['id','type','title','cover_img','detail_img','message','is_pay'])->where('status',4)
-                ->where('status',4)->get();
+            $works_data = Works::select(['id','type','title','cover_img','detail_img','message','is_pay','is_end','is_free','subscribe_num'])
+                ->where('column_id', $column_id)->where('status',4)->get();
+
+            foreach ($works_data as $key=>$val){
+                $works_data[$key]['is_sub'] = Column::isSubscribe($user_id,$val['id'],2);
+            }
 
         }else if($column['type'] == 2){
             //单课程查询【 多了专栏大纲 】
