@@ -112,7 +112,7 @@ class ColumnController extends Controller
             return $this->error(0,'column_id 不能为空');
         }
 
-        $field = ['id', 'name', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic','subscribe_num'];
+        $field = ['id', 'name', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
         $column = Column::where('id',$column_id)
                     ->first($field)->toArray();
         if( empty($column) )    {
