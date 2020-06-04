@@ -24,6 +24,7 @@ class Column extends Model
     public function user()
     {
         return $this->hasOne('App\Models\User', 'user_id','id');
+        //->select(['field']);
     }
 
     /**
@@ -33,6 +34,11 @@ class Column extends Model
      * */
     static function isSubscribe($user_id=0,$target_id=0,$type=0){
         $is_sub = 0;
+
+        //会员都免费
+        $level = User::getLevel($user_id);
+        if($level) return 1;
+
         if($user_id && $target_id && $type ){
             $where = [
                 'type' => $type,
@@ -46,8 +52,6 @@ class Column extends Model
                 $where['works_id'] = $target_id;
             }else if($type == 3){
                 $where['live_id'] = $target_id;
-            }else if($type == 5){
-                $where['product_id'] = $target_id;
             }else{
                 //type 类型错误直接返回0
                 return 0;

@@ -11,6 +11,18 @@ class User extends Authenticatable
     use Notifiable;
     protected $table = 'nlsg_user';
 
+    static function getLevel($uid=0){
+        if(!$uid)return 0;
+        $user = User::find($uid);
+
+        //判断会员
+        $time    = strtotime(date('Y-m-d', time())) + 86400;
+        if (!empty($user) && in_array ($user->level, [3,4,5]) && $user['expire_time']>$time) { //会员
+            return $user->level;
+        }else{
+            return 0;
+        }
+    }
     /**
      * The attributes that are mass assignable.
      *
