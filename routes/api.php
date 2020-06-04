@@ -14,7 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::namespace('Api')->group(function(){
-   Route::get('index', 'IndexController@index');
+Route::namespace('Api\V4')->group(function(){
+    Route::get('index', 'IndexController@index');
+    Route::get('column/index', 'ColumnController@index');
+    Route::get('column/get_list', 'ColumnController@get_list');
+
+//    Route::match(['get','post'],'column/get_list', 'ColumnController@get_list');
 
 });
