@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\ColumnOutline;
+use App\Models\Subscribe;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
@@ -36,7 +37,7 @@ class WorksController extends Controller
         }
         $works_data = $works_data->toArray();
         //是否订阅
-        $is_sub = Column::isSubscribe($user_id,$works_id,2);
+        $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
 
         //查询所属专栏
         $field = ['id', 'name', 'type', 'user_id', 'subtitle', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
@@ -53,8 +54,9 @@ class WorksController extends Controller
 
 
         $res = [
-            'column_info'  =>$column,
-            'works_data'   =>$works_data,
+            'column_info'  => $column,
+            'works_data'   => $works_data,
+            'works_info'   => $info,
         ];
         return $this->success($res);
     }

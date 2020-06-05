@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\ColumnOutline;
+use App\Models\Subscribe;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
@@ -112,7 +113,7 @@ class ColumnController extends Controller
             return $this->error(0,'专栏不存在不能为空');
         }
         //是否关注
-        $column['is_sub'] = Column::isSubscribe($user_id,$column['user_id'],1);
+        $column['is_sub'] = Subscribe::isSubscribe($user_id,$column['user_id'],1);
 
 
         $works_data= [];
@@ -123,7 +124,7 @@ class ColumnController extends Controller
                 ->where('column_id', $column_id)->where('status',4)->get();
 
             foreach ($works_data as $key=>$val){
-                $works_data[$key]['is_sub'] = Column::isSubscribe($user_id,$val['id'],2);
+                $works_data[$key]['is_sub'] = Subscribe::isSubscribe($user_id,$val['id'],2);
             }
 
         }else if($column['type'] == 2){
