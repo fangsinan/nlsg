@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Collection;
 use App\Models\Column;
 use App\Models\ColumnOutline;
 use App\Models\History;
@@ -20,10 +21,15 @@ class WorksController extends Controller
     }
 
     /**
+     * 课程首页
+     */
+    public function getWorksIndex(Request $request){
+
+    }
+    /**
      * 音频详情列表
      */
     public function getWorksDetail(Request $request){
-        //排序
         $works_id = $request->input('works_id',0);
         $user_id   = $request->input('user_id',0);
         if( empty($works_id) ){
@@ -113,7 +119,18 @@ class WorksController extends Controller
             ]);
         return $this->success();
     }
-
+    /**
+     * 收藏课程
+     */
+    public function worksCollection(Request $request){
+        $works_id = $request->input('works_id',0);
+        $user_id   = $request->input('user_id',0);
+        if( empty($works_id) || empty($user_id) ){
+            return $this->error(0,'works_id 或者user_id 不能为空');
+        }
+        $is_collection = Collection::CollectionData($user_id,$works_id,2);
+        return $this->success($is_collection);
+    }
 
 
 }

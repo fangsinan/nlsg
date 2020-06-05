@@ -30,6 +30,16 @@ class Column extends Model
         //->select(['field']);
     }
 
+    static function getColumnInfo($column_id,$field,$user_id=0){
+        $column = Column::where('id',$column_id)->first($field)->toArray();
+        if( empty($column) )    {
+            return [];
+        }
+        //是否关注
+        $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
+        return $column;
+    }
+
     /**
      * 首页专栏推荐
      * @param $ids

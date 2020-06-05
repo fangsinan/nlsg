@@ -15,69 +15,7 @@ class ColumnController extends Controller
 
     public function index(Request $request)
     {
-//            $model = Column::whereHas('user', function ($query) use ($name) {
-//                $query->where('username', $name);
-//            })->get('nlsg_user.name','id');
-
-
-//            $model = Column::whereHas('user', function ($query) use ($name) {
-//                $query->where('id', 211172);
-//            })->where('id', 3)->with(
-////                'user:id','user:username'
-//                ['user'=>function($query){
-//                    $query->select('id','username');
-//                }]
-//            )->get();
-
-
-//            dd($model);die;
-            //$email = Column::where('status',1)->get($field);
-            //$email = Column::first($field);
-//            all();
-//            find();
-//            findOrFail(2)
-//            get()
-//            first()
-//            chunk();
-
-//            echo "<pre>";
-//            Column::chunk(1, function ($c){
-//                var_dump($c);
-//            });
-//            $c = Column::min('id');
-//            dd($c);
-//            $cObj = new Column();
-//            $cObj->name = '专栏1';
-//            $cObj->user_id = 211172;
-//            $c = $cObj->save();
-
-//            $c = Column::create([
-//                    'name'=>'专栏2',
-//                    'user_id'=>211172,]
-//            );
-//            $c = Column::firstOrCreate([
-//                    'name'=>'专栏2',
-//                    'user_id'=>211172,
-//                ]);
-//            $c = Column::where('id',7)->update([
-//                'name'=>'专栏2',
-//                'status'=>2,
-//            ]);
-
-            //通过主键删除 str or arr
-            //Column::destroy(4,10);
-
-//            $c = Column::where('id',7)->delete();
-//            dd($c);
-
-
-//            $email = Column::where('status',1)->orderBy()->get($field);
-//            dd($email);
-
-//            $email = Column::where('status',1)->paginate(1);
-
-//var_dump($email);die;
-            return 'hello world';
+        return 'hello world';
 
     }
 
@@ -97,8 +35,11 @@ class ColumnController extends Controller
     }
 
 
-
-    public function getColumnDetail(Request $request){
+    /**
+     * 专栏详情 (单\多课程列表)
+     *
+    */
+    public function getColumnWorks(Request $request){
         //排序
         $column_id = $request->input('column_id',0);
         $user_id   = $request->input('user_id',0);
@@ -107,14 +48,10 @@ class ColumnController extends Controller
         }
 
         $field = ['id', 'name', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
-        $column = Column::where('id',$column_id)
-                    ->first($field)->toArray();
+        $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) )    {
             return $this->error(0,'专栏不存在不能为空');
         }
-        //是否关注
-        $column['is_sub'] = Subscribe::isSubscribe($user_id,$column['user_id'],1);
-
 
         $works_data= [];
         $column_outline= [];
@@ -150,6 +87,26 @@ class ColumnController extends Controller
         ];
         return $this->success($res);
     }
+
+
+    //试读 专栏介绍 [标题...]
+    public function getColumnDetail(Request $request){
+
+        $column_id = $request->input('column_id',0);
+        $user_id   = $request->input('user_id',0);
+        if( empty($column_id) ){
+            return $this->error(0,'column_id 不能为空');
+        }
+        $field = ['id', 'name', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
+        $column = Column::getColumnInfo($column_id,$field,$user_id);
+        if( empty($column) )    {
+            return $this->error(0,'专栏不存在不能为空');
+        }
+        return $this->success([
+            'column_info'  =>$column,
+        ]);
+    }
+
 
 
 

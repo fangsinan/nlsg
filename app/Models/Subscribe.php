@@ -35,8 +35,8 @@ class Subscribe extends Authenticatable
                 //type 类型错误直接返回0
                 return 0;
             }
-            $sub_data = Subscribe::where($where)->get()->toArray();
-            if($sub_data){
+            $sub_data = Subscribe::where($where)->first();
+            if( $sub_data ){
                 $is_sub = 1;
             }
         }
