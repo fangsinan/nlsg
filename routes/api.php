@@ -4,7 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
-  <<<<<<< HEAD
   |--------------------------------------------------------------------------
   | API Routes
   |--------------------------------------------------------------------------
@@ -15,14 +14,25 @@ use Illuminate\Support\Facades\Route;
   |
  */
 
-Route::namespace('Api')->group(function() {
-    Route::get('index', 'IndexController@index');
-});
 
 Route::namespace('Api\V4')->group(function() {
-    Route::get('/v4/index', 'IndexController@index');
-    Route::get('/v4/announce', 'IndexController@announce');
-    Route::get('/v4/banner', 'IndexController@banner');
+
+    Route::get('/v4/index/announce', 'IndexController@announce');
+    Route::get('/v4/index/banner', 'IndexController@banner');
+    Route::get('/v4/index/live', 'IndexController@live');
+    Route::get('/v4/index/column', 'IndexController@column');
+    Route::get('/v4/index/works', 'IndexController@works');
+
+    //专栏
+    Route::get('/v4/column/get_column_list', 'ColumnController@getColumnList');
+    Route::get('/v4/column/get_column_detail', 'ColumnController@getColumnDetail');
+    //课程
+    Route::get('/v4/works/get_works_detail', 'WorksController@getWorksDetail');
+    Route::get('/v4/works/show', 'WorksController@show');
+    Route::get('/v4/works/edit_history_time', 'WorksController@editHistoryTime');
+
+
+    //商城部分
     Route::get('/V4/goods/info', 'MallController@goodsList');
     Route::get('/V4/goods/coupon_list', 'MallController@couponList');
     Route::get('/V4/goods/comment_list', 'MallController@commentList');
