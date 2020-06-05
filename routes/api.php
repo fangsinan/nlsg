@@ -23,4 +23,12 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/v4/index/column', 'IndexController@column');
     Route::get('/v4/index/works', 'IndexController@works');
     Route::get('/V4/goods/index', 'MallController@goods_list');
+    //专栏
+    Route::get('/v4/column/get_column_list', 'ColumnController@getColumnList');
+    Route::get('/v4/column/get_column_detail', 'ColumnController@getColumnDetail');
+    //课程
+    Route::get('/v4/works/get_works_detail', 'WorksController@getWorksDetail');
+    Route::get('/v4/works/show', 'WorksController@show');
+    Route::get('/v4/works/edit_history_time', 'WorksController@editHistoryTime');
+
 });
