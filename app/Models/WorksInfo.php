@@ -21,7 +21,7 @@ class WorksInfo extends Model
     }
 
 
-    public function getInfo($works_id,$is_sub=0){
+    public function getInfo($works_id,$is_sub=0,$user_id=0){
         $works_data = WorksInfo::select([
             'id','type','title','section','introduce','url','callback_url1','callback_url1', 'callback_url2', 'callback_url3','view_num','duration','free_trial'
         ])->where('status',4)->where('pid',$works_id)->orderBy('order','asc')->get()->toArray();
@@ -41,7 +41,24 @@ class WorksInfo extends Model
             unset($works_data[$key]['callback_url2']);
             unset($works_data[$key]['callback_url1']);
             unset($works_data[$key]['url']);
+
+            $works_data[$key]['time_leng'] = 0;
+            $works_data[$key]['time_number'] = 0;
+            if($user_id){
+                //单章节 学习记录 百分比
+                $his_data = History::select('time_leng','time_number')->where([
+                    'works_id'     => $works_id,
+                    'worksinfo_id' => 1,
+                    'user_id'      => $user_id,
+                    'is_del'       => 0,
+                ])->orderBy('updated_at','desc')->first();
+                if($his_data){
+                    $works_data[$key]['time_leng'] = $his_data->time_leng;
+                    $works_data[$key]['time_number'] = $his_data->time_number;
+                }
+            }
         }
+
 
         return $works_data;
     }

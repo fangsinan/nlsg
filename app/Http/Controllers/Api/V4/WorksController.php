@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\ColumnOutline;
+use App\Models\History;
 use App\Models\Subscribe;
 use App\Models\Works;
 use App\Models\WorksInfo;
@@ -15,7 +16,7 @@ class WorksController extends Controller
 
     public function index()
     {
-            return 'hello world';
+        return 'hello world';
     }
 
     /**
@@ -50,7 +51,7 @@ class WorksController extends Controller
         }
         //查询章节
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($works_data['id'],$is_sub);
+        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id);
 
 
         $res = [
@@ -59,6 +60,58 @@ class WorksController extends Controller
             'works_info'   => $info,
         ];
         return $this->success($res);
+    }
+
+    //点播时 记录首次历史记录 阅读数自增
+    public function show(Request $request){
+        $user_id    = $request->input('user_id',0);
+        $column_id  = $request->input('column_id',0);
+        $works_id   = $request->input('works_id',0);
+        $works_info_id = $request->input('works_info_id',0);
+        if( empty($works_id) || empty($works_info_id)){
+            return $this->success();
+        }
+        //课程和章节自增
+        WorksInfo::increment('view_num');
+        Works::increment('view_num');
+        if( empty($user_id) ) return $this->success();
+
+        History::firstOrCreate([
+            'column_id' =>$column_id,
+            'works_id'  =>$works_id,
+            'worksinfo_id' =>$works_info_id,
+            'user_id'   =>$user_id,
+            'is_del'    =>0,
+        ]);
+        return $this->success();
+    }
+
+    //更新学习进度 时长及百分比
+    public function editHistoryTime(Request $request){
+        $user_id    = $request->input('user_id',0);
+        $column_id  = $request->input('column_id',0);
+        $works_id   = $request->input('works_id',0);
+        $time_leng  = $request->input('time_leng',0);
+        $time_number= $request->input('time_number',0);
+        $works_info_id = $request->input('works_info_id',0);
+
+        if( empty($user_id) || empty($works_id) || empty($works_info_id)){
+            return $this->success();
+        }
+        //防止 show接口未请求
+        $his = History::firstOrCreate([
+            'column_id' =>$column_id,
+            'works_id'  =>$works_id,
+            'worksinfo_id' =>$works_info_id,
+            'user_id'   =>$user_id,
+            'is_del'    =>0,
+        ]);
+        //更新学习进度
+        History::where('id',$his->id)->update([
+            'time_leng'=>$time_leng,
+            'time_number'=>$time_number,
+            ]);
+        return $this->success();
     }
 
 
