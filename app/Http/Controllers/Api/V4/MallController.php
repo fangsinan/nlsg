@@ -56,7 +56,8 @@ class MallController extends Controller {
      * @apiSuccess {number} picture_list.id 图片id
      * @apiSuccess {string} picture_list.url 图片地址
      * @apiSuccess {number} picture_list.is_main 1:主图
-     * @apiSuccess {number} picture_list.is_video 1:表示是视频
+     * @apiSuccess {number} picture_list.is_video 1:表示是视频 
+     * @apiSuccess {number} picture_list.duration 视频时长(单位秒)
      * 
      * @apiSuccess {string[]} tos_list 服务说明
      * @apiSuccess {string} tos_list.title 标题
@@ -371,4 +372,13 @@ class MallController extends Controller {
         }
     }
 
+    //todo banner(轮播,分类下方的banner)
+    //todo 推荐位(教学工具,家庭图书,时光文创)
+    //todo 秒杀和拼团预告,秒杀和拼团首页
+    //todo 拼团商品详情
+    //todo 优选爆款
+
+    //todo 商品购买说明(详情页下方)和商城首页服务说明(满88包邮等)
+    //todo 建立免邮优惠券
+    //todo 我的地址
 }

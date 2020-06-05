@@ -25,7 +25,7 @@ class MallPicture extends Model {
         $list = DB::table('nlsg_mall_picture')
                 ->where('goods_id', '=', $goods_id)
                 ->where('status', '=', 1)
-                ->select(['id', 'url', 'is_main', 'is_video'])
+                ->select(['id', 'url', 'is_main', 'is_video','duration'])
                 ->orderBy('is_video', 'desc')
                 ->orderBy('is_main', 'desc')
                 ->orderBy('rank', 'asc')
