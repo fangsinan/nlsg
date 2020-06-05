@@ -20,31 +20,30 @@ class WorksInfo extends Model
         return time();
     }
 
+
     public function getInfo($works_id,$is_sub=0){
         $works_data = WorksInfo::select([
             'id','type','title','section','introduce','url','callback_url1','callback_url1', 'callback_url2', 'callback_url3','view_num','duration','free_trial'
         ])->where('status',4)->where('pid',$works_id)->orderBy('order','asc')->get()->toArray();
 
-
         foreach ($works_data as $key=>$val){
             //处理url  关注或试听
+            $works_data[$key]['href_url'] = '';
             if( $is_sub == 1 || $val['free_trial'] == 1 ){
-                $works_data[$key]['url'] = WorksInfo::GetWorksUrl ([
+                $works_data[$key]['href_url'] = WorksInfo::GetWorksUrl ([
                     'callback_url3' => $val['callback_url3'],
                     'callback_url2' => $val['callback_url2'],
                     'callback_url1' => $val['callback_url1'],
                     'url' => $val['url'],
                 ]);
-            }else{
-                //url置为空
-                $works_data[$key]['url'] = '';
-                $works_data[$key]['callback_url1'] = '';
-                $works_data[$key]['callback_url2'] = '';
-                $works_data[$key]['callback_url3'] = '';
-
             }
-
+            unset($works_data[$key]['callback_url3']);
+            unset($works_data[$key]['callback_url2']);
+            unset($works_data[$key]['callback_url1']);
+            unset($works_data[$key]['url']);
         }
+
+        return $works_data;
     }
 
     static function GetWorksUrl($WorkArr){
