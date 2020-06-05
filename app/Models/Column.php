@@ -14,6 +14,9 @@ class Column extends Model
     // 允许批量赋值
     protected  $fillable = ['name','user_id'];
 
+    //状态 1上架  2 下架
+    const STATUS_ONE = 1;
+    const STATUS_TWO = 2;
 
     public function getDateFormat()
     {
@@ -27,14 +30,23 @@ class Column extends Model
         //->select(['field']);
     }
 
-    public function get($field){
-        $email = DB::table('nlsg_column')
-            ->where('status', 1)
-            ->orderBy('sort', 'desc')
-            ->get($field)
-            ->map(function ($value) {
-                return (array)$value;
-            })->toArray();
-        return $email;
+    /**
+     * 首页专栏推荐
+     * @param $ids
+     * @return bool
+     */
+    public function getIndexColumn($ids)
+    {
+        if (!$ids){
+            return false;
+        }
+        $lists= $this->select('id','name', 'title','subtitle', 'message','price', 'cover_pic')
+            ->whereIn('id', $ids)
+            ->where('status',self::STATUS_ONE)
+            ->orderBy('created_at', 'desc')
+            ->take(2)
+            ->get()
+            ->toArray();
+        return $lists;
     }
 }
