@@ -23,5 +23,7 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/v4/index', 'IndexController@index');
     Route::get('/v4/announce', 'IndexController@announce');
     Route::get('/v4/banner', 'IndexController@banner');
-    Route::get('/V4/goods/index', 'MallController@goods_list');
+    Route::get('/V4/goods/info', 'MallController@goodsList');
+    Route::get('/V4/goods/coupon_list', 'MallController@couponList');
+    Route::get('/V4/goods/comment_list', 'MallController@commentList');
 });

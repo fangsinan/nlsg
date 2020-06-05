@@ -9,7 +9,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Description of Config
@@ -25,10 +25,10 @@ class ConfigModel extends Model {
         $expire_num = 3600;
         $cache_key_name = 'v4_config_' . $id;
 
-        $res = Redis::get($cache_key_name);
+        $res = Cache::get($cache_key_name);
         if (empty($res)) {
             $res = self::getFromDb($id);
-            Redis::set($cache_key_name, $res, $expire_num);
+            Cache::add($cache_key_name, $res, $expire_num);
         }
         return $res;
     }
