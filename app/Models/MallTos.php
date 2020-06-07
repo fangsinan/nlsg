@@ -17,4 +17,5 @@ use Illuminate\Support\Facades\DB;
 class MallTos  extends Model {
 
     protected $table = 'nlsg_mall_tos';
+
 }

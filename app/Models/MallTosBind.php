@@ -31,5 +31,13 @@ class MallTosBind extends Model {
 
         return $list->toArray();
     }
+    
+    
+        
+    public function tos() {
+        return $this->hasMany('App\Models\MallTos', 'id', 'tos_id')
+                        ->where('status', '=', 1)
+                        ->select(['title', 'content', 'icon','id']);
+    }
 
 }

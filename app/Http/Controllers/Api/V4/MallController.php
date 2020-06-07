@@ -27,18 +27,17 @@ class MallController extends Controller {
      * @apiParam {number} [size] 条数,默认10
      * @apiParam {number} [get_all] 1:不设置分页,都传回
      * 
-     * 
      * @apiSuccess {number} id 商品id
      * @apiSuccess {string} name 商品名称
      * @apiSuccess {string} subtitle 副标题
      * @apiSuccess {string} picture 图片
      * @apiSuccess {number} original_price 原价
      * @apiSuccess {number} price 售价
-     * @apiSuccess {string} category 分类名称
-     * @apiSuccess {string} category_id 分类id
      * @apiSuccess {number} stock 库存
      * @apiSuccess {string} content 商品详情
-     *
+     * 
+     * @apiSuccess {string[]} cagetory_list 分类
+     * @apiSuccess {string[]} cagetory_list.name 分类名称
      * 
      * @apiSuccess {string[]} sku_list 规格列表
      * @apiSuccess {number} sku_list.id 规格id
@@ -59,10 +58,9 @@ class MallController extends Controller {
      * @apiSuccess {number} picture_list.is_video 1:表示是视频 
      * @apiSuccess {number} picture_list.duration 视频时长(单位秒)
      * 
-     * @apiSuccess {string[]} tos_list 服务说明
-     * @apiSuccess {string} tos_list.title 标题
-     * @apiSuccess {string} tos_list.content 内容
-     * @apiSuccess {string} tos_list.icon 图标
+     * @apiSuccess {string[]} tos_bind_list 服务说明
+     * @apiSuccess {string} tos_list.tos.title 标题
+     * @apiSuccess {string} tos_list.tos.content 内容
      * 
      * @apiSuccess {string[]} active_group_list 促销活动(可能多条,以第一条为准)
      * @apiSuccess {number} active_group_list.id 活动id
@@ -77,9 +75,11 @@ class MallController extends Controller {
      * @apiSuccess {string} active_group_list.wx_share_desc 分享内容
      * 
      * @apiSuccess {string[]} sp_info 商品特价详情
-     * @apiSuccess {number} sp_info.group_buy 是否有拼团,1有
-     * @apiSuccess {number} sp_info.sp_type 当前商品特价表示(1:折扣  2:秒杀  3.凑单)
-     * @apiSuccess {string[]} sp_info.list 所有活动类型列表([2,3,1])
+     * @apiSuccess {number} sp_info.group_buy 空表示没有拼团或多 不是空且price有值表有拼团和拼团的价格
+     * @apiSuccess {number} sp_info.count.price 空表示没有几元几件 不是空且price有值表有几元几件和几元几件的价格
+     *  @apiSuccess {number} sp_info.count.num 空表示没有几元几件 不是空且num有值表有几元几件和几元几件的数量
+     * @apiSuccess {number} sp_info.sp_type 当前商品特价表示(1:折扣  2:秒杀)
+     * @apiSuccess {string[]} sp_info.list 所有活动类型列表([2,1])
      * 
      * 
      * @apiSuccessExample {json} Request-Example:
@@ -371,8 +371,8 @@ class MallController extends Controller {
             return $this->success($data);
         }
     }
-    
-    public function hasTest(){
+
+    public function hasTest() {
         $model = new MallGoods();
         $res = $model->has_test_goods();
         return $this->success($res);
@@ -383,7 +383,6 @@ class MallController extends Controller {
     //todo 秒杀和拼团预告,秒杀和拼团首页
     //todo 拼团商品详情
     //todo 优选爆款
-
     //todo 商品购买说明(详情页下方)和商城首页服务说明(满88包邮等)
     //todo 建立免邮优惠券
     //todo 我的地址
