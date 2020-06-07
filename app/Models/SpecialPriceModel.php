@@ -89,8 +89,6 @@ class SpecialPriceModel extends Model {
         //config  活动优先顺序
         $sp_type_order = ConfigModel::getData(2);
 
-        //CacheTools::getLastSqlBegin();
-
         $list = DB::table('nlsg_special_price')
                 ->where('goods_id', '=', $id)
                 ->where('goods_type', '=', $goods_type)
@@ -112,7 +110,6 @@ class SpecialPriceModel extends Model {
                 ])
                 ->get();
 
-        //dd(CacheTools::getLastSql());
         return $list;
     }
 

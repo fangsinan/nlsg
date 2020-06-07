@@ -161,4 +161,50 @@ class MallGoods extends Model {
         return $res;
     }
 
+    //**************************************************
+    public function has_test_goods() {
+
+        DB::connection()->enableQueryLog();
+
+        if (1) {
+            //一堆多的预加载
+            if (0) {
+                //遍历的方法
+                $goods_list = MallGoods::limit(5)->offset(0)
+                                ->orderBy('id', 'desc')
+                                ->with(['goods_sku_list'])->get();
+                foreach ($goods_list as $v) {
+                    foreach ($v->goods_sku_list as $vv) {
+                        $vv->goods_sku_vavlue_list;
+                    }
+                }
+            } else {
+                //多层级预加载
+                $goods_list = MallGoods::limit(5)->offset(0)
+                        ->orderBy('id', 'desc')
+                        ->with([
+                            'goods_sku_list',
+                            'goods_sku_list.goods_sku_vavlue_list'
+                        ])
+                        ->get();
+            }
+
+
+            $sql = DB::getQueryLog();
+            return ['goods_list' => $goods_list, 'sql' => $sql];
+        }
+
+
+
+
+        $sql = DB::getQueryLog();
+
+        return $goods_list;
+    }
+
+    public function goods_sku_list() {
+        return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
+                        ->where('status', '=', 1);
+    }
+
 }

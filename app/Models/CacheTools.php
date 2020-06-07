@@ -42,12 +42,4 @@ class CacheTools {
         return $exprie;
     }
 
-    public static function getLastSqlBegin() {
-        return DB::connection()->enableQueryLog();
-    }
-
-    public static function getLastSql() {
-        return DB::getQueryLog();
-    }
-
 }

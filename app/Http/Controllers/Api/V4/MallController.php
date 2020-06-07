@@ -371,6 +371,12 @@ class MallController extends Controller {
             return $this->success($data);
         }
     }
+    
+    public function hasTest(){
+        $model = new MallGoods();
+        $res = $model->has_test_goods();
+        return $this->success($res);
+    }
 
     //todo banner(轮播,分类下方的banner)
     //todo 推荐位(教学工具,家庭图书,时光文创)

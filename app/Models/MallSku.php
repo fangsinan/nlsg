@@ -49,4 +49,10 @@ class MallSku extends Model {
         return $sku->toArray();
     }
 
+    public function goods_sku_vavlue_list() {
+        return $this->hasMany('App\Models\MallSkuValue', 'sku_id', 'id')
+                        ->where('status', '=', 1)
+                        ->select(['id', 'sku_id', 'key_name', 'value_name']);
+    }
+
 }
