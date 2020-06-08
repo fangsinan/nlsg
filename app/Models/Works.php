@@ -46,7 +46,7 @@ class Works extends Model
 
     public  function user()
     {
-        return $this->belongsTo('App\Models\User')->select('id', 'username');
+        return $this->belongsTo('App\Models\User','user_id','id')->select('id', 'username');
     }
 
 }
