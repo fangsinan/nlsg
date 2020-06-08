@@ -21,7 +21,7 @@ class WorksCategory extends Model
 
     public function CategoryRelation()
     {
+        //一对多
         return $this->hasMany('App\Models\WorksCategoryRelation','category_id');
-//        return $this->belongsTo('App\Models\WorksCategoryRelation','category_id','id')->select('id');
     }
 }

@@ -9,8 +9,11 @@ use App\Models\ColumnOutline;
 use App\Models\History;
 use App\Models\Subscribe;
 use App\Models\Works;
+use App\Models\WorksCategory;
+use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WorksController extends Controller
 {
@@ -24,7 +27,22 @@ class WorksController extends Controller
      * 课程首页
      */
     public function getWorksIndex(Request $request){
+    }
 
+
+    /**
+     * 课程分类
+     */
+    public function getWorksCategory(Request $request){
+        //分类
+        DB::enableQueryLog();
+        $category = WorksCategory::select()->with([
+            'CategoryRelation'=>function($query) {
+                $query->select('category_id');
+            }
+        ])->get()->toArray();
+        dump($category);
+        dd(DB::getQueryLog());
     }
     /**
      * 音频详情列表
@@ -43,6 +61,14 @@ class WorksController extends Controller
             return $this->error(0,'课程不存在或已下架');
         }
         $works_data = $works_data->toArray();
+
+        //查询课程分类
+        $category = WorksCategoryRelation::select('category_id')->with([
+            'CategoryName'=>function($query) use($works_id){
+                $query->select('id','name')->where('status',1);
+            }])->where(['work_id'=>$works_id])->first();
+
+        $works_data['category_name'] = $category->CategoryName->name;
         //是否订阅
         $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
 
@@ -129,8 +155,12 @@ class WorksController extends Controller
             return $this->error(0,'works_id 或者user_id 不能为空');
         }
         $is_collection = Collection::CollectionData($user_id,$works_id,2);
+
         return $this->success($is_collection);
     }
+
+
+
 
 
 }
