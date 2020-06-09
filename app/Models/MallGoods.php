@@ -284,4 +284,21 @@ class MallGoods extends Model {
         return $res->toArray();
     }
 
+    /**
+     * 首页好物推荐
+     * @param $ids 相关作品id
+     * @return bool
+     */
+    public function getIndexGoods($ids)
+    {
+        $lists= MallGoods::query()
+            ->select('id','name','picture','original_price')
+            ->whereIn('id',$ids)
+            ->orderBy('created_at','desc')
+            ->take(10)
+            ->get()
+            ->toArray();
+        return $lists;
+    }
+
 }

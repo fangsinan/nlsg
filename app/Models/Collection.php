@@ -12,20 +12,14 @@ class Collection extends Authenticatable
     protected $fillable = ['type','user_id','column_id','works_id', 'worksinfo_id','goods_id','sku_number',];
 
     //收藏
-    //$type   1：课程  2：专栏 3 :商品
+    //$type   1：专栏  2：课程 3 :商品
     static function CollectionData($user_id=0,$target_id=0,$type=0 ){
-        $where = ['type' => $type, 'user_id' => $user_id,];
+
         //处理专栏的关注信息
-        if($type == 1){
-            $where['column_id'] = $target_id;
-        }else if($type == 2){
-            $where['works_id'] = $target_id;
-        }else if($type == 3){
-            $where['goods_id'] = $target_id;
-        }else{
-            //type 类型错误直接返回0
+        if( !in_array($type,[1,2,3]) ){
             return 0;
         }
+        $where = ['type' => $type, 'user_id' => $user_id,'relation_id'=>$target_id];
         $data = Collection::where($where)->first();
         if($data){
             //直接物理删除

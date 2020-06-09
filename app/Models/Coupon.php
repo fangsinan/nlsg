@@ -20,4 +20,14 @@ class Coupon extends Model {
 
     protected $table = 'nlsg_coupon';
 
+    static function getCouponMoney($coupon_id,$user_id,$price,$type=1){
+        $data = Coupon::select()->where([
+            'id'        => $coupon_id,
+            'user_id'   => $user_id,
+            'type'      => $type,
+            'status'    => 1,
+        ])->where('deadline','>=',time())
+        ->where('fullcut_price','>=',$price)->first();
+        return $data->money ?? 0;
+    }
 }
