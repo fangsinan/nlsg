@@ -33,11 +33,17 @@ class CacheTools {
             case 'goods_price_exprie':
                 $exprie = $sort_exprice;
                 break;
+            case 'goods_category_list':
+                $exprie = $long__exprice;
+                break;
             default :
                 $exprie = 0;
         }
 
         return $exprie;
     }
+    
+    
+    //coupon_rule_list 优惠券规则列表
 
 }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\MallGoods;
 use App\Models\CouponRule;
 use App\Models\MallComment;
+use App\Models\MallCategory;
 
 class MallController extends Controller {
 
@@ -94,47 +95,8 @@ class MallController extends Controller {
       "picture": "/nlsg/goods/20191026172620981048.jpg",
       "original_price": "379.00",
       "price": "5.00",
-      "category": "益智玩具",
-      "stock": "3327",
+      "category_id": 56,
       "content": "<p><img src=\"http://share.nlsgapp.com/wechat/mall/goods/15205072688377.jpg\"></p>",
-      "sku_list": [
-      {
-      "id": 1884,
-      "goods_id": 91,
-      "sku_number": "1612728266",
-      "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
-      "original_price": "379.00",
-      "price": "9.70",
-      "stock": 294,
-      "sku_value": [
-      {
-      "sku_id": 1884,
-      "key_name": "规格",
-      "value_name": "AR立体浮雕星座地球仪"
-      }
-      ]
-      }
-      ],
-      "picture_list": [
-      {
-      "id": 6711,
-      "url": "/wechat/mall/goods/vg_20181208142653.jpg",
-      "is_main": 0,
-      "is_video": 0
-      }
-      ],
-      "tos_list": [
-      {
-      "title": "7天可退还",
-      "content": "不影响销售的话",
-      "icon": "1.jpg"
-      },
-      {
-      "title": "14天保修",
-      "content": "不是人为损坏",
-      "icon": ""
-      }
-      ],
       "active_group_list": {
       "1": {
       "id": 1,
@@ -161,8 +123,33 @@ class MallController extends Controller {
       }
       }
       ],
+      "sku_list": [
+      {
+      "id": 1884,
+      "goods_id": 91,
+      "sku_number": "1612728266",
+      "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
+      "original_price": "379.00",
+      "price": "9.70",
+      "stock": 294,
+      "sku_vavlue_list": [
+      {
+      "id": 364,
+      "sku_id": 1884,
+      "key_name": "规格",
+      "value_name": "AR立体浮雕星座地球仪"
+      }
+      ]
+      }
+      ],
       "sp_info": {
-      "group_buy": 1,
+      "group_buy": {
+      "price": "5.00"
+      },
+      "count_buy": {
+      "price": "100.00",
+      "num": 3
+      },
       "sp_type": 2,
       "list": [
       2,
@@ -170,6 +157,45 @@ class MallController extends Controller {
       1,
       4
       ]
+      },
+      "tos_bind_list": [
+      {
+      "goods_id": 91,
+      "tos_id": 1,
+      "tos": [
+      {
+      "title": "7天可退还",
+      "content": "不影响销售的话",
+      "icon": "1.jpg",
+      "id": 1
+      }
+      ]
+      },
+      {
+      "goods_id": 91,
+      "tos_id": 2,
+      "tos": [
+      {
+      "title": "14天保修",
+      "content": "不是人为损坏",
+      "icon": "",
+      "id": 2
+      }
+      ]
+      }
+      ],
+      "picture_list": [
+      {
+      "url": "/wechat/mall/goods/vg_20181208142653.jpg",
+      "is_main": 0,
+      "is_video": 0,
+      "duration": "",
+      "goods_id": 91
+      }
+      ],
+      "category_list": {
+      "id": 56,
+      "name": "益智玩具"
       }
       }
       ]
@@ -372,10 +398,41 @@ class MallController extends Controller {
         }
     }
 
-    public function hasTest() {
-        $model = new MallGoods();
-        $res = $model->has_test_goods();
-        return $this->success($res);
+    /**
+     * 商品分类列表
+     * @api {post} /api/V4/goods/category_list 商品分类列表
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/goods/category_list
+     * @apiGroup  Mall
+     * @apiSampleRequest /api/V4/goods/category_list
+     * @apiDescription 获取商品分类列表
+     * 
+      @apiSuccess {number} id id
+      @apiSuccess {number} name 名称
+     * @apiSuccessExample {json} Request-Example:
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "id": 40,
+      "name": "家庭育儿"
+      },
+      {
+      "id": 41,
+      "name": "夫妻关系"
+      },
+      {
+      "id": 42,
+      "name": "心理励志"
+      }
+      ]
+      }
+     */
+    public function categoryList() {
+        $model = new MallCategory();
+        $data = $model->getUsedList();
+        return $this->success($data);
     }
 
     //todo banner(轮播,分类下方的banner)

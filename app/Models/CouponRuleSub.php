@@ -20,4 +20,10 @@ class CouponRuleSub extends Model {
 
     protected $table = 'nlsg_coupon_rule_sub';
 
+    public function goods_list() {
+        return $this->hasOne('App\Models\MallGoods', 'id', 'goods_id')
+                        ->where('status', '=', 2)
+                        ->select(['id', 'name']);
+    }
+
 }

@@ -189,7 +189,7 @@ class MallGoods extends Model {
     }
 
     public function category_list() {
-        return $this->hasMany('App\Models\MallCategory', 'id', 'category_id')
+        return $this->hasOne('App\Models\MallCategory', 'id', 'category_id')
                         ->select(['id', 'name'])
                         ->where('status', '=', 1);
     }

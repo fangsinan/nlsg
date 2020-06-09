@@ -36,4 +36,5 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/V4/goods/info', 'MallController@goodsList');
     Route::get('/V4/goods/coupon_list', 'MallController@couponList');
     Route::get('/V4/goods/comment_list', 'MallController@commentList');
+    Route::get('/V4/goods/category_list', 'MallController@categoryList');
 });

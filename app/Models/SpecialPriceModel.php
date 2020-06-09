@@ -12,15 +12,16 @@ class SpecialPriceModel extends Model {
 
     public function getPriceByGoodsId($id, $goods_type, $user_id) {
         $now = time();
-        $today_begin_time = strtotime(date('Y-m-d', $now));
-        $today_end_time = $today_begin_time + 86399;
+        $now_date = date('Y-m-d H:i:s',$now);
+        $today_begin_time = date('Y-m-d', $now);
+        $today_end_time = date('Y-m-d 23:59:59', $now);
 
         //获取所谓未结束活动信息
         $res = $this->getSpData($id, $goods_type);
 
         //筛选时间和库存
         foreach ($res as $k => $v) {
-            if ($v->begin_time > $now || $v->end_time < $now) {
+            if ($v->begin_time > $now_date || $v->end_time < $now_date) {
                 unset($res[$k]);
             }
 
@@ -93,7 +94,7 @@ class SpecialPriceModel extends Model {
                 ->where('goods_id', '=', $id)
                 ->where('goods_type', '=', $goods_type)
                 ->where('status', '=', 1)
-                ->where('end_time', '>', time())
+                ->where('end_time', '>', date('Y-m-d H:i:s'))
                 ->whereIn('type', [1, 2, 3, 4])
                 ->groupBy('type')
                 ->orderByRaw('FIELD(type,' . $sp_type_order . ') asc')
@@ -104,9 +105,7 @@ class SpecialPriceModel extends Model {
                     'sku_price', 'sku_price_black', 'sku_price_yellow', 'group_price',
                     'sku_price_dealer', 'is_set_t_money', 't_money', 't_money_black',
                     't_money_yellow', 't_money_dealer', 'begin_time', 'end_time',
-                    'type', 'use_coupon', 'group_name', 'group_num_type', 'group_num',
-                    DB::raw('FROM_UNIXTIME(begin_time) as begin_date'),
-                    DB::raw('FROM_UNIXTIME(end_time) as end_date')
+                    'type', 'use_coupon', 'group_name', 'group_num_type', 'group_num'
                 ])
                 ->get();
 
