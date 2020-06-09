@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+
 class Works extends Model
 {
     protected $table = 'nlsg_works';
@@ -34,7 +35,9 @@ class Works extends Model
         }
 
         $lists= Works::select('id','user_id','title','cover_img','subtitle','price')
-            ->with('user')
+            ->with(['user'=>function($query){
+                $query->select('id','username');
+            }])
             ->whereIn('id',$ids)
             ->orderBy('created_at','desc')
             ->get()
@@ -45,7 +48,15 @@ class Works extends Model
 
     public  function user()
     {
-        return $this->belongsTo('App\Models\User','user_id','id')->select('id', 'username');
+        return $this->belongsTo('App\Models\User');
     }
+
+
+    public function lists()
+    {
+        return $this->belongsToMany('App\Models\Lists',
+            'nlsg_lists_work','works_id', 'lists_id');
+    }
+
 
 }

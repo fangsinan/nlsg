@@ -133,6 +133,7 @@ class IndexController extends Controller
         $lists = $recommendModel->getIndexRecommend(1, 1);
         return $this->success($lists);
     }
+
     /**
      * @api {post} api/v4/index/column 首页-直播推荐
      * @apiVersion 1.0.0
@@ -182,6 +183,141 @@ class IndexController extends Controller
     {
         $recommendModel = new Recommend();
         $lists = $recommendModel->getIndexRecommend(2, 1);
+        return $this->success($lists);
+    }
+     /**
+      * @api {post} api/v4/index/book 首页-听书推荐
+      * @apiVersion 1.0.0
+      * @apiName  book
+      * @apiGroup Index
+      *
+      * @apiSuccessExample Success-Response:
+      * // 20200609161832
+     // http://v4.com/api/v4/index/book
+
+     {
+     "code": 200,
+     "msg": "成功",
+     "data": [
+     {
+     "id": 1,
+     "title": "世界名著必读，历经岁月经典依旧陪伴成长",
+     "subtitle": "强烈推荐",
+     "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
+     "created_at": "2020-06-08T10:00:00.000000Z",
+     "updated_at": "2020-06-08T10:00:00.000000Z",
+     "status": 1,
+     "works": [
+     {
+     "user_id": 168934,
+     "title": "不要羞辱你的孩子 他的心很脆弱",
+     "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+     "pivot": {
+     "lists_id": 1,
+     "works_id": 30
+     },
+     "user": {
+     "id": 168934,
+     "nick_name": "chandler_v4",
+     "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     }
+     },
+     {
+     "user_id": 168934,
+     "title": "小孩子做噩梦怎么办？九成父母都没当回事",
+     "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
+     "pivot": {
+     "lists_id": 1,
+     "works_id": 31
+     },
+     "user": {
+     "id": 168934,
+     "nick_name": "chandler_v4",
+     "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     }
+     }
+     ]
+     }
+     ]
+     }
+      */
+
+    public function book()
+    {
+        $recommendModel = new Recommend();
+        $lists = $recommendModel->getIndexRecommend(4, 1);
+        return $this->success($lists);
+    }
+
+    /**
+     * @api {post} api/v4/index/goods 首页-好物推荐
+     * @apiVersion 1.0.0
+     * @apiName  goods
+     * @apiGroup Index
+     *
+     * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 58,
+    "name": "得力 儿童益智绘画套装",
+    "picture": "/wechat/mall/mall/goods/7587_1520590551.png",
+    "original_price": "90.00"
+    },
+    {
+    "id": 59,
+    "name": "Novomill e-Button纽扣便携蓝牙音箱",
+    "picture": "/wechat/mall/mall/goods/3785_1519697155.png",
+    "original_price": "298.00"
+    }
+    ]
+    }
+     */
+    public  function goods()
+    {
+        $recommendModel = new Recommend();
+        $lists = $recommendModel->getIndexRecommend(8, 1);
+        return $this->success($lists);
+    }
+
+    /**
+     * @api {post} api/v4/index/wiki 首页-百科推荐
+     * @apiVersion 1.0.0
+     * @apiName  wiki
+     * @apiGroup Index
+     *
+     * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 1,
+    "name": "室内空气污染对孩子的危害",
+    "content": "社会的进步，工业的发展，导致污染越来越严重，触目惊心",
+    "cover": "",
+    "view_num": 10,
+    "like_num": 2,
+    "comment_num": 5
+    },
+    {
+    "id": 2,
+    "name": "世界名著必读岁月经典",
+    "content": "每个时代都有极其红极广受好评",
+    "cover": "",
+    "view_num": 5,
+    "like_num": 6,
+    "comment_num": 5
+    }
+    ]
+    }
+     */
+    public function wiki()
+    {
+        $recommendModel = new Recommend();
+        $lists = $recommendModel->getIndexRecommend(5, 1);
         return $this->success($lists);
     }
 
