@@ -10,8 +10,7 @@ class WorksCategory extends Model
 {
     protected $table = 'nlsg_works_category';
 
-    // 允许批量赋值
-    protected  $fillable = [''];
+
 
 
     public function getDateFormat()

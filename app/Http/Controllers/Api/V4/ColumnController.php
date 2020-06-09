@@ -89,7 +89,8 @@ class ColumnController extends Controller
             $order_str = 'desc';
         }
         $field = ['id', 'name', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic'];
-        $list = Column::where("status",'1')->orderBy('sort',$order_str)->get($field);
+        $list = Column::where("status",'1')->orderBy('updated_at', 'desc')
+                    ->orderBy('sort', $order_str)->get($field);
         return $this->success($list);
     }
 

@@ -44,9 +44,75 @@ class WorksController extends Controller
         dump($category);
         dd(DB::getQueryLog());
     }
+
+
     /**
-     * 音频详情列表
-     */
+     * @api {post} /api/v4/column/collection  音频详情列表
+     * @apiName collection
+     * @apiVersion 1.0.0
+     * @apiGroup Column
+     *
+     * @apiParam {int} works_id 课程id
+     * @apiParam {int} user_id 用户id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *
+     *
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "column_info": {
+    "id": 1,
+    "name": "王琨专栏",
+    "type": 1,
+    "user_id": 211172,
+    "subtitle": "顶尖导师 经营能量",
+    "message": "",
+    "original_price": "0.00",
+    "price": "0.00",
+    "online_time": 0,
+    "works_update_time": 0,
+    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+    "details_pic": "",
+    "is_end": 0,
+    "subscribe_num": 0
+    },
+    "works_data": {
+    "id": 16,
+    "column_id": 1,
+    "type": 1,
+    "title": "如何经营幸福婚姻",
+    "subtitle": "",
+    "cover_img": "/nlsg/works/20190822150244797760.png",
+    "detail_img": "/nlsg/works/20191023183946478177.png",
+    "message": null,
+    "content": "<p>幸福的婚姻是“同床同梦”，悲情的婚姻是“同床异梦”。两个相爱的人因为一时的爱慕之情走到一起，但在经过柴米油盐酱醋茶的考验后他们未必会幸福、未必会长久；两个不相爱的人走到一起，但在长时间的磨合之后他们未必不幸福、未必不长久。</p>",
+    "is_pay": 1,
+    "is_end": 1,
+    "is_free": 0,
+    "subscribe_num": 287,
+    "category_name": "父母关系"
+    },
+    "works_info": [
+    {
+    "id": 1,
+    "type": 2,
+    "title": "01何为坚毅",
+    "section": "第一章",
+    "introduce": "第一章",
+    "view_num": 3,
+    "duration": "04:35",
+    "free_trial": 1,
+    "href_url": "http://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/f63da4f95285890780889058541/aaodecBf5FAA.mp3",
+    "time_leng": "10",
+    "time_number": "5"
+    }
+    ]
+    }
+    }
+    */
     public function getWorksDetail(Request $request){
         $works_id = $request->input('works_id',0);
         $user_id   = $request->input('user_id',0);
@@ -94,7 +160,25 @@ class WorksController extends Controller
         return $this->success($res);
     }
 
-    //点播时 记录首次历史记录 阅读数自增
+    /**
+     * @api {post} /v4/works/show  点播时 记录首次历史记录 阅读数自增
+     * @apiName show
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiParam {int} column_id  专栏id
+     * @apiParam {int} works_id 课程id
+     * @apiParam {int} works_info_id 章节id
+     * @apiParam {int} user_id 用户id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+        {
+        "code": 200,
+        "msg": "成功",
+        "data": { }
+        }
+     */
     public function show(Request $request){
         $user_id    = $request->input('user_id',0);
         $column_id  = $request->input('column_id',0);
@@ -118,7 +202,27 @@ class WorksController extends Controller
         return $this->success();
     }
 
-    //更新学习进度 时长及百分比
+    /**
+     * @api {post} /v4/works/edit_history_time  更新学习进度 时长及百分比
+     * @apiName edit_history_time
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiParam {int} column_id  专栏id
+     * @apiParam {int} works_id 课程id
+     * @apiParam {int} works_info_id 章节id
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} time_leng  百分比
+     * @apiParam {int} time_number  章节分钟数
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": { }
+    }
+     */
     public function editHistoryTime(Request $request){
         $user_id    = $request->input('user_id',0);
         $column_id  = $request->input('column_id',0);

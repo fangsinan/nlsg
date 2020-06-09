@@ -40,6 +40,9 @@ class Column extends Model
         $column['teacher_name'] = $user->nick_name;
         //是否关注
         $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
+        //是否收藏
+        $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
+        $column['is_collection'] =$collection ? 1 : 0;
         return $column;
     }
 

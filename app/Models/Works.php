@@ -11,8 +11,7 @@ class Works extends Model
     protected $table = 'nlsg_works';
     public $timestamps = false;
 
-    // 允许批量赋值
-    protected  $fillable = [''];
+
 
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
