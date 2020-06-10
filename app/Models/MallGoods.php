@@ -189,7 +189,7 @@ class MallGoods extends Model {
     }
 
     public function category_list() {
-        return $this->hasMany('App\Models\MallCategory', 'id', 'category_id')
+        return $this->hasOne('App\Models\MallCategory', 'id', 'category_id')
                         ->select(['id', 'name'])
                         ->where('status', '=', 1);
     }
@@ -282,6 +282,23 @@ class MallGoods extends Model {
             }
         }
         return $res->toArray();
+    }
+
+    /**
+     * 首页好物推荐
+     * @param $ids 相关作品id
+     * @return bool
+     */
+    public function getIndexGoods($ids)
+    {
+        $lists= MallGoods::query()
+            ->select('id','name','picture','original_price')
+            ->whereIn('id',$ids)
+            ->orderBy('created_at','desc')
+            ->take(10)
+            ->get()
+            ->toArray();
+        return $lists;
     }
 
 }

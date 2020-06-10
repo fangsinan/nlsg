@@ -14,14 +14,13 @@ class GetPriceTools {
 
     public function goodsList($list, $user_level, $user_id, $is_staff) {
         foreach ($list as $v) {
-            $v->test_new = $this->getGoodsPrice($v, $user_level, $user_id, $is_staff);
+            $this->getGoodsPrice($v, $user_level, $user_id, $is_staff);
         }
     }
 
     //获取计算价格
     public function getGoodsPrice($data, $user_level, $user_id, $is_staff) {
         //计算推客的常规购买价格和收益
-        $now = time();
         $goods_id = $data->id;
         $expire_num = CacheTools::getExpire('goods_price_exprie');
         $cache_key_name = 'goods_price'; //哈希组名
@@ -245,7 +244,6 @@ class GetPriceTools {
     public function getGoodsPriceOld(&$data, $user_level, $user_id, $is_staff) {
         //计算推客的常规购买价格和收益
         $goods_id = $data->id;
-        $now = time();
         $expire_num = CacheTools::getExpire('goods_price_exprie');
         $cache_key_name = 'goods_price'; //哈希组名
         $cache_name = 'goods_' . $goods_id;

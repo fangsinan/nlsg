@@ -10,6 +10,136 @@ class CouponRule extends Model {
 
     protected $table = 'nlsg_coupon_rule';
 
+    public function getList($params) {
+
+        $cache_key_name = 'coupon_rule_list';
+
+        $expire_num = CacheTools::getExpire('coupon_rule_list');
+        $res = Cache::get($cache_key_name);
+        if (empty($res)) {
+            $res = self::getListFromDbNew();
+            Cache::add($cache_key_name, $res, $expire_num);
+        }
+
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        //过滤掉已经结束的
+        foreach ($res as $k => $v) {
+            if ($v->get_end_time <= $now_date) {
+                unset($res[$k]);
+            }
+        }
+
+        //只返回可以开始领取的
+        if (($params['only_begin'] ?? 0) == 1) {
+            foreach ($res as $k => $v) {
+                if ($v->get_begin_time >= $now_date) {
+                    unset($res[$k]);
+                }
+            }
+        }
+
+        //只返回有库存的
+        foreach ($res as $k => $v) {
+            //infinite库存无限  1无限  0有限
+            if (($params['only_stock'] ?? 0) == 1) {
+                if ($v->infinite == 0 && $v->sotck <= $v->used_stock) {
+                    unset($res[$k]);
+                }
+            }
+        }
+
+        //指定商品id
+        if (($params['goods_id'] ?? false)) {
+            $get_type = intval($params['get_type'] ?? 0);
+            $goods_id = intval($params['goods_id']);
+            //1 返回不限制商品 以及 商品可用的
+            //2 返回商品可用的
+            switch ($get_type) {
+                case 1:
+                    //过滤掉可用列表不包含商品的
+                    foreach ($res as $k => $v) {
+                        if (!empty($v->goods_list) && !empty($v->goods_list['can_use'])) {
+                            $temp_goods_id_list = array_column($v->goods_list['can_use'], 'id');
+                            if (array_search($goods_id, $temp_goods_id_list) === null) {
+                                unset($res[$k]);
+                            }
+                        }
+                    }
+                case 2:
+                    //过滤掉不限制的
+                    foreach ($res as $k => $v) {
+                        if (empty($v->goods_list['can_use'])) {
+                            unset($res[$k]);
+                        }
+                    }
+                default:
+                    //排除掉不能用于该商品的
+                    foreach ($res as $k => $v) {
+                        if (!empty($v->goods_list) && !empty($v->goods_list['cant_use'])) {
+                            $temp_goods_id_list = array_column($v->goods_list['cant_use'], 'id');
+                            if (array_search($goods_id, $temp_goods_id_list) !== null) {
+                                unset($res[$k]);
+                            }
+                        }
+                    }
+            }
+        }
+
+
+
+
+        //todo 判断用户是否还能领取该优惠券
+
+
+
+
+
+        return $res;
+    }
+
+    //ORM重写
+    public static function getListFromDbNew() {
+        //查询所有当前时间没下线的规则
+        $res = self::where('status', '=', 1)
+                ->where('buffet', '=', 1)
+                ->where('get_end_time', '>', date('Y-m-d H:i:s'))
+                ->whereIn('use_type', [3])
+                ->with(['sub_list', 'sub_list.goods_list'])
+                ->select(['id', 'name', 'infinite', 'stock', 'used_stock', 'price', 'restrict',
+                    'full_cut', 'get_begin_time', 'get_end_time', 'past', 'use_type',
+                    'remarks', 'use_time_begin', 'use_time_end'])
+                ->get();
+
+        foreach ($res as $k => $v) {
+            $goods_list['can_use'] = [];
+            $goods_list['cant_use'] = [];
+
+            foreach ($v->sub_list as $vv) {
+                //1可用  2不可用
+                switch ($vv->use_type) {
+                    case 1:
+                        $goods_list['can_use'][] = $vv->goods_list;
+                        break;
+                    case 2:
+                        $goods_list['cant_use'][] = $vv->goods_list;
+                        break;
+                }
+            }
+            $v->goods_list = $goods_list;
+            unset($res[$k]->sub_list);
+        }
+
+        return $res;
+    }
+
+    //优惠券规则补充表
+    public function sub_list() {
+        return $this->hasMany('App\Models\CouponRuleSub', 'rule_id', 'id');
+    }
+
+    //**************************DB废弃**************************
     public static function getListFromDb($params) {
         $now = time();
 
@@ -50,11 +180,11 @@ class CouponRule extends Model {
         $sql_1 .= ' and r.have_sub = 1';
         $sql_2 .= ' and r.have_sub = 2';
 
-        
+
         if ($params['goods_id'] ?? false) {
-            if(($params['goods_only']??0) == 1){
+            if (($params['goods_only'] ?? 0) == 1) {
                 $sql = $sql_2;
-            }else{
+            } else {
                 $sql = 'select * from (' . $sql_1 . ' union ' . $sql_2 . ') as a';
             }
         } else {
@@ -81,21 +211,6 @@ class CouponRule extends Model {
                     ($params['page'] - 1) * $params['size'];
         }
         $res = DB::select($sql);
-        return $res;
-    }
-
-    public function getList($params) {
-
-        $cache_key_name = 'c_l_' . ($params['goods_id'] ?? 0) . '_' .
-                ($params['get_all'] ?? 0) . '_' . ($params['page'] ?? 0) .
-                '_' . ($params['size'] ?? 0);
-
-        $expire_num = CacheTools::getExpire('coupon_rule_list');
-        $res = Cache::get($cache_key_name);
-        if (empty($res)) {
-            $res = self::getListFromDb($params);
-            Cache::add($cache_key_name, $res, $expire_num);
-        }
         return $res;
     }
 
