@@ -20,4 +20,9 @@ class WorksCategoryRelation extends Model {
     {
         return $this->belongsTo('App\Models\WorksCategory','category_id','id');
     }
+
+    public function Works()
+    {
+        return $this->belongsTo('App\Models\Works','work_id');
+    }
 }

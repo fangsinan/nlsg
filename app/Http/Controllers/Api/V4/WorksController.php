@@ -12,6 +12,7 @@ use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
+use App\Models\WorksInfoContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -23,26 +24,202 @@ class WorksController extends Controller
         return 'hello world';
     }
 
+
     /**
-     * 课程首页
+     * @api {post} /api/v4/works/get_works_index  课程首页
+     * @apiName get_works_index
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiParam {int} order   1 最多学习  2 最新上架  3最多收藏  4 最多分享
+     * @apiParam {int} hide   1 隐藏已购
+     * @apiParam {int} category_id 分类id
+     * @apiParam {int} user_id
+     * @apiParam {int} page  页数
+     * @apiParam {int} teacher_id  老师id
+     * @apiParam {int} is_free  1免费
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 16,
+    "column_id": 1,
+    "type": 1,
+    "title": "如何经营幸福婚姻",
+    "subtitle": "",
+    "cover_img": "/nlsg/works/20190822150244797760.png",
+    "detail_img": "/nlsg/works/20191023183946478177.png",
+    "content": "<p>幸福的婚姻是“同床同梦”，悲情的婚姻是“同床异梦”。两个相爱的人因为一时的爱慕之情走到一起，但在经过柴米油盐酱醋茶的考验后他们未必会幸福、未必会长久；两个不相爱的人走到一起，但在长时间的磨合之后他们未必不幸福、未必不长久。</p>",
+    "down_time": null,
+    "user_id": 168934,
+    "online_time": 1571827192,
+    "view_num": 1295460,
+    "message": null,
+    "is_pay": 1,
+    "original_price": "29.90",
+    "price": "29.90",
+    "promotion_cost": "0.00",
+    "twitter_price": "0.00",
+    "subscribe_num": 287,
+    "collection_num": 0,
+    "timing_online": 0,
+    "timing_time": 0,
+    "can_twitter": 0,
+    "book_sku": 0,
+    "is_audio_book": 0,
+    "is_end": 1,
+    "roof_placement": 1,
+    "is_teaching_aids": 0,
+    "is_free": 0,
+    "status": 4,
+    "created_at": null,
+    "updated_at": null
+    }
+    ]
+    }
      */
     public function getWorksIndex(Request $request){
+        //order   1 最多学习  2 最新上架  3最多收藏  4 最多分享
+        //hide  1 隐藏已购
+        //$category_id 分类id
+        //is_free 1免费
+
+        $order = $request->input('order',0);
+        $hide = $request->input('hide',0);
+        $category_id = $request->input('category_id',0);
+        $user_id = $request->input('user_id',0);
+        $page = $request->input('page',1);
+        $teacher_id = $request->input('teacher_id',1);
+        $is_free = $request->input('is_free',1);
+
+        switch ($order){
+            case 1:
+                $order_str = 'subscribe_num';
+                break;
+            case 2:
+                $order_str = 'online_time';
+                break;
+            case 3:
+                $order_str = 'collection_num';
+                break;
+            case 4:  //分享
+                $order_str = 'collection_num';
+                break;
+            default:
+                $order_str = 'updated_at';
+        }
+
+        $where = [];
+        $newWorks = [];
+        if($category_id){
+            $where = ['category_id'=>$category_id];
+        }
+
+        $works_where['status'] =4;
+        if( $teacher_id )   { $works_where['teacher_id'] = $teacher_id;}
+        if( $is_free )      { $works_where['is_free'] = $is_free;   }
+
+
+        $worksData = WorksCategoryRelation::with([
+            'Works' =>function($query) use($order_str,$works_where){
+                $query->where($works_where)->select("*")
+                    ->orderBy($order_str,'desc')->groupBy('id');
+            }])->select()->where($where)
+            ->paginate(20);
+        $worksData = $worksData->toArray();
+        foreach ($worksData['data'] as $key=>$val){
+            if($hide == 1){
+                $is_sub = Subscribe::isSubscribe($user_id,$val['works']['id'],2);
+                if($is_sub == 1){
+                    unset($worksData['data'][$key]);
+                    continue;
+                }
+            }
+            $newWorks[] = $worksData['data'][$key];
+
+        }
+        //$work_data = $worksData->toArray();
+        $res = [
+            'data' => $newWorks,
+            'last_page' => $worksData['last_page'],
+            'per_page' => $worksData['per_page'],
+            'total' => $worksData['total'],
+
+        ];
+        return $this->success($res);
+
     }
 
 
+
     /**
-     * 课程分类
+     * @api {post} /api/v4/works/get_works_category  课程首页分类 名师
+     * @apiName get_works_category
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "category": [
+    {
+    "id": 1,
+    "name": "父母关系",
+    "count": 2
+    },
+    {
+    "id": 2,
+    "name": "亲子关系",
+    "count": 0
+    }
+    ],
+    "teacher": [
+    {
+    "id": 168934,
+    "nick_name": "chandler_v4"
+    },
+    {
+    "id": 211172,
+    "nick_name": "房某某"
+    }
+    ]
+    }
+    }
      */
-    public function getWorksCategory(Request $request){
+    public function getWorksCategoryTeacher(Request $request){
+//        DB::enableQueryLog();
+//        dd(DB::getQueryLog());
         //分类
-        DB::enableQueryLog();
-        $category = WorksCategory::select()->with([
-            'CategoryRelation'=>function($query) {
-                $query->select('category_id');
+        $category = WorksCategory::select('id','name')->where([
+            'type' => 1, 'status' => 1,
+        ])->orderBy('order','desc')->get();
+
+        foreach ($category as $key=>&$val){
+            $val['count'] = WorksCategoryRelation::where(['category_id'=>$val->id])->count();
+        }
+
+        //精品名师
+        $Teacher = Works::select('user_id')->with([
+            'UserName'=>function($query){
+                $query->select('id','nick_name');
+            }])->where('status',4)
+            ->orderBy('subscribe_num','desc')->groupBy('user_id')
+            ->paginate(6)->toArray();
+        $newTeacher = [];
+        foreach ($Teacher['data'] as $key=>$val){
+            if($val['user_name']){
+                $newTeacher[] = $val['user_name'];
             }
-        ])->get()->toArray();
-        dump($category);
-        dd(DB::getQueryLog());
+        }
+
+        return $this->success(['category'=>$category,'teacher'=>$newTeacher]);
     }
 
 
@@ -57,7 +234,6 @@ class WorksController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
-     *
      *
     {
     "code": 200,
@@ -160,8 +336,42 @@ class WorksController extends Controller
         return $this->success($res);
     }
 
+
     /**
-     * @api {post} /v4/works/show  点播时 记录首次历史记录 阅读数自增
+     * @api {post} api/v4/works/get_works_content  获取音频文稿
+     * @apiName get_works_content
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiParam {int} workinfo_id 章节id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "id": 1,
+    "works_info_id": 16,
+    "content": "文稿内容",
+    "created_at": null,
+    "updated_at": null
+    }
+    }
+     */
+    public function getWorksContent(Request $request){
+        $info_id = $request->input('info_id',0);
+        if( empty($info_id) ){
+            return $this->error(0,'info_id 1不能为空');
+        }
+        $res = WorksInfoContent::where('works_info_id',$info_id)->first();
+        return $this->success($res);
+    }
+
+
+    /**
+     * @api {post} api/v4/works/show  点播时 记录首次历史记录 阅读数自增
      * @apiName show
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -203,7 +413,7 @@ class WorksController extends Controller
     }
 
     /**
-     * @api {post} /v4/works/edit_history_time  更新学习进度 时长及百分比
+     * @api {post} api/v4/works/edit_history_time  更新学习进度 时长及百分比
      * @apiName edit_history_time
      * @apiVersion 1.0.0
      * @apiGroup works

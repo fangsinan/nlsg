@@ -12,6 +12,19 @@ class Works extends Model
     public $timestamps = false;
 
 
+    public function CategoryRelation()
+    {
+        //一对多
+        return $this->hasMany('App\Models\WorksCategoryRelation','work_id', 'id');
+    }
+
+
+    public function UserName()
+    {
+        //一对多
+        return $this->belongsTo('App\Models\User','user_id');
+    }
+
 
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
