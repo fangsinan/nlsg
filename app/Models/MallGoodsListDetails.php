@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
  * @author wangxh
  */
 class MallGoodsListDetails extends Model {
-
+    protected $fillable = ['list_id','goods_id'];
     protected $table = 'nlsg_mall_goods_list_details';
 
 }

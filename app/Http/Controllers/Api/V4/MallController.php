@@ -9,7 +9,7 @@ use App\Models\CouponRule;
 use App\Models\MallComment;
 use App\Models\MallCategory;
 use App\Models\Banner;
-use App\Models\MallGoodsList;
+use App\Models\SpecialPriceModel;
 
 class MallController extends Controller {
 
@@ -537,9 +537,220 @@ class MallController extends Controller {
         return $this->success($data);
     }
 
-    //todo 秒杀和拼团预告,秒杀和拼团首页
+    /**
+     * 秒杀和拼团预告
+     * @api {post} /api/V4/goods/home_sp_list 秒杀和拼团预告
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/goods/home_sp_list
+     * @apiGroup  Mall
+     * @apiSampleRequest /api/V4/goods/home_sp_list
+     * @apiDescription 秒杀和拼团预告
+     * 
+      @apiSuccess {number} sec 秒杀的
+      @apiSuccess {number} sec.time 开始时间
+      @apiSuccess {number} sec.list 商品列表
+      @apiSuccess {number} sec.list.goods_id 商品id
+      @apiSuccess {number} sec.list.name 名称
+      @apiSuccess {number} sec.list.subtitle 副标题
+      @apiSuccess {number} sec.list.group_num 拼团需要人数
+      @apiSuccess {number} sec.list.group_price 拼团价格
+      @apiSuccess {number} sec.list.begin_time 开始时间
+      @apiSuccess {number} sec.list.end_time 结束时间
+     * 
+     * 
+      @apiSuccess {number} group 拼团的
+      @apiSuccess {number} group.goods_id 商品id
+      @apiSuccess {number} group.name 名称
+      @apiSuccess {number} group.subtitle 副标题
+      @apiSuccess {number} group.group_num 拼团需要人数
+      @apiSuccess {number} group.group_price 拼团价格
+      @apiSuccess {number} group.begin_time 开始时间
+      @apiSuccess {number} group.end_time 结束时间
+     * @apiSuccessExample {json} Request-Example:
+     * {
+      "code": 200,
+      "msg": "成功",
+      "data": {
+      "sec": {
+      "time": "2020-06-11 17:34:00",
+      "list": [
+      {
+      "goods_id": 86,
+      "name": "AR智能学生专用北斗地球仪",
+      "subtitle": "王树声地理教学研究室倾力打造地理教学地球仪",
+      "goods_original_price": "0.00",
+      "original_price": "379.00",
+      "goods_price": "0.00",
+      "begin_time": "2020-06-11 17:34:00",
+      "end_time": "2020-06-11 17:52:59"
+      }
+      ]
+      },
+      "group": [
+      {
+      "goods_id": 91,
+      "name": "AR立体浮雕星座地球仪",
+      "subtitle": "高清生动准确的星座秘密等你来发现",
+      "group_num": 10,
+      "group_price": "20.00",
+      "begin_time": "2020-06-05 09:40:00",
+      "end_time": "2022-01-26 09:40:00"
+      },
+      {
+      "goods_id": 86,
+      "name": "AR智能学生专用北斗地球仪",
+      "subtitle": "王树声地理教学研究室倾力打造地理教学地球仪",
+      "group_num": 5,
+      "group_price": "18.00",
+      "begin_time": "2020-06-05 09:36:17",
+      "end_time": "2022-01-26 09:40:00"
+      }
+      ]
+      }
+      }
+     */
+    public function homeSpList() {
+        $model = new SpecialPriceModel();
+        $data['sec'] = $model->homeSecList();
+        $data['group'] = $model->homeGroupList();
+        return $this->success($data);
+    }
+
+    /**
+     * 秒杀首页
+     * @api {post} /api/V4/goods/flash_sale 秒杀首页
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/goods/flash_sale
+     * @apiGroup  Mall
+     * @apiSampleRequest /api/V4/goods/flash_sale
+     * @apiDescription 秒杀首页
+     * 
+      @apiSuccess {number} goods_id 商品id
+      @apiSuccess {number} name 名称
+      @apiSuccess {number} subtitle 副标题
+      @apiSuccess {number} group_num 拼团需要人数
+      @apiSuccess {number} group_price 拼团价格
+      @apiSuccess {number} begin_time 开始时间
+      @apiSuccess {number} end_time 结束时间
+     * @apiSuccessExample {json} Request-Example:
+     * {
+      "code": 200,
+      "msg": "成功",
+      "data": {
+      "2020-06-11 17:34:00": [
+      {
+      "goods_id": 86,
+      "name": "AR智能学生专用北斗地球仪",
+      "subtitle": "王树声地理教学研究室倾力打造地理教学地球仪",
+      "goods_original_price": "0.00",
+      "original_price": "379.00",
+      "goods_price": "0.00",
+      "begin_time": "2020-06-11 17:34:00",
+      "end_time": "2020-06-11 17:52:59"
+      }
+      ],
+      "2020-06-11 18:12:00": [
+      {
+      "goods_id": 91,
+      "name": "AR立体浮雕星座地球仪",
+      "subtitle": "高清生动准确的星座秘密等你来发现",
+      "goods_original_price": "0.00",
+      "original_price": "379.00",
+      "goods_price": "5.00",
+      "begin_time": "2020-06-11 18:12:00",
+      "end_time": "2020-06-11 18:26:59"
+      }
+      ]
+      }
+      }
+     */
+    public function flashSaleList() {
+        $model = new SpecialPriceModel();
+        $data = $model->getSecList();
+        return $this->success($data);
+    }
+
+    /**
+     * 拼团首页
+     * @api {post} /api/V4/goods/group_buy 拼团首页
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/goods/group_buy
+     * @apiGroup  Mall
+     * @apiSampleRequest /api/V4/goods/group_buy
+     * @apiDescription 拼团首页
+     * 
+      @apiSuccess {number} goods_id 商品id
+      @apiSuccess {number} name 名称
+      @apiSuccess {number} subtitle 副标题
+      @apiSuccess {number} group_num 拼团需要人数
+      @apiSuccess {number} group_price 拼团价格
+      @apiSuccess {number} begin_time 开始时间
+      @apiSuccess {number} end_time 结束时间
+      @apiSuccess {number} order_count 成团订单数
+      @apiSuccess {number} user_count 参加人数
+      @apiSuccess {string[]} order_user 用户头像列表
+     * @apiSuccessExample {json} Request-Example:
+     * 
+     * {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "goods_id": 91,
+      "name": "AR立体浮雕星座地球仪",
+      "subtitle": "高清生动准确的星座秘密等你来发现",
+      "group_num": 10,
+      "group_price": "20.00",
+      "begin_time": "2020-06-05 09:40:00",
+      "end_time": "2022-01-26 09:40:00",
+      "order_count": 1,
+      "user_count": 4,
+      "order_user": [
+      "1.jpg",
+      "1.jpg",
+      "1.jpg",
+      "1.jpg"
+      ]
+      }
+      ]
+      }
+     */
+    public function groupBuyList() {
+        $model = new SpecialPriceModel();
+        $data = $model->groupBuyList();
+        return $this->success($data);
+    }
+
+    /**
+     * 商城服务说明
+     * @api {post} /api/V4/goods/mall_service_description 商城服务说明
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/goods/mall_service_description
+     * @apiGroup  Mall
+     * @apiSampleRequest /api/V4/goods/mall_service_description
+     * @apiDescription 商城服务说明
+     * @apiSuccessExample {json} Request-Example:
+     * 
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": {
+      "七天无理由退换货": "买家提出退款申请。",
+      "正品保障": "正品保障服务是指能量款外，还需向消费者增加 赔偿。",
+      "会员85折": "成为能量时光皇钻5折。",
+      "满88包邮": "能量时光自营需承担10元运费。"
+      }
+      }
+     */
+    public function mallServiceDescription() {
+        $res = \App\Models\ConfigModel::getData(6);
+        $res = json_decode($res);
+        return $this->success($res);
+    }
+    
+    
+    
     //todo 拼团商品详情
-    //todo 商品购买说明(详情页下方)和商城首页服务说明(满88包邮等)
     //todo 建立免邮优惠券
     //todo 我的地址
 }

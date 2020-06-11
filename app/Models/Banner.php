@@ -29,7 +29,7 @@ class Banner extends Model {
         $cache_key_name = 'mall_banner_list';
         $expire_num = CacheTools::getExpire('mall_banner_list');
         $res = Cache::get($cache_key_name);
-        if (true || empty($res)) {
+        if (empty($res)) {
             $res = self::mallBannerListFromDb();
             Cache::add($cache_key_name, $res, $expire_num);
         }

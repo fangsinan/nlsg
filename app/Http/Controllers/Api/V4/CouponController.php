@@ -6,4 +6,5 @@ use App\Http\Controllers\Controller;
 
 class CouponController extends Controller {
     //todo 领取优惠券
+    
 }

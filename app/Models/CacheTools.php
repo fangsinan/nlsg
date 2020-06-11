@@ -19,19 +19,21 @@ class CacheTools {
 
     //获取缓存时间  单位秒
     public static function getExpire($flag) {
-        $sort_exprice = 10;
-        $normal_exprice = 10;
+        $sort_exprice = 300;
+        $normal_exprice = 3600;
         $long__exprice = 86400;
         switch (strtolower($flag)) {
             case 'goods_sp_list_exprie':
             case 'sku_value':
             case 'get_list':
             case 'mall_banner_list':
+            case 'home_group_list':
                 $exprie = $normal_exprice;
                 break;
             case 'mall_comment_list':
             case 'coupon_rule_list':
             case 'goods_price_exprie':
+            case 'set_kill_list':
                 $exprie = $sort_exprice;
                 break;
             case 'goods_category_list':

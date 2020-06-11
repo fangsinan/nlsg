@@ -24,10 +24,10 @@ class MallOrder extends Model {
                 ->where('nmod.user_id', '=', $params['user_id']);
 
         if ($params['begin_time'] ?? false) {
-            $query->where('nmo.create_at', '>=', $params['begin_time']);
+            $query->where('nmo.created_at', '>=', $params['begin_time']);
         }
         if ($params['end_time'] ?? false) {
-            $query->where('nmo.create_at', '<=', $params['end_time']);
+            $query->where('nmo.created_at', '<=', $params['end_time']);
         }
 
         $list = $query->whereRaw('FIND_IN_SET(2,nmod.special_price_type)')
