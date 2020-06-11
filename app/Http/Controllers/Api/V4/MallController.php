@@ -8,6 +8,7 @@ use App\Models\MallGoods;
 use App\Models\CouponRule;
 use App\Models\MallComment;
 use App\Models\MallCategory;
+use App\Models\Banner;
 
 class MallController extends Controller {
 
@@ -435,7 +436,87 @@ class MallController extends Controller {
         return $this->success($data);
     }
 
-    //todo banner(轮播,分类下方的banner)
+
+     /**
+     * 商城首页banner和推荐位
+     * @api {post} /api/V4/goods/banner_list 商城banner
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/goods/banner_list
+     * @apiGroup  Mall
+     * @apiSampleRequest /api/V4/goods/banner_list
+     * @apiDescription 轮播,分类下方的banner,推荐的商品集
+     * 
+      @apiSuccess {number} banner banner轮播的
+      @apiSuccess {number} banner.id
+      @apiSuccess {number} banner.title
+      @apiSuccess {number} banner.pic
+      @apiSuccess {number} banner.url
+      * 
+      *  @apiSuccess {number} recommend 下方推荐位
+      @apiSuccess {number} recommend.id
+      @apiSuccess {number} recommend.title
+      @apiSuccess {number} recommend.pic
+      @apiSuccess {number} recommend.url
+      * 
+      * @apiSuccess {number} goods_list 推荐的商品专区
+      @apiSuccess {number} goods_list.id
+      @apiSuccess {number} goods_list.icon 图标
+      @apiSuccess {number} goods_list.name  名称
+      * 
+     * @apiSuccessExample {json} Request-Example:
+      {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+        "banner": [
+            {
+                "id": 407,
+                "title": "儿童情商社交游戏绘本",
+                "pic": "wechat/mall/goods/20190110155407_333.png",
+                "url": "/mall/shop-details?goods_id=333"
+            },
+            {
+                "id": 406,
+                "title": "乌合之众",
+                "pic": "wechat/mall/goods/20190110155401_327.png",
+                "url": "/mall/shop-details?goods_id=327"
+            }
+        ],
+        "recommend": [
+            {
+                "id": 412,
+                "title": "活动测试",
+                "pic": "nlsg/banner/20200521142524320648.png",
+                "url": "/pages/activity/sixOne"
+            }
+        ],
+        "goods_list": [
+            {
+                "id": 2,
+                "name": "教学工具",
+                "icon": "nlsg/works/20200611095918952974.png"
+            },
+            {
+                "id": 3,
+                "name": "家庭图书",
+                "icon": "nlsg/works/20200611095853861665.png"
+            },
+            {
+                "id": 1,
+                "name": "时光文创",
+                "icon": "nlsg/works/20200611095722140572.png"
+            }
+        ]
+    }
+}
+     */
+    public function bannerList(){
+        $model = new Banner();
+        $data = $model->mallBannerList();
+        return $this->success($data);
+    }
+
+
     //todo 推荐位(教学工具,家庭图书,时光文创)
     //todo 秒杀和拼团预告,秒杀和拼团首页
     //todo 拼团商品详情

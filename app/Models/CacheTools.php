@@ -26,6 +26,7 @@ class CacheTools {
             case 'goods_sp_list_exprie':
             case 'sku_value':
             case 'get_list':
+            case 'mall_banner_list':
                 $exprie = $normal_exprice;
                 break;
             case 'mall_comment_list':
@@ -42,8 +43,6 @@ class CacheTools {
 
         return $exprie;
     }
-    
-    
-    //coupon_rule_list 优惠券规则列表
 
+    //coupon_rule_list 优惠券规则列表
 }
