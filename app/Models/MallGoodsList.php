@@ -21,4 +21,9 @@ class MallGoodsList extends Model {
 
     protected $table = 'nlsg_mall_goods_list';
 
+    public function goods_list() {
+        return $this
+                ->hasMany('App\Models\MallGoodsListDetails', 'list_id', 'id')
+                ->select(['list_id','goods_id']);
+    }
 }
