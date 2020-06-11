@@ -21,6 +21,62 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
 
+    /**
+     * @api {post} /v4/order/get_coupon   获取我的优惠券
+     * @apiName get_coupon
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} type  类型 1专栏  2会员  4课程
+     * @apiParam {int} price  订单金额
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *
+     *
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 1,
+    "name": "优惠券",
+    "number": "123456",
+    "type": 1,   0不限制 1专栏 2会员 3商品 4精品课 5:跨境商品
+    "user_id": 211172,
+    "money": 10,
+    "starttime": 0,
+    "deadline": 1593517938,
+    "use_time": 0,
+    "status": 1,
+    "ctime": 0,
+    "fullcut_price": 99,
+    "explain": "",
+    "order_id": 0,
+    "flag": "",
+    "get_way": 1,
+    "cr_id": 0
+    }
+    ]
+    }
+     */
+    public function getCoupon(Request $request){
+        $price = $request->input('price',99);
+        $type  = $request->input('type',0);
+        $user_id = $request->input('user_id',0);
+        $where_type = [0];
+        if($type){
+            $where_type = [0, $type];
+        }
+        $coupon = Coupon::where([
+           'status' => 1,
+           'user_id'=> $user_id,
+        ])->whereIn('type',$where_type)
+        ->where('deadline','>=',time())
+        ->where('fullcut_price','>=',$price)->get();
+        return $this->success($coupon);
+    }
 
     //下单check
     protected function addOrderCheck($user_id,$tweeter_code,$target_id,$type){

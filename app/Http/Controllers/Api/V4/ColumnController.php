@@ -205,24 +205,72 @@ class ColumnController extends Controller
             $historyData = $historyData?$historyData->toArray():[];
         }
 
-        //相关推荐
-        $recommendModel = new Recommend();
-        $recommendLists = $recommendModel->getIndexRecommend(1, 2);
-        foreach ($recommendLists as $key=>$val){
-            if($val['id'] == $column_id){
-                unset($recommendLists[$key]);
-            }
-        }
-        $recommendLists = array_values($recommendLists);
         $res = [
             'column_info'  => $column,
             'works_data'   => $works_data,
             'outline_data' => $column_outline,
             'historyData'  => $historyData,
-            'recommendLists'  => $recommendLists,
         ];
         return $this->success($res);
     }
+
+    //
+    /**
+     * @api {post} /api/v4/column/get_recommend 相关推荐[专栏|课程]
+     * @apiName get_recommend
+     * @apiVersion 1.0.0
+     * @apiGroup Column
+     *
+     * @apiParam {int} target_id  详情对应的id 专栏id或课程id
+     * @apiParam {int} type 1.专栏 2.课堂 3. 讲座 4.听书
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 1,
+    "name": "王琨专栏",
+    "title": "顶尖导师 经营能量",
+    "subtitle": "顶尖导师 经营能量",
+    "message": "",
+    "price": "99.00",
+    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg"
+    },
+    {
+    "id": 2,
+    "name": "张宝萍专栏",
+    "title": "国家十百千万工程心灵导师",
+    "subtitle": "心灵导师 直击人心",
+    "message": "",
+    "price": "0.00",
+    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg"
+    }
+    ]
+    }
+     */
+    public  function getRecommend(Request $request){
+        $target_id  = $request->input('target_id',0);
+        $type       = $request->input('type',0);
+        $position   = $request->input('position',0);
+
+        //相关推荐
+        $recommendModel = new Recommend();
+        $recommendLists = $recommendModel->getIndexRecommend($type, $position);
+        if($recommendLists == false)         return $this->success();
+
+        foreach ($recommendLists as $key=>$val){
+            if($target_id && ($val['id'] == $target_id)){
+                unset($recommendLists[$key]);
+            }
+        }
+        $recommendLists = array_values($recommendLists);
+        return $this->success($recommendLists);
+
+     }
+
 
 
     /**
