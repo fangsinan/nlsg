@@ -109,7 +109,7 @@ class CouponRule extends Model {
                 ->with(['sub_list', 'sub_list.goods_list'])
                 ->select(['id', 'name', 'infinite', 'stock', 'used_stock', 'price', 'restrict',
                     'full_cut', 'get_begin_time', 'get_end_time', 'past', 'use_type',
-                    'remarks', 'use_time_begin', 'use_time_end'])
+                    'remarks', 'use_time_begin', 'use_time_end','created_at','updated_at'])
                 ->get();
 
         foreach ($res as $k => $v) {

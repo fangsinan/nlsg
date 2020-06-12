@@ -15,7 +15,7 @@ class MallController extends Controller {
 
     /**
      * 获取商品信息
-     * @api {post} /api/V4/goods/info 获取商品信息(列表,详情)
+     * @api {get} /api/V4/goods/info 获取商品信息(列表,详情)
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/info
      * @apiGroup  Mall
@@ -215,7 +215,7 @@ class MallController extends Controller {
 
     /**
      * 优惠券列表
-     * @api {post} /api/V4/goods/coupon_list 优惠券列表
+     * @api {get} /api/V4/goods/coupon_list 优惠券列表
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/coupon_list
      * @apiGroup  Mall
@@ -282,7 +282,7 @@ class MallController extends Controller {
 
     /**
      * 商品评论列表
-     * @api {post} /api/V4/goods/comment_list 商品评论列表
+     * @api {get} /api/V4/goods/comment_list 商品评论列表
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/comment_list
      * @apiGroup  Mall
@@ -402,7 +402,7 @@ class MallController extends Controller {
 
     /**
      * 商品分类列表
-     * @api {post} /api/V4/goods/category_list 商品分类列表
+     * @api {get} /api/V4/goods/category_list 商品分类列表
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/category_list
      * @apiGroup  Mall
@@ -439,7 +439,7 @@ class MallController extends Controller {
 
     /**
      * 商城首页banner和推荐位
-     * @api {post} /api/V4/goods/banner_list 商城banner
+     * @api {get} /api/V4/goods/banner_list 商城banner
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/banner_list
      * @apiGroup  Mall
@@ -539,7 +539,7 @@ class MallController extends Controller {
 
     /**
      * 秒杀和拼团预告
-     * @api {post} /api/V4/goods/home_sp_list 秒杀和拼团预告
+     * @api {get} /api/V4/goods/home_sp_list 秒杀和拼团预告
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/home_sp_list
      * @apiGroup  Mall
@@ -618,7 +618,7 @@ class MallController extends Controller {
 
     /**
      * 秒杀首页
-     * @api {post} /api/V4/goods/flash_sale 秒杀首页
+     * @api {get} /api/V4/goods/flash_sale 秒杀首页
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/flash_sale
      * @apiGroup  Mall
@@ -672,7 +672,7 @@ class MallController extends Controller {
 
     /**
      * 拼团首页
-     * @api {post} /api/V4/goods/group_buy 拼团首页
+     * @api {get} /api/V4/goods/group_buy 拼团首页
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/group_buy
      * @apiGroup  Mall
@@ -723,11 +723,11 @@ class MallController extends Controller {
 
     /**
      * 商城服务说明
-     * @api {post} /api/V4/goods/mall_service_description 商城服务说明
+     * @api {get} /api/V4/goods/service_description 商城服务说明
      * @apiVersion 4.0.0
-     * @apiName /api/V4/goods/mall_service_description
+     * @apiName /api/V4/goods/service_description
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/mall_service_description
+     * @apiSampleRequest /api/V4/goods/service_description
      * @apiDescription 商城服务说明
      * @apiSuccessExample {json} Request-Example:
      * 
@@ -744,13 +744,21 @@ class MallController extends Controller {
      */
     public function mallServiceDescription() {
         $res = \App\Models\ConfigModel::getData(6);
+
+        $freight_line = \App\Models\ConfigModel::getData(1);
+        $post_money = \App\Models\ConfigModel::getData(7);
+ 
+        $res = str_replace('$freight_line',$freight_line, $res);
+        $res = str_replace('$post_money',$post_money, $res);
+
         $res = json_decode($res);
         return $this->success($res);
     }
     
-    
-    
     //todo 拼团商品详情
-    //todo 建立免邮优惠券
+
     //todo 我的地址
+    
+    
+    
 }

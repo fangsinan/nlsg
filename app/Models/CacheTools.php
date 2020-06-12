@@ -37,6 +37,7 @@ class CacheTools {
                 $exprie = $sort_exprice;
                 break;
             case 'goods_category_list':
+            case 'area_list':
                 $exprie = $long__exprice;
                 break;
             default :

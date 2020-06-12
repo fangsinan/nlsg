@@ -58,5 +58,9 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/V4/goods/home_sp_list', 'MallController@homeSpList');
     Route::get('/V4/goods/flash_sale', 'MallController@flashSaleList');
     Route::get('/V4/goods/group_buy', 'MallController@groupBuyList');
-    Route::get('/V4/goods/mall_service_description', 'MallController@mallServiceDescription');
+    Route::get('/V4/goods/service_description', 'MallController@mallServiceDescription');
+    Route::post('/V4/goods/get_coupon', 'CouponController@getCoupon');
+    Route::get('/V4/address/get_data', 'AddressController@getData');
+    Route::post('/V4/address/create', 'AddressController@create');
+    
 });
