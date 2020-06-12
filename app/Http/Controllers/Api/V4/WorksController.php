@@ -327,7 +327,7 @@ class WorksController extends Controller
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id);
 
-
+        $works_data['info_num'] = count($info);
         $res = [
             'column_info'  => $column,
             'works_data'   => $works_data,
