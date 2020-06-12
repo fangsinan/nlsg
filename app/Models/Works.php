@@ -27,6 +27,12 @@ class Works extends Model
     }
 
 
+    public function WorkInfo()
+    {
+        //一对多
+        return $this->hasMany('App\Models\WorksInfo','pid');
+    }
+
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
     const STATUS_TWO = 2;

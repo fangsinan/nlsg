@@ -40,6 +40,19 @@ class Column extends Model
         $column['teacher_name'] = $user->nick_name;
         //是否关注
         $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
+
+        //  在学人数[只存在于讲座]
+        $column['user_data'] = [];
+        if( $column['type'] == 2 ){
+            $sub_user = Subscribe::select('user_id')->where([
+                'relation_id'=> $column_id,
+                'type'       => 1,
+                'is_del'     => 0,
+            ])->orderBy('created_at','desc')->paginate(6)->toArray();
+            $user_id_arr =array_column($sub_user['data'],'user_id');
+            $column['user_data'] = User::select('id','nick_name','headimg')->whereIn('id',$user_id_arr)->get()->toArray();
+            $column['user_count'] = Subscribe::where(['relation_id'=> $column_id, 'type' => 1, 'is_del' => 0,])->count();
+        }
         //是否收藏
         $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
         $column['is_collection'] =$collection ? 1 : 0;
