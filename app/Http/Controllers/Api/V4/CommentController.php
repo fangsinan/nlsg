@@ -32,8 +32,10 @@ class CommentController extends Controller
     {
         $content = $request->input('content');
         $img     = $request->input('img');
+        $pid     = $request->input('pid');
         $result  = Comment::create([
             'user_id' => 1,
+            'pid'     => $pid,
             'content' => $content,
             'type'    => 1
         ]);
@@ -55,6 +57,7 @@ class CommentController extends Controller
         }
 
     }
+
 
     /**
      * Display the specified resource.
