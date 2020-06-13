@@ -56,27 +56,25 @@ class ReplyController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
+     * 更新回复内容
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $id      = $request->input('id');
+        $content = $request->input('content');
+        $res= CommentReply::where('id', $id)
+            ->update(['content'=>$content]);
+
+        if ($res){
+            return $this->success();
+        }
     }
 
     /**

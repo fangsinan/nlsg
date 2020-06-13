@@ -68,9 +68,11 @@ Route::namespace('Api\V4')->group(function() {
     //想法
     Route::get('/v4/comment/index', 'CommentController@index');
     Route::post('/v4/comment/store', 'CommentController@store');
+    Route::post('/v4/comment/update', 'CommentController@update');
     Route::post('/v4/comment/destroy', 'CommentController@destroy');
     //评论
     Route::post('/v4/reply/store', 'ReplyController@store');
+    Route::post('/v4/reply/update', 'ReplyController@update');
     Route::post('/v4/reply/destroy', 'ReplyController@destroy');
 
     //百科

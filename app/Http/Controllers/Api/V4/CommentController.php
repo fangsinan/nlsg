@@ -71,16 +71,6 @@ class CommentController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -89,9 +79,30 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $id      = $request->input('id');
+        $content = $request->input('content');
+        $img     = $request->input('img');
+        $res= Comment::where('id', $id)
+            ->update(['content'=>$content]);
+        if ($res){
+            Attach::where('relation_id', $id)->delete();
+
+            if ($img){
+                $imgArr = explode(',', $img);
+                $data = [];
+                foreach ($imgArr as $v){
+                    $data[] = [
+                        'relation_id' => $id,
+                        'img'   => $v,
+                        'type'  => 1
+                    ];
+                }
+                Attach::insert($data);
+            }
+            return $this->success();
+        }
     }
 
     /**
