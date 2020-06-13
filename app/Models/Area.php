@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class Area extends Model {
+class Area extends Base {
 
     protected $table = 'nlsg_area';
 

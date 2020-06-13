@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 /**
  * 商品评论表
  */
-class MallComment extends Model {
+class MallComment extends Base {
 
     protected $table = 'nlsg_mall_comment';
 

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class ConfigModel extends Model {
+class ConfigModel extends Base {
 
     protected $table = 'nlsg_config';
 

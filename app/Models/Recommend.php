@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Wiki;
 use App\Models\Lists;
 
-class Recommend extends Model
+class Recommend extends Base
 {
     protected $table = 'nlsg_recommend';
 

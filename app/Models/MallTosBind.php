@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
  *
  * @author wangxh
  */
-class MallTosBind extends Model {
+class MallTosBind extends Base {
 
     protected $table = 'nlsg_mall_goods_tos_bind';
 

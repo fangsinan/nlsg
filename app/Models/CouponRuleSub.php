@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
  *
  * @author wangxh
  */
-class CouponRuleSub extends Model {
+class CouponRuleSub extends Base {
 
     protected $table = 'nlsg_coupon_rule_sub';
 

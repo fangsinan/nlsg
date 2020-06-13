@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
  *
  * @author wangxh
  */
-class Coupon extends Model {
+class Coupon extends Base {
 
     protected $table = 'nlsg_coupon';
 

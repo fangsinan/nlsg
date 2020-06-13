@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class Banner extends Model {
+class Banner extends Base {
 
     protected $table = 'nlsg_banner';
 

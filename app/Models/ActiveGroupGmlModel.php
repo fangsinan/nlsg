@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class ActiveGroupGmlModel extends Model {
+class ActiveGroupGmlModel extends Base {
 
     protected $table = 'nlsg_active_group_module_list';
 

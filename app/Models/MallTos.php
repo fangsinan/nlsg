@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
  *
  * @author wangxh
  */
-class MallTos  extends Model {
+class MallTos  extends Base {
 
     protected $table = 'nlsg_mall_tos';
 

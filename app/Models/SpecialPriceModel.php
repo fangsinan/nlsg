@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class SpecialPriceModel extends Model {
+class SpecialPriceModel extends Base {
 
     protected $table = 'nlsg_special_price';
 

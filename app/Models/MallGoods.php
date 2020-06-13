@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class MallGoods extends Model {
+class MallGoods extends Base {
 
     protected $table = 'nlsg_mall_goods';
 

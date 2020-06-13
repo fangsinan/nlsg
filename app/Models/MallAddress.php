@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class MallAddress extends Model {
+class MallAddress extends Base {
 
     protected $table = 'nlsg_mall_address';
 

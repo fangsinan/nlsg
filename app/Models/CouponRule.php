@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class CouponRule extends Model {
+class CouponRule extends Base {
 
     protected $table = 'nlsg_coupon_rule';
 
