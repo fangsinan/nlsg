@@ -49,7 +49,7 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/v4/order/create_works_order', 'OrderController@createWorksOrder');
     Route::get('/v4/order/get_coupon', 'OrderController@getCoupon');
 
-    
+
     //商城部分
     Route::get('/V4/goods/info', 'MallController@goodsList');
     Route::get('/V4/goods/coupon_list', 'MallController@couponList');
@@ -63,5 +63,19 @@ Route::namespace('Api\V4')->group(function() {
     Route::post('/V4/goods/get_coupon', 'CouponController@getCoupon');
     Route::get('/V4/address/get_data', 'AddressController@getData');
     Route::post('/V4/address/create', 'AddressController@create');
-    
+
+
+    //想法
+    Route::get('/v4/comment/index', 'CommentController@index');
+    Route::post('/v4/comment/store', 'CommentController@store');
+
+    //评论
+    Route::post('/v4/reply/store', 'ReplyController@store');
+
+    //百科
+    Route::get('/v4/wiki/index', 'WikiController@index');
+    Route::get('/v4/wiki/category', 'WikiController@category');
+    Route::get('/v4/wiki/show', 'WikiController@show');
+    Route::get('/v4/wiki/related', 'WikiController@related');
+
 });

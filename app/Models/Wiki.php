@@ -8,16 +8,9 @@ class Wiki extends Model
 {
     protected $table = 'nlsg_wiki';
 
-    public function  getIndexWiki($ids)
+
+    public function category()
     {
-        if (!$ids){
-            return false;
-        }
-        $lists= Wiki::select('id','name','content','cover','view_num','like_num', 'comment_num')
-            ->whereIn('id',$ids)
-            ->orderBy('created_at','desc')
-            ->get()
-            ->toArray();
-        return $lists;
+        return $this->hasMany(WikiCategory::class, 'category_id', 'id');
     }
 }
