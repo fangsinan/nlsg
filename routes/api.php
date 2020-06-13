@@ -63,6 +63,11 @@ Route::namespace('Api\V4')->group(function() {
     Route::post('/V4/goods/get_coupon', 'CouponController@getCoupon');
     Route::get('/V4/address/get_data', 'AddressController@getData');
     Route::post('/V4/address/create', 'AddressController@create');
+    Route::get('/V4/address/get_list', 'AddressController@getList');
+    Route::put('/V4/address/status_change', 'AddressController@statusChange');
+    Route::post('/V4/shopping_cart/create', 'ShoppingCartController@create');
+    Route::get('/V4/shopping_cart/get_list', 'ShoppingCartController@getList');
+    Route::put('/V4/shopping_cart/status_change', 'ShoppingCartController@statusChange');
 
 
     //想法
@@ -77,5 +82,5 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/v4/wiki/category', 'WikiController@category');
     Route::get('/v4/wiki/show', 'WikiController@show');
     Route::get('/v4/wiki/related', 'WikiController@related');
-
+    
 });

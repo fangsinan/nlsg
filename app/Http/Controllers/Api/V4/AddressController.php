@@ -25,7 +25,7 @@ class AddressController extends Controller {
      * @api {get} /api/V4/address/get_data 行政区划表数据
      * @apiVersion 4.0.0
      * @apiName /api/V4/address/get_data
-     * @apiGroup  Mall
+     * @apiGroup  address
      * @apiSampleRequest /api/V4/address/get_data
      * @apiDescription 行政区划表数据
      * @apiSuccessExample {json} Request-Example:
@@ -61,37 +61,158 @@ class AddressController extends Controller {
         return $this->success($res);
     }
 
-    //todo 创建修改收获地址 post
+    /**
+     * 添加,编辑
+     * @api {post} /api/V4/address/create 添加,编辑
+     * @apiVersion 1.0.0
+     * @apiName /api/V4/address/create
+     * @apiGroup address
+     * @apiSampleRequest /api/V4/address/create
+     * @apiDescription 添加,编辑
+     * @apiParam {string} province 省
+     * @apiParam {string} city 市
+     * @apiParam {string} [area] 地区(如北京没有三级,可不传)
+     * @apiParam {string} name 收货人名称
+     * @apiParam {string} phone 收货人电话
+     * @apiParam {string} details 详细地址
+     * @apiParam {number=1,0} is_default 1:默认地址 0:普通
+     *
+     * @apiParamExample {json} Request-Example:
+      {
+      "province":210000,
+      "city":210100,
+      "area":210102,
+      "name":"张三",
+      "phone":"1111111111",
+      "details":"数量的发掘Sofia1号",
+      "is_default":1
+      }
+     * @apiSuccessExample {json} Request-Example:
+     * {
+      "code": 200,
+      "msg": "成功",
+      "data": {
+      "code": true,
+      "msg": "成功"
+      }
+      }
+     */
     public function create(Request $request) {
-
-        
-        $validatedData = $request->validate([
-            'province' => ['required'],
-            'city' => ['required'],
-            'area' => ['required'],
-            'name' => ['required'],
-        ]);
-
-
-
-
-
-
-        return $this->success($validatedData);
-//        $params = $request->input();
-//        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-//        if (empty($user['id'] ?? 0)) {
-//            return $this->error('未登录');
-//        }
-//        $model = new MallAddress();
-//        $data = $model->create($params, $user['id']);
-//        if ($data['code'] ?? true === false) {
-//            return $this->error($data['msg']);
-//        } else {
-//            return $this->success($data);
-//        }
+        $params = $request->input();
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+        if (empty($user['id'] ?? 0)) {
+            return $this->error('未登录');
+        }
+        $model = new MallAddress();
+        $data = $model->create($params, $user['id']);
+        if (($data['code'] ?? true) === false) {
+            return $this->error($data['msg']);
+        } else {
+            return $this->success($data);
+        }
     }
 
-    //todo 收获地址列表 get
-    //todo 修改收获地址状态 put
+    /**
+     * 收货地址列表
+     * @api {get} /api/V4/address/get_list 收货地址列表
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/address/get_list
+     * @apiGroup  address
+     * @apiSampleRequest /api/V4/address/get_list
+     * @apiDescription 收货地址列表,字段说明见创建接口
+     * @apiSuccessExample {json} Request-Example:
+     * 
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "id": 2812,
+      "name": "李四",
+      "phone": "18624078563",
+      "details": "sdkfjsljfl1ao",
+      "is_default": 1,
+      "province": 210000,
+      "city": 210100,
+      "area": 210102,
+      "province_name": "辽宁",
+      "city_name": "沈阳",
+      "area_name": "和平区"
+      },
+      {
+      "id": 2816,
+      "name": "sfas",
+      "phone": "18624078563",
+      "details": "sdkfjsljfl1ao",
+      "is_default": 0,
+      "province": 210000,
+      "city": 210100,
+      "area": 210102,
+      "province_name": "辽宁",
+      "city_name": "沈阳",
+      "area_name": "和平区"
+      }
+      ]
+      }
+     */
+    public function getList() {
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+        if (empty($user['id'] ?? 0)) {
+            return $this->error('未登录');
+        }
+        $model = new MallAddress();
+        $data = $model->getList($user['id']);
+        return $this->success($data);
+    }
+
+    /**
+     * 修改状态
+     * @api {put} /api/V4/address/status_change 修改状态
+     * @apiVersion 1.0.0
+     * @apiName /api/V4/address/status_change
+     * @apiGroup address
+     * @apiSampleRequest /api/V4/address/status_change
+     * @apiDescription 修改状态
+     * @apiParam {string=default,nomal,del} flag 状态(默认,普通,删除)
+     * @apiParam {number} id id
+     *
+     * @apiParamExample {json} Request-Example:
+      {
+      "flag":"default",
+      "id":2815
+      }
+     * @apiSuccessExample {json} Request-Example:
+     * {
+      "code": 200,
+      "msg": "成功",
+      "data": {
+      "code": true,
+      "msg": "成功"
+      }
+      }
+     */
+    public function statusChange(Request $request) {
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+        if (empty($user['id'] ?? 0)) {
+            return $this->error('未登录');
+        }
+        $flag = $request->input('flag', '');
+        if (empty($flag)) {
+            return $this->error('参数错误');
+        } else {
+            $flag = strtolower($flag);
+        }
+        $id = $request->input('id', 0);
+        if (empty($id)) {
+            return $this->error('参数错误');
+        }
+        $model = new MallAddress();
+        $data = $model->statusChange($id, $flag, $user['id']);
+        if (($data['code'] ?? true) === false) {
+            return $this->error($data['msg']);
+        } else {
+            return $this->success($data);
+        }
+    }
+
 }

@@ -28,18 +28,118 @@ class MallAddress extends Base {
         $details = $params['details'] ?? '';
         $name = $params['name'] ?? '';
         $phone = $params['phone'] ?? '';
+
         if (empty($province) || empty($city) ||
                 empty($details) || empty($name) ||
                 empty($phone)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        if (empty($params['id'] ?? 0)) {
-            $address = self::where('id', '=', $params['id'])
-                    ->where('user_id', '=', $user_id)
-                    ->get();
+        if (!empty(($params['id'] ?? 0))) {
+            $address = self::where('user_id', '=', $user_id)
+                    ->find($params['id']);
+            if (!$address) {
+                return ['code' => false, 'msg' => 'id错误'];
+            }
         } else {
             $address = new self();
+        }
+
+        DB::beginTransaction();
+
+        if (($params['is_default'] ?? 0) == 1) {
+            $update_res = self::where('user_id', '=', $user_id)
+                    ->where('is_default', '=', 1)
+                    ->update(['is_default' => 0]);
+            if ($update_res === false) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败'];
+            }
+        }
+
+        $address->name = $name;
+        $address->phone = $phone;
+        $address->details = $details;
+        $address->is_default = $params['is_default'] ?? 0;
+        $address->is_del = 0;
+        $address->province = $province;
+        $address->city = $city;
+        $address->area = $area;
+        $address->user_id = $user_id;
+
+        $res = $address->save();
+
+        if ($res) {
+            DB::commit();
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
+    }
+
+    public static function getNameById($id) {
+        $res = Area::find($id);
+        return $res->name ?? '';
+    }
+
+    public function getList($user_id) {
+
+        $res = self::where('user_id', '=', $user_id)
+                ->where('is_del', '=', 0)
+                ->orderBy('is_default', 'desc')
+                ->orderBy('updated_at', 'desc')
+                ->select(['id', 'name', 'phone', 'details',
+                    'is_default', 'province', 'city', 'area'])
+                ->get();
+
+        foreach ($res as $v) {
+            $v->province_name = self::getNameById($v->province);
+            $v->city_name = self::getNameById($v->city);
+            $v->area_name = self::getNameById($v->area);
+        }
+
+        return $res;
+    }
+
+    public function statusChange($id, $flag, $user_id) {
+        $address = self::where('user_id', '=', $user_id)
+                ->where('is_del', '=', 0)
+                ->find($id);
+        if (!$address) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        DB::beginTransaction();
+
+        switch ($flag) {
+            case 'default':
+                $update_res = self::where('user_id', '=', $user_id)
+                        ->where('is_default', '=', 1)
+                        ->update(['is_default' => 0]);
+                if ($update_res === false) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '失败'];
+                }
+                $address->is_default = 1;
+                break;
+            case 'nomal':
+                $address->is_default = 0;
+                break;
+            case 'del':
+                $address->is_del = 1;
+                break;
+            default:
+                return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $res = $address->save();
+        if ($res) {
+            DB::commit();
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
         }
     }
 

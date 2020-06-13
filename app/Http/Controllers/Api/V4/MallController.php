@@ -393,7 +393,7 @@ class MallController extends Controller {
         $params['page'] = 1;
         $params['size'] = 4;
         $data = $model->getList($params);
-        if ($data['code'] ?? true === false) {
+        if (($data['code'] ?? true) === false) {
             return $this->error($data['msg']);
         } else {
             return $this->success($data);

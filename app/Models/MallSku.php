@@ -55,6 +55,21 @@ class MallSku extends Base {
                         ->select(['id', 'sku_id', 'key_name', 'value_name']);
     }
 
-    
-    
+    public static function getSkuStock($goods_id, $sku_number) {
+        $check_sku = DB::table('nlsg_mall_goods as nmg')
+                ->join('nlsg_mall_sku as sku', 'nmg.id', '=', 'sku.goods_id')
+                ->where('nmg.id', '=', $goods_id)
+                ->where('sku.sku_number', '=', $sku_number)
+                ->where('nmg.status', '=', 2)
+                ->where('sku.status', '=', 1)
+                ->select(['sku.stock'])
+                ->first();
+
+        if ($check_sku) {
+            return $check_sku->stock;
+        } else {
+            return false;
+        }
+    }
+
 }
