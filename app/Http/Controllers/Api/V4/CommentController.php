@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\CommentReply;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Attach;
@@ -32,8 +33,10 @@ class CommentController extends Controller
     {
         $content = $request->input('content');
         $img     = $request->input('img');
+        $pid     = $request->input('pid');
         $result  = Comment::create([
             'user_id' => 1,
+            'pid'     => $pid,
             'content' => $content,
             'type'    => 1
         ]);
@@ -56,6 +59,7 @@ class CommentController extends Controller
 
     }
 
+
     /**
      * Display the specified resource.
      *
@@ -67,16 +71,6 @@ class CommentController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -85,9 +79,30 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $id      = $request->input('id');
+        $content = $request->input('content');
+        $img     = $request->input('img');
+        $res= Comment::where('id', $id)
+            ->update(['content'=>$content]);
+        if ($res){
+            Attach::where('relation_id', $id)->delete();
+
+            if ($img){
+                $imgArr = explode(',', $img);
+                $data = [];
+                foreach ($imgArr as $v){
+                    $data[] = [
+                        'relation_id' => $id,
+                        'img'   => $v,
+                        'type'  => 1
+                    ];
+                }
+                Attach::insert($data);
+            }
+            return $this->success();
+        }
     }
 
     /**
@@ -96,8 +111,14 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $id = $request->input('id');
+        $res = Comment::where('id',$id)
+            ->update(['status'=>0]);
+        if($res){
+            CommentReply::where('comment_id', $id)->update(['status'=>0]);
+            return $this->success();
+        }
     }
 }
