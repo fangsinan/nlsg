@@ -757,8 +757,5 @@ class MallController extends Controller {
     
     //todo 拼团商品详情
 
-    //todo 我的地址
-    
-    
-    
+
 }

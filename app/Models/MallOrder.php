@@ -30,8 +30,9 @@ class MallOrder extends Model {
             $query->where('nmo.created_at', '<=', $params['end_time']);
         }
 
+        //nmo.status > 0 避免多次下未支付订单
         $list = $query->whereRaw('FIND_IN_SET(2,nmod.special_price_type)')
-                ->where('nmo.status', '>', 1)
+                ->where('nmo.status', '>', 0)
                 ->where('nmo.is_stop', '=', 0)
                 ->select(['nmod.sku_number'])
                 ->get();
