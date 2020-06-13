@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\CommentReply;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Attach;
@@ -99,8 +100,14 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $id = $request->input('id');
+        $res = Comment::where('id',$id)
+            ->update(['status'=>0]);
+        if($res){
+            CommentReply::where('comment_id', $id)->update(['status'=>0]);
+            return $this->success();
+        }
     }
 }
