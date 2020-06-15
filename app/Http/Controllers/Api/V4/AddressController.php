@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Area;
 use App\Models\MallAddress;
+use App\Models\FreightTemplate;
 
 /**
  * Description of AddressController
@@ -213,6 +214,51 @@ class AddressController extends Controller {
         } else {
             return $this->success($data);
         }
+    }
+
+    /**
+     * 自提点和退货点列表
+     * @api {get} /api/V4/address/list_of_shop 收货地址列表
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/address/list_of_shop
+     * @apiGroup  address
+     * @apiSampleRequest /api/V4/address/list_of_shop
+     * @apiDescription 自提点和退货点列表
+     * @apiParam {number=2,3} flag 2自提 3退货
+     * @apiSuccessExample {json} Request-Example:
+     * 
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "id": 10,
+      "name": "退货点1",
+      "admin_name": "啊哈哈",
+      "admin_phone": "20349024",
+      "province": 110000,
+      "city": 110105,
+      "area": 0,
+      "details": "朝阳路85号",
+      "province_name": "北京",
+      "city_name": "朝阳",
+      "area_name": ""
+      }
+      ]
+      }
+     */
+    public function listOfShop(Request $request) {
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+        if (empty($user['id'] ?? 0)) {
+            return $this->error('未登录');
+        }
+        $flag = $request->input('flag', 0);
+        if (!in_array($flag, [2, 3])) {
+            return $this->error('参数错误');
+        }
+        $model = new FreightTemplate();
+        $data = $model->listOfShop($flag);
+        return $this->success($data);
     }
 
 }

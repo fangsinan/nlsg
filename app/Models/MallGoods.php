@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -10,9 +9,9 @@ class MallGoods extends Base {
 
     protected $table = 'nlsg_mall_goods';
 
-    public function getList($params, $user = []) {
+    public function getList($params, $user = [], $cache = true) {
 
-        $list = $this->getListData($params);
+        $list = $this->getListData($params, $cache);
 
         //获取商品所处的活动
         $agModel = new ActiveGroupGlModel();
@@ -29,7 +28,7 @@ class MallGoods extends Base {
         return $list;
     }
 
-    protected function getListData($params) {
+    protected function getListData($params, $cache = true) {
         $cache_key_name = 'goods_list'; //哈希组名
         //缓存放入 goods_list
         //名称购成  page_size_(get_sku)_ob_(ids_str)
@@ -55,7 +54,9 @@ class MallGoods extends Base {
         $list = Cache::tags($cache_key_name)->get($cache_name);
         if (empty($list)) {
             $list = $this->getListDataFromDb($params);
-            Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
+            if ($cache) {
+                Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
+            }
         }
         return $list;
     }
@@ -77,7 +78,12 @@ class MallGoods extends Base {
 
 //        DB::connection()->enableQueryLog();
 
-        $query = MallGoods::where('status', '=', 2);
+        if (($params['invalid'] ?? 0) == 0) {
+            $query = MallGoods::where('status', '=', 2);
+        } else {
+            $query = MallGoods::whereIn('status', [1, 2]);
+        }
+
         if (!empty($params['ids_str'] ?? '')) {
             if (!is_array($params['ids_str'])) {
                 $params['ids_str'] = explode(',', $params['ids_str']);
@@ -133,7 +139,11 @@ class MallGoods extends Base {
             $query->limit($params['size'])->offset(($params['page'] - 1) * $params['size']);
         }
 
-        $select_field = ['id', 'name', 'subtitle', 'picture', 'original_price', 'price', 'category_id'];
+        $select_field = ['id', 'name', 'subtitle', 'picture',
+            'original_price', 'price', 'category_id'];
+        if (($params['invalid'] ?? 0) == 1) {
+            $select_field[] = 'status';
+        }
 
         //是否需要返回商品详情(包括详情)
         if (($params['get_details'] ?? 0) == 1) {
@@ -152,6 +162,10 @@ class MallGoods extends Base {
         if (($params['get_sku'] ?? 0) == 1) {
             $with_query[] = 'sku_list';
             $with_query[] = 'sku_list.sku_vavlue_list';
+            if (($params['invalid'] ?? 0) == 1) {
+                $with_query[] = 'sku_list_all';
+                $with_query[] = 'sku_list_all.sku_vavlue_list';
+            }
         }
 
         $with_query[] = 'category_list';
@@ -171,6 +185,12 @@ class MallGoods extends Base {
                         ->where('status', '=', 1)
                         ->select(['id', 'goods_id', 'sku_number', 'picture',
                             'original_price', 'price', 'stock']);
+    }
+
+    public function sku_list_all() {
+        return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
+                        ->select(['id', 'goods_id', 'sku_number', 'picture',
+                            'original_price', 'price', 'stock', 'status']);
     }
 
     public function tos_bind_list() {
@@ -199,15 +219,14 @@ class MallGoods extends Base {
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexGoods($ids)
-    {
-        $lists= MallGoods::query()
-            ->select('id','name','picture','original_price')
-            ->whereIn('id',$ids)
-            ->orderBy('created_at','desc')
-            ->take(10)
-            ->get()
-            ->toArray();
+    public function getIndexGoods($ids) {
+        $lists = MallGoods::query()
+                ->select('id', 'name', 'picture', 'original_price')
+                ->whereIn('id', $ids)
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get()
+                ->toArray();
         return $lists;
     }
 

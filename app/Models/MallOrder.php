@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -43,6 +42,10 @@ class MallOrder extends Base {
             $sku_list[] = $v->sku_number;
         }
         return array_unique($sku_list);
+    }
+
+    public function prepareCreateOrder($params, $user_id) {
+        
     }
 
 }

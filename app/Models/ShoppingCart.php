@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class ShoppingCart extends Base {
 
-    protected $table = 'nlsg_mall_shoppingcar';
+    protected $table = 'nlsg_mall_shopping_cart';
 
     public function create($params, $user_id) {
         $goods_id = $params['goods_id'] ?? 0;
@@ -47,7 +47,15 @@ class ShoppingCart extends Base {
                 return ['code' => false, 'msg' => 'id错误'];
             }
         } else {
-            $temp = new self();
+            $check_cart = self::where('user_id', '=', $user_id)
+                    ->where('goods_id', '=', $goods_id)
+                    ->where('sku_number', '=', $sku_number)
+                    ->first();
+            if ($check_cart) {
+                $temp = $check_cart;
+            } else {
+                $temp = new self();
+            }
         }
 
         $temp->goods_id = $goods_id;
@@ -65,28 +73,95 @@ class ShoppingCart extends Base {
         }
     }
 
-    public function getList($user_id) {
-        
+    public function getList($user) {
+        $cart = self::where('user_id', '=', $user['id'])
+                        ->orderBy('updated_at', 'desc')
+                        ->select(['id', 'goods_id', 'sku_number', 'num'])
+                        ->get()->toArray();
+        if (empty($cart)) {
+            return [];
+        }
+
+        $goods_id_list = array_column($cart, 'goods_id');
+
+        $goodsModel = new MallGoods();
+        $goods_list = $goodsModel->getList(
+                [
+                    'ids_str' => $goods_id_list,
+                    'ob' => 'ids_str',
+                    'get_all' => 1,
+                    'get_sku' => 1,
+                    'page' => 1,
+                    'size' => 1,
+                    'invalid' => 1
+                ], $user, false);
+
+
+        foreach ($cart as &$v) {
+            foreach ($goods_list as $gv) {
+                if ($v['goods_id'] == $gv->id) {
+                    $v['invalid'] = 0;
+                    $v['goods_name'] = $gv->name;
+                    $v['goods_subtitle'] = $gv->subtitle;
+                    $v['original_price'] = $gv->original_price;
+                    $v['price'] = $gv->price;
+                    if ($gv->status != 2) {
+                        $v['invalid'] = 1;
+                    }
+                    foreach ($gv->sku_list_all as $sv) {
+                        if ($v['sku_number'] == $sv->sku_number) {
+                            $v['sku_list'] = $sv;
+                            if ($sv->status == 0) {
+                                $v['invalid'] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $list = [];
+        $invalid_list = [];
+
+        foreach ($cart as $cv) {
+            if ($cv['invalid'] == 1) {
+                $invalid_list[] = $cv;
+            } else {
+                $list[] = $cv;
+            }
+        }
+
+        return ['list' => $list, 'invalid_list' => $invalid_list];
     }
 
     public function statusChange($id, $flag, $user_id) {
+
+        if (!is_array($id)) {
+            $id = explode(',', $id);
+        }
+
         $temp = self::where('user_id', '=', $user_id)
-                ->find($id);
-        if (!$temp) {
+                ->whereIn('id', $id)
+                ->count();
+
+        if (count($id) !== $temp) {
             return ['code' => false, 'msg' => 'id错误'];
         }
 
         switch ($flag) {
             case 'del':
-                $res = $temp->delete();
-                if ($res) {
-                    return ['code' => true, 'msg' => '成功'];
-                } else {
-                    return ['code' => false, 'msg' => '失败'];
-                }
+                $res = self::where('user_id', '=', $user_id)
+                        ->whereIn('id', $id)
+                        ->delete();
                 break;
             default:
                 return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败'];
         }
     }
 

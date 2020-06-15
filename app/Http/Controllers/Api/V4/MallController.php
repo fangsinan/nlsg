@@ -755,7 +755,11 @@ class MallController extends Controller {
         return $this->success($res);
     }
     
+    
     //todo 拼团商品详情
+    //todo 收藏
+    //todo 评价
+    //todo 自提点,售后点
 
 
 }

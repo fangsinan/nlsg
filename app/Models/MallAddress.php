@@ -8,7 +8,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -101,12 +100,20 @@ class MallAddress extends Base {
 
         return $res;
     }
+    
 
     public function statusChange($id, $flag, $user_id) {
-        $address = self::where('user_id', '=', $user_id)
+
+        if (!is_array($id)) {
+            $id = explode(',', $id);
+        }
+
+        $temp = self::where('user_id', '=', $user_id)
+                ->whereIn('id', $id)
                 ->where('is_del', '=', 0)
-                ->find($id);
-        if (!$address) {
+                ->count();
+
+        if (count($id) !== $temp) {
             return ['code' => false, 'msg' => 'id错误'];
         }
 
@@ -121,19 +128,28 @@ class MallAddress extends Base {
                     DB::rollBack();
                     return ['code' => false, 'msg' => '失败'];
                 }
-                $address->is_default = 1;
+                $update_data = [
+                    'is_default' => 1
+                ];
                 break;
             case 'nomal':
-                $address->is_default = 0;
+                $update_data = [
+                    'is_default' => 0
+                ];
                 break;
             case 'del':
-                $address->is_del = 1;
+                $update_data = [
+                    'is_del' => 1
+                ];
                 break;
             default:
                 return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $res = $address->save();
+        $res = self::where('user_id', '=', $user_id)
+                ->whereIn('id', $id)
+                ->where('is_del', '=', 0)
+                ->update($update_data);
         if ($res) {
             DB::commit();
             return ['code' => true, 'msg' => '成功'];

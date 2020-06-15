@@ -21,7 +21,7 @@ class CacheTools {
     public static function getExpire($flag) {
         $sort_exprice = 300;
         $normal_exprice = 3600;
-        $long__exprice = 86400;
+        $long_exprice = 86400;
         switch (strtolower($flag)) {
             case 'goods_sp_list_exprie':
             case 'sku_value':
@@ -38,7 +38,8 @@ class CacheTools {
                 break;
             case 'goods_category_list':
             case 'area_list':
-                $exprie = $long__exprice;
+            case 'freight_template_list':
+                $exprie = $long_exprice;
                 break;
             default :
                 $exprie = 0;
