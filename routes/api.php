@@ -50,7 +50,7 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/v4/order/get_coupon', 'OrderController@getCoupon');
 
 
-    //商城部分
+    //*******************************商城部分开始*******************************
     Route::get('/V4/goods/info', 'MallController@goodsList');
     Route::get('/V4/goods/coupon_list', 'MallController@couponList');
     Route::get('/V4/goods/comment_list', 'MallController@commentList');
@@ -71,7 +71,9 @@ Route::namespace('Api\V4')->group(function() {
     Route::post('/V4/shopping_cart/create', 'ShoppingCartController@create');
     Route::get('/V4/shopping_cart/get_list', 'ShoppingCartController@getList');
     Route::put('/V4/shopping_cart/status_change', 'ShoppingCartController@statusChange');
-
+    
+    Route::get('/V4/mall/prepare_create_rder', 'MallOrderController@prepareCreateOrder');
+    //*******************************商城部分结束*******************************
 
     //想法
     Route::get('/v4/comment/index', 'CommentController@index');

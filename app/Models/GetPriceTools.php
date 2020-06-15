@@ -26,7 +26,7 @@ class GetPriceTools {
         $cache_name = 'goods_' . $goods_id;
         $list = Cache::tags($cache_key_name)->get($cache_name);
 
-        if (true || empty($list)) {
+        if (empty($list)) {
             $list = $this->getPriceDataFromDb($goods_id);
             Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
         }
@@ -113,7 +113,6 @@ class GetPriceTools {
                 $temp_sku_list = [];
                 foreach ($data->sku_list as $slv) {
                     $temp_sku_list_s = $slv;
-                    //引用传值为什么有时不行
                     foreach ($temp_sp_data as $spdv) {
                         if ($slv->sku_number == $spdv->sku_number) {
                             switch (intval($user_level)) {

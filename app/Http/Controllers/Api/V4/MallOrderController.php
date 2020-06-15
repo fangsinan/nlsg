@@ -8,14 +8,14 @@ use App\Models\MallOrder;
 class MallOrderController extends Controller {
 
     //todo 预下单
-    public function prepareCreateOrder() {
+    public function prepareCreateOrder(Request $request) {
         $params = $request->input();
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error('未登录');
         }
         $model = new MallOrder();
-        $data = $model->prepareCreateOrder($params, $user['id']);
+        $data = $model->prepareCreateOrder($params, $user);
         if (($data['code'] ?? true) === false) {
             return $this->error($data['msg']);
         } else {
@@ -24,7 +24,7 @@ class MallOrderController extends Controller {
     }
 
     //todo 下单
-    public function createOrder() {
+    public function createOrder(Request $request) {
         
     }
 

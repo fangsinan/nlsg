@@ -44,7 +44,7 @@ class MallOrder extends Base {
         return array_unique($sku_list);
     }
 
-    public function prepareCreateOrder($params, $user_id) {
+    public function prepareCreateOrder($params, $user) {
         
     }
 
