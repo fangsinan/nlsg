@@ -10,6 +10,12 @@ class Subscribe extends Authenticatable
 {
     protected $table = 'nlsg_subscribe';
 
+
+    public function UserInfo (){
+        return $this->belongsTo('App\Models\User','user_id');
+    }
+
+
     /**
      * $user_id  登录者用户
      * $target_id  目标id  1为专栏的老师id  2作品id ....

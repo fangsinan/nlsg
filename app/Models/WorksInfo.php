@@ -20,7 +20,7 @@ class WorksInfo extends Model
     }
 
 
-    public function getInfo($works_id,$is_sub=0,$user_id=0,$type=1){
+    public function getInfo($works_id,$is_sub=0,$user_id=0,$type=1,$order='asc'){
         $where = ['status'=>4];
         if($type == 1){
             $where['pid'] = $works_id;
@@ -29,7 +29,7 @@ class WorksInfo extends Model
         }
         $works_data = WorksInfo::select([
             'id','type','title','section','introduce','url','callback_url1','callback_url1', 'callback_url2', 'callback_url3','view_num','duration','free_trial'
-        ])->where($where)->orderBy('order','asc')->get()->toArray();
+        ])->where($where)->orderBy('id',$order)->get()->toArray();
 
         foreach ($works_data as $key=>$val){
             //处理url  关注或试听

@@ -34,6 +34,7 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/v4/column/collection', 'ColumnController@Collection');
     Route::get('/v4/column/get_recommend', 'ColumnController@getRecommend');
     Route::get('/v4/column/get_lecture_list', 'ColumnController@getLectureList');
+    Route::get('/v4/column/get_lecture_study_list', 'ColumnController@LectureStudyList');
 
 
     //课程
