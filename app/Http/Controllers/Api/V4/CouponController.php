@@ -43,7 +43,7 @@ class CouponController extends Controller {
         $model = new Coupon();
         $data = $model->getCoupon($params['flag'], $user['id']);
         if (($data['code'] ?? true) === false) {
-            return $this->error($data['msg']);
+            return $this->error(0,$data['msg']);
         } else {
             return $this->success($data);
         }

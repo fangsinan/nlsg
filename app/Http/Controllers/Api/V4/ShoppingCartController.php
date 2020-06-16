@@ -48,7 +48,7 @@ class ShoppingCartController extends Controller {
         $model = new ShoppingCart();
         $data = $model->create($params, $user['id']);
         if (($data['code'] ?? true) === false) {
-            return $this->error($data['msg']);
+            return $this->error(0, $data['msg']);
         } else {
             return $this->success($data);
         }
@@ -198,7 +198,7 @@ class ShoppingCartController extends Controller {
         $model = new ShoppingCart();
         $data = $model->statusChange($id, $flag, $user['id']);
         if (($data['code'] ?? true) === false) {
-            return $this->error($data['msg']);
+            return $this->error(0, $data['msg']);
         } else {
             return $this->success($data);
         }

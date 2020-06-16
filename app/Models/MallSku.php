@@ -71,4 +71,19 @@ class MallSku extends Base {
         }
     }
 
+    public static function checkSkuCanBuy($goods_id, $sku_number) {
+        $check = DB::table('nlsg_mall_sku as sku')
+                ->join('nlsg_mall_goods as nmg', 'sku.goods_id', '=', 'nmg.id')
+                ->where('sku.goods_id', '=', $goods_id)
+                ->where('sku.sku_number', '=', $sku_number)
+                ->where('sku.status', '=', 1)
+                ->where('nmg.status', '=', 2)
+                ->select(['sku.id'])
+                ->count();
+
+        if ($check == 0) {
+            return ['code' => false, 'msg' => '商品信息错误'.$goods_id];
+        }
+    }
+
 }
