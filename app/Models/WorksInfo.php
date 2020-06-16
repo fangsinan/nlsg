@@ -3,10 +3,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-
-class WorksInfo extends Model
+class WorksInfo extends Base
 {
     protected $table = 'nlsg_works_info';
     public $timestamps = false;

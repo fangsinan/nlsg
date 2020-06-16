@@ -8,10 +8,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
-
-class WorksCategoryRelation extends Model {
+class WorksCategoryRelation extends Base {
 
     protected $table = 'nlsg_works_category_relation';
 

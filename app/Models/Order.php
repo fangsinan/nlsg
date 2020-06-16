@@ -7,13 +7,12 @@
  */
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Model;
 /**
  * Description of MallCategory
  *
  * @author wangxh
  */
-class Order extends Model {
+class Order extends Base {
 
     protected $table = 'nlsg_order';
 

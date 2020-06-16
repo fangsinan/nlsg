@@ -3,10 +3,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
-class Column extends Model
+class Column extends Base
 {
     protected $table = 'nlsg_column';
     public $timestamps = false;

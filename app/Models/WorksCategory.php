@@ -3,10 +3,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-
-class WorksCategory extends Model
+class WorksCategory extends Base
 {
     protected $table = 'nlsg_works_category';
 
