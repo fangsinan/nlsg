@@ -134,7 +134,7 @@ class MallController extends Controller {
       "original_price": "379.00",
       "price": "9.70",
       "stock": 294,
-      "sku_vavlue_list": [
+      "sku_value_list": [
       {
       "id": 364,
       "sku_id": 1884,

@@ -48,7 +48,7 @@ class MallSku extends Base {
         return $sku->toArray();
     }
 
-    public function sku_vavlue_list() {
+    public function sku_value_list() {
         return $this->hasMany('App\Models\MallSkuValue', 'sku_id', 'id')
                         ->where('status', '=', 1)
                         ->select(['id', 'sku_id', 'key_name', 'value_name']);
@@ -78,12 +78,29 @@ class MallSku extends Base {
                 ->where('sku.sku_number', '=', $sku_number)
                 ->where('sku.status', '=', 1)
                 ->where('nmg.status', '=', 2)
-                ->select(['sku.id'])
-                ->count();
+                ->select([
+                    'sku.id', 'sku.sku_number', 'sku.original_price', 
+                    'sku.price','nmg.name','nmg.subtitle','sku.stock',
+                    'sku.picture as sku_picture','nmg.picture as goods_picture'
+                ])
+                ->first();
 
-        if ($check == 0) {
-            return ['code' => false, 'msg' => '商品信息错误'.$goods_id];
+        if (!$check) {
+            return false;
+        }else{
+            $check->sku_value = self::getValueListBySkuId($check->id);
+            return $check;
         }
     }
 
+    public static function getValueListBySkuId($sku_id){
+        $list = DB::table('nlsg_mall_sku_value')
+                ->where('sku_id','=',$sku_id)
+                ->where('status','=',1)
+                ->select(['key_name','value_name'])
+                ->get()->toArray();
+        return $list;
+        
+    }
+    
 }

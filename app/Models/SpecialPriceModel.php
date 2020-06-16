@@ -18,7 +18,6 @@ class SpecialPriceModel extends Base {
 
         //获取所谓未结束活动信息
         $res = $this->getSpData($id, $goods_type);
-
         //筛选时间和库存
         foreach ($res as $k => $v) {
             if ($v->begin_time > $now_date || $v->end_time < $now_date) {
@@ -33,7 +32,17 @@ class SpecialPriceModel extends Base {
         }
 
         //配置
-        $sec_kill_count_flag = 2; //1 一個商品一天一次  2所有商品一天一次
+        //1:一個商品一天一次  
+        //2:所有商品一天一次 
+        //3:活动期间一个商品一次(额外配置活动时间范围)
+        //4:活动期间所有商品一次(额外配置活动时间范围)
+        $sec_kill_count_flag = ConfigModel::getData(9);
+        if (in_array($sec_kill_count_flag, [3, 4])) {
+            $get_begin_end_time = ConfigModel::getData(10);
+            $get_begin_end_time = explode(',', $get_begin_end_time);
+            $today_begin_time = $get_begin_end_time[0];
+            $today_end_time = $get_begin_end_time[1];
+        }
         $temp_sec_flag = 0;
 
         //获取用户今天的秒杀订单数据(秒杀一天一次)
@@ -95,7 +104,7 @@ class SpecialPriceModel extends Base {
                 ->where('goods_type', '=', $goods_type)
                 ->where('status', '=', 1)
                 ->where('end_time', '>', date('Y-m-d H:i:s'))
-                ->whereIn('type', [1, 2, 3, 4])
+                ->whereIn('type', [1, 2, 4])
                 ->groupBy('type')
                 ->orderByRaw('FIELD(type,' . $sp_type_order . ') asc')
                 ->orderBy('id', 'desc')
@@ -203,7 +212,7 @@ class SpecialPriceModel extends Base {
     //拼团首页
     public function groupBuyList() {
         $res = $this->homeGroupListFromDb(0);
-        foreach($res as $v){
+        foreach ($res as $v) {
             $v->order_count = 1;
             $v->user_count = 4;
             $v->order_user = [

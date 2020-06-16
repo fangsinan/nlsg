@@ -98,7 +98,7 @@ class ShoppingCartController extends Controller {
       "price": "299.00",
       "stock": 457,
       "status": 1,
-      "sku_vavlue_list": [
+      "sku_value_list": [
       {
       "id": 241,
       "sku_id": 1369,
@@ -129,7 +129,7 @@ class ShoppingCartController extends Controller {
       "price": "119.68",
       "stock": 99,
       "status": 1,
-      "sku_vavlue_list": [
+      "sku_value_list": [
       {
       "id": 383,
       "sku_id": 1936,

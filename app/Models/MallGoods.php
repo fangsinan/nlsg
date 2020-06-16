@@ -161,10 +161,10 @@ class MallGoods extends Base {
         }
         if (($params['get_sku'] ?? 0) == 1) {
             $with_query[] = 'sku_list';
-            $with_query[] = 'sku_list.sku_vavlue_list';
+            $with_query[] = 'sku_list.sku_value_list';
             if (($params['invalid'] ?? 0) == 1) {
                 $with_query[] = 'sku_list_all';
-                $with_query[] = 'sku_list_all.sku_vavlue_list';
+                $with_query[] = 'sku_list_all.sku_value_list';
             }
         }
 

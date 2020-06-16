@@ -19,9 +19,16 @@ class CacheTools {
 
     //获取缓存时间  单位秒
     public static function getExpire($flag) {
-        $sort_exprice = 300;
-        $normal_exprice = 3600;
-        $long_exprice = 86400;
+        if (0) {
+            $sort_exprice = 300;
+            $normal_exprice = 3600;
+            $long_exprice = 86400;
+        } else {
+            $sort_exprice = 10;
+            $normal_exprice = 10;
+            $long_exprice = 10;
+        }
+
         switch (strtolower($flag)) {
             case 'goods_sp_list_exprie':
             case 'sku_value':

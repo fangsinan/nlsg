@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class GetPriceTools {
+class GetPriceTools extends Base {
 
     public $level_3_off = 0.9;
     public $level_4_off = 0.85;
@@ -18,9 +18,15 @@ class GetPriceTools {
     }
 
     //获取计算价格
-    public function getGoodsPrice($data, $user_level, $user_id, $is_staff) {
+    public function getGoodsPrice($data, $user_level, $user_id, $is_staff = 0, $for_order = false) {
         //计算推客的常规购买价格和收益
-        $goods_id = $data->id;
+        if ($for_order) {
+            $goods_id = $data['goods_id'];
+            $data = (object) array();
+        } else {
+            $goods_id = $data->id;
+        }
+
         $expire_num = CacheTools::getExpire('goods_price_exprie');
         $cache_key_name = 'goods_price'; //哈希组名
         $cache_name = 'goods_' . $goods_id;
@@ -31,6 +37,7 @@ class GetPriceTools {
             Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
         }
 
+        //各sku的推客收益
         $temp_twitter_data = [];
         foreach ($list->sku_price_list as $tmv) {
             $temp_tmv = [];
@@ -39,6 +46,10 @@ class GetPriceTools {
             $temp_twitter_data[] = $temp_tmv;
         }
         $data->twitter_money_list = $temp_twitter_data;
+        if ($for_order) {
+            $data->price_list = $list;
+            return $data;
+        }
 
         switch (intval($user_level)) {
             case 2:
@@ -56,7 +67,7 @@ class GetPriceTools {
         if ($data->sku_list ?? false) {
             foreach ($data->sku_list as $slv) {
                 foreach ($list->sku_price_list as $splv) {
-                    if ($slv->sku_number === $splv->sku_number) {
+                    if ($slv->sku_number == $splv->sku_number) {
                         switch (intval($user_level)) {
                             case 2:
                             case 3:
@@ -115,6 +126,7 @@ class GetPriceTools {
                     $temp_sku_list_s = $slv;
                     foreach ($temp_sp_data as $spdv) {
                         if ($slv->sku_number == $spdv->sku_number) {
+                            $temp_sku_list_s->original_price = $spdv->sku_original_price;
                             switch (intval($user_level)) {
                                 case 2:
                                 case 3:
@@ -126,6 +138,8 @@ class GetPriceTools {
                                 case 5:
                                     $temp_sku_list_s->price = $spdv->sku_price_dealer;
                                     break;
+                                default:
+                                    $temp_sku_list_s->price = $spdv->sku_price;
                             }
                         }
                     }
