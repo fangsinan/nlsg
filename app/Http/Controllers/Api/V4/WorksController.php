@@ -92,7 +92,6 @@ class WorksController extends Controller
         $hide = $request->input('hide',0);
         $category_id = $request->input('category_id',0);
         $user_id = $request->input('user_id',0);
-        $page = $request->input('page',1);
         $teacher_id = $request->input('teacher_id',0);
         $is_free = $request->input('is_free',0);
 
@@ -129,7 +128,7 @@ class WorksController extends Controller
                 $query->where($works_where)->select("*")
                     ->orderBy($order_str,'desc')->groupBy('id');
             }])->select()->where($where)
-            ->paginate(20);
+            ->paginate($this->page_per_page);
         $worksData = $worksData->toArray();
         foreach ($worksData['data'] as $key=>$val){
             if($hide == 1){

@@ -30,8 +30,7 @@ class ColumnController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup Column
      *
-     * @apiParam {int} page  （非必填）
-     * @apiParam {int} pageSize  (非必填）
+     * @apiParam {int} page
      * @apiParam {int} order 1默认倒序 2正序
      *
      * @apiSuccess {string} result json
@@ -498,7 +497,7 @@ class ColumnController extends Controller
      *
      * @apiParam {int} lecture_id 讲座id
      * @apiParam {int} user_id 用户id
-     * @apiParam {int} page 用户id
+     * @apiParam {int} page 页数
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -529,7 +528,6 @@ class ColumnController extends Controller
     public function LectureStudyList(Request $request){
         $lecture_id = $request->input('lecture_id',0);
         $user_id    = $request->input('user_id',0);
-        $page    = $request->input('page',0);
 
         $subList = Subscribe::with([
             'UserInfo' => function($query){
@@ -538,7 +536,7 @@ class ColumnController extends Controller
             'type' => 6,
             'relation_id' => $lecture_id,
         ])->where('end_time','>',time())
-            ->paginate(20);
+            ->paginate($this->page_per_page);
         $subList = $subList->toArray();
 
         foreach ($subList['data'] as $key => &$val){
