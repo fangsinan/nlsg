@@ -4,9 +4,7 @@
 namespace App\Models;
 
 
-use Illuminate\Database\Eloquent\Model;
-
-class WorksInfoContent extends Model
+class WorksInfoContent extends Base
 {
     protected $table = 'nlsg_works_info_content';
 

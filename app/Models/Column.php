@@ -3,10 +3,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
-class Column extends Model
+class Column extends Base
 {
     protected $table = 'nlsg_column';
     public $timestamps = false;
@@ -46,12 +44,12 @@ class Column extends Model
         if( $column['type'] == 2 ){
             $sub_user = Subscribe::select('user_id')->where([
                 'relation_id'=> $column_id,
-                'type'       => 1,
+                'type'       => 6,
                 'is_del'     => 0,
             ])->orderBy('created_at','desc')->paginate(6)->toArray();
             $user_id_arr =array_column($sub_user['data'],'user_id');
             $column['user_data'] = User::select('id','nick_name','headimg')->whereIn('id',$user_id_arr)->get()->toArray();
-            $column['user_count'] = Subscribe::where(['relation_id'=> $column_id, 'type' => 1, 'is_del' => 0,])->count();
+            $column['user_count'] = Subscribe::where(['relation_id'=> $column_id, 'type' => 6, 'is_del' => 0,])->count();
         }
         //是否收藏
         $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();

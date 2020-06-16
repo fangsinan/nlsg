@@ -9,6 +9,7 @@ use App\Models\ColumnOutline;
 use App\Models\History;
 use App\Models\Recommend;
 use App\Models\Subscribe;
+use App\Models\User;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
@@ -29,8 +30,7 @@ class ColumnController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup Column
      *
-     * @apiParam {int} page  （非必填）
-     * @apiParam {int} pageSize  (非必填）
+     * @apiParam {int} page
      * @apiParam {int} order 1默认倒序 2正序
      *
      * @apiSuccess {string} result json
@@ -488,4 +488,72 @@ class ColumnController extends Controller
 
         return $this->success($is_collection);
     }
+
+    /**
+     * @api {post} api/v4/column/get_lecture_study_list  在学列表
+     * @apiName get_lecture_study_list
+     * @apiVersion 1.0.0
+     * @apiGroup column
+     *
+     * @apiParam {int} lecture_id 讲座id
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} page 页数
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "data": [
+    {
+    "id": 3,
+    "user_id": 211172,
+    "user_info": {
+    "id": 211172,
+    "level": 0,
+    "username": "15650701817",
+    "nick_name": "能量时光",
+    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+    }
+    }
+    ],
+    "last_page": 1,
+    "per_page": 20,
+    "total": 1
+    }
+    }
+     */
+
+    public function LectureStudyList(Request $request){
+        $lecture_id = $request->input('lecture_id',0);
+        $user_id    = $request->input('user_id',0);
+
+        $subList = Subscribe::with([
+            'UserInfo' => function($query){
+                $query->select('id','level','username','nick_name','headimg','expire_time');
+            }])->select('id','user_id')->where([
+            'type' => 6,
+            'relation_id' => $lecture_id,
+        ])->where('end_time','>',time())
+            ->paginate($this->page_per_page);
+        $subList = $subList->toArray();
+
+        foreach ($subList['data'] as $key => &$val){
+            $val['user_info']['level'] = User::getLevel(0, $val['user_info']['level'], $val['user_info']['expire_time']);
+            unset($val['user_info']['expire_time']);
+        }
+
+
+
+        $res = [
+            'data' => $subList['data'],
+            'last_page' => $subList['last_page'],
+            'per_page' => $subList['per_page'],
+            'total' => $subList['total'],
+
+        ];
+        return $this->success($res);
+    }
+
 }

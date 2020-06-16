@@ -3,11 +3,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 
-class Works extends Model
+class Works extends Base
 {
     protected $table = 'nlsg_works';
     public $timestamps = false;
