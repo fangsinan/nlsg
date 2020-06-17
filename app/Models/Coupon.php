@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace App\Models;
-
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -179,6 +172,46 @@ class Coupon extends Base {
         } else {
             return $res;
         }
+    }
+
+    public static function getCouponListForOrder($uid, $money = 0) {
+        $now_date = date('Y-m-d H:i:s');
+
+        $temp_res = self::where('user_id', '=', $uid)
+                ->where('status', '=', 1)
+                ->whereIn('type', [3, 4])
+                ->where('order_id', '=', 0)
+                ->where('begin_time', '<=', $now_date)
+                ->where('end_time', '>', $now_date)
+                ->select(['id', 'name', 'type', 'price', 'full_cut', 'explain',
+                    'begin_time', 'end_time'])
+                ->orderBy('end_time', 'asc')
+                ->orderBy('id', 'asc')
+                ->get();
+
+        $coupon_goods = [];
+        $coupon_freight = [];
+
+        foreach ($temp_res as $v) {
+            if ($v->type == 3) {
+                //商品优惠券
+                if ($money === 0) {
+                    $coupon_goods[] = $v->toArray();
+                } else {
+                    if ($money >= $v->full_cut) {
+                        $coupon_goods[] = $v->toArray();
+                    }
+                }
+            } else {
+                //免邮券
+                $coupon_freight[] = $v->toArray();
+            }
+        }
+
+        return [
+            'coupon_goods' => $coupon_goods,
+            'coupon_freight' => $coupon_freight
+        ];
     }
 
 }

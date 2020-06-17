@@ -46,6 +46,7 @@ class CacheTools {
             case 'goods_category_list':
             case 'area_list':
             case 'freight_template_list':
+            case 'freight_template':
                 $exprie = $long_exprice;
                 break;
             default :

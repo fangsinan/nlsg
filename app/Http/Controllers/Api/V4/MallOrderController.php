@@ -18,12 +18,13 @@ class MallOrderController extends Controller {
         $params = [
             'from_cart' => 1, //1表示是购物车  0不是
             'sku' => '1612728266,1835913656,1654630825,1626220663', //如果是购物车,可能是多条
-            'goods_id'=>209,
-            'buy_num' => 5,
+            'goods_id' => 209,
+            'buy_num' => 1,
             'inviter' => 211172, //推荐人
             'post_type' => 1, //1邮寄 2自提
-            'coupon_id' => '', //优惠券id 最多两个
-            'address_id' => 2812
+            'coupon_goods_id' => '7', //优惠券id
+            'coupon_freight_id' => '10',
+            'address_id' => 0
         ];
 
         if (empty($user['id'] ?? 0)) {
@@ -32,7 +33,8 @@ class MallOrderController extends Controller {
         $model = new MallOrder();
         $data = $model->prepareCreateOrder($params, $user);
         if (($data['code'] ?? true) === false) {
-            return $this->error(0,$data['msg']);
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
         } else {
             return $this->success($data);
         }

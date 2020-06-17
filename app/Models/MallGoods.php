@@ -98,10 +98,10 @@ class MallGoods extends Base {
         }
         switch ($params['ob'] ?? 'default') {
             case 'new_asc':
-                $query->orderBy('ctime', 'asc');
+                $query->orderBy('created_at', 'asc');
                 break;
             case 'new_desc':
-                $query->orderBy('ctime', 'desc');
+                $query->orderBy('created_at', 'desc');
                 break;
             case 'sales_asc':
                 $query->orderBy('sales_num', 'asc');
@@ -213,7 +213,7 @@ class MallGoods extends Base {
                         ->select(['id', 'name'])
                         ->where('status', '=', 1);
     }
-
+    
     /**
      * 首页好物推荐
      * @param $ids 相关作品id

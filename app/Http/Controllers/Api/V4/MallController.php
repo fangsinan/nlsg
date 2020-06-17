@@ -394,7 +394,8 @@ class MallController extends Controller {
         $params['size'] = 4;
         $data = $model->getList($params);
         if (($data['code'] ?? true) === false) {
-            return $this->error(0,$data['msg']);
+            $ps = ($this->show_ps ? (($data['ps']??false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
         } else {
             return $this->success($data);
         }

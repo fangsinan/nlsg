@@ -11,6 +11,7 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     protected $page_per_page = 50;
+    protected $show_ps = true;
 
     protected function success($data =[])
     {
