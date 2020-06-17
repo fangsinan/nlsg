@@ -74,6 +74,7 @@ Route::namespace('Api\V4')->group(function() {
     Route::put('/V4/shopping_cart/status_change', 'ShoppingCartController@statusChange');
     
     Route::get('/V4/mall/prepare_create_rder', 'MallOrderController@prepareCreateOrder');
+    Route::get('/V4/mall/create_rder', 'MallOrderController@createOrder');
     //*******************************商城部分结束*******************************
 
     //想法
