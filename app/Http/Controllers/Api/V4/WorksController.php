@@ -182,11 +182,11 @@ class WorksController extends Controller
     "teacher": [
     {
     "id": 168934,
-    "nick_name": "chandler_v4"
+    "nickname": "chandler_v4"
     },
     {
     "id": 211172,
-    "nick_name": "房某某"
+    "nickname": "房某某"
     }
     ]
     }
@@ -207,7 +207,7 @@ class WorksController extends Controller
         //精品名师
         $Teacher = Works::select('user_id')->with([
             'UserName'=>function($query){
-                $query->select('id','nick_name');
+                $query->select('id','nickname');
             }])->where('status',4)
             ->orderBy('subscribe_num','desc')->groupBy('user_id')
             ->paginate(6)->toArray();

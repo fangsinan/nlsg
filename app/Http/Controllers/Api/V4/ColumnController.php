@@ -513,7 +513,7 @@ class ColumnController extends Controller
     "id": 211172,
     "level": 0,
     "username": "15650701817",
-    "nick_name": "能量时光",
+    "nickname": "能量时光",
     "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
     }
     }
@@ -531,7 +531,7 @@ class ColumnController extends Controller
 
         $subList = Subscribe::with([
             'UserInfo' => function($query){
-                $query->select('id','level','username','nick_name','headimg','expire_time');
+                $query->select('id','level','phone','nickname','headimg','expire_time');
             }])->select('id','user_id')->where([
             'type' => 6,
             'relation_id' => $lecture_id,
