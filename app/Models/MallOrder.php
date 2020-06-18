@@ -102,7 +102,6 @@ class MallOrder extends Base {
             $check_temp_res = MallSku::checkSkuCanBuy(
                             $v['goods_id'], $v['sku_number']
             );
-            //dd($check_temp_res);
             if ($check_temp_res === false) {
                 return ['code' => false, 'msg' => '商品参数错误'];
             } else {
@@ -160,6 +159,19 @@ class MallOrder extends Base {
         return $temp_list;
     }
 
+    /**
+     * 生成订单编号
+     * @param type $uid 用户id
+     * @param type $type 1:普通订单
+     */
+    public static function createOrderNumber($uid, $type) {
+        $now = time();
+        $d = date('ymd', $now);
+        $u = str_pad($uid, 8, 0, STR_PAD_LEFT);
+        $s = $now - strtotime(date('y-m-d', $now));
+        return $d . $u . str_pad($s, 5, 0, STR_PAD_LEFT) . rand(10, 99) . $type;
+    }
+
     //********************普通订单开始********************
     //检查下单参数是否正确
     public function checkParams(&$params) {
@@ -197,22 +209,98 @@ class MallOrder extends Base {
         return $sku_list;
     }
 
+    //普通订单  --下单
     public function createOrder($params, $user) {
-        $sku_list = $this->createOrderTool($params, $user, true);
-        
-        if(!$sku_list['can_sub']){
-            return ['code'=>false,'msg'=>'参数错误'];
+        $data = $this->createOrderTool($params, $user, true);
+
+        if (!$data['can_sub']) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        if (empty($params['os_type'] ?? 0)) {
+            return ['code' => false, 'msg' => '参数错误', 'ps' => 'os_type'];
+        }
+
+
+
+        //减库存
+        //优惠券和免邮券
+        $order_data = [];
+        $order_data['ordernum'] = MallOrder::createOrderNumber($user['id'], 1);
+        $order_data['user_id'] = $user['id'];
+        $order_data['order_type'] = 1;
+        $order_data['status'] = 1;
+        $order_data['cost_price'] = $data['price_list']['all_original_price'];
+        $order_data['freight'] = $data['price_list']['freight_money'];
+        $order_data['vip_cut'] = $data['price_list']['vip_cut_money'];
+        $order_data['coupon_freight_id'] = $params['coupon_freight_id'] ?? 0;
+        $order_data['coupon_id'] = $params['coupon_goods_id'] ?? 0;
+        $order_data['coupon_money'] = $data['price_list']['coupon_money'];
+        $order_data['special_price_cut'] = $data['price_list']['sp_cut_money'];
+        $order_data['price'] = $data['price_list']['order_price'];
+        $order_data['os_type'] = $params['os_type'];
+        $order_data['messages'] = $params['messages'] ?? '';
+        $order_data['post_type'] = $params['post_type'];
+        $order_data['address_id'] = $params['address_id'];
+        $order_data['address_history'] = json_encode($data['used_address']);
+        $order_data['bill_type'] = $params['bill_type'] ?? 0;
+        $order_data['bill_title'] = $params['bill_title'] ?? '';
+        $order_data['bill_number'] = $params['bill_number'] ?? '';
+        $order_data['bill_format'] = $params['bill_format'] ?? 0;
+        $order_data['active_flag'] = $params['active_flag'] ?? '';
+
+
+        DB::beginTransaction();
+
+        //********************mall_order部分********************
+        $order_res = DB::table('nlsg_mall_order')->insertGetId($order_data);
+        if (!$order_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '订单提交失败,请重试.', 'ps' => 'order error'];
+        }
+
+        //********************mall_order_detail部分********************
+        $details_data = [];
+        foreach ($data['sku_list'] as $v) {
+            $temp_details_data = [];
+            $temp_datails_data['order_id'] = $order_res;
+            $temp_datails_data['user_id'] = $user['id'];
+            $temp_datails_data['goods_id'] = $v['goods_id'];
+            $temp_datails_data['sku_number'] = $v['sku_number'];
+            $temp_datails_data['num'] = $v['num'];
+            $temp_datails_data['inviter'] = $v['inviter'];
+            if ($v['inviter']) {
+                $temp_datails_data['inviter_history'] = json_encode($v['inviter_info']);
+            }
+            $temp_sku_history = [];
+            $temp_sku_history['actual_num'] = $v['actual_num'];
+            $temp_sku_history['actual_price'] = $v['actual_price'];
+            $temp_sku_history['original_price'] = $v['original_price'];
+            $temp_sku_history['sku_value'] = $v['sku_value'];
+            $temp_sku_history['stock'] = $v['stock'];
+            $temp_datails_data['sku_history'] = json_encode($temp_sku_history);
+            $details_data[] = $temp_datails_data;
+        }
+        $detail_res = DB::table('nlsg_mall_order_detail')->insert($details_data);
+        if (!$detail_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '订单提交失败,请重试.', 'ps' => 'detail error'];
         }
         
         
-        
-        
-        
-        
-        
-        
-        
-        return $sku_list;
+
+
+
+
+
+        dd([$data, $order_data, $details_data]);
+
+
+
+
+
+
+        return $order_data;
     }
 
     //普通订单 下单工具
@@ -401,7 +489,7 @@ class MallOrder extends Base {
         $coupon_freight = 0; //是否免邮券
         $freight_free_flag = false; //是否免邮
         //****************开始计算金额*********************
-        foreach ($sku_list as $v) {
+        foreach ($sku_list as $k => $v) {
             $all_original_price = GetPriceTools::PriceCalc(
                             '+',
                             $all_original_price,
@@ -435,6 +523,8 @@ class MallOrder extends Base {
                                 )
                 );
             }
+            //todo 删掉
+            ksort($sku_list[$k]);
         }
         //****************可用优惠券*********************
         $coupon_list = Coupon::getCouponListForOrder($user['id'], $all_price);
@@ -498,7 +588,6 @@ class MallOrder extends Base {
             $freight_money = 0;
         }
 
-
         $order_price = 0;
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
@@ -515,6 +604,7 @@ class MallOrder extends Base {
         ];
 
         $res = [
+            'user' => $user,
             'sku_list' => $sku_list,
             'price_list' => $price_list,
             'address_list' => $address_list,

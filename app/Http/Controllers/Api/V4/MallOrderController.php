@@ -56,7 +56,8 @@ class MallOrderController extends Controller {
             'post_type' => 1, //1邮寄 2自提
             'coupon_goods_id' => '7', //优惠券id
             'coupon_freight_id' => '10',
-            'address_id' => 2814
+            'address_id' => 2814,
+            'os_type'=>1,
         ];
 
         if (empty($user['id'] ?? 0)) {
