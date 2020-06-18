@@ -105,6 +105,7 @@ class MallOrder extends Base {
             if ($check_temp_res === false) {
                 return ['code' => false, 'msg' => '商品参数错误'];
             } else {
+                $sku_list[$k]['sku_id'] = $check_temp_res->id;
                 $sku_list[$k]['original_price'] = $check_temp_res->original_price;
                 $sku_list[$k]['price'] = $check_temp_res->price;
                 $sku_list[$k]['name'] = $check_temp_res->name;
@@ -211,20 +212,18 @@ class MallOrder extends Base {
 
     //普通订单  --下单
     public function createOrder($params, $user) {
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
         $data = $this->createOrderTool($params, $user, true);
 
-        if (!$data['can_sub']) {
-            return ['code' => false, 'msg' => '参数错误'];
+        if (!($data['can_sub'] ?? false)) {
+            return ['code' => false, 'msg' => '参数错误', 'ps' => 'can_sub'];
         }
 
         if (empty($params['os_type'] ?? 0)) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => 'os_type'];
         }
 
-
-
-        //减库存
-        //优惠券和免邮券
         $order_data = [];
         $order_data['ordernum'] = MallOrder::createOrderNumber($user['id'], 1);
         $order_data['user_id'] = $user['id'];
@@ -248,7 +247,8 @@ class MallOrder extends Base {
         $order_data['bill_number'] = $params['bill_number'] ?? '';
         $order_data['bill_format'] = $params['bill_format'] ?? 0;
         $order_data['active_flag'] = $params['active_flag'] ?? '';
-
+        $order_data['created_at'] = $now_date;
+        $order_data['updated_at'] = $now_date;
 
         DB::beginTransaction();
 
@@ -268,9 +268,13 @@ class MallOrder extends Base {
             $temp_datails_data['goods_id'] = $v['goods_id'];
             $temp_datails_data['sku_number'] = $v['sku_number'];
             $temp_datails_data['num'] = $v['num'];
+            $temp_datails_data['created_at'] = $now_date;
+            $temp_datails_data['updated_at'] = $now_date;
             $temp_datails_data['inviter'] = $v['inviter'];
             if ($v['inviter']) {
                 $temp_datails_data['inviter_history'] = json_encode($v['inviter_info']);
+            } else {
+                $temp_datails_data['inviter_history'] = '';
             }
             $temp_sku_history = [];
             $temp_sku_history['actual_num'] = $v['actual_num'];
@@ -286,21 +290,52 @@ class MallOrder extends Base {
             DB::rollBack();
             return ['code' => false, 'msg' => '订单提交失败,请重试.', 'ps' => 'detail error'];
         }
-        
-        
 
+        //********************mall_sku库存部分********************
+        foreach ($data['sku_list'] as $v) {
+            $temp_sku = MallSku::find($v['sku_id']);
+            $temp_sku->stock = $v['stock'] - $v['actual_num'];
+            if ($temp_sku->stock < 0) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                    'ps' => $v['sku_id'] . 'stock error'];
+            }
+            $sku_res = $temp_sku->save();
+            if (!$sku_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                    'ps' => $v['sku_id'] . 'sku error'];
+            }
+        }
 
+        //********************优惠券和免邮券部分********************
+        if ($params['coupon_goods_id']) {
+            $coupon_temp = Coupon::find($params['coupon_goods_id']);
+            $coupon_temp->status = 2;
+            $coupon_temp->order_id = $order_res;
+            $coupon_res = $coupon_temp->save();
+            if (!$coupon_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                    'ps' => 'coupon goods error'];
+            }
+        }
 
+        if ($params['coupon_freight_id']) {
+            $coupon_temp = Coupon::find($params['coupon_freight_id']);
+            $coupon_temp->status = 2;
+            $coupon_temp->order_id = $order_res;
+            $coupon_res = $coupon_temp->save();
+            if (!$coupon_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                    'ps' => 'coupon freight error'];
+            }
+        }
 
+        DB::commit();
 
-        dd([$data, $order_data, $details_data]);
-
-
-
-
-
-
-        return $order_data;
+        return ['order_id' => $order_res, 'ordernum' => $order_data['ordernum']];
     }
 
     //普通订单 下单工具
