@@ -16,8 +16,10 @@
         "jpush/jpush": "^3.6",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
-        "overtrue/wechat": "~4.0",
+        "overtrue/easy-sms": "^1.1",
+        "overtrue/laravel-wechat": "~5.0",
         "predis/predis": "^1.1",
+        "tymon/jwt-auth": "^1.0",
         "yansongda/pay": "^2.9"
     },
     "require-dev": {
