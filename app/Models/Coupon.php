@@ -20,8 +20,8 @@ class Coupon extends Base {
                             'user_id' => $user_id,
                             'type' => $type,
                             'status' => 1,
-                        ])->where('deadline', '>=', time())
-                        ->where('fullcut_price', '>=', $price)->first();
+                        ])->where('end_time', '>=', time())
+                        ->where('full_cut', '>=', $price)->first();
         return $data->money ?? 0;
     }
 

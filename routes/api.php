@@ -62,19 +62,20 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/V4/goods/group_buy', 'MallController@groupBuyList');
     Route::get('/V4/goods/service_description', 'MallController@mallServiceDescription');
     Route::post('/V4/goods/get_coupon', 'CouponController@getCoupon');
-    
+
     Route::get('/V4/address/get_data', 'AddressController@getData');
     Route::post('/V4/address/create', 'AddressController@create');
     Route::get('/V4/address/get_list', 'AddressController@getList');
     Route::put('/V4/address/status_change', 'AddressController@statusChange');
     Route::get('/V4/address/list_of_shop', 'AddressController@listOfShop');
-    
+
     Route::post('/V4/shopping_cart/create', 'ShoppingCartController@create');
     Route::get('/V4/shopping_cart/get_list', 'ShoppingCartController@getList');
     Route::put('/V4/shopping_cart/status_change', 'ShoppingCartController@statusChange');
-    
-    Route::get('/V4/mall/prepare_create_order', 'MallOrderController@prepareCreateOrder');
-    Route::get('/V4/mall/create_order', 'MallOrderController@createOrder');
+
+    Route::get('/V4/mall/prepare_create_rder', 'MallOrderController@prepareCreateOrder');
+    Route::get('/V4/mall/create_rder', 'MallOrderController@createOrder');
+
     //*******************************商城部分结束*******************************
 
     //想法
@@ -93,4 +94,19 @@ Route::namespace('Api\V4')->group(function() {
     Route::get('/v4/wiki/show', 'WikiController@show');
     Route::get('/v4/wiki/related', 'WikiController@related');
 
+    Route::post('/v4/user/sendSms', 'UserController@sendSms');
+    Route::post('/v4/user/login', 'UserController@login');
+
+    Route::get('/v4/user/wechat', 'UserController@wechat');
+
+//    Route::namespace('Api\V4')->group([
+//        'middleware' => 'api',
+//        'prefix' => 'auth'
+//    ], function($router) {
+//        Route::post('login', 'AuthController@login');
+//    });
+
+
+
 });
+
