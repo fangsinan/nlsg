@@ -588,6 +588,7 @@ class MallOrder extends Base {
             ksort($sku_list[$k]);
         }
         //****************可用优惠券*********************
+        //todo 需要排除限定商品得优惠券
         $coupon_list = Coupon::getCouponListForOrder($user['id'], $all_price);
 
         if ($params['coupon_goods_id']) {
