@@ -177,15 +177,23 @@ class MallOrder extends Base {
     //********************普通订单开始********************
     //检查下单参数是否正确
     public function checkParams(&$params) {
+
         if (empty($params['sku'])) {
             return ['code' => fasle, 'msg' => '参数错误', 'ps' => 'sku'];
         }
-        if (!in_array($params['from_cart'], [1, 0])) {
-            return ['code' => false, 'msg' => '参数错误', 'ps' => 'from_cart=1,0'];
-        }
+
         if (!is_array($params['sku'])) {
             $params['sku'] = explode(',', $params['sku']);
         }
+
+        if (!in_array($params['from_cart'], [1, 0])) {
+            return ['code' => false, 'msg' => '参数错误', 'ps' => 'from_cart=1,0'];
+        }
+
+        if (!in_array($params['os_type'], [1, 2, 3])) {
+            return ['code' => false, 'msg' => '参数错误', 'ps' => 'os_type=1,2,3'];
+        }
+
         if ($params['from_cart'] == 0) {
             if (count($params['sku']) !== 1) {
                 return ['code' => false, 'msg' => '参数错误', 'ps' => 'sku数量有误'];
@@ -194,14 +202,20 @@ class MallOrder extends Base {
                 return ['code' => false, 'msg' => '参数错误', 'ps' => 'goods_id错误'];
             }
         }
+
         if (!in_array($params['post_type'], [1, 2])) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => 'post_type=1,2'];
         }
+
         $params['coupon_goods_id'] = intval($params['coupon_goods_id'] ?? 0);
+
         $params['coupon_freight_id'] = intval($params['coupon_freight_id'] ?? 0);
+
         $params['address_id'] = intval($params['address_id'] ?? 0);
+
         if ($params['post_type'] == 2 && $params['address_id'] == 0) {
-            return ['code' => false, 'msg' => '参数错误', 'ps' => '如果自提,需传自提地址address_id'];
+            return ['code' => false, 'msg' => '参数错误',
+                'ps' => '如果自提,需传自提地址address_id'];
         }
     }
 
