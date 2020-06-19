@@ -30,7 +30,8 @@ class MallOrder extends Base {
         }
 
         //nmo.status > 0 避免多次下未支付订单
-        $list = $query->whereRaw('FIND_IN_SET(2,nmod.special_price_type)')
+        $list = $query
+                ->whereRaw('FIND_IN_SET(2,nmod.special_price_type)')
                 ->where('nmo.status', '>', 0)
                 ->where('nmo.is_stop', '=', 0)
                 ->select(['nmod.sku_number'])
@@ -76,7 +77,7 @@ class MallOrder extends Base {
         return $sp_list;
     }
 
-    //获取sku_list
+    //获取sku_list,并校验商品信息和推客信息
     public function getOrderSkuList($params, $user_id) {
 
         if ($params['from_cart'] === 0) {
@@ -283,6 +284,8 @@ class MallOrder extends Base {
             $temp_sku_history['sku_value'] = $v['sku_value'];
             $temp_sku_history['stock'] = $v['stock'];
             $temp_datails_data['sku_history'] = json_encode($temp_sku_history);
+            $temp_datails_data['special_price_type'] = $v['sp_type'] ?? '';
+
             $details_data[] = $temp_datails_data;
         }
         $detail_res = DB::table('nlsg_mall_order_detail')->insert($details_data);
@@ -325,11 +328,27 @@ class MallOrder extends Base {
             $coupon_temp = Coupon::find($params['coupon_freight_id']);
             $coupon_temp->status = 2;
             $coupon_temp->order_id = $order_res;
+            $coupon_temp->used_time = $now_date;
             $coupon_res = $coupon_temp->save();
             if (!$coupon_res) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '订单提交失败,请重试.',
                     'ps' => 'coupon freight error'];
+            }
+        }
+
+        //********************购物车********************
+        if ($params['from_cart'] == 1) {
+            //如果是购物车,删除
+            $cart_sku = explode(',', $params['sku']);
+            $cart_res = DB::table('nlsg_mall_shopping_cart')
+                    ->where('user_id', '=', $user['id'])
+                    ->whereIn('sku_number', $cart_sku)
+                    ->delete();
+            if (!$cart_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                    'ps' => 'cart error'];
             }
         }
 
@@ -353,18 +372,16 @@ class MallOrder extends Base {
             return $sku_list;
         }
 
-        $sp_list = $this->getSkuSP(
-                array_column($sku_list, 'goods_id'),
-                array_column($sku_list, 'sku_number')
-        );
-
         $priceTools = new GetPriceTools();
 
-        //获取推客金额
+        //获取非折扣时商品的购买价格和收益
+        //level_price 当前用户的购买价格
+        //t_money 当前推客的收益 没有0
         foreach ($sku_list as $sl_k => $sl_v) {
-            //$data, $user_level, $user_id, $is_staff = 0,$for_order = false
-            $temp_sl_v = $priceTools->getGoodsPrice($sl_v,
-                    $user['level'], $user['id'], $user['is_staff'], true);
+            //获取商品各规格的售价和推客收益
+            $temp_sl_v = $priceTools->getGoodsPrice(
+                    $sl_v, $user['level'], $user['id'], $user['is_staff'], true
+            );
 
             foreach ($temp_sl_v->price_list->sku_price_list as $vv) {
                 if ($vv->sku_number == $sl_v['sku_number']) {
@@ -385,6 +402,7 @@ class MallOrder extends Base {
                     }
                 }
             }
+
             foreach ($temp_sl_v->twitter_money_list as $vv) {
                 if ($vv['sku_number'] == $sl_v['sku_number']) {
                     //初始推客金额(不是活动单独设定)
@@ -418,68 +436,62 @@ class MallOrder extends Base {
             }
         }
 
+        //查询商品的折扣信息
+        $sp_list = $this->getSkuSP(
+                array_column($sku_list, 'goods_id'),
+                array_column($sku_list, 'sku_number')
+        );
+
         //如果有优惠价格
         if (!empty($sp_list)) {
-            //计算优先级  1:折扣  3:几元几件
+            //计算优先级  1:折扣  3:几元几件(废弃)
             $sp_list_1 = [];
-            $sp_list_3 = [];
 
             foreach ($sp_list as $sp_v) {
                 if ($sp_v->type == 1) {
                     $sp_list_1[] = $sp_v;
-                } else {
-                    $sp_list_3[] = $sp_v;
                 }
             }
 
-            foreach ($sp_list_1 as $slv) {
+            foreach ($sp_list_1 as $spv) {
                 foreach ($sku_list as $sl_k => $sl_v) {
-                    if ($slv->sku_number == $sl_v['sku_number']) {
+                    if ($spv->sku_number == $sl_v['sku_number']) {
+                        //活动的售价
                         $sku_list[$sl_k]['sp_type'] = 1;
-                        $sku_list[$sl_k]['sp_o_price'] = $slv->sku_original_price;
+                        $sku_list[$sl_k]['sp_o_price'] = $spv->sku_original_price;
                         //优惠价格
                         switch (intval($user['level'])) {
                             case 2:
                             case 3:
-                                $sku_list[$sl_k]['sp_price'] = $slv->sku_price_black;
+                                $sku_list[$sl_k]['sp_price'] = $spv->sku_price_black;
                                 break;
                             case 4:
-                                $sku_list[$sl_k]['sp_price'] = $slv->sku_price_yellow;
+                                $sku_list[$sl_k]['sp_price'] = $spv->sku_price_yellow;
                                 break;
                             case 5:
-                                $sku_list[$sl_k]['sp_price'] = $slv->sku_price_dealer;
+                                $sku_list[$sl_k]['sp_price'] = $spv->sku_price_dealer;
                                 break;
                             default :
-                                $sku_list[$sl_k]['sp_price'] = $slv->sku_price;
+                                $sku_list[$sl_k]['sp_price'] = $spv->sku_price;
                         }
-                        //推客收益
+                        //如果有推客
                         if (!empty($sl_v['inviter']) && !empty($sl_v['inviter_info'])) {
-                            foreach ($slv->twitter_money_list as $tmv) {
-                                if ($tmv['sku_number'] == $sl_v['sku_number']) {
-                                    $sku_list[$sl_k]['t_money'] = 0;
-                                    if ($sl_v['inviter_info']['is_staff'] == 0) {
-                                        $sku_list[$sl_k]['t_money'] = $tmv['twitter_money']['t_staff_money'];
-                                    } else {
-                                        if ($sl_v['inviter_info']['expire_time'] > $now_date) {
-                                            switch (intval($sl_v['inviter_info']['level'])) {
-                                                //用户等级 1 早期366老会员 2 推客 3黑钻 4皇钻 5代理
-                                                case 2:
-                                                    $sku_list[$sl_k]['t_money'] = $tmv['twitter_money']['t_money'];
-                                                    break;
-                                                case 3:
-                                                    $sku_list[$sl_k]['t_money'] = $tmv['twitter_money']['t_money_black'];
-                                                    break;
-                                                case 4:
-                                                    $sku_list[$sl_k]['t_money'] = $tmv['twitter_money']['t_money_yellow'];
-                                                    break;
-                                                case 5:
-                                                    $sku_list[$sl_k]['t_money'] = $tmv['twitter_money']['t_money_dealer'];
-                                                    break;
-                                                default :
-                                                    $sku_list[$sl_k]['t_money'] = 0;
-                                            }
-                                        }
-                                    }
+
+                            if ($spv->is_set_t_money == 1) {
+                                switch (intval($sl_v['inviter_info']['level'])) {
+                                    //用户等级 1 早期366老会员 2 推客 3黑钻 4皇钻 5代理
+                                    case 2:
+                                        $sku_list[$sl_k]['t_money'] = $spv->t_money;
+                                        break;
+                                    case 3:
+                                        $sku_list[$sl_k]['t_money'] = $spv->t_money_black;
+                                        break;
+                                    case 4:
+                                        $sku_list[$sl_k]['t_money'] = $spv->t_money_yellow;
+                                        break;
+                                    case 5:
+                                        $sku_list[$sl_k]['t_money'] = $spv->t_money_dealer;
+                                        break;
                                 }
                             }
                         }
@@ -615,7 +627,7 @@ class MallOrder extends Base {
             }
 
             foreach ($sku_list as $v) {
-                if ($v['freight_money'] > $freight_money) {
+                if (($v['freight_money'] ?? 0) > $freight_money) {
                     $freight_money = $v['freight_money'];
                 }
             }
@@ -640,7 +652,7 @@ class MallOrder extends Base {
 
         $res = [
             'user' => $user,
-            'sku_list' => $sku_list,
+            'sku_list' => $sku_list_show,
             'price_list' => $price_list,
             'address_list' => $address_list,
             'coupon_list' => $coupon_list,
@@ -653,6 +665,7 @@ class MallOrder extends Base {
 
         if ($check_sub) {
             $res['can_sub'] = $can_sub;
+            $res['sku_list'] = $sku_list;
         }
 
         return $res;

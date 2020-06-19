@@ -15,17 +15,33 @@ class MallOrderController extends Controller {
 
         //1626220663,1627866674,1734814569
         //1835913656,1654630825,1626220663
-        $params = [
-            'from_cart' => 1, //1表示是购物车  0不是
-            'sku' => '1612728266,1835913656,1654630825,1626220663', //如果是购物车,可能是多条
-            'goods_id' => 209,
-            'buy_num' => 1,
-            'inviter' => 211172, //推荐人
-            'post_type' => 1, //1邮寄 2自提
-            'coupon_goods_id' => '7', //优惠券id
-            'coupon_freight_id' => '10',
-            'address_id' => 0
-        ];
+
+        if (0) {
+            $params = [
+                'from_cart' => 0, //1表示是购物车  0不是
+                'sku' => '1612728266', //如果是购物车,可能是多条
+                'goods_id' => 91,
+                'buy_num' => 1,
+                'inviter' => 211172, //推荐人
+                'post_type' => 1, //1邮寄 2自提
+                'coupon_goods_id' => 0, //优惠券id
+                'coupon_freight_id' => 0,
+                'address_id' => 2815
+            ];
+        } else {
+            $params = [
+                'from_cart' => 1, //1表示是购物车  0不是
+                'sku' => '1612728266,1835913656,1654630825,1626220663', //如果是购物车,可能是多条
+                'goods_id' => 209,
+                'buy_num' => 1,
+                'inviter' => 211172, //推荐人
+                'post_type' => 1, //1邮寄 2自提
+                'coupon_goods_id' => 0, //优惠券id
+                'coupon_freight_id' => 0,
+                'address_id' => 2814,
+                'os_type' => 1,
+            ];
+        }
 
         if (empty($user['id'] ?? 0)) {
             return $this->error('未登录');
@@ -54,10 +70,10 @@ class MallOrderController extends Controller {
             'buy_num' => 1,
             'inviter' => 211172, //推荐人
             'post_type' => 1, //1邮寄 2自提
-            'coupon_goods_id' => '7', //优惠券id
-            'coupon_freight_id' => '10',
+            'coupon_goods_id' => 0, //优惠券id
+            'coupon_freight_id' => 0,
             'address_id' => 2814,
-            'os_type'=>1,
+            'os_type' => 1,
         ];
 
         if (empty($user['id'] ?? 0)) {
