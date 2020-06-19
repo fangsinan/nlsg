@@ -91,7 +91,23 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
-
+    static function GetIncomeFlag($twitter_id,$user_id)
+    {
+        if($twitter_id==$user_id){
+            return false;
+        }
+        $level_twitterId = self::getLevel($twitter_id);
+        if($level_twitterId>0){//推客级别
+            $level_userId = self::getLevel($user_id);
+            if($level_twitterId<=$level_userId){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
+        }
+    }
 
 
 }
