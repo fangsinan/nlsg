@@ -21,7 +21,7 @@ class Subscribe extends Authenticatable
      * $target_id  目标id  1为专栏的id  2作品id ....
      * type 1 专栏  2作品 3直播  4会员 5线下产品
      * */
-    static function     isSubscribe($user_id=0,$target_id=0,$type=0){
+    static function isSubscribe($user_id=0,$target_id=0,$type=0){
         $is_sub = 0;
 
         //会员都免费
