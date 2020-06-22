@@ -50,6 +50,11 @@ class Recommend extends Base
                 $model = new MallGoods();
                 $result  = $model->getIndexGoods($ids);
                 break;
+            case 9:
+                //听书
+                $model = new Works();
+                $result = $model->getIndexWorks($ids, 1);
+                break;
 
         }
         return $result;

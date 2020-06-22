@@ -45,7 +45,7 @@ class Works extends Base
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexWorks($ids)
+    public function getIndexWorks($ids,$is_audio_book=0)
     {
         if (!$ids){
             return false;
@@ -53,9 +53,10 @@ class Works extends Base
 
         $lists= Works::select('id','user_id','title','cover_img','subtitle','price')
             ->with(['user'=>function($query){
-                $query->select('id','username');
+                $query->select('id','phone','nickname');
             }])
             ->whereIn('id',$ids)
+            ->where('is_audio_book',$is_audio_book)
             ->orderBy('created_at','desc')
             ->get()
             ->toArray();
