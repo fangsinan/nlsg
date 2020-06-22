@@ -31,16 +31,6 @@ class Subscribe extends Authenticatable
         if($user_id && $target_id && $type ){
             $where = ['type' => $type, 'user_id' => $user_id,];
             //处理专栏的关注信息
-//            if($type == 1){
-//                $where['column_id'] = $target_id;
-//            }else if($type == 2){
-//                $where['works_id'] = $target_id;
-//            }else if($type == 3){
-//                $where['live_id'] = $target_id;
-//            }else{
-//                //type 类型错误直接返回0
-//                return 0;
-//            }
             if( !in_array($type,[1,2,3]) ){
                 return 0;
             }

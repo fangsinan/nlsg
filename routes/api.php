@@ -45,6 +45,14 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
     Route::get('works/get_works_content', 'WorksController@getWorksContent');
     Route::get('works/get_works_index', 'WorksController@getWorksIndex');
 
+    //听书
+    Route::get('book/get_book_list', 'ListenBookController@getBookList');
+    Route::get('book/get_book_list_detail', 'ListenBookController@getBookListDetail');
+    Route::get('book/get_new_book_list', 'ListenBookController@getNewBookList');
+
+    Route::get('pay/wechat_pay', 'PayController@prePay');
+    Route::get('wechat_pay/notify', 'CallbackController@Notify');
+
     //下单
     Route::get('order/create_column_order', 'OrderController@createColumnOrder');
     Route::get('order/create_works_order', 'OrderController@createWorksOrder');
