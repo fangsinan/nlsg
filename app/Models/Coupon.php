@@ -174,37 +174,66 @@ class Coupon extends Base {
         }
     }
 
-    public static function getCouponListForOrder($uid, $money = 0) {
-        $now_date = date('Y-m-d H:i:s');
+    public function sub_list() {
+        return $this->hasMany('App\Models\CouponRuleSub', 'rule_id', 'cr_id')
+                        ->select(['id', 'rule_id', 'use_type', 'goods_id']);
+    }
 
-        $temp_res = self::where('user_id', '=', $uid)
-                ->where('status', '=', 1)
-                ->whereIn('type', [3, 4])
-                ->where('order_id', '=', 0)
-                ->where('begin_time', '<=', $now_date)
-                ->where('end_time', '>', $now_date)
-                ->select(['id', 'name', 'type', 'price', 'full_cut', 'explain',
-                    'begin_time', 'end_time'])
-                ->orderBy('end_time', 'asc')
-                ->orderBy('id', 'asc')
-                ->get();
+    public static function getCouponListForOrder($uid, $money = 0, $goods_id_list = []) {
+        $now_date = date('Y-m-d H:i:s');
 
         $coupon_goods = [];
         $coupon_freight = [];
 
+        $temp_res = self::where('user_id', '=', $uid)
+                        ->where('status', '=', 1)
+                        ->whereIn('type', [3, 4])
+                        ->where('order_id', '=', 0)
+                        ->where('begin_time', '<=', $now_date)
+                        ->where('end_time', '>', $now_date)
+                        ->select(['id', 'name', 'type', 'price', 'full_cut',
+                            'explain', 'begin_time', 'end_time', 'cr_id'])
+                        ->with(['sub_list'])
+                        ->orderBy('end_time', 'asc')
+                        ->orderBy('id', 'asc')
+                        ->get()->toArray();
+
+        if (empty($temp_res)) {
+            return [
+                'coupon_goods' => $coupon_goods,
+                'coupon_freight' => $coupon_freight
+            ];
+        }
+
+        foreach ($temp_res as $k => $v) {
+            if ($v['type'] == 3 && $v['sub_list']) {
+                $del_flag = 1;
+                foreach ($v['sub_list'] as $vv) {
+                    if ($vv['use_type'] == 2) {
+                        if (!in_array($vv['goods_id'], $goods_id_list)) {
+                            $del_flag = 0;
+                        }
+                    }
+                }
+                if ($del_flag) {
+                    unset($temp_res[$k]);
+                }
+            }
+        }
+
         foreach ($temp_res as $v) {
-            if ($v->type == 3) {
+            if ($v['type'] == 3) {
                 //商品优惠券
                 if ($money === 0) {
-                    $coupon_goods[] = $v->toArray();
+                    $coupon_goods[] = $v;
                 } else {
-                    if ($money >= $v->full_cut) {
-                        $coupon_goods[] = $v->toArray();
+                    if ($money >= $v['full_cut']) {
+                        $coupon_goods[] = $v;
                     }
                 }
             } else {
                 //免邮券
-                $coupon_freight[] = $v->toArray();
+                $coupon_freight[] = $v;
             }
         }
 

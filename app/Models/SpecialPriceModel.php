@@ -110,11 +110,15 @@ class SpecialPriceModel extends Base {
                 ->orderBy('id', 'desc')
                 ->select([
                     'id', 'goods_type', 'goods_id', 'goods_original_price',
-                    'goods_price', 'sku_number', 'stock', 'sku_original_price',
-                    'sku_price', 'sku_price_black', 'sku_price_yellow', 'group_price',
-                    'sku_price_dealer', 'is_set_t_money', 't_money', 't_money_black',
-                    't_money_yellow', 't_money_dealer', 'begin_time', 'end_time',
-                    'type', 'use_coupon', 'group_name', 'group_num_type', 'group_num'
+                    'goods_price', 'sku_number', 'stock', 'use_stock',
+                    'sku_original_price', 'sku_price',
+                    'sku_price_black', 'sku_price_yellow',
+                    'group_price', 'sku_price_dealer',
+                    'is_set_t_money', 't_money', 't_money_black',
+                    't_money_yellow', 't_money_dealer',
+                    'begin_time', 'end_time', 'type',
+                    'use_coupon', 'group_name', 'group_num_type', 'group_num',
+                    'freight_free', 'freight_free_line'
                 ])
                 ->get();
 

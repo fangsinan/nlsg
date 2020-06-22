@@ -15,8 +15,6 @@ class MallOrder extends Base {
             return [];
         }
 
-        //DB::connection()->enableQueryLog();
-
         $query = DB::table('nlsg_mall_order as nmo')
                 ->leftJoin('nlsg_mall_order_detail as nmod',
                         'nmo.id', '=', 'nmod.order_id')
@@ -80,7 +78,7 @@ class MallOrder extends Base {
     //获取sku_list,并校验商品信息和推客信息
     public function getOrderSkuList($params, $user_id) {
 
-        if ($params['from_cart'] === 0) {
+        if ($params['from_cart'] === 2) {
             $temp = [];
             $temp['cart_id'] = 0;
             $temp['sku_number'] = $params['sku'][0];
@@ -174,7 +172,6 @@ class MallOrder extends Base {
         return $d . $u . str_pad($s, 5, 0, STR_PAD_LEFT) . rand(10, 99) . $type;
     }
 
-    //********************普通订单开始********************
     //检查下单参数是否正确
     public function checkParams(&$params) {
 
@@ -186,7 +183,7 @@ class MallOrder extends Base {
             $params['sku'] = explode(',', $params['sku']);
         }
 
-        if (!in_array($params['from_cart'], [1, 0])) {
+        if (!in_array($params['from_cart'], [1, 2])) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => 'from_cart=1,0'];
         }
 
@@ -194,12 +191,15 @@ class MallOrder extends Base {
             return ['code' => false, 'msg' => '参数错误', 'ps' => 'os_type=1,2,3'];
         }
 
-        if ($params['from_cart'] == 0) {
+        if ($params['from_cart'] == 2) {
             if (count($params['sku']) !== 1) {
                 return ['code' => false, 'msg' => '参数错误', 'ps' => 'sku数量有误'];
             }
             if (empty($params['goods_id'] ?? 0)) {
                 return ['code' => false, 'msg' => '参数错误', 'ps' => 'goods_id错误'];
+            }
+            if ($params['buy_num'] < 1) {
+                return ['code' => false, 'msg' => '参数错误', 'ps' => '购买数量有误'];
             }
         }
 
@@ -233,10 +233,6 @@ class MallOrder extends Base {
 
         if (!($data['can_sub'] ?? false)) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => 'can_sub'];
-        }
-
-        if (empty($params['os_type'] ?? 0)) {
-            return ['code' => false, 'msg' => '参数错误', 'ps' => 'os_type'];
         }
 
         $order_data = [];
@@ -471,6 +467,7 @@ class MallOrder extends Base {
                 foreach ($sku_list as $sl_k => $sl_v) {
                     if ($spv->sku_number == $sl_v['sku_number']) {
                         //活动的售价
+                        $sku_list[$sl_k]['sp_id'] = $spv->id;
                         $sku_list[$sl_k]['sp_type'] = 1;
                         $sku_list[$sl_k]['sp_o_price'] = $spv->sku_original_price;
                         //优惠价格
@@ -540,7 +537,6 @@ class MallOrder extends Base {
             $sku_list_show[] = $temp_v;
         }
 
-
         $all_original_price = 0; //所有商品的原价
         $all_price = 0; //所有商品的售价
         $freight_money = ConfigModel::getData(7); //运费
@@ -588,8 +584,12 @@ class MallOrder extends Base {
             ksort($sku_list[$k]);
         }
         //****************可用优惠券*********************
-        //todo 需要排除限定商品得优惠券
-        $coupon_list = Coupon::getCouponListForOrder($user['id'], $all_price);
+        $goods_id_list = array_column($sku_list, 'goods_id');
+
+        //需要排除限定商品得优惠券
+        $coupon_list = Coupon::getCouponListForOrder(
+                        $user['id'], $all_price, $goods_id_list
+        );
 
         if ($params['coupon_goods_id']) {
             foreach ($coupon_list['coupon_goods'] as $cv) {
@@ -686,5 +686,4 @@ class MallOrder extends Base {
         return $res;
     }
 
-    //********************普通订单结束********************
 }

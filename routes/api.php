@@ -76,6 +76,9 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
 
     Route::post('mall/prepare_create_order', 'MallOrderController@prepareCreateOrder');
     Route::post('mall/create_order', 'MallOrderController@createOrder');
+    
+    Route::get('mall/prepare_create_flash_sale_order', 'MallOrderController@prepareCreateFlashSaleOrder');
+    Route::get('mall/create_flash_sale_order', 'MallOrderController@createFlashSaleOrder');
 
     //*******************************商城部分结束*******************************
 
