@@ -103,14 +103,15 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
     Route::get('wiki/show', 'WikiController@show');
     Route::get('wiki/related', 'WikiController@related');
 
-    Route::post('user/sendSms', 'UserController@sendSms');
-    Route::post('user/login', 'UserController@login');
+    Route::post('auth/sms', 'AuthController@sendSms');
+    Route::post('auth/login', 'AuthController@login');
 
-    Route::get('user/wechat', 'UserController@wechat');
+    Route::get('auth/wechat', 'AuthController@wechat');
 
-    //我的
-    Route::get('user/index', 'UserController@index');
+    Route::group(['middleware' => 'auth.jwt'], function () {
+        Route::get('user/index', 'UserController@index');
+    });
+
 
 });
-
 
