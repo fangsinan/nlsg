@@ -286,7 +286,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} api/v4/works/get_works_content  获取音频文稿
+     * @api {post} api/v4/works/get_works_content  获取文稿
      * @apiName get_works_content
      * @apiVersion 1.0.0
      * @apiGroup works

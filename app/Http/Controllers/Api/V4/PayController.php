@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
+use App\Models\Order;
+use App\Models\User;
 use EasyWeChat\Factory;
+use Illuminate\Http\Request;
 
 class PayController extends  Controller
 {
@@ -35,24 +39,77 @@ class PayController extends  Controller
     }
     }
      */
-    public function prePay(){
+    public function prePay(Request $request){
+
+        //1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
+        $attach = $request->input('type',0);
+        $order_id = $request->input('id',0);
+
+        if (empty($order_id) || empty($attach)) { //订单id有误
+            return $this->error(0,'订单信息为空');
+        }
+
+        $pay_info = $this->getPayInfo($order_id, $attach);
+        if($pay_info == false){
+            return $this->error(0,'订单信息错误');
+        }
 
         $config = Config('wechat.payment.default');
-        //$config['sandbox'] = true;
         $app = Factory::payment($config);
-
         $result = $app->order->unify([
-            'body' => '商品测试购买',
-            'out_trade_no' => '202008061253461',
-            'total_fee' => 88,
-            //'spbill_create_ip' => '123.12.12.123', // 可选，如不传该参数，SDK 将会自动获取相应 IP 地址
-            'notify_url' => 'qweqew', // 支付结果通知网址，如果不设置则会使用配置里的默认地址
+            'body' => $pay_info['body'],
+            'out_trade_no' => $pay_info['ordernum'],
+            'total_fee' => $pay_info['price'],
             'trade_type' => 'APP', // 请对应换成你的支付方式对应的值类型
-            'attach' => 1,
-            'openid' => 'oVvvfwHw0EB-ZL5Iab5YrAirQVTI',
+            'attach' => $attach,
+            'openid' => $pay_info['openid'],
         ]);
 
         return $this->success($result);
+
+    }
+
+    function getPayInfo($order_id, $attach)
+    {
+
+        $body = '';
+        if(in_array($attach,[1,2,5,9,11,14])) //1专栏 2会员 5打赏 9精品课 听课
+        {
+            $OrderInfo = Order::find($order_id);
+            if (empty($OrderInfo)) { //订单有误
+                return false;
+            }
+            if ($OrderInfo['status'] == 1) { //已支付
+                return false;
+            }
+            $OrderInfo = $OrderInfo->toArray();
+            if ($attach == 1) {
+                $ColumnInfo = Column::find($OrderInfo['relation_id']);
+                $body = "能量时光-专栏购买-".$ColumnInfo['name'];
+            } else if ($attach == 2) {
+                $body = "能量时光-微信端会员";
+            } else if ($attach == 5) {
+                $body = "能量时光-打赏-" . $OrderInfo['ordernum'];
+            } else if ($attach == 9) {
+                $body = "能量时光-精品课购买-" . $OrderInfo['ordernum'];
+            } else if ($attach == 11) {
+                $body = "能量时光-直播购买-" . $OrderInfo['ordernum'];
+            } else if ($attach == 14) {
+                $body = "能量时光-线下课购买-" . $OrderInfo['ordernum'];
+
+            }
+
+        }else{
+            return false;
+        }
+
+        $userInfo = User::find($OrderInfo['user_id']);
+        return [
+            'body'      => $body,
+            'price'     => $OrderInfo['price'],
+            'ordernum'  => $OrderInfo['ordernum'],
+            'openid'    => $userInfo['openid'],
+        ];
 
     }
 }

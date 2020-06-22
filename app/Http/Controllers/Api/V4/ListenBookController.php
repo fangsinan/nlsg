@@ -7,27 +7,44 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Lists;
 use App\Models\ListsWork;
+use App\Models\Recommend;
 use App\Models\Subscribe;
 use App\Models\Works;
+use App\Models\WorksCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ListenBookController extends Controller
 {
     //  听书首页
-    public function ListenBookIndex(){
+    public function ListenBookIndex(Request $request){
+        $recommendObj = new Recommend();
+
         //主编力荐
+        $index_recommend = $recommendObj->getIndexRecommend(9,10 );
 
         //热门推荐
+        $hot_recommend = $recommendObj->getIndexRecommend(9,11 );
 
         //精选书单
+        $book_list = $recommendObj->getIndexRecommend(4,12 );
 
         //新书速递
+        $new_book = $recommendObj->getIndexRecommend(9,13 );
 
         //热门分类
+        $hot_type = WorksCategory::select('id','name')->where('status',1)->get()->toArray();
 
         //猜你喜欢
+        $like_book = $recommendObj->getIndexRecommend(9,14 );
 
+        return [
+            'index_recommend'   => $index_recommend,
+            'hot_recommend'     => $hot_recommend,
+            'book_list'         => $book_list,
+            'new_book'          => $new_book,
+            'hot_type'          => $hot_type,
+            'like_book'         => $like_book,
+        ];
     }
 
 

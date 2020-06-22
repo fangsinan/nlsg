@@ -175,7 +175,7 @@ class ColumnController extends Controller
         $field = ['id', 'name', 'column_type', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) )    {
-            return $this->error(0,'专栏不存在不能为空');
+            return $this->error(0,'该信息不存在');
         }
         $is_sub = Subscribe::isSubscribe($user_id,$column_id,1);
 
