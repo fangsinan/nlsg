@@ -73,8 +73,8 @@ class OrderController extends Controller
            'status' => 1,
            'user_id'=> $user_id,
         ])->whereIn('type',$where_type)
-        ->where('deadline','>=',time())
-        ->where('fullcut_price','>=',$price)->get();
+        ->where('end_time','>=',time())
+        ->where('full_cut','>=',$price)->get();
         return $this->success($coupon);
     }
 
