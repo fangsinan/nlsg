@@ -101,7 +101,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_column_works 专栏-专栏详情[课程列表(单\多课程列表)]
+     * @api {post} /api/v4/column/get_column_works 专栏-专栏|讲座详情[课程列表(单\多课程列表)]
      * @apiName get_column_works
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -475,6 +475,7 @@ class ColumnController extends Controller
     public function Collection(Request $request){
         $type       = $request->input('type',0);
         $target_id  = $request->input('target_id',0);
+        $info_id  = $request->input('info_id',0);
         $user_id    = $request->input('user_id',0);
 
         if( empty($column_id) || empty($user_id) ){
@@ -484,7 +485,7 @@ class ColumnController extends Controller
         if( !in_array($type,[1,2,3]) ){
             return $this->error(0,'type类型错误');
         }
-        $is_collection = Collection::CollectionData($user_id,$target_id,$type);
+        $is_collection = Collection::CollectionData($user_id,$target_id,$type,$info_id);
 
         return $this->success($is_collection);
     }

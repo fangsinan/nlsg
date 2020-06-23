@@ -16,7 +16,7 @@ class WorksInfo extends Base
         return time();
     }
 
-
+    // $type  1 专栏  2 讲座
     public function getInfo($works_id,$is_sub=0,$user_id=0,$type=1,$order='asc'){
         $where = ['status'=>4];
         if($type == 1){
@@ -50,7 +50,7 @@ class WorksInfo extends Base
                 //单章节 学习记录 百分比
                 $his_data = History::select('time_leng','time_number')->where([
                     'works_id'     => $works_id,
-                    'worksinfo_id' => 1,
+                    'worksinfo_id' => $val['id'],
                     'user_id'      => $user_id,
                     'is_del'       => 0,
                 ])->orderBy('updated_at','desc')->first();

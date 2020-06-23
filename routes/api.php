@@ -50,6 +50,7 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
     Route::get('book/get_book_list_detail', 'ListenBookController@getBookListDetail');
     Route::get('book/get_new_book_list', 'ListenBookController@getNewBookList');
     Route::get('book/get_book_index', 'ListenBookController@ListenBookIndex');
+    Route::get('book/get_listen_detail', 'ListenBookController@getListenDetail');
 
     Route::get('pay/wechat_pay', 'PayController@prePay');
     Route::get('wechat_pay/notify', 'CallbackController@Notify');
