@@ -90,10 +90,12 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
     //秒杀订单
     Route::post('mall/prepare_create_flash_sale_order', 'MallOrderController@prepareCreateFlashSaleOrder');
     Route::post('mall/create_flash_sale_order', 'MallOrderController@createFlashSaleOrder');
+    Route::get('mall/flash_sale_pay_fail', 'MallOrderController@flashSalePayFail');
+    
     
     //拼团订单
-    Route::get('mall/prepare_create_group_buy_order', 'MallOrderController@prepareCreateGroupBuyOrder');
-    Route::get('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');
+    Route::post('mall/prepare_create_group_buy_order', 'MallOrderController@prepareCreateGroupBuyOrder');
+    Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');
     
     //*******************************商城部分结束*******************************
 

@@ -33,11 +33,11 @@ class CouponController extends Controller {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0,'未登录');
         }
 
         if (empty($params['flag'] ?? 0)) {
-            return $this->error('参数错误');
+            return $this->error(0,'参数错误');
         }
 
         $model = new Coupon();

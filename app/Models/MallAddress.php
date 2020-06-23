@@ -100,7 +100,6 @@ class MallAddress extends Base {
 
         return $res;
     }
-    
 
     public function statusChange($id, $flag, $user_id) {
 

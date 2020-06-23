@@ -102,12 +102,12 @@ class AddressController extends Controller {
         $params = $request->input();
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
         $model = new MallAddress();
         $data = $model->create($params, $user['id']);
         if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps']??false) ? (':' . $data['ps']) : '') : '');
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
             return $this->success($data);
@@ -160,7 +160,7 @@ class AddressController extends Controller {
     public function getList() {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
         $model = new MallAddress();
         $data = $model->getList($user['id']);
@@ -196,22 +196,22 @@ class AddressController extends Controller {
     public function statusChange(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
         $flag = $request->input('flag', '');
         if (empty($flag)) {
-            return $this->error('参数错误');
+            return $this->error(0, '参数错误');
         } else {
             $flag = strtolower($flag);
         }
         $id = $request->input('id', 0);
         if (empty($id)) {
-            return $this->error('参数错误');
+            return $this->error(0, '参数错误');
         }
         $model = new MallAddress();
         $data = $model->statusChange($id, $flag, $user['id']);
         if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps']??false) ? (':' . $data['ps']) : '') : '');
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
             return $this->success($data);
@@ -252,11 +252,11 @@ class AddressController extends Controller {
     public function listOfShop(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
         $flag = $request->input('flag', 0);
         if (!in_array($flag, [2, 3])) {
-            return $this->error('参数错误');
+            return $this->error(0, '参数错误');
         }
         $model = new FreightTemplate();
         $data = $model->listOfShop($flag);

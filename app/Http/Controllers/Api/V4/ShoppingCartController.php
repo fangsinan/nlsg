@@ -43,7 +43,7 @@ class ShoppingCartController extends Controller {
         $params = $request->input();
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0,'未登录');
         }
         $model = new ShoppingCart();
         $data = $model->create($params, $user['id']);
@@ -147,7 +147,7 @@ class ShoppingCartController extends Controller {
     public function getList() {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0,'未登录');
         }
         $model = new ShoppingCart();
         $data = $model->getList($user);
@@ -183,17 +183,17 @@ class ShoppingCartController extends Controller {
     public function statusChange(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0,'未登录');
         }
         $flag = $request->input('flag', '');
         if (empty($flag)) {
-            return $this->error('参数错误');
+            return $this->error(0,'参数错误');
         } else {
             $flag = strtolower($flag);
         }
         $id = $request->input('id', 0);
         if (empty($id)) {
-            return $this->error('参数错误');
+            return $this->error(0,'参数错误');
         }
 
         $model = new ShoppingCart();

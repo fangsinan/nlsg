@@ -58,7 +58,7 @@ class MallOrderFlashSale extends Base {
         $order_data['active_flag'] = $params['active_flag'] ?? '';
         $order_data['created_at'] = $now_date;
         $order_data['updated_at'] = $now_date;
-        $order_data['flash_sale_id'] = $data['sku_list']['flash_sale_id'];
+        $order_data['sp_id'] = $data['sku_list']['flash_sale_id'];
 
         DB::beginTransaction();
 
@@ -104,6 +104,7 @@ class MallOrderFlashSale extends Base {
         //********************mall_sku库存部分********************
         $temp_sku = MallSku::find($data['sku_list']['sku_id']);
         $temp_sku->stock = $data['sku_list']['stock'] - $data['sku_list']['num'];
+        $temp_sku->sales_num = $data['sku_list']['sales_num'] + $data['sku_list']['num'];
         if ($temp_sku->stock < 0) {
             DB::rollBack();
             return ['code' => false, 'msg' => '订单提交失败,请重试.',
@@ -116,6 +117,15 @@ class MallOrderFlashSale extends Base {
                 'ps' => $data['sku_list']['sku_id'] . 'sku error'];
         }
 
+        //********************mall_goods销量部分********************
+        $goods_sale_res = DB::table('nlsg_mall_goods')
+                ->where('id', '=', $data['sku_list']['goods_id'])
+                ->increment('sales_num', $data['sku_list']['num']);
+        if (!$goods_sale_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                'ps' => 'goods sale error'];
+        }
         //********************special_price部分********************
         $sp_res = DB::table('nlsg_special_price')
                 ->where('id', '=', $data['sku_list']['flash_sale_id'])
@@ -295,7 +305,7 @@ class MallOrderFlashSale extends Base {
             'sku_list' => $sku_list_show,
             'price_list' => $price_list,
             'address_list' => $address_list,
-            'coupon_freight_list' => $coupon_freight_list ?? [],
+            'coupon_list' => ['coupon_freight' => $coupon_freight_list ?? []],
             'used_address' => $used_address,
         ];
 
@@ -351,7 +361,7 @@ class MallOrderFlashSale extends Base {
 
     public function checkUserCanFlashSale($flash_sale_id, $uid) {
         $check = MallOrder::where('user_id', '=', $uid)
-                ->where('flash_sale_id', '=', $flash_sale_id)
+                ->where('sp_id', '=', $flash_sale_id)
                 ->first();
         if (!empty($check)) {
             return ['code' => false, 'msg' => '无法参加'];
@@ -397,6 +407,71 @@ class MallOrderFlashSale extends Base {
             return ['code' => false, 'msg' => '参数错误',
                 'ps' => '如果自提,需传自提地址address_id'];
         }
+    }
+
+    public function flashSalePayFail($order_id, $user_id) {
+        $check = self::where('user_id', '=', $user_id)
+                ->where('order_type', '=', 2)
+                ->where('status', '=', 1)
+                ->find($order_id);
+        if ($check) {
+            $order_details = DB::table('nlsg_mall_order_detail')
+                    ->where('order_id', '=', $order_id)
+                    ->first();
+
+            DB::beginTransaction();
+
+            //********************订单部分部分********************
+            $check->is_del = 1;
+            $check->del_at = date('Y-m-d H:i:s');
+            $order_res = $check->save();
+            if (!$order_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败', 'ps' => '订单状态修改错误'];
+            }
+
+            //********************mall_sku库存部分********************
+            $sku_res = MallSku::where('sku_number', '=', $order_details->sku_number)
+                    ->increment('stock', $order_details->num);
+            if (!$sku_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                    'ps' => 'sku error'];
+            }
+
+            //********************special_price部分********************
+            $sp_res = DB::table('nlsg_special_price')
+                    ->where('id', '=', $check['sp_id'])
+                    ->decrement('use_stock');
+            if (!$sp_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                    'ps' => 'sp error'];
+            }
+
+            //********************免邮券部分********************
+            if ($check->coupon_freight_id) {
+                $coupon_temp = Coupon::find($check->coupon_freight_id);
+                $coupon_temp->status = 1;
+                $coupon_temp->order_id = 0;
+                $coupon_temp->used_time = null;
+                $coupon_res = $coupon_temp->save();
+                if (!$coupon_res) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                        'ps' => 'coupon freight error'];
+                }
+            }
+            DB::commit();
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => '订单状态错误'];
+        }
+    }
+
+    public static function paySuccessForFlashSaleOrder($data, $order_id, $pay_type) {
+        //todo 修改订单支付状态
+        //todo 添加支付记录
     }
 
 }

@@ -44,7 +44,7 @@ class MallOrder extends Base {
     }
 
     /**
-     * 获取普通优惠列表(优惠,几元几件)
+     * 获取普通优惠列表(折扣)
      * @param array $goods_id
      * @param array $sku_number
      */
@@ -114,6 +114,7 @@ class MallOrder extends Base {
                 $sku_list[$k]['weight'] = $check_temp_res->weight;
                 $sku_list[$k]['volume'] = $check_temp_res->volume;
                 $sku_list[$k]['sku_value'] = $check_temp_res->sku_value;
+                $sku_list[$k]['sales_num'] = $check_temp_res->sales_num;
                 $sku_list[$k]['picture'] = $check_temp_res->sku_picture ?? $check_temp_res->goods_picture;
             }
 
@@ -308,6 +309,7 @@ class MallOrder extends Base {
         foreach ($data['sku_list'] as $v) {
             $temp_sku = MallSku::find($v['sku_id']);
             $temp_sku->stock = $v['stock'] - $v['actual_num'];
+            $temp_sku->sales_num = $v['sales_num'] + $v['actual_num'];
             if ($temp_sku->stock < 0) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '订单提交失败,请重试.',
@@ -320,7 +322,15 @@ class MallOrder extends Base {
                     'ps' => $v['sku_id'] . 'sku error'];
             }
         }
-
+        //********************mall_goods销量部分********************
+        $goods_sale_res = DB::table('nlsg_mall_goods')
+                ->where('id', '=', $v['goods_id'])
+                ->increment('sales_num', $v['actual_num']);
+        if (!$goods_sale_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '订单提交失败,请重试.',
+                'ps' => 'goods sale error'];
+        }
         //********************优惠券和免邮券部分********************
         if ($params['coupon_goods_id']) {
             $coupon_temp = Coupon::find($params['coupon_goods_id']);
@@ -684,6 +694,76 @@ class MallOrder extends Base {
         }
 
         return $res;
+    }
+
+    /**
+     * 订单支付成功处理
+     * @param type $params
+     */
+    public function orderPaySuccess($params, $pay_type = 1) {
+        if (1) {
+            $out_trade_no = '2006230016893465631561';
+        } else {
+            $out_trade_no = substr($params['out_trade_no'], 0, -5);
+        }
+
+        $order = self::where('ordernum', '=', $out_trade_no)
+                ->where('status', '=', 1)
+                ->first();
+
+        if (!empty($order)) {
+            //1:普通订单  2:秒杀订单 3:拼团订单
+            switch (intval($order->order_type)) {
+                case 1:
+                    MallOrder::paySuccessForOrder($params, $order->id, $pay_type);
+                    break;
+                case 2:
+                    MallOrderFlashSale::paySuccessForFlashSaleOrder($params, $order->id, $pay_type);
+                    break;
+                case 3:
+                    MallOrderGroupBuy::paySuccessFroGroupBuyOrder($params, $order->id, $pay_type);
+                    break;
+            }
+        }
+    }
+
+    public static function paySuccessForOrder($data, $order_id, $pay_type) {
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+        switch ($pay_type) {
+            case 1:
+                $total_fee = $data['total_fee'];
+                $transaction_id = $data['transaction_id'];
+                break;
+            default :
+                return ['code' => false, 'msg' => '支付方式错误'];
+        }
+
+        DB::beginTransaction();
+        //修改订单支付状态
+        $order_obj = MallOrder::find($order_id);
+        if ($order_obj->post_type == 1) {
+            //邮寄
+            $order_obj->status = 10; //待发货
+        } else {
+            $order_obj->status = 20; //待收货
+        }
+        $order_obj->pay_type = $pay_type;
+        $order_obj->pay_time = $now_date;
+        $order_obj->pay_price = $total_fee;
+        $order_res = $order_obj->save();
+        if (!$order_res) {
+            return ['code' => false, 'msg' => '修改订单状态错误'];
+        }
+
+
+        //todo 添加支付记录
+        //todo 添加收益
+    }
+
+    //todo 订单状态修改
+    public function statusChange($id, $flag, $user_id) {
+        
     }
 
 }

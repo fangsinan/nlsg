@@ -160,7 +160,7 @@ class MallOrderController extends Controller {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
 
         if (0) {
@@ -255,7 +255,7 @@ class MallOrderController extends Controller {
         }
 
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
         $model = new MallOrder();
         $data = $model->createOrder($params, $user);
@@ -409,7 +409,7 @@ class MallOrderController extends Controller {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
 
         if (0) {
@@ -493,7 +493,7 @@ class MallOrderController extends Controller {
         }
 
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
         $model = new MallOrderFlashSale();
         $data = $model->createFlashSaleOrder($params, $user);
@@ -505,26 +505,187 @@ class MallOrderController extends Controller {
         }
     }
 
-    //todo 拼团订单预下单
+    /**
+     * 拼团订单预下单
+     * @api {post} /api/V4/mall/prepare_create_group_buy_order 拼团订单预下单
+     * @apiVersion 1.0.0
+     * @apiName /api/V4/mall/prepare_create_group_buy_order
+     * @apiGroup MallOrder
+     * @apiSampleRequest /api/V4/mall/prepare_create_group_buy_order
+     * @apiDescription 拼团订单预下单
+     * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
+     * @apiParam {string} goods_id 如果是购物车则不用传,直接购买必须传
+     * @apiParam {string} buy_num 如果是购物车则不用传,直接购买必须传
+     * @apiParam {string} inviter 推客id,没有0
+     * @apiParam {number=1,2} post_type 物流方式(1邮寄2自提)
+     * @apiParam {number} coupon_freight_id 免邮券id,没有0
+     * @apiParam {number} address_id 选择的地址id
+     * @apiParam {number=1,2,3} os_type 1安卓2苹果3微信
+     * @apiParam {buy_type=1,2} buy_type 1开团 2参团
+     * @apiParam {number} group_key 如果是参团,需要传
+     *
+     * @apiParamExample {json} Request-Example:
+     * {
+     * "sku":"1612728266",
+     * "goods_id":209,
+     * "buy_num":1,
+     * "inviter":211172,
+     * "post_type":1,
+     * "coupon_goods_id":0,
+     * "coupon_freight_id":0,
+     * "address_id":2814,
+     * "os_type":1,
+     * "buy_type":1,
+     * "group_key":1
+     * }
+     * 
+     * @apiSuccess {string[]} sku_list 商品信息
+     * @apiSuccess {string} sku_list.name 商品名称
+     * @apiSuccess {string} sku_list.subtitle 副标题
+     * @apiSuccess {string} sku_list.picture 图片
+     * @apiSuccess {string[]} sku_list.sku_value_list 规格
+     * @apiSuccess {number} sku_list.num 数量
+     * @apiSuccess {string} sku_list.original_price 原价
+     * @apiSuccess {string} sku_list.price 售价
+     * 
+     * @apiSuccess {string[]} price_list 订单价格
+     * @apiSuccess {number} price_list.all_original_price 原价
+     * @apiSuccess {number} price_list.all_price 售价
+     * @apiSuccess {number} price_list.freight_money 邮费
+     * @apiSuccess {number} price_list.sp_cut_money 活动立减
+     * @apiSuccess {number} price_list.coupon_money 优惠券立减
+     * @apiSuccess {number} price_list.order_price 订单金额
+     * @apiSuccess {string[]} address_list 用户地址列表
+     * @apiSuccess {string[]} coupon_freight_list 免邮券列表
+     * @apiSuccessExample {json} Request-Example:
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": {
+      "user": {
+      "id": 168934,
+      "level": 4,
+      "is_staff": 1
+      },
+      "sku_list": {
+      "goods_id": 91,
+      "name": "AR立体浮雕星座地球仪",
+      "subtitle": "高清生动准确的星座秘密等你来发现",
+      "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
+      "sku_value_list": [
+      {
+      "key_name": "规格",
+      "value_name": "AR立体浮雕星座地球仪"
+      }
+      ],
+      "num": 2,
+      "original_price": "379.00",
+      "price": "20.00"
+      },
+      "price_list": {
+      "all_original_price": "758.00",
+      "all_price": "40.00",
+      "freight_money": "13.00",
+      "vip_cut_money": 0,
+      "sp_cut_money": "718.00",
+      "coupon_money": 0,
+      "freight_free_flag": false,
+      "order_price": "53.00"
+      },
+      "address_list": [
+      {
+      "id": 2815,
+      "name": "sfas",
+      "phone": "18624078563",
+      "details": "sdkfjsljfl1ao",
+      "is_default": 1,
+      "province": 210000,
+      "city": 210100,
+      "area": 210102,
+      "province_name": "辽宁",
+      "city_name": "沈阳",
+      "area_name": "和平区"
+      }
+      ],
+      "coupon_list": {
+      "coupon_goods": [
+      {
+      "id": 7,
+      "name": "5元优惠券(六一专享)",
+      "type": 3,
+      "price": "5.00",
+      "full_cut": "0.00",
+      "explain": "六一活动期间",
+      "begin_time": "2020-06-12 00:00:00",
+      "end_time": "2020-06-28 23:59:59",
+      "cr_id": 31,
+      "sub_list": []
+      }
+      ],
+      "coupon_freight": [
+      {
+      "id": 10,
+      "name": "测试免邮券",
+      "type": 4,
+      "price": "0.00",
+      "full_cut": "0.00",
+      "explain": "商品免邮券",
+      "begin_time": "2020-06-12 00:00:00",
+      "end_time": "2020-06-28 23:59:59",
+      "cr_id": 35,
+      "sub_list": []
+      }
+      ]
+      },
+      "used_address": {
+      "id": 2814,
+      "name": "sfas",
+      "phone": "18624078563",
+      "details": "sdkfjsljfl1ao",
+      "is_default": 0,
+      "province": 210000,
+      "city": 210100,
+      "area": 210102,
+      "province_name": "辽宁",
+      "city_name": "沈阳",
+      "area_name": "和平区"
+      }
+      }
+      }
+     */
     public function prepareCreateGroupBuyOrder(Request $request) {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
-            return $this->error('未登录');
+            return $this->error(0, '未登录');
         }
 
-        $params['sku'] = '1612728266';
-        $params['goods_id'] = 91;
-        $params['buy_num'] = intval($request->input('buy_num', 2));
-        $params['inviter'] = $request->input('inviter', 0);
-        $params['post_type'] = 1;
-        $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
-        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
-        $params['address_id'] = $request->input('address_id', 2814);
-        $params['os_type'] = 1;
-        $params['buy_type'] = 1;//1开团 2参团
-        $params['group_key'] = '';
+        if (0) {
+            $params['sku'] = '1612728266';
+            $params['goods_id'] = 91;
+            $params['buy_num'] = intval($request->input('buy_num', 2));
+            $params['inviter'] = $request->input('inviter', 0);
+            $params['post_type'] = 1;
+            $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
+            $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+            $params['address_id'] = $request->input('address_id', 2814);
+            $params['os_type'] = 1;
+            $params['buy_type'] = 1; //1开团 2参团
+            $params['group_key'] = '';
+        } else {
+            $params['sku'] = $request->input('sku', '');
+            $params['goods_id'] = $request->input('goods_id', 0);
+            $params['buy_num'] = $request->input('buy_num', 0);
+            $params['inviter'] = $request->input('inviter', 0);
+            $params['post_type'] = $request->input('post_type', 0);
+            $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
+            $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+            $params['address_id'] = $request->input('address_id', 0);
+            $params['os_type'] = $request->input('os_type', 0);
+            $params['buy_type'] = $request->input('buy_type', 0);
+            $params['group_key'] = $request->input('group_key', '');
+        }
 
         $model = new MallOrderGroupBuy();
         $data = $model->prepareCreateGroupBuyOrder($params, $user);
@@ -536,14 +697,167 @@ class MallOrderController extends Controller {
         }
     }
 
-    //todo 拼团订单下单
+    /**
+     * 拼团订单下单
+     * @api {post} /api/V4/mall/create_group_buy_order 拼团订单下单
+     * @apiVersion 1.0.0
+     * @apiName /api/V4/mall/create_group_buy_order
+     * @apiGroup MallOrder
+     * @apiSampleRequest /api/V4/mall/create_group_buy_order
+     * @apiDescription 拼团订单下单
+     * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
+     * @apiParam {string} goods_id 如果是购物车则不用传,直接购买必须传
+     * @apiParam {string} buy_num 如果是购物车则不用传,直接购买必须传
+     * @apiParam {string} inviter 推客id,没有0
+     * @apiParam {number=1,2} post_type 物流方式(1邮寄2自提)
+     * @apiParam {number} coupon_freight_id 免邮券id,没有0
+     * @apiParam {number} address_id 选择的地址id
+     * @apiParam {number=1,2,3} os_type 1安卓2苹果3微信
+     * @apiParam {buy_type=1,2} buy_type 1开团 2参团
+     * @apiParam {number} group_key 如果是参团,需要传
+     *
+     * @apiParamExample {json} Request-Example:
+     * {
+     * "sku":"1612728266",
+     * "goods_id":209,
+     * "buy_num":1,
+     * "inviter":211172,
+     * "post_type":1,
+     * "coupon_goods_id":0,
+     * "coupon_freight_id":0,
+     * "address_id":2814,
+     * "os_type":1,
+     * "buy_type":1,
+     * "group_key":1
+     * }
+     * 
+     * @apiSuccessExample {json} Request-Example:
+     * {
+      "code": 200,
+      "msg": "成功",
+      "data": {
+      "order_id": 9555,
+      "ordernum": "2006230016893460198201",
+      "group_key": "2006230016893460198117"
+      }
+      }
+     */
     public function createGroupBuyOrder(Request $request) {
-        
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+
+        if (0) {
+            $params['sku'] = '1612728266';
+            $params['goods_id'] = 91;
+            $params['buy_num'] = intval($request->input('buy_num', 2));
+            $params['inviter'] = $request->input('inviter', 0);
+            $params['post_type'] = 1;
+            $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
+            $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+            $params['address_id'] = $request->input('address_id', 2814);
+            $params['os_type'] = 1;
+            $params['buy_type'] = 2; //1开团 2参团
+            $params['group_key'] = '2006230016893460198117';
+        } else {
+            $params['sku'] = $request->input('sku', '');
+            $params['goods_id'] = $request->input('goods_id', 0);
+            $params['buy_num'] = $request->input('buy_num', 0);
+            $params['inviter'] = $request->input('inviter', 0);
+            $params['post_type'] = $request->input('post_type', 0);
+            $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
+            $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+            $params['address_id'] = $request->input('address_id', 0);
+            $params['os_type'] = $request->input('os_type', 0);
+            $params['buy_type'] = $request->input('buy_type', 0);
+            $params['group_key'] = $request->input('group_key', '');
+        }
+
+        $model = new MallOrderGroupBuy();
+        $data = $model->createGroupBuyOrder($params, $user);
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
+    /**
+     * 秒杀订单支付未成功处理
+     * @api {post} /api/V4/mall/flash_sale_pay_fail 秒杀订单支付未成功处理
+     * @apiVersion 1.0.0
+     * @apiName /api/V4/mall/flash_sale_pay_fail
+     * @apiGroup MallOrder
+     * @apiSampleRequest /api/V4/mall/flash_sale_pay_fail
+     * @apiDescription 秒杀订单支付未成功处理
+     * @apiParam {string} order_id 订单id
+
+     * @apiSuccessExample {json} Request-Example:
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": {
+      "code": true,
+      "msg": "成功"
+      }
+      }
+     */
+    public function flashSalePayFail(Request $request) {
+        $m = new MallOrder();
+        $m->orderPaySuccess([]);
+
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+        $order_id = $request->input('order_id', 0);
+        if (empty($order_id)) {
+            return $this->error(0, '参数错误');
+        }
+
+        $model = new MallOrderFlashSale();
+        $data = $model->flashSalePayFail($order_id, $user['id']);
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
     }
 
     //todo 订单详情
-    //todo 取消订单
     //todo 确认收货
-    //todo 删除订单
     //todo 评论
+    //todo 订单列表(普通&秒杀)
+    //todo 拼团订单列表
+    //todo 取消(已支付),关闭(未支付),删除
+    public function statusChange(Request $request) {
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+        $flag = $request->input('flag', '');
+        if (empty($flag)) {
+            return $this->error(0, '参数错误');
+        } else {
+            $flag = strtolower($flag);
+        }
+        $id = $request->input('id', 0);
+        if (empty($id)) {
+            return $this->error(0, '参数错误');
+        }
+        $model = new MallOrder();
+        $data = $model->statusChange($id, $flag, $user['id']);
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
 }
