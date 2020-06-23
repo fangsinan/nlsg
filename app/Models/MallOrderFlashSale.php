@@ -320,6 +320,8 @@ class MallOrderFlashSale extends Base {
             return ['code' => false, 'msg' => '活动不存在'];
         }
 
+
+        $res = [];
         foreach ($sp_data as $k => $v) {
             if ($v->type == 2) {
                 if ($v->begin_time > $now_date) {
@@ -331,17 +333,19 @@ class MallOrderFlashSale extends Base {
                 if ($v->sku_number != $sku) {
                     unset($sp_data[$k]);
                 }
+                if (isset($sp_data[$k])) {
+                    $res = $sp_data[$k];
+                    break;
+                }
             } else {
                 unset($sp_data[$k]);
             }
         }
 
-        $sp_data = $sp_data[0] ?? [];
-
-        if (empty($sp_data)) {
+        if (empty($res)) {
             return ['code' => false, 'msg' => '活动不存在'];
         } else {
-            return $sp_data;
+            return $res;
         }
     }
 

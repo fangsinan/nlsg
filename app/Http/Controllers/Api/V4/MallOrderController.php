@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MallOrder;
 use App\Models\MallOrderFlashSale;
+use App\Models\MallOrderGroupBuy;
 
 class MallOrderController extends Controller {
 
@@ -411,7 +412,7 @@ class MallOrderController extends Controller {
             return $this->error('未登录');
         }
 
-        if (1) {
+        if (0) {
             $params['sku'] = '1612728266';
             $params['goods_id'] = 91;
             $params['buy_num'] = intval($request->input('buy_num', 2));
@@ -505,12 +506,38 @@ class MallOrderController extends Controller {
     }
 
     //todo 拼团订单预下单
-    public function prepareCreateGroupBuyOrder() {
-        
+    public function prepareCreateGroupBuyOrder(Request $request) {
+
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        if (empty($user['id'] ?? 0)) {
+            return $this->error('未登录');
+        }
+
+        $params['sku'] = '1612728266';
+        $params['goods_id'] = 91;
+        $params['buy_num'] = intval($request->input('buy_num', 2));
+        $params['inviter'] = $request->input('inviter', 0);
+        $params['post_type'] = 1;
+        $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
+        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+        $params['address_id'] = $request->input('address_id', 2814);
+        $params['os_type'] = 1;
+        $params['buy_type'] = 1;//1开团 2参团
+        $params['group_key'] = '';
+
+        $model = new MallOrderGroupBuy();
+        $data = $model->prepareCreateGroupBuyOrder($params, $user);
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
     }
 
     //todo 拼团订单下单
-    public function createGroupBuyOrder() {
+    public function createGroupBuyOrder(Request $request) {
         
     }
 
