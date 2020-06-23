@@ -237,6 +237,7 @@ class WorksController extends Controller
      *
     */
     public function getWorksDetail(Request $request){
+
         $works_id = $request->input('works_id',0);
         $user_id   = $request->input('user_id',0);
         $order   = $request->input('order','asc');
@@ -253,12 +254,12 @@ class WorksController extends Controller
         $works_data = $works_data->toArray();
 
         //查询课程分类
-        $category = WorksCategoryRelation::select('category_id')->with([
-            'CategoryName'=>function($query) use($works_id){
-                $query->select('id','name')->where('status',1);
-            }])->where(['work_id'=>$works_id])->first();
-
-        $works_data['category_name'] = $category->CategoryName->name;
+//        $category = WorksCategoryRelation::select('category_id')->with([
+//            'CategoryName'=>function($query) use($works_id){
+//                $query->select('id','name')->where('status',1);
+//            }])->where(['work_id'=>$works_id])->first();
+//
+//        $works_data['category_name'] = $category->CategoryName->name;
         //是否订阅
         $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
 

@@ -13,13 +13,13 @@ class Collection extends Authenticatable
 
     //收藏
     //$type   1：专栏  2：课程 3 :商品
-    static function CollectionData($user_id=0,$target_id=0,$type=0 ){
+    static function CollectionData($user_id=0,$target_id=0,$type=0, $info_id=0){
 
         //处理专栏的关注信息
         if( !in_array($type,[1,2,3]) ){
             return 0;
         }
-        $where = ['type' => $type, 'user_id' => $user_id,'relation_id'=>$target_id];
+        $where = ['type' => $type, 'user_id' => $user_id,'relation_id'=>$target_id, 'info_id'=>$info_id];
         $data = Collection::where($where)->first();
         if($data){
             //直接物理删除
