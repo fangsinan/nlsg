@@ -22,8 +22,8 @@ class MallController extends Controller {
      * @apiSampleRequest /api/V4/goods/info
      * @apiDescription 获取商品信息,如不指定id,get_sku=0 则返回商品列表.指定商品id,get_sku=1则返回商品详情
      * @apiParam {string} ids_str 商品id,如果需要指定商品,则传该值(例:91,98)
-     * @apiParam {number} [get_sku] 1:获取商品sku_list规格信息
-     * @apiParam {number} [get_details] 1:获取商品详情,图片列表,服务说明
+     * @apiParam {number=1,0} [get_sku] 1:获取商品sku_list规格信息
+     * @apiParam {number=1,0} [get_details] 1:获取商品详情,图片列表,服务说明
      * @apiParam {string} [cid] 商品分类,如需指定分类搜索则传该值(1,2,3)
      * @apiParam {string} [ob] 排序(new上架时间,sales售出,price价格,以上后缀分为_asc正序,_desc逆序.如果有ids_str可指定排序为ids_str,不传为默认)
      * @apiParam {number} [page] 页数,默认1
@@ -37,6 +37,7 @@ class MallController extends Controller {
      * @apiSuccess {number} original_price 原价
      * @apiSuccess {number} price 售价
      * @apiSuccess {number} stock 库存
+     * @apiSuccess {string} top_content 商品详情上方,用于运营临时插入通知等
      * @apiSuccess {string} content 商品详情
      * 
      * @apiSuccess {string[]} cagetory_list 分类
@@ -79,9 +80,9 @@ class MallController extends Controller {
      * 
      * @apiSuccess {string[]} sp_info 商品特价详情
      * @apiSuccess {number} sp_info.group_buy 空表示没有拼团或多 不是空且price有值表有拼团和拼团的价格
-     * @apiSuccess {number} sp_info.count.price 空表示没有几元几件 不是空且price有值表有几元几件和几元几件的价格
-     *  @apiSuccess {number} sp_info.count.num 空表示没有几元几件 不是空且num有值表有几元几件和几元几件的数量
      * @apiSuccess {number} sp_info.sp_type 当前商品特价表示(1:折扣  2:秒杀)
+     * @apiSuccess {number} sp_info.begin_time 开始时间
+     * @apiSuccess {number} sp_info.end_time 结束时间
      * @apiSuccess {string[]} sp_info.list 所有活动类型列表([2,1])
      * 
      * 
@@ -145,20 +146,21 @@ class MallController extends Controller {
       }
       ],
       "sp_info": {
-      "group_buy": {
-      "price": "5.00"
-      },
-      "count_buy": {
-      "price": "100.00",
-      "num": 3
-      },
-      "sp_type": 2,
-      "list": [
-      2,
-      3,
-      1,
-      4
-      ]
+        {
+            "group_buy": {
+              "price": "0.00",
+              "num": 10,
+              "begin_time": "2020-06-05 09:40:00",
+              "end_time": "2022-01-26 09:40:00"
+            },
+            "sp_type": 1,
+            "begin_time": "2020-06-04 20:16:45",
+            "end_time": "2020-07-11 00:00:00",
+            "list": [
+              1,
+              4
+            ]
+        }
       },
       "tos_bind_list": [
       {
@@ -394,7 +396,7 @@ class MallController extends Controller {
         $params['size'] = 4;
         $data = $model->getList($params);
         if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps']??false) ? (':' . $data['ps']) : '') : '');
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
             return $this->success($data);
@@ -748,19 +750,16 @@ class MallController extends Controller {
 
         $freight_line = \App\Models\ConfigModel::getData(1);
         $post_money = \App\Models\ConfigModel::getData(7);
- 
-        $res = str_replace('$freight_line',$freight_line, $res);
-        $res = str_replace('$post_money',$post_money, $res);
+
+        $res = str_replace('$freight_line', $freight_line, $res);
+        $res = str_replace('$post_money', $post_money, $res);
 
         $res = json_decode($res);
         return $this->success($res);
     }
-    
-    
+
     //todo 拼团商品详情
     //todo 收藏
     //todo 评价
     //todo 自提点,售后点
-
-
 }

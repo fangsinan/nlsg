@@ -488,9 +488,4 @@ class MallOrderGroupBuy extends Base {
         }
     }
 
-    public static function paySuccessFroGroupBuyOrder($data, $order_id, $pay_type) {
-        //todo 修改订单支付状态
-        //todo 添加支付记录
-    }
-
 }

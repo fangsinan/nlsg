@@ -92,22 +92,21 @@ class GetPriceTools extends Base {
         );
 
         $sp_info['group_buy'] = []; //1表示有拼团
-        $sp_info['count_buy'] = []; //1表示有几元几件
+        //$sp_info['count_buy'] = []; //1表示有几元几件
         $sp_info['sp_type'] = 0; //当前商品优先级最高的活动 0表示没有活动
+        $sp_info['begin_time'] = '';
+        $sp_info['end_time'] = '';
         $sp_info['list'] = []; //当前商品所有可参加活动
         //需要设置活动
         if (!empty($temp_sp_data)) {
-
-            //活动type=4是拼团 3是几元几件,只需要给出标记,并不显示在商品详情上
+            //活动type=4是拼团 只需要给出标记,并不显示在商品详情上
             foreach ($temp_sp_data as $tsdk => $tsdv) {
                 array_push($sp_info['list'], $tsdv->type);
                 if ($tsdv->type == 4) {
                     $sp_info['group_buy']['price'] = $tsdv->goods_price;
-                    unset($temp_sp_data[$tsdk]);
-                }
-                if ($tsdv->type == 3) {
-                    $sp_info['count_buy']['price'] = $tsdv->group_price;
-                    $sp_info['count_buy']['num'] = $tsdv->group_num;
+                    $sp_info['group_buy']['num'] = $tsdv->group_num;
+                    $sp_info['group_buy']['begin_time'] = $tsdv->begin_time;
+                    $sp_info['group_buy']['end_time'] = $tsdv->end_time;
                     unset($temp_sp_data[$tsdk]);
                 }
             }
@@ -116,6 +115,8 @@ class GetPriceTools extends Base {
             if (!empty($temp_sp_data)) {
                 $temp_sp_goods_data = reset($temp_sp_data);
                 $sp_info['sp_type'] = $temp_sp_goods_data->type;
+                $sp_info['begin_time'] = $temp_sp_goods_data->begin_time;
+                $sp_info['end_time'] = $temp_sp_goods_data->end_time;
                 if (floatval($temp_sp_goods_data->goods_original_price) > 0) {
                     $data->original_price = $temp_sp_goods_data->goods_original_price;
                 }

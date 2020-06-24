@@ -31,7 +31,6 @@ class MallGoods extends Base {
     protected function getListData($params, $cache = true) {
         $cache_key_name = 'goods_list'; //哈希组名
         //缓存放入 goods_list
-        //名称购成  page_size_(get_sku)_ob_(ids_str)
         $cache_name_arr['page'] = $params['page'];
         $cache_name_arr['size'] = $params['size'];
         $cache_name_arr['get_sku'] = $params['get_sku'] ?? 0;
@@ -75,8 +74,6 @@ class MallGoods extends Base {
     //***************************ORM重写***************************************
 
     public function getListDataFromDb($params) {
-
-//        DB::connection()->enableQueryLog();
 
         if (($params['invalid'] ?? 0) == 0) {
             $query = MallGoods::where('status', '=', 2);
@@ -145,9 +142,11 @@ class MallGoods extends Base {
             $select_field[] = 'status';
         }
 
+        $top_content = '';
         //是否需要返回商品详情(包括详情)
         if (($params['get_details'] ?? 0) == 1) {
             $select_field[] = 'content';
+            $top_content = ConfigModel::getData(11);
         }
 
         $query->select($select_field);
@@ -176,7 +175,10 @@ class MallGoods extends Base {
 
         $res = $query->get();
 
-//        dd(DB::getQueryLog());
+        foreach ($res as $v) {
+            $v->top_content = $top_content;
+        }
+
         return $res;
     }
 
@@ -213,7 +215,7 @@ class MallGoods extends Base {
                         ->select(['id', 'name'])
                         ->where('status', '=', 1);
     }
-    
+
     /**
      * 首页好物推荐
      * @param $ids 相关作品id

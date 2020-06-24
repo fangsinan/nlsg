@@ -469,9 +469,4 @@ class MallOrderFlashSale extends Base {
         }
     }
 
-    public static function paySuccessForFlashSaleOrder($data, $order_id, $pay_type) {
-        //todo 修改订单支付状态
-        //todo 添加支付记录
-    }
-
 }
