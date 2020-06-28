@@ -233,7 +233,6 @@ class MallGoods extends Base {
     }
 
     // 全局搜索用 $keywords
-
     static function search($keywords){
         $res = Column::select('id', 'name', 'subtitle', 'original_price', 'price', 'picture')
             ->where('status', 2)
