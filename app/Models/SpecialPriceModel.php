@@ -46,7 +46,7 @@ class SpecialPriceModel extends Base {
         }
         $temp_sec_flag = 0;
 
-        //todo 修改秒杀记录查询
+        //修改秒杀记录查询
         //获取用户今天的秒杀订单数据(秒杀一天一次)
         if ($user_id) {
             $oModel = new MallOrder();
@@ -225,17 +225,60 @@ class SpecialPriceModel extends Base {
     //拼团首页
     public function groupBuyList() {
         $res = $this->homeGroupListFromDb(0);
+        $group_buy_id_list = [];
         foreach ($res as $v) {
-            $v->order_count = 1;
-            $v->user_count = 4;
-            $v->order_user = [
-                '1.jpg',
-                '1.jpg',
-                '1.jpg',
-                '1.jpg',
-            ];
+            $group_buy_id_list[] = $v->group_name;
+            $v->user_count = 0;
+            $v->order_user = [];
         }
+
+        $order_list = $this->groupBuyListCounts($group_buy_id_list);
+
+        foreach ($res as $v) {
+            foreach ($order_list as $vv) {
+                if ($v->group_buy_id == $vv->group_buy_id) {
+                    $v->user_count = $vv->order_count;
+                    $v->order_user = $vv->headimg_list;
+                }
+            }
+        }
+
         return $res;
+    }
+
+    public function groupBuyListCounts($id, $limit = 5) {
+
+        $query = DB::table('nlsg_mall_group_buy_list as gbl')
+                ->join('nlsg_mall_order as nmo', 'gbl.order_id', '=', 'nmo.id')
+                ->join('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
+                ->whereIn('gbl.group_name', $id)
+                ->where('nmo.is_stop', '=', 0)
+                ->where('nmo.is_del', '=', 0);
+
+        $query_temp = clone $query;
+
+        $user_list = $query_temp->select(['gbl.group_name as group_buy_id', 'gbl.user_id', 'nuser.headimg'])
+                ->limit($limit)
+                ->get();
+
+        $order_list = $query->select([
+                    'gbl.group_name as group_buy_id', DB::raw('count(gbl.id) as order_count')
+                ])
+                ->groupBy('gbl.group_buy_id')
+                ->get();
+
+        foreach ($order_list as $v) {
+            $v->user_list = [];
+            $v->headimg_list = [];
+            foreach ($user_list as $vv) {
+                if ($v->group_buy_id == $vv->group_buy_id) {
+                    $v->headimg_list[] = $vv->headimg;
+                    unset($vv->group_buy_id);
+                    $v->user_list[] = $vv;
+                }
+            }
+        }
+        return $order_list;
     }
 
     public function homeGroupListFromDb($limit = 0) {
@@ -253,9 +296,10 @@ class SpecialPriceModel extends Base {
                         $join->on('nsp.goods_id', '=', 'nmg.id')
                         ->where('nmg.status', '=', 2);
                     })
-                    ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
-                        'nmg.original_price', 'group_num', 'group_price',
+                    ->select(['nsp.group_name as group_buy_id', 'nsp.goods_id', 'nmg.name',
+                        'nmg.subtitle', 'nmg.original_price', 'group_num', 'group_price',
                         'nsp.begin_time', 'nsp.end_time', 'group_name'])
+                    ->groupBy('nsp.group_name')
                     ->get();
             Cache::add($cache_key_name, $res, $expire_num);
         }

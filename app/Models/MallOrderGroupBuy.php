@@ -159,6 +159,7 @@ class MallOrderGroupBuy extends Base {
         }
         //********************拼团记录表部分********************  
         $gl_data['group_buy_id'] = $data['sku_list']['group_buy_id'];
+        $gl_data['group_name'] = $data['sku_list']['group_name'];
         $gl_data['order_id'] = $order_res;
         $gl_data['created_at'] = $now_date;
         $gl_data['updated_at'] = $now_date;
@@ -236,6 +237,7 @@ class MallOrderGroupBuy extends Base {
             $sku_list['group_buy_need_num'] = $f_data->group_num;
             $sku_list['group_buy_id'] = $f_data->id;
             $sku_list['group_life'] = $f_data->group_life;
+            $sku_list['group_name'] = $f_data->group_name;
         }
 
 
@@ -453,8 +455,17 @@ class MallOrderGroupBuy extends Base {
 
     public function checkSkuCanGroupBuy($goods_id, $sku) {
         $now_date = date('Y-m-d H:i:s');
-        $spModel = new SpecialPriceModel();
-        $sp_data = $spModel->getSpData($goods_id, 1);
+
+        $sp_data = SpecialPriceModel::where('goods_id', '=', $goods_id)
+                ->where('sku_number', '=', $sku)
+                ->where('type', '=', 4)
+                ->where('goods_type', '=', 1)
+                ->where('begin_time', '<=', $now_date)
+                ->where('end_time', '>=', $now_date)
+                ->get();
+
+//        $spModel = new SpecialPriceModel();
+//        $sp_data = $spModel->getSpData($goods_id, 1);
 
         if ($sp_data->isEmpty()) {
             return ['code' => false, 'msg' => '活动不存在'];

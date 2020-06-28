@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 
-Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
+Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 
     //首页
     Route::get('index/announce', 'IndexController@announce');
@@ -71,6 +71,8 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
     Route::get('goods/home_sp_list', 'MallController@homeSpList');
     Route::get('goods/flash_sale', 'MallController@flashSaleList');
     Route::get('goods/group_buy', 'MallController@groupBuyList');
+    Route::get('goods/group_buy_info', 'MallController@groupByGoodsInfo');
+    Route::get('goods/group_buy_info_order', 'MallController@groupByGoodsOrderList');
     Route::get('goods/service_description', 'MallController@mallServiceDescription');
     Route::post('goods/get_coupon', 'CouponController@getCoupon');
 
@@ -87,23 +89,22 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
     //普通订单
     Route::post('mall/prepare_create_order', 'MallOrderController@prepareCreateOrder');
     Route::post('mall/create_order', 'MallOrderController@createOrder');
-    
+
     //秒杀订单
     Route::post('mall/prepare_create_flash_sale_order', 'MallOrderController@prepareCreateFlashSaleOrder');
     Route::post('mall/create_flash_sale_order', 'MallOrderController@createFlashSaleOrder');
     Route::get('mall/flash_sale_pay_fail', 'MallOrderController@flashSalePayFail');
-    
-    
+
+
     //拼团订单
     Route::post('mall/prepare_create_group_buy_order', 'MallOrderController@prepareCreateGroupBuyOrder');
     Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');
-    
-    
-    Route::post('mall/status_change', 'MallOrderController@statusChange');
-    
-    
-    //*******************************商城部分结束*******************************
 
+
+    Route::post('mall/status_change', 'MallOrderController@statusChange');
+
+
+    //*******************************商城部分结束*******************************
     //想法
     Route::get('comment/index', 'CommentController@index');
     Route::post('comment/store', 'CommentController@store');
@@ -128,7 +129,5 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
     Route::group(['middleware' => 'auth.jwt'], function () {
         Route::get('user/index', 'UserController@index');
     });
-
-
 });
 

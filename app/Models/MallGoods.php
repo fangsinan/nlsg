@@ -232,4 +232,82 @@ class MallGoods extends Base {
         return $lists;
     }
 
+    /**
+     * todo 团购商品的订单数据
+     * @param type $params
+     * @param type $user
+     */
+    public function groupByGoodsOrderList($params, $user) {
+        $group_buy_id = $params['group_buy_id'] ?? 0;
+        $flag = $params['flag'] ?? 1;//1两条  2全部
+        if (empty($group_buy_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $now = time();
+        $now_data = date('Y-m-d H:i:s', $now);
+
+        //todo 几人成团
+        //todo 开团列表 所差人数  剩余时间
+    }
+
+    /**
+     * 团购商品详情
+     * @param type $params
+     * @param type $user
+     */
+    public function groupByGoodsInfo($params, $user) {
+        $group_buy_id = $params['group_buy_id'] ?? 0;
+        if (empty($group_buy_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $now = time();
+        $now_data = date('Y-m-d H:i:s', $now);
+        $check_id = SpecialPriceModel::where('group_name', '=', $group_buy_id)
+                ->where('status', '=', 1)
+                ->where('type', '=', 4)
+                ->where('begin_time', '<=', $now_data)
+                ->where('end_time', '>=', $now_data)
+                ->select(['id', 'goods_id', 'group_num',
+                    'goods_price', 'sku_number', 'group_price'])
+                ->get();
+
+        if ($check_id->isEmpty()) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check_id = $check_id->toArray();
+
+        $sku_number_list = array_column($check_id, 'sku_number');
+
+        $data = $this->getListData(
+                [
+                    'ids_str' => [$check_id[0]['goods_id']],
+                    'get_sku' => 1,
+                    'get_details' => 1,
+                    'page' => 1,
+                    'size' => 1
+                ],
+                true
+        );
+        $data = $data[0];
+
+        if ($check_id[0]['goods_price'] > 0) {
+            $data['price'] = $check_id[0]['goods_price'];
+        }
+        $data['group_num'] = $check_id[0]['group_num'];
+
+        foreach ($data['sku_list'] as $k => $v) {
+            if (!in_array($v->sku_number, $sku_number_list)) {
+                unset($data['sku_list'][$k]);
+            }
+            foreach ($check_id as $vv) {
+                if ($v->sku_number == $vv['sku_number']) {
+                    $v->group_num = $vv['group_num'];
+                    $v->price = $vv['group_price'];
+                }
+            }
+        }
+
+        return $data;
+    }
+
 }

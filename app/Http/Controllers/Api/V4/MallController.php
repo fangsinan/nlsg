@@ -146,21 +146,21 @@ class MallController extends Controller {
       }
       ],
       "sp_info": {
-        {
-            "group_buy": {
-              "price": "0.00",
-              "num": 10,
-              "begin_time": "2020-06-05 09:40:00",
-              "end_time": "2022-01-26 09:40:00"
-            },
-            "sp_type": 1,
-            "begin_time": "2020-06-04 20:16:45",
-            "end_time": "2020-07-11 00:00:00",
-            "list": [
-              1,
-              4
-            ]
-        }
+      {
+      "group_buy": {
+      "price": "0.00",
+      "num": 10,
+      "begin_time": "2020-06-05 09:40:00",
+      "end_time": "2022-01-26 09:40:00"
+      },
+      "sp_type": 1,
+      "begin_time": "2020-06-04 20:16:45",
+      "end_time": "2020-07-11 00:00:00",
+      "list": [
+      1,
+      4
+      ]
+      }
       },
       "tos_bind_list": [
       {
@@ -689,7 +689,6 @@ class MallController extends Controller {
       @apiSuccess {number} group_price 拼团价格
       @apiSuccess {number} begin_time 开始时间
       @apiSuccess {number} end_time 结束时间
-      @apiSuccess {number} order_count 成团订单数
       @apiSuccess {number} user_count 参加人数
       @apiSuccess {string[]} order_user 用户头像列表
      * @apiSuccessExample {json} Request-Example:
@@ -706,7 +705,6 @@ class MallController extends Controller {
       "group_price": "20.00",
       "begin_time": "2020-06-05 09:40:00",
       "end_time": "2022-01-26 09:40:00",
-      "order_count": 1,
       "user_count": 4,
       "order_user": [
       "1.jpg",
@@ -737,12 +735,24 @@ class MallController extends Controller {
       {
       "code": 200,
       "msg": "成功",
-      "data": {
-      "七天无理由退换货": "买家提出退款申请。",
-      "正品保障": "正品保障服务是指能量款外，还需向消费者增加 赔偿。",
-      "会员85折": "成为能量时光皇钻5折。",
-      "满88包邮": "能量时光自营需承担10元运费。"
+      "data": [
+      {
+      "k": "七天无理由退换货",
+      "v": "买家提出退款申请所指向的商品"
+      },
+      {
+      "k": "正品保障",
+      "v": "正品保障服务是指"
+      },
+      {
+      "k": "会员85折",
+      "v": "成为能量时光皇钻会员"
+      },
+      {
+      "k": "满88包邮",
+      "v": "能量时光自营商品"
       }
+      ]
       }
      */
     public function mallServiceDescription() {
@@ -758,7 +768,44 @@ class MallController extends Controller {
         return $this->success($res);
     }
 
-    //todo 拼团商品详情
+    /**
+     * 拼团商品详情
+     * @api {get} /api/V4/goods/group_buy_info 拼团商品详情(列表,详情)
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/goods/group_buy_info
+     * @apiGroup  Mall
+     * @apiSampleRequest /api/V4/goods/group_buy_info
+     * @apiDescription 拼团商品详情
+     */
+    public function groupByGoodsInfo(Request $request) {
+        $params = $request->input();
+        $model = new MallGoods();
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+        $data = $model->groupByGoodsInfo($params, $user);
+
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
+    //todo 拼团队伍信息(几人团,队伍列表)
+    public function groupByGoodsOrderList(Request $request) {
+        $params = $request->input();
+        $model = new MallGoods();
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+        $data = $model->groupByGoodsOrderList($params, $user);
+
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
     //todo 收藏
     //todo 评价
     //todo 自提点,售后点

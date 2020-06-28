@@ -750,8 +750,8 @@ class MallOrderController extends Controller {
         }
 
         if (0) {
-            $params['sku'] = '1612728266';
-            $params['goods_id'] = 91;
+            $params['sku'] = '1904221194';
+            $params['goods_id'] = 160;
             $params['buy_num'] = intval($request->input('buy_num', 2));
             $params['inviter'] = $request->input('inviter', 0);
             $params['post_type'] = 1;
@@ -759,8 +759,8 @@ class MallOrderController extends Controller {
             $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
             $params['address_id'] = $request->input('address_id', 2814);
             $params['os_type'] = 1;
-            $params['buy_type'] = 2; //1开团 2参团
-            $params['group_key'] = '2006230016893460198117';
+            $params['buy_type'] = 1; //1开团 2参团
+            $params['group_key'] = '';
         } else {
             $params['sku'] = $request->input('sku', '');
             $params['goods_id'] = $request->input('goods_id', 0);
