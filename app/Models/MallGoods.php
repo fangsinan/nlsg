@@ -234,9 +234,9 @@ class MallGoods extends Base {
 
     // 全局搜索用 $keywords
     static function search($keywords){
-        $res = Column::select('id', 'name', 'subtitle', 'original_price', 'price', 'picture')
+        $res = MallGoods::select('id', 'name', 'subtitle', 'original_price', 'price', 'picture')
             ->where('status', 2)
-            ->where('can_sale', 1)
+            //->where('can_sale', 1)
             ->where(function ($query)use($keywords){
                 $query->orWhere('name','LIKE',"%$keywords%");
                 $query->orWhere('subtitle','LIKE',"%$keywords%");
