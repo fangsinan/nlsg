@@ -88,7 +88,7 @@ class Column extends Base
                 $query->orWhere('name','LIKE',"%$keywords%");
                 $query->orWhere('subtitle','LIKE',"%$keywords%");
             })->get();
-        return $res;
+        return ['res' => $res, 'count'=> $res->count() ];
 
     }
 }

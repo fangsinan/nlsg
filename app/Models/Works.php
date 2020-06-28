@@ -94,7 +94,7 @@ class Works extends Base
                 $query->orwhere('info.title', 'like', "%{$keywords}%");
             })->groupBy('works.id')->get();
 
-        return $res;
+        return ['res' => $res, 'count'=> $res->count() ];
 
     }
 
