@@ -76,4 +76,19 @@ class Column extends Base
             ->toArray();
         return $lists;
     }
+
+
+
+    static function search($keywords,$type){
+        $res = Column::select('id', 'name', 'user_id', 'subtitle', 'original_price', 'price', 'cover_pic')
+            ->where('type',$type)
+            ->where('status',1)
+            ->where(function ($query)use($keywords){
+                $query->orWhere('title','LIKE',"%$keywords%");
+                $query->orWhere('name','LIKE',"%$keywords%");
+                $query->orWhere('subtitle','LIKE',"%$keywords%");
+            })->get();
+        return $res;
+
+    }
 }

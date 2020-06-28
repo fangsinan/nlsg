@@ -5,6 +5,9 @@ namespace App\Models;
 
 
 
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
+
 class Works extends Base
 {
     protected $table = 'nlsg_works';
@@ -76,5 +79,23 @@ class Works extends Base
             'nlsg_lists_work','works_id', 'lists_id');
     }
 
+
+    static function search($keywords,$is_audio_book){
+        $worksObj = new Works();
+        $infoObj = new WorksInfo();
+        $res = DB::table($worksObj->getTable(), 'works')
+            ->leftJoin($infoObj->getTable() .' as info', 'works.id', '=', 'info.pid')
+            ->select('works.id','works.type','works.title','works.user_id')
+            ->where('works.status',4)
+            ->where('works.is_audio_book',$is_audio_book)
+            ->where('info.status',4)
+            ->where(function ($query)use ($keywords) {
+                $query->orwhere('works.title', 'like', "%{$keywords}%");
+                $query->orwhere('info.title', 'like', "%{$keywords}%");
+            })->groupBy('works.id')->get();
+
+        return $res;
+
+    }
 
 }
