@@ -20,6 +20,7 @@
         "overtrue/laravel-wechat": "~5.0",
         "predis/predis": "^1.1",
         "tymon/jwt-auth": "^1.0",
+        "yansongda/laravel-pay": "^2.2",
         "yansongda/pay": "^2.9"
     },
     "require-dev": {

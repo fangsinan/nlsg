@@ -232,6 +232,7 @@ class MallGoods extends Base {
         return $lists;
     }
 
+
     /**
      * todo 团购商品的订单数据
      * @param type $params
@@ -308,6 +309,20 @@ class MallGoods extends Base {
         }
 
         return $data;
+
+    // 全局搜索用 $keywords
+    static function search($keywords){
+        $res = MallGoods::select('id', 'name', 'subtitle', 'original_price', 'price', 'picture')
+            ->where('status', 2)
+            //->where('can_sale', 1)
+            ->where(function ($query)use($keywords){
+                $query->orWhere('name','LIKE',"%$keywords%");
+                $query->orWhere('subtitle','LIKE',"%$keywords%");
+            })->get();
+
+        return ['res' => $res, 'count'=> $res->count() ];
+
+
     }
 
 }
