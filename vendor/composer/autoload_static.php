@@ -52,6 +52,7 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         array (
             'Yansongda\\Supports\\' => 19,
             'Yansongda\\Pay\\' => 14,
+            'Yansongda\\LaravelPay\\' => 21,
         ),
         'X' => 
         array (
@@ -224,6 +225,10 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'Yansongda\\Pay\\' => 
         array (
             0 => __DIR__ . '/..' . '/yansongda/pay/src',
+        ),
+        'Yansongda\\LaravelPay\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yansongda/laravel-pay/src',
         ),
         'XdgBaseDir\\' => 
         array (
@@ -643,17 +648,22 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Http\\Controllers\\Api\\V4\\AddressController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/AddressController.php',
+        'App\\Http\\Controllers\\Api\\V4\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/AuthController.php',
+        'App\\Http\\Controllers\\Api\\V4\\CallbackController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/CallbackController.php',
         'App\\Http\\Controllers\\Api\\V4\\ColumnController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/ColumnController.php',
         'App\\Http\\Controllers\\Api\\V4\\CommentController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/CommentController.php',
         'App\\Http\\Controllers\\Api\\V4\\CouponController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/CouponController.php',
         'App\\Http\\Controllers\\Api\\V4\\IndexController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/IndexController.php',
-        'App\\Http\\Controllers\\Api\\V4\\ListenBook' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/ListenBookController.php',
+        'App\\Http\\Controllers\\Api\\V4\\ListenBookController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/ListenBookController.php',
         'App\\Http\\Controllers\\Api\\V4\\MallController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/MallController.php',
         'App\\Http\\Controllers\\Api\\V4\\MallOrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/MallOrderController.php',
         'App\\Http\\Controllers\\Api\\V4\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/OrderController.php',
+        'App\\Http\\Controllers\\Api\\V4\\PayController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/PayController.php',
         'App\\Http\\Controllers\\Api\\V4\\ReplyController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/ReplyController.php',
+        'App\\Http\\Controllers\\Api\\V4\\SearchController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/SearchController.php',
         'App\\Http\\Controllers\\Api\\V4\\ShoppingCartController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/ShoppingCartController.php',
         'App\\Http\\Controllers\\Api\\V4\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/UserController.php',
+        'App\\Http\\Controllers\\Api\\V4\\WechatPay' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/WechatPay.php',
         'App\\Http\\Controllers\\Api\\V4\\WikiController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/WikiController.php',
         'App\\Http\\Controllers\\Api\\V4\\WorksController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/WorksController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
@@ -698,15 +708,21 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'App\\Models\\MallGoods' => __DIR__ . '/../..' . '/app/Models/MallGoods.php',
         'App\\Models\\MallGoodsList' => __DIR__ . '/../..' . '/app/Models/MallGoodsList.php',
         'App\\Models\\MallGoodsListDetails' => __DIR__ . '/../..' . '/app/Models/MallGoodsListDetails.php',
+        'App\\Models\\MallGroupBuyList' => __DIR__ . '/../..' . '/app/Models/MallGroupBuyList.php',
         'App\\Models\\MallOrder' => __DIR__ . '/../..' . '/app/Models/MallOrder.php',
         'App\\Models\\MallOrderDetails' => __DIR__ . '/../..' . '/app/Models/MallOrderDetails.php',
+        'App\\Models\\MallOrderFlashSale' => __DIR__ . '/../..' . '/app/Models/MallOrderFlashSale.php',
+        'App\\Models\\MallOrderGroupBuy' => __DIR__ . '/../..' . '/app/Models/MallOrderGroupBuy.php',
         'App\\Models\\MallPicture' => __DIR__ . '/../..' . '/app/Models/MallPicture.php',
         'App\\Models\\MallSku' => __DIR__ . '/../..' . '/app/Models/MallSku.php',
         'App\\Models\\MallSkuValue' => __DIR__ . '/../..' . '/app/Models/MallSkuValue.php',
         'App\\Models\\MallTos' => __DIR__ . '/../..' . '/app/Models/MallTos.php',
         'App\\Models\\MallTosBind' => __DIR__ . '/../..' . '/app/Models/MallTosBind.php',
         'App\\Models\\Order' => __DIR__ . '/../..' . '/app/Models/Order.php',
+        'App\\Models\\PayRecord' => __DIR__ . '/../..' . '/app/Models/PayRecord.php',
+        'App\\Models\\PayRecordDetail' => __DIR__ . '/../..' . '/app/Models/PayRecordDetail.php',
         'App\\Models\\Recommend' => __DIR__ . '/../..' . '/app/Models/Recommend.php',
+        'App\\Models\\Search' => __DIR__ . '/../..' . '/app/Models/Search.php',
         'App\\Models\\ShoppingCart' => __DIR__ . '/../..' . '/app/Models/ShoppingCart.php',
         'App\\Models\\SpecialPriceModel' => __DIR__ . '/../..' . '/app/Models/SpecialPriceModel.php',
         'App\\Models\\Subscribe' => __DIR__ . '/../..' . '/app/Models/Subscribe.php',
@@ -6153,6 +6169,8 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'Windwalker\\Structure\\Test\\Stubs\\StubDumpable' => __DIR__ . '/..' . '/windwalker/structure/Test/Stubs/StubDumpable.php',
         'Windwalker\\Structure\\ValueReference' => __DIR__ . '/..' . '/windwalker/structure/ValueReference.php',
         'XdgBaseDir\\Xdg' => __DIR__ . '/..' . '/dnoegel/php-xdg-base-dir/src/Xdg.php',
+        'Yansongda\\LaravelPay\\Facades\\Pay' => __DIR__ . '/..' . '/yansongda/laravel-pay/src/Facades/Pay.php',
+        'Yansongda\\LaravelPay\\PayServiceProvider' => __DIR__ . '/..' . '/yansongda/laravel-pay/src/PayServiceProvider.php',
         'Yansongda\\Pay\\Contracts\\GatewayApplicationInterface' => __DIR__ . '/..' . '/yansongda/pay/src/Contracts/GatewayApplicationInterface.php',
         'Yansongda\\Pay\\Contracts\\GatewayInterface' => __DIR__ . '/..' . '/yansongda/pay/src/Contracts/GatewayInterface.php',
         'Yansongda\\Pay\\Events' => __DIR__ . '/..' . '/yansongda/pay/src/Events.php',

@@ -8310,6 +8310,68 @@
         ]
     },
     {
+        "name": "yansongda/laravel-pay",
+        "version": "v2.2.2",
+        "version_normalized": "2.2.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/yansongda/laravel-pay.git",
+            "reference": "52bbbc26234f76f868d6ddad1dafbfe1aed28c2a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/yansongda/laravel-pay/zipball/52bbbc26234f76f868d6ddad1dafbfe1aed28c2a",
+            "reference": "52bbbc26234f76f868d6ddad1dafbfe1aed28c2a",
+            "shasum": "",
+            "mirrors": [
+                {
+                    "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                    "preferred": true
+                }
+            ]
+        },
+        "require": {
+            "illuminate/support": "^5.1 || ^6.0 || ^7.0",
+            "yansongda/pay": "^2.0"
+        },
+        "time": "2020-04-19T06:57:47+00:00",
+        "type": "library",
+        "extra": {
+            "laravel": {
+                "providers": [
+                    "Yansongda\\LaravelPay\\PayServiceProvider"
+                ],
+                "aliases": {
+                    "Pay": "Yansongda\\LaravelPay\\Facades\\Pay"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Yansongda\\LaravelPay\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "yansongda",
+                "email": "me@yansongda.cn"
+            }
+        ],
+        "description": "专注 Alipay 和 WeChat 的 laravel 支付扩展包",
+        "keywords": [
+            "alipay",
+            "laravel",
+            "package",
+            "pay",
+            "wechat"
+        ]
+    },
+    {
         "name": "yansongda/pay",
         "version": "v2.9.3",
         "version_normalized": "2.9.3.0",
