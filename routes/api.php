@@ -101,6 +101,10 @@ Route::group(['namespace' =>'Api\V4' ,'prefix' =>'v4'],function() {
     Route::post('mall/prepare_create_group_buy_order', 'MallOrderController@prepareCreateGroupBuyOrder');
     Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');
     
+    
+    Route::post('mall/status_change', 'MallOrderController@statusChange');
+    
+    
     //*******************************商城部分结束*******************************
 
     //想法

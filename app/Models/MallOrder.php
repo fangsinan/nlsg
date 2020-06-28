@@ -10,10 +10,46 @@ class MallOrder extends Base {
     protected $table = 'nlsg_mall_order';
 
     //检擦用户在规定时间内参加过秒杀活动
+
+    public function getUserSecKillOrderNew($params) {
+        if (empty($params['user_id'])) {
+            return [];
+        }
+
+        $query = DB::table('nlsg_mall_order as nmo')
+                ->join('nlsg_special_price as nsp', 'nmo.sp_id', '=', 'nsp.id')
+                ->where('nmo.user_id', '=', $params['user_id'])
+                ->where('nsp.type', '=', 2)
+                ->where('nmo.is_stop', '=', 0);
+
+        if ($params['begin_time'] ?? false) {
+            $query->where('nmo.created_at', '>=', $params['begin_time']);
+        }
+        if ($params['end_time'] ?? false) {
+            $query->where('nmo.created_at', '<=', $params['end_time']);
+        }
+
+        $query->groupBy('nsp.id');
+
+        $order = $query->select(['nmo.sp_id'])->get();
+
+        if ($order->isEmpty()) {
+            return [];
+        }
+
+        $order = $order->toArray();
+
+        $sp_list = array_column($order, 'sp_id');
+
+        return $sp_list;
+    }
+
     public function getUserSecKillOrder($params) {
         if (empty($params['user_id'])) {
             return [];
         }
+
+        $this->getSqlBegin();
 
         $query = DB::table('nlsg_mall_order as nmo')
                 ->leftJoin('nlsg_mall_order_detail as nmod',
@@ -35,6 +71,7 @@ class MallOrder extends Base {
                 ->select(['nmod.sku_number'])
                 ->get();
 
+        $this->getSql();
 
         $sku_list = [];
         foreach ($list as $v) {
@@ -590,8 +627,6 @@ class MallOrder extends Base {
                                 )
                 );
             }
-            //todo 删掉
-            ksort($sku_list[$k]);
         }
         //****************可用优惠券*********************
         $goods_id_list = array_column($sku_list, 'goods_id');
@@ -701,47 +736,27 @@ class MallOrder extends Base {
      * @param type $params
      */
     public function orderPaySuccess($params, $pay_type = 1) {
-        if (1) {
-            $out_trade_no = '2006230016893465631561';
-        } else {
-            $out_trade_no = substr($params['out_trade_no'], 0, -5);
-        }
-
-        $order = self::where('ordernum', '=', $out_trade_no)
-                ->where('status', '=', 1)
-                ->first();
-
-        if (!empty($order)) {
-            //1:普通订单  2:秒杀订单 3:拼团订单
-            switch (intval($order->order_type)) {
-                case 1:
-                    MallOrder::paySuccessForOrder($params, $order->id, $pay_type);
-                    break;
-                case 2:
-                    MallOrderFlashSale::paySuccessForFlashSaleOrder($params, $order->id, $pay_type);
-                    break;
-                case 3:
-                    MallOrderGroupBuy::paySuccessFroGroupBuyOrder($params, $order->id, $pay_type);
-                    break;
-            }
-        }
-    }
-
-    public static function paySuccessForOrder($data, $order_id, $pay_type) {
+        //1 微信端 2app微信 3app支付宝 4ios 
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         switch ($pay_type) {
             case 1:
-                $total_fee = $data['total_fee'];
-                $transaction_id = $data['transaction_id'];
+                $params['out_trade_no'] = '200623001689346563156199999';
+                $total_fee = $params['total_fee'];
+                $transaction_id = $params['transaction_id'];
+                $out_trade_no = substr($params['out_trade_no'], 0, -5);
                 break;
             default :
                 return ['code' => false, 'msg' => '支付方式错误'];
         }
 
+
+        $order_obj = self::where('ordernum', '=', $out_trade_no)
+                ->where('status', '=', 1)
+                ->first();
+
         DB::beginTransaction();
         //修改订单支付状态
-        $order_obj = MallOrder::find($order_id);
         if ($order_obj->post_type == 1) {
             //邮寄
             $order_obj->status = 10; //待发货
@@ -753,17 +768,80 @@ class MallOrder extends Base {
         $order_obj->pay_price = $total_fee;
         $order_res = $order_obj->save();
         if (!$order_res) {
+            DB::rollBack();
             return ['code' => false, 'msg' => '修改订单状态错误'];
         }
 
-
-        //todo 添加支付记录
-        //todo 添加收益
+        //添加支付记录
+        $payRecordModel = new PayRecord();
+        $payRecordModel->ordernum = $out_trade_no;
+        $payRecordModel->price = $total_fee;
+        $payRecordModel->transaction_id = $transaction_id;
+        $payRecordModel->user_id = $order_obj->user_id;
+        $payRecordModel->type = $pay_type;
+        $payRecordModel->order_type = 10;
+        $payRecordModel->status = 1;
+        $pr_res = $payRecordModel->save();
+        if (!$pr_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '修改支付记录错误'];
+        }
+        DB::commit();
+        return ['code' => true, 'msg' => '修改成功'];
     }
 
-    //todo 订单状态修改
+    //订单状态修改
     public function statusChange($id, $flag, $user_id) {
-        
+        $check = MallOrder::where('user_id', '=', $user_id)
+                ->find($id);
+
+        if (!$check) {
+            return ['code' => false, 'msg' => '订单不存在'];
+        }
+        $now_date = date('Y-m-d H:i:s', time());
+
+        dd([$check->status, gettype($check->status)]);
+
+        switch (strtolower($flag)) {
+            case 'stop':
+                if ($check->status === 1 || $check->status === 10) {
+                    DB::beginTransaction();
+                    //未支付的可以直接取消
+                    $check->is_stop = 1;
+                    $check->stop_by = $user_id;
+                    $check->stop_at = $now_date;
+                    $update_res = $check->save();
+                    if (!$update_res) {
+                        DB::rollBack();
+                        return ['code' => false, 'msg' => '失败'];
+                    }
+
+                    if ($check->status === 10) {
+                        //todo 订单状态修改-写入后台审核
+                        //todo 订单状态修改-写入需退款队列
+                    }
+                } else {
+                    return ['code' => false, 'msg' => '订单状态错误', 'ps' => '只有待支付和待发货可以取消'];
+                }
+                break;
+            case 'del':
+                //已经取消或者已经完成的订单可以删除
+                if ($check->is_stop === 1 || $check->status === 30) {
+                    $check->is_del = 1;
+                    $check->del_at = $now_date;
+                    $update_res = $check->save();
+                    if ($update_res) {
+                        return ['code' => true, 'msg' => '成功'];
+                    } else {
+                        return ['code' => false, 'msg' => '失败'];
+                    }
+                } else {
+                    return ['code' => false, 'msg' => '订单状态错误', 'ps' => '只有已完成和已取消的可以删除'];
+                }
+                break;
+            default:
+                return ['code' => false, 'msg' => '参数错误', 'ps' => 'flag'];
+        }
     }
 
 }

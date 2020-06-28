@@ -23,32 +23,34 @@ class SpecialPriceModel extends Base {
             if ($v->begin_time > $now_date || $v->end_time < $now_date) {
                 unset($res[$k]);
             }
-
             //stock=0表示无库存限制    use_stock已经使用的库存
-            //todo redis
             if ($v->stock > 0 && ($v->use_stock >= $v->stock )) {
                 unset($res[$k]);
             }
         }
 
         //配置
-        //1:一個商品一天一次  
-        //2:所有商品一天一次 
-        //3:活动期间一个商品一次(额外配置活动时间范围)
-        //4:活动期间所有商品一次(额外配置活动时间范围)
+        //1:一次活动参加一次
+        //2:一次活动一天参加一次
+        //3:一次活动指定时间内参加一次
         $sec_kill_count_flag = ConfigModel::getData(9);
-        if (in_array($sec_kill_count_flag, [3, 4])) {
+        if ($sec_kill_count_flag == 1) {
+            $today_begin_time = $today_end_time = null;
+        } elseif ($sec_kill_count_flag == 3) {
             $get_begin_end_time = ConfigModel::getData(10);
-            $get_begin_end_time = explode(',', $get_begin_end_time);
-            $today_begin_time = $get_begin_end_time[0];
-            $today_end_time = $get_begin_end_time[1];
+            if (!empty($get_begin_end_time)) {
+                $get_begin_end_time = explode(',', $get_begin_end_time);
+                $today_begin_time = $get_begin_end_time[0];
+                $today_end_time = $get_begin_end_time[1];
+            }
         }
         $temp_sec_flag = 0;
 
+        //todo 修改秒杀记录查询
         //获取用户今天的秒杀订单数据(秒杀一天一次)
         if ($user_id) {
             $oModel = new MallOrder();
-            $sec_kill_list = $oModel->getUserSecKillOrder([
+            $sec_kill_list = $oModel->getUserSecKillOrderNew([
                 'user_id' => $user_id,
                 'begin_time' => $today_begin_time,
                 'end_time' => $today_end_time,
@@ -58,22 +60,29 @@ class SpecialPriceModel extends Base {
         }
 
         if (!empty($sec_kill_list)) {
-            //如果用户今天有秒杀订单,则过滤已经秒杀过的特价信息
+
             foreach ($res as $k => $v) {
-                if ($v->type == 2 && in_array($v->sku_number, $sec_kill_list)) {
+                if ($v->type == 2 && in_array($v->id, $sec_kill_list)) {
                     $temp_sec_flag = 1;
                     unset($res[$k]);
                 }
             }
 
+            //如果用户今天有秒杀订单,则过滤已经秒杀过的特价信息
+//            foreach ($res as $k => $v) {
+//                if ($v->type == 2 && in_array($v->sku_number, $sec_kill_list)) {
+//                    $temp_sec_flag = 1;
+//                    unset($res[$k]);
+//                }
+//            }
             //如果是所有商品一天一次  则过滤掉所有秒杀信息
-            if ($sec_kill_count_flag == 2 && $temp_sec_flag == 1) {
-                foreach ($res as $k => $v) {
-                    if ($v->type == 2) {
-                        unset($res[$k]);
-                    }
-                }
-            }
+//            if ($sec_kill_count_flag == 2 && $temp_sec_flag == 1) {
+//                foreach ($res as $k => $v) {
+//                    if ($v->type == 2) {
+//                        unset($res[$k]);
+//                    }
+//                }
+//            }
         }
 
         return $res->toArray();
