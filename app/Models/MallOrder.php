@@ -267,6 +267,8 @@ class MallOrder extends Base {
     public function createOrder($params, $user) {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
+        $dead_time = ConfigModel::getData(12);
+        $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
         $data = $this->createOrderTool($params, $user, true);
 
         if (!($data['can_sub'] ?? false)) {
@@ -298,6 +300,7 @@ class MallOrder extends Base {
         $order_data['active_flag'] = $params['active_flag'] ?? '';
         $order_data['created_at'] = $now_date;
         $order_data['updated_at'] = $now_date;
+        $order_data['dead_time'] = $dead_time;
 
         DB::beginTransaction();
 
@@ -786,6 +789,45 @@ class MallOrder extends Base {
             DB::rollBack();
             return ['code' => false, 'msg' => '修改支付记录错误'];
         }
+
+
+        //如果是拼团订单  需要查看拼团订单是否成功
+        if ($order_obj->order_type == 3) {
+            $temp_data = DB::table('nlsg_mall_group_buy_list')
+                    ->where('user_id', '=', $order_obj->user_id)
+                    ->where('order_id', '=', $order_obj->id)
+                    ->first();
+            if (!$temp_data) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '拼团信息错误'];
+            }
+            $group_buy_id = $temp_data->group_buy_id;
+            $sp_info = DB::table('nlsg_special_price')
+                    ->find($group_buy_id);
+            $need_num = $sp_info->group_num;
+
+            $now_num = DB::table('nlsg_mall_group_buy_list')
+                    ->where('group_key', '=', $order_obj->group_key)
+                    ->count();
+
+            if ($now_num >= $need_num) {
+                $gb_res = MallOrderGroupBuy::where(
+                                'group_key', '=', $order_obj->group_key
+                        )->update(
+                        [
+                            'is_success' => 1,
+                            'success_at' => $now_date
+                        ]
+                );
+                if (!$gb_res) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '拼团信息错误'];
+                }
+            }
+        }
+
+        //todo 收益表
+
         DB::commit();
         return ['code' => true, 'msg' => '修改成功'];
     }
@@ -821,7 +863,8 @@ class MallOrder extends Base {
                         //todo 订单状态修改-写入需退款队列
                     }
                 } else {
-                    return ['code' => false, 'msg' => '订单状态错误', 'ps' => '只有待支付和待发货可以取消'];
+                    return ['code' => false, 'msg' => '订单状态错误',
+                        'ps' => '只有待支付和待发货可以取消'];
                 }
                 break;
             case 'del':
@@ -836,12 +879,129 @@ class MallOrder extends Base {
                         return ['code' => false, 'msg' => '失败'];
                     }
                 } else {
-                    return ['code' => false, 'msg' => '订单状态错误', 'ps' => '只有已完成和已取消的可以删除'];
+                    return ['code' => false, 'msg' => '订单状态错误',
+                        'ps' => '只有已完成和已取消的可以删除'];
                 }
                 break;
             default:
                 return ['code' => false, 'msg' => '参数错误', 'ps' => 'flag'];
         }
+    }
+
+    //用户普通订单列表
+    public function userOrderList($params, $user, $flag = false) {
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+        $user_id = $user['id'];
+        $params['page'] = $params['page'] ?? 1;
+        $params['size'] = $params['size'] ?? 10;
+        //库数据:订单状态 1待付款  10待发货 20待收货 30已完成
+        //列表tab栏:全部0,待付款1,待发货10,待签收20,已完成30,已取消99
+        //展示数据:订单编号,状态,商品列表,价格,数量,取消时间,金额
+
+        $query = self::from('nlsg_mall_order as nmo')
+                ->where('user_id', '=', $user_id)
+                ->whereIn('order_type', [1, 2])
+                ->where('is_del', '=', 0)
+                ->limit($params['size'])
+                ->offset(($params['page'] - 1) * $params['size']);
+
+        if (!empty($params['ordernum'])) {
+            $query->where('nmo.ordernum', '=', $params['ordernum']);
+        }
+
+        switch (intval($params['status'] ?? 0)) {
+            case 1:
+                $query->where('nmo.status', '=', 1);
+                break;
+            case 10:
+                $query->where('nmo.status', '=', 10);
+                break;
+            case 20:
+                $query->where('nmo.status', '=', 20);
+                break;
+            case 30:
+                $query->where('nmo.status', '=', 30);
+                break;
+            case 99:
+                $query->where('nmo.is_stop', '=', 1);
+                break;
+        }
+
+        $field = [
+            'id', 'ordernum', 'price', 'dead_time',
+            DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`')
+        ];
+        $with = ['orderDetails', 'orderDetails.goodsInfo'];
+
+        if ($flag) {
+            $field[] = 'address_history';
+            $field[] = 'cost_price';
+            $field[] = 'freight';
+            $field[] = 'vip_cut';
+            $field[] = 'coupon_money';
+            $field[] = 'special_price_cut';
+            $field[] = 'price';
+            $field[] = 'pay_time';
+            $field[] = 'pay_type';
+            $field[] = 'messages';
+            $field[] = 'post_type';
+            $field[] = 'bill_type';
+            $field[] = 'bill_title';
+            $field[] = 'bill_number';
+            $field[] = 'bill_format';
+            $with[] = 'orderChild';
+        }
+
+        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
+                $now_date . '" then FALSE ELSE TRUE END) ');
+
+        $list = $query->with($with)->select($field)->get();
+
+        foreach ($list as $v) {
+            $v->goods_count = 0;
+            foreach ($v->orderDetails as $vv) {
+                $v->goods_count += $vv->num;
+                $vv->sku_history = json_decode($vv->sku_history);
+            }
+            $v->address_history = json_decode($v->address_history);
+        }
+
+        return $list;
+    }
+
+    public function orderDetails() {
+        return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
+                        ->select([
+                            'status', 'goods_id', 'num', 'id as details_id',
+                            'order_id', 'sku_history', 'comment_id'
+        ]);
+    }
+
+    public function orderChild() {
+        return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')
+                        ->select([
+                            'status', 'order_id', 'order_detail_id',
+                            'express_id', 'express_num'
+        ]);
+    }
+
+    public function orderInfo($user_id, $ordernum) {
+        if (empty($ordernum)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $data = $this->userOrderList(
+                ['ordernum' => $ordernum],
+                ['id' => $user_id],
+                true
+        );
+        $data = $data[0];
+
+
+        //todo 多快递单显示
+        //todo 拼接适合前端格式
+        return $data;
     }
 
 }

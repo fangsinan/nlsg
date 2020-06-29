@@ -19,7 +19,7 @@ class MallGroupBuyList extends Base {
 
     protected $table = 'nlsg_mall_group_buy_list';
 
-    //检查拼团key是否过期    
+    //检查拼团key是否过期
     public static function checkGroupKeyCanUse($key, $user_id) {
         $now_date = date('Y-m-d H:i:s', time());
         $check = self::where('group_key', '=', $key)
@@ -36,6 +36,11 @@ class MallGroupBuyList extends Base {
                 return true;
             }
         }
+    }
+
+    public function teamOrderCount() {
+        return $this->hasOne('App\Models\MallGroupBuyList', 'group_key', 'group_key')
+                        ->select([DB::raw('count(1) counts'), 'group_key']);
     }
 
 }

@@ -42,7 +42,7 @@ class MallOrderController extends Controller {
      * "address_id":2814,
      * "os_type":1
      * }
-     * 
+     *
      * @apiSuccess {string[]} sku_list 商品信息
      * @apiSuccess {string} sku_list.name 商品名称
      * @apiSuccess {string} sku_list.subtitle 副标题
@@ -51,7 +51,7 @@ class MallOrderController extends Controller {
      * @apiSuccess {number} sku_list.num 数量
      * @apiSuccess {string} sku_list.original_price 原价
      * @apiSuccess {string} sku_list.price 售价
-     * 
+     *
      * @apiSuccess {string[]} price_list 订单价格
      * @apiSuccess {number} price_list.all_original_price 原价
      * @apiSuccess {number} price_list.all_price 售价
@@ -60,14 +60,13 @@ class MallOrderController extends Controller {
      * @apiSuccess {number} price_list.sp_cut_money 活动立减
      * @apiSuccess {number} price_list.coupon_money 优惠券立减
      * @apiSuccess {number} price_list.order_price 订单金额
-     * 
+     *
      * @apiSuccess {string[]} address_list 用户地址列表
-     * 
+     *
      * @apiSuccess {string[]} coupon_list 可用优惠券列表
      * @apiSuccess {string[]} coupon_list.coupon_goods 商品优惠券列表
      * @apiSuccess {string[]} coupon_list.coupon_freight 免邮券列表
-     * 
-     * 
+     *
      * @apiSuccess {number} name 名称
      * @apiSuccess {number} subtitle 副标题
      * @apiSuccessExample {json} Request-Example:
@@ -295,7 +294,7 @@ class MallOrderController extends Controller {
      * "address_id":2814,
      * "os_type":1
      * }
-     * 
+     *
      * @apiSuccess {string[]} sku_list 商品信息
      * @apiSuccess {string} sku_list.name 商品名称
      * @apiSuccess {string} sku_list.subtitle 副标题
@@ -304,7 +303,7 @@ class MallOrderController extends Controller {
      * @apiSuccess {number} sku_list.num 数量
      * @apiSuccess {string} sku_list.original_price 原价
      * @apiSuccess {string} sku_list.price 售价
-     * 
+     *
      * @apiSuccess {string[]} price_list 订单价格
      * @apiSuccess {number} price_list.all_original_price 原价
      * @apiSuccess {number} price_list.all_price 售价
@@ -538,7 +537,7 @@ class MallOrderController extends Controller {
      * "buy_type":1,
      * "group_key":1
      * }
-     * 
+     *
      * @apiSuccess {string[]} sku_list 商品信息
      * @apiSuccess {string} sku_list.name 商品名称
      * @apiSuccess {string} sku_list.subtitle 副标题
@@ -547,7 +546,7 @@ class MallOrderController extends Controller {
      * @apiSuccess {number} sku_list.num 数量
      * @apiSuccess {string} sku_list.original_price 原价
      * @apiSuccess {string} sku_list.price 售价
-     * 
+     *
      * @apiSuccess {string[]} price_list 订单价格
      * @apiSuccess {number} price_list.all_original_price 原价
      * @apiSuccess {number} price_list.all_price 售价
@@ -730,7 +729,7 @@ class MallOrderController extends Controller {
      * "buy_type":1,
      * "group_key":1
      * }
-     * 
+     *
      * @apiSuccessExample {json} Request-Example:
      * {
       "code": 200,
@@ -829,11 +828,209 @@ class MallOrderController extends Controller {
         }
     }
 
+    /**
+     * 拼团队伍信息
+     * @api {get} /api/V4/goods/group_buy_team_list 拼团队伍信息
+     * @apiVersion 1.0.0
+     * @apiName /api/V4/goods/group_buy_team_list
+     * @apiGroup MallOrder
+     * @apiSampleRequest /api/V4/goods/group_buy_team_list
+     * @apiDescription 拼团队伍信息
+     * @apiParam {number} group_buy_id 拼团id
+     * @apiParam {numer} [group_key] 拼团队伍标识
+     * @apiSuccess {string} group_name group_buy_id
+     * @apiSuccess {string} created_at 创建时间
+     * @apiSuccess {string} user_id 队长id
+     * @apiSuccess {string} end_at 队伍失效时间
+     * @apiSuccess {string} nickname 队长昵称
+     * @apiSuccess {string} headimg 头像
+     * @apiSuccess {string} group_num 组队需要人数
+     * @apiSuccess {string} group_key 队伍标似
+     * @apiSuccess {string} order_count 队伍已有人数
+     *
+     * @apiSuccessExample {json} Request-Example:
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "id": 5,
+      "group_name": "111",
+      "order_id": 9560,
+      "created_at": "2020-06-28 18:13:52",
+      "user_id": 168934,
+      "is_success": 0,
+      "success_at": null,
+      "begin_at": "2020-06-28 18:13:52",
+      "end_at": "2020-07-28 18:14:59",
+      "nickname": "chandler",
+      "headimg": null,
+      "group_num": 4,
+      "group_key": "2006280016893465633736",
+      "order_count": 1
+      }
+      ]
+      }
+     */
+    public function groupByTeamList(Request $request) {
+        $params = $request->input();
+        $model = new MallOrderGroupBuy();
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        $data = $model->groupByTeamList($params, $user);
+
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
+    /**
+     * 普通和秒杀订单的列表
+     * @api {post} /api/V4/mall/order_list 普通和秒杀订单的列表
+     * @apiVersion 1.0.0
+     * @apiName /api/V4/mall/order_list
+     * @apiGroup MallOrder
+     * @apiSampleRequest /api/V4/mall/order_list
+     * @apiDescription 普通和秒杀订单的列表
+     * @apiParam {number} page 页数
+     * @apiParam {number} size 条数
+     * @apiParam {number} status 订单状态(全部0,待付款1,待发货10,待签收20,已完成30,已取消99)
+     *
+     * @apiParamExample {json} Request-Example:
+     * {
+     * "status":0
+     * }
+     *
+      @apiSuccess {number} id 订单id
+      @apiSuccess {string} ordernum 订单编号
+      @apiSuccess {string} status 状态
+      @apiSuccess {string} price 订单金额
+      @apiSuccess {string} goods_count 商品数量
+      @apiSuccess {string[]} order_details 订单商品列表
+
+      @apiSuccess {string} order_details.num 购买数量
+      @apiSuccess {string[]} order_details.goods_info 商品信息
+      @apiSuccess {string} order_details.goods_info.name 商品名称
+      @apiSuccess {string} order_details.goods_info.subtitle 商品说明
+      @apiSuccess {string} order_details.goods_info.picture 商品图片
+      @apiSuccess {string} order_details.goods_info.id 商品id
+
+     * @apiSuccessExample {json} Request-Example:
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "id": 9526,
+      "ordernum": "2006180016893463957101",
+      "status": 1,
+      "price": "741.27",
+      "goods_count": 7,
+      "order_details": [
+      {
+      "status": 0,
+      "goods_id": 91,
+      "num": 2,
+      "order_id": 9526,
+      "goods_info": {
+      "name": "AR立体浮雕星座地球仪",
+      "subtitle": "高清生动准确的星座秘密等你来发现",
+      "picture": "/nlsg/goods/20191026172620981048.jpg",
+      "id": 91
+      }
+      }
+      ]
+      }
+      ]
+      }
+     */
+    public function list(Request $request) {
+        $params = $request->input();
+        $params['page'] = 1;
+        $params['size'] = 10;
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+
+        $model = new MallOrder();
+        $data = $model->userOrderList($params, $user);
+
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
+    //拼团订单列表
+    public function listOfGroupBuy(Request $request) {
+        $params = $request->input();
+        $params['page'] = 1;
+        $params['size'] = 10;
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+
+        $model = new MallOrderGroupBuy();
+        $data = $model->userOrderList($params, $user);
+
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
+    //todo 拼团订单详情
+    public function groupBuyOrderInfo(Request $request) {
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+        $ordernum = $request->input('ordernum', 0);
+        $model = new MallOrderGroupBuy();
+        $data = $model->orderInfo($user['id'], $ordernum);
+
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
     //todo 订单详情
+    public function orderInfo(Request $request) {
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+        $ordernum = $request->input('ordernum', 0);
+        $model = new MallOrder();
+        $data = $model->orderInfo($user['id'], $ordernum);
+
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
     //todo 确认收货
+    //todo 可评论商品列表
     //todo 评论
-    //todo 订单列表(普通&秒杀)
-    //todo 拼团订单列表
     //todo 取消(已支付),关闭(未支付),删除
     public function statusChange(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];

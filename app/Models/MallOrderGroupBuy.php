@@ -26,6 +26,8 @@ class MallOrderGroupBuy extends Base {
 
     public function createGroupBuyOrder($params, $user) {
         $now = time();
+        $dead_time = ConfigModel::getData(12);
+        $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
         $now_date = date('Y-m-d H:i:s', $now);
         $data = $this->createGroupBuyOrderTool($params, $user, true);
 
@@ -59,6 +61,7 @@ class MallOrderGroupBuy extends Base {
         $order_data['created_at'] = $now_date;
         $order_data['updated_at'] = $now_date;
         $order_data['sp_id'] = $data['sku_list']['group_buy_id'];
+        $order_data['dead_time'] = $dead_time;
 
         DB::beginTransaction();
 
@@ -497,6 +500,167 @@ class MallOrderGroupBuy extends Base {
         } else {
             return $res;
         }
+    }
+
+    /**
+     * 团购商品的订单数据
+     * @param type $params
+     * @param type $user
+     */
+    public function groupByTeamList($params, $user) {
+        $group_buy_id = $params['group_buy_id'] ?? 0;
+        $flag = $params['flag'] ?? 1; //1两条  2全部
+        $group_key = $params['group_key'] ?? 0;
+        if (empty($group_buy_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        //成功队伍数量
+        $team_success_count = DB::table('nlsg_mall_group_buy_list as gbl')
+                ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
+                ->where('gbl.group_name', '=', $group_buy_id)
+                ->where('gbl.is_success', '=', 1)
+                ->where('gbl.is_captain', '=', 1)
+                ->count();
+        //队伍数量
+        $team_count = DB::table('nlsg_mall_group_buy_list as gbl')
+                ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
+                ->where('gbl.group_name', '=', $group_buy_id)
+                ->where('gbl.is_captain', '=', 1)
+                ->where('gbl.is_fail', '=', 0)
+                ->count();
+        //开团列表 所差人数  剩余时间
+        $query = MallGroupBuyList::where(
+                        'nlsg_mall_group_buy_list.group_name', '=', $group_buy_id
+                )->where('is_success', '=', 0)
+                ->where('is_captain', '=', 1)
+                ->where('is_fail', '=', 0)
+                ->where('end_at', '>', $now_date);
+
+        if ($group_key) {
+            $query->where('group_key', '=', $group_key);
+        }
+
+        $query->join('nlsg_mall_order as nmo',
+                        'nlsg_mall_group_buy_list.order_id', '=', 'nmo.id')
+                ->join('nlsg_user as nuser',
+                        'nlsg_mall_group_buy_list.user_id', '=', 'nuser.id')
+                ->join('nlsg_special_price as nsp',
+                        'nlsg_mall_group_buy_list.group_buy_id', '=', 'nsp.id')
+                ->select(['nlsg_mall_group_buy_list.id',
+                    'nlsg_mall_group_buy_list.group_name',
+                    'nlsg_mall_group_buy_list.order_id',
+                    'nlsg_mall_group_buy_list.created_at',
+                    'nlsg_mall_group_buy_list.user_id',
+                    'nlsg_mall_group_buy_list.is_success',
+                    'nlsg_mall_group_buy_list.success_at',
+                    'nlsg_mall_group_buy_list.begin_at',
+                    'nlsg_mall_group_buy_list.end_at',
+                    'nuser.nickname', 'nuser.headimg',
+                    'nsp.group_num', 'nlsg_mall_group_buy_list.group_key'])
+                ->with(['teamOrderCount'])
+                ->orderBy('is_success', 'asc')
+                ->orderBy('nlsg_mall_group_buy_list.id', 'asc');
+
+        if ($flag == 1) {
+            $query->limit(2);
+        }
+
+        $team_list = $query->get();
+
+
+        foreach ($team_list as $k => $v) {
+            $v->order_count = $v->teamOrderCount->counts;
+            unset($team_list[$k]->teamOrderCount);
+        }
+
+        return $team_list;
+    }
+
+    //用户拼团订单列表
+    public function userOrderList($params, $user) {
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+        $user_id = $user['id'];
+        $params['page'] = $params['page'] ?? 1;
+        $params['size'] = $params['size'] ?? 10;
+        //库数据:订单状态 1待付款  10待发货 20待收货 30已完成
+        //全部0,拼团中95,待付款1,代发货10,待签收20,已完成30,已取消99
+        //展示数据:订单编号,状态,商品列表,价格,数量,取消时间,金额
+
+        $query = self::from('nlsg_mall_order as nmo')
+                ->join('nlsg_mall_group_buy_list as gbl', 'nmo.id', '=', 'gbl.order_id')
+                ->where('nmo.user_id', '=', $user_id)
+                ->where('nmo.order_type', '=', 3)
+                ->where('nmo.is_del', '=', 0)
+                ->limit($params['size'])
+                ->offset(($params['page'] - 1) * $params['size']);
+
+        if (!empty($params['ordernum'])) {
+            $query->where('nmo.ordernum', '=', $params['ordernum']);
+        }
+
+        switch (intval($params['status'] ?? 0)) {
+            case 1:
+                $query->where('nmo.status', '=', 1);
+                break;
+            case 10:
+                $query->where('nmo.status', '=', 10)
+                        ->where('gbl.is_success', '=', 1);
+                break;
+            case 20:
+                $query->where('nmo.status', '=', 20)
+                        ->where('gbl.is_success', '=', 1);
+                break;
+            case 30:
+                $query->where('nmo.status', '=', 30)
+                        ->where('gbl.is_success', '=', 1);
+                break;
+            case 95:
+                $query->where('nmo.status', '=', 10)
+                        ->where('gbl.is_success', '=', 0);
+                break;
+            case 99:
+                $query->where('nmo.is_stop', '=', 1);
+                break;
+        }
+
+        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
+                $now_date . '" then FALSE ELSE TRUE END) ');
+        $query->with(['orderDetails', 'orderDetails.goodsInfo']);
+        $query->select(['nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time',
+            DB::raw('(case when nmo.`status` = 1 then 1
+                when is_success = 0 then 95 when nmo.is_stop = 1
+                then 99 ELSE nmo.`status` END) `status`')]);
+
+        $list = $query->get();
+
+        foreach ($list as $v) {
+            $v->goods_count = 0;
+            foreach ($v->orderDetails as $vv) {
+                $v->goods_count += $vv->num;
+            }
+        }
+
+        return $list;
+    }
+
+    public function orderDetails() {
+        return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
+                        ->select(['status', 'goods_id', 'num', 'order_id']);
+    }
+
+    //订单详情
+    public function orderInfo($user_id, $ordernum) {
+        if (empty($ordernum)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $data = $this->userOrderList(['ordernum' => $ordernum], ['id' => $user_id]);
+
+        return $data;
     }
 
 }

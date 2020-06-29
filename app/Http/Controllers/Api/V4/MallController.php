@@ -791,21 +791,6 @@ class MallController extends Controller {
         }
     }
 
-    //todo 拼团队伍信息(几人团,队伍列表)
-    public function groupByGoodsOrderList(Request $request) {
-        $params = $request->input();
-        $model = new MallGoods();
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        $data = $model->groupByGoodsOrderList($params, $user);
-
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
-    }
-
     //todo 收藏
     //todo 评价
     //todo 自提点,售后点

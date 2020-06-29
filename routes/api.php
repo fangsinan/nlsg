@@ -75,7 +75,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('goods/flash_sale', 'MallController@flashSaleList');
     Route::get('goods/group_buy', 'MallController@groupBuyList');
     Route::get('goods/group_buy_info', 'MallController@groupByGoodsInfo');
-    Route::get('goods/group_buy_info_order', 'MallController@groupByGoodsOrderList');
+    Route::get('goods/group_buy_team_list', 'MallOrderController@groupByTeamList');
     Route::get('goods/service_description', 'MallController@mallServiceDescription');
     Route::post('goods/get_coupon', 'CouponController@getCoupon');
 
@@ -103,7 +103,16 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::post('mall/prepare_create_group_buy_order', 'MallOrderController@prepareCreateGroupBuyOrder');
     Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');
 
+    //订单列表
+    Route::post('mall/order_list', 'MallOrderController@list');
+    Route::post('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');
 
+    //订单详情
+    Route::get('mall/order_info', 'MallOrderController@orderInfo');
+    Route::get('mall/group_buy_order_info', 'MallOrderController@groupBuyOrderInfo');
+
+
+    //修改订单状态
     Route::post('mall/status_change', 'MallOrderController@statusChange');
 
 

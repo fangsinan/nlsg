@@ -232,23 +232,7 @@ class MallGoods extends Base {
         return $lists;
     }
 
-    /**
-     * todo 团购商品的订单数据
-     * @param type $params
-     * @param type $user
-     */
-    public function groupByGoodsOrderList($params, $user) {
-        $group_buy_id = $params['group_buy_id'] ?? 0;
-        $flag = $params['flag'] ?? 1; //1两条  2全部
-        if (empty($group_buy_id)) {
-            return ['code' => false, 'msg' => '参数错误'];
-        }
-        $now = time();
-        $now_data = date('Y-m-d H:i:s', $now);
 
-        //todo 几人成团
-        //todo 开团列表 所差人数  剩余时间
-    }
 
     /**
      * 团购商品详情
