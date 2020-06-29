@@ -63,7 +63,7 @@ class SearchController extends Controller
     */
     public function index(Request $request)
     {
-        $hot_search = Search::orderBy('num','desc')->limit(6)->get();
+        $hot_search = Search::groupBy('keywords')->orderBy('num','desc')->limit(6)->get();
         return $this->success($hot_search);
     }
 
@@ -422,7 +422,7 @@ class SearchController extends Controller
 
         //搜索入库
         $SearchData = Search::firstOrCreate([
-            'keywords'   =>$keywords,
+            'keywords'  =>$keywords,
             'user_id'   =>$user_id,
         ]);
         if(!$SearchData->wasRecentlyCreated){
