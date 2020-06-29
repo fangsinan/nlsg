@@ -54,9 +54,19 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 
     //搜索
     Route::get('search/index', 'SearchController@index');
-
+    Route::get('search/search', 'SearchController@search');
+    //微信支付
     Route::get('pay/wechat_pay', 'PayController@prePay');
-    Route::get('wechat_pay/notify', 'CallbackController@Notify');
+    //支付宝支付
+    Route::get('pay/ali_pay', 'PayController@aliPay');
+    //苹果支付
+    Route::get('pay/apple_pay', 'PayController@ApplePay');
+    Route::get('pay/pay_coin', 'PayController@PayCoin');
+
+
+    //微信回调
+    Route::get('wechat_pay/wechat_notify', 'CallbackController@WechatNotify');
+    Route::get('wechat_pay/ali_notify', 'CallbackController@AliNotify');
 
     //下单
     Route::get('order/create_column_order', 'OrderController@createColumnOrder');

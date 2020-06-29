@@ -12,6 +12,8 @@ use EasyWeChat\Factory;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Request;
+use Yansongda\Pay\Log;
+use Yansongda\Pay\Pay;
 
 class PayController extends  Controller
 {
@@ -114,6 +116,34 @@ class PayController extends  Controller
         ];
 
     }
+
+
+    /*支付宝支付*/
+    public function aliPay(Request $request)
+    {
+        //1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
+        $attach = $request->input('type',0);
+        $order_id = $request->input('id',0);
+
+        if (empty($order_id) || empty($attach)) { //订单id有误
+            return $this->error(0,'订单信息为空');
+        }
+
+        $pay_info = $this->getPayInfo($order_id, $attach);
+        if($pay_info == false){
+            return $this->error(0,'订单信息错误');
+        }
+        $config = Config('pay.alipay');
+        $order = [
+            'out_trade_no' => $pay_info['ordernum'],
+            'total_amount' => $pay_info['price'],
+            'subject' => $pay_info['body'],
+            'attach' => $attach
+        ];
+        $alipay = Pay::alipay($config)->app($order);
+        return $alipay;// laravel 框架中请直接 `return $alipay`
+    }
+    /*支付宝支付*/
 
 
     /**
