@@ -59,6 +59,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('pay/wechat_pay', 'PayController@prePay');
     //支付宝支付
     Route::get('pay/ali_pay', 'PayController@aliPay');
+    //支付是否成功查询
+    Route::get('pay/order_find', 'PayController@OrderFind');
     //苹果支付
     Route::get('pay/apple_pay', 'PayController@ApplePay');
     Route::get('pay/pay_coin', 'PayController@PayCoin');

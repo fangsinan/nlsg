@@ -23,7 +23,8 @@ class PayController extends  Controller
      * @apiVersion 1.0.0
      * @apiGroup works
      *
-     * @apiParam {int} works_id 课程id
+     * @apiParam {int} id 订单id
+     * @apiParam {int} type  1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -118,7 +119,18 @@ class PayController extends  Controller
     }
 
 
-    /*支付宝支付*/
+    /**
+     * @api {post} api/v4/pay/ali_pay   支付宝支付-预下单
+     * @apiName ali_pay
+     * @apiVersion 1.0.0
+     * @apiGroup pay
+     *
+     * @apiParam {int} type 类型 1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
+     * @apiParam {int} id 订单id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     */
     public function aliPay(Request $request)
     {
         //1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
@@ -143,7 +155,41 @@ class PayController extends  Controller
         $alipay = Pay::alipay($config)->app($order);
         return $alipay;// laravel 框架中请直接 `return $alipay`
     }
-    /*支付宝支付*/
+
+    //
+    /**
+     * @api {post} api/v4/pay/ali_pay   下单查询接口
+     * @apiName ali_pay
+     * @apiVersion 1.0.0
+     * @apiGroup pay
+     *
+     * @apiParam {int} type 类型 1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
+     * @apiParam {int} id 订单id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     */
+    public function OrderFind(Request $request)
+    {
+        $id = $request->input('id',0);
+        $orderData = Order::find($id);
+        if(!$orderData){
+            return $this->error(0,'订单有误');
+        }
+        if( $orderData['pay_type'] == 2 ){
+            //微信
+            $config = Config('wechat.payment.default');
+            $app    = Factory::payment($config);
+            return $app->order->queryByOutTradeNumber($orderData['ordernum']);//"商户系统内部的订单号（out_trade_no）"
+        }elseif( $orderData['pay_type'] == 3 ){
+            //支付宝
+            $config = Config('pay.alipay');
+            return Pay::alipay($config)->find(['out_trade_no' => $orderData['ordernum']]);
+
+        }
+    }
+
+
 
 
     /**
@@ -194,10 +240,7 @@ class PayController extends  Controller
             'attach'        => 13,  //能量币
             'pay_type'      => 4,//支付方式 1 微信端 2app微信 3app支付宝  4ios
         ];
-
-
         $res = WechatPay::PayStatusUp($Paydata);  //回调
-
         if($res == false){
             return $this->error($check_data['code'],'fail:系统订单有误，重试');
         }
@@ -233,10 +276,6 @@ class PayController extends  Controller
         }
         return ['error'=>1,'data'=>$data];
     }
-
-
-
-
 
 
 
@@ -305,7 +344,6 @@ class PayController extends  Controller
             //商品不支持能量币支付
             return $this->error(0,'能量币不足,请先充值');
         }
-
 
         //校验完成支付后  修改订单内容(类似于支付宝或微信的回调)
         $Paydata = [
