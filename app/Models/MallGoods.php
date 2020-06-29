@@ -232,7 +232,6 @@ class MallGoods extends Base {
         return $lists;
     }
 
-
     /**
      * todo 团购商品的订单数据
      * @param type $params
@@ -240,7 +239,7 @@ class MallGoods extends Base {
      */
     public function groupByGoodsOrderList($params, $user) {
         $group_buy_id = $params['group_buy_id'] ?? 0;
-        $flag = $params['flag'] ?? 1;//1两条  2全部
+        $flag = $params['flag'] ?? 1; //1两条  2全部
         if (empty($group_buy_id)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
@@ -309,20 +308,19 @@ class MallGoods extends Base {
         }
 
         return $data;
+    }
 
     // 全局搜索用 $keywords
-    static function search($keywords){
+    static function search($keywords) {
         $res = MallGoods::select('id', 'name', 'subtitle', 'original_price', 'price', 'picture')
-            ->where('status', 2)
-            //->where('can_sale', 1)
-            ->where(function ($query)use($keywords){
-                $query->orWhere('name','LIKE',"%$keywords%");
-                $query->orWhere('subtitle','LIKE',"%$keywords%");
-            })->get();
+                        ->where('status', 2)
+                        //->where('can_sale', 1)
+                        ->where(function ($query)use($keywords) {
+                            $query->orWhere('name', 'LIKE', "%$keywords%");
+                            $query->orWhere('subtitle', 'LIKE', "%$keywords%");
+                        })->get();
 
-        return ['res' => $res, 'count'=> $res->count() ];
-
-
+        return ['res' => $res, 'count' => $res->count()];
     }
 
 }
