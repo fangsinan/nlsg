@@ -580,7 +580,7 @@ class MallOrderGroupBuy extends Base {
     }
 
     //用户拼团订单列表
-    public function userOrderList($params, $user) {
+    public function userOrderList($params, $user, $flag = false) {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $user_id = $user['id'];
@@ -627,21 +627,50 @@ class MallOrderGroupBuy extends Base {
                 break;
         }
 
-        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
-                $now_date . '" then FALSE ELSE TRUE END) ');
-        $query->with(['orderDetails', 'orderDetails.goodsInfo']);
-        $query->select(['nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time',
+        $field = [
+            'nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time',
             DB::raw('(case when nmo.`status` = 1 then 1
                 when is_success = 0 then 95 when nmo.is_stop = 1
-                then 99 ELSE nmo.`status` END) `status`')]);
+                then 99 ELSE nmo.`status` END) `status`')
+        ];
+        $with = ['orderDetails', 'orderDetails.goodsInfo'];
 
-        $list = $query->get();
+        if ($flag) {
+            $field[] = 'address_history';
+            $field[] = 'cost_price';
+            $field[] = 'freight';
+            $field[] = 'vip_cut';
+            $field[] = 'coupon_money';
+            $field[] = 'special_price_cut';
+            $field[] = 'price';
+            $field[] = 'pay_time';
+            $field[] = 'pay_type';
+            $field[] = 'messages';
+            $field[] = 'post_type';
+            $field[] = 'bill_type';
+            $field[] = 'bill_title';
+            $field[] = 'bill_number';
+            $field[] = 'bill_format';
+            $with[] = 'orderChild';
+        }
+
+        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
+                $now_date . '" then FALSE ELSE TRUE END) ');
+        //$query->with(['orderDetails', 'orderDetails.goodsInfo']);
+        //$query->select(['nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time',
+        //     DB::raw('(case when nmo.`status` = 1 then 1
+        //     when is_success = 0 then 95 when nmo.is_stop = 1
+        //     then 99 ELSE nmo.`status` END) `status`')]);
+
+        $list = $query->with($with)->select($field)->get();
 
         foreach ($list as $v) {
             $v->goods_count = 0;
             foreach ($v->orderDetails as $vv) {
                 $v->goods_count += $vv->num;
+                $vv->sku_history = json_decode($vv->sku_history);
             }
+            $v->address_history = json_decode($v->address_history);
         }
 
         return $list;
@@ -649,7 +678,21 @@ class MallOrderGroupBuy extends Base {
 
     public function orderDetails() {
         return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
-                        ->select(['status', 'goods_id', 'num', 'order_id']);
+                        ->select([
+                            'status', 'goods_id', 'num', 'id as details_id',
+                            'order_id', 'sku_history', 'comment_id'
+        ]);
+    }
+
+    public function orderChild() {
+        return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')
+                        ->groupBy('express_id')
+                        ->groupBy('express_num')
+                        ->select([
+                            'status', 'order_id',
+                            'express_id', 'express_num',
+                            DB::raw('GROUP_CONCAT(order_detail_id) order_detail_id')
+        ]);
     }
 
     //订单详情
@@ -658,9 +701,89 @@ class MallOrderGroupBuy extends Base {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $data = $this->userOrderList(['ordernum' => $ordernum], ['id' => $user_id]);
+        $getData = $this->userOrderList(
+                ['ordernum' => $ordernum],
+                ['id' => $user_id],
+                true
+        );
+
+        $data = $getData[0]->toArray();
+
+        foreach ($data['order_details'] as &$odv) {
+            $temp_odv = [];
+            $temp_odv['goods_id'] = $odv['goods_id'];
+            $temp_odv['num'] = $odv['num'];
+            $temp_odv['sku_value'] = $odv['sku_history']->sku_value;
+            $temp_odv['price'] = $odv['sku_history']->actual_price;
+            $temp_odv['original_price'] = $odv['sku_history']->original_price;
+            $temp_odv['name'] = $odv['goods_info']['name'];
+            $temp_odv['picture'] = $odv['goods_info']['picture'];
+            $temp_odv['subtitle'] = $odv['goods_info']['subtitle'];
+            $temp_odv['details_id'] = $odv['details_id'];
+            $odv = $temp_odv;
+        }
+
+        foreach ($data['order_child'] as &$v1) {
+            $v1['order_detail_id'] = explode(',', $v1['order_detail_id']);
+            $v1['order_details'] = [];
+        }
+
+        $price_info = [];
+        $price_info['cost_price'] = $data['cost_price'];
+        $price_info['freight'] = $data['freight'];
+        $price_info['vip_cut'] = $data['vip_cut'];
+        $price_info['coupon_money'] = $data['coupon_money'];
+        $price_info['special_price_cut'] = $data['special_price_cut'];
+        $price_info['pay_time'] = $data['pay_time'];
+        $price_info['pay_type'] = $data['pay_type'];
+        $price_info['price'] = $data['price'];
+
+        $bill_info = [];
+        $bill_info['bill_type'] = $data['bill_type'];
+        $bill_info['bill_title'] = $data['bill_title'];
+        $bill_info['bill_number'] = $data['bill_number'];
+        $bill_info['bill_format'] = $data['bill_format'];
+
+
+        $data['price_info'] = $price_info;
+        $data['bill_info'] = $bill_info;
+
+
+        //todo 拼团队员列表
+
+        if (empty($data['order_child'])) {
+            $temp_data = [];
+            $temp_data['status'] = 0;
+            $temp_data['order_id'] = $data['id'];
+            $temp_data['express_id'] = 0;
+            $temp_data['express_num'] = '';
+            $temp_data['order_detail_id'] = [];
+            $temp_data['order_details'] = $data['order_details'];
+            $data['order_child'] = [$temp_data];
+        } else {
+            foreach ($data['order_child'] as $k => &$v) {
+                foreach ($data['order_details'] as $vv) {
+                    if (in_array($vv['details_id'], $v['order_detail_id'])) {
+                        array_push($v['order_details'], $vv);
+                    }
+                }
+            }
+        }
+
+        unset(
+                $data['cost_price'], $data['freight'],
+                $data['vip_cut'], $data['price'],
+                $data['coupon_money'], $data['special_price_cut'],
+                $data['pay_time'], $data['pay_type'],
+                $data['bill_type'], $data['bill_title'],
+                $data['bill_number'], $data['bill_format'],
+                $data['order_details']
+        );
 
         return $data;
     }
 
+    public function getTeamUserListbyOrderId($order_id){
+        
+    }
 }

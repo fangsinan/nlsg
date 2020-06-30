@@ -108,7 +108,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     //秒杀订单
     Route::post('mall/prepare_create_flash_sale_order', 'MallOrderController@prepareCreateFlashSaleOrder');
     Route::post('mall/create_flash_sale_order', 'MallOrderController@createFlashSaleOrder');
-    Route::get('mall/flash_sale_pay_fail', 'MallOrderController@flashSalePayFail');
+    Route::post('mall/flash_sale_pay_fail', 'MallOrderController@flashSalePayFail');
 
 
     //拼团订单
@@ -116,7 +116,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');
 
     //订单列表
-    Route::post('mall/order_list', 'MallOrderController@list');
+    Route::get('mall/order_list', 'MallOrderController@list');
     Route::get('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');
 
     //订单详情
