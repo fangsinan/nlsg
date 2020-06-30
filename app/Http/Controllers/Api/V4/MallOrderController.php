@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\MallOrder;
 use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
+use Illuminate\Http\Request;
 
-class MallOrderController extends Controller {
+class MallOrderController extends Controller
+{
 
     /**
      * 预下单
@@ -70,91 +71,92 @@ class MallOrderController extends Controller {
      * @apiSuccess {number} name 名称
      * @apiSuccess {number} subtitle 副标题
      * @apiSuccessExample {json} Request-Example:
-      {
-      "sku_list": [
-      {
-      "name": "AR立体浮雕星座地球仪",
-      "subtitle": "高清生动准确的星座秘密等你来发现",
-      "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
-      "sku_value_list": [
-      {
-      "key_name": "规格",
-      "value_name": "AR立体浮雕星座地球仪"
-      }
-      ],
-      "num": 2,
-      "original_price": "379.00",
-      "price": "9.70"
-      },
-      {
-      "name": "王琨专栏学习套装",
-      "subtitle": "王琨老师专栏年卡1张+《琨说》珍藏版",
-      "picture": "/wechat/mall/goods/8873_1545796221.png",
-      "sku_value_list": [
-      {
-      "key_name": "规格",
-      "value_name": "王琨专栏学习套装"
-      }
-      ],
-      "num": 1,
-      "original_price": "399.00",
-      "price": "254.15"
-      }
-      ],
-      "price_list": {
-      "all_original_price": "1789.00",
-      "all_price": "746.27",
-      "freight_money": "13.00",
-      "vip_cut_money": "304.13",
-      "sp_cut_money": "738.60",
-      "coupon_money": 0,
-      "freight_free_flag": false,
-      "order_price": "759.27"
-      },
-      "address_list": [
-      {
-      "id": 2815,
-      "name": "sfas",
-      "phone": "18624078563",
-      "details": "sdkfjsljfl1ao",
-      "is_default": 1,
-      "province": 210000,
-      "city": 210100,
-      "area": 210102,
-      "province_name": "辽宁",
-      "city_name": "沈阳",
-      "area_name": "和平区"
-      }
-      ],
-      "coupon_list": {
-      "coupon_goods": [
-      {
-      "id": 7,
-      "name": "5元优惠券(六一专享)",
-      "type": 3,
-      "price": "5.00",
-      "full_cut": "0.00",
-      "explain": "六一活动期间",
-      "begin_time": "2020-06-12 00:00:00",
-      "end_time": "2020-06-19 23:59:59"
-      }
-      ],
-      "coupon_freight": [
-      {
-      "id": 10,
-      "name": "测试免邮券",
-      "type": 4,
-      "price": "0.00",
-      "full_cut": "0.00",
-      "explain": "商品免邮券",
-      "begin_time": "2020-06-12 00:00:00",
-      "end_time": "2020-06-22 23:59:59"
-      }
-      ]
-      }
-      }
+    {
+    "sku_list": [
+    {
+    "name": "AR立体浮雕星座地球仪",
+    "subtitle": "高清生动准确的星座秘密等你来发现",
+    "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
+    "sku_value_list": [
+    {
+    "key_name": "规格",
+    "value_name": "AR立体浮雕星座地球仪"
+    }
+    ],
+    "num": 2,
+    "original_price": "379.00",
+    "price": "9.70"
+    },
+    {
+    "name": "王琨专栏学习套装",
+    "subtitle": "王琨老师专栏年卡1张+《琨说》珍藏版",
+    "picture": "/wechat/mall/goods/8873_1545796221.png",
+    "sku_value_list": [
+    {
+    "key_name": "规格",
+    "value_name": "王琨专栏学习套装"
+    }
+    ],
+    "num": 1,
+    "original_price": "399.00",
+    "price": "254.15"
+    }
+    ],
+    "price_list": {
+    "all_original_price": "1789.00",
+    "all_price": "746.27",
+    "freight_money": "13.00",
+    "vip_cut_money": "304.13",
+    "sp_cut_money": "738.60",
+    "coupon_money": 0,
+    "freight_free_flag": false,
+    "order_price": "759.27"
+    },
+    "address_list": [
+    {
+    "id": 2815,
+    "name": "sfas",
+    "phone": "18624078563",
+    "details": "sdkfjsljfl1ao",
+    "is_default": 1,
+    "province": 210000,
+    "city": 210100,
+    "area": 210102,
+    "province_name": "辽宁",
+    "city_name": "沈阳",
+    "area_name": "和平区"
+    }
+    ],
+    "coupon_list": {
+    "coupon_goods": [
+    {
+    "id": 7,
+    "name": "5元优惠券(六一专享)",
+    "type": 3,
+    "price": "5.00",
+    "full_cut": "0.00",
+    "explain": "六一活动期间",
+    "begin_time": "2020-06-12 00:00:00",
+    "end_time": "2020-06-19 23:59:59"
+    }
+    ],
+    "coupon_freight": [
+    {
+    "id": 10,
+    "name": "测试免邮券",
+    "type": 4,
+    "price": "0.00",
+    "full_cut": "0.00",
+    "explain": "商品免邮券",
+    "begin_time": "2020-06-12 00:00:00",
+    "end_time": "2020-06-22 23:59:59"
+    }
+    ]
+    }
+    }
      */
-    public function prepareCreateOrder(Request $request) {
+    public function prepareCreateOrder(Request $request)
+    {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -216,16 +218,17 @@ class MallOrderController extends Controller {
      * @apiParam {number=1,2,3} os_type 1安卓2苹果3微信
      *
      *  @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      "order_id": 9530,
-      "ordernum": "2006190016893457221111"
-      }
-      }
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "order_id": 9530,
+    "ordernum": "2006190016893457221111"
+    }
+    }
      */
-    public function createOrder(Request $request) {
+    public function createOrder(Request $request)
+    {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -314,97 +317,98 @@ class MallOrderController extends Controller {
      * @apiSuccess {string[]} address_list 用户地址列表
      * @apiSuccess {string[]} coupon_freight_list 免邮券列表
      * @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      "user": {
-      "id": 168934,
-      "level": 4,
-      "is_staff": 1
-      },
-      "sku_list": {
-      "goods_id": 91,
-      "name": "AR立体浮雕星座地球仪",
-      "subtitle": "高清生动准确的星座秘密等你来发现",
-      "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
-      "sku_value_list": [
-      {
-      "key_name": "规格",
-      "value_name": "AR立体浮雕星座地球仪"
-      }
-      ],
-      "num": 2,
-      "original_price": "379.00",
-      "price": "5.00"
-      },
-      "price_list": {
-      "all_original_price": "758.00",
-      "all_price": "10.00",
-      "freight_money": "13.00",
-      "sp_cut_money": "748.00",
-      "freight_free_flag": false,
-      "order_price": "23.00"
-      },
-      "address_list": [
-      {
-      "id": 2815,
-      "name": "sfas",
-      "phone": "18624078563",
-      "details": "sdkfjsljfl1ao",
-      "is_default": 1,
-      "province": 210000,
-      "city": 210100,
-      "area": 210102,
-      "province_name": "辽宁",
-      "city_name": "沈阳",
-      "area_name": "和平区"
-      },
-      {
-      "id": 2814,
-      "name": "sfas",
-      "phone": "18624078563",
-      "details": "sdkfjsljfl1ao",
-      "is_default": 0,
-      "province": 210000,
-      "city": 210100,
-      "area": 210102,
-      "province_name": "辽宁",
-      "city_name": "沈阳",
-      "area_name": "和平区"
-      }
-      ],
-      "coupon_freight_list": [
-      {
-      "id": 10,
-      "name": "测试免邮券",
-      "type": 4,
-      "price": "0.00",
-      "full_cut": "0.00",
-      "explain": "商品免邮券",
-      "begin_time": "2020-06-12 00:00:00",
-      "end_time": "2020-06-28 23:59:59",
-      "cr_id": 35,
-      "sub_list": []
-      }
-      ],
-      "used_address": {
-      "id": 2814,
-      "name": "sfas",
-      "phone": "18624078563",
-      "details": "sdkfjsljfl1ao",
-      "is_default": 0,
-      "province": 210000,
-      "city": 210100,
-      "area": 210102,
-      "province_name": "辽宁",
-      "city_name": "沈阳",
-      "area_name": "和平区"
-      }
-      }
-      }
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "user": {
+    "id": 168934,
+    "level": 4,
+    "is_staff": 1
+    },
+    "sku_list": {
+    "goods_id": 91,
+    "name": "AR立体浮雕星座地球仪",
+    "subtitle": "高清生动准确的星座秘密等你来发现",
+    "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
+    "sku_value_list": [
+    {
+    "key_name": "规格",
+    "value_name": "AR立体浮雕星座地球仪"
+    }
+    ],
+    "num": 2,
+    "original_price": "379.00",
+    "price": "5.00"
+    },
+    "price_list": {
+    "all_original_price": "758.00",
+    "all_price": "10.00",
+    "freight_money": "13.00",
+    "sp_cut_money": "748.00",
+    "freight_free_flag": false,
+    "order_price": "23.00"
+    },
+    "address_list": [
+    {
+    "id": 2815,
+    "name": "sfas",
+    "phone": "18624078563",
+    "details": "sdkfjsljfl1ao",
+    "is_default": 1,
+    "province": 210000,
+    "city": 210100,
+    "area": 210102,
+    "province_name": "辽宁",
+    "city_name": "沈阳",
+    "area_name": "和平区"
+    },
+    {
+    "id": 2814,
+    "name": "sfas",
+    "phone": "18624078563",
+    "details": "sdkfjsljfl1ao",
+    "is_default": 0,
+    "province": 210000,
+    "city": 210100,
+    "area": 210102,
+    "province_name": "辽宁",
+    "city_name": "沈阳",
+    "area_name": "和平区"
+    }
+    ],
+    "coupon_freight_list": [
+    {
+    "id": 10,
+    "name": "测试免邮券",
+    "type": 4,
+    "price": "0.00",
+    "full_cut": "0.00",
+    "explain": "商品免邮券",
+    "begin_time": "2020-06-12 00:00:00",
+    "end_time": "2020-06-28 23:59:59",
+    "cr_id": 35,
+    "sub_list": []
+    }
+    ],
+    "used_address": {
+    "id": 2814,
+    "name": "sfas",
+    "phone": "18624078563",
+    "details": "sdkfjsljfl1ao",
+    "is_default": 0,
+    "province": 210000,
+    "city": 210100,
+    "area": 210102,
+    "province_name": "辽宁",
+    "city_name": "沈阳",
+    "area_name": "和平区"
+    }
+    }
+    }
      */
-    public function prepareCreateFlashSaleOrder(Request $request) {
+    public function prepareCreateFlashSaleOrder(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -459,16 +463,17 @@ class MallOrderController extends Controller {
      * @apiParam {number=1,2,3} os_type 1安卓2苹果3微信
      *
      *  @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      "order_id": 9530,
-      "ordernum": "2006190016893457221111"
-      }
-      }
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "order_id": 9530,
+    "ordernum": "2006190016893457221111"
+    }
+    }
      */
-    public function CreateFlashSaleOrder(Request $request) {
+    public function CreateFlashSaleOrder(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (0) {
@@ -557,102 +562,103 @@ class MallOrderController extends Controller {
      * @apiSuccess {string[]} address_list 用户地址列表
      * @apiSuccess {string[]} coupon_freight_list 免邮券列表
      * @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      "user": {
-      "id": 168934,
-      "level": 4,
-      "is_staff": 1
-      },
-      "sku_list": {
-      "goods_id": 91,
-      "name": "AR立体浮雕星座地球仪",
-      "subtitle": "高清生动准确的星座秘密等你来发现",
-      "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
-      "sku_value_list": [
-      {
-      "key_name": "规格",
-      "value_name": "AR立体浮雕星座地球仪"
-      }
-      ],
-      "num": 2,
-      "original_price": "379.00",
-      "price": "20.00"
-      },
-      "price_list": {
-      "all_original_price": "758.00",
-      "all_price": "40.00",
-      "freight_money": "13.00",
-      "vip_cut_money": 0,
-      "sp_cut_money": "718.00",
-      "coupon_money": 0,
-      "freight_free_flag": false,
-      "order_price": "53.00"
-      },
-      "address_list": [
-      {
-      "id": 2815,
-      "name": "sfas",
-      "phone": "18624078563",
-      "details": "sdkfjsljfl1ao",
-      "is_default": 1,
-      "province": 210000,
-      "city": 210100,
-      "area": 210102,
-      "province_name": "辽宁",
-      "city_name": "沈阳",
-      "area_name": "和平区"
-      }
-      ],
-      "coupon_list": {
-      "coupon_goods": [
-      {
-      "id": 7,
-      "name": "5元优惠券(六一专享)",
-      "type": 3,
-      "price": "5.00",
-      "full_cut": "0.00",
-      "explain": "六一活动期间",
-      "begin_time": "2020-06-12 00:00:00",
-      "end_time": "2020-06-28 23:59:59",
-      "cr_id": 31,
-      "sub_list": []
-      }
-      ],
-      "coupon_freight": [
-      {
-      "id": 10,
-      "name": "测试免邮券",
-      "type": 4,
-      "price": "0.00",
-      "full_cut": "0.00",
-      "explain": "商品免邮券",
-      "begin_time": "2020-06-12 00:00:00",
-      "end_time": "2020-06-28 23:59:59",
-      "cr_id": 35,
-      "sub_list": []
-      }
-      ]
-      },
-      "used_address": {
-      "id": 2814,
-      "name": "sfas",
-      "phone": "18624078563",
-      "details": "sdkfjsljfl1ao",
-      "is_default": 0,
-      "province": 210000,
-      "city": 210100,
-      "area": 210102,
-      "province_name": "辽宁",
-      "city_name": "沈阳",
-      "area_name": "和平区"
-      }
-      }
-      }
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "user": {
+    "id": 168934,
+    "level": 4,
+    "is_staff": 1
+    },
+    "sku_list": {
+    "goods_id": 91,
+    "name": "AR立体浮雕星座地球仪",
+    "subtitle": "高清生动准确的星座秘密等你来发现",
+    "picture": "/wechat/mall/mall/goods/2224_1520841037.png",
+    "sku_value_list": [
+    {
+    "key_name": "规格",
+    "value_name": "AR立体浮雕星座地球仪"
+    }
+    ],
+    "num": 2,
+    "original_price": "379.00",
+    "price": "20.00"
+    },
+    "price_list": {
+    "all_original_price": "758.00",
+    "all_price": "40.00",
+    "freight_money": "13.00",
+    "vip_cut_money": 0,
+    "sp_cut_money": "718.00",
+    "coupon_money": 0,
+    "freight_free_flag": false,
+    "order_price": "53.00"
+    },
+    "address_list": [
+    {
+    "id": 2815,
+    "name": "sfas",
+    "phone": "18624078563",
+    "details": "sdkfjsljfl1ao",
+    "is_default": 1,
+    "province": 210000,
+    "city": 210100,
+    "area": 210102,
+    "province_name": "辽宁",
+    "city_name": "沈阳",
+    "area_name": "和平区"
+    }
+    ],
+    "coupon_list": {
+    "coupon_goods": [
+    {
+    "id": 7,
+    "name": "5元优惠券(六一专享)",
+    "type": 3,
+    "price": "5.00",
+    "full_cut": "0.00",
+    "explain": "六一活动期间",
+    "begin_time": "2020-06-12 00:00:00",
+    "end_time": "2020-06-28 23:59:59",
+    "cr_id": 31,
+    "sub_list": []
+    }
+    ],
+    "coupon_freight": [
+    {
+    "id": 10,
+    "name": "测试免邮券",
+    "type": 4,
+    "price": "0.00",
+    "full_cut": "0.00",
+    "explain": "商品免邮券",
+    "begin_time": "2020-06-12 00:00:00",
+    "end_time": "2020-06-28 23:59:59",
+    "cr_id": 35,
+    "sub_list": []
+    }
+    ]
+    },
+    "used_address": {
+    "id": 2814,
+    "name": "sfas",
+    "phone": "18624078563",
+    "details": "sdkfjsljfl1ao",
+    "is_default": 0,
+    "province": 210000,
+    "city": 210100,
+    "area": 210102,
+    "province_name": "辽宁",
+    "city_name": "沈阳",
+    "area_name": "和平区"
+    }
+    }
+    }
      */
-    public function prepareCreateGroupBuyOrder(Request $request) {
+    public function prepareCreateGroupBuyOrder(Request $request)
+    {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -732,16 +738,17 @@ class MallOrderController extends Controller {
      *
      * @apiSuccessExample {json} Request-Example:
      * {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      "order_id": 9555,
-      "ordernum": "2006230016893460198201",
-      "group_key": "2006230016893460198117"
-      }
-      }
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "order_id": 9555,
+    "ordernum": "2006230016893460198201",
+    "group_key": "2006230016893460198117"
+    }
+    }
      */
-    public function createGroupBuyOrder(Request $request) {
+    public function createGroupBuyOrder(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -795,16 +802,17 @@ class MallOrderController extends Controller {
      * @apiParam {string} order_id 订单id
 
      * @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      "code": true,
-      "msg": "成功"
-      }
-      }
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "code": true,
+    "msg": "成功"
+    }
+    }
      */
-    public function flashSalePayFail(Request $request) {
+    public function flashSalePayFail(Request $request)
+    {
         $m = new MallOrder();
         $m->orderPaySuccess([]);
 
@@ -849,30 +857,31 @@ class MallOrderController extends Controller {
      * @apiSuccess {string} order_count 队伍已有人数
      *
      * @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": [
-      {
-      "id": 5,
-      "group_name": "111",
-      "order_id": 9560,
-      "created_at": "2020-06-28 18:13:52",
-      "user_id": 168934,
-      "is_success": 0,
-      "success_at": null,
-      "begin_at": "2020-06-28 18:13:52",
-      "end_at": "2020-07-28 18:14:59",
-      "nickname": "chandler",
-      "headimg": null,
-      "group_num": 4,
-      "group_key": "2006280016893465633736",
-      "order_count": 1
-      }
-      ]
-      }
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 5,
+    "group_name": "111",
+    "order_id": 9560,
+    "created_at": "2020-06-28 18:13:52",
+    "user_id": 168934,
+    "is_success": 0,
+    "success_at": null,
+    "begin_at": "2020-06-28 18:13:52",
+    "end_at": "2020-07-28 18:14:59",
+    "nickname": "chandler",
+    "headimg": null,
+    "group_num": 4,
+    "group_key": "2006280016893465633736",
+    "order_count": 1
+    }
+    ]
+    }
      */
-    public function groupByTeamList(Request $request) {
+    public function groupByTeamList(Request $request)
+    {
         $params = $request->input();
         $model = new MallOrderGroupBuy();
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
@@ -904,50 +913,50 @@ class MallOrderController extends Controller {
      * "status":0
      * }
      *
-      @apiSuccess {number} id 订单id
-      @apiSuccess {string} ordernum 订单编号
-      @apiSuccess {string} status 状态
-      @apiSuccess {string} price 订单金额
-      @apiSuccess {string} goods_count 商品数量
-      @apiSuccess {string[]} order_details 订单商品列表
+    @apiSuccess {number} id 订单id
+    @apiSuccess {string} ordernum 订单编号
+    @apiSuccess {string} status 状态
+    @apiSuccess {string} price 订单金额
+    @apiSuccess {string} goods_count 商品数量
+    @apiSuccess {string[]} order_details 订单商品列表
 
-      @apiSuccess {string} order_details.num 购买数量
-      @apiSuccess {string[]} order_details.goods_info 商品信息
-      @apiSuccess {string} order_details.goods_info.name 商品名称
-      @apiSuccess {string} order_details.goods_info.subtitle 商品说明
-      @apiSuccess {string} order_details.goods_info.picture 商品图片
-      @apiSuccess {string} order_details.goods_info.id 商品id
+    @apiSuccess {string} order_details.num 购买数量
+    @apiSuccess {string[]} order_details.goods_info 商品信息
+    @apiSuccess {string} order_details.goods_info.name 商品名称
+    @apiSuccess {string} order_details.goods_info.subtitle 商品说明
+    @apiSuccess {string} order_details.goods_info.picture 商品图片
+    @apiSuccess {string} order_details.goods_info.id 商品id
 
      * @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": [
-      {
-      "id": 9526,
-      "ordernum": "2006180016893463957101",
-      "status": 1,
-      "price": "741.27",
-      "goods_count": 7,
-      "order_details": [
-      {
-      "status": 0,
-      "goods_id": 91,
-      "num": 2,
-      "order_id": 9526,
-      "goods_info": {
-      "name": "AR立体浮雕星座地球仪",
-      "subtitle": "高清生动准确的星座秘密等你来发现",
-      "picture": "/nlsg/goods/20191026172620981048.jpg",
-      "id": 91
-      }
-      }
-      ]
-      }
-      ]
-      }
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 9526,
+    "ordernum": "2006180016893463957101",
+    "status": 1,
+    "price": "741.27",
+    "goods_count": 7,
+    "order_details": [
+    {
+    "status": 0,
+    "goods_id": 91,
+    "num": 2,
+    "order_id": 9526,
+    "goods_info": {
+    "name": "AR立体浮雕星座地球仪",
+    "subtitle": "高清生动准确的星座秘密等你来发现",
+    "picture": "/nlsg/goods/20191026172620981048.jpg",
+    "id": 91
+    }
+    }
+    ]
+    }
+    ]
+    }
      */
-    public function list(Request $request) {
+    function list(Request $request) {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
@@ -968,8 +977,202 @@ class MallOrderController extends Controller {
         }
     }
 
+    /**
+    普通和秒杀订单的详情
+    @api {post} /api/V4/mall/order_info 普通和秒杀订单的详情
+    @apiVersion 1.0.0
+    @apiName /api/V4/mall/order_info
+    @apiGroup MallOrder
+    @apiSampleRequest /api/V4/mall/order_info
+    @apiDescription 普通和秒杀订单的详情
+    @apiParam {string} ordernum 订单编号
+     *
+    @apiParamExample {json} Request-Example:
+    {
+    "ordernum":'2006190016893457221111'
+    }
+
+    @apiSuccess {number} id 订单id
+    @apiSuccess {string} ordernum 订单编号
+    @apiSuccess {string} dead_time 未支付的失效时间
+    @apiSuccess {number} status 订单状态(同列表)
+    @apiSuccess {string} message 留言
+    @apiSuccess {string[]} address_history 收货地址
+    @apiSuccess {string} address_history.name 收货人
+    @apiSuccess {string} address_history.phone 电话
+    @apiSuccess {string} address_history.details 详情
+    @apiSuccess {string} address_history.province_name 省
+    @apiSuccess {string} address_history.city_name 市
+    @apiSuccess {string} address_history.area_name 区
+
+    @apiSuccess {string[]} order_child 商品列表(按物流分组)
+    @apiSuccess {string} order_child.status  1:已发货 2:已签收
+    @apiSuccess {string} order_child.express_id 物流公司id
+    @apiSuccess {string} order_child.express_num 物流单号
+    @apiSuccess {string[]} order_child.order_details 商品详情
+    @apiSuccess {string} order_child.order_details.goods_id 商品id
+    @apiSuccess {string} order_child.order_details.num 购买数量
+    @apiSuccess {string} order_child.order_details.sku_value 规格信息
+    @apiSuccess {string} order_child.order_details.name 商品名称
+    @apiSuccess {string} order_child.order_details.subtitle 副标题
+    @apiSuccess {string} order_child.order_details.picture 图片
+    @apiSuccess {string} order_child.order_details.price 购买单价
+    @apiSuccess {string} order_child.order_details.original_price 购买原价
+
+    @apiSuccess {string[]} price_info 价格
+    @apiSuccess {string} price_info.cost_price 总价格
+    @apiSuccess {string} price_info.freight 运费
+    @apiSuccess {string} price_info.vip_cut 权益立减
+    @apiSuccess {string} price_info.coupon_money 优惠券金额
+    @apiSuccess {string} price_info.special_price_cut 活动立减
+    @apiSuccess {string} price_info.pay_time 支付时间
+    @apiSuccess {string} price_info.pay_type 支付渠道(1微信端 2app微信 3app支付宝 4ios)
+    @apiSuccess {string} price_info.price 订单金额
+
+    @apiSuccess {string[]} bill 发票
+    @apiSuccess {string} bill.bill_type   0为不开发票 1个人 2公司
+    @apiSuccess {string} bill.bill_title  发票抬头
+    @apiSuccess {string} bill.bill_number 纳税人识别号
+    @apiSuccessExample {json} Request-Example:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "id": 9530,
+    "ordernum": "2006190016893457221111",
+    "dead_time": null,
+    "status": 10,
+    "address_history": {
+    "id": 2814,
+    "name": "sfas",
+    "phone": "18624078563",
+    "details": "sdkfjsljfl1ao",
+    "is_default": 0,
+    "province": 210000,
+    "city": 210100,
+    "area": 210102,
+    "province_name": "辽宁",
+    "city_name": "沈阳",
+    "area_name": "和平区"
+    },
+    "messages": "",
+    "post_type": 1,
+    "goods_count": 7,
+    "order_child": [
+    {
+    "status": 1,
+    "order_id": 9530,
+    "express_id": 1,
+    "express_num": "1111111",
+    "order_detail_id": [
+    "10335",
+    "10336",
+    "10337"
+    ],
+    "order_details": [
+    {
+    "goods_id": 91,
+    "num": 2,
+    "sku_value": [
+    {
+    "key_name": "规格",
+    "value_name": "AR立体浮雕星座地球仪"
+    }
+    ],
+    "price": "9.70",
+    "original_price": "379.00",
+    "name": "AR立体浮雕星座地球仪",
+    "picture": "/nlsg/goods/20191026172620981048.jpg",
+    "subtitle": "高清生动准确的星座秘密等你来发现",
+    "details_id": 10335
+    },
+    {
+    "goods_id": 98,
+    "num": 1,
+    "sku_value": [
+    {
+    "key_name": "规格",
+    "value_name": "王琨专栏学习套装"
+    }
+    ],
+    "price": "254.15",
+    "original_price": "399.00",
+    "name": "王琨专栏学习套装",
+    "picture": "/wechat/mall/goods/8885_1545795771.png",
+    "subtitle": "王琨老师专栏年卡1张+《琨说》珍藏版",
+    "details_id": 10336
+    }
+    ]
+    },
+    {
+    "status": 1,
+    "order_id": 9530,
+    "express_id": 1,
+    "express_num": "2222222",
+    "order_detail_id": [
+    "10338"
+    ],
+    "order_details": [
+    {
+    "goods_id": 209,
+    "num": 2,
+    "sku_value": [
+    {
+    "key_name": "规格",
+    "value_name": "儿童财商绘本(全10册)"
+    }
+    ],
+    "price": "134.64",
+    "original_price": "180.00",
+    "name": "儿童财商绘本(全10册)",
+    "picture": "/wechat/mall/goods/625_1544239955.png",
+    "subtitle": "帮助孩子建立正确的金钱观念 从容面对金钱问题",
+    "details_id": 10338
+    }
+    ]
+    }
+    ],
+    "price_info": {
+    "cost_price": "1789.00",
+    "freight": "13.00",
+    "vip_cut": "304.13",
+    "coupon_money": "0.00",
+    "special_price_cut": "738.60",
+    "pay_time": null,
+    "pay_type": 0,
+    "price": "759.27"
+    },
+    "bill_info": {
+    "bill_type": 0,
+    "bill_title": "",
+    "bill_number": "",
+    "bill_format": 0
+    }
+    }
+    }
+     */
+    public function orderInfo(Request $request)
+    {
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+        $ordernum = $request->input('ordernum', 0);
+        $model = new MallOrder();
+        $data = $model->orderInfo($user['id'], $ordernum);
+
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
     //拼团订单列表
-    public function listOfGroupBuy(Request $request) {
+    public function listOfGroupBuy(Request $request)
+    {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
@@ -991,7 +1194,8 @@ class MallOrderController extends Controller {
     }
 
     //todo 拼团订单详情
-    public function groupBuyOrderInfo(Request $request) {
+    public function groupBuyOrderInfo(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -1009,30 +1213,12 @@ class MallOrderController extends Controller {
         }
     }
 
-    //todo 订单详情
-    public function orderInfo(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
-        if (empty($user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
-        }
-        $ordernum = $request->input('ordernum', 0);
-        $model = new MallOrder();
-        $data = $model->orderInfo($user['id'], $ordernum);
-
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
-    }
-
     //todo 确认收货
     //todo 可评论商品列表
     //todo 评论
     //todo 取消(已支付),关闭(未支付),删除
-    public function statusChange(Request $request) {
+    public function statusChange(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');

@@ -980,9 +980,12 @@ class MallOrder extends Base {
 
     public function orderChild() {
         return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')
+                        ->groupBy('express_id')
+                        ->groupBy('express_num')
                         ->select([
-                            'status', 'order_id', 'order_detail_id',
-                            'express_id', 'express_num'
+                            'status', 'order_id',
+                            'express_id', 'express_num',
+                            DB::raw('GROUP_CONCAT(order_detail_id) order_detail_id')
         ]);
     }
 
@@ -991,16 +994,82 @@ class MallOrder extends Base {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $data = $this->userOrderList(
+        $getData = $this->userOrderList(
                 ['ordernum' => $ordernum],
                 ['id' => $user_id],
                 true
         );
-        $data = $data[0];
+
+        $data = $getData[0]->toArray();
+
+        foreach ($data['order_details'] as &$odv) {
+            $temp_odv = [];
+            $temp_odv['goods_id'] = $odv['goods_id'];
+            $temp_odv['num'] = $odv['num'];
+            $temp_odv['sku_value'] = $odv['sku_history']->sku_value;
+            $temp_odv['price'] = $odv['sku_history']->actual_price;
+            $temp_odv['original_price'] = $odv['sku_history']->original_price;
+            $temp_odv['name'] = $odv['goods_info']['name'];
+            $temp_odv['picture'] = $odv['goods_info']['picture'];
+            $temp_odv['subtitle'] = $odv['goods_info']['subtitle'];
+            $temp_odv['details_id'] = $odv['details_id'];
+            $odv = $temp_odv;
+        }
+
+        foreach ($data['order_child'] as &$v1) {
+            $v1['order_detail_id'] = explode(',', $v1['order_detail_id']);
+            $v1['order_details'] = [];
+        }
+
+        $price_info = [];
+        $price_info['cost_price'] = $data['cost_price'];
+        $price_info['freight'] = $data['freight'];
+        $price_info['vip_cut'] = $data['vip_cut'];
+        $price_info['coupon_money'] = $data['coupon_money'];
+        $price_info['special_price_cut'] = $data['special_price_cut'];
+        $price_info['pay_time'] = $data['pay_time'];
+        $price_info['pay_type'] = $data['pay_type'];
+        $price_info['price'] = $data['price'];
+
+        $bill_info = [];
+        $bill_info['bill_type'] = $data['bill_type'];
+        $bill_info['bill_title'] = $data['bill_title'];
+        $bill_info['bill_number'] = $data['bill_number'];
+        $bill_info['bill_format'] = $data['bill_format'];
 
 
-        //todo 多快递单显示
-        //todo 拼接适合前端格式
+        $data['price_info'] = $price_info;
+        $data['bill_info'] = $bill_info;
+
+        if (empty($data['order_child'])) {
+            $temp_data = [];
+            $temp_data['status'] = 0;
+            $temp_data['order_id'] = $data['id'];
+            $temp_data['express_id'] = 0;
+            $temp_data['express_num'] = '';
+            $temp_data['order_detail_id'] = [];
+            $temp_data['order_details'] = $data['order_details'];
+            $data['order_child'] = [$temp_data];
+        } else {
+            foreach ($data['order_child'] as $k => &$v) {
+                foreach ($data['order_details'] as $vv) {
+                    if (in_array($vv['details_id'], $v['order_detail_id'])) {
+                        array_push($v['order_details'], $vv);
+                    }
+                }
+            }
+        }
+
+        unset(
+                $data['cost_price'], $data['freight'],
+                $data['vip_cut'], $data['price'],
+                $data['coupon_money'], $data['special_price_cut'],
+                $data['pay_time'], $data['pay_type'],
+                $data['bill_type'], $data['bill_title'],
+                $data['bill_number'], $data['bill_format'],
+                $data['order_details']
+        );
+
         return $data;
     }
 

@@ -117,7 +117,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 
     //订单列表
     Route::post('mall/order_list', 'MallOrderController@list');
-    Route::post('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');
+    Route::get('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');
 
     //订单详情
     Route::get('mall/order_info', 'MallOrderController@orderInfo');
