@@ -842,8 +842,6 @@ class MallOrder extends Base {
         }
         $now_date = date('Y-m-d H:i:s', time());
 
-        dd([$check->status, gettype($check->status)]);
-
         switch (strtolower($flag)) {
             case 'stop':
                 if ($check->status === 1 || $check->status === 10) {
@@ -881,6 +879,42 @@ class MallOrder extends Base {
                 } else {
                     return ['code' => false, 'msg' => '订单状态错误',
                         'ps' => '只有已完成和已取消的可以删除'];
+                }
+                break;
+            case 'receipt':
+                //确认收货
+                if ($check->status === 20) {
+                    $check->status = 30;
+                    $check->receipt_at = $now_date;
+
+                    DB::beginTransaction();
+
+                    $update_res = $check->save();
+                    if (!$update_res) {
+                        DB::rollBack();
+                        return ['code' => false, 'msg' => '失败'];
+                    }
+
+                    $child_res = DB::table('nlsg_mall_order_child')
+                            ->where('order_id', '=', $check->id)
+                            ->update(
+                            [
+                                'status' => 2,
+                                'receipt_at' => $now_date
+                            ]
+                    );
+
+                    if (!$child_res) {
+                        DB::rollBack();
+                        return ['code' => false, 'msg' => '失败'];
+                    }
+
+                    DB::commit();
+
+                    return ['code' => true, 'msg' => '成功'];
+                } else {
+                    return ['code' => false, 'msg' => '订单状态错误',
+                        'ps' => '只有待收货订单可以收货'];
                 }
                 break;
             default:
@@ -1071,6 +1105,94 @@ class MallOrder extends Base {
         );
 
         return $data;
+    }
+
+    public function noCommentList($user_id) {
+
+        $list = DB::table('nlsg_mall_order as nmo')
+                ->join('nlsg_mall_order_detail as nmod', 'nmo.id', '=', 'nmod.order_id')
+                ->join('nlsg_mall_goods as nmg', 'nmod.goods_id', '=', 'nmg.id')
+                ->where('nmo.user_id', '=', $user_id)
+                ->where('nmo.status', '=', 30)
+                ->where('nmod.comment_id', '=', 0)
+                ->where('nmod.num', '>', 'nmod.after_sale_used_num')
+                ->where('nmo.is_del', '=', 0)
+                ->select(['nmo.id as order_id', 'nmo.ordernum',
+                    'nmod.id as order_detail_id', 'nmod.sku_history',
+                    'nmg.name', 'nmg.subtitle'])
+                ->get();
+
+        foreach ($list as $v) {
+            $temp = json_decode($v->sku_history);
+            $v->sku_value = $temp->sku_value;
+            unset($v->sku_history);
+        }
+
+        return $list;
+    }
+
+    public function subComment($params, $user) {
+        $order_detial_id = $params['order_detail_id'] ?? 0;
+        if (empty($order_detial_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        //校验是否能评价
+        $check = DB::table('nlsg_mall_order_detail as nmod')
+                ->join('nlsg_mall_order as nmo', 'nmod.order_id', '=', 'nmo.id')
+                ->where('nmod.id', '=', $order_detial_id)
+                ->where('nmo.user_id', '=', $user['id'])
+                ->where('nmo.status', '=', 30)
+                ->where('nmod.comment_id', '=', 0)
+                ->where('nmod.num', '>', 'nmod.after_sale_used_num')
+                ->where('nmo.is_del', '=', 0)
+                ->first();
+
+        if (empty($check)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        $c_data = [];
+        $c_data['star'] = intval($params['star'] ?? 0);
+        if ($c_data['star'] < 1 || $c_data['star'] > 5) {
+            return ['code' => false, 'msg' => '参数错误', 'ps' => 'star:1->5'];
+        }
+
+        $c_data['picture'] = $params['picture'] ?? '';
+        $c_data['issue_type'] = $params['issue_type'] ?? '';
+
+        $c_data['user_id'] = $user['id'];
+        $c_data['content'] = $params['content'] ?? '';
+        $c_data['order_id'] = $check->order_id;
+        $c_data['order_detail_id'] = $order_detial_id;
+        $c_data['goods_id'] = $check->goods_id;
+        $c_data['sku_number'] = $check->sku_number;
+        $c_data['pid'] = 0;
+        $c_data['status'] = 1;
+        $c_data['created_at'] = $now_date;
+        $c_data['updated_at'] = $now_date;
+
+        DB::beginTransaction();
+
+        $c_res = DB::table('nlsg_mall_comment')->insertGetId($c_data);
+
+        if (!$c_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败', 'ps' => '写入评论失败'];
+        }
+
+        $od = MallOrderDetails::find($order_detial_id);
+        $od->comment_id = $c_res;
+        $d_res = $od->save();
+        if (!$d_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败', 'ps' => '订单错误'];
+        }
+
+        DB::commit();
+        return ['code' => true, 'msg' => 'ok'];
     }
 
 }

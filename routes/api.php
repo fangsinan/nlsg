@@ -125,8 +125,19 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 
 
     //修改订单状态
-    Route::post('mall/status_change', 'MallOrderController@statusChange');
-
+    Route::put('mall/status_change', 'MallOrderController@statusChange');
+    
+    //商品评价
+    Route::get('mall/no_comment_list', 'MallOrderController@noCommentList');
+    Route::get('mall/get_comment', 'MallOrderController@getComment');
+    Route::get('mall/comment_issue_list', 'MallOrderController@commentIssueList');
+    Route::post('mall/sub_comment', 'MallOrderController@subComment');
+    
+    //售后部分
+    Route::get('after_sales/list', 'AfterSalesController@list');
+    Route::get('after_sales/createOrder', 'AfterSalesController@createOrder');
+    Route::get('after_sales/orderInfo', 'AfterSalesController@orderInfo');
+    Route::get('after_sales/statusChange', 'AfterSalesController@statusChange');
 
     //*******************************商城部分结束*******************************
     //想法

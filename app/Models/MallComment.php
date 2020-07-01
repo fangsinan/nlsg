@@ -83,4 +83,28 @@ class MallComment extends Base {
         return $res;
     }
 
+    public function getComment($comment_id, $user) {
+        $data = MallComment::where('user_id', '=', $user['id'])
+                ->select(['id', 'content', 'picture', 'star', 'status', 'issue_type'])
+                ->find($comment_id);
+
+        if (empty($data)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        if (empty($data->picture)) {
+            $data->picture = [];
+        } else {
+            $data->picture = explode(',', $data->picture);
+        }
+
+        if (empty($data->issue_type)) {
+            $data->issue_type = [];
+        } else {
+            $data->issue_type = explode(',', $data->issue_type);
+        }
+
+        return $data;
+    }
+
 }

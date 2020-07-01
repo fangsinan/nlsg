@@ -744,12 +744,11 @@ class MallOrderGroupBuy extends Base {
         $bill_info['bill_number'] = $data['bill_number'];
         $bill_info['bill_format'] = $data['bill_format'];
 
-
         $data['price_info'] = $price_info;
         $data['bill_info'] = $bill_info;
 
-
-        //todo 拼团队员列表
+        //拼团队员列表
+        $data['team_user_list'] = $this->getTeamUserListbyOrderId($data['id']);
 
         if (empty($data['order_child'])) {
             $temp_data = [];
@@ -783,7 +782,28 @@ class MallOrderGroupBuy extends Base {
         return $data;
     }
 
-    public function getTeamUserListbyOrderId($order_id){
-        
+    public function getTeamUserListbyOrderId($order_id) {
+
+        $get_info = MallGroupBuyList::where('order_id', '=', $order_id)
+                ->first();
+
+        $group_key = $get_info->group_key;
+        $user_id = $get_info->user_id;
+
+        $list = DB::table('nlsg_mall_group_buy_list as gbl')
+                ->leftJoin('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
+                ->leftJoin('nlsg_mall_order as nmo', 'gbl.order_id', '=', 'nmo.id')
+                ->where('gbl.group_key', '=', $group_key)
+//                ->where('nmo.is_stop', '=', 0)
+//                ->where('nmo.is_del', '=', 0)
+                ->orderBy('gbl.is_captain', 'desc')
+                ->orderByRaw('FIELD(gbl.user_id,' . $user_id . ')', 'desc')
+                ->orderBy('gbl.id', 'asc')
+                ->select(['gbl.id', 'gbl.user_id', 'nuser.nickname',
+                    'nuser.headimg', 'gbl.is_captain'])
+                ->get();
+
+        return $list;
     }
+
 }
