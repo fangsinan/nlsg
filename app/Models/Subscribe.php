@@ -2,11 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
-class Subscribe extends Authenticatable
+class Subscribe extends Base
 {
     protected $table = 'nlsg_subscribe';
 
@@ -14,6 +11,9 @@ class Subscribe extends Authenticatable
     public function UserInfo (){
         return $this->belongsTo('App\Models\User','user_id');
     }
+    protected $fillable = ['user_id','pay_time','type','order_id','status','start_time','end_time', 'relation_id', 'service_id', ];
+
+
 
 
     /**
