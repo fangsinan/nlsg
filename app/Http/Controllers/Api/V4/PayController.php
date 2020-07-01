@@ -158,8 +158,8 @@ class PayController extends  Controller
 
     //
     /**
-     * @api {post} api/v4/pay/ali_pay   下单查询接口
-     * @apiName ali_pay
+     * @api {post} api/v4/pay/order_find   下单查询接口
+     * @apiName order_find
      * @apiVersion 1.0.0
      * @apiGroup pay
      *
@@ -176,17 +176,25 @@ class PayController extends  Controller
         if(!$orderData){
             return $this->error(0,'订单有误');
         }
-        if( $orderData['pay_type'] == 2 ){
-            //微信
-            $config = Config('wechat.payment.default');
-            $app    = Factory::payment($config);
-            return $app->order->queryByOutTradeNumber($orderData['ordernum']);//"商户系统内部的订单号（out_trade_no）"
-        }elseif( $orderData['pay_type'] == 3 ){
-            //支付宝
-            $config = Config('pay.alipay');
-            return Pay::alipay($config)->find(['out_trade_no' => $orderData['ordernum']]);
 
+        //订单号码不存在时报错 捕获异常处理
+        try{
+            if( $orderData['pay_type'] == 2 ){
+                //微信
+                $config = Config('wechat.payment.default');
+                $app    = Factory::payment($config);
+                $res = $app->order->queryByOutTradeNumber($orderData['ordernum']);//"商户系统内部的订单号（out_trade_no）"
+            }elseif( $orderData['pay_type'] == 3 ){
+                //支付宝
+                $config = Config('pay.alipay');
+                $res = Pay::alipay($config)->find(['out_trade_no' => $orderData['ordernum']]);
+            }
+
+            $this->success($res);
+        } catch (\Exception $e) {
+            return $this->error(0,'error');
         }
+
     }
 
 

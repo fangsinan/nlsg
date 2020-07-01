@@ -49,6 +49,7 @@ class User extends Authenticatable implements JWTSubject
             $user['level'] = $level;
             $user['expire_time'] = $expire_time;
         }
+        $user['expire_time'] = strtotime($user['expire_time']);
 
         //判断会员
         $time    = strtotime(date('Y-m-d', time())) + 86400;

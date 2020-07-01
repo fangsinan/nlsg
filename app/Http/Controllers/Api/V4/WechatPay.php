@@ -70,6 +70,7 @@ class WechatPay extends Controller
 
             DB::beginTransaction();
             try {
+
                 $teacher_id = $orderInfo['relation_id']; //专栏老师
                 $coupon_id  = $orderInfo['coupon_id']; //优惠券
                 $user_id    = $orderInfo['user_id']; //用户
@@ -90,9 +91,8 @@ class WechatPay extends Controller
                 $couponRst = 1;
                 //消除优惠券
                 if ($coupon_id > 0) {
-                    Coupon::where('id', $coupon_id)->update(['status' => 2, 'used_time' => $time]);
+                    $couponRst = Coupon::where('id', $coupon_id)->update(['status' => 2, 'used_time' => $time]);
                 }
-
                 $phoneRst = 1;
                 //防止短信发送不成功
                 $AdminInfo = User::find($user_id);
@@ -113,7 +113,6 @@ class WechatPay extends Controller
                 $record = [
                     'ordernum'       => $out_trade_no,            //订单编号
                     'price'          => $total_fee,                //支付金额
-                    'ctime'          => $time,                     //支付时间
                     'transaction_id' => $transaction_id,            //流水号
                     'user_id'        => $user_id,                   //会员id
                     'type'           => $pay_type,          //1：微信  2：支付宝
@@ -121,7 +120,8 @@ class WechatPay extends Controller
                     'order_type'     => 1,                          //1 专栏 2 会员  3充值  4财务打款 5 打赏
                     'status'         => 1                           //收入
                 ];
-                $recordRst = PayRecord::firstOrCreate([$record]);
+
+                $recordRst = PayRecord::firstOrCreate($record);
 
                 $Sy_Rst     = true;
                 $shareSyRst = true;
@@ -236,7 +236,7 @@ class WechatPay extends Controller
                     'user_id'        => $user_id,                //会员id
                     'pay_time'       => $time,                            //支付时间
                     'type'           => 1,
-                    'order'          => $orderId, //订单id
+                    'order_id'       => $orderId, //订单id
                     'status'         => 1,
                     'start_time'     => $starttime,
                     'end_time'       => $endtime,
@@ -244,6 +244,7 @@ class WechatPay extends Controller
                     'service_id'     =>$orderInfo['service_id'],
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
+
 //                $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
 //                $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
@@ -255,12 +256,14 @@ class WechatPay extends Controller
                     return true;
 
                 } else {
+
                     DB::rollBack();
                     return false;
                 }
 
             } catch (\Exception $e) {
                 DB::rollBack();
+
                 return false;
             }
 
