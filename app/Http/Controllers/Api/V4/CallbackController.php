@@ -28,7 +28,7 @@ class CallbackController extends Controller
             $res = WechatPay::PayStatusUp($data);
 
             if($res == true){
-                //在函数里 return true; 才代表处理完成。
+                //在闭包函数里 return true; 才代表处理完成。
                 return true;
             }
             // $fail 为一个函数，触发该函数可向微信服务器返回对应的错误信息，微信会稍后重试再通知。
@@ -64,6 +64,7 @@ class CallbackController extends Controller
                 WechatPay::PayStatusUp($data);
 
                 Log::debug('Alipay notify', $data->all());
+                return $alipay->success();
             } catch (\Exception $e) {
                 // $e->getMessage();
             }

@@ -158,8 +158,8 @@ class PayController extends  Controller
 
     //
     /**
-     * @api {post} api/v4/pay/ali_pay   下单查询接口
-     * @apiName ali_pay
+     * @api {post} api/v4/pay/order_find   下单查询接口
+     * @apiName order_find
      * @apiVersion 1.0.0
      * @apiGroup pay
      *
