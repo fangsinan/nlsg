@@ -158,13 +158,22 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('wiki/show', 'WikiController@show');
     Route::get('wiki/related', 'WikiController@related');
 
+    //我的
+    Route::get('user/index', 'UserController@index');
+    Route::post('user/feedback', 'UserController@feedback');
+    Route::post('user/base', 'UserController@base');
+    Route::post('user/followed', 'UserController@followed');
+    Route::post('user/unfollow', 'UserController@unfollow');
+    Route::post('user/fan', 'UserController@fan');
+    Route::post('user/follower', 'UserController@follower');
+
     Route::post('auth/sms', 'AuthController@sendSms');
     Route::post('auth/login', 'AuthController@login');
 
     Route::get('auth/wechat', 'AuthController@wechat');
 
-    Route::group(['middleware' => 'auth.jwt'], function () {
-        Route::get('user/index', 'UserController@index');
-    });
+//    Route::group(['middleware' => 'auth.jwt'], function () {
+//        Route::get('user/index', 'UserController@index');
+//    });
 });
 
