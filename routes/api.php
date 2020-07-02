@@ -74,6 +74,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('order/create_column_order', 'OrderController@createColumnOrder');
     Route::get('order/create_works_order', 'OrderController@createWorksOrder');
     Route::get('order/get_coupon', 'OrderController@getCoupon');
+    //生成海报
+    Route::get('create/create_poster', 'CreatePosterController@CreatePoster');
 
 
     //*******************************商城部分开始*******************************

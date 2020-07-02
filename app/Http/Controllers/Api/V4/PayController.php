@@ -190,7 +190,7 @@ class PayController extends  Controller
                 $res = Pay::alipay($config)->find(['out_trade_no' => $orderData['ordernum']]);
             }
 
-            $this->success($res);
+            return $this->success($res);
         } catch (\Exception $e) {
             return $this->error(0,'error');
         }

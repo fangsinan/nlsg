@@ -92,7 +92,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
-    static function GetIncomeFlag($twitter_id,$user_id)
+    static function getIncomeFlag($twitter_id,$user_id)
     {
         if($twitter_id==$user_id){
             return false;
