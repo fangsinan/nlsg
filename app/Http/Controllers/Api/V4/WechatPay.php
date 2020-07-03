@@ -128,7 +128,7 @@ class WechatPay extends Controller
                 $map        = [];
                 if (!empty($twitter_id) && $orderInfo['twitter_id']!=$orderInfo['service_id'] ) {
 
-                    $isFlag = User::GetIncomeFlag($twitter_id,$user_id); //获取是否可返利
+                    $isFlag = User::getIncomeFlag($twitter_id,$user_id); //获取是否可返利
                     //$isFlag=Profit::GetIncomeFlag
                     if ( $isFlag ) { //推客是自己不算
                         //查看用户权限

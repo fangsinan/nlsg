@@ -92,7 +92,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
-    static function GetIncomeFlag($twitter_id,$user_id)
+    static function getIncomeFlag($twitter_id,$user_id)
     {
         if($twitter_id==$user_id){
             return false;
@@ -108,6 +108,26 @@ class User extends Authenticatable implements JWTSubject
         }else{
             return false;
         }
+    }
+
+    public function  follow()
+    {
+        return  $this->belongsToMany('App\Models\User', 'nlsg_user_follow', 'from_uid','to_uid');
+    }
+
+    public function fans()
+    {
+        return  $this->belongsToMany('App\Models\User', 'nlsg_user_follow', 'to_uid','from_uid');
+    }
+
+    public function  works()
+    {
+        return $this->hasMany(Works::class,'user_id', 'id');
+    }
+
+    public function  columns()
+    {
+        return $this->hasMany(Column::class,'user_id', 'id');
     }
 
 
