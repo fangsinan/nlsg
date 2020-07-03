@@ -83,15 +83,21 @@ class UserController extends Controller
         $input = $request->all();
 
         $list = UserFollow::where([
-            'from_uid' =>1 ,
-            'to_uid'   =>2
-        ])->first();
-        if (!$list){
-            UserFollow::create([
-                'from_uid' => 1,
-                'to_uid'   => $input['to_uid']
-            ]);
+                    'from_uid' => 1 ,
+                    'to_uid'   => $input['to_uid']
+                ])->first();
+
+        if($list){
+            return error(1000, '不要重复关注');
         }
+
+        UserFollow::create([
+            'from_uid' => 1,
+            'to_uid'   => $input['to_uid']
+        ]);
+
+        User::where('id', $input['to_uid'])->increment('fan_num');
+
         return $this->success();
     }
     /**
