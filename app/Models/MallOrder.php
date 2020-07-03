@@ -853,12 +853,26 @@ class MallOrder extends Base {
                     $update_res = $check->save();
                     if (!$update_res) {
                         DB::rollBack();
-                        return ['code' => false, 'msg' => '失败'];
+                        return ['code' => false, 'msg' => '失败', 'ps' => order];
                     }
 
                     if ($check->status === 10) {
                         //todo 订单状态修改-写入后台审核
-                        //todo 订单状态修改-写入需退款队列
+                        $refund_data['service_num'] = MallOrder::createOrderNumber($user_id, 2);
+                        $refund_data['order_id'] = $id;
+                        $refund_data['order_detail_id'] = 0;
+                        $refund_data['type'] = 4;
+                        $refund_data['pay_type'] = $check->pay_type;
+                        $refund_data['status'] = 10;
+                        $refund_data['user_id'] = $user_id;
+                        $refund_data['created_at'] = $now_date;
+                        $refund_data['updated_at'] = $now_date;
+                        $refund_res = DB::table('nlsg_mall_refund_record')
+                                ->insert($refund_data);
+                        if (!$refund_res) {
+                            DB::rollBack();
+                            return ['code' => false, 'msg' => '失败', 'ps' => 'refund'];
+                        }
                     }
                 } else {
                     return ['code' => false, 'msg' => '订单状态错误',

@@ -9,7 +9,8 @@ use App\Models\MallOrderGroupBuy;
 use App\Models\MallComment;
 use Illuminate\Http\Request;
 
-class MallOrderController extends Controller {
+class MallOrderController extends Controller
+{
 
     /**
      * 预下单
@@ -155,7 +156,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function prepareCreateOrder(Request $request) {
+    public function prepareCreateOrder(Request $request)
+    {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -226,7 +228,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function createOrder(Request $request) {
+    public function createOrder(Request $request)
+    {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -405,7 +408,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function prepareCreateFlashSaleOrder(Request $request) {
+    public function prepareCreateFlashSaleOrder(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -469,7 +473,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function CreateFlashSaleOrder(Request $request) {
+    public function CreateFlashSaleOrder(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (0) {
@@ -653,7 +658,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function prepareCreateGroupBuyOrder(Request $request) {
+    public function prepareCreateGroupBuyOrder(Request $request)
+    {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -742,7 +748,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function createGroupBuyOrder(Request $request) {
+    public function createGroupBuyOrder(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -805,7 +812,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function flashSalePayFail(Request $request) {
+    public function flashSalePayFail(Request $request)
+    {
         $m = new MallOrder();
         $m->orderPaySuccess([]);
 
@@ -873,7 +881,8 @@ class MallOrderController extends Controller {
       ]
       }
      */
-    public function groupByTeamList(Request $request) {
+    public function groupByTeamList(Request $request)
+    {
         $params = $request->input();
         $model = new MallOrderGroupBuy();
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
@@ -948,7 +957,8 @@ class MallOrderController extends Controller {
       ]
       }
      */
-    function list(Request $request) {
+    function list(Request $request)
+    {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
@@ -1143,7 +1153,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function orderInfo(Request $request) {
+    public function orderInfo(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -1221,7 +1232,8 @@ class MallOrderController extends Controller {
       ]
       }
      */
-    public function listOfGroupBuy(Request $request) {
+    public function listOfGroupBuy(Request $request)
+    {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
@@ -1431,7 +1443,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function groupBuyOrderInfo(Request $request) {
+    public function groupBuyOrderInfo(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -1450,7 +1463,7 @@ class MallOrderController extends Controller {
     }
 
     /**
-      修改订单状态
+     修改订单状态
       @api {put} /api/V4/mall/status_change 修改订单状态(取消,删除,确认收货)
       @apiVersion 1.0.0
       @apiName /api/V4/mall/status_change
@@ -1460,7 +1473,10 @@ class MallOrderController extends Controller {
       @apiParam {string} id 订单id
       @apiParam {string=stop,del,receipt} flag 标记
      */
-    public function statusChange(Request $request) {
+
+
+    public function statusChange(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -1514,7 +1530,8 @@ class MallOrderController extends Controller {
       ]
       }
      */
-    public function noCommentList() {
+    public function noCommentList()
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -1544,7 +1561,8 @@ class MallOrderController extends Controller {
       @apiParam {string} issue_type 原因,多个用逗号隔开(1,2,3)
       @apiParam {string} content 评价内容
      */
-    public function subComment(Request $request) {
+    public function subComment(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -1569,8 +1587,8 @@ class MallOrderController extends Controller {
       @apiSampleRequest /api/V4/mall/get_comment
       @apiDescription 查看评价
       @apiParam {number} comment_id id
-     * @apiSuccessExample {json} Request-Example:
-     * {
+     @apiSuccessExample {json} Request-Example:
+     {
       "code": 200,
       "msg": "成功",
       "data": {
@@ -1583,7 +1601,8 @@ class MallOrderController extends Controller {
       }
       }
      */
-    public function getComment(Request $request) {
+    public function getComment(Request $request)
+    {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -1632,7 +1651,8 @@ class MallOrderController extends Controller {
       ]
       }
      */
-    public function commentIssueList() {
+    public function commentIssueList()
+    {
         $res = \App\Models\ConfigModel::getData(13);
         return $this->success(json_decode($res));
     }

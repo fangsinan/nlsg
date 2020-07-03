@@ -135,9 +135,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     
     //售后部分
     Route::get('after_sales/list', 'AfterSalesController@list');
-    Route::get('after_sales/createOrder', 'AfterSalesController@createOrder');
-    Route::get('after_sales/orderInfo', 'AfterSalesController@orderInfo');
-    Route::get('after_sales/statusChange', 'AfterSalesController@statusChange');
+    Route::get('after_sales/goods_list', 'AfterSalesController@goodsList');
+    Route::get('after_sales/create_order', 'AfterSalesController@createOrder');
+    Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');
+    Route::get('after_sales/status_change', 'AfterSalesController@statusChange');
 
     //*******************************商城部分结束*******************************
     //想法
