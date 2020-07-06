@@ -863,6 +863,7 @@ class MallOrder extends Base {
                         $refund_data['order_detail_id'] = 0;
                         $refund_data['type'] = 4;
                         $refund_data['pay_type'] = $check->pay_type;
+                        $refund_data['refe_price'] = $check->pay_price;
                         $refund_data['status'] = 10;
                         $refund_data['user_id'] = $user_id;
                         $refund_data['created_at'] = $now_date;
@@ -1207,6 +1208,12 @@ class MallOrder extends Base {
 
         DB::commit();
         return ['code' => true, 'msg' => 'ok'];
+    }
+
+    //mall_refund_record使用
+    public function infoOrderDetail() {
+        return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
+                        ->select(['id', 'order_id', 'goods_id', 'sku_history']);
     }
 
 }

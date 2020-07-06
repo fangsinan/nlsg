@@ -48,9 +48,15 @@ class MallRefundRecord extends Base {
 
         $query->select([
             'nmo.ordernum', 'nmo.id as order_id', 'nmod.id as order_detail_id',
-            'nmod.goods_id', 'nmod.sku_number', 'nmod.sku_history', 'nmo.pay_type',
-            'nmg.name as goods_name', 'nmg.subtitle', 'nmo.receipt_at',
-            DB::raw('(nmod.num - nmod.after_sale_used_num) as num')
+            'nmod.goods_id', 'nmod.sku_number', 'nmod.sku_history',
+            'nmo.pay_type', 'nmg.name as goods_name', 'nmg.subtitle',
+            'nmo.receipt_at', 'nmo.pay_price', 'nmo.coupon_money',
+            DB::raw('(nmo.cost_price - nmo.vip_cut - nmo.special_price_cut) as temp_money'),
+            DB::raw('(nmod.num - nmod.after_sale_used_num) as num'),
+            DB::raw('(SELECT sum(num) FROM nlsg_mall_order_detail '
+                    . 'where order_id = nmo.id) as all_num'),
+            DB::raw('(SELECT sum(after_sale_used_num) FROM nlsg_mall_order_detail '
+                    . 'where order_id = nmo.id) as all_after_sale_used_num'),
         ]);
 
         $query->limit($size)->offset(($page - 1) * $size)
@@ -144,6 +150,7 @@ class MallRefundRecord extends Base {
         $data['pay_type'] = $get_data->pay_type;
 
         if ($type == 2) {
+            //退货
             $data['order_detail_id'] = $order_detail_id;
 
             $data['num'] = $params['num'] ?? 0;
@@ -160,6 +167,31 @@ class MallRefundRecord extends Base {
                 return ['code' => false, 'msg' => '失败,数量超出限制'];
             }
 
+            //分优惠券金额
+            if ($get_data->coupon_money > 0) {
+                if ($get_data->all_after_sale_used_num == 0 &&
+                        $data['num'] == $get_data->all_num) {
+                    //如果是全退,则是支付金额
+                    $data['refe_price'] = $get_data->pay_price;
+                } else {
+                    //不是全退,计算每个商品优惠券的金额占比
+                    $temp_cm = GetPriceTools::PriceCalc('/',
+                                    $get_data->coupon_money, $get_data->temp_money);
+
+                    $temp_cm = GetPriceTools::PriceCalc('*',
+                                    $data['cost_price'], $temp_cm);
+
+                    $temp_cm = GetPriceTools::PriceCalc('-',
+                                    $data['cost_price'], $temp_cm);
+
+                    $data['refe_price'] = GetPriceTools::PriceCalc('*',
+                                    $temp_cm, $data['num']);
+                }
+            } else {
+                $data['refe_price'] = GetPriceTools::PriceCalc('*',
+                                $data['cost_price'], $data['num']);
+            }
+
             $od->after_sale_used_num = $new_num;
             $od_res = $od->save();
 
@@ -167,6 +199,9 @@ class MallRefundRecord extends Base {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '失败', 'ps' => 'order_detail error'];
             }
+        } else {
+            //退款
+            $data['refe_price'] = $get_data->pay_price;
         }
 
         $rr_res = DB::table('nlsg_mall_refund_record')
@@ -182,7 +217,102 @@ class MallRefundRecord extends Base {
     }
 
     public function list($params, $user) {
-        
+
+        $page = $params['page'] ?? 1;
+        $size = $params['size'] ?? 10;
+
+        $query = MallRefundRecord::where('user_id', '=', $user['id'])
+                ->where('status', '<>', 80)
+                ->whereIn('type', [1, 2]);
+
+        $query->select(['id', 'service_num', 'order_id', 'order_detail_id',
+            'type', 'num', 'cost_price', 'refe_price', 'price', 'status',
+            'user_cancel', 'user_cancel_time']);
+
+        $query->with(['infoOrder',
+            'infoOrder.infoOrderDetail',
+            'infoOrder.infoOrderDetail.goodsInfo',
+            'infoDetail',
+            'infoDetail.goodsInfo',
+        ]);
+
+        //全部,待审核,待寄回,带鉴定,带退款,已完成,已取消
+        //10:待审核  20:待寄回   30:待鉴定  40待退款  50:退款中 60:已退款  70:驳回
+        //全部0  待审核10 待寄回20 待鉴定30 待退款40 已完成:50,60 已取消99(包含70)
+        switch (intval($params['status'] ?? 0)) {
+            case 10:
+                $query->where('status', '=', 10);
+                break;
+            case 20:
+                $query->where('status', '=', 20);
+                break;
+            case 30:
+                $query->where('status', '=', 30);
+                break;
+            case 40:
+                $query->where('status', '=', 40);
+                break;
+            case 50:
+            case 60:
+                $query->whereIn('status', [50, 60]);
+                break;
+            case 99:
+            case 70:
+                $query->where(function($query) {
+                    $query->where('user_cancel', '=', 1)
+                            ->orWhere('status', '=', 70);
+                });
+                break;
+        }
+
+        $list = $query->limit($size)->offset(($page - 1) * $size)->get();
+
+        //如果type=1  读取infoOrder   =2读取infoDetail
+        foreach ($list as $k => $v) {
+            if ($v->user_cancel == 1 || $v->status = 70) {
+                $v->status = 99;
+            }
+            $temp_data = [];
+            if ($v->type == 1) {
+                foreach ($v->infoOrder->infoOrderDetail as $vv) {
+                    $temp = [];
+                    $temp['goods_id'] = $vv->goods_id;
+                    $temp['name'] = $vv->goodsInfo->name;
+                    $temp['subtitle'] = $vv->goodsInfo->subtitle;
+                    $temp['picture'] = $vv->goodsInfo->picture;
+                    $temp_sku = json_decode($vv->sku_history);
+                    $temp['num'] = $temp_sku->actual_num;
+                    $temp['price'] = $temp_sku->actual_price;
+                    $temp_data[] = $temp;
+                }
+            } else {
+                foreach ($v->infoDetail as $vv) {
+                    $temp = [];
+                    $temp['goods_id'] = $vv->goods_id;
+                    $temp['name'] = $vv->goodsInfo->name;
+                    $temp['subtitle'] = $vv->goodsInfo->subtitle;
+                    $temp['picture'] = $vv->goodsInfo->picture;
+                    $temp_sku = json_decode($vv->sku_history);
+                    $temp['num'] = $v->num;
+                    $temp['price'] = $temp_sku->actual_price;
+                    $temp_data[] = $temp;
+                }
+            }
+            $v->goods_list = $temp_data;
+            unset($list[$k]->infoOrder, $list[$k]->infoDetail);
+        }
+
+        return $list;
+    }
+
+    public function infoOrder() {
+        return $this->hasOne('App\Models\MallOrder', 'id', 'order_id')
+                        ->select(['id', 'ordernum']);
+    }
+
+    public function infoDetail() {
+        return $this->hasMany('App\Models\MallOrderDetails', 'id', 'order_detail_id')
+                        ->select(['id', 'order_id', 'goods_id', 'sku_history']);
     }
 
     public function orderInfo($params, $user) {

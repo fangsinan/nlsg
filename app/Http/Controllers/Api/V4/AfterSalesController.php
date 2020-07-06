@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\MallRefundRecord;
 
 /**
- * Description of AfterSalesController
+ * 售后相关
  *
  * @author wangxh
  */
@@ -112,7 +112,64 @@ class AfterSalesController extends Controller {
         }
     }
 
-    //todo 售后列表
+    /**
+     * 售后列表
+     * @api {get} /api/V4/after_sales/list 售后列表
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/after_sales/list
+     * @apiGroup  afterSales
+     * @apiSampleRequest /api/V4/after_sales/list
+     * @apiDescription 售后列表
+     * @apiParam {number} [page] 页数,默认1
+     * @apiParam {number} [size] 条数,默认10
+     * @apiParam {number} [status] 状态(全部0,待审核10,待寄回20,待鉴定30,待退款40,已完成:60,已取消99)
+     * 
+     * @apiSuccess {number} id id
+     * @apiSuccess {number} service_num 服务单号
+     * @apiSuccess {number} order_id 订单id
+     * @apiSuccess {number} type 类型(1退款,2退货)
+     * @apiSuccess {number} refe_price 预计退款金额
+     * @apiSuccess {number} price 实际退款金额
+     * @apiSuccess {number} status 状态
+     * @apiSuccess {string[]} goods_list 商品列表
+     * @apiSuccess {number} goods_list.goods_id 商品id
+     * @apiSuccess {number} goods_list.name 品名
+     * @apiSuccess {number} goods_list.subtitle 副标题
+     * @apiSuccess {number} goods_list.picture 图片
+     * @apiSuccess {number} goods_list.num 数量
+     * @apiSuccess {number} goods_list.price 单价
+     * @apiSuccessExample {json} Request-Example:
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "id": 2,
+      "service_num": "2007030016893462686832",
+      "order_id": 9560,
+      "order_detail_id": 10367,
+      "type": 2,
+      "num": 1,
+      "cost_price": "10.00",
+      "refe_price": "0.00",
+      "price": "0.00",
+      "status": 99,
+      "user_cancel": 0,
+      "user_cancel_time": null,
+      "goods_list": [
+      {
+      "goods_id": 160,
+      "name": "少有人走的路",
+      "subtitle": "武志红 张德芬 胡茵梦等名人大咖推荐",
+      "picture": "/wechat/mall/goods/7700_1532401324.png",
+      "num": 1,
+      "price": "10.00"
+      }
+      ]
+      }
+      ]
+      }
+     */
     public function list(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
