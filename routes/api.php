@@ -128,13 +128,13 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 
     //修改订单状态
     Route::put('mall/status_change', 'MallOrderController@statusChange');
-    
+
     //商品评价
     Route::get('mall/no_comment_list', 'MallOrderController@noCommentList');
     Route::get('mall/get_comment', 'MallOrderController@getComment');
     Route::get('mall/comment_issue_list', 'MallOrderController@commentIssueList');
     Route::post('mall/sub_comment', 'MallOrderController@subComment');
-    
+
     //售后部分
     Route::get('after_sales/list', 'AfterSalesController@list');
     Route::get('after_sales/goods_list', 'AfterSalesController@goodsList');
@@ -143,11 +143,16 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('after_sales/status_change', 'AfterSalesController@statusChange');
 
     //*******************************商城部分结束*******************************
+
+    Route::post('like', 'LikeController@like');
+    Route::post('unlike', 'LikeController@unlike');
+
     //想法
     Route::get('comment/index', 'CommentController@index');
     Route::post('comment/store', 'CommentController@store');
     Route::post('comment/update', 'CommentController@update');
     Route::post('comment/destroy', 'CommentController@destroy');
+
     //评论
     Route::post('reply/store', 'ReplyController@store');
     Route::post('reply/update', 'ReplyController@update');
@@ -167,6 +172,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::post('user/unfollow', 'UserController@unfollow');
     Route::post('user/fan', 'UserController@fan');
     Route::post('user/follower', 'UserController@follower');
+
+    //通知
+    Route::post('notify/fans', 'NotifyController@fans');
 
     Route::post('auth/sms', 'AuthController@sendSms');
     Route::post('auth/login', 'AuthController@login');
