@@ -142,13 +142,13 @@ class WechatPay extends Controller
 //                            $ProfitPrice = 0;
 //                            switch ($TwitterInfo['level']) {
 //                                case 2: //推客
-//                                    $ProfitPrice = Profit::Income(0,2,0,1,$teacher_id);
+//                                    $ProfitPrice = Profit::IncomeController(0,2,0,1,$teacher_id);
 //                                    break;
 //                                case 3: //黑钻
-//                                    $ProfitPrice = Profit::Income(0,3,0,1,$teacher_id);
+//                                    $ProfitPrice = Profit::IncomeController(0,3,0,1,$teacher_id);
 //                                    break;
 //                                case 4://皇钻
-//                                    $ProfitPrice=Profit::Income(0,4,0,1,$teacher_id);
+//                                    $ProfitPrice=Profit::IncomeController(0,4,0,1,$teacher_id);
 //                                    break;
 //                                case 5://代理商
 //
@@ -185,11 +185,11 @@ class WechatPay extends Controller
 //                                            $LogData['price'] =$orderInfo['SurplusPrice'];   //推广产品所获金额
 //                                            $LogData['ctime'] =$time;
 //                                            $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
-//                                            $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
+//                                            $ProfitPrice = Profit::IncomeController(0, 5, 0, 1, $teacher_id);
 //                                            $ProfitPrice=$ProfitPrice-$orderInfo['SurplusPrice'];//返回剩余款项
 //                                        }else{
 //                                            //                                      $ProfitPrice = Tool::RetainDecimal ($ProfitPrice, 0.45, 1);
-//                                            $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
+//                                            $ProfitPrice = Profit::IncomeController(0, 5, 0, 1, $teacher_id);
 //                                        }
 //                                    }
 //                                    break;
@@ -363,13 +363,13 @@ class WechatPay extends Controller
                         $ProfitPrice = $WorksInfo['twitter_price'];
 //                        switch ($TwitterInfo['level']) {
 //                            case 2: //推客
-//                                $ProfitPrice = Profit::Income(0,2,0,2,$teacher_id,$works_id);
+//                                $ProfitPrice = Profit::IncomeController(0,2,0,2,$teacher_id,$works_id);
 //                                break;
 //                            case 3: //黑钻
-//                                $ProfitPrice = Profit::Income(0,3,0,2,$teacher_id,$works_id);
+//                                $ProfitPrice = Profit::IncomeController(0,3,0,2,$teacher_id,$works_id);
 //                                break;
 //                            case 4://皇钻
-//                                $ProfitPrice = Profit::Income(0,4,0,2,$teacher_id,$works_id);
+//                                $ProfitPrice = Profit::IncomeController(0,4,0,2,$teacher_id,$works_id);
 //                                break;
 //                            case 5://代理商  没有限制购买方的折扣可能存在亏损
 //
@@ -411,10 +411,10 @@ class WechatPay extends Controller
 //                                        $LogData['price'] =$orderInfo['SurplusPrice'];
 //                                        $LogData['ctime'] =$time;
 //                                        $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
-//                                        $ProfitPrice=Profit::Income(0,5,0,2,$teacher_id,$works_id);
+//                                        $ProfitPrice=Profit::IncomeController(0,5,0,2,$teacher_id,$works_id);
 //                                        $ProfitPrice=$ProfitPrice-$orderInfo['SurplusPrice'];
 //                                    }else{//海报
-//                                        $ProfitPrice=Profit::Income(0,5,0,2,$teacher_id,$works_id);
+//                                        $ProfitPrice=Profit::IncomeController(0,5,0,2,$teacher_id,$works_id);
 //                                    }
 //
 //                                }
