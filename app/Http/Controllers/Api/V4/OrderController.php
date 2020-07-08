@@ -28,7 +28,7 @@ class OrderController extends Controller
      * @apiGroup order
      *
      * @apiParam {int} user_id 用户id
-     * @apiParam {int} type  类型 1专栏  2会员  4课程
+     * @apiParam {int} type  类型 1专栏  2会员  5课程
      * @apiParam {int} price  订单金额
      *
      * @apiSuccess {string} result json
@@ -41,22 +41,23 @@ class OrderController extends Controller
     "data": [
     {
     "id": 1,
-    "name": "优惠券",
-    "number": "123456",
-    "type": 1,   0不限制 1专栏 2会员 3商品 4精品课 5:跨境商品
+    "name": "心智优惠券",
+    "number": "12353",
+    "type": 1,                  1专栏  2会员 3商品 4免邮券 5课程
     "user_id": 211172,
-    "money": 10,
-    "starttime": 0,
-    "deadline": 1593517938,
-    "use_time": 0,
-    "status": 1,
-    "ctime": 0,
-    "fullcut_price": 99,
-    "explain": "",
+    "status": 1,            //0 未领取 1 未使用 2已使用 3已过期  4已删除
+    "price": "10.00",           //优惠券金额
+    "full_cut": "99.00",        //满减金额
+    "explain": "",          //描述
     "order_id": 0,
     "flag": "",
     "get_way": 1,
-    "cr_id": 0
+    "cr_id": 0,
+    "created_at": null,
+    "updated_at": null,
+    "begin_time": null,             生效时间
+    "end_time": "2020-07-28 23:59:59",  失效时间
+    "used_time": null           使用时间
     }
     ]
     }
