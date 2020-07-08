@@ -78,7 +78,7 @@ class WikiController extends Controller
      * @apiName  id  百科id
      * @apiGroup Api
      *
-     * @apiSuccess {String} token 
+     * @apiSuccess {String} token
      *
      * @apiSuccessExample 成功响应:
      *   {

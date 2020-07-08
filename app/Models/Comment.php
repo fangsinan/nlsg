@@ -15,7 +15,7 @@ class Comment extends Base
      */
     public function getIndexComment($type=1)
     {
-        $lists = Comment::with(['user:id,nick_name','quote:pid,content', 'attach:id,relation_id,img',
+        $lists = Comment::with(['user:id,nickname','quote:pid,content', 'attach:id,relation_id,img',
                     'reply'=>function($query){
                         $query->select('id','comment_id','from_uid','to_uid','content')
                             ->where('status', 1)

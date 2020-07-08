@@ -17,10 +17,10 @@ class CommentController extends Controller
    /**
     * @api {get} api/v4/comment/index 列表
     * @apiVersion 4.0.0
-    * @apiName   列表
+    * @apiName  评论列表
     *
-    * @apiParam  id    模块id
-    * @apiParam  type  类型
+    * @apiParam {int} id    模块id
+    * @apiParam {int} type  类型
     *
     * @apiSuccess {String} token
     *
