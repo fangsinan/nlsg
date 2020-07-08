@@ -21,7 +21,7 @@ class PayController extends  Controller
      * @api {post} api/v4/pay/wechat_pay   微信支付-统一下单
      * @apiName wechat_pay
      * @apiVersion 1.0.0
-     * @apiGroup works
+     * @apiGroup pay
      *
      * @apiParam {int} id 订单id
      * @apiParam {int} type  1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
