@@ -21,7 +21,7 @@ class PayController extends  Controller
      * @api {post} api/v4/pay/wechat_pay   微信支付-统一下单
      * @apiName wechat_pay
      * @apiVersion 1.0.0
-     * @apiGroup works
+     * @apiGroup pay
      *
      * @apiParam {int} id 订单id
      * @apiParam {int} type  1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
@@ -109,6 +109,7 @@ class PayController extends  Controller
         }
 
         $userInfo = User::find($OrderInfo['user_id']);
+
         return [
             'body'      => $body,
             'price'     => $OrderInfo['price'],
@@ -130,6 +131,12 @@ class PayController extends  Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function aliPay(Request $request)
     {
@@ -156,7 +163,8 @@ class PayController extends  Controller
         return $alipay;// laravel 框架中请直接 `return $alipay`
     }
 
-    //
+
+
     /**
      * @api {post} api/v4/pay/order_find   下单查询接口
      * @apiName order_find
@@ -168,6 +176,12 @@ class PayController extends  Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function OrderFind(Request $request)
     {
@@ -211,6 +225,12 @@ class PayController extends  Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function ApplePay(Request $request){
         $params = $request->input();
@@ -299,6 +319,12 @@ class PayController extends  Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function PayCoin(Request $request)
     {

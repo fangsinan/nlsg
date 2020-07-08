@@ -42,15 +42,15 @@ class ColumnController extends Controller
     {
     "id": 1,
     "name": "王琨专栏",
-    "type": 1,
+    "type": 1,              //类型 1专栏  2讲座
     "user_id": 211172,
-    "message": "",
-    "original_price": "0.00",
-    "price": "0.00",
+    "message": "",                  //推荐语
+    "original_price": "0.00",   //原价
+    "price": "0.00",            // 金额
     "online_time": 0,
-    "works_update_time": 0,
-    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
-    "details_pic": ""
+    "works_update_time": 0,             //更新时间
+    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",  //封面图
+    "details_pic": ""               //详情图
     },
     {
     "id": 2,
@@ -126,40 +126,29 @@ class ColumnController extends Controller
     "online_time": 0,
     "works_update_time": 0,
     "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
-    "details_pic": "",
-    "is_end": 0,
-    "subscribe_num": 0,
-    "teacher_name": "房爸爸",
-    "is_sub": 0
+    "details_pic": "",  //详情图
+    "is_end": 0,            //是否完结  1完结
+    "subscribe_num": 0,     //关注数
+    "teacher_name": "房",      //老师姓名
+    "is_sub": 0             //是否关注
     },
-    "works_data": [
+    "works_data": [         //多课程
     {
     "id": 16,
     "type": 1,
-    "title": "如何经营幸福婚姻",
-    "cover_img": "/nlsg/works/20190822150244797760.png",
-    "detail_img": "/nlsg/works/20191023183946478177.png",
+    "title": "如何经营幸福婚姻",            //课程
+    "cover_img": "/nlsg/works/20190822150244797760.png",   //课程封面
+    "detail_img": "/nlsg/works/20191023183946478177.png",   //课程详情
     "message": null,
-    "is_pay": 1,
-    "is_end": 1,
-    "is_free": 0,
-    "subscribe_num": 287,
-    "is_sub": 0
+    "is_pay": 1,        //是否精品课
+    "is_end": 1,        //是否完结
+    "is_free": 0,       //是否免费 1是
+    "subscribe_num": 287,       关注数
+    "is_sub": 0         用户是否关注
     },
     ],
-    "outline_data": [],
-    "historyData": [],
-    "recommendLists": [
-    {
-    "id": 2,
-    "name": "张宝萍专栏",
-    "title": "国家十百千万工程心灵导师",
-    "subtitle": "心灵导师 直击人心",
-    "message": "",
-    "price": "0.00",
-    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg"
-    }
-    ]
+    "outline_data": [],         //单课程  大纲
+    "historyData": [],          //历史章节
     }
     }
      */
@@ -247,7 +236,7 @@ class ColumnController extends Controller
     "data": [
     {
     "id": 1,
-    "name": "王琨专栏",
+    "name": "王琨专栏",             //专栏标题
     "title": "顶尖导师 经营能量",
     "subtitle": "顶尖导师 经营能量",
     "message": "",
@@ -359,44 +348,31 @@ class ColumnController extends Controller
     "data": {
     "works_data": {
     "id": 16,
-    "title": "如何经营幸福婚姻",
-    "subtitle": "",
-    "cover_img": "/nlsg/works/20190822150244797760.png",
-    "detail_img": "/nlsg/works/20191023183946478177.png",
+    "title": "如何经营幸福婚姻",  //标题
+    "subtitle": "",             //副标题
+    "cover_img": "/nlsg/works/20190822150244797760.png",   //封面
+    "detail_img": "/nlsg/works/20191023183946478177.png",   //详情图
     "content": "<p>幸福的婚姻是“同床同梦”，悲情的婚姻是“同床异梦”。两个相爱的人因为一时的爱慕之情走到一起，但在经过柴米油盐酱醋茶的考验后他们未必会幸福、未必会长久；两个不相爱的人走到一起，但在长时间的磨合之后他们未必不幸福、未必不长久。</p>",
-    "view_num": 1295460,
+    "view_num": 1295460,     //浏览数
     "price": "29.90",
-    "subscribe_num": 287,
+    "subscribe_num": 287,       关注数
     "is_free": 0,
     "is_end": 1,
-    "info_num": 3
+    "info_num": 2       //现有章节数
     },
     "info": [
-    {
-    "id": 1,
-    "type": 1,
-    "title": "01何为坚毅",
-    "section": "第一章",
-    "introduce": "第一章",
-    "view_num": 3,
-    "duration": "04:35",
-    "free_trial": 1,
-    "href_url": "http://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/f63da4f95285890780889058541/aaodecBf5FAA.mp3",
-    "time_leng": "10",
-    "time_number": "5"
-    },
     {
     "id": 2,
     "type": 1,
     "title": "02坚毅品格的重要性",
-    "section": "第二章",
-    "introduce": "第二章",
-    "view_num": 246,
+    "section": "第二章",       //章节数
+    "introduce": "第二章",     //章节简介
+    "view_num": 246,        //观看数
     "duration": "03:47",
-    "free_trial": 0,
+    "free_trial": 0,     //是否可以免费试听
     "href_url": "",
-    "time_leng": "10",
-    "time_number": "5"
+    "time_leng": "10",      //观看 百分比
+    "time_number": "5"      //观看 分钟数
     },
     {
     "id": 3,
@@ -525,7 +501,6 @@ class ColumnController extends Controller
     }
     }
      */
-
     public function LectureStudyList(Request $request){
         $lecture_id = $request->input('lecture_id',0);
         $user_id    = $request->input('user_id',0);

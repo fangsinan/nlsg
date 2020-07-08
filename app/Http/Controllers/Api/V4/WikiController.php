@@ -74,11 +74,11 @@ class WikiController extends Controller
 
     /**
      * @api {get} api/v4/wiki/like 点赞
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiName  id  百科id
      * @apiGroup Api
      *
-     * @apiSuccess {String} token   token
+     * @apiSuccess {String} token
      *
      * @apiSuccessExample 成功响应:
      *   {

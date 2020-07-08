@@ -16,14 +16,17 @@ class CommentController extends Controller
 
    /**
     * @api {get} api/v4/comment/index 列表
-    * @apiVersion 4.0
-    * @apiParam  id    模块id
-    * @apiParam  type  类型
-    * @apiGroup Api
+    * @apiVersion 4.0.0
+    * @apiName  评论列表
     *
-    * @apiSuccess {String} token   token
+    * @apiParam {int} id    模块id
+    * @apiParam {int} type  类型
     *
-    * @apiSuccessExample 成功响应:
+    * @apiSuccess {String} token
+    * @apiSuccess {String} result
+    *
+    * @apiSuccessExample  成功响应:
+    *  HTTP/1.1 200 OK
     *   {
     *      "code": 200,
     *      "msg" : '成功',
@@ -43,16 +46,17 @@ class CommentController extends Controller
 
     /**
      * @api {get} api/v4/comment/store 登录
-     * @apiVersion 4.0
-     * @apiParam  id      模块id
+     * @apiVersion 4.0.0
+     * @apiName   登录
+     *
+     * @apiParam  id     模块id
      * @apiParam  pid     父id
      * @apiParam  content 内容
      * @apiParam  type    类型
-     * @apiGroup Api
      *
      * @apiSuccess {String} token   token
      *
-     * @apiSuccessExample 成功响应:
+     * @apiSuccessExample {json} 成功响应:
      *   {
      *      "code": 200,
      *      "msg" : '成功',
@@ -112,16 +116,6 @@ class CommentController extends Controller
     }
 
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
 
     /**

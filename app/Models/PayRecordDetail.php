@@ -4,6 +4,7 @@
 namespace App\Models;
 
 
+
 class PayRecordDetail extends Base
 {
     protected $table = 'nlsg_pay_record_detail';
@@ -50,6 +51,35 @@ class PayRecordDetail extends Base
             $money = $query->sum('price');
             return $money;
         }
+    }
+
+
+    //计算当前提现税额
+    static function cal_tax($user_id, $money)
+    {
+
+        $cash_data_info = CashData::where(['user_id'=>$user_id])->first();
+        if (empty($cash_data_info) ) {
+            return 0;
+        }
+        //这个月提现的总额
+        $sum = PayRecord::where(['user_id' => $user_id,])
+            ->whereIn('status', [1, 2])
+            ->whereIn('order_type', [7, 8])
+            ->where('created_at','>',date('Y-m-1', time()))
+            ->sum('price');
+        //$sum=(empty($sum['price']) || $sum['price']<0)?0:$sum['price'];
+
+        $sum += $money;
+        //应该缴纳的税
+
+        $shui = Withdrawals::cal_tax($sum);
+        //这个月已经缴纳的税
+        $tax_sum = PayRecord::where(['user_id' => $user_id,])
+            ->whereIn('status', [1, 2])
+            ->whereIn('order_type', [7, 8])
+            ->where('created_at','>',date('Y-m-1', time()))->sum('tax');
+        return round($shui - $tax_sum, 2);
     }
 
 }

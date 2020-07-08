@@ -47,34 +47,34 @@ class WorksController extends Controller
     "data": [
     {
     "id": 16,
-    "column_id": 1,
-    "type": 1,
+    "column_id": 1,  //所属专栏 id
+    "type": 1,  //1 视频 2音频 3 文章
     "title": "如何经营幸福婚姻",
     "subtitle": "",
-    "cover_img": "/nlsg/works/20190822150244797760.png",
+    "cover_img": "/nlsg/works/20190822150244797760.png",   //封面
     "detail_img": "/nlsg/works/20191023183946478177.png",
     "content": "<p>幸福的婚姻是“同床同梦”，悲情的婚姻是“同床异梦”。两个相爱的人因为一时的爱慕之情走到一起，但在经过柴米油盐酱醋茶的考验后他们未必会幸福、未必会长久；两个不相爱的人走到一起，但在长时间的磨合之后他们未必不幸福、未必不长久。</p>",
-    "down_time": null,
+    "down_time": null,  下架时间
     "user_id": 168934,
-    "online_time": 1571827192,
-    "view_num": 1295460,
-    "message": null,
-    "is_pay": 1,
-    "original_price": "29.90",
-    "price": "29.90",
+    "online_time": 1571827192,          //上架时间
+    "view_num": 1295460,    //观看数
+    "message": null,            //推荐语
+    "is_pay": 1,        //是否精品课
+    "original_price": "29.90",  //原价
+    "price": "29.90",       //金额
     "promotion_cost": "0.00",
     "twitter_price": "0.00",
-    "subscribe_num": 287,
-    "collection_num": 0,
+    "subscribe_num": 287,  //订阅量
+    "collection_num": 0,        //收藏量
     "timing_online": 0,
     "timing_time": 0,
     "can_twitter": 0,
     "book_sku": 0,
-    "is_audio_book": 0,
-    "is_end": 1,
+    "is_audio_book": 0,     //是否听书 1 听书
+    "is_end": 1,                //0未完结 1已完结
     "roof_placement": 1,
     "is_teaching_aids": 0,
-    "is_free": 0,
+    "is_free": 0,           //是否免费
     "status": 4,
     "created_at": null,
     "updated_at": null
@@ -234,8 +234,14 @@ class WorksController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      *
-    */
+     */
     public function getWorksDetail(Request $request){
 
         $works_id = $request->input('works_id',0);

@@ -11,7 +11,7 @@ class AuthController extends Controller
 
     /**
      * @api {get} api/v4/user/login 登录
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiName  phone 手机号
      * @apiName  code  验证码
      * @apiGroup Api
@@ -67,7 +67,7 @@ class AuthController extends Controller
 
     /**
      * @api {get} api/v4/auth/logout 退出
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiGroup Api
      *
      * @apiSuccess {String} token   token
@@ -90,7 +90,7 @@ class AuthController extends Controller
 
     /**
      * @api {get} api/v4/auth/wechat 微信授权
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiName  code  授权码
      * @apiGroup Api
      *
@@ -156,7 +156,7 @@ class AuthController extends Controller
 
     /**
      * @api {post} api/v4/user/sendSms 发送验证码
-     * @apiVersion 1.0.0
+     * @apiVersion 4.0.0
      * @apiName  sendEms
      * @apiGroup User
      *
