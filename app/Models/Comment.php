@@ -6,7 +6,7 @@ namespace App\Models;
 class Comment extends Base
 {
     protected $table = 'nlsg_comment';
-    protected $fillable = ['user_id','content','type','status'];
+    protected $fillable = ['user_id','pid','relation_id','content','type','status'];
 
     /**
      * 想法
