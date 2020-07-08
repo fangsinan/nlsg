@@ -21,7 +21,7 @@ class Comment extends Base
                             ->where('status', 1)
                             ->limit(3);
                     },
-                    'reply.from_user:id,nick_name', 'reply.to_user:id,nick_name'])
+                    'reply.from_user:id,nickname', 'reply.to_user:id,nickname'])
                 ->where('type', $type)
                 ->where('status', 1)
                 ->paginate(10);

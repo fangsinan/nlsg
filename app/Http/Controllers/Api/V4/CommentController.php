@@ -24,7 +24,7 @@ class CommentController extends Controller
     *
     * @apiSuccess {String} token
     *
-    * @apiSuccessExample {json} 成功响应:
+    * @apiSuccessExample  成功响应:
     *  HTTP/1.1 200 OK
     *   {
     *      "code": 200,
