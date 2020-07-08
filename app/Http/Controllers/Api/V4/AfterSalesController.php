@@ -84,7 +84,7 @@ class AfterSalesController extends Controller {
 
     /**
      * 申请售后
-     * @api {get} /api/V4/after_sales/create_order 申请售后
+     * @api {post} /api/V4/after_sales/create_order 申请售后
      * @apiVersion 4.0.0
      * @apiName /api/V4/after_sales/create_order
      * @apiGroup  afterSales

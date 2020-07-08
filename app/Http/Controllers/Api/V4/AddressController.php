@@ -32,29 +32,29 @@ class AddressController extends Controller {
      * @apiSuccessExample {json} Request-Example:
      * 
       {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      {
-      "id": 110000,
-      "name": "北京",
-      "pid": 0,
-      "area_list": [
-      {
-      "id": 110101,
-      "name": "东城",
-      "pid": 110000,
-      "area_list": []
-      },
-      {
-      "id": 110102,
-      "name": "西城",
-      "pid": 110000,
-      "area_list": []
-      }
-      ]
-      }
-      }
+        "code": 200,
+        "msg": "成功",
+        "data": {
+            {
+                "id": 110000,
+                "name": "北京",
+                "pid": 0,
+                "area_list": [
+                    {
+                        "id": 110101,
+                        "name": "东城",
+                        "pid": 110000,
+                        "area_list": []
+                    },
+                    {
+                        "id": 110102,
+                        "name": "西城",
+                        "pid": 110000,
+                        "area_list": []
+                    }
+                ]
+            }
+        }
       }
      */
     public function getData() {

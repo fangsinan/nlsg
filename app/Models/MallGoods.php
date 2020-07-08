@@ -12,6 +12,29 @@ class MallGoods extends Base {
     public function getList($params, $user = [], $cache = true) {
 
         $list = $this->getListData($params, $cache);
+        //收藏
+        if ($user['id']) {
+            $col_list = Collection::where('user_id', '=', $user['id'])
+                    ->where('type', '=', 3)
+                    ->select(['relation_id as goods_id'])
+                    ->get();
+            if ($col_list->isEmpty()) {
+                $col_list = [];
+            } else {
+                $col_list = $col_list->toArray();
+                $col_list = array_column($col_list, 'goods_id');
+            }
+        } else {
+            $col_list = [];
+        }
+
+        foreach ($list as $v) {
+            if (in_array($v->id, $col_list)) {
+                $v->collect = 1;
+            } else {
+                $v->collect = 0;
+            }
+        }
 
         //获取商品所处的活动
         $agModel = new ActiveGroupGlModel();
