@@ -131,6 +131,12 @@ class PayController extends  Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function aliPay(Request $request)
     {
@@ -169,6 +175,12 @@ class PayController extends  Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function OrderFind(Request $request)
     {
@@ -212,6 +224,12 @@ class PayController extends  Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function ApplePay(Request $request){
         $params = $request->input();
@@ -300,6 +318,12 @@ class PayController extends  Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function PayCoin(Request $request)
     {

@@ -234,8 +234,14 @@ class WorksController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      *
-    */
+     */
     public function getWorksDetail(Request $request){
 
         $works_id = $request->input('works_id',0);
