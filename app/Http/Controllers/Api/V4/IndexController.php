@@ -17,7 +17,7 @@ class IndexController extends Controller
 
     /**
      * @api {post} api/v4/index/announce  获取首页公告
-     * @apiVersion 1.0.0
+     * @apiVersion 4.0.0
      * @apiName  announce
      * @apiGroup Index
      *
