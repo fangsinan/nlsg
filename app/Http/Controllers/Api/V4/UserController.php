@@ -20,10 +20,10 @@ class UserController extends Controller
 
     /**
      * @api {get} api/v4/user/index 个人主页
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiSuccess {String} token   token
+     * @apiSuccess {String} token
      *
      * @apiSuccessExample 成功响应:
      *   {
@@ -61,14 +61,14 @@ class UserController extends Controller
 
     /**
      * @api {get} api/v4/user/follow 关注
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiName  from_uid 用户id
      * @apiName  to_uid   被关注用户id
      * @apiGroup Api
      *
      * @apiSuccess {String} token   token
      *
-     * @apiSuccessExample 成功响应:
+     * @apiSuccessExample  成功响应:
      *   {
      *      "code": 200,
      *      "msg" : '成功',
@@ -102,13 +102,13 @@ class UserController extends Controller
     }
     /**
      * @api {get} api/v4/user/unfollow 取消关注
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiName  to_uid  被关注用户id
      * @apiGroup Api
      *
-     * @apiSuccess {String} token   token
+     * @apiSuccess {String} token
      *
-     * @apiSuccessExample 成功响应:
+     * @apiSuccessExample  成功响应:
      *   {
      *      "code": 200,
      *      "msg" : '成功',
@@ -133,16 +133,16 @@ class UserController extends Controller
 
     /**
      * @api {get} api/v4/user/base 基本资料
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiName  nickname 昵称
      * @apiName  headimg  头像
      * @apiName  sex  性别
      * @apiName  intro  简介
      * @apiGroup Api
      *
-     * @apiSuccess {String} token   token
+     * @apiSuccess {String} token
      *
-     * @apiSuccessExample 成功响应:
+     * @apiSuccessExample  成功响应:
      *   {
      *      "code": 200,
      *      "msg" : '成功',
@@ -173,15 +173,15 @@ class UserController extends Controller
 
     /**
      * @api {get} api/v4/user/feedback 我要吐槽
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiParam {string} type 10:使用建议 11:内容漏缺 12:购物相关 13:物流配送 14:客服体验 15:节约相关
      * @apiParam {string} content 内容  不能大于200字
      * @apiParam {string} pic  图片url(数组格式)
      * @apiGroup Api
      *
-     * @apiSuccess {String} token   token
+     * @apiSuccess {String} token
      *
-     * @apiSuccessExample 成功响应:
+     * @apiSuccessExample  成功响应:
      *   {
      *      "code": 200,
      *      "msg" : '成功',
@@ -213,10 +213,10 @@ class UserController extends Controller
     }
     /**
      * @api {get} api/v4/user/fan 我关注的
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiSuccess {String}
+     * @apiSuccess {String} token
      *
      * @apiSuccessExample 成功响应:
      *
@@ -273,10 +273,10 @@ class UserController extends Controller
     }
    /**
     * @api {get} api/v4/user/follower 我关注的
-    * @apiVersion 4.0
+    * @apiVersion 4.0.0
     * @apiGroup Api
     *
-    * @apiSuccess {String}
+    * @apiSuccess {String} token
     *
     * @apiSuccessExample 成功响应:
     *

@@ -20,7 +20,7 @@ class NotifyController extends Controller
 
     /**
      * @api {get} api/v4/notify/fans 新增粉丝
-     * @apiVersion 4.0
+     * @apiVersion 4.0.0
      * @apiGroup Api
      *
      * @apiSuccess {String} token   token
