@@ -23,6 +23,7 @@ class CommentController extends Controller
     * @apiParam {int} type  类型
     *
     * @apiSuccess {String} token
+    * @apiSuccess {String} result
     *
     * @apiSuccessExample  成功响应:
     *  HTTP/1.1 200 OK
