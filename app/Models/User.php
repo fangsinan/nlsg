@@ -45,9 +45,13 @@ class User extends Authenticatable implements JWTSubject
 
         if($uid){
             $user = User::find($uid);
+
         }else{
             $user['level'] = $level;
             $user['expire_time'] = $expire_time;
+        }
+        if( empty($user) ){
+            return 0;
         }
         $user['expire_time'] = strtotime($user['expire_time']);
 

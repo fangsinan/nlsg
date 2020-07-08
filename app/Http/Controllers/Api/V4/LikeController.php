@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
-use App\Models\Like;
+use App\Models\Comment;
 use Illuminate\Http\Request;
+use App\Models\Like;
+use App\Models\Notify;
+use Mockery\Matcher\Not;
 
 class LikeController extends Controller
 {
@@ -12,8 +15,8 @@ class LikeController extends Controller
     /**
      * @api {get} api/v4/like 点赞
      * @apiVersion 4.0
-     * @apiName  id  评论id
-     * @apiName  type  类型 1.想法 2.百科
+     * @apiParam  id  评论id
+     * @apiParam  type  类型 1.想法 2.百科
      * @apiGroup Api
      *
      * @apiSuccess {String} token   token
@@ -46,6 +49,16 @@ class LikeController extends Controller
             'type'        => 1
         ]);
         if ($res){
+            if ($type ==1){
+                $comment = Comment::where('id', $id)->first();
+                $notify = new Notify();
+                $notify->from_uid = 1;
+                $notify->to_uid   = $comment->user_id;
+                $notify->source_id= 1;
+                $notify->type     = 1;
+                $notify->subject  = '喜欢了你的想法';
+                $notify->save();
+            }
             return success('操作成功');
         }
         return error(1000, '操作失败');
@@ -55,8 +68,8 @@ class LikeController extends Controller
     /**
      * @api {get} api/unlike 点赞
      * @apiVersion 4.0
-     * @apiName  id    评论id
-     * @apiName  type  类型 1.想法 2.百科
+     * @apiParam  id    评论id
+     * @apiParam  type  类型 1.想法 2.百科
      * @apiGroup Api
      *
      * @apiSuccess {String} token   token
