@@ -26,6 +26,12 @@ class ListenBookController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function ListenBookIndex(Request $request){
         $recommendObj = new Recommend();
@@ -71,6 +77,12 @@ class ListenBookController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function getListenDetail(Request $request){
         $listen_id = $request->input('id',0);
@@ -112,6 +124,12 @@ class ListenBookController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
      */
     public function getBookList(Request $request){
 
