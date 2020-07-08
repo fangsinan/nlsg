@@ -221,20 +221,37 @@ class MallRefundRecord extends Base {
         $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
 
-        $query = MallRefundRecord::where('user_id', '=', $user['id'])
-                ->where('status', '<>', 80)
-                ->whereIn('type', [1, 2]);
-
-        $query->select(['id', 'service_num', 'order_id', 'order_detail_id',
+        $field = ['id', 'service_num', 'order_id', 'order_detail_id',
             'type', 'num', 'cost_price', 'refe_price', 'price', 'status',
-            'user_cancel', 'user_cancel_time']);
+            'user_cancel', 'user_cancel_time', 'created_at'];
 
-        $query->with(['infoOrder',
+        $with = ['infoOrder',
             'infoOrder.infoOrderDetail',
             'infoOrder.infoOrderDetail.goodsInfo',
             'infoDetail',
             'infoDetail.goodsInfo',
-        ]);
+        ];
+
+        if ($params['id'] ?? 0) {
+            $query = MallRefundRecord::where('id', '=', $params['id'])
+                    ->where('user_id', '=', $user['id']);
+
+            $field_sup = [
+                'return_address_id', 'picture', 'pass_at', 'check_at',
+                'receive_at', 'succeed_at', 'price', 'reason_id', 'description',
+                'is_check_reject', 'check_reject_at', 'check_remark',
+                'is_authenticate_reject', 'authenticate_reject_at',
+                'authenticate_remark', 'express_id', 'express_num'
+            ];
+
+            $field = array_merge($field, $field_sup);
+        } else {
+            $query = MallRefundRecord::where('user_id', '=', $user['id']);
+        }
+
+        $query->where('status', '<>', 80)->whereIn('type', [1, 2]);
+
+        $query->select($field)->with($with);
 
         //全部,待审核,待寄回,带鉴定,带退款,已完成,已取消
         //10:待审核  20:待寄回   30:待鉴定  40待退款  50:退款中 60:已退款  70:驳回
@@ -316,11 +333,123 @@ class MallRefundRecord extends Base {
     }
 
     public function orderInfo($params, $user) {
-        
+        $data = $this->list($params, $user);
+        if ($data->isEmpty()) {
+            return ['code' => false, 'msg' => '参数错误', 'ps' => '未查询到售后单'];
+        }
+
+        $data = $data[0];
+        $data->express_name = ExpressCompany::onlyGetName($data->express_id);
+
+        $ftModel = new FreightTemplate();
+        $freight_template_data = $ftModel->listOfShop(3);
+
+        foreach ($freight_template_data as $v) {
+            if ($v->id == $data->return_address_id) {
+                $data->refund_address = $v;
+            }
+        }
+
+        return $data;
     }
 
-    public function statusChange($params, $user) {
-        
+    //删除,取消,寄回
+    public function statusChange($id, $flag, $user_id) {
+
+        $check = self::where('user_id', '=', $user_id)
+                ->where('status', '<>', 80)
+                ->find($id);
+
+        if (!$check) {
+            return ['code' => false, 'msg' => '订单错误'];
+        }
+
+        $now_date = date('Y-m-d H:i:s');
+
+        DB::beginTransaction();
+
+        // 10:待审核 20:待寄回  30:待鉴定 40待退款  
+        // 50:退款中 60:已退款  70:驳回   80删除
+
+        switch ($flag) {
+            case 'stop':
+                //取消:待审核,待寄回
+                if ($check->status == 10 || $check->status == 20) {
+                    $check->user_cancel = 1;
+                    $check->user_cancel_time = $now_date;
+
+                    //如果是退货,需要把order_details的after_sale_num改回
+                    if ($check->type == 2) {
+                        $d_res = DB::table('nlsg_mall_order_detail')
+                                ->where('id', '=', $check->order_detail_id)
+                                ->decrement('after_sale_used_num', $check->num);
+
+                        if (!$d_res) {
+                            DB::rollBack();
+                            return ['code' => false, 'msg' => '参数错误',
+                                'ps' => 'detail error'];
+                        }
+                    }
+                } else {
+                    return ['code' => false, 'msg' => '订单状态错误'];
+                }
+                break;
+            case 'del':
+                //删除:已拒绝,已取消
+                if ($check->user_cancel == 1 || $check->status == 70) {
+                    $check->status = 80;
+                } else {
+                    return ['code' => false, 'msg' => '订单状态错误'];
+                }
+                break;
+            default:
+                return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $res = $check->save();
+
+        if ($res) {
+            DB::commit();
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
+    }
+
+    public function refundPost($params, $user) {
+        $id = $params['id'] ?? 0;
+        $express_id = $params['express_id'] ?? 0;
+        $express_num = $params['express_num'] ?? 0;
+        if (empty($id) || empty($express_id) || empty($express_num)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+
+        $check = self::where('user_id', '=', $user['id'])
+                ->where('status', '<>', 80)
+                ->find($id);
+
+        if ($check->status == 20 && $check->user_cancel == 0) {
+            $check_express = ExpressCompany::find($express_id);
+            if ($check_express) {
+                $check->status = 30;
+                $check->express_id = $express_id;
+                $check->express_num = $express_num;
+                $check->refund_at = date('Y-m-d H:i:s');
+
+                $res = $check->save();
+                if ($res) {
+                    return ['code' => true, 'msg' => '成功'];
+                } else {
+                    return ['code' => false, 'msg' => '失败'];
+                }
+            } else {
+                return ['code' => false, 'msg' => '状态错误'];
+            }
+        } else {
+            return ['code' => false, 'msg' => '状态错误'];
+        }
     }
 
 }

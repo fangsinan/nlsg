@@ -232,7 +232,31 @@ class MallGoods extends Base {
         return $lists;
     }
 
+    public function collect($goods_id, $user_id) {
+        if (empty($goods_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check = Collection::where('user_id', '=', $user_id)
+                ->where('relation_id', '=', $goods_id)
+                ->where('type', '=', 3)
+                ->first();
+        if ($check) {
+            $res = $check->forceDelete();
+        } else {
+            $model = new Collection();
+            $model->type = 3;
+            $model->user_id = $user_id;
+            $model->relation_id = $goods_id;
 
+            $res = $model->save();
+        }
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败'];
+        }
+    }
 
     /**
      * 团购商品详情

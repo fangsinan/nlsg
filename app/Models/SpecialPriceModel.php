@@ -169,16 +169,6 @@ class SpecialPriceModel extends Base {
         return $sec_date_list;
     }
 
-    //todo 秒杀列表
-    public function secList() {
-        
-    }
-
-    //todo 拼团列表
-    public function groupList() {
-        
-    }
-
     //首页秒杀推荐
     public function homeSecList() {
 

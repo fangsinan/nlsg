@@ -791,6 +791,31 @@ class MallController extends Controller {
         }
     }
 
-    //todo 收藏
-    //todo 自提点,售后点
+    /**
+     * 收藏
+     * @api {post} /api/V4/goods/collect 收藏
+     * @apiVersion 4.0.0
+     * @apiName /api/V4/goods/collect
+     * @apiGroup  Mall
+     * @apiSampleRequest /api/V4/goods/collect
+     * @apiDescription 收藏,取消收藏
+     * @apiParam {number} goods_id 商品id
+     * 
+     */
+    public function collect(Request $request) {
+        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+        if (empty($user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+        $goods_id = $request->input('goods_id', 0);
+        $model = new MallGoods();
+        $data = $model->collect($goods_id, $user['id']);
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
 }

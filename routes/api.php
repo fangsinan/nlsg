@@ -92,6 +92,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('goods/group_buy_team_list', 'MallOrderController@groupByTeamList');
     Route::get('goods/service_description', 'MallController@mallServiceDescription');
     Route::post('goods/get_coupon', 'CouponController@getCoupon');
+    Route::post('goods/collect', 'MallController@collect');
 
     Route::get('address/get_data', 'AddressController@getData');
     Route::post('address/create', 'AddressController@create');
@@ -140,7 +141,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('after_sales/goods_list', 'AfterSalesController@goodsList');
     Route::get('after_sales/create_order', 'AfterSalesController@createOrder');
     Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');
-    Route::get('after_sales/status_change', 'AfterSalesController@statusChange');
+    Route::put('after_sales/status_change', 'AfterSalesController@statusChange');
+    Route::get('after_sales/refund_post', 'AfterSalesController@refundPost');
 
     //*******************************商城部分结束*******************************
 
