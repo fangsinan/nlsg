@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
 use App\Models\CommentReply;
+use App\Models\Notify;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Attach;
@@ -11,11 +13,26 @@ use App\Models\Like;
 
 class CommentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+   /**
+    * @api {get} api/v4/comment/index 列表
+    * @apiVersion 4.0
+    * @apiParam  id    模块id
+    * @apiParam  type  类型
+    * @apiGroup Api
+    *
+    * @apiSuccess {String} token   token
+    *
+    * @apiSuccessExample 成功响应:
+    *   {
+    *      "code": 200,
+    *      "msg" : '成功',
+    *      "data": {
+    *
+    *       }
+    *   }
+    *
+   */
     public function index()
     {
         $model = new Comment();
@@ -25,26 +42,41 @@ class CommentController extends Controller
 
 
     /**
-     * Store a newly created resource in storage.
+     * @api {get} api/v4/comment/store 登录
+     * @apiVersion 4.0
+     * @apiParam  id      模块id
+     * @apiParam  pid     父id
+     * @apiParam  content 内容
+     * @apiParam  type    类型
+     * @apiGroup Api
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+     * @apiSuccess {String} token   token
+     *
+     * @apiSuccessExample 成功响应:
+     *   {
+     *      "code": 200,
+     *      "msg" : '成功',
+     *      "data": {
+     *
+     *       }
+     *   }
+     *
+    */
     public function store(Request $request)
     {
-        $content = $request->input('content');
-        $img     = $request->input('img');
-        $pid     = $request->input('pid');
+        $user_id = 1;
+        $input  = $request->all();
         $result  = Comment::create([
-            'user_id' => 1,
-            'pid'     => $pid,
-            'content' => $content,
-            'type'    => 1
+            'user_id'     => $user_id,
+            'relation_id' => $input['id'],
+            'pid'     => $input['pid'],
+            'content' => $input['content'],
+            'type'    => $input['type']
         ]);
 
         if ($result->id){
-            if ($img){
-                $imgArr = explode(',', $img);
+            if ($input['img']){
+                $imgArr = explode(',', $input['img']);
                 $data = [];
                 foreach ($imgArr as $v){
                     $data[] = [
@@ -55,6 +87,25 @@ class CommentController extends Controller
                 }
                 Attach::insert($data);
             }
+
+            switch ($input['type']){
+                case 1:
+                    $list    = Column::where('id', $input['id'])->first();
+                    $subject = '评论了你的专栏';
+                    break;
+                case  2:
+                    break;
+            }
+
+            //发送通知
+            $notify = new Notify();
+            $notify->from_uid = $user_id;
+            $notify->to_uid   = $list->user_id;
+            $notify->source_id= $input['id'];
+            $notify->type     = 4;
+            $notify->subject  = $subject;
+            $notify->save();
+
             return $this->success();
         }
 

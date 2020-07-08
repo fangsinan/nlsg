@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserFollow;
 use Illuminate\Http\Request;
 
 class NotifyController extends Controller
@@ -40,7 +41,12 @@ class NotifyController extends Controller
         User::where('id', 1)->update(['fan_num'=>0]);
 
         $user  = User::findOrFail(1);
-        $lists = $user->fans()->paginate(10);
+        $lists = $user->fans()->paginate(10, ['from_uid','to_uid','nickname'])->toArray();
+        if ($lists['data']){
+            foreach ($lists['data'] as &$v) {
+                $v['is_follow'] = UserFollow::where(['from_uid'=>1, 'to_uid'=>$v['from_uid']])->count();
+            }
+        }
         return  success($lists);
     }
 
