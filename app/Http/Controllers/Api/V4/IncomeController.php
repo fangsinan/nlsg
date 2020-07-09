@@ -12,6 +12,7 @@ use App\Models\MallOrderDetails;
 use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
+use App\Models\SendInvoice;
 use App\Models\User;
 use App\Models\Withdrawals;
 use App\Models\Works;
@@ -868,5 +869,54 @@ class IncomeController extends Controller
         ])->get();
         return $this->success($lists);
     }
+
+
+
+
+
+    /**
+     * @api {post} /api/v4/income/send_invoice  邮寄发票
+     * @apiName send_invoice
+     * @apiVersion 1.0.0
+     * @apiGroup income
+     *
+     * @apiParam {int} user_id
+     * @apiParam {int} express   快递公司快递公司 编码 如：YUNDA
+     * @apiParam {int} express_num  快递单号
+     * @apiParam {int} img   图片
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "id": 1,
+    "user_id": 211172,
+    "express": "YUNDA",
+    "express_num": "12312313",
+    "img": "image",
+    "created_at": "2020-07-09 14:30:55",
+    "updated_at": "2020-07-09 14:30:55",
+    "status": 0         //状态 1 审核通过 2 未通过
+    }
+    }
+     */
+    public  function  sendInvoice(Request $request)
+    {
+        $user_id = $request->input('user_id', 0);
+        $express = $request->input('express', 0);
+        $express_num = $request->input('express_num', 0);
+        $img = $request->input('img', 0);
+
+        $res = SendInvoice::firstOrCreate([
+            'user_id'     =>$user_id,
+            'express'     =>$express,
+            'express_num' =>$express_num,
+            'img'         => $img,
+        ]);
+        return $this->success($res);
+    }
+
 
 }

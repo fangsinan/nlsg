@@ -165,12 +165,12 @@ class ListenBookController extends Controller
         "type": 3,
         "title": "不要羞辱你的孩子 他的心很脆弱",
         "subtitle": "",
-        "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+        "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg", 封面
         "original_price": "0.00",
         "price": "0.00",
         "message": "",
-        "is_free": 0,
-        "is_sub": 0
+        "is_free": 0,           //1免费
+        "is_sub": 0             //1关注
         },
         {
         "id": 31,

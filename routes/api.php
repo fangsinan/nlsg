@@ -88,6 +88,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('income/get_list', 'IncomeController@getList');
     Route::get('income/detail', 'IncomeController@Detail');
     Route::get('income/get_deposit', 'IncomeController@getOrderDepositHistory');
+    Route::get('income/send_invoice', 'IncomeController@sendInvoice');
 
 
     //*******************************商城部分开始*******************************
