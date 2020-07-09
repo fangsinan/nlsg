@@ -63,6 +63,10 @@ class Works extends Base
             ->orderBy('created_at','desc')
             ->get()
             ->toArray();
+        foreach ($lists as &$v) {
+            $v['is_new'] = 1;
+            $v['is_free']= 1;
+        }
         return $lists;
 
     }

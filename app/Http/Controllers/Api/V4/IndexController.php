@@ -126,6 +126,7 @@ class IndexController extends Controller
      * @apiSuccess {string} title    标题
      * @apiSuccess {string} subtitle 副标题
      * @apiSuccess {number} price    价格
+     * @apiSuccess {number} is_new   是否新上架 1是 0 否
      * @apiSuccess {string} cover_pic 封面
      *
      * @apiSuccessExample  Success-Response:
@@ -141,6 +142,7 @@ class IndexController extends Controller
      *                   "subtitle": "顶尖导师 经营能量",
      *                   "message": "",
      *                   "price": "99.00",
+     *                   "is_new": 1,
      *                   "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg"
      *               }
      *
@@ -167,6 +169,8 @@ class IndexController extends Controller
      * @apiSuccess {string} cover_img 封面
      * @apiSuccess {string} subtitle  副标题
      * @apiSuccess {string} price     价格
+     * @apiSuccess {string} is_new    是否为新上架 1 是 0 否
+     * @apiSuccess {string} is_free   是否为限免   1 是 0 否
      * @apiSuccess {string} user    用户
      * @apiSuccess {number} user.id      用户id
      * @apiSuccess {string} user.nickname 用户昵称
@@ -187,7 +191,9 @@ class IndexController extends Controller
      *                   "user": {
      *                      "id": 168934,
      *                      "nickname": "chandler"
-     *                   }
+     *                   },
+     *                   "is_new": 1,
+     *                   "is_free": 1
      *                }
      *       ]
      *     }
@@ -356,4 +362,9 @@ class IndexController extends Controller
         return $this->success($lists);
     }
 
+
+    public function  course()
+    {
+
+    }
 }
