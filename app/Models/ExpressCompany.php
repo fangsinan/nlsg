@@ -8,7 +8,7 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Description of ExpressCompany
@@ -31,83 +31,101 @@ class ExpressCompany extends Base {
         }
     }
 
-    public function getPostInfo($params, $user) {
-        if (empty($params['express_id']) ||
-                empty($params['order_id']) ||
-                empty($params['express_num']) ||
-                empty($params['type'])) {
+    public function getPostInfo($params) {
+        if (empty($params['express_id']) || empty($params['express_num'])) {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        //todo 查询用户和订单匹配状态   订单是否已发货
-
-        $data['type'] = self::onlyGetName($params['express_id'], 2);
-        if (empty($data['type'])) {
+        $express_type = self::onlyGetName($params['express_id'], 2);
+        if (empty($express_type)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $mobile = '17301246549'; //公司固定发货手机号
+        $check = ExpressInfo::where('express_id', '=', $params['express_id'])
+                ->where('express_num', '=', $params['express_num'])
+                ->first();
 
-        $data['mobile'] = $mobile;
-        $data['number'] = $params['express_num'];
+        if ($check->delivery_status == 3) {
+            //已签收的直接返回
+            return json_decode($check->history, true);
+        }
 
-        $querys = http_build_query($data);
+        $data = $this->toQuery($params['express_num'], $express_type);
 
-        $data = $this->toQuery($params['express_num'], $data['type']);
-        return $data;
+        if (!empty($data)) {
+            //如果查询有结果 返回结果并存库
+            $update_data = [
+                'history' => json_encode($data),
+                'delivery_status' => $data['deliverystatus'],
+            ];
+
+            ExpressInfo::where('express_id', '=', $params['express_id'])
+                    ->where('express_num', '=', $params['express_num'])
+                    ->update($update_data);
+
+            return $data;
+        } else {
+            //直接返回库
+            return json_decode($check->history, true);
+        }
     }
 
     public function toQuery($number, $type) {
-        $appcode = "635e0f54d03e443989140f0163260408";
-        $headers = [
-            "Authorization:APPCODE " . $appcode,
-            "Content-Type" . ":" . "application/json; charset=UTF-8"
-        ];
 
-        $host = "https://jisukdcx.market.alicloudapi.com";
-        $path = "/express/query";
-        $querys = "number=YT4538526006366&type=YTO";
-        $url = $host . $path . "?" . $querys;
+        $cache_key_name = 'post_info' . '_' . $type . '_' . $number;
 
+        $expire_num = CacheTools::getExpire('post_info');
+        $res = Cache::get($cache_key_name);
+        if (empty($res)) {
+            //如果没有,表示过期就查询.
+            $host = "http://jisukdcx.market.alicloudapi.com";
+            $path = "/express/query";
+            $method = "GET";
+            $appcode = "cc703c76da5b4b15bb6fc4aa0c0febf9";
+            $headers = array();
+            array_push($headers, "Authorization:APPCODE " . $appcode);
+            $querys = 'number=' . $number . '&type=' . $type;
+            $bodys = "";
+            $url = $host . $path . "?" . $querys;
 
-        $response = Http::withHeaders($headers)->get($url);
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_FAILONERROR, false);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_HEADER, false);
+            if (1 == strpos("$" . $host, "https://")) {
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+            }
 
-        dd($response);
+            $result = curl_exec($curl);
+            if (empty($result)) {
+                return '';
+            }
 
+            $jsonarr = json_decode($result, true);
+            if ($jsonarr['status'] !== 0) {
+                return '';
+            }
 
-
-
-
-
-
-
-
-
-        $host = "https://jisukdcx.market.alicloudapi.com";
-        $path = "/express/query";
-        $method = "GET";
-        $appcode = "635e0f54d03e443989140f0163260408";
-        $headers = array();
-        array_push($headers, "Authorization:APPCODE " . $appcode);
-        //根据API的要求，定义相对应的Content-Type
-        array_push($headers, "Content-Type" . ":" . "application/json; charset=UTF-8");
-        $querys = "number=YT4538526006366&type=YTO";
-        $bodys = "null";
-        $url = $host . $path . "?" . $querys;
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_FAILONERROR, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        if (1 == strpos("$" . $host, "https://")) {
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+            Cache::add($cache_key_name, time(), $expire_num);
+            $result = $jsonarr['result'];
+            return $result;
+        } else {
+            return '';
         }
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $bodys);
-        var_dump(curl_exec($curl));
+    }
+
+    public function companyList() {
+        $res = self::where('status', '=', 1)
+                ->whereIn('show_frontend', [1, 3])
+                ->orderBy('rank', 'asc')
+                ->select(['id', 'name'])
+                ->get();
+
+        return $res;
     }
 
 }

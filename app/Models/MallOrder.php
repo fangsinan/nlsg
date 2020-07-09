@@ -1000,6 +1000,7 @@ class MallOrder extends Base {
             $field[] = 'bill_number';
             $field[] = 'bill_format';
             $with[] = 'orderChild';
+            $with[] = 'expressInfo';
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
@@ -1027,13 +1028,17 @@ class MallOrder extends Base {
         ]);
     }
 
+    public function expressInfo() {
+        return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
+                        ->select(['id', 'history']);
+    }
+
     public function orderChild() {
         return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')
-                        ->groupBy('express_id')
-                        ->groupBy('express_num')
+                        ->groupBy('express_info_id')
                         ->select([
                             'status', 'order_id',
-                            'express_id', 'express_num',
+                            'express_info_id',
                             DB::raw('GROUP_CONCAT(order_detail_id) order_detail_id')
         ]);
     }
@@ -1094,7 +1099,7 @@ class MallOrder extends Base {
             $temp_data = [];
             $temp_data['status'] = 0;
             $temp_data['order_id'] = $data['id'];
-            $temp_data['express_id'] = 0;
+            $temp_data['express_info_id'] = 0;
             $temp_data['express_num'] = '';
             $temp_data['order_detail_id'] = [];
             $temp_data['order_details'] = $data['order_details'];

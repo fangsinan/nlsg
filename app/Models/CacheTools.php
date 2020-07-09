@@ -24,9 +24,9 @@ class CacheTools {
             $normal_exprice = 3600;
             $long_exprice = 86400;
         } else {
-            $sort_exprice = 10;
-            $normal_exprice = 10;
-            $long_exprice = 10;
+            $sort_exprice = 60;
+            $normal_exprice = 120;
+            $long_exprice = 180;
         }
 
         switch (strtolower($flag)) {
@@ -41,6 +41,7 @@ class CacheTools {
             case 'coupon_rule_list':
             case 'goods_price_exprie':
             case 'set_kill_list':
+            case 'post_info':
                 $exprie = $sort_exprice;
                 break;
             case 'goods_category_list':

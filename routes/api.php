@@ -146,6 +146,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     
     //物流查询
     Route::get('post/get_info', 'ExpressController@getPostInfo');
+    Route::get('post/company_list', 'ExpressController@companyList');
     //*******************************商城部分结束*******************************
 
     Route::post('like', 'LikeController@like');

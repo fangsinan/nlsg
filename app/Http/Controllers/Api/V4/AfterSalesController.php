@@ -222,8 +222,12 @@ class AfterSalesController extends Controller {
      * @apiSuccess {string} express_name 寄回快递公司名称
      * @apiSuccess {string[]} goods_list 商品列表
      * @apiSuccess {string[]} refund_address 售后点信息
+     * @apiSuccess {string[]} express_info 寄回物流信息
      * @apiSuccessExample {json} Request-Example:
-     * {
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": {
       "id": 2,
       "service_num": "2007030016893462686832",
       "order_id": 9560,
@@ -234,8 +238,8 @@ class AfterSalesController extends Controller {
       "refe_price": "0.00",
       "price": "0.00",
       "status": 99,
-      "user_cancel": 0,
-      "user_cancel_time": null,
+      "user_cancel": 1,
+      "user_cancel_time": "2020-07-08 13:51:57",
       "created_at": "2020-07-03 17:24:46",
       "return_address_id": 10,
       "picture": "",
@@ -251,8 +255,7 @@ class AfterSalesController extends Controller {
       "is_authenticate_reject": 0,
       "authenticate_reject_at": null,
       "authenticate_remark": "",
-      "express_id": 0,
-      "express_num": "",
+      "express_info_id": 1,
       "goods_list": [
       {
       "goods_id": 160,
@@ -276,6 +279,28 @@ class AfterSalesController extends Controller {
       "province_name": "北京",
       "city_name": "朝阳",
       "area_name": ""
+      },
+      "express_info": {
+      "id": 1,
+      "history": {
+      "number": "YT4538526006366",
+      "type": "yto",
+      "typename": "圆通速递",
+      "logo": "https://api.jisuapi.com/express/static/images/logo/80/yto.png",
+      "list": [
+      {
+      "time": "2020-05-24 13:23:02",
+      "status": "客户签收人: 周一派送急件电联18513793888 已签收  感谢使用圆通速递，期待再次为您服务 如有疑问请联系：18513793888，投诉电话：010-53579888"
+      },
+      {
+      "time": "2020-05-24 07:17:22",
+      "status": "【北京市朝阳区十里堡公司】 派件中  派件人: 张小秋 电话 18513793888  如有疑问，请联系：010-53579888"
+      }
+      ],
+      "deliverystatus": 3,
+      "issign": 1
+      }
+      }
       }
       }
      */

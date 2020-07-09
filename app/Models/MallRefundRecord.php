@@ -230,6 +230,7 @@ class MallRefundRecord extends Base {
             'infoOrder.infoOrderDetail.goodsInfo',
             'infoDetail',
             'infoDetail.goodsInfo',
+            'expressInfo'
         ];
 
         if ($params['id'] ?? 0) {
@@ -241,7 +242,8 @@ class MallRefundRecord extends Base {
                 'receive_at', 'succeed_at', 'price', 'reason_id', 'description',
                 'is_check_reject', 'check_reject_at', 'check_remark',
                 'is_authenticate_reject', 'authenticate_reject_at',
-                'authenticate_remark', 'express_id', 'express_num'
+                'authenticate_remark','express_info_id'
+//                'express_id', 'express_num'
             ];
 
             $field = array_merge($field, $field_sup);
@@ -316,12 +318,21 @@ class MallRefundRecord extends Base {
                 }
             }
             $v->goods_list = $temp_data;
+            if(!empty($v->expressInfo)){
+                $v->expressInfo->history = json_decode($v->expressInfo->history);
+            }
             unset($list[$k]->infoOrder, $list[$k]->infoDetail);
         }
 
         return $list;
     }
 
+    
+    public function expressInfo() {
+        return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
+                        ->select(['id', 'history']);
+    }
+    
     public function infoOrder() {
         return $this->hasOne('App\Models\MallOrder', 'id', 'order_id')
                         ->select(['id', 'ordernum']);
