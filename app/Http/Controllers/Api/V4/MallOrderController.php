@@ -1473,8 +1473,6 @@ class MallOrderController extends Controller
       @apiParam {string} id 订单id
       @apiParam {string=stop,del,receipt} flag 标记
      */
-
-
     public function statusChange(Request $request)
     {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
@@ -1657,5 +1655,4 @@ class MallOrderController extends Controller
         return $this->success(json_decode($res));
     }
 
-    //todo 物流跟踪
 }

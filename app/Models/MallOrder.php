@@ -10,7 +10,6 @@ class MallOrder extends Base {
     protected $table = 'nlsg_mall_order';
 
     //检擦用户在规定时间内参加过秒杀活动
-
     public function getUserSecKillOrderNew($params) {
         if (empty($params['user_id'])) {
             return [];
@@ -752,7 +751,6 @@ class MallOrder extends Base {
             default :
                 return ['code' => false, 'msg' => '支付方式错误'];
         }
-
 
         $order_obj = self::where('ordernum', '=', $out_trade_no)
                 ->where('status', '=', 1)
