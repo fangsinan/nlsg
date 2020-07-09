@@ -63,7 +63,7 @@ class ShoppingCartController extends Controller {
      * @apiGroup  shopping_cart
      * @apiSampleRequest /api/V4/shopping_cart/get_list
      * @apiDescription 购物车列表
-     * @apiSuccess {string[]} id list列表  invalid_list失效商品(失效商品返回值可能不全)
+     * @apiSuccess {string[]} id list列表  invalid_list失效商品
      * @apiSuccess {string} id 购物车id
      * @apiSuccess {string} goods_id
      * @apiSuccess {string} sku_number
