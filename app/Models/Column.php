@@ -74,6 +74,9 @@ class Column extends Base
             ->take(2)
             ->get()
             ->toArray();
+        foreach ($lists as &$v){
+            $v['is_new'] =1;
+        }
         return $lists;
     }
 

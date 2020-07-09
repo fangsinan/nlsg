@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Lists;
 use App\Models\Works;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Models\Wiki;
-use App\Models\Lists;
 
 class Recommend extends Base
 {
@@ -36,7 +36,7 @@ class Recommend extends Base
                 break;
             case 4:
                 $model = new Lists();
-                $result = $model->getIndexListenBook($ids);
+                $result = $model->getIndexListWorks($ids, 3);
                 break;
             case 5:
                 $model  = new Wiki();
@@ -54,6 +54,14 @@ class Recommend extends Base
                 //听书
                 $model = new Works();
                 $result = $model->getIndexWorks($ids, 1);
+                break;
+            case 10:
+                $model = new Lists();
+                $result = $model->getIndexListWorks($ids, 1);
+                break;
+            case 11:
+                $model = new Lists();
+                $result = $model->getIndexListWorks($ids, 2);
                 break;
 
         }

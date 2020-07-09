@@ -246,7 +246,7 @@ class MallGoods extends Base {
      */
     public function getIndexGoods($ids) {
         $lists = MallGoods::query()
-                ->select('id', 'name', 'picture', 'original_price')
+                ->select('id', 'name', 'picture', 'original_price','price')
                 ->whereIn('id', $ids)
                 ->orderBy('created_at', 'desc')
                 ->take(10)

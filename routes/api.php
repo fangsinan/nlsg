@@ -26,6 +26,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('index/wiki', 'IndexController@wiki');
     Route::get('index/book', 'IndexController@book');
     Route::get('index/goods', 'IndexController@goods');
+    Route::get('index/course', 'IndexController@course');
+    Route::get('index/rank', 'IndexController@rank');
 
     //专栏
     Route::get('column/get_column_list', 'ColumnController@getColumnList');
@@ -76,6 +78,17 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('order/get_coupon', 'OrderController@getCoupon');
     //生成海报
     Route::get('create/create_poster', 'CreatePosterController@CreatePoster');
+
+    //钱包
+    Route::get('income/index', 'IncomeController@index');
+    Route::get('income/profit', 'IncomeController@profit');
+    Route::get('income/cash_data', 'IncomeController@cashData');
+    Route::get('income/present', 'IncomeController@present');
+    Route::get('income/withdrawals', 'IncomeController@withdrawals');
+    Route::get('income/get_list', 'IncomeController@getList');
+    Route::get('income/detail', 'IncomeController@Detail');
+    Route::get('income/get_deposit', 'IncomeController@getOrderDepositHistory');
+    Route::get('income/send_invoice', 'IncomeController@sendInvoice');
 
 
     //*******************************商城部分开始*******************************
@@ -143,7 +156,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');
     Route::put('after_sales/status_change', 'AfterSalesController@statusChange');
     Route::get('after_sales/refund_post', 'AfterSalesController@refundPost');
-    
+
     //物流查询
     Route::get('post/get_info', 'ExpressController@getPostInfo');
     Route::get('post/company_list', 'ExpressController@companyList');

@@ -17,7 +17,7 @@ class Banner extends Base {
     public function getIndexBanner() {
         $lists = $this->select('id', 'pic', 'title', 'url')
                 ->where('status', 1)
-                ->orderBy('sort', 'desc')
+                ->orderBy('rank', 'desc')
                 ->take(5)
                 ->get()
                 ->toArray();

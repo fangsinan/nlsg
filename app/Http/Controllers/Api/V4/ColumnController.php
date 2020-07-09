@@ -470,7 +470,7 @@ class ColumnController extends Controller
      * @api {post} api/v4/column/get_lecture_study_list  在学列表
      * @apiName get_lecture_study_list
      * @apiVersion 1.0.0
-     * @apiGroup column
+     * @apiGroup Column
      *
      * @apiParam {int} lecture_id 讲座id
      * @apiParam {int} user_id 用户id

@@ -8,6 +8,23 @@ class Wiki extends Model
 {
     protected $table = 'nlsg_wiki';
 
+    /**
+     * 首页百科推荐
+     * @param $ids
+     * @return bool
+     */
+    public function  getIndexWiki($ids)
+    {
+        if (!$ids){
+            return false;
+        }
+        $lists= Wiki::select('id','name','content','cover','view_num','like_num', 'comment_num')
+            ->whereIn('id',$ids)
+            ->orderBy('created_at','desc')
+            ->get()
+            ->toArray();
+        return $lists;
+    }
 
     public function category()
     {

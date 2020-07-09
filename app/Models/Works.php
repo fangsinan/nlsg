@@ -56,13 +56,17 @@ class Works extends Base
 
         $lists= Works::select('id','user_id','title','cover_img','subtitle','price')
             ->with(['user'=>function($query){
-                $query->select('id','phone','nickname');
+                $query->select('id','nickname');
             }])
             ->whereIn('id',$ids)
             ->where('is_audio_book',$is_audio_book)
             ->orderBy('created_at','desc')
             ->get()
             ->toArray();
+        foreach ($lists as &$v) {
+            $v['is_new'] = 1;
+            $v['is_free']= 1;
+        }
         return $lists;
 
     }
