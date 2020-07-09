@@ -58,36 +58,56 @@ class ExpressCompany extends Base {
     }
 
     public function toQuery($number, $type) {
+        $appcode = "635e0f54d03e443989140f0163260408";
+        $headers = [
+            "Authorization:APPCODE " . $appcode,
+            "Content-Type" . ":" . "application/json; charset=UTF-8"
+        ];
 
-        $host = "http://jisukdcx.market.alicloudapi.com";
+        $host = "https://jisukdcx.market.alicloudapi.com";
+        $path = "/express/query";
+        $querys = "number=YT4538526006366&type=YTO";
+        $url = $host . $path . "?" . $querys;
+
+
+        $response = Http::withHeaders($headers)->get($url);
+
+        dd($response);
+
+
+
+
+
+
+
+
+
+
+        $host = "https://jisukdcx.market.alicloudapi.com";
         $path = "/express/query";
         $method = "GET";
-        $appcode = "cc703c76da5b4b15bb6fc4aa0c0febf9";
+        $appcode = "635e0f54d03e443989140f0163260408";
         $headers = array();
         array_push($headers, "Authorization:APPCODE " . $appcode);
-        $querys = 'number=' . $number . '&type=' . $type;
-        $bodys = "";
+        //根据API的要求，定义相对应的Content-Type
+        array_push($headers, "Content-Type" . ":" . "application/json; charset=UTF-8");
+        $querys = "number=YT4538526006366&type=YTO";
+        $bodys = "null";
         $url = $host . $path . "?" . $querys;
+
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_FAILONERROR, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_HEADER, true);
         if (1 == strpos("$" . $host, "https://")) {
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         }
-
-        $result = curl_exec($curl);
-        $jsonarr = json_decode($result, true);
-
-        dd([$curl,$number,$type,$querys,$jsonarr,__LINE__]);
-
-        $result = $jsonarr['result'];
-        $result = empty($result) ? [] : $result;
-        return $result;
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $bodys);
+        var_dump(curl_exec($curl));
     }
 
 }
