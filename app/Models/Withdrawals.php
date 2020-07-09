@@ -122,7 +122,7 @@ class Withdrawals extends Base
         if(in_array($user_id, $Test_User)){
             $amount=0.01;   // 元单位
         }
-        $amount=0.01;   // 元单位
+        $amount=1;   // 元单位
         if($channel == 'WeChat'){
             //微信提现
 /*            $config = Config('wechat.payment.default');
@@ -136,7 +136,6 @@ class Withdrawals extends Base
                 'desc' => $orderid, // 企业付款操作说明信息。必填
             ]);*/
     //成功后返回参数
-            dump($orderid);
             $result=[
               "return_code" => "SUCCESS",
               "return_msg" => null,
@@ -155,22 +154,42 @@ class Withdrawals extends Base
                 'out_biz_no' => $orderid,
                 'trans_amount' => $amount,  // 企业付款金额，单位为元
                 'product_code' => 'TRANS_ACCOUNT_NO_PWD',
+                'biz_scene' => 'DIRECT_TRANSFER',
                 'payee_info' => [
                     'identity' => $zh_account,
                     'identity_type' => 'ALIPAY_LOGON_ID',
-
+                    'name' => '房思楠',
                 ],
             ];
             $config = Config('pay.alipay');
             $result = Pay::alipay($config)->transfer($order);
 
+//  成功返回参数
+//[
+//    "code" => "10000",
+//    "msg" => "Success",
+//    "order_id" => "20200709110070000006310011153064",
+//    "out_biz_no" => "20200709104916",
+//    "pay_fund_order_id" => "20200709110070001506310012874792",
+//    "status" => "SUCCESS",
+//    "trans_date" => "2020-07-09 10:49:17",
+//];
+$result['return_msg'] = $result['sub_msg'] ??'';
+
         }
+        dump($result);
         if ( ($channel == 'WeChat' && strtolower($result['result_code']) == 'success') ||
             ($channel == 'ali' && strtolower($result['msg']) == 'success')) {
             DB::beginTransaction();
             try{
+               if($channel == 'WeChat') {
+                   $payment_no = $result['payment_no'];
+               }else{
+                   $payment_no = $result['order_id'];
+               }
+
                 $map=[
-                    'transaction_id'=>$result['payment_no'], //交易单号 支付宝或微信交易号
+                    'transaction_id' => $payment_no, //交易单号 支付宝或微信交易号
                     'product_id'=>$truename.':'.$zh_account, //如果是重试的去掉重试标志
                     'status'=>2 //更改正常状态
                 ];
@@ -186,7 +205,7 @@ class Withdrawals extends Base
                 }
                 if($payRst && $OrderRst && $CashRst){
                     DB::commit();
-                    return ['status'=>200, 'msg'=>'提现成功', 'result'=>['ali_order_id'=>$result['payment_no']]];
+                    return ['status'=>200, 'msg'=>'提现成功', 'result'=>['ali_order_id'=>$payment_no]];
                 }else{
                     DB::rollBack();
                     return ['status'=>0, 'msg'=>'提现失败',];

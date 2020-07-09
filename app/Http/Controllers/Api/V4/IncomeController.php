@@ -18,7 +18,6 @@ use App\Models\Works;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redis;
 
 class IncomeController extends Controller
 {
@@ -562,6 +561,7 @@ class IncomeController extends Controller
 
     //处理标记
     public function RedisFlag($user_id,$type){
+
         $filename='swoole_income_pay'.$user_id;
         if($type==1){
             return Cache::store('redis')->get($filename);
@@ -576,10 +576,8 @@ class IncomeController extends Controller
 
 
 
-
-
     /**
-     * @api {post} /api/v4/income/get_list  收支明细
+     * @api {post} /api/v4/income/get_list  收支明细[默认显示支出的  不可同时显示支出和收入]
      * @apiName get_list
      * @apiVersion 1.0.0
      * @apiGroup income
@@ -603,17 +601,17 @@ class IncomeController extends Controller
     "data": [
     {
     "id": 1,
-    "ordernum": "202005231631148119",
+    "ordernum": "202005231631148119",  所属订单号
     "created_at": "2020-06-03 14:12:34",
-    "type": 2,
+    "type": 2,          同请求参数
     "user_id": 211172,
-    "price": "110.00",
+    "price": "110.00",    金额
     "order_detail_id": 0,
     "subsidy_type": 0,
-    "earn_type": 2,
-    "pay_content": "到账成功",
-    "content": "分享收益",
-    "name": "王琨专栏"
+    "earn_type": 2,             //1支出 2收入
+    "pay_content": "到账成功",   状态描述
+    "content": "分享收益",      类型描述
+    "name": "王琨专栏"          支出|收益 主体
     }
     ],
     "first_page_url": "http://nlsgv4.com/api/v4/income/get_list?page=1",
@@ -835,11 +833,34 @@ class IncomeController extends Controller
 
 
 
-    //充值记录
+    //
+    /**
+     * @api {post} /api/v4/income/detail  充值记录
+     * @apiName detail
+     * @apiVersion 1.0.0
+     * @apiGroup income
+     *
+     * @apiParam {int} user_id
+     * @apiParam {int} id
+     * @apiParam {int} earn_type  1支出 2收入
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+        {
+        "price": "10.00",
+        "created_at": "2020-07-09 10:49:16"
+        }
+    ]
+    }
+     */
     public function getOrderDepositHistory(Request $request){
         $user_id = $request->input('user_id', 0);
 
-        $lists = Order::selecty('price', 'created_at')->where([
+        $lists = Order::select('price', 'created_at')->where([
             'user_id'   => $user_id,
             'type'      => 13,
             'pay_type'  => 4,
