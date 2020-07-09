@@ -217,8 +217,9 @@ class IndexController extends Controller
      * @apiSuccess {string} cover 封面
      * @apiSuccess {number}  num  数量
      * @apiSuccess {string} works 听书作品
-     * @apiSuccess {string}   works.title  作品标题
-     * @apiSuccess {string}   works.cover_img  作品封面
+     * @apiSuccess {string} works.works_id 作品id
+     * @apiSuccess {string} works.title  作品标题
+     * @apiSuccess {string} works.cover_img  作品封面
      * @apiSuccess {string} user  作品用户
      * @apiSuccess {string} user  作品用户
      * @apiSuccess {string} user.id  用户id
@@ -239,6 +240,7 @@ class IndexController extends Controller
                     "num"  :  5,
                     "works": [
                         {
+     *                      "works_id": 18,
                             "user_id": 168934,
                             "title": "不要羞辱你的孩子 他的心很脆弱",
                             "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
@@ -362,9 +364,142 @@ class IndexController extends Controller
         return $this->success($lists);
     }
 
-
+   /**
+     * @api {get} api/v4/index/course  首页-课程集合
+     * @apiVersion 4.0.0
+     * @apiName  course
+     * @apiGroup Index
+     *
+     * @apiSuccess {string} title 标题
+     * @apiSuccess {string} subtitle 副标题
+     * @apiSuccess {string} cover 封面
+     * @apiSuccess {number}  num  数量
+     * @apiSuccess {string}  works 听书作品
+     * @apiSuccess {string}  works.works_id  作品id
+     * @apiSuccess {string}  works.title  作品标题
+     * @apiSuccess {string}  works.cover_img  作品封面
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+                 {
+                    "id": 1,
+                    "title": "世界名著必读，历经岁月经典依旧陪伴成长",
+                    "subtitle": "强烈推荐",
+                    "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
+                    "num"  :  5,
+                    "works": [
+                        {
+                            "user_id": 168934,
+                            "title": "不要羞辱你的孩子 他的心很脆弱",
+                            "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+                            "pivot": {
+                                "lists_id": 1,
+                                "works_id": 30
+                            },
+                            "user": {
+                                "id": 168934,
+                                "nickname": "chandler",
+                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                            }
+                        },
+                        {
+                            "user_id": 168934,
+                            "title": "小孩子做噩梦怎么办？九成父母都没当回事",
+                            "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
+                            "pivot": {
+                                "lists_id": 1,
+                                "works_id": 31
+                            },
+                            "user": {
+                                "id": 168934,
+                                "nickname": "chandler",
+                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                            }
+                        }
+                    ]
+                 }
+     *         ]
+     *     }
+     *
+     */
     public function  course()
     {
+        $recommendModel = new Recommend();
+        $lists = $recommendModel->getIndexRecommend(10, 1);
+        return $this->success($lists);
+    }
 
+   /**
+     * @api {get} api/v4/index/rank  首页-热门榜单
+     * @apiVersion 4.0.0
+     * @apiName  rank
+     * @apiGroup Index
+     *
+     * @apiSuccess {string} title 标题
+     * @apiSuccess {string} subtitle 副标题
+     * @apiSuccess {string} cover 封面
+     * @apiSuccess {number}  num  数量
+     * @apiSuccess {string}  works 听书作品
+     * @apiSuccess {string}  works.works_id 作品id
+     * @apiSuccess {string}  works.title  作品标题
+     * @apiSuccess {string}  works.cover_img  作品封面
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+                 {
+                    "id": 1,
+                    "title": "世界名著必读，历经岁月经典依旧陪伴成长",
+                    "subtitle": "强烈推荐",
+                    "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
+                    "num"  :  5,
+                    "works": [
+                        {
+    *                       "works_id": 18,
+                            "user_id": 168934,
+                            "title": "不要羞辱你的孩子 他的心很脆弱",
+                            "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+                            "pivot": {
+                                "lists_id": 1,
+                                "works_id": 30
+                            },
+                            "user": {
+                                "id": 168934,
+                                "nickname": "chandler",
+                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                            }
+                        },
+                        {
+                            "user_id": 168934,
+                            "title": "小孩子做噩梦怎么办？九成父母都没当回事",
+                            "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
+                            "pivot": {
+                                "lists_id": 1,
+                                "works_id": 31
+                            },
+                            "user": {
+                                "id": 168934,
+                                "nickname": "chandler",
+                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                            }
+                        }
+                    ]
+                 }
+     *         ]
+     *     }
+     *
+     */
+    public function rank()
+    {
+        $recommendModel = new Recommend();
+        $lists = $recommendModel->getIndexRecommend(11, 1);
+        return $this->success($lists);
     }
 }

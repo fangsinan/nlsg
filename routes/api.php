@@ -26,6 +26,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('index/wiki', 'IndexController@wiki');
     Route::get('index/book', 'IndexController@book');
     Route::get('index/goods', 'IndexController@goods');
+    Route::get('index/course', 'IndexController@course');
+    Route::get('index/rank', 'IndexController@rank');
 
     //专栏
     Route::get('column/get_column_list', 'ColumnController@getColumnList');
@@ -153,7 +155,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');
     Route::put('after_sales/status_change', 'AfterSalesController@statusChange');
     Route::get('after_sales/refund_post', 'AfterSalesController@refundPost');
-    
+
     //物流查询
     Route::get('post/get_info', 'ExpressController@getPostInfo');
     //*******************************商城部分结束*******************************

@@ -13,7 +13,7 @@ class Lists extends Model
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexListenBook($ids)
+    public function getIndexListWorks($ids, $type=1)
     {
         if (!$ids){
             return false;
@@ -21,10 +21,11 @@ class Lists extends Model
 
         $lists  = Lists::select('id','title', 'subtitle','cover','num')
         ->with(['works'=> function($query){
-            $query->select('user_id','title', 'cover_img');
+            $query->select('works_id','user_id','title', 'cover_img');
         }, 'works.user'=>function($query){
             $query->select('id','nickname','headimg');
         }])->whereIn('id',$ids)
+            ->where('type', $type)
             ->get()
             ->toArray();
         return $lists;
