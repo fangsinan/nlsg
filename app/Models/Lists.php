@@ -19,7 +19,7 @@ class Lists extends Model
             return false;
         }
 
-        $lists  = Lists::select('id','title', 'subtitle','cover')
+        $lists  = Lists::select('id','title', 'subtitle','cover','num')
         ->with(['works'=> function($query){
             $query->select('user_id','title', 'cover_img');
         }, 'works.user'=>function($query){

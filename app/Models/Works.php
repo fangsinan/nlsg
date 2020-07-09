@@ -56,7 +56,7 @@ class Works extends Base
 
         $lists= Works::select('id','user_id','title','cover_img','subtitle','price')
             ->with(['user'=>function($query){
-                $query->select('id','phone','nickname');
+                $query->select('id','nickname');
             }])
             ->whereIn('id',$ids)
             ->where('is_audio_book',$is_audio_book)
