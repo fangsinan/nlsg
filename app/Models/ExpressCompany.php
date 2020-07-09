@@ -83,7 +83,7 @@ class ExpressCompany extends Base {
         $result = curl_exec($curl);
         $jsonarr = json_decode($result, true);
 
-        dd([$curl,$number,$type,$querys,$jsonarr]);
+        dd([$curl,$number,$type,$querys,$jsonarr,__LINE__]);
 
         $result = $jsonarr['result'];
         $result = empty($result) ? [] : $result;
