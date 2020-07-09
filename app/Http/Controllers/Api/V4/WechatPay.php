@@ -48,11 +48,11 @@ class WechatPay extends Controller {
         } elseif ($data['attach'] == 14) { // 线下产品门票
             return self::PayOfflineProducts($data);
         } elseif ($data['attach'] == 8) { //电商
-            return self::MallOrder($data);
+            return self::mallOrder($data);
         }
     }
 
-    public static function MallOrder($data) {
+    public static function mallOrder($data) {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $ordernum = substr($data['out_trade_no'], 0, -5);
@@ -91,7 +91,6 @@ class WechatPay extends Controller {
             DB::rollBack();
             return ['code' => false, 'msg' => '修改支付记录错误'];
         }
-
 
         //如果是拼团订单  需要查看拼团订单是否成功
         if ($order_obj->order_type == 3) {
