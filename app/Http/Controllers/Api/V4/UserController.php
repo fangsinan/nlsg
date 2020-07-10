@@ -20,7 +20,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-//        $this->user = auth('api')->user();
+        $this->user = auth('api')->user();
     }
 
     /**

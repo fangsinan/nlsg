@@ -6,6 +6,7 @@ use App\Models\Announce;
 use App\Models\Banner;
 use App\Models\Live;
 use App\Models\Recommend;
+use App\Models\Works;
 
 class IndexController extends Controller
 {
@@ -501,5 +502,13 @@ class IndexController extends Controller
         $recommendModel = new Recommend();
         $lists = $recommendModel->getIndexRecommend(11, 1);
         return $this->success($lists);
+    }
+
+
+    public  function recommend()
+    {
+        $works = new Works();
+        $lists = $works->getRecommendWorks(34);
+        return success($lists);
     }
 }

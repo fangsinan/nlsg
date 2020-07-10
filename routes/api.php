@@ -28,6 +28,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('index/goods', 'IndexController@goods');
     Route::get('index/course', 'IndexController@course');
     Route::get('index/rank', 'IndexController@rank');
+    Route::get('index/recommend', 'IndexController@recommend');
 
     //专栏
     Route::get('column/get_column_list', 'ColumnController@getColumnList');
@@ -46,6 +47,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('works/get_works_category', 'WorksController@getWorksCategoryTeacher');
     Route::get('works/get_works_content', 'WorksController@getWorksContent');
     Route::get('works/get_works_index', 'WorksController@getWorksIndex');
+    Route::post('works/subscribe', 'WorksController@subscribe');
 
     //听书
     Route::get('book/get_book_list', 'ListenBookController@getBookList');
