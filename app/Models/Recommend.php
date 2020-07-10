@@ -67,4 +67,19 @@ class Recommend extends Base
         }
         return $result;
     }
+
+    /**
+     * 首页的每日琨说
+     * @param $id
+     * @return bool
+     */
+    public  function  getRecommendWorks($id)
+    {
+        if (!$id){
+            return false;
+        }
+
+
+
+    }
 }

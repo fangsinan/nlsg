@@ -415,5 +415,51 @@ class WorksController extends Controller
         return $this->success();
     }
 
+    /**
+     * @api {post} api/v4/works/subscribe  订阅
+     * @apiVersion 4.0.0
+     * @apiName  评论列表
+     * @apiGroup Works
+     *
+     * @apiParam {int} id  作品id
+     *
+     * @apiSuccess {string}
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function  subscribe(Request $request)
+    {
+        $user_id = 1;
+        $input = $request->all();
+        $list  = Subscribe::where('relation_id', $input['id'])
+                    ->where('type', 2)
+                    ->where('user_id', $user_id)
+                    ->first();
+        if ($list){
+            return error(1000, '已经订阅了');
+        }
+
+        $res = Subscribe::create([
+            'user_id'     => $user_id,
+            'relation_id' => $input['id'],
+            'type'    => 2,
+            'status'  => 1
+        ]);
+
+        if ($res){
+            return success('订阅成功');
+        }
+
+
+    }
+
 
 }

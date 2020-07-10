@@ -71,19 +71,6 @@ class Works extends Base
 
     }
 
-    public  function user()
-    {
-        return $this->belongsTo('App\Models\User');
-    }
-
-
-    public function lists()
-    {
-        return $this->belongsToMany('App\Models\Lists',
-            'nlsg_lists_work','works_id', 'lists_id');
-    }
-
-
     static function search($keywords,$is_audio_book){
         $worksObj = new Works();
         $infoObj = new WorksInfo();
@@ -100,6 +87,38 @@ class Works extends Base
 
         return ['res' => $res, 'count'=> $res->count() ];
 
+    }
+
+    /**
+     * 首页推荐的课程
+     * @param $id
+     * @return bool
+     */
+    public function  getRecommendWorks($id)
+    {
+        if (!$id){
+            return false;
+        }
+
+        $list = Works::with('WorkInfo')
+                ->select('title', 'subscribe_num')
+                ->where('id', $id)
+                ->where(['type'=>2, 'status'=>4])
+                ->get();
+        return $list;
+
+    }
+
+    public  function user()
+    {
+        return $this->belongsTo('App\Models\User');
+    }
+
+
+    public function lists()
+    {
+        return $this->belongsToMany('App\Models\Lists',
+            'nlsg_lists_work','works_id', 'lists_id');
     }
 
 }
