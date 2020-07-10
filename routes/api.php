@@ -82,7 +82,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     //钱包
     Route::get('income/index', 'IncomeController@index');
     Route::get('income/profit', 'IncomeController@profit');
-    Route::get('income/cash_data', 'IncomeController@cashData');
+    Route::post('income/cash_data', 'IncomeController@cashData');
     Route::get('income/present', 'IncomeController@present');
     Route::get('income/withdrawals', 'IncomeController@withdrawals');
     Route::get('income/get_list', 'IncomeController@getList');
