@@ -243,38 +243,31 @@ class MallController extends Controller {
       @apiSuccess {number} remarks 说明
       @apiSuccess {number} use_time_begin 有效期
       @apiSuccess {number} use_time_end 有效期
-      @apiSuccess {number} lock 0有效 1失效
+      @apiSuccess {number} can_use 1有效 0失效
      * 
      * 
      * @apiSuccessExample {json} Request-Example:
-      {
+     * {
       "code": 200,
       "msg": "成功",
       "data": [
       {
-      "id": 12,
-      "name": "双十二优惠券",
+      "id": 34,
+      "name": "车速",
       "infinite": 0,
-      "stock": 9,
-      "used_stock": 0,
-      "price": "15.00",
+      "stock": 10,
+      "price": "8.00",
       "restrict": 1,
-      "full_cut": "50.00",
-      "get_begin_time": "2020-05-01 15:10:33",
-      "get_end_time": "2020-11-12 15:10:45",
-      "past": "10",
+      "full_cut": "0.00",
+      "get_begin_time": 0,
+      "get_end_time": 0,
+      "past": "2",
       "use_type": 3,
-      "remarks": "限时秒杀及特价特惠商品除外",
-      "use_time_begin": null,
-      "use_time_end": null,
-      "created_at": "2020-06-12 11:44:34",
-      "updated_at": "2020-06-12 11:44:36",
-      "hold_max_num": 0,
-      "goods_list": {
-      "can_use": [],
-      "cant_use": []
-      },
-      "lock": 0
+      "remarks": "10",
+      "use_time_begin": 0,
+      "use_time_end": 0,
+      "have_sub": 2,
+      "can_use": 1
       }
       ]
       }
@@ -284,7 +277,7 @@ class MallController extends Controller {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 4;
-        $data = $model->getList($params, $this->user['id']);
+        $data = $model->getList($params,$this->user['id']);
         return $this->success($data);
     }
 

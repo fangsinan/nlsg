@@ -24,7 +24,7 @@ class CouponRule extends Base {
 
         //过滤掉已经结束的
         foreach ($res as $k => $v) {
-            $v->lock = 0;
+            $v->can_use = 1;
             if ($v->get_end_time <= $now_date) {
                 unset($res[$k]);
             }
@@ -117,21 +117,21 @@ class CouponRule extends Base {
                     case 1:
                         foreach ($get_list as $glv) {
                             if ($v->id == $glv['cr_id']) {
-                                $v->lock = 1;
+                                $v->can_use = 0;
                             }
                         }
                         break;
                     case 2:
                         foreach ($get_list as $glv) {
                             if ($v->id == $glv['cr_id'] && $glv['created_at'] >= date('Y-m-d')) {
-                                $v->lock = 1;
+                                $v->can_use = 0;
                             }
                         }
                         break;
                     case 3:
                         foreach ($get_list as $glv) {
                             if ($v->id == $glv['cr_id'] && $v->hold_max_num >= $glv['counts']) {
-                                $v->lock = 1;
+                                $v->can_use = 0;
                             }
                         }
                         break;
