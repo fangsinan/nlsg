@@ -423,8 +423,6 @@ class WorksController extends Controller
      *
      * @apiParam {int} id  作品id
      *
-     * @apiSuccess {string}
-     *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {

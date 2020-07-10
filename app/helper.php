@@ -5,10 +5,10 @@
      * @param  array  $data
      * @return \Illuminate\Http\JsonResponse
      */
-    function success($msg='成功',$data =[]) {
+    function success($data =[]) {
         $result = [
             'code' => 200,
-            'msg'  => $msg,
+            'msg'  => '成功',
             'data' => $data
         ];
         return  response()->json($result);

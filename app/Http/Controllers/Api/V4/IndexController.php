@@ -505,35 +505,56 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/banner  首页轮播图
+     * @api {get} api/v4/index/recommend  首页-每日琨说
      * @apiVersion 4.0.0
-     * @apiName  banner
+     * @apiName  recommend
      * @apiGroup Index
      *
-     * @apiSuccess {string}
+     * @apiSuccess {number} subscribe_num 订阅数量
+     * @apiSuccess {string} title 课程标题
+     * @apiSuccess {string[]} work_info 章节
+     * @apiSuccess {number} work_info.duration 时长
+     * @apiSuccess {string} work_info.title   章节标题
+     * @apiSuccess {number} work_info.view_num 学习人数
+     * @apiSuccess {number} work_info.is_new  是否更新
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-     *       "data":[
-     *               {
-     *                   "id": 274,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
-     *                   "title": "电商弹窗课程日历套装",
-     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
-     *               },
-     *               {
-     *                   "id": 296,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
-     *                   "title": "心里学",
-     *                   "url": "/mall/shop-details?goods_id=479"
-     *               }
-     *         ]
+     *       "data":{
+                "id": 34,
+                "subscribe_num": 34234,
+                "title": "每日琨说",
+                "work_info": [
+                    {
+                        "duration": "06:14",
+                        "id": 15,
+                        "is_new": 1,
+                        "online_time": "2020-08-10 08:10:00",
+                        "pid": 34,
+                        "rank": 7,
+                        "title": "006 | 父母和孩子为什么有沟通障碍？",
+                        "view_num": 27426
+                    },
+                    {
+                        "duration": "10:29",
+                        "id": 14,
+                        "is_new": 0,
+                        "online_time": "2020-05-10 08:10:00",
+                        "pid": 34,
+                        "rank": 6,
+                        "title": "005 | 六个字就可以让家族富过三代？",
+                        "view_num": 30097
+                    }
+                ]
+
+     *
      *     }
      *
      */
+
     public  function recommend()
     {
         $works = new Works();
