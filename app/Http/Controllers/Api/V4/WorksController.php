@@ -26,7 +26,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} /api/v4/works/get_works_index  课程首页
+     * @api {get} /api/v4/works/get_works_index  课程首页
      * @apiName get_works_index
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -156,7 +156,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} /api/v4/works/get_works_category  课程首页分类 名师
+     * @api {get} /api/v4/works/get_works_category  课程首页分类 名师
      * @apiName get_works_category
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -206,7 +206,7 @@ class WorksController extends Controller
 
         //精品名师
         $Teacher = Works::select('user_id')->with([
-            'UserName'=>function($query){
+            'userName'=>function($query){
                 $query->select('id','nickname');
             }])->where('status',4)
             ->orderBy('subscribe_num','desc')->groupBy('user_id')
@@ -223,7 +223,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} api/v4/works/get_works_detail   课程详情
+     * @api {get} api/v4/works/get_works_detail   课程详情
      * @apiName get_works_detail
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -293,7 +293,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} api/v4/works/get_works_content  获取文稿
+     * @api {get} api/v4/works/get_works_content  获取文稿
      * @apiName get_works_content
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -326,7 +326,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} api/v4/works/show  点播时 记录首次历史记录 阅读数自增
+     * @api {get} api/v4/works/show  点播时 记录首次历史记录 阅读数自增
      * @apiName show
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -368,7 +368,7 @@ class WorksController extends Controller
     }
 
     /**
-     * @api {post} api/v4/works/edit_history_time  更新学习进度 时长及百分比
+     * @api {get} api/v4/works/edit_history_time  更新学习进度 时长及百分比
      * @apiName edit_history_time
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -413,6 +413,50 @@ class WorksController extends Controller
             'time_number'=>$time_number,
             ]);
         return $this->success();
+    }
+
+    /**
+     * @api {post} api/v4/works/subscribe  订阅
+     * @apiVersion 4.0.0
+     * @apiName  评论列表
+     * @apiGroup Works
+     *
+     * @apiParam {int} id  作品id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function  subscribe(Request $request)
+    {
+        $user_id = 1;
+        $input = $request->all();
+        $list  = Subscribe::where('relation_id', $input['id'])
+                    ->where('type', 2)
+                    ->where('user_id', $user_id)
+                    ->first();
+        if ($list){
+            return error(1000, '已经订阅了');
+        }
+
+        $res = Subscribe::create([
+            'user_id'     => $user_id,
+            'relation_id' => $input['id'],
+            'type'    => 2,
+            'status'  => 1
+        ]);
+
+        if ($res){
+            return success('订阅成功');
+        }
+
+
     }
 
 

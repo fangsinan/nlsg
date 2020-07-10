@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 class ListenBookController extends Controller
 {
     /**
-     * @api {post} /api/v4/book/get_listen_detail  听书-听书首页
+     * @api {get} /api/v4/book/get_listen_detail  听书-听书首页
      * @apiName get_listen_detail
      * @apiVersion 1.0.0
      * @apiGroup book
@@ -67,7 +67,7 @@ class ListenBookController extends Controller
 
 
     /**
-     * @api {post} /api/v4/book/get_listen_detail  听书-听书详情
+     * @api {get} /api/v4/book/get_listen_detail  听书-听书详情
      * @apiName get_listen_detail
      * @apiVersion 1.0.0
      * @apiGroup book
@@ -115,7 +115,7 @@ class ListenBookController extends Controller
     }
 
     /**
-     * @api {post} /api/v4/book/get_book_list 听书-精选书单
+     * @api {get} /api/v4/book/get_book_list 听书-精选书单
      * @apiName get_book_list
      * @apiVersion 1.0.0
      * @apiGroup book
@@ -146,7 +146,7 @@ class ListenBookController extends Controller
 
 
     /**
-     * @api {post} /api/v4/book/get_book_list_detail 听书-精选书单详情
+     * @api {get} /api/v4/book/get_book_list_detail 听书-精选书单详情
      * @apiName get_book_list_detail
      * @apiVersion 1.0.0
      * @apiGroup book
@@ -208,7 +208,7 @@ class ListenBookController extends Controller
     }
 
     /**
-     * @api {post} /api/v4/book/get_new_book_list 听书-新书速递
+     * @api {get} /api/v4/book/get_new_book_list 听书-新书速递
      * @apiName get_new_book_list
      * @apiVersion 1.0.0
      * @apiGroup book

@@ -9,7 +9,7 @@ class Collection extends Authenticatable
     protected $table = 'nlsg_collection';
     protected $fillable = ['type','user_id','column_id','works_id', 'worksinfo_id','goods_id','sku_number',];
 
-    //收藏
+    //收藏 操作
     //$type   1：专栏  2：课程 3 :商品
     static function CollectionData($user_id=0,$target_id=0,$type=0, $info_id=0){
 
@@ -27,4 +27,38 @@ class Collection extends Authenticatable
             return Collection::create($where);
         }
     }
+
+    static function getCollection($type,$ids){
+        switch ($type) {
+            case 1:   //专栏
+                $model = new Column();
+                $result = $model->getIndexColumn($ids);
+                break;
+            case 2: //课程
+                $model = new Works();
+                $result = $model->getIndexWorks($ids);
+                break;
+            case 3:
+                $model = new MallGoods();
+                $result  = $model->getIndexGoods($ids);
+                break;
+            case 4:   //书单
+                $model = new Lists();
+                $result = $model->getIndexListWorks($ids, 3);
+                break;
+            case 5:  //百科
+                $model  = new Wiki();
+                $result = $model->getIndexWiki($ids);
+                break;
+            case 6: //听书
+                //听书
+                $model = new Works();
+                $result = $model->getIndexWorks($ids, 1);
+                break;
+
+        }
+        return $result;
+    }
+
+
 }

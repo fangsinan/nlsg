@@ -22,7 +22,7 @@ class OrderController extends Controller
 {
 
     /**
-     * @api {post} /v4/order/get_coupon   获取我的优惠券
+     * @api {get} /v4/order/get_coupon   获取我的优惠券
      * @apiName get_coupon
      * @apiVersion 1.0.0
      * @apiGroup order
@@ -110,7 +110,7 @@ class OrderController extends Controller
     }
 
     /**
-     * @api {post} /v4/order/create_column_order  专栏下单
+     * @api {get} /v4/order/create_column_order  专栏下单
      * @apiName create_column_order
      * @apiVersion 1.0.0
      * @apiGroup order

@@ -14,21 +14,21 @@ class Works extends Base
     public $timestamps = false;
 
 
-    public function CategoryRelation()
+    public function categoryRelation()
     {
         //一对多
         return $this->hasMany('App\Models\WorksCategoryRelation','work_id', 'id');
     }
 
 
-    public function UserName()
+    public function userName()
     {
         //一对多
         return $this->belongsTo('App\Models\User','user_id');
     }
 
 
-    public function WorkInfo()
+    public function workInfo()
     {
         //一对多
         return $this->hasMany('App\Models\WorksInfo','pid');
@@ -71,19 +71,6 @@ class Works extends Base
 
     }
 
-    public  function user()
-    {
-        return $this->belongsTo('App\Models\User');
-    }
-
-
-    public function lists()
-    {
-        return $this->belongsToMany('App\Models\Lists',
-            'nlsg_lists_work','works_id', 'lists_id');
-    }
-
-
     static function search($keywords,$is_audio_book){
         $worksObj = new Works();
         $infoObj = new WorksInfo();
@@ -100,6 +87,54 @@ class Works extends Base
 
         return ['res' => $res, 'count'=> $res->count() ];
 
+    }
+
+    /**
+     * 首页推荐的课程
+     * @param $id
+     * @return bool
+     */
+    public function  getRecommendWorks($id)
+    {
+        if (!$id){
+            return false;
+        }
+
+        $list = Works::with(['workInfo'=> function ($query){
+                    $query->select('id', 'pid','rank', 'title','duration', 'view_num','online_time')
+                          ->orderBy('rank', 'desc')
+                          ->orderBy('id','desc')
+                          ->limit(2);
+                }])
+                ->select('id','title', 'subscribe_num')
+                ->where('id', $id)
+                ->where(['type'=>2, 'status'=>4])
+                ->first()
+                ->toArray();
+        if ($list['work_info']){
+            $now = date('Y-m-d', time());
+            foreach ($list['work_info'] as &$v) {
+                if ($v['online_time'] > $now ){
+                    $v['is_new']  = 1;
+                } else {
+                    $v['is_new']  = 0;
+                }
+            }
+        }
+        return $list ?: [];
+
+    }
+
+    public  function user()
+    {
+        return $this->belongsTo('App\Models\User');
+    }
+
+
+    public function lists()
+    {
+        return $this->belongsToMany('App\Models\Lists',
+            'nlsg_lists_work','works_id', 'lists_id');
     }
 
 }

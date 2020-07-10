@@ -25,7 +25,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_column_list 专栏-专栏|讲座首页列表
+     * @api {get} /api/v4/column/get_column_list 专栏-专栏|讲座首页列表
      * @apiName get_column_list
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -101,7 +101,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_column_works 专栏-专栏|讲座详情[课程列表(单\多课程列表)]
+     * @api {get} /api/v4/column/get_column_works 专栏-专栏|讲座详情[课程列表(单\多课程列表)]
      * @apiName get_column_works
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -220,7 +220,7 @@ class ColumnController extends Controller
 
     //
     /**
-     * @api {post} /api/v4/column/get_recommend 相关推荐[专栏|课程]
+     * @api {get} /api/v4/column/get_recommend 相关推荐[专栏|课程]
      * @apiName get_recommend
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -278,7 +278,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_column_detail 专栏-专栏|讲座详细信息
+     * @api {get} /api/v4/column/get_column_detail 专栏-专栏|讲座详细信息
      * @apiName get_column_detail
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -332,7 +332,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_lecture_list  讲座目录  针对讲座[讲座与课程一对一]
+     * @api {get} /api/v4/column/get_lecture_list  讲座目录  针对讲座[讲座与课程一对一]
      * @apiName get_column_detail
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -431,14 +431,15 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/collection  收藏[专栏、课程、商品]
+     * @api {get} /api/v4/column/collection  收藏[专栏、课程、商品]
      * @apiName collection
      * @apiVersion 1.0.0
      * @apiGroup Column
      *
-     * @apiParam {int} type  type 1：专栏  2：课程 3 :商品
+     * @apiParam {int} type  type 1专栏  2课程  3商品  4书单 5百科 6听书
      * @apiParam {int} target_id  对应id
      * @apiParam {int} user_id 用户id
+     * @apiParam {int} info_id 如果是课程 需要传当前章节
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -458,7 +459,7 @@ class ColumnController extends Controller
             return $this->error(0,'column_id 或者 user_id 不能为空');
         }
         //  type 1：专栏  2：课程 3 :商品
-        if( !in_array($type,[1,2,3]) ){
+        if( !in_array($type,[1,2,3,4,5,6]) ){
             return $this->error(0,'type类型错误');
         }
         $is_collection = Collection::CollectionData($user_id,$target_id,$type,$info_id);
@@ -467,7 +468,7 @@ class ColumnController extends Controller
     }
 
     /**
-     * @api {post} api/v4/column/get_lecture_study_list  在学列表
+     * @api {get} api/v4/column/get_lecture_study_list  在学列表
      * @apiName get_lecture_study_list
      * @apiVersion 1.0.0
      * @apiGroup Column
