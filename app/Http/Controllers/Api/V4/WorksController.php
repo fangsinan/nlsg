@@ -26,7 +26,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} /api/v4/works/get_works_index  课程首页
+     * @api {get} /api/v4/works/get_works_index  课程首页
      * @apiName get_works_index
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -156,7 +156,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} /api/v4/works/get_works_category  课程首页分类 名师
+     * @api {get} /api/v4/works/get_works_category  课程首页分类 名师
      * @apiName get_works_category
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -223,7 +223,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} api/v4/works/get_works_detail   课程详情
+     * @api {get} api/v4/works/get_works_detail   课程详情
      * @apiName get_works_detail
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -293,7 +293,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} api/v4/works/get_works_content  获取文稿
+     * @api {get} api/v4/works/get_works_content  获取文稿
      * @apiName get_works_content
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -326,7 +326,7 @@ class WorksController extends Controller
 
 
     /**
-     * @api {post} api/v4/works/show  点播时 记录首次历史记录 阅读数自增
+     * @api {get} api/v4/works/show  点播时 记录首次历史记录 阅读数自增
      * @apiName show
      * @apiVersion 1.0.0
      * @apiGroup works
@@ -368,7 +368,7 @@ class WorksController extends Controller
     }
 
     /**
-     * @api {post} api/v4/works/edit_history_time  更新学习进度 时长及百分比
+     * @api {get} api/v4/works/edit_history_time  更新学习进度 时长及百分比
      * @apiName edit_history_time
      * @apiVersion 1.0.0
      * @apiGroup works

@@ -24,7 +24,7 @@ class IncomeController extends Controller
 {
 
     /**
-     * @api {post} /api/v4/income/index  用户钱包首页信息
+     * @api {get} /api/v4/income/index  用户钱包首页信息
      * @apiName index
      * @apiVersion 1.0.0
      * @apiGroup income
@@ -112,7 +112,7 @@ class IncomeController extends Controller
 
 
     /**
-     * @api {post} /api/v4/income/profit  用户钱包首页 (统计数)
+     * @api {get} /api/v4/income/profit  用户钱包首页 (统计数)
      * @apiName profit
      * @apiVersion 1.0.0
      * @apiGroup income
@@ -349,7 +349,7 @@ class IncomeController extends Controller
 
 
     /**
-     * @api {post} /api/v4/income/present  绑定提现微信|支付宝账户
+     * @api {get} /api/v4/income/present  绑定提现微信|支付宝账户
      * @apiName present
      * @apiVersion 1.0.0
      * @apiGroup income
@@ -414,7 +414,7 @@ class IncomeController extends Controller
 
 
     /**
-     * @api {post} /api/v4/income/withdrawals  提现操作
+     * @api {get} /api/v4/income/withdrawals  提现操作
      * @apiName withdrawals
      * @apiVersion 1.0.0
      * @apiGroup income
@@ -578,7 +578,7 @@ class IncomeController extends Controller
 
 
     /**
-     * @api {post} /api/v4/income/get_list  收支明细[默认显示支出的  不可同时显示支出和收入]
+     * @api {get} /api/v4/income/get_list  收支明细[默认显示支出的  不可同时显示支出和收入]
      * @apiName get_list
      * @apiVersion 1.0.0
      * @apiGroup income
@@ -770,7 +770,7 @@ class IncomeController extends Controller
 
 
     /**
-     * @api {post} /api/v4/income/detail  收益详情
+     * @api {get} /api/v4/income/detail  收益详情
      * @apiName detail
      * @apiVersion 1.0.0
      * @apiGroup income
@@ -836,7 +836,7 @@ class IncomeController extends Controller
 
     //
     /**
-     * @api {post} /api/v4/income/detail  充值记录
+     * @api {get} /api/v4/income/detail  充值记录
      * @apiName detail
      * @apiVersion 1.0.0
      * @apiGroup income
@@ -875,7 +875,7 @@ class IncomeController extends Controller
 
 
     /**
-     * @api {post} /api/v4/income/send_invoice  邮寄发票
+     * @api {get} /api/v4/income/send_invoice  邮寄发票
      * @apiName send_invoice
      * @apiVersion 1.0.0
      * @apiGroup income

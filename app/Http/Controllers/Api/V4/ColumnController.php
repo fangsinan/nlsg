@@ -25,7 +25,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_column_list 专栏-专栏|讲座首页列表
+     * @api {get} /api/v4/column/get_column_list 专栏-专栏|讲座首页列表
      * @apiName get_column_list
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -101,7 +101,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_column_works 专栏-专栏|讲座详情[课程列表(单\多课程列表)]
+     * @api {get} /api/v4/column/get_column_works 专栏-专栏|讲座详情[课程列表(单\多课程列表)]
      * @apiName get_column_works
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -220,7 +220,7 @@ class ColumnController extends Controller
 
     //
     /**
-     * @api {post} /api/v4/column/get_recommend 相关推荐[专栏|课程]
+     * @api {get} /api/v4/column/get_recommend 相关推荐[专栏|课程]
      * @apiName get_recommend
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -278,7 +278,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_column_detail 专栏-专栏|讲座详细信息
+     * @api {get} /api/v4/column/get_column_detail 专栏-专栏|讲座详细信息
      * @apiName get_column_detail
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -332,7 +332,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/get_lecture_list  讲座目录  针对讲座[讲座与课程一对一]
+     * @api {get} /api/v4/column/get_lecture_list  讲座目录  针对讲座[讲座与课程一对一]
      * @apiName get_column_detail
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -431,7 +431,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {post} /api/v4/column/collection  收藏[专栏、课程、商品]
+     * @api {get} /api/v4/column/collection  收藏[专栏、课程、商品]
      * @apiName collection
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -467,7 +467,7 @@ class ColumnController extends Controller
     }
 
     /**
-     * @api {post} api/v4/column/get_lecture_study_list  在学列表
+     * @api {get} api/v4/column/get_lecture_study_list  在学列表
      * @apiName get_lecture_study_list
      * @apiVersion 1.0.0
      * @apiGroup Column

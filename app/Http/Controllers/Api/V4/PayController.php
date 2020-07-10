@@ -17,7 +17,7 @@ use Yansongda\Pay\Pay;
 class PayController extends Controller {
 
     /**
-     * @api {post} api/v4/pay/wechat_pay   微信支付-统一下单
+     * @api {get} api/v4/pay/wechat_pay   微信支付-统一下单
      * @apiName wechat_pay
      * @apiVersion 1.0.0
      * @apiGroup pay
@@ -122,7 +122,7 @@ class PayController extends Controller {
     }
 
     /**
-     * @api {post} api/v4/pay/ali_pay   支付宝支付-预下单
+     * @api {get} api/v4/pay/ali_pay   支付宝支付-预下单
      * @apiName ali_pay
      * @apiVersion 1.0.0
      * @apiGroup pay
@@ -164,7 +164,7 @@ class PayController extends Controller {
     }
 
     /**
-     * @api {post} api/v4/pay/order_find   下单查询接口
+     * @api {get} api/v4/pay/order_find   下单查询接口
      * @apiName order_find
      * @apiVersion 1.0.0
      * @apiGroup pay
@@ -208,7 +208,7 @@ class PayController extends Controller {
     }
 
     /**
-     * @api {post} api/v4/pay/apple_pay   苹果支付验证接口 [ 苹果端 能量币充值 ]
+     * @api {get} api/v4/pay/apple_pay   苹果支付验证接口 [ 苹果端 能量币充值 ]
      * @apiName apple_pay
      * @apiVersion 1.0.0
      * @apiGroup pay
@@ -299,7 +299,7 @@ class PayController extends Controller {
     }
 
     /**
-     * @api {post} api/v4/pay/pay_coin   能量币支付回调
+     * @api {get} api/v4/pay/pay_coin   能量币支付回调
      * @apiName pay_coin
      * @apiVersion 1.0.0
      * @apiGroup pay
