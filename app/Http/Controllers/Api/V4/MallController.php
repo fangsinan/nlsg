@@ -243,31 +243,38 @@ class MallController extends Controller {
       @apiSuccess {number} remarks 说明
       @apiSuccess {number} use_time_begin 有效期
       @apiSuccess {number} use_time_end 有效期
-      @apiSuccess {number} can_use 是否能领取
+      @apiSuccess {number} lock 0可以领取  1不可以领取
      * 
      * 
      * @apiSuccessExample {json} Request-Example:
-     * {
+      {
       "code": 200,
       "msg": "成功",
       "data": [
       {
-      "id": 34,
-      "name": "车速",
+      "id": 12,
+      "name": "双十二优惠券",
       "infinite": 0,
-      "stock": 10,
-      "price": "8.00",
+      "stock": 9,
+      "used_stock": 0,
+      "price": "15.00",
       "restrict": 1,
-      "full_cut": "0.00",
-      "get_begin_time": 0,
-      "get_end_time": 0,
-      "past": "2",
+      "full_cut": "50.00",
+      "get_begin_time": "2020-05-01 15:10:33",
+      "get_end_time": "2020-11-12 15:10:45",
+      "past": "10",
       "use_type": 3,
-      "remarks": "10",
-      "use_time_begin": 0,
-      "use_time_end": 0,
-      "have_sub": 2,
-      "can_use": 1
+      "remarks": "限时秒杀及特价特惠商品除外",
+      "use_time_begin": null,
+      "use_time_end": null,
+      "created_at": "2020-06-12 11:44:34",
+      "updated_at": "2020-06-12 11:44:36",
+      "hold_max_num": 0,
+      "goods_list": {
+      "can_use": [],
+      "cant_use": []
+      },
+      "lock": 0
       }
       ]
       }
@@ -277,7 +284,7 @@ class MallController extends Controller {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 4;
-        $data = $model->getList($params);
+        $data = $model->getList($params, $this->user['id']);
         return $this->success($data);
     }
 
@@ -775,7 +782,7 @@ class MallController extends Controller {
      * @apiGroup  Mall
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy_info
      * @apiDescription 拼团商品详情(返回值参考商品详情)
-     * @apiSuccess {number} group_buy_id 拼团列表id
+     * @apiParam {number} group_buy_id 拼团列表id
      * @apiSuccessExample {json} Request-Example:
      */
     public function groupByGoodsInfo(Request $request) {

@@ -9,8 +9,7 @@ class CouponRule extends Base {
 
     protected $table = 'nlsg_coupon_rule';
 
-    public function getList($params) {
-
+    public function getList($params, $user_id) {
         $cache_key_name = 'coupon_rule_list';
 
         $expire_num = CacheTools::getExpire('coupon_rule_list');
@@ -25,6 +24,7 @@ class CouponRule extends Base {
 
         //过滤掉已经结束的
         foreach ($res as $k => $v) {
+            $v->lock = 0;
             if ($v->get_end_time <= $now_date) {
                 unset($res[$k]);
             }
@@ -86,7 +86,58 @@ class CouponRule extends Base {
             }
         }
 
-        //todo 是否需要判断用户是否还能领取该优惠券
+        //是否需要判断用户是否还能领取该优惠券
+        if ($user_id == 0) {
+            $get_list = [];
+        } else {
+            $cr_id = [];
+            foreach ($res as $v) {
+                $cr_id[] = $v->id;
+            }
+
+            $get_list = Coupon::where('user_id', '=', $user_id)
+                            ->whereIn('cr_id', $cr_id)
+                            ->select([
+                                'cr_id',
+                                DB::raw('max(created_at) as created_at'),
+                                DB::raw('count(id) as counts')
+                            ])->groupBy('cr_id')->get();
+
+
+
+            if ($get_list->isEmpty()) {
+                $get_list = [];
+            } else {
+                $get_list = $get_list->toArray();
+            }
+
+            //todo 根据优惠券的restrict判断
+            foreach ($res as $k => $v) {
+                switch (intval($v->restrict)) {
+                    case 1:
+                        foreach ($get_list as $glv) {
+                            if ($v->id == $glv['cr_id']) {
+                                $v->lock = 1;
+                            }
+                        }
+                        break;
+                    case 2:
+                        foreach ($get_list as $glv) {
+                            if ($v->id == $glv['cr_id'] && $glv['created_at'] >= date('Y-m-d')) {
+                                $v->lock = 1;
+                            }
+                        }
+                        break;
+                    case 3:
+                        foreach ($get_list as $glv) {
+                            if ($v->id == $glv['cr_id'] && $v->hold_max_num >= $glv['counts']) {
+                                $v->lock = 1;
+                            }
+                        }
+                        break;
+                }
+            }
+        }
 
         return $res;
     }
@@ -99,9 +150,11 @@ class CouponRule extends Base {
                 ->where('get_end_time', '>', date('Y-m-d H:i:s'))
                 ->whereIn('use_type', [3])
                 ->with(['sub_list', 'sub_list.goods_list'])
-                ->select(['id', 'name', 'infinite', 'stock', 'used_stock', 'price', 'restrict',
-                    'full_cut', 'get_begin_time', 'get_end_time', 'past', 'use_type',
-                    'remarks', 'use_time_begin', 'use_time_end', 'created_at', 'updated_at'])
+                ->select(['id', 'name', 'infinite', 'stock', 'used_stock',
+                    'price', 'restrict', 'full_cut', 'get_begin_time',
+                    'get_end_time', 'past', 'use_type', 'remarks',
+                    'use_time_begin', 'use_time_end', 'created_at',
+                    'updated_at', 'hold_max_num'])
                 ->get();
 
         foreach ($res as $k => $v) {
