@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
+use App\Models\History;
+use App\Models\Works;
+use App\Models\WorksInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use GuzzleHttp\Client;
@@ -330,6 +334,155 @@ class UserController extends Controller
         $user  = User::findOrFail(1);
         $lists = $user->follow()->paginate(10);
         return  $this->success($lists);
+    }
+
+
+
+
+    /**
+     * @api {get} api/v4/user/history  我的--历史记录
+     * @apiVersion 4.0.0
+     * @apiGroup user
+     *
+     * @apiParam {string} user_id 用户id
+     * @apiParam {string} page 页数
+     * @apiParam {string} order  desc|asc
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccess {string} column_name 名称   优先级 专栏 > 课程  >章节
+     * @apiSuccess {string} works_name 名称   优先级 专栏 > 课程  >章节
+     * @apiSuccess {string} works_info_name 名称   优先级 专栏 > 课程  >章节
+     * @apiSuccess {string} column_cover_img  封面 优先级 专栏 > 课程
+     * @apiSuccess {string} works_cover_img  封面 优先级 专栏 > 课程
+     * @apiSuccess {string} user_id  用户id
+     *
+     * @apiSuccessExample 成功响应:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "07-05 ": [
+    {
+    "id": 8,
+    "column_id": 0,
+    "works_id": 16,
+    "worksinfo_id": 1,
+    "user_id": 211172,
+    "time_leng": "10",
+    "time_number": "5",
+    "is_del": 0,
+    "created_at": "2020-07-04T19:47:22.000000Z",
+    "updated_at": "2020-06-04T20:07:36.000000Z",
+    "column_name": "",
+    "column_cover_img": "",
+    "works_name": "如何经营幸福婚姻",
+    "works_cover_img": "/nlsg/works/20190822150244797760.png",
+    "worksInfo_name": "01何为坚毅"
+    },
+    {
+    "id": 9,
+    "column_id": 1,
+    "works_id": 16,
+    "worksinfo_id": 2,
+    "user_id": 211172,
+    "time_leng": "0",
+    "time_number": "",
+    "is_del": 0,
+    "created_at": "2020-07-04T19:47:22.000000Z",
+    "updated_at": null,
+    "column_name": "王琨专栏",
+    "column_cover_img": null,
+    "works_name": "如何经营幸福婚姻",
+    "works_cover_img": "/nlsg/works/20190822150244797760.png",
+    "worksInfo_name": "02坚毅品格的重要性"
+    }
+    ]
+    }
+    }
+     */
+    public function history(Request $request)
+    {
+        $user_id = $request->input('user_id',0);
+        $order = $request->input('order','desc');
+
+        $lists = History::where(['user_id' => $user_id, 'is_del' => 0,])
+            ->orderBy('created_at',$order)->paginate($this->page_per_page)->toArray();
+
+        if(empty($lists['data'])){
+            return $this->success();
+        }
+        $new_list = [];
+        foreach ($lists['data'] as $key => $val){
+            //查询所属专栏 课程 以及章节
+            $val['column_name']      = '';
+            $val['column_cover_img'] = '';
+            $val['works_name']       = '';
+            $val['works_cover_img']  = '';
+            $val['worksInfo_name']   = '';
+
+
+
+            if($val['column_id']){
+                $column = Column::find($val['column_id']);
+                $val['column_name']  = $column['name'];
+                $val['column_cover_img']  = $column['cover_img'];
+            }
+            if($val['works_id']){
+                $works = Works::find($val['works_id']);
+                $val['works_name']  = $works['title'];
+                $val['works_cover_img']  = $works['cover_img'];
+            }
+            if($val['worksinfo_id']){
+                $worksInfo = WorksInfo::find($val['worksinfo_id']);
+                $val['worksInfo_name']  = $worksInfo['title'];
+            }
+
+
+            $new_list[History::DateTime($val['created_at'])][]=$val;
+        }
+
+
+        return  $this->success($new_list);
+    }
+
+
+
+    /**
+     * @api {get} api/v4/user/clear_history  我的--清空学习记录
+     * @apiVersion 4.0.0
+     * @apiGroup user
+     *
+     * @apiParam {string} user_id 用户id
+     * @apiParam {string} his_id  清空全部值为all  否则传id 多个用英文逗号拼接 如1,2,3
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample 成功响应:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": []
+    }
+     */
+    public function clearHistory(Request $request)
+    {
+        $user_id  = $request->input('user_id',0);
+        $his_id = $request->input('his_id',0);
+        if ( empty($his_id) ) {
+            return $this->error(0,'fail:his_id参数有误');
+        }
+
+        if($his_id == 'all'){
+            $res = History::where('user_id',$user_id)->update(['is_del' => 1]);
+        }else{
+            $his_id = explode(',',$his_id);
+            $res = History::where('user_id',$user_id)
+                ->whereIn('id',$his_id)->update(['is_del' => 1]);
+        }
+        if ($res) {
+            return $this->success();
+        } else {
+            return $this->error(0,'fail');
+        }
     }
 
 

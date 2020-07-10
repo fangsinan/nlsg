@@ -26,8 +26,8 @@ class CreatePosterController extends Controller
     public function CreatePoster(Request $request)
     {
         $uid = $request->input('user_id', 0);
-        $gid = $request->input('goods_id', 0);
-        $post_type = $request->input('goods_type', 0);
+        $gid = $request->input('relation_id', 0);
+        $post_type = $request->input('post_type', 0);
 
 
         $level = User::getLevel($uid);
