@@ -243,9 +243,7 @@ class MallController extends Controller {
       @apiSuccess {number} remarks 说明
       @apiSuccess {number} use_time_begin 有效期
       @apiSuccess {number} use_time_end 有效期
-      @apiSuccess {number} can_use 1有效 0失效
-     * 
-     * 
+      @apiSuccess {number} can_use 是否能领取
      * @apiSuccessExample {json} Request-Example:
      * {
       "code": 200,
@@ -277,7 +275,7 @@ class MallController extends Controller {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 4;
-        $data = $model->getList($params,$this->user['id']);
+        $data = $model->getList($params, $this->user['id']);
         return $this->success($data);
     }
 
@@ -775,8 +773,7 @@ class MallController extends Controller {
      * @apiGroup  Mall
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy_info
      * @apiDescription 拼团商品详情(返回值参考商品详情)
-     * @apiParam {number} group_buy_id 拼团列表id
-     * @apiSuccessExample {json} Request-Example:
+     * @apiSuccess {number} group_buy_id 拼团列表id
      */
     public function groupByGoodsInfo(Request $request) {
         $params = $request->input();
