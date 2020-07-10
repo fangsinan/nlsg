@@ -50,7 +50,7 @@ class CouponController extends Controller {
 
     /**
      * 我的优惠券列表
-     * @api {post} /api/v4/coupon/list 我的优惠券列表
+     * @api {get} /api/v4/coupon/list 我的优惠券列表
      * @apiVersion 4.0.0
      * @apiName /api/v4/coupon/list
      * @apiGroup  coupon
