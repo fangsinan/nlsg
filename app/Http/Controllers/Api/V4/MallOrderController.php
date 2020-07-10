@@ -156,10 +156,7 @@ class MallOrderController extends Controller {
       }
      */
     public function prepareCreateOrder(Request $request) {
-
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
@@ -188,7 +185,7 @@ class MallOrderController extends Controller {
         }
 
         $model = new MallOrder();
-        $data = $model->prepareCreateOrder($params, $user);
+        $data = $model->prepareCreateOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -227,9 +224,6 @@ class MallOrderController extends Controller {
       }
      */
     public function createOrder(Request $request) {
-
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
         if (0) {
             $params['from_cart'] = 1;
             $params['sku'] = '1612728266,1835913656,1654630825,1626220663';
@@ -254,11 +248,11 @@ class MallOrderController extends Controller {
             $params['os_type'] = $request->input('os_type', 0);
         }
 
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $model = new MallOrder();
-        $data = $model->createOrder($params, $user);
+        $data = $model->createOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -406,9 +400,7 @@ class MallOrderController extends Controller {
       }
      */
     public function prepareCreateFlashSaleOrder(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
@@ -433,7 +425,7 @@ class MallOrderController extends Controller {
         }
 
         $model = new MallOrderFlashSale();
-        $data = $model->prepareCreateFlashSaleOrder($params, $user);
+        $data = $model->prepareCreateFlashSaleOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -470,8 +462,6 @@ class MallOrderController extends Controller {
       }
      */
     public function CreateFlashSaleOrder(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
         if (0) {
             $params['sku'] = '1612728266';
             $params['goods_id'] = 91;
@@ -492,11 +482,11 @@ class MallOrderController extends Controller {
             $params['os_type'] = $request->input('os_type', 0);
         }
 
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $model = new MallOrderFlashSale();
-        $data = $model->createFlashSaleOrder($params, $user);
+        $data = $model->createFlashSaleOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -654,10 +644,7 @@ class MallOrderController extends Controller {
       }
      */
     public function prepareCreateGroupBuyOrder(Request $request) {
-
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
@@ -688,7 +675,7 @@ class MallOrderController extends Controller {
         }
 
         $model = new MallOrderGroupBuy();
-        $data = $model->prepareCreateGroupBuyOrder($params, $user);
+        $data = $model->prepareCreateGroupBuyOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -743,9 +730,7 @@ class MallOrderController extends Controller {
       }
      */
     public function createGroupBuyOrder(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
@@ -776,7 +761,7 @@ class MallOrderController extends Controller {
         }
 
         $model = new MallOrderGroupBuy();
-        $data = $model->createGroupBuyOrder($params, $user);
+        $data = $model->createGroupBuyOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -809,9 +794,7 @@ class MallOrderController extends Controller {
         $m = new MallOrder();
         $m->orderPaySuccess([]);
 
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $order_id = $request->input('order_id', 0);
@@ -820,7 +803,7 @@ class MallOrderController extends Controller {
         }
 
         $model = new MallOrderFlashSale();
-        $data = $model->flashSalePayFail($order_id, $user['id']);
+        $data = $model->flashSalePayFail($order_id, $this->user['id']);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -876,9 +859,8 @@ class MallOrderController extends Controller {
     public function groupByTeamList(Request $request) {
         $params = $request->input();
         $model = new MallOrderGroupBuy();
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
-        $data = $model->groupByTeamList($params, $user);
+        $data = $model->groupByTeamList($params, $this->user);
 
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
@@ -952,14 +934,13 @@ class MallOrderController extends Controller {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
         $model = new MallOrder();
-        $data = $model->userOrderList($params, $user);
+        $data = $model->userOrderList($params, $this->user);
 
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
@@ -1144,14 +1125,13 @@ class MallOrderController extends Controller {
       }
      */
     public function orderInfo(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $ordernum = $request->input('ordernum', 0);
         $model = new MallOrder();
-        $data = $model->orderInfo($user['id'], $ordernum);
+        $data = $model->orderInfo($this->user['id'], $ordernum);
 
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
@@ -1225,14 +1205,13 @@ class MallOrderController extends Controller {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
         $model = new MallOrderGroupBuy();
-        $data = $model->userOrderList($params, $user);
+        $data = $model->userOrderList($params, $this->user);
 
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
@@ -1432,14 +1411,13 @@ class MallOrderController extends Controller {
       }
      */
     public function groupBuyOrderInfo(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-
-        if (empty($user['id'] ?? 0)) {
+        
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $ordernum = $request->input('ordernum', 0);
         $model = new MallOrderGroupBuy();
-        $data = $model->orderInfo($user['id'], $ordernum);
+        $data = $model->orderInfo($this->user['id'], $ordernum);
 
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
@@ -1461,8 +1439,8 @@ class MallOrderController extends Controller {
       @apiParam {string=stop,del,receipt} flag 标记
      */
     public function statusChange(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $flag = $request->input('flag', '');
@@ -1476,7 +1454,7 @@ class MallOrderController extends Controller {
             return $this->error(0, '参数错误');
         }
         $model = new MallOrder();
-        $data = $model->statusChange($id, $flag, $user['id']);
+        $data = $model->statusChange($id, $flag, $this->user['id']);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -1515,13 +1493,13 @@ class MallOrderController extends Controller {
       }
      */
     public function noCommentList() {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
         $model = new MallOrder();
-        $data = $model->noCommentList($user['id']);
+        $data = $model->noCommentList($this->user['id']);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -1545,13 +1523,13 @@ class MallOrderController extends Controller {
       @apiParam {string} content 评价内容
      */
     public function subComment(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $params = $request->input();
         $model = new MallOrder();
-        $data = $model->subComment($params, $user);
+        $data = $model->subComment($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -1584,13 +1562,13 @@ class MallOrderController extends Controller {
       }
      */
     public function getComment(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $comment_id = $request->input('comment_id', 0);
         $model = new MallComment();
-        $data = $model->getComment($comment_id, $user);
+        $data = $model->getComment($comment_id, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);

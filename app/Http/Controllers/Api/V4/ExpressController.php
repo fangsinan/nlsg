@@ -56,8 +56,7 @@ class ExpressController extends Controller {
       }
      */
     public function getPostInfo(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
@@ -107,8 +106,7 @@ class ExpressController extends Controller {
       }
      */
     public function companyList() {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $model = new ExpressCompany();

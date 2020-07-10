@@ -354,4 +354,25 @@ class MallGoods extends Base {
         return ['res' => $res, 'count' => $res->count()];
     }
 
+    
+    public function forYourReference($num,$user){
+        $id_list = MallGoods::where('status','=',2)
+                ->orderByRaw('rand()')
+                ->limit($num)
+                ->select(['id'])
+                ->get()->toArray();
+        
+        $id_list = array_column($id_list, 'id');
+        $id_list = implode(',', $id_list);
+        
+        $res = $this->getList([
+            'ids_str'=>$id_list,
+            'page'=>1,
+            'size'=>1,
+            'get_all'=>1
+                ], 
+                $user, false);
+        
+        return $res;
+    }
 }

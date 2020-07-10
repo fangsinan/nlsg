@@ -243,4 +243,52 @@ class Coupon extends Base {
         ];
     }
 
+    public function listInHome($user_id, $params) {
+
+        $status = intval($params['status'] ?? 1);
+        $page = intval($params['page'] ?? 1);
+        $size = intval($params['size'] ?? 10);
+
+        $now_date = date('Y-m-d H:i:s');
+
+        $count['status_1'] = self::where('user_id', '=', $user_id)
+                ->where('end_time', '>', $now_date)
+                ->where('status', '=', 1)
+                ->count();
+
+        $count['status_2'] = self::where('user_id', '=', $user_id)
+                ->where('status', '=', 2)
+                ->count();
+
+        $count['status_3'] = self::where('user_id', '=', $user_id)
+                        ->Where(function($query) {
+                            $query->where('status', '=', 3)
+                            ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
+                        })->count();
+
+        $query = self::where('user_id', '=', $user_id);
+        switch ($status) {
+            case 2:
+                $query->where('status', '=', 2);
+                break;
+            case 3:
+                $query->Where(function($query) {
+                    $query->where('status', '=', 3)
+                            ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
+                });
+                break;
+            default :
+                $query->where('end_time', '>', $now_date)->where('status', '=', 1);
+        }
+
+        $query->select([
+            'id', 'number', 'name', 'type', 'price', 'full_cut',
+            'explain', 'begin_time', 'end_time'
+        ]);
+
+        $list = $query->limit($size)->offset(($page - 1) * $size)->get();
+
+        return ['count' => $count, 'list' => $list];
+    }
+
 }

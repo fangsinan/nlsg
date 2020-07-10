@@ -106,6 +106,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('goods/service_description', 'MallController@mallServiceDescription');
     Route::post('goods/get_coupon', 'CouponController@getCoupon');
     Route::post('goods/collect', 'MallController@collect');
+    Route::get('goods/for_your_reference', 'MallController@forYourReference');
 
     Route::get('address/get_data', 'AddressController@getData');
     Route::post('address/create', 'AddressController@create');
@@ -156,10 +157,13 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');
     Route::put('after_sales/status_change', 'AfterSalesController@statusChange');
     Route::put('after_sales/refund_post', 'AfterSalesController@refundPost');
+    Route::get('after_sales/reason_list', 'AfterSalesController@reasonList');
 
     //物流查询
     Route::get('post/get_info', 'ExpressController@getPostInfo');
     Route::get('post/company_list', 'ExpressController@companyList');
+    
+    Route::get('coupon/list', 'CouponController@list');
     //*******************************商城部分结束*******************************
 
     Route::post('like', 'LikeController@like');

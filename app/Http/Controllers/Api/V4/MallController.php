@@ -210,9 +210,8 @@ class MallController extends Controller {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 4;
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         $model = new MallGoods();
-        $data = $model->getList($params, $user);
+        $data = $model->getList($params, $this->user);
         return $this->success($data);
     }
 
@@ -781,8 +780,7 @@ class MallController extends Controller {
     public function groupByGoodsInfo(Request $request) {
         $params = $request->input();
         $model = new MallGoods();
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        $data = $model->groupByGoodsInfo($params, $user);
+        $data = $model->groupByGoodsInfo($params, $this->user);
 
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
@@ -804,13 +802,35 @@ class MallController extends Controller {
      * 
      */
     public function collect(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $goods_id = $request->input('goods_id', 0);
         $model = new MallGoods();
-        $data = $model->collect($goods_id, $user['id']);
+        $data = $model->collect($goods_id, $this->user['id']);
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
+    /**
+     * 猜你喜欢
+     * @api {post} /api/v4/goods/for_your_reference 猜你喜欢
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/goods/for_your_reference
+     * @apiGroup  Mall
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/for_your_reference
+     * @apiDescription 猜你喜欢(参数同商品列表接口)
+     * @apiParam {number} [num] 显示数量
+     * 
+     */
+    public function forYourReference(Request $request) {
+        $num = $request->input('num', 4);
+        $model = new MallGoods();
+        $data = $model->forYourReference($num, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);

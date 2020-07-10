@@ -67,13 +67,12 @@ class AfterSalesController extends Controller {
       }
      */
     public function goodsList(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $params = $request->input();
         $model = new MallRefundRecord();
-        $data = $model->goodsList($params, $user);
+        $data = $model->goodsList($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -97,13 +96,12 @@ class AfterSalesController extends Controller {
      * @apiParam {number} [num] 退货的申请数量
      */
     public function createOrder(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $params = $request->input();
         $model = new MallRefundRecord();
-        $data = $model->createOrder($params, $user);
+        $data = $model->createOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -171,13 +169,12 @@ class AfterSalesController extends Controller {
       }
      */
     public function list(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $params = $request->input();
         $model = new MallRefundRecord();
-        $data = $model->list($params, $user);
+        $data = $model->list($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -305,13 +302,12 @@ class AfterSalesController extends Controller {
       }
      */
     public function orderInfo(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $params = $request->input();
         $model = new MallRefundRecord();
-        $data = $model->orderInfo($params, $user);
+        $data = $model->orderInfo($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -347,8 +343,7 @@ class AfterSalesController extends Controller {
       }
      */
     public function statusChange(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $flag = $request->input('flag', '');
@@ -362,7 +357,7 @@ class AfterSalesController extends Controller {
             return $this->error(0, '参数错误');
         }
         $model = new MallRefundRecord();
-        $data = $model->statusChange($id, $flag, $user['id']);
+        $data = $model->statusChange($id, $flag, $this->user['id']);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -400,19 +395,80 @@ class AfterSalesController extends Controller {
       }
      */
     public function refundPost(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $params = $request->input();
         $model = new MallRefundRecord();
-        $data = $model->refundPost($params, $user);
+        $data = $model->refundPost($params, $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
             return $this->success($data);
         }
+    }
+
+    /**
+      售后原因列表
+      @api {get} /api/v4/after_sales/reason_list 售后原因列表
+      @apiVersion 1.0.0
+      @apiName /api/v4/after_sales/reason_list
+      @apiGroup afterSales
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/reason_list
+      @apiDescription 售后原因列表
+     * @apiSuccessExample {json} Request-Example:
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "id": 1,
+      "value": "不喜欢/不想要",
+      "status": 1
+      },
+      {
+      "id": 2,
+      "value": "颜色/图案/款式等不符",
+      "status": 1
+      },
+      {
+      "id": 3,
+      "value": "包装/商品破损/污渍",
+      "status": 1
+      },
+      {
+      "id": 4,
+      "value": "少件/漏发",
+      "status": 1
+      },
+      {
+      "id": 5,
+      "value": "发票问题",
+      "status": 1
+      },
+      {
+      "id": 6,
+      "value": "卖家发错货",
+      "status": 1
+      },
+      {
+      "id": 7,
+      "value": "退运费",
+      "status": 1
+      }
+      ]
+      }
+     */
+    public function reasonList() {
+        $res = \App\Models\ConfigModel::getData(15);
+        $res = json_decode($res);
+        foreach ($res as $k => $v) {
+            if ($v['status'] != 1) {
+                unset($res[$k]);
+            }
+        }
+        return $this->success($res);
     }
 
 }

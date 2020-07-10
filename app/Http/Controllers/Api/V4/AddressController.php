@@ -100,12 +100,11 @@ class AddressController extends Controller {
      */
     public function create(Request $request) {
         $params = $request->input();
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $model = new MallAddress();
-        $data = $model->create($params, $user['id']);
+        $data = $model->create($params, $this->user['id']);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -158,12 +157,11 @@ class AddressController extends Controller {
       }
      */
     public function getList() {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $model = new MallAddress();
-        $data = $model->getList($user['id']);
+        $data = $model->getList($this->user['id']);
         return $this->success($data);
     }
 
@@ -194,8 +192,7 @@ class AddressController extends Controller {
       }
      */
     public function statusChange(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $flag = $request->input('flag', '');
@@ -209,7 +206,7 @@ class AddressController extends Controller {
             return $this->error(0, '参数错误');
         }
         $model = new MallAddress();
-        $data = $model->statusChange($id, $flag, $user['id']);
+        $data = $model->statusChange($id, $flag, $this->user['id']);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -250,8 +247,7 @@ class AddressController extends Controller {
       }
      */
     public function listOfShop(Request $request) {
-        $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
-        if (empty($user['id'] ?? 0)) {
+        if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $flag = $request->input('flag', 0);
