@@ -436,9 +436,10 @@ class ColumnController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup Column
      *
-     * @apiParam {int} type  type 1：专栏  2：课程 3 :商品
+     * @apiParam {int} type  type 1专栏  2课程  3商品  4书单 5百科 6听书
      * @apiParam {int} target_id  对应id
      * @apiParam {int} user_id 用户id
+     * @apiParam {int} info_id 如果是课程 需要传当前章节
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -458,7 +459,7 @@ class ColumnController extends Controller
             return $this->error(0,'column_id 或者 user_id 不能为空');
         }
         //  type 1：专栏  2：课程 3 :商品
-        if( !in_array($type,[1,2,3]) ){
+        if( !in_array($type,[1,2,3,4,5,6]) ){
             return $this->error(0,'type类型错误');
         }
         $is_collection = Collection::CollectionData($user_id,$target_id,$type,$info_id);

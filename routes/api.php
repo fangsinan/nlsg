@@ -194,6 +194,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     //历史记录
     Route::get('user/history', 'UserController@history');
     Route::get('user/clear_history', 'UserController@clearHistory');
+    Route::get('user/collection', 'UserController@collection');
 
     //通知
     Route::post('notify/fans', 'NotifyController@fans');

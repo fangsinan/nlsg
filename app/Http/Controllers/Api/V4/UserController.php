@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Collection;
 use App\Models\Column;
 use App\Models\History;
 use App\Models\Works;
@@ -483,6 +484,71 @@ class UserController extends Controller
         } else {
             return $this->error(0,'fail');
         }
+    }
+
+
+
+
+    /**
+     * @api {get} api/v4/user/collection  我的--收藏列表
+     * @apiVersion 4.0.0
+     * @apiGroup user
+     *
+     * @apiParam {string} user_id 用户id
+     * @apiParam {string} type  默认1  1专栏  2课程  3商品  4书单 5百科 6听书
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample 成功响应:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 91,
+    "name": "AR立体浮雕星座地球仪",
+    "picture": "/nlsg/goods/20191026172620981048.jpg",
+    "original_price": "379.00",
+    "price": "333.52"
+    }
+    ]
+    }
+     *
+     *
+     * {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    {
+    "id": 1,
+    "name": "王琨专栏",
+    "title": "顶尖导师 经营能量",
+    "subtitle": "顶尖导师 经营能量",
+    "message": "",
+    "price": "99.00",
+    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+    "is_new": 1
+    }
+    ]
+    }
+     */
+
+
+    public function collection(Request $request)
+    {
+        $user_id    = $request->input('user_id',0);
+        $type     = $request->input('type',1);
+        //1专栏  2课程  3商品  4书单 5百科 6听书
+
+        $collection = Collection::where([
+            'user_id' =>$user_id,
+            'type' =>$type,
+        ])->paginate($this->page_per_page)->toArray();
+        $relation_id = array_column($collection['data'],'relation_id');
+
+        $list = Collection::getCollection($type,$relation_id);
+        if($list == false) $list =[];
+
+        return $this->success($list);
     }
 
 
