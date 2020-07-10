@@ -505,7 +505,7 @@ class UserController extends Controller
     "data": [
     {
     "id": 91,
-    "name": "AR立体浮雕星座地球仪",
+    "name": "AR立体浮雕星座地球仪",   //商品名称  类型不同返回字段不同
     "picture": "/nlsg/goods/20191026172620981048.jpg",
     "original_price": "379.00",
     "price": "333.52"
@@ -520,9 +520,9 @@ class UserController extends Controller
     "data": [
     {
     "id": 1,
-    "name": "王琨专栏",
-    "title": "顶尖导师 经营能量",
-    "subtitle": "顶尖导师 经营能量",
+    "name": "王琨专栏",     //专栏名
+    "title": "顶尖导师 经营能量",       //头衔
+    "subtitle": "顶尖导师 经营能量",    //副标题
     "message": "",
     "price": "99.00",
     "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
