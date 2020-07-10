@@ -213,7 +213,7 @@ class MallOrder extends Base {
     public function checkParams(&$params) {
 
         if (empty($params['sku'])) {
-            return ['code' => fasle, 'msg' => '参数错误', 'ps' => 'sku'];
+            return ['code' => false, 'msg' => '参数错误', 'ps' => 'sku'];
         }
 
         if (!is_array($params['sku'])) {

@@ -890,7 +890,7 @@ class MallOrderController extends Controller {
 
     /**
      * 普通和秒杀订单的列表
-     * @api {post} /api/v4/mall/order_list 普通和秒杀订单的列表
+     * @api {get} /api/v4/mall/order_list 普通和秒杀订单的列表
      * @apiVersion 1.0.0
      * @apiName /api/v4/mall/order_list
      * @apiGroup MallOrder
