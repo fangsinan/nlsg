@@ -5,6 +5,7 @@ namespace App\Models;
 
 
 
+use EasyWeChat\Work\ExternalContact\Client;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -12,27 +13,6 @@ class Works extends Base
 {
     protected $table = 'nlsg_works';
     public $timestamps = false;
-
-
-    public function categoryRelation()
-    {
-        //一对多
-        return $this->hasMany('App\Models\WorksCategoryRelation','work_id', 'id');
-    }
-
-
-    public function userName()
-    {
-        //一对多
-        return $this->belongsTo('App\Models\User','user_id');
-    }
-
-
-    public function workInfo()
-    {
-        //一对多
-        return $this->hasMany('App\Models\WorksInfo','pid');
-    }
 
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
@@ -125,6 +105,44 @@ class Works extends Base
 
     }
 
+    /**
+     * 免费专区
+     * @return array
+     */
+    public  function getFreeWorks()
+    {
+        $works =  Works::with(['user'=>function($query){
+                        $query->select('id','nickname');
+                    }])
+                    ->select('id','user_id', 'title', 'subtitle','cover_img','chapter_num')
+                    ->where('is_free', 1)
+                    ->where('is_audio_book', 0)
+                    ->limit(5)
+                    ->get();
+        if ($works){
+            foreach ($works as &$v) {
+                $v['is_new'] = 1;
+            }
+        }
+
+        $book =  Works::with(['user'=>function($query){
+                        $query->select('id','nickname');
+                    }])
+                    ->select('id','user_id', 'title', 'subtitle','cover_img','chapter_num')
+                    ->where('is_free', 1)
+                    ->where('is_audio_book', 1)
+                    ->limit(5)
+                    ->get();
+        if ($book){
+            foreach ($book as &$v) {
+                $v['is_new'] = 1;
+            }
+        }
+
+        return [ 'works'=>$works, 'book'=>$book];
+
+    }
+
     public  function user()
     {
         return $this->belongsTo('App\Models\User');
@@ -135,6 +153,26 @@ class Works extends Base
     {
         return $this->belongsToMany('App\Models\Lists',
             'nlsg_lists_work','works_id', 'lists_id');
+    }
+
+       public function categoryRelation()
+    {
+        //一对多
+        return $this->hasMany('App\Models\WorksCategoryRelation','work_id', 'id');
+    }
+
+
+    public function userName()
+    {
+        //一对多
+        return $this->belongsTo('App\Models\User','user_id');
+    }
+
+
+    public function workInfo()
+    {
+        //一对多
+        return $this->hasMany('App\Models\WorksInfo','pid');
     }
 
 }
