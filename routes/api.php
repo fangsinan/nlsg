@@ -155,7 +155,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::post('after_sales/create_order', 'AfterSalesController@createOrder');
     Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');
     Route::put('after_sales/status_change', 'AfterSalesController@statusChange');
-    Route::get('after_sales/refund_post', 'AfterSalesController@refundPost');
+    Route::put('after_sales/refund_post', 'AfterSalesController@refundPost');
 
     //物流查询
     Route::get('post/get_info', 'ExpressController@getPostInfo');
