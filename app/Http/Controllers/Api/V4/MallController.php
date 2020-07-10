@@ -243,7 +243,7 @@ class MallController extends Controller {
       @apiSuccess {number} remarks 说明
       @apiSuccess {number} use_time_begin 有效期
       @apiSuccess {number} use_time_end 有效期
-      @apiSuccess {number} lock 0可以领取  1不可以领取
+      @apiSuccess {number} lock 0有效 1失效
      * 
      * 
      * @apiSuccessExample {json} Request-Example:
