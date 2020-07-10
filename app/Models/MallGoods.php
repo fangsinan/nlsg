@@ -54,8 +54,8 @@ class MallGoods extends Base {
     protected function getListData($params, $cache = true) {
         $cache_key_name = 'goods_list'; //哈希组名
         //缓存放入 goods_list
-        $cache_name_arr['page'] = $params['page'];
-        $cache_name_arr['size'] = $params['size'];
+        $cache_name_arr['page'] = $params['page']??1;
+        $cache_name_arr['size'] = $params['size']??10;
         $cache_name_arr['get_sku'] = $params['get_sku'] ?? 0;
         $cache_name_arr['get_details'] = $params['get_details'] ?? 0;
         $cache_name_arr['ob'] = $params['ob'] ?? '';

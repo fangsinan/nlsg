@@ -226,11 +226,10 @@ class MallController extends Controller {
      * @apiParam {number} [goods_id] 指定商品id则返回无限制优惠券以及指定商品优惠券 
      * @apiParam {number} [goods_only] 1:如果指定goods_id,可通过该参数控制只返回指定商品优惠券
      * @apiParam {string} [ob] 排序(id上架时间,price价格,以上后缀分为_asc正序,_desc逆序.不传为默认)
-     * @apiParam {nuimber} [show_zero_stock] 1:没有库存的也返回  默认不返回
+     * @apiParam {number} [show_zero_stock] 1:没有库存的也返回  默认不返回
      * @apiParam {number} [page] 页数,默认1
      * @apiParam {number} [size] 条数,默认10
-     * @apiParam {number} [get_all] 1:不设置分页,都传回 
-     * 
+     * @apiParam {number=1,0} [get_all] 1:不设置分页,都传回 
      * 
       @apiSuccess {number} id id
       @apiSuccess {number} name 优惠券名称
@@ -775,7 +774,9 @@ class MallController extends Controller {
      * @apiName /api/v4/goods/group_buy_info
      * @apiGroup  Mall
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy_info
-     * @apiDescription 拼团商品详情
+     * @apiDescription 拼团商品详情(返回值参考商品详情)
+     * @apiSuccess {number} group_buy_id 拼团列表id
+     * @apiSuccessExample {json} Request-Example:
      */
     public function groupByGoodsInfo(Request $request) {
         $params = $request->input();
