@@ -462,7 +462,7 @@ class AfterSalesController extends Controller {
      */
     public function reasonList() {
         $res = \App\Models\ConfigModel::getData(15);
-        $res = json_decode($res);
+        $res = json_decode($res,true);
         foreach ($res as $k => $v) {
             if ($v['status'] != 1) {
                 unset($res[$k]);
