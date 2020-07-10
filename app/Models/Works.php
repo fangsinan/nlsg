@@ -100,11 +100,27 @@ class Works extends Base
             return false;
         }
 
-        $list = Works::with('WorkInfo')
-                ->select('title', 'subscribe_num')
+        $list = Works::with(['workInfo'=> function ($query){
+                    $query->select('id', 'pid','rank', 'title','duration', 'view_num','online_time')
+                          ->orderBy('rank', 'desc')
+                          ->orderBy('id','desc')
+                          ->limit(2);
+                }])
+                ->select('id','title', 'subscribe_num')
                 ->where('id', $id)
                 ->where(['type'=>2, 'status'=>4])
-                ->get();
+                ->first()
+                ->toArray();
+        if ($list['work_info']){
+            $now = date('Y-m-d', time());
+            foreach ($list['work_info'] as &$v) {
+                if ($v['online_time'] > $now ){
+                    $v['is_new']  = 1;
+                } else {
+                    $v['is_new']  = 0;
+                }
+            }
+        }
         return $list;
 
     }

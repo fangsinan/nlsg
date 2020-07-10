@@ -504,7 +504,36 @@ class IndexController extends Controller
         return $this->success($lists);
     }
 
-
+    /**
+     * @api {get} api/v4/index/banner  首页轮播图
+     * @apiVersion 4.0.0
+     * @apiName  banner
+     * @apiGroup Index
+     *
+     * @apiSuccess {string}
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 274,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
+     *                   "title": "电商弹窗课程日历套装",
+     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
+     *               },
+     *               {
+     *                   "id": 296,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
+     *                   "title": "心里学",
+     *                   "url": "/mall/shop-details?goods_id=479"
+     *               }
+     *         ]
+     *     }
+     *
+     */
     public  function recommend()
     {
         $works = new Works();
