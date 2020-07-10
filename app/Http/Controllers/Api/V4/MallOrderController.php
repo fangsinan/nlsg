@@ -9,8 +9,7 @@ use App\Models\MallOrderGroupBuy;
 use App\Models\MallComment;
 use Illuminate\Http\Request;
 
-class MallOrderController extends Controller
-{
+class MallOrderController extends Controller {
 
     /**
      * 预下单
@@ -18,7 +17,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/prepare_create_order
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/prepare_create_order
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/prepare_create_order
      * @apiDescription 普通订单预下单
      * @apiParam {number=0,1} from_cart 下单方式(1:购物车下单  2:立即购买
      * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
@@ -156,8 +155,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function prepareCreateOrder(Request $request)
-    {
+    public function prepareCreateOrder(Request $request) {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -205,7 +203,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/create_order
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/create_order
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/create_order
      * @apiDescription 普通订单下单(参数同预下单)
      * @apiParam {number=0,1} from_cart 下单方式(1:购物车下单  2:立即购买
      * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
@@ -228,8 +226,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function createOrder(Request $request)
-    {
+    public function createOrder(Request $request) {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -276,7 +273,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/prepare_create_flash_sale_order
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/prepare_create_flash_sale_order
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/prepare_create_flash_sale_order
      * @apiDescription 秒杀订单预下单
      * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
      * @apiParam {string} goods_id 如果是购物车则不用传,直接购买必须传
@@ -408,8 +405,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function prepareCreateFlashSaleOrder(Request $request)
-    {
+    public function prepareCreateFlashSaleOrder(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -452,7 +448,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/create_flash_sale_order
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/create_flash_sale_order
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/create_flash_sale_order
      * @apiDescription 秒杀订单下单(参数同预下单)
      * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
      * @apiParam {string} goods_id 如果是购物车则不用传,直接购买必须传
@@ -473,8 +469,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function CreateFlashSaleOrder(Request $request)
-    {
+    public function CreateFlashSaleOrder(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (0) {
@@ -516,7 +511,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/prepare_create_group_buy_order
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/prepare_create_group_buy_order
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/prepare_create_group_buy_order
      * @apiDescription 拼团订单预下单
      * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
      * @apiParam {string} goods_id 如果是购物车则不用传,直接购买必须传
@@ -658,8 +653,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function prepareCreateGroupBuyOrder(Request $request)
-    {
+    public function prepareCreateGroupBuyOrder(Request $request) {
 
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
@@ -709,7 +703,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/create_group_buy_order
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/create_group_buy_order
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/create_group_buy_order
      * @apiDescription 拼团订单下单
      * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
      * @apiParam {string} goods_id 如果是购物车则不用传,直接购买必须传
@@ -748,8 +742,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function createGroupBuyOrder(Request $request)
-    {
+    public function createGroupBuyOrder(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -798,7 +791,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/flash_sale_pay_fail
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/flash_sale_pay_fail
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/flash_sale_pay_fail
      * @apiDescription 秒杀订单支付未成功处理
      * @apiParam {string} order_id 订单id
 
@@ -812,8 +805,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function flashSalePayFail(Request $request)
-    {
+    public function flashSalePayFail(Request $request) {
         $m = new MallOrder();
         $m->orderPaySuccess([]);
 
@@ -843,7 +835,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/goods/group_buy_team_list
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/goods/group_buy_team_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy_team_list
      * @apiDescription 拼团队伍信息
      * @apiParam {number} group_buy_id 拼团id
      * @apiParam {numer} [group_key] 拼团队伍标识
@@ -881,8 +873,7 @@ class MallOrderController extends Controller
       ]
       }
      */
-    public function groupByTeamList(Request $request)
-    {
+    public function groupByTeamList(Request $request) {
         $params = $request->input();
         $model = new MallOrderGroupBuy();
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
@@ -903,7 +894,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/order_list
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/order_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/order_list
      * @apiDescription 普通和秒杀订单的列表
      * @apiParam {number} page 页数
      * @apiParam {number} size 条数
@@ -957,8 +948,7 @@ class MallOrderController extends Controller
       ]
       }
      */
-    function list(Request $request)
-    {
+    function list(Request $request) {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
@@ -985,7 +975,7 @@ class MallOrderController extends Controller
       @apiVersion 1.0.0
       @apiName /api/V4/mall/order_info
       @apiGroup MallOrder
-      @apiSampleRequest /api/V4/mall/order_info
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/order_info
       @apiDescription 普通和秒杀订单的详情
       @apiParam {string} ordernum 订单编号
      *
@@ -1153,8 +1143,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function orderInfo(Request $request)
-    {
+    public function orderInfo(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -1178,7 +1167,7 @@ class MallOrderController extends Controller
      * @apiVersion 1.0.0
      * @apiName /api/V4/mall/group_buy_order_list
      * @apiGroup MallOrder
-     * @apiSampleRequest /api/V4/mall/group_buy_order_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/group_buy_order_list
      * @apiDescription 拼团订单的列表
      * @apiParam {number} page 页数
      * @apiParam {number} size 条数
@@ -1232,8 +1221,7 @@ class MallOrderController extends Controller
       ]
       }
      */
-    public function listOfGroupBuy(Request $request)
-    {
+    public function listOfGroupBuy(Request $request) {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
@@ -1260,7 +1248,7 @@ class MallOrderController extends Controller
       @apiVersion 1.0.0
       @apiName /api/V4/mall/group_buy_order_info
       @apiGroup MallOrder
-      @apiSampleRequest /api/V4/mall/group_buy_order_info
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/group_buy_order_info
       @apiDescription 拼团订单详情
       @apiParam {string} ordernum 订单编号
 
@@ -1443,8 +1431,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function groupBuyOrderInfo(Request $request)
-    {
+    public function groupBuyOrderInfo(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
 
         if (empty($user['id'] ?? 0)) {
@@ -1463,18 +1450,17 @@ class MallOrderController extends Controller
     }
 
     /**
-     修改订单状态
+      修改订单状态
       @api {put} /api/V4/mall/status_change 修改订单状态(取消,删除,确认收货)
       @apiVersion 1.0.0
       @apiName /api/V4/mall/status_change
       @apiGroup MallOrder
-      @apiSampleRequest /api/V4/mall/status_change
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/status_change
       @apiDescription 修改订单状态
       @apiParam {string} id 订单id
       @apiParam {string=stop,del,receipt} flag 标记
      */
-    public function statusChange(Request $request)
-    {
+    public function statusChange(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -1505,7 +1491,7 @@ class MallOrderController extends Controller
       @apiVersion 1.0.0
       @apiName /api/V4/mall/no_comment_list
       @apiGroup MallOrder
-      @apiSampleRequest /api/V4/mall/no_comment_list
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/no_comment_list
       @apiDescription 未评论商品列表
       @apiSuccessExample {json} Request-Example:
       {
@@ -1528,8 +1514,7 @@ class MallOrderController extends Controller
       ]
       }
      */
-    public function noCommentList()
-    {
+    public function noCommentList() {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -1551,7 +1536,7 @@ class MallOrderController extends Controller
       @apiVersion 1.0.0
       @apiName /api/V4/mall/sub_comment
       @apiGroup MallOrder
-      @apiSampleRequest /api/V4/mall/sub_comment
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/sub_comment
       @apiDescription 评价
       @apiParam {number} order_detail_id id
       @apiParam {number=1,2,3,4,5} star 星级
@@ -1559,8 +1544,7 @@ class MallOrderController extends Controller
       @apiParam {string} issue_type 原因,多个用逗号隔开(1,2,3)
       @apiParam {string} content 评价内容
      */
-    public function subComment(Request $request)
-    {
+    public function subComment(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -1582,11 +1566,11 @@ class MallOrderController extends Controller
       @apiVersion 1.0.0
       @apiName /api/V4/mall/get_comment
       @apiGroup MallOrder
-      @apiSampleRequest /api/V4/mall/get_comment
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/get_comment
       @apiDescription 查看评价
       @apiParam {number} comment_id id
-     @apiSuccessExample {json} Request-Example:
-     {
+      @apiSuccessExample {json} Request-Example:
+      {
       "code": 200,
       "msg": "成功",
       "data": {
@@ -1599,8 +1583,7 @@ class MallOrderController extends Controller
       }
       }
      */
-    public function getComment(Request $request)
-    {
+    public function getComment(Request $request) {
         $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
         if (empty($user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -1622,7 +1605,7 @@ class MallOrderController extends Controller
       @apiVersion 1.0.0
       @apiName /api/V4/mall/comment_issue_list
       @apiGroup MallOrder
-      @apiSampleRequest /api/V4/mall/comment_issue_list
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/comment_issue_list
       @apiDescription 评价原因列表
       @apiParam {number} comment_id id
      * @apiSuccessExample {json} Request-Example:
@@ -1649,8 +1632,7 @@ class MallOrderController extends Controller
       ]
       }
      */
-    public function commentIssueList()
-    {
+    public function commentIssueList() {
         $res = \App\Models\ConfigModel::getData(13);
         return $this->success(json_decode($res));
     }

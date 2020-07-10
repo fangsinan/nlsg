@@ -25,7 +25,7 @@ class ExpressController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/post/get_info
      * @apiGroup  express
-     * @apiSampleRequest /api/V4/post/get_info
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/post/get_info
      * @apiDescription 快递进度查询
      * @apiParam {string} express_id 快递公司id
      * @apiParam {string} express_num 快递单号
@@ -80,7 +80,7 @@ class ExpressController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/post/company_list
      * @apiGroup  express
-     * @apiSampleRequest /api/V4/post/company_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/post/company_list
      * @apiDescription 快递公司列表
      * @apiSuccessExample {json} Request-Example:
      * {

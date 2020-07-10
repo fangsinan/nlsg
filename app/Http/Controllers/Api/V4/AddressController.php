@@ -27,7 +27,7 @@ class AddressController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/address/get_data
      * @apiGroup  address
-     * @apiSampleRequest /api/V4/address/get_data
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/get_data
      * @apiDescription 行政区划表数据
      * @apiSuccessExample {json} Request-Example:
      * 
@@ -68,7 +68,7 @@ class AddressController extends Controller {
      * @apiVersion 1.0.0
      * @apiName /api/V4/address/create
      * @apiGroup address
-     * @apiSampleRequest /api/V4/address/create
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/create
      * @apiDescription 添加,编辑
      * @apiParam {string} province 省
      * @apiParam {string} city 市
@@ -120,7 +120,7 @@ class AddressController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/address/get_list
      * @apiGroup  address
-     * @apiSampleRequest /api/V4/address/get_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/get_list
      * @apiDescription 收货地址列表,字段说明见创建接口
      * @apiSuccessExample {json} Request-Example:
      * 
@@ -173,7 +173,7 @@ class AddressController extends Controller {
      * @apiVersion 1.0.0
      * @apiName /api/V4/address/status_change
      * @apiGroup address
-     * @apiSampleRequest /api/V4/address/status_change
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/status_change
      * @apiDescription 修改状态
      * @apiParam {string=default,nomal,del} flag 状态(默认,普通,删除)
      * @apiParam {number} id id
@@ -224,7 +224,7 @@ class AddressController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/address/list_of_shop
      * @apiGroup  address
-     * @apiSampleRequest /api/V4/address/list_of_shop
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/list_of_shop
      * @apiDescription 自提点和退货点列表
      * @apiParam {number=2,3} flag 2自提 3退货
      * @apiSuccessExample {json} Request-Example:

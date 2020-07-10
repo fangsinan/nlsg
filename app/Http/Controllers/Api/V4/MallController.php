@@ -19,7 +19,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/info
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/info
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/info
      * @apiDescription 获取商品信息,如不指定id,get_sku=0 则返回商品列表.指定商品id,get_sku=1则返回商品详情
      * @apiParam {string} ids_str 商品id,如果需要指定商品,则传该值(例:91,98)
      * @apiParam {number=1,0} [get_sku] 1:获取商品sku_list规格信息
@@ -222,7 +222,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/coupon_list
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/coupon_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/coupon_list
      * @apiDescription 获取商品信息,如不指定id,get_sku=0 则返回商品列表.指定商品id,get_sku=1则返回商品详情
      * @apiParam {number} [goods_id] 指定商品id则返回无限制优惠券以及指定商品优惠券 
      * @apiParam {number} [goods_only] 1:如果指定goods_id,可通过该参数控制只返回指定商品优惠券
@@ -289,7 +289,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/comment_list
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/comment_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/comment_list
      * @apiDescription 获取商品信息,如不指定id,get_sku=0 则返回商品列表.指定商品id,get_sku=1则返回商品详情
      * @apiParam {number} [goods_id] 指定商品id则返回无限制优惠券以及指定商品优惠券 
      * @apiParam {number} [page] 页数,默认1
@@ -410,7 +410,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/category_list
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/category_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/category_list
      * @apiDescription 获取商品分类列表
      * 
       @apiSuccess {number} id id
@@ -447,7 +447,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/banner_list
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/banner_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/banner_list
      * @apiDescription 轮播,分类下方的banner,推荐的商品集
      * 
       @apiSuccess {number} banner banner轮播的
@@ -547,7 +547,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/home_sp_list
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/home_sp_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/home_sp_list
      * @apiDescription 秒杀和拼团预告
      * 
       @apiSuccess {number} sec 秒杀的
@@ -626,7 +626,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/flash_sale
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/flash_sale
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/flash_sale
      * @apiDescription 秒杀首页
      * 
       @apiSuccess {number} goods_id 商品id
@@ -680,7 +680,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/group_buy
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/group_buy
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy
      * @apiDescription 拼团首页
      * 
       @apiSuccess {number} goods_id 商品id
@@ -729,7 +729,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/service_description
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/service_description
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/service_description
      * @apiDescription 商城服务说明
      * @apiSuccessExample {json} Request-Example:
      * 
@@ -775,7 +775,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/group_buy_info
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/group_buy_info
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy_info
      * @apiDescription 拼团商品详情
      */
     public function groupByGoodsInfo(Request $request) {
@@ -798,7 +798,7 @@ class MallController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/collect
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/collect
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/collect
      * @apiDescription 收藏,取消收藏
      * @apiParam {number} goods_id 商品id
      * 

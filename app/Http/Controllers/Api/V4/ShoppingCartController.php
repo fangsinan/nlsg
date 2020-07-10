@@ -14,7 +14,7 @@ class ShoppingCartController extends Controller {
      * @apiVersion 1.0.0
      * @apiName /api/V4/shopping_cart/create
      * @apiGroup shopping_cart
-     * @apiSampleRequest /api/V4/shopping_cart/create
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/shopping_cart/create
      * @apiDescription 添加,编辑
      * @apiParam {string} goods_id 商品id
      * @apiParam {string} sku_number sku
@@ -61,7 +61,7 @@ class ShoppingCartController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/shopping_cart/get_list
      * @apiGroup  shopping_cart
-     * @apiSampleRequest /api/V4/shopping_cart/get_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/shopping_cart/get_list
      * @apiDescription 购物车列表
      * @apiSuccess {string[]} id list列表  invalid_list失效商品
      * @apiSuccess {string} id 购物车id
@@ -160,7 +160,7 @@ class ShoppingCartController extends Controller {
      * @apiVersion 1.0.0
      * @apiName /api/V4/shopping_cart/status_change
      * @apiGroup shopping_cart
-     * @apiSampleRequest /api/V4/shopping_cart/status_change
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/shopping_cart/status_change
      * @apiDescription 修改状态
      * @apiParam {string=del} flag 状态(删除)
      * @apiParam {number} id id(如  1或者1,2,3 或者[1,2,3])

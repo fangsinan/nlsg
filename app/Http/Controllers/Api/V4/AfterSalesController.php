@@ -25,7 +25,7 @@ class AfterSalesController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/after_sales/goods_list
      * @apiGroup  afterSales
-     * @apiSampleRequest /api/V4/after_sales/goods_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/goods_list
      * @apiDescription 可申请售后订单和商品列表
      * @apiParam {number} [page] 页数,默认1
      * @apiParam {number} [size] 条数,默认10
@@ -88,7 +88,7 @@ class AfterSalesController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/after_sales/create_order
      * @apiGroup  afterSales
-     * @apiSampleRequest /api/V4/after_sales/create_order
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/create_order
      * @apiDescription 申请售后
      * 
      * @apiParam {number=1,2} type  1退款2退货
@@ -118,7 +118,7 @@ class AfterSalesController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/after_sales/list
      * @apiGroup  afterSales
-     * @apiSampleRequest /api/V4/after_sales/list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/list
      * @apiDescription 售后列表
      * @apiParam {number} [page] 页数,默认1
      * @apiParam {number} [size] 条数,默认10
@@ -192,7 +192,7 @@ class AfterSalesController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/after_sales/order_info
      * @apiGroup  afterSales
-     * @apiSampleRequest /api/V4/after_sales/order_info
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/order_info
      * @apiDescription 售后详情
      * @apiParam {number} id id
      * 
@@ -326,7 +326,7 @@ class AfterSalesController extends Controller {
      * @apiVersion 1.0.0
      * @apiName /api/V4/after_sales/status_change
      * @apiGroup afterSales
-     * @apiSampleRequest /api/V4/after_sales/status_change
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/status_change
      * @apiDescription 修改状态
      * @apiParam {string=stop,del} flag 状态(取消,删除)
      * @apiParam {number} id id
@@ -377,7 +377,7 @@ class AfterSalesController extends Controller {
      * @apiVersion 1.0.0
      * @apiName /api/V4/after_sales/refund_post
      * @apiGroup afterSales
-     * @apiSampleRequest /api/V4/after_sales/refund_post
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/refund_post
      * @apiDescription 寄回商品
      * @apiParam {number} id id
      * @apiParam {number} express_id 快递公司id

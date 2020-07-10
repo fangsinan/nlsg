@@ -14,7 +14,7 @@ class CouponController extends Controller {
      * @apiVersion 4.0.0
      * @apiName /api/V4/goods/get_coupon
      * @apiGroup  Mall
-     * @apiSampleRequest /api/V4/goods/get_coupon
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/get_coupon
      * @apiDescription 领取优惠券
      * @apiParam {string} flag 优惠券规则id(31,32,33)
      * 
