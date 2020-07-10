@@ -13,9 +13,9 @@ class MallOrderController extends Controller {
 
     /**
      * 预下单
-     * @api {post} /api/V4/mall/prepare_create_order 普通订单预下单
+     * @api {post} /api/v4/mall/prepare_create_order 普通订单预下单
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/prepare_create_order
+     * @apiName /api/v4/mall/prepare_create_order
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/prepare_create_order
      * @apiDescription 普通订单预下单
@@ -199,9 +199,9 @@ class MallOrderController extends Controller {
 
     /**
      * 下单
-     * @api {post} /api/V4/mall/create_order 普通订单下单
+     * @api {post} /api/v4/mall/create_order 普通订单下单
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/create_order
+     * @apiName /api/v4/mall/create_order
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/create_order
      * @apiDescription 普通订单下单(参数同预下单)
@@ -269,9 +269,9 @@ class MallOrderController extends Controller {
 
     /**
      * 秒杀订单预下单
-     * @api {post} /api/V4/mall/prepare_create_flash_sale_order 秒杀订单预下单
+     * @api {post} /api/v4/mall/prepare_create_flash_sale_order 秒杀订单预下单
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/prepare_create_flash_sale_order
+     * @apiName /api/v4/mall/prepare_create_flash_sale_order
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/prepare_create_flash_sale_order
      * @apiDescription 秒杀订单预下单
@@ -444,9 +444,9 @@ class MallOrderController extends Controller {
 
     /**
      * 秒杀订单下单
-     * @api {post} /api/V4/mall/create_flash_sale_order 秒杀订单下单
+     * @api {post} /api/v4/mall/create_flash_sale_order 秒杀订单下单
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/create_flash_sale_order
+     * @apiName /api/v4/mall/create_flash_sale_order
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/create_flash_sale_order
      * @apiDescription 秒杀订单下单(参数同预下单)
@@ -507,9 +507,9 @@ class MallOrderController extends Controller {
 
     /**
      * 拼团订单预下单
-     * @api {post} /api/V4/mall/prepare_create_group_buy_order 拼团订单预下单
+     * @api {post} /api/v4/mall/prepare_create_group_buy_order 拼团订单预下单
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/prepare_create_group_buy_order
+     * @apiName /api/v4/mall/prepare_create_group_buy_order
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/prepare_create_group_buy_order
      * @apiDescription 拼团订单预下单
@@ -699,9 +699,9 @@ class MallOrderController extends Controller {
 
     /**
      * 拼团订单下单
-     * @api {post} /api/V4/mall/create_group_buy_order 拼团订单下单
+     * @api {post} /api/v4/mall/create_group_buy_order 拼团订单下单
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/create_group_buy_order
+     * @apiName /api/v4/mall/create_group_buy_order
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/create_group_buy_order
      * @apiDescription 拼团订单下单
@@ -787,9 +787,9 @@ class MallOrderController extends Controller {
 
     /**
      * 秒杀订单支付未成功处理
-     * @api {post} /api/V4/mall/flash_sale_pay_fail 秒杀订单支付未成功处理
+     * @api {post} /api/v4/mall/flash_sale_pay_fail 秒杀订单支付未成功处理
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/flash_sale_pay_fail
+     * @apiName /api/v4/mall/flash_sale_pay_fail
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/flash_sale_pay_fail
      * @apiDescription 秒杀订单支付未成功处理
@@ -831,9 +831,9 @@ class MallOrderController extends Controller {
 
     /**
      * 拼团队伍信息
-     * @api {get} /api/V4/goods/group_buy_team_list 拼团队伍信息
+     * @api {get} /api/v4/goods/group_buy_team_list 拼团队伍信息
      * @apiVersion 1.0.0
-     * @apiName /api/V4/goods/group_buy_team_list
+     * @apiName /api/v4/goods/group_buy_team_list
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy_team_list
      * @apiDescription 拼团队伍信息
@@ -890,9 +890,9 @@ class MallOrderController extends Controller {
 
     /**
      * 普通和秒杀订单的列表
-     * @api {post} /api/V4/mall/order_list 普通和秒杀订单的列表
+     * @api {post} /api/v4/mall/order_list 普通和秒杀订单的列表
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/order_list
+     * @apiName /api/v4/mall/order_list
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/order_list
      * @apiDescription 普通和秒杀订单的列表
@@ -971,9 +971,9 @@ class MallOrderController extends Controller {
 
     /**
       普通和秒杀订单的详情
-      @api {get} /api/V4/mall/order_info 普通和秒杀订单的详情
+      @api {get} /api/v4/mall/order_info 普通和秒杀订单的详情
       @apiVersion 1.0.0
-      @apiName /api/V4/mall/order_info
+      @apiName /api/v4/mall/order_info
       @apiGroup MallOrder
       @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/order_info
       @apiDescription 普通和秒杀订单的详情
@@ -1163,9 +1163,9 @@ class MallOrderController extends Controller {
 
     /**
      * 拼团订单的列表
-     * @api {get} /api/V4/mall/group_buy_order_list 拼团订单的列表
+     * @api {get} /api/v4/mall/group_buy_order_list 拼团订单的列表
      * @apiVersion 1.0.0
-     * @apiName /api/V4/mall/group_buy_order_list
+     * @apiName /api/v4/mall/group_buy_order_list
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/group_buy_order_list
      * @apiDescription 拼团订单的列表
@@ -1244,9 +1244,9 @@ class MallOrderController extends Controller {
 
     /**
       拼团订单详情
-      @api {get} /api/V4/mall/group_buy_order_info 拼团订单详情
+      @api {get} /api/v4/mall/group_buy_order_info 拼团订单详情
       @apiVersion 1.0.0
-      @apiName /api/V4/mall/group_buy_order_info
+      @apiName /api/v4/mall/group_buy_order_info
       @apiGroup MallOrder
       @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/group_buy_order_info
       @apiDescription 拼团订单详情
@@ -1451,9 +1451,9 @@ class MallOrderController extends Controller {
 
     /**
       修改订单状态
-      @api {put} /api/V4/mall/status_change 修改订单状态(取消,删除,确认收货)
+      @api {put} /api/v4/mall/status_change 修改订单状态(取消,删除,确认收货)
       @apiVersion 1.0.0
-      @apiName /api/V4/mall/status_change
+      @apiName /api/v4/mall/status_change
       @apiGroup MallOrder
       @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/status_change
       @apiDescription 修改订单状态
@@ -1487,9 +1487,9 @@ class MallOrderController extends Controller {
 
     /**
       未评论商品列表
-      @api {get} /api/V4/mall/no_comment_list 未评论商品列表
+      @api {get} /api/v4/mall/no_comment_list 未评论商品列表
       @apiVersion 1.0.0
-      @apiName /api/V4/mall/no_comment_list
+      @apiName /api/v4/mall/no_comment_list
       @apiGroup MallOrder
       @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/no_comment_list
       @apiDescription 未评论商品列表
@@ -1532,9 +1532,9 @@ class MallOrderController extends Controller {
 
     /**
       评价
-      @api {post} /api/V4/mall/sub_comment 评价
+      @api {post} /api/v4/mall/sub_comment 评价
       @apiVersion 1.0.0
-      @apiName /api/V4/mall/sub_comment
+      @apiName /api/v4/mall/sub_comment
       @apiGroup MallOrder
       @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/sub_comment
       @apiDescription 评价
@@ -1562,9 +1562,9 @@ class MallOrderController extends Controller {
 
     /**
       查看评价
-      @api {get} /api/V4/mall/get_comment 查看评价
+      @api {get} /api/v4/mall/get_comment 查看评价
       @apiVersion 1.0.0
-      @apiName /api/V4/mall/get_comment
+      @apiName /api/v4/mall/get_comment
       @apiGroup MallOrder
       @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/get_comment
       @apiDescription 查看评价
@@ -1601,9 +1601,9 @@ class MallOrderController extends Controller {
 
     /**
       评价原因列表
-      @api {get} /api/V4/mall/comment_issue_list 评价原因列表
+      @api {get} /api/v4/mall/comment_issue_list 评价原因列表
       @apiVersion 1.0.0
-      @apiName /api/V4/mall/comment_issue_list
+      @apiName /api/v4/mall/comment_issue_list
       @apiGroup MallOrder
       @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/comment_issue_list
       @apiDescription 评价原因列表

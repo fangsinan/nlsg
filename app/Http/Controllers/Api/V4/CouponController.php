@@ -10,9 +10,9 @@ class CouponController extends Controller {
 
     /**
      * 领取优惠券
-     * @api {post} /api/V4/goods/get_coupon 领取优惠券
+     * @api {post} /api/v4/goods/get_coupon 领取优惠券
      * @apiVersion 4.0.0
-     * @apiName /api/V4/goods/get_coupon
+     * @apiName /api/v4/goods/get_coupon
      * @apiGroup  Mall
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/get_coupon
      * @apiDescription 领取优惠券

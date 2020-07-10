@@ -10,9 +10,9 @@ class ShoppingCartController extends Controller {
 
     /**
      * 添加,编辑
-     * @api {post} /api/V4/shopping_cart/create 添加,编辑
+     * @api {post} /api/v4/shopping_cart/create 添加,编辑
      * @apiVersion 1.0.0
-     * @apiName /api/V4/shopping_cart/create
+     * @apiName /api/v4/shopping_cart/create
      * @apiGroup shopping_cart
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/shopping_cart/create
      * @apiDescription 添加,编辑
@@ -57,9 +57,9 @@ class ShoppingCartController extends Controller {
 
     /**
      * 购物车列表
-     * @api {get} /api/V4/shopping_cart/get_list 购物车列表
+     * @api {get} /api/v4/shopping_cart/get_list 购物车列表
      * @apiVersion 4.0.0
-     * @apiName /api/V4/shopping_cart/get_list
+     * @apiName /api/v4/shopping_cart/get_list
      * @apiGroup  shopping_cart
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/shopping_cart/get_list
      * @apiDescription 购物车列表
@@ -156,9 +156,9 @@ class ShoppingCartController extends Controller {
 
     /**
      * 修改状态
-     * @api {put} /api/V4/shopping_cart/status_change 修改状态
+     * @api {put} /api/v4/shopping_cart/status_change 修改状态
      * @apiVersion 1.0.0
-     * @apiName /api/V4/shopping_cart/status_change
+     * @apiName /api/v4/shopping_cart/status_change
      * @apiGroup shopping_cart
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/shopping_cart/status_change
      * @apiDescription 修改状态

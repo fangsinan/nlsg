@@ -21,9 +21,9 @@ class AfterSalesController extends Controller {
 
     /**
      * 可申请售后订单和商品列表
-     * @api {get} /api/V4/after_sales/goods_list 可申请售后订单和商品列表
+     * @api {get} /api/v4/after_sales/goods_list 可申请售后订单和商品列表
      * @apiVersion 4.0.0
-     * @apiName /api/V4/after_sales/goods_list
+     * @apiName /api/v4/after_sales/goods_list
      * @apiGroup  afterSales
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/goods_list
      * @apiDescription 可申请售后订单和商品列表
@@ -84,9 +84,9 @@ class AfterSalesController extends Controller {
 
     /**
      * 申请售后
-     * @api {post} /api/V4/after_sales/create_order 申请售后
+     * @api {post} /api/v4/after_sales/create_order 申请售后
      * @apiVersion 4.0.0
-     * @apiName /api/V4/after_sales/create_order
+     * @apiName /api/v4/after_sales/create_order
      * @apiGroup  afterSales
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/create_order
      * @apiDescription 申请售后
@@ -114,9 +114,9 @@ class AfterSalesController extends Controller {
 
     /**
      * 售后列表
-     * @api {get} /api/V4/after_sales/list 售后列表
+     * @api {get} /api/v4/after_sales/list 售后列表
      * @apiVersion 4.0.0
-     * @apiName /api/V4/after_sales/list
+     * @apiName /api/v4/after_sales/list
      * @apiGroup  afterSales
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/list
      * @apiDescription 售后列表
@@ -188,9 +188,9 @@ class AfterSalesController extends Controller {
 
     /**
      * 售后详情
-     * @api {get} /api/V4/after_sales/order_info 售后详情
+     * @api {get} /api/v4/after_sales/order_info 售后详情
      * @apiVersion 4.0.0
-     * @apiName /api/V4/after_sales/order_info
+     * @apiName /api/v4/after_sales/order_info
      * @apiGroup  afterSales
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/order_info
      * @apiDescription 售后详情
@@ -322,9 +322,9 @@ class AfterSalesController extends Controller {
 
     /**
      * 修改状态
-     * @api {put} /api/V4/after_sales/status_change 修改状态
+     * @api {put} /api/v4/after_sales/status_change 修改状态
      * @apiVersion 1.0.0
-     * @apiName /api/V4/after_sales/status_change
+     * @apiName /api/v4/after_sales/status_change
      * @apiGroup afterSales
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/status_change
      * @apiDescription 修改状态
@@ -373,9 +373,9 @@ class AfterSalesController extends Controller {
 
     /**
      * 寄回商品
-     * @api {put} /api/V4/after_sales/refund_post 寄回商品
+     * @api {put} /api/v4/after_sales/refund_post 寄回商品
      * @apiVersion 1.0.0
-     * @apiName /api/V4/after_sales/refund_post
+     * @apiName /api/v4/after_sales/refund_post
      * @apiGroup afterSales
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/refund_post
      * @apiDescription 寄回商品

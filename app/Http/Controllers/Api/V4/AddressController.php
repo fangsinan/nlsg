@@ -23,9 +23,9 @@ class AddressController extends Controller {
 
     /**
      * 行政区划表数据
-     * @api {get} /api/V4/address/get_data 行政区划表数据
+     * @api {get} /api/v4/address/get_data 行政区划表数据
      * @apiVersion 4.0.0
-     * @apiName /api/V4/address/get_data
+     * @apiName /api/v4/address/get_data
      * @apiGroup  address
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/get_data
      * @apiDescription 行政区划表数据
@@ -64,9 +64,9 @@ class AddressController extends Controller {
 
     /**
      * 添加,编辑
-     * @api {post} /api/V4/address/create 添加,编辑
+     * @api {post} /api/v4/address/create 添加,编辑
      * @apiVersion 1.0.0
-     * @apiName /api/V4/address/create
+     * @apiName /api/v4/address/create
      * @apiGroup address
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/create
      * @apiDescription 添加,编辑
@@ -116,9 +116,9 @@ class AddressController extends Controller {
 
     /**
      * 收货地址列表
-     * @api {get} /api/V4/address/get_list 收货地址列表
+     * @api {get} /api/v4/address/get_list 收货地址列表
      * @apiVersion 4.0.0
-     * @apiName /api/V4/address/get_list
+     * @apiName /api/v4/address/get_list
      * @apiGroup  address
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/get_list
      * @apiDescription 收货地址列表,字段说明见创建接口
@@ -169,9 +169,9 @@ class AddressController extends Controller {
 
     /**
      * 修改状态
-     * @api {put} /api/V4/address/status_change 修改状态
+     * @api {put} /api/v4/address/status_change 修改状态
      * @apiVersion 1.0.0
-     * @apiName /api/V4/address/status_change
+     * @apiName /api/v4/address/status_change
      * @apiGroup address
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/status_change
      * @apiDescription 修改状态
@@ -220,9 +220,9 @@ class AddressController extends Controller {
 
     /**
      * 自提点和退货点列表
-     * @api {get} /api/V4/address/list_of_shop 收货地址列表
+     * @api {get} /api/v4/address/list_of_shop 收货地址列表
      * @apiVersion 4.0.0
-     * @apiName /api/V4/address/list_of_shop
+     * @apiName /api/v4/address/list_of_shop
      * @apiGroup  address
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/list_of_shop
      * @apiDescription 自提点和退货点列表

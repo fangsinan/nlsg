@@ -21,9 +21,9 @@ class ExpressController extends Controller {
 
     /**
      * 快递进度查询
-     * @api {get} /api/V4/post/get_info 快递进度查询
+     * @api {get} /api/v4/post/get_info 快递进度查询
      * @apiVersion 4.0.0
-     * @apiName /api/V4/post/get_info
+     * @apiName /api/v4/post/get_info
      * @apiGroup  express
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/post/get_info
      * @apiDescription 快递进度查询
@@ -76,9 +76,9 @@ class ExpressController extends Controller {
 
     /**
      * 快递公司列表
-     * @api {get} /api/V4/post/company_list 快递公司列表
+     * @api {get} /api/v4/post/company_list 快递公司列表
      * @apiVersion 4.0.0
-     * @apiName /api/V4/post/company_list
+     * @apiName /api/v4/post/company_list
      * @apiGroup  express
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/post/company_list
      * @apiDescription 快递公司列表
