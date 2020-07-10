@@ -206,7 +206,7 @@ class WorksController extends Controller
 
         //精品名师
         $Teacher = Works::select('user_id')->with([
-            'UserName'=>function($query){
+            'userName'=>function($query){
                 $query->select('id','nickname');
             }])->where('status',4)
             ->orderBy('subscribe_num','desc')->groupBy('user_id')

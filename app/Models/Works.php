@@ -14,21 +14,21 @@ class Works extends Base
     public $timestamps = false;
 
 
-    public function CategoryRelation()
+    public function categoryRelation()
     {
         //一对多
         return $this->hasMany('App\Models\WorksCategoryRelation','work_id', 'id');
     }
 
 
-    public function UserName()
+    public function userName()
     {
         //一对多
         return $this->belongsTo('App\Models\User','user_id');
     }
 
 
-    public function WorkInfo()
+    public function workInfo()
     {
         //一对多
         return $this->hasMany('App\Models\WorksInfo','pid');
