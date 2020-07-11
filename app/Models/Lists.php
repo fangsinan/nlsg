@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Lists extends Model
 {
@@ -31,13 +32,6 @@ class Lists extends Model
         return $lists;
     }
 
-    public function works()
-    {
-        return $this->belongsToMany('App\Models\Works',
-            'nlsg_lists_work','lists_id', 'works_id');
-    }
-
-
 
     public function getIndexGoods($ids) {
 
@@ -50,6 +44,58 @@ class Lists extends Model
             ->toArray();
         return $lists;
     }
+
+    public function getRankWorks()
+    {
+        $lists = Lists::select('id', 'title')
+            ->with([
+                'works' => function ($query) {
+                    $query->select('works_id', 'user_id', 'title','subtitle', 'cover_img','chapter_num', 'subscribe_num','is_free','price');
+                }
+            ])
+            ->where('type', 4)
+            ->limit(20)
+            ->get()
+            ->toArray();
+        return $lists;
+    }
+
+    public function getRankWiki()
+    {
+        $lists = Lists::select('id', 'title')
+            ->with([
+                'listWorks.wiki' => function($query){
+                    $query->select('id','name','content','view_num','like_num','comment_num');
+                }
+            ])
+            ->where('type', 5)
+            ->limit(20)
+            ->get();
+
+        $lists->map(function($item){
+            $item->content = Str::limit($item->content, 30);
+        });
+        return $lists;
+    }
+
+    public function listWorks()
+    {
+        return $this->hasMany('App\Models\ListsWork','lists_id', 'id');
+    }
+
+    public function works()
+    {
+        return $this->belongsToMany('App\Models\Works',
+            'nlsg_lists_work', 'lists_id', 'works_id');
+    }
+
+    public function wiki()
+    {
+       return $this->belongsTo('App\Models\Wiki',
+           'nlsg_lists_work', 'lists_id', 'works_id');
+    }
+
+
 
 
 }

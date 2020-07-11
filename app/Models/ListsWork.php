@@ -28,18 +28,21 @@ class ListsWork extends Model
         }])->whereIn('lists_id',$ids)
             ->get()
             ->toArray();
-        dd(array_values($lists));
         $arr = [];
         foreach ($lists as $v) {
             $arr[$v['lists_id']][] = $v;
         }
-        dd($arr);
         return $arr;
     }
 
     public function lists()
     {
         return $this->belongsToMany('App\Models\Lists', 'nlsg_lists_work','lists_id', 'works_id');
+    }
+
+    public function wiki()
+    {
+        return $this->belongsTo('App\Models\Wiki','works_id', 'id');
     }
 
 }

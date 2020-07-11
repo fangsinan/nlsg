@@ -191,6 +191,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('wiki/show', 'WikiController@show');
     Route::get('wiki/related', 'WikiController@related');
 
+    //排行榜
+    Route::get('rank/works', 'RankController@works');
+    Route::get('rank/wiki', 'RankController@wiki');
+
     //我的
     Route::get('user/index', 'UserController@index');
     Route::post('user/feedback', 'UserController@feedback');
