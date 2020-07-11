@@ -459,69 +459,7 @@ class WorksController extends Controller
 
     }
 
-    /**
-     * @api {get} api/v4/works/free  免费专区
-     * @apiVersion 4.0.0
-     * @apiName  free
-     * @apiGroup Works
-     *
-     * @apiSuccess {string} works  课程
-     * @apiSuccess {string} works.title 标题
-     * @apiSuccess {string} works.subtitle 副标题
-     * @apiSuccess {string} works.cover_img 封面
-     * @apiSuccess {number} works.is_new  是否为new
-     * @apiSuccess {number} works.chapter_num  课程章节数
-     * @apiSuccess {string} book  听书
-     * @apiSuccess {string} book.title 标题
-     * @apiSuccess {string} book.subtitle 副标题
-     * @apiSuccess {string} book.cover_img 封面
-     * @apiSuccess {number} book.is_new  是否为new
-     * @apiSuccess {number} book.chapter_num  听书章节数
-     *
-     * @apiSuccessExample  Success-Response:
-     *     HTTP/1.1 200 OK
-     *     {
-     *       "code": 200,
-     *       "msg" : '成功',
-     *       "data":{
-                "works": [
-                  {
-                    "id": 20,
-                    "user_id": 1,
-                    "title": "理解孩子行为背后的原因",
-                    "subtitle": "",
-                    "cover_img": "/wechat/works/video/161627/2017061411282192073.jpg",
-                    "is_new": 1,
-                     "user": {
-                          "id": 1,
-                          "nickname": "刘先森"
-                     }
-                  }
-                ],
-                "book": [
-                  {
-                    "id": 30,
-                    "user_id": 168934,
-                    "title": "不要羞辱你的孩子 他的心很脆弱",
-                    "subtitle": "家庭教育",
-                    "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
-                    "is_new": 1,
-                    "user": {
-                      "id": 168934,
-                      "nickname": "chandler"
-                    }
-                  }
-                ]
-              }
-     *     }
-     *
-     */
-    public function free()
-    {
-        $work = new Works();
-        $lists = $work->getFreeWorks();
-        return success($lists);
-    }
+
 
 
 }

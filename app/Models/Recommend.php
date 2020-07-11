@@ -68,18 +68,25 @@ class Recommend extends Base
         return $result;
     }
 
-    /**
-     * 首页的每日琨说
-     * @param $id
-     * @return bool
-     */
-    public  function  getRecommendWorks($id)
+
+    public  function  getEditorWorks()
     {
-        if (!$id){
-            return false;
-        }
+        $lists = Recommend::with(['works'=>function($query){
+                    $query->select('id','user_id','title','subtitle','cover_img','price','chapter_num','subscribe_num');
+                 },
+                 'works.user' => function($query){
+                    $query->select('id','nickname');
+                 }])
+                 ->select('id', 'relation_id','reason')
+                 ->where('position', 1)
+                 ->where('type', 12)
+                 ->orderBy('created_at', 'desc')
+                 ->get();
+        return $lists;
+    }
 
-
-
+    public function  works()
+    {
+        return $this->belongsTo('App\Models\Works', 'relation_id', 'id');
     }
 }

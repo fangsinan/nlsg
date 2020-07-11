@@ -29,6 +29,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('index/course', 'IndexController@course');
     Route::get('index/rank', 'IndexController@rank');
     Route::get('index/recommend', 'IndexController@recommend');
+    Route::get('index/free', 'IndexController@free');
+    Route::get('index/editor', 'IndexController@editor');
 
     //专栏
     Route::get('column/get_column_list', 'ColumnController@getColumnList');
@@ -48,7 +50,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('works/get_works_content', 'WorksController@getWorksContent');
     Route::get('works/get_works_index', 'WorksController@getWorksIndex');
     Route::post('works/subscribe', 'WorksController@subscribe');
-    Route::get('works/free', 'WorksController@free');
+
 
     //听书
     Route::get('book/get_book_list', 'ListenBookController@getBookList');
@@ -165,7 +167,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     //物流查询
     Route::get('post/get_info', 'ExpressController@getPostInfo');
     Route::get('post/company_list', 'ExpressController@companyList');
-    
+
     Route::get('coupon/list', 'CouponController@list');
     //*******************************商城部分结束*******************************
 
