@@ -627,32 +627,107 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/editor  首页轮播图
+     * @api {get} api/v4/index/editor  首页-主编推荐
      * @apiVersion 4.0.0
-     * @apiName  banner
+     * @apiName  editor
      * @apiGroup Index
      *
-     * @apiSuccess {string}
+     * @apiSuccess {string} reason 推荐理由
+     * @apiSuccess {string} relation_type 1.课程 2.听书 3.专栏 4.讲座
+     * @apiSuccess {string} works  课程
+     * @apiSuccess {string} works.title    标题
+     * @apiSuccess {string} works.subtitle 副标题
+     * @apiSuccess {string} works.cover_img 封面
+     * @apiSuccess {string} works.chapter_num 章节数
+     * @apiSuccess {string} works.subscibe_num 学习数
+     * @apiSuccess {string} user     用户
+     * @apiSuccess {string} user.nickname  用户昵称
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-     *       "data":[
-     *               {
-     *                   "id": 274,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
-     *                   "title": "电商弹窗课程日历套装",
-     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
-     *               },
-     *               {
-     *                   "id": 296,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
-     *                   "title": "心里学",
-     *                   "url": "/mall/shop-details?goods_id=479"
-     *               }
-     *         ]
+              * "data": [
+    * {
+      * "id": 17,
+      * "relation_id": "16",
+      * "relation_type": 1,
+      * "reason": "欣赏是一种享受，是一种实实在在的享受",
+      * "works": {
+        * "id": 16,
+        * "user_id": 168934,
+        * "title": "如何经营幸福婚姻",
+        * "subtitle": "",
+        * "cover_img": "/nlsg/works/20190822150244797760.png",
+        * "price": "29.90",
+        * "chapter_num": 0,
+        * "subscribe_num": 287,
+        * "user": {
+          * "id": 168934,
+          * "nickname": "chandler"
+        * }
+      * }
+    * },
+    * {
+      * "id": 18,
+      * "relation_id": "2",
+      * "relation_type": 4,
+      * "reason": "值得学习",
+      * "works": {
+        * "id": 2,
+        * "user_id": 1,
+        * "name": "张宝萍专栏",
+        * "title": "国家十百千万工程心灵导师",
+        * "subtitle": "心灵导师 直击人心",
+        * "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+        * "price": "0.00",
+        * "user": {
+          * "id": 1,
+          * "nickname": "刘先森"
+        * }
+      * }
+    * },
+    * {
+      * "id": 19,
+      * "relation_id": "1",
+      * "relation_type": 3,
+      * "reason": "很好",
+      * "works": {
+        * "id": 1,
+        * "user_id": 211172,
+        * "name": "王琨专栏",
+        * "title": "顶尖导师 经营能量",
+        * "subtitle": "顶尖导师 经营能量",
+        * "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+        * "price": "99.00",
+        * "user": {
+          * "id": 211172,
+          * "nickname": "能量时光"
+        * }
+      * }
+    * },
+    * {
+      * "id": 21,
+      * "relation_id": "18",
+      * "relation_type": 2,
+      * "reason": "欣赏是一种享受，是一种实实在在的享受",
+      * "works": {
+        * "id": 18,
+        * "user_id": 211172,
+        * "title": "如何培养高情商孩子",
+        * "subtitle": "",
+        * "cover_img": "/wechat/works/video/161910/1639_1525340866.png",
+        * "price": "0.00",
+        * "chapter_num": 0,
+        * "subscribe_num": 0,
+        * "user": {
+          * "id": 211172,
+          * "nickname": "能量时光"
+        * }
+      * }
+    * }
+  * ]
      *     }
      *
      */

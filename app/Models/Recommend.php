@@ -7,6 +7,7 @@ use App\Models\Works;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Models\Wiki;
+use App\Models\Column;
 
 class Recommend extends Base
 {
@@ -71,18 +72,39 @@ class Recommend extends Base
 
     public  function  getEditorWorks()
     {
-        $lists = Recommend::with(['works'=>function($query){
-                    $query->select('id','user_id','title','subtitle','cover_img','price','chapter_num','subscribe_num');
-                 },
-                 'works.user' => function($query){
-                    $query->select('id','nickname');
-                 }])
-                 ->select('id', 'relation_id','reason')
+        $lists = Recommend::select('id', 'relation_id','relation_type','reason')
                  ->where('position', 1)
                  ->where('type', 12)
                  ->orderBy('created_at', 'desc')
-                 ->get();
+                 ->get()
+                 ->toArray();
+        if ($lists){
+            foreach ($lists as &$v) {
+               if ($v['relation_type']==1 || $v['relation_type'] == 2 ) {
+                   $v['works'] = Works::with([
+                       'user' => function ($query) {
+                           $query->select('id', 'nickname');
+                       }])
+                       ->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'price', 'chapter_num', 'subscribe_num'])
+                       ->where('id', $v['relation_id'])
+                       ->first();
+
+               } elseif ($v['relation_type'] == 3 || $v['relation_type'] == 4) {
+
+                   $v['works'] = Column::with([
+                       'user' => function ($query) {
+                           $query->select('id', 'nickname');
+                       }])
+                       ->select(['id', 'user_id', 'name','title','subtitle', 'cover_pic', 'price'])
+                       ->where('id', $v['relation_id'])
+                       ->first();
+               }
+
+            }
+        }
+
         return $lists;
+
     }
 
     public function  works()

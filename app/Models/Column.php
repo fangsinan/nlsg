@@ -21,13 +21,11 @@ class Column extends Base
         return time();
     }
 
-
     public function user()
     {
-        //return $this->hasOne('App\Models\User','id','user_id');
         return $this->belongsTo('App\Models\User', 'user_id','id');
-        //->select(['field']);
     }
+
     //获取专栏相关信息
     static function getColumnInfo($column_id,$field,$user_id=0){
         $column = Column::where('id',$column_id)->first($field)->toArray();
