@@ -109,7 +109,13 @@ class RankController extends Controller
      * @apiName  wiki
      * @apiGroup Rank
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/rank/wiki
-     * @apiSuccess {string}
+     * @apiSuccess {string} title 主标题
+     * @apiSuccess {string} list_wroks
+     * @apiSuccess {string} list_wroks.wiki.name 标题
+     * @apiSuccess {string} list_wroks.wiki.content 内容简介
+     * @apiSuccess {string} list_wroks.wiki.view_num 浏览数
+     * @apiSuccess {string} list_wroks.wiki.like_num 收藏数
+     * @apiSuccess {string} list_wroks.wiki.comment_num 评论数
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
