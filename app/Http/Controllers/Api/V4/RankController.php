@@ -49,6 +49,10 @@ class RankController extends Controller
             "lists_id": 8,
             "works_id": 30
           }
+         "user": {
+            "id": 168934,
+            "nickname": "chandler"
+         }
         },
         {
           "works_id": 31,
@@ -64,6 +68,10 @@ class RankController extends Controller
             "lists_id": 8,
             "works_id": 31
           }
+          "user": {
+                "id": 168934,
+                "nickname": "chandler"
+           }
         },
         {
           "works_id": 32,
@@ -79,6 +87,10 @@ class RankController extends Controller
             "lists_id": 8,
             "works_id": 32
           }
+          "user": {
+             "id": 168934,
+             "nickname": "chandler"
+          }
         }
       ]
      *     }
@@ -91,6 +103,61 @@ class RankController extends Controller
         return success($lists);
     }
 
+    /**
+     * @api {get} api/v4/rank/wiki  首页轮播图
+     * @apiVersion 4.0.0
+     * @apiName  wiki
+     * @apiGroup Rank
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/rank/wiki
+     * @apiSuccess {string}
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+            "data": [
+               {
+                 "id": 9,
+                 "title": "热门百科榜单",
+                 "content": null,
+                 "list_works": [
+                   {
+                     "id": 16,
+                     "lists_id": 9,
+                     "works_id": 1,
+                     "created_at": "2020-07-08T02:00:00.000000Z",
+                     "updated_at": "2020-07-08T02:00:00.000000Z",
+                     "wiki": {
+                       "id": 1,
+                       "name": "室内空气污染对孩子的危害",
+                       "content": "社会的进步，工业的发展，导致污染越来越严重，触目惊心",
+                       "view_num": 10,
+                       "like_num": 2,
+                       "comment_num": 5
+                     }
+                   },
+                   {
+                     "id": 17,
+                     "lists_id": 9,
+                     "works_id": 2,
+                     "created_at": "2020-07-08T02:00:00.000000Z",
+                     "updated_at": "2020-07-08T02:00:00.000000Z",
+                     "wiki": {
+                       "id": 2,
+                       "name": "世界名著必读岁月经典",
+                       "content": "每个时代都有极其红极广受好评",
+                       "view_num": 5,
+                       "like_num": 6,
+                       "comment_num": 5
+                     }
+                   }
+                 ]
+               }
+             ]
+     *     }
+     *
+     */
     public function wiki()
     {
         $model = new Lists();

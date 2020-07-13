@@ -51,6 +51,9 @@ class Lists extends Model
             ->with([
                 'works' => function ($query) {
                     $query->select('works_id', 'user_id', 'title','subtitle', 'cover_img','chapter_num', 'subscribe_num','is_free','price');
+                },
+                'works.user' =>function($query){
+                    $query->select('id','nickname');
                 }
             ])
             ->where('type', 4)
@@ -64,6 +67,9 @@ class Lists extends Model
     {
         $lists = Lists::select('id', 'title')
             ->with([
+                'listWorks'  =>function($query){
+                    $query->select('id','lists_id', 'works_id');
+                },
                 'listWorks.wiki' => function($query){
                     $query->select('id','name','content','view_num','like_num','comment_num');
                 }
