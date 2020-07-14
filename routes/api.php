@@ -50,6 +50,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('works/get_works_content', 'WorksController@getWorksContent');
     Route::get('works/get_works_index', 'WorksController@getWorksIndex');
     Route::post('works/subscribe', 'WorksController@subscribe');
+    Route::get('works/works_category_data', 'WorksController@worksCategory');
 
 
     //听书
