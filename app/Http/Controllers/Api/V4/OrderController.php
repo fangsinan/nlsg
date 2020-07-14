@@ -159,11 +159,14 @@ class OrderController extends Controller
 
         //优惠券
         $coupon_price = Coupon::getCouponMoney($coupon_id,$user_id,$column_data->price,1);
-
+        $type = 1;
+        if($column_data['type'] == 2){
+            $type = 15;
+        }
         $ordernum = '123';
         $data=[
             'ordernum'      => $ordernum,
-            'type'          => 1,
+            'type'          => $type,
             'user_id'       => $user_id,
             'relation_id'   => $column_id,
             'cost_price'    => $column_data->price,

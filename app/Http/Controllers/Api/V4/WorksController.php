@@ -462,4 +462,61 @@ class WorksController extends Controller
 
 
 
+
+    /**
+     * @api {get} /api/v4/works/works_category_data  获取分类[app首页和分类列表用]
+     * @apiName works_category_data
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiParam {int} is_index  是否首页
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    code: 200,
+    msg: "成功",
+    data: [
+    {
+    id: 1,
+    name: "父母关系",
+    pid: 0,
+    level: 1,
+    son: [
+    {
+    id: 3,
+    name: "母子亲密关系",
+    pid: 1,
+    level: 2,
+    son: [ ]
+    }
+    ]
+    },
+    {
+    id: 2,
+    name: "亲子关系",
+    pid: 0,
+    level: 1,
+    son: [ ]
+    }
+    ]
+    }
+     */
+    public function worksCategory(Request $request){
+
+        $is_index = $request->input('is_index',0);
+        if($is_index){
+            $category = WorksCategory::select('id','name','pid','level')->where([
+                'type' => 1, 'status' => 1, 'is_index'=>1,
+            ])->orderBy('order','desc')->get()->toArray();
+            return $this->success($category);
+        }
+        $category = WorksCategory::select('id','name','pid','level')->where([
+            'type' => 1, 'status' => 1,
+        ])->orderBy('order','desc')->get()->toArray();
+        $data = WorksCategory::getCategory($category,0,1);
+        return $this->success($data);
+    }
+
+
 }

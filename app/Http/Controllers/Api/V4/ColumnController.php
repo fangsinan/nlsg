@@ -82,6 +82,7 @@ class ColumnController extends Controller
     }
      */
     public function getColumnList(Request $request){
+
         //排序
         $order = $request->input('order',1);
         //type 1 专栏  2讲座
