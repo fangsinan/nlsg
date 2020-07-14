@@ -10,6 +10,7 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 /**
  * Description of MallRefundRecord
@@ -242,7 +243,7 @@ class MallRefundRecord extends Base {
                 'receive_at', 'succeed_at', 'price', 'reason_id', 'description',
                 'is_check_reject', 'check_reject_at', 'check_remark',
                 'is_authenticate_reject', 'authenticate_reject_at',
-                'authenticate_remark','express_info_id'
+                'authenticate_remark', 'express_info_id'
 //                'express_id', 'express_num'
             ];
 
@@ -318,7 +319,7 @@ class MallRefundRecord extends Base {
                 }
             }
             $v->goods_list = $temp_data;
-            if(!empty($v->expressInfo)){
+            if (!empty($v->expressInfo)) {
                 $v->expressInfo->history = json_decode($v->expressInfo->history);
             }
             unset($list[$k]->infoOrder, $list[$k]->infoDetail);
@@ -327,12 +328,11 @@ class MallRefundRecord extends Base {
         return $list;
     }
 
-    
     public function expressInfo() {
         return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
                         ->select(['id', 'history']);
     }
-    
+
     public function infoOrder() {
         return $this->hasOne('App\Models\MallOrder', 'id', 'order_id')
                         ->select(['id', 'ordernum']);
