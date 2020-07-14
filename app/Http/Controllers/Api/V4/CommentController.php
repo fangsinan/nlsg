@@ -21,8 +21,8 @@ class CommentController extends Controller
      *
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/index
      *
-     * @apiParams {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课
-     * @apiParams {number} id    模块id
+     * @apiParam {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课
+     * @apiParam {number} id    模块id
      *
      * @apiSuccess {string} content  发表的内容
      * @apiSuccess {number} forward_num  转发数
