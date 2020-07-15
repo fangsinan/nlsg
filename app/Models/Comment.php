@@ -59,6 +59,7 @@ class Comment extends Base
                         'to_user:id,nickname,headimg'
                   ])
                  ->select(['id','from_uid','to_uid','created_at'])
+                 ->where('status', 1)
                  ->paginate(2)
                  ->toArray();
         $comment['reply'] = $reply['data'];

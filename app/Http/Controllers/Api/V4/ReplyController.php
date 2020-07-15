@@ -10,22 +10,27 @@ use Illuminate\Http\Request;
 
 class ReplyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
 
     /**
-     * Store a newly created resource in storage.
+     * @api {get} api/v4/reply/store  回复
+     * @apiVersion 4.0.0
+     * @apiName  store
+     * @apiGroup Reply
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/reply/store
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @apiParam {number} comment_id 评论id
+     * @apiParam {string} content    回复内容
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
      */
     public function store(Request $request)
     {
@@ -60,30 +65,33 @@ class ReplyController extends Controller
             $notify->save();
 
             //发送通知
-            return $this->success();
+            return success();
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
 
     /**
-     * 更新回复内容
-     * Update the specified resource in storage.
+     * @api {get} api/v4/reply/update  回复更新内容
+     * @apiVersion 4.0.0
+     * @apiName  update
+     * @apiGroup Reply
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/reply/update
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @apiParam {number} id       回复id
+     * @apiParam {string} content  回复内容
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
      */
+
     public function update(Request $request)
     {
         $id      = $request->input('id');
@@ -92,15 +100,27 @@ class ReplyController extends Controller
             ->update(['content'=>$content]);
 
         if ($res){
-            return $this->success();
+            return success();
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @api {get} api/v4/reply/destroy 回复删除
+     * @apiVersion 4.0.0
+     * @apiName  destroy
+     * @apiGroup Reply
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/reply/destroy
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @apiParam {int} id 回复id
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
      */
     public function destroy(Request $request)
     {
@@ -108,7 +128,7 @@ class ReplyController extends Controller
         $res = CommentReply::where('id',$id)
             ->update(['status'=>0]);
         if($res){
-            return $this->success();
+            return success();
         }
     }
 }
