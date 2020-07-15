@@ -180,6 +180,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::post('comment/store', 'CommentController@store');
     Route::post('comment/update', 'CommentController@update');
     Route::post('comment/destroy', 'CommentController@destroy');
+    Route::get('comment/show', 'CommentController@show');
+    Route::get('comment/forward/user', 'CommentController@getForwardUser');
+    Route::get('comment/like/user', 'CommentController@getLikeUser');
 
     //评论
     Route::post('reply/store', 'ReplyController@store');

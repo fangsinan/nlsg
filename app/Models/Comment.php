@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+Use Carbon\Carbon;
 
 class Comment extends Base
 {
@@ -19,18 +19,58 @@ class Comment extends Base
         }
         $lists = Comment::with(['user:id,nickname,headimg','quote:id,pid,content', 'attach:id,relation_id,img',
                     'reply'=>function($query){
-                        $query->select('id','comment_id','from_uid','to_uid','content')
+                        $query->select('id','comment_id','from_uid','to_uid','content','created_at')
                             ->where('status', 1)
                             ->limit(5);
                     },
                     'reply.from_user:id,nickname', 'reply.to_user:id,nickname'])
-                ->select('id','pid', 'user_id', 'relation_id', 'content','forward_num','share_num','like_num','reply_num')
+                ->select('id','pid', 'user_id', 'relation_id', 'content','forward_num','share_num','like_num','reply_num','created_at')
                 ->where('type', $type)
                 ->where('relation_id', $id)
                 ->where('status', 1)
                 ->paginate(10)
                 ->toArray();
         return $lists;
+    }
+
+
+    public  function  getCommentList($id, $page=1)
+    {
+        if (!$id){
+            return false;
+        }
+
+        $comment = Comment::with([
+                                'user:id,nickname,headimg',
+                                'quote:id,pid,content',
+                                'attach:id,relation_id,img',
+                                'reward' => function($query){
+                                    $query->select('id','user_id','relation_id')
+                                          ->where('type', 16)
+                                          ->where('status', 1);
+                                },
+                                'reward.user:id,nickname,headimg'
+                            ])
+                       ->select('id','pid', 'user_id', 'relation_id', 'content','forward_num','share_num','like_num','reply_num','reward_num','created_at')
+                       ->where('status', 1)
+                       ->find($id);
+        $reply = CommentReply::with([
+                        'from_user:id,nickname,headimg',
+                        'to_user:id,nickname,headimg'
+                  ])
+                 ->select(['id','from_uid','to_uid','created_at'])
+                 ->where('status', 1)
+                 ->paginate(2)
+                 ->toArray();
+        $comment['reply'] = $reply['data'];
+
+        return $comment;
+
+    }
+
+    public  function  reward()
+    {
+        return $this->hasMany(Order::class, 'relation_id', 'id');
     }
     public  function  quote()
     {
@@ -51,4 +91,5 @@ class Comment extends Base
     {
         return $this->hasMany(Attach::class, 'relation_id', 'id')->where('type', 1);
     }
+
 }
