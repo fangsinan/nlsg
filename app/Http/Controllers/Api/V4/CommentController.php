@@ -463,5 +463,89 @@ class CommentController extends Controller
         }
     }
 
+    /**
+     * @api {get} api/v4/comment/forward/user 想法-转发列表
+     * @apiVersion 4.0.0
+     * @apiName  forward_user
+     * @apiGroup Comment
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/forward/user
+     * @apiSuccess {string} user 用户
+     * @apiSuccess {string} user.nickname 用户昵称
+     * @apiSuccess {string} user.headimg 用户头像
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     * "data": [
+     * {
+     * "id": 7,
+     * "user_id": 168934,
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * }
+     * }
+     * ]
+     *     }
+     *
+     */
+    public function getForwardUser(Request $request)
+    {
+        $id = $request->input('id');
+        $forwardUser = Comment::with('user:id,nickname,headimg')
+            ->select(['id', 'user_id'])
+            ->where('pid', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($forwardUser['data']);
+    }
+
+    /**
+     * @api {get} api/v4/comment/like/user 想法-喜欢列表
+     * @apiVersion 4.0.0
+     * @apiName  like_user
+     * @apiGroup Comment
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/like/user
+     * @apiSuccess {string} user 用户
+     * @apiSuccess {string} user.nickname 用户昵称
+     * @apiSuccess {string} user.headimg 用户头像
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     * "data": [
+     * {
+     * "id": 6,
+     * "user_id": 1,
+     * "user": {
+     * "id": 1,
+     * "nickname": "刘先森",
+     * "headimg": "https://nlsg-saas.oss-cn-beijing.aliyuncs.com/static/class/157291903507887.png"
+     * }
+     * }
+     * ]
+     *     }
+     *
+     */
+
+    public function getLikeUser(Request $request)
+    {
+        $id = $request->input('id');
+        $likeUser = Like::with('user:id,nickname,headimg')
+            ->select(['id', 'user_id'])
+            ->where('relation_id', $id)
+            ->where('type', 1)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($likeUser['data']);
+    }
+
 
 }

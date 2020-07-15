@@ -10,4 +10,8 @@ class Like extends Model
 
     // 允许批量赋值
     protected  $fillable = ['relation_id','user_id','type'];
+
+    public function  user(){
+        return  $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }
