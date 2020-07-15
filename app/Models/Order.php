@@ -18,4 +18,9 @@ class Order extends Base {
 
     protected $fillable = ['ordernum' , 'type' , 'user_id' , 'relation_id' , 'cost_price'  , 'price' , 'twitter_id'  , 'coupon_id' , 'ip'  , 'os_type'  , 'live_id' ,];
 
+
+    public function user()
+    {
+        return  $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }
