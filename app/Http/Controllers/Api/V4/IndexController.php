@@ -563,10 +563,10 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/works/free  免费专区
+     * @api {get} api/v4/index/free  免费专区
      * @apiVersion 4.0.0
      * @apiName  free
-     * @apiGroup Works
+     * @apiGroup Index
      *
      * @apiSuccess {string} works  课程
      * @apiSuccess {string} works.title 标题
