@@ -469,6 +469,8 @@ class CommentController extends Controller
      * @apiName  forward_user
      * @apiGroup Comment
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/forward/user
+     * @apiParam {number} id 评论id
+     * 
      * @apiSuccess {string} user 用户
      * @apiSuccess {string} user.nickname 用户昵称
      * @apiSuccess {string} user.headimg 用户头像
@@ -510,6 +512,8 @@ class CommentController extends Controller
      * @apiName  like_user
      * @apiGroup Comment
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/like/user
+     * @apiParam {number} id 评论id
+     *
      * @apiSuccess {string} user 用户
      * @apiSuccess {string} user.nickname 用户昵称
      * @apiSuccess {string} user.headimg 用户头像
