@@ -199,7 +199,7 @@ class MallOrder extends Base {
     /**
      * 生成订单编号
      * @param type $uid 用户id
-     * @param type $type 1:普通订单
+     * @param type $type 1:普通订单 2:售后
      */
     public static function createOrderNumber($uid, $type) {
         $now = time();
@@ -1024,6 +1024,11 @@ class MallOrder extends Base {
                             'status', 'goods_id', 'num', 'id as details_id',
                             'order_id', 'sku_history', 'comment_id'
         ]);
+    }
+    
+    public function userInfo(){
+         return $this->hasOne('App\Models\User', 'id', 'user_id')
+                        ->select(['id','phone','nickname','headimg']);
     }
 
     public function expressInfo() {

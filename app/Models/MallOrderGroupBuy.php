@@ -467,8 +467,8 @@ class MallOrderGroupBuy extends Base {
                 ->where('end_time', '>=', $now_date)
                 ->get();
 
-//        $spModel = new SpecialPriceModel();
-//        $sp_data = $spModel->getSpData($goods_id, 1);
+        //$spModel = new SpecialPriceModel();
+        //$sp_data = $spModel->getSpData($goods_id, 1);
 
         if ($sp_data->isEmpty()) {
             return ['code' => false, 'msg' => '活动不存在'];
