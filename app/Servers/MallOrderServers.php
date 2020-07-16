@@ -298,8 +298,6 @@ class MallOrderServers {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-
-
         $order_id_list = array_column($params, 'order_id');
 
         $check_count = MallOrder::where('is_del', '=', 0)
