@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Coupon;
+use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -22,7 +23,7 @@ class OrderController extends Controller
 {
 
     /**
-     * @api {get} /v4/order/get_coupon   获取我的优惠券
+     * @api {get} /api/v4/order/get_coupon   获取我的优惠券
      * @apiName get_coupon
      * @apiVersion 1.0.0
      * @apiGroup order
@@ -110,7 +111,7 @@ class OrderController extends Controller
     }
 
     /**
-     * @api {get} /v4/order/create_column_order  专栏下单
+     * @api {post} api/v4/order/create_column_order  专栏下单
      * @apiName create_column_order
      * @apiVersion 1.0.0
      * @apiGroup order
@@ -163,7 +164,7 @@ class OrderController extends Controller
         if($column_data['type'] == 2){
             $type = 15;
         }
-        $ordernum = '123';
+        $ordernum = MallOrder::createOrderNumber($user_id,3);
         $data=[
             'ordernum'      => $ordernum,
             'type'          => $type,
@@ -176,6 +177,7 @@ class OrderController extends Controller
             'ip'            => $request->getClientIp(),
             'os_type'       => $os_type,
             'live_id'       => $live_id,
+
         ];
         $order = Order::firstOrCreate($data);
 
@@ -184,7 +186,7 @@ class OrderController extends Controller
 
 
     /**
-     * @api {post} /v4/order/create_works_order  精品课下单
+     * @api {post} /api/v4/order/create_works_order  精品课下单
      * @apiName create_works_order
      * @apiVersion 1.0.0
      * @apiGroup order
@@ -204,7 +206,7 @@ class OrderController extends Controller
         "data": { }
     }
      */
-   public function createWorksOrder(Request $request) {
+    public function createWorksOrder(Request $request) {
 
 
         $work_id    = $request->input('work_id',0);
@@ -230,7 +232,7 @@ class OrderController extends Controller
         //优惠券
         $coupon_price = Coupon::getCouponMoney($coupon_id,$user_id,$works_data->price,3);
 
-        $ordernum = '123';
+        $ordernum = MallOrder::createOrderNumber($user_id,3);
         $data=[
             'ordernum'      => $ordernum,
             'type'          => 9,
