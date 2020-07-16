@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+include __DIR__ . '/adminApi.php';
 /*
   |--------------------------------------------------------------------------
   | API Routes
@@ -226,9 +227,3 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 //    });
 });
 
-//后台
-Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function() {
-    Route::get('mall_order/list', 'MallOrderController@list');
-    Route::get('mall_order/details', 'MallOrderController@details');
-    Route::get('mall_order/send', 'MallOrderController@send');
-});
