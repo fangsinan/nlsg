@@ -149,7 +149,7 @@ class WorksController extends Controller
             'total' => $worksData['total'],
 
         ];
-        return $this->success($res);
+        return $this->success($newWorks);
 
     }
 
