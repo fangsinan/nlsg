@@ -15,17 +15,18 @@ class AuthController extends Controller
      * @apiVersion 4.0.0
      * @apiName  login
      * @apiGroup Auth
+     *
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/login
-     * @apiSuccess {string} token token验证
+     * @apiSuccess {string} token token
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-     * "data": {
-     * "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC92NC5jb21cL2FwaVwvdjRcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNTk0ODgzMzk4LCJleHAiOjE1OTQ4ODY5OTgsIm5iZiI6MTU5NDg4MzM5OCwianRpIjoic1FKYnFnRU5UM0hRYWJjSyIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.ke8ARBD6p9Rv1yTnhQxjIvle_zFN5mI_zzTQUBhSgwI"
-     * },
+     *       "data": {
+     *       "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9 .eyJpc3MiOiJodHRwOlwvXC92NC5jb21cL2FwaVwvdjRcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNTk0ODgzMzk4LCJleHAiOjE1OTQ4ODY5OTgsIm5iZiI6MTU5NDg4MzM5OCwianRpIjoic1FKYnFnRU5UM0hRYWJjSyIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.ke8ARBD6p9Rv1yTnhQxjIvle_zFN5mI_zzTQUBhSgwI"
+     *       }
      *     }
      *
      */
@@ -69,9 +70,8 @@ class AuthController extends Controller
     /**
      * @api {get} api/v4/auth/logout 退出
      * @apiVersion 4.0.0
-     * @apiGroup Api
-     *
-     * @apiSuccess {String} token   token
+     * @apiName  logout
+     * @apiGroup Auth
      *
      * @apiSuccessExample 成功响应:
      *   {
@@ -86,14 +86,15 @@ class AuthController extends Controller
     public function logout()
     {
         auth('api')->logout();
-        return $this->success();
+        return success();
     }
 
     /**
      * @api {get} api/v4/auth/wechat 微信授权
      * @apiVersion 4.0.0
-     * @apiName  code  授权码
-     * @apiGroup Api
+     * @apiName  wechat
+     * @apiGroup Auth
+     * @apiParam code 授权码
      *
      * @apiSuccess {String} token   token
      *
@@ -156,36 +157,23 @@ class AuthController extends Controller
     }
 
     /**
-     * @api {get} api/v4/auth/sendsms  发送验证码
+     * @api {get} api/v4/auth/sendsms 发送验证码
      * @apiVersion 4.0.0
-     * @apiName  banner
-     * @apiGroup Index
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/index
-     * @apiSuccess {string}
+     * @apiName  sendSms
+     * @apiGroup Auth
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/sendsms
      *
+     * @apiParam {number} phone 手机号
      * @apiSuccessExample  Success-Response:
-     *     HTTP/1.1 200 OK
-     *     {
-     *       "code": 200,
-     *       "msg" : '成功',
-     *       "data":[
-     *               {
-     *                   "id": 274,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
-     *                   "title": "电商弹窗课程日历套装",
-     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
-     *               },
-     *               {
-     *                   "id": 296,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
-     *                   "title": "心里学",
-     *                   "url": "/mall/shop-details?goods_id=479"
-     *               }
-     *         ]
-     *     }
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
      *
+     *    }
+     * }
      */
-
     public function sendSms(Request $request)
     {
         $phone = $request->input('phone');
