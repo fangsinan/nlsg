@@ -7,7 +7,9 @@
  */
 
 namespace App\Models;
+
 use Illuminate\Support\Facades\DB;
+
 /**
  * Description of MallOrderChild
  *
@@ -16,4 +18,10 @@ use Illuminate\Support\Facades\DB;
 class MallOrderChild extends Base {
 
     protected $table = 'nlsg_mall_order_child';
+
+    public function expressInfo() {
+        return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
+                        ->select(['id', 'history']);
+    }
+
 }

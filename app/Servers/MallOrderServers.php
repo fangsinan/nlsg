@@ -10,10 +10,10 @@ namespace App\servers;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\MallOrder;
-use App\Models\MallOrderDetails as MD;
-use App\Models\MallOrderChild as MC;
-use App\Models\ExpressInfo as EI;
-use App\Models\ExpressCompany as EC;
+use App\Models\MallOrderDetails;
+use App\Models\MallOrderChild;
+use App\Models\ExpressInfo;
+use App\Models\ExpressCompany;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -281,33 +281,76 @@ class MallOrderServers {
 
     public function send($params) {
 
-        $params = [
-            ['order_id' => 9526, [
-                    ['express_id' => 2, 'num' => 'express_num', 'order_detail_id' => [1, 2]],
-                    ['express_id' => 2, 'num' => 'express_num', 'order_detail_id' => [3, 4]],
-                ]
-            ],
-            ['order_id' => 9529, [
-                    ['express_id' => 2, 'num' => 'express_num', 'order_detail_id' => [1, 2]],
-                    ['express_id' => 2, 'num' => 'express_num', 'order_detail_id' => [3, 4]],
-                ]
-            ],
-        ];
+        if (0) {
+            $params = [
+                ['express_id' => 2, 'num' => 'YT4538526006366', 'order_id' => 9526, 'order_detail_id' => 10323],
+                ['express_id' => 2, 'num' => 'YT4506367161457', 'order_id' => 9526, 'order_detail_id' => 10324],
+                ['express_id' => 2, 'num' => 'YT4506367161457', 'order_id' => 9529, 'order_detail_id' => 10332],
+                ['express_id' => 2, 'num' => 'YT4506367161457', 'order_id' => 9529, 'order_detail_id' => 10333],
+            ];
+        }
 
         if (empty($params)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $order_id_list = array_column($params, 'order_id');
+        $order_id_list = array_unique(array_column($params, 'order_id'));
 
         $check_count = MallOrder::where('is_del', '=', 0)
-                ->where('is_stop', '=', 0)
-                ->where('status', '=', 10)
-                ->whereIn('id', $order_id_list)
-                ->count();
+                        ->where('is_stop', '=', 0)->where('status', '=', 10)
+                        ->whereIn('id', $order_id_list)->count();
 
         if ($check_count !== count($order_id_list)) {
             return ['code' => false, 'msg' => '包含状态错误订单'];
+        }
+
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        DB::beginTransaction();
+
+        foreach ($params as $v) {
+            //todo 只要有发货的  order状态就是已发货
+            $order_obj = MallOrder::find($v['order_id']);
+            $order_obj->status = 20;
+            $order_res = $order_obj->save();
+            if (!$order_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '错误',
+                    'ps' => $v['order_id'] . ' order error'];
+            }
+            //todo 校验发货订单表,快递公司和快递单号不重复
+            $check_ex = ExpressInfo::where('express_id', '=', $v['express_id'])
+                    ->where('express_num', '=', $v['num'])
+                    ->first();
+            if ($check_ex) {
+                $express_info_id = $check_ex->id;
+            } else {
+                //$c_res = DB::table('nlsg_mall_comment')->insertGetId($c_data);
+                $ex_data['express_id'] = $v['express_id'];
+                $ex_data['express_num'] = $v['num'];
+                $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
+                $express_info_id = DB::table('nlsg_express_info')->insertGetId($ex_data);
+                if (!$express_info_id) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '错误',
+                        'ps' => $v['order_id'] . ' ex error'];
+                }
+            }
+            //todo order_detail发货
+            $temp_obj = new MallOrderChild();
+            $temp_obj->order_id = $v['order_id'];
+            $temp_obj->order_detail_id = $v['order_detail_id'];
+            $temp_obj->express_info_id = $express_info_id;
+            $child_res = $temp_obj->save();
+            if (!$child_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '错误', 'ps' => 'child error'];
+            }
+
+
+            DB::commit();
+            return ['code' => true, 'msg' => '成功'];
         }
     }
 

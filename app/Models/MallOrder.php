@@ -998,7 +998,7 @@ class MallOrder extends Base {
             $field[] = 'bill_number';
             $field[] = 'bill_format';
             $with[] = 'orderChild';
-            $with[] = 'expressInfo';
+            $with[] = 'orderChild.expressInfo';
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
@@ -1025,15 +1025,10 @@ class MallOrder extends Base {
                             'order_id', 'sku_history', 'comment_id'
         ]);
     }
-    
-    public function userInfo(){
-         return $this->hasOne('App\Models\User', 'id', 'user_id')
-                        ->select(['id','phone','nickname','headimg']);
-    }
 
-    public function expressInfo() {
-        return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
-                        ->select(['id', 'history']);
+    public function userInfo() {
+        return $this->hasOne('App\Models\User', 'id', 'user_id')
+                        ->select(['id', 'phone', 'nickname', 'headimg']);
     }
 
     public function orderChild() {
