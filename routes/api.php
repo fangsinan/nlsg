@@ -205,6 +205,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('rank/wiki', 'RankController@wiki');
 
     //我的
+    Route::get('user/homepage', 'UserController@homepage');
+    Route::get('user/feed', 'UserController@feed');
     Route::post('user/feedback', 'UserController@feedback');
     Route::post('user/base', 'UserController@base');
     Route::post('user/fan', 'UserController@fan');
@@ -225,7 +227,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 
 
     Route::group(['middleware' => ['auth.jwt']], function() {
-        Route::get('user/homepage', 'UserController@homepage');
         Route::post('user/followed', 'UserController@followed');
         Route::post('user/unfollow', 'UserController@unfollow');
     });

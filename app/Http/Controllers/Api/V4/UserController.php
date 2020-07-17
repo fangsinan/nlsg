@@ -47,21 +47,6 @@ class UserController extends Controller
      * @apiSuccess {string}  column.subtitle  专栏副标题
      * @apiSuccess {string}  column.original_price  专栏价格
      *
-     * @apiSuccess {string}  comments             想法
-     * @apiSuccess {string}  comments.content     内容
-     * @apiSuccess {number}  comments.forward_num 转发数
-     * @apiSuccess {number}  comments.share_num   分享数
-     * @apiSuccess {number}  comments.like_num    喜欢数
-     * @apiSuccess {number}  comments.reply_num   评论数
-     * @apiSuccess {number}  comments.created_at  发布时间
-     *
-     * @apiSuccess {string}  comments.user           评论的用户
-     * @apiSuccess {string}  comments.user.nickname  评论的用户昵称
-     * @apiSuccess {string}  comments.user.headimg   评论的用户头像
-     *
-     * @apiSuccess {string}  comments.attach         评论的图片
-     * @apiSuccess {string}  comments.attach.img     评论的图片地址
-     *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
      *     {
@@ -124,26 +109,112 @@ class UserController extends Controller
     {
         $id = $request->get('id');
         $user = User::select('id', 'nickname', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
-                ->with([
-                    'works'=> function($query){
-                        $query->select(['user_id','title','cover_img','subscribe_num','original_price'])
-                            ->where('is_audio_book', 0);
-                        },
-                    'columns' => function ($query) {
-                        $query->select('user_id', 'name', 'title', 'subtitle', 'original_price');
-                        },
-                    'comments' =>function ($query) {
-                        $query->select('id','pid', 'user_id', 'relation_id', 'content','forward_num','share_num','like_num','reply_num','created_at')
-                            ->orderBy('created_at','desc')
-                            ->where('status', 1);
-                    },
-                    'comments.user:id,nickname,headimg',
-                    'comments.attach:id,relation_id,img'
-                ])
-                ->findOrFail($id);
+            ->with([
+                'history' => function ($query) {
+                    $query->select(['id', 'user_id', 'relation_id'])
+                        ->limit(4)
+                        ->orderBy('created_at', 'desc');
+                },
+                'history.columns:id,title,cover_pic',
+                'history.works:id,title,cover_img',
+                'works'   => function ($query) {
+                    $query->select(['id', 'user_id', 'title', 'cover_img', 'subscribe_num', 'original_price'])
+                        ->where('is_audio_book', 0);
+                },
+                'columns' => function ($query) {
+                    $query->select('user_id', 'name', 'title', 'subtitle', 'original_price');
+                },
 
+            ])
+            ->findOrFail($id)
+            ->toArray();
 
         return success($user);
+    }
+
+    /**
+     * @api {get} api/v4/user/feed  用户动态
+     * @apiVersion 4.0.0
+     * @apiName  feed
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/feed
+     * @apiSuccess {string}  comments             想法
+     * @apiSuccess {string}  comments.content     内容
+     * @apiSuccess {number}  comments.forward_num 转发数
+     * @apiSuccess {number}  comments.share_num   分享数
+     * @apiSuccess {number}  comments.like_num    喜欢数
+     * @apiSuccess {number}  comments.reply_num   评论数
+     * @apiSuccess {number}  comments.created_at  发布时间
+     *
+     * @apiSuccess {string}  comments.user           评论的用户
+     * @apiSuccess {string}  comments.user.nickname  评论的用户昵称
+     * @apiSuccess {string}  comments.user.headimg   评论的用户头像
+     *
+     * @apiSuccess {string}  comments.attach         评论的图片
+     * @apiSuccess {string}  comments.attach.img     评论的图片地址
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     * "data": {
+     * "id": 1,
+     * "comments": [
+     * {
+     * "id": 14,
+     * "pid": 0,
+     * "user_id": 1,
+     * "relation_id": 1,
+     * "content": "生命 ",
+     * "forward_num": 0,
+     * "share_num": 0,
+     * "like_num": 0,
+     * "reply_num": 0,
+     * "created_at": "2020-07-14 17:05:45",
+     * "user": {
+     * "id": 1,
+     * "nickname": "刘先森",
+     * "headimg": "https://nlsg-saas.oss-cn-beijing.aliyuncs.com/static/class/157291903507887.png"
+     * },
+     * "attach": [
+     * {
+     * "id": 16,
+     * "relation_id": 14,
+     * "img": "/wechat/mall/goods/3476_1533614056.png"
+     * },
+     * {
+     * "id": 17,
+     * "relation_id": 14,
+     * "img": "/wechat/mall/goods/3476_1533614056.png"
+     * },
+     * {
+     * "id": 18,
+     * "relation_id": 14,
+     * "img": "/wechat/mall/goods/3476_1533614056.png"
+     * }
+     * ]
+     * }
+     * ]
+     * }
+     *     }
+     *
+     */
+    public function feed(Request $request)
+    {
+        $id = $request->get('id');
+        $lists = User::with([
+            'comments' => function ($query) {
+                $query->select('id', 'pid', 'user_id', 'relation_id', 'content', 'forward_num', 'share_num', 'like_num',
+                    'reply_num', 'created_at')
+                    ->orderBy('created_at', 'desc')
+                    ->where('status', 1)
+                    ->paginate(1);
+            },
+            'comments.user:id,nickname,headimg',
+            'comments.attach:id,relation_id,img'
+        ])->select('id')->find($id);
+        return success($lists);
     }
 
     /**

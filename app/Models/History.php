@@ -41,4 +41,19 @@ class History extends Model
         return $msg;
     }
 
+    public function columns()
+    {
+        return $this->belongsTo('App\Models\Column','relation_id','id');
+    }
+
+    public function works()
+    {
+        return $this->belongsTo('App\Models\Works','relation_id','id');
+    }
+
+    public function chapter()
+    {
+        return $this->belongsTo('App\Models\WorksInfo','info_id', 'id');
+    }
+
 }
