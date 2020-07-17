@@ -360,7 +360,17 @@ class MallRefundRecord extends Base {
                 $data->refund_address = $v;
             }
         }
-
+        
+        //todo 进度条
+        $progress_bar = $data->expressInfo->history->list??[];
+        
+        array_push($progress_bar, ['time'=>11]);
+        array_unshift($progress_bar,['time'=>1121]);
+        
+        
+        
+        
+        $data['progress_bar'] = $progress_bar;
         return $data;
     }
 
