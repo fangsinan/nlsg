@@ -331,8 +331,8 @@ class WorksController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup works
      *
-     * @apiParam {int} column_id  专栏id
-     * @apiParam {int} works_id 课程id
+     * @apiParam {int} relation_type  1专栏  2课程   3讲座
+     * @apiParam {int} relation_id   对应id
      * @apiParam {int} works_info_id 章节id
      * @apiParam {int} user_id 用户id
      *
@@ -346,20 +346,24 @@ class WorksController extends Controller
      */
     public function show(Request $request){
         $user_id    = $request->input('user_id',0);
-        $column_id  = $request->input('column_id',0);
-        $works_id   = $request->input('works_id',0);
         $works_info_id = $request->input('works_info_id',0);
-        if( empty($works_id) || empty($works_info_id)){
+        $relation_type = $request->input('relation_type',0);
+        $relation_id = $request->input('relation_id',0);
+        if( empty($relation_type) || empty($relation_id)){
             return $this->success();
         }
         //课程和章节自增
-        WorksInfo::increment('view_num');
-        Works::increment('view_num');
+        WorksInfo::where(['id'=>$works_info_id])->increment('view_num');
+        if($relation_type == 1 || $relation_type == 3){
+            Column::where(['id'=>$relation_id])->increment('view_num');
+        }else{
+            Works::where(['id'=>$relation_id])->increment('view_num');
+        }
         if( empty($user_id) ) return $this->success();
 
         History::firstOrCreate([
-            'column_id' =>$column_id,
-            'works_id'  =>$works_id,
+            'relation_id' =>$relation_id,
+            'relation_type'  =>$relation_type,
             'worksinfo_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
@@ -390,23 +394,24 @@ class WorksController extends Controller
      */
     public function editHistoryTime(Request $request){
         $user_id    = $request->input('user_id',0);
-        $column_id  = $request->input('column_id',0);
-        $works_id   = $request->input('works_id',0);
+        $relation_id  = $request->input('relation_id',0);
+        $relation_type  = $request->input('relation_type',0);
         $time_leng  = $request->input('time_leng',0);
         $time_number= $request->input('time_number',0);
         $works_info_id = $request->input('works_info_id',0);
 
-        if( empty($user_id) || empty($works_id) || empty($works_info_id)){
+        if( empty($user_id) || empty($relation_id) || empty($relation_type)){
             return $this->success();
         }
         //防止 show接口未请求
         $his = History::firstOrCreate([
-            'column_id' =>$column_id,
-            'works_id'  =>$works_id,
+            'relation_id' =>$relation_id,
+            'relation_type'  =>$relation_type,
             'worksinfo_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
+
         //更新学习进度
         History::where('id',$his->id)->update([
             'time_leng'=>$time_leng,
