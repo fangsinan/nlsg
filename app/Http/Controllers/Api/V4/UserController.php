@@ -28,52 +28,99 @@ class UserController extends Controller
      * @apiParam  {number} id  用户id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/index
      *
-     * @apiSuccess {string}
+     * @apiSuccess {string}  nickname  用户昵称
+     * @apiSuccess {string}  headimg   用户头像
+     * @apiSuccess {string}  headcover 背景图
+     * @apiSuccess {string}  intro     简介
+     * @apiSuccess {string}  follow_num 关注数
+     * @apiSuccess {string}  fan_num    粉丝数
+     * @apiSuccess {string}  is_teacher 是否为老师
+     * @apiSuccess {string}  works      作品
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-     *       "data":[
-     *               {
-     *                   "id": 274,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
-     *                   "title": "电商弹窗课程日历套装",
-     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
-     *               },
-     *               {
-     *                   "id": 296,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
-     *                   "title": "心里学",
-     *                   "url": "/mall/shop-details?goods_id=479"
-     *               }
-     *         ]
+     * "data": {
+     * "id": 1,
+     * "nickname": "刘先森",
+     * "headimg": "https://nlsg-saas.oss-cn-beijing.aliyuncs.com/static/class/157291903507887.png",
+     * "headcover": null,
+     * "intro": "需要思考下了",
+     * "follow_num": 10,
+     * "fan_num": 0,
+     * "is_teacher": 1,
+     * "works": {
+     * "id": 1,
+     * "nickname": "刘先森",
+     * "works": [
+     * {
+     * "user_id": 1,
+     * "title": "理解孩子行为背后的原因",
+     * "cover_img": "/wechat/works/video/161627/2017061411282192073.jpg",
+     * "subscribe_num": 0,
+     * "original_price": "0.00"
+     * },
+     * {
+     * "user_id": 1,
+     * "title": "帮助孩子树立健康自尊的六个方法",
+     * "cover_img": "/wechat/works/video/161627/2017061411462579459.jpg",
+     * "subscribe_num": 0,
+     * "original_price": "0.00"
+     * },
+     * {
+     * "user_id": 1,
+     * "title": "培养责任心是孩子成长的必修课",
+     * "cover_img": "/wechat/works/video/161627/2017061411572097640.jpg",
+     * "subscribe_num": 0,
+     * "original_price": "0.00"
+     * }
+     * ]
+     * },
+     * "column": {
+     * "id": 1,
+     * "nickname": "刘先森",
+     * "columns": [
+     * {
+     * "user_id": 1,
+     * "name": "张宝萍专栏",
+     * "title": "国家十百千万工程心灵导师",
+     * "subtitle": "心灵导师 直击人心",
+     * "original_price": "0.00"
+     * }
+     * ]
+     * }
+     * }
      *     }
      *
      */
     public function homepage(Request $request)
     {
-        $id =  $request->get('id');
-        $user  = User::select('id','nickname','headimg', 'headcover', 'intro','follow_num', 'fan_num','is_teacher')
-                    ->findOrFail($id);
-        if ($user['is_teacher'] ==1){
-            $user->works  =  $user
-                    ->select('id','nickname')
-                    ->with(['works'=>function($query){
-                        $query->select('user_id','title','cover_img','subscribe_num', 'original_price')
+        $id = $request->get('id');
+        $user = User::select('id', 'nickname', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
+            ->findOrFail($id);
+        if ($user['is_teacher'] == 1) {
+            $user->works = $user
+                ->select('id', 'nickname')
+                ->with([
+                    'works' => function ($query) {
+                        $query->select('user_id', 'title', 'cover_img', 'subscribe_num', 'original_price')
                             ->where('is_audio_book', 0);
-                    }])
-                    ->first();
-            $user->column =  $user
-                    ->select('id','nickname')
-                    ->with(['columns'=>function($query){
-                        $query->select('user_id','name','title','subtitle', 'original_price');
-                    }])
-                    ->first();
+                    }
+                ])
+                ->first();
+            $user->column = $user
+                ->select('id', 'nickname')
+                ->with([
+                    'columns' => function ($query) {
+                        $query->select('user_id', 'name', 'title', 'subtitle', 'original_price');
+                    }
+                ])
+                ->first();
         }
 
-        return  success($user);
+        return success($user);
     }
 
     /**
@@ -94,17 +141,17 @@ class UserController extends Controller
      *       }
      *   }
      *
-    */
-    public function  followed(Request $request)
+     */
+    public function followed(Request $request)
     {
         $input = $request->all();
 
         $list = UserFollow::where([
-                    'from_uid' => 1 ,
-                    'to_uid'   => $input['to_uid']
-                ])->first();
+            'from_uid' => 1,
+            'to_uid'   => $input['to_uid']
+        ])->first();
 
-        if($list){
+        if ($list) {
             return error(1000, '不要重复关注');
         }
 
@@ -117,6 +164,7 @@ class UserController extends Controller
 
         return $this->success();
     }
+
     /**
      * @api {get} api/v4/user/unfollow 取消关注
      * @apiVersion 4.0.0
@@ -134,16 +182,16 @@ class UserController extends Controller
      *       }
      *   }
      *
-    */
+     */
     public function unfollow(Request $request)
     {
         $follow = UserFollow::where([
-            'from_uid' =>1 ,
-            'to_uid'   =>2
+            'from_uid' => 1,
+            'to_uid'   => 2
         ])->first();
 
-        if (!$follow->delete()){
-            return $this->error(1000,'取消失败');
+        if ( ! $follow->delete()) {
+            return $this->error(1000, '取消失败');
         }
         return $this->success();
     }
@@ -168,12 +216,12 @@ class UserController extends Controller
      *       }
      *   }
      *
-    */
+     */
     public function base(Request $request)
     {
         $input = $request->all();
-        if (!$input['nickname']){
-            return  $this->error(1000,'昵称不能为空');
+        if ( ! $input['nickname']) {
+            return $this->error(1000, '昵称不能为空');
         }
         $res = User::where('id', 1)->update([
             'nickname' => $input['nickname'],
@@ -181,7 +229,7 @@ class UserController extends Controller
             'sex'      => $input['sex'],
             'intro'    => $input['intro']
         ]);
-        if ($res){
+        if ($res) {
             return $this->success();
         }
 
@@ -205,11 +253,11 @@ class UserController extends Controller
      *      "data": []
      *   }
      *
-    */
+     */
     public function feedback(Request $request)
     {
         $input = $request->all();
-        if (!$input['content']){
+        if ( ! $input['content']) {
             return $this->error(1000, '描述不能为空');
         }
 
@@ -218,16 +266,17 @@ class UserController extends Controller
 //            return $this->error(1000,'图片过多');
 //        }
         $res = FeedBack::create([
-            'type'      => $input['type'],
-            'user_id'   => 1,
-            'content'   => $input['content'],
-            'pic'       => $input['pic']
+            'type'    => $input['type'],
+            'user_id' => 1,
+            'content' => $input['content'],
+            'pic'     => $input['pic']
         ]);
-        if ($res){
+        if ($res) {
             return $this->success();
         }
 
     }
+
     /**
      * @api {get} api/v4/user/fan 我关注的
      * @apiVersion 4.0.0
@@ -237,119 +286,118 @@ class UserController extends Controller
      *
      * @apiSuccessExample 成功响应:
      *
-    {
-    "code": 200,
-    "msg": "成功",
-    "data": {
-    "current_page": 1,
-    "data": [
-    {
-    "id": 168934,
-    "phone": "18624078563",
-    "nickname": "chandler",
-    "openid": null,
-    "unionid": null,
-    "sex": null,
-    "birthday": null,
-    "province": null,
-    "city": null,
-    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
-    "intro": null,
-    "level": 0,
-    "created_at": null,
-    "updated_at": null,
-    "expire_time": null,
-    "status": 1,
-    "is_staff": 0,
-    "pivot": {
-        "from_uid": 1,
-        "to_uid": 168934
-        }
-    }
-    ],
-    "first_page_url": "http://v4.com/api/v4/user/follower?page=1",
-    "from": 1,
-    "last_page": 1,
-    "last_page_url": "http://v4.com/api/v4/user/follower?page=1",
-    "next_page_url": null,
-    "path": "http://v4.com/api/v4/user/follower",
-    "per_page": 10,
-    "prev_page_url": null,
-    "to": 2,
-    "total": 2
-    }
-    }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "current_page": 1,
+     * "data": [
+     * {
+     * "id": 168934,
+     * "phone": "18624078563",
+     * "nickname": "chandler",
+     * "openid": null,
+     * "unionid": null,
+     * "sex": null,
+     * "birthday": null,
+     * "province": null,
+     * "city": null,
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
+     * "intro": null,
+     * "level": 0,
+     * "created_at": null,
+     * "updated_at": null,
+     * "expire_time": null,
+     * "status": 1,
+     * "is_staff": 0,
+     * "pivot": {
+     * "from_uid": 1,
+     * "to_uid": 168934
+     * }
+     * }
+     * ],
+     * "first_page_url": "http://v4.com/api/v4/user/follower?page=1",
+     * "from": 1,
+     * "last_page": 1,
+     * "last_page_url": "http://v4.com/api/v4/user/follower?page=1",
+     * "next_page_url": null,
+     * "path": "http://v4.com/api/v4/user/follower",
+     * "per_page": 10,
+     * "prev_page_url": null,
+     * "to": 2,
+     * "total": 2
+     * }
+     * }
      *   }
      *
      */
     public function fan()
     {
-        $user  = User::findOrFail(1);
+        $user = User::findOrFail(1);
         $lists = $user->fans()->paginate(10);
         return $this->success($lists);
     }
-   /**
-    * @api {get} api/v4/user/follower 我关注的
-    * @apiVersion 4.0.0
-    * @apiGroup Api
-    *
-    * @apiSuccess {String} token
-    *
-    * @apiSuccessExample 成功响应:
-    *
-        {
-           "code": 200,
-           "msg": "成功",
-           "data": {
-               "current_page": 1,
-               "data": [
-                   {
-                       "id": 168934,
-                       "phone": "18624078563",
-                       "nickname": "chandler",
-                       "openid": null,
-                       "unionid": null,
-                       "sex": null,
-                       "birthday": null,
-                       "province": null,
-                       "city": null,
-                       "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
-                       "intro": null,
-                       "level": 0,
-                       "created_at": null,
-                       "updated_at": null,
-                       "expire_time": null,
-                       "status": 1,
-                       "is_staff": 0,
-                       "pivot": {
-                       "from_uid": 1,
-                       "to_uid": 168934
-                       }
-                   }
-               ],
-               "first_page_url": "http://v4.com/api/v4/user/follower?page=1",
-               "from": 1,
-               "last_page": 1,
-               "last_page_url": "http://v4.com/api/v4/user/follower?page=1",
-               "next_page_url": null,
-               "path": "http://v4.com/api/v4/user/follower",
-               "per_page": 10,
-               "prev_page_url": null,
-               "to": 2,
-               "total": 2
-               }
-           }
-    *   }
-    *
-   */
+
+    /**
+     * @api {get} api/v4/user/follower 我关注的
+     * @apiVersion 4.0.0
+     * @apiGroup Api
+     *
+     * @apiSuccess {String} token
+     *
+     * @apiSuccessExample 成功响应:
+     *
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "current_page": 1,
+     * "data": [
+     * {
+     * "id": 168934,
+     * "phone": "18624078563",
+     * "nickname": "chandler",
+     * "openid": null,
+     * "unionid": null,
+     * "sex": null,
+     * "birthday": null,
+     * "province": null,
+     * "city": null,
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
+     * "intro": null,
+     * "level": 0,
+     * "created_at": null,
+     * "updated_at": null,
+     * "expire_time": null,
+     * "status": 1,
+     * "is_staff": 0,
+     * "pivot": {
+     * "from_uid": 1,
+     * "to_uid": 168934
+     * }
+     * }
+     * ],
+     * "first_page_url": "http://v4.com/api/v4/user/follower?page=1",
+     * "from": 1,
+     * "last_page": 1,
+     * "last_page_url": "http://v4.com/api/v4/user/follower?page=1",
+     * "next_page_url": null,
+     * "path": "http://v4.com/api/v4/user/follower",
+     * "per_page": 10,
+     * "prev_page_url": null,
+     * "to": 2,
+     * "total": 2
+     * }
+     * }
+     *   }
+     *
+     */
     public function follower()
     {
-        $user  = User::findOrFail(1);
+        $user = User::findOrFail(1);
         $lists = $user->follow()->paginate(10);
-        return  $this->success($lists);
+        return $this->success($lists);
     }
-
-
 
 
     /**
@@ -370,94 +418,92 @@ class UserController extends Controller
      * @apiSuccess {string} user_id  用户id
      *
      * @apiSuccessExample 成功响应:
-    {
-    "code": 200,
-    "msg": "成功",
-    "data": {
-    "07-05 ": [
-    {
-    "id": 8,
-    "column_id": 0,
-    "works_id": 16,
-    "worksinfo_id": 1,
-    "user_id": 211172,
-    "time_leng": "10",
-    "time_number": "5",
-    "is_del": 0,
-    "created_at": "2020-07-04T19:47:22.000000Z",
-    "updated_at": "2020-06-04T20:07:36.000000Z",
-    "column_name": "",
-    "column_cover_img": "",
-    "works_name": "如何经营幸福婚姻",
-    "works_cover_img": "/nlsg/works/20190822150244797760.png",
-    "worksInfo_name": "01何为坚毅"
-    },
-    {
-    "id": 9,
-    "column_id": 1,
-    "works_id": 16,
-    "worksinfo_id": 2,
-    "user_id": 211172,
-    "time_leng": "0",
-    "time_number": "",
-    "is_del": 0,
-    "created_at": "2020-07-04T19:47:22.000000Z",
-    "updated_at": null,
-    "column_name": "王琨专栏",
-    "column_cover_img": null,
-    "works_name": "如何经营幸福婚姻",
-    "works_cover_img": "/nlsg/works/20190822150244797760.png",
-    "worksInfo_name": "02坚毅品格的重要性"
-    }
-    ]
-    }
-    }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "07-05 ": [
+     * {
+     * "id": 8,
+     * "column_id": 0,
+     * "works_id": 16,
+     * "worksinfo_id": 1,
+     * "user_id": 211172,
+     * "time_leng": "10",
+     * "time_number": "5",
+     * "is_del": 0,
+     * "created_at": "2020-07-04T19:47:22.000000Z",
+     * "updated_at": "2020-06-04T20:07:36.000000Z",
+     * "column_name": "",
+     * "column_cover_img": "",
+     * "works_name": "如何经营幸福婚姻",
+     * "works_cover_img": "/nlsg/works/20190822150244797760.png",
+     * "worksInfo_name": "01何为坚毅"
+     * },
+     * {
+     * "id": 9,
+     * "column_id": 1,
+     * "works_id": 16,
+     * "worksinfo_id": 2,
+     * "user_id": 211172,
+     * "time_leng": "0",
+     * "time_number": "",
+     * "is_del": 0,
+     * "created_at": "2020-07-04T19:47:22.000000Z",
+     * "updated_at": null,
+     * "column_name": "王琨专栏",
+     * "column_cover_img": null,
+     * "works_name": "如何经营幸福婚姻",
+     * "works_cover_img": "/nlsg/works/20190822150244797760.png",
+     * "worksInfo_name": "02坚毅品格的重要性"
+     * }
+     * ]
+     * }
+     * }
      */
     public function history(Request $request)
     {
-        $user_id = $request->input('user_id',0);
-        $order = $request->input('order','desc');
+        $user_id = $request->input('user_id', 0);
+        $order = $request->input('order', 'desc');
 
         $lists = History::where(['user_id' => $user_id, 'is_del' => 0,])
-            ->orderBy('created_at',$order)->paginate($this->page_per_page)->toArray();
+            ->orderBy('created_at', $order)->paginate($this->page_per_page)->toArray();
 
-        if(empty($lists['data'])){
+        if (empty($lists['data'])) {
             return $this->success();
         }
         $new_list = [];
-        foreach ($lists['data'] as $key => $val){
+        foreach ($lists['data'] as $key => $val) {
             //查询所属专栏 课程 以及章节
-            $val['column_name']      = '';
+            $val['column_name'] = '';
             $val['column_cover_img'] = '';
-            $val['works_name']       = '';
-            $val['works_cover_img']  = '';
-            $val['worksInfo_name']   = '';
+            $val['works_name'] = '';
+            $val['works_cover_img'] = '';
+            $val['worksInfo_name'] = '';
 
 
-
-            if($val['column_id']){
+            if ($val['column_id']) {
                 $column = Column::find($val['column_id']);
-                $val['column_name']  = $column['name'];
-                $val['column_cover_img']  = $column['cover_img'];
+                $val['column_name'] = $column['name'];
+                $val['column_cover_img'] = $column['cover_img'];
             }
-            if($val['works_id']){
+            if ($val['works_id']) {
                 $works = Works::find($val['works_id']);
-                $val['works_name']  = $works['title'];
-                $val['works_cover_img']  = $works['cover_img'];
+                $val['works_name'] = $works['title'];
+                $val['works_cover_img'] = $works['cover_img'];
             }
-            if($val['worksinfo_id']){
+            if ($val['worksinfo_id']) {
                 $worksInfo = WorksInfo::find($val['worksinfo_id']);
-                $val['worksInfo_name']  = $worksInfo['title'];
+                $val['worksInfo_name'] = $worksInfo['title'];
             }
 
 
-            $new_list[History::DateTime($val['created_at'])][]=$val;
+            $new_list[History::DateTime($val['created_at'])][] = $val;
         }
 
 
-        return  $this->success($new_list);
+        return $this->success($new_list);
     }
-
 
 
     /**
@@ -470,35 +516,33 @@ class UserController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample 成功响应:
-    {
-    "code": 200,
-    "msg": "成功",
-    "data": []
-    }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": []
+     * }
      */
     public function clearHistory(Request $request)
     {
-        $user_id  = $request->input('user_id',0);
-        $his_id = $request->input('his_id',0);
-        if ( empty($his_id) ) {
-            return $this->error(0,'fail:his_id参数有误');
+        $user_id = $request->input('user_id', 0);
+        $his_id = $request->input('his_id', 0);
+        if (empty($his_id)) {
+            return $this->error(0, 'fail:his_id参数有误');
         }
 
-        if($his_id == 'all'){
-            $res = History::where('user_id',$user_id)->update(['is_del' => 1]);
-        }else{
-            $his_id = explode(',',$his_id);
-            $res = History::where('user_id',$user_id)
-                ->whereIn('id',$his_id)->update(['is_del' => 1]);
+        if ($his_id == 'all') {
+            $res = History::where('user_id', $user_id)->update(['is_del' => 1]);
+        } else {
+            $his_id = explode(',', $his_id);
+            $res = History::where('user_id', $user_id)
+                ->whereIn('id', $his_id)->update(['is_del' => 1]);
         }
         if ($res) {
             return $this->success();
         } else {
-            return $this->error(0,'fail');
+            return $this->error(0, 'fail');
         }
     }
-
-
 
 
     /**
@@ -511,54 +555,56 @@ class UserController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample 成功响应:
-    {
-    "code": 200,
-    "msg": "成功",
-    "data": [
-    {
-    "id": 91,
-    "name": "AR立体浮雕星座地球仪",   //商品名称  类型不同返回字段不同
-    "picture": "/nlsg/goods/20191026172620981048.jpg",
-    "original_price": "379.00",
-    "price": "333.52"
-    }
-    ]
-    }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * {
+     * "id": 91,
+     * "name": "AR立体浮雕星座地球仪",   //商品名称  类型不同返回字段不同
+     * "picture": "/nlsg/goods/20191026172620981048.jpg",
+     * "original_price": "379.00",
+     * "price": "333.52"
+     * }
+     * ]
+     * }
      *
      *
      * {
-    "code": 200,
-    "msg": "成功",
-    "data": [
-    {
-    "id": 1,
-    "name": "王琨专栏",     //专栏名
-    "title": "顶尖导师 经营能量",       //头衔
-    "subtitle": "顶尖导师 经营能量",    //副标题
-    "message": "",
-    "price": "99.00",
-    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
-    "is_new": 1
-    }
-    ]
-    }
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * {
+     * "id": 1,
+     * "name": "王琨专栏",     //专栏名
+     * "title": "顶尖导师 经营能量",       //头衔
+     * "subtitle": "顶尖导师 经营能量",    //副标题
+     * "message": "",
+     * "price": "99.00",
+     * "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+     * "is_new": 1
+     * }
+     * ]
+     * }
      */
 
 
     public function collection(Request $request)
     {
-        $user_id    = $request->input('user_id',0);
-        $type     = $request->input('type',1);
+        $user_id = $request->input('user_id', 0);
+        $type = $request->input('type', 1);
         //1专栏  2课程  3商品  4书单 5百科 6听书
 
         $collection = Collection::where([
-            'user_id' =>$user_id,
-            'type' =>$type,
+            'user_id' => $user_id,
+            'type'    => $type,
         ])->paginate($this->page_per_page)->toArray();
-        $relation_id = array_column($collection['data'],'relation_id');
+        $relation_id = array_column($collection['data'], 'relation_id');
 
-        $list = Collection::getCollection($type,$relation_id);
-        if($list == false) $list =[];
+        $list = Collection::getCollection($type, $relation_id);
+        if ($list == false) {
+            $list = [];
+        }
 
         return $this->success($list);
     }
