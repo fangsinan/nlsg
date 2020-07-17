@@ -16,7 +16,12 @@ class Controller extends BaseController
 
     public function __construct()
     {
-        $this->user = auth('api')->user()->toArray();
+        $this->user = auth('api')->user();
+        if($this->user){
+            $this->user = $this->user->toArray();
+        }else{
+            $this->user = [];
+        }
     }
 
     protected function success($data =[])

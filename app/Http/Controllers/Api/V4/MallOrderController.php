@@ -1125,6 +1125,7 @@ class MallOrderController extends Controller {
       }
      */
     public function orderInfo(Request $request) {
+//        $this->user = ['id'=>168934,'phone'=>'18624078563','is_staff'=>0];
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
