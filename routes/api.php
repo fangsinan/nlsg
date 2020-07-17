@@ -156,7 +156,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::put('mall/status_change', 'MallOrderController@statusChange');
 
     //商品评价
-    Route::get('mall/no_comment_list', 'MallOrderController@noCommentList');
+    Route::get('mall/comment_list', 'MallOrderController@commentList');
     Route::get('mall/get_comment', 'MallOrderController@getComment');
     Route::get('mall/comment_issue_list', 'MallOrderController@commentIssueList');
     Route::post('mall/sub_comment', 'MallOrderController@subComment');

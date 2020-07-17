@@ -1089,29 +1089,34 @@ class MallOrder extends Base {
         $bill_info['bill_number'] = $data['bill_number'];
         $bill_info['bill_format'] = $data['bill_format'];
 
-
         $data['price_info'] = $price_info;
         $data['bill_info'] = $bill_info;
-        
+
+        $temp_data = [];
+        $temp_data['status'] = 0;
+        $temp_data['order_id'] = $data['id'];
+        $temp_data['express_info_id'] = 0;
+        $temp_data['express_num'] = '';
+        $temp_data['express_info'] = [];
+        $temp_data['order_detail_id'] = [];
+        $temp_data['order_details'] = [];
+
         //todo 修改未发货显示
-        if (empty($data['order_child'])) {
-            $temp_data = [];
-            $temp_data['status'] = 0;
-            $temp_data['order_id'] = $data['id'];
-            $temp_data['express_info_id'] = 0;
-            $temp_data['express_num'] = '';
-            $temp_data['order_detail_id'] = [];
-            $temp_data['order_details'] = $data['order_details'];
-            $data['order_child'] = [$temp_data];
-        } else {
-            foreach ($data['order_child'] as $k => &$v) {
-                foreach ($data['order_details'] as $vv) {
-                    if (in_array($vv['details_id'], $v['order_detail_id'])) {
-                        array_push($v['order_details'], $vv);
-                    }
+
+        foreach ($data['order_details'] as &$d2c_v) {
+            $in_flag = false;
+            foreach ($data['order_child'] as &$d2c_vv) {
+                if (in_array($d2c_v['details_id'], $d2c_vv['order_detail_id'])) {
+                    array_push($d2c_vv['order_details'], $d2c_v);
+                    $in_flag = true;
                 }
             }
+            if ($in_flag == false) {
+                array_push($temp_data['order_details'], $d2c_v);
+            }
         }
+
+        $data['order_child'][] = $temp_data;
 
         unset(
                 $data['cost_price'], $data['freight'],
@@ -1126,19 +1131,39 @@ class MallOrder extends Base {
         return $data;
     }
 
-    public function noCommentList($user_id) {
+    public function commentList($user_id, $params = []) {
 
-        $list = DB::table('nlsg_mall_order as nmo')
+        $query = DB::table('nlsg_mall_order as nmo')
                 ->join('nlsg_mall_order_detail as nmod', 'nmo.id', '=', 'nmod.order_id')
                 ->join('nlsg_mall_goods as nmg', 'nmod.goods_id', '=', 'nmg.id')
-                ->where('nmo.user_id', '=', $user_id)
+                ->where('nmo.user_id', '=', $user_id);
+
+        //1已评价   2未评价  3全部
+        switch (intval($params['flag'] ?? 0)) {
+            case 1:
+                $query->where('nmod.comment_id', '>', 0);
+                break;
+            case 2:
+                $query->where('nmod.comment_id', '=', 0);
+                break;
+            case 3:
+                break;
+            default :
+                return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        //订单id筛选
+        if ($params['order_id'] ?? 0) {
+            $query->where('nmo.id', '=', $params['order_id']);
+        }
+
+        $list = $query
                 ->where('nmo.status', '=', 30)
-                ->where('nmod.comment_id', '=', 0)
                 ->where('nmod.num', '>', 'nmod.after_sale_used_num')
                 ->where('nmo.is_del', '=', 0)
                 ->select(['nmo.id as order_id', 'nmo.ordernum',
                     'nmod.id as order_detail_id', 'nmod.sku_history',
-                    'nmg.name', 'nmg.subtitle'])
+                    'nmg.name', 'nmg.subtitle', 'nmod.comment_id'])
                 ->get();
 
         foreach ($list as $v) {

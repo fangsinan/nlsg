@@ -1125,7 +1125,6 @@ class MallOrderController extends Controller {
       }
      */
     public function orderInfo(Request $request) {
-//        $this->user = ['id'=>168934,'phone'=>'18624078563','is_staff'=>0];
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
@@ -1411,7 +1410,7 @@ class MallOrderController extends Controller {
       }
      */
     public function groupBuyOrderInfo(Request $request) {
-        
+
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
@@ -1439,7 +1438,7 @@ class MallOrderController extends Controller {
       @apiParam {string=stop,del,receipt} flag 标记
      */
     public function statusChange(Request $request) {
-        
+
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
@@ -1464,24 +1463,27 @@ class MallOrderController extends Controller {
     }
 
     /**
-      未评论商品列表
-      @api {get} /api/v4/mall/no_comment_list 未评论商品列表
+      商品评论列表
+      @api {get} /api/v4/mall/comment_list 商品评论列表
       @apiVersion 1.0.0
-      @apiName /api/v4/mall/no_comment_list
+      @apiName /api/v4/mall/comment_list
       @apiGroup MallOrder
-      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/no_comment_list
+      @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/comment_list
       @apiDescription 未评论商品列表
+     * @apiParam {number=1,2,3} flag 标记(1已评价,未评价,3全部)
+     * @apiParam {number} [order_id] 如果按订单筛选,传订单id
       @apiSuccessExample {json} Request-Example:
       {
       "code": 200,
       "msg": "成功",
       "data": [
       {
-      "order_id": 9526,
-      "ordernum": "2006180016893463957101",
-      "order_detail_id": 10323,
+      "order_id": 9527,
+      "ordernum": "2006190016893436005551",
+      "order_detail_id": 10327,
       "name": "AR立体浮雕星座地球仪",
       "subtitle": "高清生动准确的星座秘密等你来发现",
+      "comment_id": 0,
       "sku_value": [
       {
       "key_name": "规格",
@@ -1492,14 +1494,13 @@ class MallOrderController extends Controller {
       ]
       }
      */
-    public function noCommentList() {
-        
+    public function commentList(Request $request) {
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
 
         $model = new MallOrder();
-        $data = $model->noCommentList($this->user['id']);
+        $data = $model->commentList($this->user['id'], $request->input());
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
@@ -1523,7 +1524,7 @@ class MallOrderController extends Controller {
       @apiParam {string} content 评价内容
      */
     public function subComment(Request $request) {
-        
+
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
@@ -1562,7 +1563,7 @@ class MallOrderController extends Controller {
       }
      */
     public function getComment(Request $request) {
-        
+
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
