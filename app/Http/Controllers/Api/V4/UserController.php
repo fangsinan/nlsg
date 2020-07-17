@@ -20,13 +20,13 @@ class UserController extends Controller
 {
 
     /**
-     * @api {get} api/v4/user/index  用户主页
+     * @api {get} api/v4/user/homepage  用户主页
      * @apiVersion 4.0.0
-     * @apiName  index
+     * @apiName  homepage
      * @apiGroup User
      * @apiHeader {string} Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC92NC5jb21cL2FwaVwvdjRcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNTk0OTU0MDQxLCJleHAiOjE1OTYyNTAwNDEsIm5iZiI6MTU5NDk1NDA0MSwianRpIjoiMFVhdmsxT0piNXJSSHFENSIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.9qShuy0F5zwn-USMqKeVrDUKUW3JYQYCn46Yy04wbg0
      * @apiParam  {number} id  用户id
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/index
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/homepage
      *
      * @apiSuccess {string}  nickname  用户昵称
      * @apiSuccess {string}  headimg   用户头像
@@ -35,7 +35,32 @@ class UserController extends Controller
      * @apiSuccess {string}  follow_num 关注数
      * @apiSuccess {string}  fan_num    粉丝数
      * @apiSuccess {string}  is_teacher 是否为老师
-     * @apiSuccess {string}  works      作品
+     * @apiSuccess {string}  works        作品
+     * @apiSuccess {string}  works.title  作品标题
+     * @apiSuccess {string}  works.cover_img     作品封面
+     * @apiSuccess {string}  works.subscribe_num 作品订阅数
+     * @apiSuccess {string}  works.original_price 作品价格
+     *
+     * @apiSuccess {string}  column           专栏
+     * @apiSuccess {string}  column.name      专栏名称
+     * @apiSuccess {string}  column.title     专栏标题
+     * @apiSuccess {string}  column.subtitle  专栏副标题
+     * @apiSuccess {string}  column.original_price  专栏价格
+     *
+     * @apiSuccess {string}  comments             想法
+     * @apiSuccess {string}  comments.content     内容
+     * @apiSuccess {number}  comments.forward_num 转发数
+     * @apiSuccess {number}  comments.share_num   分享数
+     * @apiSuccess {number}  comments.like_num    喜欢数
+     * @apiSuccess {number}  comments.reply_num   评论数
+     * @apiSuccess {number}  comments.created_at  发布时间
+     *
+     * @apiSuccess {string}  comments.user           评论的用户
+     * @apiSuccess {string}  comments.user.nickname  评论的用户昵称
+     * @apiSuccess {string}  comments.user.headimg   评论的用户头像
+     *
+     * @apiSuccess {string}  comments.attach         评论的图片
+     * @apiSuccess {string}  comments.attach.img     评论的图片地址
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -99,26 +124,24 @@ class UserController extends Controller
     {
         $id = $request->get('id');
         $user = User::select('id', 'nickname', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
-            ->findOrFail($id);
-        if ($user['is_teacher'] == 1) {
-            $user->works = $user
-                ->select('id', 'nickname')
                 ->with([
-                    'works' => function ($query) {
-                        $query->select('user_id', 'title', 'cover_img', 'subscribe_num', 'original_price')
+                    'works'=> function($query){
+                        $query->select(['user_id','title','cover_img','subscribe_num','original_price'])
                             ->where('is_audio_book', 0);
-                    }
-                ])
-                ->first();
-            $user->column = $user
-                ->select('id', 'nickname')
-                ->with([
+                        },
                     'columns' => function ($query) {
                         $query->select('user_id', 'name', 'title', 'subtitle', 'original_price');
-                    }
+                        },
+                    'comments' =>function ($query) {
+                        $query->select('id','pid', 'user_id', 'relation_id', 'content','forward_num','share_num','like_num','reply_num','created_at')
+                            ->orderBy('created_at','desc')
+                            ->where('status', 1);
+                    },
+                    'comments.user:id,nickname,headimg',
+                    'comments.attach:id,relation_id,img'
                 ])
-                ->first();
-        }
+                ->findOrFail($id);
+
 
         return success($user);
     }

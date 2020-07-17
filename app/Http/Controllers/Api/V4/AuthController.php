@@ -157,7 +157,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @api {get} api/v4/auth/sendsms 发送验证码
+     * @api {get} api/v4/auth/sms 发送验证码
      * @apiVersion 4.0.0
      * @apiName  sendSms
      * @apiGroup Auth
