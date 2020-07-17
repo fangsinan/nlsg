@@ -16,9 +16,9 @@ class Controller extends BaseController
 
      public function __construct()
     {
-//        $this->user = auth('api')->user();
+        $this->user = auth('api')->user();
     }
-    
+
     protected function success($data =[])
     {
         $result = [

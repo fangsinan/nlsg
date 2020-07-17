@@ -16,7 +16,7 @@ class Order extends Base {
 
     protected $table = 'nlsg_order';
 
-    protected $fillable = ['ordernum' , 'type' , 'user_id' , 'relation_id' , 'cost_price'  , 'price' , 'twitter_id'  , 'coupon_id' , 'ip'  , 'os_type'  , 'live_id' ,];
+    protected $fillable = ['ordernum' , 'status', 'type' , 'user_id' , 'relation_id' , 'cost_price'  , 'price' , 'twitter_id'  , 'coupon_id' , 'ip'  , 'os_type'  , 'live_id' ,'reward_type', ];
 
 
     public function user()

@@ -4,28 +4,29 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use App\Models\User;
 
 class AuthController extends Controller
 {
 
     /**
-     * @api {get} api/v4/user/login 登录
+     * @api {get} api/v4/auth/login  登录
      * @apiVersion 4.0.0
-     * @apiName  phone 手机号
-     * @apiName  code  验证码
-     * @apiGroup Api
+     * @apiName  login
+     * @apiGroup Auth
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/login
+     * @apiSuccess {string} token token验证
      *
-     * @apiSuccess {String} token   token
-     *
-     * @apiSuccessExample 成功响应:
-     *   {
-     *      "code": 200,
-     *      "msg" : '成功',
-     *      "data": {
-     *          'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ'
-     *       }
-     *   }
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     * "data": {
+     * "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC92NC5jb21cL2FwaVwvdjRcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNTk0ODgzMzk4LCJleHAiOjE1OTQ4ODY5OTgsIm5iZiI6MTU5NDg4MzM5OCwianRpIjoic1FKYnFnRU5UM0hRYWJjSyIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.ke8ARBD6p9Rv1yTnhQxjIvle_zFN5mI_zzTQUBhSgwI"
+     * },
+     *     }
      *
      */
 
@@ -62,7 +63,7 @@ class AuthController extends Controller
         $data = [
             'token' => $token
         ];
-        return $this->success($data);
+        return success($data);
     }
 
     /**
@@ -114,9 +115,9 @@ class AuthController extends Controller
         }
 
         $res = $this->getRequest('https://api.weixin.qq.com/sns/oauth2/access_token', [
-            'appid' => env('WECHAT_OFFICIAL_ACCOUNT_APPID'),
-            'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET'),
-            'code' => $code,
+            'appid'      => env('WECHAT_OFFICIAL_ACCOUNT_APPID'),
+            'secret'     => env('WECHAT_OFFICIAL_ACCOUNT_SECRET'),
+            'code'       => $code,
             'grant_type' => 'authorization_code'
         ]);
         if ( ! $res) {
@@ -124,7 +125,7 @@ class AuthController extends Controller
         }
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res['access_token'],
-            'openid' => $res['openid'],
+            'openid'       => $res['openid'],
         ]);
         if ( ! $list) {
             return $this->error(400, '获取用户信息失败');
@@ -135,10 +136,10 @@ class AuthController extends Controller
         if ( ! $user) {
             $user = User::create([
                 'nickname' => '微信',
-                'sex' => '1',
+                'sex'      => '1',
                 'province' => '北京市',
-                'city' => '海淀区',
-                'headimg' => '/wechat/works/headimg/3833/2017110823004219451.png'
+                'city'     => '海淀区',
+                'headimg'  => '/wechat/works/headimg/3833/2017110823004219451.png'
             ]);
         }
 
@@ -155,20 +156,34 @@ class AuthController extends Controller
     }
 
     /**
-     * @api {post} api/v4/user/sendSms 发送验证码
+     * @api {get} api/v4/auth/sendsms  发送验证码
      * @apiVersion 4.0.0
-     * @apiName  sendEms
-     * @apiGroup User
+     * @apiName  banner
+     * @apiGroup Index
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/index
+     * @apiSuccess {string}
      *
-     * @apiParam {string} phone 手机号
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 274,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
+     *                   "title": "电商弹窗课程日历套装",
+     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
+     *               },
+     *               {
+     *                   "id": 296,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
+     *                   "title": "心里学",
+     *                   "url": "/mall/shop-details?goods_id=479"
+     *               }
+     *         ]
+     *     }
      *
-     * @apiSuccess {string} result json
-     * @apiSuccessExample Success-Response:
-     *{
-     * "code": 200,
-     * "msg": ok,
-     * "result": { }
-     * }
      */
 
     public function sendSms(Request $request)
@@ -182,14 +197,15 @@ class AuthController extends Controller
         try {
 
             $code = rand(1000, 9999);
-            $result   = $easySms->send( $phone, [
+            $result = $easySms->send($phone, [
                 'template' => 'SMS_70300075',
                 'data'     => [
                     'code' => $code,
                 ],
-            ], ['aliyun'] );
+            ], ['aliyun']);
 
             Redis::setex($phone, 60, $code);
+            return success();
         } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
             $message = $exception->getResults();
             return $message;
@@ -216,6 +232,5 @@ class AuthController extends Controller
 
         return json_decode($res->getBody()->getContents());
     }
-
 
 }

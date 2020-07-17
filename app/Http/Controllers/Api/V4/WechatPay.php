@@ -160,10 +160,10 @@ class WechatPay extends Controller {
                 //更新订单状态
                 $data1 = [
                     'status' => 1,
-                    'pay_time' => $time,
+                    'pay_time' => date("Y-m-d H:i:s", $time),
                     'pay_price' => $total_fee,
-                    'start_time' => $starttime,
-                    'end_time' => $endtime,
+                    'start_time' => date("Y-m-d H:i:s", $starttime),
+                    'end_time' => date("Y-m-d H:i:s", $endtime),
                     'pay_type' => $pay_type,
                 ];
                 $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
@@ -257,8 +257,8 @@ class WechatPay extends Controller {
                     'type' => 1,
                     'order_id' => $orderId, //订单id
                     'status' => 1,
-                    'start_time' => $starttime,
-                    'end_time' => $endtime,
+                    'start_time' => date("Y-m-d H:i:s", $starttime),
+                    'end_time' => date("Y-m-d H:i:s", $endtime),
                     'relation_id' => $teacher_id,
                     'service_id' => $orderInfo['service_id'],
                 ];
@@ -316,7 +316,7 @@ class WechatPay extends Controller {
                 //更新订单状态
                 $data1 = [
                     'status' => 1,
-                    'pay_time' => $time,
+                    'pay_time' => date("Y-m-d H:i:s", $time),
                     'pay_price' => $total_fee,
                     'pay_type' => $pay_type,
                 ];
@@ -325,7 +325,7 @@ class WechatPay extends Controller {
                 $couponRst = 1;
                 //消除优惠券
                 if ($coupon_id > 0) {
-                    $couponRst = Coupon::where(['id' => $coupon_id])->update(['status' => 2, 'used_time' => $time]);
+                    $couponRst = Coupon::where(['id' => $coupon_id])->update(['status' => 2, 'used_time' => date('Y-m-d H:i:s', $time)]);
                 }
 
                 $record_type = self::$pay_record_type[$data['pay_type']] ?? 0;
@@ -333,7 +333,6 @@ class WechatPay extends Controller {
                 $record = [
                     'ordernum' => $out_trade_no, //订单编号
                     'price' => $total_fee, //支付金额
-                    'ctime' => $time, //支付时间
                     'transaction_id' => $transaction_id, //流水号
                     'user_id' => $user_id, //会员id
                     'type' => $pay_type, //1：微信  2：支付宝
@@ -354,7 +353,6 @@ class WechatPay extends Controller {
                             //'author_id' => $teacher_id,
                             'user_id' => $user_id,
                             'works_id' => $works_id,
-                            'ctime' => $time,
                         ];
 //                        $MessObj  = new Messages();
 //                        $phoneRst = $MessObj->add($MessObj::$table,$phoneArr);
@@ -432,14 +430,14 @@ class WechatPay extends Controller {
 //                                break;
 //                        }
                         if ($ProfitPrice > 0) {
-                            $map = array('user_id' => $twitter_id, "type" => 7, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time);
+                            $map = array('user_id' => $twitter_id, "type" => 7, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, );
                         }
                     } else {
                         $is_sub = Subscribe::isSubscribe($twitter_id, $works_id, 2);
                         if ($is_sub) {
                             $WorksInfo = Works::find($works_id);
                             $ProfitPrice = $WorksInfo['twitter_price'];
-                            $map = array('user_id' => $twitter_id, "type" => 7, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time);
+                            $map = array('user_id' => $twitter_id, "type" => 7, "ordernum" => $out_trade_no, 'price' => $ProfitPrice,);
                         }
                     }
                 }
@@ -465,7 +463,7 @@ class WechatPay extends Controller {
                     'status' => 1,
                     'relation_id' => $works_id, //精品课
                     'order' => $orderId, //订单id
-                    'pay_time' => $time, //支付时间
+                    'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
                     'service_id' => $orderInfo['service_id'],
                 ];
 
