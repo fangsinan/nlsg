@@ -18,33 +18,45 @@ use App\Models\UserFollow;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->user = auth('api')->user();
-    }
 
     /**
-     * @api {get} api/v4/user/index 个人主页
+     * @api {get} api/v4/user/index  用户主页
      * @apiVersion 4.0.0
-     * @apiGroup Api
+     * @apiName  index
+     * @apiGroup User
+     * @apiHeader {string} Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC92NC5jb21cL2FwaVwvdjRcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNTk0OTU0MDQxLCJleHAiOjE1OTYyNTAwNDEsIm5iZiI6MTU5NDk1NDA0MSwianRpIjoiMFVhdmsxT0piNXJSSHFENSIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.9qShuy0F5zwn-USMqKeVrDUKUW3JYQYCn46Yy04wbg0
+     * @apiParam  {number} id  用户id
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/index
      *
-     * @apiSuccess {String} token
+     * @apiSuccess {string}
      *
-     * @apiSuccessExample 成功响应:
-     *   {
-     *      "code": 200,
-     *      "msg" : '成功',
-     *      "data": {
-     *          'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ'
-     *       }
-     *   }
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 274,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
+     *                   "title": "电商弹窗课程日历套装",
+     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
+     *               },
+     *               {
+     *                   "id": 296,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
+     *                   "title": "心里学",
+     *                   "url": "/mall/shop-details?goods_id=479"
+     *               }
+     *         ]
+     *     }
      *
-    */
-    public function index()
+     */
+    public function homepage(Request $request)
     {
-        $user = User::select('id','nickname','headimg', 'headcover', 'intro','follow_num', 'fan_num','is_teacher')
-            ->findOrFail(1);
-
+        $id =  $request->get('id');
+        $user  = User::select('id','nickname','headimg', 'headcover', 'intro','follow_num', 'fan_num','is_teacher')
+                    ->findOrFail($id);
         if ($user['is_teacher'] ==1){
             $user->works  =  $user
                     ->select('id','nickname')
@@ -61,7 +73,7 @@ class UserController extends Controller
                     ->first();
         }
 
-        return  $this->success($user);
+        return  success($user);
     }
 
     /**
