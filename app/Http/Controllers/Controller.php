@@ -12,11 +12,11 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     protected $page_per_page = 50;
     protected $show_ps = true;
-    public $user = ['id' => 168934, 'level' => 4, 'is_staff' => 1];
+    public $user;
 
-     public function __construct()
+    public function __construct()
     {
-        $this->user = auth('api')->user();
+        $this->user = auth('api')->user()->toArray();
     }
 
     protected function success($data =[])

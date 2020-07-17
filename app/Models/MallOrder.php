@@ -1092,7 +1092,8 @@ class MallOrder extends Base {
 
         $data['price_info'] = $price_info;
         $data['bill_info'] = $bill_info;
-
+        
+        //todo 修改未发货显示
         if (empty($data['order_child'])) {
             $temp_data = [];
             $temp_data['status'] = 0;
