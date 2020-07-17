@@ -252,4 +252,358 @@ class OrderController extends Controller
     }
 
 
+    /**
+     * @api {post} /api//v4/order/create_reward_order 打赏下单
+     * @apiName create_reward_order
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} work_id 课程id
+     * @apiParam {int} column_id 专栏id
+     * @apiParam {int} commend_id 评论id
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} reward  //1 鲜花 2爱心 3书籍 4咖啡  默认1
+     * @apiParam {int} reward_num 数量 默认1
+     * @apiParam {int} reward_type 打赏类型1专栏 2课程   3想法(只需要传对应id)
+     * @apiParam {int} os_type os_type 1 安卓 2ios
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": { }
+    }
+     */
+    public function createRewardOrder(Request $request)
+    {
+        $work_id    = $request->input('work_id',0); // 课程id
+        $column_id  = $request->input('column_id',0); // 专栏id
+        $commend_id = $request->input('commend_id',0); // 评论id
+        $user_id    = $request->input('user_id',0);
+        $reward     = $request->input('reward',1);//1 鲜花 2爱心 3书籍 4咖啡
+        $reward_num = $request->input('reward_num',1);  //数量
+        $reward_type= $request->input('reward_type',0);  //打赏类型
+        $os_type    = $request->input('os_type',0);
+
+
+        //检测下单参数有效性
+        if ( empty($user_id) ) {
+            return $this->error(0,'用户id有误');
+        }
+
+        switch ($reward_type) {
+            case 1:$relation_id = $column_id;break;
+            case 2:$relation_id = $work_id;break;
+            case 3:$relation_id = $commend_id;break;
+        }
+        if ( empty($relation_id) || $relation_id == 0 ) {
+            return $this->error(0,'打赏目标有误');
+        }
+
+        $loginUserInfo = User::find($user_id);
+        if (empty($loginUserInfo)) {
+            return $this->error(0,'用户有误');
+        }
+
+        //处理订单
+
+        $price = 1;
+        switch ($reward) {
+            case 1:$price = 1;
+                break;
+            case 2:$price = 5.21;
+                break;
+            case 3:$price = 18.88;
+                break;
+            case 4:$price = 36;
+                break;
+        }
+
+
+        $ordernum = MallOrder::createOrderNumber($user_id,3);
+        $data = [
+            'ordernum'      => $ordernum,
+            'type'          => 5,
+            'user_id'       => $user_id,
+            'relation_id'   => $relation_id,
+            'price'         => $price * $reward_num,
+            'reward'        => $reward,
+            'reward_num'    => $reward_num,
+            'reward_type'   => $reward_type,
+            'ip'            => $request->getClientIp(),
+            'os_type'       => $os_type,
+        ];
+        $order = Order::firstOrCreate($data);
+        return $this->success($order['id']);
+
+    }
+
+
+
+
+
+    /**
+     * @api {get} /api/v4/order/order_list  订单列表
+     * @apiName order_list
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} user_id 用户id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+
+
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "current_page": 1,
+    "data": [
+    {
+    "id": 58,
+    "type": 15,   类型  1、专栏  9、课程  15讲座
+    "relation_id": 1,   对应id
+    "user_id": 211172,
+    "status": 1,        0待支付 1 支付
+    "price": "10.00",       金额
+    "pay_price": "0.01",        实际支付金额
+    "coupon_id": 0,     优惠券id
+    "pay_time": null,       支付时间
+    "ordernum": "20200709104916",   订单号
+    "relation_data": [
+    {
+    "id": 1,
+    "name": "王琨专栏",
+    "title": "顶尖导师 经营能量",
+    "subtitle": "顶尖导师 经营能量",
+    "message": "",
+    "price": "99.00",
+    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+    "is_new": 1
+    }
+    ]
+    },
+    {
+    "id": 45,
+    "type": 9,
+    "relation_id": 16,
+    "user_id": 211172,
+    "status": 1,
+    "price": "10.00",
+    "pay_price": "0.00",
+    "coupon_id": 0,
+    "pay_time": null,
+    "ordernum": "20200708114026",
+    "relation_data": [
+    {
+    "id": 16,
+    "user_id": 168934,
+    "title": "如何经营幸福婚姻",
+    "cover_img": "/nlsg/works/20190822150244797760.png",
+    "subtitle": "",
+    "price": "29.90",
+    "user": {
+    "id": 168934,
+    "nickname": "chandler"
+    },
+    "is_new": 1,
+    "is_free": 1
+    }
+    ]
+    },
+    {
+    "id": 3,
+    "type": 1,
+    "relation_id": 1,
+    "user_id": 211172,
+    "status": 1,
+    "price": "99.00",
+    "pay_price": "0.01",
+    "coupon_id": 0,
+    "pay_time": null,
+    "ordernum": "202005231631148119",
+    "relation_data": [
+    {
+    "id": 1,
+    "name": "王琨专栏",
+    "title": "顶尖导师 经营能量",
+    "subtitle": "顶尖导师 经营能量",
+    "message": "",
+    "price": "99.00",
+    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+    "is_new": 1
+    }
+    ]
+    }
+    ],
+    "first_page_url": "http://nlsgv4.com/api/v4/order/order_list?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "http://nlsgv4.com/api/v4/order/order_list?page=1",
+    "next_page_url": null,
+    "path": "http://nlsgv4.com/api/v4/order/order_list",
+    "per_page": 50,
+    "prev_page_url": null,
+    "to": 3,
+    "total": 3
+    }
+    }
+
+     */
+    public function orderList(Request $request){
+        $user_id    = $request->input('user_id',0);
+        $data = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum')->whereIn('type', [1, 9, 15])
+            ->where(['user_id' =>$user_id, ])
+            ->whereIn('status', [0, 1])->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
+
+        foreach ($data['data'] as $key=>$val){
+
+            switch ($val['type']) {
+                case 1:
+                    $model = new Column();
+                    $result = $model->getIndexColumn([$val['relation_id']]);
+                    break;
+                case 9:
+                    $model = new Works();
+                    $result = $model->getIndexWorks([$val['relation_id']], 0);
+                    break;
+                case 15:
+                    $model = new Column();
+                    $result = $model->getIndexColumn([$val['relation_id']]);
+                    break;
+            }
+            if($result == false){
+                $data['data'][$key]['relation_data'] = [];
+            }else{
+                $data['data'][$key]['relation_data'] = $result;
+            }
+
+
+        }
+
+        return $this->success($data['data']);
+
+    }
+
+
+    /**
+     * @api {get} /api/v4/order/order_detail  订单详情
+     * @apiName order_detail
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} id  订单id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "id": 3,
+    "type": 1,              类型  1、专栏  9、课程  15讲座
+    "relation_id": 1,   对应的id
+    "user_id": 211172,
+    "status": 1,  0待支付  1 已支付  2取消【不展示】
+    "price": "99.00",    金额
+    "pay_price": "0.01",    实际支付金额
+    "coupon_id": 0,     优惠券id
+    "pay_time": null,  支付时间
+    "ordernum": "202005231631148119", 订单号OA
+    "created_at": "2020-07-01 10:44:35",  下单时间
+    "coupon_price": 0,  优惠券金额
+    "relation_data": [    内容信息
+    {
+    "id": 1,
+    "name": "王琨专栏",
+    "title": "顶尖导师 经营能量",
+    "subtitle": "顶尖导师 经营能量",
+    "message": "",
+    "price": "99.00",
+    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+    "is_new": 1
+    }
+    ]
+    }
+    }
+     */
+    public function orderDetail(Request $request){
+        $user_id    = $request->input('user_id',0);
+        $order_id    = $request->input('id',0);
+        $data = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum','created_at')
+            ->where(['id' =>$order_id, 'user_id'=>$user_id])->first()->toArray();
+
+        //查询优惠券金额
+        $coupon = Coupon::find($data['coupon_id']);
+        $data['coupon_price'] = $coupon['price']??0;
+        //购买的内容详情
+        $result = false;
+        switch ($data['type']) {
+            case 1:
+                $model = new Column();
+                $result = $model->getIndexColumn([$data['relation_id']]);
+                break;
+            case 9:
+                $model = new Works();
+                $result = $model->getIndexWorks([$data['relation_id']], 0);
+                break;
+            case 15:
+                $model = new Column();
+                $result = $model->getIndexColumn([$data['relation_id']]);
+                break;
+        }
+        if($result == false){
+            $data['relation_data'] = [];
+        }else{
+            $data['relation_data'] = $result;
+        }
+
+
+
+        return $this->success($data);
+
+    }
+
+
+
+
+
+    /**
+     * @api {get} /api/v4/order/close_order  取消订单
+     * @apiName close_order
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} id  订单id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {}
+    }
+     */
+    public function closeOrder(Request $request){
+        $user_id    = $request->input('user_id',0);
+        $order_id    = $request->input('id',0);
+
+        $data = Order::where(['id'  => $order_id, 'user_id' => $user_id,])->first();
+        if(empty($data)){
+            return $this->error(0,'订单错误');
+        }
+
+        Order::where([
+            'id'        =>  $order_id,
+            'user_id'   =>  $user_id,
+        ])->update(['status' => 2 ]);
+        return $this->success();
+
+    }
+
+
 }
