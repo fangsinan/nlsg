@@ -169,19 +169,19 @@ class SpecialPriceModel extends Base {
             }
             Cache::add($cache_key_name, $sec_date_list, $expire_num);
         }
-        if($flag == 1){
+        if ($flag == 1) {
             return $sec_date_list;
-        }else{
+        } else {
             $temp_res = [];
-            foreach($sec_date_list as $k => $v){
+            foreach ($sec_date_list as $k => $v) {
                 $t = [];
                 $t['time'] = $k;
+
                 $t['data'] = $v;
                 $temp_res[] = $t;
             }
             return $temp_res;
         }
-        
     }
 
     //首页秒杀推荐
@@ -325,7 +325,12 @@ class SpecialPriceModel extends Base {
                 }
             }
         }
-        return $res;
+        //return array_values($res->toArray());
+        $temp_res = [];
+        foreach ($res as $v) {
+            $temp_res[] = $v;
+        }
+        return $temp_res;
     }
 
     public function tempSetSecTime() {
