@@ -142,13 +142,13 @@ class WorksController extends Controller
 
         }
         //$work_data = $worksData->toArray();
-        $res = [
-            'data' => $newWorks,
-            'last_page' => $worksData['last_page'],
-            'per_page' => $worksData['per_page'],
-            'total' => $worksData['total'],
-
-        ];
+//        $res = [
+//            'data' => $newWorks,
+//            'last_page' => $worksData['last_page'],
+//            'per_page' => $worksData['per_page'],
+//            'total' => $worksData['total'],
+//
+//        ];
         return $this->success($newWorks);
 
     }
