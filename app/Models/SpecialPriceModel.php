@@ -139,7 +139,7 @@ class SpecialPriceModel extends Base {
         $expire_num = CacheTools::getExpire('set_kill_list');
 
         $sec_date_list = Cache::get($cache_key_name);
-        if (true || empty($sec_date_list)) {
+        if (empty($sec_date_list)) {
 
             $sec_date_list = $this->getSecDateList();
 
@@ -152,7 +152,7 @@ class SpecialPriceModel extends Base {
                         ->where('nmg.status', '=', 2);
                     })
                     ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
-                        'nsp.goods_original_price',
+                        'nsp.goods_original_price','nmg.picture',
                         'nmg.original_price', 'nsp.stock', 'nsp.use_stock',
                         'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
                         DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
@@ -333,7 +333,7 @@ class SpecialPriceModel extends Base {
                         ->where('nmg.status', '=', 2);
                     })
                     ->select(['nsp.group_name as group_buy_id', 'nsp.goods_id', 'nmg.name',
-                        'nmg.subtitle', 'nmg.original_price', 'group_num', 'group_price',
+                        'nmg.subtitle', 'nmg.picture','nmg.original_price', 'group_num', 'group_price',
                         'nsp.begin_time', 'nsp.end_time', 'group_name'])
                     ->groupBy('nsp.group_name')
                     ->get();
