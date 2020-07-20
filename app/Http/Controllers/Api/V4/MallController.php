@@ -839,7 +839,7 @@ class MallController extends Controller {
 
     /**
      * 猜你喜欢
-     * @api {post} /api/v4/goods/for_your_reference 猜你喜欢
+     * @api {get} /api/v4/goods/for_your_reference 猜你喜欢
      * @apiVersion 4.0.0
      * @apiName /api/v4/goods/for_your_reference
      * @apiGroup  Mall
