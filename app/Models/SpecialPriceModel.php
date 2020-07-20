@@ -139,7 +139,7 @@ class SpecialPriceModel extends Base {
         $expire_num = CacheTools::getExpire('set_kill_list');
 
         $sec_date_list = Cache::get($cache_key_name);
-        if (empty($sec_date_list)) {
+        if (true || empty($sec_date_list)) {
 
             $sec_date_list = $this->getSecDateList();
 
@@ -153,7 +153,7 @@ class SpecialPriceModel extends Base {
                     })
                     ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
                         'nsp.goods_original_price',
-                        'nmg.original_price',
+                        'nmg.original_price', 'nsp.stock', 'nsp.use_stock',
                         'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
                         DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
                         DB::raw('unix_timestamp(end_time) as end_timestamp')])
@@ -169,15 +169,44 @@ class SpecialPriceModel extends Base {
             }
             Cache::add($cache_key_name, $sec_date_list, $expire_num);
         }
+
         if ($flag == 1) {
             return $sec_date_list;
         } else {
+            $now = time();
+            $today_begin = strtotime(date('Y-m-d', $now));
+            $tomorrow_begin = strtotime(date('Y-m-d', $now) . ' +1 days');
+            $today_day = date('d', $now);
+//            return $sec_date_list;
+            //25日已开抢,已开抢,开枪中,即将开始,明日开抢
             $temp_res = [];
-            foreach ($sec_date_list as $k => $v) {
+            foreach ($sec_date_list as $k => $v1) {
                 $t = [];
                 $t['time'] = $k;
+                $t['show_time'] = date('H:i', strtotime($k));
+                $t['timestamp'] = strtotime($k);
 
-                $t['data'] = $v;
+                $t['status'] = '';
+                if ($now >= $t['timestamp'] && $now <= $v1[0]->end_timestamp) {
+                    $t['status'] = '开抢中';
+                } else {
+                    $v_day = date('d', $v1[0]->begin_timestamp);
+                    if ($now >= $v1[0]->end_timestamp) {
+                        if ($today_day == $v_day) {
+                            $t['status'] = '已开抢';
+                        } else {
+                            $t['status'] = intval($v_day) . '日已开抢';
+                        }
+                    } else {
+                        if ($today_day == $v_day) {
+                            $t['status'] = '即将开抢';
+                        } else {
+                            $t['status'] = intval($v_day) . '日即将开抢';
+                        }
+                    }
+                }
+
+                $t['data'] = $v1;
                 $temp_res[] = $t;
             }
             return $temp_res;
@@ -197,10 +226,10 @@ class SpecialPriceModel extends Base {
                 //$res = $temp;
                 //$res[] = $v;
                 //break;
-                $res = array_merge($res,$v);
+                $res = array_merge($res, $v);
             }
         }
-        return array_slice($res,0,2);
+        return array_slice($res, 0, 2);
     }
 
     //获取秒杀时间分组

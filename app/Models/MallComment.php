@@ -36,11 +36,11 @@ class MallComment extends Base {
                 ->join('nlsg_user as nu', 'nmc.user_id', '=', 'nu.id')
                 ->leftJoin('nlsg_user as na', 'nmc.reply_user_id', '=', 'na.id')
                 ->leftJoin('nlsg_mall_sku as sku', 'nmc.sku_number', '=', 'sku.sku_number')
-                ->select(['nmc.id', 'nu.id as user_id', 'nu.headimg', 'nu.nick_name',
-            'nu.level', 'nu.expire_time', 'nmc.content', 'nmc.ctime', 'nmc.pid',
+                ->select(['nmc.id', 'nu.id as user_id', 'nu.headimg', 'nu.nickname',
+            'nu.level', 'nu.expire_time', 'nmc.content', 'nmc.created_at', 'nmc.pid',
             'nmc.goods_id', 'nmc.sku_number', 'nmc.star', 'nmc.reply_comment',
-            'nmc.reply_time', 'nmc.reply_user_id',
-            'na.nick_name as reply_nick_name', 'sku.id as sku_id']);
+            'nmc.replyed_at', 'nmc.reply_user_id', 'nmc.picture',
+            'na.nickname as reply_nickname', 'sku.id as sku_id']);
 
         $query->where([
             ['nmc.goods_id', '=', $goods_id],
@@ -59,6 +59,11 @@ class MallComment extends Base {
 
         foreach ($list as $k => $v) {
             $list[$k]->sku_value = MallSkuValue::getListBySkuNum($v->sku_number);
+            if ($v->picture) {
+                $list[$k]->picture = explode(',', $v->picture);
+            } else {
+                $list[$k]->picture = [];
+            }
             $temp_data = [];
             self::getDataByGidPid($temp_data, $goods_id, $v->id);
             $list[$k]->list = $temp_data;
@@ -70,6 +75,8 @@ class MallComment extends Base {
         if (empty($params['goods_id'])) {
             return ['code' => false, 'msg' => '参数错误'];
         }
+        $params['size'] = $params['size'] ?? 4;
+        $params['page'] = $params['page'] ?? 1;
 
         $cache_key_name = 'mall_comment_goods_' . $params['goods_id'] . '_'
                 . $params['size'] . '_' . $params['page'];

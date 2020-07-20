@@ -389,8 +389,6 @@ class MallController extends Controller {
     public function commentList(Request $request) {
         $model = new MallComment();
         $params = $request->input();
-        $params['page'] = 1;
-        $params['size'] = 4;
         $data = $model->getList($params);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
@@ -625,43 +623,68 @@ class MallController extends Controller {
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/flash_sale
      * @apiDescription 秒杀首页
      * 
-      @apiSuccess {number} goods_id 商品id
-      @apiSuccess {number} name 名称
-      @apiSuccess {number} subtitle 副标题
-      @apiSuccess {number} group_num 拼团需要人数
-      @apiSuccess {number} group_price 拼团价格
-      @apiSuccess {number} begin_time 开始时间
-      @apiSuccess {number} end_time 结束时间
+      @apiSuccess {string} show_time 时间
+      @apiSuccess {number} statis 状态
+      @apiSuccess {string[]} data 列表
+      @apiSuccess {number} data.goods_id 商品id
+      @apiSuccess {number} data.name 名称
+      @apiSuccess {number} data.subtitle 副标题
+      @apiSuccess {number} data.group_num 拼团需要人数
+      @apiSuccess {number} data.group_price 拼团价格
+      @apiSuccess {number} data.begin_time 开始时间
+      @apiSuccess {number} data.end_time 结束时间
+      @apiSuccess {number} data.stock 库存
+      @apiSuccess {number} data.use_stock 已用库存
      * @apiSuccessExample {json} Request-Example:
-     * {
+      {
       "code": 200,
       "msg": "成功",
-      "data": {
-      "2020-06-11 17:34:00": [
+      "data": [
       {
-      "goods_id": 86,
-      "name": "AR智能学生专用北斗地球仪",
-      "subtitle": "王树声地理教学研究室倾力打造地理教学地球仪",
-      "goods_original_price": "0.00",
-      "original_price": "379.00",
-      "goods_price": "0.00",
-      "begin_time": "2020-06-11 17:34:00",
-      "end_time": "2020-06-11 17:52:59"
-      }
-      ],
-      "2020-06-11 18:12:00": [
+      "time": "2020-07-30 18:12:00",
+      "show_time": "18:12",
+      "timestamp": 1596103920,
+      "status": "即将开抢",
+      "data": [
       {
       "goods_id": 91,
       "name": "AR立体浮雕星座地球仪",
       "subtitle": "高清生动准确的星座秘密等你来发现",
       "goods_original_price": "0.00",
       "original_price": "379.00",
+      "stock": 0,
+      "use_stock": 1,
       "goods_price": "5.00",
-      "begin_time": "2020-06-11 18:12:00",
-      "end_time": "2020-06-11 18:26:59"
+      "begin_time": "2020-07-30 18:12:00",
+      "end_time": "2020-08-28 18:26:59",
+      "begin_timestamp": 1596103920,
+      "end_timestamp": 1598610419
+      }
+      ]
+      },
+      {
+      "time": "2020-07-31 18:12:00",
+      "show_time": "18:12",
+      "timestamp": 1596190320,
+      "status": "即将开抢",
+      "data": [
+      {
+      "goods_id": 98,
+      "name": "王琨专栏学习套装",
+      "subtitle": "王琨老师专栏年卡1张+《琨说》珍藏版",
+      "goods_original_price": "0.00",
+      "original_price": "399.00",
+      "stock": 0,
+      "use_stock": 0,
+      "goods_price": "9.90",
+      "begin_time": "2020-07-31 18:12:00",
+      "end_time": "2020-08-28 18:26:59",
+      "begin_timestamp": 1596190320,
+      "end_timestamp": 1598610419
       }
       ]
       }
+      ]
       }
      */
     public function flashSaleList() {
