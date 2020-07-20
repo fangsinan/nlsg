@@ -20,7 +20,7 @@ class Controller extends BaseController
         if($this->user){
             $this->user = $this->user->toArray();
         }else{
-            $this->user = [];
+            $this->user = ['id'=>0,'level'=>0,'is_staff'=>0];
         }
     }
 

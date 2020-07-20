@@ -13,7 +13,7 @@ class MallGoods extends Base {
 
         $list = $this->getListData($params, $cache);
         //收藏
-        if ($user['id']) {
+        if ($user['id']??0) {
             $col_list = Collection::where('user_id', '=', $user['id'])
                     ->where('type', '=', 3)
                     ->select(['relation_id as goods_id'])
