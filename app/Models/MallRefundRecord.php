@@ -362,16 +362,17 @@ class MallRefundRecord extends Base {
         }
         
         //todo 进度条
-        $progress_bar = $data->expressInfo->history->list??[];
+        $data['progress_bar'] = $this->createProgressBar($data, $data->expressInfo->history->list??[]);
+        return $data;
+    }
+    
+    public function createProgressBar($data,$progress_bar){
         
         array_push($progress_bar, ['time'=>11]);
         array_unshift($progress_bar,['time'=>1121]);
         
         
-        
-        
-        $data['progress_bar'] = $progress_bar;
-        return $data;
+        return $progress_bar;
     }
 
     //删除,取消,寄回

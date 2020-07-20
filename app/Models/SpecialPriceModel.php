@@ -134,13 +134,15 @@ class SpecialPriceModel extends Base {
         return $list;
     }
 
-    public function getSecList() {
+    public function getSecList($flag = 1) {
         $cache_key_name = 'set_kill_list';
         $expire_num = CacheTools::getExpire('set_kill_list');
 
         $sec_date_list = Cache::get($cache_key_name);
         if (empty($sec_date_list)) {
+
             $sec_date_list = $this->getSecDateList();
+
             $res = self::from('nlsg_special_price as nsp')
                     ->where('nsp.type', '=', 2)
                     ->where('nsp.status', '=', 1)
@@ -152,8 +154,9 @@ class SpecialPriceModel extends Base {
                     ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
                         'nsp.goods_original_price',
                         'nmg.original_price',
-                        'nsp.goods_price',
-                        'nsp.begin_time', 'nsp.end_time'])
+                        'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
+                        DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
+                        DB::raw('unix_timestamp(end_time) as end_timestamp')])
                     ->get();
 
             $sec_date_list = array_fill_keys($sec_date_list, []);
@@ -166,12 +169,23 @@ class SpecialPriceModel extends Base {
             }
             Cache::add($cache_key_name, $sec_date_list, $expire_num);
         }
-        return $sec_date_list;
+        if($flag == 1){
+            return $sec_date_list;
+        }else{
+            $temp_res = [];
+            foreach($sec_date_list as $k => $v){
+                $t = [];
+                $t['time'] = $k;
+                $t['data'] = $v;
+                $temp_res[] = $t;
+            }
+            return $temp_res;
+        }
+        
     }
 
     //首页秒杀推荐
     public function homeSecList() {
-
         $list = $this->getSecList();
         $now = date('Y-m-d H:i:00');
         $res = [];

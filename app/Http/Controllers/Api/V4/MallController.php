@@ -666,7 +666,7 @@ class MallController extends Controller {
      */
     public function flashSaleList() {
         $model = new SpecialPriceModel();
-        $data = $model->getSecList();
+        $data = $model->getSecList(2);
         return $this->success($data);
     }
 
