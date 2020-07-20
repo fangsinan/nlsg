@@ -187,17 +187,20 @@ class SpecialPriceModel extends Base {
     //首页秒杀推荐
     public function homeSecList() {
         $list = $this->getSecList();
+
         $now = date('Y-m-d H:i:00');
         $res = [];
         foreach ($list as $k => $v) {
             if ($k >= $now) {
-                $temp['time'] = $k;
-                $temp['list'] = $v;
-                $res = $temp;
-                break;
+                //$temp['time'] = $k;
+                //$temp['list'] = $v;
+                //$res = $temp;
+                //$res[] = $v;
+                //break;
+                $res = array_merge($res,$v);
             }
         }
-        return $res;
+        return array_slice($res,0,2);
     }
 
     //获取秒杀时间分组
