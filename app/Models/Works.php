@@ -46,6 +46,7 @@ class Works extends Base
         foreach ($lists as &$v) {
             $v['is_new'] = 1;
             $v['is_free']= 1;
+            $v['is_pay'] = 0;
         }
         return $lists;
 

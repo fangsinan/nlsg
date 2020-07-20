@@ -15,6 +15,7 @@ use JWTAuth;
 use App\Models\User;
 use App\Models\FeedBack;
 use App\Models\UserFollow;
+use App\Models\Comment;
 
 class UserController extends Controller
 {
@@ -137,7 +138,9 @@ class UserController extends Controller
      * @apiVersion 4.0.0
      * @apiName  feed
      * @apiGroup User
+     * @apiParam  {number} id  用户id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/feed
+     *
      * @apiSuccess {string}  comments             想法
      * @apiSuccess {string}  comments.content     内容
      * @apiSuccess {number}  comments.forward_num 转发数
@@ -152,6 +155,18 @@ class UserController extends Controller
      *
      * @apiSuccess {string}  comments.attach         评论的图片
      * @apiSuccess {string}  comments.attach.img     评论的图片地址
+     *
+     * @apiSuccess {string}  comments.column           专栏 【讲座】
+     * @apiSuccess {string}  comments.column.title     专栏的标题
+     * @apiSuccess {string}  comments.column.cover_pic 专栏的封面
+     * @apiSuccess {string}  comments.column.price          专栏的价格
+     * @apiSuccess {string}  comments.column.subscribe_num  专栏的订阅数
+     *
+     * @apiSuccess {string}  comments.wiki            百科
+     * @apiSuccess {string}  comments.wiki.name       百科标题
+     * @apiSuccess {string}  comments.wiki.cover      百科封面
+     * @apiSuccess {string}  comments.wiki.view_num   百科浏览数
+     *
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -203,18 +218,32 @@ class UserController extends Controller
     public function feed(Request $request)
     {
         $id = $request->get('id');
-        $lists = User::with([
-            'comments' => function ($query) {
-                $query->select('id', 'pid', 'user_id', 'relation_id', 'content', 'forward_num', 'share_num', 'like_num',
-                    'reply_num', 'created_at')
-                    ->orderBy('created_at', 'desc')
-                    ->where('status', 1)
-                    ->paginate(1);
-            },
-            'comments.user:id,nickname,headimg',
-            'comments.attach:id,relation_id,img'
-        ])->select('id')->find($id);
-        return success($lists);
+
+        $comments = Comment::with(['user:id,nickname,headimg','attach:id,relation_id,img'])
+            ->select('id', 'pid', 'user_id', 'relation_id', 'type','content', 'forward_num', 'share_num', 'like_num',
+                                'reply_num', 'created_at')
+            ->where('user_id', $id)
+            ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        if ($comments['data']){
+            foreach ($comments['data'] as &$v) {
+                if ($v['type']==1 || $v['type'] ==2){
+                    $v['column'] = Column::where('id',$v['relation_id'])
+                                    ->select('id','title','price','subscribe_num','cover_pic')
+                                    ->first();
+                }elseif($v['type']==3 || $v['type'] ==4){
+                    $v['works'] = Works::where('id',$v['relation_id'])
+                                                      ->select('id','title','price','subscribe_num','cover_img')
+                                                      ->first();
+                } elseif($v['type']==5){
+                    $v['wiki'] = Wiki::where('id',$v['relation_id'])->select('id','name','cover','view_num')
+                                                                        ->first();
+                }
+            }
+        }
+        return success($comments['data']);
     }
 
     /**
