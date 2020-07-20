@@ -454,11 +454,11 @@ class OrderController extends Controller
      */
     public function orderList(Request $request){
         $user_id    = $request->input('user_id',0);
-        $data = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum')->whereIn('type', [1, 9, 15])
+        $list = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum')->whereIn('type', [1, 9, 15])
             ->where(['user_id' =>$user_id, ])
             ->whereIn('status', [0, 1])->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
-
-        foreach ($data['data'] as $key=>$val){
+        $data = $list['data'];
+        foreach ($data as $key=>$val){
 
             switch ($val['type']) {
                 case 1:
@@ -475,15 +475,15 @@ class OrderController extends Controller
                     break;
             }
             if($result == false){
-                $data['data'][$key]['relation_data'] = [];
+                $data[$key]['relation_data'] = [];
             }else{
-                $data['data'][$key]['relation_data'] = $result;
+                $data[$key]['relation_data'] = $result;
             }
 
 
         }
 
-        return $this->success($data['data']);
+        return $this->success($data);
 
     }
 
