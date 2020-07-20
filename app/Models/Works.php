@@ -85,8 +85,10 @@ class Works extends Base
                           ->orderBy('rank', 'desc')
                           ->orderBy('id','desc')
                           ->limit(2);
-                }])
-                ->select('id','title', 'subscribe_num')
+                    },
+                    'user:id,nickname,headimg'
+                ])
+                ->select('id','user_id','title', 'subscribe_num')
                 ->where('id', $id)
                 ->where(['type'=>2, 'status'=>4])
                 ->first()
