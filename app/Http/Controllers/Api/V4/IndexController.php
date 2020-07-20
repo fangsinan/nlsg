@@ -12,7 +12,7 @@ class IndexController extends Controller
 {
 
     /**
-     * @api {get} api/v4/index/index 首页-公告
+     * @api {get} api/v4/index/announce 首页-公告
      * @apiVersion 4.0.0
      * @apiName  index
      * @apiGroup Index
@@ -517,6 +517,9 @@ class IndexController extends Controller
      * @apiSuccess {string} work_info.title   章节标题
      * @apiSuccess {number} work_info.view_num 学习人数
      * @apiSuccess {number} work_info.is_new  是否更新
+     *
+     * @apiSuccess {string} user 作者
+     * @apiSuccess {string} user.headimg 作者头像
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
