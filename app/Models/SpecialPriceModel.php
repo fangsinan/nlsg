@@ -139,7 +139,7 @@ class SpecialPriceModel extends Base {
         $expire_num = CacheTools::getExpire('set_kill_list');
 
         $sec_date_list = Cache::get($cache_key_name);
-        if (empty($sec_date_list)) {
+        if (true || empty($sec_date_list)) {
 
             $sec_date_list = $this->getSecDateList();
 
@@ -156,7 +156,9 @@ class SpecialPriceModel extends Base {
                         'nmg.original_price', 'nsp.stock', 'nsp.use_stock',
                         'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
                         DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
-                        DB::raw('unix_timestamp(end_time) as end_timestamp')])
+                        DB::raw('unix_timestamp(end_time) as end_timestamp'),
+                        DB::raw('convert((nsp.goods_price/nmg.original_price)*100,'
+                                . 'decimal(15,1)) as price_off')])
                     ->get();
 
             $sec_date_list = array_fill_keys($sec_date_list, []);
