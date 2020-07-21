@@ -60,10 +60,6 @@ class Recommend extends Base
                 $model = new Lists();
                 $result = $model->getIndexListWorks($ids, 1);
                 break;
-            case 11:
-                $model = new Lists();
-                $result = $model->getIndexListWorks($ids, 2);
-                break;
 
         }
         return $result;
