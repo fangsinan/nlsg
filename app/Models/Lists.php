@@ -32,6 +32,23 @@ class Lists extends Model
         return $lists;
     }
 
+    public function getIndexListCourse($ids, $type=1)
+    {
+        if (!$ids){
+            return false;
+        }
+        $lists  = Lists::select('id','title', 'subtitle','cover','num')
+        ->with(['works'=> function($query){
+            $query->select('works_id','user_id','title', 'cover_img');
+        }, 'works.user'=>function($query){
+            $query->select('id','nickname','headimg');
+        }])->whereIn('id',$ids)
+            ->where('type', $type)
+            ->limit(3)
+            ->first();
+        return $lists;
+    }
+
 
     public function getIndexGoods($ids) {
 

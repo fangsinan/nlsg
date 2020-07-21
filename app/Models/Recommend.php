@@ -58,7 +58,7 @@ class Recommend extends Base
                 break;
             case 10:
                 $model = new Lists();
-                $result = $model->getIndexListWorks($ids, 1);
+                $result = $model->getIndexListCourse($ids, 1);
                 break;
 
         }

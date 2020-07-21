@@ -434,7 +434,7 @@ class IndexController extends Controller
     {
         $recommendModel = new Recommend();
         $lists = $recommendModel->getIndexRecommend(10, 1);
-        return $this->success($lists);
+        return success($lists);
     }
 
     /**
