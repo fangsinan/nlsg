@@ -59,7 +59,43 @@ class MallOrderController extends Controller {
         }
     }
 
-    //todo 发货
+    /**
+     * 发货
+     * @api {get} /api/admin_v4/mall_order/send 发货
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/mall_order/send
+     * @apiGroup  后台-订单管理
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/mall_order/send
+     * @apiDescription 发货
+     * @apiParam {strint} express_id 快递公司id
+     * @apiParam {strint} num 快递单号
+     * @apiParam {strint} order_id 订单id
+     * @apiParam {strint} order_detail_id 订单详情id
+     * 
+     *  @apiParamExample {json} Request-Example:
+      [
+      {
+      "express_id": 2,
+      "num": "YT4538526006366",
+      "order_id": 9526,
+      "order_detail_id": 10323
+      },
+      {
+      "express_id": 2,
+      "num": "YT4506367161457",
+      "order_id": 9526,
+      "order_detail_id": 10324
+      }
+      ]
+     * 
+     * @apiSuccess {number} id id
+     * @apiSuccessExample {json} Request-Example:
+      {
+      "code": 200,
+      "msg": "成功",
+      "data":{}
+      }
+     */
     public function send(Request $request) {
         $servers = new MallOrderServers();
         $data = $servers->send($request->input('list', ''));
