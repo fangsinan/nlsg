@@ -611,6 +611,7 @@ class MallController extends Controller {
         $model = new SpecialPriceModel();
         $data['sec'] = $model->homeSecList();
         $data['group'] = $model->homeGroupList();
+        $data['now'] = time();
         return $this->success($data);
     }
 
