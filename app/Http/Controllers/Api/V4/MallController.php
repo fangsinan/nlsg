@@ -208,8 +208,6 @@ class MallController extends Controller {
      */
     public function goodsList(Request $request) {
         $params = $request->input();
-        $params['page'] = 1;
-        $params['size'] = 4;
         $model = new MallGoods();
         $data = $model->getList($params, $this->user);
         return $this->success($data);
