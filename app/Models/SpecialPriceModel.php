@@ -152,7 +152,7 @@ class SpecialPriceModel extends Base {
                         ->where('nmg.status', '=', 2);
                     })
                     ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
-                        'nsp.goods_original_price','nmg.picture',
+                        'nsp.goods_original_price', 'nmg.picture',
                         'nmg.original_price', 'nsp.stock', 'nsp.use_stock',
                         'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
                         DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
@@ -187,8 +187,10 @@ class SpecialPriceModel extends Base {
                 $t['timestamp'] = strtotime($k);
 
                 $t['status'] = '';
+                $t['status_num'] = 0;
                 if ($now >= $t['timestamp'] && $now <= $v1[0]->end_timestamp) {
                     $t['status'] = '开抢中';
+                    $t['status_num'] = 1;
                 } else {
                     $v_day = date('d', $v1[0]->begin_timestamp);
                     if ($now >= $v1[0]->end_timestamp) {
@@ -197,12 +199,14 @@ class SpecialPriceModel extends Base {
                         } else {
                             $t['status'] = intval($v_day) . '日已开抢';
                         }
+                        $t['status_num'] = 3;
                     } else {
                         if ($today_day == $v_day) {
                             $t['status'] = '即将开抢';
                         } else {
                             $t['status'] = intval($v_day) . '日即将开抢';
                         }
+                        $t['status_num'] = 2;
                     }
                 }
 
@@ -333,7 +337,7 @@ class SpecialPriceModel extends Base {
                         ->where('nmg.status', '=', 2);
                     })
                     ->select(['nsp.group_name as group_buy_id', 'nsp.goods_id', 'nmg.name',
-                        'nmg.subtitle', 'nmg.picture','nmg.original_price', 'group_num', 'group_price',
+                        'nmg.subtitle', 'nmg.picture', 'nmg.original_price', 'group_num', 'group_price',
                         'nsp.begin_time', 'nsp.end_time', 'group_name'])
                     ->groupBy('nsp.group_name')
                     ->get();
