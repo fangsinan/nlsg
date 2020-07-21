@@ -27,6 +27,7 @@ class Lists extends Model
             $query->select('id','nickname','headimg');
         }])->whereIn('id',$ids)
             ->where('type', $type)
+            ->limit(3)
             ->get()
             ->toArray();
         return $lists;
@@ -57,7 +58,7 @@ class Lists extends Model
                 }
             ])
             ->where('type', 4)
-            ->limit(5)
+            ->limit(10)
             ->get()
             ->toArray();
         return $lists;
@@ -75,7 +76,7 @@ class Lists extends Model
                 }
             ])
             ->where('type', 5)
-            ->limit(5)
+            ->limit(10)
             ->get();
 
         $lists->map(function($item){

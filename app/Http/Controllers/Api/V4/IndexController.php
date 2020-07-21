@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lists;
+use Illuminate\Http\Request;
 use App\Models\Announce;
 use App\Models\Banner;
 use App\Models\Live;
@@ -439,6 +441,8 @@ class IndexController extends Controller
      * @apiVersion 4.0.0
      * @apiName  rank
      * @apiGroup Index
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/Index/rank
+     * @apiParam {number} type 1 课程集合 2 百科集合
      *
      * @apiSuccess {string} title 标题
      * @apiSuccess {string} subtitle 副标题
@@ -497,10 +501,16 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function rank()
+    public function rank(Request $request)
     {
-        $recommendModel = new Recommend();
-        $lists = $recommendModel->getIndexRecommend(11, 1);
+        $type = $request->input('type');
+        $model = new Lists();
+        if ($type ==1){
+            $lists = $model->getRankWorks();
+        } elseif($type==2) {
+            $lists = $model->getRankWiki();
+        }
+
         return $this->success($lists);
     }
 
