@@ -28,8 +28,7 @@ class Lists extends Model
         }])->whereIn('id',$ids)
             ->where('type', $type)
             ->limit(3)
-            ->get()
-            ->toArray();
+            ->get();
         return $lists;
     }
 
