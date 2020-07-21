@@ -57,7 +57,7 @@ class Lists extends Model
                 }
             ])
             ->where('type', 4)
-            ->limit(20)
+            ->limit(5)
             ->get()
             ->toArray();
         return $lists;
@@ -75,7 +75,7 @@ class Lists extends Model
                 }
             ])
             ->where('type', 5)
-            ->limit(20)
+            ->limit(5)
             ->get();
 
         $lists->map(function($item){

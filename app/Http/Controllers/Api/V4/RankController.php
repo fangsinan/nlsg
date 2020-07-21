@@ -104,7 +104,7 @@ class RankController extends Controller
     }
 
     /**
-     * @api {get} api/v4/rank/wiki  首页轮播图
+     * @api {get} api/v4/rank/wiki  百科排行榜
      * @apiVersion 4.0.0
      * @apiName  wiki
      * @apiGroup Rank
