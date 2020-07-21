@@ -92,7 +92,7 @@ class MallOrderServers {
             });
         }
 
-        $query->where('order_type', '=', 1)->where('is_del', '=', 0);
+        $query->where('is_del', '=', 0);
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
