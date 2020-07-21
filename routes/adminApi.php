@@ -3,6 +3,6 @@
 //后台
 Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function() {
     Route::get('mall_order/list', 'MallOrderController@list');
-    Route::get('mall_order/details', 'MallOrderController@details');
-    Route::get('mall_order/send', 'MallOrderController@send');
+    Route::post('mall_order/send', 'MallOrderController@send');
+    Route::get('after_sales/list', 'AfterSalesController@list');
 });

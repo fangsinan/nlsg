@@ -281,10 +281,14 @@ class MallOrderServers {
 
         if (0) {
             $params = [
-                ['express_id' => 2, 'num' => 'YT4538526006366', 'order_id' => 9526, 'order_detail_id' => 10323],
-                ['express_id' => 2, 'num' => 'YT4506367161457', 'order_id' => 9526, 'order_detail_id' => 10324],
-                ['express_id' => 2, 'num' => 'YT4506367161457', 'order_id' => 9529, 'order_detail_id' => 10332],
-                ['express_id' => 2, 'num' => 'YT4506367161457', 'order_id' => 9529, 'order_detail_id' => 10333],
+                ['express_id' => 2, 'num' => 'YT4538526006366',
+                    'order_id' => 9526, 'order_detail_id' => 10323],
+                ['express_id' => 2, 'num' => 'YT4506367161457',
+                    'order_id' => 9526, 'order_detail_id' => 10324],
+                ['express_id' => 2, 'num' => 'YT4506367161457',
+                    'order_id' => 9529, 'order_detail_id' => 10332],
+                ['express_id' => 2, 'num' => 'YT4506367161457',
+                    'order_id' => 9529, 'order_detail_id' => 10333],
             ];
         }
 

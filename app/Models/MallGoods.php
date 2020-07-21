@@ -43,6 +43,11 @@ class MallGoods extends Base {
                 'goods_type' => 1, 'goods_id' => $v->id, 'simple' => 1
             ]);
         }
+        $temp_agl = [];
+        foreach($v->active_group_list as $agl){
+            $temp_agl[] = $agl;
+        }
+        $v->active_group_list = $temp_agl;
 
         //价格类
         $getPriceTools = new GetPriceTools();

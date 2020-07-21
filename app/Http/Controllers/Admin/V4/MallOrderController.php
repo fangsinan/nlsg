@@ -61,7 +61,7 @@ class MallOrderController extends Controller {
 
     /**
      * 发货
-     * @api {get} /api/admin_v4/mall_order/send 发货
+     * @api {post} /api/admin_v4/mall_order/send 发货
      * @apiVersion 4.0.0
      * @apiName /api/admin_v4/mall_order/send
      * @apiGroup  后台-订单管理
