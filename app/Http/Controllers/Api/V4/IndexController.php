@@ -441,7 +441,7 @@ class IndexController extends Controller
      * @apiVersion 4.0.0
      * @apiName  rank
      * @apiGroup Index
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/Index/rank
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/rank
      * @apiParam {number} type 1 课程集合 2 百科集合
      *
      * @apiSuccess {string} title 标题
