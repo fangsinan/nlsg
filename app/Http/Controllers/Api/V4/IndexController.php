@@ -373,6 +373,7 @@ class IndexController extends Controller
      * @apiVersion 4.0.0
      * @apiName  course
      * @apiGroup Index
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/course
      *
      * @apiSuccess {string} title 标题
      * @apiSuccess {string} subtitle 副标题
