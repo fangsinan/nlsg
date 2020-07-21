@@ -24,9 +24,7 @@ class AfterSalesServers {
 
     public function getList($params) {
 
-        $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
-
         $field = ['id', 'service_num', 'order_id', 'order_detail_id',
             'type', 'num', 'cost_price', 'refe_price', 'price', 'status',
             'user_cancel', 'user_cancel_time', 'created_at'];
@@ -51,9 +49,11 @@ class AfterSalesServers {
             ];
 
             $field = array_merge($field, $field_sup);
+        } else {
+            $query = new M2R();
         }
 
-        $query = M2R::where('status', '<>', 80)->whereIn('type', [1, 2]);
+        $query->where('status', '<>', 80)->whereIn('type', [1, 2]);
 
         $query->select($field)->with($with);
 

@@ -791,7 +791,7 @@ class MallController extends Controller {
 
     /**
      * 拼团商品详情
-     * @api {get} /api/v4/goods/group_buy_info 拼团商品详情(列表,详情)
+     * @api {get} /api/v4/goods/group_buy_info 拼团商品详情
      * @apiVersion 4.0.0
      * @apiName /api/v4/goods/group_buy_info
      * @apiGroup  Mall
