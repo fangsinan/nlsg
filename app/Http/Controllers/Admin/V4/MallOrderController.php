@@ -21,7 +21,7 @@ class MallOrderController extends Controller {
 
     /**
      * 订单列表和详情
-     * @api {get} /api/admin_v4/mall_order/list 可申请售后订单和商品列表
+     * @api {get} /api/admin_v4/mall_order/list 订单列表和详情
      * @apiVersion 4.0.0
      * @apiName /api/admin_v4/mall_order/list
      * @apiGroup  后台-订单管理
