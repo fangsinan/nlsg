@@ -39,7 +39,7 @@ class MallOrderController extends Controller {
      * @apiParam {strint} [nickname] 昵称
      * @apiParam {strint} [goods_name] 品名
      * @apiParam {strint} [status] 状态(参考前端订单接口文档)
-     * @apiParam {string=normal,flash_sale,group_buy} 订单类型:普通,秒杀,团购
+     * @apiParam {string='normal','flash_sale','group_buy'} 订单类型:普通,秒杀,团购
      * 
      * @apiSuccessExample {json} Request-Example:
       {
