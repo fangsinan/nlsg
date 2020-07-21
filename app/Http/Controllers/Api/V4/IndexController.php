@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
@@ -35,7 +36,7 @@ class IndexController extends Controller
      */
     public function announce()
     {
-        $list = Announce::select('id','content')
+        $list = Announce::select('id', 'content')
             ->first()->toArray();
         return $this->success($list);
     }
@@ -235,44 +236,44 @@ class IndexController extends Controller
      *       "code": 200,
      *       "msg" : '成功',
      *       "data":[
-                 {
-                    "id": 1,
-                    "title": "世界名著必读，历经岁月经典依旧陪伴成长",
-                    "subtitle": "强烈推荐",
-                    "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
-                    "num"  :  5,
-                    "works": [
-                        {
+     * {
+     * "id": 1,
+     * "title": "世界名著必读，历经岁月经典依旧陪伴成长",
+     * "subtitle": "强烈推荐",
+     * "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
+     * "num"  :  5,
+     * "works": [
+     * {
      *                      "works_id": 18,
-                            "user_id": 168934,
-                            "title": "不要羞辱你的孩子 他的心很脆弱",
-                            "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
-                            "pivot": {
-                                "lists_id": 1,
-                                "works_id": 30
-                            },
-                            "user": {
-                                "id": 168934,
-                                "nickname": "chandler",
-                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                            }
-                        },
-                        {
-                            "user_id": 168934,
-                            "title": "小孩子做噩梦怎么办？九成父母都没当回事",
-                            "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
-                            "pivot": {
-                                "lists_id": 1,
-                                "works_id": 31
-                            },
-                            "user": {
-                                "id": 168934,
-                                "nickname": "chandler",
-                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                            }
-                        }
-                    ]
-                 }
+     * "user_id": 168934,
+     * "title": "不要羞辱你的孩子 他的心很脆弱",
+     * "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+     * "pivot": {
+     * "lists_id": 1,
+     * "works_id": 30
+     * },
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * }
+     * },
+     * {
+     * "user_id": 168934,
+     * "title": "小孩子做噩梦怎么办？九成父母都没当回事",
+     * "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
+     * "pivot": {
+     * "lists_id": 1,
+     * "works_id": 31
+     * },
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * }
+     * }
+     * ]
+     * }
      *         ]
      *     }
      *
@@ -312,7 +313,7 @@ class IndexController extends Controller
      *     }
      *
      */
-    public  function goods()
+    public function goods()
     {
         $recommendModel = new Recommend();
         $lists = $recommendModel->getIndexRecommend(8, 1);
@@ -367,7 +368,7 @@ class IndexController extends Controller
         return $this->success($lists);
     }
 
-   /**
+    /**
      * @api {get} api/v4/index/course  首页-课程集合
      * @apiVersion 4.0.0
      * @apiName  course
@@ -388,61 +389,60 @@ class IndexController extends Controller
      *       "code": 200,
      *       "msg" : '成功',
      *       "data":[
-                 {
-                    "id": 1,
-                    "title": "世界名著必读，历经岁月经典依旧陪伴成长",
-                    "subtitle": "强烈推荐",
-                    "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
-                    "num"  :  5,
-                    "works": [
-                        {
-                            "user_id": 168934,
-                            "title": "不要羞辱你的孩子 他的心很脆弱",
-                            "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
-                            "pivot": {
-                                "lists_id": 1,
-                                "works_id": 30
-                            },
-                            "user": {
-                                "id": 168934,
-                                "nickname": "chandler",
-                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                            }
-                        },
-                        {
-                            "user_id": 168934,
-                            "title": "小孩子做噩梦怎么办？九成父母都没当回事",
-                            "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
-                            "pivot": {
-                                "lists_id": 1,
-                                "works_id": 31
-                            },
-                            "user": {
-                                "id": 168934,
-                                "nickname": "chandler",
-                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                            }
-                        }
-                    ]
-                 }
+     * {
+     * "id": 1,
+     * "title": "世界名著必读，历经岁月经典依旧陪伴成长",
+     * "subtitle": "强烈推荐",
+     * "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
+     * "num"  :  5,
+     * "works": [
+     * {
+     * "user_id": 168934,
+     * "title": "不要羞辱你的孩子 他的心很脆弱",
+     * "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+     * "pivot": {
+     * "lists_id": 1,
+     * "works_id": 30
+     * },
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * }
+     * },
+     * {
+     * "user_id": 168934,
+     * "title": "小孩子做噩梦怎么办？九成父母都没当回事",
+     * "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
+     * "pivot": {
+     * "lists_id": 1,
+     * "works_id": 31
+     * },
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * }
+     * }
+     * ]
+     * }
      *         ]
      *     }
      *
      */
-    public function  course()
+    public function course()
     {
         $recommendModel = new Recommend();
         $lists = $recommendModel->getIndexRecommend(10, 1);
         return $this->success($lists);
     }
 
-   /**
+    /**
      * @api {get} api/v4/index/rank  首页-热门榜单
      * @apiVersion 4.0.0
      * @apiName  rank
      * @apiGroup Index
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/rank
-     * @apiParam {number} type 1 课程集合 2 百科集合
      *
      * @apiSuccess {string} title 标题
      * @apiSuccess {string} subtitle 副标题
@@ -458,60 +458,121 @@ class IndexController extends Controller
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-     *       "data":[
-                 {
-                    "id": 1,
-                    "title": "世界名著必读，历经岁月经典依旧陪伴成长",
-                    "subtitle": "强烈推荐",
-                    "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
-                    "num"  :  5,
-                    "works": [
-                        {
-    *                       "works_id": 18,
-                            "user_id": 168934,
-                            "title": "不要羞辱你的孩子 他的心很脆弱",
-                            "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
-                            "pivot": {
-                                "lists_id": 1,
-                                "works_id": 30
-                            },
-                            "user": {
-                                "id": 168934,
-                                "nickname": "chandler",
-                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                            }
-                        },
-                        {
-                            "user_id": 168934,
-                            "title": "小孩子做噩梦怎么办？九成父母都没当回事",
-                            "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
-                            "pivot": {
-                                "lists_id": 1,
-                                "works_id": 31
-                            },
-                            "user": {
-                                "id": 168934,
-                                "nickname": "chandler",
-                                "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                            }
-                        }
-                    ]
-                 }
-     *         ]
+     * "data": {
+     * "works": [
+     * {
+     * "id": 8,
+     * "title": "热门课程榜单",
+     * "works": [
+     * {
+     * "works_id": 30,
+     * "user_id": 168934,
+     * "title": "不要羞辱你的孩子 他的心很脆弱",
+     * "subtitle": "家庭教育",
+     * "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+     * "chapter_num": 8,
+     * "subscribe_num": 0,
+     * "is_free": 1,
+     * "price": "0.00",
+     * "pivot": {
+     * "lists_id": 8,
+     * "works_id": 30
+     * },
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler"
+     * }
+     * },
+     * {
+     * "works_id": 31,
+     * "user_id": 168934,
+     * "title": "小孩子做噩梦怎么办？九成父母都没当回事",
+     * "subtitle": "家庭教育",
+     * "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
+     * "chapter_num": 5,
+     * "subscribe_num": 0,
+     * "is_free": 1,
+     * "price": "0.00",
+     * "pivot": {
+     * "lists_id": 8,
+     * "works_id": 31
+     * },
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler"
+     * }
+     * },
+     * {
+     * "works_id": 32,
+     * "user_id": 1,
+     * "title": "时间就像你手中的冰淇淋",
+     * "subtitle": "",
+     * "cover_img": "/wechat/works/video/161627/2017061416424169642.jpg",
+     * "chapter_num": 0,
+     * "subscribe_num": 0,
+     * "is_free": 0,
+     * "price": "0.00",
+     * "pivot": {
+     * "lists_id": 8,
+     * "works_id": 32
+     * },
+     * "user": {
+     * "id": 1,
+     * "nickname": "刘先森"
+     * }
+     * }
+     * ]
+     * }
+     * ],
+     * "wiki": [
+     * {
+     * "id": 9,
+     * "title": "热门百科榜单",
+     * "content": null,
+     * "list_works": [
+     * {
+     * "id": 16,
+     * "lists_id": 9,
+     * "works_id": 1,
+     * "wiki": {
+     * "id": 1,
+     * "name": "室内空气污染对孩子的危害",
+     * "content": "社会的进步，工业的发展，导致污染越来越严重，触目惊心",
+     * "view_num": 10,
+     * "like_num": 2,
+     * "comment_num": 5
+     * }
+     * },
+     * {
+     * "id": 17,
+     * "lists_id": 9,
+     * "works_id": 2,
+     * "wiki": {
+     * "id": 2,
+     * "name": "世界名著必读岁月经典",
+     * "content": "每个时代都有极其红极广受好评",
+     * "view_num": 5,
+     * "like_num": 6,
+     * "comment_num": 5
+     * }
+     * }
+     * ]
+     * }
+     * ]
+     * }
      *     }
      *
      */
     public function rank(Request $request)
     {
-        $type = $request->input('type');
-        $model = new Lists();
-        if ($type ==1){
-            $lists = $model->getRankWorks();
-        } elseif($type==2) {
-            $lists = $model->getRankWiki();
-        }
 
-        return $this->success($lists);
+        $model = new Lists();
+        $data = [
+            'works' => $model->getRankWorks(),
+            'wiki'  => $model->getRankWiki()
+        ];
+
+        return $this->success($data);
     }
 
     /**
@@ -537,38 +598,37 @@ class IndexController extends Controller
      *       "code": 200,
      *       "msg" : '成功',
      *       "data":{
-                "id": 34,
-                "subscribe_num": 34234,
-                "title": "每日琨说",
-                "work_info": [
-                    {
-                        "duration": "06:14",
-                        "id": 15,
-                        "is_new": 1,
-                        "online_time": "2020-08-10 08:10:00",
-                        "pid": 34,
-                        "rank": 7,
-                        "title": "006 | 父母和孩子为什么有沟通障碍？",
-                        "view_num": 27426
-                    },
-                    {
-                        "duration": "10:29",
-                        "id": 14,
-                        "is_new": 0,
-                        "online_time": "2020-05-10 08:10:00",
-                        "pid": 34,
-                        "rank": 6,
-                        "title": "005 | 六个字就可以让家族富过三代？",
-                        "view_num": 30097
-                    }
-                ]
-
+     * "id": 34,
+     * "subscribe_num": 34234,
+     * "title": "每日琨说",
+     * "work_info": [
+     * {
+     * "duration": "06:14",
+     * "id": 15,
+     * "is_new": 1,
+     * "online_time": "2020-08-10 08:10:00",
+     * "pid": 34,
+     * "rank": 7,
+     * "title": "006 | 父母和孩子为什么有沟通障碍？",
+     * "view_num": 27426
+     * },
+     * {
+     * "duration": "10:29",
+     * "id": 14,
+     * "is_new": 0,
+     * "online_time": "2020-05-10 08:10:00",
+     * "pid": 34,
+     * "rank": 6,
+     * "title": "005 | 六个字就可以让家族富过三代？",
+     * "view_num": 30097
+     * }
+     * ]
      *
      *     }
      *
      */
 
-    public  function recommend()
+    public function recommend()
     {
         $works = new Works();
         $lists = $works->getRecommendWorks(34);
@@ -600,35 +660,35 @@ class IndexController extends Controller
      *       "code": 200,
      *       "msg" : '成功',
      *       "data":{
-                "works": [
-                  {
-                    "id": 20,
-                    "user_id": 1,
-                    "title": "理解孩子行为背后的原因",
-                    "subtitle": "",
-                    "cover_img": "/wechat/works/video/161627/2017061411282192073.jpg",
-                    "is_new": 1,
-                     "user": {
-                          "id": 1,
-                          "nickname": "刘先森"
-                     }
-                  }
-                ],
-                "book": [
-                  {
-                    "id": 30,
-                    "user_id": 168934,
-                    "title": "不要羞辱你的孩子 他的心很脆弱",
-                    "subtitle": "家庭教育",
-                    "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
-                    "is_new": 1,
-                    "user": {
-                      "id": 168934,
-                      "nickname": "chandler"
-                    }
-                  }
-                ]
-              }
+     * "works": [
+     * {
+     * "id": 20,
+     * "user_id": 1,
+     * "title": "理解孩子行为背后的原因",
+     * "subtitle": "",
+     * "cover_img": "/wechat/works/video/161627/2017061411282192073.jpg",
+     * "is_new": 1,
+     * "user": {
+     * "id": 1,
+     * "nickname": "刘先森"
+     * }
+     * }
+     * ],
+     * "book": [
+     * {
+     * "id": 30,
+     * "user_id": 168934,
+     * "title": "不要羞辱你的孩子 他的心很脆弱",
+     * "subtitle": "家庭教育",
+     * "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+     * "is_new": 1,
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler"
+     * }
+     * }
+     * ]
+     * }
      *     }
      *
      */
@@ -661,86 +721,86 @@ class IndexController extends Controller
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-              * "data": [
-    * {
-      * "id": 17,
-      * "relation_id": "16",
-      * "relation_type": 1,
-      * "reason": "欣赏是一种享受，是一种实实在在的享受",
-      * "works": {
-        * "id": 16,
-        * "user_id": 168934,
-        * "title": "如何经营幸福婚姻",
-        * "subtitle": "",
-        * "cover_img": "/nlsg/works/20190822150244797760.png",
-        * "price": "29.90",
-        * "chapter_num": 0,
-        * "subscribe_num": 287,
-        * "user": {
-          * "id": 168934,
-          * "nickname": "chandler"
-        * }
-      * }
-    * },
-    * {
-      * "id": 18,
-      * "relation_id": "2",
-      * "relation_type": 4,
-      * "reason": "值得学习",
-      * "works": {
-        * "id": 2,
-        * "user_id": 1,
-        * "name": "张宝萍专栏",
-        * "title": "国家十百千万工程心灵导师",
-        * "subtitle": "心灵导师 直击人心",
-        * "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
-        * "price": "0.00",
-        * "user": {
-          * "id": 1,
-          * "nickname": "刘先森"
-        * }
-      * }
-    * },
-    * {
-      * "id": 19,
-      * "relation_id": "1",
-      * "relation_type": 3,
-      * "reason": "很好",
-      * "works": {
-        * "id": 1,
-        * "user_id": 211172,
-        * "name": "王琨专栏",
-        * "title": "顶尖导师 经营能量",
-        * "subtitle": "顶尖导师 经营能量",
-        * "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
-        * "price": "99.00",
-        * "user": {
-          * "id": 211172,
-          * "nickname": "能量时光"
-        * }
-      * }
-    * },
-    * {
-      * "id": 21,
-      * "relation_id": "18",
-      * "relation_type": 2,
-      * "reason": "欣赏是一种享受，是一种实实在在的享受",
-      * "works": {
-        * "id": 18,
-        * "user_id": 211172,
-        * "title": "如何培养高情商孩子",
-        * "subtitle": "",
-        * "cover_img": "/wechat/works/video/161910/1639_1525340866.png",
-        * "price": "0.00",
-        * "chapter_num": 0,
-        * "subscribe_num": 0,
-        * "user": {
-          * "id": 211172,
-          * "nickname": "能量时光"
-        * }
-      * }
-    * }
-  * ]
+     * "data": [
+     * {
+     * "id": 17,
+     * "relation_id": "16",
+     * "relation_type": 1,
+     * "reason": "欣赏是一种享受，是一种实实在在的享受",
+     * "works": {
+     * "id": 16,
+     * "user_id": 168934,
+     * "title": "如何经营幸福婚姻",
+     * "subtitle": "",
+     * "cover_img": "/nlsg/works/20190822150244797760.png",
+     * "price": "29.90",
+     * "chapter_num": 0,
+     * "subscribe_num": 287,
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler"
+     * }
+     * }
+     * },
+     * {
+     * "id": 18,
+     * "relation_id": "2",
+     * "relation_type": 4,
+     * "reason": "值得学习",
+     * "works": {
+     * "id": 2,
+     * "user_id": 1,
+     * "name": "张宝萍专栏",
+     * "title": "国家十百千万工程心灵导师",
+     * "subtitle": "心灵导师 直击人心",
+     * "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+     * "price": "0.00",
+     * "user": {
+     * "id": 1,
+     * "nickname": "刘先森"
+     * }
+     * }
+     * },
+     * {
+     * "id": 19,
+     * "relation_id": "1",
+     * "relation_type": 3,
+     * "reason": "很好",
+     * "works": {
+     * "id": 1,
+     * "user_id": 211172,
+     * "name": "王琨专栏",
+     * "title": "顶尖导师 经营能量",
+     * "subtitle": "顶尖导师 经营能量",
+     * "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+     * "price": "99.00",
+     * "user": {
+     * "id": 211172,
+     * "nickname": "能量时光"
+     * }
+     * }
+     * },
+     * {
+     * "id": 21,
+     * "relation_id": "18",
+     * "relation_type": 2,
+     * "reason": "欣赏是一种享受，是一种实实在在的享受",
+     * "works": {
+     * "id": 18,
+     * "user_id": 211172,
+     * "title": "如何培养高情商孩子",
+     * "subtitle": "",
+     * "cover_img": "/wechat/works/video/161910/1639_1525340866.png",
+     * "price": "0.00",
+     * "chapter_num": 0,
+     * "subscribe_num": 0,
+     * "user": {
+     * "id": 211172,
+     * "nickname": "能量时光"
+     * }
+     * }
+     * }
+     * ]
      *     }
      *
      */
