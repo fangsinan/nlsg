@@ -330,33 +330,29 @@ class UserController extends Controller
      * @apiGroup User
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/base
      *
-     * @apiSuccess {string}
+     * @apiSuccess {string} nickname 昵称
+     * @apiSuccess {string} headimg  头像
+     * @apiSuccess {string} birthday 生日
+     * @apiSuccess {string} intro    简介
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-     *       "data":[
-     *               {
-     *                   "id": 274,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
-     *                   "title": "电商弹窗课程日历套装",
-     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
-     *               },
-     *               {
-     *                   "id": 296,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
-     *                   "title": "心里学",
-     *                   "url": "/mall/shop-details?goods_id=479"
-     *               }
-     *         ]
+     *       "data":{
+     *          'nickname': '张三',
+     *          'headimg' : 'test.png',
+     *          'sex': 1,
+     *           'birthday': '1990-1-1',
+     *           'intro': '简介'
+     *        }
      *     }
      *
      */
     public function base()
     {
-        $user = User::select(['id', 'nickname', 'headimg', 'birthday', 'intro'])
+        $user = User::select(['id', 'nickname', 'sex', 'headimg', 'birthday', 'intro'])
             ->where('id', $this->user['id'])
             ->first();
         return success($user);
