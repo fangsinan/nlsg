@@ -56,6 +56,4 @@ class CacheTools {
 
         return $exprie;
     }
-
-    //coupon_rule_list 优惠券规则列表
 }

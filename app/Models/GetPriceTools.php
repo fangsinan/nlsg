@@ -202,7 +202,7 @@ class GetPriceTools extends Base {
             $temp_data['t_money_black'] = self::PriceCalc('*', $data->original_price, 0.05);
             $temp_data['t_money_yellow'] = self::PriceCalc('*', $data->original_price, 0.1);
             $temp_data['t_money_dealer'] = self::PriceCalc('*', $data->original_price, 0.15);
-        } else if ($Percentage < 30) {
+        } else {
             $temp_data['t_money_black'] = self::PriceCalc('*', $data->original_price, 0.03);
             $temp_data['t_money_yellow'] = self::PriceCalc('*', $data->original_price, 0.05);
             $temp_data['t_money_dealer'] = self::PriceCalc('*', $data->original_price, 0.1);
