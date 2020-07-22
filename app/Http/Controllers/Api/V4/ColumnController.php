@@ -109,6 +109,9 @@ class ColumnController extends Controller
             if($v['works_update_time'] > $time){
                 $v['is_new'] = 1;
             }
+
+            $title = Works::where('column_id',$v['id'])->orderBy('updated_at','desc')->first('title');
+            $v['work_name'] = $title->title;
         }
         return $this->success($list);
     }
