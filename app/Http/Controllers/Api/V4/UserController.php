@@ -247,31 +247,33 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/follow 关注
+     * @api {get} api/v4/user/followed 列表
      * @apiVersion 4.0.0
-     * @apiName  from_uid 用户id
-     * @apiName  to_uid   被关注用户id
-     * @apiGroup Api
+     * @apiName  followed
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/followed
      *
-     * @apiSuccess {String} token   token
+     * @apiParam {number} to_uid 被关注者的uid
      *
-     * @apiSuccessExample  成功响应:
-     *   {
-     *      "code": 200,
-     *      "msg" : '成功',
-     *      "data": {
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
      *
-     *       }
-     *   }
-     *
+     *    }
+     * }
      */
     public function followed(Request $request)
     {
-        $input = $request->all();
-
+        $uid = $request->input('to_uid');
+        if (!$uid){
+            return error(1000, '参数错误');
+        }
         $list = UserFollow::where([
-            'from_uid' => 1,
-            'to_uid'   => $input['to_uid']
+            'from_uid' => $this->user['id'],
+            'to_uid'   => $uid
         ])->first();
 
         if ($list) {
@@ -279,44 +281,46 @@ class UserController extends Controller
         }
 
         UserFollow::create([
-            'from_uid' => 1,
-            'to_uid'   => $input['to_uid']
+            'from_uid' => $this->user['id'],
+            'to_uid'   => $uid
         ]);
 
-        User::where('id', $input['to_uid'])->increment('fan_num');
+        User::where('id', $uid)->increment('fan_num');
 
-        return $this->success();
+        return success();
     }
 
     /**
      * @api {get} api/v4/user/unfollow 取消关注
      * @apiVersion 4.0.0
-     * @apiName  to_uid  被关注用户id
-     * @apiGroup Api
+     * @apiName  unfollow
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/unfollow
      *
-     * @apiSuccess {String} token
+     * @apiParam {int} to_uid 被关注者uid
      *
-     * @apiSuccessExample  成功响应:
-     *   {
-     *      "code": 200,
-     *      "msg" : '成功',
-     *      "data": {
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
      *
-     *       }
-     *   }
-     *
+     *    }
+     * }
      */
     public function unfollow(Request $request)
     {
+        $uid = $request->input('to_uid');
         $follow = UserFollow::where([
-            'from_uid' => 1,
-            'to_uid'   => 2
+            'from_uid' => $this->user['id'],
+            'to_uid'   => $uid
         ])->first();
 
         if ( ! $follow->delete()) {
-            return $this->error(1000, '取消失败');
+            return error(1000, '取消失败');
         }
-        return $this->success();
+        return success();
     }
 
     /**

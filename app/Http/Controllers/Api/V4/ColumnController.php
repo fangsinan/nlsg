@@ -32,6 +32,7 @@ class ColumnController extends Controller
      *
      * @apiParam {int} page
      * @apiParam {int} order 1默认倒序 2正序
+     * @apiParam {int} type 1专栏  2讲座
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -96,7 +97,7 @@ class ColumnController extends Controller
             "status" => 1,
             "type"   => $type,
         ])->orderBy('updated_at', 'desc')
-                    ->orderBy('sort', $order_str)->get($field);
+            ->orderBy('sort', $order_str)->get($field);
         return $this->success($list);
     }
 
