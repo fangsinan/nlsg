@@ -227,6 +227,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 
 
     Route::group(['middleware' => ['auth.jwt']], function() {
+        Route::get('user/base', 'UserController@base');
+        Route::get('user/account', 'UserController@account');
+        Route::post('user/store', 'UserController@store');
         Route::post('user/followed', 'UserController@followed');
         Route::post('user/unfollow', 'UserController@unfollow');
     });

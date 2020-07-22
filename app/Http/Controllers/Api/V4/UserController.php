@@ -324,44 +324,126 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/base 基本资料
+     * @api {get} api/v4/user/base  基本资料
      * @apiVersion 4.0.0
-     * @apiName  nickname 昵称
-     * @apiName  headimg  头像
-     * @apiName  sex  性别
-     * @apiName  intro  简介
-     * @apiGroup Api
+     * @apiName  base
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/base
      *
-     * @apiSuccess {String} token
+     * @apiSuccess {string}
      *
-     * @apiSuccessExample  成功响应:
-     *   {
-     *      "code": 200,
-     *      "msg" : '成功',
-     *      "data": {
-     *
-     *       }
-     *   }
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 274,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
+     *                   "title": "电商弹窗课程日历套装",
+     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
+     *               },
+     *               {
+     *                   "id": 296,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
+     *                   "title": "心里学",
+     *                   "url": "/mall/shop-details?goods_id=479"
+     *               }
+     *         ]
+     *     }
      *
      */
-    public function base(Request $request)
+    public function base()
+    {
+        $user = User::select(['id','nickname','headimg','birthday','intro'])
+                    ->where('id', $this->user['id'])
+                    ->first();
+        return success($user);
+    }
+
+
+    /**
+     * @api {get} api/v4/user/store 个人更新
+     * @apiVersion 4.0.0
+     * @apiName  store
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/base
+     *
+     * @apiParam {string} nickname 昵称
+     * @apiParam {string} headimg   头像
+     * @apiParam {number} sex       性别
+     * @apiParam {string} birthday  生日
+     * @apiParam {string} intro     简介
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function store(Request $request)
     {
         $input = $request->all();
         if ( ! $input['nickname']) {
             return $this->error(1000, '昵称不能为空');
         }
-        $res = User::where('id', 1)->update([
+        $res = User::where('id', $this->user['id'])->update([
             'nickname' => $input['nickname'],
             'headimg'  => $input['headimg'],
+            'birthday' => $input['birthday'],
             'sex'      => $input['sex'],
             'intro'    => $input['intro']
         ]);
         if ($res) {
-            return $this->success();
+            return success();
         }
 
     }
 
+    /**
+     * @api {get} api/v4/user/account  账户与安全
+     * @apiVersion 4.0.0
+     * @apiName  account
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/account
+     *
+     * @apiSuccess {string}
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 274,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
+     *                   "title": "电商弹窗课程日历套装",
+     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
+     *               },
+     *               {
+     *                   "id": 296,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
+     *                   "title": "心里学",
+     *                   "url": "/mall/shop-details?goods_id=479"
+     *               }
+     *         ]
+     *     }
+     *
+     */
+    public function account()
+    {
+        $user = User::select(['phone'])->where('id', $this->user['id'])->first();
+        if ($user){
+            $user->phone = substr_replace($user->phone, '****', 3, 4);
+        }
+        return success($user);
+    }
 
     /**
      * @api {get} api/v4/user/feedback 我要吐槽
