@@ -25,6 +25,7 @@ class MallController extends Controller {
      * @apiParam {number=1,0} [get_sku] 1:获取商品sku_list规格信息
      * @apiParam {number=1,0} [get_details] 1:获取商品详情,图片列表,服务说明
      * @apiParam {string} [cid] 商品分类,如需指定分类搜索则传该值(1,2,3)
+     * @apiParam {string} [zone_id] 商品专区id(banner接口返回的goods_list的id)
      * @apiParam {string} [ob] 排序(new上架时间,sales售出,price价格,以上后缀分为_asc正序,_desc逆序.如果有ids_str可指定排序为ids_str,不传为默认.chandler:热度:sales_desc;上新:new_asc)
      * @apiParam {number} [page] 页数,默认1
      * @apiParam {number} [size] 条数,默认10
