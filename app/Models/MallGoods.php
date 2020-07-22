@@ -12,9 +12,9 @@ class MallGoods extends Base {
     public function getList($params, $user = [], $cache = true) {
 
         $list = $this->getListData($params, $cache);
-       
+
         //收藏
-        if ($user['id']??0) {
+        if ($user['id'] ?? 0) {
             $col_list = Collection::where('user_id', '=', $user['id'])
                     ->where('type', '=', 3)
                     ->select(['relation_id as goods_id'])
@@ -45,22 +45,22 @@ class MallGoods extends Base {
             ]);
         }
         $temp_agl = [];
-        foreach($v->active_group_list as $agl){
+        foreach ($v->active_group_list as $agl) {
             $temp_agl[] = $agl;
         }
         $v->active_group_list = $temp_agl;
 
         //价格类
         $getPriceTools = new GetPriceTools();
-        $getPriceTools->goodsList($list, $user['level']??0, $user['id']??0, $user['is_staff']??0);
+        $getPriceTools->goodsList($list, $user['level'] ?? 0, $user['id'] ?? 0, $user['is_staff'] ?? 0);
         return $list;
     }
 
     protected function getListData($params, $cache = true) {
         $cache_key_name = 'goods_list'; //哈希组名
         //缓存放入 goods_list
-        $cache_name_arr['page'] = $params['page']??1;
-        $cache_name_arr['size'] = $params['size']??10;
+        $cache_name_arr['page'] = $params['page'] ?? 1;
+        $cache_name_arr['size'] = $params['size'] ?? 10;
         $cache_name_arr['get_sku'] = $params['get_sku'] ?? 0;
         $cache_name_arr['get_details'] = $params['get_details'] ?? 0;
         $cache_name_arr['ob'] = $params['ob'] ?? '';
@@ -117,19 +117,19 @@ class MallGoods extends Base {
             }
             $query->whereIn('id', $params['ids_str']);
         }
-        
-        if($params['zone_id']??0){
-            $temp_gl = MallGoodsListDetails::where('list_id','=',$params['zone_id'])
+
+        if ($params['zone_id'] ?? 0) {
+            $temp_gl = MallGoodsListDetails::where('list_id', '=', $params['zone_id'])
                     ->select(['goods_id'])
                     ->get();
-            if($temp_gl->isEmpty()){
+            if ($temp_gl->isEmpty()) {
                 return [];
-            }else{
+            } else {
                 $ids_str = array_column($temp_gl->toArray(), 'goods_id');
-                $query->whereIn('id',$ids_str);
+                $query->whereIn('id', $ids_str);
             }
         }
-        
+
         if (!empty($params['cid'] ?? '')) {
             if (!is_array($params['cid'])) {
                 $params['cid'] = explode(',', $params['cid']);
@@ -266,13 +266,16 @@ class MallGoods extends Base {
      */
     public function getIndexGoods($ids) {
         $lists = MallGoods::query()
-                ->select('id', 'name', 'picture', 'original_price','price')
+                ->select('id', 'name', 'picture', 'original_price', 'price')
                 ->whereIn('id', $ids)
                 ->orderBy('created_at', 'desc')
                 ->take(10)
-                ->get()
-                ->toArray();
-        return $lists;
+                ->get();
+        if ($lists->isEmpty()) {
+            return [];
+        } else {
+            return $lists->toArray();
+        }
     }
 
     public function collect($goods_id, $user_id) {
@@ -374,25 +377,25 @@ class MallGoods extends Base {
         return ['res' => $res, 'count' => $res->count()];
     }
 
-    
-    public function forYourReference($num,$user = []){
-        $id_list = MallGoods::where('status','=',2)
-                ->orderByRaw('rand()')
-                ->limit($num)
-                ->select(['id'])
-                ->get()->toArray();
-        
+    public function forYourReference($num, $user = []) {
+        $id_list = MallGoods::where('status', '=', 2)
+                        ->orderByRaw('rand()')
+                        ->limit($num)
+                        ->select(['id'])
+                        ->get()->toArray();
+
         $id_list = array_column($id_list, 'id');
         $id_list = implode(',', $id_list);
-        
+
         $res = $this->getList([
-            'ids_str'=>$id_list,
-            'page'=>1,
-            'size'=>1,
-            'get_all'=>1
-                ], 
+            'ids_str' => $id_list,
+            'page' => 1,
+            'size' => 1,
+            'get_all' => 1
+                ],
                 $user, false);
-        
+
         return $res;
     }
+
 }
