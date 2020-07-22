@@ -367,7 +367,11 @@ class MallRefundRecord extends Base {
     }
     
     public function createProgressBar($data,$progress_bar){
+        //全部0  待审核10 待寄回20 已取消99(包含70)
+        //待鉴定30 待退款40 已完成:50,60 
         
+        
+        dd($data->toArray());
         array_push($progress_bar, ['time'=>11]);
         array_unshift($progress_bar,['time'=>1121]);
         

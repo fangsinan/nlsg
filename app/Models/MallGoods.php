@@ -12,6 +12,7 @@ class MallGoods extends Base {
     public function getList($params, $user = [], $cache = true) {
 
         $list = $this->getListData($params, $cache);
+       
         //收藏
         if ($user['id']??0) {
             $col_list = Collection::where('user_id', '=', $user['id'])
@@ -52,7 +53,13 @@ class MallGoods extends Base {
         //价格类
         $getPriceTools = new GetPriceTools();
         $getPriceTools->goodsList($list, $user['level'], $user['id'], $user['is_staff']);
-
+        
+//        echo '<pre>';
+//        foreach($list as $v){
+//            var_dump(gettype($v->sp_info['group_buy']));
+//        }
+//        echo '</pre>';
+//        exit();
         return $list;
     }
 

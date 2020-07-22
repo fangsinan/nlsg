@@ -92,7 +92,6 @@ class GetPriceTools extends Base {
         );
 
         $sp_info['group_buy'] = []; //1表示有拼团
-        //$sp_info['count_buy'] = []; //1表示有几元几件
         $sp_info['sp_type'] = 0; //当前商品优先级最高的活动 0表示没有活动
         $sp_info['begin_time'] = '';
         $sp_info['end_time'] = '';
@@ -110,7 +109,6 @@ class GetPriceTools extends Base {
                     unset($temp_sp_data[$tsdk]);
                 }
             }
-
             //取不是拼团的第一位
             if (!empty($temp_sp_data)) {
                 $temp_sp_goods_data = reset($temp_sp_data);
@@ -163,6 +161,9 @@ class GetPriceTools extends Base {
                 }
                 $data->twitter_money_list = $temp_twitter_money_list;
             }
+        }  
+        if(empty($sp_info['group_buy'])){
+            $sp_info['group_buy'] = new class{};
         }
         $data->sp_info = $sp_info;
     }

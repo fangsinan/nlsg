@@ -19,7 +19,7 @@ use App\servers\AfterSalesServers;
  */
 class AfterSalesController extends Controller {
 
-    public function list(Request $request) {
+    public function list(Request $request) {        
         $servers = new AfterSalesServers();
         $data = $servers->getList($request->input());
         if (($data['code'] ?? true) === false) {
