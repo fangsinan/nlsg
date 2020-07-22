@@ -39,7 +39,6 @@ class MallController extends Controller {
      * @apiSuccess {number} price 售价
      * @apiSuccess {number} stock 库存
      * @apiSuccess {number} collect 1:已收藏 0:未收藏
-     * @apiSuccess {string} top_content 商品详情上方,用于运营临时插入通知等
      * @apiSuccess {string} content 商品详情
      * 
      * @apiSuccess {string[]} cagetory_list 分类
