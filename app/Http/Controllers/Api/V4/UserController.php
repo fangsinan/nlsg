@@ -219,27 +219,27 @@ class UserController extends Controller
     {
         $id = $request->get('id');
 
-        $comments = Comment::with(['user:id,nickname,headimg','attach:id,relation_id,img'])
-            ->select('id', 'pid', 'user_id', 'relation_id', 'type','content', 'forward_num', 'share_num', 'like_num',
-                                'reply_num', 'created_at')
+        $comments = Comment::with(['user:id,nickname,headimg', 'attach:id,relation_id,img'])
+            ->select('id', 'pid', 'user_id', 'relation_id', 'type', 'content', 'forward_num', 'share_num', 'like_num',
+                'reply_num', 'created_at')
             ->where('user_id', $id)
             ->where('status', 1)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-        if ($comments['data']){
+        if ($comments['data']) {
             foreach ($comments['data'] as &$v) {
-                if ($v['type']==1 || $v['type'] ==2){
-                    $v['column'] = Column::where('id',$v['relation_id'])
-                                    ->select('id','title','price','subscribe_num','cover_pic')
-                                    ->first();
-                }elseif($v['type']==3 || $v['type'] ==4){
-                    $v['works'] = Works::where('id',$v['relation_id'])
-                                                      ->select('id','title','price','subscribe_num','cover_img')
-                                                      ->first();
-                } elseif($v['type']==5){
-                    $v['wiki'] = Wiki::where('id',$v['relation_id'])->select('id','name','cover','view_num')
-                                                                        ->first();
+                if ($v['type'] == 1 || $v['type'] == 2) {
+                    $v['column'] = Column::where('id', $v['relation_id'])
+                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_pic')
+                        ->first();
+                } elseif ($v['type'] == 3 || $v['type'] == 4) {
+                    $v['works'] = Works::where('id', $v['relation_id'])
+                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_img')
+                        ->first();
+                } elseif ($v['type'] == 5) {
+                    $v['wiki'] = Wiki::where('id', $v['relation_id'])->select('id', 'name', 'cover', 'view_num')
+                        ->first();
                 }
             }
         }
@@ -268,7 +268,7 @@ class UserController extends Controller
     public function followed(Request $request)
     {
         $uid = $request->input('to_uid');
-        if (!$uid){
+        if ( ! $uid) {
             return error(1000, '参数错误');
         }
         $list = UserFollow::where([
@@ -330,35 +330,31 @@ class UserController extends Controller
      * @apiGroup User
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/base
      *
-     * @apiSuccess {string}
+     * @apiSuccess {string} nickname 昵称
+     * @apiSuccess {string} headimg  头像
+     * @apiSuccess {string} birthday 生日
+     * @apiSuccess {string} intro    简介
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-     *       "data":[
-     *               {
-     *                   "id": 274,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
-     *                   "title": "电商弹窗课程日历套装",
-     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
-     *               },
-     *               {
-     *                   "id": 296,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
-     *                   "title": "心里学",
-     *                   "url": "/mall/shop-details?goods_id=479"
-     *               }
-     *         ]
+     *       "data":{
+     *          'nickname': '张三',
+     *          'headimg' : 'test.png',
+     *          'sex': 1,
+     *           'birthday': '1990-1-1',
+     *           'intro': '简介'
+     *        }
      *     }
      *
      */
     public function base()
     {
-        $user = User::select(['id','nickname','headimg','birthday','intro'])
-                    ->where('id', $this->user['id'])
-                    ->first();
+        $user = User::select(['id', 'nickname', 'sex', 'headimg', 'birthday', 'intro'])
+            ->where('id', $this->user['id'])
+            ->first();
         return success($user);
     }
 
@@ -405,6 +401,37 @@ class UserController extends Controller
 
     }
 
+    /**
+     * @api {get} api/v4/user/account  账户与安全
+     * @apiVersion 4.0.0
+     * @apiName  account
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/account
+     *
+     * @apiSuccess {string} phone  手机号
+     * @apiSuccess {number} is_wx  是否绑定微信 0 否 1是
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data": {
+     *          "is_wx": 1,
+     *          "phone": "186****5324"
+     *       }
+     *     }
+     *
+     */
+    public function account()
+    {
+        $user = User::select(['phone'])->where('id', $this->user['id'])->first();
+        if ($user) {
+            $user->phone = substr_replace($user->phone, '****', 3, 4);
+            $user->is_wx = 1;
+        }
+        return success($user);
+    }
 
     /**
      * @api {get} api/v4/user/feedback 我要吐槽
