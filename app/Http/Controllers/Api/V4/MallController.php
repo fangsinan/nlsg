@@ -275,7 +275,7 @@ class MallController extends Controller {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 4;
-        $data = $model->getList($params, $this->user['id']);
+        $data = $model->getList($params, $this->user['id']??0);
         return $this->success($data);
     }
 

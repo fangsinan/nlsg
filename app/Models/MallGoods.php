@@ -52,7 +52,7 @@ class MallGoods extends Base {
 
         //价格类
         $getPriceTools = new GetPriceTools();
-        $getPriceTools->goodsList($list, $user['level'], $user['id'], $user['is_staff']);
+        $getPriceTools->goodsList($list, $user['level']??0, $user['id']??0, $user['is_staff']??0);
         return $list;
     }
 
@@ -360,7 +360,7 @@ class MallGoods extends Base {
     }
 
     
-    public function forYourReference($num,$user){
+    public function forYourReference($num,$user = []){
         $id_list = MallGoods::where('status','=',2)
                 ->orderByRaw('rand()')
                 ->limit($num)

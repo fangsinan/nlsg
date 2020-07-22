@@ -21,8 +21,6 @@ class Controller extends BaseController {
         $this->user = auth('api')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
-        } else {
-            $this->user = ['id' => 0, 'level' => 0, 'is_staff' => 0];
         }
     }
 
