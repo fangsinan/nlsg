@@ -52,6 +52,8 @@ class ColumnController extends Controller
     "works_update_time": 0,             //更新时间
     "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",  //封面图
     "details_pic": ""               //详情图
+    "is_new": 0               //是否购买
+    "is_sub": 0               //是否关注
     },
     {
     "id": 2,
@@ -98,6 +100,10 @@ class ColumnController extends Controller
             "type"   => $type,
         ])->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->get($field);
+        foreach ($list as &$v) {
+            $v['is_sub'] = 0;
+            $v['is_new'] = 0;
+        }
         return $this->success($list);
     }
 
