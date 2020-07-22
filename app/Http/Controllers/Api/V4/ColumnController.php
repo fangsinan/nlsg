@@ -100,9 +100,15 @@ class ColumnController extends Controller
             "type"   => $type,
         ])->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->get($field);
+        //7天前的时间
+        $time = date('Y-m-d H:i:s',strtotime("-1 week"));
+        $uid = $this->user['id'] ?? 0;
         foreach ($list as &$v) {
-            $v['is_sub'] = 0;
+            $v['is_sub'] = Subscribe::isSubscribe($uid,$v['id']);
             $v['is_new'] = 0;
+            if($v['works_update_time'] > $time){
+                $v['is_new'] = 1;
+            }
         }
         return $this->success($list);
     }
