@@ -206,7 +206,7 @@ class MallController extends Controller {
       ]
       }
      */
-    public function goodsList(Request $request) {    
+    public function goodsList(Request $request) {
         $params = $request->input();
         $params['page'] = $params['page'] ?? 1;
         $params['size'] = $params['size'] ?? 10;
@@ -275,7 +275,7 @@ class MallController extends Controller {
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 4;
-        $data = $model->getList($params, $this->user['id']??0);
+        $data = $model->getList($params, $this->user['id'] ?? 0);
         return $this->success($data);
     }
 
@@ -785,6 +785,37 @@ class MallController extends Controller {
         $res = str_replace('$freight_line', $freight_line, $res);
         $res = str_replace('$post_money', $post_money, $res);
 
+        $res = json_decode($res);
+        return $this->success($res);
+    }
+
+    /**
+     * 商城购买须知
+     * @api {get} /api/v4/goods/buyer_reading 商城购买须知
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/goods/buyer_reading
+     * @apiGroup  Mall
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/buyer_reading
+     * @apiDescription 商城服务说明
+     * @apiSuccessExample {json} Request-Example:
+     * 
+      {
+      "code": 200,
+      "msg": "成功",
+      "data": [
+      {
+      "k": "关于发货",
+      "v": "发货以订单拍下的商品及颜色为准，付款后2个工作日内发货。"
+      },
+      {
+      "k": "售后服务电话：010-85164891",
+      "v": ""
+      }
+      ]
+      }
+     */
+    public function buyerReading() {
+        $res = \App\Models\ConfigModel::getData(16);
         $res = json_decode($res);
         return $this->success($res);
     }
