@@ -189,7 +189,6 @@ class MallGoods extends Base {
         //是否需要返回商品详情(包括详情)
         if (($params['get_details'] ?? 0) == 1) {
             $select_field[] = 'content';
-            $top_content = ConfigModel::getData(11);
         }
 
         $query->select($select_field);
@@ -218,8 +217,11 @@ class MallGoods extends Base {
 
         $res = $query->get();
 
-        foreach ($res as $v) {
-            $v->top_content = $top_content;
+        if (($params['get_details'] ?? 0) == 1) {
+            $top_content = ConfigModel::getData(11);
+            foreach ($res as $v) {
+                $v->content = $top_content . $v->content;
+            }
         }
 
         return $res;
