@@ -53,7 +53,8 @@ class ColumnController extends Controller
     "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",  //封面图
     "details_pic": ""               //详情图
     "is_new": 0               //是否购买
-    "is_sub": 0               //是否关注
+    "is_sub": 0               //是否关注  会否购买
+    "work_name": 0               //最新章节
     },
     {
     "id": 2,
