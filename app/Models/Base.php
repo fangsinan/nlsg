@@ -6,18 +6,28 @@ use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
 use Illuminate\Support\Facades\DB;
 
-class Base extends Model
-{
-    protected function serializeDate(DateTimeInterface $date)
-    {
+class Base extends Model {
+
+    protected function serializeDate(DateTimeInterface $date) {
         return $date->format('Y-m-d H:i:s');
     }
 
-    protected function getSqlBegin(){ 
+    protected function getSqlBegin() {
         DB::connection()->enableQueryLog();
     }
-    
-    protected function getSql(){
+
+    protected function getSql() {
         dd(DB::getQueryLog());
     }
+
+    protected function emptyA2c($array) {
+        if (empty($array)) {
+            return new class {
+                
+            };
+        } else {
+            return $array;
+        }
+    }
+
 }
