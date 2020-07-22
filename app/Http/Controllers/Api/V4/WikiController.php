@@ -16,7 +16,8 @@ class WikiController extends Controller
      * @apiName  index
      * @apiGroup Wiki
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/wiki/index
-     * @apiParam  page 分页
+     * @apiParam  page        分页
+     * @apiParam  category_id 分类id
      *
      * @apiSuccess {string} name 百科标题
      * @apiSuccess {string} content 百科描述
