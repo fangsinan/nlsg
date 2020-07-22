@@ -20,7 +20,7 @@ class Base extends Model {
         dd(DB::getQueryLog());
     }
 
-    protected function emptyA2c($array) {
+    protected function emptyA2C($array) {
         if (empty($array)) {
             return new class {
                 

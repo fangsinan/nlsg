@@ -162,7 +162,7 @@ class GetPriceTools extends Base {
                 $data->twitter_money_list = $temp_twitter_money_list;
             }
         }
-        $sp_info['group_buy'] = $this->emptyA2c($sp_info['group_buy']);
+        $sp_info['group_buy'] = $this->emptyA2C($sp_info['group_buy']);
         $data->sp_info = $sp_info;
     }
 
