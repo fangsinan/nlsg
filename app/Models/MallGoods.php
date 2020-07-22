@@ -74,6 +74,8 @@ class MallGoods extends Base {
         } else {
             $cache_name_arr['ids'] = '';
         }
+        $cache_name_arr['zone_id'] = $params['zone_id'] ?? 0;
+        $cache_name_arr['get_all'] = $params['get_all'] ?? 0;
 
         $cache_name = implode('_', $cache_name_arr);
 
@@ -115,6 +117,19 @@ class MallGoods extends Base {
             }
             $query->whereIn('id', $params['ids_str']);
         }
+        
+        if($params['zone_id']??0){
+            $temp_gl = MallGoodsListDetails::where('list_id','=',$params['zone_id'])
+                    ->select(['goods_id'])
+                    ->get();
+            if($temp_gl->isEmpty()){
+                return [];
+            }else{
+                $ids_str = array_column($temp_gl->toArray(), 'goods_id');
+                $query->whereIn('id',$ids_str);
+            }
+        }
+        
         if (!empty($params['cid'] ?? '')) {
             if (!is_array($params['cid'])) {
                 $params['cid'] = explode(',', $params['cid']);
