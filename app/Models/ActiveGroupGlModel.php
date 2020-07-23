@@ -53,7 +53,7 @@ class ActiveGroupGlModel extends Base {
 
         $list = Cache::get($cache_key_name);
         if ($list === '0') {
-            return [];
+            return new class{};
         } else {
             if (empty($list)) {
                 $list = $this->getListDataFromDb();
@@ -63,7 +63,7 @@ class ActiveGroupGlModel extends Base {
                 Cache::add($cache_key_name, $list, $expire_num);
             }
             if ($list === '0') {
-                return [];
+                 return new class{};
             }
             //如果指定id 就直传一个
             if ($params['id'] ?? false) {
