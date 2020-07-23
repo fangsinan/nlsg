@@ -108,8 +108,10 @@ class GetPriceTools extends Base {
                     $sp_info['group_buy']['end_time'] = $tsdv->end_time;
                     $sp_info['group_buy']['begin_timestamp'] = strtotime($tsdv->begin_time);
                     $sp_info['group_buy']['end_timestamp'] = strtotime($tsdv->end_time);
-                    $sp_info['group_buy']['order_num'] = 0;
-                    
+                    $sp_info['group_buy']['order_num'] = MallOrder::where('sp_id', $tsdv->id)
+                            ->where('status', '>', 1)
+                            ->count();
+
                     unset($temp_sp_data[$tsdk]);
                 }
             }
@@ -167,17 +169,17 @@ class GetPriceTools extends Base {
             }
         }
         $sp_info['group_buy'] = $this->emptyA2C($sp_info['group_buy']);
-        if(empty($sp_info['begin_time'])){
+        if (empty($sp_info['begin_time'])) {
             $sp_info['begin_timestamp'] = 0;
-        }else{
+        } else {
             $sp_info['begin_timestamp'] = strtotime($sp_info['begin_time']);
         }
-        if(empty($sp_info['end_time'])){
+        if (empty($sp_info['end_time'])) {
             $sp_info['end_timestamp'] = 0;
-        }else{
+        } else {
             $sp_info['end_timestamp'] = strtotime($sp_info['end_time']);
         }
-        
+
         $data->sp_info = $sp_info;
     }
 
