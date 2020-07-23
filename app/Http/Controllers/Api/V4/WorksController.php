@@ -142,14 +142,14 @@ class WorksController extends Controller
                     continue;
                 }
             }
-            $worksData['data'][$key]['is_sub'] = $is_sub;
+            $worksData['data'][$key]['works']['is_sub'] = $is_sub;
 
 
             $is_new = 0;
             if($val['works']['works_update_time'] > $time){
                 $is_new = 1;
             }
-            $worksData['data'][$key]['is_new'] = $is_new;
+            $worksData['data'][$key]['works']['is_new'] = $is_new;
 
             $newWorks[] = $worksData['data'][$key];
 
