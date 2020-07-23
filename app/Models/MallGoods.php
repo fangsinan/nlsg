@@ -53,6 +53,7 @@ class MallGoods extends Base {
         //价格类
         $getPriceTools = new GetPriceTools();
         $getPriceTools->goodsList($list, $user['level'] ?? 0, $user['id'] ?? 0, $user['is_staff'] ?? 0);
+
         return $list;
     }
 

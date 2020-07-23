@@ -206,13 +206,13 @@ class MallController extends Controller {
       ]
       }
      */
-    public function goodsList(Request $request) {
+    public function goodsList(Request $request) {      
         $params = $request->input();
         $params['page'] = $params['page'] ?? 1;
         $params['size'] = $params['size'] ?? 10;
         $model = new MallGoods();
         $data = $model->getList($params, $this->user);
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
     /**
@@ -276,7 +276,7 @@ class MallController extends Controller {
         $params['page'] = 1;
         $params['size'] = 4;
         $data = $model->getList($params, $this->user['id'] ?? 0);
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
     /**
@@ -394,7 +394,7 @@ class MallController extends Controller {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
-            return $this->success($data,1);
+            return $this->success($data);
         }
     }
 
@@ -432,7 +432,7 @@ class MallController extends Controller {
     public function categoryList() {
         $model = new MallCategory();
         $data = $model->getUsedList();
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
     /**
@@ -532,7 +532,7 @@ class MallController extends Controller {
     public function bannerList() {
         $model = new Banner();
         $data = $model->mallBannerList();
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
     /**
@@ -612,7 +612,7 @@ class MallController extends Controller {
         $data['sec'] = $model->homeSecList();
         $data['group'] = $model->homeGroupList();
         $data['now'] = time();
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
     /**
@@ -691,7 +691,7 @@ class MallController extends Controller {
     public function flashSaleList() {
         $model = new SpecialPriceModel();
         $data = $model->getSecList(2);
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
     /**
@@ -740,7 +740,7 @@ class MallController extends Controller {
     public function groupBuyList() {
         $model = new SpecialPriceModel();
         $data = $model->groupBuyList();
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
     /**
@@ -786,7 +786,7 @@ class MallController extends Controller {
         $res = str_replace('$post_money', $post_money, $res);
 
         $res = json_decode($res);
-        return $this->success($res,1);
+        return $this->success($res);
     }
 
     /**
@@ -817,7 +817,7 @@ class MallController extends Controller {
     public function buyerReading() {
         $res = \App\Models\ConfigModel::getData(16);
         $res = json_decode($res);
-        return $this->success($res,1);
+        return $this->success($res);
     }
 
     /**
@@ -839,7 +839,7 @@ class MallController extends Controller {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
-            return $this->success($data,1);
+            return $this->success($data);
         }
     }
 
@@ -865,7 +865,7 @@ class MallController extends Controller {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
-            return $this->success($data,1);
+            return $this->success($data);
         }
     }
 
@@ -888,7 +888,7 @@ class MallController extends Controller {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
-            return $this->success($data,1);
+            return $this->success($data);
         }
     }
 

@@ -59,7 +59,7 @@ class AddressController extends Controller {
      */
     public function getData() {
         $res = Area::getData();
-        return $this->success($res,1);
+        return $this->success($res);
     }
 
     /**
@@ -109,7 +109,7 @@ class AddressController extends Controller {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
-            return $this->success($data,1);
+            return $this->success($data);
         }
     }
 
@@ -162,7 +162,7 @@ class AddressController extends Controller {
         }
         $model = new MallAddress();
         $data = $model->getList($this->user['id']);
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
     /**
@@ -211,7 +211,7 @@ class AddressController extends Controller {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
         } else {
-            return $this->success($data,1);
+            return $this->success($data);
         }
     }
 
@@ -256,7 +256,7 @@ class AddressController extends Controller {
         }
         $model = new FreightTemplate();
         $data = $model->listOfShop($flag);
-        return $this->success($data,1);
+        return $this->success($data);
     }
 
 }
