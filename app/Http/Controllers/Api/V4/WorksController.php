@@ -144,7 +144,6 @@ class WorksController extends Controller
             }
             $worksData['data'][$key]['works']['is_sub'] = $is_sub;
 
-
             $is_new = 0;
             if($val['works']['works_update_time'] > $time){
                 $is_new = 1;
@@ -152,8 +151,6 @@ class WorksController extends Controller
             $worksData['data'][$key]['works']['is_new'] = $is_new;
 
             $newWorks[] = $worksData['data'][$key];
-
-
 
         }
         //$work_data = $worksData->toArray();
