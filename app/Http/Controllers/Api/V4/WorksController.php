@@ -75,6 +75,8 @@ class WorksController extends Controller
     "roof_placement": 1,
     "is_teaching_aids": 0,
     "is_free": 0,           //是否免费
+    "is_new": 0,           //是否最新
+    "is_sub": 0,           //是否购买
     "status": 4,
     "created_at": null,
     "updated_at": null
@@ -143,10 +145,12 @@ class WorksController extends Controller
             $worksData['data'][$key]['is_sub'] = $is_sub;
             $newWorks[] = $worksData['data'][$key];
 
-            $v['is_new'] = 0;
-            if($v['works_update_time'] > $time){
-                $v['is_new'] = 1;
+            $is_new = 0;
+            if($val['works_update_time'] > $time){
+                $is_new = 1;
             }
+            $worksData['data'][$key]['is_new'] = $is_new;
+
         }
         //$work_data = $worksData->toArray();
 //        $res = [
