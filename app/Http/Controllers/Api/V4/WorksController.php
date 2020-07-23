@@ -75,6 +75,8 @@ class WorksController extends Controller
     "roof_placement": 1,
     "is_teaching_aids": 0,
     "is_free": 0,           //是否免费
+    "is_new": 0,           //是否最新
+    "is_sub": 0,           //是否购买
     "status": 4,
     "created_at": null,
     "updated_at": null
@@ -130,15 +132,28 @@ class WorksController extends Controller
             }])->select()->where($where)
             ->paginate($this->page_per_page);
         $worksData = $worksData->toArray();
+
+        $time = date('Y-m-d H:i:s',strtotime("-1 week"));
         foreach ($worksData['data'] as $key=>$val){
+            $is_sub = Subscribe::isSubscribe($user_id,$val['works']['id'],2);
             if($hide == 1){
-                $is_sub = Subscribe::isSubscribe($user_id,$val['works']['id'],2);
                 if($is_sub == 1){
                     unset($worksData['data'][$key]);
                     continue;
                 }
             }
+            $worksData['data'][$key]['works']['is_sub'] = $is_sub;
+
+
+            $is_new = 0;
+            if($val['works']['works_update_time'] > $time){
+                $is_new = 1;
+            }
+            $worksData['data'][$key]['works']['is_new'] = $is_new;
+
             $newWorks[] = $worksData['data'][$key];
+
+
 
         }
         //$work_data = $worksData->toArray();
