@@ -108,6 +108,8 @@ class GetPriceTools extends Base {
                     $sp_info['group_buy']['end_time'] = $tsdv->end_time;
                     $sp_info['group_buy']['begin_timestamp'] = strtotime($tsdv->begin_time);
                     $sp_info['group_buy']['end_timestamp'] = strtotime($tsdv->end_time);
+                    $sp_info['group_buy']['order_num'] = 0;
+                    
                     unset($temp_sp_data[$tsdk]);
                 }
             }
