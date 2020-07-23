@@ -130,16 +130,23 @@ class WorksController extends Controller
             }])->select()->where($where)
             ->paginate($this->page_per_page);
         $worksData = $worksData->toArray();
+
+        $time = date('Y-m-d H:i:s',strtotime("-1 week"));
         foreach ($worksData['data'] as $key=>$val){
+            $is_sub = Subscribe::isSubscribe($user_id,$val['works']['id'],2);
             if($hide == 1){
-                $is_sub = Subscribe::isSubscribe($user_id,$val['works']['id'],2);
                 if($is_sub == 1){
                     unset($worksData['data'][$key]);
                     continue;
                 }
             }
+            $worksData['data'][$key]['is_sub'] = $is_sub;
             $newWorks[] = $worksData['data'][$key];
 
+            $v['is_new'] = 0;
+            if($v['works_update_time'] > $time){
+                $v['is_new'] = 1;
+            }
         }
         //$work_data = $worksData->toArray();
 //        $res = [
