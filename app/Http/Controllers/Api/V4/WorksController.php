@@ -93,10 +93,10 @@ class WorksController extends Controller
         $order = $request->input('order',0);
         $hide = $request->input('hide',0);
         $category_id = $request->input('category_id',0);
-        $user_id = $request->input('user_id',0);
         $teacher_id = $request->input('teacher_id',0);
         $is_free = $request->input('is_free',0);
 
+        $user_id = $this->user['id'] ?? 0;
         switch ($order){
             case 1:
                 $order_str = 'subscribe_num';
