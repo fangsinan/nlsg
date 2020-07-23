@@ -106,6 +106,8 @@ class GetPriceTools extends Base {
                     $sp_info['group_buy']['num'] = $tsdv->group_num;
                     $sp_info['group_buy']['begin_time'] = $tsdv->begin_time;
                     $sp_info['group_buy']['end_time'] = $tsdv->end_time;
+                    $sp_info['group_buy']['begin_timestamp'] = strtotime($tsdv->begin_time);
+                    $sp_info['group_buy']['end_timestamp'] = strtotime($tsdv->end_time);
                     unset($temp_sp_data[$tsdk]);
                 }
             }
@@ -163,6 +165,17 @@ class GetPriceTools extends Base {
             }
         }
         $sp_info['group_buy'] = $this->emptyA2C($sp_info['group_buy']);
+        if(empty($sp_info['begin_time'])){
+            $sp_info['begin_timestamp'] = 0;
+        }else{
+            $sp_info['begin_timestamp'] = strtotime($sp_info['begin_time']);
+        }
+        if(empty($sp_info['end_time'])){
+            $sp_info['end_timestamp'] = 0;
+        }else{
+            $sp_info['end_timestamp'] = strtotime($sp_info['end_time']);
+        }
+        
         $data->sp_info = $sp_info;
     }
 
