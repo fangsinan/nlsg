@@ -34,7 +34,7 @@ class MallTosBind extends Base {
     
         
     public function tos() {
-        return $this->hasMany('App\Models\MallTos', 'id', 'tos_id')
+        return $this->hasOne('App\Models\MallTos', 'id', 'tos_id')
                         ->where('status', '=', 1)
                         ->select(['title', 'content', 'icon','id']);
     }

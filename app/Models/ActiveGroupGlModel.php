@@ -43,27 +43,27 @@ class ActiveGroupGlModel extends Base {
                 $v->goods_id = $temp_res;
             }
         }
-        return $list;
+        return $list->toArray();
     }
 
     //获取当前未开始活动数据
     public function getList($params = []) {
-        $expire_num = 3600;
+        $expire_num = 300;
         $cache_key_name = 'active_group_list';
 
         $list = Cache::get($cache_key_name);
         if ($list === '0') {
-            return new class{};
+            return [];
         } else {
             if (empty($list)) {
                 $list = $this->getListDataFromDb();
                 if (empty($list)) {
                     $list = '0';
                 }
-                Cache::add($cache_key_name, $list, $expire_num);
+//                Cache::add($cache_key_name, $list, $expire_num);
             }
             if ($list === '0') {
-                 return new class{};
+                 return [];
             }
             //如果指定id 就直传一个
             if ($params['id'] ?? false) {
@@ -77,9 +77,8 @@ class ActiveGroupGlModel extends Base {
                     }
                 }
 
-                return $this->emptyA2C($res);
+                return $res;
             } else {
-
                 //没有指定id  返回全部
                 //如果指定商品类型和id  则只返回包含该id的活动
                 if (($params['goods_id'] ?? false) && ($params['goods_type'] ?? false)) {
@@ -97,7 +96,7 @@ class ActiveGroupGlModel extends Base {
                         }
                     }
                 }
-                return $this->emptyA2C($list);
+                return $list;
             }
         }
     }

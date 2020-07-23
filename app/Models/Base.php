@@ -20,13 +20,20 @@ class Base extends Model {
         dd(DB::getQueryLog());
     }
 
-    protected function emptyA2C($array) {
-        if (empty($array)) {
-            return new class {
-                
-            };
+    protected function emptyA2C($data) {
+//        dd([rand(),$data->isEmpty()]);
+        if (is_object($data)) {
+            if ($data->isEmpty()) {
+                return new class {};
+            } else {
+                return $data;
+            }
         } else {
-            return $array;
+            if (empty($data)) {
+                return new class {};
+            } else {
+                return $data;
+            }
         }
     }
 

@@ -40,12 +40,10 @@ class MallGoods extends Base {
         //获取商品所处的活动
         $agModel = new ActiveGroupGlModel();
         foreach ($list as $v) {
-            $v->active_group_list = $agModel->getList([
+            $temp_gl = $agModel->getList([
                 'goods_type' => 1, 'goods_id' => $v->id, 'simple' => 1
             ]);
-            if($v->active_group_list->isEmpty()){
-                $v->active_group_list = new class{};
-            }
+            $v->active_group_list = array_values($temp_gl);
         }
 
         //价格类       
