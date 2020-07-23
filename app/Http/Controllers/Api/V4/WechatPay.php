@@ -251,10 +251,14 @@ class WechatPay extends Controller {
                 }
 
                 //添加订阅记录
+                $sub_type = 1;
+                if($orderInfo['type'] == 15){
+                    $sub_type = 6;  //讲座
+                }
                 $subscribe = [
                     'user_id' => $user_id, //会员id
                     'pay_time' => $time, //支付时间
-                    'type' => 1,
+                    'type' => $sub_type,
                     'order_id' => $orderId, //订单id
                     'status' => 1,
                     'start_time' => date("Y-m-d H:i:s", $starttime),
