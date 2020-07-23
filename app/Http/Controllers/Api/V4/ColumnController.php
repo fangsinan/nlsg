@@ -53,8 +53,9 @@ class ColumnController extends Controller
     "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",  //封面图
     "details_pic": ""               //详情图
     "is_new": 0               //是否最新
-    "is_sub": 0               //是否关注【购买、订阅】
+    "is_sub": 0               //是否购买【订阅】
     "work_name": 0            //最新章节
+    "sub_count": 0            //在学人数
     },
     {
     "id": 2,
@@ -110,9 +111,13 @@ class ColumnController extends Controller
             if($v['works_update_time'] > $time){
                 $v['is_new'] = 1;
             }
-
             $title = Works::where('column_id',$v['id'])->orderBy('updated_at','desc')->first('title');
             $v['work_name'] = $title->title;
+            $v['sub_count'] = 0;
+            if($type  == 2){//仅讲座   
+                $v['sub_count'] = Subscribe::where(['type'=>6,'relation_id'=>$v['id']])->count();
+            }
+
         }
         return $this->success($list);
     }
