@@ -77,7 +77,7 @@ class ActiveGroupGlModel extends Base {
                     }
                 }
 
-                return $res;
+                return $this->emptyA2C($res);
             } else {
 
                 //没有指定id  返回全部
@@ -97,7 +97,7 @@ class ActiveGroupGlModel extends Base {
                         }
                     }
                 }
-                return $list;
+                return $this->emptyA2C($list);
             }
         }
     }

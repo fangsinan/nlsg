@@ -43,13 +43,13 @@ class MallGoods extends Base {
             $v->active_group_list = $agModel->getList([
                 'goods_type' => 1, 'goods_id' => $v->id, 'simple' => 1
             ]);
+            $v->active_group_list = $this->emptyA2C($v->active_group_list);
         }
-        $temp_agl = [];
-        foreach ($v->active_group_list as $agl) {
-            $temp_agl[] = $agl;
-        }
-        $v->active_group_list = $temp_agl;
-
+//        $temp_agl = [];
+//        foreach ($v->active_group_list as $agl) {
+//            $temp_agl[] = $agl;
+//        }
+//        $v->active_group_list = $temp_agl;
         //价格类
         $getPriceTools = new GetPriceTools();
         $getPriceTools->goodsList($list, $user['level'] ?? 0, $user['id'] ?? 0, $user['is_staff'] ?? 0);
