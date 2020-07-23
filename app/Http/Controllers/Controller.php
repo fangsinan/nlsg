@@ -30,9 +30,6 @@ class Controller extends BaseController {
             'msg' => '成功',
             'data' => $data
         ];
-        if ($flag == 1) {
-            $result = json_decode(json_encode($result, JSON_FORCE_OBJECT));
-        }
         return response()->json($result);
     }
 
