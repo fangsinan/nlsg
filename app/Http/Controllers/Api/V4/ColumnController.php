@@ -55,7 +55,8 @@ class ColumnController extends Controller
     "is_new": 0               //是否最新
     "is_sub": 0               //是否购买【订阅】
     "work_name": 0            //最新章节
-    "sub_count": 0            //在学人数
+    "subscribe_num": 0            //在学人数
+    "info_num": 0            //总章节数量「针对讲座」
     },
     {
     "id": 2,
@@ -96,7 +97,7 @@ class ColumnController extends Controller
         if($order){
             $order_str = 'desc';
         }
-        $field = ['id', 'name', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic'];
+        $field = ['id', 'name', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num'];
         $list = Column::where([
             "status" => 1,
             "type"   => $type,
@@ -113,10 +114,6 @@ class ColumnController extends Controller
             }
             $title = Works::where('column_id',$v['id'])->orderBy('updated_at','desc')->first('title');
             $v['work_name'] = $title->title;
-            $v['sub_count'] = 0;
-            if($type  == 2){//仅讲座   
-                $v['sub_count'] = Subscribe::where(['type'=>6,'relation_id'=>$v['id']])->count();
-            }
 
         }
         return $this->success($list);
