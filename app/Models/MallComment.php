@@ -37,7 +37,8 @@ class MallComment extends Base {
                 ->leftJoin('nlsg_user as na', 'nmc.reply_user_id', '=', 'na.id')
                 ->leftJoin('nlsg_mall_sku as sku', 'nmc.sku_number', '=', 'sku.sku_number')
                 ->select(['nmc.id', 'nu.id as user_id', 'nu.headimg', 'nu.nickname',
-            'nu.level', 'nu.expire_time', 'nmc.content', 'nmc.created_at', 'nmc.pid',
+            'nu.level', 'nu.expire_time', 'nmc.content', 'nmc.pid',
+            DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(nmc.created_at),\'%Y-%m-%d\') as created_at'),
             'nmc.goods_id', 'nmc.sku_number', 'nmc.star', 'nmc.reply_comment',
             'nmc.replyed_at', 'nmc.reply_user_id', 'nmc.picture',
             'na.nickname as reply_nickname', 'sku.id as sku_id']);
