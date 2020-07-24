@@ -220,6 +220,7 @@ class AfterSalesController extends Controller {
      * @apiSuccess {string[]} goods_list 商品列表
      * @apiSuccess {string[]} refund_address 售后点信息
      * @apiSuccess {string[]} express_info 寄回物流信息
+     * @apiSuccess {string[]} progress_bar 进度条
      * @apiSuccessExample {json} Request-Example:
       {
       "code": 200,
@@ -240,14 +241,14 @@ class AfterSalesController extends Controller {
       "created_at": "2020-07-03 17:24:46",
       "return_address_id": 10,
       "picture": "",
-      "pass_at": null,
-      "check_at": null,
-      "receive_at": null,
-      "succeed_at": null,
+      "pass_at": "2020-07-24 15:46:52",
+      "check_at": "2020-07-23 15:47:01",
+      "receive_at": "2020-07-12 15:47:06",
+      "succeed_at": "2020-07-25 15:47:10",
       "reason_id": 0,
       "description": null,
       "is_check_reject": 0,
-      "check_reject_at": null,
+      "check_reject_at": "2020-07-23 15:47:21",
       "check_remark": "",
       "is_authenticate_reject": 0,
       "authenticate_reject_at": null,
@@ -277,6 +278,24 @@ class AfterSalesController extends Controller {
       "city_name": "朝阳",
       "area_name": ""
       },
+      "progress_bar": [
+      {
+      "time": "2020-07-25 15:47",
+      "status": "退款完毕文本"
+      },
+      {
+      "time": "1970-01-01 08:00",
+      "status": "鉴定待退款文本"
+      },
+      {
+      "time": "2020-07-24 15:46",
+      "status": "通过,寄回文本"
+      },
+      {
+      "time": "2020-07-03 17:24",
+      "status": "提交申请"
+      }
+      ],
       "express_info": {
       "id": 1,
       "history": {
@@ -290,8 +309,8 @@ class AfterSalesController extends Controller {
       "status": "客户签收人: 周一派送急件电联18513793888 已签收  感谢使用圆通速递，期待再次为您服务 如有疑问请联系：18513793888，投诉电话：010-53579888"
       },
       {
-      "time": "2020-05-24 07:17:22",
-      "status": "【北京市朝阳区十里堡公司】 派件中  派件人: 张小秋 电话 18513793888  如有疑问，请联系：010-53579888"
+      "time": "2020-05-22 15:38:58",
+      "status": "【浙江省金华市永康市公司】 已收件 取件人: 00773969 (15268689991)"
       }
       ],
       "deliverystatus": 3,
@@ -462,7 +481,7 @@ class AfterSalesController extends Controller {
      */
     public function reasonList() {
         $res = \App\Models\ConfigModel::getData(15);
-        $res = json_decode($res,true);
+        $res = json_decode($res, true);
         foreach ($res as $k => $v) {
             if ($v['status'] != 1) {
                 unset($res[$k]);

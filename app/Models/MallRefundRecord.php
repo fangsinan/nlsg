@@ -360,23 +360,50 @@ class MallRefundRecord extends Base {
                 $data->refund_address = $v;
             }
         }
-        
-        //todo 进度条
-        $data['progress_bar'] = $this->createProgressBar($data, $data->expressInfo->history->list??[]);
+
+        //进度条
+        $data['progress_bar'] = $this->createProgressBar($data->id, $data->expressInfo->history->list ?? []);
         return $data;
     }
-    
-    public function createProgressBar($data,$progress_bar){
-        //全部0  待审核10 待寄回20 已取消99(包含70)
-        //待鉴定30 待退款40 已完成:50,60 
-        
-        
-        dd($data->toArray());
-        array_push($progress_bar, ['time'=>11]);
-        array_unshift($progress_bar,['time'=>1121]);
-        
-        
+
+    public function dateDelSec($date) {
+        return date('Y-m-d H:i', strtotime($date));
+    }
+
+    public function createProgressBar($id, $progress_bar) {
+        $info = MallRefundRecord::find($id)->toArray();
+
+        if ($info['status'] == 70) {
+            $info['status'] = 15;
+        }
+        $before_arr = []; //10:待审核  15:驳回  20:待寄回
+        $after_arr = []; //30:待鉴定  40待退款  50:退款中 60:已退款  
+        //顺序  10 15 20 () 30 40 50 60
+
+        $info['status'] = 50;
+
+        if ($info['status'] == 15) {
+            $before_arr[] = ['i' => $i, 'time' => $this->dateDelSec($info['check_reject_at']), 'status' => '驳回文本'];
+            $before_arr[] = ['time' => $this->dateDelSec($info['created_at']), 'status' => '提交申请'];
+        } else {
+            switch ($i = intval($info['status'])) {
+                case $i > 50:
+                case $i > 40:
+                    $after_arr[] = ['time' => $this->dateDelSec($info['succeed_at']), 'status' => '退款完毕文本'];
+                case $i > 30:
+                    $after_arr[] = ['time' => $this->dateDelSec($info['authenticate_reject_at']), 'status' => '鉴定待退款文本'];
+                case $i > 20:
+                    $after_arr[] = ['time' => $this->dateDelSec($info['receive_at']), 'status' => '收货但鉴定文本'];
+                case $i > 15:
+                    $before_arr[] = ['time' => $this->dateDelSec($info['pass_at']), 'status' => '通过,寄回文本'];
+                case $i > 0:
+                    $before_arr[] = ['time' => $this->dateDelSec($info['created_at']), 'status' => '提交申请'];
+            }
+        }
+        $progress_bar = array_merge($progress_bar, $before_arr);
+        $progress_bar = array_merge($after_arr, $progress_bar);
         return $progress_bar;
+        
     }
 
     //删除,取消,寄回
