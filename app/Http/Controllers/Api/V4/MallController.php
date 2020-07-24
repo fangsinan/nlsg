@@ -62,6 +62,7 @@ class MallController extends Controller {
      * @apiSuccess {number} picture_list.is_main 1:主图
      * @apiSuccess {number} picture_list.is_video 1:表示是视频 
      * @apiSuccess {number} picture_list.duration 视频时长(单位秒)
+     * @apiSuccess {number} picture_list.cover_img 视频封面
      * 
      * @apiSuccess {string[]} tos_bind_list 服务说明
      * @apiSuccess {string} tos_list.tos.title 标题
@@ -195,7 +196,8 @@ class MallController extends Controller {
       "is_main": 0,
       "is_video": 0,
       "duration": "",
-      "goods_id": 91
+      "goods_id": 91,
+      "cover_img":""
       }
       ],
       "category_list": {
