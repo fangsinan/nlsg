@@ -15,11 +15,13 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class ExpressCompany extends Base {
+class ExpressCompany extends Base
+{
 
     protected $table = 'nlsg_express_company';
 
-    public static function onlyGetName($id = 0, $flag = 1) {
+    public static function onlyGetName($id = 0, $flag = 1)
+    {
         if (!$id) {
             return '';
         }
@@ -31,7 +33,8 @@ class ExpressCompany extends Base {
         }
     }
 
-    public function getPostInfo($params) {
+    public function getPostInfo($params)
+    {
         if (empty($params['express_id']) || empty($params['express_num'])) {
             return ['code' => false, 'msg' => '参数错误'];
         }
@@ -42,8 +45,8 @@ class ExpressCompany extends Base {
         }
 
         $check = ExpressInfo::where('express_id', '=', $params['express_id'])
-                ->where('express_num', '=', $params['express_num'])
-                ->first();
+            ->where('express_num', '=', $params['express_num'])
+            ->first();
 
         if ($check->delivery_status == 3) {
             //已签收的直接返回
@@ -60,8 +63,8 @@ class ExpressCompany extends Base {
             ];
 
             ExpressInfo::where('express_id', '=', $params['express_id'])
-                    ->where('express_num', '=', $params['express_num'])
-                    ->update($update_data);
+                ->where('express_num', '=', $params['express_num'])
+                ->update($update_data);
 
             return $data;
         } else {
@@ -70,7 +73,8 @@ class ExpressCompany extends Base {
         }
     }
 
-    public function toQuery($number, $type) {
+    public function toQuery($number, $type)
+    {
 
         $cache_key_name = 'post_info' . '_' . $type . '_' . $number;
 
@@ -118,14 +122,13 @@ class ExpressCompany extends Base {
         }
     }
 
-    public function companyList() {
-        $res = self::where('status', '=', 1)
-                ->whereIn('show_frontend', [1, 3])
-                ->orderBy('rank', 'asc')
-                ->select(['id', 'name'])
-                ->get();
-
-        return $res;
+    public function companyList()
+    {
+        return self::where('status', '=', 1)
+            ->whereIn('show_frontend', [1, 3])
+            ->orderBy('rank', 'asc')
+            ->select(['id', 'name'])
+            ->get();
     }
 
 }

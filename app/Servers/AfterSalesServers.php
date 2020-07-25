@@ -20,9 +20,11 @@ use Illuminate\Database\Eloquent\Builder;
  *
  * @author wangxh
  */
-class AfterSalesServers {
+class AfterSalesServers
+{
 
-    public function getList($params) {
+    public function getList($params)
+    {
 
         $size = $params['size'] ?? 10;
         $field = ['id', 'service_num', 'order_id', 'order_detail_id',
@@ -79,9 +81,9 @@ class AfterSalesServers {
                 break;
             case 99:
             case 70:
-                $query->where(function($query) {
+                $query->where(function ($query) {
                     $query->where('user_cancel', '=', 1)
-                            ->orWhere('status', '=', 70);
+                        ->orWhere('status', '=', 70);
                 });
                 break;
         }
@@ -129,4 +131,67 @@ class AfterSalesServers {
         return $list;
     }
 
+    //审核,鉴定
+    public function statusChange($params, $uid)
+    {
+        $flag = $params['flag'] ?? 0;
+        $id = $params['id'] ?? 0;
+        $value = $params['value'] ?? 0;
+        if (empty($flag) || empty($id) || empty($value)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check = M2R::find($id);
+        if (!$check) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+        $now_date = date('Y-m-d H:i:s');
+
+        if ($flag == 'check') {
+            if ($check->status == 10) {
+                if ($value == 1) {
+                    //通过
+                    if ($check->type == 2) {
+                        //退货
+                        $check->status = 20;
+                    } else {
+                        //只退款
+                        $check->status = 40;
+                    }
+                    $check->is_check_reject = 2;
+                } else {
+                    //驳回
+                    $check->status = 70;
+                    $check->is_check_reject = 1;
+                }
+
+                $check->pass_at = $now_date;
+                $check->check_reject_at = $now_date;
+                $check->check_remark = $params['remark'] ?? '';
+
+                $res = $check->save();
+            } else {
+                return ['code' => false, 'msg' => '状态错误'];
+            }
+        } elseif ($flag == 'identify') {
+            if ($check->status == 30) {
+                $check->status = 40;
+                $check->is_authenticate_reject = 2;
+                $check->authenticate_reject_at = $now_date;
+                $check->check_remark = $params['remark'] ?? '';
+                $res = $check->save();
+            } else {
+                return ['code' => false, 'msg' => '状态错误'];
+            }
+        } else {
+            return ['code' => false, 'msg' => '参数错误 flag'];
+        }
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败'];
+        }
+    }
+
+    //todo 退款动作
 }

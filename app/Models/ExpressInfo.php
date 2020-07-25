@@ -13,7 +13,8 @@ namespace App\Models;
  *
  * @author wangxh
  */
-class ExpressInfo extends Base {
+class ExpressInfo extends Base
+{
 
     protected $table = 'nlsg_express_info';
 

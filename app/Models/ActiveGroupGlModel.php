@@ -6,23 +6,25 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class ActiveGroupGlModel extends Base {
+class ActiveGroupGlModel extends Base
+{
 
     protected $table = 'nlsg_active_group_list';
 
-    protected function getListDataFromDb() {
+    protected function getListDataFromDb()
+    {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
 
         $list = DB::table('nlsg_active_group_list')
-                ->where('status', '=', 1)
-                ->where('end_time', '>', $now_date)
-                ->orderBy('rank', 'asc')
-                ->orderBy('id', 'asc')
-                ->select(['id', 'title', 'begin_time', 'end_time',
-                    'ad_begin_time', 'pre_begin_time', 'lace_img',
-                    'wx_share_title', 'wx_share_img', 'wx_share_desc'])
-                ->get();
+            ->where('status', '=', 1)
+            ->where('end_time', '>', $now_date)
+            ->orderBy('rank', 'asc')
+            ->orderBy('id', 'asc')
+            ->select(['id', 'title', 'begin_time', 'end_time',
+                'ad_begin_time', 'pre_begin_time', 'lace_img',
+                'wx_share_title', 'wx_share_img', 'wx_share_desc'])
+            ->get();
 
         $gmlModel = new ActiveGroupGmlModel();
         foreach ($list as $v) {
@@ -47,7 +49,8 @@ class ActiveGroupGlModel extends Base {
     }
 
     //获取当前未开始活动数据
-    public function getList($params = []) {
+    public function getList($params = [])
+    {
         $expire_num = 300;
         $cache_key_name = 'active_group_list';
 
@@ -63,7 +66,7 @@ class ActiveGroupGlModel extends Base {
 //                Cache::add($cache_key_name, $list, $expire_num);
             }
             if ($list === '0') {
-                 return [];
+                return [];
             }
             //如果指定id 就直传一个
             if ($params['id'] ?? false) {
@@ -102,15 +105,15 @@ class ActiveGroupGlModel extends Base {
     }
 
     //关联活动模块表
-    public function module_list($id) {
-        $res = DB::table('nlsg_active_group_module_list')
-                ->where('aid', '=', $id)
-                ->where('status', '=', 1)
-                ->orderBy('rank', 'asc')
-                ->orderBy('id', 'desc')
-                ->select(['id', 'title'])
-                ->get();
-        return $res;
+    public function module_list($id)
+    {
+        return DB::table('nlsg_active_group_module_list')
+            ->where('aid', '=', $id)
+            ->where('status', '=', 1)
+            ->orderBy('rank', 'asc')
+            ->orderBy('id', 'desc')
+            ->select(['id', 'title'])
+            ->get();
     }
 
 }

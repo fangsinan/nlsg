@@ -19,9 +19,26 @@ use App\servers\AfterSalesServers;
  */
 class AfterSalesController extends Controller {
 
-    public function list(Request $request) {        
+    //todo 售后列表和详情
+    public function list(Request $request) {
         $servers = new AfterSalesServers();
         $data = $servers->getList($request->input());
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
+    //todo 审核,鉴定
+    public function statusChange(Request $request) {
+        if (empty($this->user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+
+        $model = new AfterSalesServers();
+        $data = $model->statusChange($request->input(), $this->user['id']);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
