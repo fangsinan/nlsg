@@ -1,6 +1,9 @@
 <?php
 
 return [
+
+    'is_new_time' => date('Y-m-d H:i:s',strtotime("-1 week")),
+
     //提现
     'Withdrawals'=>[
         'url'=>'https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers',
