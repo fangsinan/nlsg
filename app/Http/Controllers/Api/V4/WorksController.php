@@ -97,6 +97,7 @@ class WorksController extends Controller
         $is_free = $request->input('is_free',0);
 
         $user_id = $this->user['id'] ?? 0;
+
         switch ($order){
             case 1:
                 $order_str = 'subscribe_num';
