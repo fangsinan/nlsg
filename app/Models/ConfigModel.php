@@ -16,12 +16,14 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class ConfigModel extends Base {
+class ConfigModel extends Base
+{
 
     protected $table = 'nlsg_config';
 
     //1:邮费  2:特价优先级
-    public static function getData($id) {
+    public static function getData($id)
+    {
         $expire_num = 3600;
         $cache_key_name = 'v4_config_' . $id;
 
@@ -33,7 +35,8 @@ class ConfigModel extends Base {
         return $res;
     }
 
-    protected static function getFromDb($id) {
+    protected static function getFromDb($id)
+    {
         $res = ConfigModel::find($id)->toArray();
         return $res['value'];
     }
