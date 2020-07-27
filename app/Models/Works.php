@@ -34,7 +34,7 @@ class Works extends Base
             return false;
         }
 
-        $lists= Works::select('id','user_id','title','cover_img','subtitle','price')
+        $lists= Works::select('id','user_id','title','cover_img','subtitle','price','is_free','is_pay')
             ->with(['user'=>function($query){
                 $query->select('id','nickname');
             }])
@@ -43,10 +43,13 @@ class Works extends Base
             ->orderBy('created_at','desc')
             ->get()
             ->toArray();
+        
+        $time = date('Y-m-d H:i:s',strtotime("-1 week"));
         foreach ($lists as &$v) {
-            $v['is_new'] = 1;
-            $v['is_free']= 1;
-            $v['is_pay'] = 0;
+            $v['is_new'] = 0;
+            if($v['works_update_time'] > $time){
+                $v['is_new'] = 1;
+            }
         }
         return $lists;
 
