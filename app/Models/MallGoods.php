@@ -5,20 +5,22 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class MallGoods extends Base {
+class MallGoods extends Base
+{
 
     protected $table = 'nlsg_mall_goods';
 
-    public function getList($params, $user = [], $cache = true) {
+    public function getList($params, $user = [], $cache = true)
+    {
 
         $list = $this->getListData($params, $cache);
 
         //收藏
         if ($user['id'] ?? 0) {
             $col_list = Collection::where('user_id', '=', $user['id'])
-                    ->where('type', '=', 3)
-                    ->select(['relation_id as goods_id'])
-                    ->get();
+                ->where('type', '=', 3)
+                ->select(['relation_id as goods_id'])
+                ->get();
             if ($col_list->isEmpty()) {
                 $col_list = [];
             } else {
@@ -46,14 +48,15 @@ class MallGoods extends Base {
             $v->active_group_list = array_values($temp_gl);
         }
 
-        //价格类       
+        //价格类
         $getPriceTools = new GetPriceTools();
         $getPriceTools->goodsList($list, $user['level'] ?? 0, $user['id'] ?? 0, $user['is_staff'] ?? 0);
 
         return $list;
     }
 
-    protected function getListData($params, $cache = true) {
+    protected function getListData($params, $cache = true)
+    {
         $cache_key_name = 'goods_list'; //哈希组名
         //缓存放入 goods_list
         $cache_name_arr['page'] = $params['page'] ?? 1;
@@ -63,11 +66,11 @@ class MallGoods extends Base {
         $cache_name_arr['ob'] = $params['ob'] ?? '';
         $params['cid'] = $params['cid'] ?? '';
         $cache_name_arr['cid'] = is_array($params['cid']) ?
-                implode(',', $params['cid']) : $params['cid'];
+            implode(',', $params['cid']) : $params['cid'];
 
         if ($params['ids_str'] ?? false) {
             $cache_name_arr['ids'] = is_array($params['ids_str']) ?
-                    implode(',', $params['ids_str']) : $params['ids_str'];
+                implode(',', $params['ids_str']) : $params['ids_str'];
         } else {
             $cache_name_arr['ids'] = '';
         }
@@ -88,19 +91,21 @@ class MallGoods extends Base {
     }
 
     //获取商品sku价格
-    public function sku_price_list($id) {
+    public function sku_price_list($id)
+    {
         $res = DB::table(MallSku::$table)
-                ->where('goods_id', '=', $id)
-                ->where('status', '=', 1)
-                ->select(['id', 'sku_number', 'price', 'original_price',
-                    'cost', 'promotion_cost'])
-                ->get();
+            ->where('goods_id', '=', $id)
+            ->where('status', '=', 1)
+            ->select(['id', 'sku_number', 'price', 'original_price',
+                'cost', 'promotion_cost'])
+            ->get();
         return $res;
     }
 
     //***************************ORM重写***************************************
 
-    public function getListDataFromDb($params) {
+    public function getListDataFromDb($params)
+    {
 
         if (($params['invalid'] ?? 0) == 0) {
             $query = MallGoods::where('status', '=', 2);
@@ -117,8 +122,8 @@ class MallGoods extends Base {
 
         if ($params['zone_id'] ?? 0) {
             $temp_gl = MallGoodsListDetails::where('list_id', '=', $params['zone_id'])
-                    ->select(['goods_id'])
-                    ->get();
+                ->select(['goods_id'])
+                ->get();
             if ($temp_gl->isEmpty()) {
                 return [];
             } else {
@@ -224,39 +229,44 @@ class MallGoods extends Base {
         return $res;
     }
 
-    public function sku_list() {
+    public function sku_list()
+    {
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
-                        ->where('status', '=', 1)
-                        ->select(['id', 'goods_id', 'sku_number', 'picture',
-                            'original_price', 'price', 'stock']);
+            ->where('status', '=', 1)
+            ->select(['id', 'goods_id', 'sku_number', 'picture',
+                'original_price', 'price', 'stock']);
     }
 
-    public function sku_list_all() {
+    public function sku_list_all()
+    {
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
-                        ->select(['id', 'goods_id', 'sku_number', 'picture',
-                            'original_price', 'price', 'stock', 'status']);
+            ->select(['id', 'goods_id', 'sku_number', 'picture',
+                'original_price', 'price', 'stock', 'status']);
     }
 
-    public function tos_bind_list() {
+    public function tos_bind_list()
+    {
         return $this->hasMany('App\Models\MallTosBind', 'goods_id', 'id')
-                        ->select(['goods_id', 'tos_id']);
+            ->select(['goods_id', 'tos_id']);
     }
 
-    public function picture_list() {
+    public function picture_list()
+    {
         return $this->hasMany('App\Models\MallPicture', 'goods_id', 'id')
-                        ->select(['url', 'is_main', 'is_video', 'duration',
-                            'goods_id', 'cover_img'])
-                        ->where('status', '=', 1)
-                        ->orderBy('is_video', 'desc')
-                        ->orderBy('is_main', 'desc')
-                        ->orderBy('rank', 'asc')
-                        ->orderBy('id', 'asc');
+            ->select(['url', 'is_main', 'is_video', 'duration',
+                'goods_id', 'cover_img'])
+            ->where('status', '=', 1)
+            ->orderBy('is_video', 'desc')
+            ->orderBy('is_main', 'desc')
+            ->orderBy('rank', 'asc')
+            ->orderBy('id', 'asc');
     }
 
-    public function category_list() {
+    public function category_list()
+    {
         return $this->hasOne('App\Models\MallCategory', 'id', 'category_id')
-                        ->select(['id', 'name'])
-                        ->where('status', '=', 1);
+            ->select(['id', 'name'])
+            ->where('status', '=', 1);
     }
 
     /**
@@ -264,13 +274,14 @@ class MallGoods extends Base {
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexGoods($ids) {
+    public function getIndexGoods($ids)
+    {
         $lists = MallGoods::query()
-                ->select('id', 'name', 'picture', 'original_price', 'price')
-                ->whereIn('id', $ids)
-                ->orderBy('created_at', 'desc')
-                ->take(10)
-                ->get();
+            ->select('id', 'name', 'picture', 'original_price', 'price')
+            ->whereIn('id', $ids)
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
         if ($lists->isEmpty()) {
             return [];
         } else {
@@ -278,14 +289,15 @@ class MallGoods extends Base {
         }
     }
 
-    public function collect($goods_id, $user_id) {
+    public function collect($goods_id, $user_id)
+    {
         if (empty($goods_id)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
         $check = Collection::where('user_id', '=', $user_id)
-                ->where('relation_id', '=', $goods_id)
-                ->where('type', '=', 3)
-                ->first();
+            ->where('relation_id', '=', $goods_id)
+            ->where('type', '=', 3)
+            ->first();
         if ($check) {
             $res = $check->forceDelete();
         } else {
@@ -309,7 +321,8 @@ class MallGoods extends Base {
      * @param type $params
      * @param type $user
      */
-    public function groupByGoodsInfo($params, $user) {
+    public function groupByGoodsInfo($params, $user)
+    {
         $group_buy_id = $params['group_buy_id'] ?? 0;
         if (empty($group_buy_id)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -317,13 +330,13 @@ class MallGoods extends Base {
         $now = time();
         $now_data = date('Y-m-d H:i:s', $now);
         $check_id = SpecialPriceModel::where('group_name', '=', $group_buy_id)
-                ->where('status', '=', 1)
-                ->where('type', '=', 4)
-                ->where('begin_time', '<=', $now_data)
-                ->where('end_time', '>=', $now_data)
-                ->select(['id', 'goods_id', 'group_num',
-                    'goods_price', 'sku_number', 'group_price'])
-                ->get();
+            ->where('status', '=', 1)
+            ->where('type', '=', 4)
+            ->where('begin_time', '<=', $now_data)
+            ->where('end_time', '>=', $now_data)
+            ->select(['id', 'goods_id', 'group_num',
+                'goods_price', 'sku_number', 'group_price'])
+            ->get();
 
         if ($check_id->isEmpty()) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -333,14 +346,14 @@ class MallGoods extends Base {
         $sku_number_list = array_column($check_id, 'sku_number');
 
         $data = $this->getListData(
-                [
-                    'ids_str' => [$check_id[0]['goods_id']],
-                    'get_sku' => 1,
-                    'get_details' => 1,
-                    'page' => 1,
-                    'size' => 1
-                ],
-                true
+            [
+                'ids_str' => [$check_id[0]['goods_id']],
+                'get_sku' => 1,
+                'get_details' => 1,
+                'page' => 1,
+                'size' => 1
+            ],
+            true
         );
         $data = $data[0];
 
@@ -361,28 +374,30 @@ class MallGoods extends Base {
             }
         }
 
-        return $data;
+        return [$data];
     }
 
     // 全局搜索用 $keywords
-    static function search($keywords) {
+    static function search($keywords)
+    {
         $res = MallGoods::select('id', 'name', 'subtitle', 'original_price', 'price', 'picture')
-                        ->where('status', 2)
-                        //->where('can_sale', 1)
-                        ->where(function ($query)use($keywords) {
-                            $query->orWhere('name', 'LIKE', "%$keywords%");
-                            $query->orWhere('subtitle', 'LIKE', "%$keywords%");
-                        })->get();
+            ->where('status', 2)
+            //->where('can_sale', 1)
+            ->where(function ($query) use ($keywords) {
+                $query->orWhere('name', 'LIKE', "%$keywords%");
+                $query->orWhere('subtitle', 'LIKE', "%$keywords%");
+            })->get();
 
         return ['res' => $res, 'count' => $res->count()];
     }
 
-    public function forYourReference($num, $user = []) {
+    public function forYourReference($num, $user = [])
+    {
         $id_list = MallGoods::where('status', '=', 2)
-                        ->orderByRaw('rand()')
-                        ->limit($num)
-                        ->select(['id'])
-                        ->get()->toArray();
+            ->orderByRaw('rand()')
+            ->limit($num)
+            ->select(['id'])
+            ->get()->toArray();
 
         $id_list = array_column($id_list, 'id');
         $id_list = implode(',', $id_list);
@@ -392,8 +407,8 @@ class MallGoods extends Base {
             'page' => 1,
             'size' => 1,
             'get_all' => 1
-                ],
-                $user, false);
+        ],
+            $user, false);
 
         return $res;
     }

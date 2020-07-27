@@ -181,11 +181,10 @@ class FreightTemplate extends Base
 
     public function getFreightDataFromDb($id)
     {
-        $res = self::where('type', '=', 1)
+        return self::where('type', '=', 1)
             ->with(['f_details', 'f_details.d_list'])
             ->select(['id', 'name'])
             ->find($id)->toArray();
-        return $res;
     }
 
 }
