@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class FreightTemplate extends Base {
+class FreightTemplate extends Base
+{
 
     protected $table = 'nlsg_freight_template';
 
-    public function listOfShop($flag) {
+    public function listOfShop($flag)
+    {
         $cache_key_name = 'freight_template_list';
         $expire_num = CacheTools::getExpire('freight_template_list');
         $now = date('Y-m-d H:i:s');
@@ -22,12 +24,12 @@ class FreightTemplate extends Base {
         $res = Cache::get($cache_key_name);
         if (empty($res)) {
             $res = self::whereIn('type', [2, 3])
-                    ->where('status', '=', 1)
-                    ->select(['id', 'type', 'name',
-                        'admin_name', 'admin_phone',
-                        'province', 'city', 'area', 'details',
-                        'start_time', 'end_time'])
-                    ->get();
+                ->where('status', '=', 1)
+                ->select(['id', 'type', 'name',
+                    'admin_name', 'admin_phone',
+                    'province', 'city', 'area', 'details',
+                    'start_time', 'end_time'])
+                ->get();
             Cache::add($cache_key_name, $res, $expire_num);
         }
 
@@ -46,14 +48,16 @@ class FreightTemplate extends Base {
         return $list;
     }
 
-    public function f_details() {
+    public function f_details()
+    {
         return $this->hasMany('App\Models\FreightTemplateDetails', 'pid', 'id')
-                        ->select(['id', 'name', 'pid', 'type', 'start_price', 'count_type',
-                            'count_start_line', 'skip_num', 'skip_price',])
-                        ->where('status', '=', 1);
+            ->select(['id', 'name', 'pid', 'type', 'start_price', 'count_type',
+                'count_start_line', 'skip_num', 'skip_price',])
+            ->where('status', '=', 1);
     }
 
-    public static function getFreightMoney($info, $address_info) {
+    public static function getFreightMoney($info, $address_info)
+    {
 
         $freight_id = MallGoods::find($info['goods_id'])->freight_id;
         if ($freight_id) {
@@ -86,7 +90,8 @@ class FreightTemplate extends Base {
         }
     }
 
-    public static function computeMoney($info, $v) {
+    public static function computeMoney($info, $v)
+    {
         //计数类型 1:件数  2:重量  3:体积
         $all_skip_price = 0;
         switch (intval($v['count_type'])) {
@@ -117,7 +122,8 @@ class FreightTemplate extends Base {
         return GetPriceTools::PriceCalc('+', $v['start_price'], $all_skip_price);
     }
 
-    public static function checkAreaIsIn($address, $list) {
+    public static function checkAreaIsIn($address, $list)
+    {
         $list = array_column($list, 'area_id');
         $area_id = intval(($address['area'] == 0) ? $address['city'] : $address['area']);
 
@@ -160,7 +166,8 @@ class FreightTemplate extends Base {
     }
 
     //获取运费模板详细配置
-    public function getFreightData($id) {
+    public function getFreightData($id)
+    {
         $cache_key_name = 'freight_template'; //哈希组名
         $cache_name = 'id_' . $id;
         $expire_num = CacheTools::getExpire('freight_template');
@@ -172,11 +179,12 @@ class FreightTemplate extends Base {
         return $list;
     }
 
-    public function getFreightDataFromDb($id) {
+    public function getFreightDataFromDb($id)
+    {
         $res = self::where('type', '=', 1)
-                        ->with(['f_details', 'f_details.d_list'])
-                        ->select(['id', 'name'])
-                        ->find($id)->toArray();
+            ->with(['f_details', 'f_details.d_list'])
+            ->select(['id', 'name'])
+            ->find($id)->toArray();
         return $res;
     }
 

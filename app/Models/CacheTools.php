@@ -15,10 +15,12 @@ use Illuminate\Support\Facades\DB;
  *
  * @author wangxh
  */
-class CacheTools {
+class CacheTools
+{
 
     //获取缓存时间  单位秒
-    public static function getExpire($flag) {
+    public static function getExpire($flag)
+    {
         if (0) {
             $sort_exprice = 300;
             $normal_exprice = 3600;

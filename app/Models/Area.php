@@ -16,11 +16,13 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class Area extends Base {
+class Area extends Base
+{
 
     protected $table = 'nlsg_area';
 
-    public static function getData() {
+    public static function getData()
+    {
         if (0) {
             $cache_key_name = 'area_list';
             $expire_num = CacheTools::getExpire('area_list');
@@ -34,19 +36,19 @@ class Area extends Base {
         return $res;
     }
 
-    public static function getDataFromDb() {
-        $list = self::where('pid', '=', 0)
-                ->with(['area_list', 'area_list.area_list'])
-                ->select(['id', 'name', 'pid'])
-                ->get();
-        return $list;
+    public static function getDataFromDb()
+    {
+        return self::where('pid', '=', 0)
+            ->with(['area_list', 'area_list.area_list'])
+            ->select(['id', 'name', 'pid'])
+            ->get();
     }
 
-    public function area_list() {
+    public function area_list()
+    {
         return $this->hasMany('App\Models\Area', 'pid', 'id')
-                        ->select(['id', 'name', 'pid']);
+            ->select(['id', 'name', 'pid']);
     }
 
-    
 
 }
