@@ -833,8 +833,18 @@ class MallController extends Controller
         return $this->success($res);
     }
 
-    public function buyerReadingForGroupBuy(){
-        $res = \App\Models\ConfigModel::getData(16);
+    /**
+     * 拼团购买须知
+     * @api {get} /api/v4/goods/buyer_reading_gb 拼团购买须知
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/goods/buyer_reading_gb
+     * @apiGroup  Mall
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/buyer_reading_gb
+     * @apiDescription 拼团购买须知
+     */
+    public function buyerReadingForGroupBuy()
+    {
+        $res = \App\Models\ConfigModel::getData(17);
         $res = json_decode($res);
         return $this->success($res);
     }

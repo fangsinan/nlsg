@@ -360,7 +360,7 @@ class MallGoods extends Base
         $data['order_num'] = MallOrder::where('sp_id', $group_buy_id)
             ->where('status', '>', 1)
             ->count();
-        
+
         if ($check_id[0]['goods_price'] > 0) {
             $data['price'] = $check_id[0]['goods_price'];
         }
