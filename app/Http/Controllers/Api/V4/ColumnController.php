@@ -104,7 +104,7 @@ class ColumnController extends Controller
         ])->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->get($field);
         //7天前的时间
-        $time = date('Y-m-d H:i:s',strtotime("-1 week"));
+        $time = Config('web.is_new_time');
         $uid = $this->user['id'] ?? 0;
         foreach ($list as &$v) {
             $v['is_sub'] = Subscribe::isSubscribe($uid,$v['id']);

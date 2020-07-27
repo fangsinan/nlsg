@@ -143,7 +143,7 @@ class WorksController extends Controller
 
 
 
-        $time = date('Y-m-d H:i:s',strtotime("-1 week"));
+        $time =Config('web.is_new_time');
         foreach ($worksData['data'] as $key=>$val){
             $is_sub = Subscribe::isSubscribe($user_id,$val['works']['id'],2);
             if($hide == 1){

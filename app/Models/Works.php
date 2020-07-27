@@ -43,8 +43,8 @@ class Works extends Base
             ->orderBy('created_at','desc')
             ->get()
             ->toArray();
-        
-        $time = date('Y-m-d H:i:s',strtotime("-1 week"));
+
+        $time = Config('web.is_new_time');
         foreach ($lists as &$v) {
             $v['is_new'] = 0;
             if($v['works_update_time'] > $time){
