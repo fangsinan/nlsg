@@ -19,7 +19,7 @@ class WorksCategoryRelation extends Base {
         return $this->belongsTo('App\Models\WorksCategory','category_id','id');
     }
 
-    public function Works()
+    public function works()
     {
         return $this->belongsTo('App\Models\Works','work_id');
     }

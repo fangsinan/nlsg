@@ -125,13 +125,22 @@ class WorksController extends Controller
         if( $is_free )      { $works_where['is_free'] = $is_free;   }
 
 
-        $worksData = WorksCategoryRelation::with([
-            'Works' =>function($query) use($order_str,$works_where){
-                $query->where($works_where)->select("*")
-                    ->orderBy($order_str,'desc')->groupBy('id');
-            }])->select()->where($where)
-            ->paginate($this->page_per_page);
-        $worksData = $worksData->toArray();
+//        $worksData = WorksCategoryRelation::with([
+//            'works' =>function($query) use($order_str,$works_where){
+//                $query->where($works_where)->select("*")
+//                    ->orderBy($order_str,'desc')->groupBy('id');
+//            }])->select()->where($where)
+//            ->paginate($this->page_per_page)->toArray();
+
+        $worksData = WorksCategoryRelation::with(['works' => function($query){
+            $query->select("*");
+        }])->whereHas('works', function ($query) use ($works_where){
+                 $query->where($works_where);
+        })->select("*")->where($where)
+        ->paginate($this->page_per_page)->toArray();
+
+
+
 
         $time = date('Y-m-d H:i:s',strtotime("-1 week"));
         foreach ($worksData['data'] as $key=>$val){

@@ -18,8 +18,8 @@ use Illuminate\Http\Request;
 class ListenBookController extends Controller
 {
     /**
-     * @api {get} /api/v4/book/get_listen_detail  听书-听书首页
-     * @apiName get_listen_detail
+     * @api {get} /api/v4/book/get_book_index  听书-听书首页
+     * @apiName get_book_index
      * @apiVersion 1.0.0
      * @apiGroup book
      *
