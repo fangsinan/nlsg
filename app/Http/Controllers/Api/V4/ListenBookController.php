@@ -288,9 +288,18 @@ class ListenBookController extends Controller
      */
     public function getNewBookList(Request $request){
 
-        $user_id = $request->input('user_id',0);
-        $works = Works::select(['id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
-            ->where(['status' => 4 , 'is_audio_book' => 1,])
+
+        $user_id = $this->user['id'] ?? 0;
+//        $user_id = $request->input('user_id',0);
+//        $works = Works::select(['id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
+//            ->where(['status' => 4 , 'is_audio_book' => 1,])
+//            ->paginate($this->page_per_page)->toArray();
+
+
+        $works = Works::select(['id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','user_id'])
+            ->with(['user'=>function($query){
+            $query->select('id','nickname', 'headimg');
+        }])->where(['status' => 4 , 'is_audio_book' => 1,])
             ->paginate($this->page_per_page)->toArray();
 
         foreach ($works['data'] as $key=>$val){
