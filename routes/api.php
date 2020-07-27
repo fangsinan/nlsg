@@ -114,6 +114,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('goods/group_buy', 'MallController@groupBuyList');
     Route::get('goods/group_buy_info', 'MallController@groupByGoodsInfo');
     Route::get('goods/group_buy_team_list', 'MallOrderController@groupByTeamList');
+    Route::get('goods/group_buy_scrollbar', 'MallOrderController@gbScrollbar');
     Route::get('goods/service_description', 'MallController@mallServiceDescription');
     Route::get('goods/buyer_reading', 'MallController@buyerReading');
     Route::get('goods/buyer_reading_gb', 'MallController@buyerReadingForGroupBuy');

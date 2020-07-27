@@ -15,16 +15,18 @@ use Illuminate\Support\Facades\DB;
  *
  * @author wangxh
  */
-class MallOrderGroupBuy extends Base {
+class MallOrderGroupBuy extends Base
+{
 
     protected $table = 'nlsg_mall_order';
 
-    public function prepareCreateGroupBuyOrder($params, $user) {
-        $sku_list = $this->createGroupBuyOrderTool($params, $user);
-        return $sku_list;
+    public function prepareCreateGroupBuyOrder($params, $user)
+    {
+        return $this->createGroupBuyOrderTool($params, $user);
     }
 
-    public function createGroupBuyOrder($params, $user) {
+    public function createGroupBuyOrder($params, $user)
+    {
         $now = time();
         $dead_time = ConfigModel::getData(12);
         $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
@@ -119,8 +121,8 @@ class MallOrderGroupBuy extends Base {
         }
         //********************mall_goods销量部分********************
         $goods_sale_res = DB::table('nlsg_mall_goods')
-                ->where('id', '=', $data['sku_list']['goods_id'])
-                ->increment('sales_num', $data['sku_list']['num']);
+            ->where('id', '=', $data['sku_list']['goods_id'])
+            ->increment('sales_num', $data['sku_list']['num']);
         if (!$goods_sale_res) {
             DB::rollBack();
             return ['code' => false, 'msg' => '订单提交失败,请重试.',
@@ -128,8 +130,8 @@ class MallOrderGroupBuy extends Base {
         }
         //********************special_price部分********************
         $sp_res = DB::table('nlsg_special_price')
-                ->where('id', '=', $data['sku_list']['group_buy_id'])
-                ->increment('use_stock');
+            ->where('id', '=', $data['sku_list']['group_buy_id'])
+            ->increment('use_stock');
         if (!$sp_res) {
             DB::rollBack();
             return ['code' => false, 'msg' => '订单提交失败,请重试.',
@@ -160,7 +162,7 @@ class MallOrderGroupBuy extends Base {
                     'ps' => 'coupon freight error'];
             }
         }
-        //********************拼团记录表部分********************  
+        //********************拼团记录表部分********************
         $gl_data['group_buy_id'] = $data['sku_list']['group_buy_id'];
         $gl_data['group_name'] = $data['sku_list']['group_name'];
         $gl_data['order_id'] = $order_res;
@@ -173,7 +175,7 @@ class MallOrderGroupBuy extends Base {
             //如果是开团 需要指定开团有效期
             $gl_data['begin_at'] = $now_date;
             $gl_data['end_at'] = date('Y-m-d H:i:59',
-                    ($now + $data['sku_list']['group_life'] * 60 + 60)
+                ($now + $data['sku_list']['group_life'] * 60 + 60)
             );
         } else {
             $gl_data['is_captain'] = 0;
@@ -195,7 +197,8 @@ class MallOrderGroupBuy extends Base {
         ];
     }
 
-    public function createGroupBuyKey($uid) {
+    public function createGroupBuyKey($uid)
+    {
         $now = time();
         $d = date('ymd', $now);
         $u = str_pad($uid, 8, 0, STR_PAD_LEFT);
@@ -203,7 +206,8 @@ class MallOrderGroupBuy extends Base {
         return $d . $u . str_pad($s, 5, 0, STR_PAD_LEFT) . rand(100, 999);
     }
 
-    public function createGroupBuyOrderTool($params, $user, $check_sub = false) {
+    public function createGroupBuyOrderTool($params, $user, $check_sub = false)
+    {
         $now_date = date('Y-m-d H:i:s');
         $can_sub = true;
         //检查参数逻辑
@@ -226,7 +230,7 @@ class MallOrderGroupBuy extends Base {
 
         //校验商品秒杀状态是否可用
         $check_sku_res = $this->checkSkuCanGroupBuy(
-                $sku_list['goods_id'], $sku_list['sku_number']
+            $sku_list['goods_id'], $sku_list['sku_number']
         );
 
         if (!is_object($check_sku_res) && (($check_sku_res['code'] ?? true) === false)) {
@@ -245,11 +249,11 @@ class MallOrderGroupBuy extends Base {
 
 
         $all_original_price = GetPriceTools::PriceCalc(
-                        '*', $sku_list['original_price'], $sku_list['num']
+            '*', $sku_list['original_price'], $sku_list['num']
         );
 
         $all_price = GetPriceTools::PriceCalc(
-                        '*', $sku_list['group_buy_price'], $sku_list['num']
+            '*', $sku_list['group_buy_price'], $sku_list['num']
         );
 
         $temp_sp_cut = GetPriceTools::PriceCalc('-', $sku_list['original_price'], $sku_list['group_buy_price']);
@@ -278,7 +282,7 @@ class MallOrderGroupBuy extends Base {
 
         //需要排除限定商品得优惠券
         $coupon_list = Coupon::getCouponListForOrder(
-                        $user['id'], $all_price, $goods_id_list
+            $user['id'], $all_price, $goods_id_list
         );
 
         if ($params['coupon_goods_id']) {
@@ -343,7 +347,7 @@ class MallOrderGroupBuy extends Base {
         if ($freight_free_flag === false) {
             if (!empty($used_address)) {
                 $sku_list['freight_money'] = FreightTemplate::getFreightMoney(
-                                $sku_list, $used_address
+                    $sku_list, $used_address
                 );
             }
             if (($sku_list['freight_money'] ?? 0) > $freight_money) {
@@ -398,7 +402,8 @@ class MallOrderGroupBuy extends Base {
         return $res;
     }
 
-    public function checkGroupBuyParams(&$params, $user_id) {
+    public function checkGroupBuyParams(&$params, $user_id)
+    {
         if (empty($params['sku'])) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => 'sku'];
         }
@@ -456,16 +461,17 @@ class MallOrderGroupBuy extends Base {
         }
     }
 
-    public function checkSkuCanGroupBuy($goods_id, $sku) {
+    public function checkSkuCanGroupBuy($goods_id, $sku)
+    {
         $now_date = date('Y-m-d H:i:s');
 
         $sp_data = SpecialPriceModel::where('goods_id', '=', $goods_id)
-                ->where('sku_number', '=', $sku)
-                ->where('type', '=', 4)
-                ->where('goods_type', '=', 1)
-                ->where('begin_time', '<=', $now_date)
-                ->where('end_time', '>=', $now_date)
-                ->get();
+            ->where('sku_number', '=', $sku)
+            ->where('type', '=', 4)
+            ->where('goods_type', '=', 1)
+            ->where('begin_time', '<=', $now_date)
+            ->where('end_time', '>=', $now_date)
+            ->get();
 
         //$spModel = new SpecialPriceModel();
         //$sp_data = $spModel->getSpData($goods_id, 1);
@@ -507,7 +513,8 @@ class MallOrderGroupBuy extends Base {
      * @param type $params
      * @param type $user
      */
-    public function groupByTeamList($params, $user) {
+    public function groupByTeamList($params, $user)
+    {
         $group_buy_id = $params['group_buy_id'] ?? 0;
         $flag = $params['flag'] ?? 1; //1两条  2全部
         $group_key = $params['group_key'] ?? 0;
@@ -519,50 +526,53 @@ class MallOrderGroupBuy extends Base {
 
         //成功队伍数量
         $team_success_count = DB::table('nlsg_mall_group_buy_list as gbl')
-                ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
-                ->where('gbl.group_name', '=', $group_buy_id)
-                ->where('gbl.is_success', '=', 1)
-                ->where('gbl.is_captain', '=', 1)
-                ->count();
+            ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
+            ->where('gbl.group_name', '=', $group_buy_id)
+            ->where('gbl.is_success', '=', 1)
+            ->where('gbl.is_captain', '=', 1)
+            ->count();
         //队伍数量
         $team_count = DB::table('nlsg_mall_group_buy_list as gbl')
-                ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
-                ->where('gbl.group_name', '=', $group_buy_id)
-                ->where('gbl.is_captain', '=', 1)
-                ->where('gbl.is_fail', '=', 0)
-                ->count();
+            ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
+            ->where('gbl.group_name', '=', $group_buy_id)
+            ->where('gbl.is_captain', '=', 1)
+            ->where('gbl.is_fail', '=', 0)
+            ->count();
         //开团列表 所差人数  剩余时间
         $query = MallGroupBuyList::where(
-                        'nlsg_mall_group_buy_list.group_name', '=', $group_buy_id
-                )->where('is_success', '=', 0)
-                ->where('is_captain', '=', 1)
-                ->where('is_fail', '=', 0)
-                ->where('end_at', '>', $now_date);
+            'nlsg_mall_group_buy_list.group_name', '=', $group_buy_id
+        )->where('is_success', '=', 0)
+            ->where('is_captain', '=', 1)
+            ->where('is_fail', '=', 0)
+            ->where('end_at', '>', $now_date);
 
         if ($group_key) {
             $query->where('group_key', '=', $group_key);
         }
 
         $query->join('nlsg_mall_order as nmo',
-                        'nlsg_mall_group_buy_list.order_id', '=', 'nmo.id')
-                ->join('nlsg_user as nuser',
-                        'nlsg_mall_group_buy_list.user_id', '=', 'nuser.id')
-                ->join('nlsg_special_price as nsp',
-                        'nlsg_mall_group_buy_list.group_buy_id', '=', 'nsp.id')
-                ->select(['nlsg_mall_group_buy_list.id',
-                    'nlsg_mall_group_buy_list.group_name',
-                    'nlsg_mall_group_buy_list.order_id',
-                    'nlsg_mall_group_buy_list.created_at',
-                    'nlsg_mall_group_buy_list.user_id',
-                    'nlsg_mall_group_buy_list.is_success',
-                    'nlsg_mall_group_buy_list.success_at',
-                    'nlsg_mall_group_buy_list.begin_at',
-                    'nlsg_mall_group_buy_list.end_at',
-                    'nuser.nickname', 'nuser.headimg',
-                    'nsp.group_num', 'nlsg_mall_group_buy_list.group_key'])
-                ->with(['teamOrderCount'])
-                ->orderBy('is_success', 'asc')
-                ->orderBy('nlsg_mall_group_buy_list.id', 'asc');
+            'nlsg_mall_group_buy_list.order_id', '=', 'nmo.id')
+            ->join('nlsg_user as nuser',
+                'nlsg_mall_group_buy_list.user_id', '=', 'nuser.id')
+            ->join('nlsg_special_price as nsp',
+                'nlsg_mall_group_buy_list.group_buy_id', '=', 'nsp.id')
+            ->select(['nlsg_mall_group_buy_list.id',
+                'nlsg_mall_group_buy_list.group_name',
+                'nlsg_mall_group_buy_list.order_id',
+                'nlsg_mall_group_buy_list.created_at',
+                'nlsg_mall_group_buy_list.user_id',
+                'nlsg_mall_group_buy_list.is_success',
+                'nlsg_mall_group_buy_list.success_at',
+                'nlsg_mall_group_buy_list.begin_at',
+                'nlsg_mall_group_buy_list.end_at',
+                DB::raw('UNIX_TIMESTAMP(nlsg_mall_group_buy_list.end_at) as end_timestamp'),
+                DB::raw('UNIX_TIMESTAMP(nlsg_mall_group_buy_list.begin_at) as begin_timestamp'),
+                DB::raw('UNIX_TIMESTAMP(nlsg_mall_group_buy_list.created_at) as created_timestamp'),
+                'nuser.nickname', 'nuser.headimg',
+                'nsp.group_num', 'nlsg_mall_group_buy_list.group_key'])
+            ->with(['teamOrderCount'])
+            ->orderBy('is_success', 'asc')
+            ->orderBy('nlsg_mall_group_buy_list.id', 'asc');
 
         if ($flag == 1) {
             $query->limit(2);
@@ -580,7 +590,8 @@ class MallOrderGroupBuy extends Base {
     }
 
     //用户拼团订单列表
-    public function userOrderList($params, $user, $flag = false) {
+    public function userOrderList($params, $user, $flag = false)
+    {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $user_id = $user['id'];
@@ -591,12 +602,12 @@ class MallOrderGroupBuy extends Base {
         //展示数据:订单编号,状态,商品列表,价格,数量,取消时间,金额
 
         $query = self::from('nlsg_mall_order as nmo')
-                ->join('nlsg_mall_group_buy_list as gbl', 'nmo.id', '=', 'gbl.order_id')
-                ->where('nmo.user_id', '=', $user_id)
-                ->where('nmo.order_type', '=', 3)
-                ->where('nmo.is_del', '=', 0)
-                ->limit($params['size'])
-                ->offset(($params['page'] - 1) * $params['size']);
+            ->join('nlsg_mall_group_buy_list as gbl', 'nmo.id', '=', 'gbl.order_id')
+            ->where('nmo.user_id', '=', $user_id)
+            ->where('nmo.order_type', '=', 3)
+            ->where('nmo.is_del', '=', 0)
+            ->limit($params['size'])
+            ->offset(($params['page'] - 1) * $params['size']);
 
         if (!empty($params['ordernum'])) {
             $query->where('nmo.ordernum', '=', $params['ordernum']);
@@ -608,19 +619,19 @@ class MallOrderGroupBuy extends Base {
                 break;
             case 10:
                 $query->where('nmo.status', '=', 10)
-                        ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 20:
                 $query->where('nmo.status', '=', 20)
-                        ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 30:
                 $query->where('nmo.status', '=', 30)
-                        ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 95:
                 $query->where('nmo.status', '=', 10)
-                        ->where('gbl.is_success', '=', 0);
+                    ->where('gbl.is_success', '=', 0);
                 break;
             case 99:
                 $query->where('nmo.is_stop', '=', 1);
@@ -655,7 +666,7 @@ class MallOrderGroupBuy extends Base {
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
-                $now_date . '" then FALSE ELSE TRUE END) ');
+            $now_date . '" then FALSE ELSE TRUE END) ');
         //$query->with(['orderDetails', 'orderDetails.goodsInfo']);
         //$query->select(['nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time',
         //     DB::raw('(case when nmo.`status` = 1 then 1
@@ -676,34 +687,37 @@ class MallOrderGroupBuy extends Base {
         return $list;
     }
 
-    public function orderDetails() {
+    public function orderDetails()
+    {
         return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
-                        ->select([
-                            'status', 'goods_id', 'num', 'id as details_id',
-                            'order_id', 'sku_history', 'comment_id'
-        ]);
+            ->select([
+                'status', 'goods_id', 'num', 'id as details_id',
+                'order_id', 'sku_history', 'comment_id'
+            ]);
     }
 
-    public function orderChild() {
+    public function orderChild()
+    {
         return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')
-                        ->groupBy('express_info_id')
-                        ->select([
-                            'status', 'order_id',
-                            'express_info_id',
-                            DB::raw('GROUP_CONCAT(order_detail_id) order_detail_id')
-        ]);
+            ->groupBy('express_info_id')
+            ->select([
+                'status', 'order_id',
+                'express_info_id',
+                DB::raw('GROUP_CONCAT(order_detail_id) order_detail_id')
+            ]);
     }
 
     //订单详情
-    public function orderInfo($user_id, $ordernum) {
+    public function orderInfo($user_id, $ordernum)
+    {
         if (empty($ordernum)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
         $getData = $this->userOrderList(
-                ['ordernum' => $ordernum],
-                ['id' => $user_id],
-                true
+            ['ordernum' => $ordernum],
+            ['id' => $user_id],
+            true
         );
 
         $data = $getData[0]->toArray();
@@ -769,40 +783,53 @@ class MallOrderGroupBuy extends Base {
         }
 
         unset(
-                $data['cost_price'], $data['freight'],
-                $data['vip_cut'], $data['price'],
-                $data['coupon_money'], $data['special_price_cut'],
-                $data['pay_time'], $data['pay_type'],
-                $data['bill_type'], $data['bill_title'],
-                $data['bill_number'], $data['bill_format'],
-                $data['order_details']
+            $data['cost_price'], $data['freight'],
+            $data['vip_cut'], $data['price'],
+            $data['coupon_money'], $data['special_price_cut'],
+            $data['pay_time'], $data['pay_type'],
+            $data['bill_type'], $data['bill_title'],
+            $data['bill_number'], $data['bill_format'],
+            $data['order_details']
         );
 
         return $data;
     }
 
-    public function getTeamUserListbyOrderId($order_id) {
+    public function getTeamUserListbyOrderId($order_id)
+    {
 
         $get_info = MallGroupBuyList::where('order_id', '=', $order_id)
-                ->first();
+            ->first();
 
         $group_key = $get_info->group_key;
         $user_id = $get_info->user_id;
 
         $list = DB::table('nlsg_mall_group_buy_list as gbl')
-                ->leftJoin('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
-                ->leftJoin('nlsg_mall_order as nmo', 'gbl.order_id', '=', 'nmo.id')
-                ->where('gbl.group_key', '=', $group_key)
+            ->leftJoin('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
+            ->leftJoin('nlsg_mall_order as nmo', 'gbl.order_id', '=', 'nmo.id')
+            ->where('gbl.group_key', '=', $group_key)
 //                ->where('nmo.is_stop', '=', 0)
 //                ->where('nmo.is_del', '=', 0)
-                ->orderBy('gbl.is_captain', 'desc')
-                ->orderByRaw('FIELD(gbl.user_id,' . $user_id . ')', 'desc')
-                ->orderBy('gbl.id', 'asc')
-                ->select(['gbl.id', 'gbl.user_id', 'nuser.nickname',
-                    'nuser.headimg', 'gbl.is_captain'])
-                ->get();
+            ->orderBy('gbl.is_captain', 'desc')
+            ->orderByRaw('FIELD(gbl.user_id,' . $user_id . ')', 'desc')
+            ->orderBy('gbl.id', 'asc')
+            ->select(['gbl.id', 'gbl.user_id', 'nuser.nickname',
+                'nuser.headimg', 'gbl.is_captain'])
+            ->get();
 
         return $list;
     }
 
+    public function gbScrollbar($group_buy_id, $size = 10)
+    {
+        if (empty($group_buy_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+//        $list = DB::from('nlsg_mall_group_buy_list as gbl')
+//            ->join('nlsg_user as nuser','gbl.user_id','=','nuser.id')
+//            ->get();
+
+        dd($list);
+    }
 }
