@@ -93,13 +93,12 @@ class MallGoods extends Base
     //获取商品sku价格
     public function sku_price_list($id)
     {
-        $res = DB::table(MallSku::$table)
+        return DB::table(MallSku::$table)
             ->where('goods_id', '=', $id)
             ->where('status', '=', 1)
             ->select(['id', 'sku_number', 'price', 'original_price',
                 'cost', 'promotion_cost'])
             ->get();
-        return $res;
     }
 
     //***************************ORM重写***************************************
@@ -318,8 +317,8 @@ class MallGoods extends Base
 
     /**
      * 团购商品详情
-     * @param type $params
-     * @param type $user
+     * @param array $params
+     * @param array $user
      */
     public function groupByGoodsInfo($params, $user)
     {
@@ -357,6 +356,11 @@ class MallGoods extends Base
         );
         $data = $data[0];
 
+        $data['group_buy_id'] = $group_buy_id;
+        $data['order_num'] = MallOrder::where('sp_id', $group_buy_id)
+            ->where('status', '>', 1)
+            ->count();
+        
         if ($check_id[0]['goods_price'] > 0) {
             $data['price'] = $check_id[0]['goods_price'];
         }
