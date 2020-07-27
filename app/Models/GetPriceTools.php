@@ -102,6 +102,7 @@ class GetPriceTools extends Base {
             foreach ($temp_sp_data as $tsdk => $tsdv) {
                 array_push($sp_info['list'], $tsdv->type);
                 if ($tsdv->type == 4) {
+                    $sp_info['group_buy']['group_buy_id'] = $tsdv->group_name;
                     $sp_info['group_buy']['price'] = $tsdv->goods_price;
                     $sp_info['group_buy']['num'] = $tsdv->group_num;
                     $sp_info['group_buy']['begin_time'] = $tsdv->begin_time;
