@@ -829,6 +829,7 @@ class MallOrderController extends Controller
      * @apiDescription 拼团队伍信息
      * @apiParam {number} group_buy_id 拼团id
      * @apiParam {numer} [group_key] 拼团队伍标识
+     * @apiParam {number=1,2} [flag] 1只返回两条 2全返
      * @apiSuccess {string} group_name group_buy_id
      * @apiSuccess {string} created_at 创建时间
      * @apiSuccess {string} user_id 队长id
@@ -879,11 +880,46 @@ class MallOrderController extends Controller
     }
 
     //todo 拼团滚动信息
-    public function gbScrollbar(Request $request){
-        $group_buy_id = $request->input('group_buy_id',0);
-        $size = $request->input('size',10);
+
+    /**
+     * 拼团滚动信息
+     * @api {get} /api/v4/goods/group_buy_scrollbar 拼团滚动信息
+     * @apiVersion 1.0.0
+     * @apiName /api/v4/goods/group_buy_scrollbar
+     * @apiGroup MallOrder
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy_scrollbar
+     * @apiDescription 拼团滚动信息
+     * @apiParam {number} group_buy_id 拼团id
+     *
+     * @apiSuccess {string} user_id 用户id
+     * @apiSuccess {string} headimg 头像
+     * @apiSuccess {string} nickname 昵称
+     * @apiSuccess {string} explain 说明
+     * @apiSuccess {string} created_at 订单时间
+     *
+     * @apiSuccessExample {json} Request-Example:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * {
+     * "user_id": 168934,
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
+     * "nickname": "chandler",
+     * "created_at": "2020-06-23 16:16:24",
+     * "is_captain": 1,
+     * "is_success": 0,
+     * "explain": "发起拼团"
+     * }
+     * ]
+     * }
+     */
+    public function gbScrollbar(Request $request)
+    {
+        $group_buy_id = $request->input('group_buy_id', 0);
+        $size = $request->input('size', 10);
         $model = new MallOrderGroupBuy();
-        $data = $model->gbScrollbar($group_buy_id,$size);
+        $data = $model->gbScrollbar($group_buy_id, $size);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);

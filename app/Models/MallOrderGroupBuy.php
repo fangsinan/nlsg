@@ -826,10 +826,26 @@ class MallOrderGroupBuy extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-//        $list = DB::from('nlsg_mall_group_buy_list as gbl')
-//            ->join('nlsg_user as nuser','gbl.user_id','=','nuser.id')
-//            ->get();
+        $list = DB::table('nlsg_mall_group_buy_list as gbl')
+            ->join('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
+            ->select(['nuser.id as user_id', 'nuser.headimg', 'nuser.nickname',
+                'gbl.created_at', 'gbl.is_captain', 'gbl.is_success'])
+            ->limit($size)
+            ->orderBy('gbl.updated_at', 'desc')
+            ->orderBy('gbl.id', 'desc')
+            ->get();
 
-        dd($list);
+        foreach ($list as $v) {
+            if ($v->is_captain == 1) {
+                $v->explain = '发起拼团';
+            } else {
+                if ($v->gbl . is_success == 1) {
+                    $v->explain = '拼团成功';
+                } else {
+                    $v->explain = '参加拼团';
+                }
+            }
+        }
+        return $list;
     }
 }
