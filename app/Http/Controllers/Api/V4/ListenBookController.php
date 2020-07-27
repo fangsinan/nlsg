@@ -54,14 +54,14 @@ class ListenBookController extends Controller
         //猜你喜欢
         $like_book = $recommendObj->getIndexRecommend(9,14 );
 
-        return [
+        return $this->success( [
             'index_recommend'   => $index_recommend,
             'hot_recommend'     => $hot_recommend,
             'book_list'         => $book_list,
             'new_book'          => $new_book,
             'hot_type'          => $hot_type,
             'like_book'         => $like_book,
-        ];
+        ]);
     }
 
 
