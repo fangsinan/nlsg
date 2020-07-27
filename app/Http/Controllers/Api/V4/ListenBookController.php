@@ -296,7 +296,7 @@ class ListenBookController extends Controller
 //            ->paginate($this->page_per_page)->toArray();
 
 
-        $works = Works::select(['id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','user_id'])
+        $works = Works::select(['id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','chapter_num', 'user_id'])
             ->with(['user'=>function($query){
             $query->select('id','nickname', 'headimg');
         }])->where(['status' => 4 , 'is_audio_book' => 1,])
