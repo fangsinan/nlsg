@@ -160,36 +160,50 @@ class ListenBookController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
-        {
-        "code": 200,
-        "msg": "成功",
-        "data": [
-        {
-        "id": 30,
-        "type": 3,
-        "title": "不要羞辱你的孩子 他的心很脆弱",
-        "subtitle": "",
-        "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg", 封面
-        "original_price": "0.00",
-        "price": "0.00",
-        "message": "",
-        "is_free": 0,           //1免费
-        "is_sub": 0             //1关注
-        },
-        {
-        "id": 31,
-        "type": 3,
-        "title": "小孩子做噩梦怎么办？九成父母都没当回事",
-        "subtitle": "",
-        "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
-        "original_price": "0.00",
-        "price": "0.00",
-        "message": "",
-        "is_free": 0,
-        "is_sub": 0
-        }
-        ]
-        }
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {
+    "lists_info": {
+    "id": 1,
+    "title": "世界名著必读，历经岁月经典依旧陪伴成长",
+    "subtitle": "强烈推荐",
+    "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
+    "details_pic": "",
+    "num": 5,
+    "type": 3,
+    "created_at": "2020-06-08T02:00:00.000000Z",
+    "updated_at": "2020-06-08T02:00:00.000000Z",
+    "status": 1
+    },
+    "works": [
+    {
+    "id": 30,
+    "type": 3,
+    "title": "不要羞辱你的孩子 他的心很脆弱",
+    "subtitle": "家庭教育",
+    "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+    "original_price": "0.00",
+    "price": "0.00",
+    "message": "",
+    "is_free": 1,
+    "is_sub": 0
+    },
+    {
+    "id": 31,
+    "type": 3,
+    "title": "小孩子做噩梦怎么办？九成父母都没当回事",
+    "subtitle": "家庭教育",
+    "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
+    "original_price": "0.00",
+    "price": "0.00",
+    "message": "",
+    "is_free": 1,
+    "is_sub": 0
+    }
+    ]
+    }
+    }
      */
     public function getBookListDetail(Request $request){
         $lists_id = $request->input('lists_id',0);
