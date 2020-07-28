@@ -837,12 +837,12 @@ class MallOrderGroupBuy extends Base
 
         foreach ($list as $v) {
             if ($v->is_captain == 1) {
-                $v->explain = '发起拼团';
+                $v->explain = $v->nickname . '发起拼团';
             } else {
                 if ($v->gbl . is_success == 1) {
-                    $v->explain = '拼团成功';
+                    $v->explain = $v->nickname . '拼团成功';
                 } else {
-                    $v->explain = '参加拼团';
+                    $v->explain = $v->nickname . '参加拼团';
                 }
             }
         }
