@@ -9,6 +9,7 @@ use App\Models\Lists;
 use App\Models\ListsWork;
 use App\Models\Recommend;
 use App\Models\Subscribe;
+use App\Models\User;
 use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
@@ -86,10 +87,9 @@ class ListenBookController extends Controller
      */
     public function getListenDetail(Request $request){
         $listen_id = $request->input('id',0);
-        $user_id = $request->input('user_id',0);
 
-
-        $works_data = Works::select(['id' ,'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num'])
+        $user_id = $this->user['id'];
+        $works_data = Works::select(['id', 'user_id', 'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','chapter_num'])
             ->where('status',4)->find($listen_id);
 
         if(empty($works_data)){
@@ -110,6 +110,9 @@ class ListenBookController extends Controller
         $infoObj = new WorksInfo();
         $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id);
         $works_data['info_num'] = count($works_data['info']);
+
+        //作者信息
+        $works_data['user_info'] = User::find($works_data['user_id']);
 
         return $this->success($works_data);
     }
