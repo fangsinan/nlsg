@@ -79,7 +79,7 @@ class Recommend extends Base
                if ($v['relation_type']==1 || $v['relation_type'] == 2 ) {
                    $v['works'] = Works::with([
                        'user' => function ($query) {
-                           $query->select('id', 'nickname');
+                           $query->select('id', 'nickname','headimg');
                        }])
                        ->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'price', 'chapter_num', 'subscribe_num'])
                        ->where('id', $v['relation_id'])

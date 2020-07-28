@@ -797,7 +797,8 @@ class IndexController extends Controller
      * "subscribe_num": 0,
      * "user": {
      * "id": 211172,
-     * "nickname": "能量时光"
+     * "nickname": "能量时光",
+     * "headimg" : "test.png"
      * }
      * }
      * }
