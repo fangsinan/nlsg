@@ -38,8 +38,13 @@ class MallGoods extends Base
                 $v->collect = 0;
             }
             $v->stock = $this->getGoodsAllStock($v->id);
-            foreach($v->sku_list as $vv){
-                $vv->stock = $this->getGoodsAllStock($v->id,$vv->id);
+            foreach ($v->sku_list as $vv) {
+                $vv->stock = $this->getGoodsAllStock($v->id, $vv->id);
+                $temp_id_arr = [];
+                foreach ($vv->sku_value_list as $sv) {
+                    $temp_id_arr[] = $sv->id;
+                }
+                $vv->id_arr = $temp_id_arr;
             }
         }
 
