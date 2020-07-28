@@ -86,10 +86,10 @@ class ListenBookController extends Controller
     }
      */
     public function getListenDetail(Request $request){
-        $listen_id = $request->input('id',0);
 
+        $listen_id = $request->input('id',0);
         $user_id = $this->user['id'];
-        $works_data = Works::select(['id', 'user_id', 'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','chapter_num'])
+        $works_data = Works::select(['id', 'user_id', 'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','chapter_num','original_price','price'])
             ->where('status',4)->find($listen_id);
 
         if(empty($works_data)){
