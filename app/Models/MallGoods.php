@@ -81,7 +81,7 @@ class MallGoods extends Base
 
         $expire_num = CacheTools::getExpire('get_list');
         $list = Cache::tags($cache_key_name)->get($cache_name);
-        if (empty($list)) {
+        if (true || empty($list)) {
             $list = $this->getListDataFromDb($params);
             if ($cache) {
                 Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
@@ -222,10 +222,17 @@ class MallGoods extends Base
             $top_content = ConfigModel::getData(11);
             foreach ($res as $v) {
                 $v->content = $top_content . $v->content;
+                $v->stock = $this->getGoodsAllStock($v->id);
             }
         }
 
         return $res;
+    }
+
+    public function getGoodsAllStock($goods_id){
+        return MallSku::where('goods_id','=',$goods_id)
+            ->where('status','=',1)
+            ->sum('stock');
     }
 
     public function sku_list()
