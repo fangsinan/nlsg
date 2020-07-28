@@ -252,8 +252,8 @@ class MallGoods extends Base
     public function picture_list()
     {
         return $this->hasMany('App\Models\MallPicture', 'goods_id', 'id')
-            ->select(['url', 'is_main', 'is_video', 'duration',
-                'goods_id', 'cover_img'])
+            ->select(['url', 'is_main', 'is_video', 'duration','goods_id',
+                DB::raw('(case when is_video = 0 then url ELSE cover_img END) as cover_img')])
             ->where('status', '=', 1)
             ->orderBy('is_video', 'desc')
             ->orderBy('is_main', 'desc')
