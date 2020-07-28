@@ -14,7 +14,7 @@ class WorksCategoryRelation extends Base {
     protected $table = 'nlsg_works_category_relation';
 
 
-    public function CategoryName()
+    public function categoryName()
     {
         return $this->belongsTo('App\Models\WorksCategory','category_id','id');
     }

@@ -99,7 +99,7 @@ class ListenBookController extends Controller
 
         //查询课程分类
         $category = WorksCategoryRelation::select('category_id')->with([
-            'CategoryName'=>function($query) use($listen_id){
+            'categoryName'=>function($query) use($listen_id){
                 $query->select('id','name')->where('status',1);
             }])->where(['work_id'=>$listen_id])->first();
         $works_data['category_name'] = $category->CategoryName->name ??'';
