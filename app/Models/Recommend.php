@@ -89,7 +89,7 @@ class Recommend extends Base
 
                    $v['works'] = Column::with([
                        'user' => function ($query) {
-                           $query->select('id', 'nickname');
+                           $query->select('id', 'nickname','headimg');
                        }])
                        ->select(['id', 'user_id', 'name','title','subtitle', 'cover_pic', 'price'])
                        ->where('id', $v['relation_id'])
