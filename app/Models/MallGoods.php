@@ -37,6 +37,15 @@ class MallGoods extends Base
             } else {
                 $v->collect = 0;
             }
+            $v->stock = $this->getGoodsAllStock($v->id);
+            foreach ($v->sku_list as $vv) {
+                $vv->stock = $this->getGoodsAllStock($v->id, $vv->id);
+                $temp_id_arr = [];
+                foreach ($vv->sku_value_list as $sv) {
+                    $temp_id_arr[] = $sv->id;
+                }
+                $vv->id_arr = $temp_id_arr;
+            }
         }
 
         //获取商品所处的活动
@@ -81,7 +90,7 @@ class MallGoods extends Base
 
         $expire_num = CacheTools::getExpire('get_list');
         $list = Cache::tags($cache_key_name)->get($cache_name);
-        if (true || empty($list)) {
+        if (empty($list)) {
             $list = $this->getListDataFromDb($params);
             if ($cache) {
                 Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
@@ -222,7 +231,6 @@ class MallGoods extends Base
             $top_content = ConfigModel::getData(11);
             foreach ($res as $v) {
                 $v->content = $top_content . $v->content;
-                $v->stock = $this->getGoodsAllStock($v->id);
             }
         }
 
@@ -230,10 +238,16 @@ class MallGoods extends Base
     }
 
     //获取商品全规格总库存
-    public function getGoodsAllStock($goods_id){
-        return MallSku::where('goods_id','=',$goods_id)
-            ->where('status','=',1)
-            ->sum('stock');
+    public function getGoodsAllStock($goods_id, $sku_id = 0)
+    {
+        if ($sku_id) {
+            return MallSku::where('id', '=', $sku_id)
+                ->sum('stock');
+        } else {
+            return MallSku::where('goods_id', '=', $goods_id)
+                ->where('status', '=', 1)
+                ->sum('stock');
+        }
     }
 
     public function sku_list()
@@ -260,7 +274,7 @@ class MallGoods extends Base
     public function picture_list()
     {
         return $this->hasMany('App\Models\MallPicture', 'goods_id', 'id')
-            ->select(['url', 'is_main', 'is_video', 'duration','goods_id',
+            ->select(['url', 'is_main', 'is_video', 'duration', 'goods_id',
                 DB::raw('(case when is_video = 0 then url ELSE cover_img END) as cover_img')])
             ->where('status', '=', 1)
             ->orderBy('is_video', 'desc')
