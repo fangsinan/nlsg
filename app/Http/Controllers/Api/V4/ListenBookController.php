@@ -89,7 +89,9 @@ class ListenBookController extends Controller
 
         $listen_id = $request->input('id',0);
         $user_id = $this->user['id'];
-        $works_data = Works::select(['id', 'user_id', 'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','chapter_num','original_price','price'])
+        $works_data = Works::select([
+            'id', 'user_id', 'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message',
+            'content','is_pay','is_end', 'is_free','subscribe_num','chapter_num','original_price','price'])
             ->where('status',4)->find($listen_id);
 
         if(empty($works_data)){
@@ -136,9 +138,8 @@ class ListenBookController extends Controller
      */
     public function getBookList(Request $request){
 
-        $list = Lists::select(['id', 'title', 'subtitle', 'cover', ])->where([
-            'status'=>1
-            ])->paginate($this->page_per_page)->toArray();
+        $list = Lists::select(['id', 'title', 'subtitle', 'cover', ])
+            ->where(['status'=>1])->paginate($this->page_per_page)->toArray();
 
         foreach ($list['data'] as $key => &$val){
             $val['lists_count'] = ListsWork::where(['lists_id'=>$val['id']])->count();
