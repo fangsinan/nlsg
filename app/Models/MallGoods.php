@@ -229,6 +229,7 @@ class MallGoods extends Base
         return $res;
     }
 
+    //获取商品全规格总库存
     public function getGoodsAllStock($goods_id){
         return MallSku::where('goods_id','=',$goods_id)
             ->where('status','=',1)
