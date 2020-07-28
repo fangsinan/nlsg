@@ -138,7 +138,7 @@ class ListenBookController extends Controller
      */
     public function getBookList(Request $request){
 
-        $list = Lists::select(['id', 'title', 'subtitle', 'cover', ])
+        $list = Lists::select(['id', 'title', 'subtitle', 'cover' ])
             ->where(['status'=>1])->paginate($this->page_per_page)->toArray();
 
         foreach ($list['data'] as $key => &$val){
@@ -193,8 +193,10 @@ class ListenBookController extends Controller
      */
     public function getBookListDetail(Request $request){
         $lists_id = $request->input('lists_id',0);
-        $user_id = $request->input('user_id',0);
+        $user_id = $this->user['id'] ?? 0;
 
+
+        $lists_info = Lists::find($lists_id);
         $lists = ListsWork::select('*')->where(['lists_id'=>$lists_id])->paginate($this->page_per_page)->toArray();
         $works_ids = array_column($lists['data'],'works_id');
         //$works_ids = array_column($lists,'works_id');
@@ -208,7 +210,7 @@ class ListenBookController extends Controller
             $works[$key]['is_sub'] = Subscribe::isSubscribe($user_id, $val['id'], 2);
         }
 
-        return $this->success($works);
+        return $this->success(['lists_info'=>$lists_info,'works'=>$works]);
     }
 
     /**
