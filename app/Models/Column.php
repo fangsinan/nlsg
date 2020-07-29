@@ -32,9 +32,10 @@ class Column extends Base
         if( empty($column) )    {
             return [];
         }
+
         //作者信息
         $user = User::find($column['user_id']);
-        $column['teacher_name'] = $user->nick_name;
+        $column['teacher_data'] = $user;
         //是否关注
         $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
 
@@ -48,7 +49,7 @@ class Column extends Base
             ])->orderBy('created_at','desc')->paginate(6)->toArray();
             $user_id_arr =array_column($sub_user['data'],'user_id');
             $column['user_data'] = User::select('id','nickname','headimg')->whereIn('id',$user_id_arr)->get()->toArray();
-            $column['user_count'] = Subscribe::where(['relation_id'=> $column_id, 'type' => 6, 'is_del' => 0,])->count();
+            //$column['user_count'] = Subscribe::where(['relation_id'=> $column_id, 'type' => 6, 'is_del' => 0,])->count();
         }
         //是否收藏
         $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();

@@ -38,6 +38,7 @@ class WorksController extends Controller
      * @apiParam {int} page  页数
      * @apiParam {int} teacher_id  老师id
      * @apiParam {int} is_free  1免费
+     * @apiParam {int} is_audio_book  0全部  1 听书 2课程
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -95,6 +96,7 @@ class WorksController extends Controller
         $category_id = $request->input('category_id',0);
         $teacher_id = $request->input('teacher_id',0);
         $is_free = $request->input('is_free',0);
+        $is_audio_book = $request->input('is_audio_book',0);
 
         $user_id = $this->user['id'] ?? 0;
 
@@ -121,10 +123,17 @@ class WorksController extends Controller
             $where = ['category_id'=>$category_id];
         }
 
+
+
         $works_where['status'] =4;
         if( $teacher_id )   { $works_where['user_id'] = $teacher_id;}
         if( $is_free )      { $works_where['is_free'] = $is_free;   }
 
+        if($is_audio_book != 0){
+            //  0全部  1 听书 2课程
+            $is_audio_book_arr = ['1' => 1, '2' => 0,];
+            $works_where['is_audio_book'] = $is_audio_book_arr[$is_audio_book];
+        }
 
 //        $worksData = WorksCategoryRelation::with([
 //            'works' =>function($query) use($order_str,$works_where){
@@ -133,8 +142,8 @@ class WorksController extends Controller
 //            }])->select()->where($where)
 //            ->paginate($this->page_per_page)->toArray();
 
-        $worksData = WorksCategoryRelation::with(['works' => function($query){
-            $query->select("*");
+        $worksData = WorksCategoryRelation::with(['works' => function($query) use($order_str){
+            $query->select("*")->orderBy($order_str,'desc')->groupBy('id');
         }])->whereHas('works', function ($query) use ($works_where){
                  $query->where($works_where);
         })->select("*")->where($where)
