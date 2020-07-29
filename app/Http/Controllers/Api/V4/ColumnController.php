@@ -121,7 +121,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {get} /api/v4/column/get_column_works 专栏-专栏|讲座详情[课程列表(单\多课程列表)]
+     * @api {get} /api/v4/column/get_column_works 专栏-专栏详情[课程列表(单\多课程列表)]
      * @apiName get_column_works
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -303,7 +303,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {get} /api/v4/column/get_column_detail 专栏-专栏|讲座详细信息
+     * @api {get} /api/v4/column/get_column_detail 讲座-讲座详细信息
      * @apiName get_column_detail
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -345,7 +345,7 @@ class ColumnController extends Controller
         if( empty($column_id) ){
             return $this->error(0,'column_id 不能为空');
         }
-        $field = ['id', 'name', 'type','column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
+        $field = ['id', 'name', 'type','column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) )    {
             return $this->error(0,'专栏不存在不能为空');
@@ -358,7 +358,7 @@ class ColumnController extends Controller
 
     /**
      * @api {get} /api/v4/column/get_lecture_list  讲座目录  针对讲座[讲座与课程一对一]
-     * @apiName get_column_detail
+     * @apiName get_lecture_list
      * @apiVersion 1.0.0
      * @apiGroup Column
      *
