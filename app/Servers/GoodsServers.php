@@ -39,6 +39,46 @@ class GoodsServers
 
         DB::beginTransaction();
 
+        $goods_res = $goods_model->save();
+        if (!$goods_res) {
+            DB::rollBack();
+        }
+
+        if ($params['goods_id'] ?? 0) {
+            $goods_id = $params['goods_id'];
+        } else {
+            $goods_id = $goods_model->id;
+        }
+
+        dd($goods_id);
+
 
     }
+
+
+    /**
+     * 校验number唯一性
+     */
+    //生成货号和sku   1 sku_number   2货号
+//    public function checkNumberOne($type = 1) {
+//        if ($type == 1) {
+//            $number = rand(10000000, 99999999) + time();
+//            $mallSkuModel = new MallSku();
+//            $data = $mallSkuModel->getBy(['sku_number' => $number], 'id');
+//        } else {
+//            $range_str = range(0, 14);
+//            $number = '';
+//            for ($i = 0; $i < 16; $i++) {
+//                $number .= array_rand($range_str);
+//            }
+//            $goodsObj = new MallGoods();
+//            $data = $goodsObj->getBy(['number' => $number], 'id');
+//        }
+//
+//        if (!empty($data)) {
+//            return $this->checkNumberOne($type);
+//        } else {
+//            return $number;
+//        }
+//    }
 }
