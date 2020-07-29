@@ -88,7 +88,7 @@ class ListenBookController extends Controller
     public function getListenDetail(Request $request){
 
         $listen_id = $request->input('id',0);
-        $user_id = $this->user['id'];
+        $user_id = $this->user['id'] ?? 0;
         $works_data = Works::select([
             'id', 'user_id', 'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message',
             'content','is_pay','is_end', 'is_free','subscribe_num','chapter_num','original_price','price'])
@@ -216,6 +216,9 @@ class ListenBookController extends Controller
         //$works_ids = array_column($lists,'works_id');
 
         $works = Works::select(['id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
+            ->with(['user'=>function($query){
+                $query->select('id','nickname', 'headimg');
+            }])
             ->where(['status' => 4 , 'is_audio_book' => 1,])
             ->whereIn('id', $works_ids)->get()->toArray();
 
