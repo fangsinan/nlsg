@@ -396,11 +396,11 @@ class MallGoods extends Base
                 if ($v->sku_number == $vv['sku_number']) {
                     $v->group_num = $vv['group_num'];
                     $v->price = $vv['group_price'];
-                    $v->normal_price = MallSku::where('sku_number','=',$vv['sku_number'])->sum('price');
+                    $v->normal_price = MallSku::where('sku_number', '=', $vv['sku_number'])->sum('price');
                 }
             }
         }
-        $data['normol_price'] = $data['sku_list'][0]->normal_price;
+        $data['normol_price'] = MallGoods::where('id', '=', $data['id'])->sum('price');
 
         return [$data];
     }
