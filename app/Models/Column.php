@@ -40,8 +40,8 @@ class Column extends Base
         //是否购买
         $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
         //是否关注
-        $follow = UserFollow::where(['from_uid'=>$user_id,'to_uid'=>$column['user_id']])->get();
-        $column['is_follow'] = $follow? 1 :0;
+        $follow = UserFollow::where(['from_uid'=>$user_id,'to_uid'=>$column['user_id']])->first();
+        $column['is_follow'] = $follow ? 1 :0;
 
         //  在学人数[只存在于讲座]
         $column['user_data'] = [];
