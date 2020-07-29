@@ -856,7 +856,7 @@ class MallController extends Controller
      * @apiName /api/v4/goods/group_buy_info
      * @apiGroup  Mall
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/group_buy_info
-     * @apiDescription 拼团商品详情(返回值参考商品详情. group_num拼团需要人数 order_numn已拼人数)
+     * @apiDescription 拼团商品详情(返回值参考商品详情. group_num拼团需要人数 order_numn已拼人数 normol_price单独购买价格)
      * @apiSuccess {number} group_buy_id 拼团列表id
      */
     public function groupByGoodsInfo(Request $request)
