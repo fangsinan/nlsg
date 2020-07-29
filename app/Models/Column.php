@@ -32,9 +32,10 @@ class Column extends Base
         if( empty($column) )    {
             return [];
         }
+
         //作者信息
         $user = User::find($column['user_id']);
-        $column['teacher_name'] = $user->nick_name;
+        $column['teacher_data'] = $user;
         //是否关注
         $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
 
