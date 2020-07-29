@@ -175,7 +175,7 @@ class ColumnController extends Controller
     public function getColumnWorks(Request $request){
         //排序
         $column_id = $request->input('column_id',0);
-        $user_id   = $this->user['id'];
+        $user_id   = $this->user['id'] ?? 0 ;
 
         if( empty($column_id) ){
             return $this->error(0,'column_id 不能为空');
