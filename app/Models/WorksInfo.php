@@ -49,10 +49,10 @@ class WorksInfo extends Base
             if($user_id){
                 //单章节 学习记录 百分比
                 $his_data = History::select('time_leng','time_number')->where([
-                    'works_id'     => $works_id,
-                    'worksinfo_id' => $val['id'],
-                    'user_id'      => $user_id,
-                    'is_del'       => 0,
+                    'relation_type' => 3,
+                    'info'          => $val['id'],
+                    'user_id'       => $user_id,
+                    'is_del'        => 0,
                 ])->orderBy('updated_at','desc')->first();
                 if($his_data){
                     $works_data[$key]['time_leng'] = $his_data->time_leng;

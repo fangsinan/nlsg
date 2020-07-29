@@ -121,7 +121,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {get} /api/v4/column/get_column_works 专栏-专栏|讲座详情[课程列表(单\多课程列表)]
+     * @api {get} /api/v4/column/get_column_works 专栏-专栏详情[课程列表(单\多课程列表)]
      * @apiName get_column_works
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -148,9 +148,10 @@ class ColumnController extends Controller
     "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
     "details_pic": "",  //详情图
     "is_end": 0,            //是否完结  1完结
-    "subscribe_num": 0,     //关注数
+    "subscribe_num": 0,     //订阅数
     "teacher_name": "房",      //老师姓名
-    "is_sub": 0             //是否关注
+    "is_sub": 0             //是否订阅
+    "is_follow": 0             //是否关注
     },
     "works_data": [         //多课程
     {
@@ -164,7 +165,7 @@ class ColumnController extends Controller
     "is_end": 1,        //是否完结
     "is_free": 0,       //是否免费 1是
     "subscribe_num": 287,       关注数
-    "is_sub": 0         用户是否关注
+    "is_sub": 0         用户是否购买
     },
     ],
     "outline_data": [],         //单课程  大纲
@@ -181,7 +182,7 @@ class ColumnController extends Controller
             return $this->error(0,'column_id 不能为空');
         }
 
-        $field = ['id', 'name', 'column_type', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
+        $field = ['id', 'name', 'column_type', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) )    {
             return $this->error(0,'该信息不存在');
@@ -302,7 +303,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {get} /api/v4/column/get_column_detail 专栏-专栏|讲座详细信息
+     * @api {get} /api/v4/column/get_column_detail 讲座-讲座详细信息
      * @apiName get_column_detail
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -340,11 +341,11 @@ class ColumnController extends Controller
     public function getColumnDetail(Request $request){
 
         $column_id = $request->input('column_id',0);
-        $user_id   = $request->input('user_id',0);
+        $user_id   = $this->user['id'] ?? 0;
         if( empty($column_id) ){
             return $this->error(0,'column_id 不能为空');
         }
-        $field = ['id', 'name', 'type','column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
+        $field = ['id', 'name', 'type','column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) )    {
             return $this->error(0,'专栏不存在不能为空');
@@ -357,7 +358,7 @@ class ColumnController extends Controller
 
     /**
      * @api {get} /api/v4/column/get_lecture_list  讲座目录  针对讲座[讲座与课程一对一]
-     * @apiName get_column_detail
+     * @apiName get_lecture_list
      * @apiVersion 1.0.0
      * @apiGroup Column
      *
@@ -432,7 +433,7 @@ class ColumnController extends Controller
 
 
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
-        $historyData = History::select('relation_id','worksinfo_id')->where([
+        $historyData = History::select('relation_id','info_id')->where([
             'user_id'=>$user_id,
             'is_del'=>0,
             'relation_id'=>$lecture_id,

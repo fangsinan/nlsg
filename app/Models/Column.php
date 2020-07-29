@@ -32,12 +32,16 @@ class Column extends Base
         if( empty($column) )    {
             return [];
         }
-
+        $category = WorksCategory::select('name')->where(['id'=>$column['category_id'],'type'=>2])->first();
+        $column['category_name'] = $category->name ??'';
         //作者信息
         $user = User::find($column['user_id']);
         $column['teacher_data'] = $user;
-        //是否关注
+        //是否购买
         $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
+        //是否关注
+        $follow = UserFollow::where(['from_uid'=>$user_id,'to_uid'=>$column['user_id']])->first();
+        $column['is_follow'] = $follow ? 1 :0;
 
         //  在学人数[只存在于讲座]
         $column['user_data'] = [];

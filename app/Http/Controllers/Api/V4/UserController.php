@@ -247,7 +247,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/followed 列表
+     * @api {get} api/v4/user/followed 关注
      * @apiVersion 4.0.0
      * @apiName  followed
      * @apiGroup User
