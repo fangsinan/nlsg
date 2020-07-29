@@ -179,6 +179,7 @@ class ListenBookController extends Controller
     "works": [
     {
     "id": 30,
+    "user_id": 211172,
     "type": 3,
     "title": "不要羞辱你的孩子 他的心很脆弱",
     "subtitle": "家庭教育",
@@ -187,10 +188,16 @@ class ListenBookController extends Controller
     "price": "0.00",
     "message": "",
     "is_free": 1,
+    "user": {
+    "id": 211172,
+    "nickname": "能量时光",
+    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+    },
     "is_sub": 0
     },
     {
     "id": 31,
+    "user_id": 168934,
     "type": 3,
     "title": "小孩子做噩梦怎么办？九成父母都没当回事",
     "subtitle": "家庭教育",
@@ -199,6 +206,11 @@ class ListenBookController extends Controller
     "price": "0.00",
     "message": "",
     "is_free": 1,
+    "user": {
+    "id": 168934,
+    "nickname": "chandler",
+    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+    },
     "is_sub": 0
     }
     ]
