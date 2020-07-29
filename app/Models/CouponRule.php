@@ -139,7 +139,11 @@ class CouponRule extends Base {
             }
         }
 
-        return $res;
+        $temp_res = [];
+        foreach($res as $v){
+            $temp_res[] = $v;
+        }
+        return $temp_res;
     }
 
     //ORM重写

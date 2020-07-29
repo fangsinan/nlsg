@@ -5,7 +5,10 @@ namespace App\Servers;
 
 
 use App\Models\MallGoods;
+use App\Models\MallSku;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 
 class GoodsServers
 {
@@ -19,26 +22,66 @@ class GoodsServers
 
         } else {
             $goods_model = new MallGoods();
+            $goods_model->number = $this->createGoodsSkuNum(1);
         }
 
         if (empty($params['category_id'])) {
             return ['code' => false, 'msg' => '参数错误:category_id'];
         } else {
-            $goods_model->category_id = 1;
+            $goods_model->category_id = intval($params['category_id']);
         }
 
-        $goods_model->name = "手机紧身的繁了";
-        $goods_model->subtitle = "一个还行的手机";
-        $goods_model->picture = "/phone/1.jpg";
-        $goods_model->freight_id = 1;
-        $goods_model->original_price = 9999;
-        $goods_model->price = 999;
-        $goods_model->keywords = "手机,智能,安卓";
-        $goods_model->content = "<p>图文简介啊发撒发撒地方</p>";
-        $goods_model->status = 1;
+        if (empty($params['name'])) {
+            return ['code' => false, 'msg' => '参数错误:name'];
+        } else {
+            $goods_model->name = $params['name'];
+        }
+
+        if (empty($params['subtitle'])) {
+            return ['code' => false, 'msg' => '参数错误:subtitle'];
+        } else {
+            $goods_model->subtitle = $params['subtitle'];
+        }
+
+        if (empty($params['picture'])) {
+            return ['code' => false, 'msg' => '参数错误:picture'];
+        } else {
+            $goods_model->picture = trim($params['picture'], '/');
+        }
+
+        if (empty($params['freight_id'])) {
+            return ['code' => false, 'msg' => '参数错误:freight_id'];
+        } else {
+            $goods_model->freight_id = intval($params['freight_id']);
+        }
+
+        if (empty($params['original_price'])) {
+            return ['code' => false, 'msg' => '参数错误:original_price'];
+        } else {
+            $goods_model->original_price = $params['original_price'];
+        }
+        if (empty($params['price'])) {
+            return ['code' => false, 'msg' => '参数错误:price'];
+        } else {
+            $goods_model->price = $params['price'];
+        }
+
+        $goods_model->keywords = $params['keywords'] ?? '';
+
+        $goods_model->content = $params['content'] ?? '';
+
+        if (empty($params['status'])) {
+            return ['code' => false, 'msg' => '参数错误:status'];
+        } else {
+            $goods_model->status = intval($params['status']);
+            if (!in_array($goods_model->status, [1, 2])) {
+                return ['code' => false, 'msg' => '参数错误:status'];
+            }
+        }
 
         DB::beginTransaction();
 
+        //goods
         $goods_res = $goods_model->save();
         if (!$goods_res) {
             DB::rollBack();
@@ -50,35 +93,39 @@ class GoodsServers
             $goods_id = $goods_model->id;
         }
 
-        dd($goods_id);
+        //goods_picture
+        DB::table('nlsg_mall_picture')
+            ->where('goods_id', '=', $goods_id)
+            ->delete();
 
+        $pic_arr = [];
+        foreach($params['picture_list'] as $v){
+
+        }
 
     }
 
 
     /**
-     * 校验number唯一性
+     * 生成货号或sku编码
+     * @param $type 1:商品 2:sku
+     * @return string
      */
-    //生成货号和sku   1 sku_number   2货号
-//    public function checkNumberOne($type = 1) {
-//        if ($type == 1) {
-//            $number = rand(10000000, 99999999) + time();
-//            $mallSkuModel = new MallSku();
-//            $data = $mallSkuModel->getBy(['sku_number' => $number], 'id');
-//        } else {
-//            $range_str = range(0, 14);
-//            $number = '';
-//            for ($i = 0; $i < 16; $i++) {
-//                $number .= array_rand($range_str);
-//            }
-//            $goodsObj = new MallGoods();
-//            $data = $goodsObj->getBy(['number' => $number], 'id');
-//        }
-//
-//        if (!empty($data)) {
-//            return $this->checkNumberOne($type);
-//        } else {
-//            return $number;
-//        }
-//    }
+    public function createGoodsSkuNum($type)
+    {
+        if ($type == 1) {
+            //商品
+            $num = Str::random(16);
+            $check = MallGoods::where('number', '=', $num)->first();
+        } else {
+            //sku
+            $num = Str::random(10);
+            $check = MallSku::where('sku_number', '=', $num)->first();
+        }
+        if ($check) {
+            $this->createGoodsSkuNum($type);
+        } else {
+            return $num;
+        }
+    }
 }
