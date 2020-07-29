@@ -248,6 +248,7 @@ class ColumnController extends Controller
      *
      * @apiParam {int} target_id  详情对应的id 专栏id或课程id
      * @apiParam {int} type 1.专栏 2.课堂 3. 讲座 4.听书
+     * @apiParam {int} 位置 1.首页   2专栏详情  3 课程详情    4精选书单详情   
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
