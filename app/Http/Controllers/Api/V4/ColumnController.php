@@ -175,7 +175,7 @@ class ColumnController extends Controller
     public function getColumnWorks(Request $request){
         //排序
         $column_id = $request->input('column_id',0);
-        $user_id   = $request->input('user_id',0);
+        $user_id   = $this->user['id'];
 
         if( empty($column_id) ){
             return $this->error(0,'column_id 不能为空');
@@ -216,7 +216,7 @@ class ColumnController extends Controller
             }
 
             //继续学习的章节[时间倒序 第一条为最近学习的章节]
-            $historyData = History::select('relation_id','worksinfo_id')->where([
+            $historyData = History::select('relation_id','info_id')->where([
                 'user_id'=>$user_id,
                 'is_del'=>0,
                 'relation_id'=>$column['id'],
