@@ -50,7 +50,7 @@ class ListenBookController extends Controller
         $new_book = $recommendObj->getIndexRecommend(9,13 );
 
         //热门分类
-        $hot_type = WorksCategory::select('id','name')->where('status',1)->get()->toArray();
+        $hot_type = WorksCategory::select('id','name')->where(['status'=>1,'type'=>1])->get()->toArray();
 
         //猜你喜欢
         $like_book = $recommendObj->getIndexRecommend(9,14 );

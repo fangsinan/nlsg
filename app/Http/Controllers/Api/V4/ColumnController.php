@@ -148,9 +148,10 @@ class ColumnController extends Controller
     "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
     "details_pic": "",  //详情图
     "is_end": 0,            //是否完结  1完结
-    "subscribe_num": 0,     //关注数
+    "subscribe_num": 0,     //订阅数
     "teacher_name": "房",      //老师姓名
-    "is_sub": 0             //是否关注
+    "is_sub": 0             //是否订阅
+    "is_follow": 0             //是否关注
     },
     "works_data": [         //多课程
     {
@@ -164,7 +165,7 @@ class ColumnController extends Controller
     "is_end": 1,        //是否完结
     "is_free": 0,       //是否免费 1是
     "subscribe_num": 287,       关注数
-    "is_sub": 0         用户是否关注
+    "is_sub": 0         用户是否购买
     },
     ],
     "outline_data": [],         //单课程  大纲
