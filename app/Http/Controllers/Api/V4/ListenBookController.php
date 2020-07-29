@@ -215,7 +215,7 @@ class ListenBookController extends Controller
         $works_ids = array_column($lists['data'],'works_id');
         //$works_ids = array_column($lists,'works_id');
 
-        $works = Works::select(['id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
+        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
             ->with(['user'=>function($query){
                 $query->select('id','nickname', 'headimg');
             }])
