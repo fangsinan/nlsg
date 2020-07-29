@@ -280,12 +280,14 @@ class ColumnController extends Controller
         $target_id  = $request->input('target_id',0);
         $type       = $request->input('type',0);
         $position   = $request->input('position',0);
-
+        // position = 4;
+        // type = 4
         //相关推荐
         $recommendModel = new Recommend();
         $recommendLists = $recommendModel->getIndexRecommend($type, $position);
-        if($recommendLists == false)         return $this->success();
 
+        if($recommendLists == false)         return $this->success();
+        $recommendLists = $recommendLists->toArray();
         foreach ($recommendLists as $key=>$val){
             if($target_id && ($val['id'] == $target_id)){
                 unset($recommendLists[$key]);
