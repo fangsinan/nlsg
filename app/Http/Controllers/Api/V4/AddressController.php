@@ -121,6 +121,7 @@ class AddressController extends Controller {
      * @apiGroup  address
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/get_list
      * @apiDescription 收货地址列表,字段说明见创建接口
+     * @apiParam {number} [id] 如果传id,就是单条
      * @apiSuccessExample {json} Request-Example:
      *
       {
