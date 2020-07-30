@@ -16,11 +16,13 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class MallAddress extends Base {
+class MallAddress extends Base
+{
 
     protected $table = 'nlsg_mall_address';
 
-    public function create($params, $user_id) {
+    public function create($params, $user_id)
+    {
         $province = $params['province'] ?? 0;
         $city = $params['city'] ?? 0;
         $area = $params['area'] ?? 0;
@@ -29,14 +31,14 @@ class MallAddress extends Base {
         $phone = $params['phone'] ?? '';
 
         if (empty($province) || empty($city) ||
-                empty($details) || empty($name) ||
-                empty($phone)) {
+            empty($details) || empty($name) ||
+            empty($phone)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
         if (!empty(($params['id'] ?? 0))) {
             $address = self::where('user_id', '=', $user_id)
-                    ->find($params['id']);
+                ->find($params['id']);
             if (!$address) {
                 return ['code' => false, 'msg' => 'id错误'];
             }
@@ -48,8 +50,8 @@ class MallAddress extends Base {
 
         if (($params['is_default'] ?? 0) == 1) {
             $update_res = self::where('user_id', '=', $user_id)
-                    ->where('is_default', '=', 1)
-                    ->update(['is_default' => 0]);
+                ->where('is_default', '=', 1)
+                ->update(['is_default' => 0]);
             if ($update_res === false) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '失败'];
@@ -77,20 +79,28 @@ class MallAddress extends Base {
         }
     }
 
-    public static function getNameById($id) {
+    public static function getNameById($id)
+    {
         $res = Area::find($id);
         return $res->name ?? '';
     }
 
-    public function getList($user_id) {
+    public function getList($user_id, $id)
+    {
 
-        $res = self::where('user_id', '=', $user_id)
-                ->where('is_del', '=', 0)
-                ->orderBy('is_default', 'desc')
-                ->orderBy('updated_at', 'desc')
-                ->select(['id', 'name', 'phone', 'details',
-                    'is_default', 'province', 'city', 'area'])
-                ->get();
+        $query = self::where('user_id', '=', $user_id);
+
+        if ($id) {
+            $query->where('id', '=', $id);
+        }
+
+        $query->where('is_del', '=', 0)
+            ->orderBy('is_default', 'desc')
+            ->orderBy('updated_at', 'desc')
+            ->select(['id', 'name', 'phone', 'details',
+                'is_default', 'province', 'city', 'area']);
+
+        $res = $query->get();
 
         foreach ($res as $v) {
             $v->province_name = self::getNameById($v->province);
@@ -101,16 +111,17 @@ class MallAddress extends Base {
         return $res;
     }
 
-    public function statusChange($id, $flag, $user_id) {
+    public function statusChange($id, $flag, $user_id)
+    {
 
         if (!is_array($id)) {
             $id = explode(',', $id);
         }
 
         $temp = self::where('user_id', '=', $user_id)
-                ->whereIn('id', $id)
-                ->where('is_del', '=', 0)
-                ->count();
+            ->whereIn('id', $id)
+            ->where('is_del', '=', 0)
+            ->count();
 
         if (count($id) !== $temp) {
             return ['code' => false, 'msg' => 'id错误'];
@@ -121,8 +132,8 @@ class MallAddress extends Base {
         switch ($flag) {
             case 'default':
                 $update_res = self::where('user_id', '=', $user_id)
-                        ->where('is_default', '=', 1)
-                        ->update(['is_default' => 0]);
+                    ->where('is_default', '=', 1)
+                    ->update(['is_default' => 0]);
                 if ($update_res === false) {
                     DB::rollBack();
                     return ['code' => false, 'msg' => '失败'];
@@ -146,9 +157,9 @@ class MallAddress extends Base {
         }
 
         $res = self::where('user_id', '=', $user_id)
-                ->whereIn('id', $id)
-                ->where('is_del', '=', 0)
-                ->update($update_data);
+            ->whereIn('id', $id)
+            ->where('is_del', '=', 0)
+            ->update($update_data);
         if ($res) {
             DB::commit();
             return ['code' => true, 'msg' => '成功'];

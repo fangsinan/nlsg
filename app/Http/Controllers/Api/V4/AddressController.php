@@ -30,7 +30,7 @@ class AddressController extends Controller {
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/get_data
      * @apiDescription 行政区划表数据
      * @apiSuccessExample {json} Request-Example:
-     * 
+     *
       {
         "code": 200,
         "msg": "成功",
@@ -122,7 +122,7 @@ class AddressController extends Controller {
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/address/get_list
      * @apiDescription 收货地址列表,字段说明见创建接口
      * @apiSuccessExample {json} Request-Example:
-     * 
+     *
       {
       "code": 200,
       "msg": "成功",
@@ -156,12 +156,12 @@ class AddressController extends Controller {
       ]
       }
      */
-    public function getList() {
+    public function getList(Request $request) {
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
         $model = new MallAddress();
-        $data = $model->getList($this->user['id']);
+        $data = $model->getList($this->user['id'],$request->input('id',0));
         return $this->success($data);
     }
 
@@ -225,7 +225,7 @@ class AddressController extends Controller {
      * @apiDescription 自提点和退货点列表
      * @apiParam {number=2,3} flag 2自提 3退货
      * @apiSuccessExample {json} Request-Example:
-     * 
+     *
       {
       "code": 200,
       "msg": "成功",
