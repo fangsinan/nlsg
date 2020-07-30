@@ -444,7 +444,7 @@ class ColumnController extends Controller
         ])->orderBy('updated_at','desc')->first();
         $historyData = $historyData?$historyData->toArray():[];
         if($historyData){
-            $title = WorksInfo::select('title')->where('id',$historyData['worksinfo_id'])->first();
+            $title = WorksInfo::select('title')->where('id',$historyData['info_id'])->first();
             $historyData['title'] = $title->title ?? '';
         }
 
