@@ -139,6 +139,20 @@ class GoodsServers
         }
 
         //sku
+        if (empty($params['sku_list']) || !is_array($params['sku_list'])) {
+            return ['code' => false, 'msg' => 'sku_list 错误'];
+        }
+
+        $edit_sku_id_arr = [];
+        foreach ($params['sku_list'] as $v) {
+            if ($v['id'] ?? 0) {
+                //如果有是编辑,sku_number不变
+                $sku = MallSku::where('goods_id', '=', $goods_id)
+                    ->find($v['id']);
+            } else {
+                //新加
+            }
+        }
 
     }
 

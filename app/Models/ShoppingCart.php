@@ -16,11 +16,13 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author wangxh
  */
-class ShoppingCart extends Base {
+class ShoppingCart extends Base
+{
 
     protected $table = 'nlsg_mall_shopping_cart';
 
-    public function create($params, $user_id) {
+    public function create($params, $user_id)
+    {
         $goods_id = $params['goods_id'] ?? 0;
         $sku_number = $params['sku_number'] ?? 0;
         $num = $params['num'] ?? 0;
@@ -40,19 +42,21 @@ class ShoppingCart extends Base {
             }
         }
 
+        $old_num = 0;
         if (!empty(($params['id'] ?? 0))) {
             $temp = self::where('user_id', '=', $user_id)
-                    ->find($params['id']);
+                ->find($params['id']);
             if (!$temp) {
                 return ['code' => false, 'msg' => 'id错误'];
             }
         } else {
             $check_cart = self::where('user_id', '=', $user_id)
-                    ->where('goods_id', '=', $goods_id)
-                    ->where('sku_number', '=', $sku_number)
-                    ->first();
+                ->where('goods_id', '=', $goods_id)
+                ->where('sku_number', '=', $sku_number)
+                ->first();
             if ($check_cart) {
                 $temp = $check_cart;
+                $old_num = $check_cart->num;
             } else {
                 $temp = new self();
             }
@@ -61,7 +65,7 @@ class ShoppingCart extends Base {
         $temp->goods_id = $goods_id;
         $temp->sku_number = $sku_number;
         $temp->user_id = $user_id;
-        $temp->num = $num;
+        $temp->num = $num + $old_num;
         $temp->inviter = $inviter;
 
         $res = $temp->save();
@@ -73,11 +77,12 @@ class ShoppingCart extends Base {
         }
     }
 
-    public function getList($user) {
+    public function getList($user)
+    {
         $cart = self::where('user_id', '=', $user['id'])
-                        ->orderBy('updated_at', 'desc')
-                        ->select(['id', 'goods_id', 'sku_number', 'num'])
-                        ->get()->toArray();
+            ->orderBy('updated_at', 'desc')
+            ->select(['id', 'goods_id', 'sku_number', 'num'])
+            ->get()->toArray();
         if (empty($cart)) {
             return [];
         }
@@ -86,15 +91,15 @@ class ShoppingCart extends Base {
 
         $goodsModel = new MallGoods();
         $goods_list = $goodsModel->getList(
-                [
-                    'ids_str' => $goods_id_list,
-                    'ob' => 'ids_str',
-                    'get_all' => 1,
-                    'get_sku' => 1,
-                    'page' => 1,
-                    'size' => 1,
-                    'invalid' => 1
-                ], $user, false);
+            [
+                'ids_str' => $goods_id_list,
+                'ob' => 'ids_str',
+                'get_all' => 1,
+                'get_sku' => 1,
+                'page' => 1,
+                'size' => 1,
+                'invalid' => 1
+            ], $user, false);
 
 
         foreach ($cart as &$v) {
@@ -134,15 +139,16 @@ class ShoppingCart extends Base {
         return ['list' => $list, 'invalid_list' => $invalid_list];
     }
 
-    public function statusChange($id, $flag, $user_id) {
+    public function statusChange($id, $flag, $user_id)
+    {
 
         if (!is_array($id)) {
             $id = explode(',', $id);
         }
 
         $temp = self::where('user_id', '=', $user_id)
-                ->whereIn('id', $id)
-                ->count();
+            ->whereIn('id', $id)
+            ->count();
 
         if (count($id) !== $temp) {
             return ['code' => false, 'msg' => 'id错误'];
@@ -151,8 +157,8 @@ class ShoppingCart extends Base {
         switch ($flag) {
             case 'del':
                 $res = self::where('user_id', '=', $user_id)
-                        ->whereIn('id', $id)
-                        ->delete();
+                    ->whereIn('id', $id)
+                    ->delete();
                 break;
             default:
                 return ['code' => false, 'msg' => '参数错误'];
