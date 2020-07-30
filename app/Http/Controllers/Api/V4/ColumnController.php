@@ -347,7 +347,7 @@ class ColumnController extends Controller
         }
         $field = ['id', 'name', 'type','column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
-        if( empty($column) )    {
+        if( empty($column) ){
             return $this->error(0,'专栏不存在不能为空');
         }
         return $this->success([
@@ -364,6 +364,7 @@ class ColumnController extends Controller
      *
      * @apiParam {int} lecture_id  讲座id
      * @apiParam {int} user_id 用户id  默认0
+     * @apiParam {int} order asc desc
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -420,6 +421,8 @@ class ColumnController extends Controller
 
         $lecture_id = $request->input('lecture_id',0);
         $user_id   = $request->input('user_id',0);
+        $order   = $request->input('order','asc');
+
         if(empty($lecture_id)){
             return $this->error(0,'参数有误：lecture_id ');
         }
@@ -428,7 +431,7 @@ class ColumnController extends Controller
         $is_sub = Subscribe::isSubscribe($user_id,$lecture_id,1);
         //查询章节、
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id);
+        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order);
         $works_data['info_num'] = count($info);
 
 

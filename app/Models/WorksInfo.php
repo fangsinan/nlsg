@@ -16,7 +16,7 @@ class WorksInfo extends Base
         return time();
     }
 
-    // $type  1 专栏  2 讲座
+    // $type  1 单课程  2 多课程
     public function getInfo($works_id,$is_sub=0,$user_id=0,$type=1,$order='asc'){
         $where = ['status'=>4];
         if($type == 1){
