@@ -11,7 +11,9 @@ class History extends Model
     protected $table = 'nlsg_history';
 
     // 允许批量赋值
-    protected  $fillable = ['column_id','works_id','worksinfo_id','user_id','is_del'];
+    protected  $fillable = [
+        'relation_type','relation_id','info_id','user_id','is_del', 'time_leng','time_number'
+    ];
 
 
 

@@ -462,7 +462,7 @@ class WorksController extends Controller
      * @apiGroup works
      *
      * @apiParam {int} relation_type  1专栏  2课程   3讲座
-     * @apiParam {int} relation_id   对应id
+     * @apiParam {int} relation_id   对应id(1专栏对应id但课程  2课程id   3讲座使用对应的课程id )
      * @apiParam {int} works_info_id 章节id
      * @apiParam {int} user_id 用户id
      *
@@ -475,7 +475,7 @@ class WorksController extends Controller
         }
      */
     public function show(Request $request){
-        $user_id    = $request->input('user_id',0);
+        $user_id    = $this->user['id'] ?? 0;
         $works_info_id = $request->input('works_info_id',0);
         $relation_type = $request->input('relation_type',0);
         $relation_id = $request->input('relation_id',0);
@@ -491,10 +491,11 @@ class WorksController extends Controller
         }
         if( empty($user_id) ) return $this->success();
 
+
         History::firstOrCreate([
             'relation_id' =>$relation_id,
             'relation_type'  =>$relation_type,
-            'worksinfo_id' =>$works_info_id,
+            'info_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
@@ -507,10 +508,9 @@ class WorksController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup works
      *
-     * @apiParam {int} column_id  专栏id
-     * @apiParam {int} works_id 课程id
+     * @apiParam {int} relation_id  对应id(1专栏对应id但课程  2课程id   3讲座使用对应的课程id )
+     * @apiParam {int} relation_type 1专栏   2课程   3讲座
      * @apiParam {int} works_info_id 章节id
-     * @apiParam {int} user_id 用户id
      * @apiParam {int} time_leng  百分比
      * @apiParam {int} time_number  章节分钟数
      *
@@ -523,7 +523,7 @@ class WorksController extends Controller
     }
      */
     public function editHistoryTime(Request $request){
-        $user_id    = $request->input('user_id',0);
+        $user_id    = $this->user['id'] ?? 0;
         $relation_id  = $request->input('relation_id',0);
         $relation_type  = $request->input('relation_type',0);
         $time_leng  = $request->input('time_leng',0);
@@ -537,7 +537,7 @@ class WorksController extends Controller
         $his = History::firstOrCreate([
             'relation_id' =>$relation_id,
             'relation_type'  =>$relation_type,
-            'worksinfo_id' =>$works_info_id,
+            'info_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
