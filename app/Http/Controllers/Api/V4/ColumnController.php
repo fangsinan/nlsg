@@ -23,7 +23,6 @@ class ColumnController extends Controller
 
     }
 
-
     /**
      * @api {get} /api/v4/column/get_column_list 专栏-专栏|讲座首页列表
      * @apiName get_column_list
@@ -42,10 +41,10 @@ class ColumnController extends Controller
     "data": [
     {
     "id": 1,
-    "name": "王琨专栏",
+    "name": "王琨专栏",   标题
     "type": 1,              //类型 1专栏  2讲座
     "user_id": 211172,
-    "message": "",                  //推荐语
+    "message": "",                  //介绍
     "original_price": "0.00",   //原价
     "price": "0.00",            // 金额
     "online_time": 0,
@@ -97,7 +96,7 @@ class ColumnController extends Controller
         if($order){
             $order_str = 'desc';
         }
-        $field = ['id', 'name', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num'];
+        $field = ['id', 'name','subtitle','message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num'];
         $list = Column::where([
             "status" => 1,
             "type"   => $type,
@@ -345,7 +344,7 @@ class ColumnController extends Controller
         if( empty($column_id) ){
             return $this->error(0,'column_id 不能为空');
         }
-        $field = ['id', 'name', 'type','column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
+        $field = ['id', 'name', 'subtitle','type','column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) ){
             return $this->error(0,'专栏不存在不能为空');
