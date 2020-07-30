@@ -494,7 +494,7 @@ class WorksController extends Controller
         History::firstOrCreate([
             'relation_id' =>$relation_id,
             'relation_type'  =>$relation_type,
-            'worksinfo_id' =>$works_info_id,
+            'info_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
@@ -537,7 +537,7 @@ class WorksController extends Controller
         $his = History::firstOrCreate([
             'relation_id' =>$relation_id,
             'relation_type'  =>$relation_type,
-            'worksinfo_id' =>$works_info_id,
+            'info_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
