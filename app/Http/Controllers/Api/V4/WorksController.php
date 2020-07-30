@@ -475,7 +475,7 @@ class WorksController extends Controller
         }
      */
     public function show(Request $request){
-        $user_id    = $request->input('user_id',0);
+        $user_id    = $this->user['id'] ?? 0;
         $works_info_id = $request->input('works_info_id',0);
         $relation_type = $request->input('relation_type',0);
         $relation_id = $request->input('relation_id',0);
@@ -523,7 +523,7 @@ class WorksController extends Controller
     }
      */
     public function editHistoryTime(Request $request){
-        $user_id    = $request->input('user_id',0);
+        $user_id    = $this->user['id'] ?? 0;
         $relation_id  = $request->input('relation_id',0);
         $relation_type  = $request->input('relation_type',0);
         $time_leng  = $request->input('time_leng',0);
