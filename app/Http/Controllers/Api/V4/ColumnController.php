@@ -364,7 +364,7 @@ class ColumnController extends Controller
      *
      * @apiParam {int} lecture_id  讲座id
      * @apiParam {int} user_id 用户id  默认0
-     * @apiParam {int} order asc desc
+     * @apiParam {int} order asc和 desc  默认desc
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
