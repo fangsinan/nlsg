@@ -419,9 +419,10 @@ class ColumnController extends Controller
     public function getLectureList(Request $request){
 
         $lecture_id = $request->input('lecture_id',0);
-        $user_id   = $request->input('user_id',0);
         $order   = $request->input('order','desc');
         $order = $order ?? 'desc';
+
+        $user_id   = $this->user['id'] ?? 0;
         if(empty($lecture_id)){
             return $this->error(0,'参数有误：lecture_id ');
         }
