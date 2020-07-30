@@ -421,7 +421,7 @@ class ColumnController extends Controller
 
         $lecture_id = $request->input('lecture_id',0);
         $user_id   = $request->input('user_id',0);
-        $order   = $request->input('order','asc');
+        $order   = $request->input('order','desc');
 
         if(empty($lecture_id)){
             return $this->error(0,'参数有误：lecture_id ');
