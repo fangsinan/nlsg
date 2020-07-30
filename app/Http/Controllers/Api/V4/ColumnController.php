@@ -438,7 +438,7 @@ class ColumnController extends Controller
         $historyData = History::select('relation_id','info_id')->where([
             'user_id'=>$user_id,
             'is_del'=>0,
-            'relation_id'=>$lecture_id,
+            'relation_id'=>$works_data['id'],  // 讲座用的对应课程id
             'relation_type'=>3,
         ])->orderBy('updated_at','desc')->first();
         $historyData = $historyData?$historyData->toArray():[];
