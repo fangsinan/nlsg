@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class CouponRule extends Base {
+class CouponRule extends Base
+{
 
     protected $table = 'nlsg_coupon_rule';
 
-    public function getList($params, $user_id) {
+    public function getList($params, $user_id)
+    {
         $cache_key_name = 'coupon_rule_list';
 
         $expire_num = CacheTools::getExpire('coupon_rule_list');
@@ -96,13 +98,12 @@ class CouponRule extends Base {
             }
 
             $get_list = Coupon::where('user_id', '=', $user_id)
-                            ->whereIn('cr_id', $cr_id)
-                            ->select([
-                                'cr_id',
-                                DB::raw('max(created_at) as created_at'),
-                                DB::raw('count(id) as counts')
-                            ])->groupBy('cr_id')->get();
-
+                ->whereIn('cr_id', $cr_id)
+                ->select([
+                    'cr_id',
+                    DB::raw('max(created_at) as created_at'),
+                    DB::raw('count(id) as counts')
+                ])->groupBy('cr_id')->get();
 
 
             if ($get_list->isEmpty()) {
@@ -140,26 +141,30 @@ class CouponRule extends Base {
         }
 
         $temp_res = [];
-        foreach($res as $v){
+        foreach ($res as $v) {
             $temp_res[] = $v;
         }
         return $temp_res;
     }
 
     //ORM重写
-    public static function getListFromDbNew() {
+    public static function getListFromDbNew()
+    {
         //查询所有当前时间没下线的规则
         $res = self::where('status', '=', 1)
-                ->where('buffet', '=', 1)
-                ->where('get_end_time', '>', date('Y-m-d H:i:s'))
-                ->whereIn('use_type', [3])
-                ->with(['sub_list', 'sub_list.goods_list'])
-                ->select(['id', 'name', 'infinite', 'stock', 'used_stock',
-                    'price', 'restrict', 'full_cut', 'get_begin_time',
-                    'get_end_time', 'past', 'use_type', 'remarks',
-                    'use_time_begin', 'use_time_end', 'created_at',
-                    'updated_at', 'hold_max_num'])
-                ->get();
+            ->where('buffet', '=', 1)
+            ->where('get_end_time', '>', date('Y-m-d H:i:s'))
+            ->whereIn('use_type', [3])
+            ->with(['sub_list', 'sub_list.goods_list'])
+            ->select(['id', 'name', 'infinite', 'stock', 'used_stock',
+                'price', 'restrict', 'full_cut',
+                'get_begin_time', 'get_end_time',
+                DB::raw('UNIX_TIMESTAMP(get_begin_time) as get_begin_timestamp'),
+                DB::raw('UNIX_TIMESTAMP(get_end_time) as get_end_timestamp'),
+                'past', 'use_type', 'remarks',
+                'use_time_begin', 'use_time_end', 'created_at',
+                'updated_at', 'hold_max_num'])
+            ->get();
 
         foreach ($res as $k => $v) {
             $goods_list['can_use'] = [];
@@ -184,26 +189,28 @@ class CouponRule extends Base {
     }
 
     //优惠券规则补充表
-    public function sub_list() {
+    public function sub_list()
+    {
         return $this->hasMany('App\Models\CouponRuleSub', 'rule_id', 'id');
     }
 
     //**************************DB废弃**************************
-    public static function getListFromDb($params) {
+    public static function getListFromDb($params)
+    {
         $now = time();
 
         $field = 'r.id,r.`name`,r.infinite,r.stock,r.price,r.`restrict`,r.full_cut,'
-                . 'r.get_begin_time,r.get_end_time,r.past,r.use_type,r.remarks,'
-                . 'r.use_time_begin,r.use_time_end,r.have_sub,'
-                . '(case when infinite = 1 then 1 when '
-                . 'infinite = 0 and stock > 0 then 1 ELSE 0 END) can_use';
+            . 'r.get_begin_time,r.get_end_time,r.past,r.use_type,r.remarks,'
+            . 'r.use_time_begin,r.use_time_end,r.have_sub,'
+            . '(case when infinite = 1 then 1 when '
+            . 'infinite = 0 and stock > 0 then 1 ELSE 0 END) can_use';
 
         $sql_1 = 'select ' . $field . ' from nlsg_coupon_rule r  ';
         $sql_2 = 'select ' . $field . ' from nlsg_coupon_rule r  ';
 
         $temp_where = 'where r.status = 1 and r.use_type = 3 and (r.get_begin_time <= ' .
-                $now . ' or r.get_begin_time = 0) and (r.get_end_time >= ' .
-                $now . ' or r.get_end_time = 0)';
+            $now . ' or r.get_begin_time = 0) and (r.get_end_time >= ' .
+            $now . ' or r.get_end_time = 0)';
 
         if (($params['show_zero_stock'] ?? 0) != 1) {
             //只显示能领取的
@@ -214,10 +221,10 @@ class CouponRule extends Base {
             $goods_id = intval($params['goods_id']);
             $sql_2 .= ' left join nlsg_coupon_rule_sub rs on rs.rule_id = r.id ';
             $temp_where_2 = ' and ((rs.goods_id = '
-                    . $goods_id . ' and rs.use_type = 1) '
-                    . 'or '
-                    . '(rs.goods_id <> '
-                    . $goods_id . ' and rs.use_type = 2))';
+                . $goods_id . ' and rs.use_type = 1) '
+                . 'or '
+                . '(rs.goods_id <> '
+                . $goods_id . ' and rs.use_type = 2))';
         }
 
         $sql_1 .= $temp_where;
@@ -257,7 +264,7 @@ class CouponRule extends Base {
 
         if (($params['get_all'] ?? 0) != 1) {
             $sql .= ' limit ' . $params['size'] . ' offset ' .
-                    ($params['page'] - 1) * $params['size'];
+                ($params['page'] - 1) * $params['size'];
         }
         $res = DB::select($sql);
         return $res;

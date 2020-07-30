@@ -114,7 +114,8 @@ class GoodsServers
             $pic_arr[] = $temp_pic_arr;
         }
 
-        $pic_res = MallPicture::created($pic_arr);
+        $pic_res = DB::table('nlsg_mall_picture')->insert($pic_arr);
+
         if (!$pic_res) {
             DB::rollBack();
             return ['code' => false, 'msg' => 'pic 错误'];
@@ -131,7 +132,7 @@ class GoodsServers
             $temp_tos_arr['tos_id'] = $v;
             $tos_arr[] = $temp_tos_arr;
         }
-        $tos_res = MallTosBind::created($tos_arr);
+        $tos_res = DB::table('nlsg_mall_goods_tos_bind')->insert($tos_arr);
         if (!$tos_res) {
             DB::rollBack();
             return ['code' => false, 'msg' => 'tos 错误'];
