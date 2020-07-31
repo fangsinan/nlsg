@@ -436,12 +436,12 @@ class ColumnController extends Controller
         $works_data['info_num'] = count($info);
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($works_data['id'],3,$user_id);  //讲座
-        $works_data['history_ount'] = round($hisCount/$works_data['info_num']*100)."％";
+        $works_data['history_ount'] = round($hisCount/$works_data['info_num']*100);
 
 
 
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
-        $historyData = History::select('relation_id','info_id')->where([
+        $historyData = History::select('relation_id','info_id','time_number')->where([
             'user_id'=>$user_id,
             'is_del'=>0,
             'relation_id'=>$works_data['id'],  // 讲座用的对应课程id
