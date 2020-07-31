@@ -384,6 +384,7 @@ class ColumnController extends Controller
     "is_free": 0,
     "is_end": 1,
     "info_num": 2       //现有章节数
+    "history_ount": 2%       //总进度
     },
     "info": [
     {
@@ -433,6 +434,10 @@ class ColumnController extends Controller
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order);
         $works_data['info_num'] = count($info);
+        //查询总的历史记录进度`
+        $hisCount = History::getHistoryCount($works_data['id'],3,$user_id);  //讲座
+        $works_data['history_ount'] = round($hisCount/$works_data['info_num']*100)."％";
+
 
 
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
