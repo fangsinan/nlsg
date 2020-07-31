@@ -74,7 +74,7 @@ class ListenBookController extends Controller
      * @apiGroup book
      *
      * @apiParam {int} id
-     * @apiParam {int} user_id  用户id
+     * @apiParam {int} order  asc | desc  默认desc
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -88,6 +88,8 @@ class ListenBookController extends Controller
     public function getListenDetail(Request $request){
 
         $listen_id = $request->input('id',0);
+        $order = $request->input('order','desc');
+        $order = $order ?? 'desc';
         $user_id = $this->user['id'] ?? 0;
         $works_data = Works::select([
             'id', 'user_id', 'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message',
@@ -110,7 +112,7 @@ class ListenBookController extends Controller
 
 
         $infoObj = new WorksInfo();
-        $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id);
+        $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,'',$order);
         $works_data['info_num'] = count($works_data['info']);
 
         //作者信息
