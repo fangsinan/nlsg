@@ -72,7 +72,6 @@ class MallComment extends Base {
     }
 
     public function getList($params) {
-
         if (empty($params['goods_id'])) {
             return ['code' => false, 'msg' => '参数错误'];
         }

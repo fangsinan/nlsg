@@ -68,6 +68,10 @@ class ShoppingCart extends Base
         $temp->num = $num + $old_num;
         $temp->inviter = $inviter;
 
+        if ($temp->num > $check_sku) {
+            $temp->num = $check_sku;
+        }
+
         $res = $temp->save();
 
         if ($res) {

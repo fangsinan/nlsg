@@ -879,8 +879,6 @@ class MallOrderController extends Controller
         }
     }
 
-    //todo 拼团滚动信息
-
     /**
      * 拼团滚动信息
      * @api {get} /api/v4/goods/group_buy_scrollbar 拼团滚动信息

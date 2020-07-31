@@ -149,14 +149,62 @@ class GoodsServers
                 //如果有是编辑,sku_number不变
                 $sku = MallSku::where('goods_id', '=', $goods_id)
                     ->find($v['id']);
+                if ($sku) {
+                    $edit_sku_id_arr[] = $v['id'];
+
+                    $sku->picture = $v['picture'];
+                    $sku->original_price = $v['original_price'];
+                    $sku->price = $v['price'];
+                    $sku->cost = $v['cost'] ?? 0;
+                    $sku->promotion_cost = $v['promotion_cost'] ?? 0;
+                    $sku->stock = $v['price'];
+                    $sku->warning_stock = $v['price'];
+                    $sku->status = $v['price'];
+                    $sku->weight = $v['price'];
+                    $sku->volume = $v['price'];
+                    $sku->erp_enterprise_code = $v['price'];
+                    $sku->erp_goods_code = $v['price'];
+
+
+                } else {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => 'sku:' . $v['id'] . '错误'];
+                }
             } else {
                 //新加
+                $sku = new MallSku();
+
             }
         }
 
     }
 
-
+    /**
+     *  {
+     * "picture": "/phone/hong.jpg",
+     * "original_price": "9999",
+     * "price": "999",
+     * "cost": 6.6,
+     * "promotion_cost": 0,
+     * "stock": 100,
+     * "warning_stock": 10,
+     * "status": 1,
+     * "weight": 250,
+     * "volume": 100,
+     * "erp_enterprise_code": "",
+     * "erp_goods_code": "",
+     * "value_list": [
+     * {
+     * "key_name": "颜色",
+     * "value_name": "红"
+     * },
+     * {
+     * "key_name": "材质",
+     * "value_name": "铁"
+     * }
+     * ]
+     * }
+     */
     /**
      * 生成货号或sku编码
      * @param $type 1:商品 2:sku
