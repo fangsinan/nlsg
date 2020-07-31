@@ -58,4 +58,20 @@ class History extends Model
         return $this->belongsTo('App\Models\WorksInfo','info_id', 'id');
     }
 
+
+
+    static function getHistoryCount($relation_id=0,$relation_type=1,$user_id){
+        if($relation_id == 0 || $user_id == 0){
+            return 0;
+        }
+
+        $his_count = self::where([
+            'relation_type' => $relation_type,
+            'relation_id' => $relation_id,
+            'user_id' => $user_id,
+            'is_del' => 0,
+        ])->count();
+        return $his_count;
+
+    }
 }
