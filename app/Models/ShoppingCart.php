@@ -42,7 +42,6 @@ class ShoppingCart extends Base
             }
         }
 
-        $old_num = 0;
         if (!empty(($params['id'] ?? 0))) {
             $temp = self::where('user_id', '=', $user_id)
                 ->find($params['id']);
@@ -56,7 +55,6 @@ class ShoppingCart extends Base
                 ->first();
             if ($check_cart) {
                 $temp = $check_cart;
-                $old_num = $check_cart->num;
             } else {
                 $temp = new self();
             }
@@ -65,7 +63,7 @@ class ShoppingCart extends Base
         $temp->goods_id = $goods_id;
         $temp->sku_number = $sku_number;
         $temp->user_id = $user_id;
-        $temp->num = $num + $old_num;
+        $temp->num = $num;
         $temp->inviter = $inviter;
 
         $res = $temp->save();
