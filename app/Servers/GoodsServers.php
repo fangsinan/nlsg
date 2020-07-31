@@ -7,6 +7,7 @@ namespace App\Servers;
 use App\Models\MallGoods;
 use App\Models\MallPicture;
 use App\Models\MallSku;
+use App\Models\MallSkuValue;
 use App\Models\MallTosBind;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -157,14 +158,37 @@ class GoodsServers
                     $sku->price = $v['price'];
                     $sku->cost = $v['cost'] ?? 0;
                     $sku->promotion_cost = $v['promotion_cost'] ?? 0;
-                    $sku->stock = $v['price'];
-                    $sku->warning_stock = $v['price'];
-                    $sku->status = $v['price'];
-                    $sku->weight = $v['price'];
-                    $sku->volume = $v['price'];
-                    $sku->erp_enterprise_code = $v['price'];
-                    $sku->erp_goods_code = $v['price'];
+                    $sku->stock = $v['stock'];
+                    $sku->warning_stock = $v['warning_stock'];
+                    $sku->status = $v['status'];
+                    $sku->weight = $v['weight'];
+                    $sku->volume = $v['volume'];
+                    $sku->erp_enterprise_code = $v['erp_enterprise_code'] ?? '';
+                    $sku->erp_goods_code = $v['erp_goods_code'] ?? '';
 
+                    DB::table('nlsg_mall_sku_value')
+                        ->where('sku_id', '=', $v['id'])
+                        ->delete();
+
+                    $edit_sku_res = $sku->save();
+
+                    if (!$edit_sku_res) {
+                        DB::rollBack();
+                        return ['code' => false, 'msg' => 'sku 错误'];
+                    }
+
+                    foreach ($v['value_list'] as $vv) {
+                        $sku_value = new MallSkuValue();
+                        $sku_value->goods_id = $goods_id;
+                        $sku_value->sku_id = $v['id'];
+                        $sku_value->key_name = $vv['key_name'];
+                        $sku_value->value_name = $vv['value_name'];
+                        $temp_sku_value_res = $sku_value->save();
+                        if (!$temp_sku_value_res) {
+                            DB::rollBack();
+                            return ['code' => false, 'msg' => ' sku value 错误'];
+                        }
+                    }
 
                 } else {
                     DB::rollBack();
@@ -173,10 +197,45 @@ class GoodsServers
             } else {
                 //新加
                 $sku = new MallSku();
+                $sku->goods_id = $goods_id;
+                $sku->sku_number = $this->createGoodsSkuNum(2);
+                $sku->picture = $v['picture'];
+                $sku->original_price = $v['original_price'];
+                $sku->price = $v['price'];
+                $sku->cost = $v['cost'] ?? 0;
+                $sku->promotion_cost = $v['promotion_cost'] ?? 0;
+                $sku->stock = $v['stock'];
+                $sku->warning_stock = $v['warning_stock'];
+                $sku->status = $v['status'];
+                $sku->weight = $v['weight'];
+                $sku->volume = $v['volume'];
+                $sku->erp_enterprise_code = $v['erp_enterprise_code'] ?? '';
+                $sku->erp_goods_code = $v['erp_goods_code'] ?? '';
+                $edit_sku_res = $sku->save();
+
+                if (!$edit_sku_res) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => 'sku 错误'];
+                }
+
+                foreach ($v['value_list'] as $vv) {
+                    $sku_value = new MallSkuValue();
+                    $sku_value->goods_id = $goods_id;
+                    $sku_value->sku_id = $sku->id;
+                    $sku_value->key_name = $vv['key_name'];
+                    $sku_value->value_name = $vv['value_name'];
+                    $temp_sku_value_res = $sku_value->save();
+                    if (!$temp_sku_value_res) {
+                        DB::rollBack();
+                        return ['code' => false, 'msg' => ' sku value 错误'];
+                    }
+                }
 
             }
         }
 
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
     }
 
     /**
