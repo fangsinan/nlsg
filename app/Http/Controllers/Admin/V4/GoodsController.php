@@ -131,5 +131,18 @@ class GoodsController extends Controller
             return $this->success($data);
         }
     }
+
+    //todo 商品列表
+    public function list(Request $request)
+    {
+        $servers = new GoodsServers();
+        $data = $servers->list($request->input());
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
 }
 

@@ -121,6 +121,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::post('goods/get_coupon', 'CouponController@getCoupon');
     Route::post('goods/collect', 'MallController@collect');
     Route::get('goods/for_your_reference', 'MallController@forYourReference');
+    Route::post('goods/sub', 'MallController@sub');
+    Route::post('home/redeem_code', 'MallController@redeemCode');
 
     Route::get('address/get_data', 'AddressController@getData');
     Route::post('address/create', 'AddressController@create');
