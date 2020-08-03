@@ -406,4 +406,72 @@ class GetPriceTools extends Base {
         $data->sp_info = $sp_info;
     }
 
+    //权益计算
+    static function Income($is_show,$level,$user_id,$type,$column_id=0,$works_id=0,$goods_id=0,$sku_number=0)
+    {
+        if(empty($level)){ //等级为空
+            //$UserInfo = self::GetLevelInfo ($user_id); //查询用户信息
+            //未登录 默认级别 0
+            //$level=self::GetLevel($UserInfo); //获取用户等级
+
+            $level = User::getLevel($user_id);
+        }
+        if($is_show){ //页面显示使用
+            if($level==0){$level=2;}//未登录 或已过期  默认推客权益
+        }else{ //收益入账
+            if($level==0){return 0;} //没有收益 权益已过期用户
+        }
+        $price=0;
+        $time = time();
+        switch($type){
+            case 1://专栏
+                /*
+                (2 -3)(原价)*15%-促销成本
+                4  35
+                5  45*/
+                $Info = Column::find($column_id)->toArray();
+                //$Info=self::GetColumnInfo($author_id);
+                if($level==2 || $level==3){
+                    $price=self::PriceCalc('*',$Info['price'], 0.15);
+                }else if($level==4){
+                    $price=self::PriceCalc('*',$Info['price'], 0.35);
+                }else if($level==5){
+                    $price=self::PriceCalc('*',$Info['price'], 0.45);
+                }
+
+                $Symbol=substr($Info['promotion_cost'],0,1);
+                if(in_array($Symbol,['-','+'])){
+                    $price=$price.$Info['promotion_cost'];
+                }else{
+                    $price=$price-$Info['promotion_cost'];
+                }
+                break;
+            case 2://精品课
+                /*
+                (2-3)(原价)15%-促销成本
+                4  35
+                5  45*/
+                //$Info=self::GetWorksInfo($author_id,$works_id);
+                $Info=Works::find($works_id)->toArray();
+                if($level==2 || $level==3){
+                    $price=self::PriceCalc('*',$Info['price'], 0.15);
+                }else if($level==4){
+                    $price=self::PriceCalc('*',$Info['price'], 0.35);
+                }else if($level==5){
+                    $price=self::PriceCalc('*',$Info['price'], 0.45);
+                }
+                $Symbol=substr($Info['promotion_cost'],0,1);
+                if(in_array($Symbol,['-','+'])){
+                    $price=$price.$Info['promotion_cost'];
+                }else{
+                    $price=$price-$Info['promotion_cost'];
+                }
+                break;
+        }
+        if($price<0){
+            $price=0; //防止负数
+        }
+        return $price;
+    }
+
 }
