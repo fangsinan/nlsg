@@ -260,4 +260,8 @@ class GoodsServers
             return $num;
         }
     }
+
+    public function list($params){
+
+    }
 }

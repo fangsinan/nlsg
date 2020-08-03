@@ -924,4 +924,50 @@ class MallController extends Controller
         }
     }
 
+    /**
+     * 到货提醒
+     * @api {get} /api/v4/goods/sub 到货提醒
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/goods/sub
+     * @apiGroup  Mall
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/sub
+     * @apiDescription 到货提醒,假接口
+     * @apiParam {number} [sku_number] sku编码
+     * @apiParam {number} goods_id 商品id
+     *
+     */
+    public function sub(Request $request){
+        if (empty($this->user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+        $goods_id = $request->input('goods_id',0);
+        $sku_number = $request->input('sku_number', '');
+        if(empty($sku_number) || $goods_id){
+            return $this->error(0, '参数错误');
+        }
+        return $this->success(['code'=>true,'msg'=>'成功']);
+    }
+
+
+    /**
+     * 兑换码
+     * @api {get} /api/v4/home/redeemCode 兑换码
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/goods/redeemCode
+     * @apiGroup  Home
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeemCode
+     * @apiDescription 兑换码,假接口
+     * @apiParam {number} code 兑换码
+     *
+     */
+    public function redeemCode(Request $request){
+        if (empty($this->user['id'] ?? 0)) {
+            return $this->error(0, '未登录');
+        }
+        $code = $request->input('code', '');
+        if(empty($code)){
+            return $this->error(0, '参数错误');
+        }
+        return $this->success(['code'=>true,'msg'=>'兑换xxx成功']);
+    }
 }
