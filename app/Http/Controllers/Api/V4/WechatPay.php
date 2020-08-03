@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Coupon;
+use App\Models\GetPriceTools;
 use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
@@ -210,33 +211,113 @@ class WechatPay extends Controller {
                 $Sy_Rst = true;
                 $shareSyRst = true;
                 $map = [];
-//                if (!empty($twitter_id) && $orderInfo['twitter_id'] != $orderInfo['service_id']) {
-//
-//                    $isFlag = User::getIncomeFlag($twitter_id, $user_id); //获取是否可返利
-//                    //$isFlag=Profit::GetIncomeFlag
-//                    if ($isFlag) { //推客是自己不算
-//                        //查看用户权限
-////                        $TwitterInfo = $UserObj->GetLevel($twitter_id);
-////                        $is_twitter  = $UserObj->IsTweeter($TwitterInfo);
-//                        $TwitterInfo = User::find($twitter_id);
-//                        $is_twitter = User::getLevel($twitter_id);
-//                        if ($is_twitter > 1) { //是推客 皇钻 黑钻
-//
-//                        } else {
-//                            $is_sub = Subscribe::isSubscribe($twitter_id, $teacher_id, 1);
-//                            if ($is_sub) { //订阅专栏
-//                                $ColumnInfo = Column::find($teacher_id);
-//                                $ProfitPrice = $ColumnInfo['twitter_price'];
-//                                $map = [
-//                                    'user_id' => $twitter_id,
-//                                    "type" => 6, "ordernum" => $out_trade_no,
-//                                    'price' => $ProfitPrice,
-//                                    "ctime" => $time
-//                                ];
-//                            }
-//                        }
-//                    }
-//                }
+
+
+                if (!empty($twitter_id) && $orderInfo['twitter_id'] != $orderInfo['service_id']) {
+
+                    $isFlag = User::getIncomeFlag($twitter_id, $user_id); //获取是否可返利
+                    //$isFlag=Profit::GetIncomeFlag
+                    if ($isFlag) { //推客是自己不算
+                        //查看用户权限
+//                        $TwitterInfo = $UserObj->GetLevel($twitter_id);
+//                        $is_twitter  = $UserObj->IsTweeter($TwitterInfo);
+                        $TwitterInfo = User::find($twitter_id);
+                        $is_twitter = User::getLevel($twitter_id);
+                        if ($is_twitter > 1) { //是推客 皇钻 黑钻
+                            $ColumnInfo = Column::find($teacher_id)->toArray();
+//                            $ColumnObj   = new Column();
+//                            $ColumnInfo  = $ColumnObj->getOne($ColumnObj::$table,['user_id'=>$teacher_id],['price,twitter_price']);
+
+                            $ProfitPrice = 0;
+                            if(in_array($TwitterInfo['level'],[2,3,4])){
+                                $ProfitPrice = GetPriceTools::Income(0,$TwitterInfo['level'],0,1,$teacher_id);
+                            }else if($TwitterInfo['level'] == 5){
+
+
+
+
+                                //服务商
+                                $AgentProfitObj=new AgentProfitLog();
+                                $where = ['user_id'=>$twitter_id,'type'=>[1,2,3],'status'=>1];
+                                $ProfitInfo = $AgentProfitObj->getOne($AgentProfitObj::$table,$where,['sum(price) price']);
+                                if(empty($ProfitInfo['price'])){
+                                    $sumPrice=0;
+                                }else{
+                                    $sumPrice=$ProfitInfo['price'];
+                                }
+
+                                if(($TwitterInfo['level_send_price']-$sumPrice) >= $ColumnInfo['price']){
+                                    //添加记录
+                                    $LogData = [];
+                                    $LogData['ordernum'] =$out_trade_no;
+                                    $LogData['user_id']=$twitter_id;
+                                    $LogData['type'] =2;
+                                    $LogData['column_id']=$teacher_id;
+                                    $LogData['num']=1;
+                                    $LogData['price'] =$ColumnInfo['price'];
+                                    $LogData['ctime'] =$time;
+                                    $AgentProfitObj->add($AgentProfitObj::$table,$LogData); //添加记录
+                                    $ProfitPrice=$ColumnInfo['price']; //返现处理
+                                }else{ //支付金额已扣除分成
+                                    $ProfitPrice=0;
+                                    if($orderInfo['SurplusPrice']>0){
+                                        $LogData = [];
+                                        $LogData['ordernum'] =$out_trade_no;
+                                        $LogData['user_id']=$twitter_id;
+                                        $LogData['type'] =2;
+                                        $LogData['column_id']=$teacher_id;
+                                        $LogData['num']=1;
+                                        $LogData['price'] =$orderInfo['SurplusPrice'];   //推广产品所获金额
+                                        $LogData['ctime'] =$time;
+                                        $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
+                                        $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
+                                        $ProfitPrice=$ProfitPrice-$orderInfo['SurplusPrice'];//返回剩余款项
+                                    }else{
+                                        //                                      $ProfitPrice = Tool::RetainDecimal ($ProfitPrice, 0.45, 1);
+                                        $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
+                                    }
+                                }
+
+
+
+
+
+
+
+                            }
+
+                            if($ProfitPrice > 0) {
+                                $map = [
+                                    'user_id' => $twitter_id,
+                                    "type" => 6,
+                                    "ordernum" => $out_trade_no,
+                                    'price' => $ProfitPrice,
+                                    "ctime" => $time
+                                ];
+                            }
+
+
+
+                        } else {
+                            $is_sub = Subscribe::isSubscribe($twitter_id, $teacher_id, 1);
+                            if ($is_sub) { //订阅专栏
+                                $ColumnInfo = Column::find($teacher_id);
+                                $ProfitPrice = $ColumnInfo['twitter_price'];
+                                $map = [
+                                    'user_id' => $twitter_id,
+                                    "type" => 6, "ordernum" => $out_trade_no,
+                                    'price' => $ProfitPrice,
+                                    "ctime" => $time
+                                ];
+                            }
+                        }
+                    }
+                }
+
+
+
+
+
 
                 if (!empty($map)) {
 
