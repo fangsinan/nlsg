@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\ColumnOutline;
 use App\Models\History;
 use App\Models\Subscribe;
+use App\Models\User;
 use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
@@ -381,7 +382,7 @@ class WorksController extends Controller
             return $this->error(0,'works_id 不能为空');
         }
         //查询当前课程
-        $works_data = Works::select(['id' ,'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num'])
+        $works_data = Works::select(['id' ,'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','chapter_num'])
             ->where('status',4)->find($works_id);
 
         if(empty($works_data)){
@@ -389,13 +390,7 @@ class WorksController extends Controller
         }
         $works_data = $works_data->toArray();
 
-        //查询课程分类
-//        $category = WorksCategoryRelation::select('category_id')->with([
-//            'CategoryName'=>function($query) use($works_id){
-//                $query->select('id','name')->where('status',1);
-//            }])->where(['work_id'=>$works_id])->first();
-//
-//        $works_data['category_name'] = $category->CategoryName->name;
+
         //是否订阅
         $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
 
@@ -413,6 +408,16 @@ class WorksController extends Controller
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,$order);
 
         $works_data['info_num'] = count($info);
+
+        //作者信息
+        //查询课程分类
+        $category = WorksCategoryRelation::select('category_id')->with([
+            'categoryName'=>function($query) use($works_id){
+                $query->select('id','name')->where('status',1);
+            }])->where(['work_id'=>$works_id])->first();
+        $works_data['category_name'] = $category->CategoryName->name ??'';
+        $works_data['user_info'] = User::find($works_data['user_id']);
+
         $res = [
             'column_info'  => $column,
             'works_data'   => $works_data,
