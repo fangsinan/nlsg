@@ -239,32 +239,6 @@ class GoodsServers
     }
 
     /**
-     *  {
-     * "picture": "/phone/hong.jpg",
-     * "original_price": "9999",
-     * "price": "999",
-     * "cost": 6.6,
-     * "promotion_cost": 0,
-     * "stock": 100,
-     * "warning_stock": 10,
-     * "status": 1,
-     * "weight": 250,
-     * "volume": 100,
-     * "erp_enterprise_code": "",
-     * "erp_goods_code": "",
-     * "value_list": [
-     * {
-     * "key_name": "颜色",
-     * "value_name": "红"
-     * },
-     * {
-     * "key_name": "材质",
-     * "value_name": "铁"
-     * }
-     * ]
-     * }
-     */
-    /**
      * 生成货号或sku编码
      * @param $type 1:商品 2:sku
      * @return string
