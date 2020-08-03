@@ -247,8 +247,8 @@ class ColumnController extends Controller
      * @apiGroup Column
      *
      * @apiParam {int} target_id  详情对应的id 专栏id或课程id
-     * @apiParam {int} type  1.专栏 2.课堂 3. 讲座 4.听书
-     * @apiParam {int} position 位置 1.首页   2专栏详情  3 课程详情    4精选书单详情
+     * @apiParam {int} type     类型 1.专栏 2.课堂 3. 讲座 4.书单 5. 百科 6.社区 7.直播 8.好物  9听书
+     * @apiParam {int} position 位置 1.首页 2专栏详情  3 课程详情    4精选书单详情  5听书详情   6讲座详情
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -288,7 +288,7 @@ class ColumnController extends Controller
         $recommendLists = $recommendModel->getIndexRecommend($type, $position);
 
         if($recommendLists == false)         return $this->success();
-        $recommendLists = $recommendLists->toArray();
+
         foreach ($recommendLists as $key=>$val){
             if($target_id && ($val['id'] == $target_id)){
                 unset($recommendLists[$key]);
