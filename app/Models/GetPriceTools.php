@@ -180,8 +180,9 @@ class GetPriceTools extends Base {
         } else {
             $sp_info['end_timestamp'] = strtotime($sp_info['end_time']);
         }
-
+        $sp_info['now'] = time();
         $data->sp_info = $sp_info;
+
     }
 
     //计算推客的常规购买价格和收益
