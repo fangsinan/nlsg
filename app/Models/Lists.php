@@ -29,6 +29,7 @@ class Lists extends Model
             ->where('type', $type)
             ->limit(3)
             ->get();
+        if($lists) $lists->toArray();
         return $lists;
     }
 
@@ -46,6 +47,7 @@ class Lists extends Model
             ->where('type', $type)
             ->limit(3)
             ->first();
+        if($lists) $lists->toArray();
         return $lists;
     }
 
