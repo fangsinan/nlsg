@@ -85,7 +85,7 @@ class MallAddress extends Base
         return $res->name ?? '';
     }
 
-    public function getList($user_id, $id)
+    public function getList($user_id, $id = 0)
     {
 
         $query = self::where('user_id', '=', $user_id);
