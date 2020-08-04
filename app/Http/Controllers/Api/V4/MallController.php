@@ -969,7 +969,7 @@ class MallController extends Controller
             return $this->error(0, '未登录');
         }
         $model = new RedeemCode();
-        $data = $model->redeem($request->input(), $this->user['id']);
+        $data = $model->redeem($request->input(), $this->user);
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
