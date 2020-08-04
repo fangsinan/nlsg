@@ -114,7 +114,7 @@ class MallOrder extends Base {
     //获取sku_list,并校验商品信息和推客信息
     public function getOrderSkuList($params, $user_id) {
 
-        if ($params['from_cart'] === 2) {
+        if ($params['from_cart'] == 2) {
             $temp = [];
             $temp['cart_id'] = 0;
             $temp['sku_number'] = $params['sku'][0];
@@ -738,7 +738,7 @@ class MallOrder extends Base {
      * @param type $params
      */
     public function orderPaySuccess($params, $pay_type = 1) {
-        //1 微信端 2app微信 3app支付宝 4ios 
+        //1 微信端 2app微信 3app支付宝 4ios
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         switch ($pay_type) {

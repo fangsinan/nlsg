@@ -966,6 +966,7 @@ class MallController extends Controller
             return $this->error(0, '未登录');
         }
         $code = $request->input('code', '');
+        $phone = $request->input('phone','');
         if(empty($code)){
             return $this->error(0, '参数错误');
         }
