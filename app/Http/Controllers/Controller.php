@@ -42,6 +42,7 @@ class Controller extends BaseController
         $result = [
             'code' => $code,
             'msg' => $msg,
+            'now' => time(),
             'data' => ''
         ];
         return response()->json($result);
