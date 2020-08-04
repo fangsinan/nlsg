@@ -682,7 +682,7 @@ class MallOrder extends Base
         //****************地址列表和校验地址*********************
         $used_address = [];
         $addressModel = new MallAddress();
-        $address_list = $addressModel->getList($user['id']);
+        $address_list = $addressModel->getList($user['id'],0);
         if ($params['address_id']) {
             foreach ($address_list as $av) {
                 if ($params['address_id'] == $av->id) {
