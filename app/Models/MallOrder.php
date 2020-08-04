@@ -5,21 +5,23 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class MallOrder extends Base {
+class MallOrder extends Base
+{
 
     protected $table = 'nlsg_mall_order';
 
     //检擦用户在规定时间内参加过秒杀活动
-    public function getUserSecKillOrderNew($params) {
+    public function getUserSecKillOrderNew($params)
+    {
         if (empty($params['user_id'])) {
             return [];
         }
 
         $query = DB::table('nlsg_mall_order as nmo')
-                ->join('nlsg_special_price as nsp', 'nmo.sp_id', '=', 'nsp.id')
-                ->where('nmo.user_id', '=', $params['user_id'])
-                ->where('nsp.type', '=', 2)
-                ->where('nmo.is_stop', '=', 0);
+            ->join('nlsg_special_price as nsp', 'nmo.sp_id', '=', 'nsp.id')
+            ->where('nmo.user_id', '=', $params['user_id'])
+            ->where('nsp.type', '=', 2)
+            ->where('nmo.is_stop', '=', 0);
 
         if ($params['begin_time'] ?? false) {
             $query->where('nmo.created_at', '>=', $params['begin_time']);
@@ -43,7 +45,8 @@ class MallOrder extends Base {
         return $sp_list;
     }
 
-    public function getUserSecKillOrder($params) {
+    public function getUserSecKillOrder($params)
+    {
         if (empty($params['user_id'])) {
             return [];
         }
@@ -51,9 +54,9 @@ class MallOrder extends Base {
         $this->getSqlBegin();
 
         $query = DB::table('nlsg_mall_order as nmo')
-                ->leftJoin('nlsg_mall_order_detail as nmod',
-                        'nmo.id', '=', 'nmod.order_id')
-                ->where('nmod.user_id', '=', $params['user_id']);
+            ->leftJoin('nlsg_mall_order_detail as nmod',
+                'nmo.id', '=', 'nmod.order_id')
+            ->where('nmod.user_id', '=', $params['user_id']);
 
         if ($params['begin_time'] ?? false) {
             $query->where('nmo.created_at', '>=', $params['begin_time']);
@@ -64,11 +67,11 @@ class MallOrder extends Base {
 
         //nmo.status > 0 避免多次下未支付订单
         $list = $query
-                ->whereRaw('FIND_IN_SET(2,nmod.special_price_type)')
-                ->where('nmo.status', '>', 0)
-                ->where('nmo.is_stop', '=', 0)
-                ->select(['nmod.sku_number'])
-                ->get();
+            ->whereRaw('FIND_IN_SET(2,nmod.special_price_type)')
+            ->where('nmo.status', '>', 0)
+            ->where('nmo.is_stop', '=', 0)
+            ->select(['nmod.sku_number'])
+            ->get();
 
         $this->getSql();
 
@@ -84,7 +87,8 @@ class MallOrder extends Base {
      * @param array $goods_id
      * @param array $sku_number
      */
-    public function getSkuSP($goods_id, $sku_number) {
+    public function getSkuSP($goods_id, $sku_number)
+    {
         $goods_id = array_unique($goods_id);
         $sku_number = array_unique($sku_number);
         $now_date = date('Y-m-d H:i:s', time());
@@ -102,7 +106,7 @@ class MallOrder extends Base {
                 if ($trv->begin_time > $now_date || $trv->end_time < $now_date) {
                     continue;
                 }
-                if ($trv->stock > 0 && ($trv->use_stock >= $trv->stock )) {
+                if ($trv->stock > 0 && ($trv->use_stock >= $trv->stock)) {
                     continue;
                 }
                 $sp_list[] = $trv;
@@ -112,7 +116,8 @@ class MallOrder extends Base {
     }
 
     //获取sku_list,并校验商品信息和推客信息
-    public function getOrderSkuList($params, $user_id) {
+    public function getOrderSkuList($params, $user_id)
+    {
 
         if ($params['from_cart'] == 2) {
             $temp = [];
@@ -124,10 +129,14 @@ class MallOrder extends Base {
             $sku_list = [$temp];
         } else {
             $sku_list = ShoppingCart::where('user_id', '=', $user_id)
-                            ->whereIn('sku_number', $params['sku'])
-                            ->select(['id as cart_id', 'sku_number',
-                                'goods_id', 'num', 'inviter'])
-                            ->get()->toArray();
+                ->whereIn('sku_number', $params['sku'])
+                ->select(['id as cart_id', 'sku_number',
+                    'goods_id', 'num', 'inviter'])
+                ->get();
+            if($sku_list->isEmpty()){
+                return ['code' => false, 'msg' => '购物车参数错误 '];
+            }
+            $sku_list = $sku_list->toArray();
             if (count($params['sku']) !== count($sku_list)) {
                 return ['code' => false, 'msg' => '购物车参数错误'];
             }
@@ -135,7 +144,7 @@ class MallOrder extends Base {
 
         foreach ($sku_list as $k => $v) {
             $check_temp_res = MallSku::checkSkuCanBuy(
-                            $v['goods_id'], $v['sku_number']
+                $v['goods_id'], $v['sku_number']
             );
             if ($check_temp_res === false) {
                 return ['code' => false, 'msg' => '商品参数错误'];
@@ -159,8 +168,8 @@ class MallOrder extends Base {
             } else {
 
                 $temp_inviter_info = User::where('status', '=', 1)
-                                ->select(['level', 'expire_time', 'is_staff'])
-                                ->find($v['inviter'])->toArray();
+                    ->select(['level', 'expire_time', 'is_staff'])
+                    ->find($v['inviter'])->toArray();
 
                 $sku_list[$k]['inviter_info'] = $temp_inviter_info;
 
@@ -179,7 +188,8 @@ class MallOrder extends Base {
         return $sku_list;
     }
 
-    public function skuListExplode($sku_list) {
+    public function skuListExplode($sku_list)
+    {
         $temp_list = [];
         foreach ($sku_list as $v) {
             $temp_num = $v['num'];
@@ -201,7 +211,8 @@ class MallOrder extends Base {
      * @param type $uid 用户id
      * @param type $type 1:普通订单 2:售后
      */
-    public static function createOrderNumber($uid, $type) {
+    public static function createOrderNumber($uid, $type)
+    {
         $now = time();
         $d = date('ymd', $now);
         $u = str_pad($uid, 8, 0, STR_PAD_LEFT);
@@ -210,7 +221,8 @@ class MallOrder extends Base {
     }
 
     //检查下单参数是否正确
-    public function checkParams(&$params) {
+    public function checkParams(&$params)
+    {
 
         if (empty($params['sku'])) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => 'sku'];
@@ -257,13 +269,15 @@ class MallOrder extends Base {
     }
 
     //普通订单  --预下单
-    public function prepareCreateOrder($params, $user) {
+    public function prepareCreateOrder($params, $user)
+    {
         $sku_list = $this->createOrderTool($params, $user);
         return $sku_list;
     }
 
     //普通订单  --下单
-    public function createOrder($params, $user) {
+    public function createOrder($params, $user)
+    {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $dead_time = ConfigModel::getData(12);
@@ -363,8 +377,8 @@ class MallOrder extends Base {
         }
         //********************mall_goods销量部分********************
         $goods_sale_res = DB::table('nlsg_mall_goods')
-                ->where('id', '=', $v['goods_id'])
-                ->increment('sales_num', $v['actual_num']);
+            ->where('id', '=', $v['goods_id'])
+            ->increment('sales_num', $v['actual_num']);
         if (!$goods_sale_res) {
             DB::rollBack();
             return ['code' => false, 'msg' => '订单提交失败,请重试.',
@@ -401,9 +415,9 @@ class MallOrder extends Base {
             //如果是购物车,删除
             $cart_sku = explode(',', $params['sku']);
             $cart_res = DB::table('nlsg_mall_shopping_cart')
-                    ->where('user_id', '=', $user['id'])
-                    ->whereIn('sku_number', $cart_sku)
-                    ->delete();
+                ->where('user_id', '=', $user['id'])
+                ->whereIn('sku_number', $cart_sku)
+                ->delete();
             if (!$cart_res) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '订单提交失败,请重试.',
@@ -417,7 +431,8 @@ class MallOrder extends Base {
     }
 
     //普通订单 下单工具
-    public function createOrderTool($params, $user, $check_sub = false) {
+    public function createOrderTool($params, $user, $check_sub = false)
+    {
         $now_date = date('Y-m-d H:i:s');
         $can_sub = true;
         //检查参数逻辑
@@ -439,7 +454,7 @@ class MallOrder extends Base {
         foreach ($sku_list as $sl_k => $sl_v) {
             //获取商品各规格的售价和推客收益
             $temp_sl_v = $priceTools->getGoodsPrice(
-                    $sl_v, $user['level'], $user['id'], $user['is_staff'], true
+                $sl_v, $user['level'], $user['id'], $user['is_staff'], true
             );
 
             foreach ($temp_sl_v->price_list->sku_price_list as $vv) {
@@ -497,8 +512,8 @@ class MallOrder extends Base {
 
         //查询商品的折扣信息
         $sp_list = $this->getSkuSP(
-                array_column($sku_list, 'goods_id'),
-                array_column($sku_list, 'sku_number')
+            array_column($sku_list, 'goods_id'),
+            array_column($sku_list, 'sku_number')
         );
 
         //如果有优惠价格
@@ -597,36 +612,36 @@ class MallOrder extends Base {
         //****************开始计算金额*********************
         foreach ($sku_list as $k => $v) {
             $all_original_price = GetPriceTools::PriceCalc(
-                            '+',
-                            $all_original_price,
-                            GetPriceTools::PriceCalc(
-                                    '*', $v['original_price'], $v['actual_num']
-                            )
+                '+',
+                $all_original_price,
+                GetPriceTools::PriceCalc(
+                    '*', $v['original_price'], $v['actual_num']
+                )
             );
             $all_price = GetPriceTools::PriceCalc(
-                            '+',
-                            $all_price,
-                            GetPriceTools::PriceCalc(
-                                    '*', $v['actual_price'], $v['actual_num']
-                            )
+                '+',
+                $all_price,
+                GetPriceTools::PriceCalc(
+                    '*', $v['actual_price'], $v['actual_num']
+                )
             );
             if (($v['sp_price'] ?? 0) > 0) {
                 $temp_sp_cut = GetPriceTools::PriceCalc('-', $v['original_price'], $v['actual_price']);
                 $sp_cut_money = GetPriceTools::PriceCalc(
-                                '+',
-                                $sp_cut_money,
-                                GetPriceTools::PriceCalc(
-                                        '*', $temp_sp_cut, $v['actual_num']
-                                )
+                    '+',
+                    $sp_cut_money,
+                    GetPriceTools::PriceCalc(
+                        '*', $temp_sp_cut, $v['actual_num']
+                    )
                 );
             } else {
                 $temp_vip_cut = GetPriceTools::PriceCalc('-', $v['original_price'], $v['level_price']);
                 $vip_cut_money = GetPriceTools::PriceCalc(
-                                '+',
-                                $vip_cut_money,
-                                GetPriceTools::PriceCalc(
-                                        '*', $temp_vip_cut, $v['actual_num']
-                                )
+                    '+',
+                    $vip_cut_money,
+                    GetPriceTools::PriceCalc(
+                        '*', $temp_vip_cut, $v['actual_num']
+                    )
                 );
             }
         }
@@ -635,7 +650,7 @@ class MallOrder extends Base {
 
         //需要排除限定商品得优惠券
         $coupon_list = Coupon::getCouponListForOrder(
-                        $user['id'], $all_price, $goods_id_list
+            $user['id'], $all_price, $goods_id_list
         );
 
         if ($params['coupon_goods_id']) {
@@ -683,7 +698,7 @@ class MallOrder extends Base {
             if (!empty($used_address)) {
                 foreach ($sku_list as $k => $v) {
                     $sku_list[$k]['freight_money'] = FreightTemplate::getFreightMoney(
-                                    $v, $used_address
+                        $v, $used_address
                     );
                 }
             }
@@ -737,7 +752,8 @@ class MallOrder extends Base {
      * 订单支付成功处理
      * @param type $params
      */
-    public function orderPaySuccess($params, $pay_type = 1) {
+    public function orderPaySuccess($params, $pay_type = 1)
+    {
         //1 微信端 2app微信 3app支付宝 4ios
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
@@ -753,8 +769,8 @@ class MallOrder extends Base {
         }
 
         $order_obj = self::where('ordernum', '=', $out_trade_no)
-                ->where('status', '=', 1)
-                ->first();
+            ->where('status', '=', 1)
+            ->first();
 
         DB::beginTransaction();
         //修改订单支付状态
@@ -792,30 +808,30 @@ class MallOrder extends Base {
         //如果是拼团订单  需要查看拼团订单是否成功
         if ($order_obj->order_type == 3) {
             $temp_data = DB::table('nlsg_mall_group_buy_list')
-                    ->where('user_id', '=', $order_obj->user_id)
-                    ->where('order_id', '=', $order_obj->id)
-                    ->first();
+                ->where('user_id', '=', $order_obj->user_id)
+                ->where('order_id', '=', $order_obj->id)
+                ->first();
             if (!$temp_data) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '拼团信息错误'];
             }
             $group_buy_id = $temp_data->group_buy_id;
             $sp_info = DB::table('nlsg_special_price')
-                    ->find($group_buy_id);
+                ->find($group_buy_id);
             $need_num = $sp_info->group_num;
 
             $now_num = DB::table('nlsg_mall_group_buy_list')
-                    ->where('group_key', '=', $order_obj->group_key)
-                    ->count();
+                ->where('group_key', '=', $order_obj->group_key)
+                ->count();
 
             if ($now_num >= $need_num) {
                 $gb_res = MallOrderGroupBuy::where(
-                                'group_key', '=', $order_obj->group_key
-                        )->update(
-                        [
-                            'is_success' => 1,
-                            'success_at' => $now_date
-                        ]
+                    'group_key', '=', $order_obj->group_key
+                )->update(
+                    [
+                        'is_success' => 1,
+                        'success_at' => $now_date
+                    ]
                 );
                 if (!$gb_res) {
                     DB::rollBack();
@@ -831,9 +847,10 @@ class MallOrder extends Base {
     }
 
     //订单状态修改
-    public function statusChange($id, $flag, $user_id) {
+    public function statusChange($id, $flag, $user_id)
+    {
         $check = MallOrder::where('user_id', '=', $user_id)
-                ->find($id);
+            ->find($id);
 
         if (!$check) {
             return ['code' => false, 'msg' => '订单不存在'];
@@ -867,7 +884,7 @@ class MallOrder extends Base {
                         $refund_data['created_at'] = $now_date;
                         $refund_data['updated_at'] = $now_date;
                         $refund_res = DB::table('nlsg_mall_refund_record')
-                                ->insert($refund_data);
+                            ->insert($refund_data);
                         if (!$refund_res) {
                             DB::rollBack();
                             return ['code' => false, 'msg' => '失败', 'ps' => 'refund'];
@@ -909,13 +926,13 @@ class MallOrder extends Base {
                     }
 
                     $child_res = DB::table('nlsg_mall_order_child')
-                            ->where('order_id', '=', $check->id)
-                            ->update(
+                        ->where('order_id', '=', $check->id)
+                        ->update(
                             [
                                 'status' => 2,
                                 'receipt_at' => $now_date
                             ]
-                    );
+                        );
 
                     if (!$child_res) {
                         DB::rollBack();
@@ -936,7 +953,8 @@ class MallOrder extends Base {
     }
 
     //用户普通订单列表
-    public function userOrderList($params, $user, $flag = false) {
+    public function userOrderList($params, $user, $flag = false)
+    {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $user_id = $user['id'];
@@ -947,11 +965,11 @@ class MallOrder extends Base {
         //展示数据:订单编号,状态,商品列表,价格,数量,取消时间,金额
 
         $query = self::from('nlsg_mall_order as nmo')
-                ->where('user_id', '=', $user_id)
-                ->whereIn('order_type', [1, 2])
-                ->where('is_del', '=', 0)
-                ->limit($params['size'])
-                ->offset(($params['page'] - 1) * $params['size']);
+            ->where('user_id', '=', $user_id)
+            ->whereIn('order_type', [1, 2])
+            ->where('is_del', '=', 0)
+            ->limit($params['size'])
+            ->offset(($params['page'] - 1) * $params['size']);
 
         if (!empty($params['ordernum'])) {
             $query->where('nmo.ordernum', '=', $params['ordernum']);
@@ -1002,7 +1020,7 @@ class MallOrder extends Base {
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
-                $now_date . '" then FALSE ELSE TRUE END) ');
+            $now_date . '" then FALSE ELSE TRUE END) ');
 
         $list = $query->with($with)->select($field)->get();
 
@@ -1018,38 +1036,42 @@ class MallOrder extends Base {
         return $list;
     }
 
-    public function orderDetails() {
+    public function orderDetails()
+    {
         return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
-                        ->select([
-                            'status', 'goods_id', 'num', 'id as details_id',
-                            'order_id', 'sku_history', 'comment_id'
-        ]);
+            ->select([
+                'status', 'goods_id', 'num', 'id as details_id',
+                'order_id', 'sku_history', 'comment_id'
+            ]);
     }
 
-    public function userInfo() {
+    public function userInfo()
+    {
         return $this->hasOne('App\Models\User', 'id', 'user_id')
-                        ->select(['id', 'phone', 'nickname', 'headimg']);
+            ->select(['id', 'phone', 'nickname', 'headimg']);
     }
 
-    public function orderChild() {
+    public function orderChild()
+    {
         return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')
-                        ->groupBy('express_info_id')
-                        ->select([
-                            'status', 'order_id',
-                            'express_info_id',
-                            DB::raw('GROUP_CONCAT(order_detail_id) order_detail_id')
-        ]);
+            ->groupBy('express_info_id')
+            ->select([
+                'status', 'order_id',
+                'express_info_id',
+                DB::raw('GROUP_CONCAT(order_detail_id) order_detail_id')
+            ]);
     }
 
-    public function orderInfo($user_id, $ordernum) {
+    public function orderInfo($user_id, $ordernum)
+    {
         if (empty($ordernum)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
         $getData = $this->userOrderList(
-                ['ordernum' => $ordernum],
-                ['id' => $user_id],
-                true
+            ['ordernum' => $ordernum],
+            ['id' => $user_id],
+            true
         );
 
         $data = $getData[0]->toArray();
@@ -1119,24 +1141,25 @@ class MallOrder extends Base {
         $data['order_child'][] = $temp_data;
 
         unset(
-                $data['cost_price'], $data['freight'],
-                $data['vip_cut'], $data['price'],
-                $data['coupon_money'], $data['special_price_cut'],
-                $data['pay_time'], $data['pay_type'],
-                $data['bill_type'], $data['bill_title'],
-                $data['bill_number'], $data['bill_format'],
-                $data['order_details']
+            $data['cost_price'], $data['freight'],
+            $data['vip_cut'], $data['price'],
+            $data['coupon_money'], $data['special_price_cut'],
+            $data['pay_time'], $data['pay_type'],
+            $data['bill_type'], $data['bill_title'],
+            $data['bill_number'], $data['bill_format'],
+            $data['order_details']
         );
 
         return $data;
     }
 
-    public function commentList($user_id, $params = []) {
+    public function commentList($user_id, $params = [])
+    {
 
         $query = DB::table('nlsg_mall_order as nmo')
-                ->join('nlsg_mall_order_detail as nmod', 'nmo.id', '=', 'nmod.order_id')
-                ->join('nlsg_mall_goods as nmg', 'nmod.goods_id', '=', 'nmg.id')
-                ->where('nmo.user_id', '=', $user_id);
+            ->join('nlsg_mall_order_detail as nmod', 'nmo.id', '=', 'nmod.order_id')
+            ->join('nlsg_mall_goods as nmg', 'nmod.goods_id', '=', 'nmg.id')
+            ->where('nmo.user_id', '=', $user_id);
 
         //1已评价   2未评价  3全部
         switch (intval($params['flag'] ?? 0)) {
@@ -1158,13 +1181,13 @@ class MallOrder extends Base {
         }
 
         $list = $query
-                ->where('nmo.status', '=', 30)
-                ->where('nmod.num', '>', 'nmod.after_sale_used_num')
-                ->where('nmo.is_del', '=', 0)
-                ->select(['nmo.id as order_id', 'nmo.ordernum',
-                    'nmod.id as order_detail_id', 'nmod.sku_history',
-                    'nmg.name', 'nmg.subtitle', 'nmod.comment_id'])
-                ->get();
+            ->where('nmo.status', '=', 30)
+            ->where('nmod.num', '>', 'nmod.after_sale_used_num')
+            ->where('nmo.is_del', '=', 0)
+            ->select(['nmo.id as order_id', 'nmo.ordernum',
+                'nmod.id as order_detail_id', 'nmod.sku_history',
+                'nmg.name', 'nmg.subtitle', 'nmod.comment_id'])
+            ->get();
 
         foreach ($list as $v) {
             $temp = json_decode($v->sku_history);
@@ -1175,21 +1198,22 @@ class MallOrder extends Base {
         return $list;
     }
 
-    public function subComment($params, $user) {
+    public function subComment($params, $user)
+    {
         $order_detial_id = $params['order_detail_id'] ?? 0;
         if (empty($order_detial_id)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
         //校验是否能评价
         $check = DB::table('nlsg_mall_order_detail as nmod')
-                ->join('nlsg_mall_order as nmo', 'nmod.order_id', '=', 'nmo.id')
-                ->where('nmod.id', '=', $order_detial_id)
-                ->where('nmo.user_id', '=', $user['id'])
-                ->where('nmo.status', '=', 30)
-                ->where('nmod.comment_id', '=', 0)
-                ->where('nmod.num', '>', 'nmod.after_sale_used_num')
-                ->where('nmo.is_del', '=', 0)
-                ->first();
+            ->join('nlsg_mall_order as nmo', 'nmod.order_id', '=', 'nmo.id')
+            ->where('nmod.id', '=', $order_detial_id)
+            ->where('nmo.user_id', '=', $user['id'])
+            ->where('nmo.status', '=', 30)
+            ->where('nmod.comment_id', '=', 0)
+            ->where('nmod.num', '>', 'nmod.after_sale_used_num')
+            ->where('nmo.is_del', '=', 0)
+            ->first();
 
         if (empty($check)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -1240,9 +1264,10 @@ class MallOrder extends Base {
     }
 
     //mall_refund_record使用
-    public function infoOrderDetail() {
+    public function infoOrderDetail()
+    {
         return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
-                        ->select(['id', 'order_id', 'goods_id', 'sku_history']);
+            ->select(['id', 'order_id', 'goods_id', 'sku_history']);
     }
 
 }
