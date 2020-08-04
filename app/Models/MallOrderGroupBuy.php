@@ -372,6 +372,14 @@ class MallOrderGroupBuy extends Base
             'order_price' => $order_price,
         ];
 
+        $price_list_new = [
+            ['key'=>'商品总额','value'=>$all_price],
+            ['key'=>'运费','value'=>$freight_money],
+            ['key'=>'活动立减','value'=>$sp_cut_money],
+            ['key'=>'优惠券总额','value'=>$coupon_money],
+            ['key'=>'订单金额','value'=>$order_price],
+        ];
+
         $sku_list_show = [];
         $sku_list_show['goods_id'] = $sku_list['goods_id'];
         $sku_list_show['name'] = $sku_list['name'];
@@ -386,6 +394,7 @@ class MallOrderGroupBuy extends Base
             'user' => $user,
             'sku_list' => $sku_list_show,
             'price_list' => $price_list,
+            'price_list_new' => $price_list_new,
             'address_list' => $address_list,
             'coupon_list' => $coupon_list ?? [],
             'used_address' => $used_address,

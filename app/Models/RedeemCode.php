@@ -21,6 +21,16 @@ class RedeemCode extends Base
         }
 
 
+        if(empty($phone)){
+            $to_user_id = $uid;
+        }else{
+            $check_phone = User::where('phone','=',$phone)->first();
+            if($check_phone){
+                $to_user_id = $check_phone->id;
+            }else{
+
+            }
+        }
 
 
 
