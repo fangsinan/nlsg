@@ -10,6 +10,7 @@ use App\Models\MallComment;
 use App\Models\MallCategory;
 use App\Models\Banner;
 use App\Models\SpecialPriceModel;
+use App\Models\RedeemCode;
 
 class MallController extends Controller
 {
@@ -936,16 +937,17 @@ class MallController extends Controller
      * @apiParam {number} goods_id 商品id
      *
      */
-    public function sub(Request $request){
+    public function sub(Request $request)
+    {
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
-        $goods_id = $request->input('goods_id',0);
+        $goods_id = $request->input('goods_id', 0);
         $sku_number = $request->input('sku_number', '');
-        if($goods_id){
+        if ($goods_id) {
             return $this->error(0, '参数错误');
         }
-        return $this->success(['code'=>true,'msg'=>'成功']);
+        return $this->success(['code' => true, 'msg' => '成功']);
     }
 
 
@@ -961,15 +963,18 @@ class MallController extends Controller
      * @apiParam {string} phone 账号,如果空就是当前登陆账号
      *
      */
-    public function redeemCode(Request $request){
+    public function redeemCode(Request $request)
+    {
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
-        $code = $request->input('code', '');
-        $phone = $request->input('phone','');
-        if(empty($code)){
-            return $this->error(0, '参数错误');
+        $model = new RedeemCode();
+        $data = $model->redeem($request->input(), $this->user['id']);
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
         }
-        return $this->success(['code'=>true,'msg'=>'兑换xxx成功']);
     }
 }
