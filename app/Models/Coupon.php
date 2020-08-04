@@ -60,7 +60,7 @@ class Coupon extends Base {
         foreach ($coupon_rule_list as $k => $v) {
             switch (intval($v->restrict)) {
                 case 1:
-                    //每人一张     
+                    //每人一张
                     $had_count = Coupon::where('user_id', '=', $uid)
                             ->where('cr_id', '=', $v->id)
                             ->count();
@@ -192,7 +192,7 @@ class Coupon extends Base {
                         ->where('begin_time', '<=', $now_date)
                         ->where('end_time', '>', $now_date)
                         ->select(['id', 'name', 'type', 'price', 'full_cut',
-                            'explain', 'begin_time', 'end_time', 'cr_id'])
+                            'explain as remarks', 'begin_time', 'end_time', 'cr_id'])
                         ->with(['sub_list'])
                         ->orderBy('end_time', 'asc')
                         ->orderBy('id', 'asc')
