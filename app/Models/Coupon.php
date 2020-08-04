@@ -10,22 +10,25 @@ use Illuminate\Support\Str;
  *
  * @author wangxh
  */
-class Coupon extends Base {
+class Coupon extends Base
+{
 
     protected $table = 'nlsg_coupon';
 
-    static function getCouponMoney($coupon_id, $user_id, $price, $type = 1) {
+    static function getCouponMoney($coupon_id, $user_id, $price, $type = 1)
+    {
         $data = Coupon::select()->where([
-                            'id' => $coupon_id,
-                            'user_id' => $user_id,
-                            'type' => $type,
-                            'status' => 1,
-                        ])->where('end_time', '>=', time())
-                        ->where('full_cut', '>=', $price)->first();
+            'id' => $coupon_id,
+            'user_id' => $user_id,
+            'type' => $type,
+            'status' => 1,
+        ])->where('end_time', '>=', time())
+            ->where('full_cut', '>=', $price)->first();
         return $data->money ?? 0;
     }
 
-    public function getCoupon($flag, $uid, $must_all_true = false) {
+    public function getCoupon($flag, $uid, $must_all_true = false)
+    {
 
         if (!is_array($flag)) {
             $flag = explode(',', $flag);
@@ -41,17 +44,18 @@ class Coupon extends Base {
         return $res;
     }
 
-    protected static function getCouponRun($flag, $uid, $must_all_true) {
+    protected static function getCouponRun($flag, $uid, $must_all_true)
+    {
 
         $today_time = date('Y-m-d 00:00:00');
         $now = date('Y-m-d H:i:s');
         $coupon_rule_list = CouponRule::whereIn('id', $flag)
-                ->where('status', '=', 1)
-                ->whereIN('use_type', [3, 4])
-                ->where('buffet', '=', 1)
-                ->where('get_begin_time', '<=', $now)
-                ->where('get_end_time', '>=', $now)
-                ->get();
+            ->where('status', '=', 1)
+            ->whereIN('use_type', [3, 4])
+            ->where('buffet', '=', 1)
+            ->where('get_begin_time', '<=', $now)
+            ->where('get_end_time', '>=', $now)
+            ->get();
 
         if (count($flag) !== count($coupon_rule_list)) {
             return ['code' => false, 'msg' => '优惠券参数错误'];
@@ -62,8 +66,8 @@ class Coupon extends Base {
                 case 1:
                     //每人一张
                     $had_count = Coupon::where('user_id', '=', $uid)
-                            ->where('cr_id', '=', $v->id)
-                            ->count();
+                        ->where('cr_id', '=', $v->id)
+                        ->count();
                     if ($had_count >= 1) {
                         if ($must_all_true) {
                             return ['code' => false, 'msg' => '您已经领取过了'];
@@ -75,9 +79,9 @@ class Coupon extends Base {
                 case 2:
                     //活动时间段内每日领取一次
                     $had_count = Coupon::where('user_id', '=', $uid)
-                            ->where('cr_id', '=', $v->id)
-                            ->where('created_at', '>', $today_time)
-                            ->count();
+                        ->where('cr_id', '=', $v->id)
+                        ->where('created_at', '>', $today_time)
+                        ->count();
                     if ($had_count >= 1) {
                         if ($must_all_true) {
                             return ['code' => false, 'msg' => '您今天已经领取过了'];
@@ -89,8 +93,8 @@ class Coupon extends Base {
                 case 3:
                     //有个人数量上限(hold_max_num)
                     $had_count = Coupon::where('user_id', '=', $uid)
-                            ->where('cr_id', '=', $v->id)
-                            ->count();
+                        ->where('cr_id', '=', $v->id)
+                        ->count();
                     if ($had_count >= $v->hold_max_num) {
                         if ($must_all_true) {
                             return ['code' => false, 'msg' => '您已经领取过了.'];
@@ -120,8 +124,8 @@ class Coupon extends Base {
         foreach ($coupon_rule_list as $v) {
 
             $temp_used_stock = DB::table('nlsg_coupon_rule')
-                    ->where('id', '=', $v->id)
-                    ->increment('used_stock');
+                ->where('id', '=', $v->id)
+                ->increment('used_stock');
             if (!$temp_used_stock) {
                 $used_stock = false;
             }
@@ -164,7 +168,8 @@ class Coupon extends Base {
         return ['msg' => '领取成功'];
     }
 
-    protected static function createCouponNum($buffet, $id) {
+    protected static function createCouponNum($buffet, $id)
+    {
         $res = date('YmdHis') . $buffet . str_pad($id, 6, 0) . random_int(100000, 999999);
         $check = Coupon::where('number', '=', $res)->count();
         if ($check) {
@@ -174,29 +179,34 @@ class Coupon extends Base {
         }
     }
 
-    public function sub_list() {
+    public function sub_list()
+    {
         return $this->hasMany('App\Models\CouponRuleSub', 'rule_id', 'cr_id')
-                        ->select(['id', 'rule_id', 'use_type', 'goods_id']);
+            ->select(['id', 'rule_id', 'use_type', 'goods_id']);
     }
 
-    public static function getCouponListForOrder($uid, $money = 0, $goods_id_list = []) {
+    public static function getCouponListForOrder($uid, $money = 0, $goods_id_list = [])
+    {
         $now_date = date('Y-m-d H:i:s');
 
         $coupon_goods = [];
         $coupon_freight = [];
 
         $temp_res = self::where('user_id', '=', $uid)
-                        ->where('status', '=', 1)
-                        ->whereIn('type', [3, 4])
-                        ->where('order_id', '=', 0)
-                        ->where('begin_time', '<=', $now_date)
-                        ->where('end_time', '>', $now_date)
-                        ->select(['id', 'name', 'type', 'price', 'full_cut',
-                            'explain as remarks', 'begin_time', 'end_time', 'cr_id'])
-                        ->with(['sub_list'])
-                        ->orderBy('end_time', 'asc')
-                        ->orderBy('id', 'asc')
-                        ->get()->toArray();
+            ->where('status', '=', 1)
+            ->whereIn('type', [3, 4])
+            ->where('order_id', '=', 0)
+            ->where('begin_time', '<=', $now_date)
+            ->where('end_time', '>', $now_date)
+            ->select(['id', 'name', 'type', 'price', 'full_cut',
+                'explain as remarks', 'cr_id', 'begin_time', 'end_time',
+                DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
+                DB::raw('unix_timestamp(end_time) as end_timestamp'),
+            ])
+            ->with(['sub_list'])
+            ->orderBy('end_time', 'asc')
+            ->orderBy('id', 'asc')
+            ->get()->toArray();
 
         if (empty($temp_res)) {
             return [
@@ -243,7 +253,8 @@ class Coupon extends Base {
         ];
     }
 
-    public function listInHome($user_id, $params) {
+    public function listInHome($user_id, $params)
+    {
 
         $status = intval($params['status'] ?? 1);
         $page = intval($params['page'] ?? 1);
@@ -252,19 +263,19 @@ class Coupon extends Base {
         $now_date = date('Y-m-d H:i:s');
 
         $count['status_1'] = self::where('user_id', '=', $user_id)
-                ->where('end_time', '>', $now_date)
-                ->where('status', '=', 1)
-                ->count();
+            ->where('end_time', '>', $now_date)
+            ->where('status', '=', 1)
+            ->count();
 
         $count['status_2'] = self::where('user_id', '=', $user_id)
-                ->where('status', '=', 2)
-                ->count();
+            ->where('status', '=', 2)
+            ->count();
 
         $count['status_3'] = self::where('user_id', '=', $user_id)
-                        ->Where(function($query) {
-                            $query->where('status', '=', 3)
-                            ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
-                        })->count();
+            ->Where(function ($query) {
+                $query->where('status', '=', 3)
+                    ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
+            })->count();
 
         $query = self::where('user_id', '=', $user_id);
         switch ($status) {
@@ -272,9 +283,9 @@ class Coupon extends Base {
                 $query->where('status', '=', 2);
                 break;
             case 3:
-                $query->Where(function($query) {
+                $query->Where(function ($query) {
                     $query->where('status', '=', 3)
-                            ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
+                        ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
                 });
                 break;
             default :
