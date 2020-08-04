@@ -376,13 +376,13 @@ class WorksController extends Controller
     public function getWorksDetail(Request $request){
 
         $works_id = $request->input('works_id',0);
-        $user_id   = $request->input('user_id',0);
+        $user_id   = $this->user['id'] ?? 0;
         $order   = $request->input('order','asc');
         if( empty($works_id) ){
             return $this->error(0,'works_id 不能为空');
         }
         //查询当前课程
-        $works_data = Works::select(['id' ,'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','chapter_num'])
+        $works_data = Works::select(['id' ,'column_id','user_id' ,'type','title','subtitle', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','chapter_num'])
             ->where('status',4)->find($works_id);
 
         if(empty($works_data)){
@@ -418,10 +418,14 @@ class WorksController extends Controller
         $works_data['category_name'] = $category->CategoryName->name ??'';
         $works_data['user_info'] = User::find($works_data['user_id']);
 
+
+        $history_data = History::getHistoryData($works_data['id'],2,$user_id);
+
         $res = [
             'column_info'  => $column,
             'works_data'   => $works_data,
             'works_info'   => $info,
+            'history_data'   => $history_data,
         ];
         return $this->success($res);
     }

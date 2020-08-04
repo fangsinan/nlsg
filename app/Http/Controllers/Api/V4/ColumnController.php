@@ -441,17 +441,18 @@ class ColumnController extends Controller
 
 
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
-        $historyData = History::select('relation_id','info_id','time_number')->where([
-            'user_id'=>$user_id,
-            'is_del'=>0,
-            'relation_id'=>$works_data['id'],  // 讲座用的对应课程id
-            'relation_type'=>3,
-        ])->orderBy('updated_at','desc')->first();
-        $historyData = $historyData?$historyData->toArray():[];
-        if($historyData){
-            $title = WorksInfo::select('title')->where('id',$historyData['info_id'])->first();
-            $historyData['title'] = $title->title ?? '';
-        }
+//        $historyData = History::select('relation_id','info_id','time_number')->where([
+//            'user_id'=>$user_id,
+//            'is_del'=>0,
+//            'relation_id'=>$works_data['id'],  // 讲座用的对应课程id
+//            'relation_type'=>3,
+//        ])->orderBy('updated_at','desc')->first();
+//        $historyData = $historyData?$historyData->toArray():[];
+//        if($historyData){
+//            $title = WorksInfo::select('title')->where('id',$historyData['info_id'])->first();
+//            $historyData['title'] = $title->title ?? '';
+//        }
+        $historyData = History::getHistoryData($works_data['id'],3,$user_id);
 
         return $this->success([
             'works_data'    => $works_data,

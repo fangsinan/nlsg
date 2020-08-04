@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\History;
 use App\Models\Lists;
 use App\Models\ListsWork;
 use App\Models\Recommend;
@@ -117,6 +118,7 @@ class ListenBookController extends Controller
 
         //作者信息
         $works_data['user_info'] = User::find($works_data['user_id']);
+        $works_data['historyData'] = History::getHistoryData($works_data['id'],3,$user_id);
 
         return $this->success($works_data);
     }
