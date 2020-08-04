@@ -20,7 +20,7 @@ class MallOrderController extends Controller
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/prepare_create_order
      * @apiDescription 普通订单预下单
-     * @apiParam {number=0,1} from_cart 下单方式(1:购物车下单  2:立即购买
+     * @apiParam {number=1,2} from_cart 下单方式(1:购物车下单  2:立即购买
      * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
      * @apiParam {string} goods_id 如果是购物车则不用传,直接购买必须传
      * @apiParam {string} buy_num 如果是购物车则不用传,直接购买必须传
@@ -204,7 +204,7 @@ class MallOrderController extends Controller
      * @apiGroup MallOrder
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall/create_order
      * @apiDescription 普通订单下单(参数同预下单)
-     * @apiParam {number=0,1} from_cart 下单方式(1:购物车下单  2:立即购买
+     * @apiParam {number=1,2} from_cart 下单方式(1:购物车下单  2:立即购买
      * @apiParam {string} sku  sku_number字符串或数组(如果是购物车,可以多条sku,直接购买只能一个sku)
      * @apiParam {string} goods_id 如果是购物车则不用传,直接购买必须传
      * @apiParam {string} buy_num 如果是购物车则不用传,直接购买必须传

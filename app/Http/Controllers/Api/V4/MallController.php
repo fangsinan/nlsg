@@ -925,7 +925,7 @@ class MallController extends Controller
     }
 
     /**
-     * 到货提醒
+     * todo 到货提醒
      * @api {post} /api/v4/goods/sub 到货提醒
      * @apiVersion 4.0.0
      * @apiName /api/v4/goods/sub
@@ -950,7 +950,7 @@ class MallController extends Controller
 
 
     /**
-     * 兑换码
+     * todo 兑换码
      * @api {post} /api/v4/home/redeemCode 兑换码
      * @apiVersion 4.0.0
      * @apiName /api/v4/goods/redeemCode
