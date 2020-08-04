@@ -378,6 +378,12 @@ class MallOrderGroupBuy extends Base
             ['key' => '活动立减', 'value' => $sp_cut_money],
             ['key' => '优惠券总额', 'value' => $coupon_money]
         ];
+        foreach ($price_list_new as $new_k => $new_v) {
+            if (empty($new_v['value'])) {
+                unset($price_list_new[$new_k]);
+            }
+        }
+        $price_list_new = array_values($price_list_new);
 
         $sku_list_show = [];
         $sku_list_show['goods_id'] = $sku_list['goods_id'];

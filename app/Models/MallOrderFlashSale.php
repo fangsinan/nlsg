@@ -298,6 +298,12 @@ class MallOrderFlashSale extends Base
             ['key' => '运费', 'value' => $freight_money],
             ['key' => '活动立减', 'value' => $price_list['sp_cut_money']]
         ];
+        foreach ($price_list_new as $new_k => $new_v) {
+            if (empty($new_v['value'])) {
+                unset($price_list_new[$new_k]);
+            }
+        }
+        $price_list_new = array_values($price_list_new);
 
 
         $sku_list_show = [];

@@ -133,7 +133,7 @@ class MallOrder extends Base
                 ->select(['id as cart_id', 'sku_number',
                     'goods_id', 'num', 'inviter'])
                 ->get();
-            if($sku_list->isEmpty()){
+            if ($sku_list->isEmpty()) {
                 return ['code' => false, 'msg' => '购物车参数错误 '];
             }
             $sku_list = $sku_list->toArray();
@@ -682,7 +682,7 @@ class MallOrder extends Base
         //****************地址列表和校验地址*********************
         $used_address = [];
         $addressModel = new MallAddress();
-        $address_list = $addressModel->getList($user['id'],0);
+        $address_list = $addressModel->getList($user['id'], 0);
         if ($params['address_id']) {
             foreach ($address_list as $av) {
                 if ($params['address_id'] == $av->id) {
@@ -728,12 +728,19 @@ class MallOrder extends Base
         ];
 
         $price_list_new = [
-            ['key'=>'商品总额','value'=>$all_price],
-            ['key'=>'运费','value'=>$freight_money],
-            ['key'=>'权益立减','value'=>$vip_cut_money],
-            ['key'=>'活动立减','value'=>$sp_cut_money],
-            ['key'=>'优惠券总额','value'=>$coupon_money]
+            ['key' => '商品总额', 'value' => $all_price],
+            ['key' => '运费', 'value' => $freight_money],
+            ['key' => '权益立减', 'value' => $vip_cut_money],
+            ['key' => '活动立减', 'value' => $sp_cut_money],
+            ['key' => '优惠券总额', 'value' => $coupon_money]
         ];
+
+        foreach ($price_list_new as $new_k => $new_v) {
+            if (empty($new_v['value'])) {
+                unset($price_list_new[$new_k]);
+            }
+        }
+        $price_list_new = array_values($price_list_new);
 
         $res = [
             'user' => $user,
