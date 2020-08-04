@@ -379,7 +379,7 @@ class MallOrderGroupBuy extends Base
             ['key' => '优惠券总额', 'value' => GetPriceTools::PriceCalc('-', 0, $coupon_money)]
         ];
         foreach ($price_list_new as $new_k => $new_v) {
-            if (empty($new_v['value'])) {
+            if ($new_v['value'] == 0) {
                 unset($price_list_new[$new_k]);
             }
         }
