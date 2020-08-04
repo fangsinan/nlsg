@@ -926,7 +926,7 @@ class MallController extends Controller
 
     /**
      * 到货提醒
-     * @api {get} /api/v4/goods/sub 到货提醒
+     * @api {post} /api/v4/goods/sub 到货提醒
      * @apiVersion 4.0.0
      * @apiName /api/v4/goods/sub
      * @apiGroup  Mall
@@ -951,13 +951,14 @@ class MallController extends Controller
 
     /**
      * 兑换码
-     * @api {get} /api/v4/home/redeemCode 兑换码
+     * @api {post} /api/v4/home/redeemCode 兑换码
      * @apiVersion 4.0.0
      * @apiName /api/v4/goods/redeemCode
      * @apiGroup  Home
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeemCode
      * @apiDescription 兑换码,假接口
      * @apiParam {number} code 兑换码
+     * @apiParam {string} phone 账号,如果空就是当前登陆账号
      *
      */
     public function redeemCode(Request $request){
