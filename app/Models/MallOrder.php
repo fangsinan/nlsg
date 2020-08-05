@@ -684,20 +684,34 @@ class MallOrder extends Base
         $addressModel = new MallAddress();
         $address_list = $addressModel->getList($user['id'], 0);
 
-        if ($params['address_id']) {
-            foreach ($address_list as $av) {
-                if ($params['address_id'] == $av->id) {
-                    $used_address = $av->toArray();
+        if ($params['post_type'] == 1) {
+            if ($params['address_id']) {
+                foreach ($address_list as $av) {
+                    if ($params['address_id'] == $av->id) {
+                        $used_address = $av->toArray();
+                    }
+                }
+                if (empty($used_address)) {
+                    return ['code' => false, 'msg' => '地址信息错误'];
+                }
+            } else {
+                if ($address_list[0]) {
+                    $used_address = $address_list[0]->toArray();
                 }
             }
-            if (empty($used_address)) {
-                return ['code' => false, 'msg' => '地址信息错误'];
+        } else {
+            if (empty($params['address_id'])) {
+                return ['code' => false, 'msg' => '自提地址信息错误'];
             }
-        }else{
-            if($address_list[0]){
-                $used_address = $address_list[0]->toArray();
+            $check_shop_address = FreightTemplate::where('type', '=', '2')
+                ->where('status', '=', 1)
+                ->find($params['address_id']);
+            if (!$check_shop_address) {
+                return ['code' => false, 'msg' => '自提地址信息错误'];
             }
+            $freight_free_flag = true;
         }
+
 
         //****************运费模板*********************
         if ($freight_free_flag === false) {
@@ -717,6 +731,7 @@ class MallOrder extends Base
         } else {
             $freight_money = 0;
         }
+
 
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
