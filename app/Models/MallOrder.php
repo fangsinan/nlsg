@@ -683,6 +683,7 @@ class MallOrder extends Base
         $used_address = [];
         $addressModel = new MallAddress();
         $address_list = $addressModel->getList($user['id'], 0);
+
         if ($params['address_id']) {
             foreach ($address_list as $av) {
                 if ($params['address_id'] == $av->id) {
@@ -692,7 +693,12 @@ class MallOrder extends Base
             if (empty($used_address)) {
                 return ['code' => false, 'msg' => '地址信息错误'];
             }
+        }else{
+            if($address_list[0]){
+                $used_address = $address_list[0]->toArray();
+            }
         }
+
         //****************运费模板*********************
         if ($freight_free_flag === false) {
             if (!empty($used_address)) {
@@ -712,7 +718,6 @@ class MallOrder extends Base
             $freight_money = 0;
         }
 
-        $order_price = 0;
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
 
