@@ -10,6 +10,7 @@ use App\Models\History;
 use App\Models\Recommend;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\UserFollow;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
@@ -553,6 +554,9 @@ class ColumnController extends Controller
 
         foreach ($subList['data'] as $key => &$val){
             $val['user_info']['level'] = User::getLevel(0, $val['user_info']['level'], $val['user_info']['expire_time']);
+            //是否关注
+            $follow = UserFollow::where(['from_uid'=>$user_id,'to_uid'=>$val['user_info']['id']])->first();
+            $val['user_info']['is_follow'] = $follow ? 1 :0;
             unset($val['user_info']['expire_time']);
         }
 
