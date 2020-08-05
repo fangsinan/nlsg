@@ -26,7 +26,7 @@ class FreightTemplate extends Base
             $res = self::whereIn('type', [2, 3])
                 ->where('status', '=', 1)
                 ->select(['id', 'type', 'name',
-                    'admin_name', 'admin_phone',
+                    'admin_name', 'admin_phone','admin_phone as phone',
                     'province', 'city', 'area', 'details',
                     'start_time', 'end_time'])
                 ->get();
