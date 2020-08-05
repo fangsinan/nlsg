@@ -539,7 +539,7 @@ class ColumnController extends Controller
      */
     public function LectureStudyList(Request $request){
         $lecture_id = $request->input('lecture_id',0);
-        $user_id    = $request->input('user_id',0);
+        $user_id    = $this->user['id'];
 
         $subList = Subscribe::with([
             'UserInfo' => function($query){

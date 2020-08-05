@@ -58,7 +58,7 @@ class User extends Authenticatable implements JWTSubject
         //判断会员
         $time    = strtotime(date('Y-m-d', time())) + 86400;
         if (!empty($user) && in_array ($user['level'], [3,4,5]) && $user['expire_time']>$time) { //会员
-            return $user->level;
+            return $user['level'];
         }else{
             return 0;
         }
