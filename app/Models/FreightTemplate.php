@@ -58,7 +58,6 @@ class FreightTemplate extends Base
 
     public static function getFreightMoney($info, $address_info)
     {
-
         $freight_id = MallGoods::find($info['goods_id'])->freight_id;
         if ($freight_id) {
             $model = new self();

@@ -64,6 +64,7 @@ class MallOrderController extends Controller
      * @apiSuccess {number} price_list.order_price 订单金额
      *
      * @apiSuccess {string[]} address_list 用户地址列表
+     * @apiSuccess {string[]} shop_address_list 自提点列表
      *
      * @apiSuccess {string[]} coupon_list 可用优惠券列表
      * @apiSuccess {string[]} coupon_list.coupon_goods 商品优惠券列表
