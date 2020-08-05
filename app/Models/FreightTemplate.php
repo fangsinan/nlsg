@@ -185,10 +185,10 @@ class FreightTemplate extends Base
             ->with(['f_details', 'f_details.d_list'])
             ->select(['id', 'name'])
             ->find($id);
-        if ($res->isEmpty()) {
-            return [];
-        } else {
+        if ($res) {
             return $res->toArray();
+        } else {
+            return [];
         }
     }
 
