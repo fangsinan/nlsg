@@ -140,6 +140,9 @@ class PayController extends Controller {
       }
      */
     public function aliPay(Request $request) {
+
+
+
         //1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
         $attach = $request->input('type', 0);
         $order_id = $request->input('id', 0);
