@@ -26,11 +26,12 @@ class RedeemCode extends Base
         }
 
         $check_code = RedeemCode::where('code', '=', $code)
-            ->where('status', '=', 0)
-            ->where('can_use', '=', 1)
             ->first();
-        if (!$check_code) {
-            return ['code' => false, 'msg' => '无效兑换码'];
+        if (!$check_code || $check_code->can_use <> 1) {
+            return ['code' => false, 'msg' => '兑换码不存在'];
+        }
+        if ($check_code->status == 1) {
+            return ['code' => false, 'msg' => '兑换码已使用'];
         }
 
         DB::beginTransaction();

@@ -318,12 +318,16 @@ class MallOrderFlashSale extends Base
         $sku_list_show['original_price'] = $sku_list['original_price'];
         $sku_list_show['price'] = $sku_list['flash_sale_price'];
 
+        $ftModel = new FreightTemplate();
+        $shop_address_list = $ftModel->listOfShop(2);
+
         $res = [
             'user' => $user,
             'sku_list' => $sku_list_show,
             'price_list' => $price_list,
             'price_list_new' => $price_list_new,
             'address_list' => $address_list,
+            'shop_address_list' => $shop_address_list,
             'coupon_list' => ['coupon_freight' => $coupon_freight_list ?? []],
             'used_address' => $used_address,
         ];

@@ -742,12 +742,16 @@ class MallOrder extends Base
         }
         $price_list_new = array_values($price_list_new);
 
+        $ftModel = new FreightTemplate();
+        $shop_address_list = $ftModel->listOfShop(2);
+
         $res = [
             'user' => $user,
             'sku_list' => $sku_list_show,
             'price_list' => $price_list,
             'price_list_new' => $price_list_new,
             'address_list' => $address_list,
+            'shop_address_list' => $shop_address_list,
             'coupon_list' => $coupon_list,
             'used_address' => $used_address,
         ];

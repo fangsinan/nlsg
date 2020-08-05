@@ -218,7 +218,7 @@ class AddressController extends Controller {
 
     /**
      * 自提点和退货点列表
-     * @api {get} /api/v4/address/list_of_shop 收货地址列表
+     * @api {get} /api/v4/address/list_of_shop 自提点和退货点列表
      * @apiVersion 4.0.0
      * @apiName /api/v4/address/list_of_shop
      * @apiGroup  address
