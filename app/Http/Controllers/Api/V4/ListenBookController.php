@@ -111,13 +111,14 @@ class ListenBookController extends Controller
 
         $is_sub = Subscribe::isSubscribe($user_id,$listen_id,2);
 
-        //查询总的历史记录进度`
-        $hisCount = History::getHistoryCount($works_data['id'],2,$user_id);  //讲座
-        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
         $infoObj = new WorksInfo();
         $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,'',$order);
         $works_data['info_num'] = count($works_data['info']);
+
+        //查询总的历史记录进度`
+        $hisCount = History::getHistoryCount($works_data['id'],2,$user_id);  //讲座
+        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
         //作者信息
         $works_data['user_info'] = User::find($works_data['user_id']);
