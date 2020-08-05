@@ -13,7 +13,6 @@ class RedeemCode extends Base
     //todo 兑换
     public function redeem($params, $user)
     {
-
         $code = $params['code'] ?? '';
         $phone = $params['phone'] ?? '';
         $os_type = $params['os_type'] ?? 0;
@@ -37,23 +36,23 @@ class RedeemCode extends Base
         DB::beginTransaction();
 
         if (empty($phone)) {
-            $to_user_id = $user->id;
-            $phone = $user->phone;
+            $to_user_id = $user['id'];
+            $phone = $user['phone'];
         } else {
-
             $check_phone = User::where('phone', '=', $phone)->first();
             if ($check_phone) {
                 $to_user_id = $check_phone->id;
             } else {
-                $user = new User();
-                $user->phone = $phone;
-                $user->nickname = substr($phone, 0, 3) . '****' . substr($phone, -4);
-                $user_res = $user->save();
-                if (!$user_res) {
+                $new_user = new User();
+                $new_user->phone = $phone;
+                $new_user->nickname = substr($phone, 0, 3) . '****' . substr($phone, -4);
+                $new_user->inviter = $user['id'];
+                $new_user_res = $new_user->save();
+                if (!$new_user_res) {
                     DB::rollBack();
                     return ['code' => false, 'msg' => '失败'];
                 }
-                $to_user_id = $user->id;
+                $to_user_id = $new_user_res->id;
             }
         }
         $now = time();
@@ -62,7 +61,7 @@ class RedeemCode extends Base
         $check_code->status = 1;
         $check_code->exchange_time = $now_date;
         $check_code->phone = $phone;
-        $check_code->user_id = $user->id;
+        $check_code->user_id = $user['id'];
         $check_code->to_user_id = $to_user_id;
         $check_code->os_type = $os_type;
         $code_res = $check_code->save();
@@ -71,9 +70,17 @@ class RedeemCode extends Base
         }
 
         //todo 兑换过程
+        $this->toRedeem($check_code,$user['id']);
 
 
         return $this->success(['code' => true, 'msg' => '兑换xxx成功']);
+
+
+    }
+
+    public function toRedeem($code,$user_id){
+        $use_type = intval($code->redeem_type);
+        $product_id = intval($code->goodes_id);
 
 
     }
