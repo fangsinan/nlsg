@@ -193,7 +193,7 @@ class ColumnController extends Controller
         $historyData    = [];
         //多课程
         if($column['column_type'] == 1){
-            $works_data = Works::select(['id','type','title','cover_img','detail_img','message','is_pay','is_end','is_free','subscribe_num'])
+            $works_data = Works::select(['id','type','title','cover_img','detail_img','message','is_pay','is_end','is_free','subscribe_num','chapter_num as info_num','original_price','price'])
                 ->where('column_id', $column_id)->where('status',4)->get();
             foreach ($works_data as $key=>$val){
                 $works_data[$key]['is_sub'] = Subscribe::isSubscribe($user_id,$val['id'],2);
