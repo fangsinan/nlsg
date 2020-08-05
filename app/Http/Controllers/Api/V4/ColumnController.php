@@ -488,7 +488,7 @@ class ColumnController extends Controller
         $type       = $request->input('type',0);
         $target_id  = $request->input('target_id',0);
         $info_id  = $request->input('info_id',0);
-        $user_id    = $request->input('user_id',0);
+        $user_id   = $this->user['id'] ?? 0;
 
         if( empty($column_id) || empty($user_id) ){
             return $this->error(0,'column_id 或者 user_id 不能为空');
@@ -539,7 +539,7 @@ class ColumnController extends Controller
      */
     public function LectureStudyList(Request $request){
         $lecture_id = $request->input('lecture_id',0);
-        $user_id    = $request->input('user_id',0);
+        $user_id    = $this->user['id'] ?? 0;
 
         $subList = Subscribe::with([
             'UserInfo' => function($query){
