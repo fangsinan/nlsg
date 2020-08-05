@@ -436,7 +436,7 @@ class ColumnController extends Controller
         $works_data['info_num'] = count($info);
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($works_data['id'],3,$user_id);  //讲座
-        $works_data['history_ount'] = round($hisCount/$works_data['info_num']*100);
+        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
 
 

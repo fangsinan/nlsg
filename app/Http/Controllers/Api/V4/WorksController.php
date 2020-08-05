@@ -419,6 +419,12 @@ class WorksController extends Controller
         $works_data['user_info'] = User::find($works_data['user_id']);
 
 
+        //查询总的历史记录进度`
+        $hisCount = History::getHistoryCount($works_data['id'],2,$user_id);  //讲座
+        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
+
+
+
         $history_data = History::getHistoryData($works_data['id'],2,$user_id);
 
         $res = [
