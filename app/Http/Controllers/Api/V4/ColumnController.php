@@ -544,7 +544,7 @@ class ColumnController extends Controller
 
         $subList = Subscribe::with([
             'UserInfo' => function($query){
-                $query->select('id','level','phone','nickname','headimg','expire_time');
+                $query->select('id','level','phone','nickname','headimg','expire_time','intro');
             }])->select('id','user_id')->where([
             'type' => 6,
             'relation_id' => $lecture_id,
