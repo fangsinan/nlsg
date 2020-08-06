@@ -46,6 +46,10 @@ class MallOrderServers {
 
         $query = MallOrder::from('nlsg_mall_order');
 
+        if(!empty($params['id'])){
+            $query->where('id','=',intval($params['id']));
+        }
+
         if (!empty($params['ordernum'])) {
             $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
@@ -135,7 +139,7 @@ class MallOrderServers {
             $field[] = 'bill_number';
             $field[] = 'bill_format';
             $with[] = 'orderChild';
-            $with[] = 'expressInfo';
+            $with[] = 'orderChild.expressInfo';
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
@@ -150,6 +154,10 @@ class MallOrderServers {
                 $vv->sku_history = json_decode($vv->sku_history);
             }
             $v->address_history = json_decode($v->address_history);
+
+            foreach($v->orderChild as $cv){
+                
+            }
         }
 
         return $list;
