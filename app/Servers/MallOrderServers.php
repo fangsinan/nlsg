@@ -156,7 +156,7 @@ class MallOrderServers {
             $v->address_history = json_decode($v->address_history);
 
             foreach($v->orderChild as $cv){
-                
+
             }
         }
 

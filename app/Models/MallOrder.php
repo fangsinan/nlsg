@@ -1035,7 +1035,7 @@ class MallOrder extends Base
         }
 
         $field = [
-            'id', 'ordernum', 'price', 'dead_time',
+            'id', 'ordernum', 'price', 'dead_time',DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`')
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];

@@ -221,6 +221,7 @@ class MallOrderController extends Controller
     public function createOrder(Request $request)
     {
         if (0) {
+            $this->user['id'] = 168934;
             $params['from_cart'] = 1;
             $params['sku'] = '1612728266,1835913656,1654630825,1626220663';
             $params['goods_id'] = $request->input('goods_id', 0);
@@ -983,7 +984,6 @@ class MallOrderController extends Controller
         $params = $request->input();
         $params['page'] = 1;
         $params['size'] = 10;
-
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }

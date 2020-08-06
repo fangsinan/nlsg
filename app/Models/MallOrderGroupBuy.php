@@ -677,6 +677,7 @@ class MallOrderGroupBuy extends Base
 
         $field = [
             'nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time',
+            DB::raw('unix_timestamp(nmo.dead_time) as dead_timestamp'),
             DB::raw('(case when nmo.`status` = 1 then 1
                 when is_success = 0 then 95 when nmo.is_stop = 1
                 then 99 ELSE nmo.`status` END) `status`')
