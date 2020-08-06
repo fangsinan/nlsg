@@ -491,7 +491,7 @@ class ColumnController extends Controller
         $info_id  = $request->input('info_id',0);
         $user_id   = $this->user['id'] ?? 0;
 
-        if( empty($column_id) || empty($user_id) ){
+        if( empty($target_id) || empty($user_id) ){
             return $this->error(0,'column_id 或者 user_id 不能为空');
         }
         //  type 1：专栏  2：课程 3 :商品
