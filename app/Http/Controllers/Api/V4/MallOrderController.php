@@ -202,6 +202,11 @@ class MallOrderController extends Controller
      * @apiParam {number} coupon_freight_id 免邮券id,没有0
      * @apiParam {number} address_id 选择的地址id
      * @apiParam {number=1,2,3} os_type 1安卓2苹果3微信
+     * @apiParam {string} message 留言
+     * @apiParam {number} bill_type  发票选项(0为不开发票 1个人 2公司)
+     * @apiParam {string} bill_title 发票抬头
+     * @apiParam {string} bill_number 纳税人识别号
+     * @apiParam {number} bill_format 发票类型(1：纸质 2：电子)
      *
      * @apiSuccessExample {json} Request-Example:
      * {

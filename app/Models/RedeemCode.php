@@ -82,6 +82,13 @@ class RedeemCode extends Base
         $use_type = intval($code->redeem_type);
         $product_id = intval($code->goodes_id);
 
+        switch ($use_type){
+            case 1:
+                break;
+            case 2:
+                break;
+        }
+
 
     }
 }
