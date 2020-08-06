@@ -70,7 +70,7 @@ class RedeemCode extends Base
         }
 
         //todo 兑换过程
-        $this->toRedeem($check_code,$user['id']);
+        $this->toRedeem($check_code,$to_user_id);
 
 
         return $this->success(['code' => true, 'msg' => '兑换xxx成功']);

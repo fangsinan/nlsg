@@ -323,7 +323,7 @@ class MallOrderFlashSale extends Base
 
         $res = [
             'user' => $user,
-            'sku_list' => $sku_list_show,
+            'sku_list' => [$sku_list_show],
             'price_list' => $price_list,
             'price_list_new' => $price_list_new,
             'address_list' => $address_list,
