@@ -80,10 +80,13 @@ class ShoppingCart extends Base
         $cart = self::where('user_id', '=', $user['id'])
             ->orderBy('updated_at', 'desc')
             ->select(['id', 'goods_id', 'sku_number', 'num'])
-            ->get()->toArray();
-        if (empty($cart)) {
-            return [];
+            ->get();
+
+        if($cart->isEmpty()){
+            return new class{};
         }
+
+        $cart = $cart->toArray();
 
         $goods_id_list = array_column($cart, 'goods_id');
 
