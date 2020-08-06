@@ -413,7 +413,12 @@ class MallOrder extends Base
         //********************购物车********************
         if ($params['from_cart'] == 1) {
             //如果是购物车,删除
-            $cart_sku = explode(',', $params['sku']);
+            if(!is_array($params['sku'])){
+                $cart_sku = explode(',', $params['sku']);
+            }else{
+                $cart_sku = $params['sku'];
+            }
+
             $cart_res = DB::table('nlsg_mall_shopping_cart')
                 ->where('user_id', '=', $user['id'])
                 ->whereIn('sku_number', $cart_sku)
