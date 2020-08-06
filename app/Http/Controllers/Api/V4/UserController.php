@@ -788,7 +788,8 @@ class UserController extends Controller
 
     public function collection(Request $request)
     {
-        $user_id = $request->input('user_id', 0);
+
+        $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
         //1专栏  2课程  3商品  4书单 5百科 6听书
 
