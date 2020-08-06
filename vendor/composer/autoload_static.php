@@ -648,6 +648,8 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
     public static $classMap = array (
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
+        'App\\Http\\Controllers\\Admin\\V4\\AfterSalesController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/V4/AfterSalesController.php',
+        'App\\Http\\Controllers\\Admin\\V4\\GoodsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/V4/GoodsController.php',
         'App\\Http\\Controllers\\Admin\\V4\\MallOrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/V4/MallOrderController.php',
         'App\\Http\\Controllers\\Api\\V4\\AddressController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/AddressController.php',
         'App\\Http\\Controllers\\Api\\V4\\AfterSalesController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/V4/AfterSalesController.php',
@@ -765,6 +767,8 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'App\\Providers\\EasySmsServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EasySmsServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
         'App\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
+        'App\\Servers\\GoodsServers' => __DIR__ . '/../..' . '/app/Servers/GoodsServers.php',
+        'App\\servers\\AfterSalesServers' => __DIR__ . '/../..' . '/app/Servers/AfterSalesServers.php',
         'App\\servers\\MallOrderServers' => __DIR__ . '/../..' . '/app/Servers/MallOrderServers.php',
         'Asm89\\Stack\\Cors' => __DIR__ . '/..' . '/asm89/stack-cors/src/Asm89/Stack/Cors.php',
         'Asm89\\Stack\\CorsService' => __DIR__ . '/..' . '/asm89/stack-cors/src/Asm89/Stack/CorsService.php',

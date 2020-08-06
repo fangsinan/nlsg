@@ -71,7 +71,7 @@ class Column extends Base
         if (!$ids){
             return false;
         }
-        $lists= $this->select('id','name', 'title','subtitle', 'message','price', 'cover_pic','info_num as chapter_num')
+        $lists= $this->select('id','name', 'title','subtitle', 'message','price', 'cover_pic','info_num as chapter_num','is_free')
             ->whereIn('id', $ids)
             ->where('status',self::STATUS_ONE)
             ->orderBy('created_at', 'desc')
