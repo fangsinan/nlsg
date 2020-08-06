@@ -474,4 +474,53 @@ class GetPriceTools extends Base {
         return $price;
     }
 
+
+
+    /*1.服务商成交皇钻  皇钻收益的10%给服务商  (走线下打款)  服务商有效期内
+    2.服务商成交的皇钻再发展皇钻 ，最后一次皇钻收入的5%给服务商
+    皇钻：
+    1.皇钻A成交皇钻B   皇钻B所有收入的5% ,补贴给A  走线上    7 8月份有效*/
+    //服务商额外补贴5%
+    public static function ServiceIncome($out_trade_no,$type,$ProfitPrice,$twitter_id,$orderdtl_id=0){ //收益金额
+        $now=time();
+        $time    = strtotime(date('Y-m-d', time())) + 86400;
+        $UserInfo = User::find($twitter_id);
+        $rst=true;
+        if (!empty($UserInfo) && in_array ($UserInfo['level'], [3,4]) && $UserInfo['expire_time']>$time) { //会员
+            $ReferrerInfo=UserAttribution::select('referrer_user_id','referrer_user_level')->where('user_id',$twitter_id)->first();
+            if($ReferrerInfo) $ReferrerInfo = $ReferrerInfo->toArray();
+
+            if(!empty($ReferrerInfo) && $ReferrerInfo['referrer_user_level']!=5){ //排除服务商
+                //5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画
+                $ProfitPrice=self::PriceCalc('*',$ProfitPrice, 0.05);
+                $subsidy_type = 1;  //当收益为5%(0.05) 时  subsidy_type为1
+                $map =['user_id' => $ReferrerInfo['referrer_user_id'], "type" => $type, "ordernum" => $out_trade_no,
+                    'price' => $ProfitPrice, 'source_id'=>$twitter_id,'order_detail_id'=>$orderdtl_id,'subsidy_type'=>1];
+                if($type==5){
+                    $PrdInfo = PayRecordDetailStay::where([
+                        'ordernum'          => $out_trade_no,
+                        'user_id'           => $map['user_id'],
+                        'order_detail_id'   => $orderdtl_id,
+                        'type'              => 5,
+                    ])->first();
+                    if (empty($PrdInfo)) {
+                        return PayRecordDetailStay::create($map);
+                    }
+                }else{
+                    $PrdInfo = PayRecordDetail::where([
+                        'ordernum'          => $map['ordernum'],
+                        'user_id'           => $map['user_id'],
+                        'type'              => $map['type'],
+                    ])->first();
+                    if (empty($PrdInfo)) {
+                        return PayRecordDetail::create($map);
+                    }
+                }
+            }
+        }
+
+        return $rst;
+
+    }
+
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\MallOrderDetails;
 use App\Models\Order;
 use App\Models\MallOrder;
 use App\Models\User;
