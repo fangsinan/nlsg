@@ -427,7 +427,7 @@ class MallOrder extends Base
 
         DB::commit();
 
-        return ['order_id' => $order_res];
+        return ['order_id' => $order_res, 'ordernum' => $order_data['ordernum']];
     }
 
     //普通订单 下单工具
