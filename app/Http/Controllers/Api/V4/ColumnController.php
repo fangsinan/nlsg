@@ -10,6 +10,7 @@ use App\Models\History;
 use App\Models\Recommend;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\UserFollow;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
@@ -112,7 +113,7 @@ class ColumnController extends Controller
                 $v['is_new'] = 1;
             }
             $title = Works::where('column_id',$v['id'])->orderBy('updated_at','desc')->first('title');
-            $v['work_name'] = $title->title;
+            $v['work_name'] = $title->title ?? '';
 
         }
         return $this->success($list);
@@ -543,7 +544,7 @@ class ColumnController extends Controller
 
         $subList = Subscribe::with([
             'UserInfo' => function($query){
-                $query->select('id','level','phone','nickname','headimg','expire_time');
+                $query->select('id','level','phone','nickname','headimg','expire_time','intro','is_teacher');
             }])->select('id','user_id')->where([
             'type' => 6,
             'relation_id' => $lecture_id,
@@ -553,6 +554,9 @@ class ColumnController extends Controller
 
         foreach ($subList['data'] as $key => &$val){
             $val['user_info']['level'] = User::getLevel(0, $val['user_info']['level'], $val['user_info']['expire_time']);
+            //是否关注
+            $follow = UserFollow::where(['from_uid'=>$user_id,'to_uid'=>$val['user_info']['id']])->first();
+            $val['user_info']['is_follow'] = $follow ? 1 :0;
             unset($val['user_info']['expire_time']);
         }
 
