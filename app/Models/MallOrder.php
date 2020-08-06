@@ -1021,6 +1021,9 @@ class MallOrder extends Base
             $query->where('nmo.ordernum', '=', $params['ordernum']);
         }
 
+        $query->where(DB::raw('(case when `status` <> 1 then TRUE WHEN `status` = 1 AND dead_time >= "'.
+            $now_date.'" then TRUE ELSE FALSE END)'),'=',true);
+
         switch (intval($params['status'] ?? 0)) {
             case 1:
                 $query->where('nmo.status', '=', 1);
@@ -1065,8 +1068,7 @@ class MallOrder extends Base
             $with[] = 'orderChild.expressInfo';
         }
 
-        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
-            $now_date . '" then FALSE ELSE TRUE END) ');
+//        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .$now_date . '" then FALSE ELSE TRUE END) ');
 
         $list = $query->with($with)->select($field)->get();
 

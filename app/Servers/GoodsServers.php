@@ -4,6 +4,7 @@
 namespace App\Servers;
 
 
+use App\Models\ConfigModel;
 use App\Models\MallGoods;
 use App\Models\MallPicture;
 use App\Models\MallSku;
@@ -261,7 +262,60 @@ class GoodsServers
         }
     }
 
-    public function list($params){
+    public function list($params)
+    {
+        $size = $params['size'] ?? 10;
+
+        $query = MallGoods::from('nlsg_mall_goods');
+
+        if (!empty($params['id'])) {
+            $query->where('id', '=', intval($params['id']));
+        }
+
+        if (!empty($params['category_id'])) {
+            $query->where('category_id', '=', intval($params['category_id']));
+        }
+        if (!empty($params['name'])) {
+            $query->where('name', 'like', '%' . intval($params['name'] . '%'));
+        }
+
+        $field = ['id', 'category_id', 'name', 'subtitle', 'picture', 'number',
+            'original_price', 'price', 'sales_num', 'status'];
+
+        if ($params['id'] ?? 0) {
+            $field[] = 'content';
+            $field[] = 'view_num';
+            $field[] = 'collection_num';
+        }
+
+
+        switch ($params['ob'] ?? 'default') {
+            case 'new_asc':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'new_desc':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'sales_asc':
+                $query->orderBy('sales_num', 'asc');
+                break;
+            case 'sales_desc':
+                $query->orderBy('sales_num', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+        }
+        $query->orderBy('id', 'desc');
+
+        $with = [];
+        $list = $query->with($with)->select($field)->paginate($size);
+
+
+        return $list;
 
     }
 }

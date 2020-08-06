@@ -293,7 +293,7 @@ class MallController extends Controller
      * @apiGroup  Mall
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/comment_list
      * @apiDescription 获取商品信息,如不指定id,get_sku=0 则返回商品列表.指定商品id,get_sku=1则返回商品详情
-     * @apiParam {number} [goods_id] 指定商品id则返回无限制优惠券以及指定商品优惠券
+     * @apiParam {number} goods_id 指定商品id
      * @apiParam {number} [page] 页数,默认1
      * @apiParam {number} [size] 条数,默认10
      *
