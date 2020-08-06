@@ -8,6 +8,8 @@ $baseDir = dirname($vendorDir);
 return array(
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
+    'App\\Http\\Controllers\\Admin\\V4\\AfterSalesController' => $baseDir . '/app/Http/Controllers/Admin/V4/AfterSalesController.php',
+    'App\\Http\\Controllers\\Admin\\V4\\GoodsController' => $baseDir . '/app/Http/Controllers/Admin/V4/GoodsController.php',
     'App\\Http\\Controllers\\Admin\\V4\\MallOrderController' => $baseDir . '/app/Http/Controllers/Admin/V4/MallOrderController.php',
     'App\\Http\\Controllers\\Api\\V4\\AddressController' => $baseDir . '/app/Http/Controllers/Api/V4/AddressController.php',
     'App\\Http\\Controllers\\Api\\V4\\AfterSalesController' => $baseDir . '/app/Http/Controllers/Api/V4/AfterSalesController.php',
@@ -125,6 +127,8 @@ return array(
     'App\\Providers\\EasySmsServiceProvider' => $baseDir . '/app/Providers/EasySmsServiceProvider.php',
     'App\\Providers\\EventServiceProvider' => $baseDir . '/app/Providers/EventServiceProvider.php',
     'App\\Providers\\RouteServiceProvider' => $baseDir . '/app/Providers/RouteServiceProvider.php',
+    'App\\Servers\\GoodsServers' => $baseDir . '/app/Servers/GoodsServers.php',
+    'App\\servers\\AfterSalesServers' => $baseDir . '/app/Servers/AfterSalesServers.php',
     'App\\servers\\MallOrderServers' => $baseDir . '/app/Servers/MallOrderServers.php',
     'Asm89\\Stack\\Cors' => $vendorDir . '/asm89/stack-cors/src/Asm89/Stack/Cors.php',
     'Asm89\\Stack\\CorsService' => $vendorDir . '/asm89/stack-cors/src/Asm89/Stack/CorsService.php',
