@@ -114,7 +114,7 @@ class ShoppingCart extends Base
                     foreach ($gv->sku_list_all as $sv) {
                         if ($v['sku_number'] == $sv->sku_number) {
                             $v['sku_list'] = $sv;
-                            if ($sv->status == 0) {
+                            if ($sv->status == 0 || $sv->stock < 1) {
                                 $v['invalid'] = 1;
                             }
                         }

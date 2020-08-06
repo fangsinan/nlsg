@@ -776,6 +776,7 @@ class MallOrder extends Base
             'used_address' => $used_address,
         ];
 
+
         if ($params['post_type'] == 1 && empty($used_address)) {
             $can_sub = false;
         }
