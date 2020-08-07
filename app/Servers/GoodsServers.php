@@ -282,10 +282,14 @@ class GoodsServers
         $field = ['id', 'category_id', 'name', 'subtitle', 'picture', 'number',
             'original_price', 'price', 'sales_num', 'status'];
 
+        $with = [];
         if ($params['id'] ?? 0) {
             $field[] = 'content';
             $field[] = 'view_num';
             $field[] = 'collection_num';
+            $with[] = 'tos_bind_list';
+            $with[] = 'tos_bind_list.tos';
+            $with[] = 'picture_list';
         }
 
 
@@ -311,7 +315,11 @@ class GoodsServers
         }
         $query->orderBy('id', 'desc');
 
-        $with = [];
+
+        $with[] = 'sku_list';
+        $with[] = 'sku_list.sku_value_list';
+        $with[] = 'category_list';
+
         $list = $query->with($with)->select($field)->paginate($size);
 
 

@@ -19,9 +19,11 @@ use Illuminate\Database\Eloquent\Builder;
  *
  * @author wangxh
  */
-class MallOrderServers {
+class MallOrderServers
+{
 
-    public function getList($params) {
+    public function getList($params)
+    {
         $order_type = $params['order_type'] ?? 0;
 
         switch (strtolower($order_type)) {
@@ -35,7 +37,8 @@ class MallOrderServers {
         return $res;
     }
 
-    protected function listOfNormal($params) {
+    protected function listOfNormal($params)
+    {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
 
@@ -46,8 +49,8 @@ class MallOrderServers {
 
         $query = MallOrder::from('nlsg_mall_order');
 
-        if(!empty($params['id'])){
-            $query->where('id','=',intval($params['id']));
+        if (!empty($params['id'])) {
+            $query->where('id', '=', intval($params['id']));
         }
 
         if (!empty($params['ordernum'])) {
@@ -79,19 +82,19 @@ class MallOrderServers {
 
         //昵称,账号,
         if (!empty($params['phone'])) {
-            $query->whereHas('userInfo', function(Builder $query) use ($params) {
+            $query->whereHas('userInfo', function (Builder $query) use ($params) {
                 $query->where('phone', 'like', '%' . $params['phone'] . '%');
             });
         }
         if (!empty($params['nickname'])) {
-            $query->whereHas('userInfo', function(Builder $query) use ($params) {
+            $query->whereHas('userInfo', function (Builder $query) use ($params) {
                 $query->where('nickname', 'like', '%' . $params['nickname'] . '%');
             });
         }
 
         //商品名称
         if (!empty($params['goods_name'])) {
-            $query->whereHas('orderDetails.goodsInfo', function(Builder $query) use ($params) {
+            $query->whereHas('orderDetails.goodsInfo', function (Builder $query) use ($params) {
                 $query->where('name', 'like', '%' . $params['goods_name'] . '%');
             });
         }
@@ -143,7 +146,7 @@ class MallOrderServers {
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
-                $now_date . '" then FALSE ELSE TRUE END) ');
+            $now_date . '" then FALSE ELSE TRUE END) ');
 
         $list = $query->with($with)->select($field)->paginate($size);
 
@@ -155,7 +158,7 @@ class MallOrderServers {
             }
             $v->address_history = json_decode($v->address_history);
 
-            foreach($v->orderChild as $cv){
+            foreach ($v->orderChild as $cv) {
 
             }
         }
@@ -163,7 +166,8 @@ class MallOrderServers {
         return $list;
     }
 
-    protected function listOfGroupBy($params) {
+    protected function listOfGroupBy($params)
+    {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $size = $params['size'] ?? 10;
@@ -172,7 +176,7 @@ class MallOrderServers {
         //展示数据:订单编号,状态,商品列表,价格,数量,取消时间,金额
 
         $query = MallOrder::from('nlsg_mall_order as nmo')
-                ->join('nlsg_mall_group_buy_list as gbl', 'nmo.id', '=', 'gbl.order_id');
+            ->join('nlsg_mall_group_buy_list as gbl', 'nmo.id', '=', 'gbl.order_id');
 
         if (!empty($params['ordernum'])) {
             $query->where('nmo.ordernum', 'like', '%' . $params['ordernum'] . '%');
@@ -196,19 +200,19 @@ class MallOrderServers {
 
         //昵称,账号,
         if (!empty($params['phone'])) {
-            $query->whereHas('userInfo', function(Builder $query) use ($params) {
+            $query->whereHas('userInfo', function (Builder $query) use ($params) {
                 $query->where('phone', 'like', '%' . $params['phone'] . '%');
             });
         }
         if (!empty($params['nickname'])) {
-            $query->whereHas('userInfo', function(Builder $query) use ($params) {
+            $query->whereHas('userInfo', function (Builder $query) use ($params) {
                 $query->where('nickname', 'like', '%' . $params['nickname'] . '%');
             });
         }
 
         //商品名称
         if (!empty($params['goods_name'])) {
-            $query->whereHas('orderDetails.goodsInfo', function(Builder $query) use ($params) {
+            $query->whereHas('orderDetails.goodsInfo', function (Builder $query) use ($params) {
                 $query->where('name', 'like', '%' . $params['goods_name'] . '%');
             });
         }
@@ -221,19 +225,19 @@ class MallOrderServers {
                 break;
             case 10:
                 $query->where('nmo.status', '=', 10)
-                        ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 20:
                 $query->where('nmo.status', '=', 20)
-                        ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 30:
                 $query->where('nmo.status', '=', 30)
-                        ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 95:
                 $query->where('nmo.status', '=', 10)
-                        ->where('gbl.is_success', '=', 0);
+                    ->where('gbl.is_success', '=', 0);
                 break;
             case 99:
                 $query->where('nmo.is_stop', '=', 1);
@@ -269,7 +273,7 @@ class MallOrderServers {
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
-                $now_date . '" then FALSE ELSE TRUE END) ');
+            $now_date . '" then FALSE ELSE TRUE END) ');
 
         $list = $query->with($with)->select($field)->paginate($size);
 
@@ -285,7 +289,8 @@ class MallOrderServers {
         return $list;
     }
 
-    public function send($params) {
+    public function send($params)
+    {
 
         if (0) {
             $params = [
@@ -307,8 +312,9 @@ class MallOrderServers {
         $order_id_list = array_unique(array_column($params, 'order_id'));
 
         $check_count = MallOrder::where('is_del', '=', 0)
-                        ->where('is_stop', '=', 0)->where('status', '=', 10)
-                        ->whereIn('id', $order_id_list)->count();
+            ->where('is_stop', '=', 0)
+            ->whereIn('status', [10, 20])
+            ->whereIn('id', $order_id_list)->count();
 
         if ($check_count !== count($order_id_list)) {
             return ['code' => false, 'msg' => '包含状态错误订单'];
@@ -331,8 +337,8 @@ class MallOrderServers {
             }
             //todo 校验发货订单表,快递公司和快递单号不重复
             $check_ex = ExpressInfo::where('express_id', '=', $v['express_id'])
-                    ->where('express_num', '=', $v['num'])
-                    ->first();
+                ->where('express_num', '=', $v['num'])
+                ->first();
             if ($check_ex) {
                 $express_info_id = $check_ex->id;
             } else {
