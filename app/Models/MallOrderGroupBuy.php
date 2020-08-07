@@ -617,9 +617,8 @@ class MallOrderGroupBuy extends Base
 
         $team_list = $query->get();
 
-
         foreach ($team_list as $k => $v) {
-            $v->order_count = $v->teamOrderCount->counts;
+            $v->order_count = $v->teamOrderCount->counts??0;
             unset($team_list[$k]->teamOrderCount);
         }
 
