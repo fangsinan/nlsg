@@ -675,13 +675,13 @@ class MallOrderGroupBuy extends Base
         }
 
         $field = [
-            'nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time',
+            'nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time','gbl.group_key',
             DB::raw('unix_timestamp(nmo.dead_time) as dead_timestamp'),
             DB::raw('(case when nmo.`status` = 1 then 1
                 when is_success = 0 then 95 when nmo.is_stop = 1
                 then 99 ELSE nmo.`status` END) `status`')
         ];
-        $with = ['orderDetails', 'orderDetails.goodsInfo'];
+        $with = ['orderDetails', 'orderDetails.goodsInfo','groupList','groupList.userInfo'];
 
         if ($flag) {
             $field[] = 'address_history';
@@ -704,21 +704,24 @@ class MallOrderGroupBuy extends Base
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
             $now_date . '" then FALSE ELSE TRUE END) ');
-        //$query->with(['orderDetails', 'orderDetails.goodsInfo']);
-        //$query->select(['nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time',
-        //     DB::raw('(case when nmo.`status` = 1 then 1
-        //     when is_success = 0 then 95 when nmo.is_stop = 1
-        //     then 99 ELSE nmo.`status` END) `status`')]);
 
         $list = $query->with($with)->select($field)->get();
 
-        foreach ($list as $v) {
+        foreach ($list as $k => $v) {
             $v->goods_count = 0;
             foreach ($v->orderDetails as $vv) {
                 $v->goods_count += $vv->num;
                 $vv->sku_history = json_decode($vv->sku_history);
             }
             $v->address_history = json_decode($v->address_history);
+
+            $headimg = [];
+
+            foreach ($v->groupList as $glv){
+                $headimg[] = $glv->userInfo->headimg??'';
+            }
+            $v->headimg_list = $headimg;
+            unset($list[$k]->groupList);
         }
 
         return $list;
@@ -731,6 +734,12 @@ class MallOrderGroupBuy extends Base
                 'status', 'goods_id', 'num', 'id as details_id',
                 'order_id', 'sku_history', 'comment_id'
             ]);
+    }
+
+    public function groupList()
+    {
+        return $this->hasMany('App\Models\MallGroupBuyList', 'group_key', 'group_key')
+            ->select(['group_key','user_id']);
     }
 
     public function orderChild()

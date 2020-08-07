@@ -43,4 +43,9 @@ class MallGroupBuyList extends Base {
                         ->select([DB::raw('count(1) counts'), 'group_key']);
     }
 
+    public function userInfo() {
+        return $this->hasOne('App\Models\User', 'id', 'user_id')
+            ->select(['id','phone','headimg']);
+    }
+
 }
