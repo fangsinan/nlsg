@@ -50,6 +50,7 @@ class Works extends Base
             if($v['works_update_time'] > $time){
                 $v['is_new'] = 1;
             }
+            $v['is_sub'] = Subscribe::isSubscribe($this->user['id'],$v['id'],2);
         }
         return $lists;
 
