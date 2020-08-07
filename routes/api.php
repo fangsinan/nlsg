@@ -186,7 +186,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::post('unlike', 'LikeController@unlike');
 
     //想法
-    Route::get('comment/index', 'CommentController@index');
+    Route::get('comment/list', 'CommentController@index');
     Route::post('comment/store', 'CommentController@store');
     Route::post('comment/update', 'CommentController@update');
     Route::post('comment/destroy', 'CommentController@destroy');
