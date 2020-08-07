@@ -982,8 +982,6 @@ class MallOrderController extends Controller
     function list(Request $request)
     {
         $params = $request->input();
-        $params['page'] = 1;
-        $params['size'] = 10;
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
@@ -1252,9 +1250,6 @@ class MallOrderController extends Controller
     public function listOfGroupBuy(Request $request)
     {
         $params = $request->input();
-        $params['page'] = 1;
-        $params['size'] = 10;
-
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
