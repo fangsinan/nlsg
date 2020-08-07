@@ -103,7 +103,6 @@ class WikiController extends Controller
      * @apiVersion 4.0.0
      * @apiName  banner
      * @apiGroup Index
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/index
      * @apiParam {number} id 百科id
      *
      * @apiSuccess {string} name 标题
