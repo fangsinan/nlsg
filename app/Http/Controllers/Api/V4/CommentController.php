@@ -14,12 +14,12 @@ use App\Models\Like;
 class CommentController extends Controller
 {
     /**
-     * @api {get} api/v4/comment/index  想法
+     * @api {get} api/v4/comment/index  想法列表
      * @apiVersion 4.0.0
      * @apiName  index
      * @apiGroup Comment
      *
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/index
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/index?id=1&type=1
      *
      * @apiParam {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科
      * @apiParam {number} id    模块id
@@ -254,7 +254,7 @@ class CommentController extends Controller
 
 
     /**
-     * @api {get} api/v4/comment/update 列表
+     * @api {get} api/v4/comment/update 更新想法
      * @apiVersion 4.0.0
      * @apiName  update
      * @apiGroup Comment
@@ -435,7 +435,7 @@ class CommentController extends Controller
     }
 
     /**
-     * @api {get} api/v4/comment/destroy 列表
+     * @api {get} api/v4/comment/destroy  删除想法
      * @apiVersion 4.0.0
      * @apiName  destroy
      * @apiGroup Comment
