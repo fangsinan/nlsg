@@ -57,7 +57,7 @@ class Column extends Base
         }
         //是否收藏
         $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
-        $column['is_collection'] =$collection ? 1 : 0;
+        $column['is_collection'] = $collection ? 1 : 0;
         return $column;
     }
 

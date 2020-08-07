@@ -84,7 +84,7 @@ class History extends Model
             'relation_id'=>$relation_id,  // 讲座用的对应课程id
             'relation_type'=>$relation_type,
         ])->orderBy('updated_at','desc')->first();
-        $historyData = $historyData?$historyData->toArray():[];
+        $historyData = $historyData?$historyData->toArray():(object)[];
         if($historyData){
             $title = WorksInfo::select('title')->where('id',$historyData['info_id'])->first();
             $historyData['title'] = $title->title ?? '';
