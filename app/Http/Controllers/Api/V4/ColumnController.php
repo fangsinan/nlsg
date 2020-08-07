@@ -182,7 +182,7 @@ class ColumnController extends Controller
             return $this->error(0,'column_id 不能为空');
         }
 
-        $field = ['id', 'name', 'column_type', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
+        $field = ['id', 'name', 'column_type', 'subtitle', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) )    {
             return $this->error(0,'该信息不存在');
