@@ -944,7 +944,7 @@ class MallController extends Controller
         }
         $goods_id = $request->input('goods_id', 0);
         $sku_number = $request->input('sku_number', '');
-        if ($goods_id) {
+        if (!$goods_id) {
             return $this->error(0, '参数错误');
         }
         return $this->success(['code' => true, 'msg' => '成功']);
