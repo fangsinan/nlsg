@@ -1136,6 +1136,7 @@ class MallOrder extends Base
             $temp_odv['picture'] = $odv['goods_info']['picture'];
             $temp_odv['subtitle'] = $odv['goods_info']['subtitle'];
             $temp_odv['details_id'] = $odv['details_id'];
+            $temp_odv['comment_id'] = $odv['comment_id'];
             $odv = $temp_odv;
         }
 
