@@ -791,6 +791,11 @@ class MallOrderGroupBuy extends Base
 
         foreach ($data['order_child'] as &$v1) {
             $v1['order_detail_id'] = explode(',', $v1['order_detail_id']);
+
+            if(isset($v1['express_info']['history'])){
+                $v1['express_info']['history'] = json_decode($v1['express_info']['history']);
+            }
+
             $v1['order_details'] = [];
         }
 
@@ -866,6 +871,14 @@ class MallOrderGroupBuy extends Base
 
         $data['about_order'] = $about_order;
         $data['about_price'] = $price_list_new;
+
+        $temp_o_c = [];
+        foreach ($data['order_child'] as $doc){
+            if(!empty($doc['order_details'])){
+                $temp_o_c[] = $doc;
+            }
+        }
+        $data['order_child'] = $temp_o_c;
 
         unset(
             $data['cost_price'], $data['freight'],
