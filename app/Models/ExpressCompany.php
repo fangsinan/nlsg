@@ -28,8 +28,10 @@ class ExpressCompany extends Base
         $data = self::find($id);
         if ($flag == 1) {
             return $data->name ?? '';
-        } else {
+        } elseif ($flag == 2) {
             return $data->code ?? '';
+        } elseif ($flag == 3) {
+            return $data->phone ?? '';
         }
     }
 

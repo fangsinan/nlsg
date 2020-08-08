@@ -21,7 +21,7 @@ class MallOrderChild extends Base {
 
     public function expressInfo() {
         return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
-                        ->select(['id', 'history']);
+                        ->select(['id', 'history','express_id']);
     }
 
 }

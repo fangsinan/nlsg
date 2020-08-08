@@ -1234,7 +1234,16 @@ class MallOrder extends Base
         $temp_o_c = [];
         foreach ($data['order_child'] as $doc){
             if(!empty($doc['order_details'])){
+
+                if(!empty($doc['express_info'])){
+                    $doc['express_info']['express_phone'] = ExpressCompany::onlyGetName(
+                        $doc['express_info']['express_id'],3
+                    );
+                    $doc['express_info']['history']->express_phone = $doc['express_info']['express_phone'];
+                }
+
                 $temp_o_c[] = $doc;
+
             }
         }
         $data['order_child'] = $temp_o_c;
