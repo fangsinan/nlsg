@@ -233,7 +233,7 @@ class ColumnController extends Controller
 
             //查询总的历史记录进度`
             $hisCount = History::getHistoryCount($column_id,1,$user_id);  //讲座
-            $works_data['history_count'] = round($hisCount/$column['info_num']*100);
+            $column['history_count'] = round($hisCount/$column['info_num']*100);
 
 
         }
