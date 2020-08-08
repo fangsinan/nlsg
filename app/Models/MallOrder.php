@@ -1218,8 +1218,13 @@ class MallOrder extends Base
             ['key' => '活动立减', 'value' => $data['special_price_cut']],
             ['key' => '运费', 'value' => $data['freight']],
             ['key' => '优惠券总额', 'value' => $data['coupon_money']],
-            ['key' => '实付金额', 'value' => $data['pay_price']],
         ];
+
+        if($data['status'] == 1){
+            $price_list_new[] = ['key' => '应付金额', 'value' => $data['price']];
+        }else{
+            $price_list_new[] = ['key' => '实付金额', 'value' => $data['pay_price']];
+        }
 
         foreach ($price_list_new as $new_k => $new_v) {
             if ($new_v['value'] == 0) {
