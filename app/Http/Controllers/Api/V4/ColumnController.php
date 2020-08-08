@@ -203,7 +203,7 @@ class ColumnController extends Controller
         }else if($column['column_type'] == 2){
             //单课程查询【 多了专栏大纲 】
             //查询专栏对应的关联大纲表 并查询章节
-            $outline = ColumnOutline::select('id', 'name')->where('column_id',$column['id'])->orderBy('sort','asc')->get()->toArray();
+            $outline = ColumnOutline::select('id', 'name','intro')->where('column_id',$column['id'])->orderBy('sort','asc')->get()->toArray();
 //            ColumnOutline::where('column_id',$column['id'])->count();
             $worksInfoObj = new WorksInfo();
             //按照大纲表排序进行数据章节处理
