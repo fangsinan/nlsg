@@ -413,9 +413,9 @@ class MallOrder extends Base
         //********************购物车********************
         if ($params['from_cart'] == 1) {
             //如果是购物车,删除
-            if(!is_array($params['sku'])){
+            if (!is_array($params['sku'])) {
                 $cart_sku = explode(',', $params['sku']);
-            }else{
+            } else {
                 $cart_sku = $params['sku'];
             }
 
@@ -1021,8 +1021,8 @@ class MallOrder extends Base
             $query->where('nmo.ordernum', '=', $params['ordernum']);
         }
 
-        $query->where(DB::raw('(case when `status` <> 1 then TRUE WHEN `status` = 1 AND dead_time >= "'.
-            $now_date.'" then TRUE ELSE FALSE END)'),'=',true);
+        $query->where(DB::raw('(case when `status` <> 1 then TRUE WHEN `status` = 1 AND dead_time >= "' .
+            $now_date . '" then TRUE ELSE FALSE END)'), '=', true);
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
@@ -1043,8 +1043,9 @@ class MallOrder extends Base
         }
 
         $field = [
-            'id', 'ordernum', 'price', 'dead_time',DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
-            DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`')
+            'id', 'ordernum', 'price', 'dead_time', DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
+            DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'created_at', 'pay_price',
+            'price'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];
 
@@ -1089,7 +1090,7 @@ class MallOrder extends Base
         return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
             ->select([
                 'status', 'goods_id', 'num', 'id as details_id',
-                'order_id', 'sku_history', 'comment_id','sku_number'
+                'order_id', 'sku_history', 'comment_id', 'sku_number'
             ]);
     }
 
@@ -1188,6 +1189,39 @@ class MallOrder extends Base
 
         $data['order_child'][] = $temp_data;
 
+
+        $about_order = [];
+        //订单编号,下单时间,支付方式,支付时间,发票信息,备注信息
+        $about_order[] = ['key' => '订单编号', 'value' => $data['ordernum']];
+        $about_order[] = ['key' => '下单时间', 'value' => $data['created_at']];
+        if ($data['status'] > 1) {
+            $about_order[] = ['key' => '支付方式', 'value' => MallOrder::orderParamsName(1, $data['pay_type'])];
+            $about_order[] = ['key' => '支付时间', 'value' => $data['pay_time']];
+        }
+        $about_order[] = ['key' => '发票信息', 'value' => MallOrder::orderParamsName(2, $data['bill_type'])];
+        $about_order[] = ['key' => '备注信息', 'value' => $data['messages']];
+        //商品总额,权益立减,活动立减,运费,实付金额
+
+        $price_list_new = [
+            ['key' => '商品总额', 'value' => $data['cost_price']],
+            ['key' => '权益立减', 'value' => $data['vip_cut']],
+            ['key' => '活动立减', 'value' => $data['special_price_cut']],
+            ['key' => '运费', 'value' => $data['freight']],
+            ['key' => '优惠券总额', 'value' => $data['coupon_money']],
+            ['key' => '实付金额', 'value' => $data['pay_price']],
+        ];
+
+        foreach ($price_list_new as $new_k => $new_v) {
+            if ($new_v['value'] == 0) {
+                unset($price_list_new[$new_k]);
+            }
+        }
+        $price_list_new = array_values($price_list_new);
+
+        $data['about_order'] = $about_order;
+        $data['about_price'] = $price_list_new;
+
+
         unset(
             $data['cost_price'], $data['freight'],
             $data['vip_cut'], $data['price'],
@@ -1199,6 +1233,40 @@ class MallOrder extends Base
         );
 
         return $data;
+    }
+
+    public static function orderParamsName($type, $id)
+    {
+        $id = intval($id);
+        $res = '';
+        if ($type == 1) {
+            switch ($id) {
+                case 1:
+                case 2:
+                    $res = '微信';
+                    break;
+                case 3:
+                    $res = '支付宝';
+                    break;
+                case 4:
+                    $res = '余额';
+                    break;
+            }
+
+        } elseif ($type == 2) {
+            switch ($id) {
+                case 1:
+                    $res = '个人';
+                    break;
+                case 2:
+                    $res = '公司';
+                    break;
+                default:
+                    $res = '不开发票';
+            }
+        }
+
+        return $res;
     }
 
     public function commentList($user_id, $params = [])

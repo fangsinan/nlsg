@@ -618,7 +618,7 @@ class MallOrderGroupBuy extends Base
         $team_list = $query->get();
 
         foreach ($team_list as $k => $v) {
-            $v->order_count = $v->teamOrderCount->counts??0;
+            $v->order_count = $v->teamOrderCount->counts ?? 0;
             unset($team_list[$k]->teamOrderCount);
         }
 
@@ -675,13 +675,14 @@ class MallOrderGroupBuy extends Base
         }
 
         $field = [
-            'nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time','gbl.group_key',
+            'nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time', 'gbl.group_key',
             DB::raw('unix_timestamp(nmo.dead_time) as dead_timestamp'),
             DB::raw('(case when nmo.`status` = 1 then 1
                 when is_success = 0 then 95 when nmo.is_stop = 1
-                then 99 ELSE nmo.`status` END) `status`')
+                then 99 ELSE nmo.`status` END) `status`'),
+            'nmo.created_at', 'nmo.pay_price', 'nmo.price'
         ];
-        $with = ['orderDetails', 'orderDetails.goodsInfo','groupList','groupList.userInfo'];
+        $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList', 'groupList.userInfo'];
 
         if ($flag) {
             $field[] = 'address_history';
@@ -717,8 +718,8 @@ class MallOrderGroupBuy extends Base
 
             $headimg = [];
 
-            foreach ($v->groupList as $glv){
-                $headimg[] = $glv->userInfo->headimg??'';
+            foreach ($v->groupList as $glv) {
+                $headimg[] = $glv->userInfo->headimg ?? '';
             }
             $v->headimg_list = $headimg;
             unset($list[$k]->groupList);
@@ -739,7 +740,7 @@ class MallOrderGroupBuy extends Base
     public function groupList()
     {
         return $this->hasMany('App\Models\MallGroupBuyList', 'group_key', 'group_key')
-            ->select(['group_key','user_id']);
+            ->select(['group_key', 'user_id']);
     }
 
     public function orderChild()
@@ -827,6 +828,38 @@ class MallOrderGroupBuy extends Base
                 }
             }
         }
+
+
+        $about_order = [];
+        //订单编号,下单时间,支付方式,支付时间,发票信息,备注信息
+        $about_order[] = ['key' => '订单编号', 'value' => $data['ordernum']];
+        $about_order[] = ['key' => '下单时间', 'value' => $data['created_at']];
+        if ($data['status'] > 1) {
+            $about_order[] = ['key' => '支付方式', 'value' => MallOrder::orderParamsName(1, $data['pay_type'])];
+            $about_order[] = ['key' => '支付时间', 'value' => $data['pay_time']];
+        }
+        $about_order[] = ['key' => '发票信息', 'value' => MallOrder::orderParamsName(2, $data['bill_type'])];
+        $about_order[] = ['key' => '备注信息', 'value' => $data['messages']];
+        //商品总额,权益立减,活动立减,运费,实付金额
+
+        $price_list_new = [
+            ['key' => '商品总额', 'value' => $data['cost_price']],
+            ['key' => '权益立减', 'value' => $data['vip_cut']],
+            ['key' => '活动立减', 'value' => $data['special_price_cut']],
+            ['key' => '运费', 'value' => $data['freight']],
+            ['key' => '优惠券总额', 'value' => $data['coupon_money']],
+            ['key' => '实付金额', 'value' => $data['pay_price']],
+        ];
+
+        foreach ($price_list_new as $new_k => $new_v) {
+            if ($new_v['value'] == 0) {
+                unset($price_list_new[$new_k]);
+            }
+        }
+        $price_list_new = array_values($price_list_new);
+
+        $data['about_order'] = $about_order;
+        $data['about_price'] = $price_list_new;
 
         unset(
             $data['cost_price'], $data['freight'],
