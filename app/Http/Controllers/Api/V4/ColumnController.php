@@ -209,6 +209,7 @@ class ColumnController extends Controller
             //按照大纲表排序进行数据章节处理
             foreach ($outline as $key=>$val){
                 $column_outline[$key]['name'] = $val['name'];
+                $column_outline[$key]['intro'] = $val['intro'];
                 //处理已购和未购url章节
                 $works_info = $worksInfoObj->getInfo($val['id'],$is_sub,$user_id,$type=2);
                 $works_info_c = count($works_info);
