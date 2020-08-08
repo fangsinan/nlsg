@@ -714,7 +714,12 @@ class MallOrder extends Base
             if (!$check_shop_address) {
                 return ['code' => false, 'msg' => '自提地址信息错误'];
             }
+
             $used_address = $check_shop_address->toArray();
+            $used_address['phone'] = $used_address['admin_phone'];
+            $used_address['province_name'] = MallAddress::getNameById($used_address['province']);
+            $used_address['city_name'] = MallAddress::getNameById($used_address['city']);
+            $used_address['area_name'] = MallAddress::getNameById($used_address['area']);
             $freight_free_flag = true;
         }
 
@@ -1046,7 +1051,7 @@ class MallOrder extends Base
         $field = [
             'id', 'ordernum', 'price', 'dead_time', DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'created_at', 'pay_price',
-            'price','post_type'
+            'price', 'post_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];
 
