@@ -55,8 +55,14 @@ class ExpressCompany extends Base
             return json_decode($check->history, true);
         }
 
+        //30分钟内只能查询一次
+        $updated_at = strtotime($check->updated_at);
+        if (($updated_at + 1800) > time()) {
+            return json_decode($check->history, true);
+        }
+
         $data = $this->toQuery($params['express_num'], $express_type);
-        $data['express_phone'] = ExpressCompany::onlyGetName($params['express_id'],3);
+        $data['express_phone'] = ExpressCompany::onlyGetName($params['express_id'], 3);
 
         if (!empty($data)) {
             //如果查询有结果 返回结果并存库
