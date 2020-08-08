@@ -17,7 +17,8 @@ use App\Models\ExpressCompany;
  *
  * @author wangxh
  */
-class ExpressController extends Controller {
+class ExpressController extends Controller
+{
 
     /**
      * 快递进度查询
@@ -29,33 +30,34 @@ class ExpressController extends Controller {
      * @apiDescription 快递进度查询
      * @apiParam {string} express_id 快递公司id
      * @apiParam {string} express_num 快递单号
-     * 
-     * 
+     *
+     *
      * @apiSuccess {string[]} list 进度
      * @apiSuccess {string} list.time 时间
      * @apiSuccess {string} list.status 进展
-     * 
+     *
      * @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      "number": "YT4538526006366",
-      "type": "yto",
-      "typename": "圆通速递",
-      "logo": "https://api.jisuapi.com/express/static/images/logo/80/yto.png",
-      "list": [
-      {
-      "time": "2020-05-24 13:23:02",
-      "status": "客户签收人: 周一派送急件电联18513793888 已签收  感谢使用圆通速递，期待再次为您服务 如有疑问请联系：18513793888，投诉电话：010-53579888"
-      }
-      ],
-      "deliverystatus": 3,
-      "issign": 1
-      }
-      }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "number": "YT4538526006366",
+     * "type": "yto",
+     * "typename": "圆通速递",
+     * "logo": "https://api.jisuapi.com/express/static/images/logo/80/yto.png",
+     * "list": [
+     * {
+     * "time": "2020-05-24 13:23:02",
+     * "status": "客户签收人: 周一派送急件电联18513793888 已签收  感谢使用圆通速递，期待再次为您服务 如有疑问请联系：18513793888，投诉电话：010-53579888"
+     * }
+     * ],
+     * "deliverystatus": 3,
+     * "issign": 1
+     * }
+     * }
      */
-    public function getPostInfo(Request $request) {
+    public function getPostInfo(Request $request)
+    {
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
@@ -83,29 +85,30 @@ class ExpressController extends Controller {
      * @apiDescription 快递公司列表
      * @apiSuccessExample {json} Request-Example:
      * {
-      "code": 200,
-      "msg": "成功",
-      "data": [
-      {
-      "id": 3,
-      "name": "圆通"
-      },
-      {
-      "id": 1,
-      "name": "顺丰"
-      },
-      {
-      "id": 2,
-      "name": "韵达"
-      },
-      {
-      "id": 4,
-      "name": "京东"
-      }
-      ]
-      }
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * {
+     * "id": 3,
+     * "name": "圆通"
+     * },
+     * {
+     * "id": 1,
+     * "name": "顺丰"
+     * },
+     * {
+     * "id": 2,
+     * "name": "韵达"
+     * },
+     * {
+     * "id": 4,
+     * "name": "京东"
+     * }
+     * ]
+     * }
      */
-    public function companyList() {
+    public function companyList()
+    {
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }

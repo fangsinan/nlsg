@@ -56,6 +56,7 @@ class ExpressCompany extends Base
         }
 
         $data = $this->toQuery($params['express_num'], $express_type);
+        $data['express_phone'] = ExpressCompany::onlyGetName($params['express_id'],3);
 
         if (!empty($data)) {
             //如果查询有结果 返回结果并存库
@@ -110,12 +111,10 @@ class ExpressCompany extends Base
             if (empty($result)) {
                 return '';
             }
-
             $jsonarr = json_decode($result, true);
             if ($jsonarr['status'] !== 0) {
                 return '';
             }
-
             Cache::add($cache_key_name, time(), $expire_num);
             $result = $jsonarr['result'];
             return $result;
