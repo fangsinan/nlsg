@@ -182,7 +182,7 @@ class ColumnController extends Controller
             return $this->error(0,'column_id 不能为空');
         }
 
-        $field = ['id', 'name', 'column_type', 'subtitle', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
+        $field = ['id', 'name', 'column_type', 'subtitle', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id','info_num'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) ) {
             return $this->error(0,'该信息不存在');
@@ -229,6 +229,12 @@ class ColumnController extends Controller
                 $title = WorksInfo::select('title')->where('id',$historyData['worksinfo_id'])->first();
                 $historyData['title'] = $title->title ?? '';
             }
+
+
+            //查询总的历史记录进度`
+            $hisCount = History::getHistoryCount($column_id,1,$user_id);  //讲座
+            $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
+
 
         }
 
