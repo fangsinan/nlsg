@@ -182,7 +182,7 @@ class ColumnController extends Controller
             return $this->error(0,'column_id 不能为空');
         }
 
-        $field = ['id', 'name', 'column_type', 'subtitle', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id'];
+        $field = ['id', 'name', 'column_type', 'subtitle', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','info_num','is_free','category_id','info_num'];
         $column = Column::getColumnInfo($column_id,$field,$user_id);
         if( empty($column) ) {
             return $this->error(0,'该信息不存在');
@@ -199,7 +199,7 @@ class ColumnController extends Controller
             foreach ($works_data as $key=>$val){
                 $works_data[$key]['is_sub'] = Subscribe::isSubscribe($user_id,$val['id'],2);
             }
-
+            $historyData = (object)[];
         }else if($column['column_type'] == 2){
             //单课程查询【 多了专栏大纲 】
             //查询专栏对应的关联大纲表 并查询章节
@@ -209,6 +209,7 @@ class ColumnController extends Controller
             //按照大纲表排序进行数据章节处理
             foreach ($outline as $key=>$val){
                 $column_outline[$key]['name'] = $val['name'];
+                $column_outline[$key]['intro'] = $val['intro'];
                 //处理已购和未购url章节
                 $works_info = $worksInfoObj->getInfo($val['id'],$is_sub,$user_id,$type=2);
                 $works_info_c = count($works_info);
@@ -216,18 +217,24 @@ class ColumnController extends Controller
                 $column_outline[$key]['works_info'] = $works_info;
             }
 
-            //继续学习的章节[时间倒序 第一条为最近学习的章节]
-            $historyData = History::select('relation_id','info_id')->where([
-                'user_id'=>$user_id,
-                'is_del'=>0,
-                'relation_id'=>$column['id'],
-                'relation_type'=>1,
-            ])->orderBy('updated_at','desc')->first();
-            $historyData = $historyData?$historyData->toArray():[];
-            if($historyData){
-                $title = WorksInfo::select('title')->where('id',$historyData['worksinfo_id'])->first();
-                $historyData['title'] = $title->title ?? '';
-            }
+//            //继续学习的章节[时间倒序 第一条为最近学习的章节]
+//            $historyData = History::select('relation_id','info_id')->where([
+//                'user_id'=>$user_id,
+//                'is_del'=>0,
+//                'relation_id'=>$column['id'],
+//                'relation_type'=>1,
+//            ])->orderBy('updated_at','desc')->first();
+//            $historyData = $historyData?$historyData->toArray():[];
+//            if($historyData){
+//                $title = WorksInfo::select('title')->where('id',$historyData['worksinfo_id'])->first();
+//                $historyData['title'] = $title->title ?? '';
+//            }
+            $historyData = History::getHistoryData($column['id'],1,$user_id);
+
+            //查询总的历史记录进度`
+            $hisCount = History::getHistoryCount($column_id,1,$user_id);  //讲座
+            $column['history_count'] = round($hisCount/$column['info_num']*100);
+
 
         }
 
