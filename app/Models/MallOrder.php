@@ -1229,8 +1229,8 @@ class MallOrder extends Base
             $data['coupon_money'], $data['special_price_cut'],
             $data['pay_time'], $data['pay_type'],
             $data['bill_type'], $data['bill_title'],
-            $data['bill_number'], $data['bill_format'],
-            $data['order_details']
+            $data['bill_number'], $data['bill_format']
+//            ,$data['order_details']
         );
 
         return $data;
