@@ -199,7 +199,7 @@ class ColumnController extends Controller
             foreach ($works_data as $key=>$val){
                 $works_data[$key]['is_sub'] = Subscribe::isSubscribe($user_id,$val['id'],2);
             }
-
+            $historyData = (object)[];
         }else if($column['column_type'] == 2){
             //单课程查询【 多了专栏大纲 】
             //查询专栏对应的关联大纲表 并查询章节
