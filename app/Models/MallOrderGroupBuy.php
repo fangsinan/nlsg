@@ -359,6 +359,7 @@ class MallOrderGroupBuy extends Base
             if (!$check_shop_address) {
                 return ['code' => false, 'msg' => '自提地址信息错误'];
             }
+            $used_address = $check_shop_address->toArray();
             $freight_free_flag = true;
         }
 
@@ -680,7 +681,7 @@ class MallOrderGroupBuy extends Base
             DB::raw('(case when nmo.`status` = 1 then 1
                 when is_success = 0 then 95 when nmo.is_stop = 1
                 then 99 ELSE nmo.`status` END) `status`'),
-            'nmo.created_at', 'nmo.pay_price', 'nmo.price'
+            'nmo.created_at', 'nmo.pay_price', 'nmo.price','nmo.post_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList', 'groupList.userInfo'];
 

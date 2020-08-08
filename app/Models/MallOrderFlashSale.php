@@ -284,6 +284,7 @@ class MallOrderFlashSale extends Base
             if (!$check_shop_address) {
                 return ['code' => false, 'msg' => '自提地址信息错误'];
             }
+            $used_address = $check_shop_address->toArray();
             $freight_free_flag = true;
         }
 
