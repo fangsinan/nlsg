@@ -215,7 +215,8 @@ class IncomeController extends Controller
      *
      * @apiParam {int} status         1个人认证，2企业认证
      * @apiParam {int} org_name         机构名称
-     * @apiParam {int} org_address      机构地址
+     * @apiParam {int} org_area      机构地区
+     * @apiParam {int} org_address      机构详细地址
      * @apiParam {int} org_license_picture  营业执照照片
      * @apiParam {int} bank_opening         开户行
      * @apiParam {int} bank_number          银行卡号
@@ -259,6 +260,7 @@ class IncomeController extends Controller
                 $data['idcard']         = $cash_info['idcard'];
                 $data['idcard_type']    = $cash_info['type'];
                 $data['org_name']       = $cash_info['org_name'];
+                $data['org_area']    = $cash_info['org_area'];
                 $data['org_address']    = $cash_info['org_address'];
                 $data['org_license_picture'] = $cash_info['org_license_picture'];
                 $data['bank_opening']       = $cash_info['bank_opening'];
@@ -273,6 +275,7 @@ class IncomeController extends Controller
             //机构认证信息
             $org_name = $request->input('org_name', ''); //机构名称
             $org_address = $request->input('org_address', ''); //机构地址
+            $org_area = $request->input('org_area', ''); //机构地址
             $org_license_picture = $request->input('org_license_picture', ''); //营业执照照片
             $bank_opening = $request->input('bank_opening', ''); //开户行
             $bank_number = $request->input('bank_number', ''); //银行卡号
@@ -310,6 +313,7 @@ class IncomeController extends Controller
                     //机构信息
                     'org_name'=>$org_name,
                     'org_address'=>$org_address,
+                    'org_area'=>$org_area,
                     'org_license_picture'=>$org_license_picture,
                     'bank_opening'=>$bank_opening,
                     'bank_number'=>$bank_number,
