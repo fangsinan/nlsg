@@ -217,19 +217,19 @@ class ColumnController extends Controller
                 $column_outline[$key]['works_info'] = $works_info;
             }
 
-            //继续学习的章节[时间倒序 第一条为最近学习的章节]
-            $historyData = History::select('relation_id','info_id')->where([
-                'user_id'=>$user_id,
-                'is_del'=>0,
-                'relation_id'=>$column['id'],
-                'relation_type'=>1,
-            ])->orderBy('updated_at','desc')->first();
-            $historyData = $historyData?$historyData->toArray():[];
-            if($historyData){
-                $title = WorksInfo::select('title')->where('id',$historyData['worksinfo_id'])->first();
-                $historyData['title'] = $title->title ?? '';
-            }
-
+//            //继续学习的章节[时间倒序 第一条为最近学习的章节]
+//            $historyData = History::select('relation_id','info_id')->where([
+//                'user_id'=>$user_id,
+//                'is_del'=>0,
+//                'relation_id'=>$column['id'],
+//                'relation_type'=>1,
+//            ])->orderBy('updated_at','desc')->first();
+//            $historyData = $historyData?$historyData->toArray():[];
+//            if($historyData){
+//                $title = WorksInfo::select('title')->where('id',$historyData['worksinfo_id'])->first();
+//                $historyData['title'] = $title->title ?? '';
+//            }
+            $historyData = History::getHistoryData($column['id'],1,$user_id);
 
             //查询总的历史记录进度`
             $hisCount = History::getHistoryCount($column_id,1,$user_id);  //讲座
