@@ -32,7 +32,7 @@ class MallOrderFlashSale extends Base
         $now_date = date('Y-m-d H:i:s', $now);
         $data = $this->createFlashSaleOrderTool($params, $user, true);
 
-        if(in_array($params['pay_type'],[1,2,3])){
+        if(!in_array($params['pay_type'],[1,2,3])){
             return ['code' => false, 'msg' => '请选择支付方式','ps' => 'pay_type error'];
         }
 
