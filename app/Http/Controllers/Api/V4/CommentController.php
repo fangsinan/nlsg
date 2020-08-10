@@ -317,9 +317,12 @@ class CommentController extends Controller
      * @apiSuccess {number} share_num     分享数
      * @apiSuccess {number} like_num      喜欢数
      * @apiSuccess {number} reply_num     回复数
+     * @apiSuccess {number} is_quality    是否精选
      * @apiSuccess {string} attach        图片
      * @apiSuccess {string} attach.img    图片地址
+     * @apiSuccess {string} column|works|wiki   type =1、2 专栏和讲座 返回 title、subtitle、cover_pic， type =3、4 听书和精品课 works 返回title subtitle、cover_img ， type=5 百科 wiki 返回name、cover
      * @apiSuccess {string} reply         回复
+     * @apiSuccess {string} reply.content   回复内容
      * @apiSuccess {string} reply.from_user 回复者     【 张三 form_user 回复 李四 to_user 】
      * @apiSuccess {string} reply.from_user.nickname   回复者昵称
      * @apiSuccess {string} reply.from_user.headimg    回复者头像

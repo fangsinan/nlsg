@@ -283,7 +283,7 @@ class MallOrder extends Base
         $dead_time = ConfigModel::getData(12);
         $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
 
-        if(in_array($params['pay_type'],[1,2,3])){
+        if(!in_array($params['pay_type'],[1,2,3])){
             return ['code' => false, 'msg' => '请选择支付方式','ps' => 'pay_type error'];
         }
 
@@ -1057,9 +1057,11 @@ class MallOrder extends Base
         $field = [
             'id', 'ordernum', 'price', 'dead_time', DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'created_at', 'pay_price',
-            'price', 'post_type'
+            'price', 'post_type','pay_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];
+        $with[] = 'orderChild';
+        $with[] = 'orderChild.expressInfoForList';
 
         if ($flag) {
             $field[] = 'address_history';
@@ -1070,14 +1072,12 @@ class MallOrder extends Base
             $field[] = 'special_price_cut';
             $field[] = 'price';
             $field[] = 'pay_time';
-            $field[] = 'pay_type';
             $field[] = 'messages';
             $field[] = 'post_type';
             $field[] = 'bill_type';
             $field[] = 'bill_title';
             $field[] = 'bill_number';
             $field[] = 'bill_format';
-            $with[] = 'orderChild';
             $with[] = 'orderChild.expressInfo';
         }
 
@@ -1092,6 +1092,13 @@ class MallOrder extends Base
                 $vv->sku_history = json_decode($vv->sku_history);
             }
             $v->address_history = json_decode($v->address_history);
+
+            $temp_express_list = [];
+            foreach($v->orderChild as $ocv){
+                $temp_express = $ocv->expressInfoForList;
+                $temp_express_list[] = $temp_express;
+            }
+            $v->express_list = $temp_express_list;
         }
 
         return $list;
@@ -1153,6 +1160,7 @@ class MallOrder extends Base
             $temp_odv['subtitle'] = $odv['goods_info']['subtitle'];
             $temp_odv['details_id'] = $odv['details_id'];
             $temp_odv['comment_id'] = $odv['comment_id'];
+            $temp_odv['sku_number'] = $odv['sku_number'];
             $odv = $temp_odv;
         }
 
@@ -1267,7 +1275,7 @@ class MallOrder extends Base
             $data['cost_price'], $data['freight'],
             $data['vip_cut'], $data['price'],
             $data['coupon_money'], $data['special_price_cut'],
-            $data['pay_time'], $data['pay_type'],
+            $data['pay_time'],
             $data['bill_type'], $data['bill_title'],
             $data['bill_number'], $data['bill_format']
 //            ,$data['order_details']

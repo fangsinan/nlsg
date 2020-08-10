@@ -27,6 +27,7 @@ class ShoppingCart extends Base
         $sku_number = $params['sku_number'] ?? 0;
         $num = $params['num'] ?? 0;
         $inviter = $params['inviter'] ?? 0;
+        $flag = $params['flag'] ?? 'replace';
 
         if (empty($goods_id) || empty($sku_number) || empty($num)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -42,12 +43,14 @@ class ShoppingCart extends Base
             }
         }
 
+        $old_num = 0;
         if (!empty(($params['id'] ?? 0))) {
             $temp = self::where('user_id', '=', $user_id)
                 ->find($params['id']);
             if (!$temp) {
                 return ['code' => false, 'msg' => 'id错误'];
             }
+            $old_num = $temp->num;
         } else {
             $check_cart = self::where('user_id', '=', $user_id)
                 ->where('goods_id', '=', $goods_id)
@@ -55,6 +58,7 @@ class ShoppingCart extends Base
                 ->first();
             if ($check_cart) {
                 $temp = $check_cart;
+                $old_num = $check_cart->num;
             } else {
                 $temp = new self();
             }
@@ -63,7 +67,15 @@ class ShoppingCart extends Base
         $temp->goods_id = $goods_id;
         $temp->sku_number = $sku_number;
         $temp->user_id = $user_id;
-        $temp->num = $num;
+        if ($flag == 'replace') {
+            $temp->num = $num;
+        } else {
+            $temp->num = $num + $old_num;
+            if ($temp->num > $check_sku) {
+                $temp->num = $check_sku;
+            }
+        }
+
         $temp->inviter = $inviter;
 
         $res = $temp->save();
@@ -82,8 +94,9 @@ class ShoppingCart extends Base
             ->select(['id', 'goods_id', 'sku_number', 'num'])
             ->get();
 
-        if($cart->isEmpty()){
-            return new class{};
+        if ($cart->isEmpty()) {
+            return new class {
+            };
         }
 
         $cart = $cart->toArray();
