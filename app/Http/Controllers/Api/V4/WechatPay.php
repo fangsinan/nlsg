@@ -7,16 +7,19 @@ use App\Models\AgentProfitLog;
 use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\GetPriceTools;
+use App\Models\MallOrderDetails;
 use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
+use App\Models\PayRecordDetailStay;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\Works;
 use App\Models\MallOrder;
 use Illuminate\Support\Facades\DB;
 
-class WechatPay extends Controller {
+class WechatPay extends Controller
+{
 
     static public $pay_record_type = [
         //订单表支付方式'1 微信端 2app微信 3app支付宝 4ios'   => 记录表支付方式1 微信  2支付宝 3扣款  4苹果 5六周年兑换卡
@@ -26,8 +29,9 @@ class WechatPay extends Controller {
         4 => 4,
     ];
 
-    public static function PayStatusUp($data) {
-        //1专栏 2会员 5打赏 8商品(包括书籍)    
+    public static function PayStatusUp($data)
+    {
+        //1专栏 2会员 5打赏 8商品(包括书籍)
         //9精品课 听课 10借书 月卡 季卡 违约金 11直播视频 12预约回放（必填）
         if ($data['attach'] == 1) { //处理专栏  OK
             return self::PayColumn($data);
@@ -54,13 +58,14 @@ class WechatPay extends Controller {
         }
     }
 
-    public static function mallOrder($data) {
+    public static function mallOrder($data)
+    {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $ordernum = substr($data['out_trade_no'], 0, -5);
 
         $order_obj = MallOrder::where('ordernum', '=', $ordernum)
-                        ->where('status', '=', 1)->first();
+            ->where('status', '=', 1)->first();
 
         DB::beginTransaction();
         //修改订单支付状态
@@ -97,30 +102,30 @@ class WechatPay extends Controller {
         //如果是拼团订单  需要查看拼团订单是否成功
         if ($order_obj->order_type == 3) {
             $temp_data = DB::table('nlsg_mall_group_buy_list')
-                    ->where('user_id', '=', $order_obj->user_id)
-                    ->where('order_id', '=', $order_obj->id)
-                    ->first();
+                ->where('user_id', '=', $order_obj->user_id)
+                ->where('order_id', '=', $order_obj->id)
+                ->first();
             if (!$temp_data) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '拼团信息错误'];
             }
             $group_buy_id = $temp_data->group_buy_id;
             $sp_info = DB::table('nlsg_special_price')
-                    ->find($group_buy_id);
+                ->find($group_buy_id);
             $need_num = $sp_info->group_num;
 
             $now_num = DB::table('nlsg_mall_group_buy_list')
-                    ->where('group_key', '=', $order_obj->group_key)
-                    ->count();
+                ->where('group_key', '=', $order_obj->group_key)
+                ->count();
 
             if ($now_num >= $need_num) {
                 $gb_res = MallOrderGroupBuy::where(
-                                'group_key', '=', $order_obj->group_key
-                        )->update(
-                        [
-                            'is_success' => 1,
-                            'success_at' => $now_date
-                        ]
+                    'group_key', '=', $order_obj->group_key
+                )->update(
+                    [
+                        'is_success' => 1,
+                        'success_at' => $now_date
+                    ]
                 );
                 if (!$gb_res) {
                     DB::rollBack();
@@ -130,13 +135,43 @@ class WechatPay extends Controller {
         }
 
         //todo 收益表
+        $order_details = MallOrderDetails::where('order_id', '=', $order_obj->id)->first();
+        foreach ($order_details as $od_v) {
+
+            if ($od_v->inviter) {
+
+                $temp_stay_data = [
+                    'type' => 5, //电商推客
+                    'ordernum' => $order_obj->ordernum,
+                    'order_detail_id' => $od_v->id,
+                    'user_id' => $od_v->inviter,
+                    'price' => GetPriceTools::PriceCalc('*', $od_v->t_money, $od_v->num),
+                ];
+
+                $check_stay = PayRecordDetailStay::where('ordernum', '=', $order_obj->ordernum)
+                    ->where('order_detail_id', '=', $od_v->id)
+                    ->where('user_id', '=', $od_v->inviter)
+                    ->first();
+
+                if (!$check_stay) {
+                    $stay_res = DB::table('nlsg_pay_record_detail_stay')->insert($temp_stay_data);
+                    if (!$stay_res) {
+                        DB::rollBack();
+                        return ['code' => false, 'msg' => '推客记录错误'];
+                    }
+                }
+
+            }
+
+        }
 
         DB::commit();
         return ['code' => true, 'msg' => '修改成功'];
     }
 
     //微信购买专栏问题
-    public static function PayColumn($data) {
+    public static function PayColumn($data)
+    {
         $time = time();
         //$out_trade_no   = substr($data['out_trade_no'], 0, -5);
         $out_trade_no = $data['out_trade_no'];
@@ -192,7 +227,7 @@ class WechatPay extends Controller {
                 $record_type = self::$pay_record_type[$data['pay_type']] ?? 0;
                 //添加支付记录
                 $order_type = 1;
-                if($orderInfo['type'] == 15){
+                if ($orderInfo['type'] == 15) {
                     $order_type = 19;  //讲座
                 }
                 $record = [
@@ -229,66 +264,64 @@ class WechatPay extends Controller {
 //                            $ColumnInfo  = $ColumnObj->getOne($ColumnObj::$table,['user_id'=>$teacher_id],['price,twitter_price']);
 
                             $ProfitPrice = 0;
-                            if(in_array($TwitterInfo['level'],[2,3,4])){
-                                $ProfitPrice = GetPriceTools::Income(0,$TwitterInfo['level'],0,1,$teacher_id);
-                            }else if($TwitterInfo['level'] == 5){
+                            if (in_array($TwitterInfo['level'], [2, 3, 4])) {
+                                $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 1, $teacher_id);
+                            } else if ($TwitterInfo['level'] == 5) {
 
                                 //服务商
 //                                $AgentProfitObj=new AgentProfitLog();
 //                                $where = ['user_id'=>$twitter_id,'type'=>[1,2,3],'status'=>1];
 //                                $ProfitInfo = $AgentProfitObj->getOne($AgentProfitObj::$table,$where,['sum(price) price']);
 
-                                $ProfitInfoPrice = AgentProfitLog::where(['user_id'=>$twitter_id,'status'=>1])->wherIn('type',[1,2,3])->sum('price');
-                                if(empty($ProfitInfoPrice)){
-                                    $sumPrice=0;
-                                }else{
-                                    $sumPrice=$ProfitInfoPrice;
+                                $ProfitInfoPrice = AgentProfitLog::where(['user_id' => $twitter_id, 'status' => 1])->wherIn('type', [1, 2, 3])->sum('price');
+                                if (empty($ProfitInfoPrice)) {
+                                    $sumPrice = 0;
+                                } else {
+                                    $sumPrice = $ProfitInfoPrice;
                                 }
 
-                                if(($TwitterInfo['level_send_price']-$sumPrice) >= $ColumnInfo['price']){
+                                if (($TwitterInfo['level_send_price'] - $sumPrice) >= $ColumnInfo['price']) {
                                     //添加记录
                                     $LogData = [];
-                                    $LogData['ordernum'] =$out_trade_no;
-                                    $LogData['user_id']=$twitter_id;
-                                    $LogData['type'] =2;
-                                    $LogData['column_id']=$teacher_id;
-                                    $LogData['num']=1;
-                                    $LogData['price'] =$ColumnInfo['price'];
-                                    $LogData['ctime'] =$time;
+                                    $LogData['ordernum'] = $out_trade_no;
+                                    $LogData['user_id'] = $twitter_id;
+                                    $LogData['type'] = 2;
+                                    $LogData['column_id'] = $teacher_id;
+                                    $LogData['num'] = 1;
+                                    $LogData['price'] = $ColumnInfo['price'];
+                                    $LogData['ctime'] = $time;
                                     AgentProfitLog::create($LogData);
                                     //$AgentProfitObj->add($AgentProfitObj::$table,$LogData); //添加记录
-                                    $ProfitPrice=$ColumnInfo['price']; //返现处理
-                                }else{ //支付金额已扣除分成
-                                    $ProfitPrice=0;
-                                    if($orderInfo['SurplusPrice']>0){
+                                    $ProfitPrice = $ColumnInfo['price']; //返现处理
+                                } else { //支付金额已扣除分成
+                                    $ProfitPrice = 0;
+                                    if ($orderInfo['SurplusPrice'] > 0) {
                                         $LogData = [];
-                                        $LogData['ordernum'] =$out_trade_no;
-                                        $LogData['user_id']=$twitter_id;
-                                        $LogData['type'] =2;
-                                        $LogData['column_id']=$teacher_id;
-                                        $LogData['num']=1;
-                                        $LogData['price'] =$orderInfo['SurplusPrice'];   //推广产品所获金额
-                                        $LogData['ctime'] =$time;
+                                        $LogData['ordernum'] = $out_trade_no;
+                                        $LogData['user_id'] = $twitter_id;
+                                        $LogData['type'] = 2;
+                                        $LogData['column_id'] = $teacher_id;
+                                        $LogData['num'] = 1;
+                                        $LogData['price'] = $orderInfo['SurplusPrice'];   //推广产品所获金额
+                                        $LogData['ctime'] = $time;
 //                                        $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
                                         AgentProfitLog::create($LogData);
 //                                        $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
-                                        $ProfitPrice = GetPriceTools::Income(0,$TwitterInfo['level'],0,1,$teacher_id);
+                                        $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 1, $teacher_id);
 
-                                        $ProfitPrice=$ProfitPrice-$orderInfo['SurplusPrice'];//返回剩余款项
-                                    }else{
+                                        $ProfitPrice = $ProfitPrice - $orderInfo['SurplusPrice'];//返回剩余款项
+                                    } else {
                                         //                                      $ProfitPrice = Tool::RetainDecimal ($ProfitPrice, 0.45, 1);
 //                                        $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
-                                        $ProfitPrice = GetPriceTools::Income(0,$TwitterInfo['level'],0,1,$teacher_id);
+                                        $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 1, $teacher_id);
 
                                     }
                                 }
 
 
-
-
                             }
 
-                            if($ProfitPrice > 0) {
+                            if ($ProfitPrice > 0) {
                                 $map = [
                                     'user_id' => $twitter_id,
                                     "type" => 6,
@@ -296,7 +329,6 @@ class WechatPay extends Controller {
                                     'price' => $ProfitPrice,
                                 ];
                             }
-
 
 
                         } else {
@@ -322,14 +354,14 @@ class WechatPay extends Controller {
                     if (empty($PrdInfo)) {
                         PayRecordDetail::create($map);
                         //Profit::ServiceIncome($out_trade_no,6,$ProfitPrice,$twitter_id);
-                        GetPriceTools::ServiceIncome($out_trade_no,6,$ProfitPrice,$twitter_id);
+                        GetPriceTools::ServiceIncome($out_trade_no, 6, $ProfitPrice, $twitter_id);
 
                     }
                 }
 
                 //添加订阅记录
                 $sub_type = 1;
-                if( $orderInfo['type'] == 15 ){
+                if ($orderInfo['type'] == 15) {
                     $sub_type = 6;  //讲座
                 }
                 $subscribe = [
@@ -351,7 +383,6 @@ class WechatPay extends Controller {
 //                $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
-
 
 
                 if ($orderRst && $couponRst && $phoneRst && $recordRst && $subscribeRst && $shareSyRst && $Sy_Rst) {
@@ -377,7 +408,8 @@ class WechatPay extends Controller {
     }
 
     //微信购买精品课
-    public static function PayExcellent($data) {
+    public static function PayExcellent($data)
+    {
 
         $time = time();
         $out_trade_no = $data['out_trade_no'];
@@ -458,64 +490,64 @@ class WechatPay extends Controller {
                         $WorksInfo = Works::find($works_id);
                         $ProfitPrice = $WorksInfo['twitter_price'];
 
-                        if(in_array($TwitterInfo['level'],[2,3,4])){
-                            $ProfitPrice = GetPriceTools::Income(0,$TwitterInfo['level'],0,2,0,$works_id);
+                        if (in_array($TwitterInfo['level'], [2, 3, 4])) {
+                            $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 2, 0, $works_id);
 
-                        }else if($TwitterInfo['level'] == 5){
-                                //$AgentProfitObj=new AgentProfitLog();
-                                $table = '';
+                        } else if ($TwitterInfo['level'] == 5) {
+                            //$AgentProfitObj=new AgentProfitLog();
+                            $table = '';
 //                                $where = ['type'=>[1,2,3],'status'=>1];
 //                                $field = ['sum(price) price'];
 //                                $ProfitInfo = $AgentProfitObj->getOne($AgentProfitObj::$table,$where,$field);
 
-                            $ProfitInfoPrice = AgentProfitLog::where('status',1)->whereIn('type',[1,2,3])->sum('price');
-                            if(empty($ProfitInfoPrice)){
-                                    $sumPrice=0;
-                                }else{
-                                    $sumPrice=$ProfitInfoPrice;
-                                }
-                                if(($TwitterInfo['level_send_price']-$sumPrice)>=$WorksInfo['price']){
-                                    //添加记录
-                                    $LogData = [];
-                                    $LogData['ordernum'] =$out_trade_no;
-                                    $LogData['user_id']=$twitter_id;
-                                    $LogData['type'] =3;
-                                    $LogData['works_id']=$works_id;
-                                    $LogData['num']=1;
-                                    $LogData['price'] =$WorksInfo['price'];
+                            $ProfitInfoPrice = AgentProfitLog::where('status', 1)->whereIn('type', [1, 2, 3])->sum('price');
+                            if (empty($ProfitInfoPrice)) {
+                                $sumPrice = 0;
+                            } else {
+                                $sumPrice = $ProfitInfoPrice;
+                            }
+                            if (($TwitterInfo['level_send_price'] - $sumPrice) >= $WorksInfo['price']) {
+                                //添加记录
+                                $LogData = [];
+                                $LogData['ordernum'] = $out_trade_no;
+                                $LogData['user_id'] = $twitter_id;
+                                $LogData['type'] = 3;
+                                $LogData['works_id'] = $works_id;
+                                $LogData['num'] = 1;
+                                $LogData['price'] = $WorksInfo['price'];
 //                                    $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
-                                    AgentProfitLog::create($LogData);
-                                    //$ProfitPrice=$WorksInfo['price'];//返现处理 实际支付金额
-                                    $ProfitPrice=$total_fee;//返现处理 实际支付金额
-                                }else{ //支付金额已经扣除分成
+                                AgentProfitLog::create($LogData);
+                                //$ProfitPrice=$WorksInfo['price'];//返现处理 实际支付金额
+                                $ProfitPrice = $total_fee;//返现处理 实际支付金额
+                            } else { //支付金额已经扣除分成
 //                                    $ProfitPrice = Tool::RetainDecimal ($WorksInfo['price'], 0.45, 1);
-                                    $ProfitPrice=0;
-                                    if($orderInfo['SurplusPrice']>0){
-                                        $LogData = [];
-                                        $LogData['ordernum'] =$out_trade_no;
-                                        $LogData['user_id']=$twitter_id;
-                                        $LogData['type'] =3;
-                                        $LogData['works_id']=$works_id;
-                                        $LogData['num']=1;
-                                        $LogData['price'] =$orderInfo['SurplusPrice'];
-                                        $LogData['ctime'] =$time;
+                                $ProfitPrice = 0;
+                                if ($orderInfo['SurplusPrice'] > 0) {
+                                    $LogData = [];
+                                    $LogData['ordernum'] = $out_trade_no;
+                                    $LogData['user_id'] = $twitter_id;
+                                    $LogData['type'] = 3;
+                                    $LogData['works_id'] = $works_id;
+                                    $LogData['num'] = 1;
+                                    $LogData['price'] = $orderInfo['SurplusPrice'];
+                                    $LogData['ctime'] = $time;
 //                                        $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
-                                        AgentProfitLog::create($LogData);
+                                    AgentProfitLog::create($LogData);
 
 //                                        $ProfitPrice=Profit::IncomeController(0,5,0,2,$teacher_id,$works_id);
-                                        $ProfitPrice = GetPriceTools::Income(0,$TwitterInfo['level'],0,2,0,$works_id);
-                                        $ProfitPrice=$ProfitPrice-$orderInfo['SurplusPrice'];
-                                    }else{//海报
+                                    $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 2, 0, $works_id);
+                                    $ProfitPrice = $ProfitPrice - $orderInfo['SurplusPrice'];
+                                } else {//海报
 //                                        $ProfitPrice=Profit::IncomeController(0,5,0,2,$teacher_id,$works_id);
-                                        $ProfitPrice = GetPriceTools::Income(0,$TwitterInfo['level'],0,2,0,$works_id);
-
-                                    }
+                                    $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 2, 0, $works_id);
 
                                 }
+
+                            }
                         }
 
                         if ($ProfitPrice > 0) {
-                            $map = array('user_id' => $twitter_id, "type" => 7, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, );
+                            $map = array('user_id' => $twitter_id, "type" => 7, "ordernum" => $out_trade_no, 'price' => $ProfitPrice,);
                         }
                     } else {
                         $is_sub = Subscribe::isSubscribe($twitter_id, $works_id, 2);
@@ -538,7 +570,7 @@ class WechatPay extends Controller {
                         $shareSyRst = PayRecordDetail::create($map);
                         //5%返现
                         //Profit::ServiceIncome($out_trade_no,7,$ProfitPrice,$twitter_id);
-                        GetPriceTools::ServiceIncome($out_trade_no,7,$ProfitPrice,$twitter_id);
+                        GetPriceTools::ServiceIncome($out_trade_no, 7, $ProfitPrice, $twitter_id);
                     }
                 }
 
@@ -583,7 +615,8 @@ class WechatPay extends Controller {
     }
 
     // 苹果端 能量币充值
-    public static function PayCoinOrder($data) {
+    public static function PayCoinOrder($data)
+    {
         $time = time();
         //$out_trade_no   = substr($data['out_trade_no'], 0, -5);
         $out_trade_no = $data['out_trade_no'];
@@ -646,16 +679,14 @@ class WechatPay extends Controller {
     }
 
 
-
-
-    public static function UserBalance($pay_type, $user_id, $price, $edit='-')
+    public static function UserBalance($pay_type, $user_id, $price, $edit = '-')
     {
         $res = true;
-        if( $pay_type == 4 ){   // 只有虚拟产品才可以支付能量币
-            if($edit == '-'){
-                $res = User::where('id',$user_id)->decrement('ios_balance',$price);
-            }else if($edit == '+'){
-                $res = User::where('id',$user_id)->increment('ios_balance',$price);
+        if ($pay_type == 4) {   // 只有虚拟产品才可以支付能量币
+            if ($edit == '-') {
+                $res = User::where('id', $user_id)->decrement('ios_balance', $price);
+            } else if ($edit == '+') {
+                $res = User::where('id', $user_id)->increment('ios_balance', $price);
             }
         }
         return $res;
