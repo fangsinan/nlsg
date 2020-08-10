@@ -416,9 +416,6 @@ class IncomeController extends Controller
     }
 
 
-
-
-
     /**
      * @api {get} /api/v4/income/get_withdraw  提现 个税计算
      * @apiName get_withdraw
@@ -697,7 +694,7 @@ class IncomeController extends Controller
      */
     public function getList(Request $request){
 
-        $user_id = $request->input('user_id',0);
+        $user_id = $this->user['id'];
         $type    = $request->input('type',0);
         $date    = $request->input('date',0);
         $earn_type    = $request->input('earn_type',1); //1支出 2收入
