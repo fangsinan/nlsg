@@ -230,6 +230,7 @@ class MallOrderController extends Controller
         $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
         $params['address_id'] = $request->input('address_id', 0);
         $params['os_type'] = $request->input('os_type', 0);
+        $params['pay_type'] = $request->input('pay_type',0);
 
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');

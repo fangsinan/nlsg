@@ -282,6 +282,11 @@ class MallOrder extends Base
         $now_date = date('Y-m-d H:i:s', $now);
         $dead_time = ConfigModel::getData(12);
         $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
+
+        if(in_array($params['pay_type'],[1,2,3])){
+            return ['code' => false, 'msg' => '请选择支付方式','ps' => 'pay_type error'];
+        }
+
         $data = $this->createOrderTool($params, $user, true);
 
         if (!($data['can_sub'] ?? false)) {
@@ -314,6 +319,7 @@ class MallOrder extends Base
         $order_data['created_at'] = $now_date;
         $order_data['updated_at'] = $now_date;
         $order_data['dead_time'] = $dead_time;
+        $order_data['pay_type'] = $params['pay_type'];
 
         DB::beginTransaction();
 

@@ -32,6 +32,10 @@ class MallOrderFlashSale extends Base
         $now_date = date('Y-m-d H:i:s', $now);
         $data = $this->createFlashSaleOrderTool($params, $user, true);
 
+        if(in_array($params['pay_type'],[1,2,3])){
+            return ['code' => false, 'msg' => '请选择支付方式','ps' => 'pay_type error'];
+        }
+
         if (!($data['can_sub'] ?? false)) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => 'can_sub'];
         }
@@ -62,6 +66,7 @@ class MallOrderFlashSale extends Base
         $order_data['created_at'] = $now_date;
         $order_data['updated_at'] = $now_date;
         $order_data['sp_id'] = $data['sku_list']['flash_sale_id'];
+        $order_data['pay_type'] = $params['pay_type'];
 
         DB::beginTransaction();
 
