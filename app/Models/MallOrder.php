@@ -1057,7 +1057,7 @@ class MallOrder extends Base
         $field = [
             'id', 'ordernum', 'price', 'dead_time', DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'created_at', 'pay_price',
-            'price', 'post_type'
+            'price', 'post_type','pay_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];
 
@@ -1070,7 +1070,6 @@ class MallOrder extends Base
             $field[] = 'special_price_cut';
             $field[] = 'price';
             $field[] = 'pay_time';
-            $field[] = 'pay_type';
             $field[] = 'messages';
             $field[] = 'post_type';
             $field[] = 'bill_type';

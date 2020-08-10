@@ -690,7 +690,7 @@ class MallOrderGroupBuy extends Base
             DB::raw('(case when nmo.`status` = 1 then 1
                 when is_success = 0 then 95 when nmo.is_stop = 1
                 then 99 ELSE nmo.`status` END) `status`'),
-            'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type'
+            'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type','nmo.pay_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList', 'groupList.userInfo'];
 
@@ -703,7 +703,6 @@ class MallOrderGroupBuy extends Base
             $field[] = 'special_price_cut';
             $field[] = 'price';
             $field[] = 'pay_time';
-            $field[] = 'pay_type';
             $field[] = 'messages';
             $field[] = 'post_type';
             $field[] = 'bill_type';
