@@ -693,6 +693,8 @@ class MallOrderGroupBuy extends Base
             'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type','nmo.pay_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList', 'groupList.userInfo'];
+        $with[] = 'orderChild';
+        $with[] = 'orderChild.expressInfoForList';
 
         if ($flag) {
             $field[] = 'address_history';
@@ -709,7 +711,6 @@ class MallOrderGroupBuy extends Base
             $field[] = 'bill_title';
             $field[] = 'bill_number';
             $field[] = 'bill_format';
-            $with[] = 'orderChild';
             $with[] = 'orderChild.expressInfo';
         }
 
@@ -733,6 +734,14 @@ class MallOrderGroupBuy extends Base
             }
             $v->headimg_list = $headimg;
             unset($list[$k]->groupList);
+
+            $temp_express_list = [];
+            foreach($v->orderChild as $ocv){
+                $temp_express = $ocv->expressInfoForList;
+                $temp_express_list[] = $temp_express;
+            }
+            $v->express_list = $temp_express_list;
+
         }
 
         return $list;

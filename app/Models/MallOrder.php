@@ -1060,6 +1060,8 @@ class MallOrder extends Base
             'price', 'post_type','pay_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];
+        $with[] = 'orderChild';
+        $with[] = 'orderChild.expressInfoForList';
 
         if ($flag) {
             $field[] = 'address_history';
@@ -1076,7 +1078,6 @@ class MallOrder extends Base
             $field[] = 'bill_title';
             $field[] = 'bill_number';
             $field[] = 'bill_format';
-            $with[] = 'orderChild';
             $with[] = 'orderChild.expressInfo';
         }
 
@@ -1091,6 +1092,13 @@ class MallOrder extends Base
                 $vv->sku_history = json_decode($vv->sku_history);
             }
             $v->address_history = json_decode($v->address_history);
+
+            $temp_express_list = [];
+            foreach($v->orderChild as $ocv){
+                $temp_express = $ocv->expressInfoForList;
+                $temp_express_list[] = $temp_express;
+            }
+            $v->express_list = $temp_express_list;
         }
 
         return $list;
