@@ -20,6 +20,7 @@ class ShoppingCartController extends Controller
      * @apiParam {string} goods_id 商品id
      * @apiParam {string} sku_number sku
      * @apiParam {string} num 数量
+     * @apiParam {string=replace,add} flag 添加方式(replace:覆盖数量  add:累计数量)
      * @apiParam {string} [inviter] 邀请人
      *
      * @apiParamExample {json} Request-Example:
@@ -28,6 +29,7 @@ class ShoppingCartController extends Controller
      * "sku_number":"1835913656",
      * "num":666,
      * "id":1,
+     * "flag":"replace",
      * "inviter":168934
      * }
      * @apiSuccessExample {json} Request-Example:
