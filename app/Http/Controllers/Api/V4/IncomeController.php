@@ -420,13 +420,12 @@ class IncomeController extends Controller
 
 
     /**
-     * @api {get} /api/v4/income/get_withdraw  提现操作
+     * @api {get} /api/v4/income/get_withdraw  提现 个税计算
      * @apiName get_withdraw
      * @apiVersion 1.0.0
      * @apiGroup income
-     * @apiParam {int} user_id
+     *
      * @apiParam {int} money 提现金额
-     * @apiParam {int} channel   ali|WeChat  支付宝或微信
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -444,7 +443,7 @@ class IncomeController extends Controller
     {
         $money = $request->input('money', 0);
 
-        $user_id    = 211172;//$this->user['id'];
+        $user_id    = $this->user['id'];
 
         $cash_list  = CashData::where(['user_id'=>$user_id])->first();
         $bind_type = 0;
