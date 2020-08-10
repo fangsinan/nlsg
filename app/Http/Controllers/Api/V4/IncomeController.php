@@ -58,7 +58,7 @@ class IncomeController extends Controller
         //信息认证
         //账户设置
 
-        $user_id= $request->input('user_id',0);
+        $user_id = $this->user['id'] ?? 0;
         $cash_info = CashData::where(['user_id'=>$user_id])->first();
 
         $is_pass        = 0;
@@ -142,7 +142,7 @@ class IncomeController extends Controller
      */
     public function profit(Request $request)
     {
-        $user_id = $request->input('user_id', 0);
+        $user_id = $this->user['id'] ?? 0;
 
         $cash_list = CashData::where(['user_id'=>$user_id])->first();
         if ($cash_list['is_pass']==1 && $cash_list['org_type'] ==1 ) {
@@ -248,7 +248,7 @@ class IncomeController extends Controller
      */
     public function cashData(Request $request)
     {
-        $user_id = $request->input('user_id', 0);
+        $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 0);//1 获取是否有提交信息  2修改
 
         if($type==1){ //获取数据
@@ -376,7 +376,7 @@ class IncomeController extends Controller
     public function present(Request $request)
     {
         $type = $request->input('type', 0); //1微信  2支付宝
-        $user_id = $request->input('user_id', 0);
+        $user_id = $this->user['id'] ?? 0;
 
         $CashInfo = CashData::where(['user_id'=> $user_id,'is_pass'=>1])->first('id');
         //已通过审核
@@ -496,7 +496,7 @@ class IncomeController extends Controller
      */
     public function withdrawals(Request $request)
     {
-        $user_id = $request->input('user_id', 0);
+        $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 0);
         $amount = $request->input('money', 0);
         $channel = $request->input('channel', 0);//ali  |  WeChat
@@ -873,7 +873,7 @@ class IncomeController extends Controller
      */
     public function Detail(Request $request)
     {
-        $user_id = $request->input('user_id', 0);
+        $user_id = $this->user['id'] ?? 0;
         $id = $request->input('id', 0);
         $type = $request->input('earn_type', 0);  //1支出  2收入
 
@@ -936,7 +936,7 @@ class IncomeController extends Controller
     }
      */
     public function getOrderDepositHistory(Request $request){
-        $user_id = $request->input('user_id', 0);
+        $user_id = $this->user['id'] ?? 0;
 
         $lists = Order::select('price', 'created_at')->where([
             'user_id'   => $user_id,
@@ -981,7 +981,7 @@ class IncomeController extends Controller
      */
     public  function  sendInvoice(Request $request)
     {
-        $user_id = $request->input('user_id', 0);
+        $user_id = $this->user['id'] ?? 0;
         $express = $request->input('express', 0);
         $express_num = $request->input('express_num', 0);
         $img = $request->input('img', 0);
