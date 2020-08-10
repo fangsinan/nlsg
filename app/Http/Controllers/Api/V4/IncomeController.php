@@ -417,6 +417,69 @@ class IncomeController extends Controller
 
 
 
+
+    /**
+     * @api {get} /api/v4/income/get_withdraw  提现查看余额、个税
+     * @apiName get_withdraw
+     * @apiVersion 1.0.0
+     * @apiGroup income
+     *
+     * @apiParam {int} user_id
+     * @apiParam {int} money 提现金额
+     * @apiParam {int} channel   ali|WeChat  支付宝或微信
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "now": 1597030864,
+    "data": {
+    "balance": 0,    可提现余额
+    "income_tax": 0,    个税
+    }
+    }
+     */
+    public  function  getWithdraw(Request $request)
+    {
+        $money = $request->input('money', 0);
+
+        $user_id    = 211172;//$this->user['id'];
+
+        $cash_list  = CashData::where(['user_id'=>$user_id])->first();
+        $bind_type = 0;
+        if ($cash_list['is_pass'] == 1 && $cash_list['org_type'] == 1 ) {
+            if (!$cash_list['app_wx_account']) {
+                $bind_type = 1;
+            } elseif(!$cash_list['zfb_account']){
+                $bind_type = 2;
+            }
+        }
+        if ($cash_list['status']==2) {
+            return $this->error(0,'企业不能直接提现');
+        }
+
+        $balance = PayRecordDetail::getSumProfit($user_id,5);
+        //$pay_model->getSumProfit($user_id,5);
+
+        if ($balance < $money) {
+            return $this->error(0,'提现金额不能大于收益');
+
+        }
+        $income_tax = PayRecordDetail::getIncomeTax($user_id,$money);
+
+        $data=[
+//            'bind_type'    => $bind_type,
+            'balance'      => $balance > 0 ? $balance : 0,
+            'income_tax'   => $income_tax,
+//            'remain_money' => $income_tax >0 ? round($balance - $income_tax, 2) : $money,
+        ];
+
+        return $this->success($data);
+
+    }
+
+
     /**
      * @api {get} /api/v4/income/withdrawals  提现操作
      * @apiName withdrawals

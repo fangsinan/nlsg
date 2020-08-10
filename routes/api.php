@@ -96,6 +96,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::post('income/cash_data', 'IncomeController@cashData');
     Route::get('income/present', 'IncomeController@present');
     Route::get('income/withdrawals', 'IncomeController@withdrawals');
+    Route::get('income/get_withdraw', 'IncomeController@getWithdraw');
     Route::get('income/get_list', 'IncomeController@getList');
     Route::get('income/detail', 'IncomeController@Detail');
     Route::get('income/get_deposit', 'IncomeController@getOrderDepositHistory');

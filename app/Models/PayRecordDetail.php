@@ -82,4 +82,25 @@ class PayRecordDetail extends Base
         return round($shui - $tax_sum, 2);
     }
 
+
+
+    /**
+     * 计算个税
+     * @return [type] [description]
+     */
+    public static function  getIncomeTax($user_id, $money)
+    {
+        $sum = PayRecord::where(['user_id' => $user_id,])
+            ->whereIn('status', [1, 2])
+            ->whereIn('order_type', [7, 8])
+            ->where('created_at', date('Y-m-1', time()), '>')
+            ->sum('price');
+        $pay_total = $sum ? $sum : 0;
+        $total      = $sum + $money ;
+        $income_tax = Withdrawals::cal_tax($total);
+        $remain_money = round($income_tax, 2);
+
+        return $remain_money ?: 0;
+    }
+
 }
