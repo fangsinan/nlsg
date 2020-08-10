@@ -710,6 +710,7 @@ class MallOrderGroupBuy extends Base
             $field[] = 'bill_number';
             $field[] = 'bill_format';
             $with[] = 'orderChild';
+            $with[] = 'orderChild.expressInfo';
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
