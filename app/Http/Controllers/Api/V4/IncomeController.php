@@ -709,7 +709,7 @@ class IncomeController extends Controller
                 $order_type_val = [$type];
             }
 
-            $query = PayRecord::select('ordernum','created_at','order_type as type','user_id','price','status'
+            $query = PayRecord::select('id','ordernum','created_at','order_type as type','user_id','price','status'
                 ,DB::raw('1 as `earn_type`','0 as order_detail_id','0 subsidy_type'))
                 ->where('user_id',$user_id)->whereIn('order_type',$order_type_val);
 
