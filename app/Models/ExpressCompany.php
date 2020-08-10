@@ -8,6 +8,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -32,6 +33,68 @@ class ExpressCompany extends Base
             return $data->code ?? '';
         } elseif ($flag == 3) {
             return $data->phone ?? '';
+        }
+    }
+
+    public function tempPost()
+    {
+
+        if (0) {
+            //写入txt
+            $host = "http://jisukdcx.market.alicloudapi.com";
+            $path = "/express/type";
+            $method = "GET";
+            $appcode = "cc703c76da5b4b15bb6fc4aa0c0febf9";
+            $headers = array();
+            array_push($headers, "Authorization:APPCODE " . $appcode);
+            $querys = "";
+            $bodys = "";
+            $url = $host . $path;
+
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_FAILONERROR, false);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_HEADER, false);
+            if (1 == strpos("$" . $host, "https://")) {
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+            }
+
+            $result = curl_exec($curl);
+            $jsonarr = json_decode($result, true);
+
+            if ($jsonarr['status'] != 0) {
+                echo $jsonarr['msg'];
+                exit();
+            }
+
+
+            $myfile = fopen("eclist.txt", "a+") or die("Unable to open file!");
+            $txt = json_encode($jsonarr);
+            fwrite($myfile, $txt);
+            fclose($myfile);
+        }
+
+        if (0) {
+            $myfile = fopen("eclist.txt", "r") or die("Unable to open file!");
+            $txt = fread($myfile, filesize("eclist.txt"));
+            fclose($myfile);
+            $txt = json_decode($txt, true);
+            $txt = $txt['result'];
+
+            foreach ($txt as &$v) {
+                $temp_v = [];
+                $temp_v['name'] = $v['name'];
+                $temp_v['code'] = $v['type'];
+                $temp_v['phone'] = $v['tel'];
+                $temp_v['logo'] = $v['logo'];
+                $v = $temp_v;
+            }
+
+            DB::table('nlsg_express_company')->insert($txt);
         }
     }
 
