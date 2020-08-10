@@ -742,7 +742,7 @@ class MallOrderGroupBuy extends Base
         return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
             ->select([
                 'status', 'goods_id', 'num', 'id as details_id',
-                'order_id', 'sku_history', 'comment_id'
+                'order_id', 'sku_history', 'comment_id','sku_number'
             ]);
     }
 
