@@ -697,7 +697,8 @@ class MallOrderController extends Controller
         $params['os_type'] = $request->input('os_type', 0);
         $params['buy_type'] = $request->input('buy_type', 0);
         $params['group_key'] = $request->input('group_key', '');
-
+        $params['pay_type'] = $request->input('pay_type',0);
+        
         $model = new MallOrderGroupBuy();
         $data = $model->createGroupBuyOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
