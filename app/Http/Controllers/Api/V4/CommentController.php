@@ -501,12 +501,17 @@ class CommentController extends Controller
     public function getForwardUser(Request $request)
     {
         $id = $request->input('id');
-        $forwardUser = Comment::with('user:id,nickname,headimg')
+        $forwardUser = Comment::with('user:id,nickname,headimg,intro')
             ->select(['id', 'user_id'])
             ->where('pid', $id)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
+        if($forwardUser['data']){
+            foreach($forwardUser['data'] as &$v){
+                $v['is_follow'] = 1;
+            }
+        }
         return success($forwardUser['data']);
     }
 
@@ -545,13 +550,18 @@ class CommentController extends Controller
     public function getLikeUser(Request $request)
     {
         $id = $request->input('id');
-        $likeUser = Like::with('user:id,nickname,headimg')
+        $likeUser = Like::with('user:id,nickname,headimg,intro')
             ->select(['id', 'user_id'])
             ->where('relation_id', $id)
             ->where('type', 1)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
+        if($likeUser['data']){
+            foreach($likeUser['data'] as &$v){
+                $v['is_follow'] = 1;
+            }
+        }
         return success($likeUser['data']);
     }
 
