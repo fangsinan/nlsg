@@ -773,6 +773,10 @@ class MallOrderGroupBuy extends Base
             true
         );
 
+        if($getData->isEmpty()){
+            return ['code' => false, 'msg' => '订单不存在'];
+        }
+
         $data = $getData[0]->toArray();
 
         foreach ($data['order_details'] as &$odv) {
@@ -886,6 +890,8 @@ class MallOrderGroupBuy extends Base
                         $doc['express_info']['express_id'],3
                     );
                     $doc['express_info']['history']->express_phone = $doc['express_info']['express_phone'];
+                }else{
+                    $doc['express_info'] = new class{};
                 }
 
                 $temp_o_c[] = $doc;
