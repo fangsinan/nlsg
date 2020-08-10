@@ -418,12 +418,12 @@ class IncomeController extends Controller
 
 
 
+
     /**
-     * @api {get} /api/v4/income/get_withdraw  提现查看余额、个税
+     * @api {get} /api/v4/income/get_withdraw  提现操作
      * @apiName get_withdraw
      * @apiVersion 1.0.0
      * @apiGroup income
-     *
      * @apiParam {int} user_id
      * @apiParam {int} money 提现金额
      * @apiParam {int} channel   ali|WeChat  支付宝或微信
