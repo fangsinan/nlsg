@@ -320,7 +320,7 @@ class CommentController extends Controller
      * @apiSuccess {number} is_quality    是否精选
      * @apiSuccess {string} attach        图片
      * @apiSuccess {string} attach.img    图片地址
-     * @apiSuccess {string} 来源           type 1、2 专栏和讲座 【column （title、subtitle、cover_pic）】 3、4 听书和精品课【works（title、subtitle、cover_img）】 5 百科 【wiki (name、cover)】
+     * @apiSuccess {string} column|works|wiki   type =1、2 专栏和讲座 返回 title、subtitle、cover_pic， type =3、4 听书和精品课 works 返回title subtitle、cover_img ， type=5 百科 wiki 返回name、cover
      * @apiSuccess {string} reply         回复
      * @apiSuccess {string} reply.content   回复内容
      * @apiSuccess {string} reply.from_user 回复者     【 张三 form_user 回复 李四 to_user 】
