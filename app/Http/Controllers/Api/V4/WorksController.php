@@ -443,7 +443,7 @@ class WorksController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup works
      *
-     * @apiParam {int} workinfo_id 章节id
+     * @apiParam {int} info_id 章节id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
