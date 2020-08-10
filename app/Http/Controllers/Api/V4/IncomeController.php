@@ -416,9 +416,6 @@ class IncomeController extends Controller
     }
 
 
-
-
-
     /**
      * @api {get} /api/v4/income/get_withdraw  提现 个税计算
      * @apiName get_withdraw
@@ -697,7 +694,7 @@ class IncomeController extends Controller
      */
     public function getList(Request $request){
 
-        $user_id = $request->input('user_id',0);
+        $user_id = $this->user['id'] ?? 0;
         $type    = $request->input('type',0);
         $date    = $request->input('date',0);
         $earn_type    = $request->input('earn_type',1); //1支出 2收入
@@ -775,8 +772,8 @@ class IncomeController extends Controller
                 //2：用户专栏分享提成    5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画
 
                 $con = $this->detail_content($val['type'],$val['ordernum'],$val['order_detail_id']);
-                $val['content'] = $con['content'];
-                $val['name'] = $con['name'];
+                $val['content'] = $con['content'] ??'';
+                $val['name'] = $con['name'] ??'';
             }
 
         }
@@ -793,29 +790,43 @@ class IncomeController extends Controller
         $res = [];
         switch($type){
             case 2:$res['content'] = '分享收益';
-                $teacherInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
-                $ColumnInfo = Column::find($teacherInfo['relation_id']);
-                $res['name']=$ColumnInfo['name'];
+                $teacherInfo = Order::select('relation_id')->where(['ordernum'=>$ordernum])->first();
+                if($teacherInfo){
+                    $ColumnInfo = Column::find($teacherInfo['relation_id']);
+                    $res['name']=$ColumnInfo['name'];
+                }
+
                 break;
             case 5:$res['content'] = '推客收益'; //电商
                 $goodsInfo = MallOrderDetails::find($order_detail_id);
-                $name = MallGoods::find($goodsInfo['goods_id']);
-                //$val['name']=Tool::SubStr($name['name'],10);
-                $res['name']=$name['name'];
+                if($goodsInfo){
+                    $name = MallGoods::find($goodsInfo['goods_id']);
+                    if($name) $name = $name->toArray();
+                    //$val['name']=Tool::SubStr($name['name'],10);
+                    $res['name']=$name['name'];
+                }
+
+
                 break;
             case 6:$res['content'] = '推客收益'; //专栏
 
                 $teacherInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
-                $ColumnInfo = Column::find($teacherInfo['relation_id']);
-                $res['name']=$ColumnInfo['name'];
+                if($teacherInfo){
+                    $ColumnInfo = Column::find($teacherInfo['relation_id']);
+                    $res['name']=$ColumnInfo['name'];
+                }
+
                 break;
             case 7:$res['content'] = '精品课收益';
                 $OrderInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
-                $works_id=$OrderInfo['relation_id'];
+                if($OrderInfo){
+                    $works_id=$OrderInfo['relation_id'];
 
-                $workName = Works::find($works_id);;
-                //$val['name']=Tool::SubStr($workName,8); //截取名称13
-                $res['name']=$workName['title']; //截取名称13
+                    $workName = Works::find($works_id);;
+                    //$val['name']=Tool::SubStr($workName,8); //截取名称13
+                    $res['name']=$workName['title']; //截取名称13
+                }
+
                 break;
             case 8:
                 $supremacyInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
