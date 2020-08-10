@@ -51,14 +51,14 @@ class Comment extends Base
                                 },
                                 'reward.user:id,nickname,headimg'
                             ])
-                       ->select('id','pid', 'user_id', 'relation_id', 'content','forward_num','share_num','like_num','reply_num','reward_num','created_at')
+                       ->select('id','pid', 'user_id', 'relation_id','is_quality','content','forward_num','share_num','like_num','reply_num','reward_num','created_at')
                        ->where('status', 1)
                        ->find($id);
         $reply = CommentReply::with([
                         'from_user:id,nickname,headimg',
                         'to_user:id,nickname,headimg'
                   ])
-                 ->select(['id','from_uid','to_uid','created_at'])
+                 ->select(['id','from_uid','to_uid','content','created_at'])
                  ->where('status', 1)
                  ->paginate(2)
                  ->toArray();
