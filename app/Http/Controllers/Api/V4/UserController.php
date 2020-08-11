@@ -497,35 +497,34 @@ class UserController extends Controller
      *
      * @apiSuccessExample 成功响应:
      *
-     * {
-     * "code": 200,
-     * "msg": "成功",
-     * "data": [
-     * {
-     * "id": 168934,
-     * "phone": "18624078563",
-     * "nickname": "chandler",
-     * "openid": null,
-     * "unionid": null,
-     * "sex": null,
-     * "birthday": null,
-     * "province": null,
-     * "city": null,
-     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
-     * "intro": null,
-     * "level": 0,
-     * "created_at": null,
-     * "updated_at": null,
-     * "expire_time": null,
-     * "status": 1,
-     * "is_staff": 0,
-     * "pivot": {
-     * "from_uid": 1,
-     * "to_uid": 168934
-     * }
-     * }
-     * ]
-     *  }
+        {
+        "code": 200,
+        "msg": "成功",
+        "data": [
+            {
+                "id": 6,
+                "from_uid": 211172,
+                "to_uid": 1,
+                "to_user": {
+                    "id": 211172,
+                    "nickname": "能量时光",
+                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                },
+                "is_follow": 0
+            },
+            {
+                "id": 9,
+                "from_uid": 168934,
+                "to_uid": 1,
+                "to_user": {
+                    "id": 168934,
+                    "nickname": "chandler",
+                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                },
+                "is_follow": 0
+            }
+        ]
+    }
      *
      */
     public function fan(Request $request)
@@ -558,35 +557,45 @@ class UserController extends Controller
      *
      * @apiSuccessExample 成功响应:
      *
-     * {
-     * "code": 200,
-     * "msg": "成功",
-     * "data": [
-     * {
-     * "id": 168934,
-     * "phone": "18624078563",
-     * "nickname": "chandler",
-     * "openid": null,
-     * "unionid": null,
-     * "sex": null,
-     * "birthday": null,
-     * "province": null,
-     * "city": null,
-     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
-     * "intro": null,
-     * "level": 0,
-     * "created_at": null,
-     * "updated_at": null,
-     * "expire_time": null,
-     * "status": 1,
-     * "is_staff": 0,
-     * "pivot": {
-     * "from_uid": 1,
-     * "to_uid": 168934
-     * }
-     * }
-     * ],
-     * }
+     {
+        "code": 200,
+        "msg": "成功",
+        "data": [
+            {
+                "id": 4,
+                "from_uid": 1,
+                "to_uid": 211172,
+                "from_user": {
+                    "id": 211172,
+                    "nickname": "能量时光",
+                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                },
+                "is_follow": 0
+            },
+            {
+                "id": 10,
+                "from_uid": 1,
+                "to_uid": 2,
+                "from_user": {
+                    "id": 2,
+                    "nickname": "刘尚",
+                    "headimg": "/wechat/works/headimg/70/2017102911145924225.png"
+                },
+                "is_follow": 0
+            },
+            {
+                "id": 12,
+                "from_uid": 1,
+                "to_uid": 168934,
+                "from_user": {
+                    "id": 168934,
+                    "nickname": "chandler",
+                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                },
+                "is_follow": 0
+            }
+        ]
+    }
      *
      */
     public function follower(Request $request)
