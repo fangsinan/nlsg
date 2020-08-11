@@ -112,7 +112,7 @@ class CouponRule extends Base
                 $get_list = $get_list->toArray();
             }
 
-            //todo 根据优惠券的restrict判断
+            //根据优惠券的restrict判断
             foreach ($res as $k => $v) {
                 switch (intval($v->restrict)) {
                     case 1:

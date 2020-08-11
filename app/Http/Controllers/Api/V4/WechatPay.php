@@ -134,7 +134,7 @@ class WechatPay extends Controller
             }
         }
 
-        //todo 收益表
+        //收益表
         $order_details = MallOrderDetails::where('order_id', '=', $order_obj->id)->first();
         foreach ($order_details as $od_v) {
 

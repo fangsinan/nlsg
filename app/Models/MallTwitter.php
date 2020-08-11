@@ -67,7 +67,7 @@ class MallTwitter extends Base
                 //直播:https://wechat.nlsgapp.com/liveList?id=4
                 $url = '/liveList?id='.$gid.'&tweeter_code=' . $twitter;
                 break;
-            case 22: //todo 三八邀请app注册
+            case 22: //三八邀请app注册
                 $url = '';
                 break;
         }

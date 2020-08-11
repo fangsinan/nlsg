@@ -283,8 +283,8 @@ class MallOrder extends Base
         $dead_time = ConfigModel::getData(12);
         $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
 
-        if(!in_array($params['pay_type'],[1,2,3])){
-            return ['code' => false, 'msg' => '请选择支付方式','ps' => 'pay_type error'];
+        if (!in_array($params['pay_type'], [1, 2, 3])) {
+            return ['code' => false, 'msg' => '请选择支付方式', 'ps' => 'pay_type error'];
         }
 
         $data = $this->createOrderTool($params, $user, true);
@@ -898,7 +898,7 @@ class MallOrder extends Base
             }
         }
 
-        //todo 收益表
+        //收益表
 
         DB::commit();
         return ['code' => true, 'msg' => '修改成功'];
@@ -930,7 +930,7 @@ class MallOrder extends Base
                     }
 
                     if ($check->status === 10) {
-                        //todo 订单状态修改-写入后台审核
+                        //订单状态修改-写入后台审核
                         $refund_data['service_num'] = MallOrder::createOrderNumber($user_id, 2);
                         $refund_data['order_id'] = $id;
                         $refund_data['order_detail_id'] = 0;
@@ -1057,7 +1057,7 @@ class MallOrder extends Base
         $field = [
             'id', 'ordernum', 'price', 'dead_time', DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'created_at', 'pay_price',
-            'price', 'post_type','pay_type'
+            'price', 'post_type', 'pay_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];
         $with[] = 'orderChild';
@@ -1094,7 +1094,7 @@ class MallOrder extends Base
             $v->address_history = json_decode($v->address_history);
 
             $temp_express_list = [];
-            foreach($v->orderChild as $ocv){
+            foreach ($v->orderChild as $ocv) {
                 $temp_express = $ocv->expressInfoForList;
                 $temp_express_list[] = $temp_express;
             }
@@ -1142,7 +1142,7 @@ class MallOrder extends Base
             true
         );
 
-        if($getData->isEmpty()){
+        if ($getData->isEmpty()) {
             return ['code' => false, 'msg' => '订单不存在'];
         }
 
@@ -1167,7 +1167,7 @@ class MallOrder extends Base
         foreach ($data['order_child'] as &$v1) {
             $v1['order_detail_id'] = explode(',', $v1['order_detail_id']);
 
-            if(isset($v1['express_info']['history'])){
+            if (isset($v1['express_info']['history'])) {
                 $v1['express_info']['history'] = json_decode($v1['express_info']['history']);
             }
 
@@ -1238,9 +1238,9 @@ class MallOrder extends Base
             ['key' => '优惠券总额', 'value' => $data['coupon_money']],
         ];
 
-        if($data['status'] == 1){
+        if ($data['status'] == 1) {
             $price_list_new[] = ['key' => '应付金额', 'value' => $data['price']];
-        }else{
+        } else {
             $price_list_new[] = ['key' => '实付金额', 'value' => $data['pay_price']];
         }
 
@@ -1255,16 +1255,17 @@ class MallOrder extends Base
         $data['about_price'] = $price_list_new;
 
         $temp_o_c = [];
-        foreach ($data['order_child'] as $doc){
-            if(!empty($doc['order_details'])){
+        foreach ($data['order_child'] as $doc) {
+            if (!empty($doc['order_details'])) {
 
-                if(!empty($doc['express_info'])){
+                if (!empty($doc['express_info'])) {
                     $doc['express_info']['express_phone'] = ExpressCompany::onlyGetName(
-                        $doc['express_info']['express_id'],3
+                        $doc['express_info']['express_id'], 3
                     );
                     $doc['express_info']['history']->express_phone = $doc['express_info']['express_phone'];
-                }else{
-                    $doc['express_info'] = new class{};
+                } else {
+                    $doc['express_info'] = new class {
+                    };
                 }
                 $temp_o_c[] = $doc;
             }
@@ -1351,7 +1352,7 @@ class MallOrder extends Base
             ->where('nmo.is_del', '=', 0)
             ->select(['nmo.id as order_id', 'nmo.ordernum',
                 'nmod.id as order_detail_id', 'nmod.sku_history',
-                'nmg.name', 'nmg.subtitle', 'nmod.comment_id'])
+                'nmg.name', 'nmg.subtitle', 'nmod.comment_id','nmg.picture'])
             ->get();
 
         foreach ($list as $v) {

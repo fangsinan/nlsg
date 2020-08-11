@@ -315,8 +315,8 @@ class SpecialPriceModel extends Base {
             foreach ($user_list as $vv) {
                 if ($v->group_buy_id == $vv->group_buy_id) {
                     $v->headimg_list[] = $vv->headimg;
-                    //todo 检擦正常下单是否会有缺失情况
-//                    unset($vv->group_buy_id);
+                    //检擦正常下单是否会有缺失情况
+                    //unset($vv->group_buy_id);
                     $v->user_list[] = $vv;
                 }
             }
