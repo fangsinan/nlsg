@@ -531,8 +531,8 @@ class UserController extends Controller
     public function fan()
     {
         $user = User::findOrFail(1);
-        $lists = $user->fans()->paginate(10);
-        return $this->success($lists);
+        $lists = $user->fans()->paginate(10)->toArray();
+        return success($lists['data']);
     }
 
     /**
@@ -592,8 +592,9 @@ class UserController extends Controller
     public function follower()
     {
         $user = User::findOrFail(1);
-        $lists = $user->follow()->paginate(10);
-        return $this->success($lists);
+        $lists = $user->follow()->paginate(10)->toArray();
+
+        return success($lists['data']);
     }
 
 
