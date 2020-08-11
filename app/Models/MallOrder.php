@@ -797,6 +797,7 @@ class MallOrder extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => $coupon_list,
             'used_address' => $used_address,
+            'from_cart'=>$params['from_cart']
         ];
 
 
