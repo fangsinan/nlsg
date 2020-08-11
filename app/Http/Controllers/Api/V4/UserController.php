@@ -486,8 +486,6 @@ class UserController extends Controller
      * {
      * "code": 200,
      * "msg": "成功",
-     * "data": {
-     * "current_page": 1,
      * "data": [
      * {
      * "id": 168934,
@@ -512,20 +510,8 @@ class UserController extends Controller
      * "to_uid": 168934
      * }
      * }
-     * ],
-     * "first_page_url": "http://v4.com/api/v4/user/follower?page=1",
-     * "from": 1,
-     * "last_page": 1,
-     * "last_page_url": "http://v4.com/api/v4/user/follower?page=1",
-     * "next_page_url": null,
-     * "path": "http://v4.com/api/v4/user/follower",
-     * "per_page": 10,
-     * "prev_page_url": null,
-     * "to": 2,
-     * "total": 2
-     * }
-     * }
-     *   }
+     * ]
+     *  }
      *
      */
     public function fan()
@@ -547,8 +533,6 @@ class UserController extends Controller
      * {
      * "code": 200,
      * "msg": "成功",
-     * "data": {
-     * "current_page": 1,
      * "data": [
      * {
      * "id": 168934,
@@ -574,19 +558,7 @@ class UserController extends Controller
      * }
      * }
      * ],
-     * "first_page_url": "http://v4.com/api/v4/user/follower?page=1",
-     * "from": 1,
-     * "last_page": 1,
-     * "last_page_url": "http://v4.com/api/v4/user/follower?page=1",
-     * "next_page_url": null,
-     * "path": "http://v4.com/api/v4/user/follower",
-     * "per_page": 10,
-     * "prev_page_url": null,
-     * "to": 2,
-     * "total": 2
      * }
-     * }
-     *   }
      *
      */
     public function follower()
