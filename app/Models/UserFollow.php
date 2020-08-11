@@ -16,4 +16,15 @@ class UserFollow extends Model
     protected $fillable = [
         'from_uid', 'to_uid'
     ];
+
+    public  function toUser()
+    {
+        return $this->belongsTo('App\Models\User','from_uid','id');
+    }
+
+    public  function fromUser()
+    {
+        return $this->belongsTo('App\Models\User','to_uid','id');
+    }
+
 }

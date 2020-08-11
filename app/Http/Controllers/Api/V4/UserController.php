@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\FeedBack;
 use App\Models\UserFollow;
 use App\Models\Comment;
+use App\Models\Wiki;
 
 class UserController extends Controller
 {
@@ -244,11 +245,11 @@ class UserController extends Controller
             foreach ($comments['data'] as &$v) {
                 if ($v['type'] == 1 || $v['type'] == 2) {
                     $v['column'] = Column::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_pic')
+                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_pic','type')
                         ->first();
                 } elseif ($v['type'] == 3 || $v['type'] == 4) {
                     $v['works'] = Works::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_img')
+                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_img','is_audio_book')
                         ->first();
                 } elseif ($v['type'] == 5) {
                     $v['wiki'] = Wiki::where('id', $v['relation_id'])->select('id', 'name', 'cover', 'view_num')
@@ -527,10 +528,24 @@ class UserController extends Controller
      *  }
      *
      */
-    public function fan()
+    public function fan(Request $request)
     {
-        $user = User::findOrFail(1);
-        $lists = $user->fans()->paginate(10)->toArray();
+        $uid = $request->get('user_id');
+        $user = User::findOrFail($uid);
+        if($user){
+            $lists = UserFollow::with('toUser:id,nickname,headimg')
+                    ->select('id','from_uid','to_uid')
+                    ->where('to_uid', $uid)
+                    ->paginate(10)->toArray();
+            if($lists['data']){
+                foreach ($lists['data'] as &$v) {
+                    if($v['from_uid'] !== $this->user['id']){
+                        $isFollow = UserFollow::where(['from_uid'=>$this->user['id'],'to_uid'=>$v['from_uid']])->first();
+                        $v['is_follow'] = $isFollow ? 1 : 0;
+                    }
+                }
+            }
+        }
         return success($lists['data']);
     }
 
@@ -574,11 +589,24 @@ class UserController extends Controller
      * }
      *
      */
-    public function follower()
+    public function follower(Request $request)
     {
-        $user = User::findOrFail(1);
-        $lists = $user->follow()->paginate(10)->toArray();
-
+        $uid = $request->get('user_id');
+        $user = User::findOrFail($uid);
+        if($user){
+            $lists = UserFollow::with('fromUser:id,nickname,headimg')
+                    ->select('id','from_uid','to_uid')
+                    ->where('from_uid', $uid)
+                    ->paginate(10)->toArray();
+            if($lists['data']){
+                foreach ($lists['data'] as &$v) {
+                    if($v['to_uid'] !== $this->user['id']){
+                        $isFollow = UserFollow::where(['from_uid'=>$this->user['id'], 'to_uid'=>$v['to_uid']])->first();
+                        $v['is_follow'] = $isFollow ? 1 : 0;
+                    }
+                }
+            }
+        }
         return success($lists['data']);
     }
 
