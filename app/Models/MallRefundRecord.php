@@ -17,22 +17,24 @@ use Illuminate\Support\Str;
  *
  * @author wangxh
  */
-class MallRefundRecord extends Base {
+class MallRefundRecord extends Base
+{
 
     protected $table = 'nlsg_mall_refund_record';
 
-    public function goodsList($params, $user) {
+    public function goodsList($params, $user)
+    {
         $begin_date = $this->getAfterSalesbeginDate(1);
         $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
 
         $query = DB::table('nlsg_mall_order_detail as nmod')
-                ->join('nlsg_mall_order as nmo', 'nmod.order_id', '=', 'nmo.id')
-                ->join('nlsg_mall_goods as nmg', 'nmod.goods_id', '=', 'nmg.id')
-                ->where('nmod.user_id', '=', $user['id'])
-                ->where('nmo.user_id', '=', $user['id'])
-                ->where('nmo.status', '=', 30)
-                ->where('nmod.num', '>', 'after_sale_used_num');
+            ->join('nlsg_mall_order as nmo', 'nmod.order_id', '=', 'nmo.id')
+            ->join('nlsg_mall_goods as nmg', 'nmod.goods_id', '=', 'nmg.id')
+            ->where('nmod.user_id', '=', $user['id'])
+            ->where('nmo.user_id', '=', $user['id'])
+            ->where('nmo.status', '=', 30)
+            ->where('nmod.num', '>', 'after_sale_used_num');
 
         //不过滤已失效的
         //$query->where('nmo.receipt_at', '>', $begin_date);
@@ -55,14 +57,14 @@ class MallRefundRecord extends Base {
             DB::raw('(nmo.cost_price - nmo.vip_cut - nmo.special_price_cut) as temp_money'),
             DB::raw('(nmod.num - nmod.after_sale_used_num) as num'),
             DB::raw('(SELECT sum(num) FROM nlsg_mall_order_detail '
-                    . 'where order_id = nmo.id) as all_num'),
+                . 'where order_id = nmo.id) as all_num'),
             DB::raw('(SELECT sum(after_sale_used_num) FROM nlsg_mall_order_detail '
-                    . 'where order_id = nmo.id) as all_after_sale_used_num'),
+                . 'where order_id = nmo.id) as all_after_sale_used_num'),
         ]);
 
         $query->limit($size)->offset(($page - 1) * $size)
-                ->orderBy('nmo.receipt_at', 'desc')
-                ->orderBy('nmo.id', 'desc');
+            ->orderBy('nmo.receipt_at', 'desc')
+            ->orderBy('nmo.id', 'desc');
 
         $list = $query->get();
 
@@ -97,7 +99,8 @@ class MallRefundRecord extends Base {
         }
     }
 
-    public function getAfterSalesbeginDate($flag = 1) {
+    public function getAfterSalesbeginDate($flag = 1)
+    {
         $now = time();
         $can_after_sales_day = ConfigModel::getData(14);
 
@@ -114,7 +117,8 @@ class MallRefundRecord extends Base {
         return $temp;
     }
 
-    public function createOrder($params, $user) {
+    public function createOrder($params, $user)
+    {
         $type = intval($params['type'] ?? 0);
         $order_id = intval($params['order_id'] ?? 0);
         $order_detail_id = intval($params['order_detail_id'] ?? 0);
@@ -171,26 +175,26 @@ class MallRefundRecord extends Base {
             //分优惠券金额
             if ($get_data->coupon_money > 0) {
                 if ($get_data->all_after_sale_used_num == 0 &&
-                        $data['num'] == $get_data->all_num) {
+                    $data['num'] == $get_data->all_num) {
                     //如果是全退,则是支付金额
                     $data['refe_price'] = $get_data->pay_price;
                 } else {
                     //不是全退,计算每个商品优惠券的金额占比
                     $temp_cm = GetPriceTools::PriceCalc('/',
-                                    $get_data->coupon_money, $get_data->temp_money);
+                        $get_data->coupon_money, $get_data->temp_money);
 
                     $temp_cm = GetPriceTools::PriceCalc('*',
-                                    $data['cost_price'], $temp_cm);
+                        $data['cost_price'], $temp_cm);
 
                     $temp_cm = GetPriceTools::PriceCalc('-',
-                                    $data['cost_price'], $temp_cm);
+                        $data['cost_price'], $temp_cm);
 
                     $data['refe_price'] = GetPriceTools::PriceCalc('*',
-                                    $temp_cm, $data['num']);
+                        $temp_cm, $data['num']);
                 }
             } else {
                 $data['refe_price'] = GetPriceTools::PriceCalc('*',
-                                $data['cost_price'], $data['num']);
+                    $data['cost_price'], $data['num']);
             }
 
             $od->after_sale_used_num = $new_num;
@@ -206,7 +210,7 @@ class MallRefundRecord extends Base {
         }
 
         $rr_res = DB::table('nlsg_mall_refund_record')
-                ->insert($data);
+            ->insert($data);
 
         if (!$rr_res) {
             DB::rollBack();
@@ -217,7 +221,8 @@ class MallRefundRecord extends Base {
         return ['code' => true, 'msg' => '成功'];
     }
 
-    public function list($params, $user) {
+    public function list($params, $user)
+    {
 
         $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
@@ -236,7 +241,7 @@ class MallRefundRecord extends Base {
 
         if ($params['id'] ?? 0) {
             $query = MallRefundRecord::where('id', '=', $params['id'])
-                    ->where('user_id', '=', $user['id']);
+                ->where('user_id', '=', $user['id']);
 
             $field_sup = [
                 'return_address_id', 'picture', 'pass_at', 'check_at',
@@ -261,27 +266,30 @@ class MallRefundRecord extends Base {
         //全部0  待审核10 待寄回20 待鉴定30 待退款40 已完成:50,60 已取消99(包含70)
         switch (intval($params['status'] ?? 0)) {
             case 10:
-                $query->where('status', '=', 10);
+                $query->where('status', '=', 10)->where('user_cancel', '=', 0);
                 break;
             case 20:
-                $query->where('status', '=', 20);
+                $query->where('status', '=', 20)->where('user_cancel', '=', 0);
                 break;
             case 30:
-                $query->where('status', '=', 30);
+                $query->where('status', '=', 30)->where('user_cancel', '=', 0);
                 break;
             case 40:
-                $query->where('status', '=', 40);
+                $query->where('status', '=', 40)->where('user_cancel', '=', 0);
                 break;
             case 50:
             case 60:
-                $query->whereIn('status', [50, 60]);
+                $query->whereIn('status', [50, 60])->where('user_cancel', '=', 0);
                 break;
             case 99:
+                $query->where('status', '=', 70)->where('user_cancel', '=', 0);
+                break;
             case 70:
-                $query->where(function($query) {
-                    $query->where('user_cancel', '=', 1)
-                            ->orWhere('status', '=', 70);
-                });
+                $query->where('user_cancel', '=', 1);
+//                $query->where(function($query) {
+//                    $query->where('user_cancel', '=', 1)
+//                            ->orWhere('status', '=', 70);
+//                });
                 break;
         }
 
@@ -328,22 +336,26 @@ class MallRefundRecord extends Base {
         return $list;
     }
 
-    public function expressInfo() {
+    public function expressInfo()
+    {
         return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
-                        ->select(['id', 'history']);
+            ->select(['id', 'history']);
     }
 
-    public function infoOrder() {
+    public function infoOrder()
+    {
         return $this->hasOne('App\Models\MallOrder', 'id', 'order_id')
-                        ->select(['id', 'ordernum']);
+            ->select(['id', 'ordernum']);
     }
 
-    public function infoDetail() {
+    public function infoDetail()
+    {
         return $this->hasMany('App\Models\MallOrderDetails', 'id', 'order_detail_id')
-                        ->select(['id', 'order_id', 'goods_id', 'sku_history']);
+            ->select(['id', 'order_id', 'goods_id', 'sku_history']);
     }
 
-    public function orderInfo($params, $user) {
+    public function orderInfo($params, $user)
+    {
         $data = $this->list($params, $user);
         if ($data->isEmpty()) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => '未查询到售后单'];
@@ -366,18 +378,20 @@ class MallRefundRecord extends Base {
         return $data;
     }
 
-    public function dateDelSec($date) {
+    public function dateDelSec($date)
+    {
         return date('Y-m-d H:i', strtotime($date));
     }
 
-    public function createProgressBar($id, $progress_bar) {
+    public function createProgressBar($id, $progress_bar)
+    {
         $info = MallRefundRecord::find($id)->toArray();
 
         if ($info['status'] == 70) {
             $info['status'] = 15;
         }
         $before_arr = []; //10:待审核  15:驳回  20:待寄回
-        $after_arr = []; //30:待鉴定  40待退款  50:退款中 60:已退款  
+        $after_arr = []; //30:待鉴定  40待退款  50:退款中 60:已退款
         //顺序  10 15 20 () 30 40 50 60
 
         $info['status'] = 50;
@@ -403,15 +417,16 @@ class MallRefundRecord extends Base {
         $progress_bar = array_merge($progress_bar, $before_arr);
         $progress_bar = array_merge($after_arr, $progress_bar);
         return $progress_bar;
-        
+
     }
 
     //删除,取消,寄回
-    public function statusChange($id, $flag, $user_id) {
+    public function statusChange($id, $flag, $user_id)
+    {
 
         $check = self::where('user_id', '=', $user_id)
-                ->where('status', '<>', 80)
-                ->find($id);
+            ->where('status', '<>', 80)
+            ->find($id);
 
         if (!$check) {
             return ['code' => false, 'msg' => '订单错误'];
@@ -421,7 +436,7 @@ class MallRefundRecord extends Base {
 
         DB::beginTransaction();
 
-        // 10:待审核 20:待寄回  30:待鉴定 40待退款  
+        // 10:待审核 20:待寄回  30:待鉴定 40待退款
         // 50:退款中 60:已退款  70:驳回   80删除
 
         switch ($flag) {
@@ -434,8 +449,8 @@ class MallRefundRecord extends Base {
                     //如果是退货,需要把order_details的after_sale_num改回
                     if ($check->type == 2) {
                         $d_res = DB::table('nlsg_mall_order_detail')
-                                ->where('id', '=', $check->order_detail_id)
-                                ->decrement('after_sale_used_num', $check->num);
+                            ->where('id', '=', $check->order_detail_id)
+                            ->decrement('after_sale_used_num', $check->num);
 
                         if (!$d_res) {
                             DB::rollBack();
@@ -470,7 +485,8 @@ class MallRefundRecord extends Base {
         }
     }
 
-    public function refundPost($params, $user) {
+    public function refundPost($params, $user)
+    {
         $id = $params['id'] ?? 0;
         $express_id = $params['express_id'] ?? 0;
         $express_num = $params['express_num'] ?? 0;
@@ -480,8 +496,8 @@ class MallRefundRecord extends Base {
 
 
         $check = self::where('user_id', '=', $user['id'])
-                ->where('status', '<>', 80)
-                ->find($id);
+            ->where('status', '<>', 80)
+            ->find($id);
 
         if ($check->status == 20 && $check->user_cancel == 0) {
             $check_express = ExpressCompany::find($express_id);

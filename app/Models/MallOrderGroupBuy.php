@@ -31,8 +31,8 @@ class MallOrderGroupBuy extends Base
         $dead_time = ConfigModel::getData(12);
         $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
         $now_date = date('Y-m-d H:i:s', $now);
-        if(!in_array($params['pay_type'],[1,2,3])){
-            return ['code' => false, 'msg' => '请选择支付方式','ps' => 'pay_type error'];
+        if (!in_array($params['pay_type'], [1, 2, 3])) {
+            return ['code' => false, 'msg' => '请选择支付方式', 'ps' => 'pay_type error'];
         }
         $data = $this->createGroupBuyOrderTool($params, $user, true);
 
@@ -661,22 +661,27 @@ class MallOrderGroupBuy extends Base
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
-                $query->where('nmo.status', '=', 1);
+                $query->where('nmo.status', '=', 1)
+                    ->where('nmo.is_stop', '=', 0);
                 break;
             case 10:
                 $query->where('nmo.status', '=', 10)
+                    ->where('nmo.is_stop', '=', 0)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 20:
                 $query->where('nmo.status', '=', 20)
+                    ->where('nmo.is_stop', '=', 0)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 30:
                 $query->where('nmo.status', '=', 30)
+                    ->where('nmo.is_stop', '=', 0)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 95:
                 $query->where('nmo.status', '=', 10)
+                    ->where('nmo.is_stop', '=', 0)
                     ->where('gbl.is_success', '=', 0);
                 break;
             case 99:
@@ -690,7 +695,7 @@ class MallOrderGroupBuy extends Base
             DB::raw('(case when nmo.`status` = 1 then 1
                 when is_success = 0 then 95 when nmo.is_stop = 1
                 then 99 ELSE nmo.`status` END) `status`'),
-            'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type','nmo.pay_type'
+            'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList', 'groupList.userInfo'];
         $with[] = 'orderChild';
@@ -736,7 +741,7 @@ class MallOrderGroupBuy extends Base
             unset($list[$k]->groupList);
 
             $temp_express_list = [];
-            foreach($v->orderChild as $ocv){
+            foreach ($v->orderChild as $ocv) {
                 $temp_express = $ocv->expressInfoForList;
                 $temp_express_list[] = $temp_express;
             }
@@ -752,7 +757,7 @@ class MallOrderGroupBuy extends Base
         return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
             ->select([
                 'status', 'goods_id', 'num', 'id as details_id',
-                'order_id', 'sku_history', 'comment_id','sku_number'
+                'order_id', 'sku_history', 'comment_id', 'sku_number'
             ]);
     }
 
@@ -786,7 +791,7 @@ class MallOrderGroupBuy extends Base
             true
         );
 
-        if($getData->isEmpty()){
+        if ($getData->isEmpty()) {
             return ['code' => false, 'msg' => '订单不存在'];
         }
 
@@ -811,7 +816,7 @@ class MallOrderGroupBuy extends Base
         foreach ($data['order_child'] as &$v1) {
             $v1['order_detail_id'] = explode(',', $v1['order_detail_id']);
 
-            if(isset($v1['express_info']['history'])){
+            if (isset($v1['express_info']['history'])) {
                 $v1['express_info']['history'] = json_decode($v1['express_info']['history']);
             }
 
@@ -880,9 +885,9 @@ class MallOrderGroupBuy extends Base
             ['key' => '优惠券总额', 'value' => $data['coupon_money']],
         ];
 
-        if($data['status'] == 1){
+        if ($data['status'] == 1) {
             $price_list_new[] = ['key' => '应付金额', 'value' => $data['price']];
-        }else{
+        } else {
             $price_list_new[] = ['key' => '实付金额', 'value' => $data['pay_price']];
         }
 
@@ -897,16 +902,17 @@ class MallOrderGroupBuy extends Base
         $data['about_price'] = $price_list_new;
 
         $temp_o_c = [];
-        foreach ($data['order_child'] as $doc){
-            if(!empty($doc['order_details'])){
+        foreach ($data['order_child'] as $doc) {
+            if (!empty($doc['order_details'])) {
 
-                if(!empty($doc['express_info'])){
+                if (!empty($doc['express_info'])) {
                     $doc['express_info']['express_phone'] = ExpressCompany::onlyGetName(
-                        $doc['express_info']['express_id'],3
+                        $doc['express_info']['express_id'], 3
                     );
                     $doc['express_info']['history']->express_phone = $doc['express_info']['express_phone'];
-                }else{
-                    $doc['express_info'] = new class{};
+                } else {
+                    $doc['express_info'] = new class {
+                    };
                 }
 
                 $temp_o_c[] = $doc;

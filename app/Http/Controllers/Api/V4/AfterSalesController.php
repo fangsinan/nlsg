@@ -123,7 +123,7 @@ class AfterSalesController extends Controller
      * @apiDescription 售后列表
      * @apiParam {number} [page] 页数,默认1
      * @apiParam {number} [size] 条数,默认10
-     * @apiParam {number} [status] 状态(全部0,待审核10,待寄回20,待鉴定30,待退款40,已完成:60,已取消99)
+     * @apiParam {number} [status] 状态(全部0,待审核10,待寄回20,待鉴定30,待退款40,已完成:60,已驳回:70,已取消99)
      *
      * @apiSuccess {number} id id
      * @apiSuccess {number} service_num 服务单号
