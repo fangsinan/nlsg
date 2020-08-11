@@ -493,7 +493,7 @@ class UserController extends Controller
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiSuccess {String} token
+     * @apiParam  {number} user_id  用户id
      *
      * @apiSuccessExample 成功响应:
      *
@@ -553,7 +553,7 @@ class UserController extends Controller
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiSuccess {String} token
+     * @apiParam  {number} user_id  用户id
      *
      * @apiSuccessExample 成功响应:
      *
