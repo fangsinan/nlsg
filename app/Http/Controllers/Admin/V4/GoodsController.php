@@ -132,7 +132,7 @@ class GoodsController extends Controller
         }
     }
 
-    //todo 商品列表
+    //商品列表
     public function list(Request $request)
     {
         $servers = new GoodsServers();

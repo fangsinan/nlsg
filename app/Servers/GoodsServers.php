@@ -236,6 +236,8 @@ class GoodsServers
         }
 
         DB::commit();
+
+        CacheServers::clear(1);
         return ['code' => true, 'msg' => '成功'];
     }
 
@@ -292,7 +294,6 @@ class GoodsServers
             $with[] = 'picture_list';
         }
 
-
         switch ($params['ob'] ?? 'default') {
             case 'new_asc':
                 $query->orderBy('created_at', 'asc');
@@ -320,10 +321,8 @@ class GoodsServers
         $with[] = 'sku_list.sku_value_list';
         $with[] = 'category_list';
 
-        $list = $query->with($with)->select($field)->paginate($size);
-
-
-        return $list;
-
+        return $query->with($with)->select($field)->paginate($size);
     }
+
+
 }
