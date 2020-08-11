@@ -169,9 +169,13 @@ class MallOrder extends Base
 
                 $temp_inviter_info = User::where('status', '=', 1)
                     ->select(['level', 'expire_time', 'is_staff'])
-                    ->find($v['inviter'])->toArray();
+                    ->find($v['inviter']);
 
-                $sku_list[$k]['inviter_info'] = $temp_inviter_info;
+                if ($temp_inviter_info) {
+                    $sku_list[$k]['inviter_info'] = $temp_inviter_info->toArray();
+                } else {
+                    $sku_list[$k]['inviter_info'] = [];
+                }
 
                 if ($temp_inviter_info['is_staff'] == 0) {
                     //如果不是内部员工,则校验推客有效期
@@ -1352,7 +1356,7 @@ class MallOrder extends Base
             ->where('nmo.is_del', '=', 0)
             ->select(['nmo.id as order_id', 'nmo.ordernum',
                 'nmod.id as order_detail_id', 'nmod.sku_history',
-                'nmg.name', 'nmg.subtitle', 'nmod.comment_id','nmg.picture'])
+                'nmg.name', 'nmg.subtitle', 'nmod.comment_id', 'nmg.picture'])
             ->get();
 
         foreach ($list as $v) {
