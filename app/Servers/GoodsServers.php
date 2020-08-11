@@ -3,16 +3,11 @@
 
 namespace App\Servers;
 
-
-use App\Models\ConfigModel;
 use App\Models\MallGoods;
-use App\Models\MallPicture;
 use App\Models\MallSku;
 use App\Models\MallSkuValue;
-use App\Models\MallTosBind;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
 
 class GoodsServers
 {
@@ -277,6 +272,7 @@ class GoodsServers
         if (!empty($params['category_id'])) {
             $query->where('category_id', '=', intval($params['category_id']));
         }
+
         if (!empty($params['name'])) {
             $query->where('name', 'like', '%' . intval($params['name'] . '%'));
         }

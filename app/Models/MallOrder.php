@@ -930,7 +930,7 @@ class MallOrder extends Base
                     $update_res = $check->save();
                     if (!$update_res) {
                         DB::rollBack();
-                        return ['code' => false, 'msg' => '失败', 'ps' => order];
+                        return ['code' => false, 'msg' => '失败', 'ps' => 'order error'];
                     }
 
                     if ($check->status === 10) {
@@ -952,6 +952,10 @@ class MallOrder extends Base
                             return ['code' => false, 'msg' => '失败', 'ps' => 'refund'];
                         }
                     }
+
+                    DB::commit();
+                    return ['code' => true, 'msg' => '成功'];
+
                 } else {
                     return ['code' => false, 'msg' => '订单状态错误',
                         'ps' => '只有待支付和待发货可以取消'];

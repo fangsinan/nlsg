@@ -1423,7 +1423,6 @@ class MallOrderController extends Controller
      */
     public function statusChange(Request $request)
     {
-
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
