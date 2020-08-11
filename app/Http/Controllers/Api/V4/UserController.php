@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\FeedBack;
 use App\Models\UserFollow;
 use App\Models\Comment;
+use App\Models\Wiki;
 
 class UserController extends Controller
 {
@@ -38,6 +39,7 @@ class UserController extends Controller
      * @apiSuccess {string}  fan_num    粉丝数
      * @apiSuccess {string}  is_teacher 是否为老师
      * @apiSuccess {string}  is_self    是否为当前用户  1 是 0 否
+     * @apiSuccess {string}  is_follow  是否关注 1 是 0 否
      * @apiSuccess {string}  works        作品
      * @apiSuccess {string}  works.title  作品标题
      * @apiSuccess {string}  works.subtitle  作品副标题
@@ -137,7 +139,9 @@ class UserController extends Controller
             ->findOrFail($id)
             ->toArray();
         if($user){
+            $isFollow =  UserFollow::where(['from_uid'=> $this->user['id'], 'to_uid'=>$id])->first();
             $user['is_self'] =  $id == $this->user['id'] ?  1 : 0;
+            $user['is_follow'] = $isFollow ? 1: 0;
         }
 
         return success($user);
@@ -241,11 +245,11 @@ class UserController extends Controller
             foreach ($comments['data'] as &$v) {
                 if ($v['type'] == 1 || $v['type'] == 2) {
                     $v['column'] = Column::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_pic')
+                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_pic','type')
                         ->first();
                 } elseif ($v['type'] == 3 || $v['type'] == 4) {
                     $v['works'] = Works::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_img')
+                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_img','is_audio_book')
                         ->first();
                 } elseif ($v['type'] == 5) {
                     $v['wiki'] = Wiki::where('id', $v['relation_id'])->select('id', 'name', 'cover', 'view_num')
@@ -485,97 +489,133 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/fan 我关注的
+     * @api {get} api/v4/user/fan 关注他的人
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiSuccess {String} token
+     * @apiParam  {number} user_id  用户id
      *
      * @apiSuccessExample 成功响应:
      *
-     * {
-     * "code": 200,
-     * "msg": "成功",
-     * "data": [
-     * {
-     * "id": 168934,
-     * "phone": "18624078563",
-     * "nickname": "chandler",
-     * "openid": null,
-     * "unionid": null,
-     * "sex": null,
-     * "birthday": null,
-     * "province": null,
-     * "city": null,
-     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
-     * "intro": null,
-     * "level": 0,
-     * "created_at": null,
-     * "updated_at": null,
-     * "expire_time": null,
-     * "status": 1,
-     * "is_staff": 0,
-     * "pivot": {
-     * "from_uid": 1,
-     * "to_uid": 168934
-     * }
-     * }
-     * ]
-     *  }
+        {
+        "code": 200,
+        "msg": "成功",
+        "data": [
+            {
+                "id": 6,
+                "from_uid": 211172,
+                "to_uid": 1,
+                "to_user": {
+                    "id": 211172,
+                    "nickname": "能量时光",
+                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                },
+                "is_follow": 0
+            },
+            {
+                "id": 9,
+                "from_uid": 168934,
+                "to_uid": 1,
+                "to_user": {
+                    "id": 168934,
+                    "nickname": "chandler",
+                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                },
+                "is_follow": 0
+            }
+        ]
+    }
      *
      */
-    public function fan()
+    public function fan(Request $request)
     {
-        $user = User::findOrFail(1);
-        $lists = $user->fans()->paginate(10)->toArray();
+        $uid = $request->get('user_id');
+        $user = User::findOrFail($uid);
+        if($user){
+            $lists = UserFollow::with('toUser:id,nickname,headimg')
+                    ->select('id','from_uid','to_uid')
+                    ->where('to_uid', $uid)
+                    ->paginate(10)->toArray();
+            if($lists['data']){
+                foreach ($lists['data'] as &$v) {
+                    if($v['from_uid'] !== $this->user['id']){
+                        $isFollow = UserFollow::where(['from_uid'=>$this->user['id'],'to_uid'=>$v['from_uid']])->first();
+                        $v['is_follow'] = $isFollow ? 1 : 0;
+                    }
+                }
+            }
+        }
         return success($lists['data']);
     }
 
     /**
-     * @api {get} api/v4/user/follower 我关注的
+     * @api {get} api/v4/user/follower 他关注的人
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiSuccess {String} token
+     * @apiParam  {number} user_id  用户id
      *
      * @apiSuccessExample 成功响应:
      *
-     * {
-     * "code": 200,
-     * "msg": "成功",
-     * "data": [
-     * {
-     * "id": 168934,
-     * "phone": "18624078563",
-     * "nickname": "chandler",
-     * "openid": null,
-     * "unionid": null,
-     * "sex": null,
-     * "birthday": null,
-     * "province": null,
-     * "city": null,
-     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png",
-     * "intro": null,
-     * "level": 0,
-     * "created_at": null,
-     * "updated_at": null,
-     * "expire_time": null,
-     * "status": 1,
-     * "is_staff": 0,
-     * "pivot": {
-     * "from_uid": 1,
-     * "to_uid": 168934
-     * }
-     * }
-     * ],
-     * }
+     {
+        "code": 200,
+        "msg": "成功",
+        "data": [
+            {
+                "id": 4,
+                "from_uid": 1,
+                "to_uid": 211172,
+                "from_user": {
+                    "id": 211172,
+                    "nickname": "能量时光",
+                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                },
+                "is_follow": 0
+            },
+            {
+                "id": 10,
+                "from_uid": 1,
+                "to_uid": 2,
+                "from_user": {
+                    "id": 2,
+                    "nickname": "刘尚",
+                    "headimg": "/wechat/works/headimg/70/2017102911145924225.png"
+                },
+                "is_follow": 0
+            },
+            {
+                "id": 12,
+                "from_uid": 1,
+                "to_uid": 168934,
+                "from_user": {
+                    "id": 168934,
+                    "nickname": "chandler",
+                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+                },
+                "is_follow": 0
+            }
+        ]
+    }
      *
      */
-    public function follower()
+    public function follower(Request $request)
     {
-        $user = User::findOrFail(1);
-        $lists = $user->follow()->paginate(10)->toArray();
-
+        $uid = $request->get('user_id');
+        $user = User::findOrFail($uid);
+        if($user){
+            $lists = UserFollow::with('fromUser:id,nickname,headimg')
+                    ->select('id','from_uid','to_uid')
+                    ->where('from_uid', $uid)
+                    ->paginate(10)->toArray();
+            if($lists['data']){
+                foreach ($lists['data'] as &$v) {
+                    if($v['to_uid'] !== $this->user['id']){
+                        $isFollow = UserFollow::where(['from_uid'=>$this->user['id'], 'to_uid'=>$v['to_uid']])->first();
+                        $v['is_follow'] = $isFollow ? 1 : 0;
+                    }
+                }
+            }
+        }
         return success($lists['data']);
     }
 

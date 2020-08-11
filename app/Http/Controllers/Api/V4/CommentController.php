@@ -30,6 +30,7 @@ class CommentController extends Controller
      * @apiSuccess {number} share_num    分享数
      * @apiSuccess {number} like_num     喜欢数
      * @apiSuccess {number} reply_num    评论数
+     * @apiSuccess {number} is_like      是否点赞 1 是 0 否
      * @apiSuccess {string} user            发布的用户
      * @apiSuccess {string} user.nickname   用户昵称
      * @apiSuccess {string} user.headimg    用户头像
@@ -150,8 +151,9 @@ class CommentController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
+        $uid   = $this->user['id'] ?? 0;
         $model = new Comment();
-        $lists = $model->getIndexComment($input['id'], $input['type']);
+        $lists = $model->getIndexComment($input['id'], $input['type'], $uid);
         return success($lists['data']);
     }
 
