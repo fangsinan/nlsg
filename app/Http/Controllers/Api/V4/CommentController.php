@@ -181,6 +181,7 @@ class CommentController extends Controller
     {
         $user_id = 1;
         $input = $request->all();
+        $img   = $input['img'] ?? '';
 
         if ( ! $input['id']) {
             return error(1000, '参数有误');
@@ -194,8 +195,8 @@ class CommentController extends Controller
         ]);
 
         if ($result->id) {
-            if ($input['img']) {
-                $imgArr = explode(',', $input['img']);
+            if (!empty($img)) {
+                $imgArr = explode(',', $img);
                 $data = [];
                 foreach ($imgArr as $v) {
                     $data[] = [
