@@ -13,7 +13,7 @@ class Comment extends Base
      * 想法
      * @param  int  $type 类型 1.专栏 2.讲座 3.听书 4.精品课
      */
-    public function getIndexComment($id, $type=1)
+    public function getIndexComment($id, $type=1, $uid=0)
     {
         if (!$id){
             return false;
@@ -31,6 +31,13 @@ class Comment extends Base
                 ->where('status', 1)
                 ->paginate(10)
                 ->toArray();
+
+        if($lists['data']){
+            foreach ($lists['data'] as &$v) {
+                $isLike = Like::where(['relation_id'=>$v['id'], 'type'=>1,'user_id'=>$uid])->first();
+                $v['is_like'] = $isLike ? 1 : 0;
+            }
+        }
         return $lists;
     }
 

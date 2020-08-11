@@ -150,8 +150,9 @@ class CommentController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
+        $uid   = $this->user['id'] ?? 0;
         $model = new Comment();
-        $lists = $model->getIndexComment($input['id'], $input['type']);
+        $lists = $model->getIndexComment($input['id'], $input['type'], $uid);
         return success($lists['data']);
     }
 
