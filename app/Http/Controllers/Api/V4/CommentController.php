@@ -240,6 +240,9 @@ class CommentController extends Controller
                     $subject = '评论了你的精品课';
                     break;
             }
+            if(!$list){
+                return error('数据不存在');
+            }
 
             //发送通知
             $notify = new Notify();
