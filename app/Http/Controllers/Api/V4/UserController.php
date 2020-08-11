@@ -38,6 +38,7 @@ class UserController extends Controller
      * @apiSuccess {string}  fan_num    粉丝数
      * @apiSuccess {string}  is_teacher 是否为老师
      * @apiSuccess {string}  is_self    是否为当前用户  1 是 0 否
+     * @apiSuccess {string}  is_follow  是否关注 1 是 0 否
      * @apiSuccess {string}  works        作品
      * @apiSuccess {string}  works.title  作品标题
      * @apiSuccess {string}  works.subtitle  作品副标题
@@ -137,7 +138,9 @@ class UserController extends Controller
             ->findOrFail($id)
             ->toArray();
         if($user){
+            $isFollow =  UserFollow::where(['from_uid'=> $this->user['id'], 'to_uid'=>$id])->first();
             $user['is_self'] =  $id == $this->user['id'] ?  1 : 0;
+            $user['is_follow'] = $isFollow ? 1: 0;
         }
 
         return success($user);
