@@ -1046,16 +1046,16 @@ class MallOrder extends Base
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
-                $query->where('nmo.status', '=', 1);
+                $query->where('nmo.status', '=', 1)->where('nmo.is_stop','=',0);
                 break;
             case 10:
-                $query->where('nmo.status', '=', 10);
+                $query->where('nmo.status', '=', 10)->where('nmo.is_stop','=',0);
                 break;
             case 20:
-                $query->where('nmo.status', '=', 20);
+                $query->where('nmo.status', '=', 20)->where('nmo.is_stop','=',0);
                 break;
             case 30:
-                $query->where('nmo.status', '=', 30);
+                $query->where('nmo.status', '=', 30)->where('nmo.is_stop','=',0);
                 break;
             case 99:
                 $query->where('nmo.is_stop', '=', 1);
