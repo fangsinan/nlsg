@@ -148,7 +148,7 @@ class UserController extends Controller
      * @apiVersion 4.0.0
      * @apiName  feed
      * @apiGroup User
-     * @apiParam  {number} id  用户id
+     * @apiParam  {number} user_id  用户id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/feed
      *
      * @apiSuccess {string}  comments             想法
@@ -227,7 +227,7 @@ class UserController extends Controller
      */
     public function feed(Request $request)
     {
-        $id = $request->get('id');
+        $id = $request->get('user_id');
 
         $comments = Comment::with(['user:id,nickname,headimg', 'attach:id,relation_id,img'])
             ->select('id', 'pid', 'user_id', 'relation_id', 'type', 'content', 'forward_num', 'share_num', 'like_num',
