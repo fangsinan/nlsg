@@ -125,7 +125,7 @@ class UserController extends Controller
                     $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 0);
                 },
-                'listen'   => function ($query) {
+                'listens'   => function ($query) {
                     $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 1);
                 },
