@@ -489,7 +489,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/fan 我关注的
+     * @api {get} api/v4/user/fan 关注他的人
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
@@ -549,7 +549,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/follower 我关注的
+     * @api {get} api/v4/user/follower 他关注的人
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
