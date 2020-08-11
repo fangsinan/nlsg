@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Attach;
 use App\Models\Like;
+use App\Models\Works;
 
 class CommentController extends Controller
 {
@@ -164,6 +165,7 @@ class CommentController extends Controller
      * @apiParam {number} id  模块id
      * @apiParam {number} pid 转发评论id
      * @apiParam {string} content 发布的内容
+     * @apiParam {string} img  多个图片  格式 a.png,b.png,c.png
      * @apiParam {string} type 模块类型  类型 1.专栏 2.讲座 3.听书 4.精品课
      *
      *
@@ -181,6 +183,7 @@ class CommentController extends Controller
     {
         $user_id = 1;
         $input = $request->all();
+        $img   = $input['img'] ?? '';
 
         if ( ! $input['id']) {
             return error(1000, '参数有误');
@@ -194,8 +197,8 @@ class CommentController extends Controller
         ]);
 
         if ($result->id) {
-            if ($input['img']) {
-                $imgArr = explode(',', $input['img']);
+            if (!empty($img)) {
+                $imgArr = explode(',', $img);
                 $data = [];
                 foreach ($imgArr as $v) {
                     $data[] = [

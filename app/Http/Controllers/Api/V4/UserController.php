@@ -26,18 +26,21 @@ class UserController extends Controller
      * @apiName  homepage
      * @apiGroup User
      * @apiHeader {string} Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC92NC5jb21cL2FwaVwvdjRcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNTk0OTU0MDQxLCJleHAiOjE1OTYyNTAwNDEsIm5iZiI6MTU5NDk1NDA0MSwianRpIjoiMFVhdmsxT0piNXJSSHFENSIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.9qShuy0F5zwn-USMqKeVrDUKUW3JYQYCn46Yy04wbg0
-     * @apiParam  {number} id  用户id
+     * @apiParam  {number} user_id  用户id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/homepage
      *
      * @apiSuccess {string}  nickname  用户昵称
+     * @apiSuccess {string}  sex       性别   1 男 2 女
      * @apiSuccess {string}  headimg   用户头像
      * @apiSuccess {string}  headcover 背景图
      * @apiSuccess {string}  intro     简介
      * @apiSuccess {string}  follow_num 关注数
      * @apiSuccess {string}  fan_num    粉丝数
      * @apiSuccess {string}  is_teacher 是否为老师
+     * @apiSuccess {string}  is_self    是否为当前用户  1 是 0 否
      * @apiSuccess {string}  works        作品
      * @apiSuccess {string}  works.title  作品标题
+     * @apiSuccess {string}  works.subtitle  作品副标题
      * @apiSuccess {string}  works.cover_img     作品封面
      * @apiSuccess {string}  works.subscribe_num 作品订阅数
      * @apiSuccess {string}  works.original_price 作品价格
@@ -108,8 +111,8 @@ class UserController extends Controller
      */
     public function homepage(Request $request)
     {
-        $id = $request->get('id');
-        $user = User::select('id', 'nickname', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
+        $id = $request->get('user_id');
+        $user = User::select('id', 'nickname', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
             ->with([
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id'])
@@ -119,8 +122,12 @@ class UserController extends Controller
                 'history.columns:id,title,cover_pic',
                 'history.works:id,title,cover_img',
                 'works'   => function ($query) {
-                    $query->select(['id', 'user_id', 'title', 'cover_img', 'subscribe_num', 'original_price'])
+                    $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 0);
+                },
+                'listens'   => function ($query) {
+                    $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
+                        ->where('is_audio_book', 1);
                 },
                 'columns' => function ($query) {
                     $query->select('user_id', 'name', 'title', 'subtitle', 'original_price');
@@ -129,6 +136,9 @@ class UserController extends Controller
             ])
             ->findOrFail($id)
             ->toArray();
+        if($user){
+            $user['is_self'] =  $id == $this->user['id'] ?  1 : 0;
+        }
 
         return success($user);
     }
@@ -138,7 +148,7 @@ class UserController extends Controller
      * @apiVersion 4.0.0
      * @apiName  feed
      * @apiGroup User
-     * @apiParam  {number} id  用户id
+     * @apiParam  {number} user_id  用户id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/feed
      *
      * @apiSuccess {string}  comments             想法
@@ -217,7 +227,7 @@ class UserController extends Controller
      */
     public function feed(Request $request)
     {
-        $id = $request->get('id');
+        $id = $request->get('user_id');
 
         $comments = Comment::with(['user:id,nickname,headimg', 'attach:id,relation_id,img'])
             ->select('id', 'pid', 'user_id', 'relation_id', 'type', 'content', 'forward_num', 'share_num', 'like_num',
@@ -486,8 +496,6 @@ class UserController extends Controller
      * {
      * "code": 200,
      * "msg": "成功",
-     * "data": {
-     * "current_page": 1,
      * "data": [
      * {
      * "id": 168934,
@@ -512,27 +520,15 @@ class UserController extends Controller
      * "to_uid": 168934
      * }
      * }
-     * ],
-     * "first_page_url": "http://v4.com/api/v4/user/follower?page=1",
-     * "from": 1,
-     * "last_page": 1,
-     * "last_page_url": "http://v4.com/api/v4/user/follower?page=1",
-     * "next_page_url": null,
-     * "path": "http://v4.com/api/v4/user/follower",
-     * "per_page": 10,
-     * "prev_page_url": null,
-     * "to": 2,
-     * "total": 2
-     * }
-     * }
-     *   }
+     * ]
+     *  }
      *
      */
     public function fan()
     {
         $user = User::findOrFail(1);
-        $lists = $user->fans()->paginate(10);
-        return $this->success($lists);
+        $lists = $user->fans()->paginate(10)->toArray();
+        return success($lists['data']);
     }
 
     /**
@@ -547,8 +543,6 @@ class UserController extends Controller
      * {
      * "code": 200,
      * "msg": "成功",
-     * "data": {
-     * "current_page": 1,
      * "data": [
      * {
      * "id": 168934,
@@ -574,26 +568,15 @@ class UserController extends Controller
      * }
      * }
      * ],
-     * "first_page_url": "http://v4.com/api/v4/user/follower?page=1",
-     * "from": 1,
-     * "last_page": 1,
-     * "last_page_url": "http://v4.com/api/v4/user/follower?page=1",
-     * "next_page_url": null,
-     * "path": "http://v4.com/api/v4/user/follower",
-     * "per_page": 10,
-     * "prev_page_url": null,
-     * "to": 2,
-     * "total": 2
      * }
-     * }
-     *   }
      *
      */
     public function follower()
     {
         $user = User::findOrFail(1);
-        $lists = $user->follow()->paginate(10);
-        return $this->success($lists);
+        $lists = $user->follow()->paginate(10)->toArray();
+
+        return success($lists['data']);
     }
 
 
