@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Attach;
 use App\Models\Like;
+use App\Models\Works;
 
 class CommentController extends Controller
 {

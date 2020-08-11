@@ -26,18 +26,21 @@ class UserController extends Controller
      * @apiName  homepage
      * @apiGroup User
      * @apiHeader {string} Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC92NC5jb21cL2FwaVwvdjRcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNTk0OTU0MDQxLCJleHAiOjE1OTYyNTAwNDEsIm5iZiI6MTU5NDk1NDA0MSwianRpIjoiMFVhdmsxT0piNXJSSHFENSIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.9qShuy0F5zwn-USMqKeVrDUKUW3JYQYCn46Yy04wbg0
-     * @apiParam  {number} id  用户id
+     * @apiParam  {number} user_id  用户id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/homepage
      *
      * @apiSuccess {string}  nickname  用户昵称
+     * @apiSuccess {string}  sex       性别   1 男 2 女
      * @apiSuccess {string}  headimg   用户头像
      * @apiSuccess {string}  headcover 背景图
      * @apiSuccess {string}  intro     简介
      * @apiSuccess {string}  follow_num 关注数
      * @apiSuccess {string}  fan_num    粉丝数
      * @apiSuccess {string}  is_teacher 是否为老师
+     * @apiSuccess {string}  is_self    是否为当前用户  1 是 0 否
      * @apiSuccess {string}  works        作品
      * @apiSuccess {string}  works.title  作品标题
+     * @apiSuccess {string}  works.subtitle  作品副标题
      * @apiSuccess {string}  works.cover_img     作品封面
      * @apiSuccess {string}  works.subscribe_num 作品订阅数
      * @apiSuccess {string}  works.original_price 作品价格
@@ -108,8 +111,8 @@ class UserController extends Controller
      */
     public function homepage(Request $request)
     {
-        $id = $request->get('id');
-        $user = User::select('id', 'nickname', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
+        $id = $request->get('user_id');
+        $user = User::select('id', 'nickname', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
             ->with([
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id'])
@@ -119,8 +122,12 @@ class UserController extends Controller
                 'history.columns:id,title,cover_pic',
                 'history.works:id,title,cover_img',
                 'works'   => function ($query) {
-                    $query->select(['id', 'user_id', 'title', 'cover_img', 'subscribe_num', 'original_price'])
+                    $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 0);
+                },
+                'listen'   => function ($query) {
+                    $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
+                        ->where('is_audio_book', 1);
                 },
                 'columns' => function ($query) {
                     $query->select('user_id', 'name', 'title', 'subtitle', 'original_price');
@@ -129,6 +136,9 @@ class UserController extends Controller
             ])
             ->findOrFail($id)
             ->toArray();
+        if($user){
+            $user['is_self'] =  $id == $this->user['id'] ?  1 : 0;
+        }
 
         return success($user);
     }
