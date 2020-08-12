@@ -13,11 +13,20 @@ class Comment extends Base
      * 想法
      * @param  int  $type 类型 1.专栏 2.讲座 3.听书 4.精品课
      */
-    public function getIndexComment($id, $type=1, $uid=0)
+    public function getIndexComment($id, $type=1, $uid=0, $order=1, $self=false)
     {
         if (!$id){
             return false;
         }
+        if ($type ==1||$type ==2) {
+            $res = Column::where('id',$id)->first()->toArray();
+        } elseif($type==3 || $type==4){
+            $res = Works::where('id',$id)->first()->toArray();
+        }else{
+            $res = Wiki::where('id',$id)->first()->toArray();
+        }
+
+        $order = $order ==1 ? 'reply_num': 'created_at';
         $lists = Comment::with(['user:id,nickname,headimg','quote:id,pid,content', 'attach:id,relation_id,img',
                     'reply'=>function($query){
                         $query->select('id','comment_id','from_uid','to_uid','content','created_at')
@@ -29,6 +38,10 @@ class Comment extends Base
                 ->where('type', $type)
                 ->where('relation_id', $id)
                 ->where('status', 1)
+                ->when($self, function ($query) use ($res) {
+                    return $query->where('user_id', $res['user_id']);
+                })
+                ->orderBy($order,'desc')
                 ->paginate(10)
                 ->toArray();
 
