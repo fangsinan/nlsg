@@ -432,6 +432,7 @@ class WorksController extends Controller
             'works_data'   => $works_data,
             'works_info'   => $info,
             'history_data'   => $history_data,
+            'is_sub'         => $is_sub ? 1: 0
         ];
         return $this->success($res);
     }
