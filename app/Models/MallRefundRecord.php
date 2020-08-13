@@ -51,7 +51,7 @@ class MallRefundRecord extends Base
 
         $query->select([
             'nmo.ordernum', 'nmo.id as order_id', 'nmod.id as order_detail_id',
-            'nmod.goods_id', 'nmod.sku_number', 'nmod.sku_history',
+            'nmod.goods_id', 'nmod.sku_number', 'nmod.sku_history','nmg.picture',
             'nmo.pay_type', 'nmg.name as goods_name', 'nmg.subtitle',
             'nmo.receipt_at', 'nmo.pay_price', 'nmo.coupon_money',
             DB::raw('(nmo.cost_price - nmo.vip_cut - nmo.special_price_cut) as temp_money'),
@@ -87,9 +87,9 @@ class MallRefundRecord extends Base
                 }
             }
 
-            if (($params['get_first'] ?? 0) == 0) {
-                unset($list[$k]->sku_history);
-            }
+//            if (($params['get_first'] ?? 0) == 0) {
+//                unset($list[$k]->sku_history);
+//            }
         }
 
         if (($params['get_first'] ?? 0) == 1) {
