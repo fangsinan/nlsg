@@ -314,7 +314,7 @@ class MallRefundRecord extends Base
 
         //如果type=1  读取infoOrder   =2读取infoDetail
         foreach ($list as $k => $v) {
-            if ($v->user_cancel == 1 || $v->status = 70) {
+            if ($v->user_cancel == 1 || $v->status == 70) {
                 $v->status = 99;
             }
             $temp_data = [];
