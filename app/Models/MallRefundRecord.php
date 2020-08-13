@@ -317,6 +317,11 @@ class MallRefundRecord extends Base
             if ($v->user_cancel == 1 || $v->status == 70) {
                 $v->status = 99;
             }
+
+            if($v->status == 50 || $v->status == 60){
+                $v->status = 60;
+            }
+
             $temp_data = [];
             if ($v->type == 1) {
                 foreach ($v->infoOrder->infoOrderDetail as $vv) {
