@@ -77,7 +77,7 @@ class MallRefundRecord extends Base
             $v->sku_history = $temp;
             $v->sku_value = $temp->sku_value;
 
-            if (empty($v->receipt_at)) {
+            if (empty($v->receipt_at) || $v->num == 0) {
                 $v->is_pass = 1;
             } else {
                 if (strtotime($v->receipt_at) < strtotime($begin_date)) {
@@ -104,7 +104,7 @@ class MallRefundRecord extends Base
                     $temp_list[$v->order_id][] = $v;
                 }
             }
-            $temp_list = array_values($temp_list);
+            //$temp_list = array_values($temp_list);
             return $temp_list;
         }
     }
