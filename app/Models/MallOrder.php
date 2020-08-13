@@ -1437,27 +1437,65 @@ class MallOrder extends Base
         }
 
         //todo 好评有礼 五星且有内容 送优惠券一张
-        $coupon = new class {};
-//        if ($c_data['star'] == 5 && strlen($c_data['content']) > 10) {
-//            $coupon_rule_id = ConfigModel::getData(18);
-//            $coupon_rule_id = explode(',', $coupon_rule_id);
-//            shuffle($coupon_rule_id);
-//            $coupon_rule_id = $coupon_rule_id[0];
-//
-//            if ($coupon_rule_id) {
-//                $cpModel = new Coupon();
-//                $coupon_res = $cpModel->getCoupon([$coupon_rule_id], $user['id'], 1, 1);
-//                dd($coupon_res);
-//                if($coupon_res['code']??0 == false){
-//                    DB::rollBack();
-//                    return ['code' => false, 'msg' => '失败', 'ps' => '领取发生错误'];
-//                }
-//                $coupon = $coupon_res['info'];
-//            }
-//        }
+        if ($c_data['star'] == 5 && strlen($c_data['content']) > 10) {
+            $coupon_rule_id = ConfigModel::getData(18);
+            $coupon_rule_id = explode(',', $coupon_rule_id);
+            shuffle($coupon_rule_id);
+            $coupon_rule_id = $coupon_rule_id[0];
+
+            if ($coupon_rule_id) {
+
+                $coupon_rule = CouponRule::where('status', '=', 1)
+                    ->whereIN('use_type', [3, 4])
+                    ->find($coupon_rule_id);
+                if (!$coupon_rule) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '失败', 'ps' => '服务器错误,请重试'];
+                }
+
+                $coupon_data = [];
+                $today_time = date('Y-m-d 00:00:00');
+                $coupon_data['name'] = $coupon_rule->name;
+                $coupon_data['number'] = Coupon::createCouponNum($coupon_rule->buffet, $coupon_rule->id);
+                $coupon_data['type'] = $coupon_rule->use_type;
+                $coupon_data['price'] = $coupon_rule->price;
+                $coupon_data['full_cut'] = $coupon_rule->full_cut;
+                $coupon_data['explain'] = $coupon_rule->remarks;
+                if ($coupon_rule->use_time_begin) {
+                    $coupon_data['begin_time'] = $coupon_rule->use_time_begin;
+                } else {
+                    $coupon_data['begin_time'] = $today_time;
+                }
+                if ($coupon_rule->use_time_end) {
+                    $coupon_data['end_time'] = $coupon_rule->use_time_end;
+                } else {
+                    $coupon_data['end_time'] = date('Y-m-d H:i:s',
+                        strtotime($today_time) + ($coupon_rule->past + 1) * 86400 - 1);
+                }
+                $coupon_data['get_way'] = 1;
+                $coupon_data['user_id'] = $user['id'];
+                $coupon_data['cr_id'] = $coupon_rule->id;
+
+                $coupon_res = DB::table('nlsg_coupon')->insertGetId($coupon_data);
+                if (!$coupon_res) {
+                    return ['code' => false, 'msg' => '失败', 'ps' => '服务器错误,请重试'];
+                }
+
+                $coupon = Coupon::where('id', '=', $coupon_res)
+                    ->select(['id', 'number', 'name', 'type', 'price', 'full_cut',
+                        'explain', 'begin_time', 'end_time'])
+                    ->first();
+
+            }
+        }
+
+        if (!($coupon ?? 0)) {
+            $coupon = new class {
+            };
+        }
 
         DB::commit();
-        return ['code' => true, 'msg' => 'ok','coupon'=>$coupon];
+        return ['code' => true, 'msg' => 'ok', 'coupon' => $coupon];
     }
 
     //mall_refund_record使用

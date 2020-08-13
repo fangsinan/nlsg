@@ -230,12 +230,12 @@ class MallOrderController extends Controller
         $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
         $params['address_id'] = $request->input('address_id', 0);
         $params['os_type'] = $request->input('os_type', 0);
-        $params['pay_type'] = $request->input('pay_type',0);
-        $params['messages'] = $request->input('messages','');
-        $params['bill_type'] = $request->input('bill_type',0);
-        $params['bill_title'] = $request->input('bill_title','');
-        $params['bill_number'] = $request->input('bill_number','');
-        $params['bill_format'] = $request->input('bill_format',2);
+        $params['pay_type'] = $request->input('pay_type', 0);
+        $params['messages'] = $request->input('messages', '');
+        $params['bill_type'] = $request->input('bill_type', 0);
+        $params['bill_title'] = $request->input('bill_title', '');
+        $params['bill_number'] = $request->input('bill_number', '');
+        $params['bill_format'] = $request->input('bill_format', 2);
 
 //        $params = $request->input();
 
@@ -452,12 +452,12 @@ class MallOrderController extends Controller
         $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
         $params['address_id'] = $request->input('address_id', 0);
         $params['os_type'] = $request->input('os_type', 0);
-        $params['pay_type'] = $request->input('pay_type',0);
-        $params['messages'] = $request->input('messages','');
-        $params['bill_type'] = $request->input('bill_type',0);
-        $params['bill_title'] = $request->input('bill_title','');
-        $params['bill_number'] = $request->input('bill_number','');
-        $params['bill_format'] = $request->input('bill_format',2);
+        $params['pay_type'] = $request->input('pay_type', 0);
+        $params['messages'] = $request->input('messages', '');
+        $params['bill_type'] = $request->input('bill_type', 0);
+        $params['bill_title'] = $request->input('bill_title', '');
+        $params['bill_number'] = $request->input('bill_number', '');
+        $params['bill_format'] = $request->input('bill_format', 2);
 
 //        $params = $request->input();
 
@@ -712,12 +712,12 @@ class MallOrderController extends Controller
         $params['os_type'] = $request->input('os_type', 0);
         $params['buy_type'] = $request->input('buy_type', 0);
         $params['group_key'] = $request->input('group_key', '');
-        $params['pay_type'] = $request->input('pay_type',0);
-        $params['messages'] = $request->input('messages','');
-        $params['bill_type'] = $request->input('bill_type',0);
-        $params['bill_title'] = $request->input('bill_title','');
-        $params['bill_number'] = $request->input('bill_number','');
-        $params['bill_format'] = $request->input('bill_format',2);
+        $params['pay_type'] = $request->input('pay_type', 0);
+        $params['messages'] = $request->input('messages', '');
+        $params['bill_type'] = $request->input('bill_type', 0);
+        $params['bill_title'] = $request->input('bill_title', '');
+        $params['bill_number'] = $request->input('bill_number', '');
+        $params['bill_format'] = $request->input('bill_format', 2);
 
 //        $params = $request->input();
 
@@ -1527,6 +1527,28 @@ class MallOrderController extends Controller
      * @apiParam {string} picture 图片,多张用逗号隔开
      * @apiParam {string} issue_type 原因,多个用逗号隔开(1,2,3)
      * @apiParam {string} content 评价内容
+     *
+     * @apiSuccessExample {json} Request-Example:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "now": 1597312942,
+     * "data": {
+     * "code": true,
+     * "msg": "ok",
+     * "coupon": {
+     * "id": 61,
+     * "number": "202008131802211330000843024",
+     * "name": "20元优惠券(六一专享)",
+     * "type": 3,
+     * "price": "20.00",
+     * "full_cut": "199.00",
+     * "explain": "六一活动期间使用",
+     * "begin_time": "2020-06-18 00:00:21",
+     * "end_time": "2020-06-20 23:59:59"
+     * }
+     * }
+     * }
      */
     public function subComment(Request $request)
     {

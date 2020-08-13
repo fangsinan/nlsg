@@ -169,7 +169,7 @@ class Coupon extends Base
         return ['code' => true, 'msg' => '领取成功'];
     }
 
-    protected static function createCouponNum($buffet, $id)
+    public static function createCouponNum($buffet, $id)
     {
         $res = date('YmdHis') . $buffet . str_pad($id, 6, 0) . random_int(100000, 999999);
         $check = Coupon::where('number', '=', $res)->count();
