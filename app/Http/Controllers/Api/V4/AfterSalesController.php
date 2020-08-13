@@ -189,7 +189,7 @@ class AfterSalesController extends Controller
     }
 
     /**
-     * 售后详情
+     * 售后详情和进度条
      * @api {get} /api/v4/after_sales/order_info 售后详情
      * @apiVersion 4.0.0
      * @apiName /api/v4/after_sales/order_info
@@ -199,6 +199,7 @@ class AfterSalesController extends Controller
      * @apiParam {number} id id
      *
      * @apiSuccess {number} id id
+     * @apiSuccess {number=1,0} only_bar 是否只返回进度条(1是0否)
      * @apiSuccess {string} service_num 售后单号
      * @apiSuccess {number} order_id 订单id
      * @apiSuccess {number} order_detail_id 订单详情id

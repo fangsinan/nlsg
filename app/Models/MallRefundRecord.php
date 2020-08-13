@@ -51,7 +51,7 @@ class MallRefundRecord extends Base
 
         $query->select([
             'nmo.ordernum', 'nmo.id as order_id', 'nmod.id as order_detail_id',
-            'nmod.goods_id', 'nmod.sku_number', 'nmod.sku_history','nmg.picture',
+            'nmod.goods_id', 'nmod.sku_number', 'nmod.sku_history', 'nmg.picture',
             'nmo.pay_type', 'nmg.name as goods_name', 'nmg.subtitle',
             'nmo.receipt_at', 'nmo.pay_price', 'nmo.coupon_money',
             DB::raw('(nmo.cost_price - nmo.vip_cut - nmo.special_price_cut) as temp_money'),
@@ -96,18 +96,19 @@ class MallRefundRecord extends Base
             return $list[0];
         } else {
             $temp_list = [];
-            foreach ($list as $v){
-                if(isset($temp_list[$v->order_id])){
+            foreach ($list as $v) {
+                if (isset($temp_list[$v->order_id])) {
                     $temp_list[$v->order_id][] = $v;
-                }else{
+                } else {
                     $temp_list[$v->order_id] = [];
                     $temp_list[$v->order_id][] = $v;
                 }
             }
             $temp_list = array_values($temp_list);
 
-            foreach ($temp_list as &$v){
-                $temp_v = new class {};
+            foreach ($temp_list as &$v) {
+                $temp_v = new class {
+                };
                 $temp_v->data = $v;
                 $v = $temp_v;
             }
@@ -318,7 +319,7 @@ class MallRefundRecord extends Base
                 $v->status = 99;
             }
 
-            if($v->status == 50 || $v->status == 60){
+            if ($v->status == 50 || $v->status == 60) {
                 $v->status = 60;
             }
 
@@ -395,8 +396,12 @@ class MallRefundRecord extends Base
             }
         }
 
-        //进度条
         $data['progress_bar'] = $this->createProgressBar($data->id, $data->expressInfo->history->list ?? []);
+
+        //进度条
+        if($params['only_bar']??0 == 1){
+            $data = $data['progress_bar'];
+        }
         return $data;
     }
 
@@ -516,6 +521,7 @@ class MallRefundRecord extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
 
+        DB::beginTransaction();
 
         $check = self::where('user_id', '=', $user['id'])
             ->where('status', '<>', 80)
@@ -524,15 +530,33 @@ class MallRefundRecord extends Base
         if ($check->status == 20 && $check->user_cancel == 0) {
             $check_express = ExpressCompany::find($express_id);
             if ($check_express) {
+
+                $check_ex = ExpressInfo::where('express_id', '=', $express_id)
+                    ->where('express_num', '=', $express_num)
+                    ->first();
+                if ($check_ex) {
+                    $express_info_id = $check_ex->id;
+                } else {
+                    $ex_data['express_id'] = $express_id;
+                    $ex_data['express_num'] = $express_num;
+                    $ex_data['created_at'] = $ex_data['updated_at'] = date('Y-m-d H:i:s');
+                    $express_info_id = DB::table('nlsg_express_info')->insertGetId($ex_data);
+                    if (!$express_info_id) {
+                        DB::rollBack();
+                        return ['code' => false, 'msg' => '错误', 'ps' => 'ex error'];
+                    }
+                }
+
                 $check->status = 30;
-                $check->express_id = $express_id;
-                $check->express_num = $express_num;
+                $check->express_info_id = $express_info_id;
                 $check->refund_at = date('Y-m-d H:i:s');
 
                 $res = $check->save();
                 if ($res) {
+                    DB::commit();
                     return ['code' => true, 'msg' => '成功'];
                 } else {
+                    DB::rollBack();
                     return ['code' => false, 'msg' => '失败'];
                 }
             } else {

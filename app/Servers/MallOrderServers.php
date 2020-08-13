@@ -291,20 +291,6 @@ class MallOrderServers
 
     public function send($params)
     {
-
-        if (0) {
-            $params = [
-                ['express_id' => 2, 'num' => 'YT4538526006366',
-                    'order_id' => 9526, 'order_detail_id' => 10323],
-                ['express_id' => 2, 'num' => 'YT4506367161457',
-                    'order_id' => 9526, 'order_detail_id' => 10324],
-                ['express_id' => 2, 'num' => 'YT4506367161457',
-                    'order_id' => 9529, 'order_detail_id' => 10332],
-                ['express_id' => 2, 'num' => 'YT4506367161457',
-                    'order_id' => 9529, 'order_detail_id' => 10333],
-            ];
-        }
-
         if (empty($params)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
@@ -326,7 +312,7 @@ class MallOrderServers
         DB::beginTransaction();
 
         foreach ($params as $v) {
-            //todo 只要有发货的  order状态就是已发货
+            //只要有发货的  order状态就是已发货
             $order_obj = MallOrder::find($v['order_id']);
             $order_obj->status = 20;
             $order_res = $order_obj->save();
