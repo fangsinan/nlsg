@@ -220,20 +220,24 @@ class MallOrderController extends Controller
      */
     public function createOrder(Request $request)
     {
-//        $params['from_cart'] = $request->input('from_cart', 9);
-//        $params['sku'] = $request->input('sku', '');
-//        $params['goods_id'] = $request->input('goods_id', 0);
-//        $params['buy_num'] = $request->input('buy_num', 0);
-//        $params['inviter'] = $request->input('inviter', 0);
-//        $params['post_type'] = $request->input('post_type', 0);
-//        $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
-//        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
-//        $params['address_id'] = $request->input('address_id', 0);
-//        $params['os_type'] = $request->input('os_type', 0);
-//        $params['pay_type'] = $request->input('pay_type',0);
-//        $params['messages'] = $request->input('messages','');
+        $params['from_cart'] = $request->input('from_cart', 9);
+        $params['sku'] = $request->input('sku', '');
+        $params['goods_id'] = $request->input('goods_id', 0);
+        $params['buy_num'] = $request->input('buy_num', 0);
+        $params['inviter'] = $request->input('inviter', 0);
+        $params['post_type'] = $request->input('post_type', 0);
+        $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
+        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+        $params['address_id'] = $request->input('address_id', 0);
+        $params['os_type'] = $request->input('os_type', 0);
+        $params['pay_type'] = $request->input('pay_type',0);
+        $params['messages'] = $request->input('messages','');
+        $params['bill_type'] = $request->input('bill_type',0);
+        $params['bill_title'] = $request->input('bill_title','');
+        $params['bill_number'] = $request->input('bill_number','');
+        $params['bill_format'] = $request->input('bill_format',2);
 
-        $params = $request->input();
+//        $params = $request->input();
 
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -440,18 +444,22 @@ class MallOrderController extends Controller
      */
     public function CreateFlashSaleOrder(Request $request)
     {
-//        $params['sku'] = $request->input('sku', '');
-//        $params['goods_id'] = $request->input('goods_id', 0);
-//        $params['buy_num'] = $request->input('buy_num', 0);
-//        $params['inviter'] = $request->input('inviter', 0);
-//        $params['post_type'] = $request->input('post_type', 0);
-//        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
-//        $params['address_id'] = $request->input('address_id', 0);
-//        $params['os_type'] = $request->input('os_type', 0);
-//        $params['pay_type'] = $request->input('pay_type',0);
-//        $params['messages'] = $request->input('messages','');
+        $params['sku'] = $request->input('sku', '');
+        $params['goods_id'] = $request->input('goods_id', 0);
+        $params['buy_num'] = $request->input('buy_num', 0);
+        $params['inviter'] = $request->input('inviter', 0);
+        $params['post_type'] = $request->input('post_type', 0);
+        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+        $params['address_id'] = $request->input('address_id', 0);
+        $params['os_type'] = $request->input('os_type', 0);
+        $params['pay_type'] = $request->input('pay_type',0);
+        $params['messages'] = $request->input('messages','');
+        $params['bill_type'] = $request->input('bill_type',0);
+        $params['bill_title'] = $request->input('bill_title','');
+        $params['bill_number'] = $request->input('bill_number','');
+        $params['bill_format'] = $request->input('bill_format',2);
 
-        $params = $request->input();
+//        $params = $request->input();
 
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
@@ -693,21 +701,25 @@ class MallOrderController extends Controller
             return $this->error(0, '未登录');
         }
 
-//        $params['sku'] = $request->input('sku', '');
-//        $params['goods_id'] = $request->input('goods_id', 0);
-//        $params['buy_num'] = $request->input('buy_num', 0);
-//        $params['inviter'] = $request->input('inviter', 0);
-//        $params['post_type'] = $request->input('post_type', 0);
-//        $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
-//        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
-//        $params['address_id'] = $request->input('address_id', 0);
-//        $params['os_type'] = $request->input('os_type', 0);
-//        $params['buy_type'] = $request->input('buy_type', 0);
-//        $params['group_key'] = $request->input('group_key', '');
-//        $params['pay_type'] = $request->input('pay_type',0);
-//        $params['messages'] = $request->input('messages','');
+        $params['sku'] = $request->input('sku', '');
+        $params['goods_id'] = $request->input('goods_id', 0);
+        $params['buy_num'] = $request->input('buy_num', 0);
+        $params['inviter'] = $request->input('inviter', 0);
+        $params['post_type'] = $request->input('post_type', 0);
+        $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
+        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+        $params['address_id'] = $request->input('address_id', 0);
+        $params['os_type'] = $request->input('os_type', 0);
+        $params['buy_type'] = $request->input('buy_type', 0);
+        $params['group_key'] = $request->input('group_key', '');
+        $params['pay_type'] = $request->input('pay_type',0);
+        $params['messages'] = $request->input('messages','');
+        $params['bill_type'] = $request->input('bill_type',0);
+        $params['bill_title'] = $request->input('bill_title','');
+        $params['bill_number'] = $request->input('bill_number','');
+        $params['bill_format'] = $request->input('bill_format',2);
 
-        $params = $request->input();
+//        $params = $request->input();
 
         $model = new MallOrderGroupBuy();
         $data = $model->createGroupBuyOrder($params, $this->user);
