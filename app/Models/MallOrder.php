@@ -1483,7 +1483,10 @@ class MallOrder extends Base
 
                 $coupon = Coupon::where('id', '=', $coupon_res)
                     ->select(['id', 'number', 'name', 'type', 'price', 'full_cut',
-                        'explain', 'begin_time', 'end_time'])
+                        'explain', 'begin_time', 'end_time',
+                        DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
+                        DB::raw('unix_timestamp(end_time) as end_timestamp')
+                    ])
                     ->first();
 
             }
