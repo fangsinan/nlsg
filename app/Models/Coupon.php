@@ -27,7 +27,7 @@ class Coupon extends Base
         return $data->money ?? 0;
     }
 
-    public function getCoupon($flag, $uid, $must_all_true = false)
+    public function getCoupon($flag, $uid, $must_all_true = false, $get_info = 0)
     {
 
         if (!is_array($flag)) {
@@ -35,20 +35,20 @@ class Coupon extends Base
             $flag = array_unique($flag);
         }
 
-        $check_uid = User::find($uid)->toArray();
-        if (empty($check_uid)) {
+        $check_uid = User::find($uid);
+        if (!$check_uid) {
             return ['code' => false, 'msg' => '用户不存在'];
         }
 
-        $res = self::getCouponRun($flag, $uid, $must_all_true);
-        return $res;
+        return self::getCouponRun($flag, $uid, $must_all_true, $get_info);
     }
 
-    protected static function getCouponRun($flag, $uid, $must_all_true)
+    protected static function getCouponRun($flag, $uid, $must_all_true, $get_info = 0)
     {
 
         $today_time = date('Y-m-d 00:00:00');
         $now = date('Y-m-d H:i:s');
+
         $coupon_rule_list = CouponRule::whereIn('id', $flag)
             ->where('status', '=', 1)
             ->whereIN('use_type', [3, 4])
@@ -152,6 +152,7 @@ class Coupon extends Base
             $data['cr_id'] = $v->id;
             $add_data[] = $data;
         }
+
         if ($used_stock === false) {
             DB::rollBack();
             return ['code' => false, 'msg' => '领取失败'];
@@ -165,7 +166,7 @@ class Coupon extends Base
         }
 
         DB::commit();
-        return ['msg' => '领取成功'];
+        return ['code' => true, 'msg' => '领取成功'];
     }
 
     protected static function createCouponNum($buffet, $id)

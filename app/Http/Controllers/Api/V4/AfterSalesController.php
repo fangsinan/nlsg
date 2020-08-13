@@ -41,6 +41,7 @@ class AfterSalesController extends Controller
      * @apiSuccess {number} subtitle 副标题
      * @apiSuccess {number} num 可申请数量
      * @apiSuccess {number} sku_value 规格信息
+     * @apiSuccess {number=1,0} is_pass 1:失效
      * @apiSuccessExample {json} Request-Example:
      * {
      * "code": 200,

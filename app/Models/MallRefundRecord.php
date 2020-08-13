@@ -95,7 +95,17 @@ class MallRefundRecord extends Base
         if (($params['get_first'] ?? 0) == 1) {
             return $list[0];
         } else {
-            return $list;
+            $temp_list = [];
+            foreach ($list as $v){
+                if(isset($temp_list[$v->order_id])){
+                    $temp_list[$v->order_id][] = $v;
+                }else{
+                    $temp_list[$v->order_id] = [];
+                    $temp_list[$v->order_id][] = $v;
+                }
+            }
+            $temp_list = array_values($temp_list);
+            return $temp_list;
         }
     }
 

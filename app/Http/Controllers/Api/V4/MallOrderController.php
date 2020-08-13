@@ -1504,7 +1504,6 @@ class MallOrderController extends Controller
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
-
         $model = new MallOrder();
         $data = $model->commentList($this->user['id'], $request->input());
         if (($data['code'] ?? true) === false) {
@@ -1531,7 +1530,6 @@ class MallOrderController extends Controller
      */
     public function subComment(Request $request)
     {
-
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }

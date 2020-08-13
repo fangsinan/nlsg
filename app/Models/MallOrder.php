@@ -797,7 +797,7 @@ class MallOrder extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => $coupon_list,
             'used_address' => $used_address,
-            'from_cart'=>$params['from_cart']
+            'from_cart' => $params['from_cart']
         ];
 
 
@@ -1049,16 +1049,16 @@ class MallOrder extends Base
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
-                $query->where('nmo.status', '=', 1)->where('nmo.is_stop','=',0);
+                $query->where('nmo.status', '=', 1)->where('nmo.is_stop', '=', 0);
                 break;
             case 10:
-                $query->where('nmo.status', '=', 10)->where('nmo.is_stop','=',0);
+                $query->where('nmo.status', '=', 10)->where('nmo.is_stop', '=', 0);
                 break;
             case 20:
-                $query->where('nmo.status', '=', 20)->where('nmo.is_stop','=',0);
+                $query->where('nmo.status', '=', 20)->where('nmo.is_stop', '=', 0);
                 break;
             case 30:
-                $query->where('nmo.status', '=', 30)->where('nmo.is_stop','=',0);
+                $query->where('nmo.status', '=', 30)->where('nmo.is_stop', '=', 0);
                 break;
             case 99:
                 $query->where('nmo.is_stop', '=', 1);
@@ -1436,8 +1436,28 @@ class MallOrder extends Base
             return ['code' => false, 'msg' => '失败', 'ps' => '订单错误'];
         }
 
+        //todo 好评有礼 五星且有内容 送优惠券一张
+        $coupon = new class {};
+//        if ($c_data['star'] == 5 && strlen($c_data['content']) > 10) {
+//            $coupon_rule_id = ConfigModel::getData(18);
+//            $coupon_rule_id = explode(',', $coupon_rule_id);
+//            shuffle($coupon_rule_id);
+//            $coupon_rule_id = $coupon_rule_id[0];
+//
+//            if ($coupon_rule_id) {
+//                $cpModel = new Coupon();
+//                $coupon_res = $cpModel->getCoupon([$coupon_rule_id], $user['id'], 1, 1);
+//                dd($coupon_res);
+//                if($coupon_res['code']??0 == false){
+//                    DB::rollBack();
+//                    return ['code' => false, 'msg' => '失败', 'ps' => '领取发生错误'];
+//                }
+//                $coupon = $coupon_res['info'];
+//            }
+//        }
+
         DB::commit();
-        return ['code' => true, 'msg' => 'ok'];
+        return ['code' => true, 'msg' => 'ok','coupon'=>$coupon];
     }
 
     //mall_refund_record使用
