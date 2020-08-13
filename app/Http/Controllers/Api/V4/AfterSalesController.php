@@ -197,9 +197,9 @@ class AfterSalesController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/after_sales/order_info
      * @apiDescription 售后详情
      * @apiParam {number} id id
+     * @apiParam {number=1,0} only_bar 是否只返回进度条(1是0否)
      *
      * @apiSuccess {number} id id
-     * @apiSuccess {number=1,0} only_bar 是否只返回进度条(1是0否)
      * @apiSuccess {string} service_num 售后单号
      * @apiSuccess {number} order_id 订单id
      * @apiSuccess {number} order_detail_id 订单详情id
