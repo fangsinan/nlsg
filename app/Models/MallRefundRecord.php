@@ -104,7 +104,14 @@ class MallRefundRecord extends Base
                     $temp_list[$v->order_id][] = $v;
                 }
             }
-            //$temp_list = array_values($temp_list);
+            $temp_list = array_values($temp_list);
+
+            foreach ($temp_list as &$v){
+                $temp_v = new class {};
+                $temp_v->data = $v;
+                $v = $temp_v;
+            }
+
             return $temp_list;
         }
     }
