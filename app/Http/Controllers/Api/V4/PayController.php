@@ -182,7 +182,7 @@ class PayController extends Controller {
 
         $alipay = Pay::alipay($config)->app($order);
         //return $alipay; // laravel 框架中请直接 `return $alipay`
-        return $this->success($alipay->send());
+        return $this->success($alipay->getContent());
     }
 
     /**
