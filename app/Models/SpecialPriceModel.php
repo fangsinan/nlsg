@@ -104,7 +104,7 @@ class SpecialPriceModel extends Base
             $list = $this->getSpDataFromDb($id, $goods_type);
             Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
         }
-        
+
         return $list;
     }
 
