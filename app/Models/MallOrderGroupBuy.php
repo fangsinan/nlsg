@@ -231,7 +231,6 @@ class MallOrderGroupBuy extends Base
         //秒杀订单只能是一个商品
         $sku_list = reset($sku_list);
 
-
         //校验商品秒杀状态是否可用
         $check_sku_res = $this->checkSkuCanGroupBuy(
             $sku_list['goods_id'], $sku_list['sku_number']
@@ -423,6 +422,7 @@ class MallOrderGroupBuy extends Base
         $sku_list_show['num'] = $sku_list['num'];
         $sku_list_show['original_price'] = $sku_list['original_price'];
         $sku_list_show['price'] = $sku_list['group_buy_price'];
+        $sku_list_show['sku_number'] = $sku_list['sku_number'];
 
         $ftModel = new FreightTemplate();
         $shop_address_list = $ftModel->listOfShop(2);
@@ -436,6 +436,7 @@ class MallOrderGroupBuy extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => $coupon_list ?? [],
             'used_address' => $used_address,
+            'from_cart' => $params['from_cart']??0
         ];
 
         if ($params['post_type'] == 1 && empty($used_address)) {

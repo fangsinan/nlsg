@@ -348,6 +348,7 @@ class MallOrderFlashSale extends Base
         $sku_list_show['num'] = $sku_list['num'];
         $sku_list_show['original_price'] = $sku_list['original_price'];
         $sku_list_show['price'] = $sku_list['flash_sale_price'];
+        $sku_list_show['sku_number'] = $sku_list['sku_number'];
 
         $ftModel = new FreightTemplate();
         $shop_address_list = $ftModel->listOfShop(2);
@@ -361,6 +362,7 @@ class MallOrderFlashSale extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => ['coupon_freight' => $coupon_freight_list ?? []],
             'used_address' => $used_address,
+            'from_cart' => $params['from_cart']??0
         ];
 
         if ($params['post_type'] == 1 && empty($used_address)) {

@@ -379,6 +379,9 @@ class MallRefundRecord extends Base
 
     public function orderInfo($params, $user)
     {
+        if(empty($params['id']??0)){
+            return ['code' => false, 'msg' => '参数错误', 'ps' => '未查询到售后单'];
+        }
         $data = $this->list($params, $user);
         if ($data->isEmpty()) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => '未查询到售后单'];
