@@ -280,12 +280,13 @@ class OrderController extends Controller
         $work_id    = $request->input('work_id',0); // 课程id
         $column_id  = $request->input('column_id',0); // 专栏id
         $commend_id = $request->input('commend_id',0); // 评论id
-        $user_id    = $request->input('user_id',0);
+        //$user_id    = $request->input('user_id',0);
         $reward     = $request->input('reward',1);//1 鲜花 2爱心 3书籍 4咖啡
         $reward_num = $request->input('reward_num',1);  //数量
         $reward_type= $request->input('reward_type',0);  //打赏类型
         $os_type    = $request->input('os_type',0);
 
+        $user_id    = $this->user['id'];
 
         //检测下单参数有效性
         if ( empty($user_id) ) {

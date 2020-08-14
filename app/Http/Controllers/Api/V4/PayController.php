@@ -161,8 +161,16 @@ class PayController extends Controller {
             'out_trade_no' => $pay_info['ordernum'],
             'total_amount' => $pay_info['price'],
             'subject' => $pay_info['body'],
-            'attach' => $attach
+//            'attach' => $attach
         ];
+
+
+        $order = [
+            'out_trade_no' => time(),
+            'total_amount' => '1',
+            'subject' => 'test subject - 测试',
+        ];
+
         $alipay = Pay::alipay($config)->app($order);
         return $alipay; // laravel 框架中请直接 `return $alipay`
     }

@@ -26,10 +26,12 @@ class AppGateway extends Gateway
 
         $biz_array = json_decode($payload['biz_content'], true);
         if ((Alipay::MODE_SERVICE === $this->mode) && (!empty(Support::getInstance()->pid))) {
-            //·þÎñÉÌÄ£Ê½ÇÒ·þÎñÉÌpid²ÎÊý²»Îª¿Õ
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½pidï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½
             $biz_array['extend_params'] = is_array($biz_array['extend_params']) ? array_merge(['sys_service_provider_id' => Support::getInstance()->pid], $biz_array['extend_params']) : ['sys_service_provider_id' => Support::getInstance()->pid];
         }
         $payload['biz_content'] = json_encode(array_merge($biz_array, ['product_code' => 'QUICK_MSECURITY_PAY']));
+
+        ksort($payload);
         $payload['sign'] = Support::generateSign($payload);
 
         Events::dispatch(new Events\PayStarted('Alipay', 'App', $endpoint, $payload));
