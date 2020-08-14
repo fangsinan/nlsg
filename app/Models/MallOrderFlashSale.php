@@ -387,7 +387,6 @@ class MallOrderFlashSale extends Base
             return ['code' => false, 'msg' => '活动不存在'];
         }
 
-
         $res = [];
         foreach ($sp_data as $k => $v) {
             if ($v->type == 2) {
