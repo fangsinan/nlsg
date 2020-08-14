@@ -436,7 +436,7 @@ class MallOrderGroupBuy extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => $coupon_list ?? [],
             'used_address' => $used_address,
-            'from_cart' => $params['from_cart']??0
+            'from_cart' => $params['from_cart']??2
         ];
 
         if ($params['post_type'] == 1 && empty($used_address)) {
