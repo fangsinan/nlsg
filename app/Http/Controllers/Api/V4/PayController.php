@@ -61,10 +61,19 @@ class PayController extends Controller {
 
         $config = Config('wechat.payment.default');
         $app = Factory::payment($config);
+
+//dd([
+//    'body' => $pay_info['body'],
+//    'out_trade_no' => $pay_info['ordernum'],
+//    'total_fee' => 3    ,
+//    'trade_type' => 'APP', // 请对应换成你的支付方式对应的值类型
+//    'attach' => $attach,
+//    'openid' => $pay_info['openid'],
+//]);
         $result = $app->order->unify([
             'body' => $pay_info['body'],
             'out_trade_no' => $pay_info['ordernum'],
-            'total_fee' => $pay_info['price'],
+            'total_fee' => $pay_info['price']*100,
             'trade_type' => 'APP', // 请对应换成你的支付方式对应的值类型
             'attach' => $attach,
             'openid' => $pay_info['openid'],
@@ -172,7 +181,8 @@ class PayController extends Controller {
         ];
 
         $alipay = Pay::alipay($config)->app($order);
-        return $alipay; // laravel 框架中请直接 `return $alipay`
+        //return $alipay; // laravel 框架中请直接 `return $alipay`
+        return $this->success($alipay->send());
     }
 
     /**
