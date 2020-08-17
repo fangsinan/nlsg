@@ -210,10 +210,12 @@ class MallOrder extends Base
         return $temp_list;
     }
 
+
     /**
      * 生成订单编号
-     * @param type $uid 用户id
-     * @param type $type 1:普通订单 2:售后
+     * @param $uid 用户id
+     * @param $type 1:普通商品订单 2:售后
+     * @return string
      */
     public static function createOrderNumber($uid, $type)
     {
@@ -221,7 +223,8 @@ class MallOrder extends Base
         $d = date('ymd', $now);
         $u = str_pad($uid, 8, 0, STR_PAD_LEFT);
         $s = $now - strtotime(date('y-m-d', $now));
-        return $d . $u . str_pad($s, 5, 0, STR_PAD_LEFT) . rand(10, 99) . $type;
+        return $d . $u . str_pad($s, 5, 0, STR_PAD_LEFT) .
+            rand(10, 99) . str_pad($type, 2, 0, STR_PAD_LEFT);
     }
 
     //检查下单参数是否正确

@@ -269,8 +269,14 @@ class PayController extends Controller {
                 //支付宝
                 $config = Config('pay.alipay');
                 $res = Pay::alipay($config)->find(['out_trade_no' => $orderData['ordernum']]);
-                dd($res);
                 $res = json_decode(json_encode($res),true);
+                $temp_attach = substr($res['out_trade_no'],-2);
+                switch ($temp_attach){
+                    //todo 其他类型也需要配一下
+                    case '01':
+                        $res['attach'] = 8;
+                        break;
+                }
                 if($res['trade_status'] == 'TRADE_SUCCESS'){
                     $res['pay_type'] = 3;
                 }else{

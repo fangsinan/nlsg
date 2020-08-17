@@ -64,11 +64,17 @@ class WechatPay extends Controller
         $txt = date('Y-m-d H:i:s') . " 微信\r\n".json_encode($data) ."\r\n";
         fwrite($myfile, $txt);
         fclose($myfile);
-
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         //$ordernum = substr($data['out_trade_no'], 0, -5);
         $ordernum = $data['out_trade_no'];
+        if($data['pay_type']==3){
+            $pay_price = $data['total_amount'];
+            $transaction_id = $data['trade_no'];
+        }else{
+            $pay_price = $data['total_fee'];
+            $transaction_id = $data['transaction_id'];
+        }
 
         $order_obj = MallOrder::where('ordernum', '=', $ordernum)
             ->where('status', '=', 1)->first();
@@ -83,7 +89,8 @@ class WechatPay extends Controller
         }
         $order_obj->pay_type = $data['pay_type'];
         $order_obj->pay_time = $now_date;
-        $order_obj->pay_price = $data['total_fee'];
+        $order_obj->pay_price = $pay_price;
+
         $order_res = $order_obj->save();
         if (!$order_res) {
             DB::rollBack();
@@ -93,8 +100,8 @@ class WechatPay extends Controller
         //添加支付记录
         $payRecordModel = new PayRecord();
         $payRecordModel->ordernum = $ordernum;
-        $payRecordModel->price = $data['total_fee'];
-        $payRecordModel->transaction_id = $data['transaction_id'];
+        $payRecordModel->price = $pay_price;
+        $payRecordModel->transaction_id = $transaction_id;
         $payRecordModel->user_id = $order_obj->user_id;
         $payRecordModel->type = $data['pay_type'];
         $payRecordModel->order_type = 10;
