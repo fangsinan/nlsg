@@ -79,6 +79,9 @@ class PayController extends Controller {
             'openid' => $pay_info['openid'],
         ]);
 
+        $result['partnerid']=$config = Config('wechat.payment.default.mch_id');
+        $result['package']='Sign=WXPay';
+        $result['now'] = time();
         return $this->success($result);
     }
 
