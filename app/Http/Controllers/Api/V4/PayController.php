@@ -85,6 +85,16 @@ class PayController extends Controller {
             'openid' => $pay_info['openid'],
         ]);
 
+
+
+        if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
+            $result = $app->jssdk->appConfig($result['prepay_id']);//第二次签名
+            return $this->success($result);
+        }else{
+            Log::error('微信支付签名失败:'.var_export($result,1));
+            return false;
+        }
+
 //        $result['partnerid']=$config = Config('wechat.payment.default.mch_id');
 //        $result['package']='Sign=WXPay';
 //        $result['now'] = time();
