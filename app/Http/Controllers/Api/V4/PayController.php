@@ -85,6 +85,9 @@ class PayController extends Controller {
             'openid' => $pay_info['openid'],
         ]);
 
+        $result['partnerid']=$config = Config('wechat.payment.default.mch_id');
+        $result['package']='Sign=WXPay';
+        $result['now'] = time();
         return $this->success($result);
     }
 
@@ -92,8 +95,8 @@ class PayController extends Controller {
 
         $body = '';
         if (in_array($attach, [1, 2, 5, 9, 11, 14, 8])) { //1专栏 2会员 5打赏 9精品课 听课
-            if ($attach === 8) {
-                $orderInfo = MallOrder::where('status', '=', 1)
+            if ($attach == 8) {
+                $OrderInfo = MallOrder::where('status', '=', 1)
                         ->where('is_stop', '=', 0)
                         ->where('is_del', '=', 0)
                         ->where('dead_time', '>', date('Y-m-d H:i:s'))
@@ -122,6 +125,8 @@ class PayController extends Controller {
                 $body = "能量时光-线下课购买-" . $OrderInfo['ordernum'];
             } else if ($attach == 8) {
                 $body = "能量时光-电商订单-" . $OrderInfo['ordernum'];
+                //todo 临时:商城支付一分
+                $OrderInfo['price'] = 0.01;
             }
         } else {
             return false;

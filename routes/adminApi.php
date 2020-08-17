@@ -7,6 +7,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('after_sales/list', 'AfterSalesController@list');
     Route::post('goods/add', 'GoodsController@add');
     Route::get('goods/list', 'GoodsController@list');
+    Route::get('goods/category_list', 'GoodsController@categoryList');
     Route::post('active/add', 'ActiveController@add');
     Route::get('active/list', 'ActiveController@list');
 });

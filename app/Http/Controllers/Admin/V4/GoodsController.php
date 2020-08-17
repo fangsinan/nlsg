@@ -132,11 +132,40 @@ class GoodsController extends Controller
         }
     }
 
-    //商品列表
+    /**
+     * 商品列表
+     * @api {post} /api/admin_v4/goods/list 商品列表
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/goods/list
+     * @apiGroup  后台-商品管理
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/list
+     * @apiDescription 商品列表
+     */
     public function list(Request $request)
     {
         $servers = new GoodsServers();
         $data = $servers->list($request->input());
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
+
+    /**
+     * 商品分类列表
+     * @api {post} /api/admin_v4/goods/category_list 商品分类列表
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/goods/category_list
+     * @apiGroup  后台-商品管理
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/category_list
+     * @apiDescription 商品分类列表
+     */
+    public function categoryList(Request $request)
+    {
+        $servers = new GoodsServers();
+        $data = $servers->categoryList();
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
             return $this->error(0, $data['msg'] . $ps);
