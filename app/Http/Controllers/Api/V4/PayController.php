@@ -199,7 +199,7 @@ class PayController extends Controller {
             'total_amount' => $pay_info['price'],
             'subject' => $pay_info['body'],
             'passback_params' => $attach,
-            'extend_params' => $attach,
+            'goods_type' => $attach
         ];
 
 //
