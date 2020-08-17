@@ -152,7 +152,7 @@ class GoodsController extends Controller
             return $this->success($data);
         }
     }
-    
+
     /**
      * 商品分类列表
      * @api {post} /api/admin_v4/goods/category_list 商品分类列表
