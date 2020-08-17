@@ -213,7 +213,6 @@ class MallController extends Controller
      */
     public function goodsList(Request $request)
     {
-        WechatPay::mallOrder([1,2,3]);
         $params = $request->input();
         $params['page'] = $params['page'] ?? 1;
         $params['size'] = $params['size'] ?? 10;
