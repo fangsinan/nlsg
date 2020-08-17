@@ -192,7 +192,7 @@ class AuthController extends Controller
                 ],
             ], ['aliyun']);
 
-            Redis::setex($phone, 60, $code);
+            Redis::setex($phone, 60*60*24, $code);
             return success();
         } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
             $message = $exception->getResults();
