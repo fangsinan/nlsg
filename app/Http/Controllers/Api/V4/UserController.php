@@ -248,11 +248,11 @@ class UserController extends Controller
             foreach ($comments['data'] as &$v) {
                 if ($v['type'] == 1 || $v['type'] == 2) {
                     $v['column'] = Column::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_pic','type')
+                        ->select('id', 'title', 'subtitle','price', 'subscribe_num', 'cover_pic','type')
                         ->first();
                 } elseif ($v['type'] == 3 || $v['type'] == 4) {
                     $v['works'] = Works::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_img','is_audio_book')
+                        ->select('id', 'title','subtitle', 'price', 'subscribe_num', 'cover_img','is_audio_book')
                         ->first();
                 } elseif ($v['type'] == 5) {
                     $v['wiki'] = Wiki::where('id', $v['relation_id'])->select('id', 'name', 'cover', 'view_num')
