@@ -189,6 +189,7 @@ class PayController extends Controller {
         }
 
         $pay_info = $this->getPayInfo($order_id, $attach);
+        $pay_info['price'] = '0.01';
         if ($pay_info == false) {
             return $this->error(0, '订单信息错误');
         }

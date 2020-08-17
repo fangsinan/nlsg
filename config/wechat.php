@@ -111,7 +111,7 @@ return [
              'key'                => env('WECHAT_PAYMENT_KEY', 'key-for-signature'),
              'cert_path'          => base_path().env('WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
              'key_path'           => base_path().env('WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
-             'notify_url'         => env('WECHAT_PAYMENT_CALLBACK_URL', 'wechat_pay/notify'),                           // 默认支付结果通知地址
+             'notify_url'         => 'http://app.v4.api.nlsgapp.com'.env('WECHAT_PAYMENT_CALLBACK_URL', 'wechat_pay/notify'),                           // 默认支付结果通知地址
 
          ],
          // ...

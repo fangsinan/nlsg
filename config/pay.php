@@ -6,7 +6,7 @@ return [
         'app_id' => env('ALI_APP_ID', ''),
 
         // 支付宝异步通知地址
-        'notify_url' => env('ALI_PAYMENT_CALLBACK_URL', ''),
+        'notify_url' => 'http://app.v4.api.nlsgapp.com'.env('ALI_PAYMENT_CALLBACK_URL', ''),
 
         // 支付成功后同步通知地址
         'return_url' => '',
