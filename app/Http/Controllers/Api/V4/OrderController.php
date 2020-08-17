@@ -258,9 +258,7 @@ class OrderController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup order
      *
-     * @apiParam {int} work_id 课程id
-     * @apiParam {int} column_id 专栏id
-     * @apiParam {int} commend_id 评论id
+     * @apiParam {int} relation_id 打赏类型目标id
      * @apiParam {int} user_id 用户id
      * @apiParam {int} reward  //1 鲜花 2爱心 3书籍 4咖啡  默认1
      * @apiParam {int} reward_num 数量 默认1
@@ -280,6 +278,10 @@ class OrderController extends Controller
         $work_id    = $request->input('work_id',0); // 课程id
         $column_id  = $request->input('column_id',0); // 专栏id
         $commend_id = $request->input('commend_id',0); // 评论id
+
+
+        $relation_id  = $request->input('relation_id',0);   //目标id
+
         //$user_id    = $request->input('user_id',0);
         $reward     = $request->input('reward',1);//1 鲜花 2爱心 3书籍 4咖啡
         $reward_num = $request->input('reward_num',1);  //数量
@@ -293,11 +295,11 @@ class OrderController extends Controller
             return $this->error(0,'用户id有误');
         }
 
-        switch ($reward_type) {
-            case 1:$relation_id = $column_id;break;
-            case 2:$relation_id = $work_id;break;
-            case 3:$relation_id = $commend_id;break;
-        }
+//        switch ($reward_type) {
+//            case 1:$relation_id = $column_id;break;
+//            case 2:$relation_id = $work_id;break;
+//            case 3:$relation_id = $commend_id;break;
+//        }
         if ( empty($relation_id) || $relation_id == 0 ) {
             return $this->error(0,'打赏目标有误');
         }
