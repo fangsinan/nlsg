@@ -22,10 +22,31 @@ class CreatePosterController extends Controller
     public static  $Api_url = 'https://app.api.test.nlsgapp.com/';
     public static  $IMAGES_URL = 'https://image.nlsgapp.com/';
 
-    //制作专属海报
+
+    /**
+     * @api {get} /api/v4/create/create_poster   制作专属海报
+     * @apiName create_poster
+     * @apiVersion 1.0.0
+     * @apiGroup create
+     *
+     * @apiParam {int} post_type  类型 post_type 2皇钻钻邀请卡 4会员  5精品课  7优品海报   8 专栏
+     * @apiParam {int} relation_id  对应id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *
+     *
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+
     public function CreatePoster(Request $request)
     {
-        $uid = $request->input('user_id', 0);
+        $uid = $this->user['id']??0;
         $gid = $request->input('relation_id', 0);
         $post_type = $request->input('post_type', 0);
 
