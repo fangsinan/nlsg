@@ -232,6 +232,9 @@ class UserController extends Controller
     public function feed(Request $request)
     {
         $id = $request->get('user_id');
+        if(!$id){
+            return error('参数不能为空');
+        }
 
         $comments = Comment::with(['user:id,nickname,headimg', 'attach:id,relation_id,img'])
             ->select('id', 'pid', 'user_id', 'relation_id', 'type', 'content', 'forward_num', 'share_num', 'like_num',
@@ -245,11 +248,11 @@ class UserController extends Controller
             foreach ($comments['data'] as &$v) {
                 if ($v['type'] == 1 || $v['type'] == 2) {
                     $v['column'] = Column::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_pic','type')
+                        ->select('id', 'title', 'subtitle','price', 'subscribe_num', 'cover_pic','type')
                         ->first();
                 } elseif ($v['type'] == 3 || $v['type'] == 4) {
                     $v['works'] = Works::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'price', 'subscribe_num', 'cover_img','is_audio_book')
+                        ->select('id', 'title','subtitle', 'price', 'subscribe_num', 'cover_img','is_audio_book')
                         ->first();
                 } elseif ($v['type'] == 5) {
                     $v['wiki'] = Wiki::where('id', $v['relation_id'])->select('id', 'name', 'cover', 'view_num')
@@ -257,7 +260,11 @@ class UserController extends Controller
                 }
             }
         }
-        return success($comments['data']);
+        $data = [
+            'data' => $comments['data'],
+            'total'=> $comments['total']
+        ];
+        return success($data);
     }
 
     /**
