@@ -40,7 +40,7 @@ class WechatPay extends Controller
         } elseif ($data['attach'] == 5) { //打赏 OK
             return self::Areward($data);
         } elseif ($data['attach'] == 8) { //电商产品支付  OK
-            return self::PayProduct($data);
+            return self::mallOrder($data);
         } elseif ($data['attach'] == 9) { //精品课 OK  代理商返佣50%
             return self::PayExcellent($data);
         } elseif ($data['attach'] == 10) { //借书 月卡 季卡 违约金
