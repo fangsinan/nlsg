@@ -64,9 +64,9 @@ class OrderController extends Controller
     }
      */
     public function getCoupon(Request $request){
-        $price = $request->input('price',99);
+        $price = $request->input('price',0);
         $type  = $request->input('type',0);
-        $user_id = $request->input('user_id',0);
+        $user_id = $this->user['id'] ?? 0;//->input('user_id',0);
         $where_type = [0];
         if($type){
             $where_type = [0, $type];
@@ -76,7 +76,7 @@ class OrderController extends Controller
            'user_id'=> $user_id,
         ])->whereIn('type',$where_type)
         ->where('end_time','>=',time())
-        ->where('full_cut','>=',$price)->get();
+        ->where('full_cut','<=',$price)->get();
         return $this->success($coupon);
     }
 
@@ -258,13 +258,11 @@ class OrderController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup order
      *
-     * @apiParam {int} work_id 课程id
-     * @apiParam {int} column_id 专栏id
-     * @apiParam {int} commend_id 评论id
+     * @apiParam {int} relation_id 打赏类型目标id
      * @apiParam {int} user_id 用户id
      * @apiParam {int} reward  //1 鲜花 2爱心 3书籍 4咖啡  默认1
      * @apiParam {int} reward_num 数量 默认1
-     * @apiParam {int} reward_type 打赏类型1专栏|讲座 2课程|听书  3想法  (每个类型只需要传对应id)
+     * @apiParam {int} reward_type 打赏类型1专栏|讲座 2课程|听书  3想法   4百科  (每个类型只需要传对应id)
      * @apiParam {int} os_type os_type 1 安卓 2ios
      *
      * @apiSuccess {string} result json
@@ -280,23 +278,28 @@ class OrderController extends Controller
         $work_id    = $request->input('work_id',0); // 课程id
         $column_id  = $request->input('column_id',0); // 专栏id
         $commend_id = $request->input('commend_id',0); // 评论id
-        $user_id    = $request->input('user_id',0);
+
+
+        $relation_id  = $request->input('relation_id',0);   //目标id
+
+        //$user_id    = $request->input('user_id',0);
         $reward     = $request->input('reward',1);//1 鲜花 2爱心 3书籍 4咖啡
         $reward_num = $request->input('reward_num',1);  //数量
         $reward_type= $request->input('reward_type',0);  //打赏类型
         $os_type    = $request->input('os_type',0);
 
+        $user_id    = $this->user['id'];
 
         //检测下单参数有效性
         if ( empty($user_id) ) {
             return $this->error(0,'用户id有误');
         }
 
-        switch ($reward_type) {
-            case 1:$relation_id = $column_id;break;
-            case 2:$relation_id = $work_id;break;
-            case 3:$relation_id = $commend_id;break;
-        }
+//        switch ($reward_type) {
+//            case 1:$relation_id = $column_id;break;
+//            case 2:$relation_id = $work_id;break;
+//            case 3:$relation_id = $commend_id;break;
+//        }
         if ( empty($relation_id) || $relation_id == 0 ) {
             return $this->error(0,'打赏目标有误');
         }

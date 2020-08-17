@@ -61,10 +61,19 @@ class PayController extends Controller {
 
         $config = Config('wechat.payment.default');
         $app = Factory::payment($config);
+
+//dd([
+//    'body' => $pay_info['body'],
+//    'out_trade_no' => $pay_info['ordernum'],
+//    'total_fee' => 3    ,
+//    'trade_type' => 'APP', // 请对应换成你的支付方式对应的值类型
+//    'attach' => $attach,
+//    'openid' => $pay_info['openid'],
+//]);
         $result = $app->order->unify([
             'body' => $pay_info['body'],
             'out_trade_no' => $pay_info['ordernum'],
-            'total_fee' => $pay_info['price'],
+            'total_fee' => $pay_info['price']*100,
             'trade_type' => 'APP', // 请对应换成你的支付方式对应的值类型
             'attach' => $attach,
             'openid' => $pay_info['openid'],
@@ -147,6 +156,7 @@ class PayController extends Controller {
         //1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
         $attach = $request->input('type', 0);
         $order_id = $request->input('id', 0);
+        $is_h5 = $request->input('is_h5', 0);
 
         if (empty($order_id) || empty($attach)) { //订单id有误
             return $this->error(0, '订单信息为空');
@@ -161,10 +171,25 @@ class PayController extends Controller {
             'out_trade_no' => $pay_info['ordernum'],
             'total_amount' => $pay_info['price'],
             'subject' => $pay_info['body'],
-            'attach' => $attach
+            'passback_params' => $attach
         ];
-        $alipay = Pay::alipay($config)->app($order);
-        return $alipay; // laravel 框架中请直接 `return $alipay`
+
+//
+//        $order = [
+//            'out_trade_no' => time(),
+//            'total_amount' => '1',
+//            'subject' => 'test subject - 测试',
+//        ];
+
+        if($is_h5){
+            $alipay = Pay::alipay($config)->web($order);
+            return $alipay;
+        }else{
+            $alipay = Pay::alipay($config)->app($order);
+            //return $alipay; // laravel 框架中请直接 `return $alipay`
+            return $this->success($alipay->getContent());
+        }
+
     }
 
     /**

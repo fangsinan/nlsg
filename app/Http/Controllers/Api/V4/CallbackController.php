@@ -12,7 +12,7 @@ use Yansongda\Pay\Pay;
 
 class CallbackController extends Controller
 {
-    //接收微信发送的异步支付结果通知
+    //APP端   接收微信发送的异步支付结果通知
     public function WechatNotify(Request $request){
         $config = Config('wechat.payment.default');
         $app = Factory::payment($config);
@@ -22,7 +22,7 @@ class CallbackController extends Controller
                 'out_trade_no'      => $message['out_trade_no'], //获取订单号
                 'total_fee'         => $message['total_fee']/100, //价格
                 'transaction_id'    => $message['transaction_id'], //交易单号
-                'attach'            => $message['attach'],
+                'attach'            => $message['passback_params'],
                 'pay_type'          => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
             ];
             $res = WechatPay::PayStatusUp($data);
@@ -39,6 +39,7 @@ class CallbackController extends Controller
 
     }
 
+    //APP端   支付宝回调
     public function AliNotify(Request $request)
     {
         $config = Config('pay.alipay');
