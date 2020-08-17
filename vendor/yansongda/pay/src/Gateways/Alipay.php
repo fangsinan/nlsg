@@ -214,6 +214,9 @@ class Alipay implements GatewayApplicationInterface
 
         $config = call_user_func([new $gateway(), 'find'], $order);
 
+        $config['query_options'] = ["trade_settle_info","fund_bill_list","passback_params"];
+
+//print_r($config);die();
         $this->payload['method'] = $config['method'];
         $this->payload['biz_content'] = $config['biz_content'];
         $this->payload['sign'] = Support::generateSign($this->payload);

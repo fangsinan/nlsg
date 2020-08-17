@@ -198,7 +198,8 @@ class PayController extends Controller {
             'out_trade_no' => $pay_info['ordernum'],
             'total_amount' => $pay_info['price'],
             'subject' => $pay_info['body'],
-            'passback_params' => $attach
+            'passback_params' => $attach,
+            'extend_params' => $attach,
         ];
 
 //
@@ -239,7 +240,12 @@ class PayController extends Controller {
      */
     public function OrderFind(Request $request) {
         $id = $request->input('id', 0);
-        $orderData = Order::find($id);
+        $type = $request->input('type',0);
+        if($type == 8){
+            $orderData = MallOrder::find($id);
+        }else{
+            $orderData = Order::find($id);
+        }
         if (!$orderData) {
             return $this->error(0, '订单有误');
         }
@@ -251,11 +257,29 @@ class PayController extends Controller {
                 $config = Config('wechat.payment.default');
                 $app = Factory::payment($config);
                 $res = $app->order->queryByOutTradeNumber($orderData['ordernum']); //"商户系统内部的订单号（out_trade_no）"
+                if($res['return_code'] == 'SUCCESS'){
+                    if($res['trade_state'] == 'SUCCESS'){
+                        $res['pay_type'] = 2;
+                    }
+                }else{
+                    return $res;
+                }
+
             } elseif ($orderData['pay_type'] == 3) {
                 //支付宝
                 $config = Config('pay.alipay');
                 $res = Pay::alipay($config)->find(['out_trade_no' => $orderData['ordernum']]);
+                dd($res);
+                $res = json_decode(json_encode($res),true);
+                if($res['trade_status'] == 'TRADE_SUCCESS'){
+                    $res['pay_type'] = 3;
+                }else{
+                    return $res;
+                }
             }
+
+            //todo 临时用
+            WechatPay::PayStatusUp($res);
 
             return $this->success($res);
         } catch (\Exception $e) {

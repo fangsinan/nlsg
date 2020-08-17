@@ -60,7 +60,6 @@ class WechatPay extends Controller
 
     public static function mallOrder($data)
     {
-
         $myfile = fopen("pay_cb.txt", "a+") or die("Unable to open file!");
         $txt = date('Y-m-d H:i:s') . " 微信\r\n".json_encode($data) ."\r\n";
         fwrite($myfile, $txt);
@@ -88,7 +87,7 @@ class WechatPay extends Controller
         $order_res = $order_obj->save();
         if (!$order_res) {
             DB::rollBack();
-            return ['code' => false, 'msg' => '修改订单状态错误'];
+            return false;
         }
 
         //添加支付记录
@@ -103,7 +102,7 @@ class WechatPay extends Controller
         $pr_res = $payRecordModel->save();
         if (!$pr_res) {
             DB::rollBack();
-            return ['code' => false, 'msg' => '修改支付记录错误'];
+            return false;
         }
 
         //如果是拼团订单  需要查看拼团订单是否成功
@@ -114,7 +113,7 @@ class WechatPay extends Controller
                 ->first();
             if (!$temp_data) {
                 DB::rollBack();
-                return ['code' => false, 'msg' => '拼团信息错误'];
+                return false;
             }
             $group_buy_id = $temp_data->group_buy_id;
             $sp_info = DB::table('nlsg_special_price')
@@ -136,13 +135,14 @@ class WechatPay extends Controller
                 );
                 if (!$gb_res) {
                     DB::rollBack();
-                    return ['code' => false, 'msg' => '拼团信息错误'];
+                    return false;
                 }
             }
         }
 
         //收益表
-        $order_details = MallOrderDetails::where('order_id', '=', $order_obj->id)->first();
+        $order_details = MallOrderDetails::where('order_id', '=', $order_obj->id)->get();
+
         foreach ($order_details as $od_v) {
 
             if ($od_v->inviter) {
@@ -164,16 +164,15 @@ class WechatPay extends Controller
                     $stay_res = DB::table('nlsg_pay_record_detail_stay')->insert($temp_stay_data);
                     if (!$stay_res) {
                         DB::rollBack();
-                        return ['code' => false, 'msg' => '推客记录错误'];
+                        return false;
                     }
                 }
 
             }
 
         }
-
         DB::commit();
-        return ['code' => true, 'msg' => '修改成功'];
+        return true;
     }
 
     //微信购买专栏问题
