@@ -75,7 +75,8 @@ class PayController extends Controller {
         $trade_type = 'APP';
         if($is_h5 == 1){
             $trade_type = 'MWEB';
-
+        }else{
+            $pay_info['openid'] = '';
         }
 
         $result = $app->order->unify([
@@ -84,7 +85,7 @@ class PayController extends Controller {
             'total_fee' => $pay_info['price']*100,
             'trade_type' => $trade_type, // 请对应换成你的支付方式对应的值类型
             'attach' => $attach,
-//            'openid' => $pay_info['openid'],
+            'openid' => $pay_info['openid'],
         ]);
         if($is_h5 == 1){
             //h5  直接返回
@@ -152,7 +153,7 @@ class PayController extends Controller {
             'body' => $body,
             'price' => $OrderInfo['price'],
             'ordernum' => $OrderInfo['ordernum'],
-//            'openid' => $userInfo['openid'],
+            'openid' => $userInfo['openid'],
         ];
     }
 
