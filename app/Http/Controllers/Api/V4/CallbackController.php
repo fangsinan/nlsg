@@ -18,6 +18,13 @@ class CallbackController extends Controller
         $app = Factory::payment($config);
         $response = $app->handlePaidNotify(function ($message, $fail) {
             // 你的逻辑
+
+            $myfile = fopen("pay_cb.txt", "a+") or die("Unable to open file!");
+            $txt = date('Y-m-d H:i:s') . " 微信\r\n".json_encode($message) ."\r\n";
+            fwrite($myfile, $txt);
+            fclose($myfile);
+
+
             $data = [
                 'out_trade_no'      => $message['out_trade_no'], //获取订单号
                 'total_fee'         => $message['total_fee']/100, //价格
@@ -55,6 +62,11 @@ class CallbackController extends Controller
             // 4、验证app_id是否为该商户本身。
             // 5、其它业务逻辑情况
 
+            $myfile = fopen("pay_cb.txt", "a+") or die("Unable to open file!");
+            $txt = date('Y-m-d H:i:s') . " 微信\r\n".json_encode($res_data) ."\r\n";
+            fwrite($myfile, $txt);
+            fclose($myfile);
+            
             $data = [
                 'out_trade_no' => $res_data['out_trade_no'], //获取订单号
                 'total_fee' => $res_data['total_amount'],    //价格
