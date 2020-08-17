@@ -49,6 +49,8 @@ class PayController extends Controller {
         //1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放 8商城
         $attach = $request->input('type', 0);
         $order_id = $request->input('id', 0);
+        $is_h5 = $request->input('is_h5', 0);
+
 
         if (empty($order_id) || empty($attach)) { //订单id有误
             return $this->error(0, '订单信息为空');
@@ -70,11 +72,15 @@ class PayController extends Controller {
 //    'attach' => $attach,
 //    'openid' => $pay_info['openid'],
 //]);
+        $trade_type = 'APP';
+        if($is_h5 == 1){
+            $trade_type = 'JSAPI';
+        }
         $result = $app->order->unify([
             'body' => $pay_info['body'],
             'out_trade_no' => $pay_info['ordernum'],
             'total_fee' => $pay_info['price']*100,
-            'trade_type' => 'APP', // 请对应换成你的支付方式对应的值类型
+            'trade_type' => $trade_type, // 请对应换成你的支付方式对应的值类型
             'attach' => $attach,
             'openid' => $pay_info['openid'],
         ]);

@@ -22,7 +22,7 @@ class CallbackController extends Controller
                 'out_trade_no'      => $message['out_trade_no'], //获取订单号
                 'total_fee'         => $message['total_fee']/100, //价格
                 'transaction_id'    => $message['transaction_id'], //交易单号
-                'attach'            => $message['passback_params'],
+                'attach'            => $message['attach'],
                 'pay_type'          => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
             ];
             $res = WechatPay::PayStatusUp($data);
