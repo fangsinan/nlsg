@@ -60,6 +60,12 @@ class WechatPay extends Controller
 
     public static function mallOrder($data)
     {
+
+        $myfile = fopen("pay_cb.txt", "a+") or die("Unable to open file!");
+        $txt = date('Y-m-d H:i:s') . " 微信\r\n".json_encode($data) ."\r\n";
+        fwrite($myfile, $txt);
+        fclose($myfile);
+
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         //$ordernum = substr($data['out_trade_no'], 0, -5);
