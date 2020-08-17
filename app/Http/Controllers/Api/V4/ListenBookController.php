@@ -110,7 +110,7 @@ class ListenBookController extends Controller
         $works_data['category_name'] = $category->CategoryName->name ??'';
 
         $is_sub = Subscribe::isSubscribe($user_id,$listen_id,2);
-
+        $works_data['is_sub'] = $is_sub;
 
         $infoObj = new WorksInfo();
         $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,'',$order);
