@@ -116,6 +116,8 @@ class PayController extends Controller {
                 $body = "能量时光-线下课购买-" . $OrderInfo['ordernum'];
             } else if ($attach == 8) {
                 $body = "能量时光-电商订单-" . $OrderInfo['ordernum'];
+                //todo 临时:商城支付一分
+                $OrderInfo['price'] = 0.01;
             }
         } else {
             return false;
