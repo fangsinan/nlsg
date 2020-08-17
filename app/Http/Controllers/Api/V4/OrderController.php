@@ -64,7 +64,7 @@ class OrderController extends Controller
     }
      */
     public function getCoupon(Request $request){
-        $price = $request->input('price',99);
+        $price = $request->input('price',0);
         $type  = $request->input('type',0);
         $user_id = $this->user['id'] ?? 0;//->input('user_id',0);
         $where_type = [0];
@@ -76,7 +76,7 @@ class OrderController extends Controller
            'user_id'=> $user_id,
         ])->whereIn('type',$where_type)
         ->where('end_time','>=',time())
-        ->where('full_cut','>=',$price)->get();
+        ->where('full_cut','<=',$price)->get();
         return $this->success($coupon);
     }
 
