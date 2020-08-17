@@ -3,6 +3,7 @@
 
 namespace App\Servers;
 
+use App\Models\MallCategory;
 use App\Models\MallGoods;
 use App\Models\MallSku;
 use App\Models\MallSkuValue;
@@ -320,5 +321,9 @@ class GoodsServers
         return $query->with($with)->select($field)->paginate($size);
     }
 
+    public function categoryList(){
+        $model = new MallCategory();
+        return $model->getAllList();
+    }
 
 }
