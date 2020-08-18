@@ -239,6 +239,16 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
         Route::post('user/followed', 'UserController@followed');
         Route::post('user/unfollow', 'UserController@unfollow');
         Route::get('user/statistics', 'UserController@statistics');
+
+        //商城开始
+        Route::post('shopping_cart/create', 'ShoppingCartController@create');
+        Route::get('shopping_cart/get_list', 'ShoppingCartController@getList');
+        Route::put('shopping_cart/status_change', 'ShoppingCartController@statusChange');
+        Route::get('address/get_data', 'AddressController@getData');
+        Route::post('address/create', 'AddressController@create');
+        Route::get('address/get_list', 'AddressController@getList');
+        Route::put('address/status_change', 'AddressController@statusChange');
+        //商城结束
     });
 });
 
