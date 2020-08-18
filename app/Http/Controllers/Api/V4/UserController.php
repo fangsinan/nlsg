@@ -502,7 +502,7 @@ class UserController extends Controller
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiParam  {number} user_id  用户id
+     * @apiParam  {number} user_id  用户id 【我的 不用传user_id】
      *
      * @apiSuccessExample 成功响应:
      *
@@ -561,11 +561,11 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/follower 他关注的人
+     * @api {get} api/v4/user/follower 他关注的人 
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiParam  {number} user_id  用户id
+     * @apiParam  {number} user_id  用户id [我的 不用传user_id】
      *
      * @apiSuccessExample 成功响应:
      *
