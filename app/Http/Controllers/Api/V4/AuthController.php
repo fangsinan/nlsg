@@ -11,7 +11,7 @@ class AuthController extends Controller
 {
 
     /**
-     * @api {get} api/v4/auth/login  登录
+     * @api {POST} api/v4/auth/login  登录
      * @apiVersion 4.0.0
      * @apiName  login
      * @apiGroup Auth
