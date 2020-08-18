@@ -889,7 +889,7 @@ class MallController extends Controller
     public function collect(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $goods_id = $request->input('goods_id', 0);
         $model = new MallGoods();
@@ -941,7 +941,7 @@ class MallController extends Controller
     public function sub(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $goods_id = $request->input('goods_id', 0);
         $sku_number = $request->input('sku_number', '');
@@ -967,7 +967,7 @@ class MallController extends Controller
     public function redeemCode(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $model = new RedeemCode();
         $data = $model->redeem($request->input(), $this->user);

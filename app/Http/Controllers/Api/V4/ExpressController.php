@@ -59,7 +59,7 @@ class ExpressController extends Controller
     public function getPostInfo(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
 
         $params['express_id'] = $request->input('express_id', 0);
@@ -110,7 +110,7 @@ class ExpressController extends Controller
     public function companyList()
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $model = new ExpressCompany();
         $data = $model->companyList();

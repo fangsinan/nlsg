@@ -71,7 +71,7 @@ class AfterSalesController extends Controller
     public function goodsList(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $params = $request->input();
         $model = new MallRefundRecord();
@@ -101,7 +101,7 @@ class AfterSalesController extends Controller
     public function createOrder(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $params = $request->input();
         $model = new MallRefundRecord();
@@ -175,7 +175,7 @@ class AfterSalesController extends Controller
     public function list(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $params = $request->input();
         $model = new MallRefundRecord();
@@ -329,7 +329,7 @@ class AfterSalesController extends Controller
     public function orderInfo(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $params = $request->input();
         $model = new MallRefundRecord();
@@ -371,7 +371,7 @@ class AfterSalesController extends Controller
     public function statusChange(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $flag = $request->input('flag', '');
         if (empty($flag)) {
@@ -424,7 +424,7 @@ class AfterSalesController extends Controller
     public function refundPost(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $params = $request->input();
         $model = new MallRefundRecord();
