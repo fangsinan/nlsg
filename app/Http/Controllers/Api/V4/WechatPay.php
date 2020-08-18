@@ -61,20 +61,16 @@ class WechatPay extends Controller
     public static function mallOrder($data)
     {
         $myfile = fopen("pay_cb.txt", "a+") or die("Unable to open file!");
-        $txt = date('Y-m-d H:i:s') . " 微信\r\n".json_encode($data) ."\r\n";
+        $txt = date('Y-m-d H:i:s') . " \r\n" . json_encode($data) . "\r\n";
         fwrite($myfile, $txt);
         fclose($myfile);
+
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         //$ordernum = substr($data['out_trade_no'], 0, -5);
         $ordernum = $data['out_trade_no'];
-        if($data['pay_type']==3){
-            $pay_price = $data['total_amount'];
-            $transaction_id = $data['trade_no'];
-        }else{
-            $pay_price = $data['total_fee'];
-            $transaction_id = $data['transaction_id'];
-        }
+        $pay_price = $data['total_fee'];
+        $transaction_id = $data['transaction_id'];
 
         $order_obj = MallOrder::where('ordernum', '=', $ordernum)
             ->where('status', '=', 1)->first();
@@ -628,18 +624,17 @@ class WechatPay extends Controller
     }
 
 
-
     //打赏
     public static function Areward($data)
     {
 
 
-        $time           = time();
+        $time = time();
         //$out_trade_no   = substr($data['out_trade_no'], 0, -5);
-        $out_trade_no   = $data['out_trade_no'];
-        $total_fee      = $data['total_fee'];
+        $out_trade_no = $data['out_trade_no'];
+        $total_fee = $data['total_fee'];
         $transaction_id = $data['transaction_id'];
-        $pay_type       = $data['pay_type'];
+        $pay_type = $data['pay_type'];
 
 
         //支付处理正确-判断是否已处理过支付状态
@@ -662,8 +657,6 @@ class WechatPay extends Controller
                 $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
 
 
-
-
                 //添加支付记录
                 $record = [
                     'ordernum' => $out_trade_no, //订单编号
@@ -676,7 +669,6 @@ class WechatPay extends Controller
                     'status' => 1                         //收入
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
-
 
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
@@ -699,7 +691,6 @@ class WechatPay extends Controller
             return true;
         }
     }
-
 
 
     // 苹果端 能量币充值
@@ -765,7 +756,6 @@ class WechatPay extends Controller
             return true;
         }
     }
-
 
 
     public static function UserBalance($pay_type, $user_id, $price, $edit = '-')
