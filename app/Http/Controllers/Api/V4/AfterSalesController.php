@@ -70,9 +70,6 @@ class AfterSalesController extends Controller
      */
     public function goodsList(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->goodsList($params, $this->user);
@@ -100,9 +97,6 @@ class AfterSalesController extends Controller
      */
     public function createOrder(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->createOrder($params, $this->user);
@@ -174,9 +168,6 @@ class AfterSalesController extends Controller
      */
     public function list(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->list($params, $this->user);
@@ -328,9 +319,6 @@ class AfterSalesController extends Controller
      */
     public function orderInfo(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->orderInfo($params, $this->user);
@@ -370,9 +358,6 @@ class AfterSalesController extends Controller
      */
     public function statusChange(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $flag = $request->input('flag', '');
         if (empty($flag)) {
             return $this->error(0, '参数错误');
@@ -423,9 +408,6 @@ class AfterSalesController extends Controller
      */
     public function refundPost(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->refundPost($params, $this->user);

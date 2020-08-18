@@ -159,10 +159,6 @@ class MallOrderController extends Controller
      */
     public function prepareCreateOrder(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
-
         $params['from_cart'] = $request->input('from_cart', 9);
         $params['sku'] = $request->input('sku', '');
         $params['goods_id'] = $request->input('goods_id', 0);
@@ -236,12 +232,6 @@ class MallOrderController extends Controller
         $params['bill_title'] = $request->input('bill_title', '');
         $params['bill_number'] = $request->input('bill_number', '');
         $params['bill_format'] = $request->input('bill_format', 2);
-
-//        $params = $request->input();
-
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $model = new MallOrder();
         $data = $model->createOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
@@ -392,10 +382,6 @@ class MallOrderController extends Controller
      */
     public function prepareCreateFlashSaleOrder(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
-
         $params['sku'] = $request->input('sku', '');
         $params['goods_id'] = $request->input('goods_id', 0);
         $params['buy_num'] = $request->input('buy_num', 0);
@@ -459,11 +445,6 @@ class MallOrderController extends Controller
         $params['bill_number'] = $request->input('bill_number', '');
         $params['bill_format'] = $request->input('bill_format', 2);
 
-//        $params = $request->input();
-
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $model = new MallOrderFlashSale();
         $data = $model->createFlashSaleOrder($params, $this->user);
         if (($data['code'] ?? true) === false) {
@@ -624,10 +605,6 @@ class MallOrderController extends Controller
      */
     public function prepareCreateGroupBuyOrder(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
-
         $params['sku'] = $request->input('sku', '');
         $params['goods_id'] = $request->input('goods_id', 0);
         $params['buy_num'] = $request->input('buy_num', 0);
@@ -697,10 +674,6 @@ class MallOrderController extends Controller
      */
     public function createGroupBuyOrder(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
-
         $params['sku'] = $request->input('sku', '');
         $params['goods_id'] = $request->input('goods_id', 0);
         $params['buy_num'] = $request->input('buy_num', 0);
@@ -754,10 +727,6 @@ class MallOrderController extends Controller
     {
         $m = new MallOrder();
         $m->orderPaySuccess([]);
-
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $order_id = $request->input('order_id', 0);
         if (empty($order_id)) {
             return $this->error(0, '参数错误');
@@ -942,10 +911,6 @@ class MallOrderController extends Controller
     function list(Request $request)
     {
         $params = $request->input();
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
-
         $model = new MallOrder();
         $data = $model->userOrderList($params, $this->user);
 
@@ -1133,9 +1098,6 @@ class MallOrderController extends Controller
      */
     public function orderInfo(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $ordernum = $request->input('ordernum', 0);
         $model = new MallOrder();
         $data = $model->orderInfo($this->user['id'], $ordernum);
@@ -1210,10 +1172,6 @@ class MallOrderController extends Controller
     public function listOfGroupBuy(Request $request)
     {
         $params = $request->input();
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
-
         $model = new MallOrderGroupBuy();
         $data = $model->userOrderList($params, $this->user);
 
@@ -1416,9 +1374,6 @@ class MallOrderController extends Controller
      */
     public function groupBuyOrderInfo(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $ordernum = $request->input('ordernum', 0);
         $model = new MallOrderGroupBuy();
         $data = $model->orderInfo($this->user['id'], $ordernum);
@@ -1444,9 +1399,6 @@ class MallOrderController extends Controller
      */
     public function statusChange(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $flag = $request->input('flag', '');
         if (empty($flag)) {
             return $this->error(0, '参数错误');
@@ -1501,9 +1453,6 @@ class MallOrderController extends Controller
      */
     public function commentList(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $model = new MallOrder();
         $data = $model->commentList($this->user['id'], $request->input());
         if (($data['code'] ?? true) === false) {
@@ -1552,9 +1501,6 @@ class MallOrderController extends Controller
      */
     public function subComment(Request $request)
     {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $params = $request->input();
         $model = new MallOrder();
         $data = $model->subComment($params, $this->user);
@@ -1591,10 +1537,6 @@ class MallOrderController extends Controller
      */
     public function getComment(Request $request)
     {
-
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $comment_id = $request->input('comment_id', 0);
         $model = new MallComment();
         $data = $model->getComment($comment_id, $this->user);

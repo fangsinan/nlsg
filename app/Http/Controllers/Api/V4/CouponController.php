@@ -30,10 +30,6 @@ class CouponController extends Controller {
     public function getCoupon(Request $request) {
         $params = $request->input();
 
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
-
         if (empty($params['flag'] ?? 0)) {
             return $this->error(0, '参数错误');
         }

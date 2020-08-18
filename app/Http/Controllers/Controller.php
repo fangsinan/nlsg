@@ -47,14 +47,4 @@ class Controller extends BaseController
         ];
         return response()->json($result);
     }
-
-    protected function notLogin(){
-        $result = [
-            'code' => 401,
-            'msg' => '未登录',
-            'now' => time(),
-            'data' => ''
-        ];
-        return response()->json($result);
-    }
 }

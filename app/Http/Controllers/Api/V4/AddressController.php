@@ -100,9 +100,6 @@ class AddressController extends Controller {
      */
     public function create(Request $request) {
         $params = $request->input();
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $model = new MallAddress();
         $data = $model->create($params, $this->user['id']);
         if (($data['code'] ?? true) === false) {
@@ -158,9 +155,6 @@ class AddressController extends Controller {
       }
      */
     public function getList(Request $request) {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $model = new MallAddress();
         $data = $model->getList($this->user['id'],$request->input('id',0));
         return $this->success($data);
@@ -193,9 +187,6 @@ class AddressController extends Controller {
       }
      */
     public function statusChange(Request $request) {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $flag = $request->input('flag', '');
         if (empty($flag)) {
             return $this->error(0, '参数错误');
@@ -248,9 +239,6 @@ class AddressController extends Controller {
       }
      */
     public function listOfShop(Request $request) {
-//        if (empty($this->user['id'] ?? 0)) {
-//            return $this->notLogin();
-//        }
         $flag = $request->input('flag', 0);
         if (!in_array($flag, [2, 3])) {
             return $this->error(0, '参数错误');
