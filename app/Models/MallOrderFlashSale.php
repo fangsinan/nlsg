@@ -22,8 +22,7 @@ class MallOrderFlashSale extends Base
 
     public function prepareCreateFlashSaleOrder($params, $user)
     {
-        $sku_list = $this->createFlashSaleOrderTool($params, $user);
-        return $sku_list;
+        return $this->createFlashSaleOrderTool($params, $user);
     }
 
     public function createFlashSaleOrder($params, $user)
@@ -275,7 +274,7 @@ class MallOrderFlashSale extends Base
                     return ['code' => false, 'msg' => '地址信息错误'];
                 }
             } else {
-                if ($address_list[0]) {
+                if ($address_list[0]??'') {
                     $used_address = $address_list[0]->toArray();
                 }
             }
@@ -297,7 +296,6 @@ class MallOrderFlashSale extends Base
             $used_address['area_name'] = MallAddress::getNameById($used_address['area']);
             $freight_free_flag = true;
         }
-
 
         //****************运费模板*********************
         if ($freight_free_flag === false) {

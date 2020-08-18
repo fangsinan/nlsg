@@ -19,4 +19,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('active/list', 'ActiveController@list');
     Route::post('active/binding', 'ActiveController@binding');
     Route::put('active/status_change', 'ActiveController@statusChange');
+
+    //特价管理
+    Route::post('special_price/add', 'SpecialPriceController@add');
+    Route::get('special_price/list', 'SpecialPriceController@list');
+    Route::put('special_price/status_change', 'SpecialPriceController@statusChange');
 });

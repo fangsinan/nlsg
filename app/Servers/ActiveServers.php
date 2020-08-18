@@ -105,67 +105,68 @@ class ActiveServers
 
     public function binding($params)
     {
-        if(empty($params)){
-            return ['code'=>false,'msg'=>'参数错误'];
+        if (empty($params)) {
+            return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $check_active = ActiveGroupGlModel::find($params['active_id']??0);
-        if(!$check_active){
-            return ['code'=>false,'msg'=>'活动id错误'];
+        $check_active = ActiveGroupGlModel::find($params['active_id'] ?? 0);
+        if (!$check_active) {
+            return ['code' => false, 'msg' => '活动id错误'];
         }
 
         DB::beginTransaction();
 
         //删除原有module和goods数据
-        $del_m_res = ActiveGroupGmlModel::where('aid','=',$params['active_id'])->delete();
-        if($del_m_res === false){
+        $del_m_res = ActiveGroupGmlModel::where('aid', '=', $params['active_id'])->delete();
+        if ($del_m_res === false) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'del module error'];
+            return ['code' => false, 'msg' => 'del module error'];
         }
-        $del_g_res = ActiveGroupGglModel::where('aid','=',$params['active_id'])->delete();
-        if($del_g_res === false){
+        $del_g_res = ActiveGroupGglModel::where('aid', '=', $params['active_id'])->delete();
+        if ($del_g_res === false) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'del goods error'];
+            return ['code' => false, 'msg' => 'del goods error'];
         }
 
-        foreach($params['module_list'] as $v){
-            if(empty($v['title']) || empty($v['goods_list'])){
-                return ['code'=>false,'msg'=>'module data error'];
+        foreach ($params['module_list'] as $v) {
+            if (empty($v['title']) || empty($v['goods_list'])) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => 'module data error'];
             }
 
             $m_model = new ActiveGroupGmlModel();
             $m_model->aid = $params['active_id'];
             $m_model->title = $v['title'];
             $m_model->status = 1;
-            $m_model->rank = $params['rank']??1;
+            $m_model->rank = $params['rank'] ?? 1;
             $m_res = $m_model->save();
-            if(!$m_res){
-                return ['code'=>false,'msg'=>'add module error'];
+            if (!$m_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => 'add module error'];
             }
 
             $g_data = [];
-            foreach($v['goods_list'] as $gv){
+            $now_date = date('Y-m-d H:i:s');
+            foreach ($v['goods_list'] as $gv) {
                 $temp = [];
                 $temp['aid'] = $params['active_id'];
-                $temp['mid'] = $m_res->id;
+                $temp['mid'] = $m_model->id;
                 $temp['goods_type'] = 1;
                 $temp['goods_id'] = $gv;
+                $temp['created_at'] = $temp['updated_at'] = $now_date;
+                $g_data[] = $temp;
             }
 
             $g_res = DB::table('nlsg_active_group_goods_lit')
                 ->insert($g_data);
-            if(!$g_res){
-
+            if (!$g_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => 'add goods error'];
             }
-
-
         }
 
-
-
-
-
-        return $params;
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
     }
 
     public function statusChange($params)
