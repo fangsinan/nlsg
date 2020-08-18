@@ -46,7 +46,9 @@ class UserController extends Controller
      * @apiSuccess {string}  works.cover_img     作品封面
      * @apiSuccess {string}  works.subscribe_num 作品订阅数
      * @apiSuccess {string}  works.original_price 作品价格
-     *
+     * @apiSuccess {string}  history        学习记录
+     * @apiSuccess {string}  history.relation_type  学习记录类型 1专栏   2课程   3讲座
+     * 
      * @apiSuccess {string}  column           专栏
      * @apiSuccess {string}  column.name      专栏名称
      * @apiSuccess {string}  column.title     专栏标题
@@ -117,12 +119,12 @@ class UserController extends Controller
         $user = User::select('id', 'nickname', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
             ->with([
                 'history' => function ($query) {
-                    $query->select(['id', 'user_id', 'relation_id'])
+                    $query->select(['id', 'user_id', 'relation_id','relation_type'])
                         ->limit(4)
                         ->orderBy('created_at', 'desc');
                 },
                 'history.columns:id,title,cover_pic',
-                'history.works:id,title,cover_img',
+                'history.works:id,title,cover_img,is_audio_book',
                 'works'   => function ($query) {
                     $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 0);
@@ -132,7 +134,7 @@ class UserController extends Controller
                         ->where('is_audio_book', 1);
                 },
                 'columns' => function ($query) {
-                    $query->select('user_id', 'name', 'title', 'subtitle', 'original_price','subscribe_num','cover_pic');
+                    $query->select('id','user_id', 'name', 'title', 'subtitle', 'original_price','subscribe_num','cover_pic');
                 },
 
             ])
@@ -500,7 +502,7 @@ class UserController extends Controller
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiParam  {number} user_id  用户id
+     * @apiParam  {number} user_id  用户id 【我的 不用传user_id】
      *
      * @apiSuccessExample 成功响应:
      *
@@ -537,6 +539,9 @@ class UserController extends Controller
     public function fan(Request $request)
     {
         $uid = $request->get('user_id');
+        if(!$uid){
+            $uid = $this->user['id'];
+        }
         $user = User::findOrFail($uid);
         if($user){
             $lists = UserFollow::with('toUser:id,nickname,headimg')
@@ -556,11 +561,11 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/follower 他关注的人
+     * @api {get} api/v4/user/follower 他关注的人 
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiParam  {number} user_id  用户id
+     * @apiParam  {number} user_id  用户id [我的 不用传user_id】
      *
      * @apiSuccessExample 成功响应:
      *
@@ -608,6 +613,9 @@ class UserController extends Controller
     public function follower(Request $request)
     {
         $uid = $request->get('user_id');
+        if(!$uid){
+            $uid = $this->user['id'];
+        }
         $user = User::findOrFail($uid);
         if($user){
             $lists = UserFollow::with('fromUser:id,nickname,headimg')

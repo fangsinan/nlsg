@@ -31,18 +31,30 @@ class WorksInfo extends Base
         foreach ($works_data as $key=>$val){
             //处理url  关注或试听
             $works_data[$key]['href_url'] = '';
+//            if( $is_sub == 1 || $val['free_trial'] == 1 ){
+//                $works_data[$key]['href_url'] = WorksInfo::GetWorksUrl ([
+//                    'callback_url3' => $val['callback_url3'],
+//                    'callback_url2' => $val['callback_url2'],
+//                    'callback_url1' => $val['callback_url1'],
+//                    'url' => $val['url'],
+//                ]);
+//            }
+//            unset($works_data[$key]['callback_url3']);
+//            unset($works_data[$key]['callback_url2']);
+//            unset($works_data[$key]['callback_url1']);
+//            unset($works_data[$key]['url']);
+
+
             if( $is_sub == 1 || $val['free_trial'] == 1 ){
-                $works_data[$key]['href_url'] = WorksInfo::GetWorksUrl ([
-                    'callback_url3' => $val['callback_url3'],
-                    'callback_url2' => $val['callback_url2'],
-                    'callback_url1' => $val['callback_url1'],
-                    'url' => $val['url'],
-                ]);
+                $works_data[$key]['href_url'] = $works_data[$key]['url'];
+
+            }else{
+                unset($works_data[$key]['callback_url3']);
+                unset($works_data[$key]['callback_url2']);
+                unset($works_data[$key]['callback_url1']);
             }
-            unset($works_data[$key]['callback_url3']);
-            unset($works_data[$key]['callback_url2']);
-            unset($works_data[$key]['callback_url1']);
             unset($works_data[$key]['url']);
+
 
             $works_data[$key]['time_leng'] = 0;
             $works_data[$key]['time_number'] = 0;
