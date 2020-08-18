@@ -66,10 +66,11 @@ class CallbackController extends Controller
             Log::debug('Alipay notify', $data->all());
             return $alipay->success();
         } catch (\Exception $e) {
-            // $e->getMessage();
+            Log::debug('Alipay notify', $e->getMessage());
+            $e->getMessage();
         }
 
-        return $alipay->success();// laravel 框架中请直接 `return $alipay->success()`
+        //return $alipay->success();// laravel 框架中请直接 `return $alipay->success()`
     }
 
 }
