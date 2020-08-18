@@ -47,7 +47,12 @@ class CallbackController extends Controller
 
         try{
             $res_data = $alipay->verify(); // 是的，验签就这么简单！
+            //元数据
+            Log::debug('Alipay notify', $res_data->all());
 
+
+
+            $res_data = $res_data->all();
             // 请自行对 trade_status 进行判断及其它逻辑进行判断，在支付宝的业务通知中，只有交易通知状态为 TRADE_SUCCESS 或 TRADE_FINISHED 时，支付宝才会认定为买家付款成功。
             // 1、商户需要验证该通知数据中的out_trade_no是否为商户系统中创建的订单号；
             // 2、判断total_amount是否确实为该订单的实际金额（即商户订单创建时的金额）；
@@ -63,7 +68,7 @@ class CallbackController extends Controller
             ];
             WechatPay::PayStatusUp($data);
 
-            Log::debug('Alipay notify', $data->all());
+            Log::debug('Alipay notify', $res_data->all());
             return $alipay->success();
         } catch (\Exception $e) {
             Log::debug('Alipay notify', $e->getMessage());
