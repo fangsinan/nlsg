@@ -48,7 +48,7 @@ class CallbackController extends Controller
         try{
             $res_data = $alipay->verify(); // 是的，验签就这么简单！
             //元数据
-            Log::debug('Alipay notify', $res_data->all());
+            Log::info('Alipay notify', $res_data->all());
 
 
 
@@ -68,7 +68,7 @@ class CallbackController extends Controller
             ];
             WechatPay::PayStatusUp($data);
 
-            Log::debug('Alipay notify', $res_data->all());
+//            Log::info('Alipay notify', $res_data->all());
             return $alipay->success();
         } catch (\Exception $e) {
             Log::debug('Alipay notify', $e->getMessage());
