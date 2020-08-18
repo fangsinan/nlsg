@@ -132,7 +132,7 @@ class UserController extends Controller
                         ->where('is_audio_book', 1);
                 },
                 'columns' => function ($query) {
-                    $query->select('user_id', 'name', 'title', 'subtitle', 'original_price','subscribe_num','cover_pic');
+                    $query->select('id','user_id', 'name', 'title', 'subtitle', 'original_price','subscribe_num','cover_pic');
                 },
 
             ])
