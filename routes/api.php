@@ -248,6 +248,18 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
         Route::post('address/create', 'AddressController@create');
         Route::get('address/get_list', 'AddressController@getList');
         Route::put('address/status_change', 'AddressController@statusChange');
+        Route::get('after_sales/list', 'AfterSalesController@list');
+        Route::get('after_sales/goods_list', 'AfterSalesController@goodsList');
+        Route::post('after_sales/create_order', 'AfterSalesController@createOrder');
+        Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');
+        Route::put('after_sales/status_change', 'AfterSalesController@statusChange');
+        Route::put('after_sales/refund_post', 'AfterSalesController@refundPost');
+        Route::post('goods/get_coupon', 'CouponController@getCoupon');
+        Route::get('post/get_info', 'ExpressController@getPostInfo');
+        Route::get('post/company_list', 'ExpressController@companyList');
+        Route::post('goods/collect', 'MallController@collect');
+        Route::post('goods/sub', 'MallController@sub');
+        Route::post('home/redeem_code', 'MallController@redeemCode');
         //商城结束
     });
 });
