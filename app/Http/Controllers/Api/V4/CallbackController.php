@@ -68,7 +68,6 @@ class CallbackController extends Controller
             ];
             WechatPay::PayStatusUp($data);
 
-//            Log::info('Alipay notify', $res_data->all());
             return $alipay->success();
         } catch (\Exception $e) {
             Log::debug('Alipay notify', $e->getMessage());
