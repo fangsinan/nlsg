@@ -348,7 +348,7 @@ class MallOrderGroupBuy extends Base
                     return ['code' => false, 'msg' => '地址信息错误'];
                 }
             } else {
-                if ($address_list[0]) {
+                if ($address_list[0]??'') {
                     $used_address = $address_list[0]->toArray();
                 }
             }

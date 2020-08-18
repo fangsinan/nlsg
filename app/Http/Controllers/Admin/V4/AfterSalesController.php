@@ -19,7 +19,15 @@ use App\servers\AfterSalesServers;
  */
 class AfterSalesController extends Controller {
 
-    //todo 售后列表和详情
+    /**
+     * 售后列表和详情
+     * @api {get} /api/admin_v4/after_sales/list 售后列表和详情
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/after_sales/list
+     * @apiGroup  后台-售后
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/after_sales/list
+     * @apiDescription 售后列表和详情
+     */
     public function list(Request $request) {
         $servers = new AfterSalesServers();
         $data = $servers->getList($request->input());

@@ -20,4 +20,10 @@ class ActiveGroupGmlModel extends Base
             ->get();
     }
 
+    public function goodsList()
+    {
+        return $this->hasMany('App\Models\ActiveGroupGglModel', 'mid', 'id')
+            ->select(['id','aid','mid','goods_type','goods_id']);
+    }
+
 }

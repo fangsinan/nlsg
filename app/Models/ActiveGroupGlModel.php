@@ -116,4 +116,10 @@ class ActiveGroupGlModel extends Base
             ->get();
     }
 
+    public function moduleList()
+    {
+        return $this->hasMany('App\Models\ActiveGroupGmlModel', 'aid', 'id')
+            ->where('status', '<>', 3)
+            ->select(['id','aid','title','status','rank']);
+    }
 }

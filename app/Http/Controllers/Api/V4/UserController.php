@@ -46,6 +46,7 @@ class UserController extends Controller
      * @apiSuccess {string}  works.cover_img     作品封面
      * @apiSuccess {string}  works.subscribe_num 作品订阅数
      * @apiSuccess {string}  works.original_price 作品价格
+     * @apiSuccess {string}  history        学习记录
      * @apiSuccess {string}  history.relation_type  学习记录类型 1专栏   2课程   3讲座
      * 
      * @apiSuccess {string}  column           专栏
@@ -501,7 +502,7 @@ class UserController extends Controller
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiParam  {number} user_id  用户id
+     * @apiParam  {number} user_id  用户id 【我的 不用传user_id】
      *
      * @apiSuccessExample 成功响应:
      *
@@ -538,6 +539,9 @@ class UserController extends Controller
     public function fan(Request $request)
     {
         $uid = $request->get('user_id');
+        if(!$uid){
+            $uid = $this->user['id'];
+        }
         $user = User::findOrFail($uid);
         if($user){
             $lists = UserFollow::with('toUser:id,nickname,headimg')
@@ -557,11 +561,11 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/follower 他关注的人
+     * @api {get} api/v4/user/follower 他关注的人 
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
-     * @apiParam  {number} user_id  用户id
+     * @apiParam  {number} user_id  用户id [我的 不用传user_id】
      *
      * @apiSuccessExample 成功响应:
      *
@@ -609,6 +613,9 @@ class UserController extends Controller
     public function follower(Request $request)
     {
         $uid = $request->get('user_id');
+        if(!$uid){
+            $uid = $this->user['id'];
+        }
         $user = User::findOrFail($uid);
         if($user){
             $lists = UserFollow::with('fromUser:id,nickname,headimg')
@@ -840,6 +847,37 @@ class UserController extends Controller
         }
 
         return $this->success($list);
+    }
+
+    /**
+     * @api {get} api/v4/user/statistics  我的数据统计
+     * @apiVersion 4.0.0
+     * @apiGroup user
+     *
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccess {string} notify_num  消息数量 >0 显示
+     * @apiSuccess {string} follow_num  关注数
+     * @apiSuccess {string} fan_num     粉丝数
+     * @apiSuccess {string} history_num  学习记录数
+     * @apiSuccessExample 成功响应:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": 
+     *  {
+     *       "notify_num": 1,
+     *      "follow_num": 2,
+     *       "fan_num": 2,
+     *      "history_num": 4
+     *   }
+     * }
+     */
+    public function  statistics()
+    {
+        $uid   = $this->user['id'];
+        $lists = User::select('notify_num','follow_num','fan_num','history_num')->find($uid)->toArray();
+        return success($lists);
     }
 
 

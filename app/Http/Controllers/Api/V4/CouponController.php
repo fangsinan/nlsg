@@ -17,7 +17,7 @@ class CouponController extends Controller {
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/get_coupon
      * @apiDescription 领取优惠券
      * @apiParam {string} flag 优惠券规则id(31,32,33)
-     * 
+     *
      * @apiSuccessExample {json} Request-Example:
      * {
       "code": 200,
@@ -31,7 +31,7 @@ class CouponController extends Controller {
         $params = $request->input();
 
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
 
         if (empty($params['flag'] ?? 0)) {
@@ -59,7 +59,7 @@ class CouponController extends Controller {
      * @apiParam {number=1,2,3} status 标识(1未用,2已用,3过期)
      * @apiParam {number} [page] page
      * @apiParam {number} [size] size
-     * 
+     *
      * @apiSuccess {string[]} count 数量统计
      * @apiSuccess {number} count.status_1 未用数量
      * @apiSuccess {number} count.status_2 已用数量

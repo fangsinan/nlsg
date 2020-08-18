@@ -160,7 +160,7 @@ class MallOrderController extends Controller
     public function prepareCreateOrder(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
 
         $params['from_cart'] = $request->input('from_cart', 9);
@@ -240,7 +240,7 @@ class MallOrderController extends Controller
 //        $params = $request->input();
 
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $model = new MallOrder();
         $data = $model->createOrder($params, $this->user);
@@ -393,7 +393,7 @@ class MallOrderController extends Controller
     public function prepareCreateFlashSaleOrder(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
 
         $params['sku'] = $request->input('sku', '');
@@ -462,7 +462,7 @@ class MallOrderController extends Controller
 //        $params = $request->input();
 
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $model = new MallOrderFlashSale();
         $data = $model->createFlashSaleOrder($params, $this->user);
@@ -625,7 +625,7 @@ class MallOrderController extends Controller
     public function prepareCreateGroupBuyOrder(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
 
         $params['sku'] = $request->input('sku', '');
@@ -698,7 +698,7 @@ class MallOrderController extends Controller
     public function createGroupBuyOrder(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
 
         $params['sku'] = $request->input('sku', '');
@@ -756,7 +756,7 @@ class MallOrderController extends Controller
         $m->orderPaySuccess([]);
 
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $order_id = $request->input('order_id', 0);
         if (empty($order_id)) {
@@ -943,7 +943,7 @@ class MallOrderController extends Controller
     {
         $params = $request->input();
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
 
         $model = new MallOrder();
@@ -1134,7 +1134,7 @@ class MallOrderController extends Controller
     public function orderInfo(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $ordernum = $request->input('ordernum', 0);
         $model = new MallOrder();
@@ -1211,7 +1211,7 @@ class MallOrderController extends Controller
     {
         $params = $request->input();
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
 
         $model = new MallOrderGroupBuy();
@@ -1417,7 +1417,7 @@ class MallOrderController extends Controller
     public function groupBuyOrderInfo(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $ordernum = $request->input('ordernum', 0);
         $model = new MallOrderGroupBuy();
@@ -1445,7 +1445,7 @@ class MallOrderController extends Controller
     public function statusChange(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $flag = $request->input('flag', '');
         if (empty($flag)) {
@@ -1502,7 +1502,7 @@ class MallOrderController extends Controller
     public function commentList(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $model = new MallOrder();
         $data = $model->commentList($this->user['id'], $request->input());
@@ -1553,7 +1553,7 @@ class MallOrderController extends Controller
     public function subComment(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $params = $request->input();
         $model = new MallOrder();
@@ -1593,7 +1593,7 @@ class MallOrderController extends Controller
     {
 
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $comment_id = $request->input('comment_id', 0);
         $model = new MallComment();

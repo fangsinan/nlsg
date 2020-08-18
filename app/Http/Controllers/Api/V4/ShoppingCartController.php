@@ -46,7 +46,7 @@ class ShoppingCartController extends Controller
     {
         $params = $request->input();
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $model = new ShoppingCart();
         $data = $model->create($params, $this->user['id']);
@@ -150,7 +150,7 @@ class ShoppingCartController extends Controller
     public function getList()
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $model = new ShoppingCart();
         $data = $model->getList($this->user);
@@ -186,7 +186,7 @@ class ShoppingCartController extends Controller
     public function statusChange(Request $request)
     {
         if (empty($this->user['id'] ?? 0)) {
-            return $this->error(0, '未登录');
+            return $this->notLogin();
         }
         $flag = $request->input('flag', '');
         if (empty($flag)) {
