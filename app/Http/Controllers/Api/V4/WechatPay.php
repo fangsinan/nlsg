@@ -379,7 +379,7 @@ class WechatPay extends Controller
                 }
                 $subscribe = [
                     'user_id' => $user_id, //会员id
-                    'pay_time' => $time, //支付时间
+                    'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
                     'type' => $sub_type,
                     'order_id' => $orderId, //订单id
                     'status' => 1,
