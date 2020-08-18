@@ -760,10 +760,14 @@ class UserController extends Controller
 
         if ($his_id == 'all') {
             $res = History::where('user_id', $user_id)->update(['is_del' => 1]);
+            User::where(['id'=>$user_id])->update(['history_num' => 0 ]);
+
         } else {
             $his_id = explode(',', $his_id);
             $res = History::where('user_id', $user_id)
                 ->whereIn('id', $his_id)->update(['is_del' => 1]);
+            User::where(['id'=>$user_id])->decrement('history_num',count($his_id));
+
         }
         if ($res) {
             return $this->success();

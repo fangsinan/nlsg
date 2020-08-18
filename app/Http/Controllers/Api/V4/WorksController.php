@@ -506,6 +506,8 @@ class WorksController extends Controller
             Works::where(['id'=>$relation_id])->increment('view_num');
         }
         if( empty($user_id) ) return $this->success();
+        // 学习记录数增一
+        User::where(['id'=>$user_id])->increment('history_num');
 
 
         History::firstOrCreate([
