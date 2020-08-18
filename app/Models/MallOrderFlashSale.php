@@ -30,9 +30,11 @@ class MallOrderFlashSale extends Base
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $data = $this->createFlashSaleOrderTool($params, $user, true);
+        $dead_time = ConfigModel::getData(19);
+        $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
 
-        if(!in_array($params['pay_type'],[1,2,3])){
-            return ['code' => false, 'msg' => '请选择支付方式','ps' => 'pay_type error'];
+        if (!in_array($params['pay_type'], [1, 2, 3])) {
+            return ['code' => false, 'msg' => '请选择支付方式', 'ps' => 'pay_type error'];
         }
 
         if (!($data['can_sub'] ?? false)) {
@@ -65,6 +67,7 @@ class MallOrderFlashSale extends Base
         $order_data['created_at'] = $now_date;
         $order_data['updated_at'] = $now_date;
         $order_data['sp_id'] = $data['sku_list']['flash_sale_id'];
+        $order_data['dead_time'] = $dead_time;
         $order_data['pay_type'] = $params['pay_type'];
 
         DB::beginTransaction();
@@ -274,7 +277,7 @@ class MallOrderFlashSale extends Base
                     return ['code' => false, 'msg' => '地址信息错误'];
                 }
             } else {
-                if ($address_list[0]??'') {
+                if ($address_list[0] ?? '') {
                     $used_address = $address_list[0]->toArray();
                 }
             }
@@ -360,7 +363,7 @@ class MallOrderFlashSale extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => ['coupon_freight' => $coupon_freight_list ?? []],
             'used_address' => $used_address,
-            'from_cart' => $params['from_cart']??2
+            'from_cart' => $params['from_cart'] ?? 2
         ];
 
         if ($params['post_type'] == 1 && empty($used_address)) {
