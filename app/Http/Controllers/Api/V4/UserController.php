@@ -539,6 +539,9 @@ class UserController extends Controller
     public function fan(Request $request)
     {
         $uid = $request->get('user_id');
+        if(!$uid){
+            $uid = $this->user['id'];
+        }
         $user = User::findOrFail($uid);
         if($user){
             $lists = UserFollow::with('toUser:id,nickname,headimg')
@@ -610,6 +613,9 @@ class UserController extends Controller
     public function follower(Request $request)
     {
         $uid = $request->get('user_id');
+        if(!$uid){
+            $uid = $this->user['id'];
+        }
         $user = User::findOrFail($uid);
         if($user){
             $lists = UserFollow::with('fromUser:id,nickname,headimg')
