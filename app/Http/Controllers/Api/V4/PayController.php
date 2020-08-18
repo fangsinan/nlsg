@@ -90,7 +90,7 @@ class PayController extends Controller {
             'attach' => $attach,
             'openid' => $pay_info['openid'],
         ]);
-        if($is_h5 == 1 || $is_h5 == 2){
+        if($is_h5 == 1 ){
             //h5  直接返回
             return $this->success($result);
         }
