@@ -238,6 +238,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
         Route::post('user/store', 'UserController@store');
         Route::post('user/followed', 'UserController@followed');
         Route::post('user/unfollow', 'UserController@unfollow');
+        Route::get('user/statistics', 'UserController@statistics');
     });
 });
 

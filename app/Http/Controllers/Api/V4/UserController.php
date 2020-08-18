@@ -767,10 +767,14 @@ class UserController extends Controller
 
         if ($his_id == 'all') {
             $res = History::where('user_id', $user_id)->update(['is_del' => 1]);
+            User::where(['id'=>$user_id])->update(['history_num' => 0 ]);
+
         } else {
             $his_id = explode(',', $his_id);
             $res = History::where('user_id', $user_id)
                 ->whereIn('id', $his_id)->update(['is_del' => 1]);
+            User::where(['id'=>$user_id])->decrement('history_num',count($his_id));
+
         }
         if ($res) {
             return $this->success();
@@ -843,6 +847,37 @@ class UserController extends Controller
         }
 
         return $this->success($list);
+    }
+
+    /**
+     * @api {get} api/v4/user/statistics  我的数据统计
+     * @apiVersion 4.0.0
+     * @apiGroup user
+     *
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccess {string} notify_num  消息数量 >0 显示
+     * @apiSuccess {string} follow_num  关注数
+     * @apiSuccess {string} fan_num     粉丝数
+     * @apiSuccess {string} history_num  学习记录数
+     * @apiSuccessExample 成功响应:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": 
+     *  {
+     *       "notify_num": 1,
+     *      "follow_num": 2,
+     *       "fan_num": 2,
+     *      "history_num": 4
+     *   }
+     * }
+     */
+    public function  statistics()
+    {
+        $uid   = $this->user['id'];
+        $lists = User::select('notify_num','follow_num','fan_num','history_num')->find($uid)->toArray();
+        return success($lists);
     }
 
 
