@@ -76,8 +76,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
 
 
     //微信回调
-    Route::get('wechat_pay/wechat_notify', 'CallbackController@WechatNotify');
-    Route::get('wechat_pay/ali_notify', 'CallbackController@AliNotify');
+    Route::post('wechat_pay/wechat_notify', 'CallbackController@WechatNotify');
+    Route::post('wechat_pay/ali_notify', 'CallbackController@AliNotify');
 
     //下单
     Route::post('order/create_column_order', 'OrderController@createColumnOrder');
