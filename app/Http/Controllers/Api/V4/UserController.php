@@ -117,7 +117,7 @@ class UserController extends Controller
         $user = User::select('id', 'nickname', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
             ->with([
                 'history' => function ($query) {
-                    $query->select(['id', 'user_id', 'relation_id'])
+                    $query->select(['id', 'user_id', 'relation_id','relation_type'])
                         ->limit(4)
                         ->orderBy('created_at', 'desc');
                 },
