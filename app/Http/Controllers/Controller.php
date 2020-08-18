@@ -50,7 +50,7 @@ class Controller extends BaseController
 
     protected function notLogin(){
         $result = [
-            'code' => 1000,
+            'code' => 401,
             'msg' => '未登录',
             'now' => time(),
             'data' => ''
