@@ -78,6 +78,7 @@ class PayController extends Controller {
         }else{
             $pay_info['openid'] = '';
         }
+        $pay_info['price'] = '0.01';
 
         $result = $app->order->unify([
             'body' => $pay_info['body'],
