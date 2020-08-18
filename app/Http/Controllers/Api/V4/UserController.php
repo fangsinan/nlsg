@@ -46,7 +46,8 @@ class UserController extends Controller
      * @apiSuccess {string}  works.cover_img     作品封面
      * @apiSuccess {string}  works.subscribe_num 作品订阅数
      * @apiSuccess {string}  works.original_price 作品价格
-     *
+     * @apiSuccess {string}  history.relation_type  学习记录类型 1专栏   2课程   3讲座
+     * 
      * @apiSuccess {string}  column           专栏
      * @apiSuccess {string}  column.name      专栏名称
      * @apiSuccess {string}  column.title     专栏标题
