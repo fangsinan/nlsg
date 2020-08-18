@@ -16,7 +16,7 @@ include __DIR__ . '/adminApi.php';
  */
 
 
-Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
+Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     //首页
     Route::get('index/announce', 'IndexController@announce');
@@ -232,7 +232,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
     Route::get('auth/wechat', 'AuthController@wechat');
 
 
-    Route::group(['middleware' => ['auth.jwt']], function() {
+    Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/base', 'UserController@base');
         Route::get('user/account', 'UserController@account');
         Route::post('user/store', 'UserController@store');
@@ -260,6 +260,21 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function() {
         Route::post('goods/collect', 'MallController@collect');
         Route::post('goods/sub', 'MallController@sub');
         Route::post('home/redeem_code', 'MallController@redeemCode');
+        Route::post('mall/prepare_create_order', 'MallOrderController@prepareCreateOrder');
+        Route::post('mall/create_order', 'MallOrderController@createOrder');
+        Route::post('mall/prepare_create_flash_sale_order', 'MallOrderController@prepareCreateFlashSaleOrder');
+        Route::post('mall/create_flash_sale_order', 'MallOrderController@createFlashSaleOrder');
+        Route::post('mall/flash_sale_pay_fail', 'MallOrderController@flashSalePayFail');
+        Route::post('mall/prepare_create_group_buy_order', 'MallOrderController@prepareCreateGroupBuyOrder');
+        Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');
+        Route::get('mall/order_list', 'MallOrderController@list');
+        Route::get('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');
+        Route::get('mall/comment_list', 'MallOrderController@commentList');
+        Route::get('mall/order_info', 'MallOrderController@orderInfo');
+        Route::get('mall/group_buy_order_info', 'MallOrderController@groupBuyOrderInfo');
+        Route::put('mall/status_change', 'MallOrderController@statusChange');
+        Route::post('mall/sub_comment', 'MallOrderController@subComment');
+        Route::get('mall/get_comment', 'MallOrderController@getComment');
         //商城结束
     });
 });
