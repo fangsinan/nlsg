@@ -122,7 +122,7 @@ class UserController extends Controller
                         ->orderBy('created_at', 'desc');
                 },
                 'history.columns:id,title,cover_pic',
-                'history.works:id,title,cover_img',
+                'history.works:id,title,cover_img,is_audio_book',
                 'works'   => function ($query) {
                     $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 0);
