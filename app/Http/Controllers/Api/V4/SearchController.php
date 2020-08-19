@@ -18,7 +18,7 @@ class SearchController extends Controller
      * @apiName index
      * @apiVersion 1.0.0
      * @apiGroup search
-     *
+     * @apiParam {string} flag   类型(商品:only_goods)
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
