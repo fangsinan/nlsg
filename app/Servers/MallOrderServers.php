@@ -339,21 +339,27 @@ class MallOrderServers
                         'ps' => $v['order_id'] . ' ex error'];
                 }
             }
-            //todo order_detail发货
-            $temp_obj = new MallOrderChild();
-            $temp_obj->order_id = $v['order_id'];
-            $temp_obj->order_detail_id = $v['order_detail_id'];
-            $temp_obj->express_info_id = $express_info_id;
-            $child_res = $temp_obj->save();
+            //order_detail发货
+            $check_oc = MallOrderChild::where('order_id', '=', $v['order_id'])
+                ->where('order_detail_id', '=', $v['order_detail_id'])
+                ->first();
+            if ($check_oc) {
+                $check_oc->express_info_id = $express_info_id;
+            } else {
+                $check_oc = new MallOrderChild();
+                $check_oc->order_id = $v['order_id'];
+                $check_oc->order_detail_id = $v['order_detail_id'];
+                $check_oc->express_info_id = $express_info_id;
+            }
+            $child_res = $check_oc->save();
+
             if (!$child_res) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '错误', 'ps' => 'child error'];
             }
-
-
-            DB::commit();
-            return ['code' => true, 'msg' => '成功'];
         }
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
     }
 
 }
