@@ -119,6 +119,28 @@ class AuthController extends Controller
     }
 
     /**
+     * 绑定手机号
+     * 
+     */
+    public function bind(Request $request)
+    {
+        if($this->user['phone']){
+            return error(1000,'已绑定手机');
+        }
+        $phone = $request->input('phone');
+        
+        $list = User::where('phone', $phone)->first();
+        if($list){
+            return error(1000,'手机号码已经绑定，请更换手机号');
+        }
+        $res   = User::where('id', $this->user['id'])->update(['phone'=>$phone]);
+        if($res){
+            return success('绑定成功');
+        }
+
+    }
+
+    /**
      * @api {get} api/v4/auth/wechat 微信授权
      * @apiVersion 4.0.0
      * @apiName  wechat
