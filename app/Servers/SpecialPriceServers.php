@@ -33,6 +33,8 @@ class SpecialPriceServers
         $field[] = 'wx_share_desc';
         $field[] = 'lace_img';
 
+        $field = ['*'];
+
         $query->orderBy('id', 'desc');
 
         return $query->with($with)->select($field)->paginate($size);

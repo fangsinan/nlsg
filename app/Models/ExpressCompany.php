@@ -125,6 +125,9 @@ class ExpressCompany extends Base
         }
 
         $data = $this->toQuery($params['express_num'], $express_type);
+        if(empty($data)){
+            return json_decode($check->history, true);
+        }
         $data['express_phone'] = ExpressCompany::onlyGetName($params['express_id'], 3);
 
         if (!empty($data)) {
@@ -137,6 +140,26 @@ class ExpressCompany extends Base
             ExpressInfo::where('express_id', '=', $params['express_id'])
                 ->where('express_num', '=', $params['express_num'])
                 ->update($update_data);
+
+
+            //修改child表
+            if($data['deliverystatus'] == 3){
+                $ei_id = ExpressInfo::where('express_id', '=', $params['express_id'])
+                    ->where('express_num', '=', $params['express_num'])
+                    ->select(['id'])
+                    ->get();
+                if(!$ei_id->isEmpty()){
+                    $ei_id = $ei_id->toArray();
+                    $ei_id = array_column($ei_id,'id');
+
+                    MallOrderChild::whereIn('express_info_id',$ei_id)
+                        ->update([
+                            'status'=>2,
+                            'receipt_at'=>date('Y-m-d H:i:s')
+                        ]);
+
+                }
+            }
 
             return $data;
         } else {

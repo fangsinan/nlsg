@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 class SearchController extends Controller
 {
     /**
-     * @api {post} /api/v4/search/index   全局搜索 热词
+     * @api {get} /api/v4/search/index   全局搜索 热词
      * @apiName index
      * @apiVersion 1.0.0
      * @apiGroup search
@@ -74,7 +74,7 @@ class SearchController extends Controller
     }
 
     /**
-     * @api {post} /api/v4/search/search   全局搜索
+     * @api {get} /api/v4/search/search   全局搜索
      * @apiName search
      * @apiVersion 1.0.0
      * @apiGroup search
