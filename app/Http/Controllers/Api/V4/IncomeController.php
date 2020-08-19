@@ -784,7 +784,7 @@ class IncomeController extends Controller
         //计算总支出和总收入
         $res['expenditure_price']   = PayRecord::where(['user_id'=>$user_id,'status'=>2])->whereIn('order_type',[7,8,9,12])->sum('price');
         $res['income_price']        = PayRecordDetail::where('user_id',$user_id)->whereIn('type',[2,5,6,7,8,9,10])->sum('price');
-        $res['list'] = $list;
+        $res['list'] = $list['data'];
         return $this->success( $res );
     }
 
