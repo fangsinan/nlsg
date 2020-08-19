@@ -217,7 +217,7 @@ class WechatPay extends Controller
                 $couponRst = 1;
                 //消除优惠券
                 if ($coupon_id > 0) {
-                    $couponRst = Coupon::where('id', $coupon_id)->update(['status' => 2, 'used_time' => $time]);
+                    $couponRst = Coupon::where('id', $coupon_id)->update(['status' => 2, 'used_time' => date("Y-m-d H:i:s",$time)]);
                 }
                 $phoneRst = 1;
                 //防止短信发送不成功
@@ -589,7 +589,7 @@ class WechatPay extends Controller
                     'type' => 2, //作品
                     'status' => 1,
                     'relation_id' => $works_id, //精品课
-                    'order' => $orderId, //订单id
+                    'order_id' => $orderId, //订单id
                     'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
                     'service_id' => $orderInfo['service_id'],
                 ];
