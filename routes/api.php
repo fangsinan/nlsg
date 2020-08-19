@@ -50,7 +50,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('works/get_works_category', 'WorksController@getWorksCategoryTeacher');
     Route::get('works/get_works_content', 'WorksController@getWorksContent');
     Route::get('works/get_works_index', 'WorksController@getWorksIndex');
-    Route::post('works/subscribe', 'WorksController@subscribe');
     Route::get('works/works_category_data', 'WorksController@worksCategory');
 
 
@@ -79,30 +78,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('wechat_pay/wechat_notify', 'CallbackController@WechatNotify');
     Route::post('wechat_pay/ali_notify', 'CallbackController@AliNotify');
 
-    //下单
-    Route::post('order/create_column_order', 'OrderController@createColumnOrder');
-    Route::post('order/create_works_order', 'OrderController@createWorksOrder');
-    Route::post('order/create_reward_order', 'OrderController@createRewardOrder');
-    Route::post('order/create_coin_order', 'OrderController@createCoinOrder');
 
-    Route::get('order/get_coupon', 'OrderController@getCoupon');
-    Route::get('order/order_list', 'OrderController@orderList');
-    Route::get('order/order_detail', 'OrderController@orderDetail');
-    Route::get('order/close_order', 'OrderController@closeOrder');
     //生成海报
     Route::get('create/create_poster', 'CreatePosterController@CreatePoster');
 
-    //钱包
-    Route::get('income/index', 'IncomeController@index');
-    Route::get('income/profit', 'IncomeController@profit');
-    Route::post('income/cash_data', 'IncomeController@cashData');
-    Route::get('income/present', 'IncomeController@present');
-    Route::get('income/withdrawals', 'IncomeController@withdrawals');
-    Route::get('income/get_withdraw', 'IncomeController@getWithdraw');
-    Route::get('income/get_list', 'IncomeController@getList');
-    Route::get('income/detail', 'IncomeController@Detail');
-    Route::get('income/get_deposit', 'IncomeController@getOrderDepositHistory');
-    Route::get('income/send_invoice', 'IncomeController@sendInvoice');
 
 
     //*******************************商城部分开始*******************************
@@ -280,6 +259,45 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('mall/sub_comment', 'MallOrderController@subComment');
         Route::get('mall/get_comment', 'MallOrderController@getComment');
         //商城结束
+
+
+
+
+        //虚拟订单  str
+
+        //下单
+        Route::post('order/create_column_order', 'OrderController@createColumnOrder');
+        Route::post('order/create_works_order', 'OrderController@createWorksOrder');
+        Route::post('order/create_reward_order', 'OrderController@createRewardOrder');
+        Route::post('order/create_coin_order', 'OrderController@createCoinOrder');
+
+        Route::get('order/get_coupon', 'OrderController@getCoupon');
+        Route::get('order/order_list', 'OrderController@orderList');
+        Route::get('order/order_detail', 'OrderController@orderDetail');
+        Route::get('order/close_order', 'OrderController@closeOrder');
+
+        Route::post('works/subscribe', 'WorksController@subscribe');
+
+        //虚拟订单  end
+
+
+
+
+        //钱包
+        Route::get('income/index', 'IncomeController@index');
+        Route::get('income/profit', 'IncomeController@profit');
+        Route::post('income/cash_data', 'IncomeController@cashData');
+        Route::get('income/present', 'IncomeController@present');
+        Route::get('income/withdrawals', 'IncomeController@withdrawals');
+        Route::get('income/get_withdraw', 'IncomeController@getWithdraw');
+        Route::get('income/get_list', 'IncomeController@getList');
+        Route::get('income/detail', 'IncomeController@Detail');
+        Route::get('income/get_deposit', 'IncomeController@getOrderDepositHistory');
+        Route::get('income/send_invoice', 'IncomeController@sendInvoice');
+
+
+
+
     });
 });
 
