@@ -90,18 +90,32 @@ class PayController extends Controller {
             'attach' => $attach,
             'openid' => $pay_info['openid'],
         ]);
-        if($is_h5 == 1 ){
-            //h5  直接返回
-            return $this->success($result);
-        }
+
 
         if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
-            $result = $app->jssdk->appConfig($result['prepay_id']);//第二次签名
-            return $this->success($result);
+            if($is_h5 == 1 ){
+                //h5  直接返回
+                return $this->success($result);
+            }else if($is_h5 == 2){
+                $result = $app->jssdk->bridgeConfig($result['prepay_id'],false);//第二次签名
+                return $this->success($result);
+            }else{
+                $result = $app->jssdk->appConfig($result['prepay_id']);//第二次签名
+                return $this->success($result);
+            }
         }else{
             Log::error('微信支付签名失败:'.var_export($result,1));
             return false;
         }
+
+//        if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
+//            $result = $app->jssdk->appConfig($result['prepay_id']);//第二次签名
+//
+//            return $this->success($result);
+//        }else{
+//            Log::error('微信支付签名失败:'.var_export($result,1));
+//            return false;
+//        }
 
 //        $result['partnerid']=$config = Config('wechat.payment.default.mch_id');
 //        $result['package']='Sign=WXPay';
