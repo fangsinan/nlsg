@@ -63,7 +63,7 @@ class PayController extends Controller {
         }
         $config = Config('wechat.payment.default');
 
-        if($is_h5 == 2){ // 公众号openid
+        if($is_h5 == 1 || $is_h5 == 2 ){ // 公众号openid
             $config = Config('wechat.payment.wx_wechat');
         }
         $app = Factory::payment($config);
