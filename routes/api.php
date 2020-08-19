@@ -218,6 +218,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('user/fan', 'UserController@fan');
     Route::get('user/follower', 'UserController@follower');
 
+    Route::post('auth/bind', 'AuthController@bind');
+    
     //历史记录
     Route::get('user/history', 'UserController@history');
     Route::get('user/clear_history', 'UserController@clearHistory');
