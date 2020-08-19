@@ -90,6 +90,8 @@ class MallComment extends Base {
         return $res;
     }
 
+
+
     public function getComment($comment_id, $user) {
         $data = MallComment::where('user_id', '=', $user['id'])
                 ->select(['id', 'content', 'picture', 'star', 'status', 'issue_type'])
@@ -98,6 +100,13 @@ class MallComment extends Base {
         if (empty($data)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
+
+        $order_data = MallOrderDetails::where('comment_id','=',$comment_id)
+            ->with(['goodsInfo','skuInfo','skuInfo.sku_value_list'])
+            ->select(['goods_id','sku_number'])
+            ->first();
+
+        $data['info'] = $order_data;
 
         if (empty($data->picture)) {
             $data->picture = [];

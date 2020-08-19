@@ -401,4 +401,22 @@ class SpecialPriceModel extends Base
         }
     }
 
+    public function skuInfo()
+    {
+        return $this->hasOne('App\Models\MallSku', 'sku_number', 'sku_number')
+            ->select(['id','sku_number','picture','stock','status']);
+    }
+
+    public function goodsInfo(){
+        return $this->hasOne('App\Models\MallGoods', 'id', 'goods_id')
+            ->select(['id','name','subtitle','status']);
+    }
+
+
+    public function spSkuList()
+    {
+        return $this->hasMany('App\Models\SpecialPriceModel', 'group_name', 'group_name')
+            ->where('status','<>',3)
+            ->select(['sku_number','group_name']);
+    }
 }
