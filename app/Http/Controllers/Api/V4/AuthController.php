@@ -109,7 +109,7 @@ class AuthController extends Controller
 
         $token = auth('api')->login($user);;
         $data = [
-            'phone'    => $user->phone,
+            'phone'    => $user->phone ?? '',
             'token'    => $token
         ];
         return success($data);
