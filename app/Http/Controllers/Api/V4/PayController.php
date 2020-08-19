@@ -50,7 +50,7 @@ class PayController extends Controller {
         $attach = $request->input('type', 0);
         $order_id = $request->input('id', 0);
         $is_h5 = $request->input('is_h5', 0);
-        $openid = $request->input('openid', '');
+        $openid = $request->input('open_id', '');
 
 
         if (empty($order_id) || empty($attach)) { //订单id有误
