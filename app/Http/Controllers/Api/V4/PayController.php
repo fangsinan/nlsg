@@ -50,6 +50,7 @@ class PayController extends Controller {
         $attach = $request->input('type', 0);
         $order_id = $request->input('id', 0);
         $is_h5 = $request->input('is_h5', 0);
+        $openid = $request->input('openid', '');
 
 
         if (empty($order_id) || empty($attach)) { //订单id有误
@@ -72,12 +73,17 @@ class PayController extends Controller {
 //    'attach' => $attach,
 //    'openid' => $pay_info['openid'],
 //]);
+
+        if($openid){  //如果传参的话  优先用传递的openid
+            $pay_info['openid'] = $openid;
+        }
         $trade_type = 'APP';
         if($is_h5 == 1){
             $trade_type = 'MWEB';
         }else if($is_h5 == 2){
             $trade_type = 'JSAPI';
         }else{
+            //app 支付不需要openid
             $pay_info['openid'] = '';
         }
         $pay_info['price'] = '0.01';
@@ -105,7 +111,8 @@ class PayController extends Controller {
             }
         }else{
             Log::error('微信支付签名失败:'.var_export($result,1));
-            return false;
+            return $this->error(0,$result['err_code_des']);
+
         }
 
 //        if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
