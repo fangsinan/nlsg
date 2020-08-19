@@ -103,7 +103,7 @@ class AuthController extends Controller
                 'province' => $input['province'],
                 'city'     => $input['city'],
                 'headimg'  => $input['headimg'] ?? '',
-                'unionid'  => $input['unionid']
+                'unionid'  => $input['unionid'] ?? ''
             ]);
         }
 
