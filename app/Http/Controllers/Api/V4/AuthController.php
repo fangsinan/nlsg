@@ -109,10 +109,7 @@ class AuthController extends Controller
 
         $token = auth('api')->login($user);;
         $data = [
-            'nickname' => $user->nickname,
-            'sex'      => $user->sex,
-            'province' => $user->province,
-            'city'     => $user->city,
+            'phone'    => $user->phone,
             'token'    => $token
         ];
         return success($data);
@@ -124,9 +121,6 @@ class AuthController extends Controller
      */
     public function bind(Request $request)
     {
-        if($this->user['phone']){
-            return error(1000,'已绑定手机');
-        }
         $phone = $request->input('phone');
         
         $list = User::where('phone', $phone)->first();
