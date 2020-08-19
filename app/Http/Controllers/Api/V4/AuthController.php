@@ -92,6 +92,32 @@ class AuthController extends Controller
         return success();
     }
 
+    public function  wechat(Request $request)
+    {
+        $input   = $request->all();
+        $user = User::where('unionid', $input['unionid'])->first();
+        if (!$user) {
+            $user = User::create([
+                'nickname' => $input['nickname'] ?? '',
+                'sex'      => $input['sex'] =='男' ? 1 : 2,
+                'province' => $input['province'],
+                'city'     => $input['city'],
+                'headimg'  => $input['headimg'] ?? '',
+                'unionid'  => $input['unionid'] ?? ''
+            ]);
+        }
+
+        $token = auth('api')->login($user);;
+        $data = [
+            'nickname' => $user->nickname,
+            'sex'      => $user->sex,
+            'province' => $user->province,
+            'city'     => $user->city,
+            'token'    => $token
+        ];
+        return success($data);
+    }
+
     /**
      * @api {get} api/v4/auth/wechat 微信授权
      * @apiVersion 4.0.0
@@ -111,7 +137,7 @@ class AuthController extends Controller
      *   }
      *
      */
-    public function wechat(Request $request)
+    public function wechat2(Request $request)
     {
         $code = $request->input('code');
         if ( ! $code) {
