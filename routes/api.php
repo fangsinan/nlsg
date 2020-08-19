@@ -83,6 +83,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('order/create_column_order', 'OrderController@createColumnOrder');
     Route::post('order/create_works_order', 'OrderController@createWorksOrder');
     Route::post('order/create_reward_order', 'OrderController@createRewardOrder');
+    Route::get('order/create_coin_order', 'OrderController@createCoinOrder');
+
     Route::get('order/get_coupon', 'OrderController@getCoupon');
     Route::get('order/order_list', 'OrderController@orderList');
     Route::get('order/order_detail', 'OrderController@orderDetail');

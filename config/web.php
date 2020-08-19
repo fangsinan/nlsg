@@ -20,4 +20,18 @@ return [
         'Test_User'=>[],//测试账号id
     ],
 
+    //能量币类型
+    'coin_arr' => [
+        'merchant.NLSGApplePay.6nlb' => 6,
+        'merchant.NLSGApplePay.30nlb' => 30,
+        'merchant.NLSGApplePay.68nlb' => 68,
+        'merchant.NLSGApplePay.98nlb' => 98,
+        'merchant.NLSGApplePay.128nlb' => 128,
+        'merchant.NLSGApplePay.198nlb' => 198,
+        'merchant.NLSGApplePay.298nlb' => 298,
+        'merchant.NLSGApplePay.488nlb' => 488,
+        'merchant.NLSGApplePay.998nlb' => 998,
+    ],
+
+
 ];
