@@ -83,6 +83,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('order/create_column_order', 'OrderController@createColumnOrder');
     Route::post('order/create_works_order', 'OrderController@createWorksOrder');
     Route::post('order/create_reward_order', 'OrderController@createRewardOrder');
+    Route::post('order/create_coin_order', 'OrderController@createCoinOrder');
+
     Route::get('order/get_coupon', 'OrderController@getCoupon');
     Route::get('order/order_list', 'OrderController@orderList');
     Route::get('order/order_detail', 'OrderController@orderDetail');
@@ -218,6 +220,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('user/fan', 'UserController@fan');
     Route::get('user/follower', 'UserController@follower');
 
+    Route::post('auth/bind', 'AuthController@bind');
+    
     //历史记录
     Route::get('user/history', 'UserController@history');
     Route::get('user/clear_history', 'UserController@clearHistory');

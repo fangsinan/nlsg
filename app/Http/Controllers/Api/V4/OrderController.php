@@ -345,6 +345,63 @@ class OrderController extends Controller
 
 
 
+    /**
+     * @api {post} /api//v4/order/create_coin_order //能量币充值（ios支付使用）
+     * @apiName create_coin_order
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} coin_id    能量币代码 如：merchant.NLSGApplePay.6nlb
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": { }
+    }
+     */
+    function createCoinOrder(Request $request) {
+
+        $coin_arr = Config('web.coin_arr');
+        $user_id = $this->user['id'] ?? 0;
+        $coin_id = $request->input('coin_id','');
+
+        if (empty($user_id)) {
+            return $this->error(0,'用户id有误');
+
+        }
+
+        $price = $coin_arr[$coin_id];
+        if (empty($coin_id) || empty($coin_arr[$coin_id])) {
+            return $this->error(0,'产品id有误');
+        }
+        $loginUserInfo = User::find($user_id);
+        if (empty($loginUserInfo)) {
+            return $this->error(0,'用户有误');
+        }
+
+        //处理订单
+        $ordernum = MallOrder::createOrderNumber($user_id,3);
+        $data = [
+            'ordernum'      => $ordernum,
+            'type' => 13,
+            'user_id' => $user_id,
+            'price' => $price,        //打赏金额
+            'pay_type'=>4,   //1 微信端 2app微信 3app支付宝 4ios
+            'os_type'=>2,    //只有ios支持能量币
+        ];
+
+        $rst = Order::firstOrCreate($data);
+        if ($rst) {
+            return $this->success($data['ordernum']);
+        } else {
+            return $this->error(0,'添加失败');
+        }
+    }
+
+
+
 
     /**
      * @api {get} /api/v4/order/order_list  订单列表

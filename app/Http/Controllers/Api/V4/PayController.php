@@ -50,7 +50,7 @@ class PayController extends Controller {
         $attach = $request->input('type', 0);
         $order_id = $request->input('id', 0);
         $is_h5 = $request->input('is_h5', 0);
-        $openid = $request->input('openid', '');
+        $openid = $request->input('open_id', '');
 
 
         if (empty($order_id) || empty($attach)) { //订单id有误
@@ -61,8 +61,11 @@ class PayController extends Controller {
         if ($pay_info == false) {
             return $this->error(0, '订单信息错误');
         }
-
         $config = Config('wechat.payment.default');
+
+        if($is_h5 == 1 || $is_h5 == 2 ){ // 公众号openid
+            $config = Config('wechat.payment.wx_wechat');
+        }
         $app = Factory::payment($config);
 
 //dd([
@@ -80,6 +83,7 @@ class PayController extends Controller {
         $trade_type = 'APP';
         if($is_h5 == 1){
             $trade_type = 'MWEB';
+            $pay_info['openid'] = '';
         }else if($is_h5 == 2){
             $trade_type = 'JSAPI';
         }else{
