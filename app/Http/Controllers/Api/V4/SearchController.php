@@ -63,7 +63,13 @@ class SearchController extends Controller
     */
     public function index(Request $request)
     {
-        $hot_search = Search::groupBy('keywords')->orderBy('num','desc')->limit(6)->get();
+        $flag = $request->input('flag','');
+        if($flag == 'only_goods'){
+            $hot_search = \App\Models\ConfigModel::getData(20);
+            $hot_search = explode(',',$hot_search);
+        }else{
+            $hot_search = Search::groupBy('keywords')->orderBy('num','desc')->limit(6)->get();
+        }
         return $this->success($hot_search);
     }
 
