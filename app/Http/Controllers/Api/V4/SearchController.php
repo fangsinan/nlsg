@@ -74,6 +74,7 @@ class SearchController extends Controller
      * @apiGroup search
      *
      * @apiParam {int} keywords   关键字
+     * @apiParam {string} flag   类型(商品:only_goods)
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -404,21 +405,29 @@ class SearchController extends Controller
     {
         $keywords = $request->input('keywords','');
         $user_id = $request->input('user_id',0);
+        $flag = $request->input('flag','');
 
         if( empty($keywords) ){
             return $this->error(0,'关键字为空');
         }
-        //搜索专栏
-        $res['column'] = Column::search($keywords,1);
-        //课程
-        $res['works'] = Works::search($keywords,0);
-        //讲座
-        $res['lecture'] = Column::search($keywords,2);
-        //听书
-        $res['listen_book'] = Works::search($keywords,1);
-        //用户
-        //商品
-        $res['goods'] = MallGoods::search($keywords);
+
+        if($flag == 'only_goods'){
+            //商品
+            $res['goods'] = MallGoods::search($keywords);
+        }else{
+            //搜索专栏
+            $res['column'] = Column::search($keywords,1);
+            //课程
+            $res['works'] = Works::search($keywords,0);
+            //讲座
+            $res['lecture'] = Column::search($keywords,2);
+            //听书
+            $res['listen_book'] = Works::search($keywords,1);
+            //用户
+            //商品
+            $res['goods'] = MallGoods::search($keywords);
+        }
+
 
         //搜索入库
         $SearchData = Search::firstOrCreate([
