@@ -61,8 +61,11 @@ class PayController extends Controller {
         if ($pay_info == false) {
             return $this->error(0, '订单信息错误');
         }
-
         $config = Config('wechat.payment.default');
+
+        if($is_h5 == 2){ // 公众号openid
+            $config = Config('wechat.payment.wx_wechat');
+        }
         $app = Factory::payment($config);
 
 //dd([
