@@ -178,11 +178,11 @@ class MallRefundRecord extends Base
             $data['picture'] = implode(',',$data['picture']);
         }
 
+        $data['num'] = $params['num'] ?? 0;
+
         if ($type == 2) {
             //退货
             $data['order_detail_id'] = $order_detail_id;
-
-            $data['num'] = $params['num'] ?? 0;
             if ($data['num'] == 0 || $data['num'] > $get_data->num) {
                 return ['code' => false, 'msg' => '数量错误', 'ps' => 'num'];
             }
