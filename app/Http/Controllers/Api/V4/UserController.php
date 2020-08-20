@@ -881,7 +881,7 @@ class UserController extends Controller
     public function  statistics()
     {
         $uid   = $this->user['id'];
-        $lists = User::select('nickname','headimg','phone','is_author','notify_num','follow_num','fan_num','history_num')
+        $lists = User::select('id','nickname','headimg','phone','is_author','notify_num','follow_num','fan_num','history_num')
                 ->find($uid)
                 ->toArray();
         return success($lists);
