@@ -648,7 +648,7 @@ class IncomeController extends Controller
      *
      * @apiParam {int} user_id
      * @apiParam {int} earn_type 1支出 2收入
-     * @apiParam {int} type 收支类型 earn_type=1时type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现]
+     * @apiParam {int} type 收支类型 earn_type=1时type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现  18能量币充值]
      *                             earn_type=2时 type 2：用户专栏分享提成 5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画 10直播分享收益
      * @apiParam {int} date 格式化的时间精确到月
      *
@@ -704,8 +704,8 @@ class IncomeController extends Controller
         //现在只显示 提现和个税  用户分享收益     2：用户专栏分享提成  5电商推客收益  6专栏推客收益 7精品课 8会员 9沙画  12
         if($earn_type == 1){
             //earn_type==1时    type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现]
-            $order_type_val = [7,8,9,12];//默认全部查询
-            if( !empty($type) &&  in_array($type,[7,8,9,12]) ){
+            $order_type_val = [7,8,9,12,18];//默认全部查询
+            if( !empty($type) &&  in_array($type,[7,8,9,12,18]) ){
                 $order_type_val = [$type];
             }
 
@@ -767,6 +767,9 @@ class IncomeController extends Controller
                     case 9:$val['content'] = '代扣个税';
                         $val['pay_content'] = '扣税成功';
                         break;
+                    case 18:$val['content'] = '能量币充值';
+                        $val['pay_content'] = '充值成功';
+                        break;
                 }
             }else{
                 //2：用户专栏分享提成    5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画
@@ -781,7 +784,7 @@ class IncomeController extends Controller
         //计算总支出和总收入
         $res['expenditure_price']   = PayRecord::where(['user_id'=>$user_id,'status'=>2])->whereIn('order_type',[7,8,9,12])->sum('price');
         $res['income_price']        = PayRecordDetail::where('user_id',$user_id)->whereIn('type',[2,5,6,7,8,9,10])->sum('price');
-        $res['list'] = $list;
+        $res['list'] = $list['data'];
         return $this->success( $res );
     }
 

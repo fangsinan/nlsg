@@ -217,7 +217,7 @@ class WechatPay extends Controller
                 $couponRst = 1;
                 //消除优惠券
                 if ($coupon_id > 0) {
-                    $couponRst = Coupon::where('id', $coupon_id)->update(['status' => 2, 'used_time' => $time]);
+                    $couponRst = Coupon::where('id', $coupon_id)->update(['status' => 2, 'used_time' => date("Y-m-d H:i:s",$time)]);
                 }
                 $phoneRst = 1;
                 //防止短信发送不成功
@@ -589,7 +589,7 @@ class WechatPay extends Controller
                     'type' => 2, //作品
                     'status' => 1,
                     'relation_id' => $works_id, //精品课
-                    'order' => $orderId, //订单id
+                    'order_id' => $orderId, //订单id
                     'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
                     'service_id' => $orderInfo['service_id'],
                 ];
@@ -705,6 +705,7 @@ class WechatPay extends Controller
 
         //支付处理正确-判断是否已处理过支付状态
         $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
             $starttime = strtotime(date('Y-m-d', $time));
@@ -718,26 +719,27 @@ class WechatPay extends Controller
                 //更新订单状态
                 $data = [
                     'status' => 1,
-                    'pay_time' => $time,
+                    'pay_time' => date('Y-0m-d H:i:s', $time),
                     'pay_price' => $total_fee,
                     'pay_type' => $pay_type,
                 ];
                 $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data);
+
                 //添加支付记录
                 $record_type = self::$pay_record_type[$data['pay_type']] ?? 1;
 
                 $record = [
                     'ordernum' => $out_trade_no, //订单编号
                     'price' => $total_fee, //支付金额
-                    'ctime' => $time, //支付时间
                     'transaction_id' => $transaction_id, //流水号
                     'user_id' => $user_id, //会员id
                     'type' => $pay_type, //1：微信  2：支付宝
-                    'client' => $data['client'], //app微信
+                    //'client' => $data['client'], //app微信
                     'order_type' => 18, //能量币充值
                     'status' => 1                   //收入
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
+
                 //添加账户余额
                 $userRst = User::where('id', $user_id)->increment('ios_balance', $total_fee);
                 if ($orderRst && $recordRst && $userRst) {
