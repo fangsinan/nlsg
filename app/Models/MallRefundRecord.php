@@ -333,6 +333,7 @@ class MallRefundRecord extends Base
                     $temp_sku = json_decode($vv->sku_history);
                     $temp['num'] = $temp_sku->actual_num;
                     $temp['price'] = $temp_sku->actual_price;
+                    $temp['sku_info'] = $temp_sku;
                     $temp_data[] = $temp;
                 }
             } else {
@@ -345,6 +346,7 @@ class MallRefundRecord extends Base
                     $temp_sku = json_decode($vv->sku_history);
                     $temp['num'] = $v->num;
                     $temp['price'] = $temp_sku->actual_price;
+                    $temp['sku_info'] = $temp_sku;
                     $temp_data[] = $temp;
                 }
             }
