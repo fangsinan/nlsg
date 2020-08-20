@@ -337,7 +337,8 @@ class MallRefundRecord extends Base
                     $temp['subtitle'] = $vv->goodsInfo->subtitle;
                     $temp['picture'] = $vv->goodsInfo->picture;
                     $temp_sku = json_decode($vv->sku_history);
-                    $temp['num'] = $temp_sku->actual_num;
+                    //$temp['num'] = $temp_sku->actual_num;
+                    $temp['num'] = $v->num;
                     $temp['price'] = $temp_sku->actual_price;
                     $temp['sku_value'] = $temp_sku->sku_value;
                     $temp_data[] = $temp;
