@@ -119,9 +119,11 @@ class ExpressCompany extends Base
         }
 
         //30分钟内只能查询一次
-        $updated_at = strtotime($check->updated_at);
-        if (($updated_at + 1800) > time()) {
-            return json_decode($check->history, true);
+        if($check->updated_at !== $check->created_at){
+            $updated_at = strtotime($check->updated_at);
+            if (($updated_at + 1800) > time()) {
+                return json_decode($check->history, true);
+            }
         }
 
         $data = $this->toQuery($params['express_num'], $express_type);

@@ -810,6 +810,7 @@ class MallOrderGroupBuy extends Base
             $temp_odv['picture'] = $odv['goods_info']['picture'];
             $temp_odv['subtitle'] = $odv['goods_info']['subtitle'];
             $temp_odv['details_id'] = $odv['details_id'];
+            $temp_odv['order_details_id'] = $odv['details_id'];
             $temp_odv['comment_id'] = $odv['comment_id'];
             $temp_odv['sku_number'] = $odv['sku_number'];
             $odv = $temp_odv;
