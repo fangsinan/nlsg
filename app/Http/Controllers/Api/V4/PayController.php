@@ -494,7 +494,7 @@ class PayController extends Controller {
                 return $this->error(0, '当前产品不支持能量币支付');
             }
         }
-        if (empty($orderNum)) {
+        if (empty($order)) {
             //商品不支持能量币支付
             return $this->error(0, '订单有误');
         }
