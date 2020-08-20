@@ -213,6 +213,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('auth/login', 'AuthController@login');
 
     Route::post('auth/wechat', 'AuthController@wechat');
+    Route::get('auth/switch', 'AuthController@switch');
 
 
     Route::group(['middleware' => ['auth.jwt']], function () {

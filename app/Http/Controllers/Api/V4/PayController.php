@@ -442,7 +442,7 @@ class PayController extends Controller {
      *
      * @apiParam {int} user_id user_id
      * @apiParam {int} order_id order_id
-     * @apiParam {int} pay_type 当类型为[1 专栏 2 会员 5 打赏  9精品课] 传1   类型为[1 月卡 2 季卡 3押金 4 违约金 5退押金]传2
+     * @apiParam {int} pay_type 当类型为[ 专栏  会员  打赏  精品课]时 传1   类型为[ 月卡  季卡 押金  违约金 退押金] 传2
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -494,7 +494,7 @@ class PayController extends Controller {
                 return $this->error(0, '当前产品不支持能量币支付');
             }
         }
-        if (empty($orderNum)) {
+        if (empty($order)) {
             //商品不支持能量币支付
             return $this->error(0, '订单有误');
         }

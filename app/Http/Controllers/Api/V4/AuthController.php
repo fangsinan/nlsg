@@ -107,7 +107,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = auth('api')->login($user);;
+        $token = auth('api')->login($user);
         $data = [
             'phone'    => $user->phone ?? '',
             'token'    => $token
@@ -116,13 +116,42 @@ class AuthController extends Controller
     }
 
     /**
+     *  微信登录开关
+     */
+    public function switch()
+    {
+        $data = [
+            'wechat' => 1
+        ];
+        return  success($data);
+
+    }
+
+
+    /**
      * 绑定手机号
      * 
      */
     public function bind(Request $request)
     {
         $phone = $request->input('phone');
-        
+        $code  = $request->input('code');
+
+        if ( ! $phone) {
+            return error(1000, '手机号不能为空');
+        }
+        if ( ! $code) {
+            return error(1000, '验证码不能为空');
+        }
+
+        $res = Redis::get($phone);
+        if ( ! $res) {
+            return error(1000, '验证码已过期');
+        }
+        if ($code !== $res) {
+            return error(1000, '验证码错误');
+        }
+
         $list = User::where('phone', $phone)->first();
         if($list){
             return error(1000,'手机号码已经绑定，请更换手机号');
