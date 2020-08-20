@@ -171,6 +171,11 @@ class MallRefundRecord extends Base
         $data['created_at'] = $now_date;
         $data['updated_at'] = $now_date;
         $data['pay_type'] = $get_data->pay_type;
+        $data['reason_id'] = $params['reason_id']??0;
+        $data['picture'] = $params['picture']??'';
+        if(is_array($data['picture'])){
+            $data['picture'] = implode(',',$data['picture']);
+        }
 
         if ($type == 2) {
             //退货
@@ -300,10 +305,10 @@ class MallRefundRecord extends Base
                 $query->whereIn('status', [50, 60])->where('user_cancel', '=', 0);
                 break;
             case 99:
-                $query->where('status', '=', 70)->where('user_cancel', '=', 0);
+                $query->where('user_cancel', '=', 1);
                 break;
             case 70:
-                $query->where('user_cancel', '=', 1);
+                $query->where('status', '=', 70)->where('user_cancel', '=', 0);
 //                $query->where(function($query) {
 //                    $query->where('user_cancel', '=', 1)
 //                            ->orWhere('status', '=', 70);

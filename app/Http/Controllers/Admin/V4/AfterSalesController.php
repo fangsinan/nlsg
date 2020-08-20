@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use App\servers\AfterSalesServers;
 
 /**
- * Description of AfterSalesController
+ * 售后模块
  *
  * @author wangxh
  */

@@ -55,40 +55,49 @@ class AfterSalesServers
             $query = new M2R();
         }
 
-        $query->where('status', '<>', 80)->whereIn('type', [1, 2]);
+        if(in_array($params['type'],[1,2])){
+            $query->where('type','=',$params['type']);
+        }else{
+            $query->where('type','=',1);
+        }
 
-        $query->select($field)->with($with);
+        $query->where('status', '<>', 80);
 
         //全部,待审核,待寄回,带鉴定,带退款,已完成,已取消
         //10:待审核  20:待寄回   30:待鉴定  40待退款  50:退款中 60:已退款  70:驳回
         //全部0  待审核10 待寄回20 待鉴定30 待退款40 已完成:50,60 已取消99(包含70)
         switch (intval($params['status'] ?? 0)) {
             case 10:
-                $query->where('status', '=', 10);
+                $query->where('status', '=', 10)->where('user_cancel', '=', 0);
                 break;
             case 20:
-                $query->where('status', '=', 20);
+                $query->where('status', '=', 20)->where('user_cancel', '=', 0);
                 break;
             case 30:
-                $query->where('status', '=', 30);
+                $query->where('status', '=', 30)->where('user_cancel', '=', 0);
                 break;
             case 40:
-                $query->where('status', '=', 40);
+                $query->where('status', '=', 40)->where('user_cancel', '=', 0);
                 break;
             case 50:
+                $query->where('status', '=', 50)->where('user_cancel', '=', 0);
+                break;
             case 60:
-                $query->whereIn('status', [50, 60]);
+                $query->where('status', '=', 60)->where('user_cancel', '=', 0);
+                break;
+            case 70:
+                $query->where('status', '=', 70)->where('user_cancel', '=', 0);
+//                $query->where(function ($query) {
+//                    $query->where('user_cancel', '=', 1)
+//                        ->orWhere('status', '=', 70);
+//                });
                 break;
             case 99:
-            case 70:
-                $query->where(function ($query) {
-                    $query->where('user_cancel', '=', 1)
-                        ->orWhere('status', '=', 70);
-                });
+                $query->where('user_cancel', '=', 1);
                 break;
         }
 
-        $list = $query->limit($size)->paginate($size);
+        $list = $query->select($field)->with($with)->limit($size)->paginate($size);
 
         //如果type=1  读取infoOrder   =2读取infoDetail
         foreach ($list as $k => $v) {
@@ -156,6 +165,14 @@ class AfterSalesServers
                     } else {
                         //只退款
                         $check->status = 40;
+
+                        //确定退款金额和任务
+                        if(empty($params['price'])){
+                            return ['code'=>false,'msg'=>'price参数错误'];
+                        }
+                        $check->price = $params['price'];
+                        $check->run_refund = 1;
+
                     }
                     $check->is_check_reject = 2;
                 } else {
@@ -163,11 +180,9 @@ class AfterSalesServers
                     $check->status = 70;
                     $check->is_check_reject = 1;
                 }
-
                 $check->pass_at = $now_date;
                 $check->check_reject_at = $now_date;
                 $check->check_remark = $params['remark'] ?? '';
-
                 $res = $check->save();
             } else {
                 return ['code' => false, 'msg' => '状态错误'];
@@ -178,6 +193,14 @@ class AfterSalesServers
                 $check->is_authenticate_reject = 2;
                 $check->authenticate_reject_at = $now_date;
                 $check->check_remark = $params['remark'] ?? '';
+
+                //确定退款金额和任务
+                if(empty($params['price'])){
+                    return ['code'=>false,'msg'=>'price参数错误'];
+                }
+                $check->price = $params['price'];
+                $check->run_refund = 1;
+
                 $res = $check->save();
             } else {
                 return ['code' => false, 'msg' => '状态错误'];
@@ -192,6 +215,4 @@ class AfterSalesServers
             return ['code' => false, 'msg' => '失败'];
         }
     }
-
-    //todo 退款动作
 }
