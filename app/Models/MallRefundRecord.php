@@ -247,7 +247,7 @@ class MallRefundRecord extends Base
 
         $field = ['id', 'service_num', 'order_id', 'order_detail_id',
             'type', 'num', 'cost_price', 'refe_price', 'price', 'status',
-            'user_cancel', 'user_cancel_time', 'created_at'];
+            'user_cancel', 'user_cancel_time', 'created_at', 'return_address_id'];
 
         $with = ['infoOrder',
             'infoOrder.infoOrderDetail',
@@ -315,14 +315,13 @@ class MallRefundRecord extends Base
 
         //如果type=1  读取infoOrder   =2读取infoDetail
         foreach ($list as $k => $v) {
+            $v->picture = explode(',', $v->picture);
             if ($v->user_cancel == 1 || $v->status == 70) {
                 $v->status = 99;
             }
-
             if ($v->status == 50 || $v->status == 60) {
                 $v->status = 60;
             }
-
             $temp_data = [];
             if ($v->type == 1) {
                 foreach ($v->infoOrder->infoOrderDetail as $vv) {
@@ -394,9 +393,20 @@ class MallRefundRecord extends Base
         $ftModel = new FreightTemplate();
         $freight_template_data = $ftModel->listOfShop(3);
 
+        $data->refund_address = new class {
+        };
         foreach ($freight_template_data as $v) {
             if ($v->id == $data->return_address_id) {
                 $data->refund_address = $v;
+            }
+        }
+
+        $refund_reason = ConfigModel::getData(15);
+        $refund_reason = json_decode($refund_reason, true);
+        $data->reason_name = '';
+        foreach ($refund_reason as $rrv) {
+            if ($data->reason_id == $rrv['id']) {
+                $data->reason_name = $rrv['value'];
             }
         }
 
@@ -407,20 +417,20 @@ class MallRefundRecord extends Base
 
         //拼接
         $header = [];
-        if(in_array($data->status,[40,50,60])){
-            $header[] = ['key' => '鉴定结果', 'value' =>'同意退款'];
-            if($data->authenticate_reject_at){
+        if (in_array($data->status, [40, 50, 60])) {
+            $header[] = ['key' => '鉴定结果', 'value' => '同意退款'];
+            if ($data->authenticate_reject_at) {
                 $header[] = ['key' => '鉴定时间', 'value' => $data->authenticate_reject_at];
             }
-            if($data->status == 50 && $data->refund_sub_at){
+            if ($data->status == 50 && $data->refund_sub_at) {
                 $header[] = ['key' => '完成时间', 'value' => $data->refund_sub_at];
             }
-            if($data->status == 60 && $data->succeed_at){
+            if ($data->status == 60 && $data->succeed_at) {
                 $header[] = ['key' => '完成时间', 'value' => $data->succeed_at];
             }
-            if($data->status == 40){
+            if ($data->status == 40) {
                 $header[] = ['key' => '退款金额', 'value' => $data->refe_price];
-            }else{
+            } else {
                 $header[] = ['key' => '退款金额', 'value' => $data->price];
             }
         }
