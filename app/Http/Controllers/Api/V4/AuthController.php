@@ -116,6 +116,19 @@ class AuthController extends Controller
     }
 
     /**
+     *  微信登录开关
+     */
+    public function switch()
+    {
+        $data = [
+            'wechat' => 1
+        ];
+        return  success($data);
+
+    }
+
+
+    /**
      * 绑定手机号
      * 
      */
