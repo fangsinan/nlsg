@@ -353,6 +353,7 @@ class MallRefundRecord extends Base
             if (!empty($v->expressInfo)) {
                 $v->expressInfo->history = json_decode($v->expressInfo->history);
             }
+            $v->ordernum = $v->infoOrder->ordernum;
             unset($list[$k]->infoOrder, $list[$k]->infoDetail);
         }
 
@@ -379,7 +380,7 @@ class MallRefundRecord extends Base
 
     public function orderInfo($params, $user)
     {
-        if(empty($params['id']??0)){
+        if (empty($params['id'] ?? 0)) {
             return ['code' => false, 'msg' => '参数错误', 'ps' => '未查询到售后单'];
         }
         $data = $this->list($params, $user);
@@ -399,10 +400,41 @@ class MallRefundRecord extends Base
             }
         }
 
-        $data['progress_bar'] = $this->createProgressBar($data->id, $data->expressInfo->history->list ?? []);
+        $data['progress_bar'] = $this->createProgressBar(
+            $data->id,
+            $data->expressInfo->history->list ?? []
+        );
 
+        //拼接
+        $header = [];
+        if(in_array($data->status,[40,50,60])){
+            $header[] = ['key' => '鉴定结果', 'value' =>'同意退款'];
+            if($data->authenticate_reject_at){
+                $header[] = ['key' => '鉴定时间', 'value' => $data->authenticate_reject_at];
+            }
+            if($data->status == 50 && $data->refund_sub_at){
+                $header[] = ['key' => '完成时间', 'value' => $data->refund_sub_at];
+            }
+            if($data->status == 60 && $data->succeed_at){
+                $header[] = ['key' => '完成时间', 'value' => $data->succeed_at];
+            }
+            if($data->status == 40){
+                $header[] = ['key' => '退款金额', 'value' => $data->refe_price];
+            }else{
+                $header[] = ['key' => '退款金额', 'value' => $data->price];
+            }
+        }
+
+        $footer = [
+            ['key' => '服务单号', 'value' => $data->service_num],
+            ['key' => '提交时间', 'value' => $data->created_at],
+            ['key' => '商品单号', 'value' => $data->ordernum],
+        ];
+
+        $data->header = $header;
+        $data->footer = $footer;
         //进度条
-        if($params['only_bar']??0 == 1){
+        if ($params['only_bar'] ?? 0 == 1) {
             $data = $data['progress_bar'];
         }
         return $data;
