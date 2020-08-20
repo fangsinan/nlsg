@@ -234,7 +234,7 @@ class MallRefundRecord extends Base
         }
 
         $rr_res = DB::table('nlsg_mall_refund_record')
-            ->insert($data);
+            ->insertGetId($data);
 
         if (!$rr_res) {
             DB::rollBack();
@@ -242,7 +242,7 @@ class MallRefundRecord extends Base
         }
 
         DB::commit();
-        return ['code' => true, 'msg' => '成功'];
+        return ['code' => true, 'msg' => '成功','id'=>$rr_res];
     }
 
     public function list($params, $user)
