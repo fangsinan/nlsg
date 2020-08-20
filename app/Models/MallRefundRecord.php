@@ -172,6 +172,7 @@ class MallRefundRecord extends Base
         $data['updated_at'] = $now_date;
         $data['pay_type'] = $get_data->pay_type;
         $data['reason_id'] = $params['reason_id']??0;
+        $data['description'] = $params['description']??'';
         $data['picture'] = $params['picture']??'';
         if(is_array($data['picture'])){
             $data['picture'] = implode(',',$data['picture']);

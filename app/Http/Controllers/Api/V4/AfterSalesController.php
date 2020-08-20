@@ -96,6 +96,7 @@ class AfterSalesController extends Controller
      * @apiParam {number} [num] 退货的申请数量
      * @apiParam {number} reason_id 理由id
      * @apiParam {string} picture 图片(字符串,数组)
+     * @apiParam {string} description 用户退货描述
      */
     public function createOrder(Request $request)
     {
