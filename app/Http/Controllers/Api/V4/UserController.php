@@ -34,6 +34,7 @@ class UserController extends Controller
      * @apiSuccess {string}  sex       性别   1 男 2 女
      * @apiSuccess {string}  headimg   用户头像
      * @apiSuccess {string}  headcover 背景图
+     * @apiSuccess {number}  is_author   是否是作者 1是 0 否
      * @apiSuccess {string}  intro     简介
      * @apiSuccess {string}  follow_num 关注数
      * @apiSuccess {string}  fan_num    粉丝数
@@ -116,7 +117,7 @@ class UserController extends Controller
     public function homepage(Request $request)
     {
         $id = $request->get('user_id');
-        $user = User::select('id', 'nickname', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
+        $user = User::select('id', 'nickname', 'is_author', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
             ->with([
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id','relation_type'])
@@ -542,6 +543,7 @@ class UserController extends Controller
         if(!$uid){
             $uid = $this->user['id'];
         }
+        echo $uid; exit;
         $user = User::findOrFail($uid);
         if($user){
             $lists = UserFollow::with('toUser:id,nickname,headimg')
@@ -855,11 +857,14 @@ class UserController extends Controller
      * @apiGroup user
      *
      *
-     * @apiSuccess {string} result json
-     * @apiSuccess {string} notify_num  消息数量 >0 显示
-     * @apiSuccess {string} follow_num  关注数
-     * @apiSuccess {string} fan_num     粉丝数
-     * @apiSuccess {string} history_num  学习记录数
+     * @apiSuccess {string}  nickname  昵称
+     * @apiSuccess {string}  headimg   头像
+     * @apiSuccess {number}  phone     手机号
+     * @apiSuccess {number}  is_author   是否是作者 1是 0 否
+     * @apiSuccess {string}  notify_num  消息数量 >0 显示
+     * @apiSuccess {string}  follow_num  关注数
+     * @apiSuccess {string}  fan_num     粉丝数
+     * @apiSuccess {string}  history_num  学习记录数
      * @apiSuccessExample 成功响应:
      * {
      * "code": 200,
@@ -876,7 +881,9 @@ class UserController extends Controller
     public function  statistics()
     {
         $uid   = $this->user['id'];
-        $lists = User::select('notify_num','follow_num','fan_num','history_num')->find($uid)->toArray();
+        $lists = User::select('nickname','headimg','phone','is_author','notify_num','follow_num','fan_num','history_num')
+                ->find($uid)
+                ->toArray();
         return success($lists);
     }
 
