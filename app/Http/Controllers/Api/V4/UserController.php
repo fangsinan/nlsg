@@ -49,7 +49,7 @@ class UserController extends Controller
      * @apiSuccess {string}  works.original_price 作品价格
      * @apiSuccess {string}  history        学习记录
      * @apiSuccess {string}  history.relation_type  学习记录类型 1专栏   2课程   3讲座
-     * 
+     *
      * @apiSuccess {string}  column           专栏
      * @apiSuccess {string}  column.name      专栏名称
      * @apiSuccess {string}  column.title     专栏标题
@@ -117,7 +117,7 @@ class UserController extends Controller
     public function homepage(Request $request)
     {
         $id = $request->get('user_id');
-        $user = User::select('id', 'nickname', 'is_author', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_teacher')
+        $user = User::select('id', 'nickname', 'is_author', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_author')
             ->with([
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id','relation_type'])
@@ -563,7 +563,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/follower 他关注的人 
+     * @api {get} api/v4/user/follower 他关注的人
      * @apiVersion 4.0.0
      * @apiGroup Api
      *
@@ -869,7 +869,7 @@ class UserController extends Controller
      * {
      * "code": 200,
      * "msg": "成功",
-     * "data": 
+     * "data":
      *  {
      *       "notify_num": 1,
      *      "follow_num": 2,
