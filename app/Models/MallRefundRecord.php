@@ -252,7 +252,7 @@ class MallRefundRecord extends Base
         $size = $params['size'] ?? 10;
 
         $field = ['id', 'service_num', 'order_id', 'order_detail_id',
-            'type', 'num', 'cost_price', 'refe_price', 'price', 'status',
+            'type', 'num', 'cost_price', 'refe_price', 'price', 'status','description',
             'user_cancel', 'user_cancel_time', 'created_at', 'return_address_id'];
 
         $with = ['infoOrder',
