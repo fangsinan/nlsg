@@ -334,7 +334,7 @@ class MallRefundRecord extends Base
             }
 
             $v->picture = explode(',', $v->picture);
-            if ($v->user_cancel == 1 || $v->status == 70) {
+            if ($v->user_cancel == 1) {
                 $v->status = 99;
             }
             if ($v->status == 50 || $v->status == 60) {
