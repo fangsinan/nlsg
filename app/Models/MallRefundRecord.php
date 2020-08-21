@@ -251,7 +251,7 @@ class MallRefundRecord extends Base
         $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
 
-        $field = ['id', 'service_num', 'order_id', 'order_detail_id',
+        $field = ['id', 'service_num', 'order_id', 'order_detail_id', 'express_info_id',
             'type', 'num', 'cost_price', 'refe_price', 'price', 'status','description',
             'user_cancel', 'user_cancel_time', 'created_at', 'return_address_id'];
 
@@ -272,7 +272,7 @@ class MallRefundRecord extends Base
                 'receive_at', 'succeed_at', 'price', 'reason_id', 'description',
                 'is_check_reject', 'check_reject_at', 'check_remark',
                 'is_authenticate_reject', 'authenticate_reject_at',
-                'authenticate_remark', 'express_info_id'
+                'authenticate_remark'
 //                'express_id', 'express_num'
             ];
 
@@ -372,7 +372,7 @@ class MallRefundRecord extends Base
             }
             $v->goods_list = $temp_data;
             if (!empty($v->expressInfo)) {
-                $v->expressInfo->history = json_decode($v->expressInfo->history);
+                $v->expressInfo->history_arr = json_decode($v->expressInfo->history);
             }
             $v->ordernum = $v->infoOrder->ordernum;
             unset($list[$k]->infoOrder, $list[$k]->infoDetail);
