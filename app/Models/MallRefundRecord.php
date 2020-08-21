@@ -320,7 +320,20 @@ class MallRefundRecord extends Base
         $list = $query->limit($size)->offset(($page - 1) * $size)->get();
 
         //如果type=1  读取infoOrder   =2读取infoDetail
+        $ftModel = new FreightTemplate();
+
         foreach ($list as $k => $v) {
+
+            $freight_template_data = $ftModel->listOfShop(3);
+
+            $v->refund_address = new class {
+            };
+            foreach ($freight_template_data as $ftv) {
+                if ($ftv->id == $v->return_address_id) {
+                    $v->refund_address = $ftv;
+                }
+            }
+
             $v->picture = explode(',', $v->picture);
             if ($v->user_cancel == 1 || $v->status == 70) {
                 $v->status = 99;
