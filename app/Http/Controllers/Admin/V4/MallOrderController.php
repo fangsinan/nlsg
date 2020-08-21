@@ -10,7 +10,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\servers\MallOrderServers;
+use App\Servers\MallOrderServers;
 
 /**
  * Description of MallOrderController
@@ -40,7 +40,7 @@ class MallOrderController extends Controller {
      * @apiParam {strint} [goods_name] 品名
      * @apiParam {strint} [status] 状态(参考前端订单接口文档)
      * @apiParam {string='normal','flash_sale','group_buy'} order_type 订单类型:普通,秒杀,团购
-     * 
+     *
      * @apiSuccessExample {json} Request-Example:
       {
       "code": 200,
@@ -71,7 +71,7 @@ class MallOrderController extends Controller {
      * @apiParam {strint} num 快递单号
      * @apiParam {strint} order_id 订单id
      * @apiParam {strint} order_detail_id 订单详情id
-     * 
+     *
      *  @apiParamExample {json} Request-Example:
       [
       {
@@ -87,7 +87,7 @@ class MallOrderController extends Controller {
       "order_detail_id": 10324
       }
       ]
-     * 
+     *
      * @apiSuccess {number} id id
      * @apiSuccessExample {json} Request-Example:
       {
