@@ -372,8 +372,9 @@ class MallRefundRecord extends Base
             }
             $v->goods_list = $temp_data;
             if (!empty($v->expressInfo)) {
-                $v->expressInfo->history_arr = json_decode($v->expressInfo->history);
+                $v->expressInfo->history = json_decode($v->expressInfo->history_arr);
             }
+
             $v->ordernum = $v->infoOrder->ordernum;
             unset($list[$k]->infoOrder, $list[$k]->infoDetail);
         }
@@ -384,7 +385,7 @@ class MallRefundRecord extends Base
     public function expressInfo()
     {
         return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
-            ->select(['id', 'history']);
+            ->select(['id', 'history','history as history_arr']);
     }
 
     public function infoOrder()
