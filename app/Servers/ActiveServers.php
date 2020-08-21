@@ -13,6 +13,7 @@ class ActiveServers
 {
     public function list($params)
     {
+
         $size = $params['size'] ?? 10;
         $query = ActiveGroupGlModel::from('nlsg_active_group_list')
             ->where('status', '<>', 3);
