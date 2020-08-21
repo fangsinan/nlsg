@@ -5,6 +5,10 @@ namespace App\Servers;
 
 
 use App\Models\MallRefundRecord;
+use EasyWeChat\Factory;
+use Psy\Util\Str;
+use Yansongda\Pay\Log;
+use Yansongda\Pay\Pay;
 
 class CrontabServers
 {
@@ -23,7 +27,32 @@ class CrontabServers
             ->get();
 
         foreach ($list as $v){
+            switch ($v->pay_type){
+                case 1:
+                    //微信公众号
+                    break;
+                case 2:
+                    //微信app
+                    $config = Config('wechat.payment.default');
+                    $order = [
+                        'refund_account' => 'REFUND_SOURCE_RECHARGE_FUNDS',
+                        'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
+                        'out_refund_no' => $v->service_num, //商户退款单号
+                        'refund_fee' => $v->refund_price * 100, //退款金额
+                        'total_fee' => $v->all_price * 100, //订单金额
+                        'transaction_id' => $v->transaction_id, //微信订单号
+                    ];
 
+
+                    $res = Pay::wechat($config)->refund($order);
+
+                    dd($res);
+                    break;
+                case 3:
+                    //支付宝app
+                    $config = Config('pay.alipay');
+                    break;
+            }
         }
 
 
