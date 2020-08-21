@@ -171,11 +171,11 @@ class MallRefundRecord extends Base
         $data['created_at'] = $now_date;
         $data['updated_at'] = $now_date;
         $data['pay_type'] = $get_data->pay_type;
-        $data['reason_id'] = $params['reason_id']??0;
-        $data['description'] = $params['description']??'';
-        $data['picture'] = $params['picture']??'';
-        if(is_array($data['picture'])){
-            $data['picture'] = implode(',',$data['picture']);
+        $data['reason_id'] = $params['reason_id'] ?? 0;
+        $data['description'] = $params['description'] ?? '';
+        $data['picture'] = $params['picture'] ?? '';
+        if (is_array($data['picture'])) {
+            $data['picture'] = implode(',', $data['picture']);
         }
 
         $data['num'] = $params['num'] ?? 0;
@@ -242,7 +242,7 @@ class MallRefundRecord extends Base
         }
 
         DB::commit();
-        return ['code' => true, 'msg' => '成功','id'=>$rr_res];
+        return ['code' => true, 'msg' => '成功', 'id' => $rr_res];
     }
 
     public function list($params, $user)
@@ -252,15 +252,14 @@ class MallRefundRecord extends Base
         $size = $params['size'] ?? 10;
 
         $field = ['id', 'service_num', 'order_id', 'order_detail_id', 'express_info_id',
-            'type', 'num', 'cost_price', 'refe_price', 'price', 'status','description',
+            'type', 'num', 'cost_price', 'refe_price', 'price', 'status', 'description',
             'user_cancel', 'user_cancel_time', 'created_at', 'return_address_id'];
 
         $with = ['infoOrder',
             'infoOrder.infoOrderDetail',
             'infoOrder.infoOrderDetail.goodsInfo',
-            'infoDetail',
-            'infoDetail.goodsInfo',
-            'expressInfo'
+            'infoDetail', 'infoDetail.goodsInfo',
+            'expressList'
         ];
 
         if ($params['id'] ?? 0) {
@@ -273,8 +272,8 @@ class MallRefundRecord extends Base
                 'is_check_reject', 'check_reject_at', 'check_remark',
                 'is_authenticate_reject', 'authenticate_reject_at',
                 'authenticate_remark'
-//                'express_id', 'express_num'
             ];
+            $with[] = 'expressInfo';
 
             $field = array_merge($field, $field_sup);
         } else {
@@ -372,10 +371,11 @@ class MallRefundRecord extends Base
             }
             $v->goods_list = $temp_data;
             if (!empty($v->expressInfo)) {
-                $v->expressInfo->history = json_decode($v->expressInfo->history_arr);
+                $v->expressInfo->history = json_decode($v->expressInfo->history);
             }
 
             $v->ordernum = $v->infoOrder->ordernum;
+
             unset($list[$k]->infoOrder, $list[$k]->infoDetail);
         }
 
@@ -385,7 +385,13 @@ class MallRefundRecord extends Base
     public function expressInfo()
     {
         return $this->hasOne('App\Models\ExpressInfo', 'id', 'express_info_id')
-            ->select(['id', 'history','history as history_arr']);
+            ->select(['id', 'history']);
+    }
+
+    public function expressList()
+    {
+        return $this->hasMany('App\Models\ExpressInfo', 'id', 'express_info_id')
+            ->select(['id', 'express_id', 'express_num']);
     }
 
     public function infoOrder()
