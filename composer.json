@@ -21,7 +21,11 @@
         "predis/predis": "^1.1",
         "tymon/jwt-auth": "^1.0",
         "yansongda/laravel-pay": "^2.2",
-        "yansongda/pay": "^2.9"
+        "yansongda/pay": "^2.9",
+        "ext-simplexml": "*",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-libxml": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

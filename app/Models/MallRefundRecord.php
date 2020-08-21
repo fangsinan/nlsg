@@ -36,7 +36,7 @@ class MallRefundRecord extends Base
             ->where('nmo.status', '=', 30)
             ->where('nmod.num', '>', 'after_sale_used_num');
 
-        //不过滤已失效的
+        //不过滤已失效的q
         //$query->where('nmo.receipt_at', '>', $begin_date);
 
         if (!empty($params['order_id'] ?? 0)) {
