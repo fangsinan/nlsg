@@ -22,6 +22,8 @@ class AfterSalesController extends Controller
 
     /**
      * 可申请售后订单和商品列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      * @api {get} /api/v4/after_sales/goods_list 可申请售后订单和商品列表
      * @apiVersion 4.0.0
      * @apiName /api/v4/after_sales/goods_list
@@ -83,6 +85,8 @@ class AfterSalesController extends Controller
 
     /**
      * 申请售后
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      * @api {post} /api/v4/after_sales/create_order 申请售后
      * @apiVersion 4.0.0
      * @apiName /api/v4/after_sales/create_order

@@ -49,6 +49,8 @@ class MallRefundRecord extends Base
 
         //$query->where('nmo.receipt_at','>',$begin_date);
 
+        $query->where(DB::raw('(nmod.num - nmod.after_sale_used_num)'),'>',0);
+
         $query->select([
             'nmo.ordernum', 'nmo.id as order_id', 'nmod.id as order_detail_id',
             'nmod.goods_id', 'nmod.sku_number', 'nmod.sku_history', 'nmg.picture',
@@ -86,10 +88,6 @@ class MallRefundRecord extends Base
                     $v->is_pass = 0;
                 }
             }
-
-//            if (($params['get_first'] ?? 0) == 0) {
-//                unset($list[$k]->sku_history);
-//            }
         }
 
         if (($params['get_first'] ?? 0) == 1) {
