@@ -14,35 +14,20 @@ class SpecialPriceController extends Controller
     {
         $servers = new SpecialPriceServers();
         $data = $servers->list($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     public function add(Request $request)
     {
         $servers = new SpecialPriceServers();
         $data = $servers->add($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     public function statusChange(Request $request)
     {
         $servers = new SpecialPriceServers();
         $data = $servers->statusChange($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 }

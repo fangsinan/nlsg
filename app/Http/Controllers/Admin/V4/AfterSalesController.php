@@ -31,12 +31,7 @@ class AfterSalesController extends Controller {
     public function list(Request $request) {
         $servers = new AfterSalesServers();
         $data = $servers->getList($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     //todo 审核,鉴定
@@ -48,12 +43,7 @@ class AfterSalesController extends Controller {
 
         $model = new AfterSalesServers();
         $data = $model->statusChange($request->input(), $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
 }

@@ -398,12 +398,7 @@ class MallController extends Controller
         $model = new MallComment();
         $params = $request->input();
         $data = $model->getList($params);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -867,12 +862,7 @@ class MallController extends Controller
         $model = new MallGoods();
         $data = $model->groupByGoodsInfo($params, $this->user);
 
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -891,12 +881,7 @@ class MallController extends Controller
         $goods_id = $request->input('goods_id', 0);
         $model = new MallGoods();
         $data = $model->collect($goods_id, $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -915,12 +900,7 @@ class MallController extends Controller
         $num = $request->input('num', 4);
         $model = new MallGoods();
         $data = $model->forYourReference($num, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -962,11 +942,6 @@ class MallController extends Controller
     {
         $model = new RedeemCode();
         $data = $model->redeem($request->input(), $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 }

@@ -172,12 +172,7 @@ class MallOrderController extends Controller
 
         $model = new MallOrder();
         $data = $model->prepareCreateOrder($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -234,12 +229,7 @@ class MallOrderController extends Controller
         $params['bill_format'] = $request->input('bill_format', 2);
         $model = new MallOrder();
         $data = $model->createOrder($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -393,12 +383,7 @@ class MallOrderController extends Controller
 
         $model = new MallOrderFlashSale();
         $data = $model->prepareCreateFlashSaleOrder($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -447,12 +432,7 @@ class MallOrderController extends Controller
 
         $model = new MallOrderFlashSale();
         $data = $model->createFlashSaleOrder($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -619,12 +599,7 @@ class MallOrderController extends Controller
 
         $model = new MallOrderGroupBuy();
         $data = $model->prepareCreateGroupBuyOrder($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -696,12 +671,7 @@ class MallOrderController extends Controller
 
         $model = new MallOrderGroupBuy();
         $data = $model->createGroupBuyOrder($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -734,12 +704,7 @@ class MallOrderController extends Controller
 
         $model = new MallOrderFlashSale();
         $data = $model->flashSalePayFail($order_id, $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -791,15 +756,8 @@ class MallOrderController extends Controller
     {
         $params = $request->input();
         $model = new MallOrderGroupBuy();
-
         $data = $model->groupByTeamList($params, $this->user);
-
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -841,12 +799,7 @@ class MallOrderController extends Controller
         $size = $request->input('size', 10);
         $model = new MallOrderGroupBuy();
         $data = $model->gbScrollbar($group_buy_id, $size);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -913,13 +866,7 @@ class MallOrderController extends Controller
         $params = $request->input();
         $model = new MallOrder();
         $data = $model->userOrderList($params, $this->user);
-
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -1101,13 +1048,7 @@ class MallOrderController extends Controller
         $ordernum = $request->input('ordernum', 0);
         $model = new MallOrder();
         $data = $model->orderInfo($this->user['id'], $ordernum);
-
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -1174,13 +1115,7 @@ class MallOrderController extends Controller
         $params = $request->input();
         $model = new MallOrderGroupBuy();
         $data = $model->userOrderList($params, $this->user);
-
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -1377,13 +1312,7 @@ class MallOrderController extends Controller
         $ordernum = $request->input('ordernum', 0);
         $model = new MallOrderGroupBuy();
         $data = $model->orderInfo($this->user['id'], $ordernum);
-
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -1411,12 +1340,7 @@ class MallOrderController extends Controller
         }
         $model = new MallOrder();
         $data = $model->statusChange($id, $flag, $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -1455,12 +1379,7 @@ class MallOrderController extends Controller
     {
         $model = new MallOrder();
         $data = $model->commentList($this->user['id'], $request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -1504,12 +1423,7 @@ class MallOrderController extends Controller
         $params = $request->input();
         $model = new MallOrder();
         $data = $model->subComment($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -1540,12 +1454,7 @@ class MallOrderController extends Controller
         $comment_id = $request->input('comment_id', 0);
         $model = new MallComment();
         $data = $model->getComment($comment_id, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**

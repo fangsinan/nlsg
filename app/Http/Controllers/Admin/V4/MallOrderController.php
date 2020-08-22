@@ -51,12 +51,7 @@ class MallOrderController extends Controller {
     public function list(Request $request) {
         $servers = new MallOrderServers();
         $data = $servers->getList($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -99,12 +94,7 @@ class MallOrderController extends Controller {
     public function send(Request $request) {
         $servers = new MallOrderServers();
         $data = $servers->send($request->input('list', ''));
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
 }

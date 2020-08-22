@@ -102,12 +102,7 @@ class AddressController extends Controller {
         $params = $request->input();
         $model = new MallAddress();
         $data = $model->create($params, $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -199,12 +194,7 @@ class AddressController extends Controller {
         }
         $model = new MallAddress();
         $data = $model->statusChange($id, $flag, $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**

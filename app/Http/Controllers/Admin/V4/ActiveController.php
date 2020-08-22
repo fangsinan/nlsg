@@ -23,13 +23,7 @@ class ActiveController extends Controller
     {
         $servers = new ActiveServers();
         $data = $servers->list($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
-
+        return $this->getRes($data);
     }
 
     /**
@@ -45,12 +39,7 @@ class ActiveController extends Controller
     {
         $servers = new ActiveServers();
         $data = $servers->add($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -91,12 +80,7 @@ class ActiveController extends Controller
     {
         $servers = new ActiveServers();
         $data = $servers->binding($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -112,12 +96,7 @@ class ActiveController extends Controller
     {
         $servers = new ActiveServers();
         $data = $servers->statusChange($request->input());
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
 }

@@ -47,12 +47,7 @@ class ShoppingCartController extends Controller
         $params = $request->input();
         $model = new ShoppingCart();
         $data = $model->create($params, $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -192,12 +187,7 @@ class ShoppingCartController extends Controller
 
         $model = new ShoppingCart();
         $data = $model->statusChange($id, $flag, $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
 }

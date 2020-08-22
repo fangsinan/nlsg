@@ -75,12 +75,7 @@ class AfterSalesController extends Controller
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->goodsList($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -107,12 +102,7 @@ class AfterSalesController extends Controller
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->createOrder($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -178,12 +168,7 @@ class AfterSalesController extends Controller
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->list($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -329,12 +314,7 @@ class AfterSalesController extends Controller
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->orderInfo($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -377,12 +357,7 @@ class AfterSalesController extends Controller
         }
         $model = new MallRefundRecord();
         $data = $model->statusChange($id, $flag, $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -418,12 +393,7 @@ class AfterSalesController extends Controller
         $params = $request->input();
         $model = new MallRefundRecord();
         $data = $model->refundPost($params, $this->user);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**

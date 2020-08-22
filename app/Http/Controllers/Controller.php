@@ -47,4 +47,13 @@ class Controller extends BaseController
         ];
         return response()->json($result);
     }
+
+    protected function getRes($data){
+        if (($data['code'] ?? true) === false) {
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            return $this->error(0, $data['msg'] . $ps);
+        } else {
+            return $this->success($data);
+        }
+    }
 }

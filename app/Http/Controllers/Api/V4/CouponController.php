@@ -36,12 +36,7 @@ class CouponController extends Controller {
 
         $model = new Coupon();
         $data = $model->getCoupon($params['flag'], $this->user['id']);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
     /**
@@ -136,12 +131,7 @@ class CouponController extends Controller {
         $params = $request->input();
         $model = new Coupon();
         $data = $model->listInHome($this->user['id'], $params);
-        if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
-        } else {
-            return $this->success($data);
-        }
+        return $this->getRes($data);
     }
 
 }
