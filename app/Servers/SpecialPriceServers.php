@@ -70,6 +70,7 @@ class SpecialPriceServers
 
         $res = $model->save();
         if ($res) {
+            CacheServers::clear(1);
             return ['code' => true, 'msg' => '成功'];
         } else {
             return ['code' => false, 'msg' => '添加失败,请重试'];
@@ -96,19 +97,21 @@ class SpecialPriceServers
         switch ($params['type'] ?? 0) {
             case 1:
                 //降价
-                $this->addType_1($params);
+                $res = $this->addType_1($params);
                 break;
             case 2:
                 //秒杀
-                $this->addType_2($params);
+                $res = $this->addType_2($params);
                 break;
             case 4:
                 //拼团
-                $this->addType_4($params);
+                $res = $this->addType_4($params);
                 break;
             default:
                 return ['code' => false, 'msg' => 'type错误'];
         }
+        CacheServers::clear(1);
+        return $res;
     }
 
     public function addType_1($params)
@@ -132,24 +135,28 @@ class SpecialPriceServers
             $temp['goods_original_price'] = $params['goods_original_price'] ?? 0;
             $temp['goods_price'] = $params['goods_price'];
             $temp['sku_number'] = $v['sku_number'];
-            if(empty($v['sku_price'])){{
-                return ['code'=>false,'msg'=>'sku_price错误'];
-            }}
+            if (empty($v['sku_price'])) {
+                {
+                    return ['code' => false, 'msg' => 'sku_price错误'];
+                }
+            }
             $temp['sku_price'] = $v['sku_price'];
-            $temp['t_money'] = $v['t_money']??0;
-            $temp['t_money_black'] = $v['t_money_black']??0;
+            $temp['t_money'] = $v['t_money'] ?? 0;
+            $temp['t_money_black'] = $v['t_money_black'] ?? 0;
         }
 
+
+        return '';
     }
 
     public function addType_2($params)
     {
-
+        return '';
     }
 
     public function addType_4($params)
     {
-
+        return '';
     }
 
 }

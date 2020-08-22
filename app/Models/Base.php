@@ -21,7 +21,6 @@ class Base extends Model {
     }
 
     protected function emptyA2C($data) {
-//        dd([rand(),$data->isEmpty()]);
         if (is_object($data)) {
             if ($data->isEmpty()) {
                 return new class {};

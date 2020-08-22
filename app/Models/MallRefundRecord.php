@@ -36,7 +36,7 @@ class MallRefundRecord extends Base
             ->where('nmo.status', '=', 30)
             ->where('nmod.num', '>', 'after_sale_used_num');
 
-        //不过滤已失效的q
+        //不过滤已失效的
         //$query->where('nmo.receipt_at', '>', $begin_date);
 
         if (!empty($params['order_id'] ?? 0)) {
@@ -47,9 +47,7 @@ class MallRefundRecord extends Base
             $query->where('nmod.id', '=', $params['order_detail_id']);
         }
 
-        //$query->where('nmo.receipt_at','>',$begin_date);
-
-        $query->where(DB::raw('(nmod.num - nmod.after_sale_used_num)'),'>',0);
+        $query->where(DB::raw('(nmod.num - nmod.after_sale_used_num)'), '>', 0);
 
         $query->select([
             'nmo.ordernum', 'nmo.id as order_id', 'nmod.id as order_detail_id',
