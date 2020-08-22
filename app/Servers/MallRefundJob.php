@@ -8,7 +8,8 @@ use App\Models\GetPriceTools;
 use App\Models\MallRefundRecord;
 use App\Models\RunRefundRecord;
 use Illuminate\Support\Str;
-
+use Yansongda\Pay\Log;
+use Yansongda\Pay\Pay;
 
 class MallRefundJob
 {
@@ -41,7 +42,7 @@ class MallRefundJob
                     break;
                 case 3:
                     //支付宝app
-                    $this->aliRefundCheck($v);
+                    $this->aliRefundCheckGrace($v);
                     break;
             }
         }
@@ -93,7 +94,7 @@ class MallRefundJob
         $aop = new \AopClient();
         $aop->appId = env('ALI_APP_ID');
         $aop->alipayrsaPublicKey = env('ALI_PUBLIC_KEY');
-        $aop->rsaPrivateKey = env('ALI_PRIVATE_KEY');
+        $aop->rsaPrivateKey = env('ALI_PRIVATE_KEY2');
         $aop->gatewayUrl = env('ALI_PAYMENT_REFUND_CHECK_URL');
         $aop->apiVersion = '1.0';
         $aop->signType = 'RSA2';
@@ -121,6 +122,20 @@ class MallRefundJob
             return true;
         } catch (\Exception $e) {
             return true;
+        }
+    }
+
+    public function aliRefundCheckGrace($v){
+        $config = Config('pay.alipay');
+        $alipay = Pay::alipay($config);
+        $order = [
+            'out_trade_no' => $v->ordernum,
+            'out_request_no' => $v->service_num
+        ];
+        $result = $alipay->find($order, 'refund');
+
+        if ($result->code == 10000) {
+            $this->toChange($v->price, $v);
         }
     }
 
@@ -176,77 +191,50 @@ class MallRefundJob
                     break;
                 case 3:
                     //支付宝app
-                    $this->aliRefund($v);
+//                    $this->aliRefund($v);
+                    $this->aliRefundGrace($v);
                     break;
             }
         }
     }
 
-    /**
-     * ali退款
-     * @param $v
-     * @return bool
-     */
-    public function aliRefund($v)
+    //优雅的支付宝退款
+    public function aliRefundGrace($v)
     {
-        require_once base_path() . '/vendor/alipay-sdk/aop/AopClient.php';
-        require_once base_path() . '/vendor/alipay-sdk/aop/request/AlipayTradeRefundRequest.php';
+        $config = Config('pay.alipay');
+        $alipay = Pay::alipay($config);
+        $order = [
+            'out_trade_no' => $v->ordernum,
+            'refund_amount' => $v->refund_price,
+            'out_request_no' => $v->service_num,
+        ];
 
-        $aop = new \AopClient();
-        $aop->appId = env('ALI_APP_ID');
-        $aop->alipayrsaPublicKey = env('ALI_PUBLIC_KEY');
-        $aop->rsaPrivateKey = env('ALI_PRIVATE_KEY');
-        $aop->gatewayUrl = env('ALI_PAYMENT_REFUND_URL');
-        $aop->apiVersion = '1.0';
-        $aop->signType = 'RSA2';
-        $aop->postCharset = 'UTF-8';
-        $aop->format = 'json';
-
-        //退款订单信息
-        $out_trade_no = $v->ordernum; //out_trade_no 商户订单号1
-        $trade_no = $v->transaction_id; //trade_no 支付宝交易号1
-        $refund_amount = $v->refund_price; //refund_amount 退款金额 不能大于订单金额，单位为元1
-        $refund_reason = '正常退款'; //refund_reason 退款原因1
-        $out_request_no = $v->service_num; //out_request_no
-        $operator_id = 0; //operator_id 商户的操作员编号1
-        $request = new \AlipayTradeRefundRequest();
-        $request->setBizContent("{" .
-            "\"out_trade_no\":\"$out_trade_no\"," .
-            "\"trade_no\":\"$trade_no\"," .
-            "\"refund_amount\":$refund_amount," .
-            "\"refund_reason\":\"$refund_reason\"," .
-            "\"out_request_no\":\"$out_request_no\"," .
-            "\"operator_id\":\"$operator_id\"" .
-            "}");
-        /**/
         $now_date = date('Y-m-d H:i:s');
-        try {
-            $result = $aop->execute($request);
-            $responseNode = str_replace(".", "_",
-                    $request->getApiMethodName()) . "_response";
-            $resultCode = $result->$responseNode->code;
-            $rrrModel = new RunRefundRecord();
-            $rrrModel->order_type = 1;
-            $rrrModel->order_id = $v->service_id;
+        $rrrModel = new RunRefundRecord();
+        $rrrModel->order_type = 1;
+        $rrrModel->order_id = $v->service_id;
 
-            if (!empty($resultCode) && $resultCode == 10000) {
+        try {
+            $result = $alipay->refund($order);
+            if ($result->code == 10000) {
                 $mrr = MallRefundRecord::find($v->service_id);
                 $mrr->status = 50;
                 $mrr->refund_sub_at = $now_date;
                 $mrr->run_refund = 2;
                 $mrr->save();
                 $rrrModel->is_success = 1;
-                $rrrModel->refund_money = $result->$responseNode->coderefund_fee;
-            } else {
+                $rrrModel->refund_money = $result->refund_fee;
+            }else{
                 $rrrModel->is_success = 2;
-                $rrrModel->error_code = $result->$responseNode->sub_code ?? '';
-                $rrrModel->error_msg = $result->$responseNode->msg . ' : ' .
-                    $result->$responseNode->sub_msg ?? '';
+                $rrrModel->error_code = '';
+                $rrrModel->error_msg = '';
             }
-            $rrrModel->save();
         } catch (\Exception $e) {
-            return true;
+            $rrrModel->is_success = 2;
+            $rrrModel->error_code = $e->getCode();
+            $rrrModel->error_msg = substr($e->getMessage()??'', 0, 1000);
         }
+        $rrrModel->save();
         return true;
     }
 
