@@ -7,10 +7,147 @@ namespace App\Servers;
 use App\Models\GetPriceTools;
 use App\Models\MallRefundRecord;
 use App\Models\RunRefundRecord;
+use Illuminate\Support\Str;
 
 
-class CrontabServers
+class MallRefundJob
 {
+    public function mallRefundCheck()
+    {
+        $list = MallRefundRecord::from('nlsg_mall_refund_record as mrr')
+            ->join('nlsg_mall_order as mo', 'mrr.order_id', '=', 'mo.id')
+            ->join('nlsg_pay_record as pr', 'pr.ordernum', '=', 'mo.ordernum')
+            ->where('mrr.run_refund', '=', 2)
+            ->where('pr.order_type', '=', 10)
+            ->limit(100)
+            ->select(['mrr.id as service_id', 'service_num', 'mrr.order_id',
+                'mrr.order_detail_id', 'mrr.type', 'mrr.pay_type',
+                'mrr.status as service_status', 'mrr.user_id', 'pr.transaction_id',
+                'pr.ordernum', 'pr.price as all_price', 'mrr.price as refund_price'])
+            ->get();
+
+
+        ini_set('date.timezone', 'Asia/Shanghai');
+
+        foreach ($list as $v) {
+            switch ($v->pay_type) {
+                case 1:
+                    //微信公众号
+                    $this->weChatRefundCheck($v, 1);
+                    break;
+                case 2:
+                    //微信app
+                    $this->weChatRefundCheck($v, 2);
+                    break;
+                case 3:
+                    //支付宝app
+                    $this->aliRefundCheck($v);
+                    break;
+            }
+        }
+    }
+
+    public function weChatRefundCheck($v, $flag)
+    {
+        if ($flag == 1) {
+            $config = Config('wechat.payment.wx_wechat');
+        } else {
+            $config = Config('wechat.payment.default');
+        }
+        $data = array(
+            'appid' => $config['app_id'], //公众账号ID
+            'mch_id' => $config['mch_id'], //商户号
+            'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
+            'out_refund_no' => $v->service_num, //商户退款单号
+            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
+            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
+            'transaction_id' => $v->transaction_id, //微信订单号
+        );
+        $data['sign'] = self::sign_data($data, $config['key']); //加密串
+
+        $xml = self::ToXml($data); //数据包拼接
+        $res = self::postXmlCurl($config['refund_url'], $xml, 2);
+        libxml_disable_entity_loader(true);
+        if (!$res) {
+            return true;
+        }
+        try {
+            $xml = simplexml_load_string($res, 'SimpleXMLElement',
+                LIBXML_NOCDATA);
+            $xml = json_decode(json_encode($xml), true);
+
+            if (isset($xml['result_code']) && $xml['result_code'] == 'SUCCESS') {
+                $refund_fee = $xml['refund_fee']; //退款金额
+                $this->toChange($refund_fee, $v);
+            }
+            return true;
+        } catch (\Exception $e) {
+            return true;
+        }
+    }
+
+    public function aliRefundCheck($v)
+    {
+        require_once base_path() . '/vendor/alipay-sdk/aop/AopClient.php';
+        require_once base_path() . '/vendor/alipay-sdk/aop/request/AlipayTradeFastpayRefundQueryRequest.php';
+        $aop = new \AopClient();
+        $aop->appId = env('ALI_APP_ID');
+        $aop->alipayrsaPublicKey = env('ALI_PUBLIC_KEY');
+        $aop->rsaPrivateKey = env('ALI_PRIVATE_KEY');
+        $aop->gatewayUrl = env('ALI_PAYMENT_REFUND_CHECK_URL');
+        $aop->apiVersion = '1.0';
+        $aop->signType = 'RSA2';
+        $aop->postCharset = 'UTF-8';
+        $aop->format = 'json';
+        $request = new \AlipayTradeFastpayRefundQueryRequest();
+        $out_request_no = $v->service_num;
+        $trade_no = $v->transaction_id;
+
+        $request->setBizContent("{" .
+            "\"trade_no\":\"$trade_no\"," .
+            "\"out_trade_no\":\"\"," .
+            "\"out_request_no\":\"$out_request_no\"" .
+            "}");
+
+        try {
+            $result = $aop->execute($request);
+            $responseNode = str_replace(".", "_",
+                    $request->getApiMethodName()) . "_response";
+            $resultCode = $result->$responseNode->code;
+            if (!empty($resultCode) && $resultCode == 10000) {
+                $refund_amount = $result->$responseNode->refund_amount; //退款金额
+                $this->toChange($refund_amount, $v);
+            }
+            return true;
+        } catch (\Exception $e) {
+            return true;
+        }
+    }
+
+    /**
+     * 退款成功后的操作
+     * @param $id
+     * @param $fee
+     * @param $order
+     */
+    public function toChange($fee, $order)
+    {
+        if ($order->pay_type !== 3) {
+            $fee = GetPriceTools::PriceCalc('/', $fee, 100);
+        }
+
+        $now_date = date('Y-m-d H:i:s');
+
+        //修改售后表
+        $mrr = MallRefundRecord::find($order->service_id);
+        $mrr->status = 60;
+        $mrr->succeed_at = $now_date;
+        $mrr->run_refund = 3;
+        $mrr->refund_fee = $fee;
+        $mrr->save();
+
+    }
+
     public function mallRefund()
     {
         $list = MallRefundRecord::from('nlsg_mall_refund_record as mrr')
@@ -45,13 +182,17 @@ class CrontabServers
         }
     }
 
-    //todo ali退款
+    /**
+     * ali退款
+     * @param $v
+     * @return bool
+     */
     public function aliRefund($v)
     {
         require_once base_path() . '/vendor/alipay-sdk/aop/AopClient.php';
         require_once base_path() . '/vendor/alipay-sdk/aop/request/AlipayTradeRefundRequest.php';
-        $aop = new \AopClient();
 
+        $aop = new \AopClient();
         $aop->appId = env('ALI_APP_ID');
         $aop->alipayrsaPublicKey = env('ALI_PUBLIC_KEY');
         $aop->rsaPrivateKey = env('ALI_PRIVATE_KEY');
@@ -77,7 +218,7 @@ class CrontabServers
             "\"out_request_no\":\"$out_request_no\"," .
             "\"operator_id\":\"$operator_id\"" .
             "}");
-
+        /**/
         $now_date = date('Y-m-d H:i:s');
         try {
             $result = $aop->execute($request);
@@ -87,10 +228,12 @@ class CrontabServers
             $rrrModel = new RunRefundRecord();
             $rrrModel->order_type = 1;
             $rrrModel->order_id = $v->service_id;
+
             if (!empty($resultCode) && $resultCode == 10000) {
                 $mrr = MallRefundRecord::find($v->service_id);
                 $mrr->status = 50;
                 $mrr->refund_sub_at = $now_date;
+                $mrr->run_refund = 2;
                 $mrr->save();
                 $rrrModel->is_success = 1;
                 $rrrModel->refund_money = $result->$responseNode->coderefund_fee;
@@ -130,15 +273,17 @@ class CrontabServers
             'refund_account' => 'REFUND_SOURCE_RECHARGE_FUNDS',
             'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
             'out_refund_no' => $v->service_num, //商户退款单号
-            'refund_fee' => $v->refund_price * 100, //退款金额
-            'total_fee' => $v->all_price * 100, //订单金额
+            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
+            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
             'transaction_id' => $v->transaction_id, //微信订单号
         );
         $data['sign'] = self::sign_data($data, $config['key']); //加密串
         $xml = self::ToXml($data); //数据包拼接
         $res = self::postXmlCurl($config['refund_url'], $xml, 1);
         libxml_disable_entity_loader(true);
-
+        if (!$res) {
+            return true;
+        }
         try {
             $xml = simplexml_load_string($res, 'SimpleXMLElement',
                 LIBXML_NOCDATA);
@@ -154,6 +299,7 @@ class CrontabServers
                 $mrr = MallRefundRecord::find($v->service_id);
                 $mrr->status = 50;
                 $mrr->refund_sub_at = $now_date;
+                $mrr->run_refund = 2;
                 $mrr->save();
 
                 if (strtolower($xml['result_code']) == 'success') {
@@ -170,10 +316,10 @@ class CrontabServers
                 $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
             }
             $rrrModel->save();
+            return true;
         } catch (\Exception $e) {
             return true;
         }
-        return true;
     }
 
     /**
@@ -192,8 +338,7 @@ class CrontabServers
         $sign_temp = trim($sign_temp, '&');
         $sign_temp = $sign_temp . '&key=' . $appkey;
         $sign = md5($sign_temp);
-        $result = strtoupper($sign);
-        return $result;
+        return strtoupper($sign);
     }
 
     /**

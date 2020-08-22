@@ -28,4 +28,5 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     //定时任务
     Route::get('crontab/mall_refund', 'CrontabController@mallRefund');//商城退款
+    Route::get('crontab/mall_refund_check', 'CrontabController@mallRefundCheck');//商城退款查询
 });
