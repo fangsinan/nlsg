@@ -694,9 +694,9 @@ class MallOrderGroupBuy extends Base
         $field = [
             'nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time', 'gbl.group_key',
             DB::raw('unix_timestamp(nmo.dead_time) as dead_timestamp'),
-            DB::raw('(case when nmo.`status` = 1 then 1
-                when is_success = 0 then 95 when nmo.is_stop = 1
-                then 99 ELSE nmo.`status` END) `status`'),
+            DB::raw('(case when nmo.is_stop = 1
+                then 99 when nmo.`status` = 1 then 1
+                when is_success = 0 then 95  ELSE nmo.`status` END) `status`'),
             'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList', 'groupList.userInfo'];
