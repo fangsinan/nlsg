@@ -136,9 +136,7 @@ class SpecialPriceServers
             $temp['goods_price'] = $params['goods_price'];
             $temp['sku_number'] = $v['sku_number'];
             if (empty($v['sku_price'])) {
-                {
-                    return ['code' => false, 'msg' => 'sku_price错误'];
-                }
+                return ['code' => false, 'msg' => 'sku_price错误'];
             }
             $temp['sku_price'] = $v['sku_price'];
             $temp['t_money'] = $v['t_money'] ?? 0;

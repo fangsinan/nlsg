@@ -119,7 +119,7 @@ class ExpressCompany extends Base
         }
 
         //30分钟内只能查询一次
-        if($check->updated_at !== $check->created_at){
+        if ($check->updated_at !== $check->created_at) {
             $updated_at = strtotime($check->updated_at);
             if (($updated_at + 1800) > time()) {
                 return json_decode($check->history, true);
@@ -127,7 +127,7 @@ class ExpressCompany extends Base
         }
 
         $data = $this->toQuery($params['express_num'], $express_type);
-        if(empty($data)){
+        if (empty($data)) {
             return json_decode($check->history, true);
         }
         $data['express_phone'] = ExpressCompany::onlyGetName($params['express_id'], 3);
@@ -145,21 +145,20 @@ class ExpressCompany extends Base
 
 
             //修改child表
-            if($data['deliverystatus'] == 3){
+            if ($data['deliverystatus'] == 3) {
                 $ei_id = ExpressInfo::where('express_id', '=', $params['express_id'])
                     ->where('express_num', '=', $params['express_num'])
                     ->select(['id'])
                     ->get();
-                if(!$ei_id->isEmpty()){
+                if (!$ei_id->isEmpty()) {
                     $ei_id = $ei_id->toArray();
-                    $ei_id = array_column($ei_id,'id');
+                    $ei_id = array_column($ei_id, 'id');
 
-                    MallOrderChild::whereIn('express_info_id',$ei_id)
+                    MallOrderChild::whereIn('express_info_id', $ei_id)
                         ->update([
-                            'status'=>2,
-                            'receipt_at'=>date('Y-m-d H:i:s')
+                            'status' => 2,
+                            'receipt_at' => date('Y-m-d H:i:s')
                         ]);
-
                 }
             }
 
