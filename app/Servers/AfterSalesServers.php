@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace App\servers;
+namespace App\Servers;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\MallRefundRecord as M2R;
@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 class AfterSalesServers
 {
 
+    //售后列表
     public function getList($params)
     {
 
