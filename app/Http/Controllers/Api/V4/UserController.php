@@ -240,7 +240,7 @@ class UserController extends Controller
         }
 
         $comments = Comment::with(['user:id,nickname,headimg', 'attach:id,relation_id,img'])
-            ->select('id', 'pid', 'user_id', 'relation_id', 'type', 'content', 'forward_num', 'share_num', 'like_num',
+            ->select('id', 'pid', 'user_id', 'relation_id', 'type', 'content', 'forward_num', 'share_num', 'like_num', 'flower_num',
                 'reply_num', 'created_at')
             ->where('user_id', $id)
             ->where('status', 1)
