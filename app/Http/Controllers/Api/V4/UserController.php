@@ -163,6 +163,7 @@ class UserController extends Controller
      * @apiSuccess {number}  comments.forward_num 转发数
      * @apiSuccess {number}  comments.share_num   分享数
      * @apiSuccess {number}  comments.like_num    喜欢数
+     * @apiSuccess {number}  comments.flower_num  送花数量
      * @apiSuccess {number}  comments.reply_num   评论数
      * @apiSuccess {number}  comments.created_at  发布时间
      *

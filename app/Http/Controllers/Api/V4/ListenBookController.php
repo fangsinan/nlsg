@@ -16,6 +16,7 @@ use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use App\Models\Collection;
 
 class ListenBookController extends Controller
 {
@@ -123,6 +124,9 @@ class ListenBookController extends Controller
         //作者信息
         $works_data['user_info'] = User::find($works_data['user_id']);
         $works_data['historyData'] = History::getHistoryData($works_data['id'],2,$user_id);
+
+        $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$listen_id,'type'=>6])->first();
+        $works_data['is_collection'] = $isCollect ? 1 : 0;
 
         return $this->success($works_data);
     }

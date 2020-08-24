@@ -424,6 +424,7 @@ class WorksController extends Controller
         $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
 
+        $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$works_id,'type'=>2])->first();
 
         $history_data = History::getHistoryData($works_data['id'],2,$user_id);
 
@@ -432,7 +433,8 @@ class WorksController extends Controller
             'works_data'   => $works_data,
             'works_info'   => $info,
             'history_data'   => $history_data,
-            'is_sub'         => $is_sub ? 1: 0
+            'is_sub'         => $is_sub ? 1: 0,
+            'is_collection'  => $isCollect ? 1 : 0
         ];
         return $this->success($res);
     }
