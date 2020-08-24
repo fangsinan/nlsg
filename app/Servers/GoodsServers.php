@@ -321,7 +321,8 @@ class GoodsServers
         return $query->with($with)->select($field)->paginate($size);
     }
 
-    public function categoryList(){
+    public function categoryList()
+    {
         $model = new MallCategory();
         return $model->getAllList();
     }

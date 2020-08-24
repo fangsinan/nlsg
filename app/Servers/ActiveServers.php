@@ -40,7 +40,7 @@ class ActiveServers
             $query->where('end_time', '<=', $params['end_time']);
         }
 
-        $field = ['id', 'title', 'begin_time', 'end_time', 'ad_begin_time', 'status'];
+        $field = ['id', 'title', 'begin_time', 'end_time', 'ad_begin_time', 'pre_begin_time', 'status'];
         $field[] = 'wx_share_title';
         $field[] = 'wx_share_img';
         $field[] = 'wx_share_desc';
