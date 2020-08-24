@@ -124,6 +124,9 @@ class ListenBookController extends Controller
         $works_data['user_info'] = User::find($works_data['user_id']);
         $works_data['historyData'] = History::getHistoryData($works_data['id'],2,$user_id);
 
+        $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$listen_id,'type'=>6])->first();
+        $works_data['is_collection'] = $isCollect ? 1 : 0;
+
         return $this->success($works_data);
     }
 
