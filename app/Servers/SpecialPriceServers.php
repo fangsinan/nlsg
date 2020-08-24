@@ -230,7 +230,58 @@ class SpecialPriceServers
 
     public function addType_2($params)
     {
-        return '';
+        DB::beginTransaction();
+        if (!empty($params['group_name'])) {
+            $del_res = SpecialPriceModel::where('group_name', '=', $params['group_name'])
+                ->where('type', '=', 2)
+                ->update(['status' => 3]);
+            if ($del_res === false) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => 'group_name错误'];
+            }
+        }
+
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+        $group_name = Str::random(5) . $now;
+
+        //添加
+        $add_data = [];
+        foreach ($params['list'] as $v) {
+            $temp['goods_type'] = 1;
+            $temp['goods_id'] = $params['goods_id'];
+            $temp['goods_original_price'] = $params['goods_original_price'] ?? 0;
+            $temp['goods_price'] = $params['goods_price'];
+            $temp['sku_number'] = $v['sku_number'];
+            $temp['sku_price'] = $v['sku_price'];
+            $temp['sku_price_black'] = $v['sku_price'];
+            $temp['sku_price_yellow'] = $v['sku_price'];
+            $temp['sku_price_dealer'] = $v['sku_price'];
+            $temp['t_money'] = $temp['t_money_black'] =
+            $temp['t_money_yellow'] = $temp['t_money_dealer'] = 0;
+
+
+            //todo 秒杀的时间
+            $temp['begin_time'] = $params['begin_time'];
+            $temp['end_time'] = $params['end_time'];
+
+            $temp['created_at'] = $temp['updated_at'] = $now_date;
+            $temp['type'] = 2;
+            $temp['use_coupon'] = 2;
+            $temp['freight_free'] = $temp['freight_free_line'] = 0;
+            $temp['group_name'] = $group_name;
+            $add_data[] = $temp;
+        }
+
+        $add_res = DB::table('nlsg_special_price')->insert($add_data);
+
+        if (!$add_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => 'sku写入错误'];
+        }
+
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
     }
 
     public function addType_4($params)
