@@ -28,7 +28,9 @@ class FreightServers
             $field = array_merge($field, ['admin_name', 'admin_phone', 'admin_phone as phone',
                 'province', 'city', 'area', 'details',
                 'start_time', 'end_time']);
+        } else {
             $with[] = 'f_details';
+            $with[] = 'f_details.d_list';
         }
 
         $query = FreightTemplate::from('nlsg_freight_template')

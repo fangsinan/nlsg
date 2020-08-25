@@ -28,7 +28,15 @@ class GoodsServers
         if (empty($params['category_id'])) {
             return ['code' => false, 'msg' => '参数错误:category_id'];
         } else {
-            $goods_model->category_id = intval($params['category_id']);
+            if (is_string($params['category_id'])) {
+                $params['category_id'] = explode(',', $params['category_id']);
+                if (count($params['category_id']) !== 3) {
+                    return ['code' => false, 'msg' => 'category_id 必须为3级数据'];
+                }
+            } else {
+                return ['code' => false, 'msg' => 'category_id格式错误'];
+            }
+            $goods_model->category_id = intval($params['category_id'][2]);
         }
 
         if (empty($params['name'])) {
