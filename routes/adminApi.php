@@ -26,6 +26,10 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('special_price/list', 'SpecialPriceController@list');
     Route::put('special_price/status_change', 'SpecialPriceController@statusChange');
 
+    //运费模板
+    Route::get('freight/list', 'FreightController@list');
+    Route::get('freight/shop_list', 'FreightController@shopList');
+
     //定时任务
     Route::get('crontab/mall_refund', 'CrontabController@mallRefund');//商城退款
     Route::get('crontab/mall_refund_check', 'CrontabController@mallRefundCheck');//商城退款查询
