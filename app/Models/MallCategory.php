@@ -88,7 +88,7 @@ class MallCategory extends Base
             }
         }
 
-        return [$res, $list];
+        return $res;
     }
 
 }

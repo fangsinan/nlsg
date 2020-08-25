@@ -564,6 +564,8 @@ class MallOrderGroupBuy extends Base
      */
     public function groupByTeamList($params, $user)
     {
+        //todo  已经成团的是否要过滤
+
         $group_buy_id = $params['group_buy_id'] ?? 0;
         $flag = $params['flag'] ?? 1; //1两条  2全部
         $group_key = $params['group_key'] ?? 0;

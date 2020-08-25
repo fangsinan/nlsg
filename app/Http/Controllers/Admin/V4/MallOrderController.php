@@ -97,4 +97,9 @@ class MallOrderController extends Controller {
         return $this->getRes($data);
     }
 
+
+    //商城服务信息列表
+    public function tos(Request $request){
+
+    }
 }
