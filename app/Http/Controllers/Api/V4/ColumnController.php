@@ -502,7 +502,7 @@ class ColumnController extends Controller
             return $this->error(0,'column_id 或者 user_id 不能为空');
         }
         //  type 1：专栏  2：课程 3 :商品
-        if( !in_array($type,[1,2,3,4,5,6]) ){
+        if( !in_array($type,[1,2,3,4,5,6,7]) ){
             return $this->error(0,'type类型错误');
         }
         $is_collection = Collection::CollectionData($user_id,$target_id,$type,$info_id);
