@@ -259,6 +259,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::put('mall/status_change', 'MallOrderController@statusChange');
         Route::post('mall/sub_comment', 'MallOrderController@subComment');
         Route::get('mall/get_comment', 'MallOrderController@getComment');
+
+        Route::get('goods/coupon_list', 'MallController@couponList');//todo 临时
         //商城结束
 
 
