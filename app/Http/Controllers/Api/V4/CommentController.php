@@ -172,7 +172,7 @@ class CommentController extends Controller
      * @apiParam {number} pid 转发评论id
      * @apiParam {string} content 发布的内容
      * @apiParam {string} img  多个图片  格式 a.png,b.png,c.png
-     * @apiParam {string} type 模块类型  类型 1.专栏 2.讲座 3.听书 4.精品课
+     * @apiParam {string} type 模块类型  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科
      *
      *
      * @apiSuccessExample  Success-Response:
