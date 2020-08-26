@@ -91,4 +91,9 @@ class MallCategory extends Base
         return $res;
     }
 
+    public function categoryParent(){
+        return $this->hasOne('App\Models\MallCategory', 'id', 'pid')
+            ->select(['id','pid']);
+    }
+
 }

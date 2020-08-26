@@ -298,6 +298,10 @@ class GoodsServers
             $with[] = 'tos_bind_list.tos';
             $with[] = 'picture_list';
         }
+        $with[] = 'category_list';
+        $with[] = 'categoryStr';
+        $with[] = 'categoryStr.categoryParent';
+        $with[] = 'categoryStr.categoryParent.categoryParent';
 
         switch ($params['ob'] ?? 'default') {
             case 'new_asc':
@@ -321,13 +325,19 @@ class GoodsServers
         }
         $query->orderBy('id', 'desc');
 
-
         $with[] = 'sku_list';
         $with[] = 'sku_list.sku_value_list';
         $with[] = 'category_list';
 
-        return $query->with($with)->select($field)->paginate($size);
+        $list = $query->with($with)->select($field)->paginate($size);
+        foreach ($list as $v){
+
+        }
+
+        return $list;
     }
+
+
 
     public function categoryList()
     {

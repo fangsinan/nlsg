@@ -290,6 +290,11 @@ class MallGoods extends Base
             ->where('status', '=', 1);
     }
 
+    public function categoryStr(){
+        return $this->hasOne('App\Models\MallCategory', 'id', 'category_id')
+            ->select(['id','pid']);
+    }
+
     /**
      * 首页好物推荐
      * @param $ids 相关作品id
