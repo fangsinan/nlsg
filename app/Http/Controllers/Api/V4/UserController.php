@@ -544,7 +544,6 @@ class UserController extends Controller
         if(!$uid){
             $uid = $this->user['id'];
         }
-        echo $uid; exit;
         $user = User::findOrFail($uid);
         if($user){
             $lists = UserFollow::with('toUser:id,nickname,headimg')
