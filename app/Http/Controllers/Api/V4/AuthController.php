@@ -63,6 +63,8 @@ class AuthController extends Controller
             ]);
             $user = User::find($list->id);
         }
+        
+        Redis::del($phone);
         $token = auth('api')->login($user);;
         $data = [
             'id'    => $user->id,
@@ -110,6 +112,7 @@ class AuthController extends Controller
 
         $token = auth('api')->login($user);
         $data = [
+            'id'       => $user->id,
             'phone'    => $user->phone ?? '',
             'token'    => $token
         ];
@@ -267,7 +270,7 @@ class AuthController extends Controller
                 ],
             ], ['aliyun']);
 
-            Redis::setex($phone, 60*60*24, $code);
+            Redis::setex($phone, 60*5, $code);
             return success();
         } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
             $message = $exception->getResults();
