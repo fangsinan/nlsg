@@ -59,7 +59,8 @@ class AuthController extends Controller
         $user = User::where('phone', $phone)->first();
         if ( ! $user) {
             $list = User::create([
-                'phone' => $phone
+                'phone'    => $phone,
+                'nickname' => substr_replace($phone, '****', 3, 4)
             ]);
             $user = User::find($list->id);
         }

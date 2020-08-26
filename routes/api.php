@@ -196,8 +196,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('user/feed', 'UserController@feed');
     Route::post('user/feedback', 'UserController@feedback');
     Route::get('user/base', 'UserController@base');
-    Route::get('user/fan', 'UserController@fan');
-    Route::get('user/follower', 'UserController@follower');
+
 
     Route::post('auth/bind', 'AuthController@bind');
 
@@ -223,6 +222,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('user/followed', 'UserController@followed');
         Route::post('user/unfollow', 'UserController@unfollow');
         Route::get('user/statistics', 'UserController@statistics');
+        Route::get('user/fan', 'UserController@fan');
+        Route::get('user/follower', 'UserController@follower');
 
         //商城开始
         Route::post('shopping_cart/create', 'ShoppingCartController@create');
