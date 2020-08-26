@@ -125,7 +125,8 @@ class MallRefundJob
         }
     }
 
-    public function aliRefundCheckGrace($v){
+    public function aliRefundCheckGrace($v)
+    {
         $config = Config('pay.alipay');
         $alipay = Pay::alipay($config);
         $order = [
@@ -224,7 +225,7 @@ class MallRefundJob
                 $mrr->save();
                 $rrrModel->is_success = 1;
                 $rrrModel->refund_money = $result->refund_fee;
-            }else{
+            } else {
                 $rrrModel->is_success = 2;
                 $rrrModel->error_code = '';
                 $rrrModel->error_msg = '';
@@ -232,7 +233,7 @@ class MallRefundJob
         } catch (\Exception $e) {
             $rrrModel->is_success = 2;
             $rrrModel->error_code = $e->getCode();
-            $rrrModel->error_msg = substr($e->getMessage()??'', 0, 1000);
+            $rrrModel->error_msg = substr($e->getMessage() ?? '', 0, 1000);
         }
         $rrrModel->save();
         return true;
