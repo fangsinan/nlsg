@@ -65,6 +65,7 @@ class AuthController extends Controller
         }
         $token = auth('api')->login($user);;
         $data = [
+            'id'    => $user->id,
             'token' => $token
         ];
         return success($data);
@@ -137,20 +138,20 @@ class AuthController extends Controller
         $phone = $request->input('phone');
         $code  = $request->input('code');
 
-        if ( ! $phone) {
-            return error(1000, '手机号不能为空');
-        }
-        if ( ! $code) {
-            return error(1000, '验证码不能为空');
-        }
+        // if ( ! $phone) {
+        //     return error(1000, '手机号不能为空');
+        // }
+        // if ( ! $code) {
+        //     return error(1000, '验证码不能为空');
+        // }
 
-        $res = Redis::get($phone);
-        if ( ! $res) {
-            return error(1000, '验证码已过期');
-        }
-        if ($code !== $res) {
-            return error(1000, '验证码错误');
-        }
+        // $res = Redis::get($phone);
+        // if ( ! $res) {
+        //     return error(1000, '验证码已过期');
+        // }
+        // if ($code !== $res) {
+        //     return error(1000, '验证码错误');
+        // }
 
         $list = User::where('phone', $phone)->first();
         if($list){
