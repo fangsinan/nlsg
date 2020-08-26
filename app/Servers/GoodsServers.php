@@ -330,13 +330,15 @@ class GoodsServers
         $with[] = 'category_list';
 
         $list = $query->with($with)->select($field)->paginate($size);
-        foreach ($list as $v){
-
+        foreach ($list as $k => $v) {
+            $v->category_string = ($v->categoryStr->categoryParent->categoryParent->id ?? 0) . ',' .
+                ($v->categoryStr->categoryParent->id ?? 0) . ',' .
+                ($v->categoryStr->id ?? 0);
+            unset($list[$k]->categoryStr);
         }
 
         return $list;
     }
-
 
 
     public function categoryList()

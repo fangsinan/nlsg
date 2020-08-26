@@ -22,7 +22,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::put('active/status_change', 'ActiveController@statusChange');
 
     //特价管理
-    Route::post('special_price/add', 'SpecialPriceController@add');
+    Route::post('special_price/add_normal', 'SpecialPriceController@addNormal');
+    Route::post('special_price/add_flash_sale', 'SpecialPriceController@addFlashSale');
+    Route::post('special_price/add_group_buy', 'SpecialPriceController@addGroupBuy');
     Route::get('special_price/list', 'SpecialPriceController@list');
     Route::put('special_price/status_change', 'SpecialPriceController@statusChange');
 
