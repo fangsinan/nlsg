@@ -427,6 +427,10 @@ class MallOrderGroupBuy extends Base
         $ftModel = new FreightTemplate();
         $shop_address_list = $ftModel->listOfShop(2);
 
+        if(is_array($used_address) && empty($used_address)){
+            $used_address = new class {};
+        }
+
         $res = [
             'user' => $user,
             'sku_list' => [$sku_list_show],

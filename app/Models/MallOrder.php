@@ -738,7 +738,6 @@ class MallOrder extends Base
             $freight_free_flag = true;
         }
 
-
         //****************运费模板*********************
         if ($freight_free_flag === false) {
             if (!empty($used_address)) {
@@ -757,7 +756,6 @@ class MallOrder extends Base
         } else {
             $freight_money = 0;
         }
-
 
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
@@ -791,6 +789,10 @@ class MallOrder extends Base
         $ftModel = new FreightTemplate();
         $shop_address_list = $ftModel->listOfShop(2);
 
+        if(is_array($used_address) && empty($used_address)){
+            $used_address = new class {};
+        }
+
         $res = [
             'user' => $user,
             'sku_list' => $sku_list_show,
@@ -802,7 +804,6 @@ class MallOrder extends Base
             'used_address' => $used_address,
             'from_cart' => $params['from_cart']
         ];
-
 
         if ($params['post_type'] == 1 && empty($used_address)) {
             $can_sub = false;
