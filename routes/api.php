@@ -262,7 +262,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         //商城结束
 
 
-
+        Route::get('auth/logout', 'AuthController@logout');
 
         //虚拟订单  str
 
