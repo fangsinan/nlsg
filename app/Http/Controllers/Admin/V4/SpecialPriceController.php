@@ -24,8 +24,6 @@ class SpecialPriceController extends Controller
      * @apiParam {string} begin_time 开始时间
      * @apiParam {string} end_time 结束时间
      * @apiParam {number=1,2} status 状态(1上架2下架)
-     * @apiParamExample {json} Request-Example:
-     * @apiSuccessExample {json} Request-Example:
      **/
     public function list(Request $request)
     {
