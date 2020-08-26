@@ -10,13 +10,29 @@ use Illuminate\Http\Request;
 
 class SpecialPriceController extends Controller
 {
+
+    /**
+     * 列表
+     * @api {get} /api/admin_v4/special_price/list 列表
+     * @apiVersion 1.0.0
+     * @apiName /api/admin_v4/special_price/list
+     * @apiGroup 后台管理-商品价格设置
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/special_price/list
+     * @apiDescription 列表
+     * @apiParam {number=1,2,4} type 类型(1优惠2秒杀4拼团)
+     * @apiParam {string} goods_name 商品名称
+     * @apiParam {string} begin_time 开始时间
+     * @apiParam {string} end_time 结束时间
+     * @apiParam {number=1,2} status 状态(1上架2下架)
+     * @apiParamExample {json} Request-Example:
+     * @apiSuccessExample {json} Request-Example:
+     **/
     public function list(Request $request)
     {
         $servers = new SpecialPriceServers();
         $data = $servers->list($request->input());
         return $this->getRes($data);
     }
-
 
     /**
      * 添加秒杀活动

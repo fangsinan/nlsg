@@ -14,11 +14,12 @@ class SpecialPriceServers
     public function list($params)
     {
         $size = $params['size'] ?? 10;
-        $query = SpecialPriceModel::from('nlsg_special_price')->where('status', '<>', 3);
+        $query = SpecialPriceModel::from('nlsg_special_price');
 
         $with = ['goodsInfo', 'spSkuList', 'spSkuList.skuInfo', 'spSkuList.skuInfo.sku_value_list'];
         $field = ['id', 'goods_id', 'goods_original_price', 'goods_price', 'status', 'type',
-            'begin_time', 'end_time', 'group_name', 'group_num_type', 'group_num', 'group_price', 'group_life',
+            'begin_time', 'end_time', 'group_name', 'group_num_type',
+            'group_num', 'group_price', 'group_life',
         ];
 
         if (!empty($params['id'])) {
@@ -26,7 +27,9 @@ class SpecialPriceServers
             $field = ['*'];
         }
 
-//        $query->where('type', '=', intval($params['type'] ?? 1));
+        if (!empty($params['type'])) {
+            $query->where('type', '=', intval($params['type']));
+        }
 
         if (!empty($params['begin_time'])) {
             $query->where('begin_time', '>=', $params['begin_time']);
@@ -42,7 +45,11 @@ class SpecialPriceServers
             });
         }
 
-        $query->groupBy('group_name')->orderBy('id', 'desc');
+        if (!empty($params['status'])) {
+            $query->where('status', '=', intval($params['status']));
+        }
+
+        $query->where('status', '<>', 3)->groupBy('group_name')->orderBy('id', 'desc');
 
         return $query->with($with)->select($field)->paginate($size);
 
