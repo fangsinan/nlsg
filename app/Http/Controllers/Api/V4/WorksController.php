@@ -328,7 +328,7 @@ class WorksController extends Controller
 //        dd(DB::getQueryLog());
         //分类
         $category = WorksCategory::select('id','name')->where([
-            'type' => 1, 'status' => 1,
+            'type' => 1, 'status' => 1,'level'=>1
         ])->orderBy('order','desc')->get();
 
         foreach ($category as $key=>&$val){
