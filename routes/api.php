@@ -226,40 +226,46 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('user/follower', 'UserController@follower');
 
         //商城开始
-        Route::post('shopping_cart/create', 'ShoppingCartController@create');
-        Route::get('shopping_cart/get_list', 'ShoppingCartController@getList');
-        Route::put('shopping_cart/status_change', 'ShoppingCartController@statusChange');
-        Route::get('address/get_data', 'AddressController@getData');
-        Route::post('address/create', 'AddressController@create');
-        Route::get('address/get_list', 'AddressController@getList');
-        Route::put('address/status_change', 'AddressController@statusChange');
-        Route::get('after_sales/list', 'AfterSalesController@list');
-        Route::get('after_sales/goods_list', 'AfterSalesController@goodsList');
-        Route::post('after_sales/create_order', 'AfterSalesController@createOrder');
-        Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');
-        Route::put('after_sales/status_change', 'AfterSalesController@statusChange');
-        Route::put('after_sales/refund_post', 'AfterSalesController@refundPost');
-        Route::post('goods/get_coupon', 'CouponController@getCoupon');
-        Route::get('post/get_info', 'ExpressController@getPostInfo');
-        Route::get('post/company_list', 'ExpressController@companyList');
-        Route::post('goods/collect', 'MallController@collect');
-        Route::post('goods/sub', 'MallController@sub');
-        Route::post('home/redeem_code', 'MallController@redeemCode');
-        Route::post('mall/prepare_create_order', 'MallOrderController@prepareCreateOrder');
-        Route::post('mall/create_order', 'MallOrderController@createOrder');
-        Route::post('mall/prepare_create_flash_sale_order', 'MallOrderController@prepareCreateFlashSaleOrder');
-        Route::post('mall/create_flash_sale_order', 'MallOrderController@createFlashSaleOrder');
-        Route::post('mall/flash_sale_pay_fail', 'MallOrderController@flashSalePayFail');
-        Route::post('mall/prepare_create_group_buy_order', 'MallOrderController@prepareCreateGroupBuyOrder');
-        Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');
-        Route::get('mall/order_list', 'MallOrderController@list');
-        Route::get('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');
-        Route::get('mall/comment_list', 'MallOrderController@commentList');
-        Route::get('mall/order_info', 'MallOrderController@orderInfo');
-        Route::get('mall/group_buy_order_info', 'MallOrderController@groupBuyOrderInfo');
-        Route::put('mall/status_change', 'MallOrderController@statusChange');
-        Route::post('mall/sub_comment', 'MallOrderController@subComment');
-        Route::get('mall/get_comment', 'MallOrderController@getComment');
+        Route::post('shopping_cart/create', 'ShoppingCartController@create');//添加购物车
+        Route::get('shopping_cart/get_list', 'ShoppingCartController@getList');//购物车列表
+        Route::put('shopping_cart/status_change', 'ShoppingCartController@statusChange');//购物车状态修改
+
+        Route::get('address/get_data', 'AddressController@getData');//收货地址详情
+        Route::post('address/create', 'AddressController@create');//创建收获地址
+        Route::get('address/get_list', 'AddressController@getList');//收货地址列表
+        Route::put('address/status_change', 'AddressController@statusChange');//收货地址状态修改
+
+        Route::get('after_sales/list', 'AfterSalesController@list');//售后列表
+        Route::get('after_sales/goods_list', 'AfterSalesController@goodsList');//可售后商品列表
+        Route::post('after_sales/create_order', 'AfterSalesController@createOrder');//创建售后单
+        Route::get('after_sales/order_info', 'AfterSalesController@orderInfo');//售后单详情
+        Route::put('after_sales/status_change', 'AfterSalesController@statusChange');//售后状态修改
+        Route::put('after_sales/refund_post', 'AfterSalesController@refundPost');//售后快递信息提交
+
+        Route::post('goods/get_coupon', 'CouponController@getCoupon');//领取商品优惠券
+        Route::get('post/get_info', 'ExpressController@getPostInfo');//快递信息
+        Route::get('post/company_list', 'ExpressController@companyList');//快递公司列表
+
+        Route::post('goods/collect', 'MallController@collect');//商品收藏
+        Route::post('goods/sub', 'MallController@sub');//商品补货提醒
+        Route::post('home/redeem_code', 'MallController@redeemCode');//兑换码
+
+        Route::post('mall/prepare_create_order', 'MallOrderController@prepareCreateOrder');//普通预下单
+        Route::post('mall/create_order', 'MallOrderController@createOrder');//普通下单
+        Route::post('mall/prepare_create_flash_sale_order', 'MallOrderController@prepareCreateFlashSaleOrder');//秒杀预下单
+        Route::post('mall/create_flash_sale_order', 'MallOrderController@createFlashSaleOrder');//秒杀下单
+        Route::post('mall/flash_sale_pay_fail', 'MallOrderController@flashSalePayFail');//秒杀支付失败删除订单
+        Route::post('mall/prepare_create_group_buy_order', 'MallOrderController@prepareCreateGroupBuyOrder');//拼团预下单
+        Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');//拼团下单
+
+        Route::get('mall/order_list', 'MallOrderController@list');//普通和秒杀订单列表
+        Route::get('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');//拼团列表
+        Route::get('mall/comment_list', 'MallOrderController@commentList');//商品评价列表
+        Route::get('mall/order_info', 'MallOrderController@orderInfo');//普通和秒杀订单详情
+        Route::get('mall/group_buy_order_info', 'MallOrderController@groupBuyOrderInfo');//拼团订单详情
+        Route::put('mall/status_change', 'MallOrderController@statusChange');//订单状态修改
+        Route::post('mall/sub_comment', 'MallOrderController@subComment');//评论
+        Route::get('mall/get_comment', 'MallOrderController@getComment');//获取评论内容
         //商城结束
 
 
