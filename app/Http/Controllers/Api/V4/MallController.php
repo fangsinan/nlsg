@@ -233,8 +233,6 @@ class MallController extends Controller
      * @apiParam {number} [goods_only] 1:如果指定goods_id,可通过该参数控制只返回指定商品优惠券
      * @apiParam {string} [ob] 排序(id上架时间,price价格,以上后缀分为_asc正序,_desc逆序.不传为默认)
      * @apiParam {number} [show_zero_stock] 1:没有库存的也返回  默认不返回
-     * @apiParam {number} [page] 页数,默认1
-     * @apiParam {number} [size] 条数,默认10
      * @apiParam {number=1,0} [get_all] 1:不设置分页,都传回
      *
      * @apiSuccess {number} id id
@@ -924,7 +922,6 @@ class MallController extends Controller
         }
         return $this->success(['code' => true, 'msg' => '成功']);
     }
-
 
     /**
      * todo 兑换码

@@ -50,16 +50,28 @@ class MallGoods extends Base
 
         //获取商品所处的活动
         $agModel = new ActiveGroupGlModel();
+        $crModel = new CouponRule();
         foreach ($list as $v) {
             $temp_gl = $agModel->getList([
                 'goods_type' => 1, 'goods_id' => $v->id, 'simple' => 1
             ]);
             $v->active_group_list = array_values($temp_gl);
+            $temp_coupon_list = $crModel->getList([
+                'goods_id'=>$v->id,
+                'size'=>1
+            ],$user['id']??0);
+            if(empty($temp_coupon_list)){
+                $v->coupon_info = [];
+            }else{
+                $v->coupon_info = [$temp_coupon_list[0]];
+            }
         }
 
         //价格类
         $getPriceTools = new GetPriceTools();
         $getPriceTools->goodsList($list, $user['level'] ?? 0, $user['id'] ?? 0, $user['is_staff'] ?? 0);
+
+
 
         return $list;
     }
