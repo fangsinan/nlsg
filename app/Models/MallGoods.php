@@ -414,6 +414,9 @@ class MallGoods extends Base
         }
         $data['normal_price'] = MallGoods::where('id', '=', $data['id'])->sum('price');
         $data['stock'] = $this->getGoodsAllStock($data['id']);
+        $data['service_description'] = $this->mallServiceDescription();
+        $data['buyer_reading'] = $this->buyerReading();
+
         return [$data];
     }
 
