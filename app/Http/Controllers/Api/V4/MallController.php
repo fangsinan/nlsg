@@ -784,15 +784,8 @@ class MallController extends Controller
      */
     public function mallServiceDescription()
     {
-        $res = \App\Models\ConfigModel::getData(6);
-
-        $freight_line = \App\Models\ConfigModel::getData(1);
-        $post_money = \App\Models\ConfigModel::getData(7);
-
-        $res = str_replace('$freight_line', $freight_line, $res);
-        $res = str_replace('$post_money', $post_money, $res);
-
-        $res = json_decode($res);
+        $model = new MallGoods();
+        $res = $model->mallServiceDescription();
         return $this->success($res);
     }
 
@@ -823,8 +816,8 @@ class MallController extends Controller
      */
     public function buyerReading()
     {
-        $res = \App\Models\ConfigModel::getData(16);
-        $res = json_decode($res);
+        $model = new MallGoods();
+        $res = $model->buyerReading();
         return $this->success($res);
     }
 

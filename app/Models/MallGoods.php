@@ -46,6 +46,10 @@ class MallGoods extends Base
                 }
                 $vv->id_arr = $temp_id_arr;
             }
+            if(($params['get_details']??0) == 1){
+                $v->service_description = $this->mallServiceDescription();
+                $v->buyer_reading = $this->buyerReading();
+            }
         }
 
         //获取商品所处的活动
@@ -56,22 +60,15 @@ class MallGoods extends Base
                 'goods_type' => 1, 'goods_id' => $v->id, 'simple' => 1
             ]);
             $v->active_group_list = array_values($temp_gl);
-            $temp_coupon_list = $crModel->getList([
-                'goods_id'=>$v->id,
-                'size'=>1
-            ],$user['id']??0);
-            if(empty($temp_coupon_list)){
-                $v->coupon_info = [];
-            }else{
-                $v->coupon_info = [$temp_coupon_list[0]];
-            }
         }
 
         //价格类
         $getPriceTools = new GetPriceTools();
         $getPriceTools->goodsList($list, $user['level'] ?? 0, $user['id'] ?? 0, $user['is_staff'] ?? 0);
 
+        if($params['get_details']){
 
+        }
 
         return $list;
     }
@@ -302,9 +299,10 @@ class MallGoods extends Base
             ->where('status', '=', 1);
     }
 
-    public function categoryStr(){
+    public function categoryStr()
+    {
         return $this->hasOne('App\Models\MallCategory', 'id', 'category_id')
-            ->select(['id','pid']);
+            ->select(['id', 'pid']);
     }
 
     /**
@@ -414,7 +412,7 @@ class MallGoods extends Base
                     $v->group_num = $vv['group_num'];
                     $v->price = $vv['group_price'];
                     $v->normal_price = MallSku::where('sku_number', '=', $vv['sku_number'])->sum('price');
-                    $v->stock = $this->getGoodsAllStock($vv['goods_id'],$vv['id']);
+                    $v->stock = $this->getGoodsAllStock($vv['goods_id'], $vv['id']);
                 }
             }
         }
@@ -457,6 +455,24 @@ class MallGoods extends Base
             $user, false);
 
         return $res;
+    }
+
+    //商城服务说明
+    public function mallServiceDescription()
+    {
+        $res = ConfigModel::getData(6);
+        $freight_line = ConfigModel::getData(1);
+        $post_money = ConfigModel::getData(7);
+        $res = str_replace('$freight_line', $freight_line, $res);
+        $res = str_replace('$post_money', $post_money, $res);
+        return json_decode($res);
+    }
+
+    //商城购买须知
+    public function buyerReading()
+    {
+        $res = ConfigModel::getData(16);
+        return json_decode($res);
     }
 
 }
