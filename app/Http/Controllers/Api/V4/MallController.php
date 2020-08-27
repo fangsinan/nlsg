@@ -451,6 +451,8 @@ class MallController extends Controller
      * @apiSuccess {number} banner.title
      * @apiSuccess {number} banner.pic
      * @apiSuccess {number} banner.url
+     * @apiSuccess {number} banner.jump_type 跳转类型(1:h5(走url),2商品)
+     * @apiSuccess {number} banner.obj_id 跳转目标id
      *
      * @apiSuccess {number} recommend 下方推荐位(字段同banner)
      * @apiSuccess {number} hot_sale 爆款推荐(字段同banner)
