@@ -268,8 +268,7 @@ class SpecialPriceModel extends Base
     //首页拼团推荐
     public function homeGroupList()
     {
-        $res = $this->homeGroupListFromDb(2);
-        return $res;
+        return $this->homeGroupListFromDb(2);
     }
 
     //拼团首页
@@ -341,7 +340,7 @@ class SpecialPriceModel extends Base
         $now = date('Y-m-d H:i:s');
 
         $res = Cache::get($cache_key_name);
-        if (empty($res)) {
+        if (true || empty($res)) {
             $res = self::from('nlsg_special_price as nsp')
                 ->where('nsp.type', '=', 4)
                 ->where('nsp.status', '=', 1)
@@ -353,6 +352,7 @@ class SpecialPriceModel extends Base
                 ->select(['nsp.group_name as group_buy_id', 'nsp.goods_id', 'nmg.name',
                     'nmg.subtitle', 'nmg.picture', 'nmg.original_price', 'group_num', 'group_price',
                     'nsp.begin_time', 'nsp.end_time', 'group_name'])
+                ->orderBy('begin_time','asc')
                 ->groupBy('nsp.group_name')
                 ->get();
             Cache::add($cache_key_name, $res, $expire_num);
@@ -360,7 +360,12 @@ class SpecialPriceModel extends Base
 
         $key_array = [];
         foreach ($res as $k => $v) {
-            if ($v->begin_time >= $now || $v->end_time <= $now) {
+//            if ($v->begin_time >= $now || $v->end_time <= $now) {
+//                unset($res[$k]);
+//            } else {
+//                array_push($key_array, $k);
+//            }
+            if ($v->end_time <= $now) {
                 unset($res[$k]);
             } else {
                 array_push($key_array, $k);
@@ -368,14 +373,14 @@ class SpecialPriceModel extends Base
         }
 
         if ($limit && $key_array) {
-            $key_array = array_rand($key_array, 2);
+            $key_array = array_rand($key_array, count($key_array)>2?2:count($key_array));
             foreach ($res as $k => $v) {
                 if (!in_array($k, $key_array)) {
                     unset($res[$k]);
                 }
             }
         }
-        //return array_values($res->toArray());
+
         $temp_res = [];
         foreach ($res as $v) {
             $temp_res[] = $v;
