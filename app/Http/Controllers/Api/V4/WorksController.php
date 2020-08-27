@@ -342,7 +342,7 @@ class WorksController extends Controller
             }])->where('status',4)
             ->orderBy('subscribe_num','desc')->groupBy('user_id')
             ->paginate(6)->toArray();
-        $newTeacher = [];
+        $newTeacher[] = ['id'=>0,'nickname'=>'全部'];
         foreach ($Teacher['data'] as $key=>$val){
             if($val['user_name']){
                 $newTeacher[] = $val['user_name'];
