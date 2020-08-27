@@ -249,7 +249,7 @@ class WorksController extends Controller
             $query->select("*")->orderBy($order_str,'desc')->groupBy('id');
         }])->whereHas('works', function ($query) use ($works_where){
                  $query->where($works_where);
-        })->select("*")->where($where)
+        })->select("*")->where($where)->groupBy('work_id')
         ->paginate($this->page_per_page)->toArray();
 
 
