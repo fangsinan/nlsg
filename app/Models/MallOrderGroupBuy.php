@@ -730,6 +730,7 @@ class MallOrderGroupBuy extends Base
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
             $now_date . '" then FALSE ELSE TRUE END) ');
 
+        $query->orderBy('id','desc');
         $list = $query->with($with)->select($field)->get();
 
         foreach ($list as $k => $v) {
