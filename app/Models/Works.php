@@ -39,6 +39,7 @@ class Works extends Base
                 $query->select('id','nickname', 'headimg');
             }])
             ->whereIn('id',$ids)
+            ->where('status',4)
             ->where('is_audio_book',$is_audio_book)
             ->orderBy('created_at','desc')
             ->get()

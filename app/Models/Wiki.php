@@ -20,6 +20,7 @@ class Wiki extends Model
         }
         $lists= Wiki::select('id','name','content','cover','view_num','like_num', 'comment_num')
             ->whereIn('id',$ids)
+            ->where('status',1)
             ->orderBy('created_at','desc')
             ->get()
             ->toArray();

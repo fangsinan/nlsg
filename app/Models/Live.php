@@ -15,6 +15,7 @@ class Live extends Model
         }
         $lists= $this->select('id','title', 'describe','cover_img', 'start_time','end_time')
             ->whereIn('id', $ids)
+            ->where('status', 4)
             ->orderBy('created_at', 'desc')
             ->get()
             ->toArray();

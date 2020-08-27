@@ -311,6 +311,7 @@ class MallGoods extends Base
         $lists = MallGoods::query()
             ->select('id', 'name', 'picture', 'original_price', 'price')
             ->whereIn('id', $ids)
+            ->where('status', 2)
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
