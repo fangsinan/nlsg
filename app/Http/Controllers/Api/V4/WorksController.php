@@ -249,7 +249,7 @@ class WorksController extends Controller
             $query->select("*")->orderBy($order_str,'desc')->groupBy('id');
         }])->whereHas('works', function ($query) use ($works_where){
                  $query->where($works_where);
-        })->select("*")->where($where)
+        })->select("*")->where($where)->groupBy('work_id')
         ->paginate($this->page_per_page)->toArray();
 
 
@@ -328,7 +328,7 @@ class WorksController extends Controller
 //        dd(DB::getQueryLog());
         //分类
         $category = WorksCategory::select('id','name')->where([
-            'type' => 1, 'status' => 1,
+            'type' => 1, 'status' => 1,'level'=>1
         ])->orderBy('order','desc')->get();
 
         foreach ($category as $key=>&$val){
