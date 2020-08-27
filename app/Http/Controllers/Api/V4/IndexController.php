@@ -632,7 +632,7 @@ class IndexController extends Controller
     public function recommend()
     {
         $works = new Works();
-        $lists = $works->getRecommendWorks(34);
+        $lists = $works->getRecommendWorks(566);
         return success($lists);
     }
 
