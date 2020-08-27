@@ -131,7 +131,7 @@ class WikiController extends Controller
     public function show(Request $request)
     {
         $id = $request->input('id');
-        $res = Wiki::select('name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
+        $res = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
             ->find($id);
         if ( ! $res) {
             return error(1000, '百科不存在');
