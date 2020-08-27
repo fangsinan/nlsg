@@ -14,7 +14,7 @@ class Controller extends BaseController
         DispatchesJobs,
         ValidatesRequests;
 
-    protected $page_per_page = 50;
+    protected $page_per_page = 10;
     protected $show_ps = true;
     public $user;
 
