@@ -114,7 +114,7 @@ class ListenBookController extends Controller
         $works_data['is_sub'] = $is_sub;
 
         $infoObj = new WorksInfo();
-        $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,'',$order);
+        $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order);
         $works_data['info_num'] = count($works_data['info']);
 
         //查询总的历史记录进度`
