@@ -34,7 +34,7 @@ class SpecialPriceController extends Controller
 
     /**
      * 添加秒杀活动
-     * @api {get} /api/admin_v4/special_price/add_flash_sale 添加秒杀活动
+     * @api {post} /api/admin_v4/special_price/add_flash_sale 添加秒杀活动
      * @apiVersion 1.0.0
      * @apiName /api/admin_v4/special_price/add_flash_sale
      * @apiGroup 后台管理-商品价格设置
@@ -91,7 +91,7 @@ class SpecialPriceController extends Controller
 
     /**
      * 添加拼团
-     * @api {get} /api/admin_v4/special_price/add_group_buy 添加拼团
+     * @api {post} /api/admin_v4/special_price/add_group_buy 添加拼团
      * @apiVersion 1.0.0
      * @apiName /api/admin_v4/special_price/add_group_buy
      * @apiGroup 后台管理-商品价格设置
@@ -148,7 +148,7 @@ class SpecialPriceController extends Controller
 
     /**
      * 添加优惠活动
-     * @api {get} /api/admin_v4/special_price/add_normal 添加优惠活动
+     * @api {post} /api/admin_v4/special_price/add_normal 添加优惠活动
      * @apiVersion 1.0.0
      * @apiName /api/admin_v4/special_price/add_normal
      * @apiGroup 后台管理-商品价格设置
