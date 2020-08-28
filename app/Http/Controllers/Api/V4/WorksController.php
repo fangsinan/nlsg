@@ -272,6 +272,14 @@ class WorksController extends Controller
             }
             $worksData['data'][$key]['works']['is_new'] = $is_new;
 
+
+            //讲师名称
+            $user = User::find($val['works']['user_id']);
+            $worksData['data'][$key]['works']['username'] = $user['nickname'];
+            //专栏头衔
+            $column = Column::find($val['works']['column_id']);
+            $worksData['data'][$key]['works']['column_title'] = $column['title'];
+
             $newWorks[] = $worksData['data'][$key];
 
         }
