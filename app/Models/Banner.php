@@ -35,7 +35,7 @@ class Banner extends Base
             $res = self::mallBannerListFromDb();
             Cache::add($cache_key_name, $res, $expire_num);
         }
-        
+
         $keywords = ConfigModel::getData(21);
         $res['keywords'] = explode(',',$keywords);
         return $res;

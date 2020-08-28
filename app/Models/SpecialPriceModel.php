@@ -360,16 +360,16 @@ class SpecialPriceModel extends Base
 
         $key_array = [];
         foreach ($res as $k => $v) {
-//            if ($v->begin_time >= $now || $v->end_time <= $now) {
-//                unset($res[$k]);
-//            } else {
-//                array_push($key_array, $k);
-//            }
-            if ($v->end_time <= $now) {
+            if ($v->begin_time >= $now || $v->end_time <= $now) {
                 unset($res[$k]);
             } else {
                 array_push($key_array, $k);
             }
+//            if ($v->end_time <= $now) {
+//                unset($res[$k]);
+//            } else {
+//                array_push($key_array, $k);
+//            }
         }
 
         if ($limit && $key_array) {
