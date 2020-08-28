@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\CouponRuleList;
 use Illuminate\Http\Request;
 use App\Models\MallGoods;
 use App\Models\CouponRule;
@@ -925,6 +926,25 @@ class MallController extends Controller
         $num = $request->input('num', 4);
         $model = new MallGoods();
         $data = $model->forYourReference($num, $this->user);
+        return $this->getRes($data);
+    }
+
+    /**
+     * 优惠券领取页面
+     * @api {post} /api/v4/mall_coupon/rule 优惠券领取页面
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/mall_coupon/rule
+     * @apiGroup  Mall
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/mall_coupon/rule
+     * @apiDescription 优惠券领取页面
+     * @apiParam {number} id id
+     *
+     */
+    public function getCouponList(Request $request)
+    {
+        $id = $request->input('id', 0);
+        $model = new CouponRuleList();
+        $data = $model->list($id, $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 

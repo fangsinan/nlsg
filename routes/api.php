@@ -116,6 +116,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('shopping_cart/get_list', 'ShoppingCartController@getList');
     Route::put('shopping_cart/status_change', 'ShoppingCartController@statusChange');
 
+
+    //优惠券领取页面
+    Route::get('mall_coupon/rule', 'MallController@getCouponList');
+
     //普通订单
     Route::post('mall/prepare_create_order', 'MallOrderController@prepareCreateOrder');
     Route::post('mall/create_order', 'MallOrderController@createOrder');

@@ -32,6 +32,14 @@ class CouponRule extends Base
             }
         }
 
+        if ($params['id_list'] ?? false) {
+            foreach ($res as $k => $v) {
+                if (!in_array($v->id, $params['id_list'])) {
+                    unset($res[$k]);
+                }
+            }
+        }
+
         //只返回可以开始领取的
         if (($params['only_begin'] ?? 0) == 1) {
             foreach ($res as $k => $v) {
