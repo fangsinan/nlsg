@@ -37,7 +37,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('column/get_column_list', 'ColumnController@getColumnList');
     Route::get('column/get_column_detail', 'ColumnController@getColumnDetail');
     Route::get('column/get_column_works', 'ColumnController@getColumnWorks');
-    Route::get('column/collection', 'ColumnController@Collection');
     Route::get('column/get_recommend', 'ColumnController@getRecommend');
     Route::get('column/get_lecture_list', 'ColumnController@getLectureList');
     Route::get('column/get_lecture_study_list', 'ColumnController@LectureStudyList');
@@ -309,6 +308,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
         Route::get('order/get_subscribe', 'OrderController@getSubscribe');
+
+        Route::get('column/collection', 'ColumnController@Collection');
 
 
     });

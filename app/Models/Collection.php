@@ -7,14 +7,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Collection extends Authenticatable
 {
     protected $table = 'nlsg_collection';
-    protected $fillable = ['type','user_id','column_id','works_id', 'worksinfo_id','goods_id','sku_number',];
+    protected $fillable = ['type','user_id','relation_id','info_id','type'];
 
     //收藏 操作
     //$type   1：专栏  2：课程 3 :商品
     static function CollectionData($user_id=0,$target_id=0,$type=0, $info_id=0){
 
         //处理专栏的关注信息
-        if( !in_array($type,[1,2,3]) ){
+        if( !in_array($type,[1,2,3,4,5,6,7]) ){
             return 0;
         }
         $where = ['type' => $type, 'user_id' => $user_id,'relation_id'=>$target_id, 'info_id'=>$info_id];
