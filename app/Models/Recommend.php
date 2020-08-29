@@ -106,6 +106,7 @@ class Recommend extends Base
                }
 
             }
+            $lists = array_values($lists);
         }
 
         return $lists;
