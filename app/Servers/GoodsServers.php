@@ -329,8 +329,8 @@ class GoodsServers
         }
         $query->orderBy('id', 'desc');
 
-        $with[] = 'sku_list';
-        $with[] = 'sku_list.sku_value_list';
+        $with[] = 'sku_list_back';
+        $with[] = 'sku_list_back.sku_value_list';
         $with[] = 'category_list';
 
         $list = $query->with($with)->select($field)->paginate($size);

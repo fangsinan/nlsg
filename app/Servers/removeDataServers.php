@@ -9,7 +9,11 @@ class removeDataServers
 {
     public function removeGoods()
     {
-        $old_goods = DB::connection('mysql_old')->table('nlsg_mall_goods')->get()->toArray();
+        $old_goods = DB::connection('mysql_old')
+            ->table('nlsg_mall_goods')
+            ->get()
+            ->toArray();
+
         $goods_data = [];
         foreach ($old_goods as $v) {
             $temp = [];
@@ -34,6 +38,7 @@ class removeDataServers
             $goods_data[] = $temp;
         }
 
+        dd($goods_data);
 
     }
 }
