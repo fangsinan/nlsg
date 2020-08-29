@@ -263,6 +263,12 @@ class MallGoods extends Base
                 'original_price', 'price', 'stock']);
     }
 
+    public function sku_list_back(){
+        return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
+            ->where('status', '=', 1)
+            ->select();
+    }
+
     public function sku_list_all()
     {
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
