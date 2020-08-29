@@ -352,7 +352,7 @@ class SpecialPriceModel extends Base
                 ->select(['nsp.group_name as group_buy_id', 'nsp.goods_id', 'nmg.name',
                     'nmg.subtitle', 'nmg.picture', 'nmg.original_price', 'group_num', 'group_price',
                     'nsp.begin_time', 'nsp.end_time', 'group_name'])
-                ->orderBy('begin_time','asc')
+                ->orderBy('begin_time', 'asc')
                 ->groupBy('nsp.group_name')
                 ->get();
             Cache::add($cache_key_name, $res, $expire_num);
@@ -360,20 +360,29 @@ class SpecialPriceModel extends Base
 
         $key_array = [];
         foreach ($res as $k => $v) {
-            if ($v->begin_time >= $now || $v->end_time <= $now) {
-                unset($res[$k]);
+            if ($v->begin_time > $now) {
+                $v->is_begin = 0;
             } else {
-                array_push($key_array, $k);
+                $v->is_begin = 1;
             }
-//            if ($v->end_time <= $now) {
-//                unset($res[$k]);
-//            } else {
-//                array_push($key_array, $k);
-//            }
+            if (0) {
+                //过滤未开始的
+                if ($v->begin_time >= $now || $v->end_time <= $now) {
+                    unset($res[$k]);
+                } else {
+                    array_push($key_array, $k);
+                }
+            } else {
+                if ($v->end_time <= $now) {
+                    unset($res[$k]);
+                } else {
+                    array_push($key_array, $k);
+                }
+            }
         }
 
         if ($limit && $key_array) {
-            $key_array = array_rand($key_array, count($key_array)>2?2:count($key_array));
+            $key_array = array_rand($key_array, count($key_array) > 2 ? 2 : count($key_array));
             foreach ($res as $k => $v) {
                 if (!in_array($k, $key_array)) {
                     unset($res[$k]);

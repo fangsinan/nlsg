@@ -596,7 +596,6 @@ class MallOrderController extends Controller
         $params['os_type'] = $request->input('os_type', 0);
         $params['buy_type'] = $request->input('buy_type', 0);
         $params['group_key'] = $request->input('group_key', '');
-
         $model = new MallOrderGroupBuy();
         $data = $model->prepareCreateGroupBuyOrder($params, $this->user);
         return $this->getRes($data);

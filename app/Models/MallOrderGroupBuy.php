@@ -250,7 +250,6 @@ class MallOrderGroupBuy extends Base
             $sku_list['group_name'] = $f_data->group_name;
         }
 
-
         $all_original_price = GetPriceTools::PriceCalc(
             '*', $sku_list['original_price'], $sku_list['num']
         );
@@ -525,9 +524,6 @@ class MallOrderGroupBuy extends Base
             ->where('begin_time', '<=', $now_date)
             ->where('end_time', '>=', $now_date)
             ->get();
-
-        //$spModel = new SpecialPriceModel();
-        //$sp_data = $spModel->getSpData($goods_id, 1);
 
         if ($sp_data->isEmpty()) {
             return ['code' => false, 'msg' => '活动不存在'];
