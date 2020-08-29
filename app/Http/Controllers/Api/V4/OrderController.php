@@ -732,6 +732,8 @@ class OrderController extends Controller
             }
             if($result == false){
                 unset($data[$key]);
+            }else{
+                $data[$key]['relation_data'] = $result;
             }
         }
 
