@@ -519,11 +519,12 @@ class OrderController extends Controller
         $status    = $request->input('status',2);
         $where =['user_id' =>$user_id, ];
 
-        if($type >0 ){
+        if($type > 0 ){
             $where =['user_id' =>$user_id,'type'=>$type ];
         }
 
-        $OrderObj = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum','created_at')->whereIn('type', [1, 9, 15])
+        $OrderObj = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum','created_at')
+            ->whereIn('type', [1, 5, 9, 10, 13, 15])
             ->where($where);
 
         //  订单状态
@@ -534,9 +535,11 @@ class OrderController extends Controller
         }
 
         $list = $OrderObj->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
+
+
         $data = $list['data'];
         foreach ($data as $key=>$val){
-
+            $result = false;
             switch ($val['type']) {
                 case 1:
                     $model = new Column();
