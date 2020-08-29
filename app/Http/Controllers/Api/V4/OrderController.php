@@ -732,8 +732,11 @@ class OrderController extends Controller
             }
             if($result == false){
                 unset($data[$key]);
+            }else{
+                $data[$key]['relation_data'] = $result;
             }
         }
+        $data = array_values($data);
 
         return $this->success($data);
 
