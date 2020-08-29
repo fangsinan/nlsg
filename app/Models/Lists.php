@@ -22,7 +22,8 @@ class Lists extends Model
 
         $lists  = Lists::select('id','title', 'subtitle','cover','num')
         ->with(['works'=> function($query){
-            $query->select('works_id','user_id','title', 'cover_img');
+            $query->select('works_id','user_id','title', 'cover_img','status')
+            ->where('status',4);
         }, 'works.user'=>function($query){
             $query->select('id','nickname','headimg');
         }])->whereIn('id',$ids)
@@ -40,7 +41,8 @@ class Lists extends Model
         }
         $lists  = Lists::select('id','title', 'subtitle','cover','num')
         ->with(['works'=> function($query){
-            $query->select('works_id','user_id','title', 'cover_img');
+            $query->select('works_id','user_id','title', 'cover_img')
+                ->where('status',4);
         }, 'works.user'=>function($query){
             $query->select('id','nickname','headimg');
         }])->whereIn('id',$ids)

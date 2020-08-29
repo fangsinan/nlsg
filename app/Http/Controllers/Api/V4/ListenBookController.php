@@ -119,7 +119,11 @@ class ListenBookController extends Controller
 
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($works_data['id'],2,$user_id);  //讲座
-        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
+
+        $works_data['history_count'] = 0;
+        if($works_data['info_num'] > 0){
+            $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
+        }
 
         //作者信息
         $works_data['user_info'] = User::find($works_data['user_id']);

@@ -410,6 +410,7 @@ class OrderController extends Controller
      * @apiGroup order
      *
      * @apiParam {int} type 类型  专栏 2 会员  3充值  4财务打款 5 打赏 6分享赚钱 7支付宝提现 8微信提现  9精品课  10直播    13能量币充值  14 线下产品(门票类)   15讲座
+     * @apiParam {int} status 0待支付  1 已支付 2全部
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -515,14 +516,24 @@ class OrderController extends Controller
     public function orderList(Request $request){
         $user_id = $this->user['id']??0;
         $type    = $request->input('type',0);
+        $status    = $request->input('status',2);
         $where =['user_id' =>$user_id, ];
 
         if($type >0 ){
             $where =['user_id' =>$user_id,'type'=>$type ];
         }
-        $list = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum','created_at')->whereIn('type', [1, 9, 15])
-            ->where($where)
-            ->whereIn('status', [0, 1])->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
+
+        $OrderObj = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum','created_at')->whereIn('type', [1, 9, 15])
+            ->where($where);
+
+        //  订单状态
+        if($status == 2){
+            $OrderObj->where('status',2,'!=');  //2是取消的订单
+        }else{
+            $OrderObj->where('status',$status);
+        }
+
+        $list = $OrderObj->whereIn('status', [0, 1])->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
         $data = $list['data'];
         foreach ($data as $key=>$val){
 
