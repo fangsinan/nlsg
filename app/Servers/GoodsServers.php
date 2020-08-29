@@ -131,17 +131,20 @@ class GoodsServers
         DB::table('nlsg_mall_goods_tos_bind')
             ->where('goods_id', '=', $goods_id)
             ->delete();
-        $tos_arr = [];
-        foreach ($params['tos'] as $v) {
-            $temp_tos_arr = [];
-            $temp_tos_arr['goods_id'] = $goods_id;
-            $temp_tos_arr['tos_id'] = $v;
-            $tos_arr[] = $temp_tos_arr;
-        }
-        $tos_res = DB::table('nlsg_mall_goods_tos_bind')->insert($tos_arr);
-        if (!$tos_res) {
-            DB::rollBack();
-            return ['code' => false, 'msg' => 'tos 错误'];
+
+        if (0) {
+            $tos_arr = [];
+            foreach ($params['tos'] as $v) {
+                $temp_tos_arr = [];
+                $temp_tos_arr['goods_id'] = $goods_id;
+                $temp_tos_arr['tos_id'] = $v;
+                $tos_arr[] = $temp_tos_arr;
+            }
+            $tos_res = DB::table('nlsg_mall_goods_tos_bind')->insert($tos_arr);
+            if (!$tos_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => 'tos 错误'];
+            }
         }
 
         //sku
