@@ -731,12 +731,8 @@ class OrderController extends Controller
                     break;
             }
             if($result == false){
-                $data[$key]['relation_data'] = [];
-            }else{
-                $data[$key]['relation_data'] = $result;
+                unset($data[$key]);
             }
-
-
         }
 
         return $this->success($data);
