@@ -602,6 +602,7 @@ class MallController extends Controller
      * @apiSuccess {number} group.group_price 拼团价格
      * @apiSuccess {number} group.begin_time 开始时间
      * @apiSuccess {number} group.end_time 结束时间
+     * @apiSuccess {number=1,2} is_begin 是否开始(1开始 0未开始)
      * @apiSuccessExample {json} Request-Example:
      * {
      * "code": 200,
@@ -751,6 +752,7 @@ class MallController extends Controller
      * @apiSuccess {number} begin_time 开始时间
      * @apiSuccess {number} end_time 结束时间
      * @apiSuccess {number} user_count 参加人数
+     * @apiSuccess {number=1,2} is_begin 是否开始(1开始 0未开始)
      * @apiSuccess {string[]} order_user 用户头像列表
      * @apiSuccessExample {json} Request-Example:
      *
