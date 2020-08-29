@@ -79,28 +79,34 @@ class Recommend extends Base
                  ->get()
                  ->toArray();
         if ($lists){
-            foreach ($lists as &$v) {
+            foreach ($lists as $k=>$v) {
                if ($v['relation_type']==1 || $v['relation_type'] == 2 ) {
-                   $v['works'] = Works::with([
+                   $lists[$k]['works'] = Works::with([
                        'user' => function ($query) {
                            $query->select('id', 'nickname','headimg');
                        }])
                        ->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'price', 'chapter_num', 'subscribe_num'])
                        ->where('id', $v['relation_id'])
+                       ->where('status', 4)
                        ->first();
 
                } elseif ($v['relation_type'] == 3 || $v['relation_type'] == 4) {
 
-                   $v['works'] = Column::with([
+                   $lists[$k]['works'] = Column::with([
                        'user' => function ($query) {
                            $query->select('id', 'nickname','headimg');
                        }])
                        ->select(['id', 'user_id', 'name','title','subtitle', 'cover_pic', 'price'])
                        ->where('id', $v['relation_id'])
+                       ->where('status', 1)
                        ->first();
+               }
+               if(empty($lists[$k]['works'])){
+                   unset($lists[$k]);
                }
 
             }
+            $lists = array_values($lists);
         }
 
         return $lists;
