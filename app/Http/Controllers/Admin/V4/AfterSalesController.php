@@ -17,7 +17,8 @@ use App\Servers\AfterSalesServers;
  *
  * @author wangxh
  */
-class AfterSalesController extends Controller {
+class AfterSalesController extends Controller
+{
 
     /**
      * 售后列表和详情
@@ -28,14 +29,28 @@ class AfterSalesController extends Controller {
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/after_sales/list
      * @apiDescription 售后列表和详情
      */
-    public function list(Request $request) {
+    public function list(Request $request)
+    {
         $servers = new AfterSalesServers();
         $data = $servers->getList($request->input());
         return $this->getRes($data);
     }
 
-    //todo 审核,鉴定
-    public function statusChange(Request $request) {
+    /**
+     *审核,鉴定
+     * @api {get} /api/admin_v4/after_sales/status_change 审核,鉴定
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/after_sales/status_change
+     * @apiGroup  后台-售后
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/after_sales/status_change
+     * @apiDescription 审核,鉴定
+     * @apiParam {number} id id
+     * @apiParam {string=check,identify} flag check审核,identify鉴定
+     * @apiParam {number=1,2} [value]  鉴定时传,1通过 2拒绝
+     *
+     */
+    public function statusChange(Request $request)
+    {
         $this->user['id'] = 168934;
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
