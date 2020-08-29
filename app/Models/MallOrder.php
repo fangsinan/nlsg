@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class MallOrder extends Base
 {
@@ -715,7 +716,7 @@ class MallOrder extends Base
                     return ['code' => false, 'msg' => '地址信息错误'];
                 }
             } else {
-                if ($address_list[0]??'') {
+                if ($address_list[0] ?? '') {
                     $used_address = $address_list[0]->toArray();
                 }
             }
@@ -789,8 +790,9 @@ class MallOrder extends Base
         $ftModel = new FreightTemplate();
         $shop_address_list = $ftModel->listOfShop(2);
 
-        if(is_array($used_address) && empty($used_address)){
-            $used_address = new class {};
+        if (is_array($used_address) && empty($used_address)) {
+            $used_address = new class {
+            };
         }
 
         $res = [
@@ -802,7 +804,8 @@ class MallOrder extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => $coupon_list,
             'used_address' => $used_address,
-            'from_cart' => $params['from_cart']
+            'from_cart' => $params['from_cart'],
+            'token' => $this->mallOrderToken($user['id'], 1, 1),
         ];
 
         if ($params['post_type'] == 1 && empty($used_address)) {
@@ -815,6 +818,35 @@ class MallOrder extends Base
         }
 
         return $res;
+    }
+
+    //todo 提交订单令牌
+    public function mallOrderToken($uid, $order_type, $flag, $key = '')
+    {
+        $cache_key_name = 'mall_order_token';
+        if ($flag == 1) {
+            //加缓存
+            $expire_num = CacheTools::getExpire($cache_key_name);
+            $cache_name = $uid . Str::random(16) . $order_type;
+            $value = 1;
+            Cache::tags($cache_key_name)->put($cache_name, $value, $expire_num);
+            return $cache_name;
+        } elseif ($flag == 2) {
+            //删缓存
+            Cache::tags($cache_key_name)->forget($key);
+            return 1;
+        } else {
+            //查询是否存在
+            if (empty($key)) {
+                return 0;
+            }
+            $check_cache = Cache::tags($cache_key_name)->has($key);
+            if ($check_cache) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
     }
 
     /**
@@ -1098,7 +1130,7 @@ class MallOrder extends Base
 
 //        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .$now_date . '" then FALSE ELSE TRUE END) ');
 
-        $query->orderBy('id','desc');
+        $query->orderBy('id', 'desc');
         $list = $query->with($with)->select($field)->get();
 
         foreach ($list as $v) {

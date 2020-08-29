@@ -37,6 +37,7 @@ class CacheTools
             case 'get_list':
             case 'mall_banner_list':
             case 'home_group_list':
+            case 'mall_order_token':
                 $exprie = $normal_exprice;
                 break;
             case 'mall_comment_list':
