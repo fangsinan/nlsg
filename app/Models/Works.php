@@ -34,14 +34,18 @@ class Works extends Base
             return false;
         }
 
-        $lists= Works::select('id','type','user_id','title','cover_img','subtitle','price','is_free','is_pay','works_update_time','chapter_num','subscribe_num as sub_num')
+        $WorksObj = Works::select('id','type','user_id','title','cover_img','subtitle','price','is_free','is_pay','works_update_time','chapter_num','subscribe_num as sub_num')
             ->with(['user'=>function($query){
                 $query->select('id','nickname', 'headimg');
             }])
             ->whereIn('id',$ids)
-            ->where('status',4)
-            ->where('is_audio_book',$is_audio_book)
-            ->orderBy('created_at','desc')
+            ->where('status',4);
+        //2时   不考虑是否听书
+        if($is_audio_book !== 2){
+            $WorksObj->where('is_audio_book',$is_audio_book);
+        }
+
+        $lists = $WorksObj->orderBy('created_at','desc')
             ->get()
             ->toArray();
 

@@ -528,12 +528,12 @@ class OrderController extends Controller
 
         //  订单状态
         if($status == 2){
-            $OrderObj->where('status',2,'!=');  //2是取消的订单
+            $OrderObj->whereIn('status', [0, 1]);
         }else{
             $OrderObj->where('status',$status);
         }
 
-        $list = $OrderObj->whereIn('status', [0, 1])->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
+        $list = $OrderObj->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
         $data = $list['data'];
         foreach ($data as $key=>$val){
 
@@ -544,7 +544,7 @@ class OrderController extends Controller
                     break;
                 case 9:
                     $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], 0);
+                    $result = $model->getIndexWorks([$val['relation_id']],2);
                     break;
                 case 15:
                     $model = new Column();
@@ -625,7 +625,7 @@ class OrderController extends Controller
                 break;
             case 9:
                 $model = new Works();
-                $result = $model->getIndexWorks([$data['relation_id']], 0);
+                $result = $model->getIndexWorks([$data['relation_id']], 2);
                 break;
             case 15:
                 $model = new Column();
