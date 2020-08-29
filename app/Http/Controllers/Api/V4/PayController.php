@@ -454,7 +454,9 @@ class PayController extends Controller {
       }
      */
     public function PayCoin(Request $request) {
-        $uid = $request->input('user_id', 0);
+        //$uid = $request->input('user_id', 0);
+        $uid = $this->user['id']??0;
+
         $order_id = $request->input('order_id', 0);
         $pay_type = $request->input('pay_type', 0);
 
