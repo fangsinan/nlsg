@@ -528,12 +528,12 @@ class OrderController extends Controller
 
         //  订单状态
         if($status == 2){
-            $OrderObj->where('status',2,'!=');  //2是取消的订单
+            $OrderObj->whereIn('status', [0, 1]);
         }else{
             $OrderObj->where('status',$status);
         }
 
-        $list = $OrderObj->whereIn('status', [0, 1])->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
+        $list = $OrderObj->orderBy('updated_at','desc')->paginate($this->page_per_page)->toArray();
         $data = $list['data'];
         foreach ($data as $key=>$val){
 
@@ -544,7 +544,7 @@ class OrderController extends Controller
                     break;
                 case 9:
                     $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], 0);
+                    $result = $model->getIndexWorks([$val['relation_id']],2);
                     break;
                 case 15:
                     $model = new Column();
@@ -625,7 +625,7 @@ class OrderController extends Controller
                 break;
             case 9:
                 $model = new Works();
-                $result = $model->getIndexWorks([$data['relation_id']], 0);
+                $result = $model->getIndexWorks([$data['relation_id']], 2);
                 break;
             case 15:
                 $model = new Column();
@@ -666,7 +666,7 @@ class OrderController extends Controller
     }
      */
     public function closeOrder(Request $request){
-        $user_id    = $request->input('user_id',0);
+        $user_id = $this->user['id']??0;
         $order_id    = $request->input('id',0);
 
         $data = Order::where(['id'  => $order_id, 'user_id' => $user_id,])->first();
@@ -679,6 +679,64 @@ class OrderController extends Controller
             'user_id'   =>  $user_id,
         ])->update(['status' => 2 ]);
         return $this->success();
+
+    }
+
+
+
+    /**
+     * @api {get} /api/v4/order/get_subscribe  我的-已购
+     * @apiName get_subscribe
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} type  1 专栏  2作品 3直播  4会员 5线下产品  6讲座
+     * @apiParam {int} is_audio_book  当type == 2(作品)时  0课程  1 听书  2全部
+     *
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {}
+    }
+     */
+    public function getSubscribe(Request $request){
+        $user_id = $this->user['id']??0;
+        $type    = $request->input('type',1);
+        $is_audio_book    = $request->input('is_audio_book',0);
+
+        $data = Subscribe::where(['type'  => $type, 'user_id' => $user_id,])->paginate($this->page_per_page)->toArray();
+        $data = $data['data'];
+
+
+        foreach ($data as $key=>$val){
+            switch ($val['type']) {
+                case 1:
+                    $model = new Column();
+                    $result = $model->getIndexColumn([$val['relation_id']]);
+                    break;
+                case 2:
+                    $model = new Works();
+                    $result = $model->getIndexWorks([$val['relation_id']],$is_audio_book);
+                    break;
+                case 6:
+                    $model = new Column();
+                    $result = $model->getIndexColumn([$val['relation_id']]);
+                    break;
+            }
+            if($result == false){
+                $data[$key]['relation_data'] = [];
+            }else{
+                $data[$key]['relation_data'] = $result;
+            }
+
+
+        }
+
+        return $this->success($data);
 
     }
 
