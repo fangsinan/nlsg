@@ -290,7 +290,8 @@ class GoodsServers
         }
 
         $field = ['id', 'category_id', 'name', 'subtitle', 'picture', 'number',
-            'original_price', 'price', 'sales_num', 'status','keywords'];
+            'original_price', 'price', 'sales_num', 'status','keywords',
+            'freight_id'];
 
         $with = [];
         if ($params['id'] ?? 0) {
