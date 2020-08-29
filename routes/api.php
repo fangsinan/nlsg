@@ -308,6 +308,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('income/send_invoice', 'IncomeController@sendInvoice');
 
 
+        Route::get('order/get_subscribe', 'OrderController@getSubscribe');
 
 
     });
