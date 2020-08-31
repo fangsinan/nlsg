@@ -24,15 +24,20 @@ class ShoppingCart extends Base
     public function create($params, $user_id)
     {
         //新增
-        if(isset($params['goods_id'])){
+        if (isset($params['goods_id'])) {
             $params_data = [$params];
-        }else{
+            $is_one = true;
+        } else {
             $params_data = $params;
+            $is_one = false;
         }
 
         $all_res = true;
-        DB::beginTransaction();
-        foreach($params_data as $params){
+        //批量添加,不加事务
+//        DB::beginTransaction();
+
+        foreach ($params_data as $params) {
+
             $goods_id = $params['goods_id'] ?? 0;
             $sku_number = $params['sku_number'] ?? 0;
             $num = $params['num'] ?? 0;
@@ -40,13 +45,21 @@ class ShoppingCart extends Base
             $flag = $params['flag'] ?? 'replace';
 
             if (empty($goods_id) || empty($sku_number) || empty($num)) {
-                return ['code' => false, 'msg' => '参数错误'];
+                if ($is_one) {
+                    return ['code' => false, 'msg' => '参数错误'];
+                } else {
+                    continue;
+                }
             }
 
             //校验商品信息
             $check_sku = MallSku::getSkuStock($goods_id, $sku_number);
             if ($check_sku === false) {
-                return ['code' => false, 'msg' => '参数错误'];
+                if ($is_one) {
+                    return ['code' => false, 'msg' => '参数错误'];
+                } else {
+                    continue;
+                }
             } else {
                 if ($num > $check_sku) {
                     $num = $check_sku;
@@ -58,7 +71,11 @@ class ShoppingCart extends Base
                 $temp = self::where('user_id', '=', $user_id)
                     ->find($params['id']);
                 if (!$temp) {
-                    return ['code' => false, 'msg' => 'id错误'];
+                    if ($is_one) {
+                        return ['code' => false, 'msg' => 'id错误'];
+                    } else {
+                        continue;
+                    }
                 }
                 $old_num = $temp->num;
             } else {
@@ -87,18 +104,16 @@ class ShoppingCart extends Base
             }
             $temp->inviter = $inviter;
             $res = $temp->save();
-            if(!$res){
-                $all_res = false;
-            }
         }
 
-
-        if ($all_res) {
-            DB::commit();
-            return ['code' => true, 'msg' => '成功'];
+        if ($is_one) {
+            if ($res === false) {
+                return ['code' => false, 'msg' => '失败'];
+            } else {
+                return ['code' => true, 'msg' => '成功'];
+            }
         } else {
-            DB::rollBack();
-            return ['code' => false, 'msg' => '失败'];
+            return ['code' => true, 'msg' => '成功'];
         }
     }
 
