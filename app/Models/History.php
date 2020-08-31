@@ -86,8 +86,9 @@ class History extends Model
         ])->orderBy('updated_at','desc')->first();
         if($historyData){
             $historyData = $historyData?$historyData->toArray():[];
-            $title = WorksInfo::select('title')->where('id',$historyData['info_id'])->first();
+            $title = WorksInfo::select('title','introduce')->where('id',$historyData['info_id'])->first();
             $historyData['title'] = $title->title ?? '';
+            $historyData['introduce'] = $title->introduce ?? '';
         }else{
             $historyData = (object)[];
         }

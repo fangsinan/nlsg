@@ -37,13 +37,13 @@ class Controller extends BaseController
         return response()->json($result);
     }
 
-    protected function error($code, $msg = '')
+    protected function error($code, $msg = '',$data='')
     {
         $result = [
             'code' => $code,
             'msg' => $msg,
             'now' => time(),
-            'data' => ''
+            'data' => $data
         ];
         return response()->json($result);
     }

@@ -137,7 +137,7 @@ class PayController extends Controller {
     function getPayInfo($order_id, $attach) {
 
         $body = '';
-        if (in_array($attach, [1, 2, 5, 9, 11, 14, 8])) { //1专栏 2会员 5打赏 9精品课 听课
+        if (in_array($attach, [1, 2, 5, 9, 11, 14, 8, 15])) { //1专栏 2会员 5打赏 9精品课 听课
             if ($attach == 8) {
                 $OrderInfo = MallOrder::where('status', '=', 1)
                         ->where('is_stop', '=', 0)
@@ -170,6 +170,9 @@ class PayController extends Controller {
                 $body = "能量时光-电商订单-" . $OrderInfo['ordernum'];
                 //todo 临时:商城支付一分
                 $OrderInfo['price'] = 0.01;
+            } else if ($attach == 15) {
+                $ColumnInfo = Column::find($OrderInfo['relation_id']);
+                $body = "能量时光-讲座购买-" . $ColumnInfo['name'];
             }
         } else {
             return false;
@@ -479,7 +482,7 @@ class PayController extends Controller {
             if ($type == 10) { //type 与order_deposit 的 $attach重复了
                 $attach = 11;
             }
-            if (!in_array($type, [1, 2, 5, 9, 10, 14])) {
+            if (!in_array($type, [1, 2, 5, 9, 10, 14,15])) {
                 //商品不支持能量币支付
                 return $this->error(0, '当前产品不支持能量币支付');
             }

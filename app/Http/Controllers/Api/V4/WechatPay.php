@@ -55,6 +55,8 @@ class WechatPay extends Controller
             return self::PayOfflineProducts($data);
         } elseif ($data['attach'] == 8) { //电商
             return self::mallOrder($data);
+        } elseif ($data['attach'] == 15) { //处理讲座
+            return self::PayColumn($data);
         }
     }
 

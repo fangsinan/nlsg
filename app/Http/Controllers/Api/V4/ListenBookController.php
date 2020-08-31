@@ -99,7 +99,7 @@ class ListenBookController extends Controller
             ->where('status',4)->find($listen_id);
 
         if(empty($works_data)){
-            return $this->error(0,'该内容不存在或已下架');
+            return $this->error(0,'该内容不存在或已下架',(object)[]);
         }
         $works_data = $works_data->toArray();
 
