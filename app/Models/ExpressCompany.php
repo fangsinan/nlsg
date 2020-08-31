@@ -132,7 +132,7 @@ class ExpressCompany extends Base
         if ($check->express_id == 1) {
             //如果是顺序,需要收件人或者发件人的手机
             //顺丰接口并没有校验手机号是否正确,有字段即可
-            $mobile = '20349024';
+            $mobile = '17301246549';
         }
 
         $data = $this->toQuery($params['express_num'], $express_type, $mobile);
