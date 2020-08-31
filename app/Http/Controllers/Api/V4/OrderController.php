@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Coupon;
+use App\Models\History;
 use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\Subscribe;
@@ -734,10 +735,13 @@ class OrderController extends Controller
                 unset($data[$key]);
             }else{
                 if($val['type'] == 2){
-
                     //专栏头衔
                     $column = Column::find($result[0]['column_id']);
                     $result[0]['column_title'] = $column['title'];
+                    //学至最新章节
+                    $history_data = History::getHistoryData($result[0]['id'],2,$user_id);
+                    $result[0]['info_introduce'] = $history_data['introduce'];
+
                 }
                 $data[$key]['relation_data'] = $result;
             }
