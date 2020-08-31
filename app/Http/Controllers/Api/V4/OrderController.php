@@ -612,7 +612,7 @@ class OrderController extends Controller
     }
      */
     public function orderDetail(Request $request){
-        $user_id    = $request->input('user_id',0);
+        $user_id    = $this->user['id'] ?? 0;
         $order_id    = $request->input('id',0);
         $data = Order::select( 'id','type','relation_id','user_id','status','price','pay_price','coupon_id', 'pay_time','ordernum','created_at')
             ->where(['id' =>$order_id, 'user_id'=>$user_id])->first()->toArray();
