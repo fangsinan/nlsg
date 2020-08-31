@@ -92,7 +92,7 @@ class SpecialPriceModel extends Base
 
     public function getSpData($id, $goods_type)
     {
-        $expire_num = CacheTools::getExpire('goods_sp_list_exprie');
+        $expire_num = CacheTools::getExpire('goods_sp_list_expire');
         $cache_key_name = 'goods_sp_list_' . $goods_type; //哈希组名
         //缓存放入 goods_list
         //名称购成  page_size_(get_sku)_ob_(ids_str)

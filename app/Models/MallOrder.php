@@ -860,7 +860,7 @@ class MallOrder extends Base
         $now_date = date('Y-m-d H:i:s', $now);
         switch ($pay_type) {
             case 1:
-                $params['out_trade_no'] = '200623001689346563156199999';
+//                $params['out_trade_no'] = '200623001689346563156199999';
                 $total_fee = $params['total_fee'];
                 $transaction_id = $params['transaction_id'];
                 $out_trade_no = substr($params['out_trade_no'], 0, -5);
@@ -1305,6 +1305,7 @@ class MallOrder extends Base
         $data['about_price'] = $price_list_new;
 
         $temp_o_c = [];
+
         foreach ($data['order_child'] as $doc) {
             if (!empty($doc['order_details'])) {
 
@@ -1312,7 +1313,9 @@ class MallOrder extends Base
                     $doc['express_info']['express_phone'] = ExpressCompany::onlyGetName(
                         $doc['express_info']['express_id'], 3
                     );
-                    $doc['express_info']['history']->express_phone = $doc['express_info']['express_phone'];
+                    if($doc['express_info']['history']){
+                        $doc['express_info']['history']->express_phone = $doc['express_info']['express_phone'];
+                    }
                 } else {
                     $doc['express_info'] = new class {
                     };

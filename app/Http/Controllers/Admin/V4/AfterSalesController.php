@@ -51,7 +51,7 @@ class AfterSalesController extends Controller
      */
     public function statusChange(Request $request)
     {
-        $this->user['id'] = 168934;
+//        $this->user['id'] = 168934;
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }

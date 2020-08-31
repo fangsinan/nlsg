@@ -27,7 +27,7 @@ class GetPriceTools extends Base {
             $goods_id = $data->id;
         }
 
-        $expire_num = CacheTools::getExpire('goods_price_exprie');
+        $expire_num = CacheTools::getExpire('goods_price_expire');
         $cache_key_name = 'goods_price'; //哈希组名
         $cache_name = 'goods_' . $goods_id;
         $list = Cache::tags($cache_key_name)->get($cache_name);
@@ -275,7 +275,7 @@ class GetPriceTools extends Base {
     public function getGoodsPriceOld(&$data, $user_level, $user_id, $is_staff) {
         //计算推客的常规购买价格和收益
         $goods_id = $data->id;
-        $expire_num = CacheTools::getExpire('goods_price_exprie');
+        $expire_num = CacheTools::getExpire('goods_price_expire');
         $cache_key_name = 'goods_price'; //哈希组名
         $cache_name = 'goods_' . $goods_id;
         $list = Cache::tags($cache_key_name)->get($cache_name);

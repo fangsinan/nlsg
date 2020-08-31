@@ -22,41 +22,41 @@ class CacheTools
     public static function getExpire($flag)
     {
         if (0) {
-            $sort_exprice = 300;
-            $normal_exprice = 3600;
-            $long_exprice = 86400;
+            $sort_expire = 300;
+            $normal_expire = 3600;
+            $long_expire = 86400;
         } else {
-            $sort_exprice = 60;
-            $normal_exprice = 120;
-            $long_exprice = 180;
+            $sort_expire = 60;
+            $normal_expire = 120;
+            $long_expire = 180;
         }
 
         switch (strtolower($flag)) {
-            case 'goods_sp_list_exprie':
+            case 'goods_sp_list_expire':
             case 'sku_value':
             case 'get_list':
             case 'mall_banner_list':
             case 'home_group_list':
             case 'mall_order_token':
-                $exprie = $normal_exprice;
+                $expire = $normal_expire;
                 break;
             case 'mall_comment_list':
             case 'coupon_rule_list':
-            case 'goods_price_exprie':
+            case 'goods_price_expire':
             case 'set_kill_list':
             case 'post_info':
-                $exprie = $sort_exprice;
+                $expire = $sort_expire;
                 break;
             case 'goods_category_list':
             case 'area_list':
             case 'freight_template_list':
             case 'freight_template':
-                $exprie = $long_exprice;
+                $expire = $long_expire;
                 break;
             default :
-                $exprie = 0;
+                $expire = 0;
         }
 
-        return $exprie;
+        return $expire;
     }
 }
