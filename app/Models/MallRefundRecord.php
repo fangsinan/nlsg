@@ -599,6 +599,21 @@ class MallRefundRecord extends Base
             ->find($id);
 
         if ($check->status == 20 && $check->user_cancel == 0) {
+
+            if (0) {
+                //顺丰暂时不需要正确手机号
+                $return_address_id = $check->return_address_id;
+                if (!$return_address_id) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '状态错误'];
+                }
+                $address_info = FreightTemplate::where('type', '=', 3)->find($return_address_id);
+                if (!$address_info) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '状态错误'];
+                }
+            }
+
             $check_express = ExpressCompany::find($express_id);
             if ($check_express) {
 
@@ -631,9 +646,11 @@ class MallRefundRecord extends Base
                     return ['code' => false, 'msg' => '失败'];
                 }
             } else {
+                DB::rollBack();
                 return ['code' => false, 'msg' => '状态错误'];
             }
         } else {
+            DB::rollBack();
             return ['code' => false, 'msg' => '状态错误'];
         }
     }

@@ -113,20 +113,30 @@ class ExpressCompany extends Base
             ->where('express_num', '=', $params['express_num'])
             ->first();
 
+
         if ($check->delivery_status == 3) {
             //已签收的直接返回
             return json_decode($check->history, true);
         }
 
         //30分钟内只能查询一次
-        if ($check->updated_at !== $check->created_at) {
+        if ($check->updated_at != $check->created_at) {
             $updated_at = strtotime($check->updated_at);
             if (($updated_at + 1800) > time()) {
                 return json_decode($check->history, true);
             }
         }
 
-        $data = $this->toQuery($params['express_num'], $express_type);
+
+        $mobile = '';
+        if ($check->express_id == 1) {
+            //如果是顺序,需要收件人或者发件人的手机
+            //顺丰接口并没有校验手机号是否正确,有字段即可
+            $mobile = '17301246549';
+        }
+
+        $data = $this->toQuery($params['express_num'], $express_type, $mobile);
+
         if (empty($data)) {
             return json_decode($check->history, true);
         }
@@ -169,7 +179,7 @@ class ExpressCompany extends Base
         }
     }
 
-    public function toQuery($number, $type)
+    public function toQuery($number, $type, $mobile)
     {
 
         $cache_key_name = 'post_info' . '_' . $type . '_' . $number;
@@ -184,7 +194,7 @@ class ExpressCompany extends Base
             $appcode = "cc703c76da5b4b15bb6fc4aa0c0febf9";
             $headers = array();
             array_push($headers, "Authorization:APPCODE " . $appcode);
-            $querys = 'number=' . $number . '&type=' . $type;
+            $querys = 'mobile=' . $mobile . '&number=' . $number . '&type=' . $type;
             $bodys = "";
             $url = $host . $path . "?" . $querys;
 
@@ -201,6 +211,7 @@ class ExpressCompany extends Base
             }
 
             $result = curl_exec($curl);
+
             if (empty($result)) {
                 return '';
             }
