@@ -1030,18 +1030,19 @@ class MallOrder extends Base
                         return ['code' => false, 'msg' => '失败'];
                     }
 
-                    $child_res = DB::table('nlsg_mall_order_child')
-                        ->where('order_id', '=', $check->id)
-                        ->update(
-                            [
-                                'status' => 2,
-                                'receipt_at' => $now_date
-                            ]
-                        );
-
-                    if (!$child_res) {
-                        DB::rollBack();
-                        return ['code' => false, 'msg' => '失败'];
+                    if ($check->post_type == 1) {
+                        $child_res = DB::table('nlsg_mall_order_child')
+                            ->where('order_id', '=', $check->id)
+                            ->update(
+                                [
+                                    'status' => 2,
+                                    'receipt_at' => $now_date
+                                ]
+                            );
+                        if (!$child_res) {
+                            DB::rollBack();
+                            return ['code' => false, 'msg' => '失败'];
+                        }
                     }
 
                     DB::commit();
@@ -1313,7 +1314,7 @@ class MallOrder extends Base
                     $doc['express_info']['express_phone'] = ExpressCompany::onlyGetName(
                         $doc['express_info']['express_id'], 3
                     );
-                    if($doc['express_info']['history']){
+                    if ($doc['express_info']['history']) {
                         $doc['express_info']['history']->express_phone = $doc['express_info']['express_phone'];
                     }
                 } else {
