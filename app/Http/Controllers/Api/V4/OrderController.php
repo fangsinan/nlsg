@@ -733,6 +733,12 @@ class OrderController extends Controller
             if($result == false){
                 unset($data[$key]);
             }else{
+                if($val['type'] == 2){
+
+                    //专栏头衔
+                    $column = Column::find($result[0]['column_id']);
+                    $result[0]['column_title'] = $column['title'];
+                }
                 $data[$key]['relation_data'] = $result;
             }
         }
