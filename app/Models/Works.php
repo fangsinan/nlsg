@@ -66,7 +66,7 @@ class Works extends Base
         $infoObj = new WorksInfo();
         $res = DB::table($worksObj->getTable(), 'works')
             ->leftJoin($infoObj->getTable() .' as info', 'works.id', '=', 'info.pid')
-            ->select('works.id','works.type','works.title','works.user_id','works.cover_img','works.price','works.original_price')
+            ->select('works.id','works.type','works.title','works.user_id','works.cover_img','works.price','works.original_price','works.subtitle')
             ->where('works.status',4)
             ->where('works.is_audio_book',$is_audio_book)
             ->where('info.status',4)
