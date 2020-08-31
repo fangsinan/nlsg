@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use App\Models\User;
+use function GuzzleHttp\headers_from_lines;
 
 class AuthController extends Controller
 {
@@ -19,7 +20,7 @@ class AuthController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/login
      * @apiParam  {string} phone  手机号
      * @apiParam  {number} code   验证码
-     * 
+     *
      * @apiSuccess {string} token token
      *
      * @apiSuccessExample  Success-Response:
@@ -39,16 +40,17 @@ class AuthController extends Controller
 
         $phone = $request->input('phone');
         $code = $request->input('code');
+        $inviter = $request->input('inviter', 0);
 
-        if ( ! $phone) {
+        if (!$phone) {
             return $this->error(400, '手机号不能为空');
         }
-        if ( ! $code) {
+        if (!$code) {
             return $this->error(400, '验证码不能为空');
         }
 
         $res = Redis::get($phone);
-        if ( ! $res) {
+        if (!$res) {
             return $this->error(400, '验证码已过期');
         }
 
@@ -57,18 +59,25 @@ class AuthController extends Controller
         }
 
         $user = User::where('phone', $phone)->first();
-        if ( ! $user) {
+
+        if (!$user) {
             $list = User::create([
-                'phone'    => $phone,
+                'phone' => $phone,
+                'inviter' => $inviter,
+                'login_flag' => ($inviter == 0) ? 0 : 1,
                 'nickname' => substr_replace($phone, '****', 3, 4)
             ]);
             $user = User::find($list->id);
+        } else {
+            if ($user->login_flag == 1) {
+                User::where('id', '=', $user->id)->update(['login_flag' => 2]);
+            }
         }
-        
+
         Redis::del($phone);
         $token = auth('api')->login($user);;
         $data = [
-            'id'    => $user->id,
+            'id' => $user->id,
             'token' => $token
         ];
         return success($data);
@@ -96,26 +105,26 @@ class AuthController extends Controller
         return success();
     }
 
-    public function  wechat(Request $request)
+    public function wechat(Request $request)
     {
-        $input   = $request->all();
+        $input = $request->all();
         $user = User::where('unionid', $input['unionid'])->first();
         if (!$user) {
             $user = User::create([
                 'nickname' => $input['nickname'] ?? '',
-                'sex'      => $input['sex'] =='男' ? 1 : 2,
+                'sex' => $input['sex'] == '男' ? 1 : 2,
                 'province' => $input['province'],
-                'city'     => $input['city'],
-                'headimg'  => $input['headimg'] ?? '',
-                'unionid'  => $input['unionid'] ?? ''
+                'city' => $input['city'],
+                'headimg' => $input['headimg'] ?? '',
+                'unionid' => $input['unionid'] ?? ''
             ]);
         }
 
         $token = auth('api')->login($user);
         $data = [
-            'id'       => $user->id,
-            'phone'    => $user->phone ?? '',
-            'token'    => $token
+            'id' => $user->id,
+            'phone' => $user->phone ?? '',
+            'token' => $token
         ];
         return success($data);
     }
@@ -128,19 +137,19 @@ class AuthController extends Controller
         $data = [
             'wechat' => 1
         ];
-        return  success($data);
+        return success($data);
 
     }
 
 
     /**
      * 绑定手机号
-     * 
+     *
      */
     public function bind(Request $request)
     {
         $phone = $request->input('phone');
-        $code  = $request->input('code');
+        $code = $request->input('code');
 
         // if ( ! $phone) {
         //     return error(1000, '手机号不能为空');
@@ -158,11 +167,11 @@ class AuthController extends Controller
         // }
 
         $list = User::where('phone', $phone)->first();
-        if($list){
-            return error(1000,'手机号码已经绑定，请更换手机号');
+        if ($list) {
+            return error(1000, '手机号码已经绑定，请更换手机号');
         }
-        $res   = User::where('id', $this->user['id'])->update(['phone'=>$phone]);
-        if($res){
+        $res = User::where('id', $this->user['id'])->update(['phone' => $phone]);
+        if ($res) {
             return success('绑定成功');
         }
 
@@ -190,46 +199,46 @@ class AuthController extends Controller
     public function wechat2(Request $request)
     {
         $code = $request->input('code');
-        if ( ! $code) {
+        if (!$code) {
             return $this->error(1000, 'code不能为空');
         }
 
         $res = $this->getRequest('https://api.weixin.qq.com/sns/oauth2/access_token', [
-            'appid'      => env('WECHAT_OFFICIAL_ACCOUNT_APPID'),
-            'secret'     => env('WECHAT_OFFICIAL_ACCOUNT_SECRET'),
-            'code'       => $code,
+            'appid' => env('WECHAT_OFFICIAL_ACCOUNT_APPID'),
+            'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET'),
+            'code' => $code,
             'grant_type' => 'authorization_code'
         ]);
-        if ( ! $res) {
+        if (!$res) {
             return $this->error(401, 授权失败);
         }
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res['access_token'],
-            'openid'       => $res['openid'],
+            'openid' => $res['openid'],
         ]);
-        if ( ! $list) {
+        if (!$list) {
             return $this->error(400, '获取用户信息失败');
         }
 
         $unionid = $request->input('unionid');
         $user = User::where('unionid', $unionid)->first();
-        if ( ! $user) {
+        if (!$user) {
             $user = User::create([
                 'nickname' => '微信',
-                'sex'      => '1',
+                'sex' => '1',
                 'province' => '北京市',
-                'city'     => '海淀区',
-                'headimg'  => '/wechat/works/headimg/3833/2017110823004219451.png'
+                'city' => '海淀区',
+                'headimg' => '/wechat/works/headimg/3833/2017110823004219451.png'
             ]);
         }
 
         $token = auth('api')->login($user);;
         $data = [
             'nickname' => $user->nickname,
-            'sex'      => $user->sex,
+            'sex' => $user->sex,
             'province' => $user->province,
-            'city'     => $user->city,
-            'token'    => $token
+            'city' => $user->city,
+            'token' => $token
         ];
         return $this->success($data);
 
@@ -256,7 +265,7 @@ class AuthController extends Controller
     public function sendSms(Request $request)
     {
         $phone = $request->input('phone');
-        if ( ! $phone) {
+        if (!$phone) {
             return $this->error(400, '手机号不能为空');
         }
 
@@ -266,12 +275,12 @@ class AuthController extends Controller
             $code = rand(1000, 9999);
             $result = $easySms->send($phone, [
                 'template' => 'SMS_70300075',
-                'data'     => [
+                'data' => [
                     'code' => $code,
                 ],
             ], ['aliyun']);
 
-            Redis::setex($phone, 60*5, $code);
+            Redis::setex($phone, 60 * 5, $code);
             return success();
         } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
             $message = $exception->getResults();
