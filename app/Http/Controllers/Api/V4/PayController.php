@@ -479,7 +479,7 @@ class PayController extends Controller {
             if ($type == 10) { //type 与order_deposit 的 $attach重复了
                 $attach = 11;
             }
-            if (!in_array($type, [1, 2, 5, 9, 10, 14])) {
+            if (!in_array($type, [1, 2, 5, 9, 10, 14,15])) {
                 //商品不支持能量币支付
                 return $this->error(0, '当前产品不支持能量币支付');
             }

@@ -98,15 +98,16 @@ class ColumnController extends Controller
             $order_str = 'desc';
         }
         $field = ['id', 'name','subtitle','message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num'];
-        $list = Column::where([
+        $list = Column::select($field)->where([
             "status" => 1,
             "type"   => $type,
         ])->orderBy('updated_at', 'desc')
-            ->orderBy('sort', $order_str)->get($field);
+            ->orderBy('sort', $order_str)->paginate($this->page_per_page)->toArray();
+        //->get($field);
         //7天前的时间
         $time = Config('web.is_new_time');
         $uid = $this->user['id'] ?? 0;
-        foreach ($list as &$v) {
+        foreach ($list['data'] as &$v) {
             $v['is_sub'] = Subscribe::isSubscribe($uid,$v['id']);
             $v['is_new'] = 0;
             if($v['works_update_time'] > $time){
@@ -116,7 +117,7 @@ class ColumnController extends Controller
             $v['work_name'] = $title->title ?? '';
 
         }
-        return $this->success($list);
+        return $this->success($list['data']);
     }
 
 
