@@ -740,8 +740,10 @@ class OrderController extends Controller
                     $result[0]['column_title'] = $column['title'];
                     //学至最新章节
                     $history_data = History::getHistoryData($result[0]['id'],2,$user_id);
-                    $result[0]['info_introduce'] = $history_data['introduce'] ?? '';
-
+                    $result[0]['info_introduce'] = '';
+                    if((array)($history_data)){
+                        $result[0]['info_introduce'] = $history_data['introduce'] ?? '';
+                    }
                 }
                 $data[$key]['relation_data'] = $result;
             }
