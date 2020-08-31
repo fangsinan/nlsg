@@ -431,7 +431,7 @@ class SearchController extends Controller
             //听书
             $res['listen_book'] = Works::search($keywords,1);
             //百科
-            $res['Wiki'] = Wiki::search($keywords,1);
+            $res['Wiki'] = Wiki::search($keywords);
             //用户
             //商品
             $res['goods'] = MallGoods::search($keywords);

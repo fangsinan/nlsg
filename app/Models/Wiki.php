@@ -33,7 +33,7 @@ class Wiki extends Model
     }
 
 
-    public function  search($keywords)
+    public static  function  search($keywords)
     {
         if (!$keywords){
             return false;
