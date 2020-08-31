@@ -23,66 +23,81 @@ class ShoppingCart extends Base
 
     public function create($params, $user_id)
     {
-        $goods_id = $params['goods_id'] ?? 0;
-        $sku_number = $params['sku_number'] ?? 0;
-        $num = $params['num'] ?? 0;
-        $inviter = $params['inviter'] ?? 0;
-        $flag = $params['flag'] ?? 'replace';
-
-        if (empty($goods_id) || empty($sku_number) || empty($num)) {
-            return ['code' => false, 'msg' => '参数错误'];
+        //新增
+        if(isset($params['goods_id'])){
+            $params_data = [$params];
+        }else{
+            $params_data = $params;
         }
 
-        //校验商品信息
-        $check_sku = MallSku::getSkuStock($goods_id, $sku_number);
-        if ($check_sku === false) {
-            return ['code' => false, 'msg' => '参数错误'];
-        } else {
-            if ($num > $check_sku) {
-                $num = $check_sku;
-            }
-        }
+        $all_res = true;
+        DB::beginTransaction();
+        foreach($params_data as $params){
+            $goods_id = $params['goods_id'] ?? 0;
+            $sku_number = $params['sku_number'] ?? 0;
+            $num = $params['num'] ?? 0;
+            $inviter = $params['inviter'] ?? 0;
+            $flag = $params['flag'] ?? 'replace';
 
-        $old_num = 0;
-        if (!empty(($params['id'] ?? 0))) {
-            $temp = self::where('user_id', '=', $user_id)
-                ->find($params['id']);
-            if (!$temp) {
-                return ['code' => false, 'msg' => 'id错误'];
+            if (empty($goods_id) || empty($sku_number) || empty($num)) {
+                return ['code' => false, 'msg' => '参数错误'];
             }
-            $old_num = $temp->num;
-        } else {
-            $check_cart = self::where('user_id', '=', $user_id)
-                ->where('goods_id', '=', $goods_id)
-                ->where('sku_number', '=', $sku_number)
-                ->first();
-            if ($check_cart) {
-                $temp = $check_cart;
-                $old_num = $check_cart->num;
+
+            //校验商品信息
+            $check_sku = MallSku::getSkuStock($goods_id, $sku_number);
+            if ($check_sku === false) {
+                return ['code' => false, 'msg' => '参数错误'];
             } else {
-                $temp = new self();
+                if ($num > $check_sku) {
+                    $num = $check_sku;
+                }
+            }
+
+            $old_num = 0;
+            if (!empty(($params['id'] ?? 0))) {
+                $temp = self::where('user_id', '=', $user_id)
+                    ->find($params['id']);
+                if (!$temp) {
+                    return ['code' => false, 'msg' => 'id错误'];
+                }
+                $old_num = $temp->num;
+            } else {
+                $check_cart = self::where('user_id', '=', $user_id)
+                    ->where('goods_id', '=', $goods_id)
+                    ->where('sku_number', '=', $sku_number)
+                    ->first();
+                if ($check_cart) {
+                    $temp = $check_cart;
+                    $old_num = $check_cart->num;
+                } else {
+                    $temp = new self();
+                }
+            }
+
+            $temp->goods_id = $goods_id;
+            $temp->sku_number = $sku_number;
+            $temp->user_id = $user_id;
+            if ($flag == 'replace') {
+                $temp->num = $num;
+            } else {
+                $temp->num = $num + $old_num;
+                if ($temp->num > $check_sku) {
+                    $temp->num = $check_sku;
+                }
+            }
+            $temp->inviter = $inviter;
+            $res = $temp->save();
+            if(!$res){
+                $all_res = false;
             }
         }
 
-        $temp->goods_id = $goods_id;
-        $temp->sku_number = $sku_number;
-        $temp->user_id = $user_id;
-        if ($flag == 'replace') {
-            $temp->num = $num;
-        } else {
-            $temp->num = $num + $old_num;
-            if ($temp->num > $check_sku) {
-                $temp->num = $check_sku;
-            }
-        }
 
-        $temp->inviter = $inviter;
-
-        $res = $temp->save();
-
-        if ($res) {
+        if ($all_res) {
+            DB::commit();
             return ['code' => true, 'msg' => '成功'];
         } else {
+            DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
     }
