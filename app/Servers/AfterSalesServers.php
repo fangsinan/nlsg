@@ -181,6 +181,7 @@ class AfterSalesServers
                     $check->status = 70;
                     $check->is_check_reject = 1;
                 }
+                $check->return_address_id = $params['return_address_id']??0;
                 $check->pass_at = $now_date;
                 $check->check_reject_at = $now_date;
                 $check->check_remark = $params['remark'] ?? '';
