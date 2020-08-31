@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\MallGoods;
 use App\Models\Search;
+use App\Models\Wiki;
 use App\Models\Works;
 use Illuminate\Http\Request;
 
@@ -429,6 +430,8 @@ class SearchController extends Controller
             $res['lecture'] = Column::search($keywords,2);
             //听书
             $res['listen_book'] = Works::search($keywords,1);
+            //百科
+            $res['Wiki'] = Wiki::search($keywords,1);
             //用户
             //商品
             $res['goods'] = MallGoods::search($keywords);
