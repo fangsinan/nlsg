@@ -31,7 +31,7 @@ class Subscribe extends Base
         if($user_id && $target_id && $type ){
             $where = ['type' => $type, 'user_id' => $user_id,];
             //处理专栏的关注信息
-            if( !in_array($type,[1,2,3]) ){
+            if( !in_array($type,[1,2,3,4,5,6]) ){
                 return 0;
             }
 

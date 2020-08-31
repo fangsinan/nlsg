@@ -37,8 +37,7 @@ class Column extends Base
         //作者信息
         $user = User::find($column['user_id']);
         $column['teacher_data'] = $user;
-        //是否购买
-        $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
+
         //是否关注
         $follow = UserFollow::where(['from_uid'=>$user_id,'to_uid'=>$column['user_id']])->first();
         $column['is_follow'] = $follow ? 1 :0;
@@ -54,6 +53,11 @@ class Column extends Base
             $user_id_arr =array_column($sub_user['data'],'user_id');
             $column['user_data'] = User::select('id','nickname','headimg')->whereIn('id',$user_id_arr)->get()->toArray();
             //$column['user_count'] = Subscribe::where(['relation_id'=> $column_id, 'type' => 6, 'is_del' => 0,])->count();
+            //是否购买
+            $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,6);
+        }else{
+            //是否购买
+            $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
         }
         //是否收藏
         $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
