@@ -39,7 +39,7 @@ class Wiki extends Model
             return false;
         }
         $res= Wiki::select('id','name','content','cover','view_num','like_num', 'comment_num')
-            ->where('title','LIKE',"%$keywords%")
+            ->where('name','LIKE',"%$keywords%")
             ->where('status',1)
             ->orderBy('created_at','desc')
             ->get();
