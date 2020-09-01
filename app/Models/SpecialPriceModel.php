@@ -357,7 +357,6 @@ class SpecialPriceModel extends Base
                 ->get();
             Cache::add($cache_key_name, $res, $expire_num);
         }
-
         $key_array = [];
         foreach ($res as $k => $v) {
             if ($v->begin_time > $now) {
@@ -365,7 +364,7 @@ class SpecialPriceModel extends Base
             } else {
                 $v->is_begin = 1;
             }
-            if (0) {
+            if (1) {
                 //过滤未开始的
                 if ($v->begin_time >= $now || $v->end_time <= $now) {
                     unset($res[$k]);

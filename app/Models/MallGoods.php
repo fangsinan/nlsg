@@ -371,7 +371,7 @@ class MallGoods extends Base
         $check_id = SpecialPriceModel::where('group_name', '=', $group_buy_id)
             ->where('status', '=', 1)
             ->where('type', '=', 4)
-//            ->where('begin_time', '<=', $now_data)
+            ->where('begin_time', '<=', $now_data)
             ->where('end_time', '>=', $now_data)
             ->select(['id', 'goods_id', 'group_num','begin_time',
                 'goods_price', 'sku_number', 'group_price'])
