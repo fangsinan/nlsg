@@ -121,7 +121,7 @@ class UserController extends Controller
             ->with([
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id','relation_type'])
-                        ->limit(4)
+                        ->limit(10)
                         ->orderBy('created_at', 'desc');
                 },
                 'history.columns:id,title,cover_pic',
