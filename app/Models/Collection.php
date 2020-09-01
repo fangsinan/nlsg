@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Collection extends Authenticatable
+class Collection extends Base
 {
     protected $table = 'nlsg_collection';
     protected $fillable = ['type','user_id','relation_id','info_id','type'];
