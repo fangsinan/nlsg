@@ -17,12 +17,12 @@ class removeDataServers
         $goods_data = [];
         foreach ($old_goods as $v) {
             $temp = [];
-            $temp['id'] = '';
-            $temp['category_id'] = '';
-            $temp['name'] = '';
-            $temp['subtitle'] = '';
-            $temp['picture'] = '';
-            $temp['freight_id'] = '';
+            $temp['id'] = $v->id;
+            $temp['category_id'] = $v->category_id;
+            $temp['name'] = $v->name;
+            $temp['subtitle'] = $v->subtitle;
+            $temp['picture'] = $v->picture;
+            $temp['freight_id'] = 14;
             $temp['number'] = '';
             $temp['original_price'] = '';
             $temp['price'] = '';

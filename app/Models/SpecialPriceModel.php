@@ -340,7 +340,7 @@ class SpecialPriceModel extends Base
         $now = date('Y-m-d H:i:s');
 
         $res = Cache::get($cache_key_name);
-        if (true || empty($res)) {
+        if (empty($res)) {
             $res = self::from('nlsg_special_price as nsp')
                 ->where('nsp.type', '=', 4)
                 ->where('nsp.status', '=', 1)

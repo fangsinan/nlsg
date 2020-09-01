@@ -115,6 +115,81 @@ class FreightController extends Controller
     }
 
 
+    //todo 添加运费模板
+    public function add()
+    {
 
+        $params = [
+            'name'=>'模板测试1',
+            'status'=>1,
+            'count_type'=>1,
+            'details'=>[
+                //只允许一个type=1
+                [
+                    'name'=>'默认',
+                    'type'=>1,
+                    'start_price'=>10,
+                    'status'=>1
+                ],
+                [
+                    'name'=>'不包邮区域1',
+                    'type'=>2,
+                    'start_price'=>10,
+                    'status'=>1
+                ]
+            ]
+        ];
+
+
+        return $this->getRes($params);
+    }
+
+
+    /**
+     * 添加退货和自提地址
+     * @api {post} /api/admin_v4/freight/add_shop 添加退货和自提地址
+     * @apiVersion 1.0.0
+     * @apiName /api/admin_v4/freight/add_shop
+     * @apiGroup  后台-运费模板
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/freight/add_shop
+     * @apiDescription 添加退货和自提地址
+     * @apiParam {number=2,3} type 类型(2自提3退货)
+     * @apiParam {number=1,2} status 状态(1上架2下架)
+     * @apiParam {string} name 名称
+     * @apiParam {string} admin_name 联系人
+     * @apiParam {string} admin_phone 联系电话
+     * @apiParam {string} details 详细地址
+     * @apiParam {string} province 省区划码
+     * @apiParam {string} city 市
+     * @apiParam {string} area 区/县
+     *
+     * @apiParamExample {json} Request-Example:
+     *
+     * {
+     * "type": 2,
+     * "name": "台铭自提点",
+     * "admin_name": "库锁",
+     * "admin_phone": 1232456,
+     * "details": "台铭国际企业花园",
+     * "status": 1,
+     * "province": 110000,
+     * "city": 110105,
+     * "area": 0
+     * }
+     * @apiSuccessExample {json} Request-Example:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "now": 1598335384,
+     * "data": {
+     * }
+     * }
+     */
+    public function addShop(Request $request)
+    {
+        $servers = new FreightServers();
+        $data = $servers->addShop($request->input());
+        return $this->getRes($data);
+    }
 
 }

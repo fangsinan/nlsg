@@ -21,8 +21,7 @@ class FreightServers
         $size = $params['size'] ?? 10;
         $with = [];
 
-        $field = ['id', 'type', 'name',
-        ];
+        $field = ['id', 'type', 'name'];
 
         if ($type != 1) {
             $field = array_merge($field, ['admin_name', 'admin_phone', 'admin_phone as phone',
@@ -50,6 +49,55 @@ class FreightServers
         }
 
         return $list;
-
     }
+
+    public function addShop($params)
+    {
+        if (!in_array($params['type'] ?? 0, [2, 3])) {
+            return ['code' => false, 'msg' => 'type参数错误'];
+        }
+
+        if (!in_array($params['status'] ?? 0, [1, 2])) {
+            return ['code' => false, 'msg' => 'status参数错误'];
+        }
+
+        if (empty($params['id'] ?? 0)) {
+            $data = new FreightTemplate();
+        } else {
+            $data = FreightTemplate::find($params['id']);
+            if (!$data) {
+                return ['code' => false, 'msg' => 'id错误'];
+            }
+        }
+
+        $data->type = $params['type'];
+        $data->name = $params['name'];
+        $data->admin_name = $params['admin_name'];
+        $data->admin_phone = $params['admin_phone'];
+        $data->status = $params['status'];
+        if (empty($params['start_time'] ?? '')) {
+            $data->start_time = date('Y-m-d H:i:s');
+        } else {
+            $data->start_time = $params['start_time'];
+        }
+
+        if (empty($params['end_time'] ?? '')) {
+            $data->end_time = '2020-12-31 23:59:59';
+        } else {
+            $data->end_time = $params['end_time'];
+        }
+
+        $data->province = $params['province'];
+        $data->city = $params['city'];
+        $data->area = $params['area'];
+        $data->details = $params['details'];
+
+        $res = $data->save();
+        if ($res) {
+            return ['code' => true, 'msg' => '添加成功'];
+        } else {
+            return ['code' => false, 'msg' => '添加失败'];
+        }
+    }
+
 }

@@ -167,5 +167,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(History::class, 'user_id', 'id');
     }
 
+    public function getInvitationRecord($uid){
+        return User::where('inviter','=',$uid)
+            ->orderBy('id','desc')
+            ->select(['id','nickname','headimg','created_at'])
+            ->get();
+    }
 
 }

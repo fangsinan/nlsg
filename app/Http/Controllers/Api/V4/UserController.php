@@ -888,4 +888,10 @@ class UserController extends Controller
     }
 
 
+    //邀请记录
+    public function invitationRecord(){
+        $model = new User();
+        return $model->getInvitationRecord($this->user['id']??0);
+    }
+
 }

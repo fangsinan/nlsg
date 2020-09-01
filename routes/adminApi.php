@@ -31,6 +31,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     //运费模板
     Route::get('freight/list', 'FreightController@list');
     Route::get('freight/shop_list', 'FreightController@shopList');
+    Route::post('freight/add_shop', 'FreightController@addShop');
+    Route::get('freight/add', 'FreightController@add');
+
 
     //定时任务
     Route::get('crontab/mall_refund', 'CrontabController@mallRefund');//商城退款
