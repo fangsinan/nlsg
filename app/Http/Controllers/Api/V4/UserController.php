@@ -848,7 +848,7 @@ class UserController extends Controller
             $list = [];
         }
 
-        foreach ($collection as &$value){
+        foreach ($collection['data'] as &$value){
             foreach ($list as &$list_value){
                 if($value['relation_id'] == $list_value['id']){
                     $list_value['collection_time'] = $value['created_at'];
