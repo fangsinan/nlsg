@@ -33,6 +33,7 @@ class CommentController extends Controller
      * @apiSuccess {number} like_num     喜欢数
      * @apiSuccess {number} reply_num    评论数
      * @apiSuccess {number} is_like      是否点赞 1 是 0 否
+     * @apiSuccess {number} is_quality    是否精选
      * @apiSuccess {string} user            发布的用户
      * @apiSuccess {string} user.nickname   用户昵称
      * @apiSuccess {string} user.headimg    用户头像
@@ -438,9 +439,10 @@ class CommentController extends Controller
 
     public function show(Request $request)
     {
-        $id = $request->get('id');
+        $id  = $request->get('id');
+        $uid = $this->user['id'];
         $comment = new Comment();
-        $lists = $comment->getCommentList($id);
+        $lists = $comment->getCommentList($id, $uid);
         if ( ! $lists) {
             return error(1000, '评论不存在');
         }

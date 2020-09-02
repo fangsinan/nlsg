@@ -264,9 +264,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('mall/create_group_buy_order', 'MallOrderController@createGroupBuyOrder');//拼团下单
 
         Route::get('mall/order_list', 'MallOrderController@list');//普通和秒杀订单列表
-        Route::get('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');//拼团列表
         Route::get('mall/comment_list', 'MallOrderController@commentList');//商品评价列表
         Route::get('mall/order_info', 'MallOrderController@orderInfo');//普通和秒杀订单详情
+        Route::get('mall/group_buy_order_list', 'MallOrderController@listOfGroupBuy');//拼团列表
         Route::get('mall/group_buy_order_info', 'MallOrderController@groupBuyOrderInfo');//拼团订单详情
         Route::put('mall/status_change', 'MallOrderController@statusChange');//订单状态修改
         Route::post('mall/sub_comment', 'MallOrderController@subComment');//评论

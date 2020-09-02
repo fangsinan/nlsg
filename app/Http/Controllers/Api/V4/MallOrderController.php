@@ -666,8 +666,6 @@ class MallOrderController extends Controller
         $params['bill_number'] = $request->input('bill_number', '');
         $params['bill_format'] = $request->input('bill_format', 2);
 
-//        $params = $request->input();
-
         $model = new MallOrderGroupBuy();
         $data = $model->createGroupBuyOrder($params, $this->user);
         return $this->getRes($data);
