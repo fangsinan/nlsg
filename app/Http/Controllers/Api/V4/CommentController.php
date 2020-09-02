@@ -33,6 +33,7 @@ class CommentController extends Controller
      * @apiSuccess {number} like_num     喜欢数
      * @apiSuccess {number} reply_num    评论数
      * @apiSuccess {number} is_like      是否点赞 1 是 0 否
+     * @apiSuccess {number} is_quality    是否精选
      * @apiSuccess {string} user            发布的用户
      * @apiSuccess {string} user.nickname   用户昵称
      * @apiSuccess {string} user.headimg    用户头像

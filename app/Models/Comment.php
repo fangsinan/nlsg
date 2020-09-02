@@ -34,7 +34,7 @@ class Comment extends Base
                             ->limit(5);
                     },
                     'reply.from_user:id,nickname', 'reply.to_user:id,nickname'])
-                ->select('id','pid', 'user_id', 'relation_id', 'content','forward_num','share_num','like_num','reply_num','created_at')
+                ->select('id','pid', 'user_id', 'relation_id', 'content','forward_num','share_num','like_num','reply_num','created_at','is_quality')
                 ->where('type', $type)
                 ->where('relation_id', $id)
                 ->where('status', 1)
@@ -75,9 +75,9 @@ class Comment extends Base
                        ->select('id','pid', 'user_id', 'relation_id','is_quality','content','forward_num','share_num','like_num','reply_num','reward_num','created_at','type')
                        ->where('status', 1)
                        ->find($id);
-                       
+
         $follow = UserFollow::where(['from_uid'=>$uid,'to_uid'=>$comment->user_id])->first();  
-              
+
         $comment['is_follow'] = $follow ? 1 : 0;
 
         if(in_array($comment['type'], [1, 2])){
