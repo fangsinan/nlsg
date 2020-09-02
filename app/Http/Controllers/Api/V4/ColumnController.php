@@ -431,7 +431,7 @@ class ColumnController extends Controller
     public function getLectureList(Request $request){
 
         $lecture_id = $request->input('lecture_id',0);
-        $order   = $request->input('order','desc');
+        $order   = $request->input('order','asc');
         $order = $order ?? 'desc';
 
         $user_id   = $this->user['id'] ?? 0;
