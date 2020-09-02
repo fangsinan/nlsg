@@ -38,7 +38,7 @@ class LikeController extends Controller
         if (!$id){
             return false;
         }
-        $list = Like::where(['relation_id'=> $id, 'user_id'=> 1, 'type'=>$type])->first();
+        $list = Like::where(['relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type])->first();
         if ($list){
             return error(1000,'不要重复操作');
         }
@@ -59,6 +59,8 @@ class LikeController extends Controller
                 $notify->subject  = '喜欢了你的想法';
                 $notify->save();
             }
+            //增加喜欢
+            Comment::where('id', $id)->increment('like_num');
             return success('操作成功');
         }
         return error(1000, '操作失败');
@@ -91,8 +93,10 @@ class LikeController extends Controller
         if (!$id){
             return false;
         }
-        $res = Like::where(['relation_id'=> $id, 'user_id'=>1, 'type'=>$type])->delete();
+        $res = Like::where(['relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type])->delete();
         if($res){
+            //减少喜欢
+            Comment::where('id', $id)->decrement('like_num');
             return success('操作成功');
         }
         return error('操作失败');
