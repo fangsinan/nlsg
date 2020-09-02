@@ -93,7 +93,7 @@ class Lists extends Model
                     $query->select('id','lists_id', 'works_id');
                 },
                 'listWorks.wiki' => function($query){
-                    $query->select('id','name','content','view_num','like_num','comment_num');
+                    $query->select('id','name','content','view_num','like_num','comment_num','cover');
                 }
             ])
             ->where('type', 5)
