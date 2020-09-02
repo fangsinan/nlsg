@@ -755,6 +755,7 @@ class MallOrderGroupBuy extends Base
             $v->express_list = $temp_express_list;
             if ($v->status == 95) {
                 $v->dead_time = $v->groupListInfo->end_at;
+                $v->dead_timestamp = strtotime($v->groupListInfo->end_at);
             }
         }
 
