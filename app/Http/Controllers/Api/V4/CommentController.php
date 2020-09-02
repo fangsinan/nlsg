@@ -187,7 +187,7 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        $user_id = 1;
+        
         $input = $request->all();
         $img   = $input['img'] ?? '';
 
@@ -195,7 +195,7 @@ class CommentController extends Controller
             return error(1000, '参数有误');
         }
         $result = Comment::create([
-            'user_id'     => $user_id,
+            'user_id'     => $this->user['id'],
             'relation_id' => $input['id'],
             'pid'         => $input['pid'] ?? 0,
             'content'     => $input['content'] ?? '',
