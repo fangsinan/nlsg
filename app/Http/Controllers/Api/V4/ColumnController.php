@@ -236,8 +236,12 @@ class ColumnController extends Controller
 
             //查询总的历史记录进度`
             $hisCount = History::getHistoryCount($column_id,1,$user_id);  //讲座
-            $column['history_count'] = round($hisCount/$column['info_num']*100);
+//            $column['history_count'] = round($hisCount/$column['info_num']*100);
 
+            $column['history_count'] = 0;
+            if($column['info_num'] > 0){
+                $column['history_count'] = round($hisCount/$column['info_num']*100);
+            }
 
         }
 
@@ -447,8 +451,13 @@ class ColumnController extends Controller
         $works_data['info_num'] = count($info);
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($works_data['id'],3,$user_id);  //讲座
-        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
+//        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
+
+        $works_data['history_count'] = 0;
+        if($works_data['info_num'] > 0){
+            $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
+        }
 
 
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
