@@ -1218,10 +1218,11 @@ class MallOrder extends Base
         foreach ($data['order_child'] as &$v1) {
             $v1['order_detail_id'] = explode(',', $v1['order_detail_id']);
 
-            if (isset($v1['express_info']['history'])) {
+            if (isset($v1['express_info']['history']) && !empty($v1['express_info']['history'])) {
                 $v1['express_info']['history'] = json_decode($v1['express_info']['history']);
+            }else{
+                $v1['express_info']['history'] = new class {};
             }
-
             $v1['order_details'] = [];
         }
 
