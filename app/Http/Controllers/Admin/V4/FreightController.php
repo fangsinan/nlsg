@@ -116,32 +116,45 @@ class FreightController extends Controller
 
 
     //todo 添加运费模板
-    public function add()
+    public function add(Request $request)
     {
 
         $params = [
-            'name'=>'模板测试1',
-            'status'=>1,
-            'count_type'=>1,
-            'details'=>[
+            'name' => '模板测试1',
+            'status' => 1,
+            'count_type' => 1,
+            'details' => [
                 //只允许一个type=1
                 [
-                    'name'=>'默认',
-                    'type'=>1,
-                    'start_price'=>10,
-                    'status'=>1
+                    'name' => '通用',
+                    'type' => 1,
+                    'start_price' => 10,
+                    'status' => 1,
+                    'count_type' => 1,
+                    'count_start_line' => 10,
+                    'skip_num' => 5,
+                    'skip_price' => 2
                 ],
                 [
-                    'name'=>'不包邮区域1',
-                    'type'=>2,
-                    'start_price'=>10,
-                    'status'=>1
+                    'name' => '不包邮区域1',
+                    'type' => 2,
+                    'start_price' => 10,
+                    'status' => 1,
+                    'count_type' => 1,
+                    'count_start_line' => 10,
+                    'skip_num' => 5,
+                    'skip_price' => 2,
+                    'list' => [
+                        540000, 710000, 810000
+                    ]
                 ]
             ]
         ];
 
 
-        return $this->getRes($params);
+        $servers = new FreightServers();
+        $data = $servers->add($params);
+        return $this->getRes($data);
     }
 
 

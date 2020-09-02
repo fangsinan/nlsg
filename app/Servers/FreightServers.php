@@ -6,6 +6,7 @@ namespace App\Servers;
 
 use App\Models\FreightTemplate;
 use App\Models\MallAddress;
+use Illuminate\Support\Facades\DB;
 
 class FreightServers
 {
@@ -64,7 +65,7 @@ class FreightServers
         if (empty($params['id'] ?? 0)) {
             $data = new FreightTemplate();
         } else {
-            $data = FreightTemplate::find($params['id']);
+            $data = FreightTemplate::whereIN('type', [2, 3])->find($params['id']);
             if (!$data) {
                 return ['code' => false, 'msg' => 'id错误'];
             }
@@ -98,6 +99,33 @@ class FreightServers
         } else {
             return ['code' => false, 'msg' => '添加失败'];
         }
+    }
+
+    public function add($params)
+    {
+        if (empty($params['id'] ?? 0)) {
+            $data = new FreightTemplate();
+        } else {
+            $data = FreightTemplate::where('type', '=', 1)->find($params['id']);
+            if (!$data) {
+                return ['code' => false, 'msg' => 'id错误'];
+            }
+        }
+
+        $data->type = 1;
+        $data->name = $params['name'];
+        $data->status = $params['status'];
+
+        DB::beginTransaction();
+
+        $t_res = $data->save();
+        if($t_res === false){
+            DB::rollBack();
+            return ['code'=>false,'msg'=>'失败,请重试.'.__LINE__];
+        }
+
+        $template_id = $data->id;
+
     }
 
 }

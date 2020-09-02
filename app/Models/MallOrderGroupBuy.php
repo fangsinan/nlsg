@@ -228,7 +228,6 @@ class MallOrderGroupBuy extends Base
             return $sku_list;
         }
 
-        //秒杀订单只能是一个商品
         $sku_list = reset($sku_list);
 
         //校验商品秒杀状态是否可用
@@ -347,7 +346,7 @@ class MallOrderGroupBuy extends Base
                     return ['code' => false, 'msg' => '地址信息错误'];
                 }
             } else {
-                if ($address_list[0]??'') {
+                if ($address_list[0] ?? '') {
                     $used_address = $address_list[0]->toArray();
                 }
             }
@@ -426,8 +425,9 @@ class MallOrderGroupBuy extends Base
         $ftModel = new FreightTemplate();
         $shop_address_list = $ftModel->listOfShop(2);
 
-        if(is_array($used_address) && empty($used_address)){
-            $used_address = new class {};
+        if (is_array($used_address) && empty($used_address)) {
+            $used_address = new class {
+            };
         }
 
         $res = [
@@ -439,7 +439,7 @@ class MallOrderGroupBuy extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => $coupon_list ?? [],
             'used_address' => $used_address,
-            'from_cart' => $params['from_cart']??2,
+            'from_cart' => $params['from_cart'] ?? 2,
             'group_key' => $params['group_key'],
         ];
 
@@ -663,6 +663,7 @@ class MallOrderGroupBuy extends Base
             $query->where('nmo.ordernum', '=', $params['ordernum']);
         }
 
+        //(全部0,待付款1,待发货10,待签收20,已完成30,已取消99,拼团中95)
         switch (intval($params['status'] ?? 0)) {
             case 1:
                 $query->where('nmo.status', '=', 1)
@@ -704,6 +705,7 @@ class MallOrderGroupBuy extends Base
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList', 'groupList.userInfo'];
         $with[] = 'orderChild';
         $with[] = 'orderChild.expressInfoForList';
+        $with[] = 'groupListInfo';
 
         if ($flag) {
             $field[] = 'address_history';
@@ -726,7 +728,7 @@ class MallOrderGroupBuy extends Base
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
             $now_date . '" then FALSE ELSE TRUE END) ');
 
-        $query->orderBy('id','desc');
+        $query->orderBy('id', 'desc');
         $list = $query->with($with)->select($field)->get();
 
         foreach ($list as $k => $v) {
@@ -751,7 +753,10 @@ class MallOrderGroupBuy extends Base
                 $temp_express_list[] = $temp_express;
             }
             $v->express_list = $temp_express_list;
-
+            if ($v->status == 95) {
+                $v->dead_time = $v->groupListInfo->end_at;
+                $v->dead_timestamp = strtotime($v->groupListInfo->end_at);
+            }
         }
 
         return $list;
@@ -780,6 +785,15 @@ class MallOrderGroupBuy extends Base
                 'status', 'order_id',
                 'express_info_id',
                 DB::raw('GROUP_CONCAT(order_detail_id) order_detail_id')
+            ]);
+    }
+
+    public function groupListInfo()
+    {
+        return $this->hasOne('App\Models\MallGroupBuyList', 'order_id', 'id')
+            ->select([
+                'id', 'group_buy_id', 'group_name', 'group_key', 'order_id', 'is_captain', 'is_success', 'success_at',
+                'is_fail', 'fail_at', 'begin_at', 'end_at'
             ]);
     }
 
@@ -934,7 +948,6 @@ class MallOrderGroupBuy extends Base
             $data['pay_time'],
             $data['bill_type'], $data['bill_title'],
             $data['bill_number'], $data['bill_format']
-//            ,$data['order_details']
         );
 
         return $data;
