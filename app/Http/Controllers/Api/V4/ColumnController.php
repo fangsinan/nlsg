@@ -97,7 +97,7 @@ class ColumnController extends Controller
         if($order){
             $order_str = 'desc';
         }
-        $field = ['id', 'name','subtitle','message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num'];
+        $field = ['id', 'name','title','subtitle','message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num'];
         $list = Column::select($field)->where([
             "status" => 1,
             "type"   => $type,
@@ -108,6 +108,7 @@ class ColumnController extends Controller
         $time = Config('web.is_new_time');
         $uid = $this->user['id'] ?? 0;
         foreach ($list['data'] as &$v) {
+            $user_info = User::find($v['user_id']);
             $v['is_sub'] = Subscribe::isSubscribe($uid,$v['id']);
             $v['is_new'] = 0;
             if($v['works_update_time'] > $time){
@@ -115,6 +116,7 @@ class ColumnController extends Controller
             }
             $title = Works::where('column_id',$v['id'])->orderBy('updated_at','desc')->first('title');
             $v['work_name'] = $title->title ?? '';
+            $v['nickname'] = $user_info['nickname'] ??'';
 
         }
         return $this->success($list['data']);
