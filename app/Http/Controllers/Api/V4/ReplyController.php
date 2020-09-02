@@ -34,7 +34,7 @@ class ReplyController extends Controller
      */
     public function store(Request $request)
     {
-        $user_id = 1;
+        $user_id  = $this->user['id'];
         $input    = $request->all();
 
         $comment = Comment::where('id', $input['comment_id'])->first();
