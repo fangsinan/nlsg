@@ -23,4 +23,14 @@ class CrontabController extends Controller
         $servers = new MallRefundJob();
         $servers->mallRefundCheck();
     }
+
+    //todo 清除失效拼团订单
+    public function delGroupBuyOrder(){
+
+    }
+
+    //todo 清除失效秒杀订单
+    public function delFlashSaleOrder(){
+
+    }
 }
