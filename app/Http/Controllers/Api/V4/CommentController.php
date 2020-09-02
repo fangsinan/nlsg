@@ -252,7 +252,7 @@ class CommentController extends Controller
 
             //发送通知
             $notify = new Notify();
-            $notify->from_uid = $user_id;
+            $notify->from_uid = $this->user['id'];
             $notify->to_uid = $list->user_id;
             $notify->source_id = $input['id'];
             $notify->type = 4;
