@@ -45,14 +45,14 @@ class LikeController extends Controller
 
         $res = Like::create([
             'relation_id' => $id,
-            'user_id'     => 1,
+            'user_id'     => $this->user['id'],
             'type'        => 1
         ]);
         if ($res){
             if ($type ==1){
                 $comment = Comment::where('id', $id)->first();
                 $notify = new Notify();
-                $notify->from_uid = 1;
+                $notify->from_uid = $this->user['id'];
                 $notify->to_uid   = $comment->user_id;
                 $notify->source_id= 1;
                 $notify->type     = 1;
