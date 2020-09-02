@@ -885,7 +885,6 @@ class MallOrderGroupBuy extends Base
             }
         }
 
-
         $about_order = [];
         //订单编号,下单时间,支付方式,支付时间,发票信息,备注信息
         $about_order[] = ['key' => '订单编号', 'value' => $data['ordernum']];

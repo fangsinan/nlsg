@@ -18,4 +18,5 @@ class ExpressInfo extends Base
 
     protected $table = 'nlsg_express_info';
 
+
 }

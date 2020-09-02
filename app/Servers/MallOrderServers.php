@@ -331,6 +331,7 @@ class MallOrderServers
                 //$c_res = DB::table('nlsg_mall_comment')->insertGetId($c_data);
                 $ex_data['express_id'] = $v['express_id'];
                 $ex_data['express_num'] = $v['num'];
+                $ex_data['history'] = json_encode(new class {});
                 $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
                 $express_info_id = DB::table('nlsg_express_info')->insertGetId($ex_data);
                 if (!$express_info_id) {
