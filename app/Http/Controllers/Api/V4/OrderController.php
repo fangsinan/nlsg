@@ -138,12 +138,12 @@ class OrderController extends Controller
 
         $params = $request->input();
         $column_id  = !empty($params['column_id']) ? intval($params['column_id']) : 0;
-        $user_id    = !empty($params['user_id']) ? intval($params['user_id']) : 0;
         $coupon_id  = !empty($params['coupon_id']) ? intval($params['coupon_id']) : 0;
         $tweeter_code = !empty($params['tweeter_code']) ? intval($params['tweeter_code']) : 0;
         $os_type    = !empty($params['os_type']) ? intval($params['os_type']) : 1;
         $live_id    = !empty($params['live_id']) ? intval($params['live_id']) : 0;
         $pay_type    = !empty($params['pay_type']) ? intval($params['pay_type']) : 0;
+        $user_id    = $this->user['id'] ?? 0;
 
         //检测下单参数有效性
         $checked = $this->addOrderCheck($user_id,$tweeter_code,$column_id,1);
@@ -215,10 +215,11 @@ class OrderController extends Controller
         $work_id    = $request->input('work_id',0);
         $coupon_id  = $request->input('coupon_id',0);
         $tweeter_code = $request->input('tweeter_code',0);
-        $user_id    = $request->input('user_id',0);
         $os_type    = $request->input('os_type',0);
         $live_id    = $request->input('live_id',0);
         $pay_type    = $request->input('pay_type',0);
+        $user_id    = $this->user['id'] ?? 0;
+
         //$work_id 课程信息
         $works_data = Works::find($work_id);
         if(empty($works_data)){
@@ -375,7 +376,6 @@ class OrderController extends Controller
 
         if (empty($user_id)) {
             return $this->error(0,'用户id有误');
-
         }
 
         $price = $coin_arr[$coin_id];

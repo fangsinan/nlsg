@@ -385,11 +385,11 @@ class UserController extends Controller
 
 
     /**
-     * @api {get} api/v4/user/store 个人更新
+     * @api {post} api/v4/user/store 个人更新
      * @apiVersion 4.0.0
      * @apiName  store
      * @apiGroup User
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/base
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/store
      *
      * @apiParam {string} nickname 昵称
      * @apiParam {string} headimg   头像
