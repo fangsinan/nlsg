@@ -55,7 +55,7 @@ class Comment extends Base
     }
 
 
-    public  function  getCommentList($id, $page=1)
+    public  function  getCommentList($id, $uid, $page=1)
     {
         if (!$id){
             return false;
@@ -75,7 +75,10 @@ class Comment extends Base
                        ->select('id','pid', 'user_id', 'relation_id','is_quality','content','forward_num','share_num','like_num','reply_num','reward_num','created_at','type')
                        ->where('status', 1)
                        ->find($id);
-        $comment['is_follow'] = 1;
+
+        $follow = UserFollow::where(['from_uid'=>$uid,'to_uid'=>$comment->user_id)->first();           
+        $comment['is_follow'] = $follow ? 1 : 0;
+
         if(in_array($comment['type'], [1, 2])){
             $comment['column'] = Column::find($comment['relation_id'], ['title','subtitle','cover_pic']);
         }elseif(in_array($comment['type'], [3, 4])){

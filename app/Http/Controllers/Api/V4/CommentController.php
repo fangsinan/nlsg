@@ -438,9 +438,10 @@ class CommentController extends Controller
 
     public function show(Request $request)
     {
-        $id = $request->get('id');
+        $id  = $request->get('id');
+        $uid = $this->user['id'];
         $comment = new Comment();
-        $lists = $comment->getCommentList($id);
+        $lists = $comment->getCommentList($id, $uid);
         if ( ! $lists) {
             return error(1000, '评论不存在');
         }
