@@ -96,6 +96,12 @@ class Comment extends Base
                  ->where('status', 1)
                  ->paginate(10)
                  ->toArray();
+        if($reply['data']){
+            foreach ($reply['data'] as &$v) {
+                $isLike = Like::where(['relation_id'=>$v['id'], 'type'=>1,'user_id'=>$uid])->first();
+                $v['is_like'] = $isLike ? 1 : 0;
+            }
+        }
         $comment['reply'] = $reply['data'];
 
         return $comment;
