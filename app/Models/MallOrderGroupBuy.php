@@ -590,9 +590,9 @@ class MallOrderGroupBuy extends Base
             ->where('gbl.is_fail', '=', 0)
             ->count();
         //开团列表 所差人数  剩余时间
-        $query = MallGroupBuyList::where(
-            'nlsg_mall_group_buy_list.group_name', '=', $group_buy_id
-        )->where('is_success', '=', 0)
+        $query = MallGroupBuyList::where('nlsg_mall_group_buy_list.group_name', '=', $group_buy_id)
+            ->where('nlsg_mall_group_buy_list.user_id', '<>', $user['id'] ?? 0)
+            ->where('is_success', '=', 0)
             ->where('is_captain', '=', 1)
             ->where('is_fail', '=', 0)
             ->where('end_at', '>', $now_date);
