@@ -724,6 +724,7 @@ class MallOrderController extends Controller
      * @apiSuccess {string} group_num 组队需要人数
      * @apiSuccess {string} group_key 队伍标似
      * @apiSuccess {string} order_count 队伍已有人数
+     * @apiSuccess {number=1,0} [show_self] 是否显示本人订单(0默认不显示 1显示)
      *
      * @apiSuccessExample {json} Request-Example:
      * {
@@ -742,6 +743,7 @@ class MallOrderController extends Controller
      * "end_at": "2020-07-28 18:14:59",
      * "nickname": "chandler",
      * "headimg": null,
+     * "is_self":1,
      * "group_num": 4,
      * "group_key": "2006280016893465633736",
      * "order_count": 1

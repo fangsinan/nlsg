@@ -564,8 +564,7 @@ class MallOrderGroupBuy extends Base
      */
     public function groupByTeamList($params, $user)
     {
-        //todo  已经成团的是否要过滤
-
+        $user_id = $user['id'] ?? 0;
         $group_buy_id = $params['group_buy_id'] ?? 0;
         $flag = $params['flag'] ?? 1; //1两条  2全部
         $group_key = $params['group_key'] ?? 0;
@@ -590,9 +589,14 @@ class MallOrderGroupBuy extends Base
             ->where('gbl.is_fail', '=', 0)
             ->count();
         //开团列表 所差人数  剩余时间
-        $query = MallGroupBuyList::where('nlsg_mall_group_buy_list.group_name', '=', $group_buy_id)
-            ->where('nlsg_mall_group_buy_list.user_id', '<>', $user['id'] ?? 0)
-            ->where('is_success', '=', 0)
+        //todo  已经成团的是否要过滤
+        $query = MallGroupBuyList::where('nlsg_mall_group_buy_list.group_name', '=', $group_buy_id);
+
+        if (($params['show_self'] ?? 0) == 0) {
+            $query->where('nlsg_mall_group_buy_list.user_id', '<>', $user_id);
+        }
+
+        $query->where('is_success', '=', 0)
             ->where('is_captain', '=', 1)
             ->where('is_fail', '=', 0)
             ->where('end_at', '>', $now_date);
@@ -619,6 +623,7 @@ class MallOrderGroupBuy extends Base
                 DB::raw('UNIX_TIMESTAMP(nlsg_mall_group_buy_list.end_at) as end_timestamp'),
                 DB::raw('UNIX_TIMESTAMP(nlsg_mall_group_buy_list.begin_at) as begin_timestamp'),
                 DB::raw('UNIX_TIMESTAMP(nlsg_mall_group_buy_list.created_at) as created_timestamp'),
+                DB::raw('(case when nlsg_mall_group_buy_list.user_id = ' . $user_id . ' then 1 else 0 end) as is_self'),
                 'nuser.nickname', 'nuser.headimg',
                 'nsp.group_num', 'nlsg_mall_group_buy_list.group_key'])
             ->with(['teamOrderCount'])
