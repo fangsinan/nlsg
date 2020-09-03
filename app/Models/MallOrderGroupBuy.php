@@ -780,7 +780,7 @@ class MallOrderGroupBuy extends Base
     public function orderChild()
     {
         return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')
-            ->groupBy('express_info_id')
+            ->groupBy('order_id')
             ->select([
                 'status', 'order_id',
                 'express_info_id',
