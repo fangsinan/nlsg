@@ -61,7 +61,6 @@ class Recommend extends Base
                 $result = $model->getIndexWorks($ids, 1);
                 break;
             case 10:
-                $ids = array_rand($ids, 3);
                 $model = new Lists();
                 $result = $model->getIndexListCourse($ids, 1);
                 break;
