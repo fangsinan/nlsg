@@ -1132,6 +1132,7 @@ class MallOrder extends Base
 //        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .$now_date . '" then FALSE ELSE TRUE END) ');
 
         $query->orderBy('id', 'desc');
+
         $list = $query->with($with)->select($field)->get();
 
         foreach ($list as $v) {
@@ -1171,7 +1172,8 @@ class MallOrder extends Base
     public function orderChild()
     {
         return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')
-            ->groupBy('express_info_id')
+//            ->groupBy('express_info_id')
+            ->groupBy('order_id')
             ->select([
                 'status', 'order_id',
                 'express_info_id',
@@ -1220,8 +1222,9 @@ class MallOrder extends Base
 
             if (isset($v1['express_info']['history']) && !empty($v1['express_info']['history'])) {
                 $v1['express_info']['history'] = json_decode($v1['express_info']['history']);
-            }else{
-                $v1['express_info']['history'] = new class {};
+            } else {
+                $v1['express_info']['history'] = new class {
+                };
             }
             $v1['order_details'] = [];
         }
@@ -1401,14 +1404,14 @@ class MallOrder extends Base
             $query->where('nmo.id', '=', $params['order_id']);
         }
 
-        $list = $query
-            ->where('nmo.status', '=', 30)
+        $query->where('nmo.status', '=', 30)
             ->where('nmod.num', '>', 'nmod.after_sale_used_num')
             ->where('nmo.is_del', '=', 0)
             ->select(['nmo.id as order_id', 'nmo.ordernum',
                 'nmod.id as order_detail_id', 'nmod.sku_history',
-                'nmg.name', 'nmg.subtitle', 'nmod.comment_id', 'nmg.picture'])
-            ->get();
+                'nmg.name', 'nmg.subtitle', 'nmod.comment_id', 'nmg.picture']);
+
+        $list = $query->get();
 
         foreach ($list as $v) {
             $temp = json_decode($v->sku_history);
