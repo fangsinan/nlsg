@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Db;
 
 class Lists extends Model
 {
@@ -42,7 +43,8 @@ class Lists extends Model
         $lists  = Lists::select('id','title', 'subtitle','cover','num')
         ->with(['works'=> function($query){
             $query->select('works_id','user_id','title', 'cover_img')
-                ->where('status',4);
+                ->where('status',4)
+                ->inRandomOrder();
         }, 'works.user'=>function($query){
             $query->select('id','nickname','headimg');
         }])->whereIn('id',$ids)
