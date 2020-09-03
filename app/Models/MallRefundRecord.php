@@ -225,6 +225,23 @@ class MallRefundRecord extends Base
                 return ['code' => false, 'msg' => '失败', 'ps' => 'order_detail error'];
             }
         } else {
+            $data['order_detail_id'] = $order_detail_id;
+            if ($data['num'] == 0 || $data['num'] > $get_data->num) {
+                return ['code' => false, 'msg' => '数量错误', 'ps' => 'num'];
+            }
+            $od = MallOrderDetails::find($get_data->order_detail_id);
+            $new_num = $od->after_sale_used_num + $data['num'];
+            if ($new_num > $od->num) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败,数量超出限制'];
+            }
+            $od->after_sale_used_num = $new_num;
+            $od_res = $od->save();
+            if (!$od_res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败', 'ps' => 'order_detail error'];
+            }
+
             //退款
             $data['refe_price'] = $get_data->pay_price;
         }
