@@ -329,7 +329,11 @@ class MallRefundRecord extends Base
                 }
             }
 
-            $v->picture = explode(',', $v->picture);
+            if (empty($v->picture)) {
+                $v->picture = [];
+            } else {
+                $v->picture = explode(',', $v->picture);
+            }
             if ($v->user_cancel == 1) {
                 $v->status = 99;
             } else {
