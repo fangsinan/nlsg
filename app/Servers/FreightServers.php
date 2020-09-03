@@ -119,9 +119,9 @@ class FreightServers
         DB::beginTransaction();
 
         $t_res = $data->save();
-        if($t_res === false){
+        if ($t_res === false) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'失败,请重试.'.__LINE__];
+            return ['code' => false, 'msg' => '失败,请重试.' . __LINE__];
         }
 
         $template_id = $data->id;

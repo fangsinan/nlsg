@@ -21,9 +21,9 @@ class JpushService
      * @param $title  标题
      * @param $content  内容
      * @param $alias  别名
-     * @param  array  $params  扩展字段
-     * @param  string  $ios_badge  ios 角标数
-     * @param  array  $platform  推送设备
+     * @param array $params 扩展字段
+     * @param string $ios_badge ios 角标数
+     * @param array $platform 推送设备
      * @return array|bool
      */
     public function pushUser($regid, $alert, array $notification = [])
@@ -47,10 +47,10 @@ class JpushService
             Log::channel('jpush')->info('推送成功');
         } catch (\JPush\Exceptions\APIConnectionException $e) {
             // try something here
-            Log::channel('jpush')->info('连接失败，:'.$e->getMessage());
+            Log::channel('jpush')->info('连接失败，:' . $e->getMessage());
         } catch (\JPush\Exceptions\APIRequestException $e) {
             // try something here
-            Log::channel('jpush')->info('推送失败，:'.$e->getMessage());
+            Log::channel('jpush')->info('推送失败，:' . $e->getMessage());
         }
 
 
@@ -80,9 +80,9 @@ class JpushService
             $payload->send();
             Log::channel('jpush')->info('推送成功');
         } catch (\JPush\Exceptions\APIConnectionException $e) {
-            Log::channel('jpush')->info('连接失败，原因:'.$e->getMessage());
+            Log::channel('jpush')->info('连接失败，原因:' . $e->getMessage());
         } catch (\JPush\Exceptions\APIRequestException $e) {
-            Log::channel('jpush')->info('推送失败，原因:'.$e->getMessage());
+            Log::channel('jpush')->info('推送失败，原因:' . $e->getMessage());
         }
 
     }

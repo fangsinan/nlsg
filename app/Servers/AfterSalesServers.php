@@ -57,8 +57,8 @@ class AfterSalesServers
             $query = new M2R();
         }
 
-        if($params['service_num']??0){
-            $query->where('service_num','like','%'.$params['service_num'].'%');
+        if ($params['service_num'] ?? 0) {
+            $query->where('service_num', 'like', '%' . $params['service_num'] . '%');
         }
 
         if (in_array($params['type'] ?? 0, [1, 2])) {
@@ -185,16 +185,16 @@ class AfterSalesServers
                 } else {
                     //如果是驳回 需要把after_sale_used_num减掉
                     $detail_info = MallOrderDetails::find($check->order_detail_id);
-                    if(empty($detail_info)){
+                    if (empty($detail_info)) {
                         DB::rollBack();
-                        return ['code'=>false,'msg'=>'订单发生错误,请重试'];
+                        return ['code' => false, 'msg' => '订单发生错误,请重试'];
                     }
                     $new_used_num = $detail_info->after_sale_used_num - $check->num;
-                    $detail_info->after_sale_used_num = $new_used_num<0?0:$new_used_num;
+                    $detail_info->after_sale_used_num = $new_used_num < 0 ? 0 : $new_used_num;
                     $info_res = $detail_info->save();
-                    if($info_res === false){
+                    if ($info_res === false) {
                         DB::rollBack();
-                        return ['code'=>false,'msg'=>'订单修改错误,请重试'];
+                        return ['code' => false, 'msg' => '订单修改错误,请重试'];
                     }
 
                     //驳回
