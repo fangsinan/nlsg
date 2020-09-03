@@ -8,6 +8,7 @@
 
 namespace App\Servers;
 
+use App\Models\MallOrderDetails;
 use Illuminate\Support\Facades\DB;
 use App\Models\MallRefundRecord as M2R;
 use App\Models\MallOrder;
@@ -56,10 +57,14 @@ class AfterSalesServers
             $query = new M2R();
         }
 
-        if(in_array($params['type'],[1,2])){
-            $query->where('type','=',$params['type']);
-        }else{
-            $query->where('type','=',1);
+        if($params['service_num']??0){
+            $query->where('service_num','like','%'.$params['service_num'].'%');
+        }
+
+        if (in_array($params['type'] ?? 0, [1, 2])) {
+            $query->where('type', '=', $params['type']);
+        } else {
+            $query->where('type', '=', 1);
         }
 
         $query->where('status', '<>', 80);
@@ -155,7 +160,7 @@ class AfterSalesServers
             return ['code' => false, 'msg' => 'id错误'];
         }
         $now_date = date('Y-m-d H:i:s');
-
+        DB::beginTransaction();
         if ($flag == 'check') {
             if ($check->status == 10) {
                 if ($value == 1) {
@@ -168,8 +173,9 @@ class AfterSalesServers
                         $check->status = 40;
 
                         //确定退款金额和任务
-                        if(empty($params['price'])){
-                            return ['code'=>false,'msg'=>'price参数错误'];
+                        if (empty($params['price'])) {
+                            DB::rollBack();
+                            return ['code' => false, 'msg' => 'price参数错误'];
                         }
                         $check->price = $params['price'];
                         $check->run_refund = 1;
@@ -177,16 +183,31 @@ class AfterSalesServers
                     }
                     $check->is_check_reject = 2;
                 } else {
+                    //如果是驳回 需要把after_sale_used_num减掉
+                    $detail_info = MallOrderDetails::find($check->order_detail_id);
+                    if(empty($detail_info)){
+                        DB::rollBack();
+                        return ['code'=>false,'msg'=>'订单发生错误,请重试'];
+                    }
+                    $new_used_num = $detail_info->after_sale_used_num - $check->num;
+                    $detail_info->after_sale_used_num = $new_used_num<0?0:$new_used_num;
+                    $info_res = $detail_info->save();
+                    if($info_res === false){
+                        DB::rollBack();
+                        return ['code'=>false,'msg'=>'订单修改错误,请重试'];
+                    }
+
                     //驳回
                     $check->status = 70;
                     $check->is_check_reject = 1;
                 }
-                $check->return_address_id = $params['return_address_id']??0;
+                $check->return_address_id = $params['return_address_id'] ?? 0;
                 $check->pass_at = $now_date;
                 $check->check_reject_at = $now_date;
                 $check->check_remark = $params['remark'] ?? '';
                 $res = $check->save();
             } else {
+                DB::rollBack();
                 return ['code' => false, 'msg' => '状态错误'];
             }
         } elseif ($flag == 'identify') {
@@ -197,23 +218,27 @@ class AfterSalesServers
                 $check->check_remark = $params['remark'] ?? '';
 
                 //确定退款金额和任务
-                if(empty($params['price'])){
-                    return ['code'=>false,'msg'=>'price参数错误'];
+                if (empty($params['price'])) {
+                    return ['code' => false, 'msg' => 'price参数错误'];
                 }
                 $check->price = $params['price'];
                 $check->run_refund = 1;
 
                 $res = $check->save();
             } else {
+                DB::rollBack();
                 return ['code' => false, 'msg' => '状态错误'];
             }
         } else {
+            DB::rollBack();
             return ['code' => false, 'msg' => '参数错误 flag'];
         }
 
         if ($res) {
+            DB::commit();
             return ['code' => true, 'msg' => '成功'];
         } else {
+            DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
     }
