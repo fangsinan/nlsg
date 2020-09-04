@@ -215,4 +215,21 @@ class ShoppingCart extends Base
         }
     }
 
+    public function getCount($uid)
+    {
+        if (empty($uid)) {
+            return ['count' => 0];
+        } else {
+            $count = DB::table('nlsg_mall_shopping_cart as msc')
+                ->join('nlsg_mall_goods as goods', 'msc.goods_id', '=', 'goods.id')
+                ->join('nlsg_mall_sku as sku', 'msc.sku_number', '=', 'sku.sku_number')
+                ->where('msc.user_id', '=', $uid)
+                ->where('goods.status', '=', 2)
+                ->where('sku.status', '=', 1)
+                ->where('sku.stock', '>', 0)
+                ->count('msc.id');
+            return ['count' => $count];
+        }
+    }
+
 }

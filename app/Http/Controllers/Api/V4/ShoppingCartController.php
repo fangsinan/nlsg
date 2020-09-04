@@ -190,4 +190,10 @@ class ShoppingCartController extends Controller
         return $this->getRes($data);
     }
 
+
+    public function getCount(){
+        $model = new ShoppingCart();
+        $data = $model->getCount($this->user['id']??0);
+        return $this->getRes($data);
+    }
 }

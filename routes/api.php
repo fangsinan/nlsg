@@ -114,6 +114,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('shopping_cart/create', 'ShoppingCartController@create');
     Route::get('shopping_cart/get_list', 'ShoppingCartController@getList');
     Route::put('shopping_cart/status_change', 'ShoppingCartController@statusChange');
+    Route::get('shopping_cart/get_count', 'ShoppingCartController@getCount');
 
 
     //优惠券领取页面
