@@ -546,7 +546,7 @@ class UserController extends Controller
         }
         $user = User::findOrFail($uid);
         if($user){
-            $lists = UserFollow::with('toUser:id,nickname,headimg')
+            $lists = UserFollow::with('toUser:id,nickname,intro,headimg')
                     ->select('id','from_uid','to_uid')
                     ->where('to_uid', $uid)
                     ->paginate(10)->toArray();
@@ -620,7 +620,7 @@ class UserController extends Controller
         }
         $user = User::findOrFail($uid);
         if($user){
-            $lists = UserFollow::with('fromUser:id,nickname,headimg')
+            $lists = UserFollow::with('fromUser:id,nickname,intro,headimg')
                     ->select('id','from_uid','to_uid')
                     ->where('from_uid', $uid)
                     ->paginate(10)->toArray();
