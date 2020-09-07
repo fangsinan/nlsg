@@ -93,6 +93,7 @@ class Comment extends Base
                         'to_user:id,nickname,headimg'
                   ])
                  ->select(['id','from_uid','to_uid','content','created_at'])
+                 ->where('comment_id', $id)
                  ->where('status', 1)
                  ->paginate(10)
                  ->toArray();
