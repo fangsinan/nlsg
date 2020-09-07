@@ -174,4 +174,12 @@ class User extends Authenticatable implements JWTSubject
             ->get();
     }
 
+    public function getHeadimgAttribute($field)
+    {
+        if (!empty($this->attributes['headimg'])){
+            return $this->attributes['headimg'];
+        }
+        return $this->attributes['headimg'] = env('IMAGES_URL').'image/202009/13f952e04c720a550193e5655534be86.jpg';
+    }
+
 }
