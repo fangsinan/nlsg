@@ -272,7 +272,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/followed 关注
+     * @api {post} api/v4/user/followed 关注
      * @apiVersion 4.0.0
      * @apiName  followed
      * @apiGroup User
@@ -316,7 +316,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} api/v4/user/unfollow 取消关注
+     * @api {post} api/v4/user/unfollow 取消关注
      * @apiVersion 4.0.0
      * @apiName  unfollow
      * @apiGroup User
