@@ -216,50 +216,51 @@ class CommentController extends Controller
                 }
                 Attach::insert($data);
             }
+            if (in_array($input['type'], [1, 2, 3, 4])) {
+                switch ($input['type']) {
+                    case 1:
+                        $list = Column::where('id', $input['id'])
+                            ->where('type', 1)
+                            ->where('status', 1)
+                            ->first();
+                        $subject = '评论了你的专栏';
+                        break;
+                    case  2:
+                        $list = Column::where('id', $input['id'])
+                            ->where('type', 2)
+                            ->where('status', 1)
+                            ->first();
+                        $subject = '评论了你的讲座';
+                        break;
+                    case  3:
+                        $list = Works::where('id', $input['id'])
+                            ->where('is_audio_book', 1)
+                            ->where('status', 4)
+                            ->first();
+                        $subject = '评论了你的听书';
+                        break;
+                    case  4:
+                        $list = Works::where('id', $input['id'])
+                            ->where('is_audio_book', 0)
+                            ->where('status', 4)
+                            ->first();
+                        $subject = '评论了你的精品课';
+                        break;
+                }
 
-            switch ($input['type']) {
-                case 1:
-                    $list = Column::where('id', $input['id'])
-                        ->where('type', 1)
-                        ->where('status', 1)
-                        ->first();
-                    $subject = '评论了你的专栏';
-                    break;
-                case  2:
-                    $list = Column::where('id', $input['id'])
-                        ->where('type', 2)
-                        ->where('status', 1)
-                        ->first();
-                    $subject = '评论了你的讲座';
-                    break;
-                case  3:
-                    $list = Works::where('id', $input['id'])
-                        ->where('is_audio_book', 1)
-                        ->where('status', 4)
-                        ->first();
-                    $subject = '评论了你的听书';
-                    break;
-                case  4:
-                    $list = Works::where('id', $input['id'])
-                        ->where('is_audio_book', 0)
-                        ->where('status', 4)
-                        ->first();
-                    $subject = '评论了你的精品课';
-                    break;
+                if(!$list){
+                    return error('数据不存在');
+                }
+                //发送通知
+                $notify = new Notify();
+                $notify->from_uid = $this->user['id'];
+                $notify->to_uid = $list->user_id;
+                $notify->source_id = $input['id'];
+                $notify->type = 4;
+                $notify->subject = $subject;
+                $notify->save();
             }
-            if(!$list){
-                return error('数据不存在');
-            }
-
-            //发送通知
-            $notify = new Notify();
-            $notify->from_uid = $this->user['id'];
-            $notify->to_uid = $list->user_id;
-            $notify->source_id = $input['id'];
-            $notify->type = 4;
-            $notify->subject = $subject;
-            $notify->save();
-
+        
             return success();
         }
 
