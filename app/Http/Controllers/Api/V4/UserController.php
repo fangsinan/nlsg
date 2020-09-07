@@ -342,6 +342,10 @@ class UserController extends Controller
             'to_uid'   => $uid
         ])->first();
 
+        if (!$follow) {
+            return error(1000,'还没有关注');
+        }
+        
         if ( ! $follow->delete()) {
             return error(1000, '取消失败');
         }
