@@ -13,7 +13,7 @@ class LikeController extends Controller
 {
 
     /**
-     * @api {get} api/v4/like 点赞
+     * @api {post} api/v4/like 点赞
      * @apiVersion 4.0.0
      * @apiParam  id  评论id
      * @apiParam  type  类型 1.想法 2.百科
@@ -68,7 +68,7 @@ class LikeController extends Controller
     }
 
     /**
-     * @api {get} api/unlike 点赞
+     * @api {post} api/v4/unlike 点赞
      * @apiVersion 4.0.0
      * @apiParam  id    评论id
      * @apiParam  type  类型 1.想法 2.百科
