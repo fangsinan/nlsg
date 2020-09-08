@@ -7,6 +7,7 @@ use App\Models\Like;
 use Illuminate\Http\Request;
 use App\Models\Wiki;
 use App\Models\WikiCategory;
+use App\Models\Collection;
 
 class WikiController extends Controller
 {
