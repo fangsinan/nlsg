@@ -453,7 +453,7 @@ class CommentController extends Controller
     }
 
     /**
-     * @api {get} api/v4/comment/destroy  删除想法
+     * @api {post} api/v4/comment/destroy  删除想法
      * @apiVersion 4.0.0
      * @apiName  destroy
      * @apiGroup Comment
