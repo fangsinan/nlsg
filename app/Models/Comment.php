@@ -47,6 +47,9 @@ class Comment extends Base
 
         if($lists['data']){
             foreach ($lists['data'] as &$v) {
+                $follow = UserFollow::where(['from_uid'=>$uid,'to_uid'=>$v['user_id']])->first();  
+                $v['is_follow'] = $follow ? 1 : 0;
+
                 $isLike = Like::where(['relation_id'=>$v['id'], 'type'=>1,'user_id'=>$uid])->first();
                 $v['is_like'] = $isLike ? 1 : 0;
             }
