@@ -138,9 +138,8 @@ class WikiController extends Controller
             return error(1000, '百科不存在');
         }
 
-        $user_id  = $this->user['id'] ?? 0;
-        $is_collection = Collection::CollectionData($user_id, $id, 5, 0);
-        $res['is_collection'] = $is_collection;
+        $list    = Collection::where(['type' => 5, 'user_id' => $this->user['id'],'relation_id'=>$id])->first();
+        $res['is_collection'] = $list ? 1 : 0;
         return success($res);
     }
 
