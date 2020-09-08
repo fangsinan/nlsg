@@ -17,7 +17,7 @@ class CommentController extends Controller
     /**
      * @api {get} api/v4/comment/list  列表
      * @apiVersion 4.0.0
-     * @apiName  index
+     * @apiName  list
      * @apiGroup Comment
      *
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/list?id=1&type=1
