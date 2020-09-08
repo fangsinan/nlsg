@@ -139,7 +139,7 @@ class WikiController extends Controller
         }
 
         $list    = Collection::where(['type' => 5, 'user_id' => $this->user['id'],'relation_id'=>$id])->first();
-        $res['is_collection'] = $list ? 1 : 0;
+        $res->is_collection = $list ? 1 : 0;
         return success($res);
     }
 
