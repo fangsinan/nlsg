@@ -15,7 +15,7 @@ use App\Models\Works;
 class CommentController extends Controller
 {
     /**
-     * @api {get} api/v4/comment/list  想法的列表
+     * @api {get} api/v4/comment/list  列表
      * @apiVersion 4.0.0
      * @apiName  index
      * @apiGroup Comment
