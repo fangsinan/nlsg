@@ -24,8 +24,8 @@ class CommentController extends Controller
      *
      * @apiParam {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科
      * @apiParam {number} id    模块id
-     * @apiParam {number} id    order 默认1  最新是2
-     * @apiParam {number} id    self  只看作者 1  默认0
+     * @apiParam {number} order  默认1  最新是2
+     * @apiParam {number} self   只看作者 1  默认0
      *
      * @apiSuccess {string} content  发表的内容
      * @apiSuccess {number} forward_num  转发数
