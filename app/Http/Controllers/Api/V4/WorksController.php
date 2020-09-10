@@ -390,7 +390,7 @@ class WorksController extends Controller
             return $this->error(0,'works_id 不能为空');
         }
         //查询当前课程
-        $works_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','collection_num','comment_num','chapter_num'])
+        $works_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','collection_num','comment_num','chapter_num','is_free'])
             ->where('status',4)->find($works_id);
 
         if(empty($works_data)){
@@ -402,6 +402,10 @@ class WorksController extends Controller
         //是否订阅
         $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
 
+
+        if($works_data['is_free'] == 1){
+            $is_sub = 1; // 免费时全部按关注处理url
+        }
         //查询所属专栏
         $field = ['id', 'name', 'type', 'user_id', 'subtitle', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
         $column = Column::where('id',$works_data['column_id'])

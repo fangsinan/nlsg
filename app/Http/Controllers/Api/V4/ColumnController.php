@@ -208,6 +208,9 @@ class ColumnController extends Controller
             //查询专栏对应的关联大纲表 并查询章节
             $outline = ColumnOutline::select('id', 'name','intro')->where('column_id',$column['id'])->orderBy('sort','asc')->get()->toArray();
 //            ColumnOutline::where('column_id',$column['id'])->count();
+            if( $column['is_free'] == 1 ){
+                $is_sub = 1;
+            }
             $worksInfoObj = new WorksInfo();
             //按照大纲表排序进行数据章节处理
             foreach ($outline as $key=>$val){
