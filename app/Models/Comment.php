@@ -63,26 +63,30 @@ class Comment extends Base
         if (!$id){
             return false;
         }
-
         $comment = Comment::with([
                                 'user:id,nickname,headimg',
                                 'quote:id,pid,content',
                                 'attach:id,relation_id,img',
                                 'reward' => function($query){
                                     $query->select('id','user_id','relation_id')
-                                          ->where('type', 16)
-                                          ->where('status', 1);
+                                          ->where('type', 5)
+                                          ->where('status', 1)
+                                          ->groupBy('user_id');
                                 },
                                 'reward.user:id,nickname,headimg'
                             ])
                        ->select('id','pid', 'user_id', 'relation_id','is_quality','content','forward_num','share_num','like_num','reply_num','reward_num','created_at','type')
-                       ->where('status', 1)
-                       ->find($id);
+                       ->where(['id'=>$id, 'status'=>1])
+                       ->first();
+        if(!$comment){
+            return  false;
+        }
 
-        $follow = UserFollow::where(['from_uid'=>$uid,'to_uid'=>$comment->user_id])->first();  
-
-        $comment['is_follow'] = $follow ? 1 : 0;
-
+        if ($uid) {
+            $follow = UserFollow::where(['from_uid'=>$uid,'to_uid'=>$comment->user_id])->first();  
+            $comment['is_follow'] = $follow ? 1 : 0;
+        }
+      
         if(in_array($comment['type'], [1, 2])){
             $comment['column'] = Column::find($comment['relation_id'], ['title','subtitle','cover_pic']);
         }elseif(in_array($comment['type'], [3, 4])){
