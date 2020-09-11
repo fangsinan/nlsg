@@ -8,6 +8,7 @@ namespace App\Servers;
  * and open the template in the editor.
  */
 
+use App\Models\ExpressCompany;
 use Illuminate\Support\Facades\DB;
 use App\Models\MallOrder;
 use App\Models\MallOrderChild;
@@ -318,10 +319,9 @@ class MallOrderServers
             $order_res = $order_obj->save();
             if (!$order_res) {
                 DB::rollBack();
-                return ['code' => false, 'msg' => '错误',
-                    'ps' => $v['order_id'] . ' order error'];
+                return ['code' => false, 'msg' => '错误', 'ps' => $v['order_id'] . ' order error'];
             }
-            //todo 校验发货订单表,快递公司和快递单号不重复
+            //校验发货订单表,快递公司和快递单号不重复
             $check_ex = ExpressInfo::where('express_id', '=', $v['express_id'])
                 ->where('express_num', '=', $v['num'])
                 ->first();
@@ -331,14 +331,30 @@ class MallOrderServers
                 //$c_res = DB::table('nlsg_mall_comment')->insertGetId($c_data);
                 $ex_data['express_id'] = $v['express_id'];
                 $ex_data['express_num'] = $v['num'];
-                $ex_data['history'] = json_encode(new class {
-                });
+
+                $express_company_info = ExpressCompany::find($v['express_id']);
+                $history = [];
+                $history['number'] = $v['num'];
+                $history['type'] = $express_company_info->code;
+                $history['typename'] = $express_company_info->name;
+                $history['express_phone'] = $express_company_info->phone;
+                $history['logo'] = $express_company_info->logo;
+                $history['list'] = [
+//                    [
+//                        'time'=>$now_date,
+//                        'status'=>'商家发货'
+//                    ]
+                ];
+
+//                $ex_data['history'] = json_encode(new class {
+//                });
+                $ex_data['history'] = json_encode($history);
+
                 $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
                 $express_info_id = DB::table('nlsg_express_info')->insertGetId($ex_data);
                 if (!$express_info_id) {
                     DB::rollBack();
-                    return ['code' => false, 'msg' => '错误',
-                        'ps' => $v['order_id'] . ' ex error'];
+                    return ['code' => false, 'msg' => '错误','ps' => $v['order_id'] . ' ex error'];
                 }
             }
             //order_detail发货

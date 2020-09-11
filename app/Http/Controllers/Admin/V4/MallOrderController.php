@@ -17,7 +17,8 @@ use App\Servers\MallOrderServers;
  *
  * @author wangxh
  */
-class MallOrderController extends Controller {
+class MallOrderController extends Controller
+{
 
     /**
      * 订单列表和详情
@@ -42,13 +43,14 @@ class MallOrderController extends Controller {
      * @apiParam {string='normal','flash_sale','group_buy'} order_type 订单类型:普通,秒杀,团购
      *
      * @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data":{}
-      }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data":{}
+     * }
      */
-    public function list(Request $request) {
+    public function list(Request $request)
+    {
         $servers = new MallOrderServers();
         $data = $servers->getList($request->input());
         return $this->getRes($data);
@@ -67,39 +69,40 @@ class MallOrderController extends Controller {
      * @apiParam {strint} order_id 订单id
      * @apiParam {strint} order_detail_id 订单详情id
      *
-     *  @apiParamExample {json} Request-Example:
-      [
-      {
-      "express_id": 2,
-      "num": "YT4538526006366",
-      "order_id": 9526,
-      "order_detail_id": 10323
-      },
-      {
-      "express_id": 2,
-      "num": "YT4506367161457",
-      "order_id": 9526,
-      "order_detail_id": 10324
-      }
-      ]
+     * @apiParamExample {json} Request-Example:
+     * [
+     * {
+     * "express_id": 2,
+     * "num": "YT4538526006366",
+     * "order_id": 9526,
+     * "order_detail_id": 10323
+     * },
+     * {
+     * "express_id": 2,
+     * "num": "YT4506367161457",
+     * "order_id": 9526,
+     * "order_detail_id": 10324
+     * }
+     * ]
      *
      * @apiSuccess {number} id id
      * @apiSuccessExample {json} Request-Example:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data":{}
-      }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data":{}
+     * }
      */
-    public function send(Request $request) {
+    public function send(Request $request)
+    {
         $servers = new MallOrderServers();
         $data = $servers->send($request->input('list', ''));
         return $this->getRes($data);
     }
 
-
     //商城服务信息列表
-    public function tos(Request $request){
+    public function tos(Request $request)
+    {
 
     }
 }
