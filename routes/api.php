@@ -191,6 +191,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('wiki/show', 'WikiController@show');
     Route::get('wiki/related', 'WikiController@related');
 
+
     //排行榜
     Route::get('rank/works', 'RankController@works');
     Route::get('rank/wiki', 'RankController@wiki');
@@ -219,6 +220,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('auth/wechat', 'AuthController@wechat');
     Route::get('auth/switch', 'AuthController@switch');
 
+    Route::get('order/reward/user', 'OrderController@getRewardUser');
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/base', 'UserController@base');

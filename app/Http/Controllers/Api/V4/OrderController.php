@@ -759,5 +759,44 @@ class OrderController extends Controller
 
     }
 
+    /**
+     * @api {get} api/v4/order/reward/user 鼓励列表
+     * @apiVersion 4.0.0
+     * @apiName  getRewardUser
+     * @apiGroup Wiki
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/order/reward/user
+     * @apiParam {number} id 相关id
+     * @apiParam {number} type 类型 3想法 4百科
+     * 
+     * @apiSuccess {string} reward_num 数量
+     * @apiSuccess {string} user    送花的用户
+     * @apiSuccess {string} user.nickname   送花的用户昵称
+     * @apiSuccess {string} user.headimg    送花的用户头像
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *     "data": {
+     *     }
+     * 
+     */
+    public function  getRewardUser(Request $request)
+    {
+        $id    = $request->input('id');
+        $type  = $request->input('type') ?? 3;
+        
+        $lists = Order::with('user:id,nickname,headimg')
+                ->select('id','user_id','reward_num','price')
+                ->where(['type'=>5, 'reward_type'=>$type, 'status'=>1])
+                ->groupBy('user_id')
+                ->orderBy('created_at','desc')
+                ->paginate(10)
+                ->toArray();
+
+        return  success($lists['data']);
+    }
+
 
 }
