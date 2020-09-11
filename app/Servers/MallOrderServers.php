@@ -340,10 +340,10 @@ class MallOrderServers
                 $history['express_phone'] = $express_company_info->phone;
                 $history['logo'] = $express_company_info->logo;
                 $history['list'] = [
-//                    [
-//                        'time'=>$now_date,
-//                        'status'=>'商家发货'
-//                    ]
+                    [
+                        'time'=>$now_date,
+                        'status'=>'商家发货'
+                    ]
                 ];
 
 //                $ex_data['history'] = json_encode(new class {
