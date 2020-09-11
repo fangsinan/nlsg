@@ -46,7 +46,7 @@ class AfterSalesController extends Controller
      * @apiDescription 审核,鉴定
      * @apiParam {number} id id
      * @apiParam {string=check,identify} flag check审核,identify鉴定
-     * @apiParam {number=1,2} [value]  鉴定时传,1通过 2拒绝
+     * @apiParam {number=1,2} [value]  审核时传,1通过 2拒绝
      * @apiParam {number} [return_address_id] 退货地址id
      *
      */
