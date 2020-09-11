@@ -763,7 +763,7 @@ class OrderController extends Controller
      * @api {get} api/v4/order/reward/user 鼓励列表
      * @apiVersion 4.0.0
      * @apiName  getRewardUser
-     * @apiGroup Wiki
+     * @apiGroup Order
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/order/reward/user
      * @apiParam {number} id 相关id
      * @apiParam {number} type 类型 3想法 4百科
@@ -786,7 +786,7 @@ class OrderController extends Controller
     {
         $id    = $request->input('id');
         $type  = $request->input('type') ?? 3;
-        
+
         $lists = Order::with('user:id,nickname,headimg')
                 ->select('id','user_id','reward_num','price')
                 ->where(['type'=>5, 'reward_type'=>$type, 'status'=>1])
