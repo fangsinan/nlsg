@@ -69,9 +69,8 @@ class Comment extends Base
                                 'attach:id,relation_id,img',
                                 'reward' => function($query){
                                     $query->select('id','user_id','relation_id')
-                                          ->where('type', 5)
-                                          ->where('status', 1)
-                                          ->groupBy('user_id');
+                                        ->where(['type'=>5, 'reward_type'=>3, 'status'=>1])
+                                        ->groupBy('user_id');
                                 },
                                 'reward.user:id,nickname,headimg'
                             ])
