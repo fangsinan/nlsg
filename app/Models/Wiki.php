@@ -31,7 +31,10 @@ class Wiki extends Model
     {
         return $this->hasMany(WikiCategory::class, 'category_id', 'id');
     }
-
+    public  function  reward()
+    {
+        return $this->hasMany(Order::class, 'relation_id', 'id');
+    }
 
     public static  function  search($keywords)
     {

@@ -133,7 +133,15 @@ class WikiController extends Controller
     {
         $id = $request->input('id');
         $res = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
-            ->find($id);
+                ->with([
+                    'reward' => function($query){
+                        $query->select('id','user_id','relation_id')
+                            ->where(['type'=>5, 'reward_type'=>4, 'status'=>1])
+                            ->groupBy('user_id');
+                    },
+                    'reward.user:id,nickname,headimg'
+                ])
+                ->find($id);
         if ( ! $res) {
             return error(1000, '百科不存在');
         }
