@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Servers\ActiveServers;
-use Illuminate\Support\Arr;
 
 class ActiveController extends Controller
 {

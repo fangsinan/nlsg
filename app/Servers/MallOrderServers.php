@@ -346,8 +346,6 @@ class MallOrderServers
                     ]
                 ];
 
-//                $ex_data['history'] = json_encode(new class {
-//                });
                 $ex_data['history'] = json_encode($history);
 
                 $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;

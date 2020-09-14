@@ -354,8 +354,9 @@ class MallOrderFlashSale extends Base
         $ftModel = new FreightTemplate();
         $shop_address_list = $ftModel->listOfShop(2);
 
-        if(is_array($used_address) && empty($used_address)){
-            $used_address = new class {};
+        if (is_array($used_address) && empty($used_address)) {
+            $used_address = new class {
+            };
         }
 
         $res = [
@@ -367,7 +368,8 @@ class MallOrderFlashSale extends Base
             'shop_address_list' => $shop_address_list,
             'coupon_list' => ['coupon_freight' => $coupon_freight_list ?? []],
             'used_address' => $used_address,
-            'from_cart' => $params['from_cart'] ?? 2
+            'from_cart' => $params['from_cart'] ?? 2,
+            'token' => CacheTools::orderToken($user['id'], 2, 'set'),
         ];
 
         if ($params['post_type'] == 1 && empty($used_address)) {

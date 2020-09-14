@@ -441,6 +441,7 @@ class MallOrderGroupBuy extends Base
             'used_address' => $used_address,
             'from_cart' => $params['from_cart'] ?? 2,
             'group_key' => $params['group_key'],
+            'token' => CacheTools::orderToken($user['id'], 3, 'set'),
         ];
 
         if ($params['post_type'] == 1 && empty($used_address)) {

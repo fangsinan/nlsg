@@ -805,7 +805,7 @@ class MallOrder extends Base
             'coupon_list' => $coupon_list,
             'used_address' => $used_address,
             'from_cart' => $params['from_cart'],
-            'token' => $this->mallOrderToken($user['id'], 1, 1),
+            'token' => CacheTools::orderToken($user['id'], 1, 'set'),
         ];
 
         if ($params['post_type'] == 1 && empty($used_address)) {
@@ -818,35 +818,6 @@ class MallOrder extends Base
         }
 
         return $res;
-    }
-
-    //todo 提交订单令牌
-    public function mallOrderToken($uid, $order_type, $flag, $key = '')
-    {
-        $cache_key_name = 'mall_order_token';
-        if ($flag == 1) {
-            //加缓存
-            $expire_num = CacheTools::getExpire($cache_key_name);
-            $cache_name = $uid . Str::random(16) . $order_type;
-            $value = 1;
-            Cache::tags($cache_key_name)->put($cache_name, $value, $expire_num);
-            return $cache_name;
-        } elseif ($flag == 2) {
-            //删缓存
-            Cache::tags($cache_key_name)->forget($key);
-            return 1;
-        } else {
-            //查询是否存在
-            if (empty($key)) {
-                return 0;
-            }
-            $check_cache = Cache::tags($cache_key_name)->has($key);
-            if ($check_cache) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
     }
 
     /**

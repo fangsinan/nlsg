@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Cache;
 
 class CacheServers
 {
+    /**
+     * @param $type (1:商品缓存)
+     */
     public static function clear($type)
     {
         switch (intval($type)) {
