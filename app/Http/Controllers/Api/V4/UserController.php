@@ -906,4 +906,59 @@ class UserController extends Controller
         return $this->success($res);
     }
 
+     /**
+     * @api {POST} api/v4/change/phone  更换手机号
+     * @apiVersion 4.0.0
+     * @apiGroup user
+     *
+     * @apiParam {string} phone 手机号
+     * @apiParam {string} code  验证码
+     * 
+     * @apiSuccess {number}  id  用户id
+     * @apiSuccess {string}  token   用户授权
+     * @apiSuccessExample 成功响应:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data":
+     *  {
+     *      
+     *   }
+     * }
+     */
+    public function changePhone(Request $request)
+    {
+        $phone = $request->input('phone');
+        $code = $request->input('code');
+
+        if (!$phone) {
+            return error(1000, '手机号不能为空');
+        }
+        if (!$code) {
+            return error(1000, '验证码不能为空');
+        }
+
+        $res = Redis::get($phone);
+        if (!$res) {
+            return error(1000, '验证码已过期');
+        }
+
+        if ($code !== $res) {
+            return error(1000, '验证码错误');
+        }
+        $res = User::where('id', $this->uid)->update(['phone'=>$phone]);
+        if ($res) {
+            $user = User::where('id', $this->uid)->first();
+
+            Redis::del($phone);
+            $token = auth('api')->login($user);;
+            $data = [
+                'id' => $user->id,
+                'token' => $token
+            ];
+            return success($data);
+        }
+       
+    }
+
 }
