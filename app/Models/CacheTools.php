@@ -9,6 +9,8 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 /**
  * Description of CacheTools
@@ -37,7 +39,6 @@ class CacheTools
             case 'get_list':
             case 'mall_banner_list':
             case 'home_group_list':
-            case 'mall_order_token':
                 $expire = $normal_expire;
                 break;
             case 'mall_comment_list':
@@ -51,6 +52,7 @@ class CacheTools
             case 'area_list':
             case 'freight_template_list':
             case 'freight_template':
+            case 'order_token':
                 $expire = $long_expire;
                 break;
             default :
@@ -58,5 +60,42 @@ class CacheTools
         }
 
         return $expire;
+    }
+
+    /**
+     * 订单令牌
+     * @param $uid
+     * @param $order_type 订单类型 1普通2秒杀3拼团
+     * @param $flag 操作:set,check,del
+     * @param string $key
+     * @return int|string
+     */
+    public static function orderToken($uid, $order_type, $flag, $key = '')
+    {
+        $cache_key_name = 'order_token';
+        switch ($flag) {
+            case 'set':
+                $expire_num = CacheTools::getExpire($cache_key_name);
+                $cache_name = $uid . Str::random(16) . $order_type;
+                Cache::tags($cache_key_name)->put($cache_name, 1, $expire_num);
+                return $cache_name;
+            case 'check':
+                if (empty($key)) {
+                    return 0;
+                }
+                $check = Cache::tags($cache_key_name)->has($key);
+                if ($check) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+                break;
+            case 'del':
+                Cache::tags($cache_key_name)->forget($key);
+                return 1;
+            default:
+                return 0;
+        }
+
     }
 }
