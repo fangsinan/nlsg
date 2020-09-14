@@ -419,10 +419,10 @@ class UserController extends Controller
         }
         $res = User::where('id', $this->user['id'])->update([
             'nickname' => $input['nickname'],
-            'headimg'  => $input['headimg'],
-            'birthday' => $input['birthday'],
+            'headimg'  => $input['headimg'] ?? '',
+            'birthday' => $input['birthday'] ?? '',
             'sex'      => $input['sex'],
-            'intro'    => $input['intro']
+            'intro'    => $input['intro'] ?? ''
         ]);
         if ($res) {
             return success();
