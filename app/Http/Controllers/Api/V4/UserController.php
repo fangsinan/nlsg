@@ -456,7 +456,7 @@ class UserController extends Controller
     {
         $user = User::select(['phone'])->where('id', $this->user['id'])->first();
         if ($user) {
-            $user->phone = substr_replace($user->phone, '****', 3, 4);
+            // $user->phone = substr_replace($user->phone, '****', 3, 4);
             $user->is_wx = 1;
         }
         return success($user);
@@ -929,7 +929,7 @@ class UserController extends Controller
     public function changePhone(Request $request)
     {
         $phone = $request->input('phone');
-        $code = $request->input('code');
+        $code  = $request->input('code');
 
         if (!$phone) {
             return error(1000, '手机号不能为空');
@@ -945,6 +945,10 @@ class UserController extends Controller
 
         if ($code !== $res) {
             return error(1000, '验证码错误');
+        }
+        $list = User::where('phone', $phone)->first();
+        if (!$list->isEmpty) {
+            return error(1000, '该手机号码已存在');
         }
         $res = User::where('id', $this->uid)->update(['phone'=>$phone]);
         if ($res) {
