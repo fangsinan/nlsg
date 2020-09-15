@@ -318,8 +318,8 @@ class AuthController extends Controller
      // JWT 验证
     public function jwtApple(Request $request) {
         $user = $request->input('user');
-        $email = $request->input('email');
-        $fullName = $request->input('fullName');
+        $email = $request->input('email') ?? '';
+        $fullName = $request->input('fullName') ?? '';
         $authorizationCode = $request->input('authorizationCode');
 
         $identityToken     = $request->input('identityToken');
