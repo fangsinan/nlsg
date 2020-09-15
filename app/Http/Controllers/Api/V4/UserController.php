@@ -893,7 +893,7 @@ class UserController extends Controller
     {
         $uid   = $this->user['id'];
         $lists = User::select('id','nickname','headimg','phone','is_author','notify_num','follow_num','fan_num','history_num')
-                ->first($uid);
+                ->find($uid);
         if ($lists) {
             $lists->phone = substr_replace($lists->phone, '****', 3, 4);
         }
