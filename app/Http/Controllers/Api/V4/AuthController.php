@@ -118,6 +118,7 @@ class AuthController extends Controller
                 'headimg' => $input['headimg'] ?? '',
                 'unionid' => $input['unionid'] ?? ''
             ]);
+            User::where('id', $user->id)->update(['is_wx'=>1]);
         }
 
         $token = auth('api')->login($user);
