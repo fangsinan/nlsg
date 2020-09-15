@@ -329,8 +329,24 @@ class AuthController extends Controller
         $isValid = $appleSignInPayload->verifyUser($user);
 
         // 当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
+        if ($isValid === true) {
+            $user = User::where('appleid', $user)->first();
+            if (!$user) {
+                $user = User::create([
+                    'appleid' => $appleid ?? ''
+                ]);
+            }
 
-        return success($isValid);
+            $token = auth('api')->login($user);
+            $data = [
+                'id'    => $user->id,
+                'token' => $token
+            ];
+            return success($data);
+        } else {
+            return error(1000, '验证失败');
+        }
+
     }
 
 }
