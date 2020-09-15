@@ -329,7 +329,8 @@ class AuthController extends Controller
         $isValid = $appleSignInPayload->verifyUser($user);
 
         // 当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
-        var_dump($isValid);
+
+        return success($isValid);
     }
 
 }
