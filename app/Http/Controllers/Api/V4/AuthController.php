@@ -317,7 +317,7 @@ class AuthController extends Controller
 
      // JWT 验证
     public function jwtApple(Request $request) {
-        $user = $request->input('user');
+        $appleid = $request->input('user');
         $email = $request->input('email') ?? '';
         $fullName = $request->input('fullName') ?? '';
         $authorizationCode = $request->input('authorizationCode');
@@ -326,14 +326,14 @@ class AuthController extends Controller
 
         $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
 
-        $isValid = $appleSignInPayload->verifyUser($user);
+        $isValid = $appleSignInPayload->verifyUser($appleid);
 
         // 当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
         if ($isValid === true) {
-            $user = User::where('appleid', $user)->first();
+            $user = User::where('appleid', $appleid)->first();
             if (!$user) {
                 $user = User::create([
-                    'appleid' => $user ?? ''
+                    'appleid' => $appleid ?? ''
                 ]);
             }
 
