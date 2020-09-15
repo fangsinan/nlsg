@@ -950,9 +950,9 @@ class UserController extends Controller
         if ($list) {
             return error(1000, '该手机号码已存在');
         }
-        $res = User::where('id', $this->uid)->update(['phone'=>$phone]);
+        $res = User::where('id', $this->user['id'])->update(['phone'=>$phone]);
         if ($res) {
-            $user = User::where('id', $this->uid)->first();
+            $user = User::where('id', $this->user['id'])->first();
 
             Redis::del($phone);
             $token = auth('api')->login($user);;
