@@ -457,7 +457,7 @@ class UserController extends Controller
         $user = User::select(['phone'])->where('id', $this->user['id'])->first();
         if ($user) {
             $user->phone = substr_replace($user->phone, '****', 3, 4);
-            $user->is_wx = 1;
+            $user->is_wx = $user->is_wx ?? 0;
         }
         return success($user);
     }
