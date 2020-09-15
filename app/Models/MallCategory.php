@@ -42,7 +42,7 @@ class MallCategory extends Base
         $res = Cache::get($cache_key_name);
         if (empty($res)) {
             $res = self::getUsedListFromDb();
-            Cache::add($cache_key_name, $res, $expire_num);
+            Cache::put($cache_key_name, $res, $expire_num);
         }
         return $res;
     }

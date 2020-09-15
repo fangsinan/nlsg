@@ -174,7 +174,7 @@ class SpecialPriceModel extends Base
                     }
                 }
             }
-            Cache::add($cache_key_name, $sec_date_list, $expire_num);
+            Cache::put($cache_key_name, $sec_date_list, $expire_num);
         }
 
         if ($flag == 1) {
@@ -355,7 +355,7 @@ class SpecialPriceModel extends Base
                 ->orderBy('begin_time', 'asc')
                 ->groupBy('nsp.group_name')
                 ->get();
-            Cache::add($cache_key_name, $res, $expire_num);
+            Cache::put($cache_key_name, $res, $expire_num);
         }
         $key_array = [];
         foreach ($res as $k => $v) {

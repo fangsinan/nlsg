@@ -219,7 +219,7 @@ class ExpressCompany extends Base
             if ($jsonarr['status'] !== 0) {
                 return '';
             }
-            Cache::add($cache_key_name, time(), $expire_num);
+            Cache::put($cache_key_name, time(), $expire_num);
             $result = $jsonarr['result'];
             return $result;
         } else {
