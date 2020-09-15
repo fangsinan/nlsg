@@ -333,13 +333,14 @@ class AuthController extends Controller
             $user = User::where('appleid', $user)->first();
             if (!$user) {
                 $user = User::create([
-                    'appleid' => $appleid ?? ''
+                    'appleid' => $user ?? ''
                 ]);
             }
 
             $token = auth('api')->login($user);
             $data = [
                 'id'    => $user->id,
+                'phone' => $user->phone ?? '',
                 'token' => $token
             ];
             return success($data);
