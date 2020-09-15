@@ -1115,6 +1115,57 @@
         ]
     },
     {
+        "name": "griffinledingham/php-apple-signin",
+        "version": "1.1",
+        "version_normalized": "1.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/GriffinLedingham/php-apple-signin.git",
+            "reference": "069e79b7ca2366fdebd3f92289281912849e0cb1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/GriffinLedingham/php-apple-signin/zipball/069e79b7ca2366fdebd3f92289281912849e0cb1",
+            "reference": "069e79b7ca2366fdebd3f92289281912849e0cb1",
+            "shasum": "",
+            "mirrors": [
+                {
+                    "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                    "preferred": true
+                }
+            ]
+        },
+        "time": "2020-04-06T16:05:53+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "AppleSignIn\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Griffin Ledingham",
+                "email": "gcledingham@gmail.com",
+                "role": "Developer"
+            }
+        ],
+        "description": "A simple library to decode and parse Apple Sign In client tokens.",
+        "keywords": [
+            "JWK",
+            "apple",
+            "in",
+            "ios",
+            "jwt",
+            "php",
+            "sign"
+        ]
+    },
+    {
         "name": "guzzlehttp/guzzle",
         "version": "6.5.4",
         "version_normalized": "6.5.4.0",
@@ -3786,7 +3837,8 @@
         "homepage": "https://github.com/sebastianbergmann/php-token-stream/",
         "keywords": [
             "tokenizer"
-        ]
+        ],
+        "abandoned": true
     },
     {
         "name": "phpunit/phpunit",
@@ -3943,12 +3995,12 @@
         "version_normalized": "1.1.1.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/nrk/predis.git",
+            "url": "https://github.com/predis/predis.git",
             "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+            "url": "https://api.github.com/repos/predis/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
             "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
             "shasum": "",
             "mirrors": [

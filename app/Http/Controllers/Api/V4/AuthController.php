@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use App\Models\User;
+use AppleSignIn\ASDecoder;
+use GuzzleHttp\Client;
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Signer\Ecdsa\Sha256;
+use Lcobucci\JWT\Signer\Key;
 use function GuzzleHttp\headers_from_lines;
 
 class AuthController extends Controller
@@ -308,6 +313,23 @@ class AuthController extends Controller
         }
 
         return json_decode($res->getBody()->getContents());
+    }
+
+     // JWT 验证
+    public function jwtApple(Request $request) {
+        $user = $request->input('user');
+        $email = $request->input('email');
+        $fullName = $request->input('fullName');
+        $authorizationCode = $request->input('authorizationCode');
+
+        $identityToken     = $request->input('identityToken');
+
+        $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
+
+        $isValid = $appleSignInPayload->verifyUser($user);
+
+        // 当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
+        var_dump($isValid);
     }
 
 }

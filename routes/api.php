@@ -218,6 +218,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::post('auth/wechat', 'AuthController@wechat');
     Route::get('auth/switch', 'AuthController@switch');
+    Route::post('auth/apple', 'AuthController@jwtApple');
 
     Route::get('order/reward/user', 'OrderController@getRewardUser');
 

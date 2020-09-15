@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0af4558c35b3731f786d681e6bf21ddf",
+    "content-hash": "a2def7d3fae94ef8c0f90a0095113c61",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -660,6 +660,55 @@
                 "laravel"
             ],
             "time": "2020-04-28T08:47:37+00:00"
+        },
+        {
+            "name": "griffinledingham/php-apple-signin",
+            "version": "1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/GriffinLedingham/php-apple-signin.git",
+                "reference": "069e79b7ca2366fdebd3f92289281912849e0cb1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/GriffinLedingham/php-apple-signin/zipball/069e79b7ca2366fdebd3f92289281912849e0cb1",
+                "reference": "069e79b7ca2366fdebd3f92289281912849e0cb1",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AppleSignIn\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Griffin Ledingham",
+                    "email": "gcledingham@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple library to decode and parse Apple Sign In client tokens.",
+            "keywords": [
+                "JWK",
+                "apple",
+                "in",
+                "ios",
+                "jwt",
+                "php",
+                "sign"
+            ],
+            "time": "2020-04-06T16:05:53+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2099,12 +2148,12 @@
             "version": "v1.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nrk/predis.git",
+                "url": "https://github.com/predis/predis.git",
                 "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "url": "https://api.github.com/repos/predis/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
                 "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
                 "shasum": "",
                 "mirrors": [
@@ -8254,7 +8303,11 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.2.5"
+        "php": "^7.2.5",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-simplexml": "*"
     },
     "platform-dev": []
 }
