@@ -24,7 +24,7 @@ class MallSkuValue extends Base {
                     ->where('sv.status', '=', 1)
                     ->select(['sv.id', 'sv.key_name', 'sv.value_name'])
                     ->get();
-            Cache::add($cache_key_name, $res, $expire_num);
+            Cache::put($cache_key_name, $res, $expire_num);
         }
         return $res;
     }

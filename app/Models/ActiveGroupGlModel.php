@@ -63,7 +63,7 @@ class ActiveGroupGlModel extends Base
                 if (empty($list)) {
                     $list = '0';
                 }
-//                Cache::add($cache_key_name, $list, $expire_num);
+//                Cache::put($cache_key_name, $list, $expire_num);
             }
             if ($list === '0') {
                 return [];

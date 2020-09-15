@@ -18,7 +18,7 @@ class CouponRule extends Base
         $res = Cache::get($cache_key_name);
         if (empty($res)) {
             $res = self::getListFromDbNew();
-            Cache::add($cache_key_name, $res, $expire_num);
+            Cache::put($cache_key_name, $res, $expire_num);
         }
 
         $now = time();

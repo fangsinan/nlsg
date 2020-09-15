@@ -33,7 +33,7 @@ class Banner extends Base
         $res = Cache::get($cache_key_name);
         if (empty($res)) {
             $res = self::mallBannerListFromDb();
-            Cache::add($cache_key_name, $res, $expire_num);
+            Cache::put($cache_key_name, $res, $expire_num);
         }
 
         $keywords = ConfigModel::getData(21);

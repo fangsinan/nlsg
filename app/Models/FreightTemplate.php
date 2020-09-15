@@ -30,7 +30,7 @@ class FreightTemplate extends Base
                     'province', 'city', 'area', 'details',
                     'start_time', 'end_time'])
                 ->get();
-            Cache::add($cache_key_name, $res, $expire_num);
+            Cache::put($cache_key_name, $res, $expire_num);
         }
 
         $list = [];
