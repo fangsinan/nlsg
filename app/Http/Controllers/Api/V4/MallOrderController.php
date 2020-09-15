@@ -159,16 +159,37 @@ class MallOrderController extends Controller
      */
     public function prepareCreateOrder(Request $request)
     {
-        $params['from_cart'] = $request->input('from_cart', 9);
-        $params['sku'] = $request->input('sku', '');
-        $params['goods_id'] = $request->input('goods_id', 0);
-        $params['buy_num'] = $request->input('buy_num', 0);
-        $params['inviter'] = $request->input('inviter', 0);
-        $params['post_type'] = $request->input('post_type', 0);
-        $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
-        $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
-        $params['address_id'] = $request->input('address_id', 0);
-        $params['os_type'] = $request->input('os_type', 0);
+        if (0) {
+            $this->user = [
+                'id' => 168934,
+                'level' => 1,
+                'is_staff' => 0
+            ];
+            $params = [
+                'from_cart' => 2,
+                'sku' => 1612728266,
+                'goods_id' => 91,
+                'buy_num' => 4,
+                'inviter' => 0,
+                'post_type' => 1,
+                'coupon_goods_id' => 0,
+                'coupon_freight_id' => 0,
+                'address_id' => 0,
+                'os_type' => 1
+            ];
+        } else {
+            $params['from_cart'] = $request->input('from_cart', 9);
+            $params['sku'] = $request->input('sku', '');
+            $params['goods_id'] = $request->input('goods_id', 0);
+            $params['buy_num'] = $request->input('buy_num', 0);
+            $params['inviter'] = $request->input('inviter', 0);
+            $params['post_type'] = $request->input('post_type', 0);
+            $params['coupon_goods_id'] = $request->input('coupon_goods_id', 0);
+            $params['coupon_freight_id'] = $request->input('coupon_freight_id', 0);
+            $params['address_id'] = $request->input('address_id', 0);
+            $params['os_type'] = $request->input('os_type', 0);
+        }
+
 
         $model = new MallOrder();
         $data = $model->prepareCreateOrder($params, $this->user);
