@@ -329,7 +329,7 @@ class AuthController extends Controller
 
      // JWT 验证
     public function jwtApple(Request $request) {
-        
+
         $phone   = $request->input('phone');
         $appleid = $request->input('user');
         $email = $request->input('email') ?? '';
@@ -346,9 +346,15 @@ class AuthController extends Controller
         if ($isValid === true) {
             $user = User::where('phone', $phone)->first();
             if (!$user) {
-                $user = User::create([
-                    'appleid' => $appleid ?? ''
+                $list = User::create([
+                    'appleid' => $appleid ?? '',
+                    'phone'   => $phone
                 ]);
+                $user = User::find($list->id);
+
+            } else {
+                User::where('phone', $phone)->update([
+                    'appleid' => $appleid
             }
 
             $token = auth('api')->login($user);
