@@ -967,4 +967,25 @@ class UserController extends Controller
        
     }
 
+    public function bindWechat(Request $request)
+    {
+        $input = $request->all();
+        $data =[
+            'nickname' => $input['nickname'] ?? '',
+            'sex' => $input['sex'] == '男' ? 1 : 2,
+            'province' => $input['province'],
+            'city' => $input['city'],
+            'headimg' => $input['headimg'] ?? '',
+            'unionid' => $input['unionid'] ?? '',
+            'is_wx'   =>1
+        ];
+
+        $res = User::where('id', $this->user['id'])->update($data);
+        if ($res) {
+            return success();
+        }
+        return  error(1000,'绑定失败');
+      
+    }
+
 }
