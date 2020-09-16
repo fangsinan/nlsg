@@ -114,21 +114,13 @@ class AuthController extends Controller
     {
         $input = $request->all();
         $user = User::where('unionid', $input['unionid'])->first();
-        if (!$user) {
-            $user = User::create([
-                'nickname' => $input['nickname'] ?? '',
-                'sex' => $input['sex'] == '男' ? 1 : 2,
-                'province' => $input['province'],
-                'city' => $input['city'],
-                'headimg' => $input['headimg'] ?? '',
-                'unionid' => $input['unionid'] ?? ''
-            ]);
-            User::where('id', $user->id)->update(['is_wx'=>1]);
+        if ($user->is_wx ==1) {
+            return  error(1000, '微信已绑定');
         }
 
         $token = auth('api')->login($user);
         $data = [
-            'id' => $user->id,
+            'id'    => $user->id,
             'phone' => $user->phone ?? '',
             'token' => $token
         ];
@@ -154,29 +146,37 @@ class AuthController extends Controller
      */
     public function bind(Request $request)
     {
-        $phone = $request->input('phone');
-        $code = $request->input('code');
+        $input = $request->all();
+        $phone = $input['phone'];
+        $code  = $input['code'];
 
-        // if ( ! $phone) {
-        //     return error(1000, '手机号不能为空');
-        // }
-        // if ( ! $code) {
-        //     return error(1000, '验证码不能为空');
-        // }
-
-        // $res = Redis::get($phone);
-        // if ( ! $res) {
-        //     return error(1000, '验证码已过期');
-        // }
-        // if ($code !== $res) {
-        //     return error(1000, '验证码错误');
-        // }
-
-        $list = User::where('phone', $phone)->first();
-        if ($list) {
-            return error(1000, '手机号码已经绑定，请更换手机号');
+        if ( ! $phone) {
+            return error(1000, '手机号不能为空');
         }
-        $res = User::where('id', $this->user['id'])->update(['phone' => $phone]);
+        if ( ! $code) {
+            return error(1000, '验证码不能为空');
+        }
+
+        $res = Redis::get($phone);
+        if ( ! $res) {
+            return error(1000, '验证码已过期');
+        }
+        if ($code !== $res) {
+            return error(1000, '验证码错误');
+        }
+
+        $data = [
+            'nickname' => $input['nickname'] ?? '',
+            'sex'      => $input['sex'] == '男' ? 1 : 2,
+            'province' => $input['province'],
+            'city'     => $input['city'],
+            'headimg'  => $input['headimg'] ?? '',
+            'unionid'  => $input['unionid'] ?? '',
+            'phone'    => $phone,
+            'is_wx'    => 1
+        ];
+
+        $res = User::where('id', $this->user['id'])->update($data);
         if ($res) {
             return success('绑定成功');
         }
