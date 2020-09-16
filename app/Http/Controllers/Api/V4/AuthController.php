@@ -80,7 +80,7 @@ class AuthController extends Controller
         }
 
         Redis::del($phone);
-        $token = auth('api')->login($user);;
+        $token = auth('api')->login($user);
         $data = [
             'id' => $user->id,
             'token' => $token
@@ -150,22 +150,22 @@ class AuthController extends Controller
         $phone = $input['phone'];
         $code  = $input['code'];
 
-        if ( ! $phone) {
-            return error(1000, '手机号不能为空');
-        }
-        if ( ! $code) {
-            return error(1000, '验证码不能为空');
-        }
+        // if ( ! $phone) {
+        //     return error(1000, '手机号不能为空');
+        // }
+        // if ( ! $code) {
+        //     return error(1000, '验证码不能为空');
+        // }
 
-        $res = Redis::get($phone);
-        if ( ! $res) {
-            return error(1000, '验证码已过期');
-        }
-        if ($code !== $res) {
-            return error(1000, '验证码错误');
-        }
-        Redis::del($phone);
-        
+        // $res = Redis::get($phone);
+        // if ( ! $res) {
+        //     return error(1000, '验证码已过期');
+        // }
+        // if ($code !== $res) {
+        //     return error(1000, '验证码错误');
+        // }
+        // Redis::del($phone);
+
         $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex'      => $input['sex'] == '男' ? 1 : 2,
@@ -177,16 +177,21 @@ class AuthController extends Controller
         ];
         $user = User::where('phone', $phone)->first();
         if ($user) {
-            $res =User::where('phone', $phone)->update($data);
+            User::where('phone', $phone)->update($data);
+        } else {
+            $data['phone'] = $phone;
+            $res = User::create($data);
             if ($res) {
-                return success();
+                $user = User::find($res->id);
             }
         }
-        $data['phone'] = $phone;
-        $res = User::create($data);
-        if ($res) {
-            return success();
-        }
+        $token = auth('api')->login($user);
+        $arra =[
+            'id'    => $user->id,
+            'token' => $token
+        ];
+        return success($arra);
+       
 
     }
 
