@@ -355,7 +355,7 @@ class AuthController extends Controller
             } else {
                 User::where('phone', $phone)->update([
                     'appleid' => $appleid
-            }
+            ]);
 
             $token = auth('api')->login($user);
             $data = [
