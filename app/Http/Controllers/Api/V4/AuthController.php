@@ -164,7 +164,8 @@ class AuthController extends Controller
         if ($code !== $res) {
             return error(1000, '验证码错误');
         }
-
+        Redis::del($phone);
+        
         $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex'      => $input['sex'] == '男' ? 1 : 2,
@@ -172,13 +173,19 @@ class AuthController extends Controller
             'city'     => $input['city'],
             'headimg'  => $input['headimg'] ?? '',
             'unionid'  => $input['unionid'] ?? '',
-            'phone'    => $phone,
             'is_wx'    => 1
         ];
-
-        $res = User::where('id', $this->user['id'])->update($data);
+        $user = User::where('phone', $phone)->first();
+        if ($user) {
+            $res =User::where('phone', $phone)->update($data);
+            if ($res) {
+                return success();
+            }
+        }
+        $data['phone'] = $phone;
+        $res = User::create($data);
         if ($res) {
-            return success('绑定成功');
+            return success();
         }
 
     }
