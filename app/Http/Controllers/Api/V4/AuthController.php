@@ -150,21 +150,21 @@ class AuthController extends Controller
         $phone = $input['phone'];
         $code  = $input['code'];
 
-        // if ( ! $phone) {
-        //     return error(1000, '手机号不能为空');
-        // }
-        // if ( ! $code) {
-        //     return error(1000, '验证码不能为空');
-        // }
+        if ( ! $phone) {
+            return error(1000, '手机号不能为空');
+        }
+        if ( ! $code) {
+            return error(1000, '验证码不能为空');
+        }
 
-        // $res = Redis::get($phone);
-        // if ( ! $res) {
-        //     return error(1000, '验证码已过期');
-        // }
-        // if ($code !== $res) {
-        //     return error(1000, '验证码错误');
-        // }
-        // Redis::del($phone);
+        $res = Redis::get($phone);
+        if ( ! $res) {
+            return error(1000, '验证码已过期');
+        }
+        if ($code !== $res) {
+            return error(1000, '验证码错误');
+        }
+        Redis::del($phone);
 
         $data = [
             'nickname' => $input['nickname'] ?? '',
