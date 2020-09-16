@@ -332,6 +332,10 @@ class AuthController extends Controller
 
         $phone   = $request->input('phone');
         $appleid = $request->input('user');
+        $users   = User::where('appleid', $appleid)->first();
+        if (!$users) {
+             return  error(1000, '还未绑定');
+        }
         $email = $request->input('email') ?? '';
         $fullName = $request->input('fullName') ?? '';
         $authorizationCode = $request->input('authorizationCode');
