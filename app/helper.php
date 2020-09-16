@@ -20,11 +20,11 @@
      * @param  string  $msg
      * @return \Illuminate\Http\JsonResponsew
      */
-    function error($code, $msg='') {
+    function error($code, $msg='',$data='') {
         $result = [
             'code' => $code,
             'msg'  => $msg,
-            'data' => ''
+            'data' => $data
         ];
         return  response()->json($result);
     }
