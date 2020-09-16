@@ -114,8 +114,8 @@ class AuthController extends Controller
     {
         $input = $request->all();
         $user = User::where('unionid', $input['unionid'])->first();
-        if ($user->is_wx ==1) {
-            return  error(1000, '微信已绑定');
+        if (!$user) {
+            return  error(1000, '微信还未绑定');
         }
 
         $token = auth('api')->login($user);
