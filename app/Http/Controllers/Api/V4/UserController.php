@@ -454,7 +454,7 @@ class UserController extends Controller
      */
     public function account()
     {
-        $user = User::select(['phone'])->where('id', $this->user['id'])->first();
+        $user = User::select(['phone','is_wx'])->where('id', $this->user['id'])->first();
         if ($user) {
             $user->phone = !empty($user->phone) ? substr_replace($user->phone, '****', 3, 4) : '';
             $user->is_wx = $user->is_wx ? 1 : 0;
