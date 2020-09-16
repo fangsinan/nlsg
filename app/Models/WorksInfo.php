@@ -47,7 +47,7 @@ class WorksInfo extends Base
             if($user_id){
                 //单章节 学习记录 百分比
                 $his_data = History::select('time_leng','time_number')->where([
-                    'relation_type' => 3,
+                    //'relation_type' => 2,
                     'info_id'          => $val['id'],
                     'user_id'       => $user_id,
                     'is_del'        => 0,
