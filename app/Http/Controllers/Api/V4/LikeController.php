@@ -54,7 +54,7 @@ class LikeController extends Controller
                 $notify = new Notify();
                 $notify->from_uid = $this->user['id'];
                 $notify->to_uid   = $comment->user_id;
-                $notify->source_id= 1;
+                $notify->source_id= $id;
                 $notify->type     = 1;
                 $notify->subject  = '喜欢了你的想法';
                 $notify->save();
