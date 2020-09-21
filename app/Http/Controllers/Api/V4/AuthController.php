@@ -191,7 +191,7 @@ class AuthController extends Controller
             'token' => $token
         ];
         return success($arra);
-       
+
 
     }
 
@@ -327,23 +327,33 @@ class AuthController extends Controller
         return json_decode($res->getBody()->getContents());
     }
 
+    public function apple(Request $request)
+    {
+        $input = $request->all();
+        $user = User::where('appleid', $input['user'])->first();
+        if (!$user) {
+            return  error(1000, '苹果还未绑定');
+        }
+
+        $token = auth('api')->login($user);
+        $data = [
+            'id'    => $user->id,
+            'phone' => $user->phone ?? '',
+            'token' => $token
+        ];
+        return success($data);
+    }
+
      // JWT 验证
     public function jwtApple(Request $request) {
 
         $phone   = $request->input('phone');
         $appleid = $request->input('user');
-        $users   = User::where('appleid', $appleid)->first();
-        if (!$users) {
-             return  error(1000, '还未绑定');
-        }
         $email = $request->input('email') ?? '';
         $fullName = $request->input('fullName') ?? '';
         $authorizationCode = $request->input('authorizationCode');
-
         $identityToken     = $request->input('identityToken');
-
         $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
-
         $isValid = $appleSignInPayload->verifyUser($appleid);
 
         // 当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
@@ -358,7 +368,7 @@ class AuthController extends Controller
 
             } else {
                 User::where('phone', $phone)->update(['appleid' => $appleid]);
-            }; 
+            };
 
             $token = auth('api')->login($user);
             $data = [

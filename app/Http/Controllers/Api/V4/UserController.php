@@ -345,7 +345,7 @@ class UserController extends Controller
         if (!$follow) {
             return error(1000,'还没有关注');
         }
-        
+
         if ( ! $follow->delete()) {
             return error(1000, '取消失败');
         }
@@ -915,7 +915,7 @@ class UserController extends Controller
      *
      * @apiParam {string} phone 手机号
      * @apiParam {string} code  验证码
-     * 
+     *
      * @apiSuccess {number}  id  用户id
      * @apiSuccess {string}  token   用户授权
      * @apiSuccessExample 成功响应:
@@ -924,7 +924,7 @@ class UserController extends Controller
      * "msg": "成功",
      * "data":
      *  {
-     *      
+     *
      *   }
      * }
      */
@@ -964,7 +964,7 @@ class UserController extends Controller
             ];
             return success($data);
         }
-       
+
     }
 
     public function bindWechat(Request $request)
@@ -985,7 +985,8 @@ class UserController extends Controller
             return success();
         }
         return  error(1000,'绑定失败');
-      
+
     }
+
 
 }
