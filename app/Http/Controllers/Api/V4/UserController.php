@@ -988,5 +988,18 @@ class UserController extends Controller
 
     }
 
+    public  function removeWechat(Request $request)
+    {
+        $res = User::where('id', $this->user['id'])->update(
+            [
+                'unionid' => '',
+                'is_wx'   => 0
+            ]);
+        if ($res){
+            return success();
+        }
+        return  error(1000,'解绑失败');
+    }
+
 
 }

@@ -235,6 +235,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('user/invitation_record', 'UserController@invitationRecord');
         Route::post('change/phone', 'UserController@changePhone');
         Route::post('bind/wechat', 'UserController@bindWechat');
+        Route::post('remove/wechat', 'UserController@removeWechat');
 
         //商城开始
         Route::post('shopping_cart/create', 'ShoppingCartController@create');//添加购物车
