@@ -9,6 +9,7 @@
 namespace App\Servers;
 
 use App\Models\MallOrderDetails;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Models\MallRefundRecord as M2R;
 use App\Models\MallOrder;
@@ -41,8 +42,10 @@ class AfterSalesServers
             'expressInfo'
         ];
 
+        $query = new M2R();
+
         if ($params['id'] ?? 0) {
-            $query = M2R::where('id', '=', $params['id']);
+            $query->where('id', '=', $params['id']);
 
             $field_sup = [
                 'return_address_id', 'picture', 'pass_at', 'check_at',
@@ -105,6 +108,7 @@ class AfterSalesServers
 
         $list = $query->select($field)->with($with)->limit($size)->paginate($size);
 
+
         //如果type=1  读取infoOrder   =2读取infoDetail
         foreach ($list as $k => $v) {
             if ($v->user_cancel == 1 || $v->status = 70) {
@@ -138,7 +142,7 @@ class AfterSalesServers
             }
             $v->goods_list = $temp_data;
             if (!empty($v->expressInfo)) {
-                $v->expressInfo->history = json_decode($v->expressInfo->history);
+                $v->expressInfo->history_array = json_decode($v->expressInfo->history);
             }
             unset($list[$k]->infoOrder, $list[$k]->infoDetail);
         }
