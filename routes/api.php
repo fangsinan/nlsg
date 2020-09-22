@@ -167,14 +167,11 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('coupon/list', 'CouponController@list');
     //*******************************商城部分结束*******************************
 
-    Route::post('like', 'LikeController@like');
-    Route::post('unlike', 'LikeController@unlike');
+
 
     //想法
     Route::get('comment/list', 'CommentController@index');
-    Route::post('comment/store', 'CommentController@store');
-    Route::post('comment/update', 'CommentController@update');
-    Route::post('comment/destroy', 'CommentController@destroy');
+
     Route::get('comment/show', 'CommentController@show');
     Route::get('comment/forward/user', 'CommentController@getForwardUser');
     Route::get('comment/like/user', 'CommentController@getLikeUser');
@@ -312,12 +309,20 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('income/detail', 'IncomeController@Detail');
         Route::get('income/get_deposit', 'IncomeController@getOrderDepositHistory');
         Route::get('income/send_invoice', 'IncomeController@sendInvoice');
-
-
         Route::get('order/get_subscribe', 'OrderController@getSubscribe');
-
         Route::get('column/collection', 'ColumnController@Collection');
 
+        //喜欢
+        Route::post('like', 'LikeController@like');
+        Route::post('unlike', 'LikeController@unlike');
+
+        //想法
+        Route::post('comment/store', 'CommentController@store');
+        Route::post('comment/update', 'CommentController@update');
+        Route::post('comment/destroy', 'CommentController@destroy');
+
+        //通知列表
+        Route::get('notify/list', 'NotifyController@index');
 
     });
 });

@@ -11,6 +11,7 @@ use App\Models\Comment;
 use App\Models\Attach;
 use App\Models\Like;
 use App\Models\Works;
+use App\Models\Wiki;
 
 class CommentController extends Controller
 {
@@ -155,8 +156,8 @@ class CommentController extends Controller
     {
         $input = $request->all();
         $order = $input['order'] ?? 1;
-        $self  = $input['self']  ?? 0;
-        $uid   = $this->user['id'] ?? 0;
+        $self = $input['self'] ?? 0;
+        $uid = $this->user['id'] ?? 0;
         $model = new Comment();
         $lists = $model->getIndexComment($input['id'], $input['type'], $uid, $order, $self);
         return success($lists['data']);
@@ -188,9 +189,9 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         $input = $request->all();
-        $img   = $input['img'] ?? '';
+        $img = $input['img'] ?? '';
 
         if ( ! $input['id']) {
             return error(1000, '参数有误');
@@ -204,7 +205,7 @@ class CommentController extends Controller
         ]);
 
         if ($result->id) {
-            if (!empty($img)) {
+            if ( ! empty($img)) {
                 $imgArr = explode(',', $img);
                 $data = [];
                 foreach ($imgArr as $v) {
@@ -216,51 +217,7 @@ class CommentController extends Controller
                 }
                 Attach::insert($data);
             }
-            if (in_array($input['type'], [1, 2, 3, 4])) {
-                switch ($input['type']) {
-                    case 1:
-                        $list = Column::where('id', $input['id'])
-                            ->where('type', 1)
-                            ->where('status', 1)
-                            ->first();
-                        $subject = '评论了你的专栏';
-                        break;
-                    case  2:
-                        $list = Column::where('id', $input['id'])
-                            ->where('type', 2)
-                            ->where('status', 1)
-                            ->first();
-                        $subject = '评论了你的讲座';
-                        break;
-                    case  3:
-                        $list = Works::where('id', $input['id'])
-                            ->where('is_audio_book', 1)
-                            ->where('status', 4)
-                            ->first();
-                        $subject = '评论了你的听书';
-                        break;
-                    case  4:
-                        $list = Works::where('id', $input['id'])
-                            ->where('is_audio_book', 0)
-                            ->where('status', 4)
-                            ->first();
-                        $subject = '评论了你的精品课';
-                        break;
-                }
-
-                if(!$list){
-                    return error('数据不存在');
-                }
-                //发送通知
-                $notify = new Notify();
-                $notify->from_uid = $this->user['id'];
-                $notify->to_uid = $list->user_id;
-                $notify->source_id = $input['id'];
-                $notify->type = 4;
-                $notify->subject = $subject;
-                $notify->save();
-            }
-        
+            
             return success();
         }
 
@@ -440,7 +397,7 @@ class CommentController extends Controller
 
     public function show(Request $request)
     {
-        $id  = $request->get('id');
+        $id = $request->get('id');
         $uid = $this->user['id'];
         $comment = new Comment();
         $lists = $comment->getCommentList($id, $uid);
@@ -522,8 +479,8 @@ class CommentController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-        if($forwardUser['data']){
-            foreach($forwardUser['data'] as &$v){
+        if ($forwardUser['data']) {
+            foreach ($forwardUser['data'] as &$v) {
                 $v['is_follow'] = 1;
             }
         }
@@ -572,8 +529,8 @@ class CommentController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-        if($likeUser['data']){
-            foreach($likeUser['data'] as &$v){
+        if ($likeUser['data']) {
+            foreach ($likeUser['data'] as &$v) {
                 $v['is_follow'] = 1;
             }
         }

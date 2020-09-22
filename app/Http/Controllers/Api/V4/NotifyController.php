@@ -3,17 +3,34 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notify;
 use App\Models\User;
 use App\Models\UserFollow;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class NotifyController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-
-
+        $type =  $request->input('type') ?? 1;
+        $lists =  Notify::select('id','from_uid','to_uid','subject','source_id','created_at')
+                ->with(
+                [
+                    'fromUser:id,nickname,intro,headimg',
+                    'comment:id,content'
+                ])
+                ->where(['to_uid'=>$this->user['id'], 'type'=>$type])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10)
+                ->toArray();
+        if ($lists['data']){
+            foreach ($lists['data'] as &$v) {
+                $v['create_time'] =  Carbon::parse($v['created_at'])->diffForHumans();
+            }
+        }
+        return success($lists['data']);
     }
 
 

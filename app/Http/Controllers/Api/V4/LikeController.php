@@ -35,8 +35,8 @@ class LikeController extends Controller
     {
         $id   = $request->input('id');
         $type = $request->input('type');
-        if (!$id){
-            return false;
+        if (!$id || !$type){
+            return error(1000, '参数不全');
         }
         $list = Like::where(['relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type])->first();
         if ($list){
