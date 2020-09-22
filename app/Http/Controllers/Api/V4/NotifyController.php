@@ -19,7 +19,7 @@ class NotifyController extends Controller
                 ->with(
                 [
                     'fromUser:id,nickname,intro,headimg',
-                    'comment:id,content'
+                    'reply:id,content'
                 ])
                 ->where(['to_uid'=>$this->user['id'], 'type'=>$type])
                 ->orderBy('created_at', 'desc')

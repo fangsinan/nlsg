@@ -18,8 +18,8 @@ class Notify extends Base
         return $this->belongsTo(User::class, 'from_uid', 'id');
     }
 
-    public  function  comment()
+    public  function  reply()
     {
-        return $this->belongsTo(Comment::class, 'source_id', 'id');
+        return $this->belongsTo(CommentReply::class, 'source_id', 'id');
     }
 }

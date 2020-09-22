@@ -56,7 +56,7 @@ class ReplyController extends Controller
             $notify->from_uid = $user_id;
             $notify->to_uid   = $comment->user_id;
             $notify->source_id= $result->id;
-            $notify->type     = 5;
+            $notify->type     = 2;
             $notify->subject  = '回复了你的评论';
             $content = [
                 'summary'   => $input['content'],
