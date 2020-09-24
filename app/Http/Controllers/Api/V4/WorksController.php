@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use App\Models\Column;
 use App\Models\ColumnOutline;
+use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -398,6 +399,13 @@ class WorksController extends Controller
         }
         $works_data = $works_data->toArray();
 
+
+        // 身份价格
+        $works_data['twitter_price'] = GetPriceTools::Income(1,2,0,2,$works_data['user_id'],$works_id);
+        $works_data['black_price']   = GetPriceTools::Income(1,3,0,2,$works_data['user_id'],$works_id);
+        $works_data['emperor_price'] = GetPriceTools::Income(1,4,0,2,$works_data['user_id'],$works_id);
+        $works_data['service_price'] = GetPriceTools::Income(1,5,0,2,$works_data['user_id'],$works_id);
+        $works_data['content']       = $works_data['content'];
 
         //是否订阅
         $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
