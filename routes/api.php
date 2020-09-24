@@ -323,6 +323,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
         //通知列表
         Route::get('notify/list', 'NotifyController@index');
+        Route::get('notify/fans', 'NotifyController@fans');
 
     });
 });

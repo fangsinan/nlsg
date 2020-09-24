@@ -54,17 +54,16 @@ class NotifyController extends Controller
     */
     public function fans()
     {
-
         User::where('id', 1)->update(['fan_num'=>0]);
 
-        $user  = User::findOrFail(1);
+        $user  = User::find($this->user['id']);
         $lists = $user->fans()->paginate(10, ['from_uid','to_uid','nickname'])->toArray();
         if ($lists['data']){
             foreach ($lists['data'] as &$v) {
-                $v['is_follow'] = UserFollow::where(['from_uid'=>1, 'to_uid'=>$v['from_uid']])->count();
+                $v['is_follow'] = UserFollow::where(['from_uid'=>$this->user['id'], 'to_uid'=>$v['from_uid']])->count();
             }
         }
-        return  success($lists);
+        return  success($lists['data']);
     }
 
 }
