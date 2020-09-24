@@ -76,6 +76,7 @@ return array(
     'Mpociot\\ApiDoc\\' => array($vendorDir . '/mpociot/laravel-apidoc-generator/src'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'Mni\\FrontYAML\\' => array($vendorDir . '/mnapoli/front-yaml/src'),
+    'Mitoop\\JPush\\' => array($vendorDir . '/mitoop/laravel-jpush/src'),
     'League\\Flysystem\\' => array($vendorDir . '/league/flysystem/src'),
     'League\\CommonMark\\' => array($vendorDir . '/league/commonmark/src'),
     'Lcobucci\\JWT\\' => array($vendorDir . '/lcobucci/jwt/src'),

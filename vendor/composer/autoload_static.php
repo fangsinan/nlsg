@@ -146,6 +146,7 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
             'Mpociot\\ApiDoc\\' => 15,
             'Monolog\\' => 8,
             'Mni\\FrontYAML\\' => 14,
+            'Mitoop\\JPush\\' => 13,
         ),
         'L' => 
         array (
@@ -491,6 +492,10 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'Mni\\FrontYAML\\' => 
         array (
             0 => __DIR__ . '/..' . '/mnapoli/front-yaml/src',
+        ),
+        'Mitoop\\JPush\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mitoop/laravel-jpush/src',
         ),
         'League\\Flysystem\\' => 
         array (
@@ -3321,6 +3326,11 @@ class ComposerStaticInitc6fc63be66ca18c710cb6dbd0440566e
         'League\\Flysystem\\Util\\ContentListingFormatter' => __DIR__ . '/..' . '/league/flysystem/src/Util/ContentListingFormatter.php',
         'League\\Flysystem\\Util\\MimeType' => __DIR__ . '/..' . '/league/flysystem/src/Util/MimeType.php',
         'League\\Flysystem\\Util\\StreamHasher' => __DIR__ . '/..' . '/league/flysystem/src/Util/StreamHasher.php',
+        'Mitoop\\JPush\\JPushJob' => __DIR__ . '/..' . '/mitoop/laravel-jpush/src/JPushJob.php',
+        'Mitoop\\JPush\\JPushService' => __DIR__ . '/..' . '/mitoop/laravel-jpush/src/JPushService.php',
+        'Mitoop\\JPush\\JPushServiceFacade' => __DIR__ . '/..' . '/mitoop/laravel-jpush/src/JPushServiceFacade.php',
+        'Mitoop\\JPush\\PushServiceInterface' => __DIR__ . '/..' . '/mitoop/laravel-jpush/src/PushServiceInterface.php',
+        'Mitoop\\JPush\\ServiceProvider' => __DIR__ . '/..' . '/mitoop/laravel-jpush/src/ServiceProvider.php',
         'Mni\\FrontYAML\\Bridge\\CommonMark\\CommonMarkParser' => __DIR__ . '/..' . '/mnapoli/front-yaml/src/Bridge/CommonMark/CommonMarkParser.php',
         'Mni\\FrontYAML\\Bridge\\Parsedown\\ParsedownParser' => __DIR__ . '/..' . '/mnapoli/front-yaml/src/Bridge/Parsedown/ParsedownParser.php',
         'Mni\\FrontYAML\\Bridge\\Symfony\\SymfonyYAMLParser' => __DIR__ . '/..' . '/mnapoli/front-yaml/src/Bridge/Symfony/SymfonyYAMLParser.php',

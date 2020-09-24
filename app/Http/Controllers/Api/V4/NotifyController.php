@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserFollow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use JPush;
 
 class NotifyController extends Controller
 {
@@ -118,6 +119,11 @@ class NotifyController extends Controller
             }
         }
         return  success($lists['data']);
+    }
+
+    public  function jpush()
+    {
+        return  JPush::pushNow('303682', '苹果推送');
     }
 
 }

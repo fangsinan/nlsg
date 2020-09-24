@@ -1956,6 +1956,58 @@
         ]
     },
     {
+        "name": "mitoop/laravel-jpush",
+        "version": "v3.0.1",
+        "version_normalized": "3.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/mitoop/laravel-jpush.git",
+            "reference": "bf50a6adc1d87c45a9c6d190a6bb36d89e7bc19c"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/mitoop/laravel-jpush/zipball/bf50a6adc1d87c45a9c6d190a6bb36d89e7bc19c",
+            "reference": "bf50a6adc1d87c45a9c6d190a6bb36d89e7bc19c",
+            "shasum": "",
+            "mirrors": [
+                {
+                    "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                    "preferred": true
+                }
+            ]
+        },
+        "require": {
+            "illuminate/support": "^7.0",
+            "jpush/jpush": "^3.6"
+        },
+        "time": "2020-09-08T10:37:33+00:00",
+        "type": "library",
+        "extra": {
+            "laravel": {
+                "providers": [
+                    "Mitoop\\JPush\\ServiceProvider"
+                ]
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Mitoop\\JPush\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "mitoop",
+                "email": "me@mitoop.com"
+            }
+        ],
+        "description": "laravel jpush"
+    },
+    {
         "name": "mnapoli/front-yaml",
         "version": "1.7.0",
         "version_normalized": "1.7.0.0",

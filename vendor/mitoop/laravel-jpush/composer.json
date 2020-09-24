@@ -1,0 +1,33 @@
+{
+    "name": "mitoop/laravel-jpush",
+    "description": "laravel jpush",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "mitoop",
+            "email": "me@mitoop.com"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^7.0",
+        "jpush/jpush": "^3.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mitoop\\JPush\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mitoop\\JPush\\ServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

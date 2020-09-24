@@ -21,6 +21,7 @@
         "jpush/jpush": "^3.6",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
+        "mitoop/laravel-jpush": "^3.0",
         "overtrue/easy-sms": "^1.1",
         "overtrue/laravel-wechat": "~5.0",
         "predis/predis": "^1.1",
