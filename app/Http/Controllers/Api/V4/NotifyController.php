@@ -27,7 +27,24 @@ class NotifyController extends Controller
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-     *       "data":
+     *         "data": [
+             {
+                 "id": 4,
+                 "from_uid": 1,
+                 "to_uid": 303681,
+                 "subject": "喜欢了你的想法",
+                 "source_id": 92,
+                 "created_at": "2020-09-22 11:21:06",
+                 "from_user": {
+                     "id": 1,
+                     "nickname": "测试",
+                     "intro": "",
+                     "headimg": "test.png"
+                 },
+                 "reply": null,
+                 "create_time": "2天前"
+             }
+         ]
      *     }
      *
      */
@@ -70,9 +87,19 @@ class NotifyController extends Controller
      * {
      *   "code": 200,
      *   "msg" : '成功',
-     *   "data": {
-     *
-     *    }
+     *   "data": [
+             {
+                 "from_uid": 211185,
+                 "to_uid": 303681,
+                 "nickname": "丹丹",
+                 "headimg": "http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eq1iamPt3zKARVHsQMMqap77msicttX4libSBgCIgfrqumbm73uxwwlicAomRHCiawmNBd68TBicUh9IWGQ/132",
+                 "pivot": {
+                     "to_uid": 303681,
+                     "from_uid": 211185
+                 },
+                 "is_follow": 1
+             }
+         ]
      * }
      */
     public function fans()
