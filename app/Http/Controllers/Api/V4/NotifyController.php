@@ -11,7 +11,26 @@ use Illuminate\Support\Carbon;
 
 class NotifyController extends Controller
 {
-
+    /**
+     * @api {get} api/v4/notify/list  消息通知
+     * @apiVersion 4.0.0
+     * @apiName  list
+     * @apiGroup Notify
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/list
+     * @apiParam  type  1喜欢精选  2评论和@ 3活动消息 4更新消息 5收益动态
+     * @apiParam  token  用户认证
+     *
+     * @apiSuccess {string}
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":
+     *     }
+     *
+     */
     public function index(Request $request)
     {
         $type =  $request->input('type') ?? 1;
@@ -38,26 +57,30 @@ class NotifyController extends Controller
     /**
      * @api {get} api/v4/notify/fans 新增粉丝
      * @apiVersion 4.0.0
-     * @apiGroup Api
+     * @apiName  fans
+     * @apiGroup Notify
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/fans
      *
-     * @apiSuccess {String} token   token
+     * @apiParam {string}  token
      *
-     * @apiSuccessExample 成功响应:
-     *   {
-     *      "code": 200,
-     *      "msg" : '成功',
-     *      "data": {
+     * @apiSuccess {string}
      *
-     *       }
-     *   }
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
      *
-    */
+     *    }
+     * }
+     */
     public function fans()
     {
         User::where('id', 1)->update(['fan_num'=>0]);
 
         $user  = User::find($this->user['id']);
-        $lists = $user->fans()->paginate(10, ['from_uid','to_uid','nickname'])->toArray();
+        $lists = $user->fans()->paginate(10, ['from_uid','to_uid','nickname','headimg'])->toArray();
         if ($lists['data']){
             foreach ($lists['data'] as &$v) {
                 $v['is_follow'] = UserFollow::where(['from_uid'=>$this->user['id'], 'to_uid'=>$v['from_uid']])->count();
