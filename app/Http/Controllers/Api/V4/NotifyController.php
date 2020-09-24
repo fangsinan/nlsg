@@ -20,7 +20,9 @@ class NotifyController extends Controller
      * @apiParam  type  1喜欢精选  2评论和@ 3活动消息 4更新消息 5收益动态
      * @apiParam  token  用户认证
      *
-     * @apiSuccess {string}
+     * @apiSuccess {string} subject 标题
+     * @apiSuccess {string} create_time 时间
+     * @apiSuccess {string} from_user   用户相关
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -80,7 +82,9 @@ class NotifyController extends Controller
      *
      * @apiParam {string}  token
      *
-     * @apiSuccess {string}
+     * @apiSuccess {string} nickname  用户昵称
+     * @apiSuccess {string} from_uid  用户id
+     * @apiSuccess {string} headimg  用户头像
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
