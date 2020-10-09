@@ -31,6 +31,7 @@ class CreatePosterController extends Controller
      *
      * @apiParam {int} post_type  类型 post_type 2皇钻钻邀请卡 4会员  5精品课  7优品海报   8 专栏
      * @apiParam {int} relation_id  对应id
+     * @apiParam {int} is_qrcode   1 生成纯二维码
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -49,6 +50,7 @@ class CreatePosterController extends Controller
         $uid = $this->user['id']??0;
         $gid = $request->input('relation_id', 0);
         $post_type = $request->input('post_type', 0);
+        $is_qrcode = $request->input('is_qrcode', 0);
 
 
         $level = User::getLevel($uid);
@@ -59,6 +61,18 @@ class CreatePosterController extends Controller
         if (!file_exists($save_path)) {
             mkdir($save_path, 0777, true);
         }
+
+
+
+        //海报二维码  [客户端生成]
+        if($is_qrcode == 1){
+            $QR_url     = $this->getGetQRUrl($post_type, $gid, $uid);
+            $temp_9_res = $this->createQRcode($QR_url, false, true, true);
+            $src        = '';
+            $url        = self::$Api_url.'temp_poster/' . $temp_9_res;
+            return ['url' => $url, 'src' => $src];
+        }
+
 
         $source_name = '';
         switch ($post_type) {
