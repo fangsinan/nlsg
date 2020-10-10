@@ -70,7 +70,7 @@ class CreatePosterController extends Controller
             $temp_9_res = $this->createQRcode($QR_url, false, true, true);
             $src        = '';
             $url        = self::$Api_url.'public/image/' . $temp_9_res;
-            return ['url' => $url, 'src' => $src];
+            return $this->success(['url' => $url, 'src' => $src]);
         }
 
 
