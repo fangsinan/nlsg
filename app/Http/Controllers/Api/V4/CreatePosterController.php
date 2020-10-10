@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 
 class CreatePosterController extends Controller
 {
-    public static  $Api_url = 'https://app.api.test.nlsgapp.com/';
+    public static  $Api_url = 'https://app.v4.api.nlsgapp.com/';
     public static  $IMAGES_URL = 'https://image.nlsgapp.com/';
 
 
@@ -69,7 +69,7 @@ class CreatePosterController extends Controller
             $QR_url     = $this->getGetQRUrl($post_type, $gid, $uid);
             $temp_9_res = $this->createQRcode($QR_url, false, true, true);
             $src        = '';
-            $url        = self::$Api_url.'temp_poster/' . $temp_9_res;
+            $url        = self::$Api_url.'public/image/' . $temp_9_res;
             return ['url' => $url, 'src' => $src];
         }
 

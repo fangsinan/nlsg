@@ -14,6 +14,11 @@ use App\Models\Works;
 class IndexController extends Controller
 {
 
+    function browse($file_name){
+        return response()->file(storage_path().$file_name);
+    }
+
+
     /**
      * @api {get} api/v4/index/announce 首页-公告
      * @apiVersion 4.0.0
