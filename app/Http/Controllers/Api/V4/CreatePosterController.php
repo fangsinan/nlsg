@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 
 class CreatePosterController extends Controller
 {
-    public static  $Api_url = 'https://app.v4.api.nlsgapp.com/';
+    public static  $Api_url = 'http://app.v4.api.nlsgapp.com/';
     public static  $IMAGES_URL = 'https://image.nlsgapp.com/';
 
 
