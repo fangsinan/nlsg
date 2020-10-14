@@ -326,6 +326,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('notify/fans', 'NotifyController@fans');
         Route::post('notify/push', 'NotifyController@jpush');
         Route::get('notify/systerm', 'NotifyController@systerm');
+        Route::get('notify/course', 'NotifyController@course');
 
 
     });

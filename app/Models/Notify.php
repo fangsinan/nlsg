@@ -22,4 +22,8 @@ class Notify extends Base
     {
         return $this->belongsTo(CommentReply::class, 'source_id', 'id');
     }
+
+    public function  works(){
+        return  $this->belongsTo(Works::class, 'source_id', 'id');
+    }
 }

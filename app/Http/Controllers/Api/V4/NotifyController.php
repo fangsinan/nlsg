@@ -157,7 +157,7 @@ class NotifyController extends Controller
      */
     public  function systerm()
     {
-        $lists = Notify::whereIn('type', [5, 6, 7])->where('status',1)
+        $lists = Notify::whereIn('relation_type', [5, 6, 7])->where(['type'=>5,'status'=>1])
                 ->orderBy('created_at','desc')
                 ->get()
                 ->toArray();
@@ -170,6 +170,50 @@ class NotifyController extends Controller
                 }else{
                     $v['title']   = '审核提醒';
                 }
+                $v['create_time'] =  Carbon::parse($v['created_at'])->diffForHumans();
+            }
+        }
+        return success($lists);
+    }
+
+     /**
+     * @api {get} api/v4/notify/course 更新消息
+     * @apiVersion 4.0.0
+     * @apiName  course
+     * @apiGroup Notify
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/systerm
+     *
+     * @apiParam {string}  token
+     *
+     * @apiSuccess {string} title        消息类型标题
+     * @apiSuccess {string} subject      消息标题
+     * @apiSuccess {string} source_id    来源id
+     * @apiSuccess {string} create_time  时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": [
+             {
+                 "subject": "您订阅的《王琨专栏》即将到期",
+                 "source_id": 来源id,
+                 "title": "过期提醒",
+                 "create_time": "1小时前",
+             }
+         ]
+     * }
+     */
+    public function course()
+    {
+        $lists = Notify::with('works:id,title,cover_img')
+            ->where('type', 3)->where('status',1)
+            ->orderBy('created_at','desc')
+            ->get()
+            ->toArray();
+        if($lists){
+            foreach($lists as &$v){
                 $v['create_time'] =  Carbon::parse($v['created_at'])->diffForHumans();
             }
         }
