@@ -238,6 +238,7 @@ class LiveConsole extends Base
         //todo 写入权限表
         if(!empty($params['helper'])){
             $helper_list = explode(',',$params['helper']);
+            dd($helper_list);
         }
 
         return [$live_data, $params['list'], $live_info_data];
