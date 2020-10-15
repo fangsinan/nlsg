@@ -127,6 +127,116 @@ class LiveController extends Controller
     }
 
     /**
+     * @api {get} api/v4/live/lists  直播更多列表
+     * @apiVersion 4.0.0
+     * @apiName  lists
+     * @apiGroup Live
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/lists
+     * @apiParam  {number}  page  分页
+     *
+     * @apiSuccess {string}  同直播首页返回值
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *                {
+                          "id": 136,
+                          "user_id": 161904,
+                          "title": "测试57",
+                          "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
+                          "price": "0.00",
+                          "cover_img": "/nlsg/works/20200611095034263657.jpg",
+                          "begin_at": "2020-10-01 15:02:00",
+                          "type": 1,
+                          "user": {
+                              "id": 161904,
+                              "nickname": "王琨"
+                          },
+                          "live_time": "2020.10.01 15:02",
+                          "live_status": "正在直播"
+                      }
+     *         ]
+     *     }
+     *
+     */
+    public  function  getLiveLists()
+    {
+        $lists =  Live::with('user:id,nickname')
+                           ->select('id','user_id','title', 'describe','price','cover_img','begin_at','type','end_at')
+                           ->where('status', 4)
+                           ->orderBy('begin_at','desc')
+                           ->paginate(10)
+                           ->toArray();
+        if (!empty($lists['data'])){
+            foreach ($lists['data'] as &$v) {
+                if (strtotime($v['end_at']) < time()) {
+                   $v['live_status'] = '已结束';
+                } else {
+                   $v['live_status'] = '正在直播';
+                }
+                $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
+            }
+        }
+
+        return success($lists['data']);
+    }
+
+    /**
+     * @api {get} api/v4/live/back_lists  回放更多列表
+     * @apiVersion 4.0.0
+     * @apiName  back_lists
+     * @apiGroup Live
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/back_lists
+     * @apiParam  {number}  page  分页
+     *
+     * @apiSuccess {string}  同直播首页返回值
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *                {
+                          "id": 136,
+                          "user_id": 161904,
+                          "title": "测试57",
+                          "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
+                          "price": "0.00",
+                          "cover_img": "/nlsg/works/20200611095034263657.jpg",
+                          "begin_at": "2020-10-01 15:02:00",
+                          "type": 1,
+                          "user": {
+                              "id": 161904,
+                              "nickname": "王琨"
+                          },
+                          "live_time": "2020.10.01 15:02"
+                      }
+     *         ]
+     *     }
+     *
+     */
+    public  function  getLiveBackLists()
+    {
+        $lists =  Live::with('user:id,nickname')
+                    ->select('id','user_id','title', 'describe','price','cover_img','begin_at','type')
+                    ->where('end_at', '>' , Carbon::now()->toDateTimeString())
+                    ->where('status', 4)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+        if (!empty($lists['data'])){
+            foreach ($lists['data'] as &$v) {
+              $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
+            }
+        }
+        return $lists['data'];
+    }
+
+    /**
      * 重置直播类型
      */
     public  function  reLiveType()
@@ -145,4 +255,5 @@ class LiveController extends Controller
         }
         return;
     }
+
 }

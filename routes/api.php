@@ -264,6 +264,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
         //直播
         Route::get('live/index', 'LiveController@index');
+        Route::get('live/lists', 'LiveController@getLiveLists');
+        Route::get('live/back_lists', 'LiveController@getLiveBackLists');
         Route::post('live/retype', 'LiveController@reLiveType');
 
         //通知列表
