@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -21,6 +22,7 @@ class Controller extends BaseController
     public function __construct()
     {
         $this->user = auth('api')->user();
+        $this->user = User::find(168934);
         if ($this->user) {
             $this->user = $this->user->toArray();
         }

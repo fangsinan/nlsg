@@ -107,7 +107,11 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('coupon/list', 'CouponController@list');
     //*******************************商城部分结束*******************************
 
-
+    //*******************************直播部分开始*******************************
+    Route::post('live_console/add', 'LiveConsoleController@add');
+    Route::get('live_console/check_helper', 'LiveConsoleController@checkHelper');
+    Route::get('live_console/change_status', 'LiveConsoleController@changeStatus');
+    //*******************************直播部分开始*******************************
 
     //想法
     Route::get('comment/list', 'CommentController@index');
