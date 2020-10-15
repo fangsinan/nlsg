@@ -64,6 +64,8 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '无权限'];
         }
 
+        //todo 重写校验helper方法,必须是注册账号
+
         $live_data = $live_info_data = [];
 
         $live_data['user_id'] = $user_id;
@@ -230,21 +232,40 @@ class LiveConsole extends Base
         }
 
         $info_res = DB::table('nlsg_live_info')->insert($params['list']);
-        if($info_res === false){
+        if ($info_res === false) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'添加错误','ps'=>__LINE__];
+            return ['code' => false, 'msg' => '添加错误', 'ps' => __LINE__];
         }
 
-        //todo 写入权限表
-        if(!empty($params['helper'])){
-            $helper_list = explode(',',$params['helper']);
-            dd($helper_list);
+        //写入权限表
+        if (!empty($params['helper'])) {
+            $helper_list = explode(',', $params['helper']);
+            $helper_user_list = User::whereIn('phone', $helper_list)->select(['id'])->get()->toArray();
+            $helper_user_list = array_column($helper_user_list, 'id');
+
+            $helper_add_data = [];
+            foreach ($helper_user_list as $hv) {
+                $check_hl = LiveUserPrivilege::where('user_id', '=', $hv)->where('is_del', '=', 0)->first();
+                if (!$check_hl) {
+                    $temp_helper_add_data['user_id'] = $hv;
+                    $temp_helper_add_data['pri_level'] = 1;
+                    $temp_helper_add_data['created_at'] = $now_date;
+                    $helper_add_data[] = $temp_helper_add_data;
+                }
+            }
+            if ($helper_add_data) {
+                $helper_res = DB::table('nlsg_live_user_privilege')->insert($helper_add_data);
+                if ($helper_res === false) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '添加错误', 'ps' => __LINE__];
+                }
+            }
         }
 
-        return [$live_data, $params['list'], $live_info_data];
+        return [$live_data, $params['list'], $live_info_data, $helper_add_data ?? []];
 
         DB::commit();
-        return ['code'=>true,'msg'=>'添加成功'];
+        return ['code' => true, 'msg' => '添加成功'];
     }
 
 
