@@ -270,6 +270,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('live/index', 'LiveController@index');
         Route::get('live/lists', 'LiveController@getLiveLists');
         Route::get('live/back_lists', 'LiveController@getLiveBackLists');
+        Route::get('live/channels', 'LiveController@getLiveChannel');
         Route::post('live/retype', 'LiveController@reLiveType');
 
         //通知列表

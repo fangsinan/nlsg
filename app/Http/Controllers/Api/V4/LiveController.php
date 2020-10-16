@@ -172,11 +172,16 @@ class LiveController extends Controller
                            ->toArray();
         if (!empty($lists['data'])){
             foreach ($lists['data'] as &$v) {
-                if (strtotime($v['end_at']) < time()) {
-                   $v['live_status'] = '已结束';
+                if (strtotime($v['begin_at']) > time()) {
+                   $v['live_status'] = '未开始';
                 } else {
-                   $v['live_status'] = '正在直播';
+                    if (strtotime($v['end_at']) < time()) {
+                        $v['live_status'] = '已结束';
+                    } else {
+                        $v['live_status'] = '正在直播';
+                    }
                 }
+
                 $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
@@ -234,6 +239,79 @@ class LiveController extends Controller
             }
         }
         return $lists['data'];
+    }
+
+    /**
+     * @api {get} api/v4/live/channels  直播场次列表
+     * @apiVersion 4.0.0
+     * @apiName  channels
+     * @apiGroup Live
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/channels
+     * @apiParam {number} id  直播期数id
+     *
+     * @apiSuccess {string} live_time    直播时间
+     * @apiSuccess {string} live_status  直播状态
+     * @apiSuccess {string} user         直播用户
+     * @apiSuccess {string} live         直播相关
+     * @apiSuccess {string} live.title   直播标题
+     * @apiSuccess {string} live.price   直播价格
+     * @apiSuccess {string} live.cover_img   直播封面
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+                         "id": 11,
+                         "user_id": 161904,
+                         "live_pid": 1,
+                         "begin_at": "2020-10-17 10:00:00",
+                         "end_at": null,
+                         "user": {
+                             "id": 161904,
+                             "nickname": "王琨"
+                         },
+                         "live": {
+                             "id": 1,
+                             "title": "第85期《经营能量》直播",
+                             "price": "0.00",
+                             "cover_img": "/live/look_back/live-1-9.jpg"
+                         },
+                         "live_status": "未开始",
+                         "live_time": "2020.10.17 10:00"
+                     }
+     *         ]
+     *     }
+     *
+     */
+    public  function  getLiveChannel(Request $request)
+    {
+        $id =  $request->get('id');
+        $lists =  LiveInfo::with(['user:id,nickname','live:id,title,price,cover_img'])
+                      ->select('id','user_id','live_pid','begin_at','end_at')
+                      ->where('status', 4)
+                      ->where('live_pid', $id)
+                      ->orderBy('begin_at','desc')
+                      ->paginate(10)
+                      ->toArray();
+
+       if (!empty($lists['data'])){
+           foreach ($lists['data'] as &$v) {
+               if (strtotime($v['begin_at']) > time()) {
+                  $v['live_status'] = '未开始';
+               } else {
+                   if (strtotime($v['end_at']) < time()) {
+                       $v['live_status'] = '已结束';
+                   } else {
+                       $v['live_status'] = '正在直播';
+                   }
+               }
+               $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
+           }
+       }
+       return success($lists['data']);
     }
 
     /**
