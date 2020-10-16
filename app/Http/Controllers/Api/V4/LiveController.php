@@ -134,7 +134,7 @@ class LiveController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/lists
      * @apiParam  {number}  page  分页
      *
-     * @apiSuccess {string}  同直播首页返回值
+     * @apiSuccess {string}  title 同直播首页返回值
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -197,7 +197,7 @@ class LiveController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/back_lists
      * @apiParam  {number}  page  分页
      *
-     * @apiSuccess {string}  同直播首页返回值
+     * @apiSuccess {string}  title 同直播首页返回值
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
