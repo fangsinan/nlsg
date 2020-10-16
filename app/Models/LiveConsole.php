@@ -3,6 +3,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class LiveConsole extends Base
@@ -65,10 +66,10 @@ class LiveConsole extends Base
 
         $res = Live::whereId($params['id'])->update($data);
 
-        if($res === false){
-            return ['code'=>false,'msg'=>'错误,请重试'];
-        }else{
-            return ['code'=>true,'msg'=>'成功'];
+        if ($res === false) {
+            return ['code' => false, 'msg' => '错误,请重试'];
+        } else {
+            return ['code' => true, 'msg' => '成功'];
         }
 
     }
@@ -322,6 +323,121 @@ class LiveConsole extends Base
         return ['code' => true, 'msg' => '添加成功'];
     }
 
+    public function info($id, $user_id)
+    {
+        if (empty($id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $live = self::whereId($id)
+            ->where('user_id', $user_id)
+            ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content',
+                'reason', 'check_time', 'price', 'helper', 'is_free', 'is_show', 'can_push'])
+            ->with(['infoList'])
+            ->first();
+        if (empty($live)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $live->statistics = $this->liveStatistisc($id, $user_id);
+        return $live;
+    }
+
+    //todo 直播的相关统计
+    public function liveStatistisc($live_id, $user_id)
+    {
+        return [
+            ['key' => '预约人数', 'value' => '1人'],
+            ['key' => '观看人数', 'value' => '1人'],
+            ['key' => '打赏人数', 'value' => '1人'],
+            ['key' => '打赏金额', 'value' => '100元'],
+            ['key' => '分销收入', 'value' => '100元'],
+            ['key' => '报名收入', 'value' => '100元'],
+            ['key' => '回放收入', 'value' => '100元'],
+            ['key' => '报名流水', 'value' => '100元'],
+            ['key' => '回放流水', 'value' => '100元'],
+        ];
+    }
+
+    public function infoList()
+    {
+        return $this->hasMany('App\Models\LiveInfo', 'live_pid', 'id')
+            ->where('status', '=', 1)
+            ->select(['id', 'begin_at', 'end_at', 'length', 'live_pid', 'playback_url']);
+    }
+
+    public function list($params, $user_id)
+    {
+        //全部,待审核,待直播,已结束,已取消(直播状态 1:待审核  2:已取消 3:已驳回  4:通过)
+
+        //list_flag = 1 待审核 status = 1
+        //list_flag = 2 已取消 status = 2,3
+        //list_flag = 3 待直播 status = 4  and info end_time > now
+        //list_flag = 4 已结束 status = 4 and info end_time < now
+
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+        $page = intval($params['page'] ?? 1);
+        $size = intval($params['size'] ?? 10);
+
+        $query = self::from('nlsg_live as l')
+            ->leftJoin('nlsg_user as u', 'l.user_id', '=', 'u.id')
+            ->where('l.user_id', '=', $user_id)
+            ->where('l.is_del', '=', 0);
+
+        $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content',
+            'l.reason', 'l.check_time', 'l.price', 'l.helper', 'l.is_free', 'l.is_show', 'l.can_push',
+            'u.nickname', 'l.end_at', DB::raw('(SELECT count(1)*2 = SUM(`status`)
+            from nlsg_live_info where live_pid = l.id) as all_pass_flag')];
+
+        switch (intval($params['list_flag'] ?? 0)) {
+            case 1:
+                $query->where('l.status', '=', 1);
+                break;
+            case 2:
+                $query->whereIn('l.status', [2, 3]);
+                break;
+            case 3:
+                $query->where('l.status', '=', 4)
+                    ->where('l.end_at', '>', $now_date)
+                    ->whereRaw(
+                        '(SELECT count(1)*2 = SUM(`status`) from nlsg_live_info where live_pid = l.id) = 0'
+                    );
+                break;
+            case 4:
+                $query->where(function ($query) use ($params, $now_date) {
+                    $query->whereRaw('(l.status = 4 and l.end_at < "' . $now_date . '")')
+                        ->orWhereRaw('((SELECT count(1)*2 = SUM(`status`) from nlsg_live_info where live_pid = l.id) = 1)');
+                });
+                break;
+        }
+
+        $list = $query
+            ->with(['infoList'])
+            ->select($fields)
+            ->orderBy('l.id', 'desc')
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get();
+
+        foreach ($list as &$v) {
+            if ($v->status == 1) {
+                $v->list_flag = 1;
+            } elseif ($v->status == 2 || $v->status == 3) {
+                $v->list_flag = 2;
+            } else {
+                if ($v->end_at <= $now_date) {
+                    $v->list_flag = 4;
+                } else {
+                    $v->list_flag = 3;
+                }
+                if ($v->all_pass_flag == 1) {
+                    $v->list_flag = 4;
+                }
+            }
+        }
+
+        return $list;
+    }
 
     /**
      * 获取推流地址
@@ -332,7 +448,6 @@ class LiveConsole extends Base
      *        time 过期时间 sample 2016-11-12 12:00:00
      * @return String url
      */
-    //echo getPushUrl("123456","时间戳");
     function getPushUrl($streamName, $time = null)
     {
         $key = env('LIVE_PUSH_URL');

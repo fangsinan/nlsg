@@ -107,12 +107,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('coupon/list', 'CouponController@list');
     //*******************************商城部分结束*******************************
 
-    //*******************************直播部分开始*******************************
-    Route::post('live_console/add', 'LiveConsoleController@add');
-    Route::post('live_console/check_helper', 'LiveConsoleController@checkHelper');
-    Route::put('live_console/change_status', 'LiveConsoleController@changeStatus');
-    //*******************************直播部分开始*******************************
-
     //想法
     Route::get('comment/list', 'CommentController@index');
 
@@ -220,6 +214,15 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('mall/sub_comment', 'MallOrderController@subComment');//评论
         Route::get('mall/get_comment', 'MallOrderController@getComment');//获取评论内容
         //商城结束
+
+
+        //*******************************我的直播部分开始*******************************
+        Route::post('live_console/add', 'LiveConsoleController@add');
+        Route::post('live_console/check_helper', 'LiveConsoleController@checkHelper');
+        Route::put('live_console/change_status', 'LiveConsoleController@changeStatus');
+        Route::get('live_console/list', 'LiveConsoleController@list');
+        Route::get('live_console/info', 'LiveConsoleController@info');
+        //*******************************我的直播部分开始*******************************
 
 
         Route::get('auth/logout', 'AuthController@logout');
