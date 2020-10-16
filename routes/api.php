@@ -109,8 +109,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     //*******************************直播部分开始*******************************
     Route::post('live_console/add', 'LiveConsoleController@add');
-    Route::get('live_console/check_helper', 'LiveConsoleController@checkHelper');
-    Route::get('live_console/change_status', 'LiveConsoleController@changeStatus');
+    Route::post('live_console/check_helper', 'LiveConsoleController@checkHelper');
+    Route::put('live_console/change_status', 'LiveConsoleController@changeStatus');
     //*******************************直播部分开始*******************************
 
     //想法

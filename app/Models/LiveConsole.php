@@ -10,14 +10,66 @@ class LiveConsole extends Base
 
     protected $table = 'nlsg_live';
 
-
+    //校验助手是否合法
     public function checkHelper($params, $user_id)
     {
+        if ($params['helper'] ?? false) {
+            $helper = preg_replace('/[^0-9]/i', ',', $params['helper']);
+            $helper = explode(',', $helper);
+
+            $check_user = User::whereIn('phone', $helper)->select(['id', 'phone'])->get();
+            if ($check_user->isEmpty()) {
+                return ['code' => false, 'msg' => '数据错误'];
+            } else {
+                $check_user = $check_user->toArray();
+                $check_user = array_column($check_user, 'phone');
+
+                $diff = array_diff($helper, $check_user);
+                if ($diff) {
+                    return ['code' => false, 'msg' => implode(',', $diff) . '不是注册账号'];
+                } else {
+                    return ['code' => true, 'msg' => '成功'];
+                }
+            }
+        } else {
+            return ['code' => true, 'msg' => '没有数据'];
+        }
 
     }
 
     public function changeStatus($params, $user_id)
     {
+        if (empty($params['id'] ?? 0)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $live = Live::whereId($params['id'])->where('user_id', $user_id)
+            ->first();
+        if (empty($live)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        switch ($params['flag'] ?? '') {
+            case 'off';
+                $data['status'] = 2;
+                break;
+            case 'del':
+                if ($live->status == 2) {
+                    $data['is_del'] = 1;
+                } else {
+                    return ['code' => false, 'msg' => '状态错误'];
+                }
+                break;
+            default:
+                return ['code' => false, 'msg' => '参数错误'];
+        }
+        $data['updated_at'] = date('Y-m-d H:i:s');
+
+        $res = Live::whereId($params['id'])->update($data);
+
+        if($res === false){
+            return ['code'=>false,'msg'=>'错误,请重试'];
+        }else{
+            return ['code'=>true,'msg'=>'成功'];
+        }
 
     }
 
@@ -64,9 +116,13 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '无权限'];
         }
 
-        //todo 重写校验helper方法,必须是注册账号
-
-        $live_data = $live_info_data = [];
+        //必须是注册账号
+        if ($params['helper'] ?? false) {
+            $check_helper = $this->checkHelper($params, $user_id);
+            if ($check_helper['code'] === false) {
+                return $check_helper;
+            }
+        }
 
         $live_data['user_id'] = $user_id;
         $live_data['is_show'] = 1;
@@ -87,7 +143,7 @@ class LiveConsole extends Base
         } else {
             $check_title = $this->haveEmojiChar($params['title']);
             if ($check_title) {
-                return ['code' => false, 'msg' => '直播名称错误'];
+                return ['code' => false, 'msg' => '直播名称非法字符'];
             }
         }
         if (empty($params['describe'] ?? '')) {
@@ -228,7 +284,7 @@ class LiveConsole extends Base
         foreach ($params['list'] as &$v) {
             $v['live_pid'] = $live_id;
             $v['user_id'] = $user_id;
-            $v['created_at'] = $now_date;
+            $v['created_at'] = $v['updated_at'] = $now_date;
         }
 
         $info_res = DB::table('nlsg_live_info')->insert($params['list']);
@@ -261,8 +317,6 @@ class LiveConsole extends Base
                 }
             }
         }
-
-        return [$live_data, $params['list'], $live_info_data, $helper_add_data ?? []];
 
         DB::commit();
         return ['code' => true, 'msg' => '添加成功'];
