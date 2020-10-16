@@ -18,7 +18,7 @@ class LiveController extends Controller
      * @api {get} api/v4/live/index  直播首页
      * @apiVersion 4.0.0
      * @apiName  index
-     * @apiGroup Live
+     * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/index
      *
      * @apiSuccess {array} live_lists 直播列表
@@ -134,7 +134,7 @@ class LiveController extends Controller
      * @api {get} api/v4/live/lists  直播更多列表
      * @apiVersion 4.0.0
      * @apiName  lists
-     * @apiGroup Live
+     * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/lists
      * @apiParam  {number}  page  分页
      *
@@ -197,7 +197,7 @@ class LiveController extends Controller
      * @api {get} api/v4/live/back_lists  回放更多列表
      * @apiVersion 4.0.0
      * @apiName  back_lists
-     * @apiGroup Live
+     * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/back_lists
      * @apiParam  {number}  page  分页
      *
@@ -249,7 +249,7 @@ class LiveController extends Controller
      * @api {get} api/v4/live/channels  直播场次列表
      * @apiVersion 4.0.0
      * @apiName  channels
-     * @apiGroup Live
+     * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/channels
      * @apiParam {number} id  直播期数id
      *
@@ -322,7 +322,7 @@ class LiveController extends Controller
      * @api {get} api/v4/live/show  直播详情
      * @apiVersion 4.0.0
      * @apiName  show
-     * @apiGroup Live
+     * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/show
      * @apiParam {number} live_id  直播id
      *
