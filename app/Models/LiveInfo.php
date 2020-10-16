@@ -15,4 +15,16 @@ use Illuminate\Database\Eloquent\Model;
 class LiveInfo extends Model
 {
     protected $table = 'nlsg_live_info';
+
+
+    public function live()
+    {
+        return $this->belongsTo(Live::class, 'live_pid', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
 }

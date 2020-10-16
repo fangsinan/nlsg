@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Subscribe;
 use Illuminate\Http\Request;
 use App\Models\Live;
 use App\Models\LiveInfo;
+use App\Models\User;
 use Carbon\Carbon;
 
 class LiveController extends Controller
@@ -134,7 +136,7 @@ class LiveController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/lists
      * @apiParam  {number}  page  分页
      *
-     * @apiSuccess {string}  同直播首页返回值
+     * @apiSuccess {string}  title 同直播首页返回值
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -172,11 +174,16 @@ class LiveController extends Controller
                            ->toArray();
         if (!empty($lists['data'])){
             foreach ($lists['data'] as &$v) {
-                if (strtotime($v['end_at']) < time()) {
-                   $v['live_status'] = '已结束';
+                if (strtotime($v['begin_at']) > time()) {
+                   $v['live_status'] = '未开始';
                 } else {
-                   $v['live_status'] = '正在直播';
+                    if (strtotime($v['end_at']) < time()) {
+                        $v['live_status'] = '已结束';
+                    } else {
+                        $v['live_status'] = '正在直播';
+                    }
                 }
+
                 $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
@@ -192,7 +199,7 @@ class LiveController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/back_lists
      * @apiParam  {number}  page  分页
      *
-     * @apiSuccess {string}  同直播首页返回值
+     * @apiSuccess {string}  title 同直播首页返回值
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -234,6 +241,139 @@ class LiveController extends Controller
             }
         }
         return $lists['data'];
+    }
+
+    /**
+     * @api {get} api/v4/live/channels  直播场次列表
+     * @apiVersion 4.0.0
+     * @apiName  channels
+     * @apiGroup Live
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/channels
+     * @apiParam {number} id  直播期数id
+     *
+     * @apiSuccess {string} live_time    直播时间
+     * @apiSuccess {string} live_status  直播状态
+     * @apiSuccess {string} user         直播用户
+     * @apiSuccess {string} live         直播相关
+     * @apiSuccess {string} live.title   直播标题
+     * @apiSuccess {string} live.price   直播价格
+     * @apiSuccess {string} live.cover_img   直播封面
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+                         "id": 11,
+                         "user_id": 161904,
+                         "live_pid": 1,
+                         "begin_at": "2020-10-17 10:00:00",
+                         "end_at": null,
+                         "user": {
+                             "id": 161904,
+                             "nickname": "王琨"
+                         },
+                         "live": {
+                             "id": 1,
+                             "title": "第85期《经营能量》直播",
+                             "price": "0.00",
+                             "cover_img": "/live/look_back/live-1-9.jpg"
+                         },
+                         "live_status": "未开始",
+                         "live_time": "2020.10.17 10:00"
+                     }
+     *         ]
+     *     }
+     *
+     */
+    public  function  getLiveChannel(Request $request)
+    {
+        $id =  $request->get('id');
+        $lists =  LiveInfo::with(['user:id,nickname','live:id,title,price,cover_img'])
+                      ->select('id','user_id','live_pid','begin_at','end_at')
+                      ->where('status', 4)
+                      ->where('live_pid', $id)
+                      ->orderBy('begin_at','desc')
+                      ->paginate(10)
+                      ->toArray();
+
+       if (!empty($lists['data'])){
+           foreach ($lists['data'] as &$v) {
+               if (strtotime($v['begin_at']) > time()) {
+                  $v['live_status'] = '未开始';
+               } else {
+                   if (strtotime($v['end_at']) < time()) {
+                       $v['live_status'] = '已结束';
+                   } else {
+                       $v['live_status'] = '正在直播';
+                   }
+               }
+               $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
+           }
+       }
+       return success($lists['data']);
+    }
+
+    /**
+     * @api {get} api/v4/live/show  直播详情
+     * @apiVersion 4.0.0
+     * @apiName  show
+     * @apiGroup Live
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/show
+     * @apiParam {number} live_id  直播id
+     *
+     * @apiSuccess {string} is_sub 是否订阅专栏
+     * @apiSuccess {string} level  当前用户等级
+     * @apiSuccess {string} user   用户
+     * @apiSuccess {string} user.nickname  用户昵称
+     * @apiSuccess {string} user.headimg   用户头像
+     * @apiSuccess {string} user.intro     用户简介
+     * @apiSuccess {string} user.columns    用户专栏
+     * @apiSuccess {string} user.columns.id   专栏id
+     * @apiSuccess {string} user.columns.name 专栏名称
+     * @apiSuccess {string} user.live     直播相关
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 274,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
+     *                   "title": "电商弹窗课程日历套装",
+     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
+     *               },
+     *               {
+     *                   "id": 296,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
+     *                   "title": "心里学",
+     *                   "url": "/mall/shop-details?goods_id=479"
+     *               }
+     *         ]
+     *     }
+     *
+     */
+    public  function show(Request $request)
+    {
+        $id   = $request->get('live_id');
+        $list = LiveInfo::with(['user:id,nickname,headimg,intro','user.columns:id,user_id,name,title,subtitle','live:id,title,price,cover_img,content'])
+                ->select('id','push_live_url','live_url', 'live_url_flv','live_pid','user_id')
+                ->where('id', $id)
+                ->first();
+        if ($list){
+            $column =  $list->user->columns;
+            $userId =  $this->user['id'] ?? 0;
+            $user  = new User();
+            $isSub = Subscribe::isSubscribe($userId, $column[0]['id'],1);
+            $list['is_sub'] = $this->user['id'] ? $isSub : 0;
+            $list['level']  = $user->getLevel($userId);
+        }
+        return success($list);
+
     }
 
     /**
