@@ -38,94 +38,98 @@ class LiveController extends Controller
      *       "msg" : '成功',
      *       "data":[
      *                "data": {
-             "live_lists": [
-                 {
-                     "id": 136,
-                     "user_id": 161904,
-                     "title": "测试57",
-                     "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
-                     "price": "0.00",
-                     "cover_img": "/nlsg/works/20200611095034263657.jpg",
-                     "begin_at": "2020-10-01 15:02:00",
-                     "type": 1,
-                     "user": {
-                         "id": 161904,
-                         "nickname": "王琨"
-                     },
-                     "live_time": "2020.10.01 15:02",
-                     "live_status": "正在直播"
-                 }
-             ],
-             "back_lists": [
-                 {
-                     "id": 136,
-                     "user_id": 161904,
-                     "title": "测试57",
-                     "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
-                     "price": "0.00",
-                     "cover_img": "/nlsg/works/20200611095034263657.jpg",
-                     "begin_at": "2020-10-01 15:02:00",
-                     "type": 1,
-                     "user": {
-                         "id": 161904,
-                         "nickname": "王琨"
-                     },
-                     "live_time": "2020.10.01 15:02"
-                 },
-                 {
-                     "id": 137,
-                     "user_id": 255446,
-                     "title": "测试",
-                     "describe": "测试",
-                     "price": "1.00",
-                     "cover_img": "/nlsg/works/20200611172548507266.jpg",
-                     "begin_at": "2020-10-01 15:02:00",
-                     "type": 1,
-                     "user": null,
-                     "live_time": "2020.10.01 15:02"
-                 }
-             ]
-         }
+     * "live_lists": [
+     * {
+     * "id": 136,
+     * "user_id": 161904,
+     * "title": "测试57",
+     * "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
+     * "price": "0.00",
+     * "cover_img": "/nlsg/works/20200611095034263657.jpg",
+     * "begin_at": "2020-10-01 15:02:00",
+     * "type": 1,
+     * "user": {
+     * "id": 161904,
+     * "nickname": "王琨"
+     * },
+     * "live_time": "2020.10.01 15:02",
+     * "live_status": "正在直播"
+     * }
+     * ],
+     * "back_lists": [
+     * {
+     * "id": 136,
+     * "user_id": 161904,
+     * "title": "测试57",
+     * "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
+     * "price": "0.00",
+     * "cover_img": "/nlsg/works/20200611095034263657.jpg",
+     * "begin_at": "2020-10-01 15:02:00",
+     * "type": 1,
+     * "user": {
+     * "id": 161904,
+     * "nickname": "王琨"
+     * },
+     * "live_time": "2020.10.01 15:02"
+     * },
+     * {
+     * "id": 137,
+     * "user_id": 255446,
+     * "title": "测试",
+     * "describe": "测试",
+     * "price": "1.00",
+     * "cover_img": "/nlsg/works/20200611172548507266.jpg",
+     * "begin_at": "2020-10-01 15:02:00",
+     * "type": 1,
+     * "user": null,
+     * "live_time": "2020.10.01 15:02"
+     * }
+     * ]
+     * }
      *         ]
      *     }
      *
      */
-    public function  index()
+    public function index()
     {
-        $liveLists =  Live::with('user:id,nickname')
-                   ->select('id','user_id','title', 'describe','price','cover_img','begin_at','type','end_at')
-                   ->where('status', 4)
-                   ->orderBy('begin_at','desc')
-                   ->limit(3)
-                   ->get()
-                   ->toArray();
-        if (!empty($liveLists)){
+        $liveLists = Live::with('user:id,nickname')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at')
+            ->where('status', 4)
+            ->orderBy('begin_at', 'desc')
+            ->limit(3)
+            ->get()
+            ->toArray();
+        if ( ! empty($liveLists)) {
             foreach ($liveLists as &$v) {
                 if (strtotime($v['end_at']) < time()) {
-                   $v['live_status'] = '已结束';
+                    $v['live_status'] = '已结束';
                 } else {
-                   $v['live_status'] = '正在直播';
+                    $v['live_status'] = '正在直播';
                 }
-                $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
+                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
 
-        $backLists =  Live::with('user:id,nickname')
-                    ->select('id','user_id','title', 'describe','price','cover_img','begin_at','type')
-                    ->where('end_at', '>' , Carbon::now()->toDateTimeString())
-                    ->where('status', 4)
-                    ->orderBy('created_at', 'desc')
-                    ->limit(2)
-                    ->get()
-                    ->toArray();
-        if (!empty($backLists)){
-              foreach ($backLists as &$v) {
-                  $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
-              }
-      }
-        $data  = [
-            'live_lists' =>  $liveLists,
-            'back_lists' =>  $backLists
+        $backLists = Live::with('user:id,nickname')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type')
+            ->where('end_at', '>', Carbon::now()->toDateTimeString())
+            ->where('status', 4)
+            ->orderBy('created_at', 'desc')
+            ->limit(2)
+            ->get()
+            ->toArray();
+        if ( ! empty($backLists)) {
+            foreach ($backLists as &$v) {
+                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+            }
+        }
+
+        $liveWork = new LiveWorks();
+        $recommend = $liveWork->getLiveWorks(0, 1, 3);
+        $data = [
+            'live_lists' => $liveLists,
+            'back_lists' => $backLists,
+            'recommend'  => $recommend
         ];
         return success($data);
     }
@@ -147,37 +151,37 @@ class LiveController extends Controller
      *       "msg" : '成功',
      *       "data":[
      *                {
-                          "id": 136,
-                          "user_id": 161904,
-                          "title": "测试57",
-                          "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
-                          "price": "0.00",
-                          "cover_img": "/nlsg/works/20200611095034263657.jpg",
-                          "begin_at": "2020-10-01 15:02:00",
-                          "type": 1,
-                          "user": {
-                              "id": 161904,
-                              "nickname": "王琨"
-                          },
-                          "live_time": "2020.10.01 15:02",
-                          "live_status": "正在直播"
-                      }
+     * "id": 136,
+     * "user_id": 161904,
+     * "title": "测试57",
+     * "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
+     * "price": "0.00",
+     * "cover_img": "/nlsg/works/20200611095034263657.jpg",
+     * "begin_at": "2020-10-01 15:02:00",
+     * "type": 1,
+     * "user": {
+     * "id": 161904,
+     * "nickname": "王琨"
+     * },
+     * "live_time": "2020.10.01 15:02",
+     * "live_status": "正在直播"
+     * }
      *         ]
      *     }
      *
      */
-    public  function  getLiveLists()
+    public function getLiveLists()
     {
-        $lists =  Live::with('user:id,nickname')
-                           ->select('id','user_id','title', 'describe','price','cover_img','begin_at','type','end_at')
-                           ->where('status', 4)
-                           ->orderBy('begin_at','desc')
-                           ->paginate(10)
-                           ->toArray();
-        if (!empty($lists['data'])){
+        $lists = Live::with('user:id,nickname')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at')
+            ->where('status', 4)
+            ->orderBy('begin_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        if ( ! empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
                 if (strtotime($v['begin_at']) > time()) {
-                   $v['live_status'] = '未开始';
+                    $v['live_status'] = '未开始';
                 } else {
                     if (strtotime($v['end_at']) < time()) {
                         $v['live_status'] = '已结束';
@@ -186,7 +190,7 @@ class LiveController extends Controller
                     }
                 }
 
-                $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
+                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
 
@@ -210,36 +214,36 @@ class LiveController extends Controller
      *       "msg" : '成功',
      *       "data":[
      *                {
-                          "id": 136,
-                          "user_id": 161904,
-                          "title": "测试57",
-                          "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
-                          "price": "0.00",
-                          "cover_img": "/nlsg/works/20200611095034263657.jpg",
-                          "begin_at": "2020-10-01 15:02:00",
-                          "type": 1,
-                          "user": {
-                              "id": 161904,
-                              "nickname": "王琨"
-                          },
-                          "live_time": "2020.10.01 15:02"
-                      }
+     * "id": 136,
+     * "user_id": 161904,
+     * "title": "测试57",
+     * "describe": "行字节处理知牛哥教学楼哦咯咯娄哦咯加油加油加油",
+     * "price": "0.00",
+     * "cover_img": "/nlsg/works/20200611095034263657.jpg",
+     * "begin_at": "2020-10-01 15:02:00",
+     * "type": 1,
+     * "user": {
+     * "id": 161904,
+     * "nickname": "王琨"
+     * },
+     * "live_time": "2020.10.01 15:02"
+     * }
      *         ]
      *     }
      *
      */
-    public  function  getLiveBackLists()
+    public function getLiveBackLists()
     {
-        $lists =  Live::with('user:id,nickname')
-                    ->select('id','user_id','title', 'describe','price','cover_img','begin_at','type')
-                    ->where('end_at', '>' , Carbon::now()->toDateTimeString())
-                    ->where('status', 4)
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(10)
-                    ->toArray();
-        if (!empty($lists['data'])){
+        $lists = Live::with('user:id,nickname')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type')
+            ->where('end_at', '>', Carbon::now()->toDateTimeString())
+            ->where('status', 4)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        if ( ! empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
-              $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
+                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
         return $lists['data'];
@@ -268,54 +272,54 @@ class LiveController extends Controller
      *       "msg" : '成功',
      *       "data":[
      *               {
-                         "id": 11,
-                         "user_id": 161904,
-                         "live_pid": 1,
-                         "begin_at": "2020-10-17 10:00:00",
-                         "end_at": null,
-                         "user": {
-                             "id": 161904,
-                             "nickname": "王琨"
-                         },
-                         "live": {
-                             "id": 1,
-                             "title": "第85期《经营能量》直播",
-                             "price": "0.00",
-                             "cover_img": "/live/look_back/live-1-9.jpg"
-                         },
-                         "live_status": "未开始",
-                         "live_time": "2020.10.17 10:00"
-                     }
+     * "id": 11,
+     * "user_id": 161904,
+     * "live_pid": 1,
+     * "begin_at": "2020-10-17 10:00:00",
+     * "end_at": null,
+     * "user": {
+     * "id": 161904,
+     * "nickname": "王琨"
+     * },
+     * "live": {
+     * "id": 1,
+     * "title": "第85期《经营能量》直播",
+     * "price": "0.00",
+     * "cover_img": "/live/look_back/live-1-9.jpg"
+     * },
+     * "live_status": "未开始",
+     * "live_time": "2020.10.17 10:00"
+     * }
      *         ]
      *     }
      *
      */
-    public  function  getLiveChannel(Request $request)
+    public function getLiveChannel(Request $request)
     {
-        $id =  $request->get('id');
-        $lists =  LiveInfo::with(['user:id,nickname','live:id,title,price,cover_img'])
-                      ->select('id','user_id','live_pid','begin_at','end_at')
-                      ->where('status', 4)
-                      ->where('live_pid', $id)
-                      ->orderBy('begin_at','desc')
-                      ->paginate(10)
-                      ->toArray();
+        $id = $request->get('id');
+        $lists = LiveInfo::with(['user:id,nickname', 'live:id,title,price,cover_img'])
+            ->select('id', 'user_id', 'live_pid', 'begin_at', 'end_at')
+            ->where('status', 4)
+            ->where('live_pid', $id)
+            ->orderBy('begin_at', 'desc')
+            ->paginate(10)
+            ->toArray();
 
-       if (!empty($lists['data'])){
-           foreach ($lists['data'] as &$v) {
-               if (strtotime($v['begin_at']) > time()) {
-                  $v['live_status'] = '未开始';
-               } else {
-                   if (strtotime($v['end_at']) < time()) {
-                       $v['live_status'] = '已结束';
-                   } else {
-                       $v['live_status'] = '正在直播';
-                   }
-               }
-               $v['live_time'] =  date('Y.m.d H:i', strtotime($v['begin_at']));
-           }
-       }
-       return success($lists['data']);
+        if ( ! empty($lists['data'])) {
+            foreach ($lists['data'] as &$v) {
+                if (strtotime($v['begin_at']) > time()) {
+                    $v['live_status'] = '未开始';
+                } else {
+                    if (strtotime($v['end_at']) < time()) {
+                        $v['live_status'] = '已结束';
+                    } else {
+                        $v['live_status'] = '正在直播';
+                    }
+                }
+                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+            }
+        }
+        return success($lists['data']);
     }
 
     /**
@@ -363,43 +367,28 @@ class LiveController extends Controller
      *     }
      *
      */
-    public  function show(Request $request)
+    public function show(Request $request)
     {
-        $id   = $request->get('live_id');
+        $id = $request->get('live_id');
         $list = LiveInfo::with(['user:id,nickname,headimg,intro', 'live:id,title,price,cover_img,content'])
-                ->select('id','push_live_url','live_url', 'live_url_flv','live_pid','user_id')
-                ->where('id', $id)
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id')
+            ->where('id', $id)
+            ->first();
+        if ($list) {
+            $column = Column::where('user_id', $list['user_id'])
+                ->orderBy('created_at', 'desc')
                 ->first();
-        if ($list){
-            $column =  Column::where('user_id', $list['user_id'])
-                        ->orderBy('created_at','desc')
-                        ->first();
-            $userId =  $this->user['id'] ?? 0;
-            $user  = new User();
-            $isSub = Subscribe::isSubscribe($userId, $column->id,1);
+            $userId = $this->user['id'] ?? 0;
+            $user = new User();
+            $isSub = Subscribe::isSubscribe($userId, $column->id, 1);
             $list['column_id'] = $column->id;
-            $list['is_sub']    = $this->user['id'] ? $isSub : 0;
-            $list['level']  = $user->getLevel($userId);
+            $list['is_sub'] = $this->user['id'] ? $isSub : 0;
+            $list['level'] = $user->getLevel($userId);
 
         }
 
-        $recommend = LiveWorks::select('id','rid','type')
-                    ->where('status', 1)
-                    ->orderBy('created_at','desc')
-                    ->limit(2)
-                    ->get()
-                    ->toArray();
-        if ($recommend){
-            foreach ($recommend as &$v) {
-                if ($v['type']==1){
-                    $lists = Column::select('id','title','subtitle','original_price','price','cover_pic')
-                                ->where('id', $v['rid'])
-                                ->get()
-                                ->toArray();
-                    $v['list'] = $lists;
-                }
-            }
-        }
+        $liveWork = new LiveWorks();
+        $recommend = $liveWork->getLiveWorks($id, 2, 2);
         $data = [
             'info'      => $list,
             'recomment' => $recommend
@@ -411,12 +400,12 @@ class LiveController extends Controller
     /**
      * 重置直播类型
      */
-    public  function  reLiveType()
+    public function reLiveType()
     {
-        $liveLists = Live::orderBy('begin_at','desc')
-                      ->get()
-                      ->toArray();
-        if ($liveLists){
+        $liveLists = Live::orderBy('begin_at', 'desc')
+            ->get()
+            ->toArray();
+        if ($liveLists) {
             foreach ($liveLists as $v) {
                 $count = LiveInfo::where('live_pid', $v['id'])->count();
                 $type = $count > 1 ? 2 : 1;
