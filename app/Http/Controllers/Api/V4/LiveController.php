@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Subscribe;
 use Illuminate\Http\Request;
 use App\Models\Live;
 use App\Models\LiveInfo;
+use App\Models\User;
 use Carbon\Carbon;
 
 class LiveController extends Controller
@@ -312,6 +314,66 @@ class LiveController extends Controller
            }
        }
        return success($lists['data']);
+    }
+
+    /**
+     * @api {get} api/v4/live/show  直播详情
+     * @apiVersion 4.0.0
+     * @apiName  show
+     * @apiGroup Live
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/show
+     * @apiParam {number} live_id  直播id
+     *
+     * @apiSuccess {string} is_sub 是否订阅专栏
+     * @apiSuccess {string} level  当前用户等级
+     * @apiSuccess {string} user   用户
+     * @apiSuccess {string} user.nickname  用户昵称
+     * @apiSuccess {string} user.headimg   用户头像
+     * @apiSuccess {string} user.intro     用户简介
+     * @apiSuccess {string} user.columns    用户专栏
+     * @apiSuccess {string} user.columns.id   专栏id
+     * @apiSuccess {string} user.columns.name 专栏名称
+     * @apiSuccess {string} user.live     直播相关
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 274,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
+     *                   "title": "电商弹窗课程日历套装",
+     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
+     *               },
+     *               {
+     *                   "id": 296,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
+     *                   "title": "心里学",
+     *                   "url": "/mall/shop-details?goods_id=479"
+     *               }
+     *         ]
+     *     }
+     *
+     */
+    public  function show(Request $request)
+    {
+        $id   = $request->get('live_id');
+        $list = LiveInfo::with(['user:id,nickname,headimg,intro','user.columns:id,user_id,name,title,subtitle','live:id,title,price,cover_img,content'])
+                ->select('id','push_live_url','live_url', 'live_url_flv','live_pid','user_id')
+                ->where('id', $id)
+                ->first();
+        if ($list){
+            $column =  $list->user->columns;
+            $userId =  $this->user['id'] ?? 0;
+            $user  = new User();
+            $isSub = Subscribe::isSubscribe($userId, $column[0]['id'],1);
+            $list['is_sub'] = $this->user['id'] ? $isSub : 0;
+            $list['level']  = $user->getLevel($userId);
+        }
+        return success($list);
+
     }
 
     /**
