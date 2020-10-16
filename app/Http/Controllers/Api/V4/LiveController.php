@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
 use App\Models\Subscribe;
 use Illuminate\Http\Request;
 use App\Models\Live;
 use App\Models\LiveInfo;
 use App\Models\User;
+use App\Models\LiveWorks;
 use Carbon\Carbon;
 
 class LiveController extends Controller
@@ -324,16 +326,20 @@ class LiveController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/show
      * @apiParam {number} live_id  直播id
      *
-     * @apiSuccess {string} is_sub 是否订阅专栏
-     * @apiSuccess {string} level  当前用户等级
-     * @apiSuccess {string} user   用户
-     * @apiSuccess {string} user.nickname  用户昵称
-     * @apiSuccess {string} user.headimg   用户头像
-     * @apiSuccess {string} user.intro     用户简介
-     * @apiSuccess {string} user.columns    用户专栏
-     * @apiSuccess {string} user.columns.id   专栏id
-     * @apiSuccess {string} user.columns.name 专栏名称
-     * @apiSuccess {string} user.live     直播相关
+     * @apiSuccess {string} info  直播相关
+     * @apiSuccess {string} info.is_sub 是否订阅专栏
+     * @apiSuccess {string} info.level  当前用户等级
+     * @apiSuccess {string} info.column_id   专栏id
+     * @apiSuccess {string} info.user   用户
+     * @apiSuccess {string} info.user.nickname  用户昵称
+     * @apiSuccess {string} info.user.headimg   用户头像
+     * @apiSuccess {string} info.user.intro     用户简介
+     * @apiSuccess {string} recommend.list    推荐
+     * @apiSuccess {string} recommend.list.title    推荐标题
+     * @apiSuccess {string} recommend.list.subtitle 推荐副标题
+     * @apiSuccess {number} recommend.list.original_price     原价格
+     * @apiSuccess {number} recommend.list.price     推荐价格
+     * @apiSuccess {string} recommend.list.cover_pic 推荐封面图
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -360,19 +366,45 @@ class LiveController extends Controller
     public  function show(Request $request)
     {
         $id   = $request->get('live_id');
-        $list = LiveInfo::with(['user:id,nickname,headimg,intro','user.columns:id,user_id,name,title,subtitle','live:id,title,price,cover_img,content'])
+        $list = LiveInfo::with(['user:id,nickname,headimg,intro', 'live:id,title,price,cover_img,content'])
                 ->select('id','push_live_url','live_url', 'live_url_flv','live_pid','user_id')
                 ->where('id', $id)
                 ->first();
         if ($list){
-            $column =  $list->user->columns;
+            $column =  Column::where('user_id', $list['user_id'])
+                        ->orderBy('created_at','desc')
+                        ->first();
             $userId =  $this->user['id'] ?? 0;
             $user  = new User();
-            $isSub = Subscribe::isSubscribe($userId, $column[0]['id'],1);
-            $list['is_sub'] = $this->user['id'] ? $isSub : 0;
+            $isSub = Subscribe::isSubscribe($userId, $column->id,1);
+            $list['column_id'] = $column->id;
+            $list['is_sub']    = $this->user['id'] ? $isSub : 0;
             $list['level']  = $user->getLevel($userId);
+
         }
-        return success($list);
+
+        $recommend = LiveWorks::select('id','rid','type')
+                    ->where('status', 1)
+                    ->orderBy('created_at','desc')
+                    ->limit(2)
+                    ->get()
+                    ->toArray();
+        if ($recommend){
+            foreach ($recommend as &$v) {
+                if ($v['type']==1){
+                    $lists = Column::select('id','title','subtitle','original_price','price','cover_pic')
+                                ->where('id', $v['rid'])
+                                ->get()
+                                ->toArray();
+                    $v['list'] = $lists;
+                }
+            }
+        }
+        $data = [
+            'info'      => $list,
+            'recomment' => $recommend
+        ];
+        return success($data);
 
     }
 
