@@ -299,7 +299,7 @@ class LiveController extends Controller
         $id = $request->get('id');
         $lists = LiveInfo::with(['user:id,nickname', 'live:id,title,price,cover_img'])
             ->select('id', 'user_id', 'live_pid', 'begin_at', 'end_at')
-            ->where('status', 4)
+            ->where('status', 1)
             ->where('live_pid', $id)
             ->orderBy('begin_at', 'desc')
             ->paginate(10)
