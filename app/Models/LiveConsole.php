@@ -178,7 +178,8 @@ class LiveConsole extends Base
         $live_begin_at = 0;
         $live_end_at = 0;
 
-        if (empty($params['list'] ?? '')) {
+dd([empty($params['list'] ?? '') ,!is_array($params['list'] ?? ''),gettype($params['list']),$params['list']]);
+        if (empty($params['list'] ?? '') || !is_array($params['list'] ?? '')) {
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
 

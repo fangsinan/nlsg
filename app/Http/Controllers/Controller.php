@@ -22,7 +22,7 @@ class Controller extends BaseController
     public function __construct()
     {
         $this->user = auth('api')->user();
-//        $this->user = User::find(168934);
+        $this->user = User::find(168934);
         if ($this->user) {
             $this->user = $this->user->toArray();
         }
