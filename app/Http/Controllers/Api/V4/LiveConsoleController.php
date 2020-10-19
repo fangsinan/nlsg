@@ -22,6 +22,7 @@ class LiveConsoleController extends Controller
      * @apiParam {string} describe 简介
      * @apiParam {string} cover_img 封面
      * @apiParam {string} price 价格
+     * @apiParam {string} twitter_money 分校金额
      * @apiParam {number=1,0} is_free 是否免费  1免费0收费
      * @apiParam {number=1,0} is_show 是否公开  1公开
      * @apiParam {string} password  密码
