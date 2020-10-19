@@ -71,7 +71,7 @@ class LiveConsoleController extends Controller
         $params = $request->input();
         $model = new LiveConsole();
         $data = $model->add($params, $this->user['id']);
-        return $this->success($data);
+        return $this->getRes($data);
     }
 
     /**
@@ -82,13 +82,14 @@ class LiveConsoleController extends Controller
      * @apiGroup  我的直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_console/check_helper
      * @apiDescription 检查助手手机号
+     * @apiParam {string} helper 手机号,可多条
      */
     public function checkHelper(Request $request)
     {
         $params = $request->input();
         $model = new LiveConsole();
         $data = $model->checkHelper($params, $this->user['id']);
-        return $this->success($data);
+        return $this->getRes($data);
     }
 
     /**
@@ -107,7 +108,7 @@ class LiveConsoleController extends Controller
         $params = $request->input();
         $model = new LiveConsole();
         $data = $model->changeStatus($params, $this->user['id']);
-        return $this->success($data);
+        return $this->getRes($data);
     }
 
     /**
@@ -188,7 +189,7 @@ class LiveConsoleController extends Controller
         $id = $request->input('id', 0);
         $model = new LiveConsole();
         $data = $model->info($id, $this->user['id']);
-        return $this->success($data);
+        return $this->getRes($data);
     }
 
     /**
@@ -265,7 +266,7 @@ class LiveConsoleController extends Controller
         $params = $request->input();
         $model = new LiveConsole();
         $data = $model->list($params, $this->user['id']);
-        return $this->success($data);
+        return $this->getRes($data);
     }
 
 }
