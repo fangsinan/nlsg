@@ -380,7 +380,8 @@ class LiveController extends Controller
                 ->first();
             $userId = $this->user['id'] ?? 0;
             $user = new User();
-            $isSub = Subscribe::isSubscribe($userId, $column->id, 1);
+            //todo 只是解决报错 逻辑后期捋  ??0
+            $isSub = Subscribe::isSubscribe($userId, $column->id??0, 1);
             $list['column_id'] = $column->id;
             $list['is_sub'] = $this->user['id'] ? $isSub : 0;
             $list['level'] = $user->getLevel($userId);
