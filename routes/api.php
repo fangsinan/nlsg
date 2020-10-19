@@ -158,6 +158,14 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::get('order/reward/user', 'OrderController@getRewardUser');
 
+    //*******************************我的直播部分开始*******************************
+    Route::get('live_console/add', 'LiveConsoleController@add');
+    Route::post('live_console/check_helper', 'LiveConsoleController@checkHelper');
+    Route::put('live_console/change_status', 'LiveConsoleController@changeStatus');
+    Route::get('live_console/list', 'LiveConsoleController@list');
+    Route::get('live_console/info', 'LiveConsoleController@info');
+    //*******************************我的直播部分开始*******************************
+
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/base', 'UserController@base');
         Route::get('user/account', 'UserController@account');
@@ -216,13 +224,13 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         //商城结束
 
 
-        //*******************************我的直播部分开始*******************************
-        Route::post('live_console/add', 'LiveConsoleController@add');
-        Route::post('live_console/check_helper', 'LiveConsoleController@checkHelper');
-        Route::put('live_console/change_status', 'LiveConsoleController@changeStatus');
-        Route::get('live_console/list', 'LiveConsoleController@list');
-        Route::get('live_console/info', 'LiveConsoleController@info');
-        //*******************************我的直播部分开始*******************************
+//        //*******************************我的直播部分开始*******************************
+//        Route::post('live_console/add', 'LiveConsoleController@add');
+//        Route::post('live_console/check_helper', 'LiveConsoleController@checkHelper');
+//        Route::put('live_console/change_status', 'LiveConsoleController@changeStatus');
+//        Route::get('live_console/list', 'LiveConsoleController@list');
+//        Route::get('live_console/info', 'LiveConsoleController@info');
+//        //*******************************我的直播部分开始*******************************
 
 
         Route::get('auth/logout', 'AuthController@logout');
