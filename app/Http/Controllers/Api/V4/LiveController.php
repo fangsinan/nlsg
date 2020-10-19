@@ -246,7 +246,7 @@ class LiveController extends Controller
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
-        return $lists['data'];
+        return success($lists['data']);
     }
 
     /**
