@@ -72,7 +72,7 @@ class LiveConsoleController extends Controller
         $params = $request->input();
         $model = new LiveConsole();
         $data = $model->add($params, $this->user['id']);
-        return $this->getRes(['code'=>true,'data'=>$params]);
+        dd($params);
         return $this->getRes($data);
     }
 
