@@ -20,7 +20,7 @@ class LiveConsole extends Base
 
             $check_user = User::whereIn('phone', $helper)->select(['id', 'phone'])->get();
             if ($check_user->isEmpty()) {
-                return ['code' => false, 'msg' => '数据错误'];
+                return ['code' => false, 'msg' => '助手数据错误'];
             } else {
                 $check_user = $check_user->toArray();
                 $check_user = array_column($check_user, 'phone');
