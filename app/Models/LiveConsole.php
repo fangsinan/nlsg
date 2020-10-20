@@ -181,8 +181,8 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
 
-        $params['list'] = json_decode($params['list'],true);
-        if(!is_array($params['list'] ?? '')){
+        $params['list'] = json_decode($params['list'], true);
+        if (!is_array($params['list'] ?? '')) {
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
 
@@ -252,7 +252,7 @@ class LiveConsole extends Base
             } else {
                 $live_data['type'] = 1;
             }
-            if(empty($params['list'])){
+            if (empty($params['list'])) {
                 $live_data['is_finish'] = 0;
             }
             $live_res = $liveModel->whereId($params['id'])->update($live_data);
@@ -337,9 +337,10 @@ class LiveConsole extends Base
         }
         $live = self::whereId($id)
             ->where('user_id', $user_id)
-            ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content','created_at','twitter_money',
-                'reason', 'check_time', 'price', 'playback_price','helper', 'is_free', 'is_show', 'can_push','is_finish'])
-            ->with(['infoList'])
+            ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content', 'created_at',
+                'twitter_money','reason', 'check_time', 'price', 'playback_price', 'helper', 'is_free',
+                'is_show', 'can_push', 'is_finish','user_id'])
+            ->with(['infoList','userInfo'])
             ->first();
         if (empty($live)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -369,7 +370,12 @@ class LiveConsole extends Base
     {
         return $this->hasMany('App\Models\LiveInfo', 'live_pid', 'id')
             ->where('status', '=', 1)
-            ->select(['id', 'begin_at', 'end_at', 'length', 'live_pid', 'playback_url']);
+            ->select(['id', 'begin_at', 'end_at', 'length', 'live_pid', 'playback_url', 'is_finish']);
+    }
+
+    public function userInfo(){
+        return $this->hasOne(User::class,'id','user_id')
+            ->select(['id','nickname']);
     }
 
     public function list($params, $user_id)
@@ -392,7 +398,7 @@ class LiveConsole extends Base
             ->where('l.is_del', '=', 0);
 
         $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content',
-            'l.reason', 'l.check_time', 'l.price','l.playback_price', 'l.helper', 'l.is_free', 'l.is_show', 'l.can_push',
+            'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show', 'l.can_push',
             'u.nickname', 'l.end_at', DB::raw('(SELECT count(1)*2 = SUM(`status`)
             from nlsg_live_info where live_pid = l.id) as all_pass_flag')];
 
@@ -444,6 +450,19 @@ class LiveConsole extends Base
         }
 
         return $list;
+    }
+
+    public function listNew($params, $user_id)
+    {
+        $now_date = date('Y-m-d H:i:s', time());
+        $page = intval($params['page'] ?? 1);
+        $size = intval($params['size'] ?? 10);
+
+        $query = self::from('nlsg_live as l')
+            ->leftJoin('nlsg_user as u', 'l.user_id', '=', 'u.id')
+            ->where('l.user_id', '=', $user_id)
+            ->where('l.is_del', '=', 0);
+
     }
 
     /**
