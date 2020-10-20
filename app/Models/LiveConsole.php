@@ -132,11 +132,10 @@ class LiveConsole extends Base
                 return ['code' => false, 'msg' => '金额错误'];
             }
             $live_data['price'] = $params['price'];
-            $live_data['appoint_price'] = $params['appoint_price'] ?? $params['price'];
-            $live_data['limit_price'] = $params['limit_price'] ?? $params['price'];
         } else {
-            $live_data['price'] = $live_data['appoint_price'] = $live_data['limit_price'] = 0;
+            $live_data['price'] = 0;
         }
+        $live_data['playback_price'] = $params['playback_price'] ?? 0;
         $live_data['twitter_money'] = $params['twitter_money'] ?? 0;
 
         if (empty($params['title'] ?? '')) {
@@ -177,7 +176,7 @@ class LiveConsole extends Base
         $live_data['is_free'] = $params['is_free'];
         $live_begin_at = 0;
         $live_end_at = 0;
-        
+
         if (empty($params['list'] ?? '')) {
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
@@ -336,7 +335,7 @@ class LiveConsole extends Base
         $live = self::whereId($id)
             ->where('user_id', $user_id)
             ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content',
-                'reason', 'check_time', 'price', 'helper', 'is_free', 'is_show', 'can_push'])
+                'reason', 'check_time', 'price', 'playback_price','helper', 'is_free', 'is_show', 'can_push'])
             ->with(['infoList'])
             ->first();
         if (empty($live)) {
@@ -390,7 +389,7 @@ class LiveConsole extends Base
             ->where('l.is_del', '=', 0);
 
         $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content',
-            'l.reason', 'l.check_time', 'l.price', 'l.helper', 'l.is_free', 'l.is_show', 'l.can_push',
+            'l.reason', 'l.check_time', 'l.price','l.playback_price', 'l.helper', 'l.is_free', 'l.is_show', 'l.can_push',
             'u.nickname', 'l.end_at', DB::raw('(SELECT count(1)*2 = SUM(`status`)
             from nlsg_live_info where live_pid = l.id) as all_pass_flag')];
 
