@@ -205,6 +205,7 @@ class LiveConsoleController extends Controller
      * @apiParam {number} [page] page
      * @apiParam {number} [size] size
      *
+     * @apiSuccess {string} status 直播状态(1:待审核,2:已取消,3:已驳回,4:通过)
      * @apiSuccessExample {json} Request-Example:
      *{
      * "code": 200,
