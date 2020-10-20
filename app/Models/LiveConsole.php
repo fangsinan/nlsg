@@ -337,8 +337,8 @@ class LiveConsole extends Base
         }
         $live = self::whereId($id)
             ->where('user_id', $user_id)
-            ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content',
-                'reason', 'check_time', 'price', 'playback_price','helper', 'is_free', 'is_show', 'can_push'])
+            ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content','created_at','twitter_money',
+                'reason', 'check_time', 'price', 'playback_price','helper', 'is_free', 'is_show', 'can_push','is_finish'])
             ->with(['infoList'])
             ->first();
         if (empty($live)) {
