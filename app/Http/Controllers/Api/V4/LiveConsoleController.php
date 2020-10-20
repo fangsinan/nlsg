@@ -132,6 +132,8 @@ class LiveConsoleController extends Controller
      * @apiSuccess {string} reason 驳回原因
      * @apiSuccess {string} check_time 驳回或通过时间
      * @apiSuccess {number} price 价格
+     * @apiSuccess {number} playback_price 回放价格
+     * @apiSuccess {number} is_finish 当status=4的时候  is_finish=1表示已结束 0表示待直播
      * @apiSuccess {string} helper 助手
      * @apiSuccess {number} is_free 是否免费
      * @apiSuccess {number} is_show 是否公开
