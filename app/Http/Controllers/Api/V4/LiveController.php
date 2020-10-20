@@ -30,6 +30,8 @@ class LiveController extends Controller
      * @apiSuccess {array} live_lists.live_time 直播时间
      * @apiSuccess {array} live_lists.live_status 直播状态 1未开始 2已结束 3正在直播
      * @apiSuccess {array} back_lists 回放列表
+     * @apiSuccess {array} recommend  推荐
+     * @apiSuccess {array} recommend.type  类型 1专栏 2讲座 3听书 4精品课  5线下课 6商品
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
