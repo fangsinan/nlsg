@@ -436,6 +436,46 @@ class LiveController extends Controller
     }
 
     /**
+     * @api {get} api/v4/offline/info  线下课程详情
+     * @apiVersion 4.0.0
+     * @apiName  show
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/offline/info
+     * @apiParam {number} id  课程id
+     *
+     * @apiSuccess {string}
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 274,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
+     *                   "title": "电商弹窗课程日历套装",
+     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
+     *               },
+     *               {
+     *                   "id": 296,
+     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
+     *                   "title": "心里学",
+     *                   "url": "/mall/shop-details?goods_id=479"
+     *               }
+     *         ]
+     *     }
+     *
+     */
+    public  function   getOfflineInfo(Request $request)
+    {
+        $id =  $request->get('id');
+        $list = OfflineProducts::where(['id'=>$id, 'is_del'=>0])
+                ->first();
+        return success($list);
+    }
+
+    /**
      * 重置直播类型
      */
     public function reLiveType()
