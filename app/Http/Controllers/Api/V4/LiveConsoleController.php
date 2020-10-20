@@ -270,7 +270,8 @@ class LiveConsoleController extends Controller
     {
         $params = $request->input();
         $model = new LiveConsole();
-        $data = $model->list($params, $this->user['id']);
+//        $data = $model->list($params, $this->user['id']);
+        $data = $model->listNew($params, $this->user['id']);
         return $this->getRes($data);
     }
 

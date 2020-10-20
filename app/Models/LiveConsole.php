@@ -338,9 +338,9 @@ class LiveConsole extends Base
         $live = self::whereId($id)
             ->where('user_id', $user_id)
             ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content', 'created_at',
-                'twitter_money','reason', 'check_time', 'price', 'playback_price', 'helper', 'is_free',
-                'is_show', 'can_push', 'is_finish','user_id'])
-            ->with(['infoList','userInfo'])
+                'twitter_money', 'reason', 'check_time', 'price', 'playback_price', 'helper', 'is_free',
+                'is_show', 'can_push', 'is_finish', 'user_id'])
+            ->with(['infoList', 'userInfo'])
             ->first();
         if (empty($live)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -373,9 +373,10 @@ class LiveConsole extends Base
             ->select(['id', 'begin_at', 'end_at', 'length', 'live_pid', 'playback_url', 'is_finish']);
     }
 
-    public function userInfo(){
-        return $this->hasOne(User::class,'id','user_id')
-            ->select(['id','nickname']);
+    public function userInfo()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id')
+            ->select(['id', 'nickname']);
     }
 
     public function list($params, $user_id)
@@ -463,6 +464,48 @@ class LiveConsole extends Base
             ->where('l.user_id', '=', $user_id)
             ->where('l.is_del', '=', 0);
 
+        $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content',
+            'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show',
+            'l.can_push', 'u.nickname', 'l.end_at', 'l.is_finish'];
+
+        switch (intval($params['list_flag'] ?? 0)) {
+            case 1:
+                $query->where('l.status', '=', 1);
+                break;
+            case 2:
+                $query->whereIn('l.status', [2, 3]);
+                break;
+            case 3:
+                $query->where('l.status', '=', 4)->where('l.is_finish', '=', 0);
+                break;
+            case 4:
+                $query->where('l.status', '=', 4)->where('l.is_finish', '=', 1);
+                break;
+        }
+
+        $list = $query
+            ->with(['infoList'])
+            ->select($fields)
+            ->orderBy('l.id', 'desc')
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get();
+
+        foreach ($list as &$v) {
+            if ($v->status == 1) {
+                $v->list_flag = 1;
+            } elseif ($v->status == 2 || $v->status == 3) {
+                $v->list_flag = 2;
+            } else {
+                if ($v->is_finish == 1) {
+                    $v->list_flag = 4;
+                } else {
+                    $v->list_flag = 3;
+                }
+            }
+        }
+
+        return $list;
     }
 
     /**
