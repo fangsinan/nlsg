@@ -252,6 +252,9 @@ class LiveConsole extends Base
             } else {
                 $live_data['type'] = 1;
             }
+            if(empty($params['list'])){
+                $live_data['is_finish'] = 0;
+            }
             $live_res = $liveModel->whereId($params['id'])->update($live_data);
             if ($live_res === false) {
                 DB::rollBack();
