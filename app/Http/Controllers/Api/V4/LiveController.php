@@ -444,6 +444,11 @@ class LiveController extends Controller
      * @apiParam {number} id  课程id
      *
      * @apiSuccess {string} title 标题
+     * @apiSuccess {string} subtitle 副标题
+     * @apiSuccess {string} describe 内容
+     * @apiSuccess {number} total_price 总价
+     * @apiSuccess {number} price  现价
+     * @apiSuccess {number} image  详情图
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
