@@ -22,8 +22,8 @@ class LiveWorks extends Base
                 if ($v['type'] == 1) {
                     $lists = Column::select('id', 'title', 'subtitle', 'original_price', 'price', 'cover_pic')
                         ->where('id', $v['rid'])
-                        ->first()
-                        ->toArray();
+                        ->first();
+                    $lists->type = 1;
                     $data[]  = $lists;
                 }
             }
