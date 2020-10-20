@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\History;
+use App\Models\LiveInfo;
 use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\Subscribe;
@@ -269,6 +270,7 @@ class OrderController extends Controller
      * @apiParam {int} reward_num 数量 默认1
      * @apiParam {int} reward_type 打赏类型1专栏|讲座 2课程|听书  3想法   4百科  (每个类型只需要传对应id)
      * @apiParam {int} os_type os_type 1 安卓 2ios
+     * @apiParam {int} live_id 直播id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -293,6 +295,7 @@ class OrderController extends Controller
         $reward_type= $request->input('reward_type',0);  //打赏类型
         $os_type    = $request->input('os_type',0);
         $pay_type    = $request->input('pay_type',0);
+        $live_id = !empty($params['live_id']) ? intval($params['live_id']) : 0;
 
         $user_id    = $this->user['id'];
 
@@ -314,7 +317,11 @@ class OrderController extends Controller
         if (empty($loginUserInfo)) {
             return $this->error(0,'用户有误');
         }
-
+        $live_pid = 0;
+        if($live_id){
+            $live_pid = LiveInfo::find($live_id);
+            $live_pid = $live_pid['live_pid'];
+        }
         //处理订单
 
         $price = 1;
@@ -343,6 +350,7 @@ class OrderController extends Controller
             'ip'            => $request->getClientIp(),
             'os_type'       => $os_type,
             'pay_type'       => $pay_type,
+            'live_id'       => $live_pid,
         ];
         $order = Order::firstOrCreate($data);
         return $this->success($order['id']);

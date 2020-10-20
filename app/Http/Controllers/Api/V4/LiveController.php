@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\OfflineProducts;
 use App\Models\Subscribe;
 use Illuminate\Http\Request;
 use App\Models\Live;
@@ -30,6 +31,14 @@ class LiveController extends Controller
      * @apiSuccess {array} live_lists.live_time 直播时间
      * @apiSuccess {array} live_lists.live_status 直播状态 1未开始 2已结束 3正在直播
      * @apiSuccess {array} back_lists 回放列表
+     * @apiSuccess {array} offline    线下课程
+     * @apiSuccess {array} offline.title   标题
+     * @apiSuccess {array} offline.subtitle  副标题
+     * @apiSuccess {array} offline.total_price   原价
+     * @apiSuccess {array} offline.price   现价
+     * @apiSuccess {array} offline.cover_img   封面
+     * @apiSuccess {array} recommend  推荐
+     * @apiSuccess {array} recommend.type  类型 1专栏 2讲座 3听书 4精品课  5线下课 6商品
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -93,7 +102,7 @@ class LiveController extends Controller
     public function index()
     {
         $liveLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','playback_price','is_free')
             ->where('status', 4)
             ->orderBy('begin_at', 'desc')
             ->limit(3)
@@ -101,17 +110,20 @@ class LiveController extends Controller
             ->toArray();
         if (!empty($liveLists)) {
             foreach ($liveLists as &$v) {
-                if (strtotime($v['begin_at']) > time()) {
+                $channel = LiveInfo::where('live_pid', $v['id'])
+                            ->where('status', 1)
+                            ->orderBy('id','desc')
+                            ->first();
+                if (strtotime($channel['begin_at']) > time()) {
                     $v['live_status'] = '1';
                 } else {
-                    if (strtotime($v['end_at']) < time()) {
+                    if (strtotime($channel['end_at']) < time()) {
                         $v['live_status'] = '2';
                     } else {
                         $v['live_status'] = '3';
                     }
                 }
                 if ($v['type']==1){
-                    $channel = LiveInfo::where('live_pid', $v['id'])->orderBy('id','desc')->first();
                     $v['id'] = $channel->id;
                 }
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
@@ -119,7 +131,7 @@ class LiveController extends Controller
         }
 
         $backLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type','playback_price','is_free')
             ->where('end_at', '>', Carbon::now()->toDateTimeString())
             ->where('status', 4)
             ->orderBy('created_at', 'desc')
@@ -132,11 +144,19 @@ class LiveController extends Controller
             }
         }
 
+        $offline =  OfflineProducts::where('is_del', 0)
+                    ->select('id','title','subtitle','total_price', 'price','cover_img')
+                    ->orderBy('created_at','desc')
+                    ->limit(3)
+                    ->get()
+                    ->toArray();
+
         $liveWork = new LiveWorks();
         $recommend = $liveWork->getLiveWorks(0, 1, 3);
         $data = [
             'live_lists' => $liveLists,
             'back_lists' => $backLists,
+            'offline'    => $offline,
             'recommend'  => $recommend
         ];
         return success($data);
@@ -181,25 +201,28 @@ class LiveController extends Controller
     public function getLiveLists()
     {
         $lists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','playback_price','is_free')
             ->where('status', 4)
             ->orderBy('begin_at', 'desc')
             ->paginate(10)
             ->toArray();
         if ( ! empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
-                if (strtotime($v['begin_at']) > time()) {
+                $channel = LiveInfo::where('live_pid', $v['id'])
+                            ->where('status', 1)
+                            ->orderBy('id','desc')
+                            ->first();
+                if (strtotime($channel['begin_at']) > time()) {
                     $v['live_status'] = '1';
                 } else {
-                    if (strtotime($v['end_at']) < time()) {
+                    if (strtotime($channel['end_at']) < time()) {
                         $v['live_status'] = '2';
                     } else {
                         $v['live_status'] = '3';
                     }
                 }
                 if ($v['type']==1){
-                   $channel = LiveInfo::where('live_pid', $v['id'])->orderBy('id','desc')->first();
-                   $v['id'] = $channel->id;
+                    $v['id'] = $channel->id;
                 }
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
@@ -246,7 +269,7 @@ class LiveController extends Controller
     public function getLiveBackLists()
     {
         $lists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type','is_free','playback_price','is_free')
             ->where('end_at', '>', Carbon::now()->toDateTimeString())
             ->where('status', 4)
             ->orderBy('created_at', 'desc')
