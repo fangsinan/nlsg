@@ -28,7 +28,7 @@ class LiveController extends Controller
      * @apiSuccess {array} live_lists.type 直播类型 1单场 2多场
      * @apiSuccess {array} live_lists.user 直播用户信息
      * @apiSuccess {array} live_lists.live_time 直播时间
-     * @apiSuccess {array} live_lists.live_status 直播状态
+     * @apiSuccess {array} live_lists.live_status 直播状态 1未开始 2已结束 3正在直播
      * @apiSuccess {array} back_lists 回放列表
      *
      * @apiSuccessExample  Success-Response:
@@ -53,7 +53,7 @@ class LiveController extends Controller
      * "nickname": "王琨"
      * },
      * "live_time": "2020.10.01 15:02",
-     * "live_status": "正在直播"
+     * "live_status": "3"
      * }
      * ],
      * "back_lists": [
@@ -99,12 +99,20 @@ class LiveController extends Controller
             ->limit(3)
             ->get()
             ->toArray();
-        if ( ! empty($liveLists)) {
+        if (!empty($liveLists)) {
             foreach ($liveLists as &$v) {
-                if (strtotime($v['end_at']) < time()) {
-                    $v['live_status'] = '已结束';
+                if (strtotime($v['begin_at']) > time()) {
+                    $v['live_status'] = '1';
                 } else {
-                    $v['live_status'] = '正在直播';
+                    if (strtotime($v['end_at']) < time()) {
+                        $v['live_status'] = '2';
+                    } else {
+                        $v['live_status'] = '3';
+                    }
+                }
+                if ($v['type']==1){
+                    $channel = LiveInfo::where('live_pid', $v['id'])->orderBy('id','desc')->first();
+                    $v['id'] = $channel->id;
                 }
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
@@ -181,15 +189,18 @@ class LiveController extends Controller
         if ( ! empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
                 if (strtotime($v['begin_at']) > time()) {
-                    $v['live_status'] = '未开始';
+                    $v['live_status'] = '1';
                 } else {
                     if (strtotime($v['end_at']) < time()) {
-                        $v['live_status'] = '已结束';
+                        $v['live_status'] = '2';
                     } else {
-                        $v['live_status'] = '正在直播';
+                        $v['live_status'] = '3';
                     }
                 }
-
+                if ($v['type']==1){
+                   $channel = LiveInfo::where('live_pid', $v['id'])->orderBy('id','desc')->first();
+                   $v['id'] = $channel->id;
+                }
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
@@ -258,7 +269,7 @@ class LiveController extends Controller
      * @apiParam {number} id  直播期数id
      *
      * @apiSuccess {string} live_time    直播时间
-     * @apiSuccess {string} live_status  直播状态
+     * @apiSuccess {string} live_status  直播状态 1 未开始 2已结束 3正在进行
      * @apiSuccess {string} user         直播用户
      * @apiSuccess {string} live         直播相关
      * @apiSuccess {string} live.title   直播标题
@@ -308,12 +319,12 @@ class LiveController extends Controller
         if ( ! empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
                 if (strtotime($v['begin_at']) > time()) {
-                    $v['live_status'] = '未开始';
+                    $v['live_status'] = '1';
                 } else {
                     if (strtotime($v['end_at']) < time()) {
-                        $v['live_status'] = '已结束';
+                        $v['live_status'] = '2';
                     } else {
-                        $v['live_status'] = '正在直播';
+                        $v['live_status'] = '3';
                     }
                 }
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
