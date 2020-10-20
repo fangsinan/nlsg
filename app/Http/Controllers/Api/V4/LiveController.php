@@ -438,7 +438,7 @@ class LiveController extends Controller
     /**
      * @api {get} api/v4/offline/info  线下课程详情
      * @apiVersion 4.0.0
-     * @apiName  show
+     * @apiName  info
      * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/offline/info
      * @apiParam {number} id  课程id
