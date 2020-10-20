@@ -507,7 +507,65 @@ class LiveConsole extends Base
 
     public function changeInfoState($params, $user_id)
     {
+        $live_id = $params['live_id'] ?? 0;
+        $live_info_id = $params['live_info_id'] ?? 0;
+        $flag = $params['flag'] ?? 0;
+        if (empty($live_id) || empty($live_info_id) || empty($flag)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        if (!in_array($flag, ['on', 'off', 'finish'])) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check = LiveInfo::whereId($live_info_id)
+            ->where('live_pid', $live_id)
+            ->where('user_id', $user_id)
+            ->first();
+        if (empty($check)) {
+            return ['code' => false, 'msg' => '直播不存在'];
+        }
 
+        switch ($flag) {
+            case 'on':
+                $data['is_begin'] = 1;
+                break;
+            case 'off':
+                $data['is_begin'] = 0;
+                break;
+            case 'finish':
+                $data['is_begin'] = 0;
+                $data['is_finish'] = 1;
+                $data['finished_at'] = date('Y-m-d H:i:s');
+                break;
+        }
+
+        DB::beginTransaction();
+
+        $info_res = LiveInfo::whereId($live_info_id)->update($data);
+        if ($info_res === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败,请重试'];
+        }
+        if($flag == 'finish'){
+            $check_all_finish = LiveInfo::where('live_pid',$live_id)
+                ->where('status',1)
+                ->where('is_finish',0)
+                ->select(['id'])
+                ->first();
+
+            if(empty($check_all_finish)){
+                $live_res = self::whereId($live_id)->update([
+                    'is_finish'=>1,
+                    'finished_at'=>date('Y-m-d H:i:s')
+                ]);
+                if($live_res === false){
+                    DB::rollBack();
+                    return ['code'=>false,'msg'=>'失败,请重试'];
+                }
+            }
+        }
+
+        DB::commit();
+        return ['code'=>true,'msg'=>'成功'];
     }
 
     /**

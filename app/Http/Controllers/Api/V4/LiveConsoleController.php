@@ -113,7 +113,6 @@ class LiveConsoleController extends Controller
         return $this->getRes($data);
     }
 
-
     /**
      * 详情
      * @api {get} /api/v4/live_console/info 详情
@@ -275,8 +274,21 @@ class LiveConsoleController extends Controller
         return $this->getRes($data);
     }
 
-    //直播状态修改
-    public function changeInfoState(Request $request){
+
+    /**
+     * 开始,结束直播
+     * @api {put} /api/v4/live_console/change_info_status 开始,结束直播
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/live_console/change_info_status
+     * @apiGroup  直播画面页
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_console/change_info_status
+     * @apiDescription 开始,结束直播
+     * @apiParam {number} live_id 直播期数id
+     * @apiParam {number} live_info_id 直播场次id
+     * @apiParam {string=on,finish} flag 操作(开始,结束)
+     */
+    public function changeInfoState(Request $request)
+    {
         $params = $request->input();
         $model = new LiveConsole();
         $data = $model->changeInfoState($params, $this->user['id']);
