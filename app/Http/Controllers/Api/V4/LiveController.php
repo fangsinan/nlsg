@@ -443,7 +443,7 @@ class LiveController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/offline/info
      * @apiParam {number} id  课程id
      *
-     * @apiSuccess {string}  title 标题
+     * @apiSuccess {string}
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
