@@ -126,7 +126,7 @@ class LiveConsole extends Base
         }
 
         $live_data['user_id'] = $user_id;
-        $live_data['is_show'] = 1;
+        $live_data['is_show'] = $params['is_show'] ?? 1;
         if (($params['is_free'] ?? 0) == 0) {
             if (($params['price'] ?? 0) <= 0) {
                 return ['code' => false, 'msg' => '金额错误'];
@@ -503,6 +503,11 @@ class LiveConsole extends Base
         }
 
         return $list;
+    }
+
+    public function changeInfoState($params, $user_id)
+    {
+
     }
 
     /**

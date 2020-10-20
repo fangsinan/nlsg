@@ -113,6 +113,7 @@ class LiveConsoleController extends Controller
         return $this->getRes($data);
     }
 
+
     /**
      * 详情
      * @api {get} /api/v4/live_console/info 详情
@@ -265,13 +266,20 @@ class LiveConsoleController extends Controller
      * }
      *
      **/
-
     public function list(Request $request)
     {
         $params = $request->input();
         $model = new LiveConsole();
-//        $data = $model->list($params, $this->user['id']);
+        //$data = $model->list($params, $this->user['id']);
         $data = $model->listNew($params, $this->user['id']);
+        return $this->getRes($data);
+    }
+
+    //直播状态修改
+    public function changeInfoState(Request $request){
+        $params = $request->input();
+        $model = new LiveConsole();
+        $data = $model->changeInfoState($params, $this->user['id']);
         return $this->getRes($data);
     }
 
