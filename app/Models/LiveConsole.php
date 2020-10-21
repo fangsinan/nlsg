@@ -395,7 +395,7 @@ class LiveConsole extends Base
             ->where('l.user_id', '=', $user_id)
             ->where('l.is_del', '=', 0);
 
-        $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content','l.twitter_money',
+        $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content', 'l.twitter_money',
             'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show', 'l.can_push',
             'u.nickname', 'l.end_at', DB::raw('(SELECT count(1)*2 = SUM(`status`)
             from nlsg_live_info where live_pid = l.id) as all_pass_flag')];
@@ -452,7 +452,6 @@ class LiveConsole extends Base
 
     public function listNew($params, $user_id)
     {
-        $now_date = date('Y-m-d H:i:s', time());
         $page = intval($params['page'] ?? 1);
         $size = intval($params['size'] ?? 10);
 
@@ -461,7 +460,7 @@ class LiveConsole extends Base
             ->where('l.user_id', '=', $user_id)
             ->where('l.is_del', '=', 0);
 
-        $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content','l.twitter_money',
+        $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content', 'l.twitter_money',
             'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show',
             'l.can_push', 'u.nickname', 'l.end_at', 'l.is_finish'];
 
@@ -505,6 +504,64 @@ class LiveConsole extends Base
         return $list;
     }
 
+    /**
+     * 获取推流地址
+     * 如果不传key和过期时间，将返回不含防盗链的url
+     * @param domain 您用来推流的域名
+     *        streamName 您用来区别不同推流地址的唯一流名称
+     *        key 安全密钥
+     *        time 过期时间 sample 2016-11-12 12:00:00
+     * @return String url
+     */
+    function getPushUrl($streamName, $time = null)
+    {
+        $key = env('LIVE_PUSH_URL');
+        $push_url = env('LIVE_PLAY_URL');
+        $play_url = env('Live_API_KEY');
+
+        if ($key && $time) {
+            $txTime = strtoupper(base_convert(($time), 10, 16));
+            $txSecret = md5($key . $streamName . $txTime);
+            $ext_str = "?" . http_build_query(array(
+                    "txSecret" => $txSecret,
+                    "txTime" => $txTime
+                ));
+        }
+
+        return [
+            'push_url' => "rtmp://" . $push_url . "/live/" . $streamName . (isset($ext_str) ? $ext_str : ""),
+            'play_url' => "http://" . $play_url . "/live/" . $streamName . '.m3u8' . (isset($ext_str) ? $ext_str : ""),
+            'play_url_flv' => "http://" . $play_url . "/live/" . $streamName . '.flv' . (isset($ext_str) ? $ext_str : ""),
+        ];
+    }
+
+    /*****************************直播画面页部分***************************************/
+
+    /**
+     * 校验用户是否为指定直播的管理员
+     * @param $user_id
+     * @param $live_id
+     * @return bool
+     */
+    public static function isAdmininLive($user_id, $live_id)
+    {
+        $live_info = Live::whereId($live_id)->select(['user_id', 'helper'])->first();
+        if ($user_id == $live_info->user_id) {
+            return true;
+        }
+
+        $user_info = User::whereId($user_id)->select(['phone'])->first();
+        $helper = explode(',', $live_info->helper);
+        if (empty($user_info) || empty($helper)) {
+            return false;
+        }
+        if (in_array($user_info->phone, $helper)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function changeInfoState($params, $user_id)
     {
         $live_id = $params['live_id'] ?? 0;
@@ -545,58 +602,114 @@ class LiveConsole extends Base
             DB::rollBack();
             return ['code' => false, 'msg' => '失败,请重试'];
         }
-        if($flag == 'finish'){
-            $check_all_finish = LiveInfo::where('live_pid',$live_id)
-                ->where('status',1)
-                ->where('is_finish',0)
+        if ($flag == 'finish') {
+            $check_all_finish = LiveInfo::where('live_pid', $live_id)
+                ->where('status', 1)
+                ->where('is_finish', 0)
                 ->select(['id'])
                 ->first();
 
-            if(empty($check_all_finish)){
+            if (empty($check_all_finish)) {
                 $live_res = self::whereId($live_id)->update([
-                    'is_finish'=>1,
-                    'finished_at'=>date('Y-m-d H:i:s')
+                    'is_finish' => 1,
+                    'finished_at' => date('Y-m-d H:i:s')
                 ]);
-                if($live_res === false){
+                if ($live_res === false) {
                     DB::rollBack();
-                    return ['code'=>false,'msg'=>'失败,请重试'];
+                    return ['code' => false, 'msg' => '失败,请重试'];
                 }
             }
         }
 
         DB::commit();
-        return ['code'=>true,'msg'=>'成功'];
+        return ['code' => true, 'msg' => '成功'];
     }
 
-    /**
-     * 获取推流地址
-     * 如果不传key和过期时间，将返回不含防盗链的url
-     * @param domain 您用来推流的域名
-     *        streamName 您用来区别不同推流地址的唯一流名称
-     *        key 安全密钥
-     *        time 过期时间 sample 2016-11-12 12:00:00
-     * @return String url
-     */
-    function getPushUrl($streamName, $time = null)
+    public function pushMsgToLive($params, $user_id)
     {
-        $key = env('LIVE_PUSH_URL');
-        $push_url = env('LIVE_PLAY_URL');
-        $play_url = env('Live_API_KEY');
+        $live_id = $params['live_id'] ?? 0;
+        $live_info_id = $params['live_info_id'] ?? 0;
+        $push_type = $params['type'] ?? 0;
+        $push_gid = $params['gid'] ?? 0;
+        $push_at = $params['time'] ?? 0;
+        $now_date = date('Y-m-d H:i:s');
 
-        if ($key && $time) {
-            $txTime = strtoupper(base_convert(($time), 10, 16));
-            $txSecret = md5($key . $streamName . $txTime);
-            $ext_str = "?" . http_build_query(array(
-                    "txSecret" => $txSecret,
-                    "txTime" => $txTime
-                ));
+        if (empty($live_id) || empty($live_info_id) || empty($push_gid) || empty($push_type)) {
+            return ['code' => false, 'msg' => '参数错误'];
         }
 
-        return [
-            'push_url' => "rtmp://" . $push_url . "/live/" . $streamName . (isset($ext_str) ? $ext_str : ""),
-            'play_url' => "http://" . $play_url . "/live/" . $streamName . '.m3u8' . (isset($ext_str) ? $ext_str : ""),
-            'play_url_flv' => "http://" . $play_url . "/live/" . $streamName . '.flv' . (isset($ext_str) ? $ext_str : ""),
-        ];
+        if (empty($push_at) || strtotime($push_at) === false || $push_at < $now_date) {
+            return ['code' => false, 'msg' => '时间错误'];
+        }
+
+        if (!in_array($push_type, [1, 2, 3, 4, 6, 7, 8])) {
+            return ['code' => false, 'msg' => '类型错误'];
+        }
+
+        $check_live_info = LiveInfo::whereId($live_info_id)
+            ->where('live_pid', '=', $live_id)
+            ->where('status', '=', 1)
+            ->select(['id', 'is_begin', 'is_finish', 'user_id'])
+            ->first();
+
+        if (empty($check_live_info)) {
+            return ['code' => false, 'msg' => '直播不存在'];
+        }
+
+        if ($check_live_info->is_begin == 0) {
+            return ['code' => false, 'msg' => '直播未开始'];
+        }
+
+        if ($check_live_info->is_finish == 1) {
+            return ['code' => false, 'msg' => '直播已结束'];
+        }
+
+        $check_is_admin = self::isAdmininLive($user_id, $live_id);
+        if ($check_is_admin === false) {
+            return ['code' => false, 'msg' => '需要管理员权限'];
+        }
+
+        $check_push = LivePush::where('live_id', '=', $live_id)
+            ->where('live_info_id', '=', $live_info_id)
+            ->where('is_del', '=', 0)
+            ->where('push_at', 'like', date('Y-m-d H:i', strtotime($push_at)) . '%')
+            ->select(['id'])
+            ->first();
+
+        if (empty($params['id'] ?? 0)) {
+            if (!empty($check_push)) {
+                return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+            }
+        } else {
+            if ($params['id'] != $check_push->id) {
+                return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+            }
+        }
+
+        if (empty($params['id'] ?? 0)) {
+            $model = new LivePush();
+        } else {
+            $model = LivePush::whereId($params['id'])->where('user_id', '=', $user_id)->first();
+            if (empty($model)) {
+                return ['code' => false, 'msg' => '需本人修改'];
+            }
+        }
+
+        $model->live_id = $live_id;
+        $model->live_info_id = $live_info_id;
+        $model->user_id = $user_id;
+        $model->push_type = $push_type;
+        $model->push_gid = $push_gid;
+        $model->push_at = $push_at;
+
+        $res = $model->save();
+
+        if ($res) {
+            return ['code' => false, 'msg' => '添加成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败,请重试'];
+        }
+
     }
 
 }

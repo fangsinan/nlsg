@@ -275,6 +275,7 @@ class LiveConsoleController extends Controller
     }
 
 
+    /*****************************直播画面页部分***************************************/
     /**
      * 开始,结束直播
      * @api {put} /api/v4/live_console/change_info_status 开始,结束直播
@@ -293,6 +294,39 @@ class LiveConsoleController extends Controller
         $model = new LiveConsole();
         $data = $model->changeInfoState($params, $this->user['id']);
         return $this->getRes($data);
+    }
+
+
+    /**
+     * 添加(修改)直播的推送消息
+     * @api {post} /api/v4/live_console/push_msg_to_live 添加(修改)直播的推送消息
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/live_console/push_msg_to_live
+     * @apiGroup  直播画面页
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_console/push_msg_to_live
+     * @apiDescription 添加(修改)直播的推送消息
+     * @apiParam {number} live_id 直播期数id
+     * @apiParam {number} ive_info_id 直播场次id
+     * @apiParam {number} type 类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书)
+     * @apiParam {number} gid 目标id(type=6时,1是360)
+     * @apiParam {string} time 推送时间(2020-01-01 01:00)
+     */
+    public function pushMsgToLive(Request $request)
+    {
+        $params = $request->input();
+        $model = new LiveConsole();
+        $data = $model->pushMsgToLive($params, $this->user['id']);
+        return $this->getRes($data);
+    }
+
+    //todo 推送消息列表
+
+    //todo 推送消息状态修改
+
+    //todo 直播公告
+    public function liveNotice(Request $request)
+    {
+
     }
 
 }

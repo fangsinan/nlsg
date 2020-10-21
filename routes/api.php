@@ -222,7 +222,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::put('live_console/change_status', 'LiveConsoleController@changeStatus');
         Route::get('live_console/list', 'LiveConsoleController@list');
         Route::get('live_console/info', 'LiveConsoleController@info');
+        //*******************************直播画面页*******************************
         Route::put('live_console/change_info_status', 'LiveConsoleController@changeInfoState');
+        Route::get('live_console/push_msg_to_live', 'LiveConsoleController@pushMsgToLive');
         //*******************************我的直播部分开始*******************************
 
 
