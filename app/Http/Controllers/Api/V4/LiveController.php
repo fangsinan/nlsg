@@ -12,6 +12,7 @@ use App\Models\LiveInfo;
 use App\Models\User;
 use App\Models\LiveWorks;
 use App\Models\Order;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class LiveController extends Controller
@@ -540,6 +541,36 @@ class LiveController extends Controller
             }
         }
         return success($lists['data']);
+    }
+
+    /**
+     * @api {get} api/v4/live/check_password 直播验证密码
+     * @apiVersion 4.0.0
+     * @apiName  check_password
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/check_password
+     * @apiParam  {number} id 直播id
+     * @apiParam  {number} password 密码
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public  function  checkLivePassword(Request $request)
+    {
+        $input  =  $request->all();
+        $list   = Live::where('id', $input['id'])->first();
+        if (!Hash::check($input['password'], $list->password)){
+            return  error('密码无效');
+        }
+        return  success();
     }
 
     /**
