@@ -12,6 +12,7 @@ use App\Models\LiveInfo;
 use App\Models\User;
 use App\Models\LiveWorks;
 use App\Models\Order;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class LiveController extends Controller
@@ -29,6 +30,7 @@ class LiveController extends Controller
      * @apiSuccess {array} live_lists.cover_img 直播封面
      * @apiSuccess {array} live_lists.type 直播类型 1单场 2多场
      * @apiSuccess {array} live_lists.user 直播用户信息
+     * @apiSuccess {array} live_lists.is_password 是否需要房间密码 1是 0否
      * @apiSuccess {array} live_lists.live_time 直播时间
      * @apiSuccess {array} live_lists.live_status 直播状态 1未开始 2已结束 3正在直播
      * @apiSuccess {array} back_lists 回放列表
@@ -103,7 +105,7 @@ class LiveController extends Controller
     public function index()
     {
         $liveLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','playback_price','is_free')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','playback_price','is_free','password')
             ->where('status', 4)
             ->orderBy('begin_at', 'desc')
             ->limit(3)
@@ -127,12 +129,13 @@ class LiveController extends Controller
                 if ($v['type']==1){
                     $v['id'] = $channel->id;
                 }
-                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+                $v['is_password'] = $v['password'] ? 1 : 0;
+                $v['live_time']   = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
 
         $backLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type','playback_price','is_free')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type','playback_price','is_free','password')
             ->where('end_at', '>', Carbon::now()->toDateTimeString())
             ->where('status', 4)
             ->orderBy('created_at', 'desc')
@@ -141,7 +144,8 @@ class LiveController extends Controller
             ->toArray();
         if ( ! empty($backLists)) {
             foreach ($backLists as &$v) {
-                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+                $v['is_password'] = $v['password'] ? 1 : 0;
+                $v['live_time']   = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
 
@@ -203,7 +207,7 @@ class LiveController extends Controller
     public function getLiveLists()
     {
         $lists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','playback_price','is_free')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','playback_price','is_free','password')
             ->where('status', 4)
             ->orderBy('begin_at', 'desc')
             ->paginate(10)
@@ -226,6 +230,7 @@ class LiveController extends Controller
                 if ($v['type']==1){
                     $v['id'] = $channel->id;
                 }
+                $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
@@ -271,7 +276,7 @@ class LiveController extends Controller
     public function getLiveBackLists()
     {
         $lists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type','is_free','playback_price','is_free')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type','is_free','playback_price','is_free','password')
             ->where('end_at', '>', Carbon::now()->toDateTimeString())
             ->where('status', 4)
             ->orderBy('created_at', 'desc')
@@ -279,6 +284,7 @@ class LiveController extends Controller
             ->toArray();
         if ( ! empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
+                $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
@@ -535,6 +541,36 @@ class LiveController extends Controller
             }
         }
         return success($lists['data']);
+    }
+
+    /**
+     * @api {get} api/v4/live/check_password 直播验证密码
+     * @apiVersion 4.0.0
+     * @apiName  check_password
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/check_password
+     * @apiParam  {number} id 直播id
+     * @apiParam  {number} password 密码
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public  function  checkLivePassword(Request $request)
+    {
+        $input  =  $request->all();
+        $list   = Live::where('id', $input['id'])->first();
+        if (!Hash::check($input['password'], $list->password)){
+            return  error('密码无效');
+        }
+        return  success();
     }
 
     /**

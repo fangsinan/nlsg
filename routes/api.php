@@ -279,6 +279,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('live/back_lists', 'LiveController@getLiveBackLists');
         Route::get('live/channels', 'LiveController@getLiveChannel');
         Route::get('live/show', 'LiveController@show');
+        Route::post('live/check_password', 'LiveController@checkLivePassword');
         Route::get('offline/info', 'LiveController@getOfflineInfo');
         Route::get('offline/order', 'LiveController@getOfflineOrder');
         Route::post('live/retype', 'LiveController@reLiveType');
