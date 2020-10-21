@@ -29,7 +29,7 @@ class LiveController extends Controller
      * @apiSuccess {array} live_lists.cover_img 直播封面
      * @apiSuccess {array} live_lists.type 直播类型 1单场 2多场
      * @apiSuccess {array} live_lists.user 直播用户信息
-     * @apiSuccess {array} live_lists.is_password 是否需要房间密码
+     * @apiSuccess {array} live_lists.is_password 是否需要房间密码 1是 0否
      * @apiSuccess {array} live_lists.live_time 直播时间
      * @apiSuccess {array} live_lists.live_status 直播状态 1未开始 2已结束 3正在直播
      * @apiSuccess {array} back_lists 回放列表
