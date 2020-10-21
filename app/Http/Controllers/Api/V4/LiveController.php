@@ -505,17 +505,16 @@ class LiveController extends Controller
      *       "msg" : '成功',
      *       "data":[
      *               {
-     *                   "id": 274,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191118184425289911.jpg",
-     *                   "title": "电商弹窗课程日历套装",
-     *                   "url": "/mall/shop-detailsgoods_id=448&time=201911091925"
-     *               },
-     *               {
-     *                   "id": 296,
-     *                   "pic": "https://image.nlsgapp.com/nlsg/banner/20191227171346601666.jpg",
-     *                   "title": "心里学",
-     *                   "url": "/mall/shop-details?goods_id=479"
-     *               }
+                     "relation_id": 1,
+                     "price": "99.00",
+                     "ordernum": "20091100211190416747499",
+                     "product": {
+                         "id": 1,
+                         "title": "经营能量线下品牌课",
+                         "cover_img": "/live/jynl/jynltjlb.jpg",
+                         "total_price": "1000.00"
+                     }
+                 }
      *         ]
      *     }
      *
