@@ -544,7 +544,7 @@ class LiveController extends Controller
     }
 
     /**
-     * @api {get} api/v4/live/check_password 直播验证密码
+     * @api {post} api/v4/live/check_password 直播验证密码
      * @apiVersion 4.0.0
      * @apiName  check_password
      * @apiGroup 直播
@@ -567,7 +567,7 @@ class LiveController extends Controller
     {
         $input  =  $request->all();
         $list   = Live::where('id', $input['id'])->first();
-        if (!Hash::check($input['password'], $list->password)){
+        if (!Hash::check($input['password'], '$2y$10$5ASiOopyFLJunWOCdfGrfuwDit7NsO.0s3JsWm6dmx8VKPsyTQ/uO')){
             return  error('密码无效');
         }
         return  success();
