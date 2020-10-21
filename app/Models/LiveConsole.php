@@ -461,7 +461,7 @@ class LiveConsole extends Base
             ->where('l.user_id', '=', $user_id)
             ->where('l.is_del', '=', 0);
 
-        $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content',
+        $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content','l.twitter_money',
             'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show',
             'l.can_push', 'u.nickname', 'l.end_at', 'l.is_finish'];
 
