@@ -330,6 +330,9 @@ class LiveConsoleController extends Controller
      * @apiDescription 推送消息列表
      * @apiParam {number} [page] page
      * @apiParam {number} [size] size
+     * @apiParam {number} [id] id(获取单条)
+     * @apiParam {number} live_id live_id
+     * @apiParam {number} live_info_id live_info_id
      *
      * @apiSuccess {number} id 推送id
      * @apiSuccess {number} live_id 直播id

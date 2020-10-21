@@ -70,7 +70,12 @@ class LivePush extends Base
             return ['code' => false, 'msg' => '需要管理员权限'];
         }
 
-        $query = self::where('live_id', '=', $live_id)
+        if (empty($params['id'] ?? 0)) {
+            $query = new self();
+        } else {
+            $query = self::whereId($params['id']);
+        }
+        $query->where('live_id', '=', $live_id)
             ->where('live_info_id', '=', $live_info_id)
             ->where('is_del', '=', 0);
 
