@@ -308,7 +308,7 @@ class LiveConsoleController extends Controller
      * @apiDescription 添加(修改)直播的推送消息
      * @apiParam {number} live_id 直播期数id
      * @apiParam {number} ive_info_id 直播场次id
-     * @apiParam {number} type 类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书)
+     * @apiParam {number=1,2,3,4,6,7,8} type 类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书)
      * @apiParam {number} gid 目标id(type=6时,1是360)
      * @apiParam {string} time 推送时间(2020-01-01 01:00)
      */
@@ -320,15 +320,89 @@ class LiveConsoleController extends Controller
         return $this->getRes($data);
     }
 
-    //todo 推送消息列表
-    public function pushMsgList(Request $request){
+    /**
+     * 推送消息列表
+     * @api {get} /api/v4/live_console/push_msg_list 推送消息列表
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/live_console/push_msg_list
+     * @apiGroup  直播画面页
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_console/push_msg_list
+     * @apiDescription 推送消息列表
+     * @apiParam {number} [page] page
+     * @apiParam {number} [size] size
+     *
+     * @apiSuccess {number} id 推送id
+     * @apiSuccess {number} live_id 直播id
+     * @apiSuccess {number} live_info_id 場次id
+     * @apiSuccess {number} push_type 商品類型
+     * @apiSuccess {number} push_gid 目標id
+     * @apiSuccess {number} click_num 點擊數
+     * @apiSuccess {number} close_num 关闭数
+     * @apiSuccess {number} is_push 是否推送 0已取消
+     * @apiSuccess {string} push_at 预设推送时间
+     * @apiSuccess {number} is_done 是否完成(1完成)
+     * @apiSuccess {string} done_at 完成时间
+     * @apiSuccess {number} is_self 是不是自己的(自己的能编辑删除)
+     * @apiSuccess {string} order_count 单量
+     * @apiSuccess {string} money_count 收益
+     * @apiSuccess {string[]} info 目标信息
+     *
+     * @apiSuccessExample {json} Request-Example:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "now": 1603272248,
+     * "data": [
+     * {
+     * "id": 9,
+     * "live_id": 224,
+     * "live_info_id": 346,
+     * "push_type": 8,
+     * "push_gid": 553,
+     * "click_num": 0,
+     * "close_num": 0,
+     * "is_push": 0,
+     * "push_at": "2020-10-21 14:50",
+     * "is_self": 1,
+     * "info": {
+     * "id": 553,
+     * "title": "孩子，把你的手给我",
+     * "subtitle": "《孩子把你的手给我》的作者是海姆·G.吉诺特，此书是畅高居美国各大图书排行榜榜首。",
+     * "cover_img": "/nlsg/works/20191118162916177457.png",
+     * "price": "0.00",
+     * "with_type": 8
+     * },
+     * "order_count": "暂无单",
+     * "money_count": "¥暂无"
+     * }
+     * ]
+     * }
+     **/
+    public function pushMsgList(Request $request)
+    {
         $params = $request->input();
         $model = new LivePush();
         $data = $model->pushMsgList($params, $this->user['id']);
         return $this->getRes($data);
     }
 
-    //todo 推送消息状态修改
+    /**
+     * 推送消息状态修改
+     * @api {put} /api/v4/live_console/change_push_msg_state 推送消息状态修改
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/live_console/change_push_msg_state
+     * @apiGroup  直播画面页
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_console/change_push_msg_state
+     * @apiDescription 推送消息状态修改
+     * @apiParam {number} id 推送记录id
+     * @apiParam {string=on,del} flag 操作(取消,删除)
+     */
+    public function changePushMsgState(Request $request){
+        $params = $request->input();
+        $model = new LivePush();
+        $data = $model->changePushMsgState($params, $this->user['id']);
+        return $this->getRes($data);
+    }
 
     //todo 直播公告
     public function liveNotice(Request $request)

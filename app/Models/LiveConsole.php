@@ -693,6 +693,9 @@ class LiveConsole extends Base
             if (empty($model)) {
                 return ['code' => false, 'msg' => '需本人修改'];
             }
+            if($model->is_done == 1){
+                return ['code'=>false,'msg'=>'已经推送,无法修改'];
+            }
         }
 
         $model->live_id = $live_id;
