@@ -11,6 +11,7 @@ use App\Models\Live;
 use App\Models\LiveInfo;
 use App\Models\User;
 use App\Models\LiveWorks;
+use App\Models\Order;
 use Carbon\Carbon;
 
 class LiveController extends Controller
@@ -479,6 +480,61 @@ class LiveController extends Controller
         $list = OfflineProducts::where(['id'=>$id, 'is_del'=>0])
                 ->first();
         return success($list);
+    }
+
+    /**
+     * @api {get} api/v4/offline/order  线下课程报名记录
+     * @apiVersion 4.0.0
+     * @apiName  order
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/offline/order
+     * @apiParam  {number} id 线下课程id
+     * @apiParam  {number} page 分页
+     *
+     * @apiSuccess {number} price 支付定金
+     * @apiSuccess {number} ordernum 订单号
+     * @apiSuccess {string} product  线下课程
+     * @apiSuccess {string} product.title 课程标题
+     * @apiSuccess {string} product.cover_img 课程封面
+     * @apiSuccess {string} product.total_price 课程总价
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+                     "relation_id": 1,
+                     "price": "99.00",
+                     "ordernum": "20091100211190416747499",
+                     "product": {
+                         "id": 1,
+                         "title": "经营能量线下品牌课",
+                         "cover_img": "/live/jynl/jynltjlb.jpg",
+                         "total_price": "1000.00"
+                     }
+                 }
+     *         ]
+     *     }
+     *
+     */
+    public  function getOfflineOrder(Request $request)
+    {
+        $id = $request->get('id');
+        $lists = Order::where(['relation_id'=> $id, 'status'=>1, 'type'=>14])
+                ->select('relation_id','price','ordernum')
+                ->paginate(10)
+                ->toArray();
+        if ($lists['data']){
+            foreach ($lists['data'] as &$v) {
+                $product = OfflineProducts::where('id', $v['relation_id'])
+                    ->select('id','title','cover_img','total_price')
+                    ->first();
+                $v['product'] = $product ?? [];
+            }
+        }
+        return success($lists['data']);
     }
 
     /**
