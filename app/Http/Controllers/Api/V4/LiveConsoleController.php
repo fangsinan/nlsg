@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Live;
 use App\Models\LiveConsole;
+use App\Models\LivePush;
 use Illuminate\Http\Request;
 
 class LiveConsoleController extends Controller
@@ -320,6 +321,12 @@ class LiveConsoleController extends Controller
     }
 
     //todo 推送消息列表
+    public function pushMsgList(Request $request){
+        $params = $request->input();
+        $model = new LivePush();
+        $data = $model->pushMsgList($params, $this->user['id']);
+        return $this->getRes($data);
+    }
 
     //todo 推送消息状态修改
 

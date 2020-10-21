@@ -162,7 +162,7 @@ class LiveConsole extends Base
             $live_data['helper'] = preg_replace('/[^0-9]/i', ',', $params['helper']);
         }
         if (!empty($params['password'] ?? '')) {
-            $live_data['password'] = bcrypt($params['password']);
+            $live_data['password'] = bcrypt(trim($params['password']));
         }
         $live_data['title'] = $params['title'];
         $live_data['describe'] = $params['describe'];
