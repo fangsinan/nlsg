@@ -233,6 +233,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
         Route::put('live_notice/change_state', 'LiveConsoleController@changeLiveNoticeState');
 
+        Route::post('live_forbid/add', 'LiveConsoleController@forbid');//禁言
         //*******************************我的直播部分开始*******************************
 
 

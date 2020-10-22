@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Live;
 use App\Models\LiveConsole;
+use App\Models\LiveForbiddenWords;
 use App\Models\LiveNotice;
 use App\Models\LivePush;
 use Illuminate\Http\Request;
@@ -486,7 +487,7 @@ class LiveConsoleController extends Controller
         $data = $model->list($params, $this->user['id']);
         return $this->getRes($data);
     }
-    
+
     /**
      * 公告和笔记-修改状态
      * @api {put} /api/v4/live_notice/change_state 公告和笔记-修改状态
@@ -506,6 +507,24 @@ class LiveConsoleController extends Controller
         return $this->getRes($data);
     }
 
-    //todo 禁言
+    /**
+     * 禁言
+     * @api {post} /api/v4/live_forbid/add禁言
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/live_forbid/add
+     * @apiGroup  直播画面页
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_forbid/add
+     * @apiDescription 禁言
+     * @apiParam {number} live_id 直播期数id
+     * @apiParam {number} ive_info_id 直播场次id
+     * @apiParam {number} user_id 目标任务id(全体就是0)
+     * @apiParam {string=on,off} flag on开启禁言,off关闭禁言
+     */
+    public function forbid(Request $request){
+        $params = $request->input();
+        $model = new LiveForbiddenWords();
+        $data = $model->add($params, $this->user['id']);
+        return $this->getRes($data);
+    }
 
 }
