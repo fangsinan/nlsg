@@ -509,7 +509,7 @@ class LiveConsoleController extends Controller
 
     /**
      * 禁言
-     * @api {post} /api/v4/live_forbid/add禁言
+     * @api {post} /api/v4/live_forbid/add 禁言
      * @apiVersion 4.0.0
      * @apiName /api/v4/live_forbid/add
      * @apiGroup  直播画面页
