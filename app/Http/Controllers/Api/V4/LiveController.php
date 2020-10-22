@@ -413,7 +413,7 @@ class LiveController extends Controller
     {
         $id = $request->get('live_id');
         $list = LiveInfo::with(['user:id,nickname,headimg,intro', 'live:id,title,price,cover_img,content'])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id')
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id','begin_at')
             ->where('id', $id)
             ->first();
         if ($list) {
