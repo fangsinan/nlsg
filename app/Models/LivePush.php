@@ -206,7 +206,7 @@ class LivePush extends Base
                         'id' => 0,
                         'title' => '360幸福大使',
                         'subtitle' => '',
-                        'cover_img' => '',
+                        'cover_img' => 'nlsg/poster_img/1581599882211_.pic.jpg',
                         'price' => 360,
                         'with_type' => 6
                     ];
