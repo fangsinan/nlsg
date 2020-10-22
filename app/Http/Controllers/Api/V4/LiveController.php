@@ -499,6 +499,7 @@ class LiveController extends Controller
      *
      * @apiSuccess {number} price 支付定金
      * @apiSuccess {number} ordernum 订单号
+     * @apiSuccess {number} status 状态 0 待支付  1已支付  2取消
      * @apiSuccess {string} product  线下课程
      * @apiSuccess {string} product.title 课程标题
      * @apiSuccess {string} product.cover_img 课程封面
@@ -529,7 +530,7 @@ class LiveController extends Controller
     {
         $id = $request->get('id');
         $lists = Order::where(['relation_id'=> $id, 'status'=>1, 'type'=>14])
-                ->select('relation_id','price','ordernum')
+                ->select('relation_id','price','ordernum','status')
                 ->paginate(10)
                 ->toArray();
         if ($lists['data']){
