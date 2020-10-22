@@ -576,6 +576,68 @@ class LiveController extends Controller
     }
 
     /**
+     * @api {get} api/v4/live/ranking  排行榜
+     * @apiVersion 4.0.0
+     * @apiName  ranking
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/ranking
+     * @apiParam  {number} live_id 直播id
+     *
+     * @apiSuccess {string}  user_ranking 自己排名
+     * @apiSuccess {string}  user_invite_num 自己邀请数量
+     * @apiSuccess {string}  ranking 排行
+     * @apiSuccess {string}  ranking.username 用户昵称
+     * @apiSuccess {string}  ranking.headimg  用户头像
+     * @apiSuccess {string}  ranking.invite_num  邀请数量
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data": {
+                 "user_ranking": 2,
+                 "user_invite_num": 10,
+                 "ranking": [
+                     {
+                         "username": "亚梦想",
+                         "headimg": "/wechat/authorpt/lzh.png",
+                         "invite_num": 30
+                     },
+                     {
+                         "username": "小雨衣",
+                         "headimg": "/wechat/authorpt/lzh.png",
+                         "invite_num": 20
+                     }
+                 ]
+             }
+     *     }
+     *
+     */
+    public  function  ranking()
+    {
+        $data = [
+            'user_ranking'=> 2,
+            'user_invite_num' => 10,
+            'ranking' => [
+                [
+                   'username' => '亚梦想',
+                   'headimg'  => '/wechat/authorpt/lzh.png',
+                   'invite_num'=> 30,
+                   'is_self'  => 1
+                ],
+                [
+                   'username' => '小雨衣',
+                   'headimg'  => '/wechat/authorpt/lzh.png',
+                   'invite_num'=> 20,
+                   'is_self'  => 0
+                ]
+            ]
+        ];
+        return success($data);
+    }
+
+    /**
      * 重置直播类型
      */
     public function reLiveType()
