@@ -214,8 +214,8 @@ class LivePush extends Base
             }
             unset($v['info_of_column'], $v['info_of_works'], $v['info_of_goods'], $v['info_of_offline']);
 
-            $v['order_count'] = '暂无单';
-            $v['money_count'] = '¥暂无';
+            $v['order_count'] = '暂无';
+            $v['money_count'] = '暂无';
             $v['push_at'] = date('Y-m-d H:i', strtotime($v['push_at']));
         }
 
