@@ -18,7 +18,97 @@ class LivePush extends Base
 {
     protected $table = 'nlsg_live_push';
 
-    public function changePushMsgState($params, $user_id)
+    public function add($params, $user_id)
+    {
+        $live_id = $params['live_id'] ?? 0;
+        $live_info_id = $params['live_info_id'] ?? 0;
+        $push_type = $params['type'] ?? 0;
+        $push_gid = $params['gid'] ?? 0;
+        $push_at = $params['time'] ?? 0;
+        $now_date = date('Y-m-d H:i:s');
+
+        if (empty($live_id) || empty($live_info_id) || empty($push_gid) || empty($push_type)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        if (empty($push_at) || strtotime($push_at) === false || $push_at < $now_date) {
+            return ['code' => false, 'msg' => '时间错误'];
+        }
+
+        if (!in_array($push_type, [1, 2, 3, 4, 6, 7, 8])) {
+            return ['code' => false, 'msg' => '类型错误'];
+        }
+
+        $check_live_info = LiveInfo::whereId($live_info_id)
+            ->where('live_pid', '=', $live_id)
+            ->where('status', '=', 1)
+            ->select(['id', 'is_begin', 'is_finish', 'user_id'])
+            ->first();
+
+        if (empty($check_live_info)) {
+            return ['code' => false, 'msg' => '直播不存在'];
+        }
+
+        if ($check_live_info->is_begin == 0) {
+            return ['code' => false, 'msg' => '直播未开始'];
+        }
+
+        if ($check_live_info->is_finish == 1) {
+            return ['code' => false, 'msg' => '直播已结束'];
+        }
+
+        $check_is_admin = LiveConsole::isAdmininLive($user_id, $live_id);
+        if ($check_is_admin === false) {
+            return ['code' => false, 'msg' => '需要管理员权限'];
+        }
+
+        $check_push = LivePush::where('live_id', '=', $live_id)
+            ->where('live_info_id', '=', $live_info_id)
+            ->where('is_del', '=', 0)
+            ->where('push_at', 'like', date('Y-m-d H:i', strtotime($push_at)) . '%')
+            ->select(['id'])
+            ->first();
+
+        if (empty($params['id'] ?? 0)) {
+            if (!empty($check_push)) {
+                return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+            }
+        } else {
+            if ($params['id'] != $check_push->id) {
+                return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+            }
+        }
+
+        if (empty($params['id'] ?? 0)) {
+            $model = new LivePush();
+        } else {
+            $model = LivePush::whereId($params['id'])->where('user_id', '=', $user_id)->first();
+            if (empty($model)) {
+                return ['code' => false, 'msg' => '需本人修改'];
+            }
+            if($model->is_done == 1){
+                return ['code'=>false,'msg'=>'已经推送,无法修改'];
+            }
+        }
+
+        $model->live_id = $live_id;
+        $model->live_info_id = $live_info_id;
+        $model->user_id = $user_id;
+        $model->push_type = $push_type;
+        $model->push_gid = $push_gid;
+        $model->push_at = $push_at;
+
+        $res = $model->save();
+
+        if ($res) {
+            return ['code' => false, 'msg' => '添加成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败,请重试'];
+        }
+
+    }
+
+    public function changeState($params, $user_id)
     {
         $id = $params['id'] ?? 0;
         if (empty($id)) {
@@ -55,7 +145,7 @@ class LivePush extends Base
 
     }
 
-    public function pushMsgList($params, $user_id)
+    public function list($params, $user_id)
     {
         $live_id = $params['live_id'] ?? 0;
         $live_info_id = $params['live_info_id'] ?? 0;

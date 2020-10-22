@@ -223,10 +223,13 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('live_console/list', 'LiveConsoleController@list');
         Route::get('live_console/info', 'LiveConsoleController@info');
         //*******************************直播画面页*******************************
-        Route::put('live_console/change_info_status', 'LiveConsoleController@changeInfoState');
-        Route::post('live_console/push_msg_to_live', 'LiveConsoleController@pushMsgToLive');
-        Route::get('live_console/push_msg_list', 'LiveConsoleController@pushMsgList');
-        Route::put('live_console/change_push_msg_state', 'LiveConsoleController@changePushMsgState');
+        Route::put('live_console/change_info_status', 'LiveConsoleController@changeInfoState');//开始停止直播
+
+        Route::post('live_console/push_msg_to_live', 'LiveConsoleController@pushMsgToLive');//推送商品
+        Route::get('live_console/push_msg_list', 'LiveConsoleController@pushMsgList');//推送商品记录
+        Route::put('live_console/change_push_msg_state', 'LiveConsoleController@changePushMsgState');//推送记录状态修改
+
+
         //*******************************我的直播部分开始*******************************
 
 

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Live;
 use App\Models\LiveConsole;
+use App\Models\LiveNotice;
 use App\Models\LivePush;
 use Illuminate\Http\Request;
 
@@ -315,8 +316,8 @@ class LiveConsoleController extends Controller
     public function pushMsgToLive(Request $request)
     {
         $params = $request->input();
-        $model = new LiveConsole();
-        $data = $model->pushMsgToLive($params, $this->user['id']);
+        $model = new LivePush();
+        $data = $model->add($params, $this->user['id']);
         return $this->getRes($data);
     }
 
@@ -385,7 +386,7 @@ class LiveConsoleController extends Controller
     {
         $params = $request->input();
         $model = new LivePush();
-        $data = $model->pushMsgList($params, $this->user['id']);
+        $data = $model->list($params, $this->user['id']);
         return $this->getRes($data);
     }
 
@@ -400,17 +401,42 @@ class LiveConsoleController extends Controller
      * @apiParam {number} id 推送记录id
      * @apiParam {string=on,del} flag 操作(取消,删除)
      */
-    public function changePushMsgState(Request $request){
+    public function changePushMsgState(Request $request)
+    {
         $params = $request->input();
         $model = new LivePush();
-        $data = $model->changePushMsgState($params, $this->user['id']);
+        $data = $model->changeState($params, $this->user['id']);
         return $this->getRes($data);
     }
 
-    //todo 直播公告
-    public function liveNotice(Request $request)
-    {
 
+    //todo 添加直播公告
+    public function createLiveNotice(Request $request)
+    {
+        $params = $request->input();
+        $model = new LiveNotice();
+        $data = $model->add($params, $this->user['id']);
+        return $this->getRes($data);
     }
+
+    //todo 直播公告列表
+    public function liveNoticeList(Request $request)
+    {
+        $params = $request->input();
+        $model = new LiveNotice();
+        $data = $model->list($params, $this->user['id']);
+        return $this->getRes($data);
+    }
+
+    //todo 修改直播公告状态
+    public function changeLiveNoticeState(Request $request)
+    {
+        $params = $request->input();
+        $model = new LiveNotice();
+        $data = $model->changeState($params, $this->user['id']);
+        return $this->getRes($data);
+    }
+
+    //todo 禁言
 
 }
