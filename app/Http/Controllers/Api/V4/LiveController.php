@@ -567,7 +567,7 @@ class LiveController extends Controller
     {
         $input  =  $request->all();
         $list   = Live::where('id', $input['id'])->first();
-        if (!Hash::check($input['password'], '$2y$10$5ASiOopyFLJunWOCdfGrfuwDit7NsO.0s3JsWm6dmx8VKPsyTQ/uO')){
+        if (!Hash::check($input['password'], $list->password)){
             return  error('密码无效');
         }
         return  success();
