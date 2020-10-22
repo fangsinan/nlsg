@@ -182,6 +182,9 @@ class LiveConsole extends Base
         if (!is_array($params['list'] ?? '')) {
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
+        if(count($params['list']) != 1){
+            return ['code' => false, 'msg' => '直播时间信息过多'];
+        }
 
         $p_l_time = array_column($params['list'], 'begin_at');
         array_multisort($p_l_time, SORT_ASC, $params['list']);
