@@ -494,7 +494,7 @@ class LiveController extends Controller
      * @apiName  order
      * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/offline/order
-     * @apiParam  {number} id 线下课程id
+     * @apiParam  {number} token 当前用户
      * @apiParam  {number} page 分页
      *
      * @apiSuccess {number} price 支付定金
@@ -531,6 +531,7 @@ class LiveController extends Controller
         $id = $request->get('id');
         $lists = Order::where(['relation_id'=> $id, 'status'=>1, 'type'=>14])
                 ->select('relation_id','price','ordernum','status')
+                ->where('user_id', $this->user['id'])
                 ->paginate(10)
                 ->toArray();
         if ($lists['data']){
