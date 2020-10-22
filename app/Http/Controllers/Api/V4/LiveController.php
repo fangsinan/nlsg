@@ -430,6 +430,7 @@ class LiveController extends Controller
             $list['column_id'] =  $columnId;
             $list['is_sub']    =  $isSub ?? 0;
             $list['level'] = $user->getLevel($userId);
+            $list['welcome'] = '说话都注意点';
 
         }
 
