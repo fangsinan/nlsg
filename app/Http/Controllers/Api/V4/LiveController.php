@@ -590,6 +590,7 @@ class LiveController extends Controller
      * @apiSuccess {string}  ranking.username 用户昵称
      * @apiSuccess {string}  ranking.headimg  用户头像
      * @apiSuccess {string}  ranking.invite_num  邀请数量
+     * @apiSuccess {string}  ranking.is_self  是否是当前用户
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
