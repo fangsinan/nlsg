@@ -165,11 +165,9 @@ class LivePush extends Base
         } else {
             $query = self::whereId($params['id']);
         }
-        $query->where('live_id', '=', $live_id)
+        $list = $query->where('live_id', '=', $live_id)
             ->where('live_info_id', '=', $live_info_id)
-            ->where('is_del', '=', 0);
-
-        $list = $query
+            ->where('is_del', '=', 0)
             ->select([
                 'id', 'live_id', 'live_info_id', 'push_type',
                 'push_gid', 'click_num', 'close_num', 'is_push', 'push_at', 'is_done', 'done_at',

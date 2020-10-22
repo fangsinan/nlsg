@@ -300,13 +300,13 @@ class LiveConsoleController extends Controller
 
 
     /**
-     * 添加(修改)直播的推送消息
-     * @api {post} /api/v4/live_console/push_msg_to_live 添加(修改)直播的推送消息
+     * 推送消息-添加(修改)
+     * @api {post} /api/v4/live_console/push_msg_to_live 推送消息-添加(修改)
      * @apiVersion 4.0.0
      * @apiName /api/v4/live_console/push_msg_to_live
      * @apiGroup  直播画面页
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_console/push_msg_to_live
-     * @apiDescription 添加(修改)直播的推送消息
+     * @apiDescription 推送消息-添加(修改)
      * @apiParam {number} live_id 直播期数id
      * @apiParam {number} ive_info_id 直播场次id
      * @apiParam {number=1,2,3,4,6,7,8} type 类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书)
@@ -322,13 +322,13 @@ class LiveConsoleController extends Controller
     }
 
     /**
-     * 推送消息列表
-     * @api {get} /api/v4/live_console/push_msg_list 推送消息列表
+     * 推送消息-列表
+     * @api {get} /api/v4/live_console/push_msg_list 推送消息-列表
      * @apiVersion 4.0.0
      * @apiName /api/v4/live_console/push_msg_list
      * @apiGroup  直播画面页
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_console/push_msg_list
-     * @apiDescription 推送消息列表
+     * @apiDescription 推送消息-列表
      * @apiParam {number} [page] page
      * @apiParam {number} [size] size
      * @apiParam {number} [id] id(获取单条)
@@ -391,13 +391,13 @@ class LiveConsoleController extends Controller
     }
 
     /**
-     * 推送消息状态修改
-     * @api {put} /api/v4/live_console/change_push_msg_state 推送消息状态修改
+     * 推送消息-状态修改
+     * @api {put} /api/v4/live_console/change_push_msg_state 推送消息-状态修改
      * @apiVersion 4.0.0
      * @apiName /api/v4/live_console/change_push_msg_state
      * @apiGroup  直播画面页
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_console/change_push_msg_state
-     * @apiDescription 推送消息状态修改
+     * @apiDescription 推送消息-状态修改
      * @apiParam {number} id 推送记录id
      * @apiParam {string=on,del} flag 操作(取消,删除)
      */
@@ -409,8 +409,21 @@ class LiveConsoleController extends Controller
         return $this->getRes($data);
     }
 
-
-    //todo 添加直播公告
+    /**
+     * 公告和笔记-添加
+     * @api {post} /api/v4/live_notice/add 公告和笔记-添加
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/live_notice/add
+     * @apiGroup  直播画面页
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_notice/add
+     * @apiDescription 公告和笔记-添加
+     * @apiParam {number} live_id 直播期数id
+     * @apiParam {number} ive_info_id 直播场次id
+     * @apiParam {number=1,2} type 类型(1公告 2笔记)
+     * @apiParam {string} content 内容(最多300字)
+     * @apiParam {number} [length] 公告的持续时长(秒)
+     * @apiParam {string} [send_at] 推送时间,不传默认为下一分钟
+     */
     public function createLiveNotice(Request $request)
     {
         $params = $request->input();
@@ -419,7 +432,53 @@ class LiveConsoleController extends Controller
         return $this->getRes($data);
     }
 
-    //todo 直播公告列表
+    /**
+     * 公告和笔记-列表
+     * @api {get} /api/v4/live_notice/list 公告和笔记-列表
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/live_notice/list
+     * @apiGroup  直播画面页
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_notice/list
+     * @apiDescription 公告和笔记-列表
+     * @apiParam {number} [page] page
+     * @apiParam {number} [size] size
+     * @apiParam {number} [id] id(获取单条)
+     * @apiParam {number} live_id live_id
+     * @apiParam {number} live_info_id live_info_id
+     * @apiParam {number=1,2} [type] 类型(1公告 2笔记)
+     *
+     * @apiSuccess {number} id 推送id
+     * @apiSuccess {number} live_id 直播id
+     * @apiSuccess {number} live_info_id 場次id
+     * @apiSuccess {number} content 内容
+     * @apiSuccess {number} length 时长(秒)
+     * @apiSuccess {number} is_send 是否推送 0已取消
+     * @apiSuccess {string} send_at 预设推送时间
+     * @apiSuccess {number} is_done 是否完成(1完成)
+     * @apiSuccess {string} done_at 完成时间
+     * @apiSuccess {number} is_self 是不是自己的(自己的能编辑删除)
+     *
+     * @apiSuccessExample {json} Request-Example:
+     *{
+     * "code": 200,
+     * "msg": "成功",
+     * "now": 1603350636,
+     * "data": [
+     * {
+     * "id": 350,
+     * "live_id": 224,
+     * "live_info_id": 346,
+     * "content": "笔记法撒旦飞洒",
+     * "length": 300,
+     * "send_at": "2020-10-22 14:55:00",
+     * "is_send": 1,
+     * "is_done": 0,
+     * "done_at": null,
+     * "is_self": 1
+     * }
+     * ]
+     * }
+     */
     public function liveNoticeList(Request $request)
     {
         $params = $request->input();
@@ -427,8 +486,18 @@ class LiveConsoleController extends Controller
         $data = $model->list($params, $this->user['id']);
         return $this->getRes($data);
     }
-
-    //todo 修改直播公告状态
+    
+    /**
+     * 公告和笔记-修改状态
+     * @api {put} /api/v4/live_notice/change_state 公告和笔记-修改状态
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/live_notice/change_state
+     * @apiGroup  直播画面页
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_notice/change_state
+     * @apiDescription 公告和笔记-修改状态
+     * @apiParam {number} id 推送记录id
+     * @apiParam {string=on,del} flag 操作(取消,删除)
+     */
     public function changeLiveNoticeState(Request $request)
     {
         $params = $request->input();

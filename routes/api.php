@@ -229,6 +229,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('live_console/push_msg_list', 'LiveConsoleController@pushMsgList');//推送商品记录
         Route::put('live_console/change_push_msg_state', 'LiveConsoleController@changePushMsgState');//推送记录状态修改
 
+        Route::post('live_notice/add', 'LiveConsoleController@createLiveNotice');
+        Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
+        Route::put('live_notice/change_state', 'LiveConsoleController@changeLiveNoticeState');
 
         //*******************************我的直播部分开始*******************************
 
