@@ -494,11 +494,12 @@ class LiveController extends Controller
      * @apiName  order
      * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/offline/order
-     * @apiParam  {number} id 线下课程id
+     * @apiParam  {number} token 当前用户
      * @apiParam  {number} page 分页
      *
      * @apiSuccess {number} price 支付定金
      * @apiSuccess {number} ordernum 订单号
+     * @apiSuccess {number} status 状态 0 待支付  1已支付  2取消
      * @apiSuccess {string} product  线下课程
      * @apiSuccess {string} product.title 课程标题
      * @apiSuccess {string} product.cover_img 课程封面
@@ -529,7 +530,8 @@ class LiveController extends Controller
     {
         $id = $request->get('id');
         $lists = Order::where(['relation_id'=> $id, 'status'=>1, 'type'=>14])
-                ->select('relation_id','price','ordernum')
+                ->select('relation_id','price','ordernum','status')
+                ->where('user_id', $this->user['id'])
                 ->paginate(10)
                 ->toArray();
         if ($lists['data']){
@@ -567,10 +569,74 @@ class LiveController extends Controller
     {
         $input  =  $request->all();
         $list   = Live::where('id', $input['id'])->first();
-        if (!Hash::check($input['password'], '$2y$10$5ASiOopyFLJunWOCdfGrfuwDit7NsO.0s3JsWm6dmx8VKPsyTQ/uO')){
+        if (!Hash::check($input['password'], $list->password)){
             return  error('密码无效');
         }
         return  success();
+    }
+
+    /**
+     * @api {get} api/v4/live/ranking  排行榜
+     * @apiVersion 4.0.0
+     * @apiName  ranking
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/ranking
+     * @apiParam  {number} live_id 直播id
+     * @apiParam  {number} page 分页
+     *
+     * @apiSuccess {string}  user_ranking 自己排名
+     * @apiSuccess {string}  user_invite_num 自己邀请数量
+     * @apiSuccess {string}  ranking 排行
+     * @apiSuccess {string}  ranking.username 用户昵称
+     * @apiSuccess {string}  ranking.headimg  用户头像
+     * @apiSuccess {string}  ranking.invite_num  邀请数量
+     * @apiSuccess {string}  ranking.is_self  是否是当前用户
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data": {
+                 "user_ranking": 2,
+                 "user_invite_num": 10,
+                 "ranking": [
+                     {
+                         "username": "亚梦想",
+                         "headimg": "/wechat/authorpt/lzh.png",
+                         "invite_num": 30
+                     },
+                     {
+                         "username": "小雨衣",
+                         "headimg": "/wechat/authorpt/lzh.png",
+                         "invite_num": 20
+                     }
+                 ]
+             }
+     *     }
+     *
+     */
+    public  function  ranking()
+    {
+        $data = [
+            'user_ranking'=> 2,
+            'user_invite_num' => 10,
+            'ranking' => [
+                [
+                   'username' => '亚梦想',
+                   'headimg'  => '/wechat/authorpt/lzh.png',
+                   'invite_num'=> 30,
+                   'is_self'  => 1
+                ],
+                [
+                   'username' => '小雨衣',
+                   'headimg'  => '/wechat/authorpt/lzh.png',
+                   'invite_num'=> 20,
+                   'is_self'  => 0
+                ]
+            ]
+        ];
+        return success($data);
     }
 
     /**

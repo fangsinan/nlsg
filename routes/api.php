@@ -289,6 +289,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('live/check_password', 'LiveController@checkLivePassword');
         Route::get('offline/info', 'LiveController@getOfflineInfo');
         Route::get('offline/order', 'LiveController@getOfflineOrder');
+        Route::get('live/ranking', 'LiveController@ranking');
         Route::post('live/retype', 'LiveController@reLiveType');
 
         //通知列表
