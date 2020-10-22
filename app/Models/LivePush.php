@@ -175,7 +175,7 @@ class LivePush extends Base
                 'push_gid', 'click_num', 'close_num', 'is_push', 'push_at', 'is_done', 'done_at',
                 DB::raw("if(user_id=$user_id,1,0) as is_self")
             ])
-            ->with(['infoOfColumn', 'infoOfWorks', 'infoOfGoods', 'infoOfOffline'])
+            ->with(['liveInfo','infoOfColumn', 'infoOfWorks', 'infoOfGoods', 'infoOfOffline'])
             ->orderBy('id', 'desc')
             ->limit($size)
             ->offset(($page - 1) * $size)
@@ -256,6 +256,11 @@ class LivePush extends Base
         return $this->hasOne(OfflineProducts::class, 'id', 'push_gid')
             ->select(['id', 'title', 'subtitle', 'cover_img', 'price',
                 DB::raw('4 as with_type')]);
+    }
+
+    public function liveInfo(){
+        return $this->hasOne(Live::class, 'id', 'live_id')
+            ->select(['id', 'title']);
     }
 
 
