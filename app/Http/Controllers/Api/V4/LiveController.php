@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\LiveConsole;
 use App\Models\LiveForbiddenWords;
 use App\Models\OfflineProducts;
 use App\Models\Subscribe;
@@ -377,6 +378,8 @@ class LiveController extends Controller
      * @apiSuccess {string} info.is_sub 是否订阅专栏
      * @apiSuccess {string} info.is_forbid 是否全体禁言(1禁了,2没禁)
      * @apiSuccess {string} info.level  当前用户等级
+     * @apiSuccess {string} info.is_begin  1是直播中
+     * @apiSuccess {string} info.is_admin  1是管理员(包括创建人和助手) 0不是
      * @apiSuccess {string} info.column_id   专栏id
      * @apiSuccess {string} info.user   用户
      * @apiSuccess {string} info.user.nickname  用户昵称
@@ -415,7 +418,7 @@ class LiveController extends Controller
     {
         $id = $request->get('live_id');
         $list = LiveInfo::with(['user:id,nickname,headimg,intro', 'live:id,title,price,cover_img,content'])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id','begin_at')
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id','begin_at','is_begin')
             ->where('id', $id)
             ->first();
         if ($list) {
@@ -436,6 +439,13 @@ class LiveController extends Controller
                 $list['is_forbid'] = 1;
             }else{
                 $list['is_forbid'] = 0;
+            }
+
+            $is_admin = LiveConsole::isAdmininLive($this->user['id']??0,$list['live_pid']);
+            if($is_admin){
+                $list['is_admin'] = 1;
+            }else{
+                $list['is_admin'] = 0;
             }
 
             $list['column_id'] =  $columnId;
