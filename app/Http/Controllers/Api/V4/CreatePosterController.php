@@ -1058,7 +1058,6 @@ class CreatePosterController extends Controller
                 $m_t_type = 11;
                 break;
             case 22: //三八活动app注册邀请
-                //todo 添加用户标识
                 // $res = $mtModel->createJumpUrl(22, 0, 0, 0);
                 // return $res;
                 return 'https://a.app.qq.com/o/simple.jsp?pkgname=com.huiyujiaoyu.powertime';

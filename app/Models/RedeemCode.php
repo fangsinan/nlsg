@@ -10,7 +10,7 @@ class RedeemCode extends Base
 {
     protected $table = 'nlsg_redeem_code';
 
-    //todo 兑换
+    //兑换
     public function redeem($params, $user)
     {
         $code = $params['code'] ?? '';

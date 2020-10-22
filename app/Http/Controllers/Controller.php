@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\VipUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -24,6 +25,7 @@ class Controller extends BaseController
         $this->user = auth('api')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
+            $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
         }
     }
 
