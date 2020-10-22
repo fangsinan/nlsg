@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\LiveForbiddenWords;
 use App\Models\OfflineProducts;
 use App\Models\Subscribe;
 use Illuminate\Http\Request;
@@ -374,6 +375,7 @@ class LiveController extends Controller
      *
      * @apiSuccess {string} info  直播相关
      * @apiSuccess {string} info.is_sub 是否订阅专栏
+     * @apiSuccess {string} info.is_forbid 是否全体禁言(1禁了,2没禁)
      * @apiSuccess {string} info.level  当前用户等级
      * @apiSuccess {string} info.column_id   专栏id
      * @apiSuccess {string} info.user   用户
@@ -426,6 +428,15 @@ class LiveController extends Controller
             $columnId = $column ?  $column->id : 0;
 
             $isSub = Subscribe::isSubscribe($userId, $columnId, 1);
+
+            $is_forbid = LiveForbiddenWords::where('live_info_id','=',$id)
+                ->where('user_id','=',0)->where('is_forbid','=',1)
+                ->first();
+            if($is_forbid){
+                $list['is_forbid'] = 1;
+            }else{
+                $list['is_forbid'] = 0;
+            }
 
             $list['column_id'] =  $columnId;
             $list['is_sub']    =  $isSub ?? 0;
