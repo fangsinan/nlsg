@@ -582,6 +582,7 @@ class LiveController extends Controller
      * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/ranking
      * @apiParam  {number} live_id 直播id
+     * @apiParam  {number} page 分页
      *
      * @apiSuccess {string}  user_ranking 自己排名
      * @apiSuccess {string}  user_invite_num 自己邀请数量
