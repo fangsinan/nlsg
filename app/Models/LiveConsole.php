@@ -518,9 +518,9 @@ class LiveConsole extends Base
      */
     function getPushUrl($streamName, $time = null)
     {
-        $key = env('LIVE_PUSH_URL');
-        $push_url = env('LIVE_PLAY_URL');
-        $play_url = env('Live_API_KEY');
+        $key = env('Live_API_KEY');
+        $push_url = env('LIVE_PUSH_URL');
+        $play_url = env('LIVE_PLAY_URL');
 
         if ($key && $time) {
             $txTime = strtoupper(base_convert(($time), 10, 16));
