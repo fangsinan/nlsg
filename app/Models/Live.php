@@ -13,22 +13,26 @@ class Live extends Model
         if ( ! $ids) {
             return false;
         }
-        $lists = $this->select('id', 'title', 'describe', 'cover_img', 'start_time', 'end_time')
+        $lists = $this->select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at')
             ->whereIn('id', $ids)
-            ->where('status', 4)
+            ->where('is_del', 0)
             ->orderBy('created_at', 'desc')
             ->get()
             ->toArray();
         if ($lists) {
             foreach ($lists as &$v) {
-                if (strtotime($v['start_time']) > time()) {
-                    $v['live_status'] = '未开始';
+                $channel = LiveInfo::where('live_pid', $v['id'])
+                            ->where('status', 1)
+                            ->orderBy('id','desc')
+                            ->first();
+                if (strtotime($channel['begin_at']) > time()) {
+                   $v['live_status'] = '1';
                 } else {
-                    if (strtotime($v['end_time']) < time()) {
-                        $v['live_status'] = '已结束';
-                    } else {
-                        $v['live_status'] = '正在直播';
-                    }
+                   if (strtotime($channel['end_at']) < time()) {
+                       $v['live_status'] = '2';
+                   } else {
+                       $v['live_status'] = '3';
+                   }
                 }
             }
         }
