@@ -384,7 +384,6 @@ class LiveController extends Controller
      * @apiSuccess {string} info.begin_at   直播开始时间
      * @apiSuccess {string} info.end_at     直播结束时间
      * @apiSuccess {string} info.length     直播时长
-     * @apiSuccess {string} info.is_free    是否免费 0免费 1付费
      * @apiSuccess {string} info.user   用户
      * @apiSuccess {string} info.user.nickname  用户昵称
      * @apiSuccess {string} info.user.headimg   用户头像
@@ -392,6 +391,7 @@ class LiveController extends Controller
      * @apiSuccess {string} info.live   直播
      * @apiSuccess {string} info.live.title   直播标题
      * @apiSuccess {string} info.live.cover_img   直播封面
+     * @apiSuccess {string} info.is_free    是否免费 0免费 1付费
      * @apiSuccess {string} info.live.price        价格
      * @apiSuccess {string} info.live.twitter_money   分销金额
      * @apiSuccess {string} info.live.playback_price   回放金额
