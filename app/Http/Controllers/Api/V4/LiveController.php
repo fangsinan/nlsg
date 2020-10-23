@@ -382,6 +382,7 @@ class LiveController extends Controller
      * @apiSuccess {string} info.is_admin  1是管理员(包括创建人和助手) 0不是
      * @apiSuccess {string} info.column_id   专栏id
      * @apiSuccess {string} info.begin_at   直播开始时间
+     * @apiSuccess {string} info.end_at     直播结束时间
      * @apiSuccess {string} info.length     直播时长
      * @apiSuccess {string} info.is_free    是否免费 0免费 1付费
      * @apiSuccess {string} info.user   用户
