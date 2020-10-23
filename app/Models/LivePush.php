@@ -206,12 +206,13 @@ class LivePush extends Base
                         'id' => 0,
                         'title' => '360幸福大使',
                         'subtitle' => '',
-                        'cover_img' => 'nlsg/poster_img/1581599882211_.pic.jpg',
+                        'cover_img' => ConfigModel::getData(22),
                         'price' => 360,
                         'with_type' => 6
                     ];
                     break;
             }
+
             unset($v['info_of_column'], $v['info_of_works'], $v['info_of_goods'], $v['info_of_offline']);
 
             //todo 统计数据
