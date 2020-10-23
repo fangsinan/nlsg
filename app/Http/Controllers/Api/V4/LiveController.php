@@ -381,10 +381,23 @@ class LiveController extends Controller
      * @apiSuccess {string} info.is_begin  1是直播中
      * @apiSuccess {string} info.is_admin  1是管理员(包括创建人和助手) 0不是
      * @apiSuccess {string} info.column_id   专栏id
+     * @apiSuccess {string} info.begin_at   直播开始时间
+     * @apiSuccess {string} info.length     直播时长
+     * @apiSuccess {string} info.is_free    是否免费 0免费 1付费
      * @apiSuccess {string} info.user   用户
      * @apiSuccess {string} info.user.nickname  用户昵称
      * @apiSuccess {string} info.user.headimg   用户头像
      * @apiSuccess {string} info.user.intro     用户简介
+     * @apiSuccess {string} info.live   直播
+     * @apiSuccess {string} info.live.title   直播标题
+     * @apiSuccess {string} info.live.cover_img   直播封面
+     * @apiSuccess {string} info.live.price        价格
+     * @apiSuccess {string} info.live.twitter_money   分销金额
+     * @apiSuccess {string} info.live.playback_price   回放金额
+     * @apiSuccess {string} info.live.is_show   是否公开 1显示  0不显示
+     * @apiSuccess {string} info.live.helper   助理电话
+     * @apiSuccess {string} info.live.msg      直播预约公告
+     * @apiSuccess {string} info.live.content  直播内容
      * @apiSuccess {string} recommend.list    推荐
      * @apiSuccess {string} recommend.list.title    推荐标题
      * @apiSuccess {string} recommend.list.subtitle 推荐副标题
@@ -417,7 +430,7 @@ class LiveController extends Controller
     public function show(Request $request)
     {
         $id = $request->get('live_id');
-        $list = LiveInfo::with(['user:id,nickname,headimg,intro', 'live:id,title,price,cover_img,content'])
+        $list = LiveInfo::with(['user:id,nickname,headimg,intro', 'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg'])
             ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id','begin_at','is_begin')
             ->where('id', $id)
             ->first();
