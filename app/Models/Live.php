@@ -13,7 +13,7 @@ class Live extends Model
         if ( ! $ids) {
             return false;
         }
-        $lists = $this->select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at')
+        $lists = $this->select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at','price','order_num')
             ->whereIn('id', $ids)
             ->where('is_del', 0)
             ->orderBy('created_at', 'desc')
