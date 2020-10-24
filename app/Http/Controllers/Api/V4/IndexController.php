@@ -118,7 +118,7 @@ class IndexController extends Controller
     {
         $recommendModel = new Recommend();
         $lists = $recommendModel->getIndexRecommend(7, 1);
-        return $this->success($lists);
+        return success($lists);
     }
 
     /**
