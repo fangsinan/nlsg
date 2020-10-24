@@ -93,7 +93,6 @@ class IndexController extends Controller
      * @apiSuccess {string} cover_img   封面
      * @apiSuccess {string} order_num   预约人数
      * @apiSuccess {string} price       预约价格
-     * @apiSuccess {string} live_status 直播状态 1未开始 2已结束 3正在直播
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
