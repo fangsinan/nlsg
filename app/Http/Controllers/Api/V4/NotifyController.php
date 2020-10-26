@@ -29,6 +29,7 @@ class NotifyController extends Controller
      * @apiSuccess {string} create_time 时间
      * @apiSuccess {string} from_user   用户相关
      *
+     *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
      *     {
@@ -36,20 +37,24 @@ class NotifyController extends Controller
      *       "msg" : '成功',
      *         "data": [
              {
-                 "id": 4,
-                 "from_uid": 1,
-                 "to_uid": 303681,
-                 "subject": "喜欢了你的想法",
-                 "source_id": 92,
-                 "created_at": "2020-09-22 11:21:06",
-                 "from_user": {
-                     "id": 1,
-                     "nickname": "测试",
-                     "intro": "",
-                     "headimg": "test.png"
-                 },
-                 "reply": null,
-                 "create_time": "2天前"
+                1.  subject 标题
+                    create_time 时间
+                    chapter  章节
+                    from_user 用户相关
+                2.  subject 标题
+                    content.summary  回复内容
+                    from_user  用户相关
+                    create_time 时间
+                3.  subject 标题
+                    works  作品相关
+                    works.cover_img 封面
+                    works.title 标题
+                4.  subject 标题
+                 content.price  价格
+                 create_time  时间
+                5.  subject 标题
+                 relation_type   5.到期提醒 6.订单提醒 7.审核提醒
+                 create_time 时间
              }
          ]
      *     }
