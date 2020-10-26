@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
+use App\Models\CommentReply;
 use App\Models\Notify;
 use App\Models\User;
 use App\Models\UserFollow;
+use App\Models\Works;
+use App\Models\WorksInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use JPush;
@@ -54,20 +58,25 @@ class NotifyController extends Controller
     public function index(Request $request)
     {
         $type =  $request->input('type') ?? 1;
-        $lists =  Notify::select('id','from_uid','to_uid','subject','content','source_id','created_at')
-                ->with(
-                [
-                    'fromUser:id,nickname,intro,headimg',
-                    'reply:id,content'
-                ])
+        $lists =  Notify::select('id','from_uid','to_uid','subject','content','task_id','source_id','created_at','relation_type','type')
                 ->where(['to_uid'=>$this->user['id'], 'type'=>$type])
                 ->orderBy('created_at', 'desc')
                 ->paginate(10)
                 ->toArray();
         if ($lists['data']){
             foreach ($lists['data'] as &$v) {
-                $v['create_time'] =  Carbon::parse($v['created_at'])->diffForHumans();
+
                 $v['content']     =  !empty($v['content']) ? unserialize($v['content']) : '';
+                $v['create_time'] =  Carbon::parse($v['created_at'])->diffForHumans();
+                if ($v['type'] ==1){
+                    $v['chapter'] = WorksInfo::select('id','title')->where('id', $v['task_id'])->first();
+                    $v['from_user'] = User::select('id','nickname','intro','headimg')->where('id', $v['from_uid'])->first();
+                }elseif ($v['type']==2){
+                    $v['from_user'] = User::select('id','nickname','intro','headimg')->where('id', $v['from_uid'])->first();
+                } elseif ($v['type']==3){
+                    $v['works'] = Works::select('id','cover_img','title')->where('id', $v['source_id'])->first();
+                }
+
             }
         }
         return success($lists['data']);
