@@ -75,6 +75,8 @@ class NotifyController extends Controller
                     $v['from_user'] = User::select('id','nickname','intro','headimg')->where('id', $v['from_uid'])->first();
                 } elseif ($v['type']==3){
                     $v['works'] = Works::select('id','cover_img','title')->where('id', $v['source_id'])->first();
+                } elseif($v['type']==4){
+                    $v['from_user'] = User::select('id','nickname','intro','headimg')->where('id', $v['from_uid'])->first();
                 }
 
             }
