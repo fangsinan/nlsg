@@ -54,7 +54,7 @@ class NotifyController extends Controller
     public function index(Request $request)
     {
         $type =  $request->input('type') ?? 1;
-        $lists =  Notify::select('id','from_uid','to_uid','subject','source_id','created_at')
+        $lists =  Notify::select('id','from_uid','to_uid','subject','content','source_id','created_at')
                 ->with(
                 [
                     'fromUser:id,nickname,intro,headimg',
@@ -67,6 +67,7 @@ class NotifyController extends Controller
         if ($lists['data']){
             foreach ($lists['data'] as &$v) {
                 $v['create_time'] =  Carbon::parse($v['created_at'])->diffForHumans();
+                $v['content']     =  !empty($v['content']) ? unserialize($v['content']) : '';
             }
         }
         return success($lists['data']);
