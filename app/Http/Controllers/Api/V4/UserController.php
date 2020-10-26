@@ -723,17 +723,17 @@ class UserController extends Controller
             $val['worksInfo_name'] = '';
 
 
-            if ($val['column_id']) {
+            if ($val['relation_type'] == 1 or $val['relation_type'] == 2) {
                 $column = Column::find($val['column_id']);
                 $val['column_name'] = $column['name'];
                 $val['column_cover_img'] = $column['cover_img'];
             }
-            if ($val['works_id']) {
+            if ($val['relation_type'] == 3 or $val['relation_type'] == 4) {
                 $works = Works::find($val['works_id']);
                 $val['works_name'] = $works['title'];
                 $val['works_cover_img'] = $works['cover_img'];
             }
-            if ($val['worksinfo_id']) {
+            if ($val['info_id']) {
                 $worksInfo = WorksInfo::find($val['worksinfo_id']);
                 $val['worksInfo_name'] = $worksInfo['title'];
             }
