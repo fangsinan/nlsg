@@ -49,7 +49,12 @@ class SpecialPriceServers
             $query->where('status', '=', intval($params['status']));
         }
 
-        $query->where('status', '<>', 3)->groupBy('group_name')->orderBy('id', 'desc');
+        $list = $query->where('status', '<>', 3)->groupBy('group_name')->orderBy('id', 'desc');
+        foreach($list as $v){
+            if($v->goods_original_price > 0){
+                $v->goodsInfo->original_price = $v->goods_original_price;
+            }
+        }
 
         return $query->with($with)->select($field)->paginate($size);
 
