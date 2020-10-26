@@ -736,6 +736,7 @@ class UserController extends Controller
             if ($val['info_id']) {
                 $worksInfo = WorksInfo::find($val['worksinfo_id']);
                 $val['worksInfo_name'] = $worksInfo['title'];
+                $val['worksInfo_type'] = $worksInfo['type'];
             }
 
 
