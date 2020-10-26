@@ -18,7 +18,7 @@ class NotifyController extends Controller
      * @apiName  list
      * @apiGroup Notify
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/list
-     * @apiParam  type  1喜欢精选  2评论和@ 3活动消息 4更新消息 5收益动态
+     * @apiParam  type  1.喜欢精选  2. 评论和@ 3更新消息 4.收益动态 5.系统消息
      * @apiParam  token  用户认证
      *
      * @apiSuccess {string} subject 标题
@@ -125,7 +125,7 @@ class NotifyController extends Controller
     {
         return  JPush::pushNow('303682', '苹果推送');
     }
-    
+
      /**
      * @api {get} api/v4/notify/systerm 系统消息
      * @apiVersion 4.0.0
