@@ -125,7 +125,9 @@ class NotifyController extends Controller
         $lists = $user->fans()->paginate(10, ['from_uid','to_uid','nickname','headimg'])->toArray();
         if ($lists['data']){
             foreach ($lists['data'] as &$v) {
-                $v['is_follow'] = UserFollow::where(['from_uid'=>$this->user['id'], 'to_uid'=>$v['from_uid']])->count();
+                $list   = UserFollow::where(['from_uid'=>$this->user['id'], 'to_uid'=>$v['from_uid']])->first();
+                $v['is_follow']  =  $list ? 1 : 0;
+                $v['create_time'] =  Carbon::parse($list['created_at'])->diffForHumans();
             }
         }
         return  success($lists['data']);
