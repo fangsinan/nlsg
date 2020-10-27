@@ -270,12 +270,12 @@ class NotifyController extends Controller
         $input = $request->all();
         $list = NotifySettings::where('user_id', $this->user['id'])->first();
         $data = [
-            'is_comment' => $input['is_comment'] ? 1 :0,
-            'is_reply'   => $input['is_reply'] ? 1 :0,
-            'is_like'    => $input['is_like'] ? 1 : 0,
-            'is_fans'    => $input['is_fans'] ? 1 : 0,
-            'is_income'  => $input['is_income'] ? 1 : 0,
-            'is_update'  => $input['is_update'] ? 1 : 0
+            'is_comment' => $input['is_comment'] ?? 0,
+            'is_reply'   => $input['is_reply'] ?? 0,
+            'is_like'    => $input['is_like'] ?? 0,
+            'is_fans'    => $input['is_fans'] ?? 0,
+            'is_income'  => $input['is_income'] ?? 0,
+            'is_update'  => $input['is_update'] ?? 0
         ];
         if (!$list){
             $data['user_id'] = $this->user['id'];
