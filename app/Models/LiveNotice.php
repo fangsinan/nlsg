@@ -79,15 +79,19 @@ class LiveNotice extends Base
                 ->select(['id'])
                 ->first();
 
-            if (empty($params['id'] ?? 0)) {
-                if (!empty($check_push)) {
-                    return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
-                }
-            } else {
-                if ($params['id'] != $check_push->id) {
-                    return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+            //todo 暂时关闭,测试
+            if (0) {
+                if (empty($params['id'] ?? 0)) {
+                    if (!empty($check_push)) {
+                        return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+                    }
+                } else {
+                    if ($params['id'] != $check_push->id) {
+                        return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+                    }
                 }
             }
+
         }
 
         if (empty($params['id'] ?? 0)) {
