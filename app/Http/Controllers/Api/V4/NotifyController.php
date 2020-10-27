@@ -241,7 +241,7 @@ class NotifyController extends Controller
     }
 
     /**
-     * @api {get} api/v4/notify/settings  通知设置
+     * @api {POST} api/v4/notify/settings  通知设置
      * @apiVersion 4.0.0
      * @apiName  settings
      * @apiGroup 通知
