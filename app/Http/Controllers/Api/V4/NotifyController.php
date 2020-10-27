@@ -72,7 +72,7 @@ class NotifyController extends Controller
         if ($lists['data']){
             foreach ($lists['data'] as &$v) {
 
-                $v['content']     =  !empty($v['content']) ? unserialize($v['content']) : '';
+                $v['content']     =  !empty($v['content']) ? unserialize($v['content']) : '{}';
                 $v['create_time'] =  Carbon::parse($v['created_at'])->diffForHumans();
                 if ($v['type'] ==1){
                     $v['chapter'] = WorksInfo::select('id','title')->where('id', $v['task_id'])->first();
