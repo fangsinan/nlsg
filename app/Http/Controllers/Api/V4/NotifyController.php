@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\CommentReply;
 use App\Models\Notify;
+use App\Models\NotifySettings;
 use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\Works;
@@ -20,7 +21,7 @@ class NotifyController extends Controller
      * @api {get} api/v4/notify/list  消息通知
      * @apiVersion 4.0.0
      * @apiName  list
-     * @apiGroup Notify
+     * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/list
      * @apiParam  type  1.喜欢精选  2. 评论和@ 3更新消息 4.收益动态 5.系统消息
      * @apiParam  token  用户认证
@@ -95,7 +96,7 @@ class NotifyController extends Controller
      * @api {get} api/v4/notify/fans 新增粉丝
      * @apiVersion 4.0.0
      * @apiName  fans
-     * @apiGroup Notify
+     * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/fans
      *
      * @apiParam {string}  token
@@ -149,7 +150,7 @@ class NotifyController extends Controller
      * @api {get} api/v4/notify/systerm 系统消息
      * @apiVersion 4.0.0
      * @apiName  systerm
-     * @apiGroup Notify
+     * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/systerm
      *
      * @apiParam {string}  token
@@ -199,7 +200,7 @@ class NotifyController extends Controller
      * @api {get} api/v4/notify/course 更新消息
      * @apiVersion 4.0.0
      * @apiName  course
-     * @apiGroup Notify
+     * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/systerm
      *
      * @apiParam {string}  token
@@ -237,6 +238,52 @@ class NotifyController extends Controller
             }
         }
         return success($lists);
+    }
+
+    /**
+     * @api {get} api/v4/notify/settings  通知设置
+     * @apiVersion 4.0.0
+     * @apiName  settings
+     * @apiGroup 通知
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/settings
+     * @apiParam  {string} token 当前用户
+     * @apiParam  {number} is_comment 是否评论
+     * @apiParam  {number} is_reply   是否回复
+     * @apiParam  {number} is_like   是否精选
+     * @apiParam  {number} is_fans   是否粉丝
+     * @apiParam  {number} is_income 是否收益
+     * @apiParam  {number} is_update 是否更新
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public  function  settings(Request $request)
+    {
+        $input = $request->all();
+        $list = NotifySettings::where('user_id', $this->user['id'])->first();
+        $data = [
+            'is_comment' => $input['is_comment'] ? 1 :0,
+            'is_reply'   => $input['is_reply'] ? 1 :0,
+            'is_like'    => $input['is_like'] ? 1 : 0,
+            'is_fans'    => $input['is_fans'] ? 1 : 0,
+            'is_income'  => $input['is_income'] ? 1 : 0,
+            'is_update'  => $input['is_update'] ? 1 : 0
+        ];
+        if (!$list){
+            $data['user_id'] = $this->user['id'];
+            NotifySettings::create($data);
+        }
+        NotifySettings::where('user_id', $this->user['id'])->update($data);
+
+        return  success();
     }
 
 }

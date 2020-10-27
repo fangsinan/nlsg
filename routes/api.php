@@ -299,6 +299,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('notify/push', 'NotifyController@jpush');
         Route::get('notify/systerm', 'NotifyController@systerm');
         Route::get('notify/course', 'NotifyController@course');
+        Route::post('notify/settings', 'NotifyController@settings');
 
 
     });
