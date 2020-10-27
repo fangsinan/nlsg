@@ -247,12 +247,12 @@ class NotifyController extends Controller
      * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/settings
      * @apiParam  {string} token 当前用户
-     * @apiParam  {number} is_comment 是否评论
-     * @apiParam  {number} is_reply   是否回复
-     * @apiParam  {number} is_like   是否精选
-     * @apiParam  {number} is_fans   是否粉丝
-     * @apiParam  {number} is_income 是否收益
-     * @apiParam  {number} is_update 是否更新
+     * @apiParam  {number} is_comment 是否评论 0 否 1是
+     * @apiParam  {number} is_reply   是否回复  0 否 1是
+     * @apiParam  {number} is_like   是否精选 0 否 1是
+     * @apiParam  {number} is_fans   是否粉丝  0 否 1是
+     * @apiParam  {number} is_income 是否收益 0 否 1是
+     * @apiParam  {number} is_update 是否更新 0 否 1是
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
