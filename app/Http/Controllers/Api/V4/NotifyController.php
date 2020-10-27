@@ -343,7 +343,7 @@ class NotifyController extends Controller
         $list = [
             'is_comment' => $list->is_comment ?? 0,
             'is_reply'   => $list->is_reply ?? 0,
-            'is_like'    => $list->is_fans ?? 0,
+            'is_like'    => $list->is_like ?? 0,
             'is_fans'    => $list->is_fans ?? 0,
             'is_income'  => $list->is_income ?? 0,
             'is_update'  => $list->is_update ?? 0,
