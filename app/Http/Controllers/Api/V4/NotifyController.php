@@ -241,7 +241,7 @@ class NotifyController extends Controller
     }
 
     /**
-     * @api {POST} api/v4/notify/settings  通知设置
+     * @api {POST} api/v4/notify/settings  更新通知设置
      * @apiVersion 4.0.0
      * @apiName  settings
      * @apiGroup 通知
@@ -286,6 +286,24 @@ class NotifyController extends Controller
         return  success();
     }
 
+    /**
+     * @api {get} api/v4/user/notify_settings 用户通知设置
+     * @apiVersion 4.0.0
+     * @apiName  notify_settings
+     * @apiGroup 通知
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/notify_settings*
+     * @apiParam {number} token  当前用户
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
     public  function getNotifySettings()
     {
         $list = NotifySettings::select('is_comment','is_reply','is_like','is_fans','is_income','is_update')
