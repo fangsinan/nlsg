@@ -363,6 +363,12 @@ class UserController extends Controller
      * @apiSuccess {string} headimg  头像
      * @apiSuccess {string} birthday 生日
      * @apiSuccess {string} intro    简介
+     * @apiSuccess {number} like_nun  喜欢精选
+     * @apiSuccess {number} income_num 收益动态
+     * @apiSuccess {number} reply_num   评论@
+     * @apiSuccess {number} fans_num    新增粉丝
+     * @apiSuccess {number} systerm_num  系统通知
+     * @apiSuccess {number} update_num   更新消息
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -381,7 +387,7 @@ class UserController extends Controller
      */
     public function base()
     {
-        $user = User::select(['id', 'nickname', 'sex', 'headimg', 'birthday', 'intro'])
+        $user = User::select(['id', 'nickname', 'sex', 'headimg', 'birthday', 'intro','like_nun','income_num','reply_num','fans_num','systerm_num','update_num'])
             ->where('id', $this->user['id'])
             ->first();
         return success($user);
