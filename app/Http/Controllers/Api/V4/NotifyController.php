@@ -294,6 +294,9 @@ class NotifyController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/notify_settings*
      * @apiParam {number} token  当前用户
      *
+     * @apiSuccess {string} systerm      系统消息
+     * @apiSuccess {string} update       更新消息
+     *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -309,6 +312,12 @@ class NotifyController extends Controller
         $list = NotifySettings::select('is_comment','is_reply','is_like','is_fans','is_income','is_update')
                 ->where('user_id', $this->user['id'])
                 ->first();
+        if ($list){
+            $systerm = Notify::where('type', 5)->orderBy('created_at','desc')->value('subject');
+            $course  =  Notify::where('type', 3)->orderBy('created_at','desc')->value('subject');
+            $list['systerm'] = $systerm ?? '';
+            $list['update']  = $course ?? '';
+        }
         return success($list);
     }
 
