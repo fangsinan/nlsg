@@ -247,12 +247,12 @@ class NotifyController extends Controller
      * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/settings
      * @apiParam  {string} token 当前用户
-     * @apiParam  {number} is_comment 是否评论 0 否 1是
-     * @apiParam  {number} is_reply   是否回复  0 否 1是
-     * @apiParam  {number} is_like   是否精选 0 否 1是
-     * @apiParam  {number} is_fans   是否粉丝  0 否 1是
-     * @apiParam  {number} is_income 是否收益 0 否 1是
-     * @apiParam  {number} is_update 是否更新 0 否 1是
+     * @apiParam  {number} is_comment 是否评论   type=1
+     * @apiParam  {number} is_reply   是否回复  0 否 1是  type=2
+     * @apiParam  {number} is_like   是否精选 0 否 1是  type=3
+     * @apiParam  {number} is_fans   是否粉丝  0 否 1是  type=5
+     * @apiParam  {number} is_income 是否收益 0 否 1是  type=4
+     * @apiParam  {number} is_update 是否更新 0 否 1是  type=6
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -269,18 +269,42 @@ class NotifyController extends Controller
     {
         $input = $request->all();
         $list = NotifySettings::where('user_id', $this->user['id'])->first();
-        $data = [
-            'is_comment' => $input['is_comment'] ?? 0,
-            'is_reply'   => $input['is_reply'] ?? 0,
-            'is_like'    => $input['is_like'] ?? 0,
-            'is_fans'    => $input['is_fans'] ?? 0,
-            'is_income'  => $input['is_income'] ?? 0,
-            'is_update'  => $input['is_update'] ?? 0
-        ];
-        if (!$list){
-            $data['user_id'] = $this->user['id'];
-            NotifySettings::create($data);
+
+        if ($input){
+            switch ($input['type']){
+                case  1 :
+                    $data = [
+                        'is_comment' => $input['is_comment']
+                    ];
+                    break;
+                case  2 :
+                    $data = [
+                        'is_reply' => $input['is_reply']
+                    ];
+                    break;
+                case  3 :
+                    $data = [
+                        'is_like' => $input['is_like']
+                    ];
+                   break;
+                case  4 :
+                    $data = [
+                       'is_income' => $input['is_income']
+                    ];
+                    break;
+                case  5 :
+                    $data = [
+                        'is_fans' => $input['is_fans']
+                    ];
+                   break;
+                case  6 :
+                    $data = [
+                        'is_update' => $input['is_update']
+                    ];
+                  break;
+            }
         }
+
         NotifySettings::where('user_id', $this->user['id'])->update($data);
 
         return  success();
