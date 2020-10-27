@@ -286,4 +286,12 @@ class NotifyController extends Controller
         return  success();
     }
 
+    public  function getNotifySettings()
+    {
+        $list = NotifySettings::select('is_comment','is_reply','is_like','is_fans','is_income','is_update')
+                ->where('user_id', $this->user['id'])
+                ->first();
+        return success($list);
+    }
+
 }

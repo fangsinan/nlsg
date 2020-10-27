@@ -300,6 +300,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('notify/systerm', 'NotifyController@systerm');
         Route::get('notify/course', 'NotifyController@course');
         Route::post('notify/settings', 'NotifyController@settings');
+        Route::get('user/notify_settings', 'NotifyController@getNotifySettings');
 
 
     });
