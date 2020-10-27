@@ -315,9 +315,17 @@ class NotifyController extends Controller
         if ($list){
             $systerm = Notify::where('type', 5)->orderBy('created_at','desc')->value('subject');
             $course  =  Notify::where('type', 3)->orderBy('created_at','desc')->value('subject');
-            $list['systerm'] = $systerm ?? '';
-            $list['update']  = $course ?? '';
         }
+        $list = [
+            'is_comment' => $list->is_comment ?? 0,
+            'is_reply'   => $list->is_reply ?? 0,
+            'is_like'    => $list->is_fans ?? 0,
+            'is_fans'    => $list->is_fans ?? 0,
+            'is_income'  => $list->is_income ?? 0,
+            'is_update'  => $list->is_update ?? 0,
+            'systerm'    => $systerm ?? '',
+            'update'     => $update ?? ''
+        ];
         return success($list);
     }
 
