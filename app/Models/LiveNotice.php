@@ -168,8 +168,8 @@ class LiveNotice extends Base
 
     public function userInfo()
     {
-        return $this->hasOne(User::class, 'user_id', 'id')
-            ->select(['id', 'user_id', 'phone', 'nickname']);
+        return $this->hasOne(User::class, 'id', 'user_id')
+            ->select(['id', 'phone', 'nickname']);
     }
 
     public function changeState($params, $user_id)
