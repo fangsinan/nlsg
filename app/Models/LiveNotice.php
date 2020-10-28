@@ -156,6 +156,7 @@ class LiveNotice extends Base
                 'is_send', 'is_done', 'done_at',
                 DB::raw("if(user_id=$user_id,1,0) as is_self")
             ])
+            ->with(['userInfo'])
             ->orderBy('id', 'desc')
             ->limit($size)
             ->offset(($page - 1) * $size)
@@ -163,6 +164,12 @@ class LiveNotice extends Base
 
         return $list;
 
+    }
+
+    public function userInfo()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id')
+            ->select(['id', 'user_id', 'phone', 'nickname']);
     }
 
     public function changeState($params, $user_id)
