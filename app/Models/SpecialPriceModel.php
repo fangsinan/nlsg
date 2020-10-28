@@ -258,7 +258,7 @@ class SpecialPriceModel extends Base
             ->where('type', '=', 2)
             ->orderBy('begin_time', 'asc')
             ->select(DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d %H:%i:00\') as time'))
-            ->limit(12)
+            ->limit(30)
             ->get()
             ->toArray();
 
