@@ -390,6 +390,9 @@ class MallOrderGroupBuy extends Base
             if($freight_money < 0){
                 $freight_money = 0;
             }
+            if($freight_money == 0){
+                $freight_free_flag = true;
+            }
         }
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
 
