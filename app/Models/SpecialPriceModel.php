@@ -149,9 +149,9 @@ class SpecialPriceModel extends Base
             $sec_date_list = $this->getSecDateList();
 
             $res = self::from('nlsg_special_price as nsp')
+                ->whereIn('begin_time', $sec_date_list)
                 ->where('nsp.type', '=', 2)
                 ->where('nsp.status', '=', 1)
-                ->whereIn('begin_time', $sec_date_list)
                 ->join('nlsg_mall_goods as nmg', function ($join) {
                     $join->on('nsp.goods_id', '=', 'nmg.id')
                         ->where('nmg.status', '=', 2);
@@ -258,7 +258,9 @@ class SpecialPriceModel extends Base
             ->where('type', '=', 2)
             ->orderBy('begin_time', 'asc')
             ->select(DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d %H:%i:00\') as time'))
-            ->get()->toArray();
+            ->limit(12)
+            ->get()
+            ->toArray();
 
         $res = array_unique(array_merge(array_column($list_pass, 'time'), array_column($list, 'time')));
         sort($res);
@@ -342,9 +344,9 @@ class SpecialPriceModel extends Base
         $res = Cache::get($cache_key_name);
         if (empty($res)) {
             $res = self::from('nlsg_special_price as nsp')
+                ->where('end_time', '>=', $now)
                 ->where('nsp.type', '=', 4)
                 ->where('nsp.status', '=', 1)
-                ->where('end_time', '>=', $now)
                 ->join('nlsg_mall_goods as nmg', function ($join) {
                     $join->on('nsp.goods_id', '=', 'nmg.id')
                         ->where('nmg.status', '=', 2);
@@ -423,14 +425,82 @@ class SpecialPriceModel extends Base
     public function goodsInfo()
     {
         return $this->hasOne('App\Models\MallGoods', 'id', 'goods_id')
-            ->select(['id', 'name', 'subtitle', 'status','original_price','price']);
+            ->select(['id', 'name', 'subtitle', 'status', 'original_price', 'price']);
     }
-
 
     public function spSkuList()
     {
         return $this->hasMany('App\Models\SpecialPriceModel', 'group_name', 'group_name')
             ->where('status', '<>', 3)
             ->select(['sku_number', 'group_name']);
+    }
+
+    //临时添加
+    public function tempAdd()
+    {
+        $goods_list = MallSku::from('nlsg_mall_sku as s')
+            ->join('nlsg_mall_goods as g', 's.goods_id', '=', 'g.id')
+            ->where('g.status', '=', 2)
+            ->where('s.status', '=', 1)
+            ->select(['s.goods_id', 's.sku_number', 'g.price as gprice', 's.price as sprice',
+                DB::raw('round(g.price * 0.85,2) as secprice')])
+            ->get()
+            ->toArray();
+
+        $i = 13;
+        $begin_date = date('Y-m-d 09:00:00', time());
+        $day_limit = 0;
+        $now_date = date('Y-m-d H:i:s');
+
+        $add_data = [];
+        while ($day_limit <= 31) {
+            $temp_date = date('Y-m-d H:i:s', strtotime($begin_date . " + $day_limit days"));
+
+            $j = 0;
+            while ($j < $i) {
+                $j_b = $j * 3600;
+                $j_e = ($j + 1) * 3600 - 1;
+                $t_b_time = date('Y-m-d H:i:s', strtotime($temp_date . " + $j_b seconds "));
+                $t_e_time = date('Y-m-d H:i:s', strtotime($temp_date . " + $j_e seconds "));
+
+                $glist = array_rand($goods_list, rand(2, 10));
+
+                foreach ($glist as $v) {
+                    $v = $goods_list[$v];
+
+                    $add_data[] = [
+                        'goods_type' => 1,
+                        'goods_id' => $v['goods_id'],
+                        'goods_price' => $v['secprice'],
+                        'sku_number' => $v['sku_number'],
+                        'stock' => 0,
+                        'sku_price' => $v['secprice'],
+                        'sku_price_black' => $v['secprice'],
+                        'sku_price_yellow' => $v['secprice'],
+                        'sku_price_dealer' => $v['secprice'],
+                        'is_set_t_money' => 1,
+                        't_money' => 0,
+                        't_money_black' => 0,
+                        't_money_yellow' => 0,
+                        't_money_dealer' => 0,
+                        'begin_time' => $t_b_time,
+                        'end_time' => $t_e_time,
+                        'created_at' => $now_date,
+                        'admin_id' => 168934,
+                        'type' => 2,
+                        'use_coupon' => 2,
+                        'updated_at' => $now_date
+                    ];
+                }
+
+                $j++;
+            }
+
+
+            $day_limit++;
+        }
+
+        DB::table('nlsg_special_price')->insert($add_data);
+
     }
 }
