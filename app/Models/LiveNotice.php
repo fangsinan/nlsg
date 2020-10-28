@@ -79,8 +79,9 @@ class LiveNotice extends Base
                 ->select(['id'])
                 ->first();
 
-            //todo 暂时关闭,测试
-            if (0) {
+            //是否对直播公告发送做出1分钟限制
+            $check_send_time = ConfigModel::getData(23);
+            if ($check_send_time) {
                 if (empty($params['id'] ?? 0)) {
                     if (!empty($check_push)) {
                         return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
@@ -91,7 +92,6 @@ class LiveNotice extends Base
                     }
                 }
             }
-
         }
 
         if (empty($params['id'] ?? 0)) {
