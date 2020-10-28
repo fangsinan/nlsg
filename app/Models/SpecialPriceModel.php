@@ -144,7 +144,7 @@ class SpecialPriceModel extends Base
         $expire_num = CacheTools::getExpire('set_kill_list');
 
         $sec_date_list = Cache::get($cache_key_name);
-        if (true || empty($sec_date_list)) {
+        if (empty($sec_date_list)) {
 
             $sec_date_list = $this->getSecDateList();
 
@@ -258,7 +258,6 @@ class SpecialPriceModel extends Base
             ->where('type', '=', 2)
             ->orderBy('begin_time', 'asc')
             ->select(DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d %H:%i:00\') as time'))
-            ->limit(30)
             ->get()
             ->toArray();
 
