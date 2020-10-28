@@ -153,7 +153,7 @@ class LiveNotice extends Base
             ->where('is_del', '=', 0)
             ->select([
                 'id', 'live_id', 'live_info_id', 'content', 'length', 'send_at',
-                'is_send', 'is_done', 'done_at',
+                'is_send', 'is_done', 'done_at','user_id',
                 DB::raw("if(user_id=$user_id,1,0) as is_self")
             ])
             ->with(['userInfo'])
