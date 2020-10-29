@@ -292,6 +292,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('offline/order', 'LiveController@getOfflineOrder');
         Route::get('live/ranking', 'LiveController@ranking');
         Route::post('live/retype', 'LiveController@reLiveType');
+        Route::post('live/free_order', 'LiveController@freeLiveOrder');
 
         //通知列表
         Route::get('notify/list', 'NotifyController@index');

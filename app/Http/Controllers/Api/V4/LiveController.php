@@ -11,11 +11,13 @@ use App\Models\Subscribe;
 use Illuminate\Http\Request;
 use App\Models\Live;
 use App\Models\LiveInfo;
+use App\Models\LiveCountDown;
 use App\Models\User;
 use App\Models\LiveWorks;
 use App\Models\Order;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Redis;
 
 class LiveController extends Controller
 {
@@ -676,6 +678,66 @@ class LiveController extends Controller
         ];
         return success($data);
     }
+    /**
+     * @api {POST} api/v4/live/free_order 免费预约
+     * @apiVersion 4.0.0
+     * @apiName  free_order
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/free_order
+     *
+     * @apiParam {number} live_id 直播间id
+     * @apiParam {number}  token 用户认证
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public  function  freeLiveOrder(Request $request)
+    {
+        $input = $request->all();
+        $live = LiveInfo::where('id', $input['live_id'])->first();
+        if (!$live){
+            return error('直播不存在');
+        }
+
+        $list =  LiveCountDown::where(['live_id'=>$input['live_id'], 'user_id'=>$this->user['id']])
+                 ->first();
+        if($list){
+            return error('已经预约');
+        }
+
+        $user = User::where('id', $this->user['id'])->first();
+        if ($user->phone && preg_match("/^1((34[0-8]\d{7})|((3[0-3|5-9])|(4[5-7|9])|(5[0-3|5-9])|(66)|(7[2-3|5-8])|(8[0-9])|(9[1|8|9]))\d{8})$/", $user->phone)){
+
+            LiveCountDown::create([
+                'live_id' => $input['live_id'],
+                'user_id' => $this->user['id'],
+                'phone'   => $user->phone
+            ]);
+
+            $easySms = app('easysms');
+            try {
+               $result = $easySms->send($user->phone, [
+                   'template' => 'SMS_169114800',
+               ], ['aliyun']);
+
+               return success('发送成功');
+           } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
+               $message = $exception->getResults();
+               return $message;
+           }
+
+        } else {
+            return  error('手机号不存在或者错误');
+        }
+    }
+
 
     /**
      * 重置直播类型
