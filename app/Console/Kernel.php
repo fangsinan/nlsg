@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
-            MallOrderGroupBuy::clear();//拼团失败和退款
+            MallOrderGroupBuy::clear();//拼团超时订单处理和退款
             MallOrder::clear();//超时订单处理
         })->everyMinute();
     }

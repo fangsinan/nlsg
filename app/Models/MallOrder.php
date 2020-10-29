@@ -1534,6 +1534,7 @@ class MallOrder extends Base
             ->select(['id', 'order_id', 'goods_id', 'sku_history']);
     }
 
+    //清理超时普通订单
     public static function clear()
     {
         $now = time();
