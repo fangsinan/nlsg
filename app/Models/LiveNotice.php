@@ -193,7 +193,7 @@ class LiveNotice extends Base
                 break;
             case 'del':
                 if ($check->type == 1) {
-                    if ($check->is_send == 1) {
+                    if ($check->is_done = 0 && $check->is_send == 1) {
                         return ['code' => false, 'msg' => '取消之后删除'];
                     }
                 }
