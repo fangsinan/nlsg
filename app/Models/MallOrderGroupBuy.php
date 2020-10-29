@@ -1024,6 +1024,11 @@ class MallOrderGroupBuy extends Base
     //定时清理未成功订单
     public static function clear()
     {
-        
+
+        //查询过期订单
+
+        //Models\MallOrder.php statusChange  取消订单
+
+
     }
 }

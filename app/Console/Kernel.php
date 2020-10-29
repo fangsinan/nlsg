@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\MallOrder;
 use App\Models\MallOrderGroupBuy;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -28,7 +29,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
-            MallOrderGroupBuy::clear();
+            MallOrderGroupBuy::clear();//拼团失败和退款
+            MallOrder::clear();//超时订单处理
         })->everyMinute();
     }
 

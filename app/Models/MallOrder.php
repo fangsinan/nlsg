@@ -758,12 +758,12 @@ class MallOrder extends Base
         }
 
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
-        if ($freight_money > 0 && $order_price > ConfigModel::getData(1)){
+        if ($freight_money > 0 && $order_price > ConfigModel::getData(1)) {
             $freight_money = $freight_money - ConfigModel::getData(7);
-            if($freight_money < 0){
+            if ($freight_money < 0) {
                 $freight_money = 0;
             }
-            if($freight_money == 0){
+            if ($freight_money == 0) {
                 $freight_free_flag = true;
             }
         }
@@ -1532,6 +1532,21 @@ class MallOrder extends Base
     {
         return $this->hasMany('App\Models\MallOrderDetails', 'order_id', 'id')
             ->select(['id', 'order_id', 'goods_id', 'sku_history']);
+    }
+
+    public static function clear()
+    {
+        $now = time();
+        $time_line = date('Y-m-d H:i:s', $now - 60);
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        DB::table('nlsg_mall_order')
+            ->where('order_type', '=', 1)
+            ->where('status', '=', 1)
+            ->where('is_stop', '=', 0)
+            ->where('dead_time', '<', $time_line)
+            ->update(['is_stop' => 1, 'stop_by' => 0, 'stop_at' => $now_date]);
+
     }
 
 }
