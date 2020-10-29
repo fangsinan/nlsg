@@ -18,7 +18,6 @@ class LiveNotice extends Base
 
     public function add($params, $user_id)
     {
-
         $now_date = date('Y-m-d H:i:00', strtotime(date('Y-m-d H:i:s') . ' +1 minutes'));
         $live_id = $params['live_id'] ?? 0;
         $live_info_id = $params['live_info_id'] ?? 0;
@@ -101,8 +100,10 @@ class LiveNotice extends Base
             if (empty($model)) {
                 return ['code' => false, 'msg' => '需本人修改'];
             }
-            if ($model->is_done == 1) {
-                return ['code' => false, 'msg' => '已经发布,无法修改'];
+            if ($type == 1) {
+                if ($model->is_done == 1) {
+                    return ['code' => false, 'msg' => '已经发布,无法修改'];
+                }
             }
         }
 
