@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\CouponRuleList;
+use App\Models\MallGoodsMsg;
 use Illuminate\Http\Request;
 use App\Models\MallGoods;
 use App\Models\CouponRule;
@@ -964,12 +965,9 @@ class MallController extends Controller
      */
     public function sub(Request $request)
     {
-        $goods_id = $request->input('goods_id', 0);
-        $sku_number = $request->input('sku_number', '');
-        if (!$goods_id) {
-            return $this->error(0, '参数错误');
-        }
-        return $this->success(['code' => true, 'msg' => '成功']);
+        $model = new MallGoodsMsg();
+        $data = $model->add($request->input(), $this->user);
+        return $this->getRes($data);
     }
 
     /**
