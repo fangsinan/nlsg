@@ -211,7 +211,6 @@ class MallOrder extends Base
         return $temp_list;
     }
 
-
     /**
      * 生成订单编号
      * @param $uid 用户id

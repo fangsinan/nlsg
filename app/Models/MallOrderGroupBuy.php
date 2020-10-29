@@ -1024,10 +1024,6 @@ class MallOrderGroupBuy extends Base
     //定时清理未成功订单
     public static function clear()
     {
-        DB::table('nlsg_mall_goods_msg')->insert(
-            ['goods_id' => time(), 'user_id' => 558934,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')]
-        );
+        
     }
 }
