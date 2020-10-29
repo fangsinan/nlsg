@@ -293,6 +293,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('live/ranking', 'LiveController@ranking');
         Route::post('live/retype', 'LiveController@reLiveType');
         Route::post('live/free_order', 'LiveController@freeLiveOrder');
+        Route::post('live/pay_order', 'LiveController@payLiveOrder');
 
         //通知列表
         Route::get('notify/list', 'NotifyController@index');
