@@ -13,7 +13,6 @@ use App\Models\MallCategory;
 use App\Models\Banner;
 use App\Models\SpecialPriceModel;
 use App\Models\RedeemCode;
-use Yansongda\Pay\Gateways\Wechat;
 
 class MallController extends Controller
 {
