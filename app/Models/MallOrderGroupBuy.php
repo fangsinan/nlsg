@@ -385,12 +385,12 @@ class MallOrderGroupBuy extends Base
 
         $order_price = 0;
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
-        if ($freight_money > 0 && $order_price > ConfigModel::getData(1)){
+        if ($freight_money > 0 && $order_price > ConfigModel::getData(1)) {
             $freight_money = $freight_money - ConfigModel::getData(7);
-            if($freight_money < 0){
+            if ($freight_money < 0) {
                 $freight_money = 0;
             }
-            if($freight_money == 0){
+            if ($freight_money == 0) {
                 $freight_free_flag = true;
             }
         }
@@ -1019,5 +1019,15 @@ class MallOrderGroupBuy extends Base
             }
         }
         return $list;
+    }
+
+    //定时清理未成功订单
+    public static function clear()
+    {
+        DB::table('nlsg_mall_goods_msg')->insert(
+            ['goods_id' => time(), 'user_id' => 558934,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')]
+        );
     }
 }
