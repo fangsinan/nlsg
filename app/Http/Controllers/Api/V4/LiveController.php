@@ -679,7 +679,7 @@ class LiveController extends Controller
         return success($data);
     }
     /**
-     * @api {get} api/v4/live/free_order 免费预约
+     * @api {POST} api/v4/live/free_order 免费预约
      * @apiVersion 4.0.0
      * @apiName  free_order
      * @apiGroup 直播
@@ -737,6 +737,8 @@ class LiveController extends Controller
             return  error('手机号不存在或者错误');
         }
     }
+
+
     /**
      * 重置直播类型
      */
