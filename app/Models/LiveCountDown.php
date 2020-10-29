@@ -14,4 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 class LiveCountDown extends Model
 {
     protected $table = 'nlsg_live_count_down';
+
+    protected  $fillable = ['live_id','user_id','phone','is_send','new_vip_uid'];
 }
