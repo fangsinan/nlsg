@@ -153,7 +153,7 @@ class LiveNotice extends Base
             ->where('is_del', '=', 0)
             ->select([
                 'id', 'live_id', 'live_info_id', 'content', 'length', 'send_at',
-                'is_send', 'is_done', 'done_at','user_id',
+                'is_send', 'is_done', 'done_at', 'user_id',
                 DB::raw("if(user_id=$user_id,1,0) as is_self")
             ])
             ->with(['userInfo'])
@@ -180,7 +180,7 @@ class LiveNotice extends Base
         }
         $check = self::whereId($id)->where('user_id', '=', $user_id)
             ->where('is_del', '=', 0)
-            ->select(['id', 'is_send'])
+            ->select(['id', 'is_send', 'type'])
             ->first();
 
         switch ($params['flag'] ?? '') {
@@ -191,9 +191,12 @@ class LiveNotice extends Base
                 $check->is_send = 0;
                 break;
             case 'del':
-                if ($check->is_send == 1) {
-                    return ['code' => false, 'msg' => '取消之后删除'];
+                if ($check->type == 1) {
+                    if ($check->is_send == 1) {
+                        return ['code' => false, 'msg' => '取消之后删除'];
+                    }
                 }
+
                 $check->is_del = 1;
                 break;
             default:
