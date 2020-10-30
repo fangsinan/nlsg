@@ -27,7 +27,6 @@ class MallRefundJob
                 'pr.ordernum', 'pr.price as all_price', 'mrr.price as refund_price'])
             ->get();
 
-
         ini_set('date.timezone', 'Asia/Shanghai');
 
         foreach ($list as $v) {
@@ -43,6 +42,41 @@ class MallRefundJob
                 case 3:
                     //支付宝app
                     $this->aliRefundCheckGrace($v);
+                    break;
+            }
+        }
+    }
+
+    public function mallRefund()
+    {
+        $list = MallRefundRecord::from('nlsg_mall_refund_record as mrr')
+            ->join('nlsg_mall_order as mo', 'mrr.order_id', '=', 'mo.id')
+            ->join('nlsg_pay_record as pr', 'pr.ordernum', '=', 'mo.ordernum')
+            ->where('mrr.run_refund', '=', 1)
+            ->where('pr.order_type', '=', 10)
+            ->limit(100)
+            ->select(['mrr.id as service_id', 'service_num', 'mrr.order_id',
+                'mrr.order_detail_id', 'mrr.type', 'mrr.pay_type',
+                'mrr.status as service_status', 'mrr.user_id', 'pr.transaction_id',
+                'pr.ordernum', 'pr.price as all_price', 'mrr.price as refund_price'])
+            ->get();
+
+        ini_set('date.timezone', 'Asia/Shanghai');
+
+        foreach ($list as $v) {
+            switch ($v->pay_type) {
+                case 1:
+                    //微信公众号
+                    $this->weChatRefund($v, 1);
+                    break;
+                case 2:
+                    //微信app
+                    $this->weChatRefund($v, 2);
+                    break;
+                case 3:
+                    //支付宝app
+//                    $this->aliRefund($v);
+                    $this->aliRefundGrace($v);
                     break;
             }
         }
@@ -162,41 +196,6 @@ class MallRefundJob
         $mrr->refund_fee = $fee;
         $mrr->save();
 
-    }
-
-    public function mallRefund()
-    {
-        $list = MallRefundRecord::from('nlsg_mall_refund_record as mrr')
-            ->join('nlsg_mall_order as mo', 'mrr.order_id', '=', 'mo.id')
-            ->join('nlsg_pay_record as pr', 'pr.ordernum', '=', 'mo.ordernum')
-            ->where('mrr.run_refund', '=', 1)
-            ->where('pr.order_type', '=', 10)
-            ->limit(100)
-            ->select(['mrr.id as service_id', 'service_num', 'mrr.order_id',
-                'mrr.order_detail_id', 'mrr.type', 'mrr.pay_type',
-                'mrr.status as service_status', 'mrr.user_id', 'pr.transaction_id',
-                'pr.ordernum', 'pr.price as all_price', 'mrr.price as refund_price'])
-            ->get();
-
-        ini_set('date.timezone', 'Asia/Shanghai');
-
-        foreach ($list as $v) {
-            switch ($v->pay_type) {
-                case 1:
-                    //微信公众号
-                    $this->weChatRefund($v, 1);
-                    break;
-                case 2:
-                    //微信app
-                    $this->weChatRefund($v, 2);
-                    break;
-                case 3:
-                    //支付宝app
-//                    $this->aliRefund($v);
-                    $this->aliRefundGrace($v);
-                    break;
-            }
-        }
     }
 
     //优雅的支付宝退款

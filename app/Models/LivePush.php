@@ -101,7 +101,7 @@ class LivePush extends Base
         $res = $model->save();
 
         if ($res) {
-            return ['code' => false, 'msg' => '添加成功'];
+            return ['code' => true, 'msg' => '添加成功'];
         } else {
             return ['code' => false, 'msg' => '失败,请重试'];
         }

@@ -28,25 +28,17 @@ class AfterSalesServers
     //售后列表
     public function getList($params)
     {
-
         $size = $params['size'] ?? 10;
         $field = ['id', 'service_num', 'order_id', 'order_detail_id',
             'type', 'num', 'cost_price', 'refe_price', 'price', 'status',
             'user_cancel', 'user_cancel_time', 'created_at'];
 
-        $with = ['infoOrder',
-            'infoOrder.infoOrderDetail',
-            'infoOrder.infoOrderDetail.goodsInfo',
-            'infoDetail',
-            'infoDetail.goodsInfo',
-            'expressInfo'
+        $with = ['infoOrder', 'infoOrder.infoOrderDetail',
+            'infoOrder.infoOrderDetail.goodsInfo', 'infoDetail', 'infoDetail.goodsInfo', 'expressInfo'
         ];
 
-        $query = new M2R();
-
         if ($params['id'] ?? 0) {
-            $query->where('id', '=', $params['id']);
-
+            $query = M2R::whereId($params['id']);
             $field_sup = [
                 'return_address_id', 'picture', 'pass_at', 'check_at',
                 'receive_at', 'succeed_at', 'price', 'reason_id', 'description',
@@ -54,10 +46,9 @@ class AfterSalesServers
                 'is_authenticate_reject', 'authenticate_reject_at',
                 'authenticate_remark', 'express_info_id',
             ];
-
             $field = array_merge($field, $field_sup);
         } else {
-            $query = new M2R();
+            $query = M2R::query();
         }
 
         if ($params['service_num'] ?? 0) {
@@ -108,7 +99,6 @@ class AfterSalesServers
 
         $list = $query->select($field)->with($with)->limit($size)->paginate($size);
 
-
         //如果type=1  读取infoOrder   =2读取infoDetail
         foreach ($list as $k => $v) {
             if ($v->user_cancel == 1 || $v->status = 70) {
@@ -146,7 +136,6 @@ class AfterSalesServers
             }
             unset($list[$k]->infoOrder, $list[$k]->infoDetail);
         }
-
         return $list;
     }
 
