@@ -385,6 +385,15 @@ class MallOrderGroupBuy extends Base
 
         $order_price = 0;
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
+        if ($freight_money > 0 && $order_price > ConfigModel::getData(1)) {
+            $freight_money = $freight_money - ConfigModel::getData(7);
+            if ($freight_money < 0) {
+                $freight_money = 0;
+            }
+            if ($freight_money == 0) {
+                $freight_free_flag = true;
+            }
+        }
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
 
         $price_list = [
@@ -1010,5 +1019,83 @@ class MallOrderGroupBuy extends Base
             }
         }
         return $list;
+    }
+
+    //定时清理未成功订单
+    public static function clear()
+    {
+
+        //查询过期订单
+        $now = time();
+        $time_line = date('Y-m-d H:i:s', $now - 60);
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        $gbl_list = DB::table('nlsg_mall_group_buy_list')
+            ->where('is_captain', '=', 1)
+            ->where('is_success', '=', 0)
+            ->where('is_fail', '=', 0)
+            ->where('end_at', '<', $time_line)
+            ->select(['id', 'group_key', 'order_id'])
+            ->get();
+        if ($gbl_list->isEmpty()) {
+            return true;
+        }
+
+        $gbl_list = $gbl_list->toArray();
+        $gbl_list = array_column($gbl_list, 'group_key');
+
+        $list = MallGroupBuyList::whereIn('group_key', $gbl_list)
+            ->select(['id', 'order_id'])
+            ->get();
+
+        foreach ($list as $v) {
+            DB::beginTransaction();
+
+            //group_buy_list部分
+            $v->is_fail = 1;
+            $v->fail_at = $now_date;
+            $v_res = $v->save();
+            if ($v_res === false) {
+                DB::rollBack();
+                continue;
+            }
+            //mall_order
+            $order_info = MallOrder::whereId($v->order_id)->where('is_stop', '=', 0)->first();
+            if (empty($order_info)) {
+                DB::rollBack();
+                continue;
+            }
+            $order_info->is_stop = 1;
+            $order_info->stop_by = 0;
+            $order_info->stop_at = $now_date;
+            $order_res = $order_info->save();
+            if ($order_res === false) {
+                DB::rollBack();
+                continue;
+            }
+            if ($order_info->status > 1) {
+                //已经支付 需要写入 refund_record表
+                $refund_data['service_num'] = MallOrder::createOrderNumber($order_info->user_id, 2);
+                $refund_data['order_id'] = $order_info->id;
+                $refund_data['order_detail_id'] = 0;
+                $refund_data['type'] = 4;
+                $refund_data['pay_type'] = $order_info->pay_type;
+                $refund_data['refe_price'] = $order_info->pay_price;
+                $refund_data['status'] = 10;
+                $refund_data['user_id'] = $order_info->user_id;
+                $refund_data['created_at'] = $now_date;
+                $refund_data['updated_at'] = $now_date;
+                $refund_res = DB::table('nlsg_mall_refund_record')->insert($refund_data);
+                if ($refund_res === false) {
+                    DB::rollBack();
+                    continue;
+                }
+            }
+
+            DB::commit();
+            return true;
+        }
+
+
     }
 }

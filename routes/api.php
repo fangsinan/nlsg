@@ -292,6 +292,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('offline/order', 'LiveController@getOfflineOrder');
         Route::get('live/ranking', 'LiveController@ranking');
         Route::post('live/retype', 'LiveController@reLiveType');
+        Route::post('live/free_order', 'LiveController@freeLiveOrder');
+        Route::post('live/pay_order', 'LiveController@payLiveOrder');
 
         //通知列表
         Route::get('notify/list', 'NotifyController@index');
@@ -299,6 +301,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('notify/push', 'NotifyController@jpush');
         Route::get('notify/systerm', 'NotifyController@systerm');
         Route::get('notify/course', 'NotifyController@course');
+        Route::post('notify/settings', 'NotifyController@settings');
+        Route::get('user/notify_settings', 'NotifyController@getNotifySettings');
 
 
     });

@@ -6,16 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\LiveConsole;
 use App\Models\LiveForbiddenWords;
+use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Subscribe;
 use Illuminate\Http\Request;
 use App\Models\Live;
 use App\Models\LiveInfo;
+use App\Models\LiveCountDown;
 use App\Models\User;
 use App\Models\LiveWorks;
 use App\Models\Order;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Redis;
 
 class LiveController extends Controller
 {
@@ -107,18 +110,19 @@ class LiveController extends Controller
     public function index()
     {
         $liveLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','playback_price','is_free','password')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
+                'playback_price', 'is_free', 'password')
             ->where('status', 4)
             ->orderBy('begin_at', 'desc')
             ->limit(3)
             ->get()
             ->toArray();
-        if (!empty($liveLists)) {
+        if ( ! empty($liveLists)) {
             foreach ($liveLists as &$v) {
                 $channel = LiveInfo::where('live_pid', $v['id'])
-                            ->where('status', 1)
-                            ->orderBy('id','desc')
-                            ->first();
+                    ->where('status', 1)
+                    ->orderBy('id', 'desc')
+                    ->first();
                 if (strtotime($channel['begin_at']) > time()) {
                     $v['live_status'] = '1';
                 } else {
@@ -128,16 +132,17 @@ class LiveController extends Controller
                         $v['live_status'] = '3';
                     }
                 }
-                if ($v['type']==1){
+                if ($v['type'] == 1) {
                     $v['id'] = $channel->id;
                 }
                 $v['is_password'] = $v['password'] ? 1 : 0;
-                $v['live_time']   = date('Y.m.d H:i', strtotime($v['begin_at']));
+                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
 
         $backLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type','playback_price','is_free','password')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'playback_price',
+                'is_free', 'password')
             ->where('end_at', '>', Carbon::now()->toDateTimeString())
             ->where('status', 4)
             ->orderBy('created_at', 'desc')
@@ -147,16 +152,16 @@ class LiveController extends Controller
         if ( ! empty($backLists)) {
             foreach ($backLists as &$v) {
                 $v['is_password'] = $v['password'] ? 1 : 0;
-                $v['live_time']   = date('Y.m.d H:i', strtotime($v['begin_at']));
+                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
         }
 
-        $offline =  OfflineProducts::where('is_del', 0)
-                    ->select('id','title','subtitle','total_price', 'price','cover_img')
-                    ->orderBy('created_at','desc')
-                    ->limit(3)
-                    ->get()
-                    ->toArray();
+        $offline = OfflineProducts::where('is_del', 0)
+            ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get()
+            ->toArray();
 
         $liveWork = new LiveWorks();
         $recommend = $liveWork->getLiveWorks(0, 1, 3);
@@ -209,7 +214,8 @@ class LiveController extends Controller
     public function getLiveLists()
     {
         $lists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','playback_price','is_free','password')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
+                'playback_price', 'is_free', 'password')
             ->where('status', 4)
             ->orderBy('begin_at', 'desc')
             ->paginate(10)
@@ -217,9 +223,9 @@ class LiveController extends Controller
         if ( ! empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
                 $channel = LiveInfo::where('live_pid', $v['id'])
-                            ->where('status', 1)
-                            ->orderBy('id','desc')
-                            ->first();
+                    ->where('status', 1)
+                    ->orderBy('id', 'desc')
+                    ->first();
                 if (strtotime($channel['begin_at']) > time()) {
                     $v['live_status'] = '1';
                 } else {
@@ -229,7 +235,7 @@ class LiveController extends Controller
                         $v['live_status'] = '3';
                     }
                 }
-                if ($v['type']==1){
+                if ($v['type'] == 1) {
                     $v['id'] = $channel->id;
                 }
                 $v['is_password'] = $v['password'] ? 1 : 0;
@@ -278,7 +284,8 @@ class LiveController extends Controller
     public function getLiveBackLists()
     {
         $lists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type','is_free','playback_price','is_free','password')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'is_free',
+                'playback_price', 'is_free', 'password')
             ->where('end_at', '>', Carbon::now()->toDateTimeString())
             ->where('status', 4)
             ->orderBy('created_at', 'desc')
@@ -388,6 +395,7 @@ class LiveController extends Controller
      * @apiSuccess {string} info.user.nickname  用户昵称
      * @apiSuccess {string} info.user.headimg   用户头像
      * @apiSuccess {string} info.user.intro     用户简介
+     * @apiSuccess {string} info.is_password  是否需要密码 0 不需要 1需要
      * @apiSuccess {string} info.live   直播
      * @apiSuccess {string} info.live.title   直播标题
      * @apiSuccess {string} info.live.cover_img   直播封面
@@ -433,8 +441,11 @@ class LiveController extends Controller
     public function show(Request $request)
     {
         $id = $request->get('live_id');
-        $list = LiveInfo::with(['user:id,nickname,headimg,intro', 'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push'])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id','begin_at','is_begin')
+        $list = LiveInfo::with([
+            'user:id,nickname,headimg,intro',
+            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password'
+        ])
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin')
             ->where('id', $id)
             ->first();
         if ($list) {
@@ -444,30 +455,31 @@ class LiveController extends Controller
             $userId = $this->user['id'] ?? 0;
             $user = new User();
 
-            $columnId = $column ?  $column->id : 0;
+            $columnId = $column ? $column->id : 0;
 
             $isSub = Subscribe::isSubscribe($userId, $columnId, 1);
 
-            $is_forbid = LiveForbiddenWords::where('live_info_id','=',$id)
-                ->where('user_id','=',0)->where('is_forbid','=',1)
+            $is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
+                ->where('user_id', '=', 0)->where('is_forbid', '=', 1)
                 ->first();
-            if($is_forbid){
+            if ($is_forbid) {
                 $list['is_forbid'] = 1;
-            }else{
+            } else {
                 $list['is_forbid'] = 0;
             }
 
-            $is_admin = LiveConsole::isAdmininLive($this->user['id']??0,$list['live_pid']);
-            if($is_admin){
+            $is_admin = LiveConsole::isAdmininLive($this->user['id'] ?? 0, $list['live_pid']);
+            if ($is_admin) {
                 $list['is_admin'] = 1;
-            }else{
+            } else {
                 $list['is_admin'] = 0;
             }
 
-            $list['column_id'] =  $columnId;
-            $list['is_sub']    =  $isSub ?? 0;
+            $list['column_id'] = $columnId;
+            $list['is_sub'] = $isSub ?? 0;
             $list['level'] = $user->getLevel($userId);
             $list['welcome'] = '说话都注意点';
+            $list['is_password'] = $list->live->password ? 1 : 0;
 
         }
 
@@ -518,11 +530,11 @@ class LiveController extends Controller
      *     }
      *
      */
-    public  function   getOfflineInfo(Request $request)
+    public function getOfflineInfo(Request $request)
     {
-        $id =  $request->get('id');
-        $list = OfflineProducts::where(['id'=>$id, 'is_del'=>0])
-                ->first();
+        $id = $request->get('id');
+        $list = OfflineProducts::where(['id' => $id, 'is_del' => 0])
+            ->first();
         return success($list);
     }
 
@@ -550,32 +562,32 @@ class LiveController extends Controller
      *       "msg" : '成功',
      *       "data":[
      *               {
-                     "relation_id": 1,
-                     "price": "99.00",
-                     "ordernum": "20091100211190416747499",
-                     "product": {
-                         "id": 1,
-                         "title": "经营能量线下品牌课",
-                         "cover_img": "/live/jynl/jynltjlb.jpg",
-                         "total_price": "1000.00"
-                     }
-                 }
+     * "relation_id": 1,
+     * "price": "99.00",
+     * "ordernum": "20091100211190416747499",
+     * "product": {
+     * "id": 1,
+     * "title": "经营能量线下品牌课",
+     * "cover_img": "/live/jynl/jynltjlb.jpg",
+     * "total_price": "1000.00"
+     * }
+     * }
      *         ]
      *     }
      *
      */
-    public  function getOfflineOrder(Request $request)
+    public function getOfflineOrder(Request $request)
     {
         $id = $request->get('id');
-        $lists = Order::where(['relation_id'=> $id, 'status'=>1, 'type'=>14])
-                ->select('relation_id','price','ordernum','status')
-                ->where('user_id', $this->user['id'])
-                ->paginate(10)
-                ->toArray();
-        if ($lists['data']){
+        $lists = Order::where(['relation_id' => $id, 'status' => 1, 'type' => 14])
+            ->select('relation_id', 'price', 'ordernum', 'status')
+            ->where('user_id', $this->user['id'])
+            ->paginate(10)
+            ->toArray();
+        if ($lists['data']) {
             foreach ($lists['data'] as &$v) {
                 $product = OfflineProducts::where('id', $v['relation_id'])
-                    ->select('id','title','cover_img','total_price')
+                    ->select('id', 'title', 'cover_img', 'total_price')
                     ->first();
                 $v['product'] = $product ?? [];
             }
@@ -603,14 +615,14 @@ class LiveController extends Controller
      *     }
      *
      */
-    public  function  checkLivePassword(Request $request)
+    public function checkLivePassword(Request $request)
     {
-        $input  =  $request->all();
-        $list   = Live::where('id', $input['id'])->first();
-        if (!Hash::check($input['password'], $list->password)){
-            return  error('密码无效');
+        $input = $request->all();
+        $list = Live::where('id', $input['id'])->first();
+        if ( ! Hash::check($input['password'], $list->password)) {
+            return error(1000,'密码无效');
         }
-        return  success();
+        return success();
     }
 
     /**
@@ -636,43 +648,168 @@ class LiveController extends Controller
      *       "code": 200,
      *       "msg" : '成功',
      *       "data": {
-                 "user_ranking": 2,
-                 "user_invite_num": 10,
-                 "ranking": [
-                     {
-                         "username": "亚梦想",
-                         "headimg": "/wechat/authorpt/lzh.png",
-                         "invite_num": 30
-                     },
-                     {
-                         "username": "小雨衣",
-                         "headimg": "/wechat/authorpt/lzh.png",
-                         "invite_num": 20
-                     }
-                 ]
-             }
+     * "user_ranking": 2,
+     * "user_invite_num": 10,
+     * "ranking": [
+     * {
+     * "username": "亚梦想",
+     * "headimg": "/wechat/authorpt/lzh.png",
+     * "invite_num": 30
+     * },
+     * {
+     * "username": "小雨衣",
+     * "headimg": "/wechat/authorpt/lzh.png",
+     * "invite_num": 20
+     * }
+     * ]
+     * }
      *     }
      *
      */
-    public  function  ranking()
+    public function ranking()
     {
         $data = [
-            'user_ranking'=> 2,
+            'user_ranking'    => 2,
             'user_invite_num' => 10,
-            'ranking' => [
+            'ranking'         => [
                 [
-                   'username' => '亚梦想',
-                   'headimg'  => '/wechat/authorpt/lzh.png',
-                   'invite_num'=> 30,
-                   'is_self'  => 1
+                    'username'   => '亚梦想',
+                    'headimg'    => '/wechat/authorpt/lzh.png',
+                    'invite_num' => 30,
+                    'is_self'    => 1
                 ],
                 [
-                   'username' => '小雨衣',
-                   'headimg'  => '/wechat/authorpt/lzh.png',
-                   'invite_num'=> 20,
-                   'is_self'  => 0
+                    'username'   => '小雨衣',
+                    'headimg'    => '/wechat/authorpt/lzh.png',
+                    'invite_num' => 20,
+                    'is_self'    => 0
                 ]
             ]
+        ];
+        return success($data);
+    }
+
+    /**
+     * @api {POST} api/v4/live/free_order 免费预约
+     * @apiVersion 4.0.0
+     * @apiName  free_order
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/free_order
+     *
+     * @apiParam {number} live_id 直播间id
+     * @apiParam {number}  token 用户认证
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function freeLiveOrder(Request $request)
+    {
+        $input = $request->all();
+        $live = LiveInfo::where('id', $input['live_id'])->first();
+        if ( ! $live) {
+            return error('直播不存在');
+        }
+
+        $list = LiveCountDown::where(['live_id' => $input['live_id'], 'user_id' => $this->user['id']])
+            ->first();
+        if ($list) {
+            return error('已经预约');
+        }
+
+        $user = User::where('id', $this->user['id'])->first();
+        if ($user->phone && preg_match("/^1((34[0-8]\d{7})|((3[0-3|5-9])|(4[5-7|9])|(5[0-3|5-9])|(66)|(7[2-3|5-8])|(8[0-9])|(9[1|8|9]))\d{8})$/",
+                $user->phone)) {
+
+            LiveCountDown::create([
+                'live_id' => $input['live_id'],
+                'user_id' => $this->user['id'],
+                'phone'   => $user->phone
+            ]);
+
+            $easySms = app('easysms');
+            try {
+                $result = $easySms->send($user->phone, [
+                    'template' => 'SMS_169114800',
+                ], ['aliyun']);
+
+                return success('发送成功');
+            } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
+                $message = $exception->getResults();
+                return $message;
+            }
+
+        } else {
+            return error('手机号不存在或者错误');
+        }
+    }
+
+    /**
+     * @api {post} api/v4/live/pay_order 付费预约
+     * @apiVersion 4.0.0
+     * @apiName  pay_order
+     * @apiGroup 直播
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/pay_order
+     *
+     * @apiParam {number} live 直播房间id
+     * @apiParam {number} token 当前用户
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function payLiveOrder(Request $request)
+    {
+        $input = $request->all();
+        $tweeterCode =  $input['tweeter_code'] ?? 0;
+        $liveId =  $input['live_id'] ?? 0;
+        $osType =  $input['os_type'] ?? 1;
+        $payType =  $input['pay_type'] ?? 0;
+        $model   = new Order();
+        $checked = $model->addOrderCheck($this->user['id'], $tweeterCode, $liveId, 3);
+        if ($checked['code'] == 0) {
+            return error($checked['msg']);
+        }
+        // 校验推客id是否有效
+        $tweeter_code = $checked['tweeter_code'];
+        $list = LiveInfo::with('live:id,title,price,twitter_money,is_free')
+                ->where('id', $input['live_id'])
+                ->first();
+        if ( ! $list) {
+            return error('直播不存在');
+        }
+
+        $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
+        $data = [
+            'ordernum'    => $ordernum,
+            'type'        => 10,
+            'user_id'     => $this->user['id'],
+            'relation_id' => $liveId,
+            'cost_price'  => $list->live->price,
+            'price'       => $list->live->price,
+            'twitter_id'  => $tweeter_code,
+            'coupon_id'   => 0,
+            'ip'          => $request->getClientIp(),
+            'os_type'     => $osType,
+            'live_id'     => $liveId,
+            'pay_type'    => $payType,
+
+        ];
+        $order = Order::firstOrCreate($data);
+        $data = [
+            'order_id' => $order['id']
         ];
         return success($data);
     }

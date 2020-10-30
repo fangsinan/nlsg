@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\CommentReply;
 use App\Models\Notify;
+use App\Models\NotifySettings;
 use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\Works;
@@ -20,7 +21,7 @@ class NotifyController extends Controller
      * @api {get} api/v4/notify/list  消息通知
      * @apiVersion 4.0.0
      * @apiName  list
-     * @apiGroup Notify
+     * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/list
      * @apiParam  type  1.喜欢精选  2. 评论和@ 3更新消息 4.收益动态 5.系统消息
      * @apiParam  token  用户认证
@@ -71,7 +72,7 @@ class NotifyController extends Controller
         if ($lists['data']){
             foreach ($lists['data'] as &$v) {
 
-                $v['content']     =  !empty($v['content']) ? unserialize($v['content']) : '';
+                $v['content']     =  !empty($v['content']) ? unserialize($v['content']) : new \StdClass();
                 $v['create_time'] =  Carbon::parse($v['created_at'])->diffForHumans();
                 if ($v['type'] ==1){
                     $v['chapter'] = WorksInfo::select('id','title')->where('id', $v['task_id'])->first();
@@ -95,7 +96,7 @@ class NotifyController extends Controller
      * @api {get} api/v4/notify/fans 新增粉丝
      * @apiVersion 4.0.0
      * @apiName  fans
-     * @apiGroup Notify
+     * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/fans
      *
      * @apiParam {string}  token
@@ -149,7 +150,7 @@ class NotifyController extends Controller
      * @api {get} api/v4/notify/systerm 系统消息
      * @apiVersion 4.0.0
      * @apiName  systerm
-     * @apiGroup Notify
+     * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/systerm
      *
      * @apiParam {string}  token
@@ -199,7 +200,7 @@ class NotifyController extends Controller
      * @api {get} api/v4/notify/course 更新消息
      * @apiVersion 4.0.0
      * @apiName  course
-     * @apiGroup Notify
+     * @apiGroup 通知
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/systerm
      *
      * @apiParam {string}  token
@@ -237,6 +238,119 @@ class NotifyController extends Controller
             }
         }
         return success($lists);
+    }
+
+    /**
+     * @api {POST} api/v4/notify/settings  更新通知设置
+     * @apiVersion 4.0.0
+     * @apiName  settings
+     * @apiGroup 通知
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/notify/settings
+     * @apiParam  {string} token 当前用户
+     * @apiParam  {number} is_comment 是否评论   type=1
+     * @apiParam  {number} is_reply   是否回复  0 否 1是  type=2
+     * @apiParam  {number} is_like   是否精选 0 否 1是  type=3
+     * @apiParam  {number} is_fans   是否粉丝  0 否 1是  type=5
+     * @apiParam  {number} is_income 是否收益 0 否 1是  type=4
+     * @apiParam  {number} is_update 是否更新 0 否 1是  type=6
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public  function  settings(Request $request)
+    {
+        $input = $request->all();
+        $list = NotifySettings::where('user_id', $this->user['id'])->first();
+
+        if ($input){
+            switch ($input['type']){
+                case  1 :
+                    $data = [
+                        'is_comment' => $input['is_comment']
+                    ];
+                    break;
+                case  2 :
+                    $data = [
+                        'is_reply' => $input['is_reply']
+                    ];
+                    break;
+                case  3 :
+                    $data = [
+                        'is_like' => $input['is_like']
+                    ];
+                   break;
+                case  4 :
+                    $data = [
+                       'is_income' => $input['is_income']
+                    ];
+                    break;
+                case  5 :
+                    $data = [
+                        'is_fans' => $input['is_fans']
+                    ];
+                   break;
+                case  6 :
+                    $data = [
+                        'is_update' => $input['is_update']
+                    ];
+                  break;
+            }
+        }
+
+        NotifySettings::where('user_id', $this->user['id'])->update($data);
+
+        return  success();
+    }
+
+    /**
+     * @api {get} api/v4/user/notify_settings 用户通知设置
+     * @apiVersion 4.0.0
+     * @apiName  notify_settings
+     * @apiGroup 通知
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/notify_settings*
+     * @apiParam {number} token  当前用户
+     *
+     * @apiSuccess {string} systerm      系统消息
+     * @apiSuccess {string} update       更新消息
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public  function getNotifySettings()
+    {
+        $list = NotifySettings::select('is_comment','is_reply','is_like','is_fans','is_income','is_update')
+                ->where('user_id', $this->user['id'])
+                ->first();
+        if ($list){
+            $systerm = Notify::where('type', 5)->orderBy('created_at','desc')->value('subject');
+            $course  =  Notify::where('type', 3)->orderBy('created_at','desc')->value('subject');
+        }
+        $list = [
+            'is_comment' => $list->is_comment ?? 0,
+            'is_reply'   => $list->is_reply ?? 0,
+            'is_like'    => $list->is_like ?? 0,
+            'is_fans'    => $list->is_fans ?? 0,
+            'is_income'  => $list->is_income ?? 0,
+            'is_update'  => $list->is_update ?? 0,
+            'systerm'    => $systerm ?? '',
+            'update'     => $update ?? ''
+        ];
+        return success($list);
     }
 
 }

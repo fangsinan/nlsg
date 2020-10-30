@@ -68,7 +68,8 @@ class SearchController extends Controller
         $flag = $request->input('flag','');
         if($flag == 'only_goods'){
             $hot_search = \App\Models\ConfigModel::getData(20);
-            $hot_search = explode(',',$hot_search);
+            $hot_search = json_decode($hot_search);
+            //$hot_search = explode(',',$hot_search);
         }else{
             $hot_search = Search::groupBy('keywords')->orderBy('num','desc')->limit(6)->get();
         }

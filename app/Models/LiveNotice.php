@@ -18,7 +18,6 @@ class LiveNotice extends Base
 
     public function add($params, $user_id)
     {
-
         $now_date = date('Y-m-d H:i:00', strtotime(date('Y-m-d H:i:s') . ' +1 minutes'));
         $live_id = $params['live_id'] ?? 0;
         $live_info_id = $params['live_info_id'] ?? 0;
@@ -79,13 +78,17 @@ class LiveNotice extends Base
                 ->select(['id'])
                 ->first();
 
-            if (empty($params['id'] ?? 0)) {
-                if (!empty($check_push)) {
-                    return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
-                }
-            } else {
-                if ($params['id'] != $check_push->id) {
-                    return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+            //是否对直播公告发送做出1分钟限制
+            $check_send_time = ConfigModel::getData(23);
+            if ($check_send_time) {
+                if (empty($params['id'] ?? 0)) {
+                    if (!empty($check_push)) {
+                        return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+                    }
+                } else {
+                    if ($params['id'] != $check_push->id) {
+                        return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+                    }
                 }
             }
         }
@@ -97,8 +100,10 @@ class LiveNotice extends Base
             if (empty($model)) {
                 return ['code' => false, 'msg' => '需本人修改'];
             }
-            if ($model->is_done == 1) {
-                return ['code' => false, 'msg' => '已经发布,无法修改'];
+            if ($type == 1) {
+                if ($model->is_done == 1) {
+                    return ['code' => false, 'msg' => '已经发布,无法修改'];
+                }
             }
         }
 
@@ -138,27 +143,42 @@ class LiveNotice extends Base
         }
 
         if (empty($params['id'] ?? 0)) {
-            $query = new self();
+            $query = self::query();
         } else {
             $query = self::whereId($params['id']);
         }
 
-        $list = $query->where('live_id', '=', $live_id)
+        $query->where('live_id', '=', $live_id)
             ->where('live_info_id', '=', $live_info_id)
             ->where('type', '=', $type)
             ->where('is_del', '=', 0)
             ->select([
                 'id', 'live_id', 'live_info_id', 'content', 'length', 'send_at',
-                'is_send', 'is_done', 'done_at',
+                'is_send', 'is_done', 'done_at', 'user_id', 'type',
                 DB::raw("if(user_id=$user_id,1,0) as is_self")
             ])
-            ->orderBy('id', 'desc')
-            ->limit($size)
+            ->with(['userInfo']);
+
+        switch ($params['ob'] ?? '') {
+            case 't_asc':
+                $query->orderBy('id', 'asc');
+                break;
+            default:
+                $query->orderBy('id', 'desc');
+        }
+
+        $list = $query->limit($size)
             ->offset(($page - 1) * $size)
             ->get();
 
         return $list;
 
+    }
+
+    public function userInfo()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id')
+            ->select(['id', 'phone', 'nickname']);
     }
 
     public function changeState($params, $user_id)
@@ -169,7 +189,7 @@ class LiveNotice extends Base
         }
         $check = self::whereId($id)->where('user_id', '=', $user_id)
             ->where('is_del', '=', 0)
-            ->select(['id', 'is_send'])
+            ->select(['id', 'is_send', 'type'])
             ->first();
 
         switch ($params['flag'] ?? '') {
@@ -180,9 +200,12 @@ class LiveNotice extends Base
                 $check->is_send = 0;
                 break;
             case 'del':
-                if ($check->is_send == 1) {
-                    return ['code' => false, 'msg' => '取消之后删除'];
+                if ($check->type == 1) {
+                    if ($check->is_done = 0 && $check->is_send == 1) {
+                        return ['code' => false, 'msg' => '取消之后删除'];
+                    }
                 }
+
                 $check->is_del = 1;
                 break;
             default:
