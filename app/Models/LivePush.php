@@ -165,7 +165,7 @@ class LivePush extends Base
         } else {
             $query = self::whereId($params['id']);
         }
-        $query->where('live_id', '=', $live_id)
+        $query = $query->where('live_id', '=', $live_id)
             ->where('live_info_id', '=', $live_info_id)
             ->where('is_del', '=', 0)
             ->select([
@@ -177,10 +177,10 @@ class LivePush extends Base
 
         switch ($params['ob'] ?? '') {
             case 't_asc':
-                $query->orderBy('id', 'asc');
+                $query = $query->orderBy('id', 'asc');
                 break;
             default:
-                $query->orderBy('id', 'desc');
+                $query = $query->orderBy('id', 'desc');
         }
 
         $list = $query->limit($size)
