@@ -408,6 +408,7 @@ class LiveController extends Controller
      * @apiSuccess {string} info.live.describe  直播简介
      * @apiSuccess {string} info.live.content  直播内容
      * @apiSuccess {string} info.live.can_push  允许推送 1允许 2不允许
+     * @apiSuccess {string} info.live.password  是否需要密码
      * @apiSuccess {string} recommend.list    推荐
      * @apiSuccess {string} recommend.list.title    推荐标题
      * @apiSuccess {string} recommend.list.subtitle 推荐副标题
@@ -442,9 +443,9 @@ class LiveController extends Controller
         $id = $request->get('live_id');
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro',
-            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push'
+            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password'
         ])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'password')
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin')
             ->where('id', $id)
             ->first();
         if ($list) {
