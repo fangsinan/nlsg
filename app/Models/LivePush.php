@@ -86,8 +86,8 @@ class LivePush extends Base
             if (empty($model)) {
                 return ['code' => false, 'msg' => '需本人修改'];
             }
-            if($model->is_done == 1){
-                return ['code'=>false,'msg'=>'已经推送,无法修改'];
+            if ($model->is_done == 1) {
+                return ['code' => false, 'msg' => '已经推送,无法修改'];
             }
         }
 
@@ -165,7 +165,7 @@ class LivePush extends Base
         } else {
             $query = self::whereId($params['id']);
         }
-        $list = $query->where('live_id', '=', $live_id)
+        $query->where('live_id', '=', $live_id)
             ->where('live_info_id', '=', $live_info_id)
             ->where('is_del', '=', 0)
             ->select([
@@ -173,9 +173,17 @@ class LivePush extends Base
                 'push_gid', 'click_num', 'close_num', 'is_push', 'push_at', 'is_done', 'done_at',
                 DB::raw("if(user_id=$user_id,1,0) as is_self")
             ])
-            ->with(['liveInfo','infoOfColumn', 'infoOfWorks', 'infoOfGoods', 'infoOfOffline'])
-            ->orderBy('id', 'desc')
-            ->limit($size)
+            ->with(['liveInfo', 'infoOfColumn', 'infoOfWorks', 'infoOfGoods', 'infoOfOffline']);
+
+        switch ($params['ob'] ?? '') {
+            case 't_asc':
+                $query->orderBy('id', 'asc');
+                break;
+            default:
+                $query->orderBy('id', 'desc');
+        }
+
+        $list = $query->limit($size)
             ->offset(($page - 1) * $size)
             ->get();
 
@@ -258,7 +266,8 @@ class LivePush extends Base
                 DB::raw('4 as with_type')]);
     }
 
-    public function liveInfo(){
+    public function liveInfo()
+    {
         return $this->hasOne(Live::class, 'id', 'live_id')
             ->select(['id', 'title']);
     }
