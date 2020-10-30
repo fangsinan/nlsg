@@ -535,4 +535,19 @@ class MallOrderFlashSale extends Base
         }
     }
 
+    //清理超时的秒杀订单
+    public static function clear()
+    {
+        $now = time();
+        $time_line = date('Y-m-d H:i:s', $now - 60);
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        DB::table('nlsg_mall_order')
+            ->where('order_type', '=', 2)
+            ->where('status', '=', 1)
+            ->where('is_stop', '=', 0)
+            ->where('dead_time', '<', $time_line)
+            ->update(['is_stop' => 1, 'stop_by' => 0, 'stop_at' => $now_date, 'is_del' => 1, 'del_at' => $now_date]);
+
+    }
 }

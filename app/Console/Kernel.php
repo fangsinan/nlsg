@@ -3,10 +3,11 @@
 namespace App\Console;
 
 use App\Models\MallOrder;
+use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\DB;
+
 
 class Kernel extends ConsoleKernel
 {
@@ -29,9 +30,10 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
-            MallOrderGroupBuy::clear();//拼团超时订单处理和退款
             MallOrder::clear();//超时订单处理
-        })->everyMinute();
+            MallOrderGroupBuy::clear();//拼团超时订单处理和退款登记
+            MallOrderFlashSale::clear();//秒杀订单处理
+        })->everyMinute();//每分
     }
 
     /**
