@@ -620,7 +620,7 @@ class LiveController extends Controller
         $input = $request->all();
         $list = Live::where('id', $input['id'])->first();
         if ( ! Hash::check($input['password'], $list->password)) {
-            return error('密码无效');
+            return error(1000,'密码无效');
         }
         return success();
     }
