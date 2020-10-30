@@ -395,6 +395,7 @@ class LiveController extends Controller
      * @apiSuccess {string} info.user.nickname  用户昵称
      * @apiSuccess {string} info.user.headimg   用户头像
      * @apiSuccess {string} info.user.intro     用户简介
+     * @apiSuccess {string} info.is_password  是否需要密码 0 不需要 1需要
      * @apiSuccess {string} info.live   直播
      * @apiSuccess {string} info.live.title   直播标题
      * @apiSuccess {string} info.live.cover_img   直播封面
@@ -408,7 +409,6 @@ class LiveController extends Controller
      * @apiSuccess {string} info.live.describe  直播简介
      * @apiSuccess {string} info.live.content  直播内容
      * @apiSuccess {string} info.live.can_push  允许推送 1允许 2不允许
-     * @apiSuccess {string} info.live.password  是否需要密码
      * @apiSuccess {string} recommend.list    推荐
      * @apiSuccess {string} recommend.list.title    推荐标题
      * @apiSuccess {string} recommend.list.subtitle 推荐副标题
@@ -479,6 +479,7 @@ class LiveController extends Controller
             $list['is_sub'] = $isSub ?? 0;
             $list['level'] = $user->getLevel($userId);
             $list['welcome'] = '说话都注意点';
+            $list['is_password'] = $list->live->password ? 1 : 0;
 
         }
 
@@ -619,7 +620,7 @@ class LiveController extends Controller
         $input = $request->all();
         $list = Live::where('id', $input['id'])->first();
         if ( ! Hash::check($input['password'], $list->password)) {
-            return error('密码无效');
+            return error(1000,'密码无效');
         }
         return success();
     }
