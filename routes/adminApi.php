@@ -2,6 +2,8 @@
 
 //后台
 Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
+
+    Route::get('class/column', 'ClassController@column');
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');
     Route::post('mall_order/send', 'MallOrderController@send');
@@ -17,7 +19,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('goods/category_list', 'GoodsController@categoryList');
 
     //活动管理
-    Route::post('active/add', 'ActiveController@add');
+    Route::post('active/add', 'ActiveCont3` roller@add');
     Route::get('active/list', 'ActiveController@list');
     Route::post('active/binding', 'ActiveController@binding');
     Route::put('active/status_change', 'ActiveController@statusChange');
