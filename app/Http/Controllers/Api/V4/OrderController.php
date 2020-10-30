@@ -295,7 +295,7 @@ class OrderController extends Controller
         $reward_type= $request->input('reward_type',0);  //打赏类型
         $os_type    = $request->input('os_type',0);
         $pay_type    = $request->input('pay_type',0);
-        $live_id = !empty($params['live_id']) ? intval($params['live_id']) : 0;
+        $live_pid = !empty($params['live_id']) ? intval($params['live_id']) : 0;
 
         $user_id    = $this->user['id'];
 
@@ -317,13 +317,10 @@ class OrderController extends Controller
         if (empty($loginUserInfo)) {
             return $this->error(0,'用户有误');
         }
-        $live_pid = 0;
-        if($live_id){
-            $live_pid = LiveInfo::find($live_id);
-            $live_pid = $live_pid['live_pid'];
-        }
-        //处理订单
 
+        //处理订单
+        //礼物 1 鲜花 1   2爱心 5.21   3书籍  18.88   4咖啡  36
+        //  5 送花  1元   6比心 5元  7独角兽 10元  8跑车  58元  9飞机 88元  10火箭 188元
         $price = 1;
         switch ($reward) {
             case 1:$price = 1;
@@ -333,6 +330,18 @@ class OrderController extends Controller
             case 3:$price = 18.88;
                 break;
             case 4:$price = 36;
+                break;
+            case 5:$price = 1;
+                break;
+            case 6:$price = 5;
+                break;
+            case 7:$price = 10;
+                break;
+            case 8:$price = 58;
+                break;
+            case 9:$price = 88;
+                break;
+            case 10:$price = 188;
                 break;
         }
 
