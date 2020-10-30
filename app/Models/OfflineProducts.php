@@ -11,7 +11,7 @@ class OfflineProducts extends Base
 
     static function search($keywords)
     {
-        $res = OfflineProducts::select('id', 'name', 'subtitle', 'original_price total_price', 'price', 'picture cover_img')
+        $res = OfflineProducts::select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
             ->where('is_del', 0)
             ->where(function ($query) use ($keywords) {
                 $query->orWhere('title', 'LIKE', "%$keywords%");
