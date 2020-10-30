@@ -444,7 +444,7 @@ class LiveController extends Controller
             'user:id,nickname,headimg,intro',
             'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push'
         ])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin')
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'password')
             ->where('id', $id)
             ->first();
         if ($list) {
@@ -749,7 +749,7 @@ class LiveController extends Controller
     }
 
     /**
-     * @api {get} api/v4/live/pay_order 付费预约
+     * @api {post} api/v4/live/pay_order 付费预约
      * @apiVersion 4.0.0
      * @apiName  pay_order
      * @apiGroup 直播
