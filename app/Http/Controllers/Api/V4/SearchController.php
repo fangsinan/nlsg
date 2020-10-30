@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\MallGoods;
+use App\Models\OfflineProducts;
 use App\Models\Search;
 use App\Models\Wiki;
 use App\Models\Works;
@@ -435,6 +436,10 @@ class SearchController extends Controller
             //用户
             //商品
             $res['goods'] = MallGoods::search($keywords);
+            //线下门票
+            $res['products'] = OfflineProducts::search($keywords);
+            $res['new_vip'] = [ 'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/poster_img/1581599882211_.pic.jpg'];
+
         }
 
 
