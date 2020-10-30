@@ -468,6 +468,8 @@ class LiveController extends Controller
                 $list['is_forbid'] = 0;
             }
 
+            $is_appmt = LiveCountDown::where(['user_id'=> $this->user['id'], 'live_id'=>$id])->first();
+            $list['is_appmt'] = $is_appmt ? 1 : 0;
             $is_admin = LiveConsole::isAdmininLive($this->user['id'] ?? 0, $list['live_pid']);
             if ($is_admin) {
                 $list['is_admin'] = 1;
