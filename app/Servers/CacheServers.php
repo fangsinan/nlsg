@@ -25,4 +25,7 @@ class CacheServers
         Cache::tags(['goods_list', 'goods_sp_list_1', 'goods_price'])->flush();
     }
 
+
+    //coupon_rule_list  商品优惠券的缓存
+
 }

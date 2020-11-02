@@ -76,6 +76,7 @@ class CouponRule extends Base
                             }
                         }
                     }
+                    break;
                 case 2:
                     //过滤掉不限制的
                     foreach ($res as $k => $v) {
@@ -83,6 +84,7 @@ class CouponRule extends Base
                             unset($res[$k]);
                         }
                     }
+                    break;
                 default:
                     //排除掉不能用于该商品的
                     foreach ($res as $k => $v) {
@@ -113,38 +115,38 @@ class CouponRule extends Base
                     DB::raw('count(id) as counts')
                 ])->groupBy('cr_id')->get();
 
-
             if ($get_list->isEmpty()) {
                 $get_list = [];
             } else {
                 $get_list = $get_list->toArray();
             }
 
-            //根据优惠券的restrict判断
-            foreach ($res as $k => $v) {
-                switch (intval($v->restrict)) {
-                    case 1:
-                        foreach ($get_list as $glv) {
-                            if ($v->id == $glv['cr_id']) {
-                                $v->can_use = 0;
-                            }
+        }
+
+        //根据优惠券的restrict判断
+        foreach ($res as $k => $v) {
+            switch (intval($v->restrict)) {
+                case 1:
+                    foreach ($get_list as $glv) {
+                        if ($v->id == $glv['cr_id']) {
+                            $v->can_use = 0;
                         }
-                        break;
-                    case 2:
-                        foreach ($get_list as $glv) {
-                            if ($v->id == $glv['cr_id'] && $glv['created_at'] >= date('Y-m-d')) {
-                                $v->can_use = 0;
-                            }
+                    }
+                    break;
+                case 2:
+                    foreach ($get_list as $glv) {
+                        if ($v->id == $glv['cr_id'] && $glv['created_at'] >= date('Y-m-d')) {
+                            $v->can_use = 0;
                         }
-                        break;
-                    case 3:
-                        foreach ($get_list as $glv) {
-                            if ($v->id == $glv['cr_id'] && $v->hold_max_num >= $glv['counts']) {
-                                $v->can_use = 0;
-                            }
+                    }
+                    break;
+                case 3:
+                    foreach ($get_list as $glv) {
+                        if ($v->id == $glv['cr_id'] && $v->hold_max_num >= $glv['counts']) {
+                            $v->can_use = 0;
                         }
-                        break;
-                }
+                    }
+                    break;
             }
         }
 
