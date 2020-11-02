@@ -391,13 +391,6 @@ class UserController extends Controller
         $user = User::select(['id', 'nickname', 'sex', 'headimg', 'birthday', 'intro','like_nun','income_num','reply_num','fans_num','systerm_num','update_num'])
             ->where('id', $this->user['id'])
             ->first();
-        if ($user){
-            $is_live =LiveUserPrivilege::where('user_id', $this->user['id'])
-                ->where('privilege', 2)
-                ->where('is_del', 0)
-                ->first();
-            $user['is_live']= $is_live ? 1 : 0;
-        }
         return success($user);
     }
 
@@ -911,6 +904,11 @@ class UserController extends Controller
                 ->find($uid);
         if ($lists) {
             $lists->phone = substr_replace($lists->phone, '****', 3, 4);
+            $is_live = LiveUserPrivilege::where('user_id', $this->user['id'])
+                           ->where('privilege', 2)
+                           ->where('is_del', 0)
+                           ->first();
+            $lists['is_live']= $is_live ? 1 : 0;
         }
         return success($lists);
     }
