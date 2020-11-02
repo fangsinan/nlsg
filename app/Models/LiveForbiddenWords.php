@@ -8,6 +8,7 @@
 
 namespace App\Models;
 
+use App\Servers\JobServers;
 use Illuminate\Database\Eloquent\Model;
 
 
@@ -63,6 +64,7 @@ class LiveForbiddenWords extends Base
         if ($res === false) {
             return ['code' => false, 'msg' => '失败'];
         } else {
+            JobServers::pushToSocket($live_id, $live_info_id, 9);
             return ['code' => true, 'msg' => '成功'];
         }
 

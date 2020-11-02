@@ -9,6 +9,7 @@
 
 namespace App\Models;
 
+use App\Servers\JobServers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -26,8 +27,8 @@ class LivePush extends Base
         $push_gid = $params['gid'] ?? 0;
         $push_at = $params['time'] ?? 0;
         $now = time();
-        $now_date = date('Y-m-d H:i:s',$now);
-        $check_date = date('Y-m-d H:i:s',$now + 10);
+        $now_date = date('Y-m-d H:i:s', $now);
+        $check_date = date('Y-m-d H:i:s', $now + 10);
 
         if (empty($live_id) || empty($live_info_id) || empty($push_gid) || empty($push_type)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -103,6 +104,7 @@ class LivePush extends Base
         $res = $model->save();
 
         if ($res) {
+            JobServers::pushToSocket($live_id, $live_info_id, 6);
             return ['code' => true, 'msg' => '添加成功'];
         } else {
             return ['code' => false, 'msg' => '失败,请重试'];
@@ -118,7 +120,7 @@ class LivePush extends Base
         }
         $check = self::whereId($id)->where('user_id', '=', $user_id)
             ->where('is_del', '=', 0)
-            ->select(['id', 'is_push'])
+            ->select(['id', 'is_push', 'live_id', 'live_info_id'])
             ->first();
 
         switch ($params['flag'] ?? '') {
@@ -140,6 +142,7 @@ class LivePush extends Base
 
         $res = $check->save();
         if ($res) {
+            JobServers::pushToSocket($check->live_id, $check->live_info_id, 6);
             return ['code' => true, 'msg' => '成功'];
         } else {
             return ['code' => false, 'msg' => '失败'];

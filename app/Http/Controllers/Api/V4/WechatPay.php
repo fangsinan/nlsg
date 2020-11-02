@@ -16,6 +16,7 @@ use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\Works;
 use App\Models\MallOrder;
+use App\Servers\JobServers;
 use Illuminate\Support\Facades\DB;
 
 class WechatPay extends Controller
@@ -676,6 +677,9 @@ class WechatPay extends Controller
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
                 if ($orderRst && $recordRst && $userRst) {
+                    if (!empty($orderInfo['live_id'])){
+                        JobServers::pushToSocket($orderInfo['live_id'], $orderInfo['relation_id'], 12);
+                    }
                     DB::commit();
                     return true;
                 } else {
