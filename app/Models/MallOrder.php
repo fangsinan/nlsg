@@ -1273,9 +1273,9 @@ class MallOrder extends Base
         ];
 
         if ($data['status'] == 1) {
-            $price_list_new[] = ['key' => '应付金额', 'value' => $data['price']];
+            $price_list_new[] = ['key' => '应付金额', 'value' => '¥'.$data['price']];
         } else {
-            $price_list_new[] = ['key' => '实付金额', 'value' => $data['pay_price']];
+            $price_list_new[] = ['key' => '实付金额', 'value' => '¥'.$data['pay_price']];
         }
 
         foreach ($price_list_new as $new_k => $new_v) {
