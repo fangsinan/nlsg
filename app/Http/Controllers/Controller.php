@@ -40,7 +40,7 @@ class Controller extends BaseController
         return response()->json($result);
     }
 
-    protected function error($code, $msg = '',$data='')
+    protected function error($code, $msg = '', $data = '')
     {
         $result = [
             'code' => $code,
@@ -51,10 +51,15 @@ class Controller extends BaseController
         return response()->json($result);
     }
 
-    protected function getRes($data){
+    protected function getRes($data)
+    {
         if (($data['code'] ?? true) === false) {
             $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
-            return $this->error(0, $data['msg'] . $ps);
+            $temp = new class {
+            };
+            $temp->code = false;
+            $temp->msg = $data['msg'];
+            return $this->error(0, $data['msg'] . $ps, $temp);
         } else {
             return $this->success($data);
         }
