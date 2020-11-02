@@ -149,8 +149,13 @@ class LiveController extends Controller
             ->toArray();
         if ( ! empty($backLists)) {
             foreach ($backLists as &$v) {
+                $channel = LiveInfo::where('live_pid', $v['id'])
+                                    ->where('status', 1)
+                                    ->orderBy('id', 'desc')
+                                    ->first();
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+                $v['info_id']   = $channel->id;
             }
         }
 
