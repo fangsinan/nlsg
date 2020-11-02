@@ -295,7 +295,7 @@ class OrderController extends Controller
         $reward_type= $request->input('reward_type',0);  //打赏类型
         $os_type    = $request->input('os_type',0);
         $pay_type    = $request->input('pay_type',0);
-        $live_pid = !empty($params['live_id']) ? intval($params['live_id']) : 0;
+        $live_pid = $request->input('live_id',0);
 
         $user_id    = $this->user['id'];
 
@@ -784,7 +784,7 @@ class OrderController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/order/reward/user
      * @apiParam {number} id 相关id
      * @apiParam {number} type 类型 3想法 4百科
-     * 
+     *
      * @apiSuccess {string} reward_num 数量
      * @apiSuccess {string} user    送花的用户
      * @apiSuccess {string} user.nickname   送花的用户昵称
@@ -797,7 +797,7 @@ class OrderController extends Controller
      *       "msg" : '成功',
      *     "data": {
      *     }
-     * 
+     *
      */
     public function  getRewardUser(Request $request)
     {
