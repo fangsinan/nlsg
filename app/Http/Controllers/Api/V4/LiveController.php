@@ -451,7 +451,7 @@ class LiveController extends Controller
             'user:id,nickname,headimg,intro',
             'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password'
         ])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin')
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin','is_finish')
             ->where('id', $id)
             ->first();
         if ($list) {
