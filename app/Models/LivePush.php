@@ -33,7 +33,7 @@ class LivePush extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        if (empty($push_at) || strtotime($push_at) === false || $push_at < $check_date) {
+        if (empty($push_at) || strtotime($push_at) === false) {
             return ['code' => false, 'msg' => '时间错误'];
         }
 
