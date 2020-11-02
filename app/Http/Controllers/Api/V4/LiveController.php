@@ -765,7 +765,7 @@ class LiveController extends Controller
      * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/pay_order
      *
-     * @apiParam {number} live 直播房间id
+     * @apiParam {number} live_id 直播房间id
      * @apiParam {number} token 当前用户
      *
      * @apiSuccessExample  Success-Response:
