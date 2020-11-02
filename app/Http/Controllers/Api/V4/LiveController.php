@@ -474,6 +474,18 @@ class LiveController extends Controller
                 $list['is_forbid'] = 0;
             }
 
+            $is_silence = LiveForbiddenWords::where('live_info_id','=',$id)
+                ->where('user_id','=',$this->user['id'])
+                ->where('is_forbid','=',1)
+                ->select(['id','forbid_at','length'])
+                ->first();
+            if($is_silence){
+                $list['is_silence'] = intval(strtotime($is_silence->forbid_at))+intval($is_silence->length)-time();
+                $list['is_silence'] = $list['is_silence'] < 0 ? 0: $list['is_silence'];
+            }else{
+                $list['is_silence'] = 0;
+            }
+
             $is_appmt = LiveCountDown::where(['user_id'=> $this->user['id'], 'live_id'=>$id])->first();
             $list['is_appmt'] = $is_appmt ? 1 : 0;
             $is_admin = LiveConsole::isAdmininLive($this->user['id'] ?? 0, $list['live_pid']);
