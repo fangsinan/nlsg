@@ -132,9 +132,7 @@ class LiveController extends Controller
                         $v['live_status'] = '3';
                     }
                 }
-                if ($v['type'] == 1) {
-                    $v['id'] = $channel->id;
-                }
+                $v['info_id']     = $channel->id;
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
