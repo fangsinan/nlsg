@@ -291,6 +291,11 @@ class LiveController extends Controller
             foreach ($lists['data'] as &$v) {
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+                $channel = LiveInfo::where('live_pid', $v['id'])
+                                  ->where('status', 1)
+                                  ->orderBy('id', 'desc')
+                                  ->first();
+                $v['info_id']  = $channel->id;
             }
         }
         return success($lists['data']);
