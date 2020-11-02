@@ -274,6 +274,7 @@ class GoodsServers
     public function list($params)
     {
         $size = $params['size'] ?? 10;
+        $flag = $params['flag'] ?? 0;
 
         $query = MallGoods::from('nlsg_mall_goods');
 
@@ -294,7 +295,7 @@ class GoodsServers
             'freight_id'];
 
         $with = [];
-        if ($params['id'] ?? 0) {
+        if ($params['id'] ?? 0 && $flag != 'simple') {
             $field[] = 'content';
             $field[] = 'view_num';
             $field[] = 'collection_num';
@@ -302,10 +303,16 @@ class GoodsServers
             $with[] = 'tos_bind_list.tos';
             $with[] = 'picture_list';
         }
-        $with[] = 'category_list';
-        $with[] = 'categoryStr';
-        $with[] = 'categoryStr.categoryParent';
-        $with[] = 'categoryStr.categoryParent.categoryParent';
+
+        if ($flag != 'simple') {
+            $with[] = 'category_list';
+            $with[] = 'categoryStr';
+            $with[] = 'categoryStr.categoryParent';
+            $with[] = 'categoryStr.categoryParent.categoryParent';
+            $with[] = 'sku_list_back';
+            $with[] = 'sku_list_back.sku_value_list';
+            $with[] = 'category_list';
+        }
 
         switch ($params['ob'] ?? 'default') {
             case 'new_asc':
@@ -327,13 +334,15 @@ class GoodsServers
                 $query->orderBy('price', 'desc');
                 break;
         }
-        $query->orderBy('id', 'desc');
+        $query->orderBy('id', 'desc')->with($with)->select($field);
 
-        $with[] = 'sku_list_back';
-        $with[] = 'sku_list_back.sku_value_list';
-        $with[] = 'category_list';
+        if($flag == 'simple'){
+            $query->where('status','=',2);
+            $list = $query->get();
+        }else{
+            $list = $query->paginate($size);
+        }
 
-        $list = $query->with($with)->select($field)->paginate($size);
         foreach ($list as $k => $v) {
             $v->category_string = ($v->categoryStr->categoryParent->categoryParent->id ?? 0) . ',' .
                 ($v->categoryStr->categoryParent->id ?? 0) . ',' .
