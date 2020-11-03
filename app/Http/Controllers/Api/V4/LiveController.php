@@ -515,6 +515,7 @@ class LiveController extends Controller
             $list['is_sub_column'] = $isSub ?? 0;
             $list['level'] = $user->getLevel($userId);
             $list['welcome'] = '说话都注意点';
+            $list['nick_name']   = $this->user['nickname'] ?? '';
             $list['is_password'] = $list->live->password ? 1 : 0;
 
         }
