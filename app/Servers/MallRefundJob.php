@@ -267,6 +267,7 @@ class MallRefundJob
         );
         $data['sign'] = self::sign_data($data, $config['key']); //加密串
         $xml = self::ToXml($data); //数据包拼接
+        dd($data);
         $res = self::postXmlCurl($config['refund_url'], $xml, 1);
         libxml_disable_entity_loader(true);
         if (!$res) {
