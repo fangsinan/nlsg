@@ -295,7 +295,7 @@ class GoodsServers
             'freight_id'];
 
         $with = [];
-        if ($params['id'] ?? 0 && $flag != 'simple') {
+        if (!empty($params['id'] ?? 0) && $flag !== 'simple') {
             $field[] = 'content';
             $field[] = 'view_num';
             $field[] = 'collection_num';
@@ -304,7 +304,7 @@ class GoodsServers
             $with[] = 'picture_list';
         }
 
-        if ($flag != 'simple') {
+        if ($flag !== 'simple') {
             $with[] = 'category_list';
             $with[] = 'categoryStr';
             $with[] = 'categoryStr.categoryParent';
@@ -336,7 +336,7 @@ class GoodsServers
         }
         $query->orderBy('id', 'desc')->with($with)->select($field);
 
-        if($flag == 'simple'){
+        if($flag === 'simple'){
             $query->where('status','=',2);
             $list = $query->get();
         }else{
