@@ -309,10 +309,11 @@ class GoodsServers
             $with[] = 'categoryStr';
             $with[] = 'categoryStr.categoryParent';
             $with[] = 'categoryStr.categoryParent.categoryParent';
-            $with[] = 'sku_list_back';
-            $with[] = 'sku_list_back.sku_value_list';
             $with[] = 'category_list';
         }
+
+        $with[] = 'sku_list_back';
+        $with[] = 'sku_list_back.sku_value_list';
 
         switch ($params['ob'] ?? 'default') {
             case 'new_asc':
