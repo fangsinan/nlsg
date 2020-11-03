@@ -137,10 +137,10 @@ class LiveNotice extends Base
         if (empty($live_id) || empty($live_info_id)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
-        $check_is_admin = LiveConsole::isAdmininLive($user_id, $live_id);
-        if ($check_is_admin === false) {
-            return ['code' => false, 'msg' => '需要管理员权限'];
-        }
+//        $check_is_admin = LiveConsole::isAdmininLive($user_id, $live_id);
+//        if ($check_is_admin === false) {
+//            return ['code' => false, 'msg' => '需要管理员权限'];
+//        }
 
         if (empty($params['id'] ?? 0)) {
             $query = self::query();
