@@ -399,7 +399,9 @@ class LiveController extends Controller
      * @apiParam {number} live_id  直播id
      *
      * @apiSuccess {string} info  直播相关
-     * @apiSuccess {string} info.is_sub 是否订阅专栏
+     * @apiSuccess {string} info.is_sub_column 是否订阅专栏
+     * @apiSuccess {string} info.is_sub 是否付费订阅
+     * @apiSuccess {string} info.is_appmt 是否免费订阅
      * @apiSuccess {string} info.is_forbid 是否全体禁言(1禁了,0没禁)
      * @apiSuccess {string} info.is_silence 当前用户是否禁言中(0没有 其他剩余秒数)
      * @apiSuccess {string} info.level  当前用户等级
@@ -475,7 +477,8 @@ class LiveController extends Controller
 
             $columnId = $column ? $column->id : 0;
 
-            $isSub = Subscribe::isSubscribe($userId, $columnId, 1);
+            $isSub   = Subscribe::isSubscribe($userId, $columnId, 1);
+            $subLive = Subscribe::isSubscribe($userId, $id, 3);
 
             $is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
                 ->where('user_id', '=', 0)->where('is_forbid', '=', 1)
@@ -508,7 +511,8 @@ class LiveController extends Controller
             }
 
             $list['column_id'] = $columnId;
-            $list['is_sub'] = $isSub ?? 0;
+            $list['is_sub']        = $subLive ?? 0;
+            $list['is_sub_column'] = $isSub ?? 0;
             $list['level'] = $user->getLevel($userId);
             $list['welcome'] = '说话都注意点';
             $list['is_password'] = $list->live->password ? 1 : 0;
