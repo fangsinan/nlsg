@@ -276,6 +276,7 @@ class MallRefundJob
             $xml = simplexml_load_string($res, 'SimpleXMLElement',
                 LIBXML_NOCDATA);
             $xml = json_decode(json_encode($xml), true);
+            dd($xml);
 
             $rrrModel = new RunRefundRecord();
             $rrrModel->order_type = 1;
