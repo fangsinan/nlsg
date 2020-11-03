@@ -390,6 +390,7 @@ class LiveController extends Controller
      * @apiSuccess {string} info  直播相关
      * @apiSuccess {string} info.is_sub 是否订阅专栏
      * @apiSuccess {string} info.is_forbid 是否全体禁言(1禁了,0没禁)
+     * @apiSuccess {string} info.is_silence 当前用户是否禁言中(0没有 其他剩余秒数)
      * @apiSuccess {string} info.level  当前用户等级
      * @apiSuccess {string} info.is_begin  1是直播中
      * @apiSuccess {string} info.is_admin  1是管理员(包括创建人和助手) 0不是
