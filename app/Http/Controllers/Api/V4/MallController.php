@@ -731,9 +731,6 @@ class MallController extends Controller
      */
     public function flashSaleList()
     {
-        $a = new MallRefundJob();
-        $a->mallRefund();
-        exit();
         $model = new SpecialPriceModel();
         $data = $model->getSecList(2);
         return $this->success($data);
