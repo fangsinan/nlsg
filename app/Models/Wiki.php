@@ -24,6 +24,11 @@ class Wiki extends Model
             ->orderBy('created_at','desc')
             ->get()
             ->toArray();
+        if ($lists){
+            foreach ($lists as &$v) {
+                $v['content'] =  strip_tags($v['content']);
+            }
+        }
         return $lists;
     }
 
