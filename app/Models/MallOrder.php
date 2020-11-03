@@ -959,10 +959,11 @@ class MallOrder extends Base
                         $refund_data['type'] = 4;
                         $refund_data['pay_type'] = $check->pay_type;
                         $refund_data['refe_price'] = $check->pay_price;
-                        $refund_data['status'] = 10;
+                        $refund_data['status'] = 40;
                         $refund_data['user_id'] = $user_id;
                         $refund_data['created_at'] = $now_date;
                         $refund_data['updated_at'] = $now_date;
+                        $refund_data['run_refund'] = 1;
                         $refund_res = DB::table('nlsg_mall_refund_record')
                             ->insert($refund_data);
                         if (!$refund_res) {
