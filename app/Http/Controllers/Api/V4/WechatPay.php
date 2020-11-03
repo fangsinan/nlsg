@@ -61,6 +61,110 @@ class WechatPay extends Controller
         }
     }
 
+
+    //微信购买直播
+    public static function PayLive($data)
+    {
+
+
+        $time = time();
+        $out_trade_no = $data['out_trade_no'];
+        $total_fee = $data['total_fee'];
+        $transaction_id = $data['transaction_id'];
+        $pay_type = $data['pay_type'];
+
+
+        //支付处理正确-判断是否已处理过支付状态
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+
+        if (!empty($orderInfo)) {
+            $orderInfo = $orderInfo->toArray();
+
+            DB::beginTransaction();
+            try {
+                $orderId = $orderInfo['id'];
+                $live_id = $orderInfo['live_id'];
+                //更新订单状态
+
+                $user_id = $orderInfo['user_id']; //用户
+                //更新订单状态
+                $data1 = [
+                    'status' => 1,
+                    'pay_time' => date("Y-m-d H:i:s", $time),
+                    'pay_price' => $total_fee,
+                    'pay_type' => $pay_type,
+                ];
+                $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
+
+
+
+
+                //添加支付记录
+                $record = [
+                    'ordernum' => $out_trade_no, //订单编号
+                    'price' => $total_fee, //支付金额
+                    'transaction_id' => $transaction_id, //流水号
+                    'user_id' => $user_id, //会员id
+                    'type' => $pay_type, //1：微信  2：支付宝
+                    'order_type' => 16,//nlsg_pay_record表type 16直播
+                    'status' => 1
+                ];
+                $recordRst = PayRecord::firstOrCreate($record);
+
+                $subscribe = [
+                    'user_id' => $user_id, //会员id
+                    'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+                    'type' => 3, //直播
+                    'status' => 1,
+                    'order_id' => $orderId, //订单id
+                    'relation_id' => $live_id,
+                ];
+                $subscribeRst = Subscribe::firstOrCreate($subscribe);
+
+
+
+                //推客收益
+                $twitter_id = $orderInfo['twitter_id'];
+                $Profit_Rst = true;
+//                if ( !empty($twitter_id) && $twitter_id != $user_id ) {
+//                    //固定收益50
+//                    $ProfitPrice = 50;
+//                    $map = array('user_id' => $twitter_id, "type" => 10, "ordernum" => $out_trade_no, 'price' => $ProfitPrice,);
+//                    if (!empty($map)) {
+//                        //$PayRDObj = new PayRecordDetail();
+//                        //防止重复添加收入
+//                        $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
+//                        $PrdInfo = PayRecordDetail::where($where)->first();
+//                        if (empty($PrdInfo)) {
+//                            $Profit_Rst = PayRecordDetail::create($map);
+//                        }
+//                    }
+//                }
+
+                $userRst = WechatPay::UserBalance(4, $user_id, $orderInfo['price']);
+
+                if ($orderRst  && $recordRst && $subscribeRst && $userRst && $Profit_Rst) {
+                    DB::commit();
+                    return true;
+
+                } else {
+                    DB::rollBack();
+                    return false;
+                }
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return false;
+            }
+
+        } else {
+            //订单状态已更新，直接返回
+            return true;
+        }
+    }
+
+
+
     public static function mallOrder($data)
     {
         $myfile = fopen("pay_cb.txt", "a+") or die("Unable to open file!");
