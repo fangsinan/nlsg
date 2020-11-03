@@ -138,26 +138,32 @@ class LiveController extends Controller
             }
         }
 
-        $backLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'playback_price',
-                'is_free', 'password')
-            ->where('end_at', '>', Carbon::now()->toDateTimeString())
+        $lists = LiveInfo::with('user:id,nickname','live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
+            ->select('id','live_pid','user_id')
             ->where('status', 4)
-            ->orderBy('created_at', 'desc')
+            ->whereNotNull('playback_url')
+            ->orderBy('id')
             ->limit(2)
             ->get()
             ->toArray();
-        if ( ! empty($backLists)) {
-            foreach ($backLists as &$v) {
-                $channel = LiveInfo::where('live_pid', $v['id'])
-                                    ->where('status', 1)
-                                    ->orderBy('id', 'desc')
-                                    ->first();
-                $v['is_password'] = $v['password'] ? 1 : 0;
-                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
-                $v['info_id']   = $channel->id;
+        if ( ! empty($lists)) {
+            $backLists = [];
+            foreach ($lists as &$v) {
+                 $backLists[] = [
+                     'id' => $v['live']['id'],
+                     'title' => $v['live']['title'],
+                     'is_password' => $v['live']['password'] ? 1  : 0,
+                     'describe'    => $v['live']['describe'],
+                     'price'       => $v['live']['price'],
+                     'cover_img'   => $v['live']['cover_img'],
+                     'playback_price' => $v['live']['playback_price'],
+                     'live_time'      => date('Y.m.d H:i', strtotime($v['live']['begin_at'])),
+                     'is_free'        => $v['live']['is_free'],
+                     'info_id'        => $v['id']
+                 ];
             }
         }
+
 
         $offline = OfflineProducts::where('is_del', 0)
             ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
@@ -284,26 +290,31 @@ class LiveController extends Controller
      */
     public function getLiveBackLists()
     {
-        $lists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'is_free',
-                'playback_price', 'is_free', 'password')
-            ->where('end_at', '>', Carbon::now()->toDateTimeString())
-            ->where('status', 4)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->toArray();
-        if ( ! empty($lists['data'])) {
-            foreach ($lists['data'] as &$v) {
-                $v['is_password'] = $v['password'] ? 1 : 0;
-                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
-                $channel = LiveInfo::where('live_pid', $v['id'])
-                                  ->where('status', 1)
-                                  ->orderBy('id', 'desc')
-                                  ->first();
-                $v['info_id']  = $channel->id;
-            }
+        $lists = LiveInfo::with('user:id,nickname','live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
+                   ->select('id','live_pid','user_id')
+                   ->where('status', 4)
+                   ->whereNotNull('playback_url')
+                   ->orderBy('begin_at','desc')
+                   ->paginate(10)
+                   ->toArray();
+        if ( !empty($lists['data'])) {
+           $backLists = [];
+           foreach ($lists['data'] as &$v) {
+                $backLists[] = [
+                    'id'          => $v['live']['id'],
+                    'title'       => $v['live']['title'],
+                    'is_password' => $v['live']['password'] ? 1  : 0,
+                    'describe'    => $v['live']['describe'],
+                    'price'       => $v['live']['price'],
+                    'cover_img'   => $v['live']['cover_img'],
+                    'playback_price' => $v['live']['playback_price'],
+                    'live_time'      => date('Y.m.d H:i', strtotime($v['live']['begin_at'])),
+                    'is_free'        => $v['live']['is_free'],
+                    'info_id'        => $v['id']
+                ];
+           }
         }
-        return success($lists['data']);
+        return success($backLists);
     }
 
     /**
