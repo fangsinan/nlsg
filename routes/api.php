@@ -158,6 +158,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::get('order/reward/user', 'OrderController@getRewardUser');
 
+    Route::get('live/index', 'LiveController@index');
+    Route::get('live/lists', 'LiveController@getLiveLists');
+    Route::get('live/back_lists', 'LiveController@getLiveBackLists');
+
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/base', 'UserController@base');
         Route::get('user/account', 'UserController@account');
@@ -282,9 +286,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
         //直播
-        Route::get('live/index', 'LiveController@index');
-        Route::get('live/lists', 'LiveController@getLiveLists');
-        Route::get('live/back_lists', 'LiveController@getLiveBackLists');
         Route::get('live/channels', 'LiveController@getLiveChannel');
         Route::get('live/show', 'LiveController@show');
         Route::post('live/check_password', 'LiveController@checkLivePassword');
