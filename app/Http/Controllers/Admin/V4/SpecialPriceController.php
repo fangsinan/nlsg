@@ -86,14 +86,44 @@ class SpecialPriceController extends Controller
      **/
     public function addFlashSale(Request $request)
     {
-        $params = $request->input();
-        if (($params['type'] ?? 0) != 2) {
-            $data = ['code' => false, 'msg' => 'type错误'];
-        } else {
-            $servers = new SpecialPriceServers();
-            $data = $servers->add($params);
-        }
+
+
+        $params = [
+            'team_id' => 4,
+            'date' => '2020-11-11',
+            'status' => 1,
+            'list' => [
+                [
+                    'goods_id' => '商品id',
+                    'goods_price' => '商品列表详情显示的秒杀价',
+                    'list' => [
+                        ['sku_number' => 'sku_number', 'sku_price' => '规格实际购买价格']
+                    ]
+                ],
+                [
+                    'goods_id' => 123,
+                    'goods_price' => 2.1,
+                    'list' => [
+                        ['sku_number' => 313123, 'sku_price' => 1.1],
+                        ['sku_number' => 3233223, 'sku_price' => 2.1],
+                        ['sku_number' => 3133232123, 'sku_price' => 3.1],
+                    ]
+                ]
+            ]
+        ];
+
+        $servers = new SpecialPriceServers();
+        $data = $servers->addFlashSaleNew($params);
         return $this->getRes($data);
+
+//        $params = $request->input();
+//        if (($params['type'] ?? 0) != 2) {
+//            $data = ['code' => false, 'msg' => 'type错误'];
+//        } else {
+//            $servers = new SpecialPriceServers();
+//            $data = $servers->add($params);
+//        }
+//        return $this->getRes($data);
     }
 
     /**

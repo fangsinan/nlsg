@@ -182,7 +182,7 @@ class LiveConsole extends Base
         if (!is_array($params['list'] ?? '')) {
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
-        if(count($params['list']) != 1){
+        if (count($params['list']) != 1) {
             return ['code' => false, 'msg' => '直播时间信息过多'];
         }
 
@@ -262,11 +262,19 @@ class LiveConsole extends Base
             }
             $live_id = $params['id'];
 
-            //删除未开始的直播
-            $info_del_res = LiveInfo::where('live_pid', '=', $params['id'])
-                ->where('begin_at', '>', $now_date)
-                ->where('status', '=', 1)
-                ->delete();
+            //直播只能单场,修改为删除所有已有直播场次
+            if (1) {
+                $info_del_res = LiveInfo::where('live_pid', '=', $params['id'])
+                    ->where('status', '=', 1)
+                    ->update(['status' => 2]);
+            } else {
+                //删除未开始的直播
+                $info_del_res = LiveInfo::where('live_pid', '=', $params['id'])
+                    ->where('begin_at', '>', $now_date)
+                    ->where('status', '=', 1)
+                    ->delete();
+            }
+
             if ($info_del_res === false) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '添加失败', 'ps' => __LINE__];
@@ -549,8 +557,8 @@ class LiveConsole extends Base
     public static function isAdmininLive($user_id, $live_id)
     {
         $live_info = Live::whereId($live_id)->select(['user_id', 'helper'])->first();
-        
-        if(empty($live_info)){
+
+        if (empty($live_info)) {
             return false;
         }
 

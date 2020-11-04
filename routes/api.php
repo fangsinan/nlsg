@@ -83,7 +83,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
     //*******************************商城部分开始*******************************
-
     Route::get('goods/info', 'MallController@goodsList');
     Route::get('goods/coupon_list', 'MallController@couponList');
     Route::get('goods/comment_list', 'MallController@commentList');

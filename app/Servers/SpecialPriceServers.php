@@ -19,7 +19,7 @@ class SpecialPriceServers
         $with = ['goodsInfo', 'spSkuList', 'spSkuList.skuInfo', 'spSkuList.skuInfo.sku_value_list'];
         $field = ['id', 'goods_id', 'goods_original_price', 'goods_price', 'status', 'type',
             'begin_time', 'end_time', 'group_name', 'group_num_type',
-            'group_num', 'group_price', 'group_life','created_at'
+            'group_num', 'group_price', 'group_life', 'created_at'
         ];
 
         if (!empty($params['id'])) {
@@ -50,8 +50,8 @@ class SpecialPriceServers
         }
 
         $list = $query->where('status', '<>', 3)->groupBy('group_name')->orderBy('id', 'desc');
-        foreach($list as $v){
-            if($v->goods_original_price > 0){
+        foreach ($list as $v) {
+            if ($v->goods_original_price > 0) {
                 $v->goodsInfo->original_price = $v->goods_original_price;
             }
         }
@@ -370,6 +370,86 @@ class SpecialPriceServers
 
         DB::commit();
         return ['code' => true, 'msg' => '成功'];
+    }
+
+    public function addFlashSaleNew($params)
+    {
+        $team_id = $params['team_id'] ?? 0;
+        if (!in_array($team_id, [1, 2, 3, 4])) {
+            return ['code' => false, 'msg' => 'team_id错误'];
+        }
+        $date = $params['date'] ?? '';
+        if (empty($date)) {
+            return ['code' => false, 'msg' => 'date错误'];
+        }
+        if (!in_array($params['status'] ?? 0, [1, 2])) {
+            return ['code' => false, 'msg' => 'status参数错误'];
+        }
+        if (!is_array($params['list'] ?? '')) {
+            return ['code' => false, 'msg' => 'list格式错误'];
+        }
+
+        switch (intval($team_id)) {
+            case 1:
+                $begin = $date . ' ' . '09:00:00';
+                $end = $date . ' ' . '12:59:59';
+                break;
+            case 2:
+                $begin = $date . ' ' . '13:00:00';
+                $end = $date . ' ' . '18:59:59';
+                break;
+            case 3:
+                $begin = $date . ' ' . '19:00:00';
+                $end = $date . ' ' . '20:59:59';
+                break;
+            case 4:
+                $begin = $date . ' ' . '21:00:00';
+                $end = date('Y-m-d', strtotime("$date +1 days")) . ' ' . '08:59:59';
+                break;
+        }
+
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+        $group_name = Str::random(5) . $now;
+
+        $add_data =  [];
+
+        foreach ($params['list'] as $v){
+            foreach ($v['list'] as $vv){
+                $temp = [];
+                $temp['goods_type'] = 1;
+                $temp['type'] = 2;
+                $temp['use_coupon'] = 2;
+                $temp['status'] = $params['status'];
+                $temp['goods_id'] = $v['goods_id'];
+                $temp['goods_original_price'] = $v['goods_original_price'] ?? 0;
+                $temp['goods_price'] = $v['goods_price'];
+
+
+                $temp['sku_number'] = $vv['sku_number'];
+                $temp['stock'] = $vv['stock'] ?? 0;
+                $temp['sku_price'] = $vv['sku_price'];
+                $temp['sku_price_black'] = $vv['sku_price'];
+                $temp['sku_price_yellow'] = $vv['sku_price'];
+                $temp['sku_price_dealer'] = $vv['sku_price'];
+
+
+                $temp['t_money'] = $temp['t_money_black'] =
+                $temp['t_money_yellow'] = $temp['t_money_dealer'] = 0;
+                $temp['created_at'] = $temp['updated_at'] = $now_date;
+
+                $temp['freight_free'] = $temp['freight_free_line'] = 0;
+                $temp['group_name'] = $group_name;
+                $temp['begin_time'] = $begin;
+                $temp['end_time'] = $end;
+
+                $add_data[] = $temp;
+            }
+        }
+
+        return $add_data;
+
+
     }
 
 }
