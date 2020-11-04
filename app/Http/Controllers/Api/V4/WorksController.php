@@ -425,7 +425,7 @@ class WorksController extends Controller
         }
         //查询章节
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order);
+        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page);
 
         $works_data['info_num'] = count($info);
 

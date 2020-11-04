@@ -10,24 +10,23 @@ class WorksInfo extends Base
 
 
 
-
     public function getDateFormat()
     {
         return time();
     }
 
     // $type  1 单课程  2 多课程
-    public function getInfo($works_id,$is_sub=0,$user_id=0,$type=1,$order='asc'){
+    public function getInfo($works_id,$is_sub=0,$user_id=0,$type=1,$order='asc',$page_per_page=50){
         $where = ['status'=>4];
         if($type == 1){
             $where['pid'] = $works_id;
         }else if($type == 2){
             $where['outline_id'] = $works_id;
         }
-        $works_data = WorksInfo::select([
+        $works_data_size = WorksInfo::select([
             'id','type','title','section','introduce','url','callback_url1','callback_url1', 'callback_url2', 'callback_url3','view_num','duration','free_trial'
-        ])->where($where)->orderBy('id',$order)->get()->toArray();
-
+        ])->where($where)->orderBy('id',$order)->paginate($page_per_page)->toArray();
+        $works_data = $works_data_size['data'];
         foreach ($works_data as $key=>$val){
             //处理url  关注或试听
             $works_data[$key]['href_url'] = '';
