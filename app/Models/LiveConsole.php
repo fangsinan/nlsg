@@ -262,8 +262,8 @@ class LiveConsole extends Base
             }
             $live_id = $params['id'];
 
-            //直播只能单场,修改为删除所有已有直播场次
-            if (1) {
+            if (0) {
+                //直播只能单场,修改为删除所有已有直播场次
                 $info_del_res = LiveInfo::where('live_pid', '=', $params['id'])
                     ->where('status', '=', 1)
                     ->update(['status' => 2]);
