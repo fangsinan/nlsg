@@ -18,7 +18,7 @@ class SpecialPriceServers
 
         $with = ['goodsInfo', 'spSkuList', 'spSkuList.skuInfo', 'spSkuList.skuInfo.sku_value_list'];
         $field = ['id', 'goods_id', 'goods_original_price', 'goods_price', 'status', 'type',
-            'begin_time', 'end_time', 'group_name', 'group_num_type','sku_number',
+            'begin_time', 'end_time', 'group_name', 'group_num_type', 'sku_number',
             'group_num', 'group_price', 'group_life', 'created_at'
         ];
 
@@ -457,7 +457,7 @@ class SpecialPriceServers
         if (!empty($old_group_name)) {
             $del_res = SpecialPriceModel::where('group_name', '=', $old_group_name)
                 ->where('type', '=', 2)
-                ->update(['status'=>3]);
+                ->update(['status' => 3]);
             if ($del_res === false) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '错误,请重试'];
@@ -475,7 +475,38 @@ class SpecialPriceServers
 
     }
 
-    public function flashSaleList($params){
+    public function flashSaleList($params)
+    {
+        $query = SpecialPriceModel::query();
+
+        $query->where('status', '<>', 3)
+            ->where('type', '=', 2)
+            ->where('team_id', '>', 0)
+            ->groupBy('group_name');
+
+        $query->with(['flashSaleGoodsList']);
+
+        $query->select([
+            'id', 'group_name', 'team_id', 'status',
+            DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d\') as date')
+        ]);
+
+        $list = $query->get();
+        if($list->isEmpty()){
+            return [];
+        }
+        $list = $list->toArray();
+
+        dd($list);
+
+        foreach ($list as $v){
+            $temp_list = [];
+            foreach ($v->flashSaleGoodsList as $vv){
+
+            }
+        }
+
+        return $list->ToArray();
 
     }
 }

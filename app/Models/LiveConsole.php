@@ -3,6 +3,7 @@
 
 namespace App\Models;
 
+use App\Servers\JobServers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -217,7 +218,7 @@ class LiveConsole extends Base
                 if ($v['end_at'] > $live_end_at) {
                     $live_end_at = $v['end_at'];
                 }
-                if(empty($v['id']??0)){
+                if (empty($v['id'] ?? 0)) {
                     unset($params['list'][$k]['id']);
                 }
                 $temp_push_end_time = date('Y-m-d H:i:s',
@@ -641,6 +642,7 @@ class LiveConsole extends Base
         }
 
         DB::commit();
+        JobServers::pushToSocket($live_id, $live_info_id, 8);
         return ['code' => true, 'msg' => '成功'];
     }
 

@@ -436,6 +436,13 @@ class SpecialPriceModel extends Base
             ->select(['sku_number', 'group_name','group_num','group_price','group_life']);
     }
 
+    public function flashSaleGoodsList(){
+        return $this->hasMany(self::class, 'group_name', 'group_name')
+            ->where('status', '<>', 3)
+//            ->groupBy('goods_id')
+            ->select(['goods_id', 'group_name','goods_price','sku_number','sku_price']);
+    }
+
     //临时添加
     public function tempAdd()
     {
