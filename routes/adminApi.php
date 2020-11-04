@@ -5,6 +5,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     Route::get('class/column', 'ClassController@column');
     Route::get('class/lecture', 'ClassController@lecture');
+    Route::get('class/works', 'ClassController@works');
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');
     Route::post('mall_order/send', 'MallOrderController@send');
