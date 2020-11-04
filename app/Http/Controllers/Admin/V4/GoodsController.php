@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Live;
 use Illuminate\Http\Request;
 use App\Servers\GoodsServers;
 
@@ -157,6 +158,22 @@ class GoodsController extends Controller
         $servers = new GoodsServers();
         $data = $servers->categoryList();
         return $this->getRes($data);
+    }
+
+    public function tempTools(Request $request){
+        $type = $request->input('type',0);
+        $id = $request->input('id',0);
+        if ($type && $id){
+            switch ($type){
+                case 'live_pass':
+                    $check = Live::whereId($id)->first();
+                    if($check){
+                      $check->status = 4;
+                      $check->check_time = date('Y-m-d H:i:s');
+                      $check->save();
+                    }
+            }
+        }
     }
 }
 
