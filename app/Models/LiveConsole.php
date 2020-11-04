@@ -237,8 +237,8 @@ class LiveConsole extends Base
 
         DB::beginTransaction();
 
-        if (isset($params['id'])) {
-            $liveModel = self::whereId($params['id']);
+        if (!empty($params['id'] ?? 0)) {
+            $liveModel = self::whereId($params['id'])->first();
             if (!$liveModel) {
                 return ['code' => false, 'msg' => 'id错误'];
             }
