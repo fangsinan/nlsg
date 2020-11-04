@@ -415,7 +415,7 @@ class WorksController extends Controller
             $is_sub = 1; // 免费时全部按关注处理url
         }
         //查询所属专栏
-        $field = ['id', 'name', 'type', 'user_id', 'subtitle', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
+        $field = ['id', 'name', 'type', 'user_id', 'title', 'subtitle', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
         $column = Column::where('id',$works_data['column_id'])
                     ->first($field);
         if($column){
