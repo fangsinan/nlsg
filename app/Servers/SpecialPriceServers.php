@@ -412,10 +412,10 @@ class SpecialPriceServers
         $now_date = date('Y-m-d H:i:s', $now);
         $group_name = Str::random(5) . $now;
 
-        $add_data =  [];
+        $add_data = [];
 
-        foreach ($params['list'] as $v){
-            foreach ($v['list'] as $vv){
+        foreach ($params['list'] as $v) {
+            foreach ($v['list'] as $vv) {
                 $temp = [];
                 $temp['goods_type'] = 1;
                 $temp['type'] = 2;
@@ -425,7 +425,6 @@ class SpecialPriceServers
                 $temp['goods_original_price'] = $v['goods_original_price'] ?? 0;
                 $temp['goods_price'] = $v['goods_price'];
 
-
                 $temp['sku_number'] = $vv['sku_number'];
                 $temp['stock'] = $vv['stock'] ?? 0;
                 $temp['sku_price'] = $vv['sku_price'];
@@ -433,8 +432,7 @@ class SpecialPriceServers
                 $temp['sku_price_yellow'] = $vv['sku_price'];
                 $temp['sku_price_dealer'] = $vv['sku_price'];
 
-
-                $temp['t_money'] = $temp['t_money_black'] =
+                $temp['t_money'] = $temp['t_money_black'] = 0;
                 $temp['t_money_yellow'] = $temp['t_money_dealer'] = 0;
                 $temp['created_at'] = $temp['updated_at'] = $now_date;
 
@@ -442,6 +440,7 @@ class SpecialPriceServers
                 $temp['group_name'] = $group_name;
                 $temp['begin_time'] = $begin;
                 $temp['end_time'] = $end;
+                $temp['team_id'] = $team_id;
 
                 $add_data[] = $temp;
             }

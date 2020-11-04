@@ -217,6 +217,9 @@ class LiveConsole extends Base
                 if ($v['end_at'] > $live_end_at) {
                     $live_end_at = $v['end_at'];
                 }
+                if(empty($v['id']??0)){
+                    unset($params['list'][$k]['id']);
+                }
                 $temp_push_end_time = date('Y-m-d H:i:s',
                     strtotime($v['end_at'] . " +1 days")
                 );
@@ -266,7 +269,7 @@ class LiveConsole extends Base
                 //直播只能单场,修改为删除所有已有直播场次
                 $info_del_res = LiveInfo::where('live_pid', '=', $params['id'])
                     ->where('status', '=', 1)
-                    ->update(['status' => 2]);
+                    ->delete();
             } else {
                 //删除未开始的直播
                 $info_del_res = LiveInfo::where('live_pid', '=', $params['id'])
