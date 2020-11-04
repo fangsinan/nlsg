@@ -549,6 +549,11 @@ class LiveConsole extends Base
     public static function isAdmininLive($user_id, $live_id)
     {
         $live_info = Live::whereId($live_id)->select(['user_id', 'helper'])->first();
+        
+        if(empty($live_info)){
+            return false;
+        }
+
         if ($user_id == $live_info->user_id) {
             return true;
         }
