@@ -115,6 +115,19 @@ class SpecialPriceController extends Controller
 //        return $this->getRes($data);
     }
 
+    /**
+     * 秒杀的列表
+     * @api {get} /api/admin_v4/special_price/flash_sale_list 秒杀的列表
+     * @apiVersion 1.0.0
+     * @apiName /api/admin_v4/special_price/flash_sale_list
+     * @apiGroup 后台管理-商品价格设置
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/special_price/flash_sale_list
+     * @apiDescription 秒杀的列表
+     * @apiParam {string} goods_name 商品名称
+     * @apiParam {string} begin_time 开始时间
+     * @apiParam {string} end_time 结束时间
+     * @apiParam {number=1,2} status 状态(1上架2下架)
+     **/
     public function flashSaleList(Request $request){
         $servers = new SpecialPriceServers();
         $data = $servers->flashSaleList($request->input());

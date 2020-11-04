@@ -477,36 +477,65 @@ class SpecialPriceServers
 
     public function flashSaleList($params)
     {
+        $size = $params['size'] ?? 10;
+
         $query = SpecialPriceModel::query();
+
+        if (!empty($params['group_name'] ?? '')) {
+            $query->where('group_name', '=', $params['group_name']);
+        }
 
         $query->where('status', '<>', 3)
             ->where('type', '=', 2)
             ->where('team_id', '>', 0)
             ->groupBy('group_name');
 
-        $query->with(['flashSaleGoodsList']);
+        if (!empty($params['begin_time'])) {
+            $query->where('begin_time', '>=', $params['begin_time']);
+        }
+
+        if (!empty($params['end_time'])) {
+            $query->where('end_time', '<=', $params['end_time']);
+        }
+
+        if (!empty($params['status'])) {
+            $query->where('status', '=', intval($params['status']));
+        }
+
+        if (!empty($params['goods_name'])) {
+            $query->whereHas('flashSaleGoodsList.goodsInfo', function (Builder $query) use ($params) {
+                $query->where('name', 'like', '%' . $params['goods_name'] . '%');
+            });
+        }
+
+
+        $query->with(['flashSaleGoodsList','flashSaleGoodsList.goodsInfo',
+            'flashSaleGoodsList.skuInfo','flashSaleGoodsList.skuInfo.sku_value_list']);
 
         $query->select([
             'id', 'group_name', 'team_id', 'status',
             DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d\') as date')
         ]);
 
-        $list = $query->get();
-        if($list->isEmpty()){
-            return [];
-        }
-        $list = $list->toArray();
+        $list = $query->paginate($size)->toArray();
 
-        dd($list);
-
-        foreach ($list as $v){
+        foreach ($list['data'] as $k => &$v) {
             $temp_list = [];
-            foreach ($v->flashSaleGoodsList as $vv){
-
+            foreach ($v['flash_sale_goods_list'] as &$vv) {
+                if (!array_key_exists($vv['goods_id'], $temp_list)) {
+                    $temp_list[$vv['goods_id']] = [];
+                    $temp_list[$vv['goods_id']]['goods_id'] = $vv['goods_id'];
+                    $temp_list[$vv['goods_id']]['goods_price'] = $vv['goods_price'];
+                    $temp_list[$vv['goods_id']]['goods_info'] = $vv['goods_info'];
+                    unset($vv['goods_info']);
+                }
+                $temp_list[$vv['goods_id']]['list'][] = $vv;
             }
+            $v['list'] = array_values($temp_list);
+            unset($v['flash_sale_goods_list']);
         }
 
-        return $list->ToArray();
+        return $list;
 
     }
 }
