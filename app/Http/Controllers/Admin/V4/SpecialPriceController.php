@@ -40,39 +40,54 @@ class SpecialPriceController extends Controller
      * @apiGroup 后台管理-商品价格设置
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/special_price/add_flash_sale
      * @apiDescription 添加秒杀活动
-     * @apiParam {number} goods_id 商品id
-     * @apiParam {number=2} type 类型(固定2)
-     * @apiParam {number} goods_price 商品价格
-     * @apiParam {number} [goods_original_price] 商品原价(可不传)
+     *
+     * @apiParam {number} team_id 时间段id(1(9:00-12:59),2(13:00-18:59),3(19:00 - 20:59),4(21:00-次日8:59))
+     * @apiParam {string} date 日期(2020-11-11)
      * @apiParam {number=1,2} status 状态(1上架2下架)
+     * @apiParam {string} [group_name] 如果编辑的时候,需要额外传它
      * @apiParam {string[]} list sku列表
-     * @apiParam {string} list.sku_number sku
-     * @apiParam {string} list.sku_price sku秒杀价格
-     * @apiParam {string[]} time_list 时间列表(秒杀时间端设置,数组,多条,时间范围)
+     * @apiParam {string} list.goods_id 商品id
+     * @apiParam {string} list.goods_price 秒杀价格
+     * @apiParam {string[]} list.list
+     * @apiParam {string} list.list.sku_number 规格
+     * @apiParam {string} list.list.sku_price 规格收加
      *
      * @apiParamExample {json} Request-Example:
      * {
-     * "goods_id": 91,
-     * "type": 2,
-     * "goods_price": 9.1,
-     * "list": [
-     * {
-     * "sku_number": 1612728266,
-     * "sku_price": 9.1
-     * }
-     * ],
-     * "status":1,
-     * "time_list": [
-     * "2020-09-01 15:00:00,2020-08-01 15:04:59",
-     * "2020-09-02 15:00:00,2020-08-02 15:04:59",
-     * "2020-09-03 15:00:00,2020-08-03 15:04:59",
-     * "2020-09-05 15:00:00,2020-08-05 15:04:59",
-     * "2020-09-10 15:00:00,2020-08-10 15:04:59",
-     * "2020-09-12 18:00:00,2020-08-12 18:04:59",
-     * "2020-09-15 15:00:00,2020-08-15 15:01:59",
-     * "2020-09-18 15:00:00,2020-08-18 15:04:59",
-     * "2020-09-19 15:00:00,2020-08-19 15:04:59"
-     * ]
+         * "team_id": 4,
+         * "date": "2020-11-11",
+         * "status": 1,
+         * "group_name":"48roQ1604475214",
+         * "list": [
+             * {
+                 * "goods_id": 57,
+                 * "goods_price": 1.4,
+                 * "list": [
+                     * {
+                         * "sku_number": 1825350558,
+                         * "sku_price": 1.4
+                     * }
+                 * ]
+             * },
+             * {
+                 * "goods_id": 330,
+                 * "goods_price": 0.67,
+                 * "list": [
+                     * {
+                         * "sku_number": 1835215184,
+                         * "sku_price": 0.67
+                     * },
+                     * {
+                         * "sku_number": 1607088243,
+                         * "sku_price": 0.68
+                     * },
+                     * {
+                         * "sku_number": 1835215184,
+                         * "sku_price": 2.1
+                     * }
+                 * ]
+             * }
+         * ]
      * }
      *
      * @apiSuccessExample {json} Request-Example:

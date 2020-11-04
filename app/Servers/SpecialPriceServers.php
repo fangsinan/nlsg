@@ -410,7 +410,13 @@ class SpecialPriceServers
 
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
-        $group_name = Str::random(5) . $now;
+
+        $old_group_name = $params['group_name'] ?? 0;
+        if (empty($old_group_name)) {
+            $group_name = Str::random(5) . $now;
+        } else {
+            $group_name = $old_group_name;
+        }
 
         $add_data = [];
 
@@ -446,8 +452,26 @@ class SpecialPriceServers
             }
         }
 
-        return $add_data;
+        DB::beginTransaction();
 
+        if (!empty($old_group_name)) {
+            $del_res = SpecialPriceModel::where('group_name', '=', $old_group_name)
+                ->where('type', '=', 2)
+                ->update(['status'=>3]);
+            if ($del_res === false) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '错误,请重试'];
+            }
+        }
+
+        $add_res = DB::table('nlsg_special_price')->insert($add_data);
+        if ($add_res === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '错误,请重试'];
+        } else {
+            DB::commit();
+            return ['code' => true, 'msg' => '成功'];
+        }
 
     }
 
