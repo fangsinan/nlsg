@@ -30,6 +30,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('special_price/add_flash_sale', 'SpecialPriceController@addFlashSale');
     Route::post('special_price/add_group_buy', 'SpecialPriceController@addGroupBuy');
     Route::get('special_price/list', 'SpecialPriceController@list');
+    Route::get('special_price/flash_sale_list', 'SpecialPriceController@flashSaleList');
     Route::put('special_price/status_change', 'SpecialPriceController@statusChange');
 
     //运费模板

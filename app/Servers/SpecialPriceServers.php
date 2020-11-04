@@ -18,7 +18,7 @@ class SpecialPriceServers
 
         $with = ['goodsInfo', 'spSkuList', 'spSkuList.skuInfo', 'spSkuList.skuInfo.sku_value_list'];
         $field = ['id', 'goods_id', 'goods_original_price', 'goods_price', 'status', 'type',
-            'begin_time', 'end_time', 'group_name', 'group_num_type',
+            'begin_time', 'end_time', 'group_name', 'group_num_type','sku_number',
             'group_num', 'group_price', 'group_life', 'created_at'
         ];
 
@@ -475,4 +475,7 @@ class SpecialPriceServers
 
     }
 
+    public function flashSaleList($params){
+
+    }
 }
