@@ -100,7 +100,7 @@ class ClassController extends Controller
         $work_id  =  $request->get('work_id');
         $title    =  $request->get('title');
         $status   =  $request->get('status');
-        $nickname =  $request->get('nickname');
+        $nickname =  $request->get('author');
         $category_id =  $request->get('category_id');
         $start    =  $request->get('start');
         $end      =  $request->get('end');
