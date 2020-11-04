@@ -44,6 +44,7 @@ class Lists extends Model
         ->with(['works'=> function($query){
             $query->select('works_id','user_id','title', 'cover_img')
                 ->where('status',4)
+                ->limit(3)
                 ->inRandomOrder();
         }, 'works.user'=>function($query){
             $query->select('id','nickname','headimg');
