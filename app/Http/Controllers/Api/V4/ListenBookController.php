@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
 use App\Models\History;
 use App\Models\Lists;
 use App\Models\ListsWork;
@@ -127,6 +128,10 @@ class ListenBookController extends Controller
 
         //作者信息
         $works_data['user_info'] = User::find($works_data['user_id']);
+
+        $field = ['id', 'name', 'type', 'user_id', 'title', 'subtitle', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
+        $works_data['column_info'] = Column::where('user_id',$works_data['user_id'])->first($field);
+
         $works_data['historyData'] = History::getHistoryData($works_data['id'],2,$user_id);
 
         $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$listen_id,'type'=>6])->first();
