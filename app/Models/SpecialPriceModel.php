@@ -433,7 +433,7 @@ class SpecialPriceModel extends Base
     {
         return $this->hasMany('App\Models\SpecialPriceModel', 'group_name', 'group_name')
             ->where('status', '<>', 3)
-            ->select(['sku_number', 'group_name']);
+            ->select(['sku_number', 'group_name','group_num','group_price','group_life']);
     }
 
     //临时添加

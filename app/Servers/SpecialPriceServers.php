@@ -25,7 +25,6 @@ class SpecialPriceServers
         if (!empty($params['id'])) {
             $query->where('id', '=', intval($params['id']));
             $field = ['*'];
-            $with[] = 'skuInfo';
         }
 
         if (!empty($params['type'])) {
