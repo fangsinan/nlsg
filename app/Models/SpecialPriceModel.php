@@ -420,7 +420,7 @@ class SpecialPriceModel extends Base
     public function skuInfo()
     {
         return $this->hasOne('App\Models\MallSku', 'sku_number', 'sku_number')
-            ->select(['id', 'sku_number', 'picture', 'stock', 'status']);
+            ->select(['id', 'sku_number', 'picture', 'stock', 'status','original_price','price']);
     }
 
     public function goodsInfo()
