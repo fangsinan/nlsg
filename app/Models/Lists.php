@@ -44,6 +44,7 @@ class Lists extends Model
         ->with(['works'=> function($query){
             $query->select('works_id','user_id','title', 'cover_img')
                 ->where('status',4)
+                ->limit(3)
                 ->inRandomOrder();
         }, 'works.user'=>function($query){
             $query->select('id','nickname','headimg');
@@ -71,7 +72,7 @@ class Lists extends Model
 
     public function getRankWorks()
     {
-        $lists = Lists::select('id', 'title')
+        $lists = Lists::select('id', 'title','num','cover')
             ->with([
                 'works' => function ($query) {
                     $query->select('works_id', 'user_id', 'title','subtitle', 'cover_img','chapter_num', 'subscribe_num','is_free','price');
@@ -81,15 +82,16 @@ class Lists extends Model
                 }
             ])
             ->where('type', 4)
-            ->limit(10)
+            ->limit(3)
             ->get()
             ->toArray();
         return $lists;
     }
 
+
     public function getRankWiki()
     {
-        $lists = Lists::select('id', 'title')
+        $lists = Lists::select('id', 'title','num','cover')
             ->with([
                 'listWorks'  =>function($query){
                     $query->select('id','lists_id', 'works_id');
@@ -99,7 +101,7 @@ class Lists extends Model
                 }
             ])
             ->where('type', 5)
-            ->limit(10)
+            ->limit(3)
             ->get();
 
         $lists->map(function($item){
