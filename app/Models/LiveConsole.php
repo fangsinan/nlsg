@@ -152,7 +152,14 @@ class LiveConsole extends Base
         }
         if (empty($params['cover_img'] ?? '')) {
             return ['code' => false, 'msg' => '直播封面错误'];
+        } else {
+            $params['cover_img'] = parse_url($params['cover_img']);
+            $params['cover_img'] = $params['cover_img']['path'] ?? '';
+            if (empty($params['cover_img'])) {
+                return ['code' => false, 'msg' => '直播封面错误'];
+            }
         }
+
         if (empty($params['msg'] ?? '')) {
             return ['code' => false, 'msg' => '直播预约公告错误'];
         }

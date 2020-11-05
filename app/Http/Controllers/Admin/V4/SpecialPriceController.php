@@ -127,6 +127,7 @@ class SpecialPriceController extends Controller
      * @apiParam {string} begin_time 开始时间
      * @apiParam {string} end_time 结束时间
      * @apiParam {number=1,2} status 状态(1上架2下架)
+     * @apiParam {string} group_name 获取详情和编辑时用(id没用)
      **/
     public function flashSaleList(Request $request){
         $servers = new SpecialPriceServers();
