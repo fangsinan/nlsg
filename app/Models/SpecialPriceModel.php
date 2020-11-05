@@ -158,8 +158,8 @@ class SpecialPriceModel extends Base
                 })
                 ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
                     'nsp.goods_original_price', 'nmg.picture',
-                    'nmg.original_price', 'nsp.use_stock',
-                    DB::raw('if(nsp.stock=0,1,nsp.stock) as stock'),
+                    'nmg.original_price', 'nsp.use_stock','nsp.stock',
+//                    DB::raw('if(nsp.stock=0,1,nsp.stock) as stock'),
                     'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
                     DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
                     DB::raw('unix_timestamp(end_time) as end_timestamp'),
