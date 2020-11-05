@@ -922,21 +922,20 @@ class MallOrderGroupBuy extends Base
         ];
 
         if ($data['status'] == 1) {
-            $price_list_new[] = ['key' => '应付金额', 'value' => '¥'.$data['price']];
+            $price_list_new[] = ['key' => '应付金额', 'value' => '¥' . $data['price']];
         } else {
-            $price_list_new[] = ['key' => '实付金额', 'value' => '¥'.$data['pay_price']];
+            $price_list_new[] = ['key' => '实付金额', 'value' => '¥' . $data['pay_price']];
         }
 
         foreach ($price_list_new as $new_k => $new_v) {
-            if ($new_v['value'] == 0) {
+            if ($new_v['value'] == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
                 unset($price_list_new[$new_k]);
-            } else {
-                if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
-                    $new_v['value'] = '-' . $new_v['value'];
-                }
-                if (in_array($new_v['key'], ['运费'])) {
-                    $new_v['value'] = '+' . $new_v['value'];
-                }
+            }
+            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
+                $new_v['value'] = '-' . $new_v['value'];
+            }
+            if (in_array($new_v['key'], ['运费'])) {
+                $new_v['value'] = '+' . $new_v['value'];
             }
         }
         $price_list_new = array_values($price_list_new);
