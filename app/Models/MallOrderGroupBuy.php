@@ -868,6 +868,7 @@ class MallOrderGroupBuy extends Base
         $price_info['pay_time'] = $data['pay_time'];
         $price_info['pay_type'] = $data['pay_type'];
         $price_info['price'] = $data['price'];
+        $price_info['pay_price'] = $data['pay_price'];
 
         $bill_info = [];
         $bill_info['bill_type'] = $data['bill_type'];
