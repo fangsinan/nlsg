@@ -346,6 +346,7 @@ class SpecialPriceServers
             $temp['stock'] = $v['stock'] ?? 0;
             $temp['group_price'] = $v['group_price'];
             $temp['group_num'] = $v['group_num'];
+            $temp['life'] = $v['life'];
 
             $temp['sku_price'] = $temp['sku_price_black'] = $temp['sku_price_yellow'] =
             $temp['sku_price_dealer'] = $temp['t_money'] = $temp['t_money_black'] =
