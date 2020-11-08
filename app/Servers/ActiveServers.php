@@ -158,7 +158,7 @@ class ActiveServers
                 $g_data[] = $temp;
             }
 
-            $g_res = DB::table('nlsg_active_group_goods_lit')
+            $g_res = DB::table('nlsg_active_group_goods_list')
                 ->insert($g_data);
             if (!$g_res) {
                 DB::rollBack();

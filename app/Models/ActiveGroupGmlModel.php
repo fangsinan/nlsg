@@ -14,7 +14,7 @@ class ActiveGroupGmlModel extends Base
     //获取活动板块的商品列表
     public function goods_list($id)
     {
-        return DB::table('nlsg_active_group_goods_lit')
+        return DB::table('nlsg_active_group_goods_list')
             ->where('mid', '=', $id)
             ->select(['goods_id', 'goods_type'])
             ->get();
