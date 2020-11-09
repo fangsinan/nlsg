@@ -114,7 +114,7 @@ class Lists extends Model
     {
         $lists = Lists::select('id', 'title','num','cover')
                 ->with([
-                    'goods' => function ($query) {
+                    'lists' => function ($query) {
                         $query->select('works_id', 'name','price');
                     }
                 ])
