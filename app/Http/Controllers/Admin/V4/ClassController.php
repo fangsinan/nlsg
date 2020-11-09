@@ -16,7 +16,7 @@ class ClassController extends Controller
      * @api {get} api/admin_v4/class/column 专栏列表
      * @apiVersion 4.0.0
      * @apiName  column
-     * @apiGroup 虚拟课程
+     * @apiGroup 后台-专栏列表
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/column
      *
      * @apiParam {number} page 分页
@@ -74,7 +74,7 @@ class ClassController extends Controller
      * @api {get} api/admin_v4/class/lecture 讲座列表
      * @apiVersion 4.0.0
      * @apiName  lecture
-     * @apiGroup 虚拟课程
+     * @apiGroup 后台-讲座列表
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/lecture
      *
      * @apiParam {number} page 分页
@@ -132,7 +132,7 @@ class ClassController extends Controller
     * @api {get} api/admin_v4/class/works 精品课
     * @apiVersion 4.0.0
     * @apiName  lecture
-    * @apiGroup 虚拟课程
+    * @apiGroup 后台-精品课
     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/works
     *
     * @apiParam {number} page 分页
