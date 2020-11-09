@@ -20,7 +20,10 @@ class Order extends Base
 
     protected $fillable = [ 'id','live_num','pay_type','share_code','activity_tag','kun_said','refund_no','is_live_order_send',
         'ordernum', 'status', 'type', 'user_id', 'relation_id', 'cost_price', 'price', 'twitter_id', 'coupon_id', 'ip',
-        'os_type', 'live_id', 'reward_type','reward','service_id','reward_num','pay_time','start_time','end_time','pay_price','city','vip_order_type'
+        'os_type', 'live_id', 'reward_type','reward','service_id','reward_num','pay_time','start_time','end_time','pay_price','city','vip_order_type',
+        'send_type','send_user_id',
+
+
     ];
 
 

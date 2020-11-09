@@ -439,7 +439,7 @@ class SearchController extends Controller
             $res['goods'] = MallGoods::search($keywords);
             //线下门票
             $res['products'] = OfflineProducts::search($keywords);
-            $res['new_vip'] = [ 'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/poster_img/1581599882211_.pic.jpg'];
+            $res['new_vip'] = [ 'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/poster_img/1581599882211_.pic.jpg','price'=>360.00];
 
         }
 

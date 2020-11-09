@@ -817,4 +817,89 @@ class OrderController extends Controller
     }
 
 
+
+
+
+    /**
+     * @api {post} /api//v4/order/create_send_order 赠送课程下单
+     * @apiName create_send_order
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} relation_id 目标id
+     * @apiParam {int} send_type   目标类型  1 专栏/讲座   2课程
+     * @apiParam {int} os_type os_type 1 安卓 2ios
+     * @apiParam {int} live_id 直播id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": { }
+     * }
+     */
+    public function createSendOrder(Request $request)
+    {
+        $relation_id = $request->input('relation_id', 0);   //目标id
+        $send_type = $request->input('send_type', 0);   //目标类型  1 专栏/讲座   2课程
+        $os_type = $request->input('os_type', 0);
+        $pay_type = $request->input('pay_type', 0);
+        $live_id = $request->input('live_id', 0);
+//        $coupon_id = $request->input('coupon_id', 0);
+
+        $user_id = $this->user['id'];
+
+        //检测下单参数有效性
+        if (empty($user_id)) {
+            return $this->error(0, '用户id有误');
+        }
+
+        $loginUserInfo = User::find($user_id);
+        if (empty($loginUserInfo)) {
+            return $this->error(0, '用户有误');
+        }
+
+        if($send_type == 1 ){
+            //$column_id 专栏信息
+            $column_data = Column::find($relation_id);
+            if (empty($column_data)) {
+                return $this->error(0, '专栏不存在');
+            }
+            $price = $column_data->price;
+
+        }else{
+            $works_data = Works::find($relation_id);
+            if (empty($works_data)) {
+                return $this->error(0, '当前课程不存在');
+            }
+            $price = $works_data->price;
+        }
+
+
+        //优惠券
+//        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $price, 1);
+
+
+        $ordernum = MallOrder::createOrderNumber($user_id, 3);
+        $data = [
+            'ordernum' => $ordernum,
+            'type' => 17,
+            'user_id' => $user_id,
+            'relation_id' => $relation_id,
+            'price' => $price,
+            'ip' => $request->getClientIp(),
+            'os_type' => $os_type,
+            'pay_type' => $pay_type,
+            'live_id' => $live_id,
+            'send_type' => $send_type,
+        ];
+        $order = Order::firstOrCreate($data);
+        return $this->success($order['id']);
+
+    }
+
+
+
+
 }

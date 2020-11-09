@@ -304,6 +304,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('notify/settings', 'NotifyController@settings');
         Route::get('user/notify_settings', 'NotifyController@getNotifySettings');
 
+        //赠送流程
+        Route::get('order/create_send_order', 'OrderController@createSendOrder'); //下单
+        Route::get('send/get_send_order', 'SendController@getSendOrder');        //获取订单详情
+        Route::get('send/send_edit', 'SendController@getSendEdit');             //点击领取操作
 
     });
 });
