@@ -10,10 +10,7 @@ use Carbon\Carbon;
 
 class ClassController extends Controller
 {
-    public function index()
-    {
 
-    }
 
     /**
      * @api {get} api/admin_v4/class/column 专栏列表
@@ -23,6 +20,11 @@ class ClassController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/column
      *
      * @apiParam {number} page 分页
+     * @apiParam {string} title 名称
+     * @apiParam {number} status 上下架
+     * @apiParam {string} author 作者名称
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -34,10 +36,33 @@ class ClassController extends Controller
      *    }
      * }
      */
-    public   function  column()
+    public   function  column(Request $request)
     {
-        $lists = Column::with('user:id,nickname,phone')
-                ->select('id','user_id','sort','name','title','subtitle','message','status','original_price','price','twitter_price','cover_pic','details_pic')
+        $title    = $request->get('title');
+        $status   = $request->get('status');
+        $nickname = $request->get('author');
+        $start    = $request->get('start');
+        $end      = $request->get('end');
+        $query = Column::with('user:id,nickname,phone')
+                ->when($status, function ($query) use ($status) {
+                           $query->where('status', $status);
+                })
+                ->when($title, function ($query) use ($title) {
+                   $query->where('name', 'like', '%'.$title.'%');
+                })
+                ->when($nickname, function ($query) use ($nickname) {
+                   $query->whereHas('user', function ($query) use ($nickname) {
+                       $query->where('nickname', 'like', '%'.$nickname.'%');
+                   });
+                })
+                ->when($start && $end, function ($query) use ($start, $end) {
+                  $query->whereBetween('created_at', [
+                      Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                      Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                  ]);
+                });
+
+        $lists =  $query->select('id','user_id','name','title','subtitle','price')
                 ->where('type', 1)
                 ->orderBy('created_at','desc')
                 ->paginate(10)
@@ -53,6 +78,11 @@ class ClassController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/lecture
      *
      * @apiParam {number} page 分页
+     * @apiParam {string} title 名称
+     * @apiParam {number} status 上下架
+     * @apiParam {string} author 作者名称
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -66,13 +96,36 @@ class ClassController extends Controller
      */
     public  function  lecture()
     {
-        $lists = Column::with('user:id,nickname,phone')
-                       ->select('id','user_id','sort','name','title','subtitle','message','status','original_price','price','twitter_price','cover_pic','details_pic')
-                       ->where('type', 2)
-                       ->orderBy('created_at','desc')
-                       ->paginate(10)
-                       ->toArray();
-               return success($lists['data']);
+        $title    = $request->get('title');
+        $status   = $request->get('status');
+        $nickname = $request->get('author');
+        $start    = $request->get('start');
+        $end      = $request->get('end');
+        $query = Column::with('user:id,nickname,phone')
+                ->when($status, function ($query) use ($status) {
+                           $query->where('status', $status);
+                })
+                ->when($title, function ($query) use ($title) {
+                   $query->where('name', 'like', '%'.$title.'%');
+                })
+                ->when($nickname, function ($query) use ($nickname) {
+                   $query->whereHas('user', function ($query) use ($nickname) {
+                       $query->where('nickname', 'like', '%'.$nickname.'%');
+                   });
+                })
+                ->when($start && $end, function ($query) use ($start, $end) {
+                  $query->whereBetween('created_at', [
+                      Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                      Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                  ]);
+                });
+
+        $lists =  $query->select('id','user_id','name','title','subtitle','price')
+                ->where('type', 2)
+                ->orderBy('created_at','desc')
+                ->paginate(10)
+                ->toArray();
+        return success($lists['data']);
     }
 
     /**
@@ -142,12 +195,10 @@ class ClassController extends Controller
 
         $lists = $query->select('id','title', 'type','is_end','created_at','user_id','view_num', 'status','price')
                   ->orderBy('id', 'desc')
-                  ->limit($limit)
-                  ->offset($offset)
-                  ->get()
+                  ->paginate(10)
                   ->toArray();
 
-        return success($lists);
+        return success($lists['data']);
 
     }
 
