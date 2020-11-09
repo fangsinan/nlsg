@@ -136,7 +136,7 @@ class ClassController extends Controller
     * @apiName  lecture
     * @apiGroup 后台-虚拟课程
     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/works
-    * @apiDescription 精品课
+    * @apiDescription 精品课列表
     *
     * @apiParam {number} page 分页
     *
