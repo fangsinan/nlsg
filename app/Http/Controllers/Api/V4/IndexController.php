@@ -561,6 +561,43 @@ class IndexController extends Controller
      * ]
      * }
      * ]
+     *  "goods": [
+                 {
+                     "id": 10,
+                     "title": "热门商品榜单",
+                     "num": 2,
+                     "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
+                     "goods": [
+                         {
+                             "works_id": 48,
+                             "name": " 香港Mcomb儿童专用智能牙刷",
+                             "price": "220.00",
+                             "pivot": {
+                                 "lists_id": 10,
+                                 "works_id": 48
+                             }
+                         },
+                         {
+                             "works_id": 58,
+                             "name": "得力 儿童益智绘画套装",
+                             "price": "90.00",
+                             "pivot": {
+                                 "lists_id": 10,
+                                 "works_id": 58
+                             }
+                         },
+                         {
+                             "works_id": 60,
+                             "name": "汉字奇遇-识字启蒙卡片",
+                             "price": "198.00",
+                             "pivot": {
+                                 "lists_id": 10,
+                                 "works_id": 60
+                             }
+                         }
+                     ]
+                 }
+             ]
      * }
      *     }
      *
@@ -571,7 +608,8 @@ class IndexController extends Controller
         $model = new Lists();
         $data = [
             'works' => $model->getRankWorks(),
-            'wiki'  => $model->getRankWiki()
+            'wiki'  => $model->getRankWiki(),
+            'goods' => $model->getRankGoods()
         ];
 
         return $this->success($data);

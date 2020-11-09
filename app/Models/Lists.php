@@ -110,6 +110,21 @@ class Lists extends Model
         return $lists;
     }
 
+    public  function  getRankGoods()
+    {
+        $lists = Lists::select('id', 'title','num','cover')
+                ->with([
+                    'goods' => function ($query) {
+                        $query->select('works_id', 'name','price');
+                    }
+                ])
+                ->where('type', 6)
+                ->limit(3)
+                ->get()
+                ->toArray();
+        return $lists;
+    }
+
     public function listWorks()
     {
         return $this->hasMany('App\Models\ListsWork','lists_id', 'id');
@@ -125,6 +140,12 @@ class Lists extends Model
     {
        return $this->belongsTo('App\Models\Wiki',
            'nlsg_lists_work', 'lists_id', 'works_id');
+    }
+
+    public function goods()
+    {
+        return $this->belongsToMany('App\Models\MallGoods',
+            'nlsg_lists_work', 'lists_id', 'works_id');
     }
 
 
