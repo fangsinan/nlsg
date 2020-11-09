@@ -133,10 +133,10 @@ class ClassController extends Controller
     /**
     * @api {get} api/admin_v4/class/works 精品课
     * @apiVersion 4.0.0
-    * @apiName  lecture
+    * @apiName  works
     * @apiGroup 后台-虚拟课程
     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/works
-    * @apiDescription 精品课列表
+    * @apiDescription 精品课
     *
     * @apiParam {number} page 分页
     *
