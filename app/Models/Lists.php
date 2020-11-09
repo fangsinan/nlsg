@@ -114,7 +114,7 @@ class Lists extends Model
     {
         $lists = Lists::select('id', 'title','num','cover')
                 ->with([
-                    'lists' => function ($query) {
+                    'listGoods' => function ($query) {
                         $query->select('works_id', 'name','price');
                     }
                 ])
@@ -142,7 +142,7 @@ class Lists extends Model
            'nlsg_lists_work', 'lists_id', 'works_id');
     }
 
-    public function goods()
+    public function listGoods()
     {
         return $this->belongsToMany('App\Models\MallGoods',
             'nlsg_lists_work', 'lists_id', 'works_id');
