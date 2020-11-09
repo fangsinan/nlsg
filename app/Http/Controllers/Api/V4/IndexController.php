@@ -455,9 +455,9 @@ class IndexController extends Controller
      * @apiSuccess {string}  works.title  作品标题
      * @apiSuccess {string}  works.cover_img  作品封面
      * @apiSuccess {string}  goods 商品排行榜
-     * @apiSuccess {string}  goods.id 商品id
-     * @apiSuccess {string}  goods.name 商品名称
-     * @apiSuccess {string}  goods.price 商品价格
+     * @apiSuccess {string}  goods.list_goods.id 商品id
+     * @apiSuccess {string}  goods.list_goods.name 商品名称
+     * @apiSuccess {string}  goods.list_goods.price 商品价格
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
