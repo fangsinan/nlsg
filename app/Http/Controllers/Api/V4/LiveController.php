@@ -290,7 +290,7 @@ class LiveController extends Controller
      */
     public function getLiveBackLists()
     {
-        $lists = LiveInfo::with('user:id,nickname','live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password,playback_url,file_id')
+        $lists = LiveInfo::with('user:id,nickname','live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
                    ->select('id','live_pid','user_id')
                    ->where('status', 4)
                    ->whereNotNull('playback_url')
