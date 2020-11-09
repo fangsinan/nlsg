@@ -139,6 +139,14 @@ class ClassController extends Controller
     * @apiDescription 精品课
     *
     * @apiParam {number} page 分页
+    * @apiParam {number} work_id 编号
+    * @apiParam {string} title 标题
+    * @apiParam {number} status 上下架
+    * @apiParam {string} author 作者名称
+    * @apiParam {number} category_id 分类id
+    * @apiParam {string} author 作者名称
+    * @apiParam {string} start 开始时间
+    * @apiParam {string} end  结束时间
     *
     * @apiSuccessExample  Success-Response:
     * HTTP/1.1 200 OK
@@ -161,10 +169,6 @@ class ClassController extends Controller
         $start    =  $request->get('start');
         $end      =  $request->get('end');
         $is_end   =  $request->get('is_end');
-
-        $limit   =  $request->query('limit', 15);
-        $offset  =   $request->query('offset', 0);
-
 
         $query  = Works::with('user:id,nickname')
                 ->when($work_id, function ($query) use ($work_id) {
