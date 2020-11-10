@@ -128,6 +128,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     //排行榜
     Route::get('rank/works', 'RankController@works');
     Route::get('rank/wiki', 'RankController@wiki');
+    Route::get('rank/goods', 'RankController@goods');
 
     //我的
     Route::get('user/homepage', 'UserController@homepage');

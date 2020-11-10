@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\MallGoods;
+use App\Models\Wiki;
+use App\Models\Works;
 use Illuminate\Http\Request;
 use App\Models\Lists;
 use App\Models\ListsWork;
@@ -31,76 +34,87 @@ class RankController extends Controller
      *       "code": 200,
      *       "msg" : '成功',
      *      "data": [
-    {
-      "id": 8,
-      "title": "热门课程榜单",
-      "works": [
-        {
-          "works_id": 30,
-          "user_id": 168934,
-          "title": "不要羞辱你的孩子 他的心很脆弱",
-          "subtitle": "家庭教育",
-          "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
-          "chapter_num": 8,
-          "subscribe_num": 0,
-          "is_free": 1,
-          "price": "0.00",
-          "pivot": {
-            "lists_id": 8,
-            "works_id": 30
-          }
-         "user": {
-            "id": 168934,
-            "nickname": "chandler"
-         }
-        },
-        {
-          "works_id": 31,
-          "user_id": 168934,
-          "title": "小孩子做噩梦怎么办？九成父母都没当回事",
-          "subtitle": "家庭教育",
-          "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
-          "chapter_num": 5,
-          "subscribe_num": 0,
-          "is_free": 1,
-          "price": "0.00",
-          "pivot": {
-            "lists_id": 8,
-            "works_id": 31
-          }
-          "user": {
-                "id": 168934,
-                "nickname": "chandler"
-           }
-        },
-        {
-          "works_id": 32,
-          "user_id": 1,
-          "title": "时间就像你手中的冰淇淋",
-          "subtitle": "",
-          "cover_img": "/wechat/works/video/161627/2017061416424169642.jpg",
-          "chapter_num": 0,
-          "subscribe_num": 0,
-          "is_free": 0,
-          "price": "0.00",
-          "pivot": {
-            "lists_id": 8,
-            "works_id": 32
-          }
-          "user": {
-             "id": 168934,
-             "nickname": "chandler"
-          }
-        }
-      ]
+     * {
+     * "id": 8,
+     * "title": "热门课程榜单",
+     * "works": [
+     * {
+     * "works_id": 30,
+     * "user_id": 168934,
+     * "title": "不要羞辱你的孩子 他的心很脆弱",
+     * "subtitle": "家庭教育",
+     * "cover_img": "/wechat/works/video/161627/2017061416324725316.jpg",
+     * "chapter_num": 8,
+     * "subscribe_num": 0,
+     * "is_free": 1,
+     * "price": "0.00",
+     * "pivot": {
+     * "lists_id": 8,
+     * "works_id": 30
+     * }
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler"
+     * }
+     * },
+     * {
+     * "works_id": 31,
+     * "user_id": 168934,
+     * "title": "小孩子做噩梦怎么办？九成父母都没当回事",
+     * "subtitle": "家庭教育",
+     * "cover_img": "/wechat/works/video/161627/2017061416393315731.jpg",
+     * "chapter_num": 5,
+     * "subscribe_num": 0,
+     * "is_free": 1,
+     * "price": "0.00",
+     * "pivot": {
+     * "lists_id": 8,
+     * "works_id": 31
+     * }
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler"
+     * }
+     * },
+     * {
+     * "works_id": 32,
+     * "user_id": 1,
+     * "title": "时间就像你手中的冰淇淋",
+     * "subtitle": "",
+     * "cover_img": "/wechat/works/video/161627/2017061416424169642.jpg",
+     * "chapter_num": 0,
+     * "subscribe_num": 0,
+     * "is_free": 0,
+     * "price": "0.00",
+     * "pivot": {
+     * "lists_id": 8,
+     * "works_id": 32
+     * }
+     * "user": {
+     * "id": 168934,
+     * "nickname": "chandler"
+     * }
+     * }
+     * ]
      *     }
      *
      */
     public function works()
     {
-        $model = new Lists();
-        $lists = $model->getRankWorks();
-        return success($lists);
+        $lists = Lists::select('id', 'title', 'num', 'cover')
+            ->where('type', 4)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if (!$lists) {
+            return error('还没有数据');
+        }
+        $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
+        $works = Works::whereIn('id', $works_id)
+            ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num', 'subscribe_num', 'is_free', 'price')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($works);
     }
 
     /**
@@ -122,53 +136,87 @@ class RankController extends Controller
      *     {
      *       "code": 200,
      *       "msg" : '成功',
-            "data": [
-               {
-                 "id": 9,
-                 "title": "热门百科榜单",
-                 "content": null,
-                 "list_works": [
-                   {
-                     "id": 16,
-                     "lists_id": 9,
-                     "works_id": 1,
-                     "created_at": "2020-07-08T02:00:00.000000Z",
-                     "updated_at": "2020-07-08T02:00:00.000000Z",
-                     "wiki": {
-                       "id": 1,
-                       "name": "室内空气污染对孩子的危害",
-                       "content": "社会的进步，工业的发展，导致污染越来越严重，触目惊心",
-                       "view_num": 10,
-                       "like_num": 2,
-                       "comment_num": 5
-                     }
-                   },
-                   {
-                     "id": 17,
-                     "lists_id": 9,
-                     "works_id": 2,
-                     "created_at": "2020-07-08T02:00:00.000000Z",
-                     "updated_at": "2020-07-08T02:00:00.000000Z",
-                     "wiki": {
-                       "id": 2,
-                       "name": "世界名著必读岁月经典",
-                       "content": "每个时代都有极其红极广受好评",
-                       "view_num": 5,
-                       "like_num": 6,
-                       "comment_num": 5
-                     }
-                   }
-                 ]
-               }
-             ]
+     * "data": [
+     * {
+     * "id": 9,
+     * "title": "热门百科榜单",
+     * "content": null,
+     * "list_works": [
+     * {
+     * "id": 16,
+     * "lists_id": 9,
+     * "works_id": 1,
+     * "created_at": "2020-07-08T02:00:00.000000Z",
+     * "updated_at": "2020-07-08T02:00:00.000000Z",
+     * "wiki": {
+     * "id": 1,
+     * "name": "室内空气污染对孩子的危害",
+     * "content": "社会的进步，工业的发展，导致污染越来越严重，触目惊心",
+     * "view_num": 10,
+     * "like_num": 2,
+     * "comment_num": 5
+     * }
+     * },
+     * {
+     * "id": 17,
+     * "lists_id": 9,
+     * "works_id": 2,
+     * "created_at": "2020-07-08T02:00:00.000000Z",
+     * "updated_at": "2020-07-08T02:00:00.000000Z",
+     * "wiki": {
+     * "id": 2,
+     * "name": "世界名著必读岁月经典",
+     * "content": "每个时代都有极其红极广受好评",
+     * "view_num": 5,
+     * "like_num": 6,
+     * "comment_num": 5
+     * }
+     * }
+     * ]
+     * }
+     * ]
      *     }
      *
      */
     public function wiki()
     {
-        $model = new Lists();
-        $lists = $model->getRankWiki();
-        return success($lists);
+        $lists = Lists::select('id', 'title', 'num', 'cover')
+            ->where('type', 5)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if (!$lists) {
+            return error('还没有数据');
+        }
+        $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
+        $wikis = Wiki::whereIn('id', $works_id)
+            ->select('id','name','view_num','like_num','comment_num','cover')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($wikis);
+
+    }
+
+
+    public function goods(Request $request)
+    {
+        $lists = Lists::select('id', 'title', 'num', 'cover')
+            ->where('type', 6)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if (!$lists) {
+            return error('还没有排行榜');
+        }
+        $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
+        if ($works_id) {
+            $goods = MallGoods::whereIn('id', $works_id)
+                ->select('id', 'name', 'price')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10)
+                ->toArray();
+        }
+
+        return success($goods);
     }
 
 }
