@@ -33,7 +33,7 @@ class ClassController extends Controller
       * @apiSuccess {string} title  标题
       * @apiSuccess {string} subtitle  副标题
       * @apiSuccess {string} user    作者相关
-      * @apiSuccess {string}  作品数量 待定
+      * @apiSuccess {string} info_num 作品数量
       * @apiSuccess {string}  price  价格
       * @apiSuccess {number}  status  状态
       * @apiSuccess {string}  created_at  创建时间
@@ -74,7 +74,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at','info_num')
             ->where('type', 1)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -101,7 +101,7 @@ class ClassController extends Controller
      * @apiSuccess {string} title  标题
      * @apiSuccess {string} subtitle  副标题
      * @apiSuccess {string} user    作者相关
-     * @apiSuccess {string}  作品数量 待定
+     * @apiSuccess {string}  info_num 作品数量
      * @apiSuccess {string}  price  价格
      * @apiSuccess {number}  status  状态
      * @apiSuccess {string}  created_at  创建时间
@@ -142,7 +142,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at','info_num')
             ->where('type', 2)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
