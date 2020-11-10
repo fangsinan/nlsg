@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Works;
+use App\Models\WorksCategory;
+use App\Models\WorksCategoryRelation;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -147,6 +149,7 @@ class ClassController extends Controller
      * @apiParam {string} author 作者名称
      * @apiParam {string} start 开始时间
      * @apiParam {string} end  结束时间
+     * @apiParam {array} category 分类
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -204,6 +207,12 @@ class ClassController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
+        if ($lists['data']){
+            foreach ($lists['data'] as &$v){
+                $category_ids = WorksCategoryRelation::where('work_id', $v['id'])->pluck('category_id');
+                $v['category'] = WorksCategory::whereIn('id',$category_ids)->pluck('name');
+            }
+        }
 
         return success($lists);
 
