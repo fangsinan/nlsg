@@ -31,6 +31,7 @@ class VipController extends Controller
      * @apiSuccess {string[]} code_info 详情
      * @apiSuccess {number} code_info.name 兑换券名称
      * @apiSuccess {number} code_info.number 兑换券编码
+     * @apiSuccess {string[]} user_info 用户详情
      * @apiSuccessExample {json} Request-Example:
      *
      * {
@@ -93,7 +94,7 @@ class VipController extends Controller
         $data = $model->takeBack($this->user, $request->input());
         return $this->getRes($data);
     }
-    
+
 
     //领取兑换券
     public function redeemCodeGet(){

@@ -25,6 +25,7 @@ class VipRedeemUser extends Base
 
         if (!empty($params['id'] ?? 0)) {
             $query->whereId($params['id']);
+            $query->with(['userInfo']);
         }
 
         $query->where('user_id', '=', $user['id']);
@@ -65,7 +66,8 @@ class VipRedeemUser extends Base
 
         $list = $query->limit($size)
             ->offset(($page - 1) * $size)
-            ->select(['id', 'redeem_code_id', 'status', 'created_at', DB::raw("concat('¥',$price) as price")])
+            ->select(['id', 'redeem_code_id', 'status', 'created_at', 'user_id',
+                DB::raw("concat('¥',$price) as price")])
             ->get();
 
         if (!empty($params['id']??0)){
@@ -167,5 +169,11 @@ class VipRedeemUser extends Base
     {
         return $this->hasOne(VipRedeemCode::class, 'id', 'redeem_code_id')
             ->select(['id', 'name', 'number']);
+    }
+
+    public function userInfo()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id')
+            ->select(['id', 'nickname', 'headimg']);
     }
 }
