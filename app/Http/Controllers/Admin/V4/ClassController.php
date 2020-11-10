@@ -232,6 +232,7 @@ class ClassController extends Controller
      * @apiParam {number} status 上下架
      * @apiParam {string} author 作者名称
      * @apiParam {number} category_id 分类id
+     * @apiParam {number} chapter_num 章节数
      * @apiParam {string} author 作者名称
      * @apiParam {string} start 开始时间
      * @apiParam {string} end  结束时间
@@ -288,7 +289,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price','chapter_num')
             ->where('is_audio_book', 1)
             ->orderBy('id', 'desc')
             ->paginate(10)
