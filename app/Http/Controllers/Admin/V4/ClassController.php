@@ -233,6 +233,7 @@ class ClassController extends Controller
      * @apiParam {string} author 作者名称
      * @apiParam {number} category_id 分类id
      * @apiParam {number} chapter_num 章节数
+     * @apiParam {array} category 分类
      * @apiParam {string} author 作者名称
      * @apiParam {string} start 开始时间
      * @apiParam {string} end  结束时间
@@ -294,6 +295,12 @@ class ClassController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
+        if ($lists['data']){
+           foreach ($lists['data'] as &$v){
+               $category_ids = WorksCategoryRelation::where('work_id', $v['id'])->pluck('category_id');
+               $v['category'] = WorksCategory::whereIn('id',$category_ids)->pluck('name');
+           }
+       }
 
         return success($lists);
 
