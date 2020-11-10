@@ -103,7 +103,7 @@ class Column extends Base
 
     }
 
-    
+
     public  function  getColumnUser()
     {
         $users = User::select('id','nickname')
