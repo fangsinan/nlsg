@@ -70,24 +70,24 @@ class VipRedeemUser extends Base
                 DB::raw("concat('¥',$price) as price")])
             ->get();
 
-        if (!empty($params['id']??0)){
-            foreach ($list as $v){
-                if($v->status == 3){
+        if (!empty($params['id'] ?? 0)) {
+            foreach ($list as $v) {
+                if ($v->status == 3) {
                     $base_url = ConfigModel::getData(26);
                     $base_url = parse_url($base_url);
 
                     //todo 分享二维码参数待定
                     $url_data = [
-                        'c'=>$params['id'],
-                        'r'=>str_random(10)
+                        'c' => $params['id'],
+                        'r' => str_random(10)
                     ];
                     $url_data = http_build_query($url_data);
 
-                    $qr_url = $base_url['scheme'].'://'.$base_url['host'].$base_url['path'];
-                    $qr_url = $qr_url.'?'.$url_data;
+                    $qr_url = $base_url['scheme'] . '://' . $base_url['host'] . $base_url['path'];
+                    $qr_url = $qr_url . '?' . $url_data;
 
                     $qrModel = new CreatePosterController();
-                    $qr_data = $qrModel->createQRcode($qr_url,true);
+                    $qr_data = $qrModel->createQRcode($qr_url, true);
 
                     $v->qr_code = $qr_data;
                 }
@@ -158,6 +158,36 @@ class VipRedeemUser extends Base
             return ['code' => true, 'msg' => '成功'];
         }
 
+    }
+
+    public function get($user, $params)
+    {
+        if (empty($params['id'] ?? 0)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check = self::query()->whereId($params['id'])->where('user_id', '=', $user['id'])->first();
+        if (empty($check)) {
+            return ['code' => false, 'msg' => '兑换券不存在'];
+        }
+        if ($check->status != 3) {
+            return ['code' => false, 'msg' => '兑换券状态错误'];
+        }
+        if ($check->user_id == $user['id']) {
+            return ['code' => false, 'msg' => '兑换券错误'];
+        }
+
+        $model = new self();
+        $model->redeem_code_id = $check->redeem_code_id;
+        $model->user_id = $user['id'];
+        $model->parent_id = $check->user_id;
+        $model->path = $check->path . ',' . $user['id'];
+        $model->vip_id = $check->vip_id;
+        $model->status = 1;
+        $res = $model->save();
+        if ($res === false) {
+            return ['code' => false, 'msg' => '错误,请重试'];
+        }
+        return ['code' => true, 'msg' => '成功'];
     }
 
     public function use($user, $params)

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\VipRedeemCode;
 use App\Models\VipRedeemUser;
+use App\Models\VipUser;
 use Illuminate\Http\Request;
 
 class VipController extends Controller
@@ -95,13 +96,24 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
-
-    //领取兑换券
-    public function redeemCodeGet(){
-
+    /**
+     * 领取兑换券
+     * @api {post} /api/v4/vip/code_get 领取兑换券
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/vip/code_get
+     * @apiGroup  360会员
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/code_get
+     * @apiDescription 领取兑换券
+     * @apiParam {number} id 记录id
+     */
+    public function redeemCodeGet(Request $request)
+    {
+        $model = new VipRedeemUser();
+        $data = $model->get($this->user, $request->input());
+        return $this->getRes($data);
     }
 
-    //使用兑换券
+    //使用兑换券 put
     public function redeemCodeUse(Request $request)
     {
         $model = new VipRedeemUser();
@@ -109,7 +121,7 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
-    //生成兑换券
+    //生成兑换券 post
     public function redeemCodeCreate(Request $request)
     {
         $model = new VipRedeemCode();
@@ -117,10 +129,81 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
-    //会员详情页
+    /**
+     * 会员详情页
+     * @api {get} /api/v4/vip/home_page 会员详情页
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/vip/home_page
+     * @apiGroup  360会员
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/home_page
+     * @apiDescription 会员详情页
+     *
+     * @apiSuccess {string[]} card_data
+     * @apiSuccess {string} card_data.nickname 昵称
+     * @apiSuccess {string} card_data.headimg 头像
+     * @apiSuccess {number} card_data.level 级别(1:360 2:钻石)
+     * @apiSuccess {string} card_data.expire_time 到期时间
+     * @apiSuccess {string} card_data.surplus_days 剩余天数
+     * @apiSuccess {string} card_data.price 价钱
+     * @apiSuccess {number} card_data.is_open 当前是否开通360(1开了 0没开)
+     *
+     * @apiSuccess {string[]} author 讲师
+     * @apiSuccess {string[]} works_list 课程列表
+     * @apiSuccess {string} detail_image 详情长图
+     *
+     * @apiSuccessExample {json} Request-Example:
+     *
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "now": 1605008475,
+     * "data": {
+     * "card_data": {
+     * "nickname": "chandler",
+     * "headimg": "https://image.nlsgapp.com/image/202009/13f952e04c720a550193e5655534be86.jpg",
+     * "level": 2,
+     * "expire_time": 0,
+     * "surplus_days": 10,
+     * "price": "360",
+     * "is_open": 1
+     * },
+     * "author": [
+     * {
+     * "nickname": "王琨",
+     * "headimg": "/wechat/authorpt/wk.png",
+     * "intro_for_360": ""
+     * },
+     * {
+     * "nickname": "吴岩",
+     * "headimg": "/wechat/works/video/161627/2017121117553852488.jpg",
+     * "intro_for_360": ""
+     * },
+     * {
+     * "nickname": "王康",
+     * "headimg": "/wechat/works/headimg/9784_1529032030.jpeg",
+     * "intro_for_360": ""
+     * }
+     * ],
+     * "works_list": [
+     * {
+     * "id": 568,
+     * "type": 2,
+     * "title": "家庭情境教育工具卡",
+     * "subtitle": "",
+     * "cover_img": "/nlsg/works/20200304023146969654.jpg",
+     * "detail_img": "/nlsg/works/20200304023153543701.jpg",
+     * "price": "0.00"
+     * }
+     * ],
+     * "detail_image": "http://image.nlsgapp.com/nlsg/works/20201110171938316421.png"
+     * }
+     * }
+     */
     public function homePage(Request $request)
     {
-
+        $model = new VipUser();
+        $data = $model->homePage($this->user, $request->input());
+        return $this->getRes($data);
     }
 
 }
