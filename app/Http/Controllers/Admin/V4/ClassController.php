@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Works;
+use App\Models\WorksCategory;
+use App\Models\WorksCategoryRelation;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -26,6 +28,15 @@ class ClassController extends Controller
      * @apiParam {string} author 作者名称
      * @apiParam {string} start  开始时间
      * @apiParam {string} end    结束时间
+     *
+     *  @apiSuccess {string} name  专栏名称
+      * @apiSuccess {string} title  标题
+      * @apiSuccess {string} subtitle  副标题
+      * @apiSuccess {string} user    作者相关
+      * @apiSuccess {string} info_num 作品数量
+      * @apiSuccess {string}  price  价格
+      * @apiSuccess {number}  status  状态
+      * @apiSuccess {string}  created_at  创建时间
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -63,12 +74,12 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at','info_num')
             ->where('type', 1)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-        return success($lists['data']);
+        return success($lists);
     }
 
     /**
@@ -86,6 +97,15 @@ class ClassController extends Controller
      * @apiParam {string} start  开始时间
      * @apiParam {string} end    结束时间
      *
+     * @apiSuccess {string} name  专栏名称
+     * @apiSuccess {string} title  标题
+     * @apiSuccess {string} subtitle  副标题
+     * @apiSuccess {string} user    作者相关
+     * @apiSuccess {string}  info_num 作品数量
+     * @apiSuccess {string}  price  价格
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  创建时间
+     *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -96,14 +116,14 @@ class ClassController extends Controller
      *    }
      * }
      */
-    public function lecture()
+    public function lecture(Request $request)
     {
         $title = $request->get('title');
         $status = $request->get('status');
         $nickname = $request->get('author');
         $start = $request->get('start');
         $end = $request->get('end');
-        $query = Column::with('user:id,nickname,phone')
+        $query = Column::with('user:id,nickname')
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
@@ -122,12 +142,12 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at','info_num')
             ->where('type', 2)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-        return success($lists['data']);
+        return success($lists);
     }
 
     /**
@@ -147,6 +167,15 @@ class ClassController extends Controller
      * @apiParam {string} author 作者名称
      * @apiParam {string} start 开始时间
      * @apiParam {string} end  结束时间
+     *
+     * @apiSuccess {array} category  分类
+     * @apiSuccess {string} title    标题
+     * @apiSuccess {array}  user     作者
+     * @apiSuccess {number} chapter_num 章节数
+     * @apiSuccess {number} price    价格
+     * @apiSuccess {number} is_end   是否完结
+     * @apiSuccess {number} status   0 删除 1 待审核 2 拒绝  3通过 4上架 5下架
+     * @apiSuccess {string} created_at  创建时间
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -200,12 +229,18 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price','is_end', 'chapter_num')
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
+        if ($lists['data']){
+            foreach ($lists['data'] as &$v){
+                $category_ids = WorksCategoryRelation::where('work_id', $v['id'])->pluck('category_id');
+                $v['category'] = WorksCategory::whereIn('id',$category_ids)->pluck('name');
+            }
+        }
 
-        return success($lists['data']);
+        return success($lists);
 
     }
 
@@ -226,6 +261,15 @@ class ClassController extends Controller
      * @apiParam {string} author 作者名称
      * @apiParam {string} start 开始时间
      * @apiParam {string} end  结束时间
+     *
+     * @apiSuccess {array} category  分类
+     * @apiSuccess {string} title    标题
+     * @apiSuccess {array}  user     作者
+     * @apiSuccess {number} chapter_num 章节数
+     * @apiSuccess {number} price    价格
+     * @apiSuccess {number} is_end   是否完结
+     * @apiSuccess {number} status   0 删除 1 待审核 2 拒绝  3通过 4上架 5下架
+     * @apiSuccess {string} created_at  创建时间
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -279,13 +323,19 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price','is_end','chapter_num')
             ->where('is_audio_book', 1)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
+        if ($lists['data']){
+           foreach ($lists['data'] as &$v){
+               $category_ids = WorksCategoryRelation::where('work_id', $v['id'])->pluck('category_id');
+               $v['category'] = WorksCategory::whereIn('id',$category_ids)->pluck('name');
+           }
+       }
 
-        return success($lists['data']);
+        return success($lists);
 
     }
 
