@@ -406,5 +406,68 @@ class ClassController extends Controller
 
     }
 
+    /**
+        * @api {post} api/admin_v4/class/add-lecture 创建讲座
+        * @apiVersion 4.0.0
+        * @apiName  add-lecture
+        * @apiGroup 后台-虚拟课程
+        * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-lecture
+        * @apiDescription 创建讲座
+        *
+        * @apiParam {string} name 专栏名称
+        * @apiParam {string} subtitle 副标题
+        * @apiParam {string} cover_pic 封面图片
+        * @apiParam {string} details_pic 详情图片
+        * @apiParam {string} message 推荐语
+        * @apiParam {number} user_id 作者
+        * @apiParam {string} author 作者名称
+        * @apiParam {string} original_price 定价
+        * @apiParam {string} price 售价
+        *
+        * @apiSuccessExample  Success-Response:
+        * HTTP/1.1 200 OK
+        * {
+        *   "code": 200,
+        *   "msg" : '成功',
+        *   "data": {
+        *
+        *    }
+        * }
+        */
+
+       public function addLecture(Request $request)
+       {
+           $input = $request->all();
+           $name = $input['name'] ?? '';
+           if (!$name) {
+               return error('名称不能为空');
+           }
+           $cover_pic = covert_img($input['cover_pic']);
+           $details_pic = covert_img($input['details_pic']);
+           $subtitle = $input['subtitle'] ?? '';
+           $message = $input['message'] ?? '';
+           $user_id = $input['user_id'] ?? 0;
+           $original_price = $input['original_price'] ?? 0;
+           $price = $input['price'] ?? 0;
+           $online_type = $input['online_type'];
+
+           $res = Column::create([
+               'cover_pic' => $cover_pic,
+               'details_pic' => $details_pic,
+               'name' => $name,
+               'subtitle' => $subtitle,
+               'message' => $message,
+               'user_id' => $user_id,
+               'price' => $price,
+               'original_price' => $original_price
+           ]);
+           if ($res) {
+               return success('创建成功');
+           }
+           return error('创建失败');
+
+       }
+
+
 
 }
