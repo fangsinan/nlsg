@@ -68,7 +68,7 @@ class ClassController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-        return success($lists['data']);
+        return success($lists);
     }
 
     /**
@@ -127,7 +127,7 @@ class ClassController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-        return success($lists['data']);
+        return success($lists);
     }
 
     /**
@@ -205,7 +205,7 @@ class ClassController extends Controller
             ->paginate(10)
             ->toArray();
 
-        return success($lists['data']);
+        return success($lists);
 
     }
 
@@ -285,7 +285,7 @@ class ClassController extends Controller
             ->paginate(10)
             ->toArray();
 
-        return success($lists['data']);
+        return success($lists);
 
     }
 
