@@ -88,6 +88,15 @@ class ClassController extends Controller
      * @apiParam {string} start  开始时间
      * @apiParam {string} end    结束时间
      *
+     * @apiSuccess {string} name  专栏名称
+     * @apiSuccess {string} title  标题
+     * @apiSuccess {string} subtitle  副标题
+     * @apiSuccess {string} user    作者相关
+     * @apiSuccess {string}  作品数量 待定
+     * @apiSuccess {string}  price  价格
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  创建时间
+     *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -98,14 +107,14 @@ class ClassController extends Controller
      *    }
      * }
      */
-    public function lecture()
+    public function lecture(Request $request)
     {
         $title = $request->get('title');
         $status = $request->get('status');
         $nickname = $request->get('author');
         $start = $request->get('start');
         $end = $request->get('end');
-        $query = Column::with('user:id,nickname,phone')
+        $query = Column::with('user:id,nickname')
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
@@ -124,7 +133,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at')
             ->where('type', 2)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
