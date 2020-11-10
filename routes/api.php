@@ -218,6 +218,13 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('mall/get_comment', 'MallOrderController@getComment');//获取评论内容
         //商城结束
 
+        //*******************************新会员部分*******************************
+        Route::get('vip/home_page', 'VipController@homePage');
+        Route::get('vip/code_list', 'VipController@redeemCodeList');
+        Route::put('vip/code_send', 'VipController@redeemCodeSend');
+        Route::put('vip/code_take_back', 'VipController@redeemCodeTakeBack');
+        Route::put('vip/code_use', 'VipController@redeemCodeUse');
+        Route::post('vip/code_create', 'VipController@redeemCodeCreate');
 
         //*******************************我的直播部分开始*******************************
         Route::post('live_console/add', 'LiveConsoleController@add');

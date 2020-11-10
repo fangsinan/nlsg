@@ -18,7 +18,7 @@ class VipUser extends Base
             ->where('is_default', '=', 1)
             ->where('start_time', '<', $now_date)
             ->where('expire_time', '>', $now_date)
-            ->select(['level', 'start_time', 'expire_time'])
+            ->select(['id as vip_id','level', 'start_time', 'expire_time'])
             ->first();
         if (empty($check)) {
             return ['level' => 0, 'start_time' => '', 'expire_time' => ''];
