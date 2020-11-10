@@ -164,6 +164,7 @@ class ClassController extends Controller
      * @apiParam {number} status 上下架
      * @apiParam {string} author 作者名称
      * @apiParam {number} category_id 分类id
+     * @apiParam {number} type  类型
      * @apiParam {string} author 作者名称
      * @apiParam {string} start 开始时间
      * @apiParam {string} end  结束时间
@@ -193,6 +194,7 @@ class ClassController extends Controller
         $work_id = $request->get('work_id');
         $title = $request->get('title');
         $status = $request->get('status');
+        $type   = $request->get('type');
         $nickname = $request->get('author');
         $category_id = $request->get('category_id');
         $start = $request->get('start');
@@ -205,6 +207,9 @@ class ClassController extends Controller
             })
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
+            })
+            ->when($type, function ($query) use ($type) {
+               $query->where('type', $type);
             })
             ->when($is_end, function ($query) use ($title) {
                 $query->where('is_end', $is_end);
