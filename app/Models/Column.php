@@ -102,4 +102,14 @@ class Column extends Base
         return ['res' => $res, 'count'=> $res->count() ];
 
     }
+
+    
+    public  function  getColumnUser()
+    {
+        $users = User::select('id','nickname')
+                ->where('is_author', 1)
+                ->orderBy('created_at','desc')
+                ->get();
+        return $users;
+    }
 }

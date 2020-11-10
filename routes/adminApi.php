@@ -9,7 +9,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('class/listen', 'ClassController@listen');
 
     Route::post('class/add-column','ClassController@addColumn');
+    Route::get('class/get-column-author','ClassController@getColumnAuthors');
     Route::post('class/add-lecture','ClassController@addLecture');
+    Route::post('class/add-works','ClassController@addWorks');
 
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');
