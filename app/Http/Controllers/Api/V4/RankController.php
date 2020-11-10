@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\MallGoods;
+use App\Models\Wiki;
+use App\Models\Works;
 use Illuminate\Http\Request;
 use App\Models\Lists;
 use App\Models\ListsWork;
@@ -99,9 +101,20 @@ class RankController extends Controller
      */
     public function works()
     {
-        $model = new Lists();
-        $lists = $model->getRankWorks();
-        return success($lists);
+        $lists = Lists::select('id', 'title', 'num', 'cover')
+            ->where('type', 4)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if (!$lists) {
+            return error('还没有数据');
+        }
+        $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
+        $works = Works::whereIn('id', $works_id)
+            ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num', 'subscribe_num', 'is_free', 'price')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($works);
     }
 
     /**
@@ -167,28 +180,43 @@ class RankController extends Controller
      */
     public function wiki()
     {
-        $model = new Lists();
-        $lists = $model->getRankWiki();
-        return success($lists);
+        $lists = Lists::select('id', 'title', 'num', 'cover')
+            ->where('type', 5)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if (!$lists) {
+            return error('还没有数据');
+        }
+        $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
+        $wikis = Wiki::whereIn('id', $works_id)
+            ->select('id','name','view_num','like_num','comment_num','cover')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($wikis);
+
     }
 
-    
+
     public function goods(Request $request)
     {
         $lists = Lists::select('id', 'title', 'num', 'cover')
             ->where('type', 6)
-            ->orderBy('created_at','desc')
+            ->orderBy('created_at', 'desc')
             ->first();
+        if (!$lists) {
+            return error('还没有排行榜');
+        }
         $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
-        if ($works_id){
+        if ($works_id) {
             $goods = MallGoods::whereIn('id', $works_id)
-                    ->select('id', 'name','price')
-                    ->orderBy('created_at','desc')
-                    ->paginate(10)
-                    ->toArray();
+                ->select('id', 'name', 'price')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10)
+                ->toArray();
         }
 
-       return success($goods['data']);
+        return success($goods);
     }
 
 }
