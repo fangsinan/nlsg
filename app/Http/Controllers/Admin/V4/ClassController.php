@@ -164,7 +164,7 @@ class ClassController extends Controller
      * @apiParam {number} status 上下架
      * @apiParam {string} author 作者名称
      * @apiParam {number} category_id 分类id
-     * @apiParam {number} type  类型
+     * @apiParam {number} type  类型 1 视频 2音频 3 文章
      * @apiParam {string} author 作者名称
      * @apiParam {string} start 开始时间
      * @apiParam {string} end  结束时间
