@@ -29,14 +29,14 @@ class ClassController extends Controller
      * @apiParam {string} start  开始时间
      * @apiParam {string} end    结束时间
      *
-     *  @apiSuccess {string} name  专栏名称
-      * @apiSuccess {string} title  标题
-      * @apiSuccess {string} subtitle  副标题
-      * @apiSuccess {string} user    作者相关
-      * @apiSuccess {string} info_num 作品数量
-      * @apiSuccess {string}  price  价格
-      * @apiSuccess {number}  status  状态
-      * @apiSuccess {string}  created_at  创建时间
+     * @apiSuccess {string} name  专栏名称
+     * @apiSuccess {string} title  标题
+     * @apiSuccess {string} subtitle  副标题
+     * @apiSuccess {string} user    作者相关
+     * @apiSuccess {string} info_num 作品数量
+     * @apiSuccess {string}  price  价格
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  创建时间
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -74,7 +74,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at','info_num')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
             ->where('type', 1)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -142,7 +142,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price','status','created_at','info_num')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
             ->where('type', 2)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -194,7 +194,7 @@ class ClassController extends Controller
         $work_id = $request->get('work_id');
         $title = $request->get('title');
         $status = $request->get('status');
-        $type   = $request->get('type');
+        $type = $request->get('type');
         $nickname = $request->get('author');
         $category_id = $request->get('category_id');
         $start = $request->get('start');
@@ -209,7 +209,7 @@ class ClassController extends Controller
                 $query->where('status', $status);
             })
             ->when($type, function ($query) use ($type) {
-               $query->where('type', $type);
+                $query->where('type', $type);
             })
             ->when($is_end, function ($query) use ($title) {
                 $query->where('is_end', $is_end);
@@ -234,14 +234,14 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price','is_end', 'chapter_num')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num')
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
-        if ($lists['data']){
-            foreach ($lists['data'] as &$v){
+        if ($lists['data']) {
+            foreach ($lists['data'] as &$v) {
                 $category_ids = WorksCategoryRelation::where('work_id', $v['id'])->pluck('category_id');
-                $v['category'] = WorksCategory::whereIn('id',$category_ids)->pluck('name');
+                $v['category'] = WorksCategory::whereIn('id', $category_ids)->pluck('name');
             }
         }
 
@@ -328,19 +328,81 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price','is_end','chapter_num')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num')
             ->where('is_audio_book', 1)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
-        if ($lists['data']){
-           foreach ($lists['data'] as &$v){
-               $category_ids = WorksCategoryRelation::where('work_id', $v['id'])->pluck('category_id');
-               $v['category'] = WorksCategory::whereIn('id',$category_ids)->pluck('name');
-           }
-       }
+        if ($lists['data']) {
+            foreach ($lists['data'] as &$v) {
+                $category_ids = WorksCategoryRelation::where('work_id', $v['id'])->pluck('category_id');
+                $v['category'] = WorksCategory::whereIn('id', $category_ids)->pluck('name');
+            }
+        }
 
         return success($lists);
+
+    }
+
+    /**
+     * @api {post} api/admin_v4/class/add-column 创建专栏
+     * @apiVersion 4.0.0
+     * @apiName  add-column
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-column
+     * @apiDescription 创建专栏
+     *
+     * @apiParam {string} name 专栏名称
+     * @apiParam {string} subtitle 副标题
+     * @apiParam {string} cover_pic 封面图片
+     * @apiParam {string} details_pic 详情图片
+     * @apiParam {string} message 推荐语
+     * @apiParam {number} user_id 作者
+     * @apiParam {string} author 作者名称
+     * @apiParam {string} original_price 定价
+     * @apiParam {string} price 售价
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function addColumn(Request $request)
+    {
+        $input = $request->all();
+        $name = $input['name'] ?? '';
+        if (!$name) {
+            return error('名称不能为空');
+        }
+        $cover_pic = covert_img($input['cover_pic']);
+        $details_pic = covert_img($input['details_pic']);
+        $subtitle = $input['subtitle'] ?? '';
+        $message = $input['message'] ?? '';
+        $user_id = $input['user_id'] ?? 0;
+        $original_price = $input['original_price'] ?? 0;
+        $price = $input['price'] ?? 0;
+        $online_type = $input['online_type'];
+
+        $res = Column::create([
+            'cover_pic' => $cover_pic,
+            'details_pic' => $details_pic,
+            'name' => $name,
+            'subtitle' => $subtitle,
+            'message' => $message,
+            'user_id' => $user_id,
+            'price' => $price,
+            'original_price' => $original_price
+        ]);
+        if ($res) {
+            return success('创建成功');
+        }
+        return error('创建失败');
 
     }
 

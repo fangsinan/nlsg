@@ -28,3 +28,11 @@
         ];
         return  response()->json($result);
     }
+
+    function  covert_img($url, $img_ulr = ''){
+        $config_img = $img_ulr == '' ? env('IMAGES_URL') : '';
+        if (strpos($url, 'http') !== false || strpos($url, 'https') !== false) {
+            $url = str_replace($config_img, '', $url);
+        }
+        return $url;
+    }

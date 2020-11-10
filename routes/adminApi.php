@@ -8,6 +8,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('class/works', 'ClassController@works');
     Route::get('class/listen', 'ClassController@listen');
 
+    Route::post('class/add-column','ClassController@addColumn');
+
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');
     Route::post('mall_order/send', 'MallOrderController@send');
