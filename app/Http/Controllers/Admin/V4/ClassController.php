@@ -232,11 +232,18 @@ class ClassController extends Controller
      * @apiParam {number} status 上下架
      * @apiParam {string} author 作者名称
      * @apiParam {number} category_id 分类id
-     * @apiParam {number} chapter_num 章节数
-     * @apiParam {array} category 分类
      * @apiParam {string} author 作者名称
      * @apiParam {string} start 开始时间
      * @apiParam {string} end  结束时间
+     *
+     * @apiSuccess {array} category  分类
+     * @apiSuccess {string} title    标题
+     * @apiSuccess {array}  user     作者
+     * @apiSuccess {number} chapter_num 章节数
+     * @apiSuccess {number} price    价格
+     * @apiSuccess {number} is_end   是否完结
+     * @apiSuccess {number} status   0 删除 1 待审核 2 拒绝  3通过 4上架 5下架
+     * @apiSuccess {string} created_at  创建时间
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -290,7 +297,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price','chapter_num')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price','is_end','chapter_num')
             ->where('is_audio_book', 1)
             ->orderBy('id', 'desc')
             ->paginate(10)
