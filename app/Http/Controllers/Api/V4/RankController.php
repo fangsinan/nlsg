@@ -109,7 +109,8 @@ class RankController extends Controller
             return error('还没有数据');
         }
         $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
-        $works = Works::whereIn('id', $works_id)
+        $works = Works::with('user:id,nickname,headimg')
+            ->whereIn('id', $works_id)
             ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num', 'subscribe_num', 'is_free', 'price')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
