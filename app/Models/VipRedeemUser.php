@@ -217,16 +217,178 @@ class VipRedeemUser extends Base
         }
 
         //不是钻石,需要校验是否有关系保护
-        if ($user['new_vip']['level'] !== 2){
+        $bind_user_info = [];
+        if ($user['new_vip']['level'] !== 2) {
             $bind_user_id = VipUserBind::getBindParent($user['phone']);
-            if ($bind_user_id !==0 && intval($check->parent_id) !== $bind_user_id){
-                return ['code'=>false,'msg'=>'您的账号已受保护,无法使用.'];
+            if ($bind_user_id !== 0 && intval($check->parent_id) !== $bind_user_id) {
+                return ['code' => false, 'msg' => '您的账号已受保护,无法使用.'];
+            }
+            if ($bind_user_id > 0) {
+                $bind_user_info = VipUser::where('user_id', '=', $check->parent_id)
+                    ->where('status', '=', 1)
+                    ->where('is_default', '=', 1)
+                    ->first();
+                if (!empty($bind_user_info)) {
+                    $bind_user_info = $bind_user_info->toArray();
+                }
             }
         }
 
-        
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        DB::beginTransaction();
+
+        //判断用户当前级别
+        switch (intval($user['new_vip']['level'])) {
+            case 0:
+                //不是360  开通
+                $source_info = VipUser::whereId($check->vip_id)->first();
+                $vip_add_data['user_id'] = $user['id'];
+                $vip_add_data['nickname'] = $user['nickname'];
+                $vip_add_data['username'] = $user['phone'];
+                $vip_add_data['level'] = 1;
+                $vip_add_data['inviter'] = $bind_user_info['user_id'] ?? 0;
+                $vip_add_data['inviter_vip_id'] = $bind_user_info['id'] ?? 0;
+                $vip_add_data['source'] = $source_info->user_id ?? 0;
+                $vip_add_data['source_vip_id'] = $check->vip_id;
+                $vip_add_data['is_default'] = 1;
+                $vip_add_data['created_at'] = $now_date;
+                $vip_add_data['start_time'] = $now_date;
+                $vip_add_data['updated_at'] = $now_date;
+                $vip_add_data['expire_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                $add_res = DB::table('nlsg_vip_user')->insert($vip_add_data);
+                if (!$add_res) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '失败,请重试.'];
+                }
+                break;
+            case 1:
+                //是360 延长
+                $this_vip = VipUser::whereId($user['new_vip']['vip_id'])->first();
+                $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . ' +1 year'));
+                $update_res = $this_vip->save();
+                if ($update_res === false) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '失败,请重试.'];
+                }
+                break;
+            case 2:
+                //钻石 修改
+                $this_vip = VipUser::whereId($user['new_vip']['vip_id'])->first();
+                $this_vip->is_open_360 = 1;
+                if (empty($this_vip->time_begin_360)) {
+                    $this_vip->time_begin_360 = $now_date;
+                }
+                if (empty($this_vip->time_end_360)) {
+                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                } else {
+                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . ' +1 year'));
+                }
+                $update_res = $this_vip->save();
+                if ($update_res === false) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '失败,请重试.'];
+                }
+                break;
+        }
 
 
+        //课程与兑换卡
+        $works_res = self::subWorksOrGetRedeemCode($user['id']);
+        if ($works_res===false){
+            DB::rollBack();
+            return ['code'=>false,'msg'=>'失败,请重试'];
+        }
+
+        DB::commit();
+        return ['code'=>true,'msg'=>'成功'];
+
+    }
+
+
+    //(加事务调用)360课程订阅和生成兑换券
+    public static function subWorksOrGetRedeemCode($user_id)
+    {
+        $now_date = date('Y-m-d H:i:s');
+        $all_works_ids = explode(',', ConfigModel::getData(27));
+
+        //查询已订阅的课程
+        $sub_list = Subscribe::where('user_id', '=', $user_id)
+            ->whereId('relation_id', $all_works_ids)
+            ->where('type', '=', 2)
+            ->select(['id', 'relation_id as works_id'])
+            ->get();
+        if (empty($sub_list)) {
+            $sub_list = [];
+        } else {
+            $sub_list = $sub_list->toArray();
+        }
+
+        //需要创建优惠券的课程
+        $sub_works_id = array_column($sub_list, 'works_id');
+
+        //未订阅的课程
+        $not_sub_works_id = array_diff($all_works_ids, $sub_works_id);
+
+        if (!empty($not_sub_works_id)) {
+            $add_sub = [];
+            foreach ($not_sub_works_id as $k => $v) {
+                $subscribe = [
+                    'user_id' => $user_id,                //会员id
+                    'type' => 2, //作品
+                    'status' => 1,
+                    'relation_id' => $v, //精品课
+                    'pay_time' => $now_date,                            //支付时间
+                    'created_at' => $now_date,                            //添加时间
+                    'updated_at' => $now_date,                            //添加时间
+                    'give' => 14,                            //添加时间
+                ];
+                $add_sub[] = $subscribe;
+            }
+            $sub_res = DB::table('nlsg_subscribe')->insert($add_sub);
+            if (!$sub_res){
+                return false;
+            }
+        }
+
+        if(!empty($sub_works_id)){
+            $group_name = RedeemCode::createGroupName();
+            $new_code = [];
+            $i = 0;
+            while ($i < count($sub_works_id)) {
+                $temp_code = $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(),5);
+                if (!in_array($temp_code, $new_code)) {
+                    $new_code[] = $temp_code;
+                    $i++;
+                }
+            }
+
+            $add_code = [];
+            foreach ($sub_works_id as $k => $v) {
+                $temp_title = Works::whereId($v)->select(['title'])->first();
+                $add = [
+                    'code' => $new_code[$k],
+                    'name' => $temp_title->title . '-兑换券',
+                    'new_group' => $group_name,
+                    'can_use' => 1,
+                    'redeem_type' => 2,
+                    'goods_id' => $v,
+                    'user_id' => $user_id,
+                    'is_new_code' => 1,
+                    'created_at'=>$now_date,
+                    'updated_at'=>$now_date
+                ];
+                $add_code[] = $add;
+            }
+
+            $sub_res = DB::table('nlsg_redeem_code')->insert($add_code);
+            if (!$sub_res){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function codeInfo()

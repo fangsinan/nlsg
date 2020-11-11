@@ -70,7 +70,7 @@ class RedeemCode extends Base
         }
 
         //todo 兑换过程
-        $this->toRedeem($check_code,$to_user_id);
+        $this->toRedeem($check_code, $to_user_id);
 
 
         return $this->success(['code' => true, 'msg' => '兑换xxx成功']);
@@ -78,11 +78,12 @@ class RedeemCode extends Base
 
     }
 
-    public function toRedeem($code,$user_id){
+    public function toRedeem($code, $user_id)
+    {
         $use_type = intval($code->redeem_type);
         $product_id = intval($code->goodes_id);
 
-        switch ($use_type){
+        switch ($use_type) {
             case 1:
                 break;
             case 2:
@@ -90,5 +91,56 @@ class RedeemCode extends Base
         }
 
 
+    }
+
+
+    //生成兑换码分组码
+    public static function createGroupName()
+    {
+        $year = intval(date('y'));
+        $day = date('z');
+        $head = $year . str_pad($day, 3, 0, STR_PAD_LEFT);
+        $head = self::get_34_Number($head, 3); //年月日标记 三位
+        $i = 0;
+        while ($i < 1) {
+            $group_name = self::get_34_Number(rand(1, 999), 2);
+            $group_name = $head . $group_name;
+            $check = self::where('new_group', '=', $group_name)
+                ->where('is_new_code', '=', 1)
+                ->select(['id'])
+                ->first();
+            if (!$check) {
+                $i++;
+            }
+        }
+
+        return $group_name;
+    }
+
+    //生成34进制数
+    public static function get_34_Number($int, $format = 8)
+    {
+        $dic = array(
+            0 => '0', 1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5', 6 => '6', 7 => '7', 8 => '8', 9 => '9',
+            10 => 'a', 11 => 'b', 12 => 'c', 13 => 'd', 14 => 'e', 15 => 'f', 16 => 'g', 17 => 'h',
+            18 => 'j', 19 => 'k', 20 => 'l', 21 => 'm', 22 => 'm', 23 => 'p', 24 => 'q', 25 => 'r',
+            26 => 's', 27 => 't', 28 => 'u', 29 => 'v', 30 => 'w', 31 => 'x', 32 => 'y', 33 => 'z',
+        );
+
+        $arr = array();
+        $loop = true;
+        while ($loop) {
+            $arr[] = $dic[bcmod($int, 34)];
+            $int = floor(bcdiv($int, 34));
+            if ($int == 0) {
+                $loop = false;
+            }
+        }
+        $arr = array_pad($arr, $format, $dic[0]);
+        return implode('', array_reverse($arr));
+    }
+
+    public static  function createCodeTemp() {
+        return str_pad(rand(1, 32900000), 5, 0, STR_PAD_LEFT);
     }
 }

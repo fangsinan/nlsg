@@ -22,7 +22,7 @@ class VipUser extends Base
                 'time_begin_360', 'time_end_360'])
             ->first();
         if (empty($check)) {
-            return ['level' => 0, 'start_time' => '', 'expire_time' => '', 'is_open_360' => 0];
+            return ['vip_id' => 0, 'level' => 0, 'start_time' => '', 'expire_time' => '', 'is_open_360' => 0];
         } else {
             return $check->toArray();
         }
@@ -63,7 +63,7 @@ class VipUser extends Base
         $author_order_str = 'FIELD(id,' . $author_order_str . ') desc';
         $author = User::where('is_author', '=', 1)->where('status', '=', 1)
             ->where('headimg', '<>', '')
-            ->select(['id','nickname', 'headimg', 'intro_for_360'])
+            ->select(['id', 'nickname', 'headimg', 'intro_for_360'])
             ->orderByRaw($author_order_str)
             ->orderBy('id', 'asc')
             ->limit(10)
@@ -89,4 +89,5 @@ class VipUser extends Base
         $res['detail_image'] = $detail_image;
         return $res;
     }
+
 }

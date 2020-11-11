@@ -113,7 +113,16 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
-    //使用兑换券 put
+    /**
+     * 使用兑换券
+     * @api {put} /api/v4/vip/code_use 使用兑换券
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/vip/code_use
+     * @apiGroup  360会员
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/code_use
+     * @apiDescription 使用兑换券
+     * @apiParam {number} id 记录id
+     */
     public function redeemCodeUse(Request $request)
     {
         $model = new VipRedeemUser();
@@ -121,7 +130,16 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
-    //生成兑换券 post
+    /**
+     * 生成兑换券
+     * @api {post} /api/v4/vip/code_create 生成兑换券
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/vip/code_create
+     * @apiGroup  360会员
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/code_create
+     * @apiDescription 生成兑换券
+     * @apiParam {number} num 数量
+     */
     public function redeemCodeCreate(Request $request)
     {
         $model = new VipRedeemCode();
