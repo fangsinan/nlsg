@@ -183,15 +183,40 @@ class VipRedeemUser extends Base
         $model->path = $check->path . ',' . $user['id'];
         $model->vip_id = $check->vip_id;
         $model->status = 1;
+
+        DB::beginTransaction();
+
         $res = $model->save();
         if ($res === false) {
-            return ['code' => false, 'msg' => '错误,请重试'];
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败,请重试'];
         }
+
+        $check->status = 4;
+        $check_res = $check->save();
+        if ($check_res === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败,请重试'];
+        }
+
+        DB::commit();
         return ['code' => true, 'msg' => '成功'];
     }
 
     public function use($user, $params)
     {
+        if (empty($params['id'] ?? 0)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check = self::query()->whereId($params['id'])->where('user_id', '=', $user['id'])->first();
+        if (empty($check)) {
+            return ['code' => false, 'msg' => '兑换券不存在'];
+        }
+        if ($check->status != 1) {
+            return ['code' => false, 'msg' => '兑换券状态错误'];
+        }
+        //todo 领取
+
 
     }
 
