@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\ColumnOutline;
 use App\Models\GetPriceTools;
 use App\Models\History;
+use App\Models\Materials;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\Works;
@@ -691,6 +692,44 @@ class WorksController extends Controller
         ])->orderBy('order','desc')->get()->toArray();
         $data = WorksCategory::getCategory($category,0,1);
         return $this->success($data);
+    }
+
+    /**
+     * @api {get} api/v4/works/materials 作品素材
+     * @apiVersion 4.0.0
+     * @apiName  materials
+     * @apiGroup works
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/works/materials
+     *
+     * @apiParam {number}  works_id  作品id
+     * @apiParam {number}  type 类型 1 文字 2图片
+     *
+     * @apiSuccess {string}  content  内容
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public  function materials(Request $request)
+    {
+        $works_id = $request->get('works_id');
+        $type   = $request->get('type') ??  1;
+        if (!$works_id){
+            return error('作品id不能为空');
+        }
+        $lists =  Materials::where('works_id', $works_id)
+                ->where('type', $type)
+                ->orderBy('created_at','desc')
+                ->get()
+                ->toArray();
+        return success($lists);
     }
 
 
