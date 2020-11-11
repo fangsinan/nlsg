@@ -905,7 +905,7 @@ class OrderController extends Controller
 
     /**
      * @api {post} /api//v4/order/create_new_vip_order 幸福360下单
-     * @apiName create_send_order
+     * @apiName create_new_vip_order
      * @apiVersion 1.0.0
      * @apiGroup order
      *
