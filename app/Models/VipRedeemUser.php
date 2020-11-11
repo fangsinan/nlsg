@@ -215,7 +215,16 @@ class VipRedeemUser extends Base
         if ($check->status != 1) {
             return ['code' => false, 'msg' => '兑换券状态错误'];
         }
-        //todo 领取
+
+        //不是钻石,需要校验是否有关系保护
+        if ($user['new_vip']['level'] !== 2){
+            $bind_user_id = VipUserBind::getBindParent($user['phone']);
+            if ($bind_user_id !==0 && intval($check->parent_id) !== $bind_user_id){
+                return ['code'=>false,'msg'=>'您的账号已受保护,无法使用.'];
+            }
+        }
+
+        
 
 
     }
