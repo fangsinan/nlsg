@@ -467,6 +467,20 @@ class GetPriceTools extends Base {
                     $price=$price-$Info['promotion_cost'];
                 }
                 break;
+            case 5://新会员
+                $vip_price = 360;
+                /*
+                1  30
+                2  50*/
+                if($level==1){
+                    $price=self::PriceCalc('*',$vip_price, 0.30);
+                }else if($level==2){
+                    $price=self::PriceCalc('*',$vip_price, 0.50);
+                }else{
+                    $price=0;
+                }
+                $price=$price-0; //没有促销成本
+                break;
         }
         if($price<0){
             $price=0; //防止负数
