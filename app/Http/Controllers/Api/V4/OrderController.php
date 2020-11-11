@@ -8,11 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\History;
+use App\Models\LiveCountDown;
 use App\Models\LiveInfo;
 use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\VipUser;
+use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
 
@@ -900,6 +903,119 @@ class OrderController extends Controller
     }
 
 
+    /**
+     * @api {post} /api//v4/order/create_new_vip_order 幸福360下单
+     * @apiName create_send_order
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} relation_id 目标id  1 360会员
+     * @apiParam {int} os_type os_type 1 安卓 2ios
+     * @apiParam {int} live_id 直播id
+     * @apiParam {int} tweeter_code 推客id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": { }
+     * }
+     */
+    public function createNewVipOrder(Request $request)
+    {
+        $level = $request->input('level', 1);   //目标id
+        $os_type = $request->input('os_type', 0);
+        $live_id = $request->input('live_id', 0);
+        $tweeter_code = $request->input('tweeter_code', 0);  //推客id
+        $user_id = $this->user['id'];
 
+
+        //检测下单参数有效性
+        if (empty($user_id)) {
+            return $this->error(0, '用户id有误');
+        }
+
+        /*********************** 校验推客身份   *********************/
+        //先校验直播预约的tweeter_code
+        if($live_id){
+            $info = LiveCountDown::where(['user_id' => $user_id, 'live_id' => $live_id,])->get('new_vip_uid');
+            if(!empty($info->new_vip_uid)  && $info->new_vip_uid > 0){
+                $vip_check = VipUser::where(['status'=>1,'is_default'=>1,'user_id'=>$info->new_vip_uid])->get()->toArray();
+                if($vip_check){
+                    $tweeter_code = $info['new_vip_uid'];
+                }
+            }
+        }
+
+        //新会员关系保护
+        $remark = '';
+        $bind_user_id = VipUserBind::getBindParent($this->user['username']);
+        if($bind_user_id == -1){
+            $remark = $tweeter_code . '->' . 0;
+            $tweeter_code = 0;
+        }else{
+            if ($bind_user_id != 0 && $tweeter_code !== $bind_user_id) {
+                $remark = $tweeter_code . '->' . $bind_user_id;
+                $tweeter_code = $bind_user_id;
+            }
+        }
+
+
+        //判断推客身份是否过期
+        if (!empty($tweeter_code)) {
+            // 钻石合伙人自己推广自己可以返佣!!!  其他不可以
+            //如果自己推广自己   必须是钻石合伙人
+            if($tweeter_code==$user_id && $this->user['new_vip']['level'] < 2 ){
+                $tweeter_code = 0;
+            }
+            //不是自己推广自己   必须身份 > 0
+            if($tweeter_code != $user_id && $this->user['new_vip']['level'] < 1 ){
+                $tweeter_code = 0;
+            }
+        }
+
+        /*********************** 校验推客身份   *********************/
+
+
+
+        if (!in_array($level, [1, 2])) {
+            return $this->error(0, 'vip类型有误');
+        }
+
+        if ($this->user['new_vip']['level'] == 1) {
+            $price = 360;
+        } else {
+            $price = 1000;
+        }
+
+
+        $type = 1;
+        if ($this->user['new_vip']['level'] > 0 ) { //续费
+            if ($level == 1) { //360 会员
+                $type = 2;
+            }
+        }
+
+
+        $ordernum = MallOrder::createOrderNumber($user_id, 3);
+        $data = [
+            'ordernum' => $ordernum,
+            'type' => 17,
+            'user_id' => $user_id,
+            'relation_id' => $level,
+            'price' => $price,
+            'ip' => $request->getClientIp(),
+            'os_type' => $os_type,
+            'live_id' => $live_id,
+            'vip_order_type' => $type,  //1开通 2续费 3升级
+            'remark'=>$remark,
+        ];
+
+
+        $order = Order::firstOrCreate($data);
+        return $this->success($order['id']);
+
+    }
 
 }

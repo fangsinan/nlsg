@@ -89,4 +89,5 @@ class VipUser extends Base
         $res['detail_image'] = $detail_image;
         return $res;
     }
+
 }
