@@ -909,7 +909,7 @@ class OrderController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup order
      *
-     * @apiParam {int} relation_id 目标id  1 360会员
+     * @apiParam {int} level      1 360会员  2钻石合伙人
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
      * @apiParam {int} tweeter_code 推客id
@@ -1010,8 +1010,8 @@ class OrderController extends Controller
             'live_id' => $live_id,
             'vip_order_type' => $type,  //1开通 2续费 3升级
             'remark'=>$remark,
+            'tweeter_code'=>$tweeter_code,
         ];
-
 
         $order = Order::firstOrCreate($data);
         return $this->success($order['id']);
