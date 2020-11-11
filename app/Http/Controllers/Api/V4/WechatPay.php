@@ -12,8 +12,10 @@ use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
 use App\Models\PayRecordDetailStay;
+use App\Models\RedeemCode;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\VipUser;
 use App\Models\Works;
 use App\Models\MallOrder;
 use App\Servers\JobServers;
@@ -58,17 +60,93 @@ class WechatPay extends Controller
             return self::mallOrder($data);
         } elseif ($data['attach'] == 15) { //处理讲座
             return self::PayColumn($data);
+        } elseif ($data['attach'] == 16) { //处理360
+            return self::PayNewVip($data);
         } elseif ($data['attach'] == 17) { //处理赠送
             return self::PaySend($data);
         }
     }
 
 
+    //微信购买线下产品门票
+    public static function PayOfflineProducts($data)
+    {
+        $time = time();
+        $out_trade_no = $data['out_trade_no'];
+        $total_fee = $data['total_fee'];
+        $transaction_id = $data['transaction_id'];
+        $pay_type = $data['pay_type'];
+
+
+        //支付处理正确-判断是否已处理过支付状态
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+
+        if (!empty($orderInfo)) {
+            $orderInfo = $orderInfo->toArray();
+
+            DB::beginTransaction();
+            try {
+                $orderId = $orderInfo['id'];
+                $live_id = $orderInfo['live_id'];
+                //更新订单状态
+
+                $user_id = $orderInfo['user_id']; //用户
+                //更新订单状态
+                $data1 = [
+                    'status' => 1,
+                    'pay_time' => date("Y-m-d H:i:s", $time),
+                    'pay_price' => $total_fee,
+                    'pay_type' => $pay_type,
+                ];
+                $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
+
+                //添加支付记录
+                $record = [
+                    'ordernum' => $out_trade_no, //订单编号
+                    'price' => $total_fee, //支付金额
+                    'transaction_id' => $transaction_id, //流水号
+                    'user_id' => $user_id, //会员id
+                    'type' => 1, //1：微信  2：支付宝
+                    'client' => 1, //微信
+                    'order_type' => 21, //
+                    'status' => 1,
+                ];
+                $recordRst = PayRecord::firstOrCreate($record);
+
+                $subscribe = [
+                    'user_id' => $user_id, //会员id
+                    'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+                    'type' => 5, //门票
+                    'status' => 1,
+                    'order_id' => $orderId, //订单id
+                    'relation_id' => $orderInfo['relation_id'],
+                ];
+                $subscribeRst = Subscribe::firstOrCreate($subscribe);
+
+
+                $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
+                if ($orderRst  && $recordRst && $subscribeRst && $userRst) {
+                    DB::commit();
+                    return true;
+
+                } else {
+                    DB::rollBack();
+                    return false;
+                }
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return false;
+            }
+
+        } else {
+            return true;
+        }
+    }
+
     //微信购买直播
     public static function PayLive($data)
     {
-
-
         $time = time();
         $out_trade_no = $data['out_trade_no'];
         $total_fee = $data['total_fee'];
@@ -774,7 +852,7 @@ class WechatPay extends Controller
                     'user_id' => $user_id, //会员id
                     'type' => $pay_type, //1：微信  2：支付宝
 //                    'client'         => $data['client'],          //微信
-                    'order_type' => 11, //精品课
+                    'order_type' => 5, //精品课
                     'status' => 1                         //收入
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
@@ -923,7 +1001,7 @@ class WechatPay extends Controller
                     'transaction_id' => $transaction_id, //流水号
                     'user_id' => $user_id, //会员id
                     'type' => $pay_type, //1：微信  2：支付宝
-                    'order_type' => 16,//nlsg_pay_record表type 16直播
+                    'order_type' => 20,//nlsg_pay_record表type 16直播
                     'status' => 1
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);

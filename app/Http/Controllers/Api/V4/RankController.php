@@ -109,7 +109,8 @@ class RankController extends Controller
             return error('还没有数据');
         }
         $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
-        $works = Works::whereIn('id', $works_id)
+        $works = Works::with('user:id,nickname,headimg')
+            ->whereIn('id', $works_id)
             ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num', 'subscribe_num', 'is_free', 'price')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -189,7 +190,7 @@ class RankController extends Controller
         }
         $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
         $wikis = Wiki::whereIn('id', $works_id)
-            ->select('id','name','view_num','like_num','comment_num','cover')
+            ->select('id','name','content','view_num','like_num','comment_num','cover')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -210,7 +211,7 @@ class RankController extends Controller
         $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
         if ($works_id) {
             $goods = MallGoods::whereIn('id', $works_id)
-                ->select('id', 'name', 'price','subtitle')
+                ->select('id', 'name', 'price','subtitle','picture')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10)
                 ->toArray();
