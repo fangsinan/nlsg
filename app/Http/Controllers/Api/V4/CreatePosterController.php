@@ -29,8 +29,8 @@ class CreatePosterController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup create
      *
-     * @apiParam {int} post_type  类型 post_type 2皇钻钻邀请卡 4会员  5精品课  7优品海报   8 专栏
-     * @apiParam {int} relation_id  对应id
+     * @apiParam {int} post_type  类型 post_type   5精品课/听书     7优品海报   8 专栏/讲座
+     * @apiParam {int} relation_id  对应 课程或专栏id
      * @apiParam {int} is_qrcode   1 生成纯二维码
      *
      * @apiSuccess {string} result json

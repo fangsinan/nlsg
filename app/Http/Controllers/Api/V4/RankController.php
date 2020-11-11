@@ -210,7 +210,7 @@ class RankController extends Controller
         $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
         if ($works_id) {
             $goods = MallGoods::whereIn('id', $works_id)
-                ->select('id', 'name', 'price')
+                ->select('id', 'name', 'price','subtitle')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10)
                 ->toArray();
