@@ -43,13 +43,13 @@ class SendController extends Controller
         }
 
 
-        if( $data['send_type'] == 1 ){
+        if( $data['send_type'] == 2 ){
             //查询当前课程
             $relation_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','collection_num','comment_num','chapter_num','is_free'])
                 ->where('status',4)->find( $data['relation_id'] );
             $relation_data['user_info'] = User::find($relation_data['user_id']);
 
-        } else{
+        } elseif($data['send_type'] == 1){
             $field = ['id', 'name', 'column_type', 'title', 'subtitle', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','collection_num','comment_num','info_num','is_free','category_id','info_num'];
             $relation_data = Column::getColumnInfo($data['relation_id'],$field,$user_id);
             if( empty($column) ) {

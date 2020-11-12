@@ -89,7 +89,9 @@ class AuthController extends Controller
         $token = auth('api')->login($user);
         $data = [
             'id' => $user->id,
-            'token' => $token
+            'token'    => $token,
+            'nickname' => $user->nickname,
+            'headimg'  => $user->headimg ?? ''
         ];
         return success($data);
     }
