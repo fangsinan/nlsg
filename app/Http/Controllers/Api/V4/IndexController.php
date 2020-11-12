@@ -865,7 +865,6 @@ class IndexController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/version
      * @apiParam {string} version  版本号 4.0.0
      *
-     * @apiSuccess {number}  is_force  当前版本小于更新版本 1 强制更新 0 不强制
      * @apiSuccess {string}  content  更新内容
      *
      * @apiSuccessExample  Success-Response:
@@ -886,13 +885,11 @@ class IndexController extends Controller
                 ->where('status', 1)
                 ->orderBy('created_at','desc')
                 ->first();
+        if (version_compare($version, $list->number, '>=')) {
+            return error(1000, '暂无更新');
+        }
         if ($list){
-            if (version_compare($version, $list->number, '<')) {
-                $list->is_force =  1;
-            } else {
-                $list->is_force = 0;
-            }
-
+            $list->is_force = 1;
             $list->content =  $list->content ? explode('；', $list->content) : '';
         }
 
