@@ -36,14 +36,14 @@ class SendController extends Controller
         $order_id = $request->input('order_id',0);
         $user_id   = $this->user['id'] ?? 0;
 
-        $data = Order::select('id', 'send_type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type')
+        $data = Order::select('id', 'send_type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type','remark','send_user_id')
             ->where(['id' => $order_id,'type'=>17])->first()->toArray();
         if( empty($data) ) {
             return $this->error(0,'订单不存在');
         }
-
-
-        if( $data['send_type'] == 2 ){
+        $user_data = User::find($data['user_id']);
+        $relation_data = [];
+        if( $data['send_type'] == 3 || $data['send_type'] == 4 ){
             //查询当前课程
             $relation_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','collection_num','comment_num','chapter_num','is_free'])
                 ->where('status',4)->find( $data['relation_id'] );
@@ -58,7 +58,7 @@ class SendController extends Controller
         }
 
 
-        return $this->success( ['order_data'=>$data,'send_data' =>$relation_data] );
+        return $this->success( ['user_data' =>$user_data, 'order_data'=>$data,'send_data' =>$relation_data] );
     }
 
 

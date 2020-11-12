@@ -811,6 +811,8 @@ class OrderController extends Controller
      * @apiParam {int} send_type   目标类型  1 专栏/讲座   2课程
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
+     * @apiParam {int} remark 增言
+     * @apiParam {int} coupon_id 优惠券id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -823,12 +825,12 @@ class OrderController extends Controller
     public function createSendOrder(Request $request)
     {
         $relation_id = $request->input('relation_id', 0);   //目标id
-        $send_type = $request->input('send_type', 0);   //目标类型  1 专栏/讲座   2课程
+        $send_type = $request->input('send_type', 0);   //目标类型  1 专栏   2讲座   3课程   4听书
         $os_type = $request->input('os_type', 0);
         $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
         $remark = $request->input('remark', '');
-//        $coupon_id = $request->input('coupon_id', 0);
+        $coupon_id = $request->input('coupon_id', 0);
 
         $user_id = $this->user['id'];
 
@@ -842,7 +844,7 @@ class OrderController extends Controller
             return $this->error(0, '用户有误');
         }
 
-        if($send_type == 1 ){
+        if($send_type == 1 || $send_type == 2  ){
             //$column_id 专栏信息
             $column_data = Column::find($relation_id);
             if (empty($column_data)) {
@@ -850,18 +852,24 @@ class OrderController extends Controller
             }
             $price = $column_data->price;
 
-        }else{
+        }else if($send_type == 3 || $send_type == 4  ){
             $works_data = Works::find($relation_id);
             if (empty($works_data)) {
                 return $this->error(0, '当前课程不存在');
             }
             $price = $works_data->price;
+        }else {
+            return $this->error(0, '参数信息错误');
+
         }
 
 
         //优惠券
-//        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $price, 1);
+        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $price, 6);
 
+        if($coupon_price == 0 ){
+            $coupon_id = 0;
+        }
 
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
@@ -869,9 +877,11 @@ class OrderController extends Controller
             'type' => 17,
             'user_id' => $user_id,
             'relation_id' => $relation_id,
-            'price' => $price,
+            'cost_price' => $price,
+            'price' => ($price - $coupon_price),
             'ip' => $request->getClientIp(),
             'os_type' => $os_type,
+            'coupon_id' => $coupon_id,
             'pay_type' => $pay_type,
             'live_id' => $live_id,
             'send_type' => $send_type,

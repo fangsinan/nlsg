@@ -22,9 +22,9 @@ class Coupon extends Base
             'user_id' => $user_id,
             'type' => $type,
             'status' => 1,
-        ])->where('end_time', '>=', time())
-            ->where('full_cut', '>=', $price)->first();
-        return $data->money ?? 0;
+        ])->where('end_time', '>=', date("Y-m-d H:i:s",time()))
+            ->where('full_cut', '<=', $price)->first();
+        return $data->price ?? 0;
     }
 
     public function getCoupon($flag, $uid, $must_all_true = false, $get_info = 0)
