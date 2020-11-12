@@ -38,6 +38,20 @@ class Kernel extends ConsoleKernel
             $mrjModel->mallRefund();
             $mrjModel->mallRefundCheck();
         })->everyMinute();//每分
+
+        $schedule->call(function () {
+
+        })->everyFiveMinutes();//每五分
+
+        $schedule->call(function () {
+
+        })->hourly();//每小时
+
+        $schedule->call(function () {
+
+        })->dailyAt('03:00');//半夜清理
+
+
     }
 
     /**
