@@ -63,7 +63,7 @@ class Order extends Base
 
     }
 
-    function getInfo($type,$relation_id,$send_type){
+    static function getInfo($type,$relation_id,$send_type){
         $result = false;
         switch ($type) {
             case 1:
