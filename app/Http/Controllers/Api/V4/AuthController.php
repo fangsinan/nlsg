@@ -90,7 +90,8 @@ class AuthController extends Controller
         $data = [
             'id' => $user->id,
             'token'    => $token,
-            'nickname' => $user->nickname
+            'nickname' => $user->nickname,
+            'headimg'  => $user->headimg ?? ''
         ];
         return success($data);
     }
