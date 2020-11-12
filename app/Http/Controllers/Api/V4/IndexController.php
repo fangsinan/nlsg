@@ -896,4 +896,36 @@ class IndexController extends Controller
         return success($list);
     }
 
+    /**
+     * @api {get} api/v4/index/event  商城活动标识
+     * @apiVersion 4.0.0
+     * @apiName  event
+     * @apiGroup Index
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/event
+     *
+     * @apiSuccess {string} pic  图片
+     * @apiSuccess {string} url  h5跳转链接
+     * @apiSuccess {number} type  1 h5 2 app商品
+     * @apiSuccess {number} obj_id  商品id
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public  function  event()
+    {
+        $list = Banner::select('id','title','pic', 'url', 'jump_type', 'obj_id')
+                ->where('type', 54)
+                ->first();
+        return success($list);
+
+    }
+
 }
