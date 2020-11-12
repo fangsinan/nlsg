@@ -63,7 +63,7 @@ class Order extends Base
 
     }
 
-    static function getInfo($type,$relation_id,$send_type){
+    static function getInfo($type,$relation_id,$send_type,$user_id=0){
         $result = false;
         switch ($type) {
             case 1:
@@ -72,7 +72,7 @@ class Order extends Base
                 break;
             case 9:
                 $model = new Works();
-                $result = $model->getIndexWorks([$relation_id], 2);
+                $result = $model->getIndexWorks([$relation_id], 2,$user_id);
                 break;
             case 10:
                 $result = Live::find($relation_id);
@@ -83,11 +83,11 @@ class Order extends Base
                 break;
             case 17:
                 if($send_type == 1 || $send_type == 2){
-                    $model = new Works();
-                    $result = $model->getIndexWorks([$relation_id], 2);
-                }else if($send_type == 3 || $send_type == 4){
                     $model = new Column();
                     $result = $model->getIndexColumn([$relation_id]);
+                }else if($send_type == 3 || $send_type == 4){
+                    $model = new Works();
+                    $result = $model->getIndexWorks([$relation_id], 2,$user_id);
                 }
                 break;
         }

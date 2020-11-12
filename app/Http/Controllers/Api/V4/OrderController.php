@@ -570,7 +570,7 @@ class OrderController extends Controller
         $data = $list['data'];
         foreach ($data as $key => $val) {
 
-            $result = Order::getInfo($val['type'],$val['relation_id'],$val['send_type']);
+            $result = Order::getInfo($val['type'],$val['relation_id'],$val['send_type'],$user_id);
 
             if ($result == false) {
                 $data[$key]['relation_data'] = [];
@@ -641,7 +641,7 @@ class OrderController extends Controller
         $data['coupon_price'] = $coupon['price'] ?? 0;
         //购买的内容详情
 
-        $result = Order::getInfo($data['type'],$data['relation_id'],$data['send_type']);
+        $result = Order::getInfo($data['type'],$data['relation_id'],$data['send_type'],$user_id);
 
         if ($result == false) {
             $data['relation_data'] = [];
@@ -728,7 +728,7 @@ class OrderController extends Controller
                     break;
                 case 2:
                     $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book);
+                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book,$user_id);
                     break;
                 case 6:
                     $model = new Column();
