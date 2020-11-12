@@ -28,7 +28,7 @@ class Collection extends Base
         }
     }
 
-    static function getCollection($type,$ids){
+    static function getCollection($type,$ids,$user_id){
         switch ($type) {
             case 1:   //专栏
                 $model = new Column();
@@ -36,7 +36,7 @@ class Collection extends Base
                 break;
             case 2: //课程
                 $model = new Works();
-                $result = $model->getIndexWorks($ids);
+                $result = $model->getIndexWorks($ids,'',$user_id);
                 break;
             case 3:
                 $model = new MallGoods();
@@ -53,7 +53,7 @@ class Collection extends Base
             case 6: //听书
                 //听书
                 $model = new Works();
-                $result = $model->getIndexWorks($ids, 1);
+                $result = $model->getIndexWorks($ids, 1,$user_id);
                 break;
 
         }

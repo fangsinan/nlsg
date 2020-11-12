@@ -553,7 +553,7 @@ class OrderController extends Controller
             $where = ['user_id' => $user_id, 'type' => $type];
         }
 
-        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at','send_type')
+        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at','send_type','send_user_id')
             ->whereIn('type', [1, 5, 9, 10, 13, 15, 16, 17])
             ->where($where);
 
@@ -570,7 +570,7 @@ class OrderController extends Controller
         $data = $list['data'];
         foreach ($data as $key => $val) {
 
-            $result = Order::getInfo($val['type'],$val['relation_id'],$val['send_type']);
+            $result = Order::getInfo($val['type'],$val['relation_id'],$val['send_type'],$user_id);
 
             if ($result == false) {
                 $data[$key]['relation_data'] = [];
@@ -633,7 +633,7 @@ class OrderController extends Controller
     {
         $user_id = $this->user['id'] ?? 0;
         $order_id = $request->input('id', 0);
-        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type')
+        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type','send_type','send_user_id')
             ->where(['id' => $order_id, 'user_id' => $user_id])->first()->toArray();
 
         //查询优惠券金额
@@ -641,7 +641,7 @@ class OrderController extends Controller
         $data['coupon_price'] = $coupon['price'] ?? 0;
         //购买的内容详情
 
-        $result = Order::getInfo($data['type'],$data['relation_id'],$data['send_type']);
+        $result = Order::getInfo($data['type'],$data['relation_id'],$data['send_type'],$user_id);
 
         if ($result == false) {
             $data['relation_data'] = [];
@@ -728,7 +728,7 @@ class OrderController extends Controller
                     break;
                 case 2:
                     $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book);
+                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book,$user_id);
                     break;
                 case 6:
                     $model = new Column();
@@ -808,7 +808,7 @@ class OrderController extends Controller
      * @apiGroup order
      *
      * @apiParam {int} relation_id 目标id
-     * @apiParam {int} send_type   目标类型  1 专栏/讲座   2课程
+     * @apiParam {int} send_type   目标类型   1专栏  2讲座  3课程  4 听书
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
      * @apiParam {int} remark 增言

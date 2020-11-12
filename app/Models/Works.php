@@ -28,7 +28,7 @@ class Works extends Base
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexWorks($ids,$is_audio_book=0)
+    public function getIndexWorks($ids,$is_audio_book=0,$user_id=0)
     {
         if (!$ids){
             return false;
@@ -55,7 +55,7 @@ class Works extends Base
             if($v['works_update_time'] > $time){
                 $v['is_new'] = 1;
             }
-            $v['is_sub'] = Subscribe::isSubscribe($this->user['id'],$v['id'],2);
+            $v['is_sub'] = Subscribe::isSubscribe($user_id,$v['id'],2);
         }
         return $lists;
 

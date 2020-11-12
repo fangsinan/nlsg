@@ -855,7 +855,7 @@ class UserController extends Controller
         ])->paginate($this->page_per_page)->toArray();
         $relation_id = array_column($collection['data'], 'relation_id');
 
-        $list = Collection::getCollection($type, $relation_id);
+        $list = Collection::getCollection($type, $relation_id,$user_id);
         if ($list == false) {
             $list = [];
         }
