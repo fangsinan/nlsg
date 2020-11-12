@@ -865,8 +865,11 @@ class OrderController extends Controller
 
 
         //优惠券
-        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $price, 1);
+        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $price, 6);
 
+        if($coupon_price == 0 ){
+            $coupon_id = 0;
+        }
 
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
