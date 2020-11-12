@@ -811,6 +811,8 @@ class OrderController extends Controller
      * @apiParam {int} send_type   目标类型  1 专栏/讲座   2课程
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
+     * @apiParam {int} remark 增言
+     * @apiParam {int} coupon_id 优惠券id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -828,7 +830,7 @@ class OrderController extends Controller
         $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
         $remark = $request->input('remark', '');
-//        $coupon_id = $request->input('coupon_id', 0);
+        $coupon_id = $request->input('coupon_id', 0);
 
         $user_id = $this->user['id'];
 
@@ -863,7 +865,7 @@ class OrderController extends Controller
 
 
         //优惠券
-//        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $price, 1);
+        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $price, 1);
 
 
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
@@ -872,9 +874,11 @@ class OrderController extends Controller
             'type' => 17,
             'user_id' => $user_id,
             'relation_id' => $relation_id,
-            'price' => $price,
+            'cost_price' => $price,
+            'price' => ($price - $coupon_price),
             'ip' => $request->getClientIp(),
             'os_type' => $os_type,
+            'coupon_id' => $coupon_id,
             'pay_type' => $pay_type,
             'live_id' => $live_id,
             'send_type' => $send_type,
