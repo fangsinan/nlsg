@@ -198,7 +198,7 @@ class Works extends Base
             ->with(['categoryRelation', 'categoryRelation.categoryName' => function ($query) {
                 $query->select(['id', 'name']);
             }, 'columnInfo', 'user' => function ($query) {
-                $query->select('id', 'nickname');
+                $query->select('id', 'nickname','intro');
             }])
             ->select(['id', 'type as works_type', 'title', 'subtitle', 'cover_img',
                 'detail_img', 'price', 'column_id', 'user_id']);
