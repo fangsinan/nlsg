@@ -227,6 +227,7 @@ class OrderController extends Controller
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
         $pay_type = $request->input('pay_type', 0);
+        $activity_tag = $request->input('activity_tag', 0);
         $user_id = $this->user['id'] ?? 0;
 
         //$work_id 课程信息
@@ -242,8 +243,14 @@ class OrderController extends Controller
         // 校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
 
-        //优惠券
-        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $works_data->price, 3);
+        if ($activity_tag == 'cytx') {
+            $price = $works_data->cytx_price;
+            $coupon_id = 0;
+        } else {
+            //优惠券
+            $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $works_data->price, 3);
+            $price = $works_data->price - $coupon_price;
+        }
 
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
@@ -252,13 +259,14 @@ class OrderController extends Controller
             'user_id' => $user_id,
             'relation_id' => $work_id,
             'cost_price' => $works_data->price,
-            'price' => ($works_data->price - $coupon_price),
+            'price' => $price,
             'twitter_id' => $tweeter_code,
             'coupon_id' => $coupon_id,
             'ip' => $request->getClientIp(),
             'os_type' => $os_type,
             'live_id' => $live_id,
             'pay_type' => $pay_type,
+            'activity_tag' => $activity_tag,
         ];
         $order = Order::firstOrCreate($data);
         return $this->success($order['id']);
@@ -553,7 +561,7 @@ class OrderController extends Controller
             $where = ['user_id' => $user_id, 'type' => $type];
         }
 
-        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at','send_type','send_user_id')
+        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id')
             ->whereIn('type', [1, 5, 9, 10, 13, 15, 16, 17])
             ->where($where);
 
@@ -570,9 +578,9 @@ class OrderController extends Controller
         $data = $list['data'];
         foreach ($data as $key => $val) {
 
-            $result = Order::getInfo($val['type'],$val['relation_id'],$val['send_type'],$user_id);
+            $result = Order::getInfo($val['type'], $val['relation_id'], $val['send_type'], $user_id);
 
-            if( $val['send_user_id'] > 0 ){
+            if ($val['send_user_id'] > 0) {
                 $userData = User::select('phone')->where(['id' => $val['send_user_id']])->first()->toArray();
                 $data[$key]['send_user_phone'] = $userData['phone'];
             }
@@ -637,7 +645,7 @@ class OrderController extends Controller
     {
         $user_id = $this->user['id'] ?? 0;
         $order_id = $request->input('id', 0);
-        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type','send_type','send_user_id')
+        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type', 'send_type', 'send_user_id')
             ->where(['id' => $order_id, 'user_id' => $user_id])->first()->toArray();
 
         //查询优惠券金额
@@ -645,13 +653,12 @@ class OrderController extends Controller
         $data['coupon_price'] = $coupon['price'] ?? 0;
         //购买的内容详情
 
-        $result = Order::getInfo($data['type'],$data['relation_id'],$data['send_type'],$user_id);
+        $result = Order::getInfo($data['type'], $data['relation_id'], $data['send_type'], $user_id);
 
-        if( $data['send_user_id'] > 0 ){
+        if ($data['send_user_id'] > 0) {
             $userData = User::select('phone')->where(['id' => $data['send_user_id']])->first()->toArray();
             $data['send_user_phone'] = $userData['phone'];
         }
-
 
 
         if ($result == false) {
@@ -739,7 +746,7 @@ class OrderController extends Controller
                     break;
                 case 2:
                     $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book,$user_id);
+                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book, $user_id);
                     break;
                 case 6:
                     $model = new Column();
@@ -809,9 +816,6 @@ class OrderController extends Controller
     }
 
 
-
-
-
     /**
      * @api {post} /api//v4/order/create_send_order 赠送课程下单
      * @apiName create_send_order
@@ -855,7 +859,7 @@ class OrderController extends Controller
             return $this->error(0, '用户有误');
         }
 
-        if($send_type == 1 || $send_type == 2  ){
+        if ($send_type == 1 || $send_type == 2) {
             //$column_id 专栏信息
             $column_data = Column::find($relation_id);
             if (empty($column_data)) {
@@ -863,13 +867,13 @@ class OrderController extends Controller
             }
             $price = $column_data->price;
 
-        }else if($send_type == 3 || $send_type == 4  ){
+        } else if ($send_type == 3 || $send_type == 4) {
             $works_data = Works::find($relation_id);
             if (empty($works_data)) {
                 return $this->error(0, '当前课程不存在');
             }
             $price = $works_data->price;
-        }else {
+        } else {
             return $this->error(0, '参数信息错误');
 
         }
@@ -878,7 +882,7 @@ class OrderController extends Controller
         //优惠券
         $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $price, 6);
 
-        if($coupon_price == 0 ){
+        if ($coupon_price == 0) {
             $coupon_id = 0;
         }
 
@@ -939,11 +943,11 @@ class OrderController extends Controller
 
         /*********************** 校验推客身份   *********************/
         //先校验直播预约的tweeter_code
-        if($live_id){
+        if ($live_id) {
             $info = LiveCountDown::where(['user_id' => $user_id, 'live_id' => $live_id,])->get('new_vip_uid');
-            if(!empty($info->new_vip_uid)  && $info->new_vip_uid > 0){
-                $vip_check = VipUser::where(['status'=>1,'is_default'=>1,'user_id'=>$info->new_vip_uid])->get()->toArray();
-                if($vip_check){
+            if (!empty($info->new_vip_uid) && $info->new_vip_uid > 0) {
+                $vip_check = VipUser::where(['status' => 1, 'is_default' => 1, 'user_id' => $info->new_vip_uid])->get()->toArray();
+                if ($vip_check) {
                     $tweeter_code = $info['new_vip_uid'];
                 }
             }
@@ -953,10 +957,10 @@ class OrderController extends Controller
         //新会员关系保护
         $remark = '';
         $bind_user_id = VipUserBind::getBindParent($this->user['phone']);
-        if($bind_user_id == -1){
+        if ($bind_user_id == -1) {
             $remark = $tweeter_code . '->' . 0;
             $tweeter_code = 0;
-        }else{
+        } else {
             if ($bind_user_id != 0 && $tweeter_code !== $bind_user_id) {
                 $remark = $tweeter_code . '->' . $bind_user_id;
                 $tweeter_code = $bind_user_id;
@@ -968,17 +972,16 @@ class OrderController extends Controller
         if (!empty($tweeter_code)) {
             // 钻石合伙人自己推广自己可以返佣!!!  其他不可以
             //如果自己推广自己   必须是钻石合伙人
-            if($tweeter_code==$user_id && $this->user['new_vip']['level'] < 2 ){
+            if ($tweeter_code == $user_id && $this->user['new_vip']['level'] < 2) {
                 $tweeter_code = 0;
             }
             //不是自己推广自己   必须身份 > 0
-            if($tweeter_code != $user_id && $this->user['new_vip']['level'] < 1 ){
+            if ($tweeter_code != $user_id && $this->user['new_vip']['level'] < 1) {
                 $tweeter_code = 0;
             }
         }
 
         /*********************** 校验推客身份   *********************/
-
 
 
         if (!in_array($level, [1, 2])) {
@@ -993,7 +996,7 @@ class OrderController extends Controller
 
 
         $type = 1;
-        if ($this->user['new_vip']['level'] > 0 ) { //续费
+        if ($this->user['new_vip']['level'] > 0) { //续费
             if ($level == 1) { //360 会员
                 $type = 2;
             }
@@ -1011,8 +1014,8 @@ class OrderController extends Controller
             'os_type' => $os_type,
             'live_id' => $live_id,
             'vip_order_type' => $type,  //1开通 2续费 3升级
-            'remark'=>$remark,
-            'tweeter_code'=>$tweeter_code,
+            'remark' => $remark,
+            'tweeter_code' => $tweeter_code,
         ];
 
         $order = Order::firstOrCreate($data);
