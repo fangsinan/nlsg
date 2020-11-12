@@ -881,7 +881,7 @@ class IndexController extends Controller
     public function  version(Request $request)
     {
         $version = $request->get('version');
-        $list =  Versions::select('id','number','content')
+        $list =  Versions::select('id','number','content','url')
                 ->where('status', 1)
                 ->orderBy('created_at','desc')
                 ->first();
