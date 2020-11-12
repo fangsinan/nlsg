@@ -259,7 +259,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('order/create_works_order', 'OrderController@createWorksOrder');
         Route::post('order/create_reward_order', 'OrderController@createRewardOrder');
         Route::post('order/create_coin_order', 'OrderController@createCoinOrder');
-        Route::get('order/create_new_vip_order', 'OrderController@createNewVipOrder'); //360下单
+        Route::post('order/create_new_vip_order', 'OrderController@createNewVipOrder'); //360下单
 
         Route::get('order/get_coupon', 'OrderController@getCoupon');
         Route::get('order/order_list', 'OrderController@orderList');
@@ -316,9 +316,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('user/notify_settings', 'NotifyController@getNotifySettings');
 
         //赠送流程
-        Route::get('order/create_send_order', 'OrderController@createSendOrder'); //赠送下单
-        Route::get('send/get_send_order', 'SendController@getSendOrder');        //获取订单详情
-        Route::get('send/send_edit', 'SendController@getSendEdit');             //点击领取操作
+        Route::post('order/create_send_order', 'OrderController@createSendOrder'); //赠送下单
+        Route::post('send/get_send_order', 'SendController@getSendOrder');        //获取订单详情
+        Route::post('send/send_edit', 'SendController@getSendEdit');             //点击领取操作
 
     });
 });
