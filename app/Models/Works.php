@@ -224,7 +224,7 @@ class Works extends Base
     public function columnInfo()
     {
         return $this->hasOne(Column::class, 'id', 'column_id')
-            ->select(['id', 'type', 'column_type','subtitle']);
+            ->select(['id', 'type', 'column_type','subtitle','title']);
     }
 
     public function listForCytx($params)
