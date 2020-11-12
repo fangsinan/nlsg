@@ -102,8 +102,6 @@ class WechatPay extends Controller
                     'pay_time' => date("Y-m-d H:i:s", $time),
                     'pay_price' => $total_fee,
                     'pay_type' => $pay_type,
-                    'start_time' => $starttime,
-                    'end_time'   => $endtime,
                 ];
                 $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
 
@@ -209,11 +207,17 @@ class WechatPay extends Controller
                     }
                 }else{
                     //当有效身份为钻石合伙人，对vip_user表进行任何处理
-                    $VipUserData = [
-                        'is_open_360'=>1,
-                        'time_begin_360'=>$starttime,
-                        'time_end_360'=>$endtime,
-                    ];
+                    if($UserAttInfo['is_open_360'] == 1){
+                        $VipUserData = [
+                            'time_end_360' => date('Y-m-d',strtotime($UserAttInfo['time_end_360'])+31536000),
+                        ];
+                    }else{
+                        $VipUserData = [
+                            'is_open_360'=>1,
+                            'time_begin_360'=>$starttime,
+                            'time_end_360'=>$endtime,
+                        ];
+                    }
                     $newVip_rst = VipUser::where(['user_id'=>$user_id])->update($VipUserData);
                 }
 
