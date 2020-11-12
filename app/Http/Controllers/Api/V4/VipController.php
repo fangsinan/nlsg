@@ -28,7 +28,7 @@ class VipController extends Controller
      * @apiSuccess {number} redeem_code_id 兑换码id
      * @apiSuccess {number=1,2,3,4} status 状态(1未使用 2已使用 3赠送中 4已送出)
      * @apiSuccess {string} price 价格
-     * @apiSuccess {string} [qr_code] 二维码(base64,当指定id且状态为3赠送中时返回)
+     * @apiSuccess {string} [qr_code] 二维码(base64,当指定id且状态为1未使用时返回)
      * @apiSuccess {string[]} code_info 详情
      * @apiSuccess {number} code_info.name 兑换券名称
      * @apiSuccess {number} code_info.number 兑换券编码
