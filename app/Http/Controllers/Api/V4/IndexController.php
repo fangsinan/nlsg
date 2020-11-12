@@ -886,7 +886,7 @@ class IndexController extends Controller
                 ->orderBy('created_at','desc')
                 ->first();
         if (version_compare($version, $list->number, '>=')) {
-            return error(1000, '暂无更新');
+            return success(['is_force'=>0]);
         }
         if ($list){
             $list->is_force = 1;
