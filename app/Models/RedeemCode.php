@@ -39,21 +39,21 @@ class RedeemCode extends Base
             $to_user_id = $user['id'];
             $phone = $user['phone'];
         } else {
-            $check_phone = User::where('phone', '=', $phone)->first();
-            if ($check_phone) {
-                $to_user_id = $check_phone->id;
-            } else {
-                $new_user = new User();
-                $new_user->phone = $phone;
-                $new_user->nickname = substr($phone, 0, 3) . '****' . substr($phone, -4);
-                $new_user->inviter = $user['id'];
-                $new_user_res = $new_user->save();
-                if (!$new_user_res) {
-                    DB::rollBack();
-                    return ['code' => false, 'msg' => '失败'];
-                }
-                $to_user_id = $new_user_res->id;
-            }
+//            $check_phone = User::where('phone', '=', $phone)->first();
+//            if ($check_phone) {
+//                $to_user_id = $check_phone->id;
+//            } else {
+//                $new_user = new User();
+//                $new_user->phone = $phone;
+//                $new_user->nickname = substr($phone, 0, 3) . '****' . substr($phone, -4);
+//                $new_user->inviter = $user['id'];
+//                $new_user_res = $new_user->save();
+//                if (!$new_user_res) {
+//                    DB::rollBack();
+//                    return ['code' => false, 'msg' => '失败'];
+//                }
+//                $to_user_id = $new_user_res->id;
+//            }
         }
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
@@ -140,7 +140,8 @@ class RedeemCode extends Base
         return implode('', array_reverse($arr));
     }
 
-    public static  function createCodeTemp() {
+    public static function createCodeTemp()
+    {
         return str_pad(rand(1, 32900000), 5, 0, STR_PAD_LEFT);
     }
 }
