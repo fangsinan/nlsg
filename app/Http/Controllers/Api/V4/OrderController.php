@@ -569,34 +569,8 @@ class OrderController extends Controller
 
         $data = $list['data'];
         foreach ($data as $key => $val) {
-            $result = false;
-            switch ($val['type']) {
-                case 1:
-                    $model = new Column();
-                    $result = $model->getIndexColumn([$val['relation_id']]);
-                    break;
-                case 9:
-                    $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], 2);
-                    break;
-                case 10:
-                    $result = Live::find($val['relation_id']);
-                    break;
-                case 15:
-                    $model = new Column();
-                    $result = $model->getIndexColumn([$val['relation_id']]);
-                    break;
-                case 17:
-                    $result = false;
-                    if($val['send_type'] == 1){
-                        $model = new Works();
-                        $result = $model->getIndexWorks([$val['relation_id']], 2);
-                    }else if($val['send_type'] == 2){
-                        $model = new Column();
-                        $result = $model->getIndexColumn([$val['relation_id']]);
-                    }
-                    break;
-            }
+            $result = Order::getInfo($val['type'],$val['relation_id'],$val['send_type']);
+
             if ($result == false) {
                 $data[$key]['relation_data'] = [];
             } else {
@@ -665,21 +639,9 @@ class OrderController extends Controller
         $coupon = Coupon::find($data['coupon_id']);
         $data['coupon_price'] = $coupon['price'] ?? 0;
         //购买的内容详情
-        $result = false;
-        switch ($data['type']) {
-            case 1:
-                $model = new Column();
-                $result = $model->getIndexColumn([$data['relation_id']]);
-                break;
-            case 9:
-                $model = new Works();
-                $result = $model->getIndexWorks([$data['relation_id']], 2);
-                break;
-            case 15:
-                $model = new Column();
-                $result = $model->getIndexColumn([$data['relation_id']]);
-                break;
-        }
+
+        $result = Order::getInfo($data['type'],$data['relation_id'],$data['send_type']);
+
         if ($result == false) {
             $data['relation_data'] = [];
         } else {

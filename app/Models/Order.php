@@ -63,4 +63,35 @@ class Order extends Base
 
     }
 
+    function getInfo($type,$relation_id,$send_type){
+        $result = false;
+        switch ($type) {
+            case 1:
+                $model = new Column();
+                $result = $model->getIndexColumn([$relation_id]);
+                break;
+            case 9:
+                $model = new Works();
+                $result = $model->getIndexWorks([$relation_id], 2);
+                break;
+            case 10:
+                $result = Live::find($relation_id);
+                break;
+            case 15:
+                $model = new Column();
+                $result = $model->getIndexColumn([$relation_id]);
+                break;
+            case 17:
+                if($send_type == 1){
+                    $model = new Works();
+                    $result = $model->getIndexWorks([$relation_id], 2);
+                }else if($send_type == 2){
+                    $model = new Column();
+                    $result = $model->getIndexColumn([$relation_id]);
+                }
+                break;
+        }
+        return $result;
+    }
+
 }
