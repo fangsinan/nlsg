@@ -224,7 +224,7 @@ class Works extends Base
     public function columnInfo()
     {
         return $this->hasOne(Column::class, 'id', 'column_id')
-            ->select(['id', 'type', 'column_type']);
+            ->select(['id', 'type', 'column_type','subtitle']);
     }
 
     public function listForCytx($params)
@@ -232,7 +232,7 @@ class Works extends Base
 
         return Works::where('for_cytx', '=', 1)
             ->with(['columnInfo', 'user' => function ($query) {
-                $query->select('id', 'nickname');
+                $query->select('id', 'nickname','intro');
             }])
             ->select(['id', 'type as works_type', 'title', 'subtitle', 'cover_img',
                 'detail_img', 'cytx_price', 'column_id', 'user_id'])
