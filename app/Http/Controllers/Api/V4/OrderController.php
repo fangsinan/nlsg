@@ -1003,7 +1003,7 @@ class OrderController extends Controller
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
             'ordernum' => $ordernum,
-            'type' => 17,
+            'type' => 16,
             'user_id' => $user_id,
             'relation_id' => $level,
             'price' => $price,
