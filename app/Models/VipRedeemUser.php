@@ -87,15 +87,15 @@ class VipRedeemUser extends Base
                     $qr_url = $qr_url . '?' . $url_data;
 
                     $qrModel = new CreatePosterController();
-                    $qr_data = $qrModel->createQRcode($qr_url, false,true,true);
-                    $qr_data        = CreatePosterController::$Api_url.'public/image/' . $qr_data;
+                    $qr_data = $qrModel->createQRcode($qr_url, false, true, true);
+                    $qr_data = CreatePosterController::$Api_url . 'public/image/' . $qr_data;
                     $v->qr_code = $qr_data;
                 }
             }
         }
 
         $statistics = VipRedeemAssign::statistics($user);
-        return ['statistics'=>$statistics,'list'=>$list];
+        return ['statistics' => $statistics, 'list' => $list];
     }
 
     public function send($user, $params)
@@ -240,6 +240,13 @@ class VipRedeemUser extends Base
 
         DB::beginTransaction();
 
+        $check->status = 2;
+        $vu_res = $check->save();
+        if ($vu_res === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败,请重试'];
+        }
+
         //判断用户当前级别
         switch (intval($user['new_vip']['level'])) {
             case 0:
@@ -297,13 +304,13 @@ class VipRedeemUser extends Base
         //课程与兑换卡
         $works_res = self::subWorksOrGetRedeemCode($user['id']);
 
-        if ($works_res===false){
+        if ($works_res === false) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'失败,请重试'];
+            return ['code' => false, 'msg' => '失败,请重试'];
         }
 
         DB::commit();
-        return ['code'=>true,'msg'=>'成功'];
+        return ['code' => true, 'msg' => '成功'];
 
     }
 
@@ -316,12 +323,12 @@ class VipRedeemUser extends Base
 
         //查询已订阅的课程
         $sub_list = Subscribe::where('user_id', '=', $user_id)
-            ->whereId('relation_id', $all_works_ids)
+            ->whereIn('relation_id', $all_works_ids)
             ->where('type', '=', 2)
             ->select(['id', 'relation_id as works_id'])
             ->get();
 
-        if (empty($sub_list)) {
+        if ($sub_list->isEmpty()) {
             $sub_list = [];
         } else {
             $sub_list = $sub_list->toArray();
@@ -350,17 +357,17 @@ class VipRedeemUser extends Base
             }
 
             $sub_res = DB::table('nlsg_subscribe')->insert($add_sub);
-            if (!$sub_res){
+            if (!$sub_res) {
                 return false;
             }
         }
 
-        if(!empty($sub_works_id)){
+        if (!empty($sub_works_id)) {
             $group_name = RedeemCode::createGroupName();
             $new_code = [];
             $i = 0;
             while ($i < count($sub_works_id)) {
-                $temp_code = $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(),5);
+                $temp_code = $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5);
                 if (!in_array($temp_code, $new_code)) {
                     $new_code[] = $temp_code;
                     $i++;
@@ -372,21 +379,21 @@ class VipRedeemUser extends Base
                 $temp_title = Works::whereId($v)->select(['title'])->first();
                 $add = [
                     'code' => $new_code[$k],
-                    'name' => $temp_title->title . '-兑换券',
+                    'name' => $temp_title->title ?? '' . '-兑换券',
                     'new_group' => $group_name,
                     'can_use' => 1,
                     'redeem_type' => 2,
                     'goods_id' => $v,
                     'user_id' => $user_id,
                     'is_new_code' => 1,
-                    'created_at'=>$now_date,
-                    'updated_at'=>$now_date
+                    'created_at' => $now_date,
+                    'updated_at' => $now_date
                 ];
                 $add_code[] = $add;
             }
 
             $sub_res = DB::table('nlsg_redeem_code')->insert($add_code);
-            if (!$sub_res){
+            if (!$sub_res) {
                 return false;
             }
         }
