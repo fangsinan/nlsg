@@ -72,11 +72,14 @@ class VipUser extends Base
 
         //精品课
         $works_id_list = ConfigModel::getData(27);
-        $works_order_str = 'FIELD(id,' . $works_id_list . ') asc';
-        $works_list = Works::whereIn('id', explode(',', $works_id_list))
-            ->where('status', '=', 4)
+        $works_order_str = 'FIELD(w.id,' . $works_id_list . ') asc';
+        $works_list = DB::table('nlsg_works as w')
+            ->leftJoin('nlsg_column as c','w.column_id','=','c.id')
+            ->whereIn('w.id',explode(',', $works_id_list))
+            ->where('w.status','=',4)
             ->orderByRaw($works_order_str)
-            ->select(['id', 'type', 'title', 'subtitle', 'cover_img', 'detail_img', 'price'])
+            ->select(['w.id', 'w.type as works_type', 'w.title', 'w.subtitle',
+                'w.cover_img', 'w.detail_img', 'w.price','c.type','c.column_type'])
             ->get()
             ->toArray();
 

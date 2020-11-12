@@ -167,6 +167,9 @@ class VipController extends Controller
      *
      * @apiSuccess {string[]} author 讲师
      * @apiSuccess {string[]} works_list 课程列表
+     * @apiSuccess {number} works_list.works_type 课程类型(1 视频 2音频)
+     * @apiSuccess {number} works_list.type 类型(1专栏  2讲座)
+     * @apiSuccess {number} works_list.column_type 专栏类型(1多课程   2单个课程)
      * @apiSuccess {string} detail_image 详情长图
      *
      * @apiSuccessExample {json} Request-Example:
