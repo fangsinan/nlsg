@@ -75,7 +75,7 @@ class Order extends Base
                 $result = $model->getIndexWorks([$relation_id], 2,$user_id);
                 break;
             case 10:
-                $result = Live::find($relation_id);
+                $result = Live::where(['id'=>$relation_id])->get()->toArray();
                 break;
             case 15:
                 $model = new Column();
