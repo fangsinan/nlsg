@@ -80,6 +80,7 @@ class VipUser extends Base
             ->orderByRaw($works_order_str)
             ->select(['w.id', 'w.type as works_type', 'w.title', 'w.subtitle',
                 'w.cover_img', 'w.detail_img', 'w.price','c.type','c.column_type'])
+            ->limit(6)
             ->get()
             ->toArray();
 

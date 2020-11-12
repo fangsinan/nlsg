@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\VipRedeemCode;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
+use App\Models\Works;
 use Illuminate\Http\Request;
 
 class VipController extends Controller
@@ -177,55 +178,152 @@ class VipController extends Controller
      *
      * @apiSuccessExample {json} Request-Example:
      *
-    {
-    "code": 200,
-    "msg": "成功",
-    "now": 1605160146,
-    "data": {
-    "card_data": {
-    "nickname": "chandler",
-    "headimg": "https://image.nlsgapp.com/image/202009/13f952e04c720a550193e5655534be86.jpg",
-    "level": 2,
-    "expire_time": "2020-11-20 23:59:59",
-    "surplus_days": 8,
-    "price": "360",
-    "is_open": 1
-    },
-    "author": {
-    "cover_img": "http://image.nlsgapp.com/nlsg/works/20201112134526746289.png",
-    "list": [
-    {
-    "id": 161904,
-    "nickname": "王琨",
-    "headimg": "/wechat/authorpt/wk.png",
-    "intro_for_360": ""
-    }
-    ]
-    },
-    "works_list": {
-    "cover_img": "http://image.nlsgapp.com/nlsg/works/20201112134456641863.png",
-    "list": [
-    {
-    "id": 568,
-    "works_type": 2,
-    "title": "家庭情境教育工具卡",
-    "subtitle": "经历过职场迷茫和彷徨的岁月，了解年轻人心中的情怀和现实之间的差异，所以《优秀的人，都敢对自己下狠手》中，没有无聊的励志和温情的鸡汤，而是真实的打拼和真诚的建议！",
-    "cover_img": "/nlsg/works/20200304023146969654.jpg",
-    "detail_img": "/nlsg/works/20200304023153543701.jpg",
-    "price": "0.00",
-    "type": 1,
-    "column_type": 1
-    }
-    ]
-    },
-    "detail_image": "http://image.nlsgapp.com/nlsg/works/20201110171938316421.png"
-    }
-    }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "now": 1605160146,
+     * "data": {
+     * "card_data": {
+     * "nickname": "chandler",
+     * "headimg": "https://image.nlsgapp.com/image/202009/13f952e04c720a550193e5655534be86.jpg",
+     * "level": 2,
+     * "expire_time": "2020-11-20 23:59:59",
+     * "surplus_days": 8,
+     * "price": "360",
+     * "is_open": 1
+     * },
+     * "author": {
+     * "cover_img": "http://image.nlsgapp.com/nlsg/works/20201112134526746289.png",
+     * "list": [
+     * {
+     * "id": 161904,
+     * "nickname": "王琨",
+     * "headimg": "/wechat/authorpt/wk.png",
+     * "intro_for_360": ""
+     * }
+     * ]
+     * },
+     * "works_list": {
+     * "cover_img": "http://image.nlsgapp.com/nlsg/works/20201112134456641863.png",
+     * "list": [
+     * {
+     * "id": 568,
+     * "works_type": 2,
+     * "title": "家庭情境教育工具卡",
+     * "subtitle": "经历过职场迷茫和彷徨的岁月，了解年轻人心中的情怀和现实之间的差异，所以《优秀的人，都敢对自己下狠手》中，没有无聊的励志和温情的鸡汤，而是真实的打拼和真诚的建议！",
+     * "cover_img": "/nlsg/works/20200304023146969654.jpg",
+     * "detail_img": "/nlsg/works/20200304023153543701.jpg",
+     * "price": "0.00",
+     * "type": 1,
+     * "column_type": 1
+     * }
+     * ]
+     * },
+     * "detail_image": "http://image.nlsgapp.com/nlsg/works/20201110171938316421.png"
+     * }
+     * }
      */
     public function homePage(Request $request)
     {
         $model = new VipUser();
         $data = $model->homePage($this->user, $request->input());
+        return $this->getRes($data);
+    }
+
+    public function explain()
+    {
+
+    }
+
+    /**
+     * 所有作品列表
+     * @api {post} /api/v4/vip/all_work 所有作品列表
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/vip/all_work
+     * @apiGroup  360会员
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/all_work
+     * @apiDescription 所有作品列表
+     * @apiParam {number} [category_id] 分类id(全部空或者0)
+     *
+     * @apiSuccess {string[]} category 分类数据
+     * @apiSuccess {string[]} list 分类数据
+     * @apiSuccess {number} list.works_type 课程类型(1 视频 2音频)
+     * @apiSuccess {number} list.column_info.type 类型(1专栏  2讲座)
+     * @apiSuccess {number} list.column_info.column_type 专栏类型(1多课程   2单个课程)
+     *
+     * @apiSuccessExample {json} Request-Example:
+     *
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "now": 1605173913,
+     * "data": {
+     * "category": [
+     * {
+     * "id": 1,
+     * "name": "家庭关系"
+     * },
+     * {
+     * "id": 21,
+     * "name": "婚姻情感"
+     * },
+     * {
+     * "id": 22,
+     * "name": "家庭育儿"
+     * },
+     * {
+     * "id": 24,
+     * "name": "人文历史"
+     * },
+     * {
+     * "id": 25,
+     * "name": "个人成长"
+     * }
+     * ],
+     * "list": [
+     * {
+     * "id": 568,
+     * "works_type": 2,
+     * "title": "家庭情境教育工具卡",
+     * "subtitle": "经历过职场迷茫和彷徨的岁月，了解年轻人心中的情怀和现实之间的差异，所以《优秀的人，都敢对自己下狠手》中，没有无聊的励志和温情的鸡汤，而是真实的打拼和真诚的建议！",
+     * "cover_img": "/nlsg/works/20200304023146969654.jpg",
+     * "detail_img": "/nlsg/works/20200304023153543701.jpg",
+     * "price": "0.00",
+     * "column_id": 61,
+     * "category_relation": [
+     * {
+     * "id": 1031,
+     * "work_id": 568,
+     * "category_id": 24,
+     * "category_name": {
+     * "id": 24,
+     * "name": "人文历史"
+     * }
+     * },
+     * {
+     * "id": 1040,
+     * "work_id": 568,
+     * "category_id": 24,
+     * "category_name": {
+     * "id": 24,
+     * "name": "人文历史"
+     * }
+     * }
+     * ],
+     * "column_info": {
+     * "id": 61,
+     * "type": 1,
+     * "column_type": 1
+     * }
+     * }
+     * ]
+     * }
+     * }
+     */
+    public function allWorks(Request $request)
+    {
+        $model = new Works();
+        $data = $model->getAllVipWorks($request->input());
         return $this->getRes($data);
     }
 
