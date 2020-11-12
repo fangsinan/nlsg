@@ -60,7 +60,7 @@ class VipRedeemCode extends Base
                 'source' => 1,
                 'created_at' => $now_date,
                 'updated_at' => $now_date,
-                'vip_id' => $user['id']
+                'vip_id' => $user['new_vip']['vip_id']
             ]);
 
         if ($update_code_res === false) {
@@ -76,7 +76,7 @@ class VipRedeemCode extends Base
             $temp_data['user_id'] = $user['id'];
             $temp_data['parent_id'] = 0;
             $temp_data['path'] = $user['id'];
-            $temp_data['vip_id'] = $user['id'];
+            $temp_data['vip_id'] = $user['new_vip']['vip_id'];
             $temp_data['status'] = 1;
             $temp_data['created_at'] = $temp_data['updated_at'] = $now_date;
             $code_user_data[] = $temp_data;
