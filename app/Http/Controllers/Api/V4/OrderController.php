@@ -808,7 +808,7 @@ class OrderController extends Controller
      * @apiGroup order
      *
      * @apiParam {int} relation_id 目标id
-     * @apiParam {int} send_type   目标类型  1 专栏/讲座   2课程
+     * @apiParam {int} send_type   目标类型   1专栏  2讲座  3课程  4 听书
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
      * @apiParam {int} remark 增言
