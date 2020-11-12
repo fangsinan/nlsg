@@ -42,8 +42,8 @@ class SendController extends Controller
             return $this->error(0,'订单不存在');
         }
         $user_data = User::find($data['user_id']);
-
-        if( $data['send_type'] == 2 ){
+        $relation_data = [];
+        if( $data['send_type'] == 3 || $data['send_type'] == 4 ){
             //查询当前课程
             $relation_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','collection_num','comment_num','chapter_num','is_free'])
                 ->where('status',4)->find( $data['relation_id'] );
