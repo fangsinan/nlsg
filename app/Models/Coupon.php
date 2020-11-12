@@ -24,7 +24,7 @@ class Coupon extends Base
             'status' => 1,
         ])->where('end_time', '>=', date("Y-m-d H:i:s",time()))
             ->where('full_cut', '<=', $price)->first();
-        return $data->money ?? 0;
+        return $data->price ?? 0;
     }
 
     public function getCoupon($flag, $uid, $must_all_true = false, $get_info = 0)
