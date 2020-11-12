@@ -33,6 +33,8 @@ class VipController extends Controller
      * @apiSuccess {number} code_info.name 兑换券名称
      * @apiSuccess {number} code_info.number 兑换券编码
      * @apiSuccess {string[]} user_info 用户详情
+     * @apiSuccess {string[]} statistics 生成配额
+     * @apiSuccess {number} statistics.can_use 可用配额
      * @apiSuccessExample {json} Request-Example:
      *
      * {

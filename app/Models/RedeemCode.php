@@ -67,38 +67,106 @@ class RedeemCode extends Base
         $check_code->os_type = $os_type;
         $code_res = $check_code->save();
         if (!$code_res) {
+            DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
 
-        //todo 兑换过程
         if ($check_code->is_new_code == 1) {
-            $this->toRedeem($check_code, $to_user_id);
+            $r_res = $this->toRedeem($check_code, $to_user_id);
         } else {
-            $this->toRedeemOld($check_code, $to_user_id);
+            //todo 兑换过程
+            $r_res = $this->toRedeemOld($check_code, $to_user_id);
+        }
+        if ($r_res === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
         }
 
-
-        return $this->success(['code' => true, 'msg' => '兑换xxx成功']);
-
-
+        DB::commit();
+        return $this->success(['code' => true, 'msg' => '兑换成功']);
     }
 
     public function toRedeemOld($code, $user_id)
     {
-
+        return false;
     }
 
     public function toRedeem($code, $user_id)
     {
         $use_type = intval($code->redeem_type);
         $product_id = intval($code->goodes_id);
-
+        $now_date = date('Y-m-d H:i:s');
 
         switch ($use_type) {
             case 1:
-                break;
+                $col_info = Column::where('user_id', '=', $product_id)->first();
+                $check_sub = Subscribe::where('user_id', '=', $user_id)
+                    ->where('relation_id', '=', $col_info->id)
+                    ->where('type', '=', 1)
+                    ->first();
+                if (empty($check_sub)) {
+                    $temp_data['type'] = 1;
+                    $temp_data['user_id'] = $user_id;
+                    $temp_data['relation_id'] = $product_id;
+                    $temp_data['start_time'] = $now_date;
+                    $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    $temp_data['status'] = 1;
+                    $temp_data['give'] = 4;
+                    $temp_data['created_at'] = $temp_data['updated_at'] = $now_date;
+                    $temp_res = DB::table('nlsg_subscribe')->insert($temp_data);
+                    if ($temp_res) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    if ($check_sub->end_time > $now_date) {
+                        $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime($check_sub->end_time . ' +1 year'));
+                    } else {
+                        $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    }
+                    $temp_res = Subscribe::whereId($check_sub->id)
+                        ->update($temp_data);
+                    if ($temp_res === false) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
             case 2:
-                break;
+                $check_sub = Subscribe::where('user_id', '=', $user_id)
+                    ->where('relation_id', '=', $product_id)
+                    ->where('type', '=', 2)
+                    ->first();
+                if (empty($check_sub)) {
+                    $temp_data['type'] = 2;
+                    $temp_data['user_id'] = $user_id;
+                    $temp_data['relation_id'] = $product_id;
+                    $temp_data['start_time'] = $now_date;
+                    $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    $temp_data['status'] = 1;
+                    $temp_data['give'] = 4;
+                    $temp_data['created_at'] = $temp_data['updated_at'] = $now_date;
+                    $temp_res = DB::table('nlsg_subscribe')->insert($temp_data);
+                    if ($temp_res) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    if ($check_sub->end_time > $now_date) {
+                        $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime($check_sub->end_time . ' +1 year'));
+                    } else {
+                        $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    }
+                    $temp_res = Subscribe::whereId($check_sub->id)
+                        ->update($temp_data);
+                    if ($temp_res === false) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
         }
 
 

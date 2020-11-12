@@ -94,7 +94,8 @@ class VipRedeemUser extends Base
             }
         }
 
-        return $list;
+        $statistics = VipRedeemAssign::statistics($user);
+        return ['statistics'=>$statistics,'list'=>$list];
     }
 
     public function send($user, $params)
@@ -293,9 +294,9 @@ class VipRedeemUser extends Base
                 break;
         }
 
-
         //课程与兑换卡
         $works_res = self::subWorksOrGetRedeemCode($user['id']);
+
         if ($works_res===false){
             DB::rollBack();
             return ['code'=>false,'msg'=>'失败,请重试'];
@@ -319,6 +320,7 @@ class VipRedeemUser extends Base
             ->where('type', '=', 2)
             ->select(['id', 'relation_id as works_id'])
             ->get();
+
         if (empty($sub_list)) {
             $sub_list = [];
         } else {
@@ -346,6 +348,7 @@ class VipRedeemUser extends Base
                 ];
                 $add_sub[] = $subscribe;
             }
+
             $sub_res = DB::table('nlsg_subscribe')->insert($add_sub);
             if (!$sub_res){
                 return false;
