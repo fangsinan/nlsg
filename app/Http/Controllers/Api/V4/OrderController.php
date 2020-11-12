@@ -948,9 +948,10 @@ class OrderController extends Controller
             }
         }
 
+
         //新会员关系保护
         $remark = '';
-        $bind_user_id = VipUserBind::getBindParent($this->user['username']);
+        $bind_user_id = VipUserBind::getBindParent($this->user['phone']);
         if($bind_user_id == -1){
             $remark = $tweeter_code . '->' . 0;
             $tweeter_code = 0;
