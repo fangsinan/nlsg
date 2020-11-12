@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use App\Models\User;
@@ -25,6 +26,7 @@ class AuthController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/login
      * @apiParam  {string} phone  手机号
      * @apiParam  {number} code   验证码
+     * @apiParam  {number} [inviter]   推荐人id
      *
      * @apiSuccess {string} token token
      *
@@ -46,6 +48,7 @@ class AuthController extends Controller
         $phone = $request->input('phone');
         $code = $request->input('code');
         $inviter = $request->input('inviter', 0);
+        $ref = $request->input('ref', 0);
 
         if (!$phone) {
             return $this->error(400, '手机号不能为空');
@@ -55,7 +58,7 @@ class AuthController extends Controller
         }
 
         //todo 临时
-        if($phone!=18624078563 && $code != 6666){
+        if ($phone != 18624078563 && $code != 6666) {
 
             $res = Redis::get($phone);
             if (!$res) {
@@ -76,25 +79,33 @@ class AuthController extends Controller
                 'phone' => $phone,
                 'inviter' => $inviter,
                 'login_flag' => ($inviter == 0) ? 0 : 1,
-                'nickname' => substr_replace($phone, '****', 3, 4)
+                'nickname' => substr_replace($phone, '****', 3, 4),
+                'ref' => $ref
             ]);
             $user = User::find($list->id);
+
+            //新注册用户发送优惠券
+            $model = new Coupon();
+            $model->giveCoupon($list->id, 36);
         } else {
             if ($user->login_flag == 1) {
                 User::where('id', '=', $user->id)->update(['login_flag' => 2]);
             }
         }
 
+
         Redis::del($phone);
         $token = auth('api')->login($user);
+
         $data = [
             'id' => $user->id,
-            'token'    => $token,
+            'token' => $token,
             'nickname' => $user->nickname,
-            'headimg'  => $user->headimg ?? ''
+            'headimg' => $user->headimg ?? ''
         ];
         return success($data);
     }
+
 
     /**
      * @api {get} api/v4/auth/logout 退出
@@ -123,12 +134,12 @@ class AuthController extends Controller
         $input = $request->all();
         $user = User::where('unionid', $input['unionid'])->first();
         if (!$user) {
-            return  error(1000, '微信还未绑定', (object)[]);
+            return error(1000, '微信还未绑定', (object)[]);
         }
 
         $token = auth('api')->login($user);
         $data = [
-            'id'    => $user->id,
+            'id' => $user->id,
             'phone' => $user->phone ?? '',
             'token' => $token
         ];
@@ -156,17 +167,17 @@ class AuthController extends Controller
     {
         $input = $request->all();
         $phone = $input['phone'];
-        $code  = $input['code'];
+        $code = $input['code'];
 
-        if ( ! $phone) {
+        if (!$phone) {
             return error(1000, '手机号不能为空');
         }
-        if ( ! $code) {
+        if (!$code) {
             return error(1000, '验证码不能为空');
         }
 
         $res = Redis::get($phone);
-        if ( ! $res) {
+        if (!$res) {
             return error(1000, '验证码已过期');
         }
         if ($code !== $res) {
@@ -176,12 +187,12 @@ class AuthController extends Controller
 
         $data = [
             'nickname' => $input['nickname'] ?? '',
-            'sex'      => $input['sex'] == '男' ? 1 : 2,
+            'sex' => $input['sex'] == '男' ? 1 : 2,
             'province' => $input['province'],
-            'city'     => $input['city'],
-            'headimg'  => $input['headimg'] ?? '',
-            'unionid'  => $input['unionid'] ?? '',
-            'is_wx'    => 1
+            'city' => $input['city'],
+            'headimg' => $input['headimg'] ?? '',
+            'unionid' => $input['unionid'] ?? '',
+            'is_wx' => 1
         ];
         $user = User::where('phone', $phone)->first();
         if ($user) {
@@ -194,8 +205,8 @@ class AuthController extends Controller
             }
         }
         $token = auth('api')->login($user);
-        $arra =[
-            'id'    => $user->id,
+        $arra = [
+            'id' => $user->id,
             'token' => $token
         ];
         return success($arra);
@@ -340,27 +351,28 @@ class AuthController extends Controller
         $input = $request->all();
         $user = User::where('appleid', $input['user'])->first();
         if (!$user) {
-            return  error(1000, '苹果还未绑定');
+            return error(1000, '苹果还未绑定');
         }
 
         $token = auth('api')->login($user);
         $data = [
-            'id'    => $user->id,
+            'id' => $user->id,
             'phone' => $user->phone ?? '',
             'token' => $token
         ];
         return success($data);
     }
 
-     // JWT 验证
-    public function jwtApple(Request $request) {
+    // JWT 验证
+    public function jwtApple(Request $request)
+    {
 
-        $phone   = $request->input('phone');
+        $phone = $request->input('phone');
         $appleid = $request->input('user');
         $email = $request->input('email') ?? '';
         $fullName = $request->input('fullName') ?? '';
         $authorizationCode = $request->input('authorizationCode');
-        $identityToken     = $request->input('identityToken');
+        $identityToken = $request->input('identityToken');
         $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
         $isValid = $appleSignInPayload->verifyUser($appleid);
 
@@ -370,7 +382,7 @@ class AuthController extends Controller
             if (!$user) {
                 $list = User::create([
                     'appleid' => $appleid ?? '',
-                    'phone'   => $phone
+                    'phone' => $phone
                 ]);
                 $user = User::find($list->id);
 
@@ -380,7 +392,7 @@ class AuthController extends Controller
 
             $token = auth('api')->login($user);
             $data = [
-                'id'    => $user->id,
+                'id' => $user->id,
                 'phone' => $user->phone ?? '',
                 'token' => $token
             ];

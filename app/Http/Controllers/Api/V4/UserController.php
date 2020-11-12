@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use App\Models\Column;
+use App\Models\Coupon;
 use App\Models\History;
 use App\Models\LiveUserPrivilege;
 use App\Models\Works;
@@ -1012,6 +1013,54 @@ class UserController extends Controller
             return success();
         }
         return  error(1000,'解绑失败');
+    }
+
+    /**
+     * @api {get} api/v4/user/coupon   邀请有礼
+     * @apiVersion 4.0.0
+     * @apiName  coupon
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/coupon
+     *
+     * @apiParam {string}   token  当前用户token
+     *
+     * @apiSuccess {string}  coupon 优惠券
+     * @apiSuccess {string}  coupon.name 优惠券名称
+     * @apiSuccess {string}  coupon.price 优惠券价格
+     * @apiSuccess {string}  coupon.begin_time 优惠券开始时间
+     * @apiSuccess {string}  coupon.end_time 优惠券结束时间
+     * @apiSuccess {number}  invite_num 邀请数量
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public  function getUserCoupon()
+    {
+        $lists = Coupon::select('id','user_id','name','price','begin_time','end_time')
+                ->where('user_id', $this->user['id'])
+                ->orderBy('created_at')
+                ->get()
+                ->toArray();
+        if ($lists){
+            foreach ($lists as &$v) {
+                $v['begin_time'] =  date('Y-m-d', strtotime($v['begin_time']));
+                $v['end_time']   =  date('Y-m-d', strtotime($v['end_time']));
+            }
+        }
+
+        $data = [
+            'coupon'     => $lists,
+            'invite_num' => 20
+        ];
+        return success($data);
     }
 
 
