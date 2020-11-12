@@ -815,13 +815,15 @@ class LiveController extends Controller
         $osType =  $input['os_type'] ?? 1;
         $payType =  $input['pay_type'] ?? 0;
         $model   = new Order();
+        
         $checked = $model->addOrderCheck($this->user['id'], $tweeterCode, $liveId, 3);
         if ($checked['code'] == 0) {
             return error($checked['msg']);
         }
-        // 校验推客id是否有效
+        //校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
-        $list = LiveInfo::with('live:id,title,price,twitter_money,is_free')
+
+        $list = Live::select('id','title','price','twitter_money','is_free')
                 ->where('id', $input['live_id'])
                 ->first();
         if ( ! $list) {
@@ -834,8 +836,8 @@ class LiveController extends Controller
             'type'        => 10,
             'user_id'     => $this->user['id'],
             'relation_id' => $liveId,
-            'cost_price'  => $list->live->price,
-            'price'       => $list->live->price,
+            'cost_price'  => $list['price'],
+            'price'       => $list['price'],
             'twitter_id'  => $tweeter_code,
             'coupon_id'   => 0,
             'ip'          => $request->getClientIp(),
