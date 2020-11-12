@@ -827,6 +827,7 @@ class OrderController extends Controller
         $os_type = $request->input('os_type', 0);
         $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
+        $remark = $request->input('remark', '');
 //        $coupon_id = $request->input('coupon_id', 0);
 
         $user_id = $this->user['id'];
@@ -874,6 +875,7 @@ class OrderController extends Controller
             'pay_type' => $pay_type,
             'live_id' => $live_id,
             'send_type' => $send_type,
+            'remark' => $remark,
         ];
         $order = Order::firstOrCreate($data);
         return $this->success($order['id']);
