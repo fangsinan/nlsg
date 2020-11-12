@@ -258,11 +258,11 @@ class VipController extends Controller
 
     /**
      * 所有作品列表
-     * @api {get} /api/v4/vip/all_work 所有作品列表
+     * @api {get} /api/v4/vip/all_works 所有作品列表
      * @apiVersion 4.0.0
-     * @apiName /api/v4/vip/all_work
+     * @apiName /api/v4/vip/all_works
      * @apiGroup  360会员
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/all_work
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/all_works
      * @apiDescription 所有作品列表
      * @apiParam {number} [category_id] 分类id(全部空或者0)
      *
