@@ -107,6 +107,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('mall/comment_issue_list', 'MallOrderController@commentIssueList');
     Route::get('after_sales/reason_list', 'AfterSalesController@reasonList');
     Route::get('coupon/list', 'CouponController@list');
+    Route::post('coupon/give', 'CouponController@giveCoupon');
     //*******************************商城部分结束*******************************
 
     //想法
@@ -168,6 +169,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('send/get_send_order', 'SendController@getSendOrder');        //获取订单详情
 
     Route::group(['middleware' => ['auth.jwt']], function () {
+        Route::get('user/coupon', 'UserController@getUserCoupon');
         Route::get('user/base', 'UserController@base');
         Route::get('user/account', 'UserController@account');
         Route::post('user/store', 'UserController@store');
@@ -180,6 +182,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('change/phone', 'UserController@changePhone');
         Route::post('bind/wechat', 'UserController@bindWechat');
         Route::post('remove/wechat', 'UserController@removeWechat');
+
 
         //商城开始
         Route::post('shopping_cart/create', 'ShoppingCartController@create');//添加购物车
