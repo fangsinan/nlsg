@@ -36,7 +36,7 @@ class AuthController extends Controller
      *       "code": 200,
      *       "msg" : '成功',
      *       "data": {
-     *       "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9 .eyJpc3MiOiJodHRwOlwvXC92NC5jb21cL2FwaVwvdjRcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNTk0ODgzMzk4LCJleHAiOjE1OTQ4ODY5OTgsIm5iZiI6MTU5NDg4MzM5OCwianRpIjoic1FKYnFnRU5UM0hRYWJjSyIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.ke8ARBD6p9Rv1yTnhQxjIvle_zFN5mI_zzTQUBhSgwI"
+     *       "token": "eyJ0eXAiOiJKV1QiLCJhbGv1yTnhQxjIvle_zFN5mI_zzTQUBhSgwI"
      *       }
      *     }
      *
