@@ -36,7 +36,7 @@ class SendController extends Controller
         $order_id = $request->input('order_id',0);
         $user_id   = $this->user['id'] ?? 0;
 
-        $data = Order::select('id', 'send_type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type')
+        $data = Order::select('id', 'send_type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type','remark','send_user_id')
             ->where(['id' => $order_id,'type'=>17])->first()->toArray();
         if( empty($data) ) {
             return $this->error(0,'订单不存在');
