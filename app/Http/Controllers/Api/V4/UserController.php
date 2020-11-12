@@ -1022,6 +1022,8 @@ class UserController extends Controller
      * @apiGroup User
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/coupon
      *
+     * @apiParam {string}   token  当前用户token
+     *
      * @apiSuccess {string}  coupon 优惠券
      * @apiSuccess {string}  coupon.name 优惠券名称
      * @apiSuccess {string}  coupon.price 优惠券价格
