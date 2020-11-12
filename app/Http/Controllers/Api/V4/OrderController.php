@@ -569,6 +569,7 @@ class OrderController extends Controller
 
         $data = $list['data'];
         foreach ($data as $key => $val) {
+
             $result = Order::getInfo($val['type'],$val['relation_id'],$val['send_type']);
 
             if ($result == false) {
