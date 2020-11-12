@@ -603,6 +603,7 @@ class OrderController extends Controller
                 $data[$key]['relation_data'] = $result;
             }
 
+            $data[$key]['created_time'] = strtotime($val['created_at']);
 
         }
 
