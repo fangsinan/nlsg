@@ -15,6 +15,10 @@ class Coupon extends Base
 
     protected $table = 'nlsg_coupon';
 
+    protected $fillable = [
+        'name','number','type','money','fullcut_price','explain','begin_time','end_time','get_way','user_id','cr_id'
+    ];
+
     static function getCouponMoney($coupon_id, $user_id, $price, $type = 1)
     {
         $data = Coupon::select()->where([
@@ -22,7 +26,7 @@ class Coupon extends Base
             'user_id' => $user_id,
             'type' => $type,
             'status' => 1,
-        ])->where('end_time', '>=', date("Y-m-d H:i:s",time()))
+        ])->where('end_time', '>=', date("Y-m-d H:i:s", time()))
             ->where('full_cut', '<=', $price)->first();
         return $data->price ?? 0;
     }
@@ -301,6 +305,35 @@ class Coupon extends Base
         $list = $query->limit($size)->offset(($page - 1) * $size)->get();
 
         return ['count' => $count, 'list' => $list];
+    }
+
+    public function giveCoupon($user_id, $cid)
+    {
+        if (!$user_id || !$cid) {
+            return error(1000, '参数无效');
+        }
+
+        $rule = CouponRule::where('id', $cid)->first();
+        if (!$rule) {
+            return error(1000, '规则不存在');
+        }
+
+        $created_at = User::where('id', $user_id)->value('created_at');
+        $res = Coupon::create([
+            'name' => $rule->name,
+            'number' => self::createCouponNum($rule->buffet, $cid),
+            'type'   => $rule->use_type,
+            'price'  => $rule->price,
+            'full_cut'  => $rule->full_cut,
+            'explain'   => $rule->remarks,
+            'begin_time'=> date('Y-m-d H:i:s', strtotime($created_at)),
+            'end_time'  => date('Y-m-d H:i:s', strtotime('+1 month', strtotime($created_at))),
+            'get_way'   => 1,
+            'user_id'   => $user_id,
+            'cr_id'     => $cid
+        ]);
+
+        return success($res);
     }
 
 }

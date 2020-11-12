@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use App\Models\User;
@@ -79,14 +80,20 @@ class AuthController extends Controller
                 'nickname' => substr_replace($phone, '****', 3, 4)
             ]);
             $user = User::find($list->id);
+
+            //新注册用户发送优惠券
+            $model = new Coupon();
+            $model->giveCoupon($list->id, 36);
         } else {
             if ($user->login_flag == 1) {
                 User::where('id', '=', $user->id)->update(['login_flag' => 2]);
             }
         }
 
+
         Redis::del($phone);
         $token = auth('api')->login($user);
+
         $data = [
             'id' => $user->id,
             'token'    => $token,
@@ -95,6 +102,7 @@ class AuthController extends Controller
         ];
         return success($data);
     }
+
 
     /**
      * @api {get} api/v4/auth/logout 退出
