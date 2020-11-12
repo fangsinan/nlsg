@@ -41,7 +41,7 @@ class SendController extends Controller
         if( empty($data) ) {
             return $this->error(0,'订单不存在');
         }
-
+        $user_data = User::find($data['user_id']);
 
         if( $data['send_type'] == 2 ){
             //查询当前课程
@@ -58,7 +58,7 @@ class SendController extends Controller
         }
 
 
-        return $this->success( ['order_data'=>$data,'send_data' =>$relation_data] );
+        return $this->success( ['user_data' =>$user_data, 'order_data'=>$data,'send_data' =>$relation_data] );
     }
 
 
