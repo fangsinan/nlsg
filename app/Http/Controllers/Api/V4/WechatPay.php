@@ -106,7 +106,6 @@ class WechatPay extends Controller
                     'end_time'   => $endtime,
                 ];
                 $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
-                var_dump('3'.$orderRst );
 
                 //添加支付记录
                 $record = [
@@ -120,22 +119,17 @@ class WechatPay extends Controller
                     'status' => 1,
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
-                var_dump('4'.$recordRst);
-
                 $Sy_Rst  = true;
                 $map     = [];
-
-
-                //防止短信发送不成功
                 $AdminInfo = User::find($user_id);
-
-                var_dump('5'.$Sy_Rst);
-
-
                 //获取用户信息
                 $twitter_id    = $orderInfo['twitter_id'];
-                //vip 信息
-                $twitter = VipUser::where(['user_id'=>$twitter_id,'is_default'=>1,'status'=>1])->first()->toArray();
+                $twitter = [];
+                if($twitter_id > 0 ){
+                    //vip 信息
+                    $twitter = VipUser::where(['user_id'=>$twitter_id,'is_default'=>1,'status'=>1])->first()->toArray();
+                }
+
                 // 后台查询需要  $source $source_vip_id  推广总代理商一直不变
                 if($twitter ){
                     if($twitter['level'] == 2){ // 只要升级为2级代理商  就默认为第一级
@@ -152,7 +146,6 @@ class WechatPay extends Controller
                     $twitter['id'] = 0;
                 }
                 $supremacy_vip = $orderInfo['relation_id']; //会员 1 360会员
-
                 $Userdata['user_id'] = $user_id;
                 $Userdata['level'] = $supremacy_vip;
                 $Userdata['username'] = $AdminInfo['username'];
@@ -224,7 +217,6 @@ class WechatPay extends Controller
                     $newVip_rst = VipUser::where(['user_id'=>$user_id])->update($VipUserData);
                 }
 
-                var_dump('2'.$newVip_rst );
 
                 //服务商购买时已是优惠价格
                 //购买必须为360会员
@@ -235,11 +227,9 @@ class WechatPay extends Controller
 
                     if ( $tk_vip && $supremacy_vip == 1) {   //目前只有360会员有收益
                         $ProfitPrice = GetPriceTools::Income(0,$tk_vip,0,5);
-                        var_dump('ProfitPrice'.$ProfitPrice);
 
                         if($ProfitPrice>0) {
                             $map = array ('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time,'vip_id'=>$vip_id,'user_vip_id'=>$Userdata['inviter_vip_id']);
-                            var_dump('map'.$map);
 
                         }
                     }
@@ -247,7 +237,6 @@ class WechatPay extends Controller
                         //防止重复添加收入
                         $where = ['user_id'=>$map['user_id'],'type'=>$map['type'],'ordernum'=>$map['ordernum']];
                         $PrdInfo = PayRecordDetail::where($where)->first('id');
-                        var_dump('PrdInfo'.$PrdInfo);
                         if (empty($PrdInfo)) {
                             $Sy_Rst = VipUser::firstOrCreate($map);
                         }
@@ -273,7 +262,6 @@ class WechatPay extends Controller
 
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
-                var_dump('6'.$userRst);
 
                 if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst  && $add_sub_Rst && $top_Sy_Rst) {
                     DB::commit();
