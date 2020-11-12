@@ -572,6 +572,10 @@ class OrderController extends Controller
 
             $result = Order::getInfo($val['type'],$val['relation_id'],$val['send_type'],$user_id);
 
+            if( $val['send_user_id'] > 0 ){
+                $userData = User::select('phone')->where(['id' => $val['send_user_id']])->first()->toArray();
+                $data[$key]['send_user_phone'] = $userData['phone'];
+            }
             if ($result == false) {
                 $data[$key]['relation_data'] = [];
             } else {
@@ -642,6 +646,13 @@ class OrderController extends Controller
         //购买的内容详情
 
         $result = Order::getInfo($data['type'],$data['relation_id'],$data['send_type'],$user_id);
+
+        if( $data['send_user_id'] > 0 ){
+            $userData = User::select('phone')->where(['id' => $data['send_user_id']])->first()->toArray();
+            $data['send_user_phone'] = $userData['phone'];
+        }
+
+
 
         if ($result == false) {
             $data['relation_data'] = [];
@@ -974,7 +985,7 @@ class OrderController extends Controller
             return $this->error(0, 'vip类型有误');
         }
 
-        if ($this->user['new_vip']['level'] == 1) {
+        if ($level == 1) {
             $price = 360;
         } else {
             $price = 1000;
@@ -992,7 +1003,7 @@ class OrderController extends Controller
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
             'ordernum' => $ordernum,
-            'type' => 17,
+            'type' => 16,
             'user_id' => $user_id,
             'relation_id' => $level,
             'price' => $price,
