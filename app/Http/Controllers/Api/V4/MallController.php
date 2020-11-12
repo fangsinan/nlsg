@@ -979,6 +979,7 @@ class MallController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeemCode
      * @apiDescription 兑换码,假接口
      * @apiParam {number} code 兑换码
+     * @apiParam {number=1,2,3} os_type 系统( 1 安卓 2ios 3微信)
      *
      */
     public function redeemCode(Request $request)

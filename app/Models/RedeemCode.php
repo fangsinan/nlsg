@@ -66,6 +66,7 @@ class RedeemCode extends Base
         $check_code->to_user_id = $to_user_id;
         $check_code->os_type = $os_type;
         $code_res = $check_code->save();
+
         if (!$code_res) {
             DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
@@ -83,7 +84,7 @@ class RedeemCode extends Base
         }
 
         DB::commit();
-        return $this->success(['code' => true, 'msg' => '兑换成功']);
+        return ['code' => true, 'msg' => '成功'];
     }
 
     public function toRedeemOld($code, $user_id)
