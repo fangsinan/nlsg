@@ -197,8 +197,11 @@ class Works extends Base
         $query = Works::whereIn('id', $works_id_list_arr)
             ->with(['categoryRelation', 'categoryRelation.categoryName' => function ($query) {
                 $query->select(['id', 'name']);
-            }, 'columnInfo'])
-            ->select(['id', 'type as works_type', 'title', 'subtitle', 'cover_img', 'detail_img', 'price', 'column_id']);
+            }, 'columnInfo', 'user' => function ($query) {
+                $query->select('id', 'nickname');
+            }])
+            ->select(['id', 'type as works_type', 'title', 'subtitle', 'cover_img',
+                'detail_img', 'price', 'column_id', 'user_id']);
 
         if (!empty($params['category_id'] ?? 0)) {
             $query->whereHas('categoryRelation', function (\Illuminate\Database\Eloquent\Builder $query) use ($params) {
@@ -209,10 +212,10 @@ class Works extends Base
         $list = $query->orderByRaw($works_order_str)->get();
 
 
-        $category_list = WorksCategoryRelation::whereIn('work_id',$works_id_list_arr)
+        $category_list = WorksCategoryRelation::whereIn('work_id', $works_id_list_arr)
             ->select(['category_id'])->get()->toArray();
-        $category_list = array_column($category_list,'category_id');
-        $category_list = WorksCategory::whereIn('id',$category_list)->select(['id','name'])->get()->toArray();
+        $category_list = array_column($category_list, 'category_id');
+        $category_list = WorksCategory::whereIn('id', $category_list)->select(['id', 'name'])->get()->toArray();
 
 
         return ['category' => $category_list, 'list' => $list];
@@ -224,5 +227,16 @@ class Works extends Base
             ->select(['id', 'type', 'column_type']);
     }
 
+    public function listForCytx($params)
+    {
+
+        return Works::where('for_cytx', '=', 1)
+            ->with(['columnInfo', 'user' => function ($query) {
+                $query->select('id', 'nickname');
+            }])
+            ->select(['id', 'type as works_type', 'title', 'subtitle', 'cover_img',
+                'detail_img', 'cytx_price', 'column_id', 'user_id'])
+            ->get();
+    }
 
 }

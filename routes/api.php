@@ -110,6 +110,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('coupon/give', 'CouponController@giveCoupon');
     //*******************************商城部分结束*******************************
 
+    //创业天下
+    Route::get('channel/cytx', 'ChannelController@cytx');
+
     //想法
     Route::get('comment/list', 'CommentController@index');
 

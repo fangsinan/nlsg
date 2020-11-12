@@ -242,8 +242,8 @@ class VipController extends Controller
     public function explain()
     {
         $data = [
-            'title'=>'能量时光幸福360使用说明',
-            'list'=>[
+            'title' => '能量时光幸福360使用说明',
+            'list' => [
                 '1. 幸福360会员为付费产品，购买成功后，即可永久性使用该产品所有内容；',
                 '2. 幸福360会员享受8大权益；',
                 '3. 幸福360会员课程包含现有12个课程，以及后续更新的所有课程；',

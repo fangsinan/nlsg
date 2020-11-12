@@ -122,31 +122,31 @@ class UserController extends Controller
         $user = User::select('id', 'nickname', 'is_author', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_author')
             ->with([
                 'history' => function ($query) {
-                    $query->select(['id', 'user_id', 'relation_id','relation_type'])
+                    $query->select(['id', 'user_id', 'relation_id', 'relation_type'])
                         ->limit(10)
                         ->orderBy('created_at', 'desc');
                 },
                 'history.columns:id,title,cover_pic',
                 'history.works:id,title,cover_img,is_audio_book',
-                'works'   => function ($query) {
-                    $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
+                'works' => function ($query) {
+                    $query->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 0);
                 },
-                'listens'   => function ($query) {
-                    $query->select(['id', 'user_id', 'title', 'subtitle','cover_img', 'subscribe_num', 'original_price'])
+                'listens' => function ($query) {
+                    $query->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 1);
                 },
                 'columns' => function ($query) {
-                    $query->select('id','user_id', 'name', 'title', 'subtitle', 'original_price','subscribe_num','cover_pic');
+                    $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'original_price', 'subscribe_num', 'cover_pic');
                 },
 
             ])
             ->findOrFail($id)
             ->toArray();
-        if($user){
-            $isFollow =  UserFollow::where(['from_uid'=> $this->user['id'], 'to_uid'=>$id])->first();
-            $user['is_self'] =  $id == $this->user['id'] ?  1 : 0;
-            $user['is_follow'] = $isFollow ? 1: 0;
+        if ($user) {
+            $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $id])->first();
+            $user['is_self'] = $id == $this->user['id'] ? 1 : 0;
+            $user['is_follow'] = $isFollow ? 1 : 0;
         }
 
         return success($user);
@@ -238,7 +238,7 @@ class UserController extends Controller
     public function feed(Request $request)
     {
         $id = $request->get('user_id');
-        if(!$id){
+        if (!$id) {
             return error('参数不能为空');
         }
 
@@ -254,11 +254,11 @@ class UserController extends Controller
             foreach ($comments['data'] as &$v) {
                 if ($v['type'] == 1 || $v['type'] == 2) {
                     $v['column'] = Column::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'subtitle','price', 'subscribe_num', 'cover_pic','type')
+                        ->select('id', 'title', 'subtitle', 'price', 'subscribe_num', 'cover_pic', 'type')
                         ->first();
                 } elseif ($v['type'] == 3 || $v['type'] == 4) {
                     $v['works'] = Works::where('id', $v['relation_id'])
-                        ->select('id', 'title','subtitle', 'price', 'subscribe_num', 'cover_img','is_audio_book')
+                        ->select('id', 'title', 'subtitle', 'price', 'subscribe_num', 'cover_img', 'is_audio_book')
                         ->first();
                 } elseif ($v['type'] == 5) {
                     $v['wiki'] = Wiki::where('id', $v['relation_id'])->select('id', 'name', 'cover', 'view_num')
@@ -268,7 +268,7 @@ class UserController extends Controller
         }
         $data = [
             'data' => $comments['data'],
-            'total'=> $comments['total']
+            'total' => $comments['total']
         ];
         return success($data);
     }
@@ -295,12 +295,12 @@ class UserController extends Controller
     public function followed(Request $request)
     {
         $uid = $request->input('to_uid');
-        if ( ! $uid) {
+        if (!$uid) {
             return error(1000, '参数错误');
         }
         $list = UserFollow::where([
             'from_uid' => $this->user['id'],
-            'to_uid'   => $uid
+            'to_uid' => $uid
         ])->first();
 
         if ($list) {
@@ -309,7 +309,7 @@ class UserController extends Controller
 
         UserFollow::create([
             'from_uid' => $this->user['id'],
-            'to_uid'   => $uid
+            'to_uid' => $uid
         ]);
 
         User::where('id', $uid)->increment('fan_num');
@@ -341,14 +341,14 @@ class UserController extends Controller
         $uid = $request->input('to_uid');
         $follow = UserFollow::where([
             'from_uid' => $this->user['id'],
-            'to_uid'   => $uid
+            'to_uid' => $uid
         ])->first();
 
         if (!$follow) {
-            return error(1000,'还没有关注');
+            return error(1000, '还没有关注');
         }
 
-        if ( ! $follow->delete()) {
+        if (!$follow->delete()) {
             return error(1000, '取消失败');
         }
         return success();
@@ -389,7 +389,7 @@ class UserController extends Controller
      */
     public function base()
     {
-        $user = User::select(['id', 'nickname', 'sex', 'headimg', 'birthday', 'intro','like_nun','income_num','reply_num','fans_num','systerm_num','update_num'])
+        $user = User::select(['id', 'nickname', 'sex', 'headimg', 'birthday', 'intro', 'like_nun', 'income_num', 'reply_num', 'fans_num', 'systerm_num', 'update_num'])
             ->where('id', $this->user['id'])
             ->first();
         return success($user);
@@ -422,15 +422,15 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
-        if ( ! $input['nickname']) {
+        if (!$input['nickname']) {
             return $this->error(1000, '昵称不能为空');
         }
         $res = User::where('id', $this->user['id'])->update([
             'nickname' => $input['nickname'],
-            'headimg'  => $input['headimg'] ?? '',
+            'headimg' => $input['headimg'] ?? '',
             'birthday' => $input['birthday'] ?? '',
-            'sex'      => $input['sex'],
-            'intro'    => $input['intro'] ?? ''
+            'sex' => $input['sex'],
+            'intro' => $input['intro'] ?? ''
         ]);
         if ($res) {
             return success();
@@ -462,7 +462,7 @@ class UserController extends Controller
      */
     public function account()
     {
-        $user = User::select(['phone','is_wx'])->where('id', $this->user['id'])->first();
+        $user = User::select(['phone', 'is_wx'])->where('id', $this->user['id'])->first();
         if ($user) {
             $user->phone = !empty($user->phone) ? substr_replace($user->phone, '****', 3, 4) : '';
             $user->is_wx = $user->is_wx ? 1 : 0;
@@ -491,7 +491,7 @@ class UserController extends Controller
     public function feedback(Request $request)
     {
         $input = $request->all();
-        if ( ! $input['content']) {
+        if (!$input['content']) {
             return $this->error(1000, '描述不能为空');
         }
 
@@ -500,10 +500,10 @@ class UserController extends Controller
 //            return $this->error(1000,'图片过多');
 //        }
         $res = FeedBack::create([
-            'type'    => $input['type'],
+            'type' => $input['type'],
             'user_id' => 1,
             'content' => $input['content'],
-            'pic'     => $input['pic']
+            'pic' => $input['pic']
         ]);
         if ($res) {
             return $this->success();
@@ -520,52 +520,52 @@ class UserController extends Controller
      *
      * @apiSuccessExample 成功响应:
      *
-        {
-        "code": 200,
-        "msg": "成功",
-        "data": [
-            {
-                "id": 6,
-                "from_uid": 211172,
-                "to_uid": 1,
-                "to_user": {
-                    "id": 211172,
-                    "nickname": "能量时光",
-                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                },
-                "is_follow": 0
-            },
-            {
-                "id": 9,
-                "from_uid": 168934,
-                "to_uid": 1,
-                "to_user": {
-                    "id": 168934,
-                    "nickname": "chandler",
-                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                },
-                "is_follow": 0
-            }
-        ]
-    }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * {
+     * "id": 6,
+     * "from_uid": 211172,
+     * "to_uid": 1,
+     * "to_user": {
+     * "id": 211172,
+     * "nickname": "能量时光",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * },
+     * "is_follow": 0
+     * },
+     * {
+     * "id": 9,
+     * "from_uid": 168934,
+     * "to_uid": 1,
+     * "to_user": {
+     * "id": 168934,
+     * "nickname": "chandler",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * },
+     * "is_follow": 0
+     * }
+     * ]
+     * }
      *
      */
     public function fan(Request $request)
     {
         $uid = $request->get('user_id');
-        if(!$uid){
+        if (!$uid) {
             $uid = $this->user['id'];
         }
         $user = User::findOrFail($uid);
-        if($user){
+        if ($user) {
             $lists = UserFollow::with('toUser:id,nickname,intro,headimg')
-                    ->select('id','from_uid','to_uid')
-                    ->where('to_uid', $uid)
-                    ->paginate(10)->toArray();
-            if($lists['data']){
+                ->select('id', 'from_uid', 'to_uid')
+                ->where('to_uid', $uid)
+                ->paginate(10)->toArray();
+            if ($lists['data']) {
                 foreach ($lists['data'] as &$v) {
-                    if($v['from_uid'] !== $this->user['id']){
-                        $isFollow = UserFollow::where(['from_uid'=>$this->user['id'],'to_uid'=>$v['from_uid']])->first();
+                    if ($v['from_uid'] !== $this->user['id']) {
+                        $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $v['from_uid']])->first();
                         $v['is_follow'] = $isFollow ? 1 : 0;
                     }
                 }
@@ -583,63 +583,63 @@ class UserController extends Controller
      *
      * @apiSuccessExample 成功响应:
      *
-     {
-        "code": 200,
-        "msg": "成功",
-        "data": [
-            {
-                "id": 4,
-                "from_uid": 1,
-                "to_uid": 211172,
-                "from_user": {
-                    "id": 211172,
-                    "nickname": "能量时光",
-                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                },
-                "is_follow": 0
-            },
-            {
-                "id": 10,
-                "from_uid": 1,
-                "to_uid": 2,
-                "from_user": {
-                    "id": 2,
-                    "nickname": "刘尚",
-                    "headimg": "/wechat/works/headimg/70/2017102911145924225.png"
-                },
-                "is_follow": 0
-            },
-            {
-                "id": 12,
-                "from_uid": 1,
-                "to_uid": 168934,
-                "from_user": {
-                    "id": 168934,
-                    "nickname": "chandler",
-                    "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
-                },
-                "is_follow": 0
-            }
-        ]
-    }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * {
+     * "id": 4,
+     * "from_uid": 1,
+     * "to_uid": 211172,
+     * "from_user": {
+     * "id": 211172,
+     * "nickname": "能量时光",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * },
+     * "is_follow": 0
+     * },
+     * {
+     * "id": 10,
+     * "from_uid": 1,
+     * "to_uid": 2,
+     * "from_user": {
+     * "id": 2,
+     * "nickname": "刘尚",
+     * "headimg": "/wechat/works/headimg/70/2017102911145924225.png"
+     * },
+     * "is_follow": 0
+     * },
+     * {
+     * "id": 12,
+     * "from_uid": 1,
+     * "to_uid": 168934,
+     * "from_user": {
+     * "id": 168934,
+     * "nickname": "chandler",
+     * "headimg": "/wechat/works/headimg/3833/2017110823004219451.png"
+     * },
+     * "is_follow": 0
+     * }
+     * ]
+     * }
      *
      */
     public function follower(Request $request)
     {
         $uid = $request->get('user_id');
-        if(!$uid){
+        if (!$uid) {
             $uid = $this->user['id'];
         }
         $user = User::findOrFail($uid);
-        if($user){
+        if ($user) {
             $lists = UserFollow::with('fromUser:id,nickname,intro,headimg')
-                    ->select('id','from_uid','to_uid')
-                    ->where('from_uid', $uid)
-                    ->paginate(10)->toArray();
-            if($lists['data']){
+                ->select('id', 'from_uid', 'to_uid')
+                ->where('from_uid', $uid)
+                ->paginate(10)->toArray();
+            if ($lists['data']) {
                 foreach ($lists['data'] as &$v) {
-                    if($v['to_uid'] !== $this->user['id']){
-                        $isFollow = UserFollow::where(['from_uid'=>$this->user['id'], 'to_uid'=>$v['to_uid']])->first();
+                    if ($v['to_uid'] !== $this->user['id']) {
+                        $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $v['to_uid']])->first();
                         $v['is_follow'] = $isFollow ? 1 : 0;
                     }
                 }
@@ -782,13 +782,13 @@ class UserController extends Controller
 
         if ($his_id == 'all') {
             $res = History::where('user_id', $user_id)->update(['is_del' => 1]);
-            User::where(['id'=>$user_id])->update(['history_num' => 0 ]);
+            User::where(['id' => $user_id])->update(['history_num' => 0]);
 
         } else {
             $his_id = explode(',', $his_id);
             $res = History::where('user_id', $user_id)
                 ->whereIn('id', $his_id)->update(['is_del' => 1]);
-            User::where(['id'=>$user_id])->decrement('history_num',count($his_id));
+            User::where(['id' => $user_id])->decrement('history_num', count($his_id));
 
         }
         if ($res) {
@@ -852,18 +852,18 @@ class UserController extends Controller
 
         $collection = Collection::where([
             'user_id' => $user_id,
-            'type'    => $type,
+            'type' => $type,
         ])->paginate($this->page_per_page)->toArray();
         $relation_id = array_column($collection['data'], 'relation_id');
 
-        $list = Collection::getCollection($type, $relation_id,$user_id);
+        $list = Collection::getCollection($type, $relation_id, $user_id);
         if ($list == false) {
             $list = [];
         }
 
-        foreach ($collection['data'] as &$value){
-            foreach ($list as &$list_value){
-                if($value['relation_id'] == $list_value['id']){
+        foreach ($collection['data'] as &$value) {
+            foreach ($list as &$list_value) {
+                if ($value['relation_id'] == $list_value['id']) {
                     $list_value['collection_time'] = $value['created_at'];
                 }
             }
@@ -898,31 +898,32 @@ class UserController extends Controller
      *   }
      * }
      */
-    public function  statistics()
+    public function statistics()
     {
-        $uid   = $this->user['id'];
-        $lists = User::select('id','nickname','headimg','phone','level','is_author','notify_num','follow_num','fan_num','history_num')
-                ->find($uid);
+        $uid = $this->user['id'];
+        $lists = User::select('id', 'nickname', 'headimg', 'phone', 'level', 'is_author', 'notify_num', 'follow_num', 'fan_num', 'history_num')
+            ->find($uid);
         if ($lists) {
             $lists->phone = substr_replace($lists->phone, '****', 3, 4);
             $is_live = LiveUserPrivilege::where('user_id', $this->user['id'])
-                           ->where('privilege', 2)
-                           ->where('is_del', 0)
-                           ->first();
-            $lists['is_live']= $is_live ? 1 : 0;
+                ->where('privilege', 2)
+                ->where('is_del', 0)
+                ->first();
+            $lists['is_live'] = $is_live ? 1 : 0;
         }
         return success($lists);
     }
 
 
     //邀请记录
-    public function invitationRecord(){
+    public function invitationRecord()
+    {
         $model = new User();
-        $res =  $model->getInvitationRecord($this->user['id']??0);
+        $res = $model->getInvitationRecord($this->user['id'] ?? 0);
         return $this->success($res);
     }
 
-     /**
+    /**
      * @api {POST} api/v4/change/phone  更换手机号
      * @apiVersion 4.0.0
      * @apiGroup user
@@ -945,7 +946,7 @@ class UserController extends Controller
     public function changePhone(Request $request)
     {
         $phone = $request->input('phone');
-        $code  = $request->input('code');
+        $code = $request->input('code');
 
         if (!$phone) {
             return error(1000, '手机号不能为空');
@@ -966,7 +967,7 @@ class UserController extends Controller
         if ($list) {
             return error(1000, '该手机号码已存在');
         }
-        $res = User::where('id', $this->user['id'])->update(['phone'=>$phone]);
+        $res = User::where('id', $this->user['id'])->update(['phone' => $phone]);
         if ($res) {
             $user = User::where('id', $this->user['id'])->first();
 
@@ -984,35 +985,35 @@ class UserController extends Controller
     public function bindWechat(Request $request)
     {
         $input = $request->all();
-        $data =[
+        $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex' => $input['sex'] == '男' ? 1 : 2,
             'province' => $input['province'],
             'city' => $input['city'],
             'headimg' => $input['headimg'] ?? '',
             'unionid' => $input['unionid'] ?? '',
-            'is_wx'   =>1
+            'is_wx' => 1
         ];
 
         $res = User::where('id', $this->user['id'])->update($data);
         if ($res) {
             return success();
         }
-        return  error(1000,'绑定失败');
+        return error(1000, '绑定失败');
 
     }
 
-    public  function removeWechat(Request $request)
+    public function removeWechat(Request $request)
     {
         $res = User::where('id', $this->user['id'])->update(
             [
                 'unionid' => '',
-                'is_wx'   => 0
+                'is_wx' => 0
             ]);
-        if ($res){
+        if ($res) {
             return success();
         }
-        return  error(1000,'解绑失败');
+        return error(1000, '解绑失败');
     }
 
     /**
@@ -1042,22 +1043,22 @@ class UserController extends Controller
      *     }
      *
      */
-    public  function getUserCoupon()
+    public function getUserCoupon()
     {
-        $lists = Coupon::select('id','user_id','name','price','begin_time','end_time')
-                ->where('user_id', $this->user['id'])
-                ->orderBy('created_at')
-                ->get()
-                ->toArray();
-        if ($lists){
+        $lists = Coupon::select('id', 'user_id', 'name', 'price', 'begin_time', 'end_time')
+            ->where('user_id', $this->user['id'])
+            ->orderBy('created_at')
+            ->get()
+            ->toArray();
+        if ($lists) {
             foreach ($lists as &$v) {
-                $v['begin_time'] =  date('Y-m-d', strtotime($v['begin_time']));
-                $v['end_time']   =  date('Y-m-d', strtotime($v['end_time']));
+                $v['begin_time'] = date('Y-m-d', strtotime($v['begin_time']));
+                $v['end_time'] = date('Y-m-d', strtotime($v['end_time']));
             }
         }
 
         $data = [
-            'coupon'     => $lists,
+            'coupon' => $lists,
             'invite_num' => 20
         ];
         return success($data);
