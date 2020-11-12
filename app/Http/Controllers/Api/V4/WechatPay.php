@@ -15,6 +15,7 @@ use App\Models\PayRecordDetailStay;
 use App\Models\RedeemCode;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Models\Works;
 use App\Models\MallOrder;
@@ -222,6 +223,7 @@ class WechatPay extends Controller
                     ];
                     $newVip_rst = VipUser::where(['user_id'=>$user_id])->update($VipUserData);
                 }
+
                 var_dump('2'.$newVip_rst );
 
                 //服务商购买时已是优惠价格
@@ -253,6 +255,7 @@ class WechatPay extends Controller
 
                 }
                 //受保护的人 需要给推荐人[非保护者] 加一个收益为0的数据
+                $top_Sy_Rst = true;
                 $twitter_top = explode('->', $orderInfo['remark']);
                 if($twitter_top[0] > 0){
                     $twitter_top_vip_id = VipUser::where(['user_id'=>$twitter_top[0],'is_default'=>1,'status'=>1])->first('id');
@@ -260,136 +263,32 @@ class WechatPay extends Controller
                     $top_Sy_Rst = VipUser::firstOrCreate($top_map);
                 }
 
-
-
-
-
                 //  升级续费都需要进行精品课赠送     已经购买的需要折算兑换码
                 //查询关注里是否有这些课程   有的话是送优惠券  没有直接添加
                 $add_sub_Rst = true;
-                $add_code_Rst = true;
                 if($supremacy_vip == 1){
-                    //$all_works_ids = [404,419,557,560,562,567,568,569,570,574,577];
-                    $all_works_ids = [593,588,568,577,404,567,419,560,586,570,569,574];
-                    $sub_data = Subscribe::where(['type'=>2,'user_id'=>$user_id,'works_id'=>$all_works_ids])->get('id','works_id');
-                    if($sub_data){
-                        $sub_data = $sub_data->toArray();
-                    }else{
-                        $sub_data = [];
-                    }
-                    $works_ids = array_column($sub_data,'works_id');  //需要创建优惠券
-                    $nosub_works = array_diff($all_works_ids,$works_ids);       //差集 需要添加关注表
-
-
-
-                    if($nosub_works){
-                        //关注
-                        $add_sub = [];
-                        foreach ($nosub_works as $k=>$v){
-                            $subscribe = [
-                                'user_id'        => $user_id,                //会员id
-                                'type'           => 2, //作品
-                                'status'         => 1,
-                                'works_id'       => $v, //精品课
-                                'pay_time'       => $time,                            //支付时间
-                                'ctime'          => $time,                            //添加时间
-                                'give'           => 14,                            //添加时间
-                            ];
-                            $add_sub[] = $subscribe;
-                        }
-                        $add_sub_Rst = Subscribe::insert($add_sub);
-                        //$add_sub_Rst = $subModel->add($subModel::$table,$add_sub,0);
-                    }
-                    var_dump('1'.$add_sub_Rst);
-
-
-
-                    /************************************************************************************************************/
-
-                    if($works_ids){
-                        //添加优惠券
-                        $model = new RedeemCode();
-                        $year = intval(date('y'));
-                        $day = date('z');
-                        $head = $year . str_pad($day, 3, 0, STR_PAD_LEFT);
-                        $head = self::get_34_Number($head, 3); //年月日标记 三位
-                        //生成分组名称和兑换码前缀
-                        $g_i = 0;
-                        while ($g_i < 1) {
-                            $group_name = self::get_34_Number(rand(1, 999), 2); //随机两位
-                            $group_name = $head . $group_name; //分组名称
-                            $check_g_n = $model->db
-                                ->where('new_group', $group_name)
-                                ->where('is_new_code', 1)
-                                ->getOne($model::$table, 'id');
-                            if (!$check_g_n) {
-                                $g_i++;
-                            }
-                        }
-                        $new_code = [];
-                        $i = 0;
-                        $true_i = 1;
-
-                        while ($i < count($works_ids)) {
-                            $true_i++;
-                            $temp_code = $group_name . self::get_34_Number(self::createCode(), 5);
-                            if (!in_array($temp_code, $new_code)) {
-                                $new_code[] = $temp_code;
-                                $i++;
-                            }
-                        }
-                        $add_code = [];
-                        $worksObj = new Works();
-                        foreach ($works_ids as $k=>$v) {
-                            $title = $worksObj->getOne($worksObj::$table,['id'=>$v],'title');
-                            print_r($title);
-                            $add = [
-                                'code'       => $new_code[$k],
-                                'name'       => $title['title'].'-兑换券',
-                                'ctime'       => $time,
-                                'new_group'       => $group_name,
-                                'can_use'       => 1,
-                                'redeem_type'       => 2,
-                                'goods_id'       => $v,
-                                'user_id'       => $user_id,
-                                'is_new_code'   => 1,
-                            ];
-                            print_r($add);
-                            $add_code[] = $add;
-                        }
-                        $add_code_Rst = $model->add($model::$table,$add_code,0);
-                    }
+                    //use
+                    $add_sub_Rst = VipRedeemUser::subWorksOrGetRedeemCode($user_id);
                 }
-                /************************************************************************************************************/
 
-
-                var_dump('7'.$add_code_Rst);
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
                 var_dump('6'.$userRst);
 
-
-                if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst && $add_code_Rst && $add_sub_Rst && $top_Sy_Rst) {
-                    $OrderObj->db->commit();
-                    $content = "订单修改:$orderRst--支付记录:$recordRst--分享收益:$Sy_Rst";
-                    Io::WriteFile('', '', $content, true);
-                    self::$user_id = $user_id;
-                    return self::WxSuccess();
+                if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst  && $add_sub_Rst && $top_Sy_Rst) {
+                    DB::commit();
+                    return true;
                 } else {
-                    $OrderObj->db->rollback();
+                    DB::rollBack();
                     return false;
                 }
-
             } catch (\Exception $e) {
 
-                echo "文件：".$e->getFile()."行：".$e->getLine()."错误：".$e->getMessage();
-                $OrderObj->db->rollback();
+                DB::rollBack();
                 return false;
             }
-
         } else {
-            //订单状态已更新，直接返回
-            return self::WxSuccess();
+            return true;
         }
     }
 

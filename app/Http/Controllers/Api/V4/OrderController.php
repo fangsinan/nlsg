@@ -985,7 +985,7 @@ class OrderController extends Controller
             return $this->error(0, 'vip类型有误');
         }
 
-        if ($this->user['new_vip']['level'] == 1) {
+        if ($level == 1) {
             $price = 360;
         } else {
             $price = 1000;
