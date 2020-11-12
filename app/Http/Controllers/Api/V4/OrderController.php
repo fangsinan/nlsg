@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\History;
+use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\LiveInfo;
 use App\Models\MallOrder;
@@ -438,7 +439,7 @@ class OrderController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup order
      *
-     * @apiParam {int} type 类型  专栏 2 会员  3充值  4财务打款 5 打赏 6分享赚钱 7支付宝提现 8微信提现  9精品课  10直播    13能量币充值  14 线下产品(门票类)   15讲座
+     * @apiParam {int} type 类型  专栏 2 会员  3充值  4财务打款 5 打赏 6分享赚钱 7支付宝提现 8微信提现  9精品课  10直播    13能量币充值  14 线下产品(门票类)   15讲座  16新360会员 17赠送下单
      * @apiParam {int} status 0待支付  1 已支付 2全部
      *
      * @apiSuccess {string} result json
@@ -552,8 +553,8 @@ class OrderController extends Controller
             $where = ['user_id' => $user_id, 'type' => $type];
         }
 
-        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at')
-            ->whereIn('type', [1, 5, 9, 10, 13, 15])
+        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at','send_type')
+            ->whereIn('type', [1, 5, 9, 10, 13, 15, 16, 17])
             ->where($where);
 
         //  订单状态
@@ -578,9 +579,22 @@ class OrderController extends Controller
                     $model = new Works();
                     $result = $model->getIndexWorks([$val['relation_id']], 2);
                     break;
+                case 10:
+                    $result = Live::find($val['relation_id']);
+                    break;
                 case 15:
                     $model = new Column();
                     $result = $model->getIndexColumn([$val['relation_id']]);
+                    break;
+                case 17:
+                    $result = false;
+                    if($val['send_type'] == 1){
+                        $model = new Works();
+                        $result = $model->getIndexWorks([$val['relation_id']], 2);
+                    }else if($val['send_type'] == 2){
+                        $model = new Column();
+                        $result = $model->getIndexColumn([$val['relation_id']]);
+                    }
                     break;
             }
             if ($result == false) {
