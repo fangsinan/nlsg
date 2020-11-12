@@ -72,7 +72,7 @@ class VipRedeemUser extends Base
 
         if (!empty($params['id'] ?? 0)) {
             foreach ($list as $v) {
-                if ($v->status == 3) {
+                if ($v->status == 1) {
                     $base_url = ConfigModel::getData(26);
                     $base_url = parse_url($base_url);
 
