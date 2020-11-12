@@ -823,7 +823,7 @@ class OrderController extends Controller
     public function createSendOrder(Request $request)
     {
         $relation_id = $request->input('relation_id', 0);   //目标id
-        $send_type = $request->input('send_type', 0);   //目标类型  1 专栏/讲座   2课程
+        $send_type = $request->input('send_type', 0);   //目标类型  1 专栏   2讲座   3课程   4听书
         $os_type = $request->input('os_type', 0);
         $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
@@ -842,7 +842,7 @@ class OrderController extends Controller
             return $this->error(0, '用户有误');
         }
 
-        if($send_type == 1 ){
+        if($send_type == 1 || $send_type == 2  ){
             //$column_id 专栏信息
             $column_data = Column::find($relation_id);
             if (empty($column_data)) {
@@ -850,12 +850,15 @@ class OrderController extends Controller
             }
             $price = $column_data->price;
 
-        }else{
+        }else if($send_type == 3 || $send_type == 4  ){
             $works_data = Works::find($relation_id);
             if (empty($works_data)) {
                 return $this->error(0, '当前课程不存在');
             }
             $price = $works_data->price;
+        }else {
+            return $this->error(0, '参数信息错误');
+
         }
 
 
