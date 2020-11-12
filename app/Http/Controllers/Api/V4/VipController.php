@@ -230,14 +230,35 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
+    /**
+     * 说明
+     * @api {get} /api/v4/vip/explain 说明
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/vip/explain
+     * @apiGroup  360会员
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/explain
+     * @apiDescription 说明
+     * */
     public function explain()
     {
-
+        $data = [
+            'title'=>'能量时光幸福360使用说明',
+            'list'=>[
+                '1. 幸福360会员为付费产品，购买成功后，即可永久性使用该产品所有内容；',
+                '2. 幸福360会员享受8大权益；',
+                '3. 幸福360会员课程包含现有12个课程，以及后续更新的所有课程；',
+                '4. 幸福360会员有效期：报名支付成功之日起1年；',
+                '5. 如果报名幸福360会员之前，有购买过幸福360会员课程，则在能量时光--我的--已购--精品课程，会自动生成该重叠课程兑换码，可以自主赠送/销售；',
+                '6. 本产品所有资源版权永久性归能量时光所有，发现盗版将追究法律及赔偿责任；',
+                '7. 本产品为虚拟内容服务，一经购买成功，概不退款，敬请理解。',
+            ]
+        ];
+        return $this->getRes($data);
     }
 
     /**
      * 所有作品列表
-     * @api {post} /api/v4/vip/all_work 所有作品列表
+     * @api {get} /api/v4/vip/all_work 所有作品列表
      * @apiVersion 4.0.0
      * @apiName /api/v4/vip/all_work
      * @apiGroup  360会员
