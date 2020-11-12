@@ -87,8 +87,8 @@ class VipUser extends Base
         $detail_image = ConfigModel::getData(28);
 
         $res['card_data'] = $card_data;
-        $res['author'] = $author;
-        $res['works_list'] = $works_list;
+        $res['author'] = ['cover_img'=>ConfigModel::getData(31),'list'=>$author];
+        $res['works_list'] = ['cover_img'=>ConfigModel::getData(32),'list'=>$works_list];
         $res['detail_image'] = $detail_image;
         return $res;
     }

@@ -16,6 +16,7 @@ class RedeemCode extends Base
         $code = $params['code'] ?? '';
         $phone = $params['phone'] ?? '';
         $os_type = $params['os_type'] ?? 0;
+        $phone = '';//关闭指定手机号兑换,只能当前账号
 
         if (!in_array($os_type, [1, 2, 3])) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -39,21 +40,21 @@ class RedeemCode extends Base
             $to_user_id = $user['id'];
             $phone = $user['phone'];
         } else {
-//            $check_phone = User::where('phone', '=', $phone)->first();
-//            if ($check_phone) {
-//                $to_user_id = $check_phone->id;
-//            } else {
-//                $new_user = new User();
-//                $new_user->phone = $phone;
-//                $new_user->nickname = substr($phone, 0, 3) . '****' . substr($phone, -4);
-//                $new_user->inviter = $user['id'];
-//                $new_user_res = $new_user->save();
-//                if (!$new_user_res) {
-//                    DB::rollBack();
-//                    return ['code' => false, 'msg' => '失败'];
-//                }
-//                $to_user_id = $new_user_res->id;
-//            }
+            $check_phone = User::where('phone', '=', $phone)->first();
+            if ($check_phone) {
+                $to_user_id = $check_phone->id;
+            } else {
+                $new_user = new User();
+                $new_user->phone = $phone;
+                $new_user->nickname = substr($phone, 0, 3) . '****' . substr($phone, -4);
+                $new_user->inviter = $user['id'];
+                $new_user_res = $new_user->save();
+                if (!$new_user_res) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '失败'];
+                }
+                $to_user_id = $new_user_res->id;
+            }
         }
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
@@ -70,7 +71,11 @@ class RedeemCode extends Base
         }
 
         //todo 兑换过程
-        $this->toRedeem($check_code, $to_user_id);
+        if ($check_code->is_new_code == 1) {
+            $this->toRedeem($check_code, $to_user_id);
+        } else {
+            $this->toRedeemOld($check_code, $to_user_id);
+        }
 
 
         return $this->success(['code' => true, 'msg' => '兑换xxx成功']);
@@ -78,10 +83,16 @@ class RedeemCode extends Base
 
     }
 
+    public function toRedeemOld($code, $user_id)
+    {
+
+    }
+
     public function toRedeem($code, $user_id)
     {
         $use_type = intval($code->redeem_type);
         $product_id = intval($code->goodes_id);
+
 
         switch ($use_type) {
             case 1:

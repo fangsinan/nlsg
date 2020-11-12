@@ -979,7 +979,6 @@ class MallController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeemCode
      * @apiDescription 兑换码,假接口
      * @apiParam {number} code 兑换码
-     * @apiParam {string} phone 账号,如果空就是当前登陆账号
      *
      */
     public function redeemCode(Request $request)

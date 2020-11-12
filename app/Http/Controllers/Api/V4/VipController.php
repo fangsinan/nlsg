@@ -28,7 +28,7 @@ class VipController extends Controller
      * @apiSuccess {number} redeem_code_id 兑换码id
      * @apiSuccess {number=1,2,3,4} status 状态(1未使用 2已使用 3赠送中 4已送出)
      * @apiSuccess {string} price 价格
-     * @apiSuccess {string} [qr_code] 二维码(base64,当指定id且状态为1未使用时返回)
+     * @apiSuccess {string} [qr_code] 二维码(完整url,当指定id且状态为1未使用时返回)
      * @apiSuccess {string[]} code_info 详情
      * @apiSuccess {number} code_info.name 兑换券名称
      * @apiSuccess {number} code_info.number 兑换券编码
@@ -174,51 +174,50 @@ class VipController extends Controller
      *
      * @apiSuccessExample {json} Request-Example:
      *
-     * {
-     * "code": 200,
-     * "msg": "成功",
-     * "now": 1605008475,
-     * "data": {
-     * "card_data": {
-     * "nickname": "chandler",
-     * "headimg": "https://image.nlsgapp.com/image/202009/13f952e04c720a550193e5655534be86.jpg",
-     * "level": 2,
-     * "expire_time": 0,
-     * "surplus_days": 10,
-     * "price": "360",
-     * "is_open": 1
-     * },
-     * "author": [
-     * {
-     * "nickname": "王琨",
-     * "headimg": "/wechat/authorpt/wk.png",
-     * "intro_for_360": ""
-     * },
-     * {
-     * "nickname": "吴岩",
-     * "headimg": "/wechat/works/video/161627/2017121117553852488.jpg",
-     * "intro_for_360": ""
-     * },
-     * {
-     * "nickname": "王康",
-     * "headimg": "/wechat/works/headimg/9784_1529032030.jpeg",
-     * "intro_for_360": ""
-     * }
-     * ],
-     * "works_list": [
-     * {
-     * "id": 568,
-     * "type": 2,
-     * "title": "家庭情境教育工具卡",
-     * "subtitle": "",
-     * "cover_img": "/nlsg/works/20200304023146969654.jpg",
-     * "detail_img": "/nlsg/works/20200304023153543701.jpg",
-     * "price": "0.00"
-     * }
-     * ],
-     * "detail_image": "http://image.nlsgapp.com/nlsg/works/20201110171938316421.png"
-     * }
-     * }
+    {
+    "code": 200,
+    "msg": "成功",
+    "now": 1605160146,
+    "data": {
+    "card_data": {
+    "nickname": "chandler",
+    "headimg": "https://image.nlsgapp.com/image/202009/13f952e04c720a550193e5655534be86.jpg",
+    "level": 2,
+    "expire_time": "2020-11-20 23:59:59",
+    "surplus_days": 8,
+    "price": "360",
+    "is_open": 1
+    },
+    "author": {
+    "cover_img": "http://image.nlsgapp.com/nlsg/works/20201112134526746289.png",
+    "list": [
+    {
+    "id": 161904,
+    "nickname": "王琨",
+    "headimg": "/wechat/authorpt/wk.png",
+    "intro_for_360": ""
+    }
+    ]
+    },
+    "works_list": {
+    "cover_img": "http://image.nlsgapp.com/nlsg/works/20201112134456641863.png",
+    "list": [
+    {
+    "id": 568,
+    "works_type": 2,
+    "title": "家庭情境教育工具卡",
+    "subtitle": "经历过职场迷茫和彷徨的岁月，了解年轻人心中的情怀和现实之间的差异，所以《优秀的人，都敢对自己下狠手》中，没有无聊的励志和温情的鸡汤，而是真实的打拼和真诚的建议！",
+    "cover_img": "/nlsg/works/20200304023146969654.jpg",
+    "detail_img": "/nlsg/works/20200304023153543701.jpg",
+    "price": "0.00",
+    "type": 1,
+    "column_type": 1
+    }
+    ]
+    },
+    "detail_image": "http://image.nlsgapp.com/nlsg/works/20201110171938316421.png"
+    }
+    }
      */
     public function homePage(Request $request)
     {
