@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lists;
+use App\Models\Versions;
 use Illuminate\Http\Request;
 use App\Models\Announce;
 use App\Models\Banner;
@@ -854,6 +855,45 @@ class IndexController extends Controller
         $recommendModel = new Recommend();
         $lists = $recommendModel->getEditorWorks();
         return $this->success($lists);
+    }
+
+    /**
+     * @api {get} api/v4/index/version  版本更新
+     * @apiVersion 4.0.0
+     * @apiName  version
+     * @apiGroup Index
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/version
+     * @apiParam {string} version  版本号 4.0.0
+     *
+     * @apiSuccess {string}  content  更新内容
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *             
+     *         ]
+     *     }
+     *
+     */
+    public function  version(Request $request)
+    {
+        $version = $request->get('version');
+        $list =  Versions::select('id','number','content')
+                ->where('status', 1)
+                ->orderBy('created_at','desc')
+                ->first();
+        if (version_compare($version, $list->number, '>=')) {
+            return success(['is_force'=>0]);
+        }
+        if ($list){
+            $list->is_force = 1;
+            $list->content =  $list->content ? explode('；', $list->content) : '';
+        }
+
+        return success($list);
     }
 
 }
