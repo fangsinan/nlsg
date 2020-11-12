@@ -82,10 +82,10 @@ class Order extends Base
                 $result = $model->getIndexColumn([$relation_id]);
                 break;
             case 17:
-                if($send_type == 1){
+                if($send_type == 1 || $send_type == 2){
                     $model = new Works();
                     $result = $model->getIndexWorks([$relation_id], 2);
-                }else if($send_type == 2){
+                }else if($send_type == 3 || $send_type == 4){
                     $model = new Column();
                     $result = $model->getIndexColumn([$relation_id]);
                 }
