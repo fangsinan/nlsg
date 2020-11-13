@@ -10,6 +10,8 @@ class VipUser extends Base
 {
     protected $table = 'nlsg_vip_user';
 
+    protected $fillable = ['id' ,  'user_id','nickname',  'username',  'password', 'level',  'inviter',  'inviter_vip_id',  'source' ,  'source_vip_id',
+        'start_time',  'expire_time',  'status',  'is_default',  'order_id',  'area', 'is_open_360',  'time_begin_360',  'time_end_360',];
     public static function newVipInfo($user_id)
     {
         $now_date = date('Y-m-d H:i:s');
