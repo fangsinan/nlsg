@@ -77,6 +77,13 @@ class CreatePosterController extends Controller
             if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
             }
+            $user_info = [
+              'nickname'=>$this->user['nickname'],
+              'headimg'=>$this->user['headimg'],
+              'level'=>$this->user['level'],
+              'expire_time'=>$this->user['expire_time'],
+              'new_vip'=>$this->user['new_vip'],
+            ];
             return $this->success(['url' => $url, 'src' => $src]);
         }
 
