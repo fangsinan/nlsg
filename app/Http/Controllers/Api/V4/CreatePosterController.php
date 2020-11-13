@@ -57,7 +57,7 @@ class CreatePosterController extends Controller
         $level = User::getLevel($uid);
 
         //分享360海报,不校验推客身份
-        if ($level < 2 && $post_type <> 23) {
+        if ($level < 2 && ($post_type <> 23 || $post_type <> 10 || $post_type <> 7)) {
             return $this->error(0, '用户身份不是推客');
         }
 
@@ -74,7 +74,7 @@ class CreatePosterController extends Controller
             $temp_9_res = $this->createQRcode($QR_url, false, true, true);
             $src = '';
             $url = self::$Api_url . 'public/image/' . $temp_9_res;
-            if ($post_type == 23){
+            if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
             }
             return $this->success(['url' => $url, 'src' => $src]);
@@ -1073,7 +1073,7 @@ class CreatePosterController extends Controller
                 // return $res;
                 return 'https://a.app.qq.com/o/simple.jsp?pkgname=com.huiyujiaoyu.powertime';
             case 23://360分享海报
-                return ConfigModel::getData(33).'?time='.time().'&=inviter'.$uid;
+                return ConfigModel::getData(33) . '?time=' . time() . '&=inviter' . $uid;
         }
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
