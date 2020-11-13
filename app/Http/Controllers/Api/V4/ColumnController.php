@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use App\Models\Column;
 use App\Models\ColumnOutline;
+use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Recommend;
 use App\Models\Subscribe;
@@ -367,6 +368,12 @@ class ColumnController extends Controller
         if( empty($column) ){
             return $this->error(0,'专栏不存在不能为空');
         }
+
+        $column['twitter_price'] = GetPriceTools::Income(1,2,0,1,$column_id);
+//        $column['black_price']   = GetPriceTools::Income(1,3,0,1,$column_id);
+        $column['emperor_price'] = GetPriceTools::Income(1,4,0,1,$column_id);
+        $column['service_price'] = GetPriceTools::Income(1,5,0,1,$column_id);
+
         return $this->success([
             'column_info'  =>$column,
         ]);
