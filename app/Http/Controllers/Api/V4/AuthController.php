@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Models\UserInvite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use App\Models\User;
@@ -47,6 +48,8 @@ class AuthController extends Controller
 
         $phone = $request->input('phone');
         $code = $request->input('code');
+        $is_invite = $request->input('is_invite');
+        $user_id   = $request->input('user_id');
         $inviter = $request->input('inviter', 0);
         $ref = $request->input('ref', 0);
 
@@ -87,6 +90,15 @@ class AuthController extends Controller
             //新注册用户发送优惠券
             $model = new Coupon();
             $model->giveCoupon($list->id, 36);
+            if ($is_invite && $user_id){
+                $model->giveCoupon($user_id, 37);
+
+                UserInvite::create([
+                    'from_uid' => $user_id,
+                    'to_uid'   => $list->id,
+                    'type'     => 1
+                ]);
+            }
         } else {
             if ($user->login_flag == 1) {
                 User::where('id', '=', $user->id)->update(['login_flag' => 2]);

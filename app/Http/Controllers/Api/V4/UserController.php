@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\History;
 use App\Models\LiveUserPrivilege;
+use App\Models\UserInvite;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
@@ -1047,6 +1048,7 @@ class UserController extends Controller
     {
         $lists = Coupon::select('id', 'user_id', 'name', 'price', 'begin_time', 'end_time')
             ->where('user_id', $this->user['id'])
+            ->where('type', 7)
             ->orderBy('created_at')
             ->get()
             ->toArray();
@@ -1057,9 +1059,14 @@ class UserController extends Controller
             }
         }
 
+        $invite_num = UserInvite::where('from_uid', $this->user['id'])
+                    ->where('type', 1)
+                    ->count();
+        $invite_num = $invite_num ?? 0;
+
         $data = [
             'coupon' => $lists,
-            'invite_num' => 20
+            'invite_num' => $invite_num
         ];
         return success($data);
     }
