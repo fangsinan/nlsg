@@ -617,8 +617,8 @@ class LiveController extends Controller
     public function getOfflineOrder(Request $request)
     {
         $id = $request->get('id');
-        $lists = Order::where(['relation_id' => $id, 'status' => 1, 'type' => 14])
-            ->select('relation_id', 'price', 'ordernum', 'status')
+        $lists = Order::where(['relation_id' => $id, 'type' => 14])
+            ->select('id','relation_id', 'price', 'ordernum', 'status')
             ->where('user_id', $this->user['id'])
             ->paginate(10)
             ->toArray();
