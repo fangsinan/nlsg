@@ -191,13 +191,14 @@ class WechatPay extends Controller
                                 'expire_time' => date('Y-m-d H:i:s',strtotime($UserAttInfo['expire_time'])+31536000),
                             ];
                             $newVip_rst = VipUser::where(['user_id'=>$user_id])->update($Userdata);
-
                             $twitter_top = explode('->', $orderInfo['remark']);
-                            if($twitter_top[1] > 0){
-                                $twitter_id = $twitter_top[1];
+
+                            if( !empty($twitter_top[1]) && $twitter_top[1] > 0){
+                                $twitter_id = $twitter_top[1] ?? 0;
                             }else{
-                                $twitter_id = $UserAttInfo['inviter'];
+                                $twitter_id = $UserAttInfo['inviter'] ?? 0;
                             }
+
 
                             //查看当前有效用户
                             $UserAttInfo = VipUser::where(['user_id'=>$user_id,'status'=>1,'is_default'=>1])->first()->toArray();
@@ -223,7 +224,6 @@ class WechatPay extends Controller
                     }
                     $newVip_rst = VipUser::where(['user_id'=>$user_id])->update($VipUserData);
                 }
-
 
                 //服务商购买时已是优惠价格
                 //购买必须为360会员
@@ -279,6 +279,7 @@ class WechatPay extends Controller
                 }
             } catch (\Exception $e) {
                 DB::rollBack();
+                dd($e);
                 return false;
             }
         } else {
