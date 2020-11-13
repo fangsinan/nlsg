@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\ConfigModel;
 use App\Models\CreatePost;
 use App\Models\CreateQRcode;
 use App\Models\Live;
@@ -73,6 +74,9 @@ class CreatePosterController extends Controller
             $temp_9_res = $this->createQRcode($QR_url, false, true, true);
             $src = '';
             $url = self::$Api_url . 'public/image/' . $temp_9_res;
+            if ($post_type == 23){
+                $src = ConfigModel::getData(34);
+            }
             return $this->success(['url' => $url, 'src' => $src]);
         }
 
@@ -1068,6 +1072,8 @@ class CreatePosterController extends Controller
                 // $res = $mtModel->createJumpUrl(22, 0, 0, 0);
                 // return $res;
                 return 'https://a.app.qq.com/o/simple.jsp?pkgname=com.huiyujiaoyu.powertime';
+            case 23://360分享海报
+                return ConfigModel::getData(33).'?time='.time().'&=inviter'.$uid;
         }
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
