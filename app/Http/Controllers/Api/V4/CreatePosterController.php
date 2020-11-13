@@ -52,6 +52,7 @@ class CreatePosterController extends Controller
         $gid = $request->input('relation_id', 0);
         $post_type = $request->input('post_type', 0);
         $is_qrcode = $request->input('is_qrcode', 0);
+        $flag = $request->input('flag',0);
 
 
         $level = User::getLevel($uid);
@@ -70,7 +71,7 @@ class CreatePosterController extends Controller
 
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
-            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid);
+            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid,$flag);
             $temp_9_res = $this->createQRcode($QR_url, false, true, true);
             $src = '';
             $url = self::$Api_url . 'public/image/' . $temp_9_res;
@@ -1009,7 +1010,7 @@ class CreatePosterController extends Controller
     }
 
     //获取二维码网址
-    protected function getGetQRUrl($type, $gid, $uid)
+    protected function getGetQRUrl($type, $gid, $uid,$flag = 0)
     {
 
         $info_id = 0;
@@ -1082,7 +1083,7 @@ class CreatePosterController extends Controller
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
         //  6:精品课视频  7:精品课音频  8:书籍  9:商品  10:会员
-        $res = $twitterObj->createJumpUrl($u_type, $gid, $info_id, $uid);
+        $res = $twitterObj->createJumpUrl($u_type, $gid, $info_id, $uid,$flag);
 
         //添加 mallTwitter Twitter_add
         // 1：专栏   2：商品  3：精品课 4听书 5线下课 6邀请卡(有且只有一条记录当前用户)
