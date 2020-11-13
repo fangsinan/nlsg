@@ -240,6 +240,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::put('vip/code_use', 'VipController@redeemCodeUse');
         Route::post('vip/code_create', 'VipController@redeemCodeCreate');
         Route::post('vip/code_get', 'VipController@redeemCodeGet');
+        Route::get('vip/code_info', 'VipController@redeemCodeInfo');
 
         //*******************************我的直播部分开始*******************************
         Route::post('live_console/add', 'LiveConsoleController@add');

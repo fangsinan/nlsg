@@ -163,12 +163,41 @@ class VipRedeemUser extends Base
 
     }
 
+    public function info($user,$params){
+        if (empty($params['id'] ?? 0)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        if (empty($params['user_id']??0)){
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check = self::query()->whereId($params['id'])->where('user_id','=',$params['user_id'])->first();
+        if (empty($check)) {
+            return ['code' => false, 'msg' => '兑换券不存在'];
+        }
+        if ($check->status != 3) {
+            return ['code' => false, 'msg' => '兑换券状态错误'];
+        }
+        if ($check->user_id == $user['id']) {
+            return ['code' => false, 'msg' => '兑换券错误'];
+        }
+
+        $res = self::whereId($params['id'])
+            ->with(['userInfo','codeInfo'])
+            ->select(['id','redeem_code_id','user_id'])
+            ->first();
+
+        if (empty($res)){
+            return new class{};
+        }
+        return $res;
+    }
+
     public function get($user, $params)
     {
         if (empty($params['id'] ?? 0)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
-        $check = self::query()->whereId($params['id'])->where('user_id', '=', $user['id'])->first();
+        $check = self::query()->whereId($params['id'])->first();
         if (empty($check)) {
             return ['code' => false, 'msg' => '兑换券不存在'];
         }

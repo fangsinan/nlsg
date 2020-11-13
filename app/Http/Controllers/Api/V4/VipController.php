@@ -116,6 +116,12 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
+    public function redeemCodeInfo(Request $request){
+        $model = new VipRedeemUser();
+        $data = $model->info($this->user,$request->input());
+        return $this->getRes($data);
+    }
+
     /**
      * 使用兑换券
      * @api {put} /api/v4/vip/code_use 使用兑换券
