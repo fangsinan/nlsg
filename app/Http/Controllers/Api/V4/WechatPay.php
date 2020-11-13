@@ -162,7 +162,7 @@ class WechatPay extends Controller
                 $vip_order_type = $orderInfo['vip_order_type']; //1开通 2续费
 
                 //$UserAttInfo=$newVipModel->db->where()->getOne($newVipModel::$table,'*');
-                $UserAttInfo = VipUser::where(['user_id'=>$user_id])->first();
+                $UserAttInfo = VipUser::where(['user_id'=>$user_id,'status'=>1,'is_default'=>1])->first();
                 if($UserAttInfo){
                     $UserAttInfo = $UserAttInfo->toArray();
                     $level = $UserAttInfo['level'];
