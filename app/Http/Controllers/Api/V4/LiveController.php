@@ -740,7 +740,9 @@ class LiveController extends Controller
              $userdata = User::find($val['new_vip_uid']);
              $new_data[$key]['user_id'] = $userdata['id'];
              $new_data[$key]['username'] = $userdata['phone'];
+             $new_data[$key]['nickname'] = $userdata['nickname'];
              $new_data[$key]['headimg'] = $userdata['headimg'];
+
              $new_data[$key]['is_self'] = 0;
              if($val['new_vip_uid'] == $user_id){
                  $new_data[$key]['is_self'] = 1;
