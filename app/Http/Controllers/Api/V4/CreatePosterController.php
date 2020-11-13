@@ -19,8 +19,8 @@ use Illuminate\Http\Request;
 
 class CreatePosterController extends Controller
 {
-    public static  $Api_url = 'http://app.v4.api.nlsgapp.com/';
-    public static  $IMAGES_URL = 'https://image.nlsgapp.com/';
+    public static $Api_url = 'http://app.v4.api.nlsgapp.com/';
+    public static $IMAGES_URL = 'https://image.nlsgapp.com/';
 
 
     /**
@@ -37,24 +37,28 @@ class CreatePosterController extends Controller
      * @apiSuccessExample Success-Response:
      *
      *
-    {
-    "code": 200,
-    "msg": "成功",
-    "data": [
-    ]
-    }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * ]
+     * }
      */
 
     public function CreatePoster(Request $request)
     {
-        $uid = $this->user['id']??0;
+        $uid = $this->user['id'] ?? 0;
         $gid = $request->input('relation_id', 0);
         $post_type = $request->input('post_type', 0);
         $is_qrcode = $request->input('is_qrcode', 0);
 
 
         $level = User::getLevel($uid);
-        if ($level < 2) return $this->error(0,'用户身份不是推客');
+
+        //分享360海报,不校验推客身份
+        if ($level < 2 && $post_type <> 23) {
+            return $this->error(0, '用户身份不是推客');
+        }
 
 
         $save_path = base_path() . '/public/image/';//存储路径
@@ -63,13 +67,12 @@ class CreatePosterController extends Controller
         }
 
 
-
         //海报二维码  [客户端生成]
-        if($is_qrcode == 1){
-            $QR_url     = $this->getGetQRUrl($post_type, $gid, $uid);
+        if ($is_qrcode == 1) {
+            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid);
             $temp_9_res = $this->createQRcode($QR_url, false, true, true);
-            $src        = '';
-            $url        = self::$Api_url.'public/image/' . $temp_9_res;
+            $src = '';
+            $url = self::$Api_url . 'public/image/' . $temp_9_res;
             return $this->success(['url' => $url, 'src' => $src]);
         }
 
@@ -99,16 +102,16 @@ class CreatePosterController extends Controller
                 break;
             case 8://专栏
                 $temp_get_gid = Column::find($gid);
-                $gid          = $temp_get_gid['id'];
-                $g_t_id       = $temp_get_gid['id'];
+                $gid = $temp_get_gid['id'];
+                $g_t_id = $temp_get_gid['id'];
 //                $g_t_id       = $temp_get_gid['user_id'];
-                $source_name  = 'zhuanlan@2x.png';
+                $source_name = 'zhuanlan@2x.png';
                 break;
             case 9://二维码
-                $QR_url     = $this->getGetQRUrl(4, $gid, $uid);
+                $QR_url = $this->getGetQRUrl(4, $gid, $uid);
                 $temp_9_res = $this->createQRcode($QR_url, false, true, true);
-                $src        = '';
-                $url        = self::$Api_url.'temp_poster/' . $temp_9_res;
+                $src = '';
+                $url = self::$Api_url . 'temp_poster/' . $temp_9_res;
                 return ['url' => $url, 'src' => $src];
             //                return $temp_9_res;
             case 20://优品海报
@@ -124,11 +127,11 @@ class CreatePosterController extends Controller
         $source = storage_path() . '/app/public/PosterMaterial/' . $source_name;
 
         $init = [
-            'path'   => $save_path,
+            'path' => $save_path,
             'source' => $source,
         ];
 
-        $cp   = new CreatePost($init);
+        $cp = new CreatePost($init);
 
         if (empty($g_t_id)) {
             $draw = $this->getDraw($uid, $post_type, $gid, $level);
@@ -136,27 +139,28 @@ class CreatePosterController extends Controller
             $draw = $this->getDraw($uid, $post_type, $gid, $level, $g_t_id);
         }
         $temp_del_path = $draw['QR']['path'];
-        $res           = $cp::draw($draw);
+        $res = $cp::draw($draw);
         $return_qr_url = '';
         if (!empty($draw['QR']['path'])) {
             $temp_qr_new_url = str_replace(storage_path() . '/app/public/PosterMaterial/', '', $temp_del_path);
-            $c_res           = copy($temp_del_path, $save_path . $temp_qr_new_url);
+            $c_res = copy($temp_del_path, $save_path . $temp_qr_new_url);
 
             unlink($temp_del_path);
         }
         $file_path = $save_path . $res;
         $res_data = false;
         if ($fp = fopen($file_path, "rb", 0)) {
-            $src    = '';
-            $domain   = self::$Api_url .'temp_poster/';
-            $res_data = ['url' => $domain. $res, 'src' => $src, 'qr_url' => $domain .$temp_qr_new_url];
+            $src = '';
+            $domain = self::$Api_url . 'temp_poster/';
+            $res_data = ['url' => $domain . $res, 'src' => $src, 'qr_url' => $domain . $temp_qr_new_url];
         }
         return $res_data;
 
     }
 
     //生成二维码
-    public function createQRcode($value, $b64 = true, $online = true, $web = false) {
+    public function createQRcode($value, $b64 = true, $online = true, $web = false)
+    {
         $logo = storage_path() . '/app/public/PosterMaterial/qrcode_logo.png';
         if ($web) {
             //$path = EASYSWOOLE_ROOT . '/webroot/temp_poster/';
@@ -166,7 +170,6 @@ class CreatePosterController extends Controller
         }
 
         $name = 'qr_' . time() . rand(1, 999) . '.png';
-
 
 
         $QRcode = new CreateQRcode();
@@ -191,7 +194,8 @@ class CreatePosterController extends Controller
     }
 
     //校验头像地址
-    public function checkHeadImgUrl($url) {
+    public function checkHeadImgUrl($url)
+    {
         $url_head_img = rtrim(self::$IMAGES_URL, '/');
 
         if (strpos($url, 'http:') === 0 || strpos($url, 'https:') === 0) {
@@ -214,7 +218,8 @@ class CreatePosterController extends Controller
     }
 
     //按类型生成坐标数组
-    public function getDraw($uid, $type, $gid, $level, $g_t_id = 0) {
+    public function getDraw($uid, $type, $gid, $level, $g_t_id = 0)
+    {
         //帽子&图标  2 推客 3黑钻 4皇钻
         $cap_img = '';
         $sign_img = '';
@@ -846,7 +851,7 @@ class CreatePosterController extends Controller
 
 //                $live_Obj = new \App\Model\App\V3_1\Live();
 //                $main_info = $live_Obj->db->where('id', $gid)->getOne($live_Obj->tableName);
-                $main_info =  Live::find($gid);
+                $main_info = Live::find($gid);
                 $res['main_img'] = [
                     'type' => 'image',
                     'path' => $img_url_share . $main_info['cover_img'],
@@ -975,7 +980,8 @@ class CreatePosterController extends Controller
     }
 
     //计算名字长度像素
-    function calculateTextBox($text, $fontFile, $fontSize, $fontAngle) {
+    function calculateTextBox($text, $fontFile, $fontSize, $fontAngle)
+    {
         //$text = Tool::textDecode($text);
         $rect = imagettfbbox($fontSize, $fontAngle, $fontFile, $text);
         $minX = min(array($rect[0], $rect[2], $rect[4], $rect[6]));
@@ -995,7 +1001,8 @@ class CreatePosterController extends Controller
     }
 
     //获取二维码网址
-    protected function getGetQRUrl($type, $gid, $uid) {
+    protected function getGetQRUrl($type, $gid, $uid)
+    {
 
         $info_id = 0;
         $u_type = 0;
@@ -1010,7 +1017,7 @@ class CreatePosterController extends Controller
                 break;
             case 5://精品课
                 $temp_work = Works::find($gid);
-                $temp_work_info = WorksInfo::select('id')->where(['pid' => $gid, 'status' => 4])->OrderBy('id','desc')->first();
+                $temp_work_info = WorksInfo::select('id')->where(['pid' => $gid, 'status' => 4])->OrderBy('id', 'desc')->first();
                 $info_id = $temp_work_info['id'];
                 if ($temp_work['is_audio_book']) {
                     $m_t_type = 4;
@@ -1077,7 +1084,8 @@ class CreatePosterController extends Controller
     }
 
     //生成价签部分
-    function createPriceArr($price, $post_type, $font) {
+    function createPriceArr($price, $post_type, $font)
+    {
         $price = strval($price);
         $money_color = '87, 150, 255';
         $money_1 = '￥';
