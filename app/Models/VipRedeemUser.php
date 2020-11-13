@@ -163,14 +163,15 @@ class VipRedeemUser extends Base
 
     }
 
-    public function info($user,$params){
+    public function info($user, $params)
+    {
         if (empty($params['id'] ?? 0)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
-        if (empty($params['user_id']??0)){
+        if (empty($params['user_id'] ?? 0)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
-        $check = self::query()->whereId($params['id'])->where('user_id','=',$params['user_id'])->first();
+        $check = self::query()->whereId($params['id'])->where('user_id', '=', $params['user_id'])->first();
         if (empty($check)) {
             return ['code' => false, 'msg' => '兑换券不存在'];
         }
@@ -180,14 +181,15 @@ class VipRedeemUser extends Base
         if ($check->user_id == $user['id']) {
             return ['code' => false, 'msg' => '兑换券错误'];
         }
-
+        $price = ConfigModel::getData(25);
         $res = self::whereId($params['id'])
-            ->with(['userInfo','codeInfo'])
-            ->select(['id','redeem_code_id','user_id'])
+            ->with(['userInfo', 'codeInfo'])
+            ->select(['id', 'redeem_code_id', 'user_id', DB::raw("concat('¥',$price) as price")])
             ->first();
 
-        if (empty($res)){
-            return new class{};
+        if (empty($res)) {
+            return new class {
+            };
         }
         return $res;
     }
