@@ -16,6 +16,7 @@ use App\Models\LiveCountDown;
 use App\Models\User;
 use App\Models\LiveWorks;
 use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
@@ -669,6 +670,7 @@ class LiveController extends Controller
      * @apiGroup 直播
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live/ranking
      * @apiParam  {number} live_id 直播id
+     * @apiParam  {number} liveinfo_id 直播info_id
      * @apiParam  {number} page 分页
      *
      * @apiSuccess {string}  user_ranking 自己排名
@@ -703,25 +705,53 @@ class LiveController extends Controller
      *     }
      *
      */
-    public function ranking()
+    public function ranking(Request $request)
     {
+        $live_id = $request->input('live_id', 0);
+        $liveinfo_id = $request->input('liveinfo_id', 0);
+        $user_id = 1;//$this->user['id'];
+
+
+
+        //获取自己的邀请人数
+        $user_ranking = LiveCountDown::select(DB::raw('count(*) c'))
+            ->where(['live_id'=>$liveinfo_id])->where(['new_vip_uid'=>$user_id])->first()->toArray();
+//        dd($user_ranking);
+
+        //查看大于自己邀请人数的数量
+        $num = LiveCountDown::select(DB::raw('count(*) num'),'new_vip_uid')
+            ->where(['live_id'=>$liveinfo_id])
+            ->where('new_vip_uid', '>', 0)
+            ->groupBy('new_vip_uid')
+            ->having('num','>=',$user_ranking['c'])
+            //->first()->toArray();
+            ->paginate($this->page_per_page)->toArray();
+
+        $ranking_data = LiveCountDown::select(DB::raw('count(*) c'),'new_vip_uid')
+        ->where(['live_id'=>$liveinfo_id])
+        ->where('new_vip_uid', '>', 0)
+        ->groupBy('new_vip_uid')
+        ->orderBy('c', 'desc')->orderBy('new_vip_uid', 'desc')->paginate($this->page_per_page)->toArray();
+
+        $new_data = [];
+         foreach ($ranking_data ['data'] as $key=>$val){
+             $new_data[$key]['user_ranking'] = ($key+1);
+             $new_data[$key]['invite_num'] = $val['c'];
+             $userdata = User::find($val['new_vip_uid']);
+             $new_data[$key]['user_id'] = $userdata['id'];
+             $new_data[$key]['username'] = $userdata['phone'];
+             $new_data[$key]['headimg'] = $userdata['headimg'];
+             $new_data[$key]['is_self'] = 0;
+             if($val['new_vip_uid'] == $user_id){
+                 $new_data[$key]['is_self'] = 1;
+             }
+         }
+
+
         $data = [
-            'user_ranking'    => 2,
-            'user_invite_num' => 10,
-            'ranking'         => [
-                [
-                    'username'   => '亚梦想',
-                    'headimg'    => '/wechat/authorpt/lzh.png',
-                    'invite_num' => 30,
-                    'is_self'    => 1
-                ],
-                [
-                    'username'   => '小雨衣',
-                    'headimg'    => '/wechat/authorpt/lzh.png',
-                    'invite_num' => 20,
-                    'is_self'    => 0
-                ]
-            ]
+            'user_ranking'    => $num['total'],
+            'user_invite_num' => $user_ranking['c'],
+            'ranking'         => $new_data
         ];
         return success($data);
     }
