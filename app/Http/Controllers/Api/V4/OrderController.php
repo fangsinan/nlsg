@@ -12,6 +12,7 @@ use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\LiveInfo;
 use App\Models\MallOrder;
+use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -1015,6 +1016,63 @@ class OrderController extends Controller
             'live_id' => $live_id,
             'vip_order_type' => $type,  //1开通 2续费 3升级
             'remark' => $remark,
+            'tweeter_code' => $tweeter_code,
+        ];
+
+        $order = Order::firstOrCreate($data);
+        return $this->success($order['id']);
+
+    }
+
+
+    /**
+     * @api {post} /api//v4/order/create_products_order 线下产品下单
+     * @apiName create_products_order
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} product_id      产品id
+     * @apiParam {int} os_type os_type 1 安卓 2ios
+     * @apiParam {int} live_id 直播id
+     * @apiParam {int} tweeter_code 推客id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": { }
+     * }
+     */
+    public function createProductsOrder(Request $request)
+    {
+        $product_id = $request->input('product_id', 1);   //目标id
+        $os_type = $request->input('os_type', 0);
+        $live_id = $request->input('live_id', 0);
+        $tweeter_code = $request->input('tweeter_code', 0);  //推客id
+        $num = $request->input('num', 0);  //推客id
+        $user_id = $this->user['id'];
+
+
+
+        $ProductInfo = OfflineProducts::find($product_id);
+        //检测下单参数有效性
+        if (empty($ProductInfo)) {
+            return $this->error(0, '产品id有误');
+        }
+
+        $price = $ProductInfo['price'];
+
+        $ordernum = MallOrder::createOrderNumber($user_id, 3);
+        $data = [
+            'ordernum' => $ordernum,
+            'type' => 14,
+            'user_id' => $user_id,
+            'relation_id' => $product_id,
+            'price' => $price,
+            'ip' => $request->getClientIp(),
+            'os_type' => $os_type,
+            'live_id' => $live_id,
             'tweeter_code' => $tweeter_code,
         ];
 
