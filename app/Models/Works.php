@@ -205,7 +205,7 @@ class Works extends Base
 
         if (!empty($params['category_id'] ?? 0)) {
             $query->whereHas('categoryRelation', function (\Illuminate\Database\Eloquent\Builder $query) use ($params) {
-                $query->where('id', '=', $params['category_id']);
+                $query->where('category_id', '=', $params['category_id']);
             });
         }
 
