@@ -78,13 +78,13 @@ class CreatePosterController extends Controller
                 $src = ConfigModel::getData(34);
             }
             $user_info = [
-              'nickname'=>$this->user['nickname'],
-              'headimg'=>$this->user['headimg'],
-              'level'=>$this->user['level'],
-              'expire_time'=>$this->user['expire_time'],
-              'new_vip'=>$this->user['new_vip'],
+                'nickname' => $this->user['nickname'],
+                'headimg' => $this->user['headimg'],
+                'level' => $this->user['level'],
+                'expire_time' => $this->user['expire_time'],
+                'new_vip' => $this->user['new_vip'],
             ];
-            return $this->success(['url' => $url, 'src' => $src]);
+            return $this->success(['url' => $url, 'src' => $src, 'user_info' => $user_info]);
         }
 
 
