@@ -480,7 +480,11 @@ class WechatPay extends Controller
         $transaction_id = $data['transaction_id'];
 
         $order_obj = MallOrder::where('ordernum', '=', $ordernum)
-            ->where('status', '=', 1)->first();
+            ->first();
+
+        if($order_obj->status > 1 ){
+            return true;
+        }
 
         DB::beginTransaction();
         //修改订单支付状态
