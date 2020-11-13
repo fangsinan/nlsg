@@ -58,7 +58,7 @@ class AuthController extends Controller
         }
 
         //todo 临时
-        if ($phone != 18624078563 && $code != 6666) {
+        if (($phone != 18624078563 || $phone != 15811570751) && $code != 6666) {
 
             $res = Redis::get($phone);
             if (!$res) {
