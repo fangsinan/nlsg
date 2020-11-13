@@ -78,8 +78,10 @@ class VipRedeemUser extends Base
 
                     //todo 分享二维码参数待定
                     $url_data = [
-                        'c' => $params['id'],
-                        'r' => str_random(10)
+                        'id' => $params['id'],
+                        'r' => str_random(10),
+                        'time' => time(),
+                        'user_id' => $user['id']
                     ];
                     $url_data = http_build_query($url_data);
 
