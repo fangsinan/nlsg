@@ -77,6 +77,9 @@ class Order extends Base
             case 10:
                 $result = Live::where(['id'=>$relation_id])->get()->toArray();
                 break;
+            case 14:
+                $result = OfflineProducts::where(['id'=>$relation_id])->get()->toArray();
+                break;
             case 15:
                 $model = new Column();
                 $result = $model->getIndexColumn([$relation_id]);
