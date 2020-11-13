@@ -97,7 +97,15 @@ class VipRedeemUser extends Base
         }
 
         $statistics = VipRedeemAssign::statistics($user);
-        return ['statistics' => $statistics, 'list' => $list];
+        $count['flag_1'] = self::where('user_id', '=', $user['id'])->where('status', '=', 1)->count();
+        $count['flag_2'] = self::where('user_id', '=', $user['id'])->where('status', '=', 2)->count();
+        $count['flag_3'] = self::where('user_id', '=', $user['id'])->where('status', '=', 3)->count();
+        $count['flag_4'] = self::where('user_id', '=', $user['id'])->where('status', '=', 4)->count();
+        $count['flag_5'] = self::where('user_id', '=', $user['id'])->where(function ($query) {
+            $query->where('status', '=', 2)->orWhere('status', '=', 4);
+        })->count();
+
+        return ['statistics' => $statistics, 'count' => $count, 'list' => $list];
     }
 
     public function send($user, $params)
