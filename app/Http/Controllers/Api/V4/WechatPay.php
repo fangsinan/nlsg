@@ -173,6 +173,7 @@ class WechatPay extends Controller
                 $vip_id = 0;
                 $newVip_rst = true;
                 //当有效身份不是钻石合伙人，对vip_user表进行任何处理
+
                 if($level != 2){
                     if($supremacy_vip == 1){   //支付定金不需要走vip表操作
                         if($vip_order_type == 1){
@@ -187,7 +188,7 @@ class WechatPay extends Controller
                         }else{
                             //过期时间延长一年   权益归属不发生改变
                             $Userdata = [
-                                'expire_time' => date('Y-m-d',strtotime($UserAttInfo['expire_time'])+31536000),
+                                'expire_time' => date('Y-m-d H:i:s',strtotime($UserAttInfo['expire_time'])+31536000),
                             ];
                             $newVip_rst = VipUser::where(['user_id'=>$user_id])->update($Userdata);
 
@@ -211,7 +212,7 @@ class WechatPay extends Controller
                     //当有效身份为钻石合伙人，对vip_user表进行任何处理
                     if( $UserAttInfo['is_open_360'] == 1){
                         $VipUserData = [
-                            'time_end_360' => date('Y-m-d',strtotime($UserAttInfo['time_end_360'])+31536000),
+                            'time_end_360' => date('Y-m-d H:i:s',strtotime($UserAttInfo['time_end_360'])+31536000),
                         ];
                     }else{
                         $VipUserData = [
