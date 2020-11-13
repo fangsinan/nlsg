@@ -707,8 +707,8 @@ class LiveController extends Controller
      */
     public function ranking(Request $request)
     {
-        $live_id = $request->input('live_id', 0);
-        $liveinfo_id = $request->input('liveinfo_id', 0);
+        $liveinfo_id = $request->input('live_id', 0);
+        //$liveinfo_id = $request->input('liveinfo_id', 0);
         $user_id = 1;//$this->user['id'];
 
 
