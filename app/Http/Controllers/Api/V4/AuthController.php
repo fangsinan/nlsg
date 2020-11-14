@@ -53,26 +53,26 @@ class AuthController extends Controller
         $inviter = $request->input('inviter', 0);
         $ref = $request->input('ref', 0);
 
-        if (!$phone) {
-            return $this->error(400, '手机号不能为空');
-        }
-        if (!$code) {
-            return $this->error(400, '验证码不能为空');
-        }
-
-        //todo 临时
-        if (($phone != 18624078563 || $phone != 15811570751) && $code != 6666) {
-
-            $res = Redis::get($phone);
-            if (!$res) {
-                return $this->error(400, '验证码已过期');
-            }
-
-            if ($code !== $res) {
-                return $this->error(400, '验证码错误');
-            }
-
-        }
+        // if (!$phone) {
+        //     return $this->error(400, '手机号不能为空');
+        // }
+        // if (!$code) {
+        //     return $this->error(400, '验证码不能为空');
+        // }
+        //
+        // //todo 临时
+        // if (($phone != 18624078563 || $phone != 15811570751) && $code != 6666) {
+        //
+        //     $res = Redis::get($phone);
+        //     if (!$res) {
+        //         return $this->error(400, '验证码已过期');
+        //     }
+        //
+        //     if ($code !== $res) {
+        //         return $this->error(400, '验证码错误');
+        //     }
+        //
+        // }
 
 
         $user = User::where('phone', $phone)->first();
