@@ -16,7 +16,7 @@ class Coupon extends Base
     protected $table = 'nlsg_coupon';
 
     protected $fillable = [
-        'name','number','type','money','fullcut_price','explain','begin_time','end_time','get_way','user_id','cr_id'
+        'name','number','type','price','money','fullcut_price','explain','begin_time','end_time','get_way','user_id','cr_id'
     ];
 
     static function getCouponMoney($coupon_id, $user_id, $price, $type = 1)

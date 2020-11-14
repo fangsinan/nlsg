@@ -86,9 +86,11 @@ class AuthController extends Controller
                 'nickname' => substr_replace($phone, '****', 3, 4),
                 'ref' => $ref
             ]);
-            $user = User::find($list->id)
+            $user = User::find($list->id);
             $model->giveCoupon($list->id, 36);
             if ($is_invite && $user_id){
+                $model->giveCoupon($user_id, 37);
+
                 UserInvite::create([
                     'from_uid' => $user_id,
                     'to_uid'   => $list->id,
@@ -101,10 +103,6 @@ class AuthController extends Controller
                 User::where('id', '=', $user->id)->update(['login_flag' => 2]);
             }
         }
-        if ($is_invite && $user_id){
-            $model->giveCoupon($user_id, 37);
-        }
-
 
         Redis::del($phone);
         $token = auth('api')->login($user);
