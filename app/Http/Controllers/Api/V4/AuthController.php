@@ -74,7 +74,8 @@ class AuthController extends Controller
         //
         // }
 
-
+        //新注册用户发送优惠券
+        $model = new Coupon();
         $user = User::where('phone', $phone)->first();
 
         if (!$user) {
@@ -85,11 +86,15 @@ class AuthController extends Controller
                 'nickname' => substr_replace($phone, '****', 3, 4),
                 'ref' => $ref
             ]);
-            $user = User::find($list->id);
-
-            //新注册用户发送优惠券
-            $model = new Coupon();
+            $user = User::find($list->id)
             $model->giveCoupon($list->id, 36);
+            if ($is_invite && $user_id){
+                UserInvite::create([
+                    'from_uid' => $user_id,
+                    'to_uid'   => $list->id,
+                    'type'     => 1
+                ]);
+            }
 
         } else {
             if ($user->login_flag == 1) {
@@ -98,12 +103,6 @@ class AuthController extends Controller
         }
         if ($is_invite && $user_id){
             $model->giveCoupon($user_id, 37);
-
-            UserInvite::create([
-                'from_uid' => $user_id,
-                'to_uid'   => $list->id,
-                'type'     => 1
-            ]);
         }
 
 
