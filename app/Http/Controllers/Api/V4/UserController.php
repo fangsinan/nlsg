@@ -1050,10 +1050,10 @@ class UserController extends Controller
             ->where('user_id', $this->user['id'])
             ->where('type', 7)
             ->orderBy('created_at')
-            ->get()
+            ->paginate(10)
             ->toArray();
-        if ($lists) {
-            foreach ($lists as &$v) {
+        if ($lists['data']) {
+            foreach ($lists['data'] as &$v) {
                 $v['begin_time'] = date('Y-m-d', strtotime($v['begin_time']));
                 $v['end_time'] = date('Y-m-d', strtotime($v['end_time']));
             }
@@ -1065,7 +1065,7 @@ class UserController extends Controller
         $invite_num = $invite_num ?? 0;
 
         $data = [
-            'coupon' => $lists,
+            'coupon' => $lists['data'],
             'invite_num' => $invite_num
         ];
         return success($data);
