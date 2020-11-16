@@ -58,9 +58,9 @@ class CreatePosterController extends Controller
         $level = User::getLevel($uid);
 
         //分享360海报,不校验推客身份
-        if ($level < 2 && ($post_type <> 23 || $post_type <> 10 || $post_type <> 7)) {
-            return $this->error(0, '用户身份不是推客');
-        }
+//        if ($level < 2 && ($post_type <> 23 || $post_type <> 10 || $post_type <> 7)) {
+//            return $this->error(0, '用户身份不是推客');
+//        }
 
 
         $save_path = base_path() . '/public/image/';//存储路径
