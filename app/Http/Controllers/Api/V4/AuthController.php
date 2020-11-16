@@ -53,11 +53,12 @@ class AuthController extends Controller
         $inviter = $request->input('inviter', 0);
         $ref = $request->input('ref', 0);
 
+        $sclass =  new \StdClass();
         if (!$phone) {
-            return $this->error(400, '手机号不能为空');
+            return error(400, '手机号不能为空', $sclass);
         }
         if (!$code) {
-            return $this->error(400, '验证码不能为空');
+            return error(400, '验证码不能为空', $sclass);
         }
 
         //todo 临时
@@ -65,11 +66,11 @@ class AuthController extends Controller
 
             $res = Redis::get($phone);
             if (!$res) {
-                return $this->error(400, '验证码已过期');
+                return error(400, '验证码已过期',$sclass);
             }
 
             if ($code !== $res) {
-                return $this->error(400, '验证码错误');
+                return error(400, '验证码错误',$sclass);
             }
 
         }
