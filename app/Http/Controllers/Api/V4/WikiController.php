@@ -132,6 +132,7 @@ class WikiController extends Controller
     public function show(Request $request)
     {
         $id = $request->input('id');
+
         $res = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
                 ->with([
                     'reward' => function($query){
@@ -145,7 +146,8 @@ class WikiController extends Controller
         if ( ! $res) {
             return error(1000, '百科不存在');
         }
-
+        
+        Wiki::where('id', $id)->increment('view_num');
         $list    = Collection::where(['type' => 5, 'user_id' => $this->user['id'],'relation_id'=>$id])->first();
         $res->is_collection = $list ? 1 : 0;
         return success($res);
