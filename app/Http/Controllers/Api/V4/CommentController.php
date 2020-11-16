@@ -436,10 +436,23 @@ class CommentController extends Controller
     public function destroy(Request $request)
     {
         $id = $request->input('id');
+        $comment =  Comment::where('id', $id)->first();
+        if (!$comment){
+            return error(1000,'评论不存在');
+        }
+        if ($comment->user_id !== $this->user['id']){
+            return error(1000,'没有权限删除');
+        }
         $res = Comment::where('id', $id)
             ->update(['status' => 0]);
         if ($res) {
             CommentReply::where('comment_id', $id)->update(['status' => 0]);
+            switch ($comment->type){
+                case 5:
+                    Wiki::where('id', $comment->relation_id)->decrement('comment_num');
+                    break;
+
+            }
             return $this->success();
         }
     }
