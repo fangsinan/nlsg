@@ -53,11 +53,12 @@ class AuthController extends Controller
         $inviter = $request->input('inviter', 0);
         $ref = $request->input('ref', 0);
 
+        $sclass =  new \StdClass();
         if (!$phone) {
-            return $this->error(400, '手机号不能为空');
+            return error(400, '手机号不能为空', $sclass);
         }
         if (!$code) {
-            return $this->error(400, '验证码不能为空');
+            return error(400, '验证码不能为空', $sclass);
         }
 
         //todo 临时
@@ -65,16 +66,17 @@ class AuthController extends Controller
 
             $res = Redis::get($phone);
             if (!$res) {
-                return $this->error(400, '验证码已过期');
+                return error(400, '验证码已过期',$sclass);
             }
 
             if ($code !== $res) {
-                return $this->error(400, '验证码错误');
+                return error(400, '验证码错误',$sclass);
             }
 
         }
 
-
+        //新注册用户发送优惠券
+        $model = new Coupon();
         $user = User::where('phone', $phone)->first();
 
         if (!$user) {
@@ -86,9 +88,6 @@ class AuthController extends Controller
                 'ref' => $ref
             ]);
             $user = User::find($list->id);
-
-            //新注册用户发送优惠券
-            $model = new Coupon();
             $model->giveCoupon($list->id, 36);
             if ($is_invite && $user_id){
                 $model->giveCoupon($user_id, 37);
@@ -99,12 +98,12 @@ class AuthController extends Controller
                     'type'     => 1
                 ]);
             }
+
         } else {
             if ($user->login_flag == 1) {
                 User::where('id', '=', $user->id)->update(['login_flag' => 2]);
             }
         }
-
 
         Redis::del($phone);
         $token = auth('api')->login($user);
