@@ -234,8 +234,8 @@ class Works extends Base
             ->with(['columnInfo', 'user' => function ($query) {
                 $query->select('id', 'nickname','intro');
             }])
-            ->select(['id', 'type as works_type', 'title', 'subtitle', 'cover_img',
-                'detail_img', 'cytx_price', 'column_id', 'user_id'])
+            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
+                'detail_img', 'cytx_price as price', 'column_id', 'user_id'])
             ->get();
     }
 

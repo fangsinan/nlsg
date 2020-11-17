@@ -250,7 +250,7 @@ class MallOrderController extends Controller
         $params['bill_format'] = $request->input('bill_format', 2);
         $params['live_id'] = $request->input('live_id',0);
         $params['live_info_id'] = $request->input('live_info_id',0);
-        
+
         $model = new MallOrder();
         $data = $model->createOrder($params, $this->user);
         return $this->getRes($data);
