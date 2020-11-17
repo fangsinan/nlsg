@@ -928,4 +928,14 @@ class IndexController extends Controller
 
     }
 
+    public  function  market()
+    {
+        $data = [
+            'id'   => 4,
+            'type' => 7,
+            'img'  => 'https://image.nlsgapp.com/nlsg/works/20201117155957451173.png'
+        ];
+        return  success($data);
+    }
+
 }
