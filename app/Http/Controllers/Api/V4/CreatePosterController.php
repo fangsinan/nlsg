@@ -53,6 +53,8 @@ class CreatePosterController extends Controller
         $post_type = $request->input('post_type', 0);
         $is_qrcode = $request->input('is_qrcode', 0);
         $flag = $request->input('flag',0);
+        $live_id = $request->input('live_id',0);
+        $live_info_id = $request->input('live_info_id',0);
 
 
         $level = User::getLevel($uid);
@@ -71,7 +73,7 @@ class CreatePosterController extends Controller
 
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
-            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid,$flag);
+            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid,$flag,$live_id,$live_info_id);
             $temp_9_res = $this->createQRcode($QR_url, false, true, true);
             $src = '';
             $url = self::$Api_url . 'public/image/' . $temp_9_res;
@@ -1010,7 +1012,7 @@ class CreatePosterController extends Controller
     }
 
     //获取二维码网址
-    protected function getGetQRUrl($type, $gid, $uid,$flag = 0)
+    protected function getGetQRUrl($type, $gid, $uid,$flag = 0,$live_id=0,$live_info_id=0)
     {
 
         $info_id = 0;
@@ -1078,12 +1080,12 @@ class CreatePosterController extends Controller
                 // return $res;
                 return 'https://a.app.qq.com/o/simple.jsp?pkgname=com.huiyujiaoyu.powertime';
             case 23://360分享海报
-                return ConfigModel::getData(33) . '?time=' . time() . '&inviter=' . $uid;
+                return ConfigModel::getData(33) . '?time=' . time() . '&inviter=' . $uid.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
         }
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
         //  6:精品课视频  7:精品课音频  8:书籍  9:商品  10:会员
-        $res = $twitterObj->createJumpUrl($u_type, $gid, $info_id, $uid,$flag);
+        $res = $twitterObj->createJumpUrl($u_type, $gid, $info_id, $uid,$flag,$live_id,$live_info_id);
 
         //添加 mallTwitter Twitter_add
         // 1：专栏   2：商品  3：精品课 4听书 5线下课 6邀请卡(有且只有一条记录当前用户)

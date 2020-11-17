@@ -248,6 +248,9 @@ class MallOrderController extends Controller
         $params['bill_title'] = $request->input('bill_title', '');
         $params['bill_number'] = $request->input('bill_number', '');
         $params['bill_format'] = $request->input('bill_format', 2);
+        $params['live_id'] = $request->input('live_id',0);
+        $params['live_info_id'] = $request->input('live_info_id',0);
+        
         $model = new MallOrder();
         $data = $model->createOrder($params, $this->user);
         return $this->getRes($data);
@@ -450,6 +453,8 @@ class MallOrderController extends Controller
         $params['bill_title'] = $request->input('bill_title', '');
         $params['bill_number'] = $request->input('bill_number', '');
         $params['bill_format'] = $request->input('bill_format', 2);
+        $params['live_id'] = $request->input('live_id',0);
+        $params['live_info_id'] = $request->input('live_info_id',0);
 
         $model = new MallOrderFlashSale();
         $data = $model->createFlashSaleOrder($params, $this->user);
@@ -686,6 +691,8 @@ class MallOrderController extends Controller
         $params['bill_title'] = $request->input('bill_title', '');
         $params['bill_number'] = $request->input('bill_number', '');
         $params['bill_format'] = $request->input('bill_format', 2);
+        $params['live_id'] = $request->input('live_id',0);
+        $params['live_info_id'] = $request->input('live_info_id',0);
 
         $model = new MallOrderGroupBuy();
         $data = $model->createGroupBuyOrder($params, $this->user);

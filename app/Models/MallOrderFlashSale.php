@@ -69,6 +69,8 @@ class MallOrderFlashSale extends Base
         $order_data['sp_id'] = $data['sku_list']['flash_sale_id'];
         $order_data['dead_time'] = $dead_time;
         $order_data['pay_type'] = $params['pay_type'];
+        $order_data['live_id'] = $params['live_id'];
+        $order_data['live_info_id'] = $params['live_info_id'];
 
         DB::beginTransaction();
 
