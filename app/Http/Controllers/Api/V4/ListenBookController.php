@@ -258,6 +258,9 @@ class ListenBookController extends Controller
         foreach ($works as $key=>$val){
             //是否购买
             $works[$key]['is_sub'] = Subscribe::isSubscribe($user_id, $val['id'], 2);
+
+            $is_collect = Collection::where(['user_id'=>$user_id,'relation_id'=>$val['id'],'type'=>6])->first();
+            $works[$key]['is_collection'] = $is_collect ? 1 : 0;
         }
 
         return $this->success(['lists_info'=>$lists_info,'works'=>$works]);
