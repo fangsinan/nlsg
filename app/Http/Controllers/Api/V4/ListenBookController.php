@@ -244,6 +244,11 @@ class ListenBookController extends Controller
 
 
         $lists_info = Lists::find($lists_id);
+
+        //11.17 增加书单收藏
+        $is_collect = Collection::where(['user_id'=>$user_id,'relation_id'=>$lists_id,'type'=>4])->first();
+        $lists_info['is_collect'] = $is_collect ? 1 : 0;
+
         $lists = ListsWork::select('*')->where(['lists_id'=>$lists_id])->paginate($this->page_per_page)->toArray();
         $works_ids = array_column($lists['data'],'works_id');
         //$works_ids = array_column($lists,'works_id');
@@ -258,9 +263,6 @@ class ListenBookController extends Controller
         foreach ($works as $key=>$val){
             //是否购买
             $works[$key]['is_sub'] = Subscribe::isSubscribe($user_id, $val['id'], 2);
-
-            $is_collect = Collection::where(['user_id'=>$user_id,'relation_id'=>$val['id'],'type'=>6])->first();
-            $works[$key]['is_collection'] = $is_collect ? 1 : 0;
         }
 
         return $this->success(['lists_info'=>$lists_info,'works'=>$works]);
