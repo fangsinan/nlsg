@@ -109,7 +109,7 @@ class Order extends Base
     {
         $past = Carbon::parse('-30 minutes')->toDateTimeString();
         $res  = Order::where('type', 14)
-            ->where('status', 1)
+            ->where('status', 0)
             ->where('created_at', '<', $past)
             ->update([
                 'status' => 2
