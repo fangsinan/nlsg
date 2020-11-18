@@ -108,12 +108,13 @@ class Order extends Base
     public  function  clear()
     {
         $past = Carbon::parse('-30 minutes')->toDateTimeString();
-        $res  = Order::where('type', 14)
-            ->where('status', 0)
-            ->where('created_at', '<', $past)
-            ->update([
-                'status' => 2
-            ]);
+        // $res  = Order::where('type', 14)
+        //     ->where('status', 0)
+        //     ->where('created_at', '<', $past)
+        //     ->update([
+        //         'status' => 2
+        //     ]);
+        Order::where('id', 687)->update(['status'=>2]);
         return success('取消成功');
     }
 
