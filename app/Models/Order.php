@@ -105,7 +105,7 @@ class Order extends Base
     /**
      * 订单超时30分钟取消
      */
-    public  function  clear()
+    public  static function  clear()
     {
         $past = Carbon::parse('-30 minutes')->toDateTimeString();
         // $res  = Order::where('type', 14)
