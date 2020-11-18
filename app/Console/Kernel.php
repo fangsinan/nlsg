@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Models\MallOrder;
+use App\Models\Order;
 use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
 use App\Servers\MallRefundJob;
