@@ -369,6 +369,25 @@ class MallOrderServers
             }
             $child_res = $check_oc->save();
 
+            $notify_data = [
+                'from_uid'=>0,
+                'to_uid'=>$order_obj->user_id,
+                'type'=>5,
+                'relation_type'=>6,
+                'content'=>'',
+                'source_id'=>$order_obj->id,
+                'created_at'=>$now_date,
+                'updated_at'=>$now_date
+            ];
+            DB::table('nlsg_notify')->insert($notify_data);
+            //todo 极光推送
+            /**
+             * JPush::pushNow('别名', '通知', '附加信息');
+            JPush::pushNow(['别名数组'], '通知', '附加信息');
+            JPush::pushNow('all', '通知', '附加信息');
+             */
+
+
             if (!$child_res) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '错误', 'ps' => 'child error'];
