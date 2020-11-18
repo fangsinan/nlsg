@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Models\MallOrder;
+use App\Models\Order;
 use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
 use App\Servers\MallRefundJob;
@@ -34,6 +35,7 @@ class Kernel extends ConsoleKernel
             MallOrder::clear();//超时订单处理
             MallOrderGroupBuy::clear();//拼团超时订单处理和退款登记
             MallOrderFlashSale::clear();//秒杀订单处理
+            Order::clear(); //线下课超时处理
             $mrjModel = new MallRefundJob();
             $mrjModel->mallRefund();
             $mrjModel->mallRefundCheck();
