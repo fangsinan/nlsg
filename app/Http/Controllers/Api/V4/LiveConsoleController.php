@@ -74,7 +74,6 @@ class LiveConsoleController extends Controller
     public function add(Request $request)
     {
         $params = $request->input();
-        return $this->getRes($params);
         $model = new LiveConsole();
         $data = $model->add($params, $this->user['id']);
         return $this->getRes($data);
