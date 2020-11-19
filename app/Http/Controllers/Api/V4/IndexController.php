@@ -675,8 +675,9 @@ class IndexController extends Controller
 
     public function recommend()
     {
+        $user_id =  $this->user['id']  ?? 0;
         $works = new Works();
-        $lists = $works->getRecommendWorks(566);
+        $lists = $works->getRecommendWorks( 566, $user_id);
         return success($lists);
     }
 
