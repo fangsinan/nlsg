@@ -104,10 +104,9 @@ class Works extends Base
             ->first();
         $is_sub = Subscribe::isSubscribe($user_id,$id,1);
         $list['is_sub']   = $is_sub ? 1 : 0;
-
-        if ($list['work_info']) {
+        if ($list['workInfo']) {
             $now = date('Y-m-d', time());
-            foreach ($list['work_info'] as &$v) {
+            foreach ($list['workInfo'] as &$v) {
                 if ($v['online_time'] > $now) {
                     $v['is_new'] = 1;
                 } else {
