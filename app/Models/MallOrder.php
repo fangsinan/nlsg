@@ -1472,7 +1472,7 @@ class MallOrder extends Base
             return ['code' => false, 'msg' => '失败', 'ps' => '订单错误'];
         }
 
-        //todo 好评有礼 五星且有内容 送优惠券一张
+        //好评有礼 五星且有内容 送优惠券一张
         if ($c_data['star'] == 5 && strlen($c_data['content']) > 10) {
             $coupon_rule_id = ConfigModel::getData(18);
             $coupon_rule_id = explode(',', $coupon_rule_id);

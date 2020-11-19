@@ -184,7 +184,8 @@ class MallGoods extends Base
                     $recommend_goods_id = implode(',', $recommend_goods_id);
                     $query->orderByRaw('FIELD(id,' . $recommend_goods_id . ') asc');
                 }
-                $query->orderBy(DB::raw('view_num+collection_num'), 'desc');
+                $query->orderBy('created_at','desc');
+                $query->orderBy(DB::raw('sales_num_virtual+sales_num'), 'desc');
         }
         $query->orderBy('id', 'desc');
         //当指定id情况下可能不需要分页  get_all = 1则返回所有
