@@ -21,7 +21,7 @@ class Comment extends Base
         if ($type ==1||$type ==2) {
             $res = Column::where('id',$id)->first()->toArray();
         } elseif($type==3 || $type==4){
-            $res = Works::where('id',$id)->first()->toArray();
+            $res = WorksInfo::where('id',$id)->first()->toArray();
         }else{
             $res = Wiki::where('id',$id)->first()->toArray();
         }
@@ -89,7 +89,11 @@ class Comment extends Base
         if(in_array($comment['type'], [1, 2])){
             $comment['column'] = Column::find($comment['relation_id'], ['title','subtitle','cover_pic']);
         }elseif(in_array($comment['type'], [3, 4])){
-            $comment['works']  = Works::find($comment['relation_id'], ['title','subtitle','cover_img']);
+            $workinfo = WorksInfo::select('pid')->where('id', $comment['relation_id'])->first();
+            if ($workinfo){
+                $works   = Works::select('title','subtitle','cover_img')->where('id', $workinfo['pid'])->first();
+                $comment['works']  = $works;
+            }
         }else{
             $comment['wiki']   = Wiki::find($comment['relation_id'], ['name','cover']);
         }

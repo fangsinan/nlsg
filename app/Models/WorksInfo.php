@@ -75,4 +75,9 @@ class WorksInfo extends Base
         return $WorkArr['url'];
     }
 
+    public  function  works()
+    {
+        return  $this->belongsTo(Works::class, 'pid', 'id');
+    }
+
 }
