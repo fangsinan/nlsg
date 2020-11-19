@@ -179,6 +179,8 @@ class CouponRule extends Base
         foreach ($res as $k => $v) {
             $goods_list['can_use'] = [];
             $goods_list['cant_use'] = [];
+            $v->price = intval($v->price);
+            $v->full_cut = intval($v->full_cut);
 
             foreach ($v->sub_list as $vv) {
                 //1可用  2不可用

@@ -90,9 +90,7 @@ class MallGoods extends Base
         }
         $cache_name_arr['zone_id'] = $params['zone_id'] ?? 0;
         $cache_name_arr['get_all'] = $params['get_all'] ?? 0;
-
         $cache_name = implode('_', $cache_name_arr);
-
         $expire_num = CacheTools::getExpire('get_list');
         $list = Cache::tags($cache_key_name)->get($cache_name);
         if (empty($list)) {
