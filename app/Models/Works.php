@@ -84,7 +84,7 @@ class Works extends Base
      * @param $id
      * @return bool
      */
-    public function getRecommendWorks($id)
+    public function getRecommendWorks($id, $user_id=0)
     {
         if (!$id) {
             return false;
@@ -101,11 +101,12 @@ class Works extends Base
             ->select('id', 'user_id', 'title', 'subscribe_num')
             ->where('id', $id)
             ->where(['type' => 2, 'status' => 4])
-            ->first()
-            ->toArray();
-        if ($list['work_info']) {
+            ->first();
+        $is_sub = Subscribe::isSubscribe($user_id,$id,1);
+        $list['is_sub']   = $is_sub ? 1 : 0;
+        if ($list['workInfo']) {
             $now = date('Y-m-d', time());
-            foreach ($list['work_info'] as &$v) {
+            foreach ($list['workInfo'] as &$v) {
                 if ($v['online_time'] > $now) {
                     $v['is_new'] = 1;
                 } else {
