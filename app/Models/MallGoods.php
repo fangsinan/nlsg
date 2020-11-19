@@ -46,7 +46,7 @@ class MallGoods extends Base
                 }
                 $vv->id_arr = $temp_id_arr;
             }
-            if(($params['get_details']??0) == 1){
+            if (($params['get_details'] ?? 0) == 1) {
                 $v->service_description = $this->mallServiceDescription();
                 $v->buyer_reading = $this->buyerReading();
             }
@@ -184,7 +184,7 @@ class MallGoods extends Base
                     $recommend_goods_id = implode(',', $recommend_goods_id);
                     $query->orderByRaw('FIELD(id,' . $recommend_goods_id . ') asc');
                 }
-                $query->orderBy('created_at','desc');
+                $query->orderBy('created_at', 'desc');
                 $query->orderBy(DB::raw('sales_num_virtual+sales_num'), 'desc');
         }
         $query->orderBy('id', 'desc');
@@ -262,7 +262,8 @@ class MallGoods extends Base
                 'original_price', 'price', 'stock']);
     }
 
-    public function sku_list_back(){
+    public function sku_list_back()
+    {
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
             ->where('status', '=', 1)
             ->select();
@@ -372,7 +373,7 @@ class MallGoods extends Base
             ->where('type', '=', 4)
             ->where('begin_time', '<=', $now_data)
             ->where('end_time', '>=', $now_data)
-            ->select(['id', 'goods_id', 'group_num','begin_time',
+            ->select(['id', 'goods_id', 'group_num', 'begin_time',
                 'goods_price', 'sku_number', 'group_price'])
             ->get();
 
