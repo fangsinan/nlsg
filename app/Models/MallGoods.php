@@ -182,7 +182,7 @@ class MallGoods extends Base
                     $recommend_goods_id = explode(',', $recommend_goods_id);
                     $recommend_goods_id = array_reverse($recommend_goods_id);
                     $recommend_goods_id = implode(',', $recommend_goods_id);
-                    $query->orderByRaw('FIELD(id,' . $recommend_goods_id . ') asc');
+                    $query->orderByRaw('FIELD(id,' . $recommend_goods_id . ') desc');
                 }
                 $query->orderBy('created_at', 'desc');
                 $query->orderBy(DB::raw('sales_num_virtual+sales_num'), 'desc');

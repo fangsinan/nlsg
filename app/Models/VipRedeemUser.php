@@ -397,7 +397,9 @@ class VipRedeemUser extends Base
                     'pay_time' => $now_date,                            //支付时间
                     'created_at' => $now_date,                            //添加时间
                     'updated_at' => $now_date,                            //添加时间
-                    'give' => 14,                            //添加时间
+                    'give' => 14,                            //添加时间,
+                    'start_time' => $now_date,
+                    'end_time' => date('Y-m-d 23:59:59', strtotime("+1 years"))
                 ];
                 $add_sub[] = $subscribe;
             }
