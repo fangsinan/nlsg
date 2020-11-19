@@ -186,12 +186,23 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
 
+        if (!is_string($params['list'])){
+            return ['code'=>false,'msg'=>'直播时间格式错误'];
+        }
         $params['list'] = json_decode($params['list'], true);
         if (!is_array($params['list'] ?? '')) {
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
         if (count($params['list']) != 1) {
             return ['code' => false, 'msg' => '直播时间信息过多'];
+        }
+        //编辑时判断info_id
+        foreach ($params['list'] as $v){
+            if(!empty($params['id'])){
+                if (empty($v['id'])){
+                    return ['code'=>false,'msg'=>'编辑数据格式错误'];
+                }
+            }
         }
 
         $p_l_time = array_column($params['list'], 'begin_at');
