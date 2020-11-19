@@ -70,28 +70,33 @@ class VipRedeemUser extends Base
                 DB::raw("concat('¥',$price) as price")])
             ->get();
 
-        if (!empty($params['id'] ?? 0)) {
-            foreach ($list as $v) {
-                if ($v->status == 1 || $v->status == 3) {
-                    $base_url = ConfigModel::getData(26);
-                    $base_url = parse_url($base_url);
+        if ($list->isEmpty()) {
+            $list = new class {
+            };
+        } else {
+            if (!empty($params['id'] ?? 0)) {
+                foreach ($list as $v) {
+                    if ($v->status == 1 || $v->status == 3) {
+                        $base_url = ConfigModel::getData(26);
+                        $base_url = parse_url($base_url);
 
-                    //todo 分享二维码参数待定
-                    $url_data = [
-                        'id' => $params['id'],
-                        'r' => str_random(10),
-                        'time' => time(),
-                        'user_id' => $user['id']
-                    ];
-                    $url_data = http_build_query($url_data);
+                        //todo 分享二维码参数待定
+                        $url_data = [
+                            'id' => $params['id'],
+                            'r' => str_random(10),
+                            'time' => time(),
+                            'user_id' => $user['id']
+                        ];
+                        $url_data = http_build_query($url_data);
 
-                    $qr_url = $base_url['scheme'] . '://' . $base_url['host'] . $base_url['path'];
-                    $qr_url = $qr_url . '?' . $url_data;
+                        $qr_url = $base_url['scheme'] . '://' . $base_url['host'] . $base_url['path'];
+                        $qr_url = $qr_url . '?' . $url_data;
 
-                    $qrModel = new CreatePosterController();
-                    $qr_data = $qrModel->createQRcode($qr_url, false, true, true);
-                    $qr_data = CreatePosterController::$Api_url . 'public/image/' . $qr_data;
-                    $v->qr_code = $qr_data;
+                        $qrModel = new CreatePosterController();
+                        $qr_data = $qrModel->createQRcode($qr_url, false, true, true);
+                        $qr_data = CreatePosterController::$Api_url . 'public/image/' . $qr_data;
+                        $v->qr_code = $qr_data;
+                    }
                 }
             }
         }
