@@ -240,7 +240,7 @@ class MallOrder extends Base
         }
 
         if (!in_array($params['from_cart'], [1, 2])) {
-            return ['code' => false, 'msg' => '参数错误', 'ps' => 'from_cart=1,0'];
+            return ['code' => false, 'msg' => '参数错误', 'ps' => 'from_cart=1,2'];
         }
 
         if (!in_array($params['os_type'], [1, 2, 3])) {
@@ -783,18 +783,29 @@ class MallOrder extends Base
         ];
 
         $price_list_new = [
-            ['key' => '商品总额', 'value' => $all_price],
+            ['key' => '商品总额', 'value' => $all_original_price],
             ['key' => '运费', 'value' => $freight_money],
-            ['key' => '权益立减', 'value' => GetPriceTools::PriceCalc('-', 0, $vip_cut_money)],
-            ['key' => '活动立减', 'value' => GetPriceTools::PriceCalc('-', 0, $sp_cut_money)],
-            ['key' => '优惠券总额', 'value' => GetPriceTools::PriceCalc('-', 0, $coupon_money)]
+//            ['key' => '权益立减', 'value' => GetPriceTools::PriceCalc('-', 0, $vip_cut_money)],
+            ['key' => '权益立减', 'value' => $vip_cut_money],
+            ['key' => '活动立减', 'value' => $sp_cut_money],
+            ['key' => '优惠券总额', 'value' => $coupon_money],
         ];
 
         foreach ($price_list_new as $new_k => $new_v) {
-            if ($new_v['value'] == 0) {
+            if (intval($new_v['value']) == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
                 unset($price_list_new[$new_k]);
             }
         }
+
+        foreach ($price_list_new as &$new_v) {
+            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
+                $new_v['value'] = '-¥' . $new_v['value'];
+            }
+            if (in_array($new_v['key'], ['运费'])) {
+                $new_v['value'] = '+¥' . $new_v['value'];
+            }
+        }
+
         $price_list_new = array_values($price_list_new);
 
         $ftModel = new FreightTemplate();
@@ -1282,10 +1293,25 @@ class MallOrder extends Base
             $price_list_new[] = ['key' => '实付金额', 'value' => '¥' . $data['pay_price']];
         }
 
+//        foreach ($price_list_new as $new_k => $new_v) {
+//            if ($new_v['value'] == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
+//                unset($price_list_new[$new_k]);
+//            }
+//            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
+//                $new_v['value'] = '-¥' . $new_v['value'];
+//            }
+//            if (in_array($new_v['key'], ['运费'])) {
+//                $new_v['value'] = '+¥' . $new_v['value'];
+//            }
+//        }
+
         foreach ($price_list_new as $new_k => $new_v) {
-            if ($new_v['value'] == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
+            if (intval($new_v['value']) == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
                 unset($price_list_new[$new_k]);
             }
+        }
+
+        foreach ($price_list_new as &$new_v) {
             if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
                 $new_v['value'] = '-¥' . $new_v['value'];
             }
@@ -1293,6 +1319,7 @@ class MallOrder extends Base
                 $new_v['value'] = '+¥' . $new_v['value'];
             }
         }
+
         $price_list_new = array_values($price_list_new);
 
         $data['about_order'] = $about_order;

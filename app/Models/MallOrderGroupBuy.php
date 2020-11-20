@@ -410,16 +410,27 @@ class MallOrderGroupBuy extends Base
         ];
 
         $price_list_new = [
-            ['key' => '商品总额', 'value' => $all_price],
+            ['key' => '商品总额', 'value' => $all_original_price],
             ['key' => '运费', 'value' => $freight_money],
-            ['key' => '活动立减', 'value' => GetPriceTools::PriceCalc('-', 0, $sp_cut_money)],
-            ['key' => '优惠券总额', 'value' => GetPriceTools::PriceCalc('-', 0, $coupon_money)]
+            ['key' => '活动立减', 'value' => $sp_cut_money],
+            ['key' => '优惠券总额', 'value' => $coupon_money],
         ];
+
         foreach ($price_list_new as $new_k => $new_v) {
-            if ($new_v['value'] == 0) {
+            if (intval($new_v['value']) == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
                 unset($price_list_new[$new_k]);
             }
         }
+
+        foreach ($price_list_new as &$new_v) {
+            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
+                $new_v['value'] = '-¥' . $new_v['value'];
+            }
+            if (in_array($new_v['key'], ['运费'])) {
+                $new_v['value'] = '+¥' . $new_v['value'];
+            }
+        }
+
         $price_list_new = array_values($price_list_new);
 
         $sku_list_show = [];
@@ -929,10 +940,25 @@ class MallOrderGroupBuy extends Base
             $price_list_new[] = ['key' => '实付金额', 'value' => '¥' . $data['pay_price']];
         }
 
+//        foreach ($price_list_new as $new_k => $new_v) {
+//            if ($new_v['value'] == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
+//                unset($price_list_new[$new_k]);
+//            }
+//            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
+//                $new_v['value'] = '-¥' . $new_v['value'];
+//            }
+//            if (in_array($new_v['key'], ['运费'])) {
+//                $new_v['value'] = '+¥' . $new_v['value'];
+//            }
+//        }
+
         foreach ($price_list_new as $new_k => $new_v) {
-            if ($new_v['value'] == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
+            if (intval($new_v['value']) == 0 && !in_array($new_v['key'], ['应付金额', '实付金额'])) {
                 unset($price_list_new[$new_k]);
             }
+        }
+
+        foreach ($price_list_new as &$new_v) {
             if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
                 $new_v['value'] = '-¥' . $new_v['value'];
             }
@@ -940,6 +966,7 @@ class MallOrderGroupBuy extends Base
                 $new_v['value'] = '+¥' . $new_v['value'];
             }
         }
+
         $price_list_new = array_values($price_list_new);
 
         $data['about_order'] = $about_order;
