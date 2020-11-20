@@ -25,6 +25,7 @@ class CommentController extends Controller
      *
      * @apiParam {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科
      * @apiParam {number} id    模块id
+     * @apiParam {number} info_id    次级id
      * @apiParam {number} order  默认1  最新是2
      * @apiParam {number} self   只看作者 1  默认0
      *
@@ -159,7 +160,7 @@ class CommentController extends Controller
         $self = $input['self'] ?? 0;
         $uid = $this->user['id'] ?? 0;
         $model = new Comment();
-        $lists = $model->getIndexComment($input['id'], $input['type'], $uid, $order, $self);
+        $lists = $model->getIndexComment($input['id'], $input['type'], $uid, $order, $self,$input['info_id']??0);
         return success($lists['data']);
     }
 
@@ -171,6 +172,7 @@ class CommentController extends Controller
      * @apiGroup Comment
      *
      * @apiParam {number} id  模块id
+     * @apiParam {number} info_id  次级id
      * @apiParam {number} pid 转发评论id
      * @apiParam {string} content 发布的内容
      * @apiParam {string} img  多个图片  格式 a.png,b.png,c.png
@@ -201,7 +203,8 @@ class CommentController extends Controller
             'relation_id' => $input['id'],
             'pid'         => $input['pid'] ?? 0,
             'content'     => $input['content'] ?? '',
-            'type'        => $input['type'] ?? 1
+            'type'        => $input['type'] ?? 1,
+            'info_id'     => $input['info_id']??0,
         ]);
 
         if ($result->id) {
@@ -222,7 +225,7 @@ class CommentController extends Controller
                 }
                 Attach::insert($data);
             }
-            
+
             return success();
         }
 
