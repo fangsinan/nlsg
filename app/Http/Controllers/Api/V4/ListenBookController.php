@@ -91,6 +91,9 @@ class ListenBookController extends Controller
     public function getListenDetail(Request $request){
 
         $listen_id = $request->input('id',0);
+        $flag = $request->input('flag','');
+        $page = $request->input('page',1);
+        $size = $request->input('size',10);
         $order = $request->input('order','desc');
         $order = $order ?? 'desc';
         $user_id = $this->user['id'] ?? 0;
@@ -104,19 +107,27 @@ class ListenBookController extends Controller
         }
         $works_data = $works_data->toArray();
 
+        $is_sub = Subscribe::isSubscribe($user_id,$listen_id,2);
+        $works_data['is_sub'] = $is_sub;
+
+        $infoObj = new WorksInfo();
+        $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,50,$page,$size);
+        if ($flag === 'catalog'){
+            $res = [
+                'info'          => $works_data['info'] ,
+            ];
+            return $this->success($res);
+        }
+
+        //$works_data['info_num'] = count($works_data['info']);
+        $works_data['info_num'] = WorksInfo::where('pid','=',$listen_id)->where('status','=',4)->count();
+
         //查询课程分类
         $category = WorksCategoryRelation::select('category_id')->with([
             'categoryName'=>function($query) use($listen_id){
                 $query->select('id','name')->where('status',1);
             }])->where(['work_id'=>$listen_id])->first();
         $works_data['category_name'] = $category->CategoryName->name ??'';
-
-        $is_sub = Subscribe::isSubscribe($user_id,$listen_id,2);
-        $works_data['is_sub'] = $is_sub;
-
-        $infoObj = new WorksInfo();
-        $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order);
-        $works_data['info_num'] = count($works_data['info']);
 
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($works_data['id'],2,$user_id);  //讲座

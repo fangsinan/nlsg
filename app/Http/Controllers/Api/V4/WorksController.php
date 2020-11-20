@@ -386,6 +386,9 @@ class WorksController extends Controller
     public function getWorksDetail(Request $request){
 
         $works_id = $request->input('works_id',0);
+        $flag = $request->input('flag','');
+        $page = $request->input('page',1);
+        $size = $request->input('size',10);
         $user_id   = $this->user['id'] ?? 0;
         $order   = $request->input('order','asc');
         if( empty($works_id) ){
@@ -400,6 +403,21 @@ class WorksController extends Controller
         }
         $works_data = $works_data->toArray();
 
+        //是否订阅
+        $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
+
+        if($works_data['is_free'] == 1){
+            $is_sub = 1; // 免费时全部按关注处理url
+        }
+        //查询章节
+        $infoObj = new WorksInfo();
+        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size);
+        if ($flag === 'catalog'){
+            $res = [
+                'info'          => $info,
+            ];
+            return $this->success($res);
+        }
 
         // 身份价格
         $works_data['twitter_price'] = GetPriceTools::Income(1,2,0,2,$works_data['user_id'],$works_id);
@@ -408,13 +426,7 @@ class WorksController extends Controller
         $works_data['service_price'] = GetPriceTools::Income(1,5,0,2,$works_data['user_id'],$works_id);
         $works_data['content']       = $works_data['content'];
 
-        //是否订阅
-        $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
 
-
-        if($works_data['is_free'] == 1){
-            $is_sub = 1; // 免费时全部按关注处理url
-        }
         //查询所属专栏
         $field = ['id', 'name', 'type', 'user_id', 'title', 'subtitle', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
         $column = Column::where('id',$works_data['column_id'])
@@ -424,11 +436,9 @@ class WorksController extends Controller
         }else{
             $column = [];
         }
-        //查询章节
-        $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page);
 
-        $works_data['info_num'] = count($info);
+        //$works_data['info_num'] = count($info);
+        $works_data['info_num'] = WorksInfo::where('pid','=',$works_id)->where('status','=',4)->count();
 
         //作者信息
         //查询课程分类

@@ -180,6 +180,9 @@ class ColumnController extends Controller
     public function getColumnWorks(Request $request){
         //排序
         $column_id = $request->input('column_id',0);
+        $flag = $request->input('flag','');
+        $page = $request->input('page',1);
+        $size = $request->input('size',10);
         $user_id   = $this->user['id'] ?? 0 ;
 
         if( empty($column_id) ){
@@ -198,7 +201,8 @@ class ColumnController extends Controller
         $historyData    = [];
         //多课程
         if($column['column_type'] == 1){
-            $works_data = Works::select(['id','type','title','cover_img','detail_img','message','is_pay','is_end','is_free','subscribe_num','chapter_num as info_num','original_price','price'])
+            $works_data = Works::select(['id','type','title','cover_img','detail_img','message','is_pay','is_end',
+                'is_free','subscribe_num','chapter_num as info_num','original_price','price'])
                 ->where('column_id', $column_id)->where('status',4)->get();
             foreach ($works_data as $key=>$val){
                 $works_data[$key]['is_sub'] = Subscribe::isSubscribe($user_id,$val['id'],2);
@@ -207,7 +211,10 @@ class ColumnController extends Controller
         }else if($column['column_type'] == 2){
             //单课程查询【 多了专栏大纲 】
             //查询专栏对应的关联大纲表 并查询章节
-            $outline = ColumnOutline::select('id', 'name','intro')->where('column_id',$column['id'])->orderBy('sort','asc')->get()->toArray();
+            $outline = ColumnOutline::select('id', 'name','intro')->where('column_id',$column['id'])
+                ->limit($size)->offset(($page - 1) * $size)
+                ->orderBy('sort','asc')
+                ->get()->toArray();
 //            ColumnOutline::where('column_id',$column['id'])->count();
             if( $column['is_free'] == 1 ){
                 $is_sub = 1;
@@ -222,6 +229,13 @@ class ColumnController extends Controller
                 $works_info_c = count($works_info);
                 $column_outline[$key]['works_info_count'] = $works_info_c;
                 $column_outline[$key]['works_info'] = $works_info;
+            }
+
+            if ($flag === 'catalog'){
+                $res = [
+                    'outline_data' => $column_outline,
+                ];
+                return $this->success($res);
             }
 
 //            //继续学习的章节[时间倒序 第一条为最近学习的章节]
@@ -446,18 +460,30 @@ class ColumnController extends Controller
 
         $lecture_id = $request->input('lecture_id',0);
         $order   = $request->input('order','asc');
+        $flag = $request->input('flag','');
+        $page = $request->input('page',1);
+        $size = $request->input('size',10);
         $order = $order ?? 'desc';
 
         $user_id   = $this->user['id'] ?? 0;
         if(empty($lecture_id)){
             return $this->error(0,'参数有误：lecture_id ');
         }
-        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content','view_num','price','subscribe_num','is_free','is_end',])
+        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
+            'view_num','price','subscribe_num','is_free','is_end',])
             ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
         $is_sub = Subscribe::isSubscribe($user_id,$lecture_id,1);
         //查询章节、
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order);
+        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,50,$page,$size);
+
+        if ($flag === 'catalog'){
+            $res = [
+                'info'          => $info,
+            ];
+            return $this->success($res);
+        }
+
         $works_data['info_num'] = count($info);
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($works_data['id'],3,$user_id);  //讲座
@@ -468,7 +494,6 @@ class ColumnController extends Controller
         if($works_data['info_num'] > 0){
             $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
         }
-
 
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
 //        $historyData = History::select('relation_id','info_id','time_number')->where([
