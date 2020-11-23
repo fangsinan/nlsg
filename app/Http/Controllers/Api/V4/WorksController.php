@@ -414,7 +414,7 @@ class WorksController extends Controller
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size);
         if ($flag === 'catalog'){
             $res = [
-                'info'          => $info,
+                'works_info'          => $info,
             ];
             return $this->success($res);
         }

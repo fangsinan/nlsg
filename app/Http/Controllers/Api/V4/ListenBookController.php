@@ -114,7 +114,7 @@ class ListenBookController extends Controller
         $works_data['info'] = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,50,$page,$size);
         if ($flag === 'catalog'){
             $res = [
-                'info'          => $works_data['info'] ,
+                'works_info'          => $works_data['info'] ,
             ];
             return $this->success($res);
         }
