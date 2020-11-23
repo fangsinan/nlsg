@@ -460,7 +460,7 @@ class WorksController extends Controller
 
         $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$works_id,'type'=>2])->first();
 
-        $history_data = History::getHistoryData($works_data['id'],2,$user_id);
+        $history_data = History::getHistoryData($works_data['id'],4,$user_id);
 
         $res = [
             'column_info'  => $column,
