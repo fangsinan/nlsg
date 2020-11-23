@@ -4,6 +4,18 @@
 Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     Route::get('auth/captcha', 'AuthController@captcha');
+    Route::post('auth/login', 'AuthController@login');
+
+    Route::group(['middleware' => ['auth.backend.jwt']], function () {
+        //活动管理
+        Route::post('active/add', 'ActiveCont3` roller@add');
+        Route::get('active/list', 'ActiveController@list');
+        Route::post('active/binding', 'ActiveController@binding');
+        Route::put('active/status_change', 'ActiveController@statusChange');
+
+
+    });
+
 
     Route::get('class/column', 'ClassController@column');
     Route::get('class/lecture', 'ClassController@lecture');
@@ -29,11 +41,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('goods/list', 'GoodsController@list');
     Route::get('goods/category_list', 'GoodsController@categoryList');
 
-    //活动管理
-    Route::post('active/add', 'ActiveCont3` roller@add');
-    Route::get('active/list', 'ActiveController@list');
-    Route::post('active/binding', 'ActiveController@binding');
-    Route::put('active/status_change', 'ActiveController@statusChange');
+
 
     //特价管理
     Route::post('special_price/add_normal', 'SpecialPriceController@addNormal');

@@ -8,7 +8,7 @@ return [
         'height' => 36,
         'quality' => 90,
         'math' => false,
-        'expire' => 60,
+        'expire' => 600,
         'encrypt' => false,
     ],
     'math' => [
