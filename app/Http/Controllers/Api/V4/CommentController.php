@@ -193,7 +193,6 @@ class CommentController extends Controller
     {
 
         $input = $request->all();
-        return $this->success($input);
         $img = $input['img'] ?? '';
 
         if ( ! $input['id']) {
