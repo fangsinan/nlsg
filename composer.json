@@ -21,6 +21,7 @@
         "jpush/jpush": "^3.6",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
+        "mews/captcha": "^3.2",
         "mitoop/laravel-jpush": "^3.0",
         "overtrue/easy-sms": "^1.1",
         "overtrue/laravel-wechat": "~5.0",
@@ -77,5 +78,11 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ]
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/"
+        }
     }
 }

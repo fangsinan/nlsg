@@ -3,6 +3,8 @@
 //后台
 Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
+    Route::get('auth/captcha', 'AuthController@captcha');
+
     Route::get('class/column', 'ClassController@column');
     Route::get('class/lecture', 'ClassController@lecture');
     Route::get('class/works', 'ClassController@works');
