@@ -32,8 +32,8 @@ class AuthController extends Controller
     }
 
     /**
-     * 验证码
-     * @api {post} /api/admin_v4/auth/login 验证码
+     * 登陆
+     * @api {post} /api/admin_v4/auth/login 登陆
      * @apiVersion 4.0.0
      * @apiName /api/admin_v4/auth/login
      * @apiGroup  后台-登陆
@@ -42,7 +42,7 @@ class AuthController extends Controller
      * @apiParam {string} password 密码
      * @apiParam {string} captcha 验证码
      * @apiParam {string} key 验证码key
-     * @apiDescription 验证码
+     * @apiDescription 登陆
      */
     public function login(Request $request)
     {
