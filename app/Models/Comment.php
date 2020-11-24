@@ -19,12 +19,12 @@ class Comment extends Base
             return false;
         }
         if ($type ==1||$type ==2) {
-            $res = Column::where('id',$id)->first()->toArray();
+            $res = Column::where('id',$id)->first();
         } elseif($type==3 || $type==4){
             //$res = WorksInfo::where('id',$id)->first()->toArray();
-            $res = Works::where('id',$id)->first()->toArray();
+            $res = Works::where('id',$id)->first();
         }else{
-            $res = Wiki::where('id',$id)->first()->toArray();
+            $res = Wiki::where('id',$id)->first();
         }
 
         $order = $order ==1 ? 'reply_num': 'created_at';

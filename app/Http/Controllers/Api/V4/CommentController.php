@@ -161,7 +161,7 @@ class CommentController extends Controller
         $uid = $this->user['id'] ?? 0;
         $model = new Comment();
         $lists = $model->getIndexComment($input['id'], $input['type'], $uid, $order, $self,$input['info_id']??0);
-        return success($lists['data']);
+        return success($lists);
     }
 
 
