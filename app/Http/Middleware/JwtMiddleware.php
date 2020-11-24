@@ -22,10 +22,10 @@ class JwtMiddleware
             $user = JWTAuth::parseToken()->authenticate();
         } catch (Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
-                return response()->json(['msg' => 'TOKEN无效','code'=>401]);
+                return response()->json(['msg' => '登录失效，请重新登录','code'=>401]);
             }else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
 
-                return response()->json(['msg' => 'TOKEN已过期', 'code'=>401]);
+                return response()->json(['msg' => '登录失效，请重新登录', 'code'=>401]);
             } else{
                 return response()->json(['msg' => '没有登录','code'=> 401]);
             }
