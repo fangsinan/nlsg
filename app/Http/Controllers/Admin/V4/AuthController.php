@@ -22,6 +22,8 @@ class AuthController extends Controller
      * @apiGroup  后台-登陆
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/auth/captcha
      * @apiDescription 验证码
+     * @apiSuccess {string} key 验证码key
+     * @apiSuccess {number} expire 验证码过期时间戳,过期需刷新,验证错误需刷新
      */
     public function captcha(Captcha $captcha)
     {
