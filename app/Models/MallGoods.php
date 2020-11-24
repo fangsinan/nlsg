@@ -50,11 +50,18 @@ class MallGoods extends Base
                 $v->service_description = $this->mallServiceDescription();
                 $v->buyer_reading = $this->buyerReading();
             }
+            if (count($list) == 1) {
+                //详情时候获取一条评论
+                $mcModel = new MallComment();
+                $v->comment_list = $mcModel->getList(['goods_id' => $v->id, 'page' => 1, 'size' => 1]);
+            } else {
+                $v->comment_list = new class {
+                };
+            }
         }
 
         //获取商品所处的活动
         $agModel = new ActiveGroupGlModel();
-        $crModel = new CouponRule();
         foreach ($list as $v) {
             $temp_gl = $agModel->getList([
                 'goods_type' => 1, 'goods_id' => $v->id, 'simple' => 1
