@@ -438,7 +438,7 @@ class MallGoods extends Base
         $data['buyer_reading'] = $this->buyerReading();
 
         $mcModel = new MallComment();
-        $data['comment_list'] = $mcModel->getList(['goods_id'=>$data['id'],'page'=>1,'size'=>1]);
+        $data['comment_list'] = $mcModel->getList(['goods_id' => $data['id'], 'page' => 1, 'size' => 1]);
 
         return [$data];
     }
@@ -459,22 +459,31 @@ class MallGoods extends Base
 
     public function forYourReference($num, $user = [])
     {
-        $id_list = MallGoods::where('status', '=', 2)
-            ->orderByRaw('rand()')
-            ->limit($num)
-            ->select(['id'])
-            ->get()->toArray();
+        $key = substr(time(), 9);
+        $cache_key_name = 'fyr_' . $key;
+        $id_list = Cache::get($cache_key_name);
 
-        $id_list = array_column($id_list, 'id');
-        $id_list = implode(',', $id_list);
+        if (empty($id_list)) {
+            $id_list = MallGoods::where('status', '=', 2)
+                ->orderByRaw('rand()')
+                ->limit($num)
+                ->select(['id'])
+                ->get()
+                ->toArray();
+
+            $id_list = array_column($id_list, 'id');
+            $id_list = implode(',', $id_list);
+
+            $expire_num = CacheTools::getExpire('fyr_list');
+            Cache::put($cache_key_name, $id_list, $expire_num);
+        }
 
         $res = $this->getList([
             'ids_str' => $id_list,
             'page' => 1,
             'size' => 1,
             'get_all' => 1
-        ],
-            $user, false);
+        ], $user, false);
 
         return $res;
     }

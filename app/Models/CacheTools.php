@@ -46,6 +46,7 @@ class CacheTools
             case 'goods_price_expire':
             case 'set_kill_list':
             case 'post_info':
+            case 'fyr_list':
                 $expire = $sort_expire;
                 break;
             case 'goods_category_list':
