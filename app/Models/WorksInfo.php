@@ -2,7 +2,9 @@
 
 
 namespace App\Models;
+
 use Illuminate\Support\Facades\DB;
+
 class WorksInfo extends Base
 {
     protected $table = 'nlsg_works_info';
@@ -87,7 +89,7 @@ class WorksInfo extends Base
     public function three2one($works)
     {
 
-        switch ($works){
+        switch ($works) {
             case !empty($works['callback_url3']):
                 $works['href_url'] = $works['callback_url3'];
                 break;
@@ -99,7 +101,7 @@ class WorksInfo extends Base
                 break;
 
         }
-        unset($works['callback_url1'],$works['callback_url2'],$works['callback_url3']);
+        unset($works['callback_url1'], $works['callback_url2'], $works['callback_url3']);
         return $works;
     }
 
@@ -119,7 +121,9 @@ class WorksInfo extends Base
         }
         $query = self::where('pid', '=', $works_id)
             ->select(['id', 'pid', 'title', 'duration', 'free_trial', 'introduce', 'section', 'type', 'view_num',
-                'callback_url1','callback_url2','callback_url3',DB::raw('0 as time_leng'),DB::raw('0 as time_number')]);
+                'callback_url1', 'callback_url2', 'callback_url3',
+                DB::raw('0 as time_leng'),
+                DB::raw('0 as time_number')]);
 
         if ($ob == 'desc') {
             $query->orderBy('id', 'desc');

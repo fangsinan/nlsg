@@ -258,12 +258,12 @@ class GoodsServers
         if ($type == 1) {
             //商品
             //$num = Str::random(16);
-            $num = time().rand(1000,9999);
+            $num = time() . rand(1000, 9999);
             $check = MallGoods::where('number', '=', $num)->first();
         } else {
             //sku
             //$num = Str::random(14);
-            $num = time().rand(1000,9999);
+            $num = time() . rand(1000, 9999);
             $check = MallSku::where('sku_number', '=', $num)->first();
         }
         if ($check) {
@@ -339,10 +339,10 @@ class GoodsServers
         }
         $query->orderBy('id', 'desc')->with($with)->select($field);
 
-        if($flag === 'simple'){
-            $query->where('status','=',2);
+        if ($flag === 'simple') {
+            $query->where('status', '=', 2);
             $list = $query->get();
-        }else{
+        } else {
             $list = $query->paginate($size);
         }
 
