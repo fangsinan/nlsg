@@ -110,9 +110,17 @@ class WorksInfo extends Base
         return $this->belongsTo(Works::class, 'pid', 'id');
     }
 
-    //用于获取章节上下曲信息
-    public function neighbor($params)
+
+    public function infoHistory()
     {
+        return $this->hasOne(History::class, 'info_id', 'works_info_id')
+            ->select(['id', 'relation_type', 'relation_id', 'info_id', 'user_id', 'time_leng', 'time_number']);
+    }
+
+    //用于获取章节上下曲信息
+    public function neighbor($params, $user)
+    {
+        $user['id'] = 303680;
         $works_id = $params['works_id'] ?? 0;
         $works_info_id = $params['works_info_id'] ?? 0;
         $ob = $params['ob'] ?? 'desc';
@@ -120,10 +128,12 @@ class WorksInfo extends Base
             return ['code' => false, 'msg' => '课程不存在'];
         }
         $query = self::where('pid', '=', $works_id)
-            ->select(['id', 'pid', 'title', 'duration', 'free_trial', 'introduce', 'section', 'type', 'view_num',
-                'callback_url1', 'callback_url2', 'callback_url3',
-                DB::raw('0 as time_leng'),
-                DB::raw('0 as time_number')]);
+            ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial',
+                'introduce', 'section', 'type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
+
+        $query->with(['infoHistory' => function ($query) use ($works_id, $user) {
+            $query->where('relation_id', '=', $works_id)->where('user_id', '=', $user['id'])->where('is_del', 0);
+        }]);
 
         if ($ob == 'desc') {
             $query->orderBy('id', 'desc');
@@ -132,6 +142,7 @@ class WorksInfo extends Base
         }
 
         $info_list = $query->get();
+
         if ($info_list->isEmpty()) {
             return ['code' => false, 'msg' => '课程不存在'];
         }
@@ -139,7 +150,11 @@ class WorksInfo extends Base
 
         $info_key = -1;
         foreach ($info_list as $k => $v) {
-            if ($v['id'] == $works_info_id) {
+            if (empty($v['info_history'])) {
+                $info_list[$k]['info_history'] = new class {
+                };
+            }
+            if ($v['works_info_id'] == $works_info_id) {
                 $info_key = $k;
             }
         }
@@ -151,11 +166,34 @@ class WorksInfo extends Base
 
         $info_list = array_merge($info_list, $info_list, $info_list);
 
-        $res['previous'] = $this->three2one($info_list[$info_key - 1]);
-        $res['current'] = $this->three2one($info_list[$info_key]);
-        $res['next'] = $this->three2one($info_list[$info_key + 1]);
+        $list['previous'] = $this->three2one($info_list[$info_key - 1]);
+        $list['current'] = $this->three2one($info_list[$info_key]);
+        $list['next'] = $this->three2one($info_list[$info_key + 1]);
 
-        return $res;
+        $works_info = DB::table('nlsg_works as w')
+            ->leftJoin('nlsg_subscribe as s', function ($join) use ($user) {
+                $join->on('s.relation_id', '=', 'w.id')
+                    ->whereRaw('s.user_id = ' . $user['id'])
+                    ->where('s.type', '=', 2)
+                    ->where('s.status', '=', 1)
+                    ->where('s.is_del', '=', 0);
+            })
+            ->where('w.id', '=', $works_id)
+            ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status',
+                DB::raw('if(s.id > 0,1,0) as is_sub')])
+            ->first();
+
+        $user_info = [
+            'level' => $user['level'],
+            'expire_time' => $user['expire_time'],
+            'new_vip' => $user['new_vip'],
+        ];
+
+        return [
+            'list' => $list,
+            'user_info' => $user_info,
+            'works_info' => $works_info,
+        ];
 
     }
 

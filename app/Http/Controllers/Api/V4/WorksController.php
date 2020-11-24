@@ -745,7 +745,7 @@ class WorksController extends Controller
     //相邻章节
     public function neighbor(Request $request){
         $model = new WorksInfo();
-        $data = $model->neighbor($request->input());
+        $data = $model->neighbor($request->input(),$this->user);
         return $this->getRes($data);
     }
 

@@ -54,7 +54,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('works/get_works_index', 'WorksController@getWorksIndex');
     Route::get('works/works_category_data', 'WorksController@worksCategory');
     Route::get('works/materials', 'WorksController@materials');
-    Route::get('works/neighbor','WorksController@neighbor');
 
 
     //听书
@@ -187,6 +186,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('change/phone', 'UserController@changePhone');
         Route::post('bind/wechat', 'UserController@bindWechat');
         Route::post('remove/wechat', 'UserController@removeWechat');
+
+        //切歌
+        Route::get('works/neighbor','WorksController@neighbor');
 
 
         //商城开始
