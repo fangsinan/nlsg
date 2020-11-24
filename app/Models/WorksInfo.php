@@ -86,7 +86,7 @@ class WorksInfo extends Base
         return $WorkArr['url'];
     }
 
-    public function three2one($works)
+    public function three2one($works, $is_show_url)
     {
 
         switch ($works) {
@@ -102,6 +102,9 @@ class WorksInfo extends Base
 
         }
         unset($works['callback_url1'], $works['callback_url2'], $works['callback_url3']);
+        if ($is_show_url == false) {
+            $works['href_url'] = '';
+        }
         return $works;
     }
 
@@ -165,9 +168,6 @@ class WorksInfo extends Base
 
         $info_list = array_merge($info_list, $info_list, $info_list);
 
-        $list['previous'] = $this->three2one($info_list[$info_key - 1]);
-        $list['current'] = $this->three2one($info_list[$info_key]);
-        $list['next'] = $this->three2one($info_list[$info_key + 1]);
 
         $works_info = DB::table('nlsg_works as w')
             ->leftJoin('nlsg_subscribe as s', function ($join) use ($user) {
@@ -181,6 +181,15 @@ class WorksInfo extends Base
             ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status',
                 DB::raw('if(s.id > 0,1,0) as is_sub')])
             ->first();
+
+        $is_show_url = true;
+        if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
+            $is_show_url = false;
+        }
+
+        $list['previous'] = $this->three2one($info_list[$info_key - 1], $is_show_url);
+        $list['current'] = $this->three2one($info_list[$info_key], $is_show_url);
+        $list['next'] = $this->three2one($info_list[$info_key + 1], $is_show_url);
 
         $user_info = [
             'level' => $user['level'],
