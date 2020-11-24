@@ -120,7 +120,6 @@ class WorksInfo extends Base
     //用于获取章节上下曲信息
     public function neighbor($params, $user)
     {
-        $user['id'] = 303680;
         $works_id = $params['works_id'] ?? 0;
         $works_info_id = $params['works_info_id'] ?? 0;
         $ob = $params['ob'] ?? 'desc';
