@@ -486,7 +486,7 @@ class ColumnController extends Controller
 
         $works_data['info_num'] = count($info);
         //查询总的历史记录进度`
-        $hisCount = History::getHistoryCount($works_data['id'],2,$user_id);  //讲座
+        $hisCount = History::getHistoryCount($lecture_id,2,$user_id);  //讲座
 //        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
 
@@ -507,7 +507,8 @@ class ColumnController extends Controller
 //            $title = WorksInfo::select('title')->where('id',$historyData['info_id'])->first();
 //            $historyData['title'] = $title->title ?? '';
 //        }
-        $historyData = History::getHistoryData($works_data['id'],2,$user_id);
+
+        $historyData = History::getHistoryData($lecture_id,2,$user_id);
 
         return $this->success([
             'works_data'    => $works_data,
