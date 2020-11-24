@@ -437,6 +437,9 @@ class MallGoods extends Base
         $data['service_description'] = $this->mallServiceDescription();
         $data['buyer_reading'] = $this->buyerReading();
 
+        $mcModel = new MallComment();
+        $data['comment_list'] = $mcModel->getList(['goods_id'=>$data['id'],'page'=>1,'size'=>1]);
+
         return [$data];
     }
 
