@@ -133,21 +133,21 @@ class WorksInfo extends Base
         }
         $info_list = $info_list->toArray();
 
-        $info_key = 0;
+        $info_key = -1;
         foreach ($info_list as $k => $v) {
             if ($v['id'] == $works_info_id) {
                 $info_key = $k;
             }
         }
 
-        if ($info_key == 0) {
+        if ($info_key == -1) {
             return ['code' => false, 'msg' => '章节不存在'];
         }
         $info_key = $info_key + count($info_list);
 
         $info_list = array_merge($info_list, $info_list, $info_list);
 
-        $res['previous '] = $this->three2one($info_list[$info_key - 1]);
+        $res['previous'] = $this->three2one($info_list[$info_key - 1]);
         $res['current'] = $this->three2one($info_list[$info_key]);
         $res['next'] = $this->three2one($info_list[$info_key + 1]);
 
