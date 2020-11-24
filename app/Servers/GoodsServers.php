@@ -257,11 +257,13 @@ class GoodsServers
     {
         if ($type == 1) {
             //商品
-            $num = Str::random(16);
+            //$num = Str::random(16);
+            $num = time().rand(1000,9999);
             $check = MallGoods::where('number', '=', $num)->first();
         } else {
             //sku
-            $num = Str::random(10);
+            //$num = Str::random(14);
+            $num = time().rand(1000,9999);
             $check = MallSku::where('sku_number', '=', $num)->first();
         }
         if ($check) {
