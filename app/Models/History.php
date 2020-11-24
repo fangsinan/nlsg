@@ -78,7 +78,7 @@ class History extends Model
     //最新章节
     static function getHistoryData($relation_id, $relation_type, $user_id){
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
-        $historyData = History::select('relation_id','info_id','time_number')->where([
+        $historyData = History::select('relation_id','info_id','time_number','time_leng')->where([
             'user_id'=>$user_id,
             'is_del'=>0,
             'relation_id'=>$relation_id,  // 讲座用的对应课程id
