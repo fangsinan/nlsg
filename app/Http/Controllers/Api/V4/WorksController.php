@@ -742,5 +742,11 @@ class WorksController extends Controller
         return success($lists);
     }
 
+    //todo 相邻章节
+    public function neighbor(Request $request){
+        $model = new WorksInfo();
+        $data = $model->neighbor($request->input());
+        return $this->getRes($data);
+    }
 
 }
