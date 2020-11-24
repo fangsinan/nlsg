@@ -46,11 +46,11 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', '39.105.214.152'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'database' => env('DB_DATABASE', 'nlsg_v4'),
+            'username' => env('DB_USERNAME', 'bj_root'),
+            'password' => env('DB_PASSWORD', 'NLSG_2019cs*beijin.0410BJ'),
 
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
