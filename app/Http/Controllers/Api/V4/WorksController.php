@@ -451,7 +451,7 @@ class WorksController extends Controller
 
 
         //查询总的历史记录进度`
-        $hisCount = History::getHistoryCount($works_data['id'],2,$user_id);  //讲座
+        $hisCount = History::getHistoryCount($works_data['id'],4,$user_id);  //讲座
         $works_data['history_count'] = 0;
         if($works_data['info_num'] > 0 ){
             $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
