@@ -522,14 +522,17 @@ class SpecialPriceServers
 
         foreach ($list['data'] as $k => &$v) {
             $temp_list = [];
+            $temp_name_list = [];
             foreach ($v['flash_sale_goods_list'] as &$vv) {
                 if (!array_key_exists($vv['goods_id'], $temp_list)) {
                     $temp_list[$vv['goods_id']] = [];
                     $temp_list[$vv['goods_id']]['goods_id'] = $vv['goods_id'];
                     $temp_list[$vv['goods_id']]['goods_price'] = $vv['goods_price'];
                     $temp_list[$vv['goods_id']]['goods_info'] = $vv['goods_info'];
+                    $temp_name_list[] = $vv['goods_info']['name'];
                     unset($vv['goods_info']);
                 }
+                $v['goods_list'] = $temp_name_list;
                 $temp_list[$vv['goods_id']]['list'][] = $vv;
             }
             $v['list'] = array_values($temp_list);
