@@ -89,19 +89,20 @@ class WorksInfo extends Base
     public function three2one($works, $is_show_url)
     {
 
-        switch ($works) {
-            case (!empty($works['callback_url3'])):
-                $works['href_url'] = $works['callback_url3'];
-                break;
-            case (!empty($works['callback_url2'])):
-                $works['href_url'] = $works['callback_url2'];
-                break;
-            case (!empty($works['callback_url1'])):
-                $works['href_url'] = $works['callback_url1'];
-                break;
-            default:
-                $works['href_url'] = $works['url'];
-        }
+//        switch ($works) {
+//            case (!empty($works['callback_url3'])):
+//                $works['href_url'] = $works['callback_url3'];
+//                break;
+//            case (!empty($works['callback_url2'])):
+//                $works['href_url'] = $works['callback_url2'];
+//                break;
+//            case (!empty($works['callback_url1'])):
+//                $works['href_url'] = $works['callback_url1'];
+//                break;
+//            default:
+//                $works['href_url'] = $works['url'];
+//        }
+        $works['href_url'] = $works['url'];
         unset($works['callback_url1'], $works['callback_url2'], $works['callback_url3'], $works['url']);
         if ($is_show_url == false && $works['free_trial'] == 0) {
             $works['href_url'] = '';
