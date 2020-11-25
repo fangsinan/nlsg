@@ -90,18 +90,19 @@ class WorksInfo extends Base
     {
 
         switch ($works) {
-            case !empty($works['callback_url3']):
+            case (!empty($works['callback_url3'])):
                 $works['href_url'] = $works['callback_url3'];
                 break;
-            case !empty($works['callback_url2']):
+            case (!empty($works['callback_url2'])):
                 $works['href_url'] = $works['callback_url2'];
                 break;
-            case !empty($works['callback_url1']):
+            case (!empty($works['callback_url1'])):
                 $works['href_url'] = $works['callback_url1'];
                 break;
-
+            default:
+                $works['href_url'] = $works['url'];
         }
-        unset($works['callback_url1'], $works['callback_url2'], $works['callback_url3']);
+        unset($works['callback_url1'], $works['callback_url2'], $works['callback_url3'], $works['url']);
         if ($is_show_url == false && $works['free_trial'] == 0) {
             $works['href_url'] = '';
         }
@@ -130,7 +131,7 @@ class WorksInfo extends Base
             return ['code' => false, 'msg' => '课程不存在'];
         }
         $query = self::where('pid', '=', $works_id)
-            ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial',
+            ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
                 'introduce', 'section', 'type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
 
         $query->with(['infoHistory' => function ($query) use ($works_id, $user) {
