@@ -102,7 +102,7 @@ class WorksInfo extends Base
 
         }
         unset($works['callback_url1'], $works['callback_url2'], $works['callback_url3']);
-        if ($is_show_url == false) {
+        if ($is_show_url == false && $works['free_trial'] == 0) {
             $works['href_url'] = '';
         }
         return $works;
