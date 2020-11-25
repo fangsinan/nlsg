@@ -194,7 +194,7 @@ class WorksInfo extends Base
         $user_info = [
             'level' => $user['level'],
             'expire_time' => $user['expire_time'],
-            'new_vip' => $user['new_vip'],
+            'vip' => $user['new_vip'],
         ];
 
         return [
