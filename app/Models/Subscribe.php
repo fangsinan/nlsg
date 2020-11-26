@@ -24,6 +24,28 @@ class Subscribe extends Base
     static function isSubscribe ($user_id=0,$target_id=0,$type=0){
         $is_sub = 0;
 
+        //is_free 免费
+        $result['is_free'] = 0;
+        switch ($type) {
+            case 1:
+                $result = Column::find($target_id);
+                break;
+            case 2:
+                $result = Works::find($target_id);
+                break;
+            case 3:
+                $result = Live::find($target_id);
+                break;
+            case 6:
+                $result = Column::find($target_id);
+                break;
+        }
+        if($result['is_free'] == 1){
+            return 1;
+        }
+
+
+
         //会员都免费
         $level = User::getLevel($user_id);
         if($level) return 1;
