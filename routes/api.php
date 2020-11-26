@@ -112,6 +112,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('post/company_list', 'ExpressController@companyList');//快递公司列表
     //*******************************商城部分结束*******************************
 
+    Route::get('vip/home_page', 'VipController@homePage');
+
     //创业天下
     Route::get('channel/cytx', 'ChannelController@cytx');
 
@@ -237,7 +239,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         //*******************************新会员部分*******************************
         Route::get('vip/explain', 'VipController@explain');
         Route::get('vip/all_works', 'VipController@allWorks');
-        Route::get('vip/home_page', 'VipController@homePage');
         Route::get('vip/code_list', 'VipController@redeemCodeList');
         Route::put('vip/code_send', 'VipController@redeemCodeSend');
         Route::put('vip/code_take_back', 'VipController@redeemCodeTakeBack');

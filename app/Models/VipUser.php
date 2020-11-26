@@ -10,8 +10,9 @@ class VipUser extends Base
 {
     protected $table = 'nlsg_vip_user';
 
-    protected $fillable = ['id' ,  'user_id','nickname',  'username',  'password', 'level',  'inviter',  'inviter_vip_id',  'source' ,  'source_vip_id',
-        'start_time',  'expire_time',  'status',  'is_default',  'order_id',  'area', 'is_open_360',  'time_begin_360',  'time_end_360',];
+    protected $fillable = ['id', 'user_id', 'nickname', 'username', 'password', 'level', 'inviter', 'inviter_vip_id', 'source', 'source_vip_id',
+        'start_time', 'expire_time', 'status', 'is_default', 'order_id', 'area', 'is_open_360', 'time_begin_360', 'time_end_360',];
+
     public static function newVipInfo($user_id)
     {
         $now_date = date('Y-m-d H:i:s');
@@ -33,12 +34,13 @@ class VipUser extends Base
     public function homePage($user, $params)
     {
         //卡片(昵称,是否开通,到期天数,价格)
-        $card_data['nickname'] = $user['nickname'];
-        $card_data['headimg'] = $user['headimg'];
+        $card_data['nickname'] = $user['nickname'] ?? '';
+        $card_data['headimg'] = $user['headimg'] ?? '';
         $card_data['level'] = 0;
         $card_data['expire_time'] = '';
         $card_data['surplus_days'] = 0;
         $card_data['price'] = ConfigModel::getData(25);
+        $card_data['is_login'] = empty($user) ? 0 : 1;
 
         if (empty($user['new_vip']['level'] ?? 0)) {
             $card_data['is_open'] = 0;
@@ -76,12 +78,12 @@ class VipUser extends Base
         $works_id_list = ConfigModel::getData(27);
         $works_order_str = 'FIELD(w.id,' . $works_id_list . ') asc';
         $works_list = DB::table('nlsg_works as w')
-            ->leftJoin('nlsg_column as c','w.column_id','=','c.id')
-            ->whereIn('w.id',explode(',', $works_id_list))
-            ->where('w.status','=',4)
+            ->leftJoin('nlsg_column as c', 'w.column_id', '=', 'c.id')
+            ->whereIn('w.id', explode(',', $works_id_list))
+            ->where('w.status', '=', 4)
             ->orderByRaw($works_order_str)
             ->select(['w.id', 'w.type as works_type', 'w.title', 'w.subtitle',
-                'w.cover_img', 'w.detail_img', 'w.price','c.type','c.column_type'])
+                'w.cover_img', 'w.detail_img', 'w.price', 'c.type', 'c.column_type'])
             ->limit(6)
             ->get()
             ->toArray();
@@ -90,8 +92,8 @@ class VipUser extends Base
         $detail_image = ConfigModel::getData(28);
 
         $res['card_data'] = $card_data;
-        $res['author'] = ['cover_img'=>ConfigModel::getData(31),'list'=>$author];
-        $res['works_list'] = ['cover_img'=>ConfigModel::getData(32),'list'=>$works_list];
+        $res['author'] = ['cover_img' => ConfigModel::getData(31), 'list' => $author];
+        $res['works_list'] = ['cover_img' => ConfigModel::getData(32), 'list' => $works_list];
         $res['detail_image'] = $detail_image;
         return $res;
     }

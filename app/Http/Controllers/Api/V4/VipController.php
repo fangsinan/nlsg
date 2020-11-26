@@ -173,6 +173,7 @@ class VipController extends Controller
      * @apiSuccess {string} card_data.surplus_days 剩余天数
      * @apiSuccess {string} card_data.price 价钱
      * @apiSuccess {number} card_data.is_open 当前是否开通360(1开了 0没开)
+     * @apiSuccess {number} card_data.is_login 当前是否登陆状态(1是 0不是)
      *
      * @apiSuccess {string[]} author 讲师
      * @apiSuccess {string[]} works_list 课程列表
