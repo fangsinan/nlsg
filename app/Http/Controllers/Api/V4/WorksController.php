@@ -754,12 +754,12 @@ class WorksController extends Controller
      * @apiParam {number} works_info_id 章节id
      *
      * @apiSuccess {string[]} list 相邻章节列表
-     * @apiSuccess {string[]} list.previous 上一个
-     * @apiSuccess {string[]} list.current 当前
+     * @apiSuccess {string} list.previous 上一个
+     * @apiSuccess {string} list.current 当前
      * @apiSuccess {string[]} list.next 下一个
      * @apiSuccess {string} list.next.works_info_id 章节id
      * @apiSuccess {string} list.next.works_id 作品id
-     * @apiSuccess {string[]} list.next.info_history 历史记录
+     * @apiSuccess {string} list.next.info_history 历史记录
      * @apiSuccess {string[]} works 作品信息
      * @apiSuccess {string} works.id 作品id
      * @apiSuccess {string} works.price 价格
