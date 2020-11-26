@@ -109,6 +109,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('after_sales/reason_list', 'AfterSalesController@reasonList');
     Route::get('coupon/list', 'CouponController@list');
     Route::post('coupon/give', 'CouponController@giveCoupon');
+    Route::get('post/company_list', 'ExpressController@companyList');//快递公司列表
     //*******************************商城部分结束*******************************
 
     //创业天下
@@ -210,7 +211,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
         Route::post('goods/get_coupon', 'CouponController@getCoupon');//领取商品优惠券
         Route::get('post/get_info', 'ExpressController@getPostInfo');//快递信息
-        Route::get('post/company_list', 'ExpressController@companyList');//快递公司列表
 
         Route::post('goods/collect', 'MallController@collect');//商品收藏
         Route::post('goods/sub', 'MallController@sub');//商品补货提醒
