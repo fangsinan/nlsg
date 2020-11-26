@@ -202,7 +202,7 @@ class WorksInfo extends Base
         return [
             'list' => $list,
             'user_info' => $user_info,
-            'works_info' => $works_info,
+            'works' => $works_info,
         ];
 
     }

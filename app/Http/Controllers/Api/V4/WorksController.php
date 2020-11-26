@@ -742,7 +742,33 @@ class WorksController extends Controller
         return success($lists);
     }
 
-    //相邻章节
+    /**
+     * 相邻章节
+     * @api {post} /api/v4/works/neighbor 相邻章节
+     * @apiVersion 1.0.0
+     * @apiName /api/v4/works/neighbor
+     * @apiGroup works
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/works/neighbor
+     * @apiDescription 相邻章节
+     * @apiParam {number} works_id 作品id
+     * @apiParam {number} works_info_id 章节id
+     *
+     * @apiSuccess {string[]} list 相邻章节列表
+     * @apiSuccess {string[]} list.previous 上一个
+     * @apiSuccess {string[]} list.current 当前
+     * @apiSuccess {string[]} list.next 下一个
+     * @apiSuccess {string} list.next.works_info_id 章节id
+     * @apiSuccess {string} list.next.works_id 作品id
+     * @apiSuccess {string[]} list.next.info_history 历史记录
+     * @apiSuccess {string[]} works 作品信息
+     * @apiSuccess {string} works.id 作品id
+     * @apiSuccess {string} works.price 价格
+     * @apiSuccess {string} works.is_pay  1为精品课
+     * @apiSuccess {string} works._is_free  1限免
+     * @apiSuccess {string} works.is_sub 1为当前用户订阅了
+     *
+     * @apiParamExample {json} Request-Example:
+     */
     public function neighbor(Request $request){
         $model = new WorksInfo();
         $data = $model->neighbor($request->input(),$this->user);
