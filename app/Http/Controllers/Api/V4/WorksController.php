@@ -766,8 +766,6 @@ class WorksController extends Controller
      * @apiSuccess {string} works.is_pay  1为精品课
      * @apiSuccess {string} works._is_free  1限免
      * @apiSuccess {string} works.is_sub 1为当前用户订阅了
-     *
-     * @apiParamExample {json} Request-Example:
      */
     public function neighbor(Request $request){
         $model = new WorksInfo();
