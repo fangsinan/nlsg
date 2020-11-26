@@ -845,6 +845,8 @@ class WechatPay extends Controller
 
             DB::beginTransaction();
             try {
+                $starttime = strtotime(date('Y-m-d', $time));
+                $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
 
                 //$teacher_id = $orderInfo['teacher_id']; //专栏老师
                 $coupon_id = $orderInfo['coupon_id']; //优惠券
@@ -1003,6 +1005,8 @@ class WechatPay extends Controller
                     'order_id' => $orderId, //订单id
                     'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
                     'service_id' => $orderInfo['service_id'],
+                    'start_time' => date("Y-m-d H:i:s", $starttime),
+                    'end_time' => date("Y-m-d H:i:s", $endtime),
                 ];
 
 
