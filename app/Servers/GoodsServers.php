@@ -36,7 +36,7 @@ class GoodsServers
             } else {
                 return ['code' => false, 'msg' => 'category_id格式错误'];
             }
-            $goods_model->category_id = intval($params['category_id'][2]);
+            $goods_model->category_id = intval($params['category_id'][1]);
         }
 
         if (empty($params['name'])) {
