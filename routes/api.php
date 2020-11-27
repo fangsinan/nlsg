@@ -287,6 +287,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('order/close_order', 'OrderController@closeOrder');
 
         Route::post('works/subscribe', 'WorksController@subscribe');
+        Route::get('works/works_sub_works','WorksController@worksSubWorks');
 
         //虚拟订单  end
 

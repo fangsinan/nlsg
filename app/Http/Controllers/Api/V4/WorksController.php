@@ -773,4 +773,46 @@ class WorksController extends Controller
         return $this->getRes($data);
     }
 
+
+    /**
+     * @api {get} /api/v4/works/works_sub_works  免费课程静默订阅操作
+     * @apiName works_sub_works
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiParam {int} relation_id  订阅id、
+     * @apiParam {int} sub_type  订阅对象类型  1 专栏  2作品 3直播  4会员 5线下产品  6讲座
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    code: 200,
+    msg: "成功",
+    data: []
+    }
+     */
+    public  function worksSubWorks(Request $request) {
+
+        $relation_id = $request->input('relation_id',0);
+        $sub_type = $request->input('sub_type',0);
+        $user_id = 1;//$this->user['id'];
+
+        $starttime = strtotime(date('Y-m-d', time()));
+        $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
+
+        $subscribe = [
+            'user_id' => $user_id, //会员id
+            'pay_time' => date("Y-m-d H:i:s", $starttime), //支付时间
+            'type' => $sub_type,
+            'order_id' => 0, //订单id
+            'status' => 1,
+            'start_time' => date("Y-m-d H:i:s", $starttime),
+            'end_time' => date("Y-m-d H:i:s", $endtime),
+            'relation_id' => $relation_id,
+        ];
+        Subscribe::firstOrCreate($subscribe);
+
+        return $this->success();
+    }
+
 }
