@@ -35,7 +35,7 @@ class VipUser extends Base
     {
         //卡片(昵称,是否开通,到期天数,价格)
         $card_data['nickname'] = $user['nickname'] ?? '';
-        $card_data['headimg'] = $user['headimg'] ?? '';
+        $card_data['headimg'] = $user['headimg'] ?? '/image/202009/13f952e04c720a550193e5655534be86.jpg';
         $card_data['level'] = 0;
         $card_data['expire_time'] = '';
         $card_data['surplus_days'] = 0;
