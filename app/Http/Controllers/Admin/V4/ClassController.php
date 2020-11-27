@@ -519,6 +519,16 @@ class ClassController extends Controller
 
     }
 
+    public function  getWorkList(Request $request)
+    {
+        $id =  $request->get('id');
+        $work = Works::with('userName:id,nickname')
+                ->select('id','title','cover_img','detail_img', 'content','status','user_id','is_end','view_num',
+                   'price','original_price')
+                ->first();
+        return  $work;
+    }
+
     public function getColumnAuthors()
     {
         $column = new Column();
