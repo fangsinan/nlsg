@@ -16,7 +16,7 @@ class Coupon extends Base
     protected $table = 'nlsg_coupon';
 
     protected $fillable = [
-        'name','number','type','price','money','fullcut_price','explain','begin_time','end_time','get_way','user_id','cr_id'
+        'name', 'number', 'type', 'price', 'money', 'fullcut_price', 'explain', 'begin_time', 'end_time', 'get_way', 'user_id', 'cr_id'
     ];
 
     static function getCouponMoney($coupon_id, $user_id, $price, $type = 1)
@@ -42,6 +42,10 @@ class Coupon extends Base
         $check_uid = User::find($uid);
         if (!$check_uid) {
             return ['code' => false, 'msg' => '用户不存在'];
+        }
+
+        if (count($flag) === 1) {
+            $must_all_true = true;
         }
 
         return self::getCouponRun($flag, $uid, $must_all_true, $get_info);
@@ -323,15 +327,15 @@ class Coupon extends Base
         $res = Coupon::create([
             'name' => $rule->name,
             'number' => self::createCouponNum($rule->buffet, $cid),
-            'type'   => $rule->use_type,
-            'price'  => $rule->price,
-            'full_cut'  => $rule->full_cut,
-            'explain'   => $rule->remarks,
-            'begin_time'=> date('Y-m-d H:i:s', strtotime($created_at)),
-            'end_time'  => date('Y-m-d H:i:s', strtotime('+1 month', strtotime($created_at))),
-            'get_way'   => 1,
-            'user_id'   => $user_id,
-            'cr_id'     => $cid
+            'type' => $rule->use_type,
+            'price' => $rule->price,
+            'full_cut' => $rule->full_cut,
+            'explain' => $rule->remarks,
+            'begin_time' => date('Y-m-d H:i:s', strtotime($created_at)),
+            'end_time' => date('Y-m-d H:i:s', strtotime('+1 month', strtotime($created_at))),
+            'get_way' => 1,
+            'user_id' => $user_id,
+            'cr_id' => $cid
         ]);
 
         return success($res);
