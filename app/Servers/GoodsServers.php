@@ -30,8 +30,8 @@ class GoodsServers
         } else {
             if (is_string($params['category_id'])) {
                 $params['category_id'] = explode(',', $params['category_id']);
-                if (count($params['category_id']) !== 3) {
-                    return ['code' => false, 'msg' => 'category_id 必须为3级数据'];
+                if (count($params['category_id']) !== 2) {
+                    return ['code' => false, 'msg' => '分类必须为2级数据'];
                 }
             } else {
                 return ['code' => false, 'msg' => 'category_id格式错误'];
