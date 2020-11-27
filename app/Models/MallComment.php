@@ -32,12 +32,20 @@ class MallComment extends Base {
 
     public static function getDataByGidPid(&$list, $goods_id, $pid = 0, $page = 1, $size = 10) {
 
+        $now_date = date('Y-m-d H:i:s');
         $query = DB::table('nlsg_mall_comment as nmc')
                 ->join('nlsg_user as nu', 'nmc.user_id', '=', 'nu.id')
                 ->leftJoin('nlsg_user as na', 'nmc.reply_user_id', '=', 'na.id')
                 ->leftJoin('nlsg_mall_sku as sku', 'nmc.sku_number', '=', 'sku.sku_number')
+                ->leftJoin('nlsg_vip_user as vu',function($query) use ($now_date){
+                    $query->on('vu.user_id','=','nu.id')
+                        ->where('vu.status','=',1)
+                        ->where('vu.is_default','=',1)
+                        ->where('vu.start_time','<',$now_date)
+                        ->where('vu.expire_time','>',$now_date);
+                })
                 ->select(['nmc.id', 'nu.id as user_id', 'nu.headimg', 'nu.nickname',
-            'nu.level', 'nu.expire_time', 'nmc.content', 'nmc.pid',
+            'nu.level', 'nu.expire_time', 'nmc.content', 'nmc.pid','vu.level as vu_level',
             DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(nmc.created_at),\'%Y-%m-%d\') as created_at'),
             'nmc.goods_id', 'nmc.sku_number', 'nmc.star', 'nmc.reply_comment',
             'nmc.replyed_at', 'nmc.reply_user_id', 'nmc.picture',
@@ -59,6 +67,13 @@ class MallComment extends Base {
         $list = $query->get();
 
         foreach ($list as $k => $v) {
+            switch ($v->vu_level){
+                case 1:
+                    $v->level = 101;
+                    break;
+                case 2:
+                    $v->level = 102;
+            }
             $list[$k]->sku_value = MallSkuValue::getListBySkuNum($v->sku_number);
             if ($v->picture) {
                 $list[$k]->picture = explode(',', $v->picture);
@@ -83,14 +98,12 @@ class MallComment extends Base {
 
         $expire_num = CacheTools::getExpire('mall_comment_list');
         $res = Cache::get($cache_key_name);
-        if (empty($res)) {
+        if (true || empty($res)) {
             $res = self::getListFromDb($params);
             Cache::add($cache_key_name, $res, $expire_num);
         }
         return $res;
     }
-
-
 
     public function getComment($comment_id, $user) {
         $data = MallComment::where('user_id', '=', $user['id'])
