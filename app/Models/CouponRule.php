@@ -32,7 +32,7 @@ class CouponRule extends Base
             }
         }
 
-        if ($params['id_list'] ?? false) {
+        if (($params['id_list'] ?? false) !== false) {
             foreach ($res as $k => $v) {
                 if (!in_array($v->id, $params['id_list'])) {
                     unset($res[$k]);
@@ -114,7 +114,6 @@ class CouponRule extends Base
                     DB::raw('max(created_at) as created_at'),
                     DB::raw('count(id) as counts')
                 ])->groupBy('cr_id')->get();
-
             if ($get_list->isEmpty()) {
                 $get_list = [];
             } else {

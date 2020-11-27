@@ -154,6 +154,7 @@ class Coupon extends Base
             $data['get_way'] = 1;
             $data['user_id'] = $uid;
             $data['cr_id'] = $v->id;
+            $data['created_at'] = $data['updated_at'] = $now;
             $add_data[] = $data;
         }
 
