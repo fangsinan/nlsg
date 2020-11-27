@@ -183,6 +183,7 @@ class ColumnController extends Controller
         $flag = $request->input('flag','');
         $page = $request->input('page',1);
         $size = $request->input('size',10);
+        $order = $request->input('order','asc');
         $user_id   = $this->user['id'] ?? 0 ;
 
         if( empty($column_id) ){
@@ -213,7 +214,7 @@ class ColumnController extends Controller
             //查询专栏对应的关联大纲表 并查询章节
             $outline = ColumnOutline::select('id', 'name','intro')->where('column_id',$column['id'])
                 ->limit($size)->offset(($page - 1) * $size)
-                ->orderBy('sort','asc')
+                ->orderBy('id',$order)
                 ->get()->toArray();
 //            ColumnOutline::where('column_id',$column['id'])->count();
             if( $column['is_free'] == 1 ){
@@ -225,7 +226,7 @@ class ColumnController extends Controller
                 $column_outline[$key]['name'] = $val['name'];
                 $column_outline[$key]['intro'] = $val['intro'];
                 //处理已购和未购url章节
-                $works_info = $worksInfoObj->getInfo($val['id'],$is_sub,$user_id,$type=2);
+                $works_info = $worksInfoObj->getInfo($val['id'],$is_sub,$user_id,$type=2,$order);
                 $works_info_c = count($works_info);
                 $column_outline[$key]['works_info_count'] = $works_info_c;
                 $column_outline[$key]['works_info'] = $works_info;
