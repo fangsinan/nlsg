@@ -49,10 +49,11 @@ class CouponRule extends Base
             }
         }
 
+        //todo 修改,查询库存
         //只返回有库存的
         foreach ($res as $k => $v) {
             //infinite库存无限  1无限  0有限
-            if ($v->infinite == 0 && $v->sotck <= $v->used_stock) {
+            if ($v->infinite == 0 && ($v->sotck <= $v->used_stock)) {
                 $v->can_use = 0;
                 if (($params['only_stock'] ?? 0) == 1) {
                     unset($res[$k]);
