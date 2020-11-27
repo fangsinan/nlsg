@@ -130,7 +130,7 @@ class ListenBookController extends Controller
         $works_data['category_name'] = $category->CategoryName->name ??'';
 
         //查询总的历史记录进度`
-        $hisCount = History::getHistoryCount($works_data['id'],2,$user_id);  //讲座
+        $hisCount = History::getHistoryCount($works_data['id'],3,$user_id);  //讲座
 
         $works_data['history_count'] = 0;
         if($works_data['info_num'] > 0){
@@ -143,7 +143,7 @@ class ListenBookController extends Controller
         $field = ['id', 'name', 'type', 'user_id', 'title', 'subtitle', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
         $works_data['column_info'] = Column::where('user_id',$works_data['user_id'])->first($field);
 
-        $works_data['historyData'] = History::getHistoryData($works_data['id'],2,$user_id);
+        $works_data['historyData'] = History::getHistoryData($works_data['id'],3,$user_id);
 
         $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$listen_id,'type'=>6])->first();
         $works_data['is_collection'] = $isCollect ? 1 : 0;
