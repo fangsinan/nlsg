@@ -98,7 +98,7 @@ class ColumnController extends Controller
         if($order){
             $order_str = 'desc';
         }
-        $field = ['id', 'name','title','subtitle','message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num'];
+        $field = ['id', 'name','title','subtitle','message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num','is_free'];
         $list = Column::select($field)->where([
             "status" => 1,
             "type"   => $type,
