@@ -479,12 +479,12 @@ class ColumnController extends Controller
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,50,$page,$size);
 
-        if ($flag === 'catalog'){
-            $res = [
-                'info'          => $info,
-            ];
-            return $this->success($res);
-        }
+//        if ($flag === 'catalog'){
+//            $res = [
+//                'info'          => $info,
+//            ];
+//            return $this->success($res);
+//        }
 
         $works_data['info_num'] = count($info);
         $works_data['is_sub'] = $is_sub;
@@ -510,7 +510,13 @@ class ColumnController extends Controller
 //            $title = WorksInfo::select('title')->where('id',$historyData['info_id'])->first();
 //            $historyData['title'] = $title->title ?? '';
 //        }
-
+        if ($flag === 'catalog'){
+            $res = [
+                'works_data'    => $works_data,
+                'info'          => $info,
+            ];
+            return $this->success($res);
+        }
         $historyData = History::getHistoryData($lecture_id,2,$user_id);
 
         return $this->success([
