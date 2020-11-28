@@ -26,7 +26,7 @@ class WorksInfo extends Base
             $where['outline_id'] = $works_id;
         }
         $query = WorksInfo::select([
-            'id', 'type', 'title', 'section', 'introduce', 'url', 'callback_url1', 'callback_url1', 'callback_url2',
+            'id','pid', 'type', 'title', 'section', 'introduce', 'url', 'callback_url1', 'callback_url1', 'callback_url2',
             'callback_url3', 'view_num', 'duration', 'free_trial'
         ])->where($where)->orderBy('id', $order);
         //->paginate($page_per_page)->toArray();

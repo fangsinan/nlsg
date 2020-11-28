@@ -473,7 +473,8 @@ class ColumnController extends Controller
         $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
             'view_num','price','subscribe_num','is_free','is_end',])
             ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
-        $is_sub = Subscribe::isSubscribe($user_id,$lecture_id,1);
+        $is_sub = Subscribe::isSubscribe($user_id,$lecture_id,6);
+
         //查询章节、
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,50,$page,$size);
