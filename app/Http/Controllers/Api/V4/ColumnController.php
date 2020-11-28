@@ -318,6 +318,7 @@ class ColumnController extends Controller
         // position = 4;
         // type = 4
         //相关推荐
+        /************    因为要临时更新 不改变数据结构的情况先这么处理   ********************/
 
         // 查询所属推荐有几种类型
         $list = Recommend::select('relation_id','type')->where('position', $position)
@@ -328,7 +329,6 @@ class ColumnController extends Controller
         }else{
             return $this->success();
         }
-
         $recommendLists = [];
         $recommendModel = new Recommend();
         foreach ($list as $key=>$val){
@@ -339,6 +339,8 @@ class ColumnController extends Controller
 
             $recommendLists = array_merge($recommendLists,$recommend);
         }
+        /************    因为要临时更新 不改变数据结构的情况先这么处理   ********************/
+        
 
         if(empty($recommendLists))         return $this->success();
 
