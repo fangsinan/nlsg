@@ -25,24 +25,24 @@ class Subscribe extends Base
         $is_sub = 0;
 
         //is_free 免费
-        $result['is_free'] = 0;
-        switch ($type) {
-            case 1:
-                $result = Column::find($target_id);
-                break;
-            case 2:
-                $result = Works::find($target_id);
-                break;
-            case 3:
-                $result = Live::find($target_id);
-                break;
-            case 6:
-                $result = Column::find($target_id);
-                break;
-        }
-        if($result['is_free'] == 1){
-            return 1;
-        }
+//        $result['is_free'] = 0;
+//        switch ($type) {
+//            case 1:
+//                $result = Column::find($target_id);
+//                break;
+//            case 2:
+//                $result = Works::find($target_id);
+//                break;
+//            case 3:
+//                $result = Live::find($target_id);
+//                break;
+//            case 6:
+//                $result = Column::find($target_id);
+//                break;
+//        }
+//        if($result['is_free'] == 1){
+//            return 1;
+//        }
 
 
 
