@@ -107,7 +107,7 @@ class Works extends Base
             ->where('id', $id)
             ->where(['type' => 2, 'status' => 4])
             ->first();
-        $is_sub = Subscribe::isSubscribe($user_id,$id,1);
+        $is_sub = Subscribe::isSubscribe($user_id,$id,2);
         $list['is_sub']   = $is_sub ? 1 : 0;
         if ($list['workInfo']) {
             $now = date('Y-m-d', time());
