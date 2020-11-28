@@ -407,9 +407,9 @@ class WorksController extends Controller
         //是否订阅
         $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
 
-        if($works_data['is_free'] == 1){
-            $is_sub = 1; // 免费时全部按关注处理url
-        }
+//        if($works_data['is_free'] == 1){
+//            $is_sub = 1; // 免费时全部按关注处理url
+//        }
         //查询章节
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size);
