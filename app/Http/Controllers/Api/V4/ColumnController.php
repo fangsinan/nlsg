@@ -318,10 +318,29 @@ class ColumnController extends Controller
         // position = 4;
         // type = 4
         //相关推荐
-        $recommendModel = new Recommend();
-        $recommendLists = $recommendModel->getIndexRecommend($type, $position);
 
-        if($recommendLists == false)         return $this->success();
+        // 查询所属推荐有几种类型
+        $list = Recommend::select('relation_id','type')->where('position', $position)
+            ->groupBy('type')
+            ->get();
+        if($list){
+            $list = $list->toArray();
+        }else{
+            return $this->success();
+        }
+
+        $recommendLists = [];
+        $recommendModel = new Recommend();
+        foreach ($list as $key=>$val){
+            $recommend = $recommendModel->getIndexRecommend($val['type'], $position);
+            array_walk($recommend, function (&$value, $key, $arr) {
+                $value = array_merge($value, $arr);
+            },['recommend_type'=>$val['type']]);
+
+            $recommendLists = array_merge($recommendLists,$recommend);
+        }
+
+        if(empty($recommendLists))         return $this->success();
 
         foreach ($recommendLists as $key=>$val){
             if($target_id && ($val['id'] == $target_id)){
