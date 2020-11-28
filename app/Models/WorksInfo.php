@@ -183,7 +183,7 @@ class WorksInfo extends Base
                     ->where('s.is_del', '=', 0);
             })
             ->where('w.id', '=', $works_id)
-            ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status',
+            ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img',
                 DB::raw('if(s.id > 0,1,0) as is_sub')])
             ->first();
 
