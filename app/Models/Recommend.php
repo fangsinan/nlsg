@@ -70,7 +70,7 @@ class Recommend extends Base
     }
 
 
-    public  function  getEditorWorks()
+    public  function  getEditorWorks($uid = false)
     {
         $lists = Recommend::select('id', 'relation_id','relation_type','reason')
                  ->where('position', 1)
@@ -81,22 +81,27 @@ class Recommend extends Base
         if ($lists){
             foreach ($lists as $k=>$v) {
                if ($v['relation_type']==1 || $v['relation_type'] == 2 ) {
-                   $lists[$k]['works'] = Works::with([
+                    if ($uid) {
+                        $lists[$k]['is_sub'] = Subscribe::isSubscribe($uid, $v['relation_id'], 2);
+                    }
+                    $lists[$k]['works'] = Works::with([
                        'user' => function ($query) {
                            $query->select('id', 'nickname','headimg');
                        }])
-                       ->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'price', 'chapter_num', 'subscribe_num'])
+                       ->select(['id', 'user_id','is_free','title', 'subtitle', 'cover_img', 'price', 'chapter_num', 'subscribe_num'])
                        ->where('id', $v['relation_id'])
                        ->where('status', 4)
                        ->first();
 
                } elseif ($v['relation_type'] == 3 || $v['relation_type'] == 4) {
-
+                   if ($uid) {
+                       $lists[$k]['is_sub'] = Subscribe::isSubscribe($uid, $v['relation_id'], 1);
+                   }
                    $lists[$k]['works'] = Column::with([
                        'user' => function ($query) {
                            $query->select('id', 'nickname','headimg');
                        }])
-                       ->select(['id', 'user_id', 'name','title','subtitle', 'cover_pic', 'price'])
+                       ->select(['id', 'user_id', 'is_free', 'name','title','subtitle', 'cover_pic', 'price'])
                        ->where('id', $v['relation_id'])
                        ->where('status', 1)
                        ->first();
