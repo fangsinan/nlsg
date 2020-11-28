@@ -163,7 +163,23 @@ class Works extends Base
             }
         }
 
-        return ['works' => $works, 'book' => $book];
+        $lecture = Column::with(['user' => function ($query) {
+                   $query->select('id', 'nickname');
+               }])
+                   ->select('id', 'user_id','is_free','title', 'subtitle', 'cover_pic', 'details_pic')
+                   ->where('type', 2)
+                   ->limit(5)
+                   ->get();
+               if ($book) {
+                   foreach ($book as &$v) {
+                       if ($uid){
+                          $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
+                       }
+                       $v['is_new'] = 1;
+                   }
+               }
+
+        return ['works' => $works, 'book' => $book,'lecture'=>$lecture];
 
     }
 
