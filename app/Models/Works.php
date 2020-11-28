@@ -127,18 +127,21 @@ class Works extends Base
      * 免费专区
      * @return array
      */
-    public function getFreeWorks()
+    public function getFreeWorks($uid =0)
     {
         $works = Works::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num')
+            ->select('id', 'user_id','is_free', 'title', 'subtitle', 'cover_img', 'chapter_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 0)
             ->limit(5)
             ->get();
         if ($works) {
             foreach ($works as &$v) {
+                if ($uid){
+                    $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);
+                }
                 $v['is_new'] = 1;
             }
         }
@@ -146,13 +149,16 @@ class Works extends Base
         $book = Works::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num')
+            ->select('id', 'user_id','is_free','title', 'subtitle', 'cover_img', 'chapter_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 1)
             ->limit(5)
             ->get();
         if ($book) {
             foreach ($book as &$v) {
+                if ($uid){
+                   $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
+                }
                 $v['is_new'] = 1;
             }
         }
