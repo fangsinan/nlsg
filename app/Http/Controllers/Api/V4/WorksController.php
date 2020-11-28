@@ -796,7 +796,7 @@ class WorksController extends Controller
 
         $relation_id = $request->input('relation_id',0);
         $sub_type = $request->input('sub_type',0);
-        $user_id = 1;//$this->user['id'];
+        $user_id = $this->user['id' ?? 0;
 
         $starttime = strtotime(date('Y-m-d', time()));
         $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
