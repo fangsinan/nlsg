@@ -125,6 +125,7 @@ class WorksInfo extends Base
     //用于获取章节上下曲信息
     public function neighbor($params, $user)
     {
+        $now_date = date('Y-m-d H:i:s');
         $works_id = $params['works_id'] ?? 0;
         $works_info_id = $params['works_info_id'] ?? 0;
         $ob = $params['ob'] ?? 'desc';
@@ -172,10 +173,12 @@ class WorksInfo extends Base
 
 
         $works_info = DB::table('nlsg_works as w')
-            ->leftJoin('nlsg_subscribe as s', function ($join) use ($user) {
+            ->leftJoin('nlsg_subscribe as s', function ($join) use ($user,$now_date) {
                 $join->on('s.relation_id', '=', 'w.id')
                     ->whereRaw('s.user_id = ' . $user['id'])
                     ->where('s.type', '=', 2)
+                    ->where('s.start_time','<',$now_date)
+                    ->where('s.end_time','>',$now_date)
                     ->where('s.status', '=', 1)
                     ->where('s.is_del', '=', 0);
             })

@@ -32,7 +32,7 @@ class CouponRule extends Base
             }
         }
 
-        if ($params['id_list'] ?? false) {
+        if (($params['id_list'] ?? false) !== false) {
             foreach ($res as $k => $v) {
                 if (!in_array($v->id, $params['id_list'])) {
                     unset($res[$k]);
@@ -49,11 +49,13 @@ class CouponRule extends Base
             }
         }
 
+        //todo 修改,查询库存
         //只返回有库存的
         foreach ($res as $k => $v) {
             //infinite库存无限  1无限  0有限
-            if (($params['only_stock'] ?? 0) == 1) {
-                if ($v->infinite == 0 && $v->sotck <= $v->used_stock) {
+            if ($v->infinite == 0 && ($v->sotck <= $v->used_stock)) {
+                $v->can_use = 0;
+                if (($params['only_stock'] ?? 0) == 1) {
                     unset($res[$k]);
                 }
             }
@@ -114,7 +116,6 @@ class CouponRule extends Base
                     DB::raw('max(created_at) as created_at'),
                     DB::raw('count(id) as counts')
                 ])->groupBy('cr_id')->get();
-
             if ($get_list->isEmpty()) {
                 $get_list = [];
             } else {

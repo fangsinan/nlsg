@@ -59,7 +59,7 @@ class Subscribe extends Base
 
             $where['relation_id'] = $target_id;
             $sub_data = Subscribe::where($where)
-                ->where('end_time', '<', date('Y-m-d H:i:s'))
+                ->where('end_time', '>', date('Y-m-d H:i:s'))
                 ->first();
             if( $sub_data ){
                 $is_sub = 1;

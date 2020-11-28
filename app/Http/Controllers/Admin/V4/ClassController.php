@@ -468,13 +468,65 @@ class ClassController extends Controller
 
     }
 
+    /**
+     * @api {post} api/admin_v4/class/add-works 创建精品课
+     * @apiVersion 4.0.0
+     * @apiName  add-works
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-works
+     * @apiDescription 创建精品课
+     *
+     * @apiParam {string} title 标题
+     * @apiParam {string} user_id 作者
+     * @apiParam {string} original_price 定价
+     * @apiParam {string} price 售价
+     * @apiParam {string} is_end 是否完结
+     * @apiParam {number} timing_online 是否自动上架
+     * @apiParam {string} status 上架状态
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
     public function addWorks(Request $request)
     {
         $input = $request->all();
-        $name = $input['name'] ?? '';
-        if (!$name) {
-            return error('名称不能为空');
+        $data['title'] = $input['title'] ?? '';
+        if (!$data['title']) {
+            return error('标题不能为空');
         }
+        $data['cover_img']  =  covert_img($input['cover_img']) ?? '';
+        $data['detail_img'] =  covert_img($input['detail_img']) ?? '';
+        $data['user_id'] = $input['user_id'] ?? 0;
+        $data['original_price'] = $input['original_price'] ?? 0;
+        $data['price'] = $input['price'] ?? 0;
+        $data['is_end'] = $input['is_end'] ? 1 : 0;
+        $data['status'] = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
+        $data['timing_online'] = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
+        $data['content'] = $input['content'] ?? '';
+
+        $res = Works::create($data);
+        if ($res) {
+            return success('创建成功');
+        }
+
+    }
+
+    public function  getWorkList(Request $request)
+    {
+        $id =  $request->get('id');
+        $work = Works::with('userName:id,nickname')
+                ->select('id','title','cover_img','detail_img', 'content','status','user_id','is_end','view_num',
+                   'price','original_price')
+                ->first();
+        return  $work;
     }
 
     public function getColumnAuthors()

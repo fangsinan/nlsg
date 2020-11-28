@@ -13,6 +13,10 @@ class Works extends Base
     protected $table = 'nlsg_works';
     public $timestamps = false;
 
+    protected $fillable = [
+       'title', 'cover_img', 'detial_img', 'user_id', 'original_price', 'price', 'is_end','status','timing_online','content'
+    ];
+
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
     const STATUS_TWO = 2;
