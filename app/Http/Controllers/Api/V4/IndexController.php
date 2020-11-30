@@ -954,7 +954,6 @@ class IndexController extends Controller
 
         $app = Factory::officialAccount($config);
         $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'],$debug = true, $beta = false, $json = true);
-        var_dump($jssdk);
         return $jssdk;
     }
 
