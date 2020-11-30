@@ -529,7 +529,9 @@ class SpecialPriceServers
                     $temp_list[$vv['goods_id']]['goods_id'] = $vv['goods_id'];
                     $temp_list[$vv['goods_id']]['goods_price'] = $vv['goods_price'];
                     $temp_list[$vv['goods_id']]['goods_info'] = $vv['goods_info'];
-                    $temp_name_list[] = $vv['goods_info']['name'];
+                    $temp_name_list_value['name'] = $vv['goods_info']['name'];
+                    $temp_name_list_value['picture'] = $vv['goods_info']['picture'];
+                    $temp_name_list[] = $temp_name_list_value;
                     unset($vv['goods_info']);
                 }
                 $v['goods_list'] = $temp_name_list;
