@@ -55,6 +55,7 @@ class ActiveGroupGlModel extends Base
         $cache_key_name = 'active_group_list';
 
         $list = Cache::get($cache_key_name);
+
         if ($list === '0') {
             return [];
         } else {
@@ -68,6 +69,7 @@ class ActiveGroupGlModel extends Base
             if ($list === '0') {
                 return [];
             }
+
             //如果指定id 就直传一个
             if ($params['id'] ?? false) {
                 $res = [];

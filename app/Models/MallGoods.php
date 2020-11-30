@@ -12,7 +12,6 @@ class MallGoods extends Base
 
     public function getList($params, $user = [], $cache = true)
     {
-
         $list = $this->getListData($params, $cache);
 
         //收藏
@@ -30,6 +29,8 @@ class MallGoods extends Base
         } else {
             $col_list = [];
         }
+
+        $count_list = count($list);
 
         foreach ($list as $v) {
             if (in_array($v->id, $col_list)) {
@@ -50,7 +51,7 @@ class MallGoods extends Base
                 $v->service_description = $this->mallServiceDescription();
                 $v->buyer_reading = $this->buyerReading();
             }
-            if (count($list) == 1) {
+            if ($count_list == 1) {
                 //详情时候获取一条评论
                 $mcModel = new MallComment();
                 $v->comment_list = $mcModel->getList(['goods_id' => $v->id, 'page' => 1, 'size' => 1]);
@@ -464,7 +465,7 @@ class MallGoods extends Base
         $cache_key_name = 'fyr_' . $key;
         $id_list = Cache::get($cache_key_name);
 
-        if (true || empty($id_list)) {
+        if (empty($id_list)) {
             $id_list = MallGoods::where('status', '=', 2)
                 ->orderByRaw('rand()')
                 ->limit($num)
