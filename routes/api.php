@@ -35,6 +35,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/version', 'IndexController@version');
     Route::get('index/event', 'IndexController@event');
     Route::get('index/market', 'IndexController@market');
+    Route::get('index/share', 'IndexController@share');
 
     //专栏
     Route::get('column/get_column_list', 'ColumnController@getColumnList');
