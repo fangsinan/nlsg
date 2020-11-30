@@ -460,10 +460,11 @@ class MallGoods extends Base
     public function forYourReference($num, $user = [])
     {
         $key = substr(time(), 9);
+        $key = $key % 4;
         $cache_key_name = 'fyr_' . $key;
         $id_list = Cache::get($cache_key_name);
 
-        if (empty($id_list)) {
+        if (true || empty($id_list)) {
             $id_list = MallGoods::where('status', '=', 2)
                 ->orderByRaw('rand()')
                 ->limit($num)
