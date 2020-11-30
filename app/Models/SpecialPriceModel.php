@@ -163,8 +163,8 @@ class SpecialPriceModel extends Base
                     'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
                     DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
                     DB::raw('unix_timestamp(end_time) as end_timestamp'),
-                    DB::raw('convert((nsp.goods_price/nmg.original_price)*100,'
-                        . 'decimal(15,1)) as price_off')])
+                    DB::raw('convert((nsp.goods_price/nmg.original_price)*10,'
+                        . 'decimal(15,2)) as price_off')])
                 ->get();
 
             $sec_date_list = array_fill_keys($sec_date_list, []);
