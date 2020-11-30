@@ -105,6 +105,7 @@ class SpecialPriceController extends Controller
         if (0) {
             //临时,批量添加测试数
             $temp_add_data = $servers->addFlashSaleNewTemp();
+            //return $this->getRes($temp_add_data);
             foreach ($temp_add_data as $v) {
                 $temp_res = $servers->addFlashSaleNew($v);
                 var_dump($temp_res);

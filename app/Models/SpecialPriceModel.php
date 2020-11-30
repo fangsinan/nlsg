@@ -170,6 +170,7 @@ class SpecialPriceModel extends Base
             $sec_date_list = array_fill_keys($sec_date_list, []);
             foreach ($sec_date_list as $k => &$v) {
                 foreach ($res as $vv) {
+                    $vv->price_off = floatval($vv->price_off);
                     if ($k == $vv->begin_time) {
                         $v[] = $vv;
                     }
@@ -194,7 +195,6 @@ class SpecialPriceModel extends Base
                 $t['time'] = $k;
                 $t['show_time'] = date('H:i', strtotime($k));
                 $t['timestamp'] = strtotime($k);
-
                 $t['status'] = '';
                 $t['status_num'] = 0;
                 if ($now >= $t['timestamp'] && $now <= $v1[0]->end_timestamp) {

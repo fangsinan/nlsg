@@ -395,14 +395,15 @@ class SpecialPriceServers
                 $goods_key = array_rand($goods_list, $goods_num);
                 $temp_add_data['list'] = [];
                 foreach ($goods_key as $v) {
+                    $temp_rand_off = rand(2, 8) / 10;
                     $v = $goods_list[$v];
                     $temp_v = [];
                     $temp_v['goods_id'] = $v->goods_id;
-                    $temp_v['goods_price'] = bcmul($v->goods_price, 0.3, 2);
+                    $temp_v['goods_price'] = bcmul($v->goods_price, $temp_rand_off, 2);
                     $temp_v['list'] = [
                         [
                             'sku_number' => $v->sku_number,
-                            'sku_price' => bcmul($v->sku_price, 0.3, 2)
+                            'sku_price' => bcmul($v->sku_price, $temp_rand_off, 2)
                         ]
                     ];
 
