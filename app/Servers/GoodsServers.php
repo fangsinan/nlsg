@@ -14,7 +14,7 @@ class GoodsServers
 {
     public function add($params)
     {
-        if ($params['goods_id'] ?? 0) {
+        if (($params['goods_id'] ?? 0) !== 0) {
             $goods_model = MallGoods::find($params['goods_id']);
             if (!$goods_model) {
                 return ['code' => false, 'msg' => 'id错误'];
@@ -96,7 +96,7 @@ class GoodsServers
             return ['code' => false, 'msg' => 'goods 错误'];
         }
 
-        if ($params['goods_id'] ?? 0) {
+        if (($params['goods_id'] ?? 0) !== 0) {
             $goods_id = $params['goods_id'];
         } else {
             $goods_id = $goods_model->id;
@@ -152,9 +152,21 @@ class GoodsServers
             return ['code' => false, 'msg' => 'sku_list 错误'];
         }
 
+        //如果是编辑,把之前存在,现在没提交的sku_id删除
+        if($params['goods_id']){
+            $del_sku_id_array = array_column($params['sku_list'],'id');
+            $del_sku_res = DB::table('nlsg_mall_sku')
+                ->whereNotIn('id',$del_sku_id_array)
+                ->update(['status'=>2]);
+            if($del_sku_res === false){
+                DB::rollBack();
+                return ['code' => false, 'msg' => '修改sku发生错误'];
+            }
+        }
+
         $edit_sku_id_arr = [];
         foreach ($params['sku_list'] as $v) {
-            if ($v['id'] ?? 0) {
+            if (($v['id'] ?? 0) !== 0) {
                 //如果有是编辑,sku_number不变
                 $sku = MallSku::where('goods_id', '=', $goods_id)
                     ->find($v['id']);
