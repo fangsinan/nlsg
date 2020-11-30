@@ -287,26 +287,106 @@ class ColumnController extends Controller
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
     {
-    "code": 200,
-    "msg": "成功",
-    "data": [
+    code: 200,
+    msg: "成功",
+    now: 1606557279,
+    data: [
     {
-    "id": 1,
-    "name": "王琨专栏",             //专栏标题
-    "title": "顶尖导师 经营能量",
-    "subtitle": "顶尖导师 经营能量",
-    "message": "",
-    "price": "99.00",
-    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg"
+    id: 18,
+    name: "邱柏森专栏",
+    column_type: 1,
+    title: "美国正面管教协会家长/学校双证讲师",
+    subtitle: "教练式正面管教 落地有效",
+    message: "能量时光，只做家庭教育一件事。大家好，感谢大家关注王琨专栏。今天开始将给大家分享《智慧育儿，听琨来说》系列课程，当然想要听到更为精彩、更为全面的内容，欢迎大家在课程下面留下您精彩的评论。下面我将继续深挖家庭教育优质的课题，持续将优质的家庭教育内容提供给大家。",
+    price: "79.50",
+    cover_pic: "/wechat/works/video/161627/2017121117542896850.jpg",
+    chapter_num: 5,
+    is_free: 0,
+    is_new: 1,
+    recommend_type: 1
     },
     {
-    "id": 2,
-    "name": "张宝萍专栏",
-    "title": "国家十百千万工程心灵导师",
-    "subtitle": "心灵导师 直击人心",
-    "message": "",
-    "price": "0.00",
-    "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg"
+    id: 17,
+    name: "能量时光",
+    column_type: 1,
+    title: "让知识变得有温度",
+    subtitle: "让知识变得有温度",
+    message: "",
+    price: "0.00",
+    cover_pic: "/wechat/works/video/1/2017082810100337412.jpg",
+    chapter_num: 0,
+    is_free: 1,
+    is_new: 1,
+    recommend_type: 1
+    },
+    {
+    id: 573,
+    column_id: 21,
+    type: 2,
+    user_id: 167861,
+    title: "女人情商100讲",
+    cover_img: "/nlsg/works/20200331175459533892.jpg",
+    subtitle: "经历过职场迷茫和彷徨的岁月，了解年轻人心中的情怀和现实之间的差异，所以《优秀的人，都敢对自己下狠手》中，没有无聊的励志和温情的鸡汤，而是真实的打拼和真诚的建议！",
+    price: "49.90",
+    is_free: 0,
+    is_pay: 1,
+    works_update_time: null,
+    chapter_num: 82,
+    sub_num: 424,
+    user: {
+    id: 167861,
+    nickname: "吴岩",
+    headimg: "/wechat/works/video/161627/2017121117553852488.jpg"
+    },
+    is_new: 0,
+    is_sub: 0,
+    recommend_type: 2
+    },
+    {
+    id: 572,
+    column_id: 4,
+    type: 2,
+    user_id: 161904,
+    title: "《琨说：改变你人生的金句名言》",
+    cover_img: "/nlsg/works/20200325181759219566.jpg",
+    subtitle: "经历过职场迷茫和彷徨的岁月，了解年轻人心中的情怀和现实之间的差异，所以《优秀的人，都敢对自己下狠手》中，没有无聊的励志和温情的鸡汤，而是真实的打拼和真诚的建议！",
+    price: "9.90",
+    is_free: 0,
+    is_pay: 1,
+    works_update_time: null,
+    chapter_num: 6,
+    sub_num: 18,
+    user: {
+    id: 161904,
+    nickname: "王琨",
+    headimg: "/wechat/authorpt/wk.png"
+    },
+    is_new: 0,
+    is_sub: 0,
+    recommend_type: 2
+    },
+    {
+    id: 570,
+    column_id: 23,
+    type: 2,
+    user_id: 168303,
+    title: "青春期叛逆孩子解救营",
+    cover_img: "/nlsg/works/20200317132810420958.jpg",
+    subtitle: "经历过职场迷茫和彷徨的岁月，了解年轻人心中的情怀和现实之间的差异，所以《优秀的人，都敢对自己下狠手》中，没有无聊的励志和温情的鸡汤，而是真实的打拼和真诚的建议！",
+    price: "49.90",
+    is_free: 0,
+    is_pay: 1,
+    works_update_time: null,
+    chapter_num: 13,
+    sub_num: 45,
+    user: {
+    id: 168303,
+    nickname: "泺仪",
+    headimg: "/wechat/authorpt/ly.png"
+    },
+    is_new: 0,
+    is_sub: 0,
+    recommend_type: 2
     }
     ]
     }
