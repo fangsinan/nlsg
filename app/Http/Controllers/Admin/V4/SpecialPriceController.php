@@ -54,40 +54,40 @@ class SpecialPriceController extends Controller
      *
      * @apiParamExample {json} Request-Example:
      * {
-         * "team_id": 4,
-         * "date": "2020-11-11",
-         * "status": 1,
-         * "group_name":"48roQ1604475214",
-         * "list": [
-             * {
-                 * "goods_id": 57,
-                 * "goods_price": 1.4,
-                 * "list": [
-                     * {
-                         * "sku_number": 1825350558,
-                         * "sku_price": 1.4
-                     * }
-                 * ]
-             * },
-             * {
-                 * "goods_id": 330,
-                 * "goods_price": 0.67,
-                 * "list": [
-                     * {
-                         * "sku_number": 1835215184,
-                         * "sku_price": 0.67
-                     * },
-                     * {
-                         * "sku_number": 1607088243,
-                         * "sku_price": 0.68
-                     * },
-                     * {
-                         * "sku_number": 1835215184,
-                         * "sku_price": 2.1
-                     * }
-                 * ]
-             * }
-         * ]
+     * "team_id": 4,
+     * "date": "2020-11-11",
+     * "status": 1,
+     * "group_name":"48roQ1604475214",
+     * "list": [
+     * {
+     * "goods_id": 57,
+     * "goods_price": 1.4,
+     * "list": [
+     * {
+     * "sku_number": 1825350558,
+     * "sku_price": 1.4
+     * }
+     * ]
+     * },
+     * {
+     * "goods_id": 330,
+     * "goods_price": 0.67,
+     * "list": [
+     * {
+     * "sku_number": 1835215184,
+     * "sku_price": 0.67
+     * },
+     * {
+     * "sku_number": 1607088243,
+     * "sku_price": 0.68
+     * },
+     * {
+     * "sku_number": 1835215184,
+     * "sku_price": 2.1
+     * }
+     * ]
+     * }
+     * ]
      * }
      *
      * @apiSuccessExample {json} Request-Example:
@@ -102,17 +102,17 @@ class SpecialPriceController extends Controller
     public function addFlashSale(Request $request)
     {
         $servers = new SpecialPriceServers();
-        $data = $servers->addFlashSaleNew($request->input());
-        return $this->getRes($data);
-
-//        $params = $request->input();
-//        if (($params['type'] ?? 0) != 2) {
-//            $data = ['code' => false, 'msg' => 'type错误'];
-//        } else {
-//            $servers = new SpecialPriceServers();
-//            $data = $servers->add($params);
-//        }
-//        return $this->getRes($data);
+        if (0) {
+            //临时,批量添加测试数
+            $temp_add_data = $servers->addFlashSaleNewTemp();
+            foreach ($temp_add_data as $v) {
+                $temp_res = $servers->addFlashSaleNew($v);
+                var_dump($temp_res);
+            }
+        } else {
+            $data = $servers->addFlashSaleNew($request->input());
+            return $this->getRes($data);
+        }
     }
 
     /**
@@ -129,7 +129,8 @@ class SpecialPriceController extends Controller
      * @apiParam {number=1,2} status 状态(1上架2下架)
      * @apiParam {string} group_name 获取详情和编辑时用(id没用)
      **/
-    public function flashSaleList(Request $request){
+    public function flashSaleList(Request $request)
+    {
         $servers = new SpecialPriceServers();
         $data = $servers->flashSaleList($request->input());
         return $this->getRes($data);

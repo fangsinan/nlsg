@@ -178,6 +178,7 @@ class SpecialPriceModel extends Base
             Cache::put($cache_key_name, $sec_date_list, $expire_num);
         }
 
+
         if ($flag == 1) {
             return $sec_date_list;
         } else {

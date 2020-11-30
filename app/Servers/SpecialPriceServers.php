@@ -373,6 +373,50 @@ class SpecialPriceServers
         return ['code' => true, 'msg' => '成功'];
     }
 
+    public function addFlashSaleNewTemp()
+    {
+        $goods_list = DB::table('nlsg_mall_goods as g')
+            ->join('nlsg_mall_sku as s', 'g.id', '=', 's.goods_id')
+            ->where('g.status', '=', 2)
+            ->where('s.status', '=', 1)
+            ->select(['g.id as goods_id', 'g.price as goods_price', 'sku_number', 's.price as sku_price'])
+            ->get()->toArray();
+
+
+        $add_data = [];
+        $i = 0;
+        while ($i < 60) {
+            for ($j = 1; $j < 5; $j++) {
+                $temp_add_data = [];
+                $temp_add_data['date'] = date('Y-m-d', strtotime("+$i days"));
+                $temp_add_data['status'] = 1;
+                $temp_add_data['team_id'] = $j;
+                $goods_num = rand(4, 10);
+                $goods_key = array_rand($goods_list, $goods_num);
+                $temp_add_data['list'] = [];
+                foreach ($goods_key as $v) {
+                    $v = $goods_list[$v];
+                    $temp_v = [];
+                    $temp_v['goods_id'] = $v->goods_id;
+                    $temp_v['goods_price'] = bcmul($v->goods_price, 0.3, 2);
+                    $temp_v['list'] = [
+                        [
+                            'sku_number' => $v->sku_number,
+                            'sku_price' => bcmul($v->sku_price, 0.3, 2)
+                        ]
+                    ];
+
+                    $temp_add_data['list'][] = $temp_v;
+                }
+
+                $add_data[] = $temp_add_data;
+            }
+
+            $i++;
+        }
+        return $add_data;
+    }
+
     public function addFlashSaleNew($params)
     {
         $team_id = $params['team_id'] ?? 0;
@@ -510,8 +554,8 @@ class SpecialPriceServers
         }
 
 
-        $query->with(['flashSaleGoodsList','flashSaleGoodsList.goodsInfo',
-            'flashSaleGoodsList.skuInfo','flashSaleGoodsList.skuInfo.sku_value_list']);
+        $query->with(['flashSaleGoodsList', 'flashSaleGoodsList.goodsInfo',
+            'flashSaleGoodsList.skuInfo', 'flashSaleGoodsList.skuInfo.sku_value_list']);
 
         $query->select([
             'id', 'group_name', 'team_id', 'status',
