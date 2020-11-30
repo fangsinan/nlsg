@@ -11,6 +11,7 @@ use App\Models\Banner;
 use App\Models\Live;
 use App\Models\Recommend;
 use App\Models\Works;
+use EasyWeChat\Factory;
 
 class IndexController extends Controller
 {
@@ -943,5 +944,17 @@ class IndexController extends Controller
         return  success($data);
     }
 
+    public function  share()
+    {
+        $config = [
+            'app_id' => env('WECHAT_OFFICIAL_ACCOUNT_APPID'),
+            'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET'),
+            'response_type' => 'array'
+        ];
+
+        $app = Factory::officialAccount($config);
+        $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'],$debug = false, $beta = false, $json = true);
+        return $jssdk;
+    }
 
 }
