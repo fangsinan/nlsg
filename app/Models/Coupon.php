@@ -116,7 +116,7 @@ class Coupon extends Base
             }
 
             if ($v->infinite === 0) {
-                if ($v->used_stock >= $v->stock) {
+                if ($v->used_stock - $v->stock >= 0) {
                     if ($must_all_true) {
                         return ['code' => false, 'msg' => '该优惠券没有库存'];
                     } else {
