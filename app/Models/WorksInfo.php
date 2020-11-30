@@ -26,7 +26,7 @@ class WorksInfo extends Base
             $where['outline_id'] = $works_id;
         }
         $query = WorksInfo::select([
-            'id', 'type', 'title', 'section', 'introduce', 'url', 'callback_url1', 'callback_url1', 'callback_url2',
+            'id','pid', 'type', 'title', 'section', 'introduce', 'url', 'callback_url1', 'callback_url1', 'callback_url2',
             'callback_url3', 'view_num', 'duration', 'free_trial'
         ])->where($where)->orderBy('id', $order);
         //->paginate($page_per_page)->toArray();
@@ -183,7 +183,7 @@ class WorksInfo extends Base
                     ->where('s.is_del', '=', 0);
             })
             ->where('w.id', '=', $works_id)
-            ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status',
+            ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img',
                 DB::raw('if(s.id > 0,1,0) as is_sub')])
             ->first();
 

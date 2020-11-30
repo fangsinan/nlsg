@@ -98,7 +98,7 @@ class ColumnController extends Controller
         if($order){
             $order_str = 'desc';
         }
-        $field = ['id', 'name','title','subtitle','message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num'];
+        $field = ['id', 'name','title','subtitle','message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num','is_free'];
         $list = Column::select($field)->where([
             "status" => 1,
             "type"   => $type,
@@ -318,10 +318,31 @@ class ColumnController extends Controller
         // position = 4;
         // type = 4
         //相关推荐
-        $recommendModel = new Recommend();
-        $recommendLists = $recommendModel->getIndexRecommend($type, $position);
+        /************    因为要临时更新 不改变数据结构的情况先这么处理   ********************/
 
-        if($recommendLists == false)         return $this->success();
+        // 查询所属推荐有几种类型
+        $list = Recommend::select('relation_id','type')->where('position', $position)
+            ->groupBy('type')
+            ->get();
+        if($list){
+            $list = $list->toArray();
+        }else{
+            return $this->success();
+        }
+        $recommendLists = [];
+        $recommendModel = new Recommend();
+        foreach ($list as $key=>$val){
+            $recommend = $recommendModel->getIndexRecommend($val['type'], $position);
+            array_walk($recommend, function (&$value, $key, $arr) {
+                $value = array_merge($value, $arr);
+            },['recommend_type'=>$val['type']]);
+
+            $recommendLists = array_merge($recommendLists,$recommend);
+        }
+        /************    因为要临时更新 不改变数据结构的情况先这么处理   ********************/
+        
+
+        if(empty($recommendLists))         return $this->success();
 
         foreach ($recommendLists as $key=>$val){
             if($target_id && ($val['id'] == $target_id)){
@@ -473,19 +494,21 @@ class ColumnController extends Controller
         $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
             'view_num','price','subscribe_num','is_free','is_end',])
             ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
-        $is_sub = Subscribe::isSubscribe($user_id,$lecture_id,1);
+        $is_sub = Subscribe::isSubscribe($user_id,$lecture_id,6);
+
         //查询章节、
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,50,$page,$size);
 
-        if ($flag === 'catalog'){
-            $res = [
-                'info'          => $info,
-            ];
-            return $this->success($res);
-        }
+//        if ($flag === 'catalog'){
+//            $res = [
+//                'info'          => $info,
+//            ];
+//            return $this->success($res);
+//        }
 
         $works_data['info_num'] = count($info);
+        $works_data['is_sub'] = $is_sub;
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($lecture_id,2,$user_id);  //讲座
 //        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
@@ -508,7 +531,13 @@ class ColumnController extends Controller
 //            $title = WorksInfo::select('title')->where('id',$historyData['info_id'])->first();
 //            $historyData['title'] = $title->title ?? '';
 //        }
-
+        if ($flag === 'catalog'){
+            $res = [
+                'works_data'    => $works_data,
+                'info'          => $info,
+            ];
+            return $this->success($res);
+        }
         $historyData = History::getHistoryData($lecture_id,2,$user_id);
 
         return $this->success([
@@ -600,7 +629,7 @@ class ColumnController extends Controller
 
         $subList = Subscribe::with([
             'UserInfo' => function($query){
-                $query->select('id','level','phone','nickname','headimg','expire_time','intro','is_teacher');
+                $query->select('id','level','phone','nickname','headimg','expire_time','intro','is_author');
             }])->select('id','user_id')->where([
             'type' => 6,
             'relation_id' => $lecture_id,

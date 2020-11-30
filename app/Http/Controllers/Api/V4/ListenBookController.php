@@ -260,23 +260,54 @@ class ListenBookController extends Controller
         $is_collect = Collection::where(['user_id'=>$user_id,'relation_id'=>$lists_id,'type'=>4])->first();
         $lists_info['is_collect'] = $is_collect ? 1 : 0;
 
-        $lists = ListsWork::select('*')->where(['lists_id'=>$lists_id])->paginate($this->page_per_page)->toArray();
-        $works_ids = array_column($lists['data'],'works_id');
-        //$works_ids = array_column($lists,'works_id');
+        $lists = ListsWork::select('type','works_id')
+                ->where(['lists_id'=>$lists_id])
+                ->orderBy('created_at','desc')
+                ->get()
+                ->toArray();
 
-        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
-            ->with(['user'=>function($query){
-                $query->select('id','nickname', 'headimg');
-            }])
-            ->where(['status' => 4 , 'is_audio_book' => 1,])
-            ->whereIn('id', $works_ids)->get()->toArray();
-
-        foreach ($works as $key=>$val){
-            //是否购买
-            $works[$key]['is_sub'] = Subscribe::isSubscribe($user_id, $val['id'], 2);
+        if ($lists){
+            foreach ($lists as $k=>$v) {
+                if ($v['type']==1){
+                    $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
+                          ->with(['user'=>function($query){
+                              $query->select('id','nickname', 'headimg');
+                          }])
+                          ->where('id', $v['works_id'])
+                          ->get()->toArray();
+                       $lists[$k]['works'] = $works;
+                }  elseif ($v['type']==2){
+                    $listen = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
+                          ->with(['user'=>function($query){
+                              $query->select('id','nickname', 'headimg');
+                          }])
+                          ->where('id', $v['works_id'])
+                          ->where('is_audio_book', 1)
+                          ->get()->toArray();
+                       $lists[$k]['listen'] = $listen;
+                } elseif ($v['type']==3){
+                    $column = Column::select(['id','user_id', 'title', 'subtitle', 'cover_pic','original_price','price', 'message','is_free'])
+                        ->with(['user'=>function($query){
+                            $query->select('id','nickname', 'headimg');
+                        }])
+                        ->where('id', $v['works_id'])
+                        ->where('type', 1)
+                        ->get()->toArray();
+                    $lists[$k]['column'] = $column;
+                } elseif ($v['type']==4 ){
+                    $column = Column::select(['id','user_id', 'title', 'subtitle', 'cover_pic','original_price','price', 'message','is_free'])
+                         ->with(['user'=>function($query){
+                             $query->select('id','nickname', 'headimg');
+                         }])
+                         ->where('id', $v['works_id'])
+                         ->where('type', 2)
+                         ->get()->toArray();
+                    $lists[$k]['column'] = $column;
+                }
+            }
         }
 
-        return $this->success(['lists_info'=>$lists_info,'works'=>$works]);
+        return $this->success(['lists_info'=>$lists_info,'lists'=>$lists]);
     }
 
     /**

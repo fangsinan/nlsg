@@ -740,8 +740,9 @@ class IndexController extends Controller
      */
     public function free()
     {
+        $uid = $this->user['id'] ?? 0;
         $work = new Works();
-        $lists = $work->getFreeWorks();
+        $lists = $work->getFreeWorks($uid);
         return success($lists);
     }
 
@@ -853,8 +854,9 @@ class IndexController extends Controller
      */
     public function editor()
     {
+        $uid =  $this->user['id'] ?? 0;
         $recommendModel = new Recommend();
-        $lists = $recommendModel->getEditorWorks();
+        $lists = $recommendModel->getEditorWorks($uid);
         return $this->success($lists);
     }
 
