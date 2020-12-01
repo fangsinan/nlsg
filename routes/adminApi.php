@@ -27,6 +27,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('class/get-column-author','ClassController@getColumnAuthors');
     Route::post('class/add-lecture','ClassController@addLecture');
     Route::post('class/add-works','ClassController@addWorks');
+    Route::post('class/add-listen','ClassController@addListen');
     Route::post('class/add-works-chapter','ClassController@addWorkChapter');
 
     //商城订单
