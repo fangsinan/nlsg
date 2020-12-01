@@ -75,6 +75,12 @@ class GoodsServers
         }
 
         $goods_model->keywords = $params['keywords'] ?? '';
+        if (!empty($goods_model->keywords)){
+            $reg = "/[[:punct:]]/i";
+            $goods_model->keywords = preg_replace($reg, ' ', $goods_model->keywords);
+            $goods_model->keywords = explode(' ',$goods_model->keywords);
+            $goods_model->keywords = implode(',',array_filter($goods_model->keywords));
+        }
 
         $goods_model->content = $params['content'] ?? '';
 
