@@ -497,7 +497,7 @@ class LiveConsoleController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/live_notice/change_state
      * @apiDescription 公告和笔记-修改状态
      * @apiParam {number} id 推送记录id
-     * @apiParam {string=on,del} flag 操作(取消,删除)
+     * @apiParam {string=off,del} flag 操作(取消,删除)
      */
     public function changeLiveNoticeState(Request $request)
     {

@@ -29,6 +29,7 @@ class removeDataServers
         $old_sku = DB::connection('mysql_old')
             ->table('nlsg_mall_sku')
             ->get()->toArray();
+
         $sku_data = [];
         $sku_value_data = [];
         foreach ($old_sku as $v) {
@@ -58,7 +59,7 @@ class removeDataServers
                 $temp_sku_value['key_value'] = $vv;
                 $sku_value_data[] = $temp_sku_value;
             }
-            $sku_data[] = $temp_sku;
+
         }
 
         $old_goods = DB::connection('mysql_old')
