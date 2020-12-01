@@ -67,7 +67,7 @@ return [
         // optional，默认 warning；日志路径为：sys_get_temp_dir().'/logs/yansongda.pay.log'
         'log' => [
             'file' => storage_path('logs/wechat.log'),
-          'level' => 'info',
+        //  'level' => 'debug'
         //  'type' => 'single', // optional, 可选 daily.
         //  'max_file' => 30,
         ],
