@@ -338,24 +338,24 @@ class AuthController extends Controller
         $dont_check_phone = explode(',',$dont_check_phone);
         if(in_array($phone,$dont_check_phone)){
             return success();
-        }
+        }else{
+            $easySms = app('easysms');
+            try {
 
-        $easySms = app('easysms');
-        try {
+                $code = rand(1000, 9999);
+                $result = $easySms->send($phone, [
+                    'template' => 'SMS_70300075',
+                    'data' => [
+                        'code' => $code,
+                    ],
+                ], ['aliyun']);
 
-            $code = rand(1000, 9999);
-            $result = $easySms->send($phone, [
-                'template' => 'SMS_70300075',
-                'data' => [
-                    'code' => $code,
-                ],
-            ], ['aliyun']);
-
-            Redis::setex($phone, 60 * 5, $code);
-            return success();
-        } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
-            $message = $exception->getResults();
-            return $message;
+                Redis::setex($phone, 60 * 5, $code);
+                return success();
+            } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
+                $message = $exception->getResults();
+                return $message;
+            }
         }
 
     }
