@@ -24,7 +24,8 @@ class ConfigModel extends Base
     //1:邮费  2:特价优先级
     public static function getData($id)
     {
-        $expire_num = 3600;
+        //$expire_num = 3600;
+        $expire_num = 60;
         $cache_key_name = 'v4_config_' . $id;
 
         $res = Cache::get($cache_key_name);
