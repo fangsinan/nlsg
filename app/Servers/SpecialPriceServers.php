@@ -336,6 +336,9 @@ class SpecialPriceServers
         //添加
         $add_data = [];
         foreach ($params['list'] as $v) {
+            if (empty($v['group_price']??'')){
+                continue;
+            }
             $temp = [];
             $temp['status'] = $params['status'];
             $temp['goods_type'] = 1;

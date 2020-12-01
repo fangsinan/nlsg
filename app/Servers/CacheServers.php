@@ -23,6 +23,8 @@ class CacheServers
     protected static function clearGoods()
     {
         Cache::tags(['goods_list', 'goods_sp_list_1', 'goods_price'])->flush();
+        Cache::forget('home_group_list');
+        Cache::forget('set_kill_list');
     }
 
 
