@@ -957,4 +957,10 @@ class IndexController extends Controller
         return success($jssdk);
     }
 
+    public function   test()
+    {
+        $a = env('JWT_SECRET');
+        echo $a;
+    }
+
 }
