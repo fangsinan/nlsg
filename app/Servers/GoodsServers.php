@@ -153,7 +153,7 @@ class GoodsServers
         }
 
         //如果是编辑,把之前存在,现在没提交的sku_id删除
-        if ($params['goods_id']) {
+        if (($params['goods_id']??0) !== 0) {
             $del_sku_id_array = array_column($params['sku_list'], 'id');
             if (empty($del_sku_id_array)) {
                 $del_sku_res = DB::table('nlsg_mall_sku')
