@@ -153,20 +153,20 @@ class GoodsServers
         }
 
         //如果是编辑,把之前存在,现在没提交的sku_id删除
-        if($params['goods_id']){
-            $del_sku_id_array = array_column($params['sku_list'],'id');
-            if (empty($del_sku_id_array)){
+        if ($params['goods_id']) {
+            $del_sku_id_array = array_column($params['sku_list'], 'id');
+            if (empty($del_sku_id_array)) {
                 $del_sku_res = DB::table('nlsg_mall_sku')
-                    ->where('goods_id','=',$params['goods_id'])
-                    ->whereNotIn('id',$del_sku_id_array)
-                    ->update(['status'=>2]);
-            }else{
+                    ->where('goods_id', '=', $params['goods_id'])
+                    ->whereNotIn('id', $del_sku_id_array)
+                    ->update(['status' => 2]);
+            } else {
                 $del_sku_res = DB::table('nlsg_mall_sku')
-                    ->where('goods_id','=',$params['goods_id'])
-                    ->update(['status'=>2]);
+                    ->where('goods_id', '=', $params['goods_id'])
+                    ->update(['status' => 2]);
             }
 
-            if($del_sku_res === false){
+            if ($del_sku_res === false) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '修改sku发生错误'];
             }
@@ -330,7 +330,6 @@ class GoodsServers
             $with[] = 'category_list';
             $with[] = 'categoryStr';
             $with[] = 'categoryStr.categoryParent';
-            $with[] = 'categoryStr.categoryParent.categoryParent';
             $with[] = 'category_list';
         }
 
@@ -367,9 +366,7 @@ class GoodsServers
         }
 
         foreach ($list as $k => $v) {
-            $v->category_string = ($v->categoryStr->categoryParent->categoryParent->id ?? 0) . ',' .
-                ($v->categoryStr->categoryParent->id ?? 0) . ',' .
-                ($v->categoryStr->id ?? 0);
+            $v->category_string = ($v->categoryStr->categoryParent->id ?? 0) . ',' . ($v->categoryStr->id ?? 0);
             unset($list[$k]->categoryStr);
         }
 
