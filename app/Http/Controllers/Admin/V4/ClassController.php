@@ -7,6 +7,7 @@ use App\Models\Column;
 use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
+use App\Models\WorksInfo;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -502,8 +503,8 @@ class ClassController extends Controller
         if (!$data['title']) {
             return error('标题不能为空');
         }
-        $data['cover_img']  =  covert_img($input['cover_img']) ?? '';
-        $data['detail_img'] =  covert_img($input['detail_img']) ?? '';
+        $data['cover_img'] = covert_img($input['cover_img']) ?? '';
+        $data['detail_img'] = covert_img($input['detail_img']) ?? '';
         $data['user_id'] = $input['user_id'] ?? 0;
         $data['original_price'] = $input['original_price'] ?? 0;
         $data['price'] = $input['price'] ?? 0;
@@ -519,21 +520,87 @@ class ClassController extends Controller
 
     }
 
-    public function  getWorkList(Request $request)
-    {
-        $id =  $request->get('id');
-        $work = Works::with('userName:id,nickname')
-                ->select('id','title','cover_img','detail_img', 'content','status','user_id','is_end','view_num',
-                   'price','original_price')
-                ->first();
-        return  $work;
-    }
-
+    /**
+     * 获取作者
+     */
     public function getColumnAuthors()
     {
         $column = new Column();
         $lists = $column->getColumnUser();
         return success($lists);
+    }
+
+
+    public function getWorkList(Request $request)
+    {
+        $id = $request->get('id');
+        $work = Works::with('userName:id,nickname')
+            ->select('id', 'title', 'cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
+                'price', 'original_price')
+            ->first();
+        return $work;
+    }
+
+    /**
+    * @api {post} api/admin_v4/class/add-works-chapter 增加章节
+    * @apiVersion 4.0.0
+    * @apiName  add-chapter
+    * @apiGroup 后台-虚拟课程
+    * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-works-chapter
+    * @apiDescription 增加章节
+    *
+    * @apiParam {string} title 标题
+    * @apiParam {string} section 第几节
+    * @apiParam {string} introduce 简介
+    * @apiParam {string} url    音视频url
+    * @apiParam {string} status 状态   0 删除 1 未审核 2 拒绝  3通过 4上架 5下架
+    * @apiParam {number} video_id 视频id
+    * @apiParam {string} free_trial 是否免费 0 否 1 是
+    * @apiParam {string} timing_online  是否自动上线 0 否 1是
+    * @apiParam {string} timing_time  自动上线时间
+    *
+    * @apiSuccessExample  Success-Response:
+    * HTTP/1.1 200 OK
+    * {
+    *   "code": 200,
+    *   "msg" : '成功',
+    *   "data": {
+    *
+    *    }
+    * }
+    */
+    public function addWorkChapter(Request $request)
+    {
+        $input =  $request->all();
+        $work_id = $request->get('pid');
+        $work = Works::where('id', $work_id)->first();
+        if (!$work) {
+            return error(1000, '作品不存在');
+        }
+
+
+        $timing_online  = $input['timing_online'] ?? 0;
+        if ($timing_online ==1){
+            $data['timing_time'] =  date('Y-m-d H:i:s', time());
+        }
+
+        $data = [
+            'pid'       => $work_id,
+            'type'      => $input['type'] ?? '',
+            'title'     => $input['title'] ?? '',
+            'section'   => $input['section'] ?? '',
+            'introduce' => $input['introduce'] ?? '',
+            'url'       => $input['url'] ?? '',
+            'status'    => $input['status'] ?? 5,
+            'video_id'  => $input['video_id'] ?? '',
+            'free_trial'=> $input['free_trial'] ?? 0,
+            'timing_online' => $timing_online ?? 0
+        ];
+
+        $res =  WorksInfo::create($data);
+        if ($res){
+            return success('创建成功');
+        }
     }
 
 
