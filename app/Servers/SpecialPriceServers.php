@@ -121,6 +121,9 @@ class SpecialPriceServers
                 return ['code' => false, 'msg' => 'sku_number错误'];
             }
             if ($params['type'] == 4) {
+                if (empty($v['group_price']??0)){
+                    continue;
+                }
                 //拼团需要校验拼团price
                 if (empty($v['group_num'])) {
                     return ['code' => false, 'msg' => 'group_num错误'];
