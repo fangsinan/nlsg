@@ -333,6 +333,13 @@ class AuthController extends Controller
             return $this->error(400, '手机号不能为空');
         }
 
+        //自己人不发验证码
+        $dont_check_phone = ConfigModel::getData(35);
+        $dont_check_phone = explode(',',$dont_check_phone);
+        if(in_array($phone,$dont_check_phone)){
+            return success();
+        }
+
         $easySms = app('easysms');
         try {
 
