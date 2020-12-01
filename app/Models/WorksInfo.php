@@ -10,6 +10,10 @@ class WorksInfo extends Base
     protected $table = 'nlsg_works_info';
     public $timestamps = false;
 
+    protected $fillable = [
+         'pid', 'type', 'title', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online'
+    ];
+
 
     public function getDateFormat()
     {
