@@ -27,9 +27,11 @@ class SpecialPriceServers
             $field = ['*'];
         }
 
-        if (!empty($params['type'])) {
-            $query->where('type', '=', intval($params['type']));
-        }
+//        if (!empty($params['type'])) {
+//            $query->where('type', '=', intval($params['type']));
+//        }
+
+        $query->where('type', '=', 1);
 
         if (!empty($params['begin_time'])) {
             $query->where('begin_time', '>=', $params['begin_time']);
@@ -121,7 +123,7 @@ class SpecialPriceServers
                 return ['code' => false, 'msg' => 'sku_number错误'];
             }
             if ($params['type'] == 4) {
-                if (empty($v['group_price']??0)){
+                if (empty($v['group_price'] ?? 0)) {
                     continue;
                 }
                 //拼团需要校验拼团price
@@ -138,7 +140,8 @@ class SpecialPriceServers
             } else {
                 //降价和秒杀需要校验sku_price
                 if (empty($v['sku_price'])) {
-                    return ['code' => false, 'msg' => 'sku_price错误'];
+                    continue;
+                    //return ['code' => false, 'msg' => 'sku_price错误'];
                 }
                 if (empty($v['sku_price_black'])) {
                     return ['code' => false, 'msg' => 'sku_price_black错误'];
@@ -206,6 +209,9 @@ class SpecialPriceServers
         //添加
         $add_data = [];
         foreach ($params['list'] as $v) {
+            if (empty($v['sku_price']??0)){
+                continue;
+            }
             $temp = [];
             $temp['goods_type'] = 1;
             $temp['goods_id'] = $params['goods_id'];
@@ -339,7 +345,7 @@ class SpecialPriceServers
         //添加
         $add_data = [];
         foreach ($params['list'] as $v) {
-            if (empty($v['group_price']??'')){
+            if (empty($v['group_price'] ?? '')) {
                 continue;
             }
             $temp = [];
