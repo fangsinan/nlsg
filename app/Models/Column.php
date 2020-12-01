@@ -28,7 +28,7 @@ class Column extends Base
 
     //获取专栏相关信息
     static function getColumnInfo($column_id,$field,$user_id=0){
-        $column = Column::where('id',$column_id)->first($field)->toArray();
+        $column = Column::where('id',$column_id)->first($field);
         if( empty($column) )    {
             return [];
         }
