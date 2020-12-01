@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Http\Controllers\Admin\V4;
+
+use App\Http\Controllers\Controller;
+use App\Models\Column;
+use App\Models\Banner;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+
+class BannerController extends Controller
+{
+
+    /**
+     * @api {get} api/admin_v4/banner/list 广告列表
+     * @apiVersion 4.0.0
+     * @apiName  list
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/banner/list
+     * @apiDescription 专栏列表
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} title 名称
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
+     *
+     * @apiSuccess {string} type  1. 首页   (50段商城预留)51.商城首页轮播  52.分类下方推荐位  53.爆款推荐
+     * @apiSuccess {string} title  标题
+     * @apiSuccess {string} rank    排序
+     * @apiSuccess {string} jump_type  跳转类型 1:h5(走url,其他都object_id)  2:商品  3:优惠券领取页面4精品课 5.讲座 6.听书 7 360
+     * @apiSuccess {string}  url    h5链接
+     * @apiSuccess {string}  obj_id  跳转id
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  创建时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function  list(Request $request)
+    {
+        $title  = $request->get('title');
+        $type   = $request->get('type');
+        $start  = $request->get('start');
+        $end    = $request->get('end');
+        $query = Banner::when($title, function ($query) use ($title) {
+                $query->where('name', 'like', '%' . $title . '%');
+            })
+            ->when($type, function ($query) use ($type) {
+                $query->where('type', $type);
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                ]);
+            });
+
+        $lists = $query->select('id', 'title', 'pic','rank','url', 'type', 'jump_type', 'obj_id', 'created_at','status')
+            ->orderBy('rank','desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($lists);
+    }
+}

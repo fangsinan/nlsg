@@ -30,6 +30,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('class/add-listen','ClassController@addListen');
     Route::post('class/add-works-chapter','ClassController@addWorkChapter');
 
+    //广告
+    Route::get('banner/list', 'BannerController@list');
+
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');
     Route::post('mall_order/send', 'MallOrderController@send');
