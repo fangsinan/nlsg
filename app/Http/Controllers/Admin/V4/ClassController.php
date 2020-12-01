@@ -542,11 +542,11 @@ class ClassController extends Controller
     }
 
     /**
-    * @api {post} api/admin_v4/class/add-chapter 增加章节
+    * @api {post} api/admin_v4/class/add-works-chapter 增加章节
     * @apiVersion 4.0.0
     * @apiName  add-chapter
     * @apiGroup 后台-虚拟课程
-    * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-chapter
+    * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-works-chapter
     * @apiDescription 增加章节
     *
     * @apiParam {string} title 标题
