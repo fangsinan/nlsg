@@ -13,4 +13,9 @@ class RemoveDataController extends Controller
         $servers = new removeDataServers();
         $servers->removeGoods();
     }
+
+    public function mallOrders(){
+        $servers = new removeDataServers();
+        $servers->removeMallOrders();
+    }
 }

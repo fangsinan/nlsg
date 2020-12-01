@@ -9,8 +9,7 @@ class removeDataServers
 {
     public function removeGoods()
     {
-
-        $now_date = date('Y-m-d H:i:s');
+        $copy_flag = '_copy1';
 
         $old_picture = DB::connection('mysql_old')
             ->table('nlsg_mall_picture')
@@ -56,7 +55,7 @@ class removeDataServers
                 $temp_sku_value['goods_id'] = $v->goods_id;
                 $temp_sku_value['sku_id'] = $v->id;
                 $temp_sku_value['key_name'] = $kk;
-                $temp_sku_value['key_value'] = $vv;
+                $temp_sku_value['value_name'] = $vv;
                 $sku_value_data[] = $temp_sku_value;
             }
 
@@ -116,11 +115,16 @@ class removeDataServers
             $goods_data[] = $temp;
         }
 
+        $r1 = DB::table('nlsg_mall_goods' . $copy_flag)->insert($goods_data);
+        $r2 = DB::table('nlsg_mall_sku' . $copy_flag)->insert($sku_data);
+        $r3 = DB::table('nlsg_mall_sku_value' . $copy_flag)->insert($sku_value_data);
+        $r4 = DB::table('nlsg_mall_picture' . $copy_flag)->insert($picture_data);
 
-        DB::table('nlsg_mall_goods')->insert($goods_data);
-        DB::table('nlsg_mall_sku')->insert($sku_data);
-        DB::table('nlsg_mall_sku_value')->insert($sku_value_data);
-        DB::table('nlsg_mall_picture')->insert($picture_data);
+        dd([$r1, $r2, $r3, $r4]);
+    }
+
+    public function removeMallOrders(){
 
     }
+
 }

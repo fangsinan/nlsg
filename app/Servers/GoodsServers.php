@@ -155,9 +155,17 @@ class GoodsServers
         //如果是编辑,把之前存在,现在没提交的sku_id删除
         if($params['goods_id']){
             $del_sku_id_array = array_column($params['sku_list'],'id');
-            $del_sku_res = DB::table('nlsg_mall_sku')
-                ->whereNotIn('id',$del_sku_id_array)
-                ->update(['status'=>2]);
+            if (empty($del_sku_id_array)){
+                $del_sku_res = DB::table('nlsg_mall_sku')
+                    ->where('goods_id','=',$params['goods_id'])
+                    ->whereNotIn('id',$del_sku_id_array)
+                    ->update(['status'=>2]);
+            }else{
+                $del_sku_res = DB::table('nlsg_mall_sku')
+                    ->where('goods_id','=',$params['goods_id'])
+                    ->update(['status'=>2]);
+            }
+
             if($del_sku_res === false){
                 DB::rollBack();
                 return ['code' => false, 'msg' => '修改sku发生错误'];
