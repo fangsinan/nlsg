@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ConfigModel;
 use App\Models\Coupon;
 use App\Models\UserInvite;
 use Illuminate\Http\Request;
@@ -62,18 +63,33 @@ class AuthController extends Controller
         }
 
         //todo 临时
-        if (($phone != 18624078563 || $phone != 15811570751) && $code != 6666) {
-
+        $dont_check_phone = ConfigModel::getData(35);
+        $dont_check_phone = explode(',',$dont_check_phone);
+        if(in_array($phone,$dont_check_phone)){
+            if ($code !== 6666){
+                return error(400, '验证码错误',$sclass);
+            }
+        }else{
             $res = Redis::get($phone);
             if (!$res) {
                 return error(400, '验证码已过期',$sclass);
             }
-
             if ($code !== $res) {
                 return error(400, '验证码错误',$sclass);
             }
-
         }
+//        if (($phone != 18624078563 || $phone != 15811570751) && $code != 6666) {
+//
+//            $res = Redis::get($phone);
+//            if (!$res) {
+//                return error(400, '验证码已过期',$sclass);
+//            }
+//
+//            if ($code !== $res) {
+//                return error(400, '验证码错误',$sclass);
+//            }
+//
+//        }
 
         //新注册用户发送优惠券
         $model = new Coupon();
