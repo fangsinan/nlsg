@@ -225,10 +225,7 @@ class IndexController extends Controller
      * @apiSuccess {number}  num  数量
      * @apiSuccess {string} list_works
      * @apiSuccess {string} list_works.type   2听书 4讲座
-     * @apiSuccess {string} list_works.lecture 讲座
-     * @apiSuccess {string} list_works.lecture.user 讲座用户
-     * @apiSuccess {string} list_works.listen  听书
-     * @apiSuccess {string} list_works.listen.user  听书用户
+     * @apiSuccess {string} list_works.works  讲座和听书
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK

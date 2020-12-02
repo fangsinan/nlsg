@@ -40,7 +40,7 @@ class Lists extends Model
                             ->where('is_audio_book', 1)
                             ->where('status', 4)
                             ->first();
-                        $v['list_works'][$kk]['listen'] = $listen;
+                        $v['list_works'][$kk]['works'] = $listen;
                     } elseif ($vv['type'] == 4) {
                         $column = Column::select(['id', 'user_id', 'title', 'subtitle', 'cover_pic', 'original_price', 'price', 'message', 'is_free'])
                             ->with(['user' => function ($query) {
@@ -50,7 +50,7 @@ class Lists extends Model
                             ->where('type', 2)
                             ->where('status', 1)
                             ->first();
-                        $v['list_works'][$kk]['lecture'] = $column;
+                        $v['list_works'][$kk]['works'] = $column;
                     }
                 }
             }
