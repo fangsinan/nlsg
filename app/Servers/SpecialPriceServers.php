@@ -209,7 +209,7 @@ class SpecialPriceServers
         //添加
         $add_data = [];
         foreach ($params['list'] as $v) {
-            if (empty($v['sku_price']??0)){
+            if (empty($v['sku_price'] ?? 0)) {
                 continue;
             }
             $temp = [];
@@ -443,6 +443,11 @@ class SpecialPriceServers
         if (!in_array($params['status'] ?? 0, [1, 2])) {
             return ['code' => false, 'msg' => 'status参数错误'];
         }
+
+        if (empty($params['list'] ?? '')) {
+            return ['code' => false, 'msg' => '商品数据不能为空'];
+        }
+
         if (!is_array($params['list'] ?? '')) {
             return ['code' => false, 'msg' => 'list格式错误'];
         }
