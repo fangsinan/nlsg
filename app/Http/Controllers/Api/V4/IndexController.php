@@ -754,6 +754,7 @@ class IndexController extends Controller
      * @apiGroup Index
      *
      * @apiSuccess {string} reason 推荐理由
+     * @apiSuccess {string} relation_id   跳转id
      * @apiSuccess {string} relation_type 1.课程 2.听书 3.专栏 4.讲座
      * @apiSuccess {string} works  课程
      * @apiSuccess {string} works.title    标题
