@@ -257,10 +257,15 @@ class ColumnController extends Controller
             $hisCount = History::getHistoryCount($column_id,1,$user_id);  //讲座
 //            $column['history_count'] = round($hisCount/$column['info_num']*100);
 
+
+
             $column['history_count'] = 0;
             if($column['info_num'] > 0){
                 $column['history_count'] = round($hisCount/$column['info_num']*100);
             }
+            //免费试听的章节
+            $free_trial = WorksInfo::select(['id'])->where(['pid'=>$column['id'], 'status' => 4,'free_trial'=>1])->first();
+            $column['free_trial']  = $free_trial['id'];
 
         }
 
@@ -484,6 +489,11 @@ class ColumnController extends Controller
         if( empty($column) ){
             return $this->error(0,'专栏不存在不能为空');
         }
+
+
+        //免费试听的章节
+        $free_trial = WorksInfo::select(['id'])->where(['pid'=>$column_id, 'status' => 4,'free_trial'=>1])->first();
+        $column['free_trial']  = $free_trial['id'];
 
         $column['twitter_price'] = GetPriceTools::Income(1,2,0,1,$column_id);
 //        $column['black_price']   = GetPriceTools::Income(1,3,0,1,$column_id);

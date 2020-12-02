@@ -462,6 +462,8 @@ class WorksController extends Controller
         $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$works_id,'type'=>2])->first();
 
         $history_data = History::getHistoryData($works_data['id'],4,$user_id);
+        //免费试听的章节
+        $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works_id, 'status' => 4,'free_trial'=>1])->first();
 
         $res = [
             'column_info'  => $column,
@@ -469,7 +471,8 @@ class WorksController extends Controller
             'works_info'   => $info,
             'history_data'   => $history_data,
             'is_sub'         => $is_sub ? 1: 0,
-            'is_collection'  => $isCollect ? 1 : 0
+            'is_collection'  => $isCollect ? 1 : 0,
+            'free_trial'  => $free_trial['id'],
         ];
         return $this->success($res);
     }
