@@ -223,15 +223,9 @@ class IndexController extends Controller
      * @apiSuccess {string} subtitle 副标题
      * @apiSuccess {string} cover 封面
      * @apiSuccess {number}  num  数量
-     * @apiSuccess {string} works 听书作品
-     * @apiSuccess {string} works.works_id 作品id
-     * @apiSuccess {string} works.title  作品标题
-     * @apiSuccess {string} works.cover_img  作品封面
-     * @apiSuccess {string} user  作品用户
-     * @apiSuccess {string} user  作品用户
-     * @apiSuccess {string} user.id  用户id
-     * @apiSuccess {string} user.nickname  用户昵称
-     * @apiSuccess {string} user.headimg   用户头像
+     * @apiSuccess {string} list_works
+     * @apiSuccess {string} list_works.type   2听书 4讲座
+     * @apiSuccess {string} list_works.works  讲座和听书
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
