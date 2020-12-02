@@ -126,10 +126,10 @@ class MallRefundJob
         require_once base_path() . '/vendor/alipay-sdk/aop/AopClient.php';
         require_once base_path() . '/vendor/alipay-sdk/aop/request/AlipayTradeFastpayRefundQueryRequest.php';
         $aop = new \AopClient();
-        $aop->appId = env('ALI_APP_ID');
-        $aop->alipayrsaPublicKey = env('ALI_PUBLIC_KEY');
-        $aop->rsaPrivateKey = env('ALI_PRIVATE_KEY2');
-        $aop->gatewayUrl = env('ALI_PAYMENT_REFUND_CHECK_URL');
+        $aop->appId = config('env.ALI_APP_ID');
+        $aop->alipayrsaPublicKey = config('env.ALI_PUBLIC_KEY');
+        $aop->rsaPrivateKey = config('env.ALI_PRIVATE_KEY2');
+        $aop->gatewayUrl = config('env.ALI_PAYMENT_REFUND_CHECK_URL');
         $aop->apiVersion = '1.0';
         $aop->signType = 'RSA2';
         $aop->postCharset = 'UTF-8';
@@ -371,17 +371,17 @@ class MallRefundJob
         if ($pay_os == 1) {
             //默认格式为PEM，可以注释
             curl_setopt($ch, CURLOPT_SSLCERTTYPE, 'PEM');
-            curl_setopt($ch, CURLOPT_SSLCERT, base_path() . env('WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'));
+            curl_setopt($ch, CURLOPT_SSLCERT, base_path() . config('env.WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'));
             //默认格式为PEM，可以注释
             curl_setopt($ch, CURLOPT_SSLKEYTYPE, 'PEM');
-            curl_setopt($ch, CURLOPT_SSLKEY, base_path() . env('WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'));
+            curl_setopt($ch, CURLOPT_SSLKEY, base_path() . config('env.WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'));
         } elseif ($pay_os == 2) {
             //默认格式为PEM，可以注释
             curl_setopt($ch, CURLOPT_SSLCERTTYPE, 'PEM');
-            curl_setopt($ch, CURLOPT_SSLCERT, base_path() . env('WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'));
+            curl_setopt($ch, CURLOPT_SSLCERT, base_path() . config('env.WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'));
             //默认格式为PEM，可以注释
             curl_setopt($ch, CURLOPT_SSLKEYTYPE, 'PEM');
-            curl_setopt($ch, CURLOPT_SSLKEY, base_path() . env('WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'));
+            curl_setopt($ch, CURLOPT_SSLKEY, base_path() . config('env.WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'));
         } else {
             return false;
         }

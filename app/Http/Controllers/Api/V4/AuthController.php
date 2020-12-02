@@ -268,8 +268,8 @@ class AuthController extends Controller
         }
 
         $res = $this->getRequest('https://api.weixin.qq.com/sns/oauth2/access_token', [
-            'appid' => env('WECHAT_OFFICIAL_ACCOUNT_APPID'),
-            'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET'),
+            'appid' => config('env.WECHAT_OFFICIAL_ACCOUNT_APPID'),
+            'secret' => config('env.WECHAT_OFFICIAL_ACCOUNT_SECRET'),
             'code' => $code,
             'grant_type' => 'authorization_code'
         ]);

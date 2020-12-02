@@ -179,7 +179,7 @@ class User extends Authenticatable implements JWTSubject
         if (!empty($this->attributes['headimg'])){
             return $this->attributes['headimg'];
         }
-        return $this->attributes['headimg'] = env('IMAGES_URL').'image/202009/13f952e04c720a550193e5655534be86.jpg';
+        return $this->attributes['headimg'] = config('env.IMAGES_URL').'image/202009/13f952e04c720a550193e5655534be86.jpg';
     }
 
 }

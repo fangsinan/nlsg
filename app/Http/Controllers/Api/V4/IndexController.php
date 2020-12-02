@@ -872,7 +872,7 @@ class IndexController extends Controller
      *       "code": 200,
      *       "msg" : '成功',
      *       "data":[
-     *             
+     *
      *         ]
      *     }
      *
@@ -954,7 +954,7 @@ class IndexController extends Controller
 
     public function   test()
     {
-        $a = env('JWT_SECRET');
+        $a = config('env.JWT_SECRET');
         echo $a;
     }
 
