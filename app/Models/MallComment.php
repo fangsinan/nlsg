@@ -22,10 +22,11 @@ class MallComment extends Base
         $list = [];
         self::getDataByGidPid($list, $goods_id, $pid, $params['page'], $params['size']);
 
-        $res['count'] = DB::table('nlsg_mall_comment')
-            ->where('goods_id', '=', $goods_id)
-            ->where('pid', '=', 0)
-            ->where('status', '=', 1)
+        $res['count'] = DB::table('nlsg_mall_comment as nmc')
+            ->join('nlsg_user as nu', 'nmc.user_id', '=', 'nu.id')
+            ->where('nmc.goods_id', '=', $goods_id)
+            ->where('nmc.pid', '=', 0)
+            ->where('nmc.status', '=', 1)
             ->count();
         $res['list'] = $list;
 
@@ -128,7 +129,7 @@ class MallComment extends Base
 
         $expire_num = CacheTools::getExpire('mall_comment_list');
         $res = Cache::get($cache_key_name);
-        if (empty($res)) {
+        if (true || empty($res)) {
             $res = self::getListFromDb($params);
             Cache::add($cache_key_name, $res, $expire_num);
         }

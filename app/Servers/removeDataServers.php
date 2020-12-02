@@ -18,27 +18,24 @@ class removeDataServers
         $comment_data = [];
         foreach ($old_comment as $v) {
             $temp_comment = [];
-            $temp_comment['id'] = $v['id'];
-            $temp_comment['user_id'] = $v['id'];
-            $temp_comment['content'] = $v['id'];
-            $temp_comment['picture'] = $v['id'];
-            $temp_comment['order_id'] = $v['id'];
-            $temp_comment['order_detail_id'] = $v['id'];
-            $temp_comment['goods_id'] = $v['id'];
-            $temp_comment['sku_number'] = $v['id'];
-            $temp_comment['star'] = $v['id'];
-            $temp_comment['status'] = $v['id'];
-            $temp_comment['reply_comment'] = $v['id'];
-            $temp_comment['reply_user_id'] = $v['id'];
-            $temp_comment['replied_at'] = $v['id'];
-            $temp_comment['issue_type'] = $v['id'];
-            $temp_comment['rank'] = $v['id'];
-            $temp_comment['pid'] = $v['id'];
+            $temp_comment['id'] = $v->id;
+            $temp_comment['user_id'] = $v->user_id;
+            $temp_comment['content'] = $v->content;
+            $temp_comment['picture'] = $v->picture;
+            $temp_comment['order_id'] = $v->order_id;
+            $temp_comment['order_detail_id'] = $v->order_detail_id;
+            $temp_comment['goods_id'] = $v->goods_id;
+            $temp_comment['sku_number'] = $v->sku_number;
+            $temp_comment['star'] = $v->star;
+            $temp_comment['status'] = $v->status;
+            $temp_comment['reply_comment'] = $v->reply_comment;
+            $temp_comment['reply_user_id'] = $v->reply_user_id;
+            if(!empty($v->reply_time)){
+                $temp_comment['replied_at'] = date('Y-m-d H:i:s');
+            }
+            $temp_comment['issue_type'] = $v->id;
+            $comment_data[] = $temp_comment;
         }
-
-
-        dd($old_comment);
-
 
         $old_picture = DB::connection('mysql_old')
             ->table('nlsg_mall_picture')
@@ -148,6 +145,18 @@ class removeDataServers
         $r2 = DB::table('nlsg_mall_sku' . $copy_flag)->insert($sku_data);
         $r3 = DB::table('nlsg_mall_sku_value' . $copy_flag)->insert($sku_value_data);
         $r4 = DB::table('nlsg_mall_picture' . $copy_flag)->insert($picture_data);
+
+
+//        foreach ($comment_data as $v){
+//            $r5 = DB::table('nlsg_mall_comment')->insertGetId($v);
+//            if (!$r5){
+//                dd([$v,$r5]);
+//            }
+//        }
+
+//        $r5 = DB::table('nlsg_mall_comment')->insert($comment_data);
+
+
 
         dd([$r1, $r2, $r3, $r4]);
     }
