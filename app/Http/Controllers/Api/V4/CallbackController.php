@@ -70,7 +70,7 @@ class CallbackController extends Controller
 
             return $alipay->success();
         } catch (\Exception $e) {
-            Log::debug('Alipay notify', $e->getMessage());
+            Log::debug('Alipay notify', [ $e->getMessage() ]);
             $e->getMessage();
         }
 
