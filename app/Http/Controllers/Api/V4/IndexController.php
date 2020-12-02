@@ -942,8 +942,8 @@ class IndexController extends Controller
     public function  share()
     {
         $config = [
-            'app_id' => env('WECHAT_OFFICIAL_ACCOUNT_APPID'),
-            'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET'),
+            'app_id' => 'wxe24a425adb5102f6',
+            'secret' => '2ded804b74f99ae2f342423dd7952620',
             'response_type' => 'array'
         ];
 
