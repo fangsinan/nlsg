@@ -275,7 +275,7 @@ class ListenBookController extends Controller
                           }])
                           ->where('id', $v['works_id'])
                           ->get()->toArray();
-                       $lists[$k]['works'] = $works;
+                       $lists[$k]['info_data'] = $works;
                 }  elseif ($v['type']==2){
                     $listen = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
                           ->with(['user'=>function($query){
@@ -284,7 +284,7 @@ class ListenBookController extends Controller
                           ->where('id', $v['works_id'])
                           ->where('is_audio_book', 1)
                           ->get()->toArray();
-                       $lists[$k]['listen'] = $listen;
+                       $lists[$k]['info_data'] = $listen;
                 } elseif ($v['type']==3){
                     $column = Column::select(['id','user_id', 'title', 'subtitle', 'cover_pic','original_price','price', 'message','is_free'])
                         ->with(['user'=>function($query){
@@ -293,7 +293,7 @@ class ListenBookController extends Controller
                         ->where('id', $v['works_id'])
                         ->where('type', 1)
                         ->get()->toArray();
-                    $lists[$k]['column'] = $column;
+                    $lists[$k]['info_data'] = $column;
                 } elseif ($v['type']==4 ){
                     $column = Column::select(['id','user_id', 'title', 'subtitle', 'cover_pic','original_price','price', 'message','is_free'])
                          ->with(['user'=>function($query){
@@ -302,7 +302,7 @@ class ListenBookController extends Controller
                          ->where('id', $v['works_id'])
                          ->where('type', 2)
                          ->get()->toArray();
-                    $lists[$k]['column'] = $column;
+                    $lists[$k]['info_data'] = $column;
                 }
             }
         }
