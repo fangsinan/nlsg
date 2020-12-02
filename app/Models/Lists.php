@@ -21,17 +21,38 @@ class Lists extends Model
             return false;
         }
 
-        $lists  = Lists::select('id','title', 'subtitle','cover','num')
-        ->with(['works'=> function($query){
-            $query->select('works_id','user_id','title', 'cover_img','status')
-            ->where('status',4);
-        }, 'works.user'=>function($query){
-            $query->select('id','nickname','headimg');
-        }])->whereIn('id',$ids)
+        $lists  = Lists::with(['listWorks:id,lists_id,type,works_id'])
+            ->select('id','title', 'subtitle','cover','num')
+            ->whereIn('id',$ids)
             ->where('type', $type)
             ->limit(3)
-            ->get();
-        if($lists) $lists = $lists->toArray();
+            ->get()
+            ->toArray();
+        if ($lists){
+            foreach ($lists as &$v) {
+                foreach ($v['list_works'] as  $kk=>&$vv) {
+                    if ($vv['type'] == 2) {
+                        $listen = Works::select(['id', 'user_id', 'type', 'title', 'subtitle', 'cover_img', 'original_price', 'price', 'message', 'is_free'])
+                            ->with(['user' => function ($query) {
+                                $query->select('id', 'nickname', 'headimg');
+                            }])
+                            ->where('id', $vv['works_id'])
+                            ->where('is_audio_book', 1)
+                            ->first();
+                        $v['list_works'][$kk]['listen'] = $listen;
+                    } elseif ($vv['type'] == 4) {
+                        $column = Column::select(['id', 'user_id', 'title', 'subtitle', 'cover_pic', 'original_price', 'price', 'message', 'is_free'])
+                            ->with(['user' => function ($query) {
+                                $query->select('id', 'nickname', 'headimg');
+                            }])
+                            ->where('id', $vv['works_id'])
+                            ->where('type', 2)
+                            ->first();
+                        $v['list_works'][$kk]['lecture'] = $column;
+                    }
+                }
+            }
+        }
         return $lists;
     }
 
