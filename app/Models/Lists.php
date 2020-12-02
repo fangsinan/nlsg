@@ -38,6 +38,7 @@ class Lists extends Model
                             }])
                             ->where('id', $vv['works_id'])
                             ->where('is_audio_book', 1)
+                            ->where('status', 4)
                             ->first();
                         $v['list_works'][$kk]['listen'] = $listen;
                     } elseif ($vv['type'] == 4) {
@@ -47,6 +48,7 @@ class Lists extends Model
                             }])
                             ->where('id', $vv['works_id'])
                             ->where('type', 2)
+                            ->where('status', 1)
                             ->first();
                         $v['list_works'][$kk]['lecture'] = $column;
                     }
