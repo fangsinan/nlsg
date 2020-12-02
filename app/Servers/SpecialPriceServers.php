@@ -533,6 +533,7 @@ class SpecialPriceServers
             return ['code' => false, 'msg' => '错误,请重试'];
         } else {
             DB::commit();
+            CacheServers::clear(1);
             return ['code' => true, 'msg' => '成功'];
         }
 
