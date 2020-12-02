@@ -882,7 +882,8 @@ class UserController extends Controller
      * @apiSuccess {string}  nickname  昵称
      * @apiSuccess {string}  headimg   头像
      * @apiSuccess {number}  phone     手机号
-     * @apiSuccess {number}  level     等级  2推客  3黑钻  4皇钻  5服务商  6幸福大使  7 钻石
+     * @apiSuccess {number}  level     等级  2推客  3黑钻  4皇钻  5服务商
+     * @apiSuccess {number}  is_vip      1幸福大使  2钻石
      * @apiSuccess {number}  is_author   是否是作者 1是 0 否
      * @apiSuccess {string}  notify_num  消息数量 >0 显示
      * @apiSuccess {string}  follow_num  关注数
@@ -918,9 +919,9 @@ class UserController extends Controller
                     ->where('is_default', 1)
                     ->first();
             if ($vip){
-                $lists['level'] =  $vip['level'] ==1 ? 6 : 7;
+                $lists['is_vip'] =  $vip['level'] ==1 ? 1 : 2;
             } else {
-                $lists['level'] =  User::getLevel($uid);
+                $lists['is_vip'] =  0;
             }
 
         }
