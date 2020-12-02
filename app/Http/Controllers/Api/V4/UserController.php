@@ -918,7 +918,11 @@ class UserController extends Controller
                     ->where('status', 1)
                     ->where('is_default', 1)
                     ->first();
-            $lists['is_vip'] =  $vip && $vip['level'] ==1 ? 1 : 2;
+            if ($vip){
+                $lists['is_vip'] =  $vip['level'] ==1 ? 1 : 2;
+            } else {
+                $lists['is_vip'] =  0;
+            }
 
         }
         return success($lists);
