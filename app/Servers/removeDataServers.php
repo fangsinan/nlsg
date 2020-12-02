@@ -11,6 +11,35 @@ class removeDataServers
     {
         $copy_flag = '_copy1';
 
+        $old_comment = DB::connection('mysql_old')
+            ->table('nlsg_mall_comment')
+            ->get()->toArray();
+
+        $comment_data = [];
+        foreach ($old_comment as $v) {
+            $temp_comment = [];
+            $temp_comment['id'] = $v['id'];
+            $temp_comment['user_id'] = $v['id'];
+            $temp_comment['content'] = $v['id'];
+            $temp_comment['picture'] = $v['id'];
+            $temp_comment['order_id'] = $v['id'];
+            $temp_comment['order_detail_id'] = $v['id'];
+            $temp_comment['goods_id'] = $v['id'];
+            $temp_comment['sku_number'] = $v['id'];
+            $temp_comment['star'] = $v['id'];
+            $temp_comment['status'] = $v['id'];
+            $temp_comment['reply_comment'] = $v['id'];
+            $temp_comment['reply_user_id'] = $v['id'];
+            $temp_comment['replied_at'] = $v['id'];
+            $temp_comment['issue_type'] = $v['id'];
+            $temp_comment['rank'] = $v['id'];
+            $temp_comment['pid'] = $v['id'];
+        }
+
+
+        dd($old_comment);
+
+
         $old_picture = DB::connection('mysql_old')
             ->table('nlsg_mall_picture')
             ->where('status', '=', 1)
@@ -123,7 +152,8 @@ class removeDataServers
         dd([$r1, $r2, $r3, $r4]);
     }
 
-    public function removeMallOrders(){
+    public function removeMallOrders()
+    {
 
     }
 

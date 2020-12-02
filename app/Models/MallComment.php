@@ -51,7 +51,7 @@ class MallComment extends Base
                 'nu.level', 'nu.expire_time', 'nmc.content', 'nmc.pid', 'vu.level as vu_level', DB::raw('"" as level_name'),
                 DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(nmc.created_at),\'%Y-%m-%d\') as created_at'),
                 'nmc.goods_id', 'nmc.sku_number', 'nmc.star', 'nmc.reply_comment',
-                'nmc.replyed_at', 'nmc.reply_user_id', 'nmc.picture',
+                'nmc.replied_at', 'nmc.reply_user_id', 'nmc.picture',
                 'na.nickname as reply_nickname', 'sku.id as sku_id']);
 
         $query->where([
