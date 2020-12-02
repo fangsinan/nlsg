@@ -32,18 +32,19 @@ class ActiveGroupGlModel extends Base
             //获取活动板块
             $v->module_list = $this->module_list($v->id);
 
+            $temp_res = [];
             foreach ($v->module_list as $vv) {
                 //获取活动模块商品
                 $vv->goods_list = $gmlModel->goods_list($vv->id);
-                $temp_res = [];
+
                 foreach ($vv->goods_list as $glv) {
                     if (!isset($temp_res[$glv->goods_type])) {
                         $temp_res[$glv->goods_type] = [];
                     }
                     $temp_res[$glv->goods_type][] = $glv->goods_id;
                 }
-                $v->goods_id = $temp_res;
             }
+            $v->goods_id = $temp_res;
         }
         return $list->toArray();
     }
@@ -59,12 +60,12 @@ class ActiveGroupGlModel extends Base
         if ($list === '0') {
             return [];
         } else {
-            if (empty($list)) {
+            if (true || empty($list)) {
                 $list = $this->getListDataFromDb();
                 if (empty($list)) {
                     $list = '0';
                 }
-//                Cache::put($cache_key_name, $list, $expire_num);
+                Cache::put($cache_key_name, $list, $expire_num);
             }
             if ($list === '0') {
                 return [];
@@ -122,6 +123,6 @@ class ActiveGroupGlModel extends Base
     {
         return $this->hasMany('App\Models\ActiveGroupGmlModel', 'aid', 'id')
             ->where('status', '<>', 3)
-            ->select(['id','aid','title','status','rank']);
+            ->select(['id', 'aid', 'title', 'status', 'rank']);
     }
 }
