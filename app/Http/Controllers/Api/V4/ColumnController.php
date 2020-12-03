@@ -265,7 +265,7 @@ class ColumnController extends Controller
             }
             //免费试听的章节
             $free_trial = WorksInfo::select(['id'])->where(['pid'=>$column['id'], 'status' => 4,'free_trial'=>1])->first();
-            $column['free_trial']  = $free_trial['id'];
+            $column['free_trial_id']  = $free_trial['id'] ?? 0;
 
         }
 
@@ -492,8 +492,9 @@ class ColumnController extends Controller
 
 
         //免费试听的章节
-        $free_trial = WorksInfo::select(['id'])->where(['pid'=>$column_id, 'status' => 4,'free_trial'=>1])->first();
-        $column['free_trial']  = $free_trial['id'];
+        $works = Works::select(['id'])->where(['column_id'=>$column_id, 'status' => 4])->first();
+        $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works['id'], 'status' => 4,'free_trial'=>1])->first();
+        $column['free_trial_id']  = $free_trial['id'] ?? 0;
 
         $column['twitter_price'] = GetPriceTools::Income(1,2,0,1,$column_id);
 //        $column['black_price']   = GetPriceTools::Income(1,3,0,1,$column_id);

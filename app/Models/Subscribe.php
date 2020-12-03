@@ -58,9 +58,15 @@ class Subscribe extends Base
             }
 
             $where['relation_id'] = $target_id;
-            $sub_data = Subscribe::where($where)
-                ->where('end_time', '>', date('Y-m-d H:i:s'))
-                ->first();
+            if( in_array($type,[3,5]) ){  //直播永久有效不需 判断end_time
+                $sub_data = Subscribe::where($where)
+                    ->first();
+            }else{
+                $sub_data = Subscribe::where($where)
+                    ->where('end_time', '>', date('Y-m-d H:i:s'))
+                    ->first();
+            }
+
             if( $sub_data ){
                 $is_sub = 1;
             }
