@@ -30,10 +30,11 @@ class removeDataServers
             $temp_comment['status'] = $v->status;
             $temp_comment['reply_comment'] = $v->reply_comment;
             $temp_comment['reply_user_id'] = $v->reply_user_id;
-            if(!empty($v->reply_time)){
+            if (!empty($v->reply_time)) {
                 $temp_comment['replied_at'] = date('Y-m-d H:i:s');
+            } else {
+                $temp_comment['replied_at'] = null;
             }
-            $temp_comment['issue_type'] = $v->id;
             $comment_data[] = $temp_comment;
         }
 
@@ -145,24 +146,68 @@ class removeDataServers
         $r2 = DB::table('nlsg_mall_sku' . $copy_flag)->insert($sku_data);
         $r3 = DB::table('nlsg_mall_sku_value' . $copy_flag)->insert($sku_value_data);
         $r4 = DB::table('nlsg_mall_picture' . $copy_flag)->insert($picture_data);
+        $r5 = DB::table('nlsg_mall_comment' . $copy_flag)->insert($comment_data);
 
-
-//        foreach ($comment_data as $v){
-//            $r5 = DB::table('nlsg_mall_comment')->insertGetId($v);
-//            if (!$r5){
-//                dd([$v,$r5]);
-//            }
-//        }
-
-//        $r5 = DB::table('nlsg_mall_comment')->insert($comment_data);
-
-
-
-        dd([$r1, $r2, $r3, $r4]);
+        dd([$r1, $r2, $r3, $r4, $r5]);
     }
 
     public function removeMallOrders()
     {
+        $old_order = DB::connection('mysql_old')
+            ->table('nlsg_mall_order')
+            ->get()->toArray();
+        dd($old_order);
+        $order_data = [];
+        foreach ($old_order as $v) {
+            $temp_order = [];
+            $temp_order['id'] = $v->id;
+            $temp_order['ordernum'] = $v->id;
+            $temp_order['user_id'] = $v->id;
+            $temp_order['order_type'] = $v->id;
+            $temp_order['status'] = $v->id;
+            $temp_order['cost_price'] = $v->id;
+            $temp_order['freight'] = $v->id;
+            $temp_order['vip_cut'] = $v->id;
+            $temp_order['coupon_id'] = $v->id;
+            $temp_order['coupon_money'] = $v->id;
+            $temp_order['coupon_freight_id'] = $v->id;
+            $temp_order['special_price_cut'] = $v->id;
+            $temp_order['price'] = $v->id;
+            $temp_order['pay_price'] = $v->id;
+            $temp_order['pay_time'] = $v->id;
+            $temp_order['pay_type'] = $v->id;
+            $temp_order['os_type'] = $v->id;
+            $temp_order['messages'] = $v->id;
+            $temp_order['remark'] = $v->id;
+            $temp_order['post_type'] = $v->id;
+            $temp_order['address_id'] = $v->id;
+            $temp_order['address_history'] = $v->id;
+            $temp_order['bill_type'] = $v->id;
+            $temp_order['bill_title'] = $v->id;
+            $temp_order['bill_number'] = $v->id;
+            $temp_order['bill_format'] = $v->id;
+            $temp_order['active_flag'] = $v->id;
+            $temp_order['created_at'] = $v->id;
+            $temp_order['updated_at'] = $v->id;
+            $temp_order['is_stop'] = $v->id;
+            $temp_order['stop_at'] = $v->id;
+            $temp_order['stop_by'] = $v->id;
+            $temp_order['stop_reason'] = $v->id;
+            $temp_order['is_del'] = $v->id;
+            $temp_order['del_at'] = $v->id;
+            $temp_order['sp_id'] = $v->id;
+            $temp_order['dead_time'] = $v->id;
+            $temp_order['receipt_at'] = $v->id;
+            $temp_order['live_id'] = $v->id;
+            $temp_order['live_info_id'] = $v->id;
+
+            $order_data[] = $temp_order;
+        }
+
+//        $old_details = DB::connection('mysql_old')
+//            ->table('nlsg_mall_order_detail')
+//            ->get()->toArray();
+
 
     }
 
