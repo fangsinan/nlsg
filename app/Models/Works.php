@@ -68,15 +68,17 @@ class Works extends Base
     {
         $worksObj = new Works();
         $infoObj = new WorksInfo();
+        $userObj = new User();
         $res = DB::table($worksObj->getTable(), 'works')
             ->leftJoin($infoObj->getTable() . ' as info', 'works.id', '=', 'info.pid')
-            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle')
+            ->leftJoin($userObj->getTable() . ' as user', 'works.user_id', '=', 'user.id')
+            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle','user.nickname')
             ->where('works.status', 4)
             ->where('works.is_audio_book', $is_audio_book)
             ->where('info.status', 4)
             ->where(function ($query) use ($keywords) {
                 $query->orwhere('works.title', 'like', "%{$keywords}%");
-                $query->orwhere('info.title', 'like', "%{$keywords}%");
+//                $query->orwhere('info.title', 'like', "%{$keywords}%");
             })->groupBy('works.id')->paginate(10)->toArray();
         //->get();
         return ['res' => $res['data'], 'count'=> $res['total'] ];
