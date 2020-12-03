@@ -153,61 +153,136 @@ class removeDataServers
 
     public function removeMallOrders()
     {
+        $now_date = date('Y-m-d H:i:s');
         $old_order = DB::connection('mysql_old')
             ->table('nlsg_mall_order')
             ->get()->toArray();
-        dd($old_order);
         $order_data = [];
         foreach ($old_order as $v) {
             $temp_order = [];
             $temp_order['id'] = $v->id;
-            $temp_order['ordernum'] = $v->id;
-            $temp_order['user_id'] = $v->id;
-            $temp_order['order_type'] = $v->id;
-            $temp_order['status'] = $v->id;
-            $temp_order['cost_price'] = $v->id;
-            $temp_order['freight'] = $v->id;
-            $temp_order['vip_cut'] = $v->id;
-            $temp_order['coupon_id'] = $v->id;
-            $temp_order['coupon_money'] = $v->id;
-            $temp_order['coupon_freight_id'] = $v->id;
-            $temp_order['special_price_cut'] = $v->id;
-            $temp_order['price'] = $v->id;
-            $temp_order['pay_price'] = $v->id;
-            $temp_order['pay_time'] = $v->id;
-            $temp_order['pay_type'] = $v->id;
-            $temp_order['os_type'] = $v->id;
-            $temp_order['messages'] = $v->id;
-            $temp_order['remark'] = $v->id;
-            $temp_order['post_type'] = $v->id;
-            $temp_order['address_id'] = $v->id;
-            $temp_order['address_history'] = $v->id;
-            $temp_order['bill_type'] = $v->id;
-            $temp_order['bill_title'] = $v->id;
-            $temp_order['bill_number'] = $v->id;
-            $temp_order['bill_format'] = $v->id;
-            $temp_order['active_flag'] = $v->id;
-            $temp_order['created_at'] = $v->id;
-            $temp_order['updated_at'] = $v->id;
-            $temp_order['is_stop'] = $v->id;
-            $temp_order['stop_at'] = $v->id;
-            $temp_order['stop_by'] = $v->id;
-            $temp_order['stop_reason'] = $v->id;
-            $temp_order['is_del'] = $v->id;
-            $temp_order['del_at'] = $v->id;
-            $temp_order['sp_id'] = $v->id;
-            $temp_order['dead_time'] = $v->id;
-            $temp_order['receipt_at'] = $v->id;
-            $temp_order['live_id'] = $v->id;
-            $temp_order['live_info_id'] = $v->id;
-
+            $temp_order['ordernum'] = $v->ordernum;
+            $temp_order['user_id'] = $v->user_id;
+            $temp_order['order_type'] = 1;
+            $temp_order['status'] = $v->status;
+            $temp_order['cost_price'] = $v->cost_price;
+            $temp_order['freight'] = $v->freight;
+            $temp_order['vip_cut'] = $v->vip_cut;
+            $temp_order['coupon_id'] = $v->coupon_id;
+            $temp_order['coupon_money'] = $v->coupon_money;
+            $temp_order['coupon_freight_id'] = 0;
+            $temp_order['special_price_cut'] = $v->special_price_cut;
+            $temp_order['price'] = $v->price;
+            $temp_order['pay_price'] = $v->pay_price;
+            if (!empty($v->pay_time)) {
+                $temp_order['pay_time'] = date('Y-m-d H:i:s', $v->pay_time);
+            } else {
+                $temp_order['pay_time'] = null;
+            }
+            $temp_order['pay_type'] = $v->pay_type;
+            $temp_order['os_type'] = $v->os_type;
+            $temp_order['messages'] = $v->messages;
+            $temp_order['remark'] = $v->remark;
+            if ($v->address_method) {
+                $temp_order['post_type'] = 2;
+            } else {
+                $temp_order['post_type'] = 1;
+            }
+            $temp_order['address_id'] = 0;
+            $temp_order['address_history'] = json_encode([
+                'id' => 0,
+                "name" => $v->address_name,
+                "phone" => $v->address_phone,
+                "details" => $v->address_detail,
+                "is_default" => 0,
+                "province" => 0,
+                "city" => 0,
+                "area" => 0,
+                "province_name" => $v->address_province,
+                "city_name" => $v->address_city,
+                "area_name" => $v->address_county,
+            ]);
+            $temp_order['bill_type'] = $v->bill_title_type;
+            $temp_order['bill_title'] = $v->bill_title;
+            $temp_order['bill_number'] = $v->bill_number;
+            $temp_order['bill_format'] = $v->bill_format;
+            $temp_order['active_flag'] = $v->active_flag;
+            $temp_order['created_at'] = date('Y-m-d H:i:s', $v->ctime);
+            $temp_order['updated_at'] = $now_date;
+            $temp_order['is_stop'] = $v->is_stop;
+            $temp_order['stop_by'] = $v->stop_by;
+            if (!empty($v->stop_at)) {
+                $temp_order['stop_at'] = date('Y-m-d H:i:s', $v->stop_at);
+            } else {
+                $temp_order['stop_at'] = null;
+            }
+            $temp_order['stop_reason'] = $v->stop_reason;
+            $temp_order['is_del'] = $v->is_del;
+            if (!empty($v->del_at)) {
+                $temp_order['del_at'] = date('Y-m-d H:i:s', $v->del_at);
+            } else {
+                $temp_order['del_at'] = null;
+            }
+            if (!empty($v->receive_goods_time)) {
+                $temp_order['receipt_at'] = date('Y-m-d H:i:s', $v->receive_goods_time);
+            } else {
+                $temp_order['receipt_at'] = null;
+            }
             $order_data[] = $temp_order;
         }
 
-//        $old_details = DB::connection('mysql_old')
-//            ->table('nlsg_mall_order_detail')
-//            ->get()->toArray();
 
+        $old_details = DB::connection('mysql_old')
+            ->table('nlsg_mall_order_detail')
+            ->get()->toArray();
+        $details_data = [];
+        foreach ($old_details as $v) {
+            $temp_details = [];
+            $temp_details['id'] = $v->id;
+            $temp_details['order_id'] = $v->order_id;
+            $temp_details['order_child_id'] = $v->order_child_id;
+            $temp_details['user_id'] = $v->user_id;
+            $temp_details['status'] = $v->status;
+            $temp_details['goods_id'] = $v->goods_id;
+            $temp_details['sku_number'] = $v->sku_number;
+            $temp_details['num'] = $v->num;
+            $temp_details['after_sale_used_num'] = 0;
+            $temp_details['comment_id'] = $v->comment_id;
+            $temp_details['inviter'] = $v->twitter_id;
+            $temp_details['created_at'] = date('Y-m-d H:i:s', $v->ctime);
+            $temp_details['updated_at'] = $now_date;
+            $temp_details['t_money'] = 0;
+            $temp_details['special_price_type'] = 0;
+            $temp_details['inviter_history'] = '';
+            $temp_check_sku = DB::connection('mysql_old')
+                ->table('nlsg_mall_sku')
+                ->where('sku_number', '=', $v->sku_number)
+                ->first();
+
+            $sku_json = json_decode($v->sku_json);
+            $temp_sku_json = [];
+
+            if (is_array($sku_json)){
+                foreach ($sku_json as $kk => $vv) {
+                    $t = new class {
+                    };
+                    $v->key_name = $kk;
+                    $v->value_name = $vv;
+                    $temp_sku_json[] = $t;
+                }
+            }
+
+            $temp_details['sku_history'] = json_encode([
+                'actual_num' => $v->num??0,
+                'actual_price' => $temp_check_sku->price??0,
+                'original_price' => $temp_check_sku->original_price??0,
+                'sku_value' => $temp_sku_json,
+                'stock' => $temp_check_sku->stock??0,
+            ]);
+            $details_data[] = $temp_details;
+        }
+
+        dd($details_data);
 
     }
 

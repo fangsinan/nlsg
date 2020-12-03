@@ -173,7 +173,7 @@ class ShoppingCart extends Base
         $invalid_list = [];
 
         foreach ($cart as $cv) {
-            if ($cv['invalid'] == 1) {
+            if (($cv['invalid'] ?? 0) == 1) {
                 $invalid_list[] = $cv;
             } else {
                 $list[] = $cv;
