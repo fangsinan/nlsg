@@ -813,7 +813,7 @@ class WorksController extends Controller
             $result = $model->getIndexWorks([$relation_id]);
         }
 
-        if(empty($result['is_free']) || $result['is_free'] == 0 ){
+        if(empty($result[0]['is_free']) || $result[0]['is_free'] == 0 ){
             return $this->success();
         }
 
