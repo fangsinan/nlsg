@@ -31,7 +31,7 @@ class Works extends Base
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexWorks($ids, $is_audio_book = 0, $user_id = 0)
+    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0)
     {
         if (!$ids) {
             return false;

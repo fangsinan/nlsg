@@ -801,6 +801,22 @@ class WorksController extends Controller
         $sub_type = $request->input('sub_type',0);
         $user_id = $this->user['id'] ?? 0;
 
+
+
+        //校验是否免费
+        if($sub_type == 1 || $sub_type ==6){
+            $model = new Column();
+            $result = $model->getIndexColumn([$relation_id]);
+        }
+        if($sub_type == 2){
+            $model = new Works();
+            $result = $model->getIndexWorks([$relation_id]);
+        }
+
+        if(empty($result['is_free']) || $result['is_free'] == 0 ){
+            return $this->success();
+        }
+
         $starttime = strtotime(date('Y-m-d', time()));
         $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
 
