@@ -29,11 +29,11 @@ class Controller extends BaseController
         }
     }
 
-    protected function success($data = [], $flag = 0)
+    protected function success($data = [], $flag = 0, $msg = '成功')
     {
         $result = [
             'code' => 200,
-            'msg' => '成功',
+            'msg' => $msg,
             'now' => time(),
             'data' => $data
         ];
@@ -61,7 +61,13 @@ class Controller extends BaseController
             $temp->msg = $data['msg'];
             return $this->error(0, $data['msg'] . $ps, $temp);
         } else {
-            return $this->success($data);
+            $msg = '成功';
+            if (is_array($data) && !empty($data['msg'] ?? '')) {
+                $msg = $data['msg'];
+            } elseif (is_object($data) && !empty($data->msg ?? '')) {
+                $msg = $data->msg;
+            }
+            return $this->success($data, 0, $msg);
         }
     }
 }
