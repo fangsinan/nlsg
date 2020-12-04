@@ -832,6 +832,12 @@ class WorksController extends Controller
         ];
         Subscribe::firstOrCreate($subscribe);
 
+        if($sub_type == 1 || $sub_type ==6){
+            Column::where(['id' => $relation_id])->increment('subscribe_num');
+        }else if($sub_type == 2){
+            Works::where(['id' => $relation_id])->increment('subscribe_num', 1);
+        }
+
         return $this->success();
     }
 
