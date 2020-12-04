@@ -19,7 +19,7 @@ class Click extends Base
 
         $model->type = $params['type'];
         $model->user_id = $user['id']??0;
-        $model->cpid = $params['cpid'];
+        $model->cpid = $params['wid'];
         $model->flag = $params['flag']??'';
         $model->ip = $ip;
         $res = $model->save();
