@@ -260,7 +260,8 @@ class Works extends Base
     public function cytxClick(){
         return $this->hasOne(Click::class,'cpid','works_id')
             ->where('flag','=','cytx')
-            ->count();
+            ->groupBy('cpid')
+            ->select([DB::raw('count(1) as counts'),'cpid']);
     }
 
     public function listForCytx($params)
@@ -269,7 +270,7 @@ class Works extends Base
         $list = Works::where('for_cytx', '=', 1)
             ->with(['columnInfo', 'user' => function ($query) {
                 $query->select('id', 'nickname', 'intro');
-            }])
+            },'cytxClick'])
             ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
                 'detail_img', 'cytx_price as price', 'column_id', 'user_id','view_num'])
             ->get();
