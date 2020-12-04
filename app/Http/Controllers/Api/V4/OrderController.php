@@ -246,6 +246,7 @@ class OrderController extends Controller
 
         if ($activity_tag == 'cytx') {
             $price = $works_data->cytx_price;
+            //todo 校验用户本月是否能继续花钱
             $coupon_id = 0;
         } else {
             //优惠券
