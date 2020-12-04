@@ -257,6 +257,12 @@ class Works extends Base
             ->select(['id', 'type', 'column_type', 'subtitle', 'title']);
     }
 
+    public function cytxClick(){
+        return $this->hasOne(Click::class,'cpid','works_id')
+            ->where('flag','=','cytx')
+            ->count();
+    }
+
     public function listForCytx($params)
     {
         $banner = 'https://wechat.nlsgapp.com/static/img/zhibo-ditu@2x.06e5e95.png';
