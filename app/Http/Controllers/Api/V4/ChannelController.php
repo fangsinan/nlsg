@@ -57,9 +57,9 @@ class ChannelController extends Controller
                 $data['nickname'] = $request->input('user_name', '');
                 $data['headimg'] = $request->input('avatar', '');
                 $data['ref'] = 1;
-                $sign = $request->input('sign','');
-                $check_sign = md5($data['phone'].'cytx');
-                if ($sign !== $check_sign){
+                $sign = $request->input('sign', '');
+                $check_sign = md5($data['phone'] . 'cytx');
+                if ($sign !== $check_sign) {
                     return $this->getRes(['code' => false, 'msg' => '签名失败']);
                 }
                 break;
@@ -86,8 +86,8 @@ class ChannelController extends Controller
         $data = [
             'user_id' => $user->id,
             'token' => $token,
-            'url'=>$url,
-            'type'=>$request->input('type',''),
+            'url' => $url,
+            'type' => $request->input('type', ''),
         ];
 
         return $this->getRes($data);
