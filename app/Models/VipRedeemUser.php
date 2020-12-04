@@ -74,8 +74,7 @@ class VipRedeemUser extends Base
             ->get();
 
         if ($list->isEmpty()) {
-            $list = new class {
-            };
+            $list = [];
         } else {
             if (!empty($params['id'] ?? 0)) {
                 foreach ($list as $v) {
