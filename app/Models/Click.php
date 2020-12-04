@@ -13,13 +13,13 @@ class Click extends Base
         if (empty($params['type']??0) || !in_array($params['type'],[1,2,3,4])){
             return ['code'=>false,'msg'=>'参数错误'];
         }
-        if (empty($params['cpid']??0)){
+        if (empty($params['wid']??0)){
             return ['code'=>false,'msg'=>'参数错误'];
         }
 
         $model->type = $params['type'];
         $model->user_id = $user['id']??0;
-        $model->cpid = $params['cpid'];
+        $model->cpid = $params['wid'];
         $model->flag = $params['flag']??'';
         $model->ip = $ip;
         $res = $model->save();

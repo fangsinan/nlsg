@@ -182,4 +182,22 @@ class User extends Authenticatable implements JWTSubject
         return $this->attributes['headimg'] = config('env.IMAGES_URL').'image/202009/13f952e04c720a550193e5655534be86.jpg';
     }
 
+    public function channelLogin($data){
+        $check = self::where('phone','=',$data['phone'])->first();
+        if($check){
+            return $check;
+        }else{
+            $model = new self();
+            $model->phone = $data['phone'];
+            $model->nickname = $data['nickname'];
+            $model->headimg = $data['headimg'];
+            $model->ref = $data['ref'];
+            $res = $model->save();
+            if ($res){
+                return $model;
+            }else{
+                return ['code'=>false,'msg'=>'请重试'];
+            }
+        }
+    }
 }
