@@ -291,7 +291,7 @@ class WorksController extends Controller
             $column = Column::find($val['column_id']);
             $worksData['data'][$key]['column_title'] = $column['title'] ?? '';
 
-            $newWorks[$key] = $worksData['data'][$key];
+            $newWorks[$key]['works'] = $worksData['data'][$key];
 
         }
         $res = [
