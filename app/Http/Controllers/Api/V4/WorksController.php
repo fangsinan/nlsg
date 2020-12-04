@@ -226,64 +226,72 @@ class WorksController extends Controller
         $where = [];
         $newWorks = [];
         if($category_id){
-            $where = ['category_id'=>$category_id];
+            $where = ['relation.category_id'=>$category_id];
         }
 
 
 
-        $works_where['status'] =4;
-        if( $teacher_id )   { $works_where['user_id'] = $teacher_id;}
-        if( $is_free )      { $works_where['is_free'] = $is_free;   }
+        $where['works.status'] =4;
+        if( $teacher_id )   { $where['works.user_id'] = $teacher_id;}
+        if( $is_free )      { $where['works.is_free'] = $is_free;   }
 
         if($is_audio_book != 0){
             //  0全部  1 听书 2课程
             $is_audio_book_arr = ['1' => 1, '2' => 0,];
-            $works_where['is_audio_book'] = $is_audio_book_arr[$is_audio_book];
+            $where['works.is_audio_book'] = $is_audio_book_arr[$is_audio_book];
         }
 
-//        $worksData = WorksCategoryRelation::with([
-//            'works' =>function($query) use($order_str,$works_where){
-//                $query->where($works_where)->select("*")
-//                    ->orderBy($order_str,'desc')->groupBy('id');
-//            }])->select()->where($where)
-//            ->paginate($this->page_per_page)->toArray();
 
-        $worksData = WorksCategoryRelation::with(['works' => function($query) use($order_str){
-            $query->select("*")->orderBy($order_str,'desc')->groupBy('id');
-        }])->whereHas('works', function ($query) use ($works_where){
-                 $query->where($works_where);
-        })->select("*")->where($where)->groupBy('work_id')
-        ->paginate($this->page_per_page)->toArray();
+//        $worksData = WorksCategoryRelation::with(['works' => function($query) use($order_str){
+//            $query->select("*")->orderBy($order_str,'desc')->groupBy('id');
+//        }])->whereHas('works', function ($query) use ($works_where){
+//                 $query->where($works_where);
+//        })->select("*")->where($where)->orderBy('works.'.$order_str,'desc')->groupBy('work_id')
+//        ->paginate($this->page_per_page)->toArray();
+
+        $relationObj = new WorksCategoryRelation();
+        $worksObj = new Works();
+        $worksData = DB::table($relationObj->getTable(), ' relation')
+            ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
+//            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle',)
+            ->select('works.*')
+            ->where($where)
+            ->orderBy('works.'.$order_str,'desc')
+            ->groupBy('works.id')->paginate($this->page_per_page)->toArray();
 
 
 
-
+//        $worksData['data'] = $worksData->all()->toArray();
         $time =Config('web.is_new_time');
-        foreach ($worksData['data'] as $key=>$val){
-            $is_sub = Subscribe::isSubscribe($user_id,$val['works']['id'],2);
+        foreach ($worksData['data'] as $key=>&$val){
+            $val = (array)$val;
+
+
+            $is_sub = Subscribe::isSubscribe($user_id,$val['id'],2);
             if($hide == 1){
                 if($is_sub == 1){
                     unset($worksData['data'][$key]);
                     continue;
                 }
             }
-            $worksData['data'][$key]['works']['is_sub'] = $is_sub;
+            $worksData['data'][$key]['is_sub'] = $is_sub ?? 0;
 
             $is_new = 0;
-            if($val['works']['works_update_time'] > $time){
+            if($val['works_update_time'] > $time){
                 $is_new = 1;
             }
-            $worksData['data'][$key]['works']['is_new'] = $is_new;
+            $worksData['data'][$key]['is_new'] = $is_new ?? 0;
 
 
             //讲师名称
-            $user = User::find($val['works']['user_id']);
-            $worksData['data'][$key]['works']['username'] = $user['nickname'];
-            //专栏头衔
-            $column = Column::find($val['works']['column_id']);
-            $worksData['data'][$key]['works']['column_title'] = $column['title'];
+            $user = User::find($val['user_id']);
+            $worksData['data'][$key]['username'] = $user['nickname'] ?? '';
 
-            $newWorks[] = $worksData['data'][$key];
+            //专栏头衔
+            $column = Column::find($val['column_id']);
+            $worksData['data'][$key]['column_title'] = $column['title'] ?? '';
+
+            $newWorks[$key] = $worksData['data'][$key];
 
         }
         $res = [
