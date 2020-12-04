@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Click;
+use App\Models\Order;
 use App\Models\User;
 use App\Models\Works;
 use Illuminate\Http\Request;
@@ -58,7 +59,7 @@ class ChannelController extends Controller
                 $data['headimg'] = $request->input('avatar', '');
                 $data['ref'] = 1;
                 $sign = $request->input('sign', '');
-                $check_sign = md5($data['phone'] . 'cytx');
+                $check_sign = md5($data['phone'] . 'cytxnlsg_v4');
                 if ($sign !== $check_sign) {
                     return $this->getRes(['code' => false, 'msg' => '签名失败']);
                 }
