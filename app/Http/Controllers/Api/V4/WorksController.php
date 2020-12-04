@@ -253,8 +253,10 @@ class WorksController extends Controller
         $worksObj = new Works();
         $worksData = DB::table($relationObj->getTable(), ' relation')
             ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
-//            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle',)
-            ->select('works.*')
+            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle',
+                'works.works_update_time','works.detail_img','works.content','relation.id as relation_id','relation.category_id','relation.work_id',
+                'works.column_id')
+//            ->select('works.*')
             ->where($where)
             ->orderBy('works.'.$order_str,'desc')
             ->groupBy('works.id')->paginate($this->page_per_page)->toArray();
@@ -291,6 +293,9 @@ class WorksController extends Controller
             $column = Column::find($val['column_id']);
             $worksData['data'][$key]['column_title'] = $column['title'] ?? '';
 
+            $newWorks[$key]['id'] = $val['relation_id'];
+            $newWorks[$key]['work_id'] = $val['work_id'];
+            $newWorks[$key]['category_id'] = $val['category_id'];
             $newWorks[$key]['works'] = $worksData['data'][$key];
 
         }
