@@ -14,7 +14,7 @@ class Works extends Base
     public $timestamps = false;
 
     protected $fillable = [
-       'title', 'cover_img', 'detial_img', 'user_id', 'original_price', 'price', 'is_end','status','timing_online','content'
+        'title', 'cover_img', 'detial_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content'
     ];
 
     //状态 1上架  2 下架
@@ -72,7 +72,7 @@ class Works extends Base
         $res = DB::table($worksObj->getTable(), 'works')
             ->leftJoin($infoObj->getTable() . ' as info', 'works.id', '=', 'info.pid')
             ->leftJoin($userObj->getTable() . ' as user', 'works.user_id', '=', 'user.id')
-            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle','user.nickname')
+            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle', 'user.nickname')
             ->where('works.status', 4)
             ->where('works.is_audio_book', $is_audio_book)
             ->where('info.status', 4)
@@ -81,7 +81,7 @@ class Works extends Base
 //                $query->orwhere('info.title', 'like', "%{$keywords}%");
             })->groupBy('works.id')->paginate(10)->toArray();
         //->get();
-        return ['res' => $res['data'], 'count'=> $res['total'] ];
+        return ['res' => $res['data'], 'count' => $res['total']];
         return ['res' => $res, 'count' => $res->count()];
 
     }
@@ -91,7 +91,7 @@ class Works extends Base
      * @param $id
      * @return bool
      */
-    public function getRecommendWorks($id, $user_id=0)
+    public function getRecommendWorks($id, $user_id = 0)
     {
         if (!$id) {
             return false;
@@ -109,8 +109,8 @@ class Works extends Base
             ->where('id', $id)
             ->where(['type' => 2, 'status' => 4])
             ->first();
-        $is_sub = Subscribe::isSubscribe($user_id,$id,2);
-        $list['is_sub']   = $is_sub ? 1 : 0;
+        $is_sub = Subscribe::isSubscribe($user_id, $id, 2);
+        $list['is_sub'] = $is_sub ? 1 : 0;
         if ($list['workInfo']) {
             $now = date('Y-m-d', time());
             foreach ($list['workInfo'] as &$v) {
@@ -129,19 +129,19 @@ class Works extends Base
      * 免费专区
      * @return array
      */
-    public function getFreeWorks($uid =0)
+    public function getFreeWorks($uid = 0)
     {
         $works = Works::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id','is_free', 'title', 'subtitle', 'cover_img', 'chapter_num')
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 0)
             ->limit(5)
             ->get();
         if ($works) {
             foreach ($works as &$v) {
-                if ($uid){
+                if ($uid) {
                     $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);
                 }
                 $v['is_new'] = 1;
@@ -151,37 +151,37 @@ class Works extends Base
         $book = Works::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id','is_free','title', 'subtitle', 'cover_img', 'chapter_num')
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 1)
             ->limit(5)
             ->get();
         if ($book) {
             foreach ($book as &$v) {
-                if ($uid){
-                   $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
+                if ($uid) {
+                    $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
                 }
                 $v['is_new'] = 1;
             }
         }
 
         $lecture = Column::with(['user' => function ($query) {
-                   $query->select('id', 'nickname');
-               }])
-                   ->select('id', 'user_id','is_free','title', 'subtitle', 'cover_pic', 'details_pic')
-                   ->where('type', 2)
-                   ->limit(5)
-                   ->get();
-               if ($book) {
-                   foreach ($book as &$v) {
-                       if ($uid){
-                          $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
-                       }
-                       $v['is_new'] = 1;
-                   }
-               }
+            $query->select('id', 'nickname');
+        }])
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_pic', 'details_pic')
+            ->where('type', 2)
+            ->limit(5)
+            ->get();
+        if ($book) {
+            foreach ($book as &$v) {
+                if ($uid) {
+                    $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
+                }
+                $v['is_new'] = 1;
+            }
+        }
 
-        return ['works' => $works, 'book' => $book,'lecture'=>$lecture];
+        return ['works' => $works, 'book' => $book, 'lecture' => $lecture];
 
     }
 
@@ -228,7 +228,7 @@ class Works extends Base
             ->with(['categoryRelation', 'categoryRelation.categoryName' => function ($query) {
                 $query->select(['id', 'name']);
             }, 'columnInfo', 'user' => function ($query) {
-                $query->select('id', 'nickname','intro');
+                $query->select('id', 'nickname', 'intro');
             }])
             ->select(['id', 'type as works_type', 'title', 'subtitle', 'cover_img',
                 'detail_img', 'price', 'column_id', 'user_id']);
@@ -254,19 +254,31 @@ class Works extends Base
     public function columnInfo()
     {
         return $this->hasOne(Column::class, 'id', 'column_id')
-            ->select(['id', 'type', 'column_type','subtitle','title']);
+            ->select(['id', 'type', 'column_type', 'subtitle', 'title']);
     }
 
     public function listForCytx($params)
     {
-
-        return Works::where('for_cytx', '=', 1)
+        $banner = 'https://wechat.nlsgapp.com/static/img/zhibo-ditu@2x.06e5e95.png';
+        $list = Works::where('for_cytx', '=', 1)
             ->with(['columnInfo', 'user' => function ($query) {
-                $query->select('id', 'nickname','intro');
+                $query->select('id', 'nickname', 'intro');
             }])
             ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
-                'detail_img', 'cytx_price as price', 'column_id', 'user_id'])
+                'detail_img', 'cytx_price as price', 'column_id', 'user_id','view_num'])
             ->get();
+        foreach ($list as $v){
+            if($v->view_num >= 10000){
+                $leftNumber = floor($v['view_num'] / 10000);
+                $rightNumber = round(($v['view_num'] % 10000) / 10000, 2);
+                $v->view_num = floatval($leftNumber + $rightNumber) . '万';
+            }
+        }
+
+        return [
+            'banner' => $banner,
+            'list' => $list,
+        ];
     }
 
 }

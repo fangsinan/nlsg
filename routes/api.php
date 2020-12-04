@@ -120,6 +120,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     //创业天下
     Route::get('channel/cytx', 'ChannelController@cytx');
+    Route::post('channel/click', 'ChannelController@click');
 
     //想法
     Route::get('comment/list', 'CommentController@index');
