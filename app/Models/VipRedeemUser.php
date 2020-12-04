@@ -15,7 +15,10 @@ class VipRedeemUser extends Base
     public function list($user, $params)
     {
         if (empty($user['new_vip']['level'] ?? 0)) {
-            return [];
+            $res['statistics'] = new class{};
+            $res['count'] = new class{};
+            $res['list'] = [];
+            return $res;
         }
         $page = intval($params['page'] ?? 1);
         $size = intval($params['size'] ?? 10);
