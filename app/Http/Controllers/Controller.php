@@ -62,9 +62,9 @@ class Controller extends BaseController
             return $this->error(0, $data['msg'] . $ps, $temp);
         } else {
             $msg = '成功';
-            if (is_array($data) && isset($data['msg']) && !empty($data['msg'] ?? '')) {
+            if (is_array($data) && isset($data['msg']) && !empty($data['msg'])) {
                 $msg = $data['msg'];
-            } elseif (is_object($data) && isset($data->msg) && !empty($data->msg ?? '')) {
+            } elseif (is_object($data) && isset($data->msg) && !empty($data->msg)) {
                 $msg = $data->msg;
             }
             return $this->success($data, 0, $msg);
