@@ -22,5 +22,11 @@ class Click extends Base
         $model->cpid = $params['cpid'];
         $model->flag = $params['flag']??'';
         $model->ip = $ip;
+        $res = $model->save();
+        if ($res){
+            return ['code'=>true,'msg'=>'成功'];
+        }else{
+            return ['code'=>false,'msg'=>'失败'];
+        }
     }
 }

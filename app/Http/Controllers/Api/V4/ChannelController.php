@@ -28,9 +28,19 @@ class ChannelController extends Controller
     }
 
 
+    /**
+     * 点击统计
+     * @api {get} /api/v4/channel/click 点击统计
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/channel/click
+     * @apiGroup  创业天下
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/channel/click
+     * @apiDescription 点击统计
+     * @apiParam {number=1,2,3,4} type(1：专栏  2：商品  3：精品课 4: banner)
+     * @apiParam {number} cpid 作品id
+     * @apiParam {string} flag(cytx)
+     * */
     public function click(Request $request){
-        $ip = Request::createFromGlobals()->getClientIp();
-        dd($ip);
         $model = new Click();
         $data = $model->add($request->input(),$this->user,$request->ip());
         return $this->getRes($data);
