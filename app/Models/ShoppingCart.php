@@ -108,12 +108,12 @@ class ShoppingCart extends Base
 
         if ($is_one) {
             if ($res === false) {
-                return ['code' => false, 'msg' => '失败'];
+                return ['code' => false, 'msg' => '加入购物车失败'];
             } else {
-                return ['code' => true, 'msg' => '成功'];
+                return ['code' => true, 'msg' => '加入购物车成功'];
             }
         } else {
-            return ['code' => true, 'msg' => '成功'];
+            return ['code' => true, 'msg' => '加入购物车成功'];
         }
     }
 

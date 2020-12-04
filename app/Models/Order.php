@@ -9,6 +9,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Description of MallCategory
@@ -114,6 +115,31 @@ class Order extends Base
                 'status' => 2
             ]);
         return success('取消成功');
+    }
+
+    //todo 推送到创业天下
+    public static function pushToCytx(){
+        $list = DB::table('nlsg_order as o')
+            ->join('nlsg_pay_record as pr','o.ordernum','=','pr.ordernum')
+            ->join('nlsg_works as w','o.relation_id','=','w.id')
+            ->join('nlsg_user as u','o.user_id','=','u.id')
+            ->where('o.activity_tag','=','cytx')
+            ->where('o.status','=',1)
+            ->where('o.type','=',9)
+            ->where('cytx_job','<>',-1)
+            ->whereRaw(DB::raw(
+                'cytx_job =0 or (UNIX_TIMESTAMP(cytx_check_time)+cytx_job*600 <= UNIX_TIMESTAMP())'
+            ))
+            ->where('pr.price','>',1)
+            ->where('u.is_staff','=',0)
+            ->where('o.is_shill','=',0)
+            ->where('cytx_job','<',11)
+            ->select(['o.id as order_id','o.ordernum','u.phone','u.nickname','pr.price','o.cytx_job','w.title'])
+            ->limit(50)
+            ->get();
+
+        dd($list);
+
     }
 
 }
