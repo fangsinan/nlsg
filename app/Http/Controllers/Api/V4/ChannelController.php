@@ -38,7 +38,7 @@ class ChannelController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/channel/click
      * @apiDescription 点击统计
      * @apiParam {number=1,2,3,4} type(1：专栏  2：商品  3：精品课 4: banner)
-     * @apiParam {number} cpid 作品id
+     * @apiParam {number} wid 作品id
      * @apiParam {string} flag(cytx)
      * */
     public function click(Request $request)
