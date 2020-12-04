@@ -801,7 +801,7 @@ class LiveController extends Controller
                 'user_id' => $this->user['id'],
                 'phone'   => $user->phone
             ]);
-            Live::where(['id' => $live['live_pid']])->increment('subscribe_num');
+            Live::where(['id' => $live['live_pid']])->increment('order_num');
 
             $easySms = app('easysms');
             try {
