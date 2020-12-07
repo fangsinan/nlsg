@@ -128,8 +128,6 @@ class UserController extends Controller
                         ->limit(10)
                         ->orderBy('created_at', 'desc');
                 },
-                'history.columns:id,title,cover_pic',
-                'history.works:id,title,cover_img,is_audio_book',
                 'works' => function ($query) {
                     $query->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 0);
@@ -143,12 +141,36 @@ class UserController extends Controller
                 },
 
             ])
-            ->findOrFail($id)
-            ->toArray();
+            ->find($id);
         if ($user) {
             $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $id])->first();
             $user['is_self'] = $id == $this->user['id'] ? 1 : 0;
             $user['is_follow'] = $isFollow ? 1 : 0;
+            if ($user['history']){
+                foreach ($user['history'] as &$v) {
+                    if ($v['relation_type'] ==1){
+                        $v['columns']  = Column::select('id','title','cover_pic')
+                                        ->where('id', $v['relation_id'])
+                                        ->where('type', 1)
+                                        ->first();
+                    } elseif($v['relation_id'] ==2){
+                        $v['lecture'] = Column::select('id','title','cover_pic')
+                                            ->where('id', $v['relation_id'])
+                                            ->where('type', 2)
+                                            ->first();
+                    } elseif($v['relation_id']==3){
+                        $v['listen'] = Works::select('id','title','cover_img','is_audio_book')
+                                           ->where('id', $v['relation_id'])
+                                           ->where('is_audio_book', 1)
+                                           ->first();
+                    } elseif($v['relation_type']==4){
+                        $v['works']  = Works::select('id','title','cover_img','is_audio_book')
+                                          ->where('id', $v['relation_id'])
+                                          ->first();
+                    }
+                }
+            }
+
         }
 
         return success($user);
