@@ -552,7 +552,7 @@ class ClassController extends Controller
     /**
      * @api {get} api/admin_v4/class/get-work-list 作品详情
      * @apiVersion 4.0.0
-     * @apiName
+     * @apiName  get-work-list
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-work-list
      * @apiDescription  作品详情
