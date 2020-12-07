@@ -5,6 +5,7 @@ namespace App\Jobs;
 
 
 use App\Models\ConfigModel;
+use App\Servers\ChannelServers;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -30,7 +31,8 @@ class JobOfCytx implements ShouldQueue
 
     public function handle()
     {
-
+        $servers = new ChannelServers();
+        $servers->cytxOrderList($this->job_data['id']);
     }
 
 }
