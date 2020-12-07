@@ -6,6 +6,7 @@ use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
+use App\Servers\ChannelServers;
 use App\Servers\MallRefundJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -39,6 +40,8 @@ class Kernel extends ConsoleKernel
             $mrjModel = new MallRefundJob();
             $mrjModel->mallRefund();
             $mrjModel->mallRefundCheck();
+            $ChannelServers = new ChannelServers();
+            $ChannelServers->cytxOrderList();
         })->everyMinute();//每分
 
         $schedule->call(function () {

@@ -30,43 +30,7 @@ class JobOfCytx implements ShouldQueue
 
     public function handle()
     {
-        $is_test = true;
-        if ($is_test) {
-            $url = 'http://39.107.71.116:8081/v1/partner/notify';
-        } else {
-            $url = 'https://api.chuangyetianxia.com/v1/partner/notify';
-        }
 
-
-//        $data['live_id'] = $this->job_data['live_id'];
-//        $data['live_info_id'] = $this->job_data['live_info_id'];
-//
-//        switch (intval($this->job_data['type'])) {
-//            case 6:
-//                $data['method'] = 'PushProduct';//产品
-//                break;
-//            case 8:
-//                $data['method'] = 'pushEnd';//直播结束
-//                break;
-//            case 9:
-//                $data['method'] = 'pushForbiddenWords';//禁言
-//                break;
-//            case 10:
-//                $data['method'] = 'getLivePushOrder';//门票订单推送
-//                break;
-//            case 11:
-//                $data['method'] = 'getLiveOrderRanking';//排行榜
-//                break;
-//            case 12:
-//                $data['method'] = 'getLiveGiftOrder';//礼物订单
-//                break;
-//            default:
-//                return;
-//        }
-//
-//        $url_params = http_build_query($data);
-//        $url = ConfigModel::getData(24) . '?' . $url_params;
-//        Http::get($url);
     }
 
 }
