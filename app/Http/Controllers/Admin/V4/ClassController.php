@@ -800,6 +800,7 @@ class ClassController extends Controller
      * @apiSuccess {number}  status    状态
      * @apiSuccess {number}  free_trial  是否免费
      * @apiSuccess {string}  timing_time 自动上架时间
+     * @apiSuccess {string}  created_at  创建时间
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
