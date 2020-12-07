@@ -132,6 +132,7 @@ class WikiController extends Controller
     public function show(Request $request)
     {
         $id = $request->input('id');
+        $uid = $this->user['id'] ?? 0;
 
         $res = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
                 ->with([
@@ -148,8 +149,13 @@ class WikiController extends Controller
         }
         
         Wiki::where('id', $id)->increment('view_num');
-        $list    = Collection::where(['type' => 5, 'user_id' => $this->user['id'],'relation_id'=>$id])->first();
-        $res->is_collection = $list ? 1 : 0;
+
+        if ($uid){
+            $list    = Collection::where(['type' => 5, 'user_id' => $uid,'relation_id'=>$id])->first();
+            $res->is_collection =  $list ? 1 : 0;
+        } else {
+            $res->is_collection =  0;
+        }
         return success($res);
     }
 
