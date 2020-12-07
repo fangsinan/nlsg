@@ -381,7 +381,7 @@ class ClassController extends Controller
         if (!$name) {
             return error('名称不能为空');
         }
-        $cover_pic   = !empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
+        $cover_pic = !empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
         $details_pic = !empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
         $subtitle = $input['subtitle'] ?? '';
         $message = $input['message'] ?? '';
@@ -391,21 +391,20 @@ class ClassController extends Controller
         $online_type = $input['online_type'] ?? 1;
 
         $data = [
-            'cover_pic'   => $cover_pic,
+            'cover_pic' => $cover_pic,
             'details_pic' => $details_pic,
-            'name'        => $name ?? '',
-            'subtitle'    => $subtitle,
-            'message'     => $message,
-            'user_id'     => $user_id,
-            'price'       => $price,
+            'name' => $name ?? '',
+            'subtitle' => $subtitle,
+            'message' => $message,
+            'user_id' => $user_id,
+            'price' => $price,
             'original_price' => $original_price
         ];
 
-        if (!empty($input['id'])){
-             Column::where('id', $input['id'])
-                ->update($data);
+        if (!empty($input['id'])) {
+            Column::where('id', $input['id'])->update($data);
         } else {
-             Column::create($data);
+            Column::create($data);
         }
 
         return success('操作成功');
@@ -448,30 +447,32 @@ class ClassController extends Controller
         if (!$name) {
             return error('名称不能为空');
         }
-        $cover_pic = covert_img($input['cover_pic']);
-        $details_pic = covert_img($input['details_pic']);
+        $cover_pic = !empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
+        $details_pic = !empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
         $subtitle = $input['subtitle'] ?? '';
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
-        $online_type = $input['online_type'];
+        $online_type = $input['online_type'] ?? 1;
 
-        $res = Column::create([
+        $data = [
             'cover_pic' => $cover_pic,
             'details_pic' => $details_pic,
-            'name' => $name,
+            'name'     => $name,
             'subtitle' => $subtitle,
             'message' => $message,
             'user_id' => $user_id,
             'price' => $price,
             'original_price' => $original_price
-        ]);
-        if ($res) {
-            return success('创建成功');
+        ];
+        if (!empty($input['id'])){
+            Column::where('id', $input['id'])->update($data);
+        } else {
+            Column::create($data);
         }
-        return error('创建失败');
 
+        return success('操作成功');
     }
 
     /**
@@ -772,7 +773,7 @@ class ClassController extends Controller
     public function getWorkChapterList(Request $request)
     {
         $id = $request->get('work_id');
-        $lists = WorksInfo::select('id', 'title', 'view_num', 'size','status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
+        $lists = WorksInfo::select('id', 'title', 'view_num', 'size', 'status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
             ->where('pid', $id)
             ->orderBy('rank', 'desc')
             ->orderBy('id', 'desc')
