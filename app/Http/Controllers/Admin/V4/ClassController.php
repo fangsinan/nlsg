@@ -652,13 +652,14 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/class/add-listen 增加听课
+     * @api {post} api/admin_v4/class/add-listen 创建/编辑听书
      * @apiVersion 4.0.0
      * @apiName  add-listen
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-listen
-     * @apiDescription 创建精品课
+     * @apiDescription 创建/编辑听书
      *
+     * @apiParam {number} id   听书id  id存在为编辑
      * @apiParam {string} title 标题
      * @apiParam {string} user_id 作者
      * @apiParam {string} original_price 定价
@@ -683,24 +684,37 @@ class ClassController extends Controller
     public function addListen(Request $request)
     {
         $input = $request->all();
-        $data['title'] = $input['title'] ?? '';
-        if (!$data['title']) {
+        $title = $input['title'] ?? '';
+        if (!$title) {
             return error('标题不能为空');
         }
-        $data['cover_img'] = covert_img($input['cover_img']) ?? '';
-        $data['detail_img'] = covert_img($input['detail_img']) ?? '';
-        $data['user_id'] = $input['user_id'] ?? 0;
-        $data['original_price'] = $input['original_price'] ?? 0;
-        $data['is_end'] = $input['is_end'] ? 1 : 0;
-        $data['status'] = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
-        $data['timing_online'] = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
-        $data['content'] = $input['content'] ?? '';
+        $cover_img  = covert_img($input['cover_img']) ?? '';
+        $detail_img = covert_img($input['detail_img']) ?? '';
+        $user_id    = $input['user_id'] ?? 0;
+        $original_price = $input['original_price'] ?? 0;
+        $is_end         = $input['is_end'] ? 1 : 0;
+        $status         = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
+        $timing_online  = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
+        $content        = $input['content'] ?? '';
 
-        $res = Works::create($data);
-        if ($res) {
-            return success('创建成功');
+        $data = [
+            'title' => $title,
+            'cover_img' => $cover_img,
+            'detail_img'=> $detail_img,
+            'user_id'   => $user_id,
+            'original_price' =>$original_price,
+            'is_end'   => $is_end,
+            'status'   => $status,
+            'timing_online' => $timing_online,
+            'content'       => $content
+        ];
+
+        if (!empty($input['id'])){
+            Works::where('id', $input['id'])->update($data);
+        } else {
+            Works::create($data);
         }
-
+        return success('操作成功');
     }
 
     /**
