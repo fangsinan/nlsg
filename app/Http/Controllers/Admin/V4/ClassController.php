@@ -550,7 +550,7 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/class/get-work-list作品详情
+     * @api {get} api/admin_v4/class/get-work-list 作品详情
      * @apiVersion 4.0.0
      * @apiName
      * @apiGroup 后台-虚拟课程
