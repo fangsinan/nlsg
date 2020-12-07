@@ -459,14 +459,14 @@ class ClassController extends Controller
         $data = [
             'cover_pic' => $cover_pic,
             'details_pic' => $details_pic,
-            'name'     => $name,
+            'name' => $name,
             'subtitle' => $subtitle,
             'message' => $message,
             'user_id' => $user_id,
             'price' => $price,
             'original_price' => $original_price
         ];
-        if (!empty($input['id'])){
+        if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
         } else {
             Column::create($data);
@@ -510,7 +510,7 @@ class ClassController extends Controller
             return error('标题不能为空');
         }
         $cover_img = covert_img($input['cover_img']) ?? '';
-        $detail_img= covert_img($input['detail_img']) ?? '';
+        $detail_img = covert_img($input['detail_img']) ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
@@ -520,17 +520,17 @@ class ClassController extends Controller
         $content = $input['content'] ?? '';
 
         $data = [
-            'title'    => $title,
+            'title' => $title,
             'cover_img' => $cover_img,
-            'detail_img'=> $detail_img,
-            'user_id'   => $user_id,
+            'detail_img' => $detail_img,
+            'user_id' => $user_id,
             'original_price' => $original_price,
-            'price'  => $price,
+            'price' => $price,
             'is_end' => $is_end,
             'status' => $status,
-            'content'=> $content
+            'content' => $content
         ];
-        if (!empty($input['id'])){
+        if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
         } else {
             Works::create($data);
@@ -545,11 +545,39 @@ class ClassController extends Controller
     public function getColumnAuthors()
     {
         $column = new Column();
-        $lists  = $column->getColumnUser();
+        $lists = $column->getColumnUser();
         return success($lists);
     }
 
-
+    /**
+     * @api {post} api/admin_v4/works/list 课程详情
+     * @apiVersion 4.0.0
+     * @apiName
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/works/list
+     * @apiDescription 专栏详情
+     *
+     * @apiParam {string} title 标题
+     * @apiParam {string} cover_img  封面图片
+     * @apiParam {string} detail_img 详细图片
+     * @apiParam {string} content    内容
+     * @apiParam {string} user_id    作者id
+     * @apiParam {string} price 售价
+     * @apiParam {string} original_price 原价
+     * @apiParam {string} status 上架状态
+     * @apiParam {string} is_end 是否完结
+     * @apiParam {string} view_num 浏览数
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
     public function getWorkList(Request $request)
     {
         $id = $request->get('id');
