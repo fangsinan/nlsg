@@ -29,9 +29,9 @@ class PayRecord extends Base
                     ->sum('p.price');
 
                 if (intval($money ?? 0) <= intval($line)) {
-                    return 0;
-                } else {
                     return 1;
+                } else {
+                    return 0;
                 }
             default:
                 return 1;
