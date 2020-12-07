@@ -216,7 +216,12 @@ class Coupon extends Base
             ->with(['sub_list'])
             ->orderBy('end_time', 'asc')
             ->orderBy('id', 'asc')
-            ->get()->toArray();
+            ->get();
+        if ($temp_res->isEmpty()){
+            $temp_res = [];
+        }else{
+            $temp_res = $temp_res->toArray();
+        }
 
         if (empty($temp_res)) {
             return [
