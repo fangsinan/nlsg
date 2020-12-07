@@ -590,13 +590,14 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/class/add-works-chapter 增加章节
+     * @api {post} api/admin_v4/class/add-works-chapter 增加/编辑章节
      * @apiVersion 4.0.0
-     * @apiName  add-chapter
+     * @apiName  add-works-chapter
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-works-chapter
-     * @apiDescription 增加章节
+     * @apiDescription 增加/编辑章节
      *
+     * @apiParam {number} id   章节id  存在为编辑
      * @apiParam {string} title 标题
      * @apiParam {string} section 第几节
      * @apiParam {string} introduce 简介
@@ -645,10 +646,13 @@ class ClassController extends Controller
             'timing_online' => $timing_online ?? 0
         ];
 
-        $res = WorksInfo::create($data);
-        if ($res) {
-            return success('创建成功');
+        if (!empty($input['id'])){
+            WorksInfo::where('id', $input['id'])->update($data);
+        } else {
+            WorksInfo::create($data);
         }
+        return success('操作成功');
+
     }
 
     /**
