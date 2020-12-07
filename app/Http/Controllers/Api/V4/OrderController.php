@@ -14,6 +14,7 @@ use App\Models\LiveInfo;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
+use App\Models\PayRecord;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\VipUser;
@@ -246,7 +247,11 @@ class OrderController extends Controller
 
         if ($activity_tag == 'cytx') {
             $price = $works_data->cytx_price;
-            //todo 校验用户本月是否能继续花钱
+            //校验用户本月是否能继续花钱
+            $check_this_money = PayRecord::thisMoneyCanSpendMoney($user_id,'cytx',$price);
+            if($check_this_money == 0){
+                return $this->error(0,'本月已超消费金额',0);
+            }
             $coupon_id = 0;
         } else {
             //优惠券

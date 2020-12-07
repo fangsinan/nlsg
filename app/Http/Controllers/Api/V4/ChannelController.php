@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Click;
-use App\Models\Order;
 use App\Models\User;
 use App\Models\Works;
 use Illuminate\Http\Request;
