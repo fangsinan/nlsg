@@ -153,12 +153,12 @@ class UserController extends Controller
                                         ->where('id', $v['relation_id'])
                                         ->where('type', 1)
                                         ->first();
-                    } elseif($v['relation_id'] ==2){
+                    } elseif($v['relation_type'] ==2){
                         $v['lecture'] = Column::select('id','title','cover_pic')
                                             ->where('id', $v['relation_id'])
                                             ->where('type', 2)
                                             ->first();
-                    } elseif($v['relation_id']==3){
+                    } elseif($v['relation_type']==3){
                         $v['listen'] = Works::select('id','title','cover_img','is_audio_book')
                                            ->where('id', $v['relation_id'])
                                            ->where('is_audio_book', 1)

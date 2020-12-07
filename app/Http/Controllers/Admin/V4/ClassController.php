@@ -152,12 +152,12 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {get} api/admin_v4/class/works 精品课
+     * @api {get} api/admin_v4/class/works 作品列表
      * @apiVersion 4.0.0
      * @apiName  works
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/works
-     * @apiDescription 精品课
+     * @apiDescription 作品列表
      *
      * @apiParam {number} page 分页
      * @apiParam {number} work_id 编号
@@ -176,6 +176,7 @@ class ClassController extends Controller
      * @apiSuccess {number} chapter_num 章节数
      * @apiSuccess {number} price    价格
      * @apiSuccess {number} is_end   是否完结
+     * @apiSuccess {number} is_pay   是否精品课 1 是 0 否
      * @apiSuccess {number} status   0 删除 1 待审核 2 拒绝  3通过 4上架 5下架
      * @apiSuccess {string} created_at  创建时间
      *
@@ -235,7 +236,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num','is_pay')
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
@@ -381,29 +382,33 @@ class ClassController extends Controller
         if (!$name) {
             return error('名称不能为空');
         }
-        $cover_pic = covert_img($input['cover_pic']);
-        $details_pic = covert_img($input['details_pic']);
+        $cover_pic = !empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
+        $details_pic = !empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
         $subtitle = $input['subtitle'] ?? '';
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
-        $online_type = $input['online_type'];
+        $online_type = $input['online_type'] ?? 1;
 
-        $res = Column::create([
+        $data = [
             'cover_pic' => $cover_pic,
             'details_pic' => $details_pic,
-            'name' => $name,
+            'name' => $name ?? '',
             'subtitle' => $subtitle,
             'message' => $message,
             'user_id' => $user_id,
             'price' => $price,
             'original_price' => $original_price
-        ]);
-        if ($res) {
-            return success('创建成功');
+        ];
+
+        if (!empty($input['id'])) {
+            Column::where('id', $input['id'])->update($data);
+        } else {
+            Column::create($data);
         }
-        return error('创建失败');
+
+        return success('操作成功');
 
     }
 
@@ -443,16 +448,16 @@ class ClassController extends Controller
         if (!$name) {
             return error('名称不能为空');
         }
-        $cover_pic = covert_img($input['cover_pic']);
-        $details_pic = covert_img($input['details_pic']);
+        $cover_pic = !empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
+        $details_pic = !empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
         $subtitle = $input['subtitle'] ?? '';
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
-        $online_type = $input['online_type'];
+        $online_type = $input['online_type'] ?? 1;
 
-        $res = Column::create([
+        $data = [
             'cover_pic' => $cover_pic,
             'details_pic' => $details_pic,
             'name' => $name,
@@ -461,12 +466,14 @@ class ClassController extends Controller
             'user_id' => $user_id,
             'price' => $price,
             'original_price' => $original_price
-        ]);
-        if ($res) {
-            return success('创建成功');
+        ];
+        if (!empty($input['id'])) {
+            Column::where('id', $input['id'])->update($data);
+        } else {
+            Column::create($data);
         }
-        return error('创建失败');
 
+        return success('操作成功');
     }
 
     /**
@@ -499,25 +506,38 @@ class ClassController extends Controller
     public function addWorks(Request $request)
     {
         $input = $request->all();
-        $data['title'] = $input['title'] ?? '';
-        if (!$data['title']) {
+        $title = $input['title'] ?? '';
+        if (!$title) {
             return error('标题不能为空');
         }
-        $data['cover_img'] = covert_img($input['cover_img']) ?? '';
-        $data['detail_img'] = covert_img($input['detail_img']) ?? '';
-        $data['user_id'] = $input['user_id'] ?? 0;
-        $data['original_price'] = $input['original_price'] ?? 0;
-        $data['price'] = $input['price'] ?? 0;
-        $data['is_end'] = $input['is_end'] ? 1 : 0;
-        $data['status'] = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
-        $data['timing_online'] = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
-        $data['content'] = $input['content'] ?? '';
+        $cover_img = covert_img($input['cover_img']) ?? '';
+        $detail_img = covert_img($input['detail_img']) ?? '';
+        $user_id = $input['user_id'] ?? 0;
+        $original_price = $input['original_price'] ?? 0;
+        $price = $input['price'] ?? 0;
+        $is_end = $input['is_end'] ? 1 : 0;
+        $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
+        $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
+        $content = $input['content'] ?? '';
 
-        $res = Works::create($data);
-        if ($res) {
-            return success('创建成功');
+        $data = [
+            'title' => $title,
+            'cover_img' => $cover_img,
+            'detail_img' => $detail_img,
+            'user_id' => $user_id,
+            'original_price' => $original_price,
+            'price' => $price,
+            'is_end' => $is_end,
+            'status' => $status,
+            'content' => $content
+        ];
+        if (!empty($input['id'])) {
+            Works::where('id', $input['id'])->update($data);
+        } else {
+            Works::create($data);
         }
 
+        return success('操作成功');
     }
 
     /**
@@ -530,7 +550,35 @@ class ClassController extends Controller
         return success($lists);
     }
 
-
+    /**
+     * @api {get} api/admin_v4/class/get-work-list 作品详情
+     * @apiVersion 4.0.0
+     * @apiName  get-work-list
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-work-list
+     * @apiDescription  作品详情
+     *
+     * @apiParam {string} title 标题
+     * @apiParam {string} cover_img  封面图片
+     * @apiParam {string} detail_img 详细图片
+     * @apiParam {string} content    内容
+     * @apiParam {string} user_id    作者id
+     * @apiParam {string} price 售价
+     * @apiParam {string} original_price 原价
+     * @apiParam {string} status 上架状态
+     * @apiParam {string} is_end 是否完结
+     * @apiParam {string} view_num 浏览数
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
     public function getWorkList(Request $request)
     {
         $id = $request->get('id');
@@ -604,13 +652,14 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/class/add-listen 增加听课
+     * @api {post} api/admin_v4/class/add-listen 创建/编辑听书
      * @apiVersion 4.0.0
      * @apiName  add-listen
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-listen
-     * @apiDescription 创建精品课
+     * @apiDescription 创建/编辑听书
      *
+     * @apiParam {number} id   听书id  id存在为编辑
      * @apiParam {string} title 标题
      * @apiParam {string} user_id 作者
      * @apiParam {string} original_price 定价
@@ -635,24 +684,37 @@ class ClassController extends Controller
     public function addListen(Request $request)
     {
         $input = $request->all();
-        $data['title'] = $input['title'] ?? '';
-        if (!$data['title']) {
+        $title = $input['title'] ?? '';
+        if (!$title) {
             return error('标题不能为空');
         }
-        $data['cover_img'] = covert_img($input['cover_img']) ?? '';
-        $data['detail_img'] = covert_img($input['detail_img']) ?? '';
-        $data['user_id'] = $input['user_id'] ?? 0;
-        $data['original_price'] = $input['original_price'] ?? 0;
-        $data['is_end'] = $input['is_end'] ? 1 : 0;
-        $data['status'] = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
-        $data['timing_online'] = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
-        $data['content'] = $input['content'] ?? '';
+        $cover_img  = covert_img($input['cover_img']) ?? '';
+        $detail_img = covert_img($input['detail_img']) ?? '';
+        $user_id    = $input['user_id'] ?? 0;
+        $original_price = $input['original_price'] ?? 0;
+        $is_end         = $input['is_end'] ? 1 : 0;
+        $status         = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
+        $timing_online  = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
+        $content        = $input['content'] ?? '';
 
-        $res = Works::create($data);
-        if ($res) {
-            return success('创建成功');
+        $data = [
+            'title' => $title,
+            'cover_img' => $cover_img,
+            'detail_img'=> $detail_img,
+            'user_id'   => $user_id,
+            'original_price' =>$original_price,
+            'is_end'   => $is_end,
+            'status'   => $status,
+            'timing_online' => $timing_online,
+            'content'       => $content
+        ];
+
+        if (!empty($input['id'])){
+            Works::where('id', $input['id'])->update($data);
+        } else {
+            Works::create($data);
         }
-
+        return success('操作成功');
     }
 
     /**
@@ -687,9 +749,96 @@ class ClassController extends Controller
         $id = $request->get('column_id');
         $list = Column::with('user:id,nickname,headimg')
             ->select('id', 'user_id', 'title', 'subtitle', 'message', 'status', 'original_price', 'price', 'cover_pic',
-                'details_pic', 'created_at',)
+                'details_pic', 'created_at')
             ->where('id', $id)->first();
         return success($list);
     }
+
+
+    /**
+     * @api {get} api/admin_v4/class/get-column-work-list 专栏作品列表
+     * @apiVersion 4.0.0
+     * @apiName  get-column-work-list
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-column-work-list
+     * @apiDescription  专栏作品列表
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} id   专栏id
+     *
+     * @apiSuccess {string}  type   1 视频 2音频 3 文章
+     * @apiSuccess {string}  title  标题
+     * @apiSuccess {string}  view_num  浏览数
+     * @apiSuccess {string}  obj_id    跳转id
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  上架时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function getColumnWorkList(Request $request)
+    {
+        $id = $request->get('id');
+        $lists = Works::select('id', 'title', 'type', 'view_num', 'status', 'is_end', 'online_time', 'chapter_num',
+            'subscribe_num', 'created_at')
+            ->where('column_id', $id)
+            ->paginate(10)
+            ->toArray();
+
+        return success($lists);
+
+    }
+
+    /**
+     * @api {get} api/admin_v4/class/get-work-chapter-list 作品章节列表
+     * @apiVersion 4.0.0
+     * @apiName  get-work-chapter-list
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-work-chapter-list
+     * @apiDescription 作品章节列表
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} work_id  作品id
+     *
+     * @apiSuccess {string}  title  标题
+     * @apiSuccess {string}  rank   排序
+     * @apiSuccess {string}  view_num  观看量
+     * @apiSuccess {string}  size      文件大小
+     * @apiSuccess {number}  status    状态
+     * @apiSuccess {number}  free_trial  是否免费
+     * @apiSuccess {string}  timing_time 自动上架时间
+     * @apiSuccess {string}  created_at  创建时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getWorkChapterList(Request $request)
+    {
+        $id = $request->get('work_id');
+        $lists = WorksInfo::select('id', 'title', 'view_num', 'size', 'status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
+            ->where('pid', $id)
+            ->orderBy('rank', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($lists);
+
+    }
+
 
 }
