@@ -692,4 +692,90 @@ class ClassController extends Controller
         return success($list);
     }
 
+
+    /**
+     * @api {get} api/admin_v4/class/get-column-work-list 专栏作品列表
+     * @apiVersion 4.0.0
+     * @apiName  get-column-work-list
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-column-work-list
+     * @apiDescription  专栏作品列表
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} id   专栏id
+     *
+     * @apiSuccess {string}  type   1 视频 2音频 3 文章
+     * @apiSuccess {string}  title  标题
+     * @apiSuccess {string}  view_num  浏览数
+     * @apiSuccess {string}  obj_id    跳转id
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  上架时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function getColumnWorkList(Request $request)
+    {
+        $id = $request->get('id');
+        $lists = Works::select('id', 'title', 'type', 'view_num', 'status', 'is_end', 'online_time', 'chapter_num',
+            'subscribe_num', 'created_at')
+            ->where('column_id', $id)
+            ->paginate(10)
+            ->toArray();
+
+        return success($lists);
+
+    }
+
+    /**
+     * @api {get} api/admin_v4/class/get-work-chapter-list 作品章节列表
+     * @apiVersion 4.0.0
+     * @apiName  get-work-chapter-list
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-work-chapter-list
+     * @apiDescription 作品章节列表
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} work_id  作品id
+     *
+     * @apiSuccess {string}  title  标题
+     * @apiSuccess {string}  rank   排序
+     * @apiSuccess {string}  view_num  观看量
+     * @apiSuccess {string}  size      文件大小
+     * @apiSuccess {number}  status    状态
+     * @apiSuccess {number}  free_trial  是否免费
+     * @apiSuccess {string}  timing_time 自动上架时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getWorkChapterList(Request $request)
+    {
+        $id = $request->get('work_id');
+        $lists = WorksInfo::select('id', 'title', 'view_num', 'size','status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
+            ->where('pid', $id)
+            ->orderBy('rank', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($lists);
+
+    }
+
+
 }
