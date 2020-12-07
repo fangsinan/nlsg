@@ -269,6 +269,17 @@ class NotifyController extends Controller
     {
         $input = $request->all();
         $list = NotifySettings::where('user_id', $this->user['id'])->first();
+        if (!$list){
+            NotifySettings::create([
+                'user_id'     => $this->user['id'],
+                'is_comment'  => $input['is_comment'] ?? 0,
+                'is_reply'    => $input['is_reply'] ?? 0,
+                'is_like'     => $input['is_like'] ??  0,
+                'is_income'   => $input['is_income'] ?? 0,
+                'is_fans'     => $input['is_fans'] ?? 0,
+                'is_update'   => $input['is_update'] ?? 0
+            ]);
+        }
 
         if ($input){
             switch ($input['type']){
