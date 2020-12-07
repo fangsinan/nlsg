@@ -550,12 +550,12 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/works/list 课程详情
+     * @api {post} api/admin_v4/class/get-work-list作品详情
      * @apiVersion 4.0.0
      * @apiName
      * @apiGroup 后台-虚拟课程
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/works/list
-     * @apiDescription 专栏详情
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-work-list
+     * @apiDescription  作品详情
      *
      * @apiParam {string} title 标题
      * @apiParam {string} cover_img  封面图片
