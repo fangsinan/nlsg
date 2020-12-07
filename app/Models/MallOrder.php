@@ -783,7 +783,7 @@ class MallOrder extends Base
         ];
 
         $price_list_new = [
-            ['key' => '商品总额', 'value' =>  $all_price],
+            ['key' => '商品总额', 'value' =>  $all_original_price],
             ['key' => '运费', 'value' => $freight_money],
 //            ['key' => '权益立减', 'value' => GetPriceTools::PriceCalc('-', 0, $vip_cut_money)],
             ['key' => '权益立减', 'value' => $vip_cut_money],
