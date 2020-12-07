@@ -245,7 +245,7 @@ class OrderController extends Controller
         // 校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
 
-        if ($activity_tag == 'cytx') {
+        if ($activity_tag === 'cytx') {
             $price = $works_data->cytx_price;
             //校验用户本月是否能继续花钱
             $check_this_money = PayRecord::thisMoneyCanSpendMoney($user_id,'cytx',$price);
