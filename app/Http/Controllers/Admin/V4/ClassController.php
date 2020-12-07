@@ -152,12 +152,12 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {get} api/admin_v4/class/works 精品课
+     * @api {get} api/admin_v4/class/works 作品列表
      * @apiVersion 4.0.0
      * @apiName  works
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/works
-     * @apiDescription 精品课
+     * @apiDescription 作品列表
      *
      * @apiParam {number} page 分页
      * @apiParam {number} work_id 编号
@@ -176,6 +176,7 @@ class ClassController extends Controller
      * @apiSuccess {number} chapter_num 章节数
      * @apiSuccess {number} price    价格
      * @apiSuccess {number} is_end   是否完结
+     * @apiSuccess {number} is_pay   是否精品课 1 是 0 否
      * @apiSuccess {number} status   0 删除 1 待审核 2 拒绝  3通过 4上架 5下架
      * @apiSuccess {string} created_at  创建时间
      *
@@ -235,7 +236,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num','is_pay')
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
