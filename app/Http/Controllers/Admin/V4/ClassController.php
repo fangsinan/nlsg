@@ -602,7 +602,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price', 'is_pay')
+                'price', 'original_price', 'is_pay','message')
             ->where('id', $id)
             ->first();
         if ($work) {
