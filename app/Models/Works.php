@@ -19,11 +19,7 @@ class Works extends Base
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
     const STATUS_TWO = 2;
-
-    public function getDateFormat()
-    {
-        return time();
-    }
+    
 
     /**
      * 首页课程推荐
