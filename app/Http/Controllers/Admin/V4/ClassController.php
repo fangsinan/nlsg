@@ -525,6 +525,8 @@ class ClassController extends Controller
         $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
         $content = $input['content'] ?? '';
+        $is_pay  = $input['is_pay'] ?? 0;
+
 
         $data = [
             'title' => $title,
@@ -535,7 +537,8 @@ class ClassController extends Controller
             'price' => $price,
             'is_end' => $is_end,
             'status' => $status,
-            'content' => $content
+            'content' => $content,
+            'is_pay'  => $is_pay
         ];
         if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
@@ -599,7 +602,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price', 'is_pay')
+                'price', 'original_price', 'is_pay','message')
             ->where('id', $id)
             ->first();
         if ($work) {
@@ -816,6 +819,7 @@ class ClassController extends Controller
         $lists = Works::select('id', 'title', 'type', 'view_num', 'status', 'is_end', 'online_time', 'chapter_num',
             'subscribe_num', 'created_at')
             ->where('column_id', $id)
+            ->where('status','>',0)
             ->paginate(10)
             ->toArray();
 
@@ -858,6 +862,7 @@ class ClassController extends Controller
         $id = $request->get('work_id');
         $lists = WorksInfo::select('id', 'title', 'view_num', 'size', 'status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
             ->where('pid', $id)
+            ->where('status', '>', 0)
             ->orderBy('rank', 'desc')
             ->orderBy('id', 'desc')
             ->paginate(10)

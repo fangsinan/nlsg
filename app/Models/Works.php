@@ -11,20 +11,15 @@ use Illuminate\Support\Facades\DB;
 class Works extends Base
 {
     protected $table = 'nlsg_works';
-    public $timestamps = false;
 
     protected $fillable = [
-        'title', 'cover_img', 'detial_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content'
+        'title', 'cover_img', 'detail_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content','is_pay'
     ];
 
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
     const STATUS_TWO = 2;
-
-    public function getDateFormat()
-    {
-        return time();
-    }
+    
 
     /**
      * 首页课程推荐
@@ -141,6 +136,7 @@ class Works extends Base
             ->get();
         if ($works) {
             foreach ($works as &$v) {
+                $v['is_sub'] = 0;
                 if ($uid) {
                     $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);
                 }
@@ -158,6 +154,7 @@ class Works extends Base
             ->get();
         if ($book) {
             foreach ($book as &$v) {
+                $v['is_sub'] = 0;
                 if ($uid) {
                     $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
                 }
@@ -172,8 +169,9 @@ class Works extends Base
             ->where('type', 2)
             ->limit(5)
             ->get();
-        if ($book) {
-            foreach ($book as &$v) {
+        if ($lecture) {
+            foreach ($lecture as &$v) {
+                $v['is_sub'] = 0;
                 if ($uid) {
                     $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
                 }
