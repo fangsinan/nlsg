@@ -816,6 +816,7 @@ class ClassController extends Controller
         $lists = Works::select('id', 'title', 'type', 'view_num', 'status', 'is_end', 'online_time', 'chapter_num',
             'subscribe_num', 'created_at')
             ->where('column_id', $id)
+            ->where('status','>',0)
             ->paginate(10)
             ->toArray();
 
@@ -858,6 +859,7 @@ class ClassController extends Controller
         $id = $request->get('work_id');
         $lists = WorksInfo::select('id', 'title', 'view_num', 'size', 'status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
             ->where('pid', $id)
+            ->where('status', '>', 0)
             ->orderBy('rank', 'desc')
             ->orderBy('id', 'desc')
             ->paginate(10)
