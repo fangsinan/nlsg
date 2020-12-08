@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 class ChannelServers
 {
 
+    //推送到创业天下
     private function pushToCytx($order_data)
     {
         if (is_object($order_data)){
@@ -49,7 +50,7 @@ class ChannelServers
         $order->save();
     }
 
-
+    //创业天下订单获取
     public function cytxOrderList($order_id = 0)
     {
         $query = DB::table('nlsg_user as u')
@@ -89,5 +90,39 @@ class ChannelServers
         }
 
     }
+
+    //todo 抖音订单拉取
+    public function getDouyinOrder(){
+
+        $min = date('i');
+        if ($min%2 === 0){
+            $begin_date = date('Y-m-d H:i:00',strtotime("-30 minutes"));
+        }else{
+            $begin_date = date('Y-m-d H:i:00',strtotime("-1470 minutes"));
+        }
+
+        $end_date = date('Y-m-d H:i:00',strtotime("$begin_date +10 minutes"));
+        dd([$begin_date,$end_date]);
+
+        $go_on = true;
+        $page = 1;
+        $size = 100;
+        $args = [];
+
+
+
+//        while ($go_on){
+//            $temp_res = $this->douyinQuery($args);
+
+//        }
+    }
+
+    private function douyinQuery($args){
+
+    }
+
+
+    //todo 抖音开通
+
 
 }

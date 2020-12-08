@@ -987,6 +987,17 @@ class MallOrder extends Base
                         }
                     }
 
+                    if ($check->coupon_id > 0){
+                        $check_coupon = Coupon::whereId($check->coupon_id)->first();
+                        $check_coupon->status = 1;
+                        $check_coupon->order_id = 0;
+                        $coupon_res = $check_coupon->save();
+                        if ($coupon_res === false){
+                            DB::rollBack();
+                            return ['code' => false, 'msg' => '失败', 'ps' => 'coupon'];
+                        }
+                    }
+
                     DB::commit();
                     return ['code' => true, 'msg' => '成功'];
 

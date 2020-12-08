@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\CouponRuleList;
 use App\Models\MallGoodsMsg;
+use App\Servers\ChannelServers;
 use Illuminate\Http\Request;
 use App\Models\MallGoods;
 use App\Models\CouponRule;
@@ -214,6 +215,9 @@ class MallController extends Controller
      */
     public function goodsList(Request $request)
     {
+//        $c = new ChannelServers();
+//        $c->getDouyinOrder();
+//        dd(__LINE__);
         $params = $request->input();
         $params['page'] = $params['page'] ?? 1;
         $params['size'] = $params['size'] ?? 10;
