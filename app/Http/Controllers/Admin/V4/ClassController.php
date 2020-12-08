@@ -846,7 +846,7 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {get} api/admin_v4/column/delete 删除专栏/讲座
+     * @api {post} api/admin_v4/column/delete 删除专栏/讲座
      * @apiVersion 4.0.0
      * @apiName  column/delete
      * @apiGroup 后台-虚拟课程
@@ -868,14 +868,14 @@ class ClassController extends Controller
     public function delColumn(Request $request)
     {
         $id = $request->get('id');
-        $res = Column::where('id', $id)->update(['status'=>3]);
+        $res = Column::where('id', $id)->update(['status' => 3]);
         if ($res) {
             return success('操作成功');
         }
     }
 
     /**
-     * @api {get} api/admin_v4/works/delete 删除听书/讲座
+     * @api {post} api/admin_v4/works/delete 删除听书/讲座
      * @apiVersion 4.0.0
      * @apiName  works/delete
      * @apiGroup 后台-虚拟课程
@@ -897,11 +897,57 @@ class ClassController extends Controller
     public function delWorks(Request $request)
     {
         $id = $request->get('id');
-        $res = Works::where('id', $id)->update(['status'=>0]);
-           if ($res) {
-               return success('操作成功');
-           }
-       }
+        $res = Works::where('id', $id)->update(['status' => 0]);
+        if ($res) {
+            return success('操作成功');
+        }
+    }
+
+    /**
+     * @api {get} /api/admin_v4/works/works_category_data  作品分类
+     * @apiName works_category_data
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * code: 200,
+     * msg: "成功",
+     * data: [
+     * {
+     * id: 1,
+     * name: "父母关系",
+     * pid: 0,
+     * level: 1,
+     * son: [
+     * {
+     * id: 3,
+     * name: "母子亲密关系",
+     * pid: 1,
+     * level: 2,
+     * son: [ ]
+     * }
+     * ]
+     * },
+     * {
+     * id: 2,
+     * name: "亲子关系",
+     * pid: 0,
+     * level: 1,
+     * son: [ ]
+     * }
+     * ]
+     * }
+     */
+    public function getWorksCategory(Request $request)
+    {
+        $category = WorksCategory::select('id', 'name', 'pid', 'level')->where([
+            'type' => 1, 'status' => 1,
+        ])->orderBy('order', 'desc')->get()->toArray();
+        $data = WorksCategory::getCategory($category, 0, 1);
+        return success($data);
+    }
 
 
 }
