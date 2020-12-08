@@ -525,6 +525,7 @@ class ClassController extends Controller
         $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
         $content = $input['content'] ?? '';
+        $is_pay  = $input['is_pay'] ?? 0;
 
         $data = [
             'title' => $title,
@@ -535,7 +536,8 @@ class ClassController extends Controller
             'price' => $price,
             'is_end' => $is_end,
             'status' => $status,
-            'content' => $content
+            'content' => $content,
+            'is_pay'  => $is_pay
         ];
         if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
