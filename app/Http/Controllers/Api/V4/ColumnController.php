@@ -648,7 +648,7 @@ class ColumnController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup Column
      *
-     * @apiParam {int} type  type 1专栏  2课程  3商品  4书单 5百科 6听书
+     * @apiParam {int} type  type 1专栏  2课程  3商品  4书单 5百科 6听书 7讲座
      * @apiParam {int} target_id  对应id
      * @apiParam {int} user_id 用户id
      * @apiParam {int} info_id 如果是课程 需要传当前章节

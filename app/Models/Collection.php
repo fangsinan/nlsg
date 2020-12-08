@@ -21,9 +21,30 @@ class Collection extends Base
         $data = Collection::where($where)->first();
         if($data){
             //直接物理删除
+            if($type == 1 || $type ==7){
+                Column::where(['id' => $target_id])->decrement('collection_num');
+            }else if($type == 2 || $type ==6){
+                Works::where(['id' => $target_id])->decrement('collection_num');
+            }else if($type == 4){
+                Lists::where(['id' => $target_id])->decrement('collection_num');
+            }else if($type == 5){
+                Wiki::where(['id' => $target_id])->decrement('collection_num');
+            }
             return Collection::destroy($data['id']);
         }else{
             //创建
+            //1专栏  2课程  3商品  4书单 5百科 6听书 7讲座
+            if($type == 1 || $type ==7){
+                Column::where(['id' => $target_id])->increment('collection_num');
+            }else if($type == 2 || $type ==6){
+                Works::where(['id' => $target_id])->increment('collection_num');
+            }else if($type == 4){
+                Lists::where(['id' => $target_id])->increment('collection_num');
+            }else if($type == 5){
+                Wiki::where(['id' => $target_id])->increment('collection_num');
+            }
+
+
             return Collection::create($where);
         }
     }
