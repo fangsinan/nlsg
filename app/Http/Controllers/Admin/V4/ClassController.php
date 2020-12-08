@@ -598,6 +598,12 @@ class ClassController extends Controller
                 'price', 'original_price')
             ->where('id', $id)
             ->first();
+        if ($work){
+            $category = WorksCategoryRelation::select('work_id','category_id')
+                    ->where('work_id', $id)
+                    ->first();
+            $work->category_id = $category ?  $category->category_id : 0;
+        }
         return success($work);
     }
 
