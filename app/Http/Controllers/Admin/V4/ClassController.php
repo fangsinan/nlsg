@@ -511,8 +511,8 @@ class ClassController extends Controller
         if (!$title) {
             return error('标题不能为空');
         }
-        $cover_img  = !empty($input['cover_pic']) ? covert_img($input['cover_img']) : '';
-        $detail_img = !empty($input['details_pic']) ? covert_img($input['detail_img']) : '';
+        $cover_img  = !empty($input['cover_img']) ? covert_img($input['cover_img']) : '';
+        $detail_img = !empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
         $user_id = $input['user_id'] ?? 0;
         $category_id = $input['category_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
@@ -861,7 +861,7 @@ class ClassController extends Controller
         return success($lists);
 
     }
-    
+
 
     /**
      * @api {post} api/admin_v4/column/delete 删除专栏/讲座
