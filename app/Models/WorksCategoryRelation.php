@@ -13,6 +13,9 @@ class WorksCategoryRelation extends Base {
 
     protected $table = 'nlsg_works_category_relation';
 
+    protected $fillable = [
+       'work_id','category_id'
+    ];
 
     public function categoryName()
     {

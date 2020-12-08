@@ -486,6 +486,7 @@ class ClassController extends Controller
      *
      * @apiParam {string} title 标题
      * @apiParam {string} user_id 作者
+     * @apiParam {string} category_id    分类id
      * @apiParam {string} original_price 定价
      * @apiParam {string} price 售价
      * @apiParam {string} is_end 是否完结
@@ -510,12 +511,13 @@ class ClassController extends Controller
         if (!$title) {
             return error('标题不能为空');
         }
-        $cover_img = covert_img($input['cover_img']) ?? '';
-        $detail_img = covert_img($input['detail_img']) ?? '';
+        $cover_img  = !empty($input['cover_pic']) ? covert_img($input['cover_img']) : '';
+        $detail_img = !empty($input['details_pic']) ? covert_img($input['detail_img']) : '';
         $user_id = $input['user_id'] ?? 0;
+        $category_id = $input['category_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
-        $is_end = $input['is_end'] ? 1 : 0;
+        $is_end = $input['is_end'] ?? 0;
         $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
         $content = $input['content'] ?? '';
@@ -533,9 +535,18 @@ class ClassController extends Controller
         ];
         if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
+            //增加分类
+            WorksCategoryRelation::where('work_id', $input['id'])
+                    ->delete();
+            $id = $input['id'];
         } else {
-            Works::create($data);
+            $work =Works::create($data);
+            $id  = $work ? $work->id : 0;
         }
+        WorksCategoryRelation::create([
+           'work_id'     => $id,
+           'category_id' => $input['category_id'] ?? 0
+        ]);
 
         return success('操作成功');
     }
