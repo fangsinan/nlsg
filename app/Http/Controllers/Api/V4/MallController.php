@@ -215,15 +215,18 @@ class MallController extends Controller
      */
     public function goodsList(Request $request)
     {
-//        $c = new ChannelServers();
-//        $c->getDouyinOrder();
-//        dd(__LINE__);
-        $params = $request->input();
-        $params['page'] = $params['page'] ?? 1;
-        $params['size'] = $params['size'] ?? 10;
-        $model = new MallGoods();
-        $data = $model->getList($params, $this->user);
-        return $this->success($data);
+        if ($request->input('aa',0) == 1){
+            $c = new ChannelServers();
+            $c->getDouyinOrder();
+            dd(__LINE__);
+        }else{
+            $params = $request->input();
+            $params['page'] = $params['page'] ?? 1;
+            $params['size'] = $params['size'] ?? 10;
+            $model = new MallGoods();
+            $data = $model->getList($params, $this->user);
+            return $this->success($data);
+        }
     }
 
     /**

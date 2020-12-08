@@ -74,5 +74,7 @@ return [
     'JPUSH_APNS_PRODUCTION' => env('JPUSH_APNS_PRODUCTION'),
     'LIVE_PUSH_URL' => env('LIVE_PUSH_URL'),
     'LIVE_PLAY_URL' => env('LIVE_PLAY_URL'),
-    'Live_API_KEY' => env('Live_API_KEY')
+    'Live_API_KEY' => env('Live_API_KEY'),
+    'DOUYIN_APP_KEY' => env('DOUYIN_APP_KEY'),
+    'DOUYIN_APP_SECRET' => env('DOUYIN_APP_SECRET'),
 ];
