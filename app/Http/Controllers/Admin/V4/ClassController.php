@@ -1039,5 +1039,62 @@ class ClassController extends Controller
         return success($list);
     }
 
+    /**
+     * @api {post} api/admin_v4/operate/chapter 操作章节
+     * @apiVersion 4.0.0
+     * @apiName  operate/chapter
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/operate/chapter
+     * @apiDescription  操作章节
+     *
+     * @apiParam {string} id   章节id
+     * @apiParam {string} type 类型  1 上线 2 下线 3 免费 4 不免费
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function operateChapter(Request $request)
+    {
+        $id   = $request->get('id');
+        $type = $request->get('type');
+        if ($type) {
+            switch ($type) {
+                case  1:
+                    $data = [
+                        'status' => 4,
+                        'online_time' => date('Y-m-d H:i:s')
+                    ];
+                    break;
+
+                case  2:
+                    $data = [
+                        'status' => 5
+                    ];
+                    break;
+                case 3:
+                    $data = [
+                        'free_trial' => 1
+                    ];
+                    break;
+                case 4:
+                    $data = [
+                        'free_trial' => 0
+                    ];
+                    break;
+            }
+        }
+        $res = WorksInfo::where('id', $id)->update($data);
+        if ($res) {
+            return success('操作成功');
+        }
+    }
+
 
 }
