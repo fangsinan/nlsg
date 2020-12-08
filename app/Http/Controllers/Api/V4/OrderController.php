@@ -229,7 +229,7 @@ class OrderController extends Controller
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
         $pay_type = $request->input('pay_type', 0);
-        $activity_tag = $request->input('activity_tag', 0);
+        $activity_tag = $request->input('activity_tag', '');
         $user_id = $this->user['id'] ?? 0;
 
         //$work_id 课程信息
