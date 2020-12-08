@@ -595,7 +595,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price')
+                'price', 'original_price','is_pay')
             ->where('id', $id)
             ->first();
         if ($work){
@@ -861,6 +861,7 @@ class ClassController extends Controller
         return success($lists);
 
     }
+    
 
     /**
      * @api {post} api/admin_v4/column/delete 删除专栏/讲座
