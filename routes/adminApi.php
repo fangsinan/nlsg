@@ -25,6 +25,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('class/works', 'ClassController@works');
     Route::get('class/listen', 'ClassController@listen');
     Route::get('class/get-work-list', 'ClassController@getWorkList');
+    Route::get('class/get-chapter-info', 'ClassController@getChapterInfo');
 
 
     Route::post('class/add-column','ClassController@addColumn');
@@ -35,6 +36,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('class/add-works-chapter','ClassController@addWorkChapter');
     Route::post('column/delete','ClassController@delColumn');
     Route::post('works/delete','ClassController@delWorks');
+    Route::post('chapter/delete','ClassController@delChapter');
     Route::get('works/category', 'ClassController@getWorksCategory');
 
     //广告
