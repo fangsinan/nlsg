@@ -1014,7 +1014,7 @@ class UserController extends Controller
                 return error(1000, '验证码错误',$data);
             }
         }
-        
+
         $list = User::where('phone', $phone)->first();
         if ($list) {
             return error(1000, '该手机号码已存在',$data);
