@@ -527,6 +527,7 @@ class ClassController extends Controller
         $content = $input['content'] ?? '';
         $is_pay  = $input['is_pay'] ?? 0;
 
+
         $data = [
             'title' => $title,
             'cover_img' => $cover_img,

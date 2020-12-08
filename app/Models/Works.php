@@ -14,7 +14,7 @@ class Works extends Base
     public $timestamps = false;
 
     protected $fillable = [
-        'title', 'cover_img', 'detial_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content'
+        'title', 'cover_img', 'detial_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content','is_pay'
     ];
 
     //状态 1上架  2 下架
