@@ -29,7 +29,7 @@ class ConfigModel extends Base
         $cache_key_name = 'v4_config_' . $id;
 
         $res = Cache::get($cache_key_name);
-        if ($flag === 1 && empty($res)) {
+        if ($flag === 1 || empty($res)) {
             $res = self::getFromDb($id);
             Cache::put($cache_key_name, $res, $expire_num);
         }
