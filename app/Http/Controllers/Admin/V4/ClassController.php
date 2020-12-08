@@ -653,7 +653,7 @@ class ClassController extends Controller
 
         $data = [
             'pid' => $work_id,
-            'type' => $input['type'] ?? '',
+            'type' => $input['type'] ?? 0,
             'title' => $input['title'] ?? '',
             'section' => $input['section'] ?? '',
             'introduce' => $input['introduce'] ?? '',
@@ -916,6 +916,35 @@ class ClassController extends Controller
     {
         $id = $request->get('id');
         $res = Works::where('id', $id)->update(['status' => 0]);
+        if ($res) {
+            return success('操作成功');
+        }
+    }
+
+    /**
+     * @api {post} api/admin_v4/chapter/delete 删除章节
+     * @apiVersion 4.0.0
+     * @apiName  chapter/delete
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/chapter/delete
+     * @apiDescription  删除章节
+     *
+     * @apiParam {string} id   章节id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function delChapter(Request $request)
+    {
+        $id = $request->get('id');
+        $res = WorksInfo::where('id', $id)->update(['status' => 0]);
         if ($res) {
             return success('操作成功');
         }
