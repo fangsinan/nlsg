@@ -25,6 +25,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('class/works', 'ClassController@works');
     Route::get('class/listen', 'ClassController@listen');
     Route::get('class/get-work-list', 'ClassController@getWorkList');
+    Route::get('class/get-chapter-info', 'ClassController@getChapterInfo');
 
 
     Route::post('class/add-column','ClassController@addColumn');
