@@ -32,6 +32,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('class/add-works','ClassController@addWorks');
     Route::post('class/add-listen','ClassController@addListen');
     Route::post('class/add-works-chapter','ClassController@addWorkChapter');
+    Route::post('column/delete','ClassController@delColumn');
+    Route::post('works/delete','ClassController@delWorks');
 
     //广告
     Route::get('banner/list', 'BannerController@list');

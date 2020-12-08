@@ -236,7 +236,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num','is_pay')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num', 'is_pay')
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
@@ -647,7 +647,7 @@ class ClassController extends Controller
             'timing_online' => $timing_online ?? 0
         ];
 
-        if (!empty($input['id'])){
+        if (!empty($input['id'])) {
             WorksInfo::where('id', $input['id'])->update($data);
         } else {
             WorksInfo::create($data);
@@ -693,28 +693,28 @@ class ClassController extends Controller
         if (!$title) {
             return error('标题不能为空');
         }
-        $cover_img  = covert_img($input['cover_img']) ?? '';
+        $cover_img = covert_img($input['cover_img']) ?? '';
         $detail_img = covert_img($input['detail_img']) ?? '';
-        $user_id    = $input['user_id'] ?? 0;
+        $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
-        $is_end         = $input['is_end'] ? 1 : 0;
-        $status         = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
-        $timing_online  = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
-        $content        = $input['content'] ?? '';
+        $is_end = $input['is_end'] ? 1 : 0;
+        $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
+        $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
+        $content = $input['content'] ?? '';
 
         $data = [
             'title' => $title,
             'cover_img' => $cover_img,
-            'detail_img'=> $detail_img,
-            'user_id'   => $user_id,
-            'original_price' =>$original_price,
-            'is_end'   => $is_end,
-            'status'   => $status,
+            'detail_img' => $detail_img,
+            'user_id' => $user_id,
+            'original_price' => $original_price,
+            'is_end' => $is_end,
+            'status' => $status,
             'timing_online' => $timing_online,
-            'content'       => $content
+            'content' => $content
         ];
 
-        if (!empty($input['id'])){
+        if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
         } else {
             Works::create($data);
@@ -844,6 +844,64 @@ class ClassController extends Controller
         return success($lists);
 
     }
+
+    /**
+     * @api {get} api/admin_v4/column/delete 删除专栏/讲座
+     * @apiVersion 4.0.0
+     * @apiName  column/delete
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/column/delete
+     * @apiDescription  删除专栏/讲座
+     *
+     * @apiParam {string} id   专栏id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function delColumn(Request $request)
+    {
+        $id = $request->get('id');
+        $res = Column::where('id', $id)->update(['status'=>3]);
+        if ($res) {
+            return success('操作成功');
+        }
+    }
+
+    /**
+     * @api {get} api/admin_v4/works/delete 删除听书/讲座
+     * @apiVersion 4.0.0
+     * @apiName  works/delete
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/works/delete
+     * @apiDescription  删除听书/讲座
+     *
+     * @apiParam {string} id   作品id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function delWorks(Request $request)
+    {
+        $id = $request->get('id');
+        $res = Works::where('id', $id)->update(['status'=>0]);
+           if ($res) {
+               return success('操作成功');
+           }
+       }
 
 
 }
