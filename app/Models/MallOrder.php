@@ -783,7 +783,7 @@ class MallOrder extends Base
         ];
 
         $price_list_new = [
-            ['key' => '商品总额', 'value' =>  $all_original_price],
+            ['key' => '商品总额', 'value' => $all_original_price],
             ['key' => '运费', 'value' => $freight_money],
 //            ['key' => '权益立减', 'value' => GetPriceTools::PriceCalc('-', 0, $vip_cut_money)],
             ['key' => '权益立减', 'value' => $vip_cut_money],
@@ -800,9 +800,9 @@ class MallOrder extends Base
         foreach ($price_list_new as &$new_v) {
             if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
-            }elseif(in_array($new_v['key'], ['运费'])) {
+            } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];
-            }else{
+            } else {
                 $new_v['value'] = '¥' . $new_v['value'];
             }
         }
@@ -953,7 +953,7 @@ class MallOrder extends Base
 
         switch (strtolower($flag)) {
             case 'stop':
-                if ($check->status === 1 || $check->status === 10) {
+                if ($check->status === 1 || $check->status === 10 || ($check->post_type === 2 && $check->status === 20)) {
                     DB::beginTransaction();
                     //未支付的可以直接取消
                     $check->is_stop = 1;
@@ -965,7 +965,7 @@ class MallOrder extends Base
                         return ['code' => false, 'msg' => '失败', 'ps' => 'order error'];
                     }
 
-                    if ($check->status === 10) {
+                    if ($check->status === 10 || $check->status === 20) {
                         //订单状态修改-写入后台审核
                         $refund_data['service_num'] = MallOrder::createOrderNumber($user_id, 2);
                         $refund_data['order_id'] = $id;
@@ -1281,7 +1281,7 @@ class MallOrder extends Base
         //商品总额,权益立减,活动立减,运费,实付金额
 
         $price_list_new = [
-            ['key' => '商品总额', 'value' =>  $data['cost_price']],
+            ['key' => '商品总额', 'value' => $data['cost_price']],
             ['key' => '权益立减', 'value' => $data['vip_cut']],
             ['key' => '活动立减', 'value' => $data['special_price_cut']],
             ['key' => '运费', 'value' => $data['freight']],
@@ -1315,9 +1315,9 @@ class MallOrder extends Base
         foreach ($price_list_new as &$new_v) {
             if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
-            }elseif(in_array($new_v['key'], ['运费'])) {
+            } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];
-            }else{
+            } else {
                 $new_v['value'] = '¥' . $new_v['value'];
             }
         }
