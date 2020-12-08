@@ -907,7 +907,7 @@ class ClassController extends Controller
      * @api {get} /api/admin_v4/works/works_category_data  作品分类
      * @apiName works_category_data
      * @apiVersion 1.0.0
-     * @apiGroup works
+     * @apiGroup  后台-虚拟课程
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
