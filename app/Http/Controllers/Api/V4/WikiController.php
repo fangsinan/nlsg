@@ -134,7 +134,7 @@ class WikiController extends Controller
         $id = $request->input('id');
         $uid = $this->user['id'] ?? 0;
 
-        $res = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
+        $res = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num','collection_num')
                 ->with([
                     'reward' => function($query){
                         $query->select('id','user_id','relation_id')

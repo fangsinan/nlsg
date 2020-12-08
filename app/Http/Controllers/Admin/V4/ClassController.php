@@ -236,7 +236,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num','is_pay')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num', 'is_pay')
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
@@ -486,6 +486,7 @@ class ClassController extends Controller
      *
      * @apiParam {string} title 标题
      * @apiParam {string} user_id 作者
+     * @apiParam {string} category_id    分类id
      * @apiParam {string} original_price 定价
      * @apiParam {string} price 售价
      * @apiParam {string} is_end 是否完结
@@ -510,12 +511,13 @@ class ClassController extends Controller
         if (!$title) {
             return error('标题不能为空');
         }
-        $cover_img = covert_img($input['cover_img']) ?? '';
-        $detail_img = covert_img($input['detail_img']) ?? '';
+        $cover_img = !empty($input['cover_img']) ? covert_img($input['cover_img']) : '';
+        $detail_img = !empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
         $user_id = $input['user_id'] ?? 0;
+        $category_id = $input['category_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
-        $is_end = $input['is_end'] ? 1 : 0;
+        $is_end = $input['is_end'] ?? 0;
         $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
         $content = $input['content'] ?? '';
@@ -533,9 +535,18 @@ class ClassController extends Controller
         ];
         if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
+            //增加分类
+            WorksCategoryRelation::where('work_id', $input['id'])
+                ->delete();
+            $id = $input['id'];
         } else {
-            Works::create($data);
+            $work = Works::create($data);
+            $id = $work ? $work->id : 0;
         }
+        WorksCategoryRelation::create([
+            'work_id' => $id,
+            'category_id' => $input['category_id'] ?? 0
+        ]);
 
         return success('操作成功');
     }
@@ -584,9 +595,16 @@ class ClassController extends Controller
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price')
+                'price', 'original_price', 'is_pay')
+            ->where('id', $id)
             ->first();
-        return $work;
+        if ($work) {
+            $category = WorksCategoryRelation::select('work_id', 'category_id')
+                ->where('work_id', $id)
+                ->first();
+            $work->category_id = $category ? $category->category_id : 0;
+        }
+        return success($work);
     }
 
     /**
@@ -646,7 +664,7 @@ class ClassController extends Controller
             'timing_online' => $timing_online ?? 0
         ];
 
-        if (!empty($input['id'])){
+        if (!empty($input['id'])) {
             WorksInfo::where('id', $input['id'])->update($data);
         } else {
             WorksInfo::create($data);
@@ -692,28 +710,28 @@ class ClassController extends Controller
         if (!$title) {
             return error('标题不能为空');
         }
-        $cover_img  = covert_img($input['cover_img']) ?? '';
+        $cover_img = covert_img($input['cover_img']) ?? '';
         $detail_img = covert_img($input['detail_img']) ?? '';
-        $user_id    = $input['user_id'] ?? 0;
+        $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
-        $is_end         = $input['is_end'] ? 1 : 0;
-        $status         = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
-        $timing_online  = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
-        $content        = $input['content'] ?? '';
+        $is_end = $input['is_end'] ? 1 : 0;
+        $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
+        $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
+        $content = $input['content'] ?? '';
 
         $data = [
             'title' => $title,
             'cover_img' => $cover_img,
-            'detail_img'=> $detail_img,
-            'user_id'   => $user_id,
-            'original_price' =>$original_price,
-            'is_end'   => $is_end,
-            'status'   => $status,
+            'detail_img' => $detail_img,
+            'user_id' => $user_id,
+            'original_price' => $original_price,
+            'is_end' => $is_end,
+            'status' => $status,
             'timing_online' => $timing_online,
-            'content'       => $content
+            'content' => $content
         ];
 
-        if (!empty($input['id'])){
+        if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
         } else {
             Works::create($data);
@@ -842,6 +860,154 @@ class ClassController extends Controller
             ->toArray();
         return success($lists);
 
+    }
+
+
+    /**
+     * @api {post} api/admin_v4/column/delete 删除专栏/讲座
+     * @apiVersion 4.0.0
+     * @apiName  column/delete
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/column/delete
+     * @apiDescription  删除专栏/讲座
+     *
+     * @apiParam {string} id   专栏id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function delColumn(Request $request)
+    {
+        $id = $request->get('id');
+        $res = Column::where('id', $id)->update(['status' => 3]);
+        if ($res) {
+            return success('操作成功');
+        }
+    }
+
+    /**
+     * @api {post} api/admin_v4/works/delete 删除听书/讲座
+     * @apiVersion 4.0.0
+     * @apiName  works/delete
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/works/delete
+     * @apiDescription  删除听书/讲座
+     *
+     * @apiParam {string} id   作品id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function delWorks(Request $request)
+    {
+        $id = $request->get('id');
+        $res = Works::where('id', $id)->update(['status' => 0]);
+        if ($res) {
+            return success('操作成功');
+        }
+    }
+
+    /**
+     * @api {get} /api/admin_v4/works/works_category_data  作品分类
+     * @apiName works_category_data
+     * @apiVersion 1.0.0
+     * @apiGroup  后台-虚拟课程
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * code: 200,
+     * msg: "成功",
+     * data: [
+     * {
+     * id: 1,
+     * name: "父母关系",
+     * pid: 0,
+     * level: 1,
+     * son: [
+     * {
+     * id: 3,
+     * name: "母子亲密关系",
+     * pid: 1,
+     * level: 2,
+     * son: [ ]
+     * }
+     * ]
+     * },
+     * {
+     * id: 2,
+     * name: "亲子关系",
+     * pid: 0,
+     * level: 1,
+     * son: [ ]
+     * }
+     * ]
+     * }
+     */
+    public function getWorksCategory(Request $request)
+    {
+        $category = WorksCategory::select('id', 'name', 'pid', 'level')->where([
+            'type' => 1, 'status' => 1,
+        ])->orderBy('order', 'desc')->get()->toArray();
+        $data = WorksCategory::getCategory($category, 0, 1);
+        return success($data);
+    }
+
+    /**
+     * @api {get} api/admin_v4/class/get-chapter-info 章节详情
+     * @apiVersion 4.0.0
+     * @apiName  get-chapter-info
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-chapter-info
+     * @apiDescription  章节详情
+     *
+     * @apiParam   {number} id 章节id
+     *
+     * @apiSuccess {string}  title  标题
+     * @apiSuccess {string}  type   类型  1 视频 2音频 3 文章
+     * @apiSuccess {string}  rank   排序
+     * @apiSuccess {string}  section   小节
+     * @apiSuccess {number}  introduce   简介
+     * @apiSuccess {number}  url      视频  音频 地址url
+     * @apiSuccess {string}  timing_time 自动上架时间
+     * @apiSuccess {string}  video_id    视频id
+     * @apiSuccess {string}  created_at  创建时间
+     * @apiSuccess {string}  free_trial  是否免费
+     * @apiSuccess {string}  timing_online  是否自动上架  1自动 0手动
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getChapterInfo(Request $request)
+    {
+        $id = $request->get('id');
+        $list = WorksInfo::select('id', 'type', 'title', 'section', 'url', 'online_time', 'timing_online', 'timing_time',
+            'status', 'introduce', 'video_id', 'free_trial')
+            ->where('id', $id)
+            ->first();
+        return success($list);
     }
 
 
