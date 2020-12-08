@@ -77,7 +77,7 @@ class ClassController extends Controller
 
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
             ->where('type', 1)
-            ->where('status', '!=', 3)
+            ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -146,6 +146,7 @@ class ClassController extends Controller
 
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
             ->where('type', 2)
+            ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -238,6 +239,7 @@ class ClassController extends Controller
             });
 
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num', 'is_pay')
+            ->where('status','>',0)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
@@ -333,6 +335,7 @@ class ClassController extends Controller
 
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num')
             ->where('is_audio_book', 1)
+            ->where('status','>',0)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
