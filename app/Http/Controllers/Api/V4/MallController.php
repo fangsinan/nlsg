@@ -217,8 +217,9 @@ class MallController extends Controller
     {
         if ($request->input('aa',0) == 1){
             $c = new ChannelServers();
-            $c->getDouyinOrder();
-            dd(__LINE__);
+//            $data = $c->douYinJob();
+            $data = $c->getDouyinOrder();
+            return $this->success($data);
         }else{
             $params = $request->input();
             $params['page'] = $params['page'] ?? 1;

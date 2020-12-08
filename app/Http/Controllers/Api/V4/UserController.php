@@ -998,7 +998,7 @@ class UserController extends Controller
             return error(1000, '验证码不能为空',$data);
         }
 
-        $dont_check_phone = ConfigModel::getData(35);
+        $dont_check_phone = ConfigModel::getData(35,1);
         $dont_check_phone = explode(',',$dont_check_phone);
         if(in_array($phone,$dont_check_phone)){
             if (intval($code) !== 6666){

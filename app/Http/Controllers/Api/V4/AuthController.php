@@ -63,7 +63,7 @@ class AuthController extends Controller
         }
 
         //todo 临时
-        $dont_check_phone = ConfigModel::getData(35);
+        $dont_check_phone = ConfigModel::getData(35,1);
         $dont_check_phone = explode(',',$dont_check_phone);
         if(in_array($phone,$dont_check_phone)){
             if (intval($code) !== 6666){
@@ -334,7 +334,7 @@ class AuthController extends Controller
         }
 
         //自己人不发验证码
-        $dont_check_phone = ConfigModel::getData(35);
+        $dont_check_phone = ConfigModel::getData(35,1);
         $dont_check_phone = explode(',',$dont_check_phone);
         if(in_array($phone,$dont_check_phone)){
             return success();
