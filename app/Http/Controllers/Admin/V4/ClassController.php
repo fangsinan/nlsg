@@ -653,7 +653,7 @@ class ClassController extends Controller
 
         $data = [
             'pid' => $work_id,
-            'type' => $input['type'] ?? '',
+            'type' => $input['type'] ?? 0,
             'title' => $input['title'] ?? '',
             'section' => $input['section'] ?? '',
             'introduce' => $input['introduce'] ?? '',
