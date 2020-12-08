@@ -77,6 +77,7 @@ class ClassController extends Controller
 
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
             ->where('type', 1)
+            ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -84,7 +85,7 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {get} api/admin_v4/class/lecture 讲座列表
+     * @api {get} api/admin_v4/class/lecture 座列表
      * @apiVersion 4.0.0
      * @apiName  lecture
      * @apiGroup 后台-虚拟课程
@@ -145,6 +146,7 @@ class ClassController extends Controller
 
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
             ->where('type', 2)
+            ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -237,6 +239,7 @@ class ClassController extends Controller
             });
 
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num', 'is_pay')
+            ->where('status','>',0)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
@@ -332,6 +335,7 @@ class ClassController extends Controller
 
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num')
             ->where('is_audio_book', 1)
+            ->where('status','>',0)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
@@ -1037,6 +1041,63 @@ class ClassController extends Controller
             ->where('id', $id)
             ->first();
         return success($list);
+    }
+
+    /**
+     * @api {post} api/admin_v4/operate/chapter 操作章节
+     * @apiVersion 4.0.0
+     * @apiName  operate/chapter
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/operate/chapter
+     * @apiDescription  操作章节
+     *
+     * @apiParam {string} id   章节id
+     * @apiParam {string} type 类型  1 上线 2 下线 3 免费 4 不免费
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function operateChapter(Request $request)
+    {
+        $id   = $request->get('id');
+        $type = $request->get('type');
+        if ($type) {
+            switch ($type) {
+                case  1:
+                    $data = [
+                        'status' => 4,
+                        'online_time' => date('Y-m-d H:i:s')
+                    ];
+                    break;
+
+                case  2:
+                    $data = [
+                        'status' => 5
+                    ];
+                    break;
+                case 3:
+                    $data = [
+                        'free_trial' => 1
+                    ];
+                    break;
+                case 4:
+                    $data = [
+                        'free_trial' => 0
+                    ];
+                    break;
+            }
+        }
+        $res = WorksInfo::where('id', $id)->update($data);
+        if ($res) {
+            return success('操作成功');
+        }
     }
 
 
