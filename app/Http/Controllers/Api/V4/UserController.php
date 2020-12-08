@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use App\Models\Column;
+use App\Models\ConfigModel;
 use App\Models\Coupon;
 use App\Models\History;
 use App\Models\LiveUserPrivilege;
@@ -997,14 +998,23 @@ class UserController extends Controller
             return error(1000, '验证码不能为空',$data);
         }
 
-        $res = Redis::get($phone);
-        if (!$res) {
-            return error(1000, '验证码已过期',$data);
-        }
+        $dont_check_phone = ConfigModel::getData(35);
+        $dont_check_phone = explode(',',$dont_check_phone);
+        if(in_array($phone,$dont_check_phone)){
+            if (intval($code) !== 6666){
+                return error(400, '验证码错误',$data);
+            }
+        }else{
+            $res = Redis::get($phone);
+            if (!$res) {
+                return error(1000, '验证码已过期',$data);
+            }
 
-        if ($code !== $res) {
-            return error(1000, '验证码错误',$data);
+            if ($code !== $res) {
+                return error(1000, '验证码错误',$data);
+            }
         }
+        
         $list = User::where('phone', $phone)->first();
         if ($list) {
             return error(1000, '该手机号码已存在',$data);
