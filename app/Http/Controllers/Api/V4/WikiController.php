@@ -54,7 +54,7 @@ class WikiController extends Controller
             $model = $model->where('category_id', $request->get('category_id'));
         }
         $lists = $model
-            ->select(['id', 'name', 'content', 'cover', 'view_num', 'like_num', 'comment_num'])
+            ->select(['id', 'name', 'content', 'cover', 'view_num', 'like_num', 'comment_num','collection_num'])
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
