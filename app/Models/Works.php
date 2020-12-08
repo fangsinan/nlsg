@@ -141,6 +141,7 @@ class Works extends Base
             ->get();
         if ($works) {
             foreach ($works as &$v) {
+                $v['is_sub'] = 0;
                 if ($uid) {
                     $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);
                 }
@@ -158,6 +159,7 @@ class Works extends Base
             ->get();
         if ($book) {
             foreach ($book as &$v) {
+                $v['is_sub'] = 0;
                 if ($uid) {
                     $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
                 }
@@ -172,8 +174,9 @@ class Works extends Base
             ->where('type', 2)
             ->limit(5)
             ->get();
-        if ($book) {
-            foreach ($book as &$v) {
+        if ($lecture) {
+            foreach ($lecture as &$v) {
+                $v['is_sub'] = 0;
                 if ($uid) {
                     $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
                 }
