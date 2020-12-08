@@ -587,7 +587,7 @@ class ClassController extends Controller
                 'price', 'original_price')
             ->where('id', $id)
             ->first();
-        return $work;
+        return success($work);
     }
 
     /**
