@@ -985,25 +985,29 @@ class UserController extends Controller
     {
         $phone = $request->input('phone');
         $code = $request->input('code');
+        $data = [
+            'id'=>0,
+            'token'=>''
+        ];
 
         if (!$phone) {
-            return error(1000, '手机号不能为空');
+            return error(1000, '手机号不能为空',$data);
         }
         if (!$code) {
-            return error(1000, '验证码不能为空');
+            return error(1000, '验证码不能为空',$data);
         }
 
         $res = Redis::get($phone);
         if (!$res) {
-            return error(1000, '验证码已过期');
+            return error(1000, '验证码已过期',$data);
         }
 
         if ($code !== $res) {
-            return error(1000, '验证码错误');
+            return error(1000, '验证码错误',$data);
         }
         $list = User::where('phone', $phone)->first();
         if ($list) {
-            return error(1000, '该手机号码已存在');
+            return error(1000, '该手机号码已存在',$data);
         }
         $res = User::where('id', $this->user['id'])->update(['phone' => $phone]);
         if ($res) {
