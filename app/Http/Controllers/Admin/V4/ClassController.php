@@ -941,7 +941,7 @@ class ClassController extends Controller
      *    }
      * }
      */
-    public function delWorks(Request $request)
+    public function delChapter(Request $request)
     {
         $id = $request->get('id');
         $res = WorksInfo::where('id', $id)->update(['status' => 0]);
