@@ -27,7 +27,10 @@ class WorksCategory extends Base
         foreach ($arr as $k=>$v){
             if ($v['pid'] == $id){
                 $v['level']=$level;
-                $v['son'] = self::getCategory($arr,$v['id'],$level+1);
+                $son  = self::getCategory($arr,$v['id'],$level+1);
+                if ($son){
+                    $v['son'] = $son;
+                }
                 $list[] = $v;
             }
         }
