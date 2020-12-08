@@ -77,6 +77,7 @@ class ClassController extends Controller
 
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
             ->where('type', 1)
+            ->where('status', '!=', 3)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -84,7 +85,7 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {get} api/admin_v4/class/lecture 讲座列表
+     * @api {get} api/admin_v4/class/lecture 座列表
      * @apiVersion 4.0.0
      * @apiName  lecture
      * @apiGroup 后台-虚拟课程
