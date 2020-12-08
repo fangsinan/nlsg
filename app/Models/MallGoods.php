@@ -250,16 +250,22 @@ class MallGoods extends Base
     }
 
     //获取商品全规格总库存
-    public function getGoodsAllStock($goods_id, $sku_id = 0)
+    public function getGoodsAllStock($goods_id, $sku_id = 0,$sku_number=0)
     {
-        if ($sku_id) {
-            return MallSku::where('id', '=', $sku_id)
+        if ($sku_number){
+            return MallSku::where('sku_number','=',$sku_number)
                 ->sum('stock');
-        } else {
-            return MallSku::where('goods_id', '=', $goods_id)
-                ->where('status', '=', 1)
-                ->sum('stock');
+        }else{
+            if ($sku_id) {
+                return MallSku::where('id', '=', $sku_id)
+                    ->sum('stock');
+            } else {
+                return MallSku::where('goods_id', '=', $goods_id)
+                    ->where('status', '=', 1)
+                    ->sum('stock');
+            }
         }
+
     }
 
     public function sku_list()
@@ -429,7 +435,7 @@ class MallGoods extends Base
                     $v->group_num = $vv['group_num'];
                     $v->price = $vv['group_price'];
                     $v->normal_price = MallSku::where('sku_number', '=', $vv['sku_number'])->sum('price');
-                    $v->stock = $this->getGoodsAllStock($vv['goods_id'], $vv['id']);
+                    $v->stock = $this->getGoodsAllStock($vv['goods_id'], 0,$vv['sku_number']);
                 }
             }
         }
