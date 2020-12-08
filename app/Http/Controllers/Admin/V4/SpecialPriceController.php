@@ -19,7 +19,7 @@ class SpecialPriceController extends Controller
      * @apiGroup 后台管理-商品价格设置
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/special_price/list
      * @apiDescription 列表
-     * @apiParam {number=1,2,4} type 类型(1优惠2秒杀4拼团)
+     * @apiParam {number=1,2,4} type 类型(1优惠4拼团)
      * @apiParam {string} goods_name 商品名称
      * @apiParam {string} begin_time 开始时间
      * @apiParam {string} end_time 结束时间

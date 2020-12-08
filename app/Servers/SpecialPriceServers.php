@@ -27,11 +27,11 @@ class SpecialPriceServers
             $field = ['*'];
         }
 
-//        if (!empty($params['type'])) {
-//            $query->where('type', '=', intval($params['type']));
-//        }
+        if (!empty($params['type'])) {
+            $query->where('type', '=', intval($params['type']));
+        }
 
-        $query->where('type', '=', 1);
+//        $query->where('type', '=', 1);
 
         if (!empty($params['begin_time'])) {
             $query->where('begin_time', '>=', $params['begin_time']);
