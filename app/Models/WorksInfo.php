@@ -228,6 +228,9 @@ class WorksInfo extends Base
                 ->first();
         }
 
+        if($user['level'] > 2){
+            $works_info->is_sub == 1;
+        }
 
         $is_show_url = true;
         if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
