@@ -1183,5 +1183,31 @@ class ClassController extends Controller
         }
     }
 
+    /**
+     * @api {post} api/admin_v4/search/category 作品分类
+     * @apiVersion 4.0.0
+     * @apiName  work/category
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/search/category
+     * @apiDescription  作品分类
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getSearchWorkCategory()
+    {
+        $lists = WorksCategory::select('id','name')->where('level', 3)
+            ->orderBy('id', 'desc')
+            ->get();
+        return success($lists);
+    }
 
 }
