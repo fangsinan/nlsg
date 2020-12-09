@@ -19,7 +19,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     Route::get('class/column', 'ClassController@column');
     Route::get('class/get-column-list', 'ClassController@getColumnList');
-    Route::get('class/get-column-work-lget-work-listist', 'ClassController@getColumnWorkList');
+    Route::get('class/get-column-work-list', 'ClassController@getColumnWorkList');
     Route::get('class/get-work-chapter-list', 'ClassController@getWorkChapterList');
     Route::get('class/lecture', 'ClassController@lecture');
     Route::get('class/works', 'ClassController@works');
