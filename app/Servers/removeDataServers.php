@@ -9,8 +9,8 @@ class removeDataServers
 {
     public function removeGoods()
     {
-        $copy_flag = '_copy1';
-//        $copy_flag = '';
+//        $copy_flag = '_copy1';
+        $copy_flag = '';
 
         $old_comment = DB::connection('mysql_old')
             ->table('nlsg_mall_comment')
