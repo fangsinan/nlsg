@@ -398,7 +398,8 @@ class ClassController extends Controller
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
-        $price = $input['price'] ?? 0;
+        $price  = $input['price'] ?? 0;
+        $status = $input['status'] ?? 2;
         $online_type = $input['online_type'] ?? 1;
 
         $data = [
@@ -410,7 +411,8 @@ class ClassController extends Controller
             'user_id' => $user_id,
             'price' => $price,
             'original_price' => $original_price,
-            'type' => 1
+            'type' => 1,
+            'status'=>$status
         ];
 
         if (!empty($input['id'])) {
@@ -465,7 +467,8 @@ class ClassController extends Controller
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
-        $price = $input['price'] ?? 0;
+        $price  = $input['price'] ?? 0;
+        $status = $input['status'] ?? 2;
         $online_type = $input['online_type'] ?? 1;
 
         $data = [
@@ -477,7 +480,8 @@ class ClassController extends Controller
             'user_id' => $user_id,
             'price' => $price,
             'original_price' => $original_price,
-            'type' => 2
+            'type' => 2,
+            'status'=>$status
         ];
         if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
