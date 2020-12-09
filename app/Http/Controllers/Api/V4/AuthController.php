@@ -269,7 +269,7 @@ class AuthController extends Controller
      * @apiParam code 授权码
      * @apiParam type 1 获取openid 默认1  0 微信信息
      *
-     * @apiSuccess {String} token   token
+     * @apiSuccess {String} openid   openid
      *
      * @apiSuccessExample 成功响应:
      *   {
