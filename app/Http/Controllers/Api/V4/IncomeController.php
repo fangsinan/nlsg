@@ -19,6 +19,8 @@ use App\Models\Works;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
+use PHPUnit\Util\Exception;
 
 class IncomeController extends Controller
 {
@@ -503,15 +505,19 @@ class IncomeController extends Controller
 
 
 
+        //加锁操作  防止多端口同时提现
+        //提现操作加锁
+        self::lock($user_id);
+
+
         $Time_Interval = Config('web.Withdrawals.Time_Interval');
+//        $Objflag = $this->RedisFlag($user_id,1);
+//        if ($Objflag) {  //防止多台设备请求
+//            return $this->error(0,'您操作太频繁');
+//        }else{
+//            $this->RedisFlag($user_id,2);
+//        }
 
-        $Objflag = $this->RedisFlag($user_id,1);
-
-        if ($Objflag) {  //防止多台设备请求
-            return $this->error(0,'您操作太频繁');
-        }else{
-            $this->RedisFlag($user_id,2);
-        }
         //用户提现金额
         $min_price = Config('web.Withdrawals.Min_Price');
         $Test_User = Config('web.Withdrawals.Test_User');
@@ -609,17 +615,67 @@ class IncomeController extends Controller
         }
         //处理提现操作
         $pay_res = $WithdrawalsObj->Pay($user_id, $zh_account, ($amount - $tax) * 100, $Info['truename'], $Info['truename'], $orderid, $Record_Id->id,$ip,$channel,$Info['zfb_account']);
-        if ($pay_res['status'] == 200) {
-            $this->RedisFlag($user_id,3);
-            return $this->Success($pay_res['result']);
 
+
+
+
+        $this->RedisFlag($user_id,3);
+        //释放锁
+        self::unlock($user_id);
+
+        if ($pay_res['status'] == 200) {
+            return $this->Success($pay_res['result']);
         } else {
-            $this->RedisFlag($user_id,3);
             return $this->error(0,$pay_res['msg']);
         }
 
+    }
 
 
+    public static function lock(string $key): string
+    {
+
+        //$redis = self::getInstance(0);
+        $redis = new Redis();
+        $key .= '_lock';
+        $value = '';
+
+        $curTime = time();
+        while (true) { // 独占式抢锁
+            $value = microtime(true).mt_rand(1000, 9999);
+            if ($redis::setnx($key, $value)) { // 获取到锁
+                // 锁过期时间5秒
+                $redis::expire($key, 5);
+                break;
+            } else  {
+                if (time() - $curTime >= 10) { // 超过10秒抛异常
+                    throw new Exception('lock error', 1);
+                    break;
+                }
+
+                $time = $redis::ttl($key);
+                if(($time / 2) > 0){
+                    sleep($time / 2);
+                }
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * 释放分布式锁
+     * @param string $key
+     * @return bool
+     */
+    public static function unlock(string $key): bool
+    {
+        //$redis = self::getInstance(0);
+        $redis = new Redis();
+
+        $key .= '_lock';
+        $redis::del($key);
+
+        return true;
     }
 
 
