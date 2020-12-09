@@ -714,7 +714,7 @@ class WorksController extends Controller
         }
         $category = WorksCategory::select('id','name','pid','level')->where([
             'type' => 1, 'status' => 1,
-        ])->orderBy('order','desc')->get()->toArray();
+        ])->orderBy('sort','desc')->get()->toArray();
         $data = WorksCategory::getCategory($category,0,1);
         return $this->success($data);
     }
