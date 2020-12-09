@@ -132,7 +132,7 @@ class SpecialPriceModel extends Base
                 't_money_yellow', 't_money_dealer',
                 'begin_time', 'end_time', 'type',
                 'use_coupon', 'group_name', 'group_num_type', 'group_num',
-                'freight_free', 'freight_free_line'
+                'freight_free', 'freight_free_line','flash_sale_max_num'
             ])
             ->get();
 

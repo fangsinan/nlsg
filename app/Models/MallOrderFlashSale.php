@@ -188,10 +188,37 @@ class MallOrderFlashSale extends Base
         //秒杀订单只能是一个商品
         $sku_list = reset($sku_list);
 
+        $priceTools = new GetPriceTools();
+        $normal_price = $priceTools->getGoodsPrice(
+            $sku_list, $user['level'], $user['id'], $user['is_staff'], true
+        );
+
+        foreach ($normal_price->price_list->sku_price_list as $np_v) {
+            if ($np_v->sku_number == $sku_list['sku_number']) {
+                if ($user['expire_time'] > $now_date && !empty($user['level'])){
+                    switch (intval($user['level'])){
+                        case 2:
+                        case 3:
+                            $sku_list['normal_price'] = $np_v->level_3;
+                            break;
+                        case 4:
+                            $sku_list['normal_price'] = $np_v->level_4;
+                            break;
+                        case 5:
+                            $sku_list['normal_price'] = $np_v->level_5;
+                            break;
+                    }
+                }else{
+                    $sku_list['normal_price'] = $np_v->price;
+                }
+            }
+        }
+
         //校验商品秒杀状态是否可用
         $check_sku_res = $this->checkSkuCanFlashSale(
             $sku_list['goods_id'], $sku_list['sku_number']
         );
+
         if (!is_object($check_sku_res) && (($check_sku_res['code'] ?? true) === false)) {
             return $check_sku_res;
         } else {
@@ -200,7 +227,6 @@ class MallOrderFlashSale extends Base
                 if ($f_data->use_stock >= $f_data->stock) {
                     return ['code' => false, 'msg' => '已售罄'];
                 }
-
                 if (($f_data->stock - $f_data->use_stock) < $sku_list['num']) {
                     return ['code' => false, 'msg' => '库存不足'];
                 }
@@ -209,15 +235,29 @@ class MallOrderFlashSale extends Base
             $sku_list['freight_free'] = $f_data->freight_free;
             $sku_list['freight_free_line'] = $f_data->freight_free_line;
             $sku_list['flash_sale_id'] = $check_sku_res->id;
+            $sku_list['flash_sale_max_num'] = $check_sku_res->flash_sale_max_num;
         }
 
         //校验用户是否参与过该次秒杀
         $check_user = $this->checkUserCanFlashSale($check_sku_res->id, $user['id']);
+
         if (($check_user['code'] ?? true) === false) {
             return $check_user;
         }
 
-
+//        if ($sku_list['num'] > $sku_list['flash_sale_max_num']){
+//            $sp_price_num = $sku_list['flash_sale_max_num'];
+//            $nm_price_num = $sku_list['num'] - $sku_list['flash_sale_max_num'];
+//
+//            $all_sp_original_price = '';
+//            $all_nm_original_price = '';
+//
+//            $all_sp_price = '';
+//            $all_nm_price = '';
+//
+//        }else{
+//
+//        }
         $all_original_price = GetPriceTools::PriceCalc(
             '*', $sku_list['original_price'], $sku_list['num']
         );
@@ -225,6 +265,7 @@ class MallOrderFlashSale extends Base
         $all_price = GetPriceTools::PriceCalc(
             '*', $sku_list['flash_sale_price'], $sku_list['num']
         );
+
         $freight_money = ConfigModel::getData(7); //运费
         $coupon_freight = 0; //是否免邮券
         $freight_free_flag = false; //是否免邮
@@ -406,7 +447,6 @@ class MallOrderFlashSale extends Base
         if ($sp_data->isEmpty()) {
             return ['code' => false, 'msg' => '活动不存在'];
         }
-
         $res = [];
         foreach ($sp_data as $k => $v) {
             if ($v->type == 2) {
@@ -439,6 +479,8 @@ class MallOrderFlashSale extends Base
     {
         $check = MallOrder::where('user_id', '=', $uid)
             ->where('sp_id', '=', $flash_sale_id)
+            ->where('status','>',1)
+            ->where('is_stop','=',0)
             ->first();
         if (!empty($check)) {
             return ['code' => false, 'msg' => '无法参加'];
