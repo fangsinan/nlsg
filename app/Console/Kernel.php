@@ -45,9 +45,9 @@ class Kernel extends ConsoleKernel
         })->everyMinute();//每分
 
         $schedule->call(function () {
-            $c = new ChannelServers();
-            $c->getDouyinOrder();
-            $c->supplementDouYinOrder();
+//            $c = new ChannelServers();
+//            $c->getDouyinOrder();
+//            $c->supplementDouYinOrder();
         })->everyFiveMinutes();//每五分
 
         $schedule->call(function () {
