@@ -227,9 +227,8 @@ class WorksInfo extends Base
                     DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
         }
-
         if($user['level'] > 2){
-            $works_info->is_sub == 1;
+            $works_info->is_sub = 1;
         }
 
         $is_show_url = true;
