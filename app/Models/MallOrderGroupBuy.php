@@ -1038,7 +1038,8 @@ class MallOrderGroupBuy extends Base
 
         $list = DB::table('nlsg_mall_group_buy_list as gbl')
             ->join('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
-            ->where('group_buy_id','=',$group_buy_id)
+            ->join('nlsg_special_price as sp','gbl.group_buy_id','=','sp.id')
+            ->where('sp.group_name','=',$group_buy_id)
             ->select(['nuser.id as user_id', 'nuser.headimg', 'nuser.nickname',
                 'gbl.created_at', 'gbl.is_captain', 'gbl.is_success'])
             ->limit($size)
