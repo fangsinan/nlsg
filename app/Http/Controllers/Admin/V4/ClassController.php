@@ -404,7 +404,8 @@ class ClassController extends Controller
             'message' => $message,
             'user_id' => $user_id,
             'price' => $price,
-            'original_price' => $original_price
+            'original_price' => $original_price,
+            'type' => 1
         ];
 
         if (!empty($input['id'])) {
@@ -470,7 +471,8 @@ class ClassController extends Controller
             'message' => $message,
             'user_id' => $user_id,
             'price' => $price,
-            'original_price' => $original_price
+            'original_price' => $original_price,
+            'type'  => 2
         ];
         if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);

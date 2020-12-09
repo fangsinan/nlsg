@@ -10,7 +10,7 @@ class Column extends Base
     public $timestamps = false;
 
     // 允许批量赋值
-    protected  $fillable = ['name','user_id','subtitle','price','original_price','cover_pic','details_pic','message','status'];
+    protected  $fillable = ['name','type','user_id','subtitle','price','original_price','cover_pic','details_pic','message','status'];
 
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
