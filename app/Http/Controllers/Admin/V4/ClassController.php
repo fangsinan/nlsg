@@ -1067,6 +1067,10 @@ class ClassController extends Controller
             'status', 'introduce', 'video_id', 'free_trial')
             ->where('id', $id)
             ->first();
+        if ($list){
+            $res = WorksInfoContent::where('works_info_id', $id)->first();
+            $list['content'] = $res->content;
+        }
         return success($list);
     }
 
