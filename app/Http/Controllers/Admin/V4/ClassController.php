@@ -215,7 +215,7 @@ class ClassController extends Controller
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when($is_pay, function ($query) use ($is_pay) {
+            ->when(!is_null($is_pay), function ($query) use ($is_pay) {
                 $query->where('is_pay', $is_pay);
             })
             ->when($type, function ($query) use ($type) {
