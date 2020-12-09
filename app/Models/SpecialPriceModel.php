@@ -287,7 +287,6 @@ class SpecialPriceModel extends Base
         }
 
         $order_list = $this->groupBuyListCounts($group_buy_id_list);
-
         foreach ($res as $v) {
             foreach ($order_list as $vv) {
                 if ($v->group_buy_id == $vv->group_buy_id) {
@@ -307,6 +306,7 @@ class SpecialPriceModel extends Base
             ->join('nlsg_mall_order as nmo', 'gbl.order_id', '=', 'nmo.id')
             ->join('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
             ->whereIn('gbl.group_name', $id)
+            ->where('is_success','=',1)
             ->where('nmo.is_stop', '=', 0)
             ->where('nmo.is_del', '=', 0);
 
