@@ -338,6 +338,7 @@ class UserController extends Controller
         ]);
 
         User::where('id', $uid)->increment('fan_num');
+        User::where('id',$this->user['id'])->increment('follow_num');
 
         return success();
     }
@@ -376,6 +377,9 @@ class UserController extends Controller
         if (!$follow->delete()) {
             return error(1000, '取消失败');
         }
+        User::where('id', $uid)->decrement('fan_num');
+        User::where('id',$this->user['id'])->decrement('follow_num');
+
         return success();
     }
 
