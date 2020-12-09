@@ -240,7 +240,7 @@ class ClassController extends Controller
             });
 
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num', 'is_pay')
-            ->where('status','>',0)
+            ->where('status', '>', 0)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
@@ -336,7 +336,7 @@ class ClassController extends Controller
 
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num')
             ->where('is_audio_book', 1)
-            ->where('status','>',0)
+            ->where('status', '>', 0)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
@@ -472,21 +472,24 @@ class ClassController extends Controller
             'user_id' => $user_id,
             'price' => $price,
             'original_price' => $original_price,
-            'type'  => 2
+            'type' => 2
         ];
         if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
         } else {
             $res = Column::create($data);
-            if ($res){
+            if ($res) {
                 $work = [
                     'column_id' => $res->id,
-                    'title'     => $name,
-                    'subtitle'  => $subtitle,
-                    'user_id'   => $user_id,
-                    'price'     => $price,
+                    'title' => $name,
+                    'subtitle' => $subtitle,
+                    'cover_img' => $cover_pic,
+                    'detail_img' => $details_pic,
+                    'user_id' => $user_id,
+                    'message' => $message,
+                    'price' => $price,
                     'original_price' => $original_price,
-                    'type'   => 1
+                    'type' => 1
                 ];
                 Works::create($work);
             }
@@ -540,7 +543,7 @@ class ClassController extends Controller
         $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
         $content = $input['content'] ?? '';
-        $is_pay  = $input['is_pay'] ?? 0;
+        $is_pay = $input['is_pay'] ?? 0;
 
 
         $data = [
@@ -553,7 +556,7 @@ class ClassController extends Controller
             'is_end' => $is_end,
             'status' => $status,
             'content' => $content,
-            'is_pay'  => $is_pay
+            'is_pay' => $is_pay
         ];
         if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
@@ -617,7 +620,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price', 'is_pay','message')
+                'price', 'original_price', 'is_pay', 'message')
             ->where('id', $id)
             ->first();
         if ($work) {
@@ -689,22 +692,22 @@ class ClassController extends Controller
         if (!empty($input['id'])) {
             WorksInfo::where('id', $input['id'])->update($data);
             $list = WorksInfoContent::where('works_info_id', $input['id'])->first();
-            if($list){
+            if ($list) {
                 WorksInfoContent::where('works_info_id', $input['id'])
-                            ->update(['content'=> $content]);
+                    ->update(['content' => $content]);
             } else {
                 WorksInfoContent::create([
-                   'works_info_id' => $input['id'],
-                   'content'       => $content
+                    'works_info_id' => $input['id'],
+                    'content' => $content
                 ]);
             }
         } else {
             $res = WorksInfo::create($data);
-            if ($res){
+            if ($res) {
 
                 WorksInfoContent::create([
                     'works_info_id' => $res->id,
-                    'content'       => $content
+                    'content' => $content
                 ]);
             }
         }
@@ -809,7 +812,7 @@ class ClassController extends Controller
     {
         $id = $request->get('column_id');
         $list = Column::with('user:id,nickname,headimg')
-            ->select('id', 'user_id','name', 'title', 'subtitle', 'message', 'status', 'original_price', 'price', 'cover_pic',
+            ->select('id', 'user_id', 'name', 'title', 'subtitle', 'message', 'status', 'original_price', 'price', 'cover_pic',
                 'details_pic', 'created_at')
             ->where('id', $id)->first();
         return success($list);
@@ -851,10 +854,49 @@ class ClassController extends Controller
         $lists = Works::select('id', 'title', 'type', 'view_num', 'status', 'is_end', 'online_time', 'chapter_num',
             'subscribe_num', 'created_at')
             ->where('column_id', $id)
-            ->where('status','>',0)
+            ->where('status', '>', 0)
             ->paginate(10)
             ->toArray();
+        return success($lists);
 
+    }
+
+    /**
+     * @api {get} api/admin_v4/class/get-lecture-work-list 专栏作品信息
+     * @apiVersion 4.0.0
+     * @apiName  get-lecture-work-list
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-lecture-work-list
+     * @apiDescription  专栏作品信息
+     * 
+     * @apiParam {string} id   专栏id
+     *
+     * @apiSuccess {string}  type   1 视频 2音频 3 文章
+     * @apiSuccess {string}  title  标题
+     * @apiSuccess {string}  view_num  浏览数
+     * @apiSuccess {string}  obj_id    跳转id
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  上架时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function getLectureWorkList(Request $request)
+    {
+        $id = $request->get('id');
+        $lists = Works::select('id', 'title', 'type', 'view_num', 'status', 'is_end', 'online_time', 'chapter_num',
+            'subscribe_num', 'created_at')
+            ->where('column_id', $id)
+            ->where('status', '>', 0)
+            ->first();
         return success($lists);
 
     }
@@ -1077,7 +1119,7 @@ class ClassController extends Controller
             'status', 'introduce', 'video_id', 'free_trial')
             ->where('id', $id)
             ->first();
-        if ($list){
+        if ($list) {
             $res = WorksInfoContent::where('works_info_id', $id)->first();
             $list['content'] = $res ? $res->content : '';
         }
@@ -1107,7 +1149,7 @@ class ClassController extends Controller
      */
     public function operateChapter(Request $request)
     {
-        $id   = $request->get('id');
+        $id = $request->get('id');
         $type = $request->get('type');
         if ($type) {
             switch ($type) {
