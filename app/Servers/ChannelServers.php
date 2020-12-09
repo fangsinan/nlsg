@@ -68,9 +68,14 @@ class ChannelServers
         $query->where('o.activity_tag', '=', 'cytx')
             ->where('o.status', '=', 1)
             ->where('o.type', '=', 9)
-            ->where('cytx_job', '<>', -1)
-            ->where('p.price', '>', 1)
-            ->where('u.is_staff', '=', 0)
+            ->where('cytx_job', '<>', -1);
+
+        $is_test = intval(ConfigModel::getData(37));
+        if (!$is_test) {
+            $query->where('p.price', '>', 1);
+        }
+
+        $query->where('u.is_staff', '=', 0)
             ->where('o.is_shill', '=', 0)
             ->where('cytx_job', '<', 11)
             ->whereRaw('(cytx_job = 0 or ((cytx_job*600) + UNIX_TIMESTAMP(cytx_check_time) <= UNIX_TIMESTAMP()))');
@@ -80,10 +85,13 @@ class ChannelServers
             $query->limit(10);
         }
 
+//        DB::connection()->enableQueryLog();
         $list = $query->select([
             'o.id', 'o.ordernum', 'u.phone as username',
             'u.nickname', 'p.price', 'o.cytx_job', 'w.title', 'o.pay_time'
         ])->get();
+//        dd(DB::getQueryLog());
+        dd($list);
 
         if ($list->isNotEmpty()) {
             $list = $list->toArray();
@@ -112,7 +120,7 @@ class ChannelServers
             }
             $begin_date = date('Y-m-d H:i:00', strtotime($begin_date));
             $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +300 minutes"));
-            ConfigModel::whereId(38)->update(['value'=>$end_date]);
+            ConfigModel::whereId(38)->update(['value' => $end_date]);
         }
 
         $page = 0;
@@ -154,10 +162,10 @@ class ChannelServers
                     continue;
                 }
 
-                $temp_data = ChannelOrder::where('order_id','=',$v['order_id'])
-                    ->where('channel','=',1)
+                $temp_data = ChannelOrder::where('order_id', '=', $v['order_id'])
+                    ->where('channel', '=', 1)
                     ->first();
-                if (empty($temp_data)){
+                if (empty($temp_data)) {
                     $temp_data = new ChannelOrder();
                 }
 

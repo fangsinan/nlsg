@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CouponRuleList;
 use App\Models\MallGoodsMsg;
 use App\Servers\ChannelServers;
+use App\Servers\JobServers;
 use Illuminate\Http\Request;
 use App\Models\MallGoods;
 use App\Models\CouponRule;
@@ -216,6 +217,17 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
+
+//            $servers = new ChannelServers();
+//            $servers->cytxOrderList(1534);
+            $i = 0;
+            while ($i < 10){
+                JobServers::pushToCytx(time().rand(100,999));
+                $i++;
+            }
+
+            dd(__LINE__);
+
 //            $c = new ChannelServers();
 //            $data = $c->getDouyinOrder();
 //            $data = $c->supplementDouYinOrder();
