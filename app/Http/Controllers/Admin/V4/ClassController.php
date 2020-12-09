@@ -777,7 +777,7 @@ class ClassController extends Controller
     {
         $id = $request->get('column_id');
         $list = Column::with('user:id,nickname,headimg')
-            ->select('id', 'user_id', 'title', 'subtitle', 'message', 'status', 'original_price', 'price', 'cover_pic',
+            ->select('id', 'user_id','name', 'title', 'subtitle', 'message', 'status', 'original_price', 'price', 'cover_pic',
                 'details_pic', 'created_at')
             ->where('id', $id)->first();
         return success($list);
