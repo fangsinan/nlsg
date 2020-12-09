@@ -131,6 +131,7 @@ class AuthController extends Controller
             'nickname' => $user->nickname,
             'headimg' => $user->headimg ?? '',
             'phone'=>$user->phone,
+            'level'=>$user->level
         ];
         return success($data);
     }
