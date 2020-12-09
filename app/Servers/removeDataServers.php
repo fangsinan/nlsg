@@ -10,6 +10,7 @@ class removeDataServers
     public function removeGoods()
     {
         $copy_flag = '_copy1';
+//        $copy_flag = '';
 
         $old_comment = DB::connection('mysql_old')
             ->table('nlsg_mall_comment')
@@ -54,7 +55,9 @@ class removeDataServers
 
         $old_sku = DB::connection('mysql_old')
             ->table('nlsg_mall_sku')
-            ->get()->toArray();
+            ->groupBy('goods_id','status','sku_json')
+            ->get()
+            ->toArray();
 
         $sku_data = [];
         $sku_value_data = [];

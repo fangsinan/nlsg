@@ -227,7 +227,7 @@ class ShoppingCart extends Base
                 ->where('goods.status', '=', 2)
                 ->where('sku.status', '=', 1)
                 ->where('sku.stock', '>', 0)
-                ->count('msc.id');
+                ->sum('msc.num');
             return ['count' => $count];
         }
     }
