@@ -155,7 +155,25 @@ class AuthController extends Controller
         auth('api')->logout();
         return success();
     }
-
+    /**
+     * @api {get} api/v4/auth/wechat 微信授权
+     * @apiVersion 4.0.0
+     * @apiName  wechat
+     * @apiGroup Auth
+     * @apiParam code 授权码
+     *
+     * @apiSuccess {String} token   token
+     *
+     * @apiSuccessExample 成功响应:
+     *   {
+     *      "code": 200,
+     *      "msg" : '成功',
+     *      "data": {
+     *
+     *       }
+     *   }
+     *
+     */
     public function wechat(Request $request)
     {
         $input = $request->all();
@@ -242,11 +260,12 @@ class AuthController extends Controller
     }
 
     /**
-     * @api {get} api/v4/auth/wechat 微信授权
+     * @api {get} api/v4/auth/wechat_info 微信授权
      * @apiVersion 4.0.0
-     * @apiName  wechat
+     * @apiName  wechat_info
      * @apiGroup Auth
      * @apiParam code 授权码
+     * @apiParam type 1 获取openid 默认1  0 微信信息
      *
      * @apiSuccess {String} token   token
      *
@@ -260,9 +279,10 @@ class AuthController extends Controller
      *   }
      *
      */
-    public function wechat2(Request $request)
+    public function wechatInfo(Request $request)
     {
         $code = $request->input('code');
+        $type = $request->input('type',1);
         if (!$code) {
             return $this->error(1000, 'code不能为空');
         }
@@ -274,37 +294,52 @@ class AuthController extends Controller
             'grant_type' => 'authorization_code'
         ]);
         if (!$res) {
-            return $this->error(401, 授权失败);
+            return $this->error(401, '授权失败');
+        }
+
+        if($type == 1){
+            return $this->success(['openid' =>$res->openid,]);
         }
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res['access_token'],
             'openid' => $res['openid'],
+//            'access_token' => '40_tltoeeRVSC3-8r1b3moslhijYvZxBk3XHQYk3RefzZCRlLv90Xz1e3rO4ZlVy2wByT--JJ6URuZSYyXCfs-AnA',
+//            'openid' => 'oVWHQwTytdgrfchdok3rKaxN6I-k',
         ]);
         if (!$list) {
             return $this->error(400, '获取用户信息失败');
         }
-
-        $unionid = $request->input('unionid');
-        $user = User::where('unionid', $unionid)->first();
-        if (!$user) {
-            $user = User::create([
-                'nickname' => '微信',
-                'sex' => '1',
-                'province' => '北京市',
-                'city' => '海淀区',
-                'headimg' => '/wechat/works/headimg/3833/2017110823004219451.png'
-            ]);
-        }
-
-        $token = auth('api')->login($user);;
         $data = [
-            'nickname' => $user->nickname,
-            'sex' => $user->sex,
-            'province' => $user->province,
-            'city' => $user->city,
-            'token' => $token
+            'unionid' => $list->unionid,
+            'nickname' => $list->nickname,
+            'openid' => $res->openid,
+            'headimg' => $list->headimgurl,
+            'sex' => $list->sex,
+            'province' => $list->province, //北京
+            'city' => $list->city, //朝阳区
+            'country' => $list->country, //中国
         ];
         return $this->success($data);
+//        $unionid = $request->input('unionid');
+//        $user = User::where('unionid', $unionid)->first();
+//        if (!$user) {
+//            $user = User::create([
+//                'nickname' => '微信',
+//                'sex' => '1',
+//                'province' => '北京市',
+//                'city' => '海淀区',
+//                'headimg' => '/wechat/works/headimg/3833/2017110823004219451.png'
+//            ]);
+//        }
+//        $token = auth('api')->login($user);;
+//        $data = [
+//            'nickname' => $user->nickname,
+//            'sex' => $user->sex,
+//            'province' => $user->province,
+//            'city' => $user->city,
+//            'token' => $token
+//        ];
+//        return $this->success($data);
 
     }
 
@@ -436,5 +471,7 @@ class AuthController extends Controller
         }
 
     }
+
+
 
 }
