@@ -164,6 +164,7 @@ class ClassController extends Controller
      *
      * @apiParam {number} page 分页
      * @apiParam {number} work_id 编号
+     * @apiParam {number} is_pay  是否精品课 1 是 0 否
      * @apiParam {string} title 标题
      * @apiParam {number} status 上下架
      * @apiParam {string} author 作者名称
@@ -205,6 +206,7 @@ class ClassController extends Controller
         $start = $request->get('start');
         $end = $request->get('end');
         $is_end = $request->get('is_end');
+        $is_pay = $request->get('is_pay');
 
         $query = Works::with('user:id,nickname')
             ->when($work_id, function ($query) use ($work_id) {
@@ -212,6 +214,9 @@ class ClassController extends Controller
             })
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
+            })
+            ->when($is_pay, function ($query) use ($is_pay) {
+                $query->where('is_pay', $is_pay);
             })
             ->when($type, function ($query) use ($type) {
                 $query->where('type', $type);
