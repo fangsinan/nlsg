@@ -4,6 +4,8 @@
 namespace App\Servers;
 
 
+use App\Models\ChannelOrder;
+use App\Models\ChannelSku;
 use App\Models\ConfigModel;
 use App\Models\Order;
 use App\Models\User;
@@ -92,44 +94,120 @@ class ChannelServers
 
     }
 
-    //todo 抖音订单拉取
+    //抖音订单拉取
     public function getDouYinOrder()
     {
-        $min = date('i');
-        if ($min % 2 === 0) {
-            $begin_date = date('Y-m-d H:i:00', strtotime("-30 minutes"));
+        $begin_date = ConfigModel::getData(38, 1);
+        if (empty($begin_date)) {
+            $min = date('i');
+            if ($min % 2 === 0) {
+                $begin_date = date('Y-m-d H:i:00', strtotime("-30 minutes"));
+            } else {
+                $begin_date = date('Y-m-d H:i:00', strtotime("-1470 minutes"));
+            }
+            $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +10 minutes"));
         } else {
-            $begin_date = date('Y-m-d H:i:00', strtotime("-1470 minutes"));
+            if (strtotime($begin_date) >= time()) {
+                return true;
+            }
+            $begin_date = date('Y-m-d H:i:00', strtotime($begin_date));
+            $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +300 minutes"));
+            ConfigModel::whereId(38)->update(['value'=>$end_date]);
         }
-        $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +10 minutes"));
 
-        $page = 1;
+        $page = 0;
         $size = 100;
         $args = [
             'start_time' => $begin_date,
             'end_time' => $end_date,
-            'size' => $size,
+            'size' => strval($size),
             'order_by' => 'create_time'
         ];
 
-        $args['page'] = 1;
-        $res = $this->douYinQuery($args);
-        dd($res);
-
         $go_on = true;
         while ($go_on) {
-            $args['page'] = $page;
+            $args['page'] = strval($page);
             $temp_res = $this->douYinQuery($args);
-            var_dump($args);
             $page++;
-            if ($page * $size >= $temp_res->total) {
+            if (empty($temp_res['err_no'])) {
+                $this->insertDouYinOrder($temp_res['data']['list']);
+                if ($page * $size >= $temp_res['data']['total']) {
+                    $go_on = false;
+                }
+            } else {
                 $go_on = false;
             }
         }
     }
 
+    //抖音订单入库
+    private function insertDouYinOrder($list)
+    {
+        if (!is_array($list) || empty($list)) {
+            return true;
+        }
+
+        foreach ($list as $v) {
+            foreach ($v['child'] as $vv) {
+                $check_sku = ChannelSku::checkSku($vv['product_id'], 1);
+                if (!$check_sku) {
+                    continue;
+                }
+
+                $temp_data = ChannelOrder::where('order_id','=',$v['order_id'])
+                    ->where('channel','=',1)
+                    ->first();
+                if (empty($temp_data)){
+                    $temp_data = new ChannelOrder();
+                }
+
+                $temp_data->order_id = $v['order_id'];
+                $temp_data->channel = 1;
+                $temp_data->sku = $vv['product_id'];
+                $temp_data->phone = $v['post_tel'];
+                $temp_data->order_status = $v['order_status'];
+                $temp_data->create_time = date('Y-m-d H:i:s', $v['create_time']);
+                $temp_data->pay_time = $v['pay_time'];
+                $temp_data->update_time = date('Y-m-d H:i:s', $v['update_time']);
+                $temp_data->save();
+            }
+        }
+    }
+
+    //抖音订单补全(定时任务)
+    public function supplementDouYinOrder()
+    {
+        $list = ChannelOrder::where('channel', '=', 1)
+            ->where('type', '=', 0)
+            ->where('status', '=', 0)
+            ->with(['skuInfo' => function ($query) {
+                $query->where('channel', '=', 1);
+            }])
+            ->limit(50)
+            ->get();
+        if ($list->isEmpty()) {
+            return true;
+        }
+
+        foreach ($list as $v) {
+            if (empty($v->skuInfo)) {
+                $v->status = 9;
+            } else {
+                $user = User::firstOrCreate([
+                    'phone' => $v->phone
+                ]);
+                $v->user_id = $user->id;
+                $v->to_id = $v->skuInfo->to_id;
+                $v->to_info_id = $v->skuInfo->to_info_id;
+                $v->type = $v->skuInfo->type;
+            }
+            $v->save();
+        }
+    }
+
     private function douYinQuery($args)
     {
+
         $token = $this->getDouYinToken();
         $now_date = date('Y-m-d H:i:s');
         $host = 'https://openapi-fxg.jinritemai.com';
@@ -137,14 +215,15 @@ class ChannelServers
         $c = 'order';
         $a = 'list';
         $method = $c . '.' . $a;
+
         $APP_KEY = config('env.DOUYIN_APP_KEY');
         $APP_SECRET = config('env.DOUYIN_APP_SECRET');
         ksort($args);
         $args_json = json_encode($args);
 
-
         // 计算签名
-        $str = 'app_key' . $APP_KEY . 'method' . $method . 'param_json' . $args_json . 'timestamp' . $now_date . 'v' . $v;
+        $str = 'app_key' . $APP_KEY . 'method' . $method . 'param_json' .
+            $args_json . 'timestamp' . $now_date . 'v' . $v;
         $md5_str = $APP_SECRET . $str . $APP_SECRET;
         $sign = md5($md5_str);
         $base_url = $host . '/' . $c . '/' . $a;
@@ -159,33 +238,8 @@ class ChannelServers
             'sign' => $sign,
         ];
 
-        //https://openapi-fxg.jinritemai.com/order/list?
-        //app_key=your_app_key_here&access_token=your_accesstoken_here&method=order.list&
-        //param_json={"end_time":"2018/05/31 16:01:02","is_desc":"1","page":"0","size":"10","start_time":"2018/04/01 15:03:58"}&
-        //timestamp=2018-06-14%2016:06:59&v=2&sign=your_sign_here
-
-        //access_token=258b142a-de5d-408a-8eef-e88d94771668&
-        //app_key=6857846430543906317&
-        //method=order.list&
-        //param_json=%7B%22end_time%22%3A%222020-12-07+16%3A49%3A00%22%2C%22order_by%22%3A%22create_time%22%2C%22page%22%3A1%2C%22size%22%3A100%2C%22start_time%22%3A%222020-12-07+16%3A39%3A00%22%7D&timestamp=2020-12-08+17%3A09%3A36&v=2&sign=6300669593c287495cc74125b03a3f8f
-
-//        dd([$base_url,$request_data,http_build_query($request_data),urldecode(http_build_query($request_data))]);
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $base_url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, urldecode(http_build_query($request_data)));
-        $res = curl_exec($curl);
-        curl_close($curl);
+        $res = Http::get($base_url . '?' . http_build_query($request_data));
         return json_decode($res, true);
-
-//        $res = Http::get($base_url.'?'.http_build_query($request_data));
-//        return json_decode($res);
-
-//        $data = new class {
-//        };
-//        $data->total = 1000;
-//        return $data;
     }
 
     private function getDouYinToken()
@@ -212,7 +266,15 @@ class ChannelServers
     }
 
 
-    //todo 抖音开通
+    //todo 抖音开通(定时任务)
+    public function douYinJob()
+    {
+        $list = ChannelOrder::where('type', '>', 0)->where('status', '=', 0)
+            ->select(['id', 'type', 'user_id', 'order_status', 'to_id', 'to_info_id'])
+            ->get();
+
+        return $list;
+    }
 
 
 }

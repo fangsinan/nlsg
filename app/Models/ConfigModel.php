@@ -22,14 +22,14 @@ class ConfigModel extends Base
     protected $table = 'nlsg_config';
 
     //1:邮费  2:特价优先级
-    public static function getData($id)
+    public static function getData($id, $flag = 0)
     {
         //$expire_num = 3600;
         $expire_num = 60;
         $cache_key_name = 'v4_config_' . $id;
 
         $res = Cache::get($cache_key_name);
-        if (empty($res)) {
+        if ($flag === 1 || empty($res)) {
             $res = self::getFromDb($id);
             Cache::put($cache_key_name, $res, $expire_num);
         }

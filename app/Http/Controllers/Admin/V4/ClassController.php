@@ -8,6 +8,7 @@ use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
+use App\Models\WorksInfoContent;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -412,7 +413,7 @@ class ClassController extends Controller
             Column::create($data);
         }
 
-        return success('操作成功');
+        return success();
 
     }
 
@@ -474,10 +475,14 @@ class ClassController extends Controller
         if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
         } else {
-            Column::create($data);
+            $res = Column::create($data);
+            if ($res){
+                $data['column_id'] = $res->id;
+                Works::create($data);
+            }
         }
 
-        return success('操作成功');
+        return success();
     }
 
     /**
@@ -555,7 +560,7 @@ class ClassController extends Controller
             'category_id' => $input['category_id'] ?? 0
         ]);
 
-        return success('操作成功');
+        return success();
     }
 
     /**
@@ -592,7 +597,7 @@ class ClassController extends Controller
      * {
      *   "code": 200,
      *   "msg" : '成功',
-     *   "data": {
+     *   "dat": {
      *
      *    }
      * }
@@ -602,7 +607,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price', 'is_pay')
+                'price', 'original_price', 'is_pay','message')
             ->where('id', $id)
             ->first();
         if ($work) {
@@ -652,7 +657,7 @@ class ClassController extends Controller
             return error(1000, '作品不存在');
         }
 
-
+        $content = $input['content'] ?? ''; //文稿
         $timing_online = $input['timing_online'] ?? 0;
         if ($timing_online == 1) {
             $data['timing_time'] = date('Y-m-d H:i:s', time());
@@ -673,10 +678,27 @@ class ClassController extends Controller
 
         if (!empty($input['id'])) {
             WorksInfo::where('id', $input['id'])->update($data);
+            $list = WorksInfoContent::where('works_info_id', $input['id'])->first();
+            if($list){
+                WorksInfoContent::where('works_info_id', $input['id'])
+                            ->update(['content'=> $content]);
+            } else {
+                WorksInfoContent::create([
+                   'works_info_id' => $input['id'],
+                   'content'       => $content
+                ]);
+            }
         } else {
-            WorksInfo::create($data);
+            $res = WorksInfo::create($data);
+            if ($res){
+
+                WorksInfoContent::create([
+                    'works_info_id' => $res->id,
+                    'content'       => $content
+                ]);
+            }
         }
-        return success('操作成功');
+        return success();
 
     }
 
@@ -743,7 +765,7 @@ class ClassController extends Controller
         } else {
             Works::create($data);
         }
-        return success('操作成功');
+        return success();
     }
 
     /**
@@ -777,7 +799,7 @@ class ClassController extends Controller
     {
         $id = $request->get('column_id');
         $list = Column::with('user:id,nickname,headimg')
-            ->select('id', 'user_id', 'title', 'subtitle', 'message', 'status', 'original_price', 'price', 'cover_pic',
+            ->select('id', 'user_id','name', 'title', 'subtitle', 'message', 'status', 'original_price', 'price', 'cover_pic',
                 'details_pic', 'created_at')
             ->where('id', $id)->first();
         return success($list);
@@ -897,7 +919,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Column::where('id', $id)->update(['status' => 3]);
         if ($res) {
-            return success('操作成功');
+            return success();
         }
     }
 
@@ -926,7 +948,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Works::where('id', $id)->update(['status' => 0]);
         if ($res) {
-            return success('操作成功');
+            return success();
         }
     }
 
@@ -955,7 +977,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = WorksInfo::where('id', $id)->update(['status' => 0]);
         if ($res) {
-            return success('操作成功');
+            return success();
         }
     }
 
@@ -1101,7 +1123,7 @@ class ClassController extends Controller
         }
         $res = WorksInfo::where('id', $id)->update($data);
         if ($res) {
-            return success('操作成功');
+            return success();
         }
     }
 

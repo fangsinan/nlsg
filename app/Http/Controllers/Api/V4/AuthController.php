@@ -63,7 +63,7 @@ class AuthController extends Controller
         }
 
         //todo 临时
-        $dont_check_phone = ConfigModel::getData(35);
+        $dont_check_phone = ConfigModel::getData(35,1);
         $dont_check_phone = explode(',',$dont_check_phone);
         if(in_array($phone,$dont_check_phone)){
             if (intval($code) !== 6666){
@@ -101,7 +101,8 @@ class AuthController extends Controller
                 'inviter' => $inviter,
                 'login_flag' => ($inviter == 0) ? 0 : 1,
                 'nickname' => substr_replace($phone, '****', 3, 4),
-                'ref' => $ref
+                'ref' => $ref,
+                'headimg'=>'image/202009/13f952e04c720a550193e5655534be86.jpg',
             ]);
             $user = User::find($list->id);
             $model->giveCoupon($list->id, 36);
@@ -128,7 +129,8 @@ class AuthController extends Controller
             'id' => $user->id,
             'token' => $token,
             'nickname' => $user->nickname,
-            'headimg' => $user->headimg ?? ''
+            'headimg' => $user->headimg ?? '',
+            'phone'=>$user->phone,
         ];
         return success($data);
     }
@@ -369,7 +371,7 @@ class AuthController extends Controller
         }
 
         //自己人不发验证码
-        $dont_check_phone = ConfigModel::getData(35);
+        $dont_check_phone = ConfigModel::getData(35,1);
         $dont_check_phone = explode(',',$dont_check_phone);
         if(in_array($phone,$dont_check_phone)){
             return success();
