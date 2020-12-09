@@ -304,8 +304,8 @@ class AuthController extends Controller
             return $this->success(['openid' =>$res->openid,]);
         }
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
-            'access_token' => $res['access_token'],
-            'openid' => $res['openid'],
+            'access_token' => $res->access_token,
+            'openid' => $res->openid,
 //            'access_token' => '40_tltoeeRVSC3-8r1b3moslhijYvZxBk3XHQYk3RefzZCRlLv90Xz1e3rO4ZlVy2wByT--JJ6URuZSYyXCfs-AnA',
 //            'openid' => 'oVWHQwTytdgrfchdok3rKaxN6I-k',
         ]);
