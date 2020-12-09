@@ -129,7 +129,8 @@ class AuthController extends Controller
             'id' => $user->id,
             'token' => $token,
             'nickname' => $user->nickname,
-            'headimg' => $user->headimg ?? ''
+            'headimg' => $user->headimg ?? '',
+            'phone'=>$user->phone,
         ];
         return success($data);
     }
