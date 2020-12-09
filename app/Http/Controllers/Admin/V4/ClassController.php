@@ -855,9 +855,7 @@ class ClassController extends Controller
             'subscribe_num', 'created_at')
             ->where('column_id', $id)
             ->where('status','>',0)
-            ->paginate(10)
-            ->toArray();
-
+            ->first();
         return success($lists);
 
     }
