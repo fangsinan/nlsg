@@ -976,6 +976,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Column::where('id', $id)->update(['status' => 3]);
         if ($res) {
+            Works::where('column_id', $id)->update(['status' => 0]);
             return success();
         }
     }
@@ -1005,6 +1006,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Works::where('id', $id)->update(['status' => 0]);
         if ($res) {
+            WorksInfo::where('pid', $id)->update(['status'=>0]);
             return success();
         }
     }
