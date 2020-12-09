@@ -188,31 +188,31 @@ class MallOrderFlashSale extends Base
         //秒杀订单只能是一个商品
         $sku_list = reset($sku_list);
 
-        $priceTools = new GetPriceTools();
-        $normal_price = $priceTools->getGoodsPrice(
-            $sku_list, $user['level'], $user['id'], $user['is_staff'], true
-        );
+//        $priceTools = new GetPriceTools();
+//        $normal_price = $priceTools->getGoodsPrice(
+//            $sku_list, $user['level'], $user['id'], $user['is_staff'], true
+//        );
 
-        foreach ($normal_price->price_list->sku_price_list as $np_v) {
-            if ($np_v->sku_number == $sku_list['sku_number']) {
-                if ($user['expire_time'] > $now_date && !empty($user['level'])){
-                    switch (intval($user['level'])){
-                        case 2:
-                        case 3:
-                            $sku_list['normal_price'] = $np_v->level_3;
-                            break;
-                        case 4:
-                            $sku_list['normal_price'] = $np_v->level_4;
-                            break;
-                        case 5:
-                            $sku_list['normal_price'] = $np_v->level_5;
-                            break;
-                    }
-                }else{
-                    $sku_list['normal_price'] = $np_v->price;
-                }
-            }
-        }
+//        foreach ($normal_price->price_list->sku_price_list as $np_v) {
+//            if ($np_v->sku_number == $sku_list['sku_number']) {
+//                if ($user['expire_time'] > $now_date && !empty($user['level'])){
+//                    switch (intval($user['level'])){
+//                        case 2:
+//                        case 3:
+//                            $sku_list['normal_price'] = $np_v->level_3;
+//                            break;
+//                        case 4:
+//                            $sku_list['normal_price'] = $np_v->level_4;
+//                            break;
+//                        case 5:
+//                            $sku_list['normal_price'] = $np_v->level_5;
+//                            break;
+//                    }
+//                }else{
+//                    $sku_list['normal_price'] = $np_v->price;
+//                }
+//            }
+//        }
 
         //校验商品秒杀状态是否可用
         $check_sku_res = $this->checkSkuCanFlashSale(
@@ -269,6 +269,7 @@ class MallOrderFlashSale extends Base
         $freight_money = ConfigModel::getData(7); //运费
         $coupon_freight = 0; //是否免邮券
         $freight_free_flag = false; //是否免邮
+
         //如果包邮
         if ($f_data->freight_free == 1) {
 
