@@ -7,7 +7,6 @@ namespace App\Models;
 class Column extends Base
 {
     protected $table = 'nlsg_column';
-    public $timestamps = false;
 
     // 允许批量赋值
     protected  $fillable = ['name','type','user_id','subtitle','price','original_price','cover_pic','details_pic','message','status'];
