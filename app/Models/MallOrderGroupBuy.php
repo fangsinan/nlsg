@@ -599,19 +599,19 @@ class MallOrderGroupBuy extends Base
         $now_date = date('Y-m-d H:i:s', $now);
 
         //成功队伍数量
-        $team_success_count = DB::table('nlsg_mall_group_buy_list as gbl')
-            ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
-            ->where('gbl.group_name', '=', $group_buy_id)
-            ->where('gbl.is_success', '=', 1)
-            ->where('gbl.is_captain', '=', 1)
-            ->count();
+//        $team_success_count = DB::table('nlsg_mall_group_buy_list as gbl')
+//            ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
+//            ->where('gbl.group_name', '=', $group_buy_id)
+//            ->where('gbl.is_success', '=', 1)
+//            ->where('gbl.is_captain', '=', 1)
+//            ->count();
         //队伍数量
-        $team_count = DB::table('nlsg_mall_group_buy_list as gbl')
-            ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
-            ->where('gbl.group_name', '=', $group_buy_id)
-            ->where('gbl.is_captain', '=', 1)
-            ->where('gbl.is_fail', '=', 0)
-            ->count();
+//        $team_count = DB::table('nlsg_mall_group_buy_list as gbl')
+//            ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
+//            ->where('gbl.group_name', '=', $group_buy_id)
+//            ->where('gbl.is_captain', '=', 1)
+//            ->where('gbl.is_fail', '=', 0)
+//            ->count();
         //开团列表 所差人数  剩余时间
         //todo  已经成团的是否要过滤
         $query = MallGroupBuyList::where('nlsg_mall_group_buy_list.group_name', '=', $group_buy_id);
@@ -635,6 +635,7 @@ class MallOrderGroupBuy extends Base
                 'nlsg_mall_group_buy_list.user_id', '=', 'nuser.id')
             ->join('nlsg_special_price as nsp',
                 'nlsg_mall_group_buy_list.group_buy_id', '=', 'nsp.id')
+            ->where('nmo.status','>',1)
             ->select(['nlsg_mall_group_buy_list.id',
                 'nlsg_mall_group_buy_list.group_name',
                 'nlsg_mall_group_buy_list.order_id',
