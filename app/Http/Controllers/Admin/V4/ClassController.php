@@ -1162,6 +1162,9 @@ class ClassController extends Controller
     {
         $id = $request->get('id');
         $type = $request->get('type');
+        if(!$type){
+            return  error(1000,'类型不能为空');
+        }
         if ($type) {
             switch ($type) {
                 case  1:
