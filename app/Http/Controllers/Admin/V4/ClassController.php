@@ -1079,7 +1079,7 @@ class ClassController extends Controller
     {
         $category = WorksCategory::select('id', 'name', 'pid', 'level')->where([
             'type' => 1, 'status' => 1,
-        ])->orderBy('order', 'desc')->get()->toArray();
+        ])->orderBy('sort', 'desc')->get()->toArray();
         $data = WorksCategory::getCategory($category, 0, 1);
         return success($data);
     }
@@ -1191,7 +1191,7 @@ class ClassController extends Controller
     /**
      * @api {post} api/admin_v4/search/category 作品分类
      * @apiVersion 4.0.0
-     * @apiName  work/category
+     * @apiName  search/category
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/search/category
      * @apiDescription  作品分类
