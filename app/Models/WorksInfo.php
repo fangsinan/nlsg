@@ -133,9 +133,27 @@ class WorksInfo extends Base
         $works_id = $params['works_id'] ?? 0;
         $works_info_id = $params['works_info_id'] ?? 0;
         $ob = $params['ob'] ?? 'desc';
-        if (empty($works_id) || empty($works_info_id)) {
-            return ['code' => false, 'msg' => '课程不存在'];
+
+        //1 专栏  2作品 3直播  4会员 5线下产品  6讲座
+        $type = $params['type'] ?? 0;
+        if($type == 1 || $type == 6){
+            $column_id = $params['column_id'] ?? 0;
+            if (empty($column_id)) {
+                return ['code' => false, 'msg' => 'id不存在'];
+            }
+            $column_data = Works::select('id')->where(['column_id'=>$column_id])->first();
+            $works_id = $column_data['id'];
+            $sub_relation_id = $column_id;
+
+        }else{
+            if (empty($works_id) || empty($works_info_id)) {
+                return ['code' => false, 'msg' => '课程id不存在'];
+            }
+            $sub_relation_id = $works_id;
         }
+
+
+
         $query = self::where('pid', '=', $works_id)
             ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
                 'introduce', 'section', 'type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
@@ -167,7 +185,6 @@ class WorksInfo extends Base
                 $info_key = $k;
             }
         }
-
         if ($info_key == -1) {
             return ['code' => false, 'msg' => '章节不存在'];
         }
@@ -176,20 +193,41 @@ class WorksInfo extends Base
         $info_list = array_merge($info_list, $info_list, $info_list);
 
 
-        $works_info = DB::table('nlsg_works as w')
-            ->leftJoin('nlsg_subscribe as s', function ($join) use ($user,$now_date) {
-                $join->on('s.relation_id', '=', 'w.id')
-                    ->whereRaw('s.user_id = ' . $user['id'])
-                    ->where('s.type', '=', 2)
-                    ->where('s.start_time','<',$now_date)
-                    ->where('s.end_time','>',$now_date)
-                    ->where('s.status', '=', 1)
-                    ->where('s.is_del', '=', 0);
-            })
-            ->where('w.id', '=', $works_id)
-            ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img',
-                DB::raw('if(s.id > 0,1,0) as is_sub')])
-            ->first();
+
+        if($type == 1 || $type == 6){
+
+            $works_info = DB::table('nlsg_column as w')
+                ->leftJoin('nlsg_subscribe as s', function ($join) use ($user,$now_date,$type) {
+                    $join->on('s.relation_id', '=', 'w.id')
+                        ->whereRaw('s.user_id = ' . $user['id'])
+                        ->where('s.type', '=', $type)
+                        ->where('s.start_time','<',$now_date)
+                        ->where('s.end_time','>',$now_date)
+                        ->where('s.status', '=', 1)
+                        ->where('s.is_del', '=', 0);
+                })
+                ->where('w.id', '=', $column_id)
+                ->select(['w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img',
+                    DB::raw('if(s.id > 0,1,0) as is_sub')])
+                ->first();
+
+        }else{
+            $works_info = DB::table('nlsg_works as w')
+                ->leftJoin('nlsg_subscribe as s', function ($join) use ($user,$now_date) {
+                    $join->on('s.relation_id', '=', 'w.id')
+                        ->whereRaw('s.user_id = ' . $user['id'])
+                        ->where('s.type', '=', 2)
+                        ->where('s.start_time','<',$now_date)
+                        ->where('s.end_time','>',$now_date)
+                        ->where('s.status', '=', 1)
+                        ->where('s.is_del', '=', 0);
+                })
+                ->where('w.id', '=', $works_id)
+                ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img',
+                    DB::raw('if(s.id > 0,1,0) as is_sub')])
+                ->first();
+        }
+
 
         $is_show_url = true;
         if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
@@ -201,6 +239,7 @@ class WorksInfo extends Base
         $list['next'] = $this->three2one($info_list[$info_key + 1], $is_show_url);
 
         $user_info = [
+            'uid' => $user['id'],
             'level' => $user['level'],
             'expire_time' => $user['expire_time'],
             'vip' => $user['new_vip'],
