@@ -351,7 +351,7 @@ class WorksController extends Controller
         //分类
         $category = WorksCategory::select('id','name')->where([
             'type' => 1, 'status' => 1,'level'=>1
-        ])->orderBy('order','desc')->get();
+        ])->orderBy('sort','desc')->get();
 
         foreach ($category as $key=>&$val){
             $val['count'] = WorksCategoryRelation::where(['category_id'=>$val->id])->count();
