@@ -112,7 +112,7 @@ class ChannelServers
             }
             $begin_date = date('Y-m-d H:i:00', strtotime($begin_date));
             $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +300 minutes"));
-//            ConfigModel::whereId(38)->update(['value'=>$end_date]);
+            ConfigModel::whereId(38)->update(['value'=>$end_date]);
         }
 
         $page = 0;
@@ -128,7 +128,6 @@ class ChannelServers
         while ($go_on) {
             $args['page'] = strval($page);
             $temp_res = $this->douYinQuery($args);
-            dd($temp_res);
             $page++;
             if (empty($temp_res['err_no'])) {
                 $this->insertDouYinOrder($temp_res['data']['list']);
@@ -147,7 +146,7 @@ class ChannelServers
         if (!is_array($list) || empty($list)) {
             return true;
         }
-return $list;
+
         foreach ($list as $v) {
             foreach ($v['child'] as $vv) {
                 $check_sku = ChannelSku::checkSku($vv['product_id'], 1);
@@ -161,8 +160,9 @@ return $list;
                 if (empty($temp_data)){
                     $temp_data = new ChannelOrder();
                 }
-dd($temp_data);
+
                 $temp_data->order_id = $v['order_id'];
+                $temp_data->channel = 1;
                 $temp_data->sku = $vv['product_id'];
                 $temp_data->phone = $v['post_tel'];
                 $temp_data->order_status = $v['order_status'];
@@ -170,22 +170,8 @@ dd($temp_data);
                 $temp_data->pay_time = $v['pay_time'];
                 $temp_data->update_time = date('Y-m-d H:i:s', $v['update_time']);
                 $temp_data->save();
-
-//                $temp_data = [];
-//                $temp_data['channel'] = 1;
-//                $temp_data['order_id'] = $v['order_id'];
-//                $temp_data['sku'] = $vv['product_id'];
-//                $temp_data['phone'] = $v['post_tel'];
-//                $temp_data['order_status'] = $v['order_status'];
-//                $temp_data['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
-//                $temp_data['pay_time'] = $v['pay_time'];
-//                $temp_data['update_time'] = date('Y-m-d H:i:s', $v['update_time']);
-//                $data[] = $temp_data;
             }
         }
-//        if (!empty($data)) {
-//            DB::table('nlsg_channel_order')->insert($data);
-//        }
     }
 
     //抖音订单补全(定时任务)
