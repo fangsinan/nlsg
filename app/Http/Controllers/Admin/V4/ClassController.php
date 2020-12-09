@@ -8,6 +8,7 @@ use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
+use App\Models\WorksInfoContent;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -592,7 +593,7 @@ class ClassController extends Controller
      * {
      *   "code": 200,
      *   "msg" : '成功',
-     *   "data": {
+     *   "dat": {
      *
      *    }
      * }
@@ -652,7 +653,7 @@ class ClassController extends Controller
             return error(1000, '作品不存在');
         }
 
-
+        $content = $input['content'] ?? ''; //文稿
         $timing_online = $input['timing_online'] ?? 0;
         if ($timing_online == 1) {
             $data['timing_time'] = date('Y-m-d H:i:s', time());
@@ -673,10 +674,22 @@ class ClassController extends Controller
 
         if (!empty($input['id'])) {
             WorksInfo::where('id', $input['id'])->update($data);
+            $list = WorksInfoContent::where('works_info_id', $input['id'])->first();
+            if($list){
+                WorksInfoContent::where('works_info_id', $input['id'])
+                            ->update(['content'=> $content]);
+            }
         } else {
-            WorksInfo::create($data);
+            $res = WorksInfo::create($data);
+            if ($res){
+
+                WorksInfoContent::create([
+                    'works_info_id' => $res->id,
+                    'content'       => $content
+                ]);
+            }
         }
-        return success('操作成功');
+        return success();
 
     }
 
