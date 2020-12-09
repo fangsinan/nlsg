@@ -215,7 +215,7 @@ class ClassController extends Controller
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when($is_pay, function ($query) use ($is_pay) {
+            ->when(!is_null($is_pay), function ($query) use ($is_pay) {
                 $query->where('is_pay', $is_pay);
             })
             ->when($type, function ($query) use ($type) {
@@ -976,6 +976,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Column::where('id', $id)->update(['status' => 3]);
         if ($res) {
+            Works::where('column_id', $id)->update(['status' => 0]);
             return success();
         }
     }
@@ -1005,6 +1006,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Works::where('id', $id)->update(['status' => 0]);
         if ($res) {
+            WorksInfo::where('pid', $id)->update(['status'=>0]);
             return success();
         }
     }
@@ -1079,7 +1081,7 @@ class ClassController extends Controller
     {
         $category = WorksCategory::select('id', 'name', 'pid', 'level')->where([
             'type' => 1, 'status' => 1,
-        ])->orderBy('order', 'desc')->get()->toArray();
+        ])->orderBy('sort', 'desc')->get()->toArray();
         $data = WorksCategory::getCategory($category, 0, 1);
         return success($data);
     }
@@ -1191,7 +1193,7 @@ class ClassController extends Controller
     /**
      * @api {post} api/admin_v4/search/category 作品分类
      * @apiVersion 4.0.0
-     * @apiName  work/category
+     * @apiName  search/category
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/search/category
      * @apiDescription  作品分类
