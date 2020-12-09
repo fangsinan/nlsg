@@ -128,6 +128,7 @@ class ChannelServers
         while ($go_on) {
             $args['page'] = strval($page);
             $temp_res = $this->douYinQuery($args);
+            dd($temp_res);
             $page++;
             if (empty($temp_res['err_no'])) {
                 $this->insertDouYinOrder($temp_res['data']['list']);
@@ -146,7 +147,7 @@ class ChannelServers
         if (!is_array($list) || empty($list)) {
             return true;
         }
-
+return $list;
         foreach ($list as $v) {
             foreach ($v['child'] as $vv) {
                 $check_sku = ChannelSku::checkSku($vv['product_id'], 1);
@@ -154,12 +155,13 @@ class ChannelServers
                     continue;
                 }
 
-                $temp_data = ChannelOrder::firstOrCreate([
-                    'channel' => 1,
-                    'order_id' => $v['order_id'],
-                ]);
-                dd($temp_data);
-
+                $temp_data = ChannelOrder::where('order_id','=',$v['order_id'])
+                    ->where('channel','=',1)
+                    ->first();
+                if (empty($temp_data)){
+                    $temp_data = new ChannelOrder();
+                }
+dd($temp_data);
                 $temp_data->order_id = $v['order_id'];
                 $temp_data->sku = $vv['product_id'];
                 $temp_data->phone = $v['post_tel'];
