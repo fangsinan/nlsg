@@ -1184,11 +1184,11 @@ class ClassController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/work/search-category 作品分类
+     * @api {post} api/admin_v4/search/category 作品分类
      * @apiVersion 4.0.0
      * @apiName  work/category
      * @apiGroup 后台-虚拟课程
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/work/category
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/search/category
      * @apiDescription  作品分类
      *
      *
