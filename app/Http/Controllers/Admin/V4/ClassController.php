@@ -413,7 +413,7 @@ class ClassController extends Controller
             Column::create($data);
         }
 
-        return success('操作成功');
+        return success();
 
     }
 
@@ -475,10 +475,14 @@ class ClassController extends Controller
         if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
         } else {
-            Column::create($data);
+            $res = Column::create($data);
+            if ($res){
+                $data['column_id'] = $res->id;
+                Works::create($data);
+            }
         }
 
-        return success('操作成功');
+        return success();
     }
 
     /**
@@ -556,7 +560,7 @@ class ClassController extends Controller
             'category_id' => $input['category_id'] ?? 0
         ]);
 
-        return success('操作成功');
+        return success();
     }
 
     /**
@@ -678,6 +682,11 @@ class ClassController extends Controller
             if($list){
                 WorksInfoContent::where('works_info_id', $input['id'])
                             ->update(['content'=> $content]);
+            } else {
+                WorksInfoContent::create([
+                   'works_info_id' => $input['id'],
+                   'content'       => $content
+                ]);
             }
         } else {
             $res = WorksInfo::create($data);
@@ -756,7 +765,7 @@ class ClassController extends Controller
         } else {
             Works::create($data);
         }
-        return success('操作成功');
+        return success();
     }
 
     /**
@@ -910,7 +919,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Column::where('id', $id)->update(['status' => 3]);
         if ($res) {
-            return success('操作成功');
+            return success();
         }
     }
 
@@ -939,7 +948,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Works::where('id', $id)->update(['status' => 0]);
         if ($res) {
-            return success('操作成功');
+            return success();
         }
     }
 
@@ -968,7 +977,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = WorksInfo::where('id', $id)->update(['status' => 0]);
         if ($res) {
-            return success('操作成功');
+            return success();
         }
     }
 
@@ -1114,7 +1123,7 @@ class ClassController extends Controller
         }
         $res = WorksInfo::where('id', $id)->update($data);
         if ($res) {
-            return success('操作成功');
+            return success();
         }
     }
 
