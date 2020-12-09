@@ -7,7 +7,9 @@ use App\Models\AgentProfitLog;
 use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\GetPriceTools;
+use App\Models\MallGroupBuyList;
 use App\Models\MallOrderDetails;
+use App\Models\MallOrderGroupBuy;
 use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
@@ -474,12 +476,12 @@ class WechatPay extends Controller
         $pay_price = $data['total_fee'];
         $transaction_id = $data['transaction_id'];
 
-        $order_obj = MallOrder::where('ordernum', '=', $ordernum)
+        $order_obj = MallOrder::where('ordernum', '=', strval($ordernum))
             ->first();
 
-        if ($order_obj->status > 1) {
-            return true;
-        }
+//        if ($order_obj->status > 1) {
+//            return true;
+//        }
 
         DB::beginTransaction();
         //修改订单支付状态
@@ -516,6 +518,7 @@ class WechatPay extends Controller
 
         //如果是拼团订单  需要查看拼团订单是否成功
         if ($order_obj->order_type == 3) {
+
             $temp_data = DB::table('nlsg_mall_group_buy_list')
                 ->where('user_id', '=', $order_obj->user_id)
                 ->where('order_id', '=', $order_obj->id)
@@ -524,18 +527,22 @@ class WechatPay extends Controller
                 DB::rollBack();
                 return false;
             }
+
             $group_buy_id = $temp_data->group_buy_id;
             $sp_info = DB::table('nlsg_special_price')
                 ->find($group_buy_id);
             $need_num = $sp_info->group_num;
 
-            $now_num = DB::table('nlsg_mall_group_buy_list')
-                ->where('group_key', '=', $order_obj->group_key)
+            DB::connection()->enableQueryLog();
+            $now_num = DB::table('nlsg_mall_group_buy_list as bl')
+                ->join('nlsg_mall_order as o','bl.order_id','=','o.id')
+                ->where('group_key', '=', $temp_data->group_key)
+                ->where('o.status','>',1)
                 ->count();
 
             if ($now_num >= $need_num) {
-                $gb_res = MallOrderGroupBuy::where(
-                    'group_key', '=', $order_obj->group_key
+                $gb_res = MallGroupBuyList::where(
+                    'group_key', '=', $temp_data->group_key
                 )->update(
                     [
                         'is_success' => 1,
