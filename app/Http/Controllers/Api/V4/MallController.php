@@ -985,11 +985,11 @@ class MallController extends Controller
 
     /**
      * 兑换码
-     * @api {post} /api/v4/home/redeemCode 兑换码
+     * @api {post} /api/v4/home/redeem_code 兑换码
      * @apiVersion 4.0.0
-     * @apiName /api/v4/goods/redeemCode
+     * @apiName /api/v4/home/redeem_code
      * @apiGroup  Home
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeemCode
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeem_code
      * @apiDescription 兑换码,假接口
      * @apiParam {number} code 兑换码
      * @apiParam {number=1,2,3} os_type 系统( 1 安卓 2ios 3微信)
