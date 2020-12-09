@@ -483,6 +483,8 @@ class ClassController extends Controller
                     'column_id' => $res->id,
                     'title'     => $name,
                     'subtitle'  => $subtitle,
+                    'cover_img' => $cover_pic,
+                    'detail_img'=> $details_pic,
                     'user_id'   => $user_id,
                     'message'   => $message,
                     'price'     => $price,
