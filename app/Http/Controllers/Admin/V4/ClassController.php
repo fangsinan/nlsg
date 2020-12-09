@@ -1069,7 +1069,7 @@ class ClassController extends Controller
             ->first();
         if ($list){
             $res = WorksInfoContent::where('works_info_id', $id)->first();
-            $list['content'] = $res->content;
+            $list['content'] = $res ? $res->content : '';
         }
         return success($list);
     }
