@@ -1501,7 +1501,7 @@ class MallOrder extends Base
 
         if (!$c_res) {
             DB::rollBack();
-            return ['code' => false, 'msg' => '失败', 'ps' => '写入评论失败'];
+            return ['code' => false, 'msg' => '评价失败', 'ps' => '写入评论失败'];
         }
 
         $od = MallOrderDetails::find($order_detial_id);
@@ -1509,7 +1509,7 @@ class MallOrder extends Base
         $d_res = $od->save();
         if (!$d_res) {
             DB::rollBack();
-            return ['code' => false, 'msg' => '失败', 'ps' => '订单错误'];
+            return ['code' => false, 'msg' => '评价失败', 'ps' => '订单错误'];
         }
 
         //好评有礼 五星且有内容 送优惠券一张
@@ -1526,7 +1526,7 @@ class MallOrder extends Base
                     ->find($coupon_rule_id);
                 if (!$coupon_rule) {
                     DB::rollBack();
-                    return ['code' => false, 'msg' => '失败', 'ps' => '服务器错误,请重试'];
+                    return ['code' => false, 'msg' => '评价失败', 'ps' => '服务器错误,请重试'];
                 }
 
                 $coupon_data = [];
@@ -1554,7 +1554,7 @@ class MallOrder extends Base
 
                 $coupon_res = DB::table('nlsg_coupon')->insertGetId($coupon_data);
                 if (!$coupon_res) {
-                    return ['code' => false, 'msg' => '失败', 'ps' => '服务器错误,请重试'];
+                    return ['code' => false, 'msg' => '评价失败', 'ps' => '服务器错误,请重试'];
                 }
 
                 $coupon = Coupon::where('id', '=', $coupon_res)
@@ -1575,7 +1575,7 @@ class MallOrder extends Base
         }
 
         DB::commit();
-        return ['code' => true, 'msg' => 'ok', 'coupon' => $coupon];
+        return ['code' => true, 'msg' => '评价成功', 'coupon' => $coupon];
     }
 
     //mall_refund_record使用
