@@ -484,6 +484,7 @@ class ClassController extends Controller
                     'title'     => $name,
                     'subtitle'  => $subtitle,
                     'user_id'   => $user_id,
+                    'message'   => $message,
                     'price'     => $price,
                     'original_price' => $original_price,
                     'type'   => 1
