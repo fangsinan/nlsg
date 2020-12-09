@@ -479,8 +479,16 @@ class ClassController extends Controller
         } else {
             $res = Column::create($data);
             if ($res){
-                $data['column_id'] = $res->id;
-                Works::create($data);
+                $work = [
+                    'column_id' => $res->id,
+                    'title'     => $name,
+                    'subtitle'  => $subtitle,
+                    'user_id'   => $user_id,
+                    'price'     => $price,
+                    'original_price' => $original_price,
+                    'type'   => 1
+                ];
+                Works::create($work);
             }
         }
 
