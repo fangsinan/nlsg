@@ -38,6 +38,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('column/delete','ClassController@delColumn');
     Route::post('works/delete','ClassController@delWorks');
     Route::post('chapter/delete','ClassController@delChapter');
+    Route::post('operate/chapter','ClassController@operateChapter');
     Route::get('works/category', 'ClassController@getWorksCategory');
     Route::get('search/category', 'ClassController@getSearchWorkCategory');
 
