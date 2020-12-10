@@ -221,7 +221,7 @@ class MallController extends Controller
 
 
             JobServers::pushToCytx(rand(1,999));
-//            JobServers::pushToSocket($orderInfo['live_id'], $orderInfo['relation_id'], 12);
+            JobServers::pushToSocket(1,1, 12);
 
 //            $servers = new ChannelServers();
 //            $servers->cytxOrderList(1534);
