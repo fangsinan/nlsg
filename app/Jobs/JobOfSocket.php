@@ -40,7 +40,7 @@ class JobOfSocket implements ShouldQueue
         if(1){
             //废弃
             ConfigModel::whereId(39)->update([
-                'name'=>$this->job_data['type']
+                'name'=>$this->job_data['type'].rand(1,999)
             ]);
         }else{
             $data['live_id'] = $this->job_data['live_id'];
