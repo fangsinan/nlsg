@@ -18,7 +18,7 @@ class Wiki extends Model
         if (!$ids){
             return false;
         }
-        $lists= Wiki::select('id','name','content','cover','view_num','like_num', 'comment_num','collection_num')
+        $lists= Wiki::select('id','name','intro','content','cover','view_num','like_num', 'comment_num','collection_num')
             ->whereIn('id',$ids)
             ->where('status',1)
             ->orderBy('created_at','desc')
