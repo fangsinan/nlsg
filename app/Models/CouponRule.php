@@ -29,6 +29,10 @@ class CouponRule extends Base
             $v->can_use = 1;
             if ($v->get_end_time <= $now_date) {
                 unset($res[$k]);
+                continue;
+            }
+            if (!empty($v->use_time_end) && $v->use_time_end <= $now_date){
+                unset($res[$k]);
             }
         }
 
