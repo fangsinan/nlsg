@@ -742,6 +742,8 @@ class UserController extends Controller
     public function history(Request $request)
     {
         $user_id = $request->input('user_id', 0);
+
+        $user_id = $this->user['id'] ??0;
         $order = $request->input('order', 'desc');
 
         $lists = History::where(['user_id' => $user_id, 'is_del' => 0,])
