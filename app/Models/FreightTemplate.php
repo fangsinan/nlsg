@@ -26,7 +26,7 @@ class FreightTemplate extends Base
             $res = self::whereIn('type', [2, 3])
                 ->where('status', '=', 1)
                 ->select(['id', 'type', 'name',
-                    'admin_name', 'admin_phone','admin_phone as phone',
+                    'admin_name', 'admin_phone', 'admin_phone as phone',
                     'province', 'city', 'area', 'details',
                     'start_time', 'end_time'])
                 ->get();
@@ -52,18 +52,20 @@ class FreightTemplate extends Base
     {
         return $this->hasMany('App\Models\FreightTemplateDetails', 'pid', 'id')
             ->select(['id', 'name', 'pid', 'type', 'start_price', 'count_type',
-                'count_start_line', 'skip_num', 'skip_price',])
-            ->where('status', '=', 1);
+                'count_start_line', 'skip_num', 'skip_price', 'add_price'])
+            ->where('status', '=', 1)
+            ->orderBy('type', 'asc');
     }
 
     public static function getFreightMoney($info, $address_info)
     {
         $freight_id = MallGoods::find($info['goods_id'])->freight_id;
+
         if ($freight_id) {
             $model = new self();
             $freight_data = $model->getFreightData($freight_id);
-
             $freight_money = ConfigModel::getData(7);
+            $add_price = $freight_data['f_details'][0]['add_price'] ?? 0;
 
             //计算运费
             foreach ($freight_data['f_details'] as $v) {
@@ -71,6 +73,7 @@ class FreightTemplate extends Base
                 if ($v['type'] == 2) {
                     //校验收货地址是否在该分组中
                     $check_in = self::checkAreaIsIn($address_info, $v['d_list']);
+                    $add_price = $v['add_price'] ?? $add_price;
                     if ($check_in) {
                         $temp_money = self::computeMoney($info, $v);
                     }
@@ -83,12 +86,15 @@ class FreightTemplate extends Base
                     $freight_money = $temp_money;
                 }
             }
-            return $freight_money;
+            return ['price' => $freight_money, 'add_price' => $add_price];
+            //return $freight_money;
         } else {
-            return ConfigModel::getData(7);
+            return ['price' => ConfigModel::getData(7), 'add_price' => 0];
+            //return ConfigModel::getData(7);
         }
     }
 
+    //计算运费价格
     public static function computeMoney($info, $v)
     {
         //计数类型 1:件数  2:重量  3:体积

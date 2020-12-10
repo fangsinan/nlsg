@@ -345,20 +345,55 @@ class MallOrderFlashSale extends Base
         }
 
         //****************运费模板*********************
+//        if ($freight_free_flag === false) {
+//            if (!empty($used_address)) {
+//                $sku_list['freight_money'] = FreightTemplate::getFreightMoney(
+//                    $sku_list, $used_address
+//                );
+//            }
+//            if (($sku_list['freight_money'] ?? 0) > $freight_money) {
+//                $freight_money = $sku_list['freight_money'];
+//            }
+//        } else {
+//            $freight_money = 0;
+//        }
+        $add_freight_money = 0;
         if ($freight_free_flag === false) {
             if (!empty($used_address)) {
-                $sku_list['freight_money'] = FreightTemplate::getFreightMoney(
-                    $sku_list, $used_address
-                );
+                foreach ($sku_list as $k => $v) {
+                    $temp_freight_money = FreightTemplate::getFreightMoney(
+                        $v, $used_address
+                    );
+                    $sku_list[$k]['freight_money'] = $temp_freight_money['price'];
+                    $sku_list[$k]['add_freight_money'] = $temp_freight_money['add_price'];
+                }
             }
-            if (($sku_list['freight_money'] ?? 0) > $freight_money) {
-                $freight_money = $sku_list['freight_money'];
+
+            foreach ($sku_list as $v) {
+                if ($v['add_freight_money'] > $add_freight_money) {
+                    $add_freight_money = $v['add_freight_money'];
+                }
+                if (($v['freight_money'] ?? 0) > $freight_money) {
+                    $freight_money = $v['freight_money'];
+                }
             }
         } else {
             $freight_money = 0;
         }
 
-        $order_price = GetPriceTools::PriceCalc('+', $all_price, $freight_money);
+        $order_price = $all_price;
+
+        if ($freight_money > 0 && $order_price > ConfigModel::getData(1)) {
+            $freight_money = $add_freight_money;
+            if ($freight_money < 0) {
+                $freight_money = 0;
+            }
+            if ($freight_money == 0) {
+                $freight_free_flag = true;
+            }
+        }
+
+        $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
 
         $price_list = [
             'all_original_price' => $all_original_price,
