@@ -15,7 +15,7 @@ class IndexController extends Controller
      * @apiName  index/works
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/works
-     * @apiDescription 专栏列表
+     * @apiDescription 精选课程
      *
      * @apiSuccess {string} title  标题
      * @apiSuccess {string} subtitle  副标题
