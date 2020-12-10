@@ -220,6 +220,14 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
+//            $data = [
+//                'out_trade_no'      => '20121000168934680385801', //获取订单号
+//                'total_fee'         => 0.01, //价格
+//                'transaction_id'    => '4200000833202012102833526945', //交易单号
+//                'attach'            => 8,
+//                'pay_type'          => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
+//            ];
+//            $res = WechatPay::PayStatusUp($data);
 //            JobServers::pushToCytx(1534);
 
 //            $servers = new ChannelServers();

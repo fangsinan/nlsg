@@ -532,10 +532,13 @@ class WechatPay extends Controller
             $sp_info = DB::table('nlsg_special_price')
                 ->find($group_buy_id);
 
-            if ($temp_data->is_caption == 1){
+
+            if ($temp_data->is_captain == 1){
                 $end_time = date('Y-m-d H:i:59',$now + $sp_info->group_life * 60);
-                $temp_data->end_at = $end_time;
-                $end_time_res = $temp_data->save();
+
+                $end_time_res = MallGroupBuyList::whereId($temp_data->id)
+                    ->update(['end_at'=>$end_time]);
+
                 if ($end_time_res === false){
                     DB::rollBack();
                     return false;
