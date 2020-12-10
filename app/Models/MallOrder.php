@@ -741,16 +741,25 @@ class MallOrder extends Base
         }
 
         //****************运费模板*********************
+        $add_freight_money = 0;
         if ($freight_free_flag === false) {
             if (!empty($used_address)) {
                 foreach ($sku_list as $k => $v) {
-                    $sku_list[$k]['freight_money'] = FreightTemplate::getFreightMoney(
+//                    $sku_list[$k]['freight_money'] = FreightTemplate::getFreightMoney(
+//                        $v, $used_address
+//                    );
+                    $temp_freight_money = FreightTemplate::getFreightMoney(
                         $v, $used_address
                     );
+                    $sku_list[$k]['freight_money'] = $temp_freight_money['price'];
+                    $sku_list[$k]['add_freight_money'] = $temp_freight_money['add_price'];
                 }
             }
 
             foreach ($sku_list as $v) {
+                if ($v['add_freight_money'] > $add_freight_money) {
+                    $add_freight_money = $v['add_freight_money'];
+                }
                 if (($v['freight_money'] ?? 0) > $freight_money) {
                     $freight_money = $v['freight_money'];
                 }
@@ -760,8 +769,10 @@ class MallOrder extends Base
         }
 
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
+
         if ($freight_money > 0 && $order_price > ConfigModel::getData(1)) {
-            $freight_money = $freight_money - ConfigModel::getData(7);
+            //$freight_money = $freight_money - ConfigModel::getData(7);
+            $freight_money = $add_freight_money;
             if ($freight_money < 0) {
                 $freight_money = 0;
             }
@@ -769,6 +780,7 @@ class MallOrder extends Base
                 $freight_free_flag = true;
             }
         }
+
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
 
         $price_list = [
@@ -987,12 +999,12 @@ class MallOrder extends Base
                         }
                     }
 
-                    if ($check->coupon_id > 0){
+                    if ($check->coupon_id > 0) {
                         $check_coupon = Coupon::whereId($check->coupon_id)->first();
                         $check_coupon->status = 1;
                         $check_coupon->order_id = 0;
                         $coupon_res = $check_coupon->save();
-                        if ($coupon_res === false){
+                        if ($coupon_res === false) {
                             DB::rollBack();
                             return ['code' => false, 'msg' => '失败', 'ps' => 'coupon'];
                         }

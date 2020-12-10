@@ -30,6 +30,8 @@ class MallOrderGroupBuy extends Base
         $now = time();
         $dead_time = ConfigModel::getData(12);
         $dead_time = date('Y-m-d H:i:59', ($now + $dead_time * 60));
+
+
         $now_date = date('Y-m-d H:i:s', $now);
         if (!in_array($params['pay_type'], [1, 2, 3])) {
             return ['code' => false, 'msg' => '请选择支付方式', 'ps' => 'pay_type error'];
@@ -181,7 +183,7 @@ class MallOrderGroupBuy extends Base
             //如果是开团 需要指定开团有效期
             $gl_data['begin_at'] = $now_date;
             $gl_data['end_at'] = date('Y-m-d H:i:59',
-                ($now + $data['sku_list']['group_life'] * 60 + 60)
+                ($now + $data['sku_list']['group_life'] * 60)
             );
         } else {
             $gl_data['is_captain'] = 0;
@@ -372,23 +374,57 @@ class MallOrderGroupBuy extends Base
         }
 
         //****************运费模板*********************
+//        if ($freight_free_flag === false) {
+//            if (!empty($used_address)) {
+//                $sku_list['freight_money'] = FreightTemplate::getFreightMoney(
+//                    $sku_list, $used_address
+//                );
+//            }
+//            if (($sku_list['freight_money'] ?? 0) > $freight_money) {
+//                $freight_money = $sku_list['freight_money'];
+//            }
+//        } else {
+//            $freight_money = 0;
+//        }
+
+        $add_freight_money = 0;
         if ($freight_free_flag === false) {
             if (!empty($used_address)) {
-                $sku_list['freight_money'] = FreightTemplate::getFreightMoney(
-                    $sku_list, $used_address
-                );
+                foreach ($sku_list as $k => $v) {
+                    $temp_freight_money = FreightTemplate::getFreightMoney(
+                        $v, $used_address
+                    );
+                    $sku_list[$k]['freight_money'] = $temp_freight_money['price'];
+                    $sku_list[$k]['add_freight_money'] = $temp_freight_money['add_price'];
+                }
             }
-            if (($sku_list['freight_money'] ?? 0) > $freight_money) {
-                $freight_money = $sku_list['freight_money'];
+
+            foreach ($sku_list as $v) {
+                if ($v['add_freight_money'] > $add_freight_money) {
+                    $add_freight_money = $v['add_freight_money'];
+                }
+                if (($v['freight_money'] ?? 0) > $freight_money) {
+                    $freight_money = $v['freight_money'];
+                }
             }
         } else {
             $freight_money = 0;
         }
 
-        $order_price = 0;
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
+
+//        if ($freight_money > 0 && $order_price > ConfigModel::getData(1)) {
+//            $freight_money = $freight_money - ConfigModel::getData(7);
+//            if ($freight_money < 0) {
+//                $freight_money = 0;
+//            }
+//            if ($freight_money == 0) {
+//                $freight_free_flag = true;
+//            }
+//        }
+
         if ($freight_money > 0 && $order_price > ConfigModel::getData(1)) {
-            $freight_money = $freight_money - ConfigModel::getData(7);
+            $freight_money = $add_freight_money;
             if ($freight_money < 0) {
                 $freight_money = 0;
             }
@@ -396,6 +432,7 @@ class MallOrderGroupBuy extends Base
                 $freight_free_flag = true;
             }
         }
+
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
 
         $price_list = [
@@ -425,9 +462,9 @@ class MallOrderGroupBuy extends Base
         foreach ($price_list_new as &$new_v) {
             if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
-            }elseif(in_array($new_v['key'], ['运费'])) {
+            } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];
-            }else{
+            } else {
                 $new_v['value'] = '¥' . $new_v['value'];
             }
         }
@@ -635,7 +672,7 @@ class MallOrderGroupBuy extends Base
                 'nlsg_mall_group_buy_list.user_id', '=', 'nuser.id')
             ->join('nlsg_special_price as nsp',
                 'nlsg_mall_group_buy_list.group_buy_id', '=', 'nsp.id')
-            ->where('nmo.status','>',1)
+            ->where('nmo.status', '>', 1)
             ->select(['nlsg_mall_group_buy_list.id',
                 'nlsg_mall_group_buy_list.group_name',
                 'nlsg_mall_group_buy_list.order_id',
@@ -929,7 +966,7 @@ class MallOrderGroupBuy extends Base
         //商品总额,权益立减,活动立减,运费,实付金额
 
         $price_list_new = [
-            ['key' => '商品总额', 'value' =>  $data['cost_price']],
+            ['key' => '商品总额', 'value' => $data['cost_price']],
             ['key' => '权益立减', 'value' => $data['vip_cut']],
             ['key' => '活动立减', 'value' => $data['special_price_cut']],
             ['key' => '运费', 'value' => $data['freight']],
@@ -963,9 +1000,9 @@ class MallOrderGroupBuy extends Base
         foreach ($price_list_new as &$new_v) {
             if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
-            }elseif(in_array($new_v['key'], ['运费'])) {
+            } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];
-            }else{
+            } else {
                 $new_v['value'] = '¥' . $new_v['value'];
             }
         }
@@ -1039,8 +1076,8 @@ class MallOrderGroupBuy extends Base
 
         $list = DB::table('nlsg_mall_group_buy_list as gbl')
             ->join('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
-            ->join('nlsg_special_price as sp','gbl.group_buy_id','=','sp.id')
-            ->where('sp.group_name','=',$group_buy_id)
+            ->join('nlsg_special_price as sp', 'gbl.group_buy_id', '=', 'sp.id')
+            ->where('sp.group_name', '=', $group_buy_id)
             ->select(['nuser.id as user_id', 'nuser.headimg', 'nuser.nickname',
                 'gbl.created_at', 'gbl.is_captain', 'gbl.is_success'])
             ->limit($size)
