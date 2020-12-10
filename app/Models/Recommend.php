@@ -18,14 +18,10 @@ class Recommend extends Base
         if (!$type){
             return false;
         }
-//        DB::enableQueryLog();
-        $list = $this->where('position', $position)
+        $ids = Recommend::where('position', $position)
             ->where('type', $type)
-            ->value('relation_id');
-//        $quries = DB::getQueryLog();
-//        dd($quries);
+            ->pluck('relation_id');
 
-        $ids = explode(',', $list);
         switch ($type) {
             case 1:
                 $model = new Column();
