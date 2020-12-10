@@ -132,6 +132,7 @@ class Works extends Base
             ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 0)
+            ->where('status', 4)
             ->limit(5)
             ->get();
         if ($works) {
@@ -150,6 +151,7 @@ class Works extends Base
             ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 1)
+            ->where('status', 4)
             ->limit(5)
             ->get();
         if ($book) {
@@ -168,6 +170,7 @@ class Works extends Base
             ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_pic', 'details_pic')
             ->where('is_free', 1)
             ->where('type', 2)
+            ->where('status', 1)
             ->limit(5)
             ->get();
         if ($lecture) {
