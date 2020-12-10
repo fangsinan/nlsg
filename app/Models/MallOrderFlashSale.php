@@ -348,16 +348,13 @@ class MallOrderFlashSale extends Base
         $add_freight_money = 0;
         if ($freight_free_flag === false) {
             if (!empty($used_address)) {
-                $temp_freight_money  = FreightTemplate::getFreightMoney(
+                $temp_freight_money = FreightTemplate::getFreightMoney(
                     $sku_list, $used_address
                 );
                 $sku_list['freight_money'] = $temp_freight_money['price'];
                 $sku_list['add_freight_money'] = $temp_freight_money['add_price'];
             }
-//            if (($sku_list['freight_money'] ?? 0) > $freight_money) {
-//                $freight_money = $sku_list['freight_money'];
-//            }
-            if ($sku_list['add_freight_money']??0 > $add_freight_money) {
+            if ($sku_list['add_freight_money'] ?? 0 > $add_freight_money) {
                 $add_freight_money = $sku_list['add_freight_money'];
             }
             if (($sku_list['freight_money'] ?? 0) > $freight_money) {
@@ -366,31 +363,6 @@ class MallOrderFlashSale extends Base
         } else {
             $freight_money = 0;
         }
-
-
-//        $add_freight_money = 0;
-//        if ($freight_free_flag === false) {
-//            if (!empty($used_address)) {
-//                foreach ($sku_list as $k => $v) {
-//                    $temp_freight_money = FreightTemplate::getFreightMoney(
-//                        $v, $used_address
-//                    );
-//                    $sku_list[$k]['freight_money'] = $temp_freight_money['price'];
-//                    $sku_list[$k]['add_freight_money'] = $temp_freight_money['add_price'];
-//                }
-//            }
-//
-//            foreach ($sku_list as $v) {
-//                if ($v['add_freight_money']??0 > $add_freight_money) {
-//                    $add_freight_money = $v['add_freight_money'];
-//                }
-//                if (($v['freight_money'] ?? 0) > $freight_money) {
-//                    $freight_money = $v['freight_money'];
-//                }
-//            }
-//        } else {
-//            $freight_money = 0;
-//        }
 
         $order_price = $all_price;
 
@@ -416,7 +388,7 @@ class MallOrderFlashSale extends Base
         ];
 
         $price_list_new = [
-            ['key' => '商品总额', 'value' =>  $all_original_price],
+            ['key' => '商品总额', 'value' => $all_original_price],
             ['key' => '运费', 'value' => $freight_money],
 //            ['key' => '活动立减', 'value' => GetPriceTools::PriceCalc('-', 0, $price_list['sp_cut_money'])],
             ['key' => '活动立减', 'value' => $price_list['sp_cut_money']],
@@ -431,9 +403,9 @@ class MallOrderFlashSale extends Base
         foreach ($price_list_new as &$new_v) {
             if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
-            }elseif(in_array($new_v['key'], ['运费'])) {
+            } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];
-            }else{
+            } else {
                 $new_v['value'] = '¥' . $new_v['value'];
             }
         }
@@ -526,8 +498,8 @@ class MallOrderFlashSale extends Base
     {
         $check = MallOrder::where('user_id', '=', $uid)
             ->where('sp_id', '=', $flash_sale_id)
-            ->where('status','>',1)
-            ->where('is_stop','=',0)
+            ->where('status', '>', 1)
+            ->where('is_stop', '=', 0)
             ->first();
         if (!empty($check)) {
             return ['code' => false, 'msg' => '无法参加'];
