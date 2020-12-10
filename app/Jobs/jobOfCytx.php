@@ -33,7 +33,7 @@ class jobOfCytx implements ShouldQueue
     public function handle()
     {
         ConfigModel::whereId(39)->update([
-            'value'=>json_encode($this->job_data)
+            'value'=>json_encode($this->job_data).'--'.$this->job_data['id']??'0000'
         ]);
 //        $servers = new ChannelServers();
 //        $servers->cytxOrderList($this->job_data['id']);
