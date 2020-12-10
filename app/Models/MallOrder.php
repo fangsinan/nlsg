@@ -751,6 +751,7 @@ class MallOrder extends Base
                     $temp_freight_money = FreightTemplate::getFreightMoney(
                         $v, $used_address
                     );
+
                     $sku_list[$k]['freight_money'] = $temp_freight_money['price'];
                     $sku_list[$k]['add_freight_money'] = $temp_freight_money['add_price'];
                 }

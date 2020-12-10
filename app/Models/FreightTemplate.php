@@ -73,9 +73,9 @@ class FreightTemplate extends Base
                 if ($v['type'] == 2) {
                     //校验收货地址是否在该分组中
                     $check_in = self::checkAreaIsIn($address_info, $v['d_list']);
-                    $add_price = $v['add_price'] ?? $add_price;
                     if ($check_in) {
                         $temp_money = self::computeMoney($info, $v);
+                        $add_price = $v['add_price'] ?? $add_price;
                     }
                 } else {
                     //计算默认价格
