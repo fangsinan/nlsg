@@ -108,7 +108,7 @@ class BannerController extends Controller
         $url = $input['url'] ?? '';
         $rank = $input['rank'] ?? 99;
         $type = $input['type'] ?? 0;
-        $objid  = $input['obj_id'] ?? 0;
+        $objid = $input['obj_id'] ?? 0;
         $jump_type = $input['jump_type'] ?? 0;
 
         $data = [
@@ -118,7 +118,7 @@ class BannerController extends Controller
             'rank' => $rank,
             'type' => $type,
             'jump_type' => $jump_type,
-            'obj_id'    => $objid
+            'obj_id' => $objid
         ];
 
         if (!empty($id)) {
@@ -128,6 +128,43 @@ class BannerController extends Controller
         }
 
         return success();
+    }
+
+    /**
+     * @api {get} api/admin_v4/banner/edit 广告编辑
+     * @apiVersion 4.0.0
+     * @apiName  banner/edit
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/banner/edit
+     * @apiDescription  广告编辑
+     *
+     * @apiParam {string} title 标题
+     * @apiParam {string} pic   图片
+     * @apiParam {string} url   h5地址
+     * @apiParam {string} rank  排序
+     * @apiParam {number} type  位置
+     * @apiParam {number} jump_type 跳转类型
+     * @apiParam {string} obj_id 跳转id
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "dat": {
+     *
+     *    }
+     * }
+     */
+    public function edit(Request $request)
+    {
+        $id = $request->get('id');
+        $list = Banner::select('id', 'title', 'pic', 'url', 'rank', 'type', 'jump_type', 'obj_id')
+            ->where('id', $id)
+            ->first();
+        if (!$list){
+            return error(1000,'广告不存在');
+        }
+        return success($list);
     }
 
 }
