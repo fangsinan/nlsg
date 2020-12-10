@@ -751,14 +751,13 @@ class MallOrder extends Base
                     $temp_freight_money = FreightTemplate::getFreightMoney(
                         $v, $used_address
                     );
-
                     $sku_list[$k]['freight_money'] = $temp_freight_money['price'];
                     $sku_list[$k]['add_freight_money'] = $temp_freight_money['add_price'];
                 }
             }
 
             foreach ($sku_list as $v) {
-                if ($v['add_freight_money'] > $add_freight_money) {
+                if ($v['add_freight_money']??0 > $add_freight_money) {
                     $add_freight_money = $v['add_freight_money'];
                 }
                 if (($v['freight_money'] ?? 0) > $freight_money) {

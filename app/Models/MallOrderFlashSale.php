@@ -370,7 +370,7 @@ class MallOrderFlashSale extends Base
             }
 
             foreach ($sku_list as $v) {
-                if ($v['add_freight_money'] > $add_freight_money) {
+                if ($v['add_freight_money']??0 > $add_freight_money) {
                     $add_freight_money = $v['add_freight_money'];
                 }
                 if (($v['freight_money'] ?? 0) > $freight_money) {
