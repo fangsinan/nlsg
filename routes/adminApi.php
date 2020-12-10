@@ -48,6 +48,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     //广告
     Route::get('banner/list', 'BannerController@list');
     Route::post('banner/add','BannerController@add');
+    Route::get('banner/edit','BannerController@edit');
 
     Route::get('index/works','IndexController@works');
 
