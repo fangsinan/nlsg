@@ -5,24 +5,27 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class GetPriceTools extends Base {
+class GetPriceTools extends Base
+{
 
     public $level_3_off = 0.9;
     public $level_4_off = 0.85;
     public $level_5_off = 0.65;
 
-    public function goodsList($list, $user_level, $user_id, $is_staff) {
+    public function goodsList($list, $user_level, $user_id, $is_staff)
+    {
         foreach ($list as $v) {
             $this->getGoodsPrice($v, $user_level, $user_id, $is_staff);
         }
     }
 
     //获取计算价格
-    public function getGoodsPrice($data, $user_level, $user_id, $is_staff = 0, $for_order = false) {
+    public function getGoodsPrice($data, $user_level, $user_id, $is_staff = 0, $for_order = false)
+    {
         //计算推客的常规购买价格和收益
         if ($for_order) {
             $goods_id = $data['goods_id'];
-            $data = (object) array();
+            $data = (object)array();
         } else {
             $goods_id = $data->id;
         }
@@ -88,7 +91,7 @@ class GetPriceTools extends Base {
         //活动价格查询,有活动价格则覆盖
         $spModel = new SpecialPriceModel();
         $temp_sp_data = $spModel->getPriceByGoodsId(
-                $goods_id, 1, $user_id
+            $goods_id, 1, $user_id
         );
 
         $sp_info['group_buy'] = []; //1表示有拼团
@@ -110,8 +113,8 @@ class GetPriceTools extends Base {
                     $sp_info['group_buy']['begin_timestamp'] = strtotime($tsdv->begin_time);
                     $sp_info['group_buy']['end_timestamp'] = strtotime($tsdv->end_time);
                     $sp_info['group_buy']['order_num'] = MallOrder::where('sp_id', $tsdv->id)
-                            ->where('status', '>', 1)
-                            ->count();
+                        ->where('status', '>', 1)
+                        ->count();
 
                     unset($temp_sp_data[$tsdk]);
                 }
@@ -129,9 +132,11 @@ class GetPriceTools extends Base {
 
                 $temp_sku_list = [];
                 foreach ($data->sku_list as $slv) {
+                    $slv->sp_type = 0;
                     $temp_sku_list_s = $slv;
                     foreach ($temp_sp_data as $spdv) {
                         if ($slv->sku_number == $spdv->sku_number) {
+                            $temp_sku_list_s->sp_type = $spdv->type;
                             $temp_sku_list_s->original_price = $spdv->sku_original_price;
                             switch (intval($user_level)) {
                                 case 2:
@@ -186,15 +191,16 @@ class GetPriceTools extends Base {
     }
 
     //计算推客的常规购买价格和收益
-    public function getPriceDataFromDb($goods_id) {
+    public function getPriceDataFromDb($goods_id)
+    {
         $res = DB::table('nlsg_mall_goods')
-                        ->select(['id', 'price'])->find($goods_id);
+            ->select(['id', 'price'])->find($goods_id);
         $sku_price = DB::table('nlsg_mall_sku')
-                ->where('goods_id', '=', $goods_id)
-                ->where('status', '=', 1)
-                ->select(['id', 'sku_number', 'price', 'original_price',
-                    'cost', 'promotion_cost'])
-                ->get();
+            ->where('goods_id', '=', $goods_id)
+            ->where('status', '=', 1)
+            ->select(['id', 'sku_number', 'price', 'original_price',
+                'cost', 'promotion_cost'])
+            ->get();
 
         $res->level_3 = self::PriceCalc('*', $res->price, $this->level_3_off);
         $res->level_4 = self::PriceCalc('*', $res->price, $this->level_4_off);
@@ -210,7 +216,8 @@ class GetPriceTools extends Base {
     }
 
     //计算返利金额
-    protected function getTwitterMoneyBySku($data) {
+    protected function getTwitterMoneyBySku($data)
+    {
         $Percentage = intval(($data->original_price - $data->cost) / $data->original_price * 100); //百分比
         $temp_data = [];
         if ($Percentage >= 50) {
@@ -240,7 +247,8 @@ class GetPriceTools extends Base {
     }
 
     //科学计算
-    public static function PriceCalc($symbol, $n1, $n2, $scale = '2') {
+    public static function PriceCalc($symbol, $n1, $n2, $scale = '2')
+    {
         $res = '';
         switch ($symbol) {
             case "+"://加法
@@ -264,7 +272,8 @@ class GetPriceTools extends Base {
 
     //****************************DB查询 废弃****************************
     //根据商品id,sku_number获得商品实际购买价格
-    public function goodsListOld(&$list, $user_level, $user_id, $is_staff) {
+    public function goodsListOld(&$list, $user_level, $user_id, $is_staff)
+    {
         foreach ($list as &$v) {
             //获取正常售价(不包括活动)
             $this->getGoodsPrice($v, $user_level, $user_id, $is_staff);
@@ -272,7 +281,8 @@ class GetPriceTools extends Base {
     }
 
     //获取计算价格
-    public function getGoodsPriceOld(&$data, $user_level, $user_id, $is_staff) {
+    public function getGoodsPriceOld(&$data, $user_level, $user_id, $is_staff)
+    {
         //计算推客的常规购买价格和收益
         $goods_id = $data->id;
         $expire_num = CacheTools::getExpire('goods_price_expire');
@@ -336,7 +346,7 @@ class GetPriceTools extends Base {
         //活动价格查询,有活动价格则覆盖
         $spModel = new SpecialPriceModel();
         $temp_sp_data = $spModel->getPriceByGoodsId(
-                $goods_id, 1, $user_id
+            $goods_id, 1, $user_id
         );
 
         $sp_info['group_buy'] = 0; //1表示有拼团
@@ -407,23 +417,27 @@ class GetPriceTools extends Base {
     }
 
     //权益计算
-    static function Income($is_show,$level,$user_id,$type,$column_id=0,$works_id=0,$goods_id=0,$sku_number=0)
+    static function Income($is_show, $level, $user_id, $type, $column_id = 0, $works_id = 0, $goods_id = 0, $sku_number = 0)
     {
-        if(empty($level)){ //等级为空
+        if (empty($level)) { //等级为空
             //$UserInfo = self::GetLevelInfo ($user_id); //查询用户信息
             //未登录 默认级别 0
             //$level=self::GetLevel($UserInfo); //获取用户等级
 
             $level = User::getLevel($user_id);
         }
-        if($is_show){ //页面显示使用
-            if($level==0){$level=2;}//未登录 或已过期  默认推客权益
-        }else{ //收益入账
-            if($level==0){return 0;} //没有收益 权益已过期用户
+        if ($is_show) { //页面显示使用
+            if ($level == 0) {
+                $level = 2;
+            }//未登录 或已过期  默认推客权益
+        } else { //收益入账
+            if ($level == 0) {
+                return 0;
+            } //没有收益 权益已过期用户
         }
-        $price=0;
+        $price = 0;
         $time = time();
-        switch($type){
+        switch ($type) {
             case 1://专栏
                 /*
                 (2 -3)(原价)*15%-促销成本
@@ -431,19 +445,19 @@ class GetPriceTools extends Base {
                 5  45*/
                 $Info = Column::find($column_id)->toArray();
                 //$Info=self::GetColumnInfo($author_id);
-                if($level==2 || $level==3){
-                    $price=self::PriceCalc('*',$Info['price'], 0.15);
-                }else if($level==4){
-                    $price=self::PriceCalc('*',$Info['price'], 0.35);
-                }else if($level==5){
-                    $price=self::PriceCalc('*',$Info['price'], 0.45);
+                if ($level == 2 || $level == 3) {
+                    $price = self::PriceCalc('*', $Info['price'], 0.15);
+                } else if ($level == 4) {
+                    $price = self::PriceCalc('*', $Info['price'], 0.35);
+                } else if ($level == 5) {
+                    $price = self::PriceCalc('*', $Info['price'], 0.45);
                 }
 
-                $Symbol=substr($Info['promotion_cost'],0,1);
-                if(in_array($Symbol,['-','+'])){
-                    $price=$price.$Info['promotion_cost'];
-                }else{
-                    $price=$price-$Info['promotion_cost'];
+                $Symbol = substr($Info['promotion_cost'], 0, 1);
+                if (in_array($Symbol, ['-', '+'])) {
+                    $price = $price . $Info['promotion_cost'];
+                } else {
+                    $price = $price - $Info['promotion_cost'];
                 }
                 break;
             case 2://精品课
@@ -452,19 +466,19 @@ class GetPriceTools extends Base {
                 4  35
                 5  45*/
                 //$Info=self::GetWorksInfo($author_id,$works_id);
-                $Info=Works::find($works_id)->toArray();
-                if($level==2 || $level==3){
-                    $price=self::PriceCalc('*',$Info['price'], 0.15);
-                }else if($level==4){
-                    $price=self::PriceCalc('*',$Info['price'], 0.35);
-                }else if($level==5){
-                    $price=self::PriceCalc('*',$Info['price'], 0.45);
+                $Info = Works::find($works_id)->toArray();
+                if ($level == 2 || $level == 3) {
+                    $price = self::PriceCalc('*', $Info['price'], 0.15);
+                } else if ($level == 4) {
+                    $price = self::PriceCalc('*', $Info['price'], 0.35);
+                } else if ($level == 5) {
+                    $price = self::PriceCalc('*', $Info['price'], 0.45);
                 }
-                $Symbol=substr($Info['promotion_cost'],0,1);
-                if(in_array($Symbol,['-','+'])){
-                    $price=$price.$Info['promotion_cost'];
-                }else{
-                    $price=$price-$Info['promotion_cost'];
+                $Symbol = substr($Info['promotion_cost'], 0, 1);
+                if (in_array($Symbol, ['-', '+'])) {
+                    $price = $price . $Info['promotion_cost'];
+                } else {
+                    $price = $price - $Info['promotion_cost'];
                 }
                 break;
             case 5://新会员
@@ -472,18 +486,18 @@ class GetPriceTools extends Base {
                 /*
                 1  30
                 2  50*/
-                if($level==1){
-                    $price=self::PriceCalc('*',$vip_price, 0.30);
-                }else if($level==2){
-                    $price=self::PriceCalc('*',$vip_price, 0.50);
-                }else{
-                    $price=0;
+                if ($level == 1) {
+                    $price = self::PriceCalc('*', $vip_price, 0.30);
+                } else if ($level == 2) {
+                    $price = self::PriceCalc('*', $vip_price, 0.50);
+                } else {
+                    $price = 0;
                 }
-                $price=$price-0; //没有促销成本
+                $price = $price - 0; //没有促销成本
                 break;
         }
-        if($price<0){
-            $price=0; //防止负数
+        if ($price < 0) {
+            $price = 0; //防止负数
         }
         return $price;
     }
@@ -493,36 +507,37 @@ class GetPriceTools extends Base {
     皇钻：
     1.皇钻A成交皇钻B   皇钻B所有收入的5% ,补贴给A  走线上    7 8月份有效*/
     //服务商额外补贴5%
-    public static function ServiceIncome($out_trade_no,$type,$ProfitPrice,$twitter_id,$orderdtl_id=0){ //收益金额
-        $now=time();
-        $time    = strtotime(date('Y-m-d', time())) + 86400;
+    public static function ServiceIncome($out_trade_no, $type, $ProfitPrice, $twitter_id, $orderdtl_id = 0)
+    { //收益金额
+        $now = time();
+        $time = strtotime(date('Y-m-d', time())) + 86400;
         $UserInfo = User::find($twitter_id);
-        $rst=true;
-        if (!empty($UserInfo) && in_array ($UserInfo['level'], [3,4]) && $UserInfo['expire_time']>$time) { //会员
-            $ReferrerInfo=UserAttribution::select('referrer_user_id','referrer_user_level')->where('user_id',$twitter_id)->first();
-            if($ReferrerInfo) $ReferrerInfo = $ReferrerInfo->toArray();
+        $rst = true;
+        if (!empty($UserInfo) && in_array($UserInfo['level'], [3, 4]) && $UserInfo['expire_time'] > $time) { //会员
+            $ReferrerInfo = UserAttribution::select('referrer_user_id', 'referrer_user_level')->where('user_id', $twitter_id)->first();
+            if ($ReferrerInfo) $ReferrerInfo = $ReferrerInfo->toArray();
 
-            if(!empty($ReferrerInfo) && $ReferrerInfo['referrer_user_level']!=5){ //排除服务商
+            if (!empty($ReferrerInfo) && $ReferrerInfo['referrer_user_level'] != 5) { //排除服务商
                 //5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画
-                $ProfitPrice=self::PriceCalc('*',$ProfitPrice, 0.05);
+                $ProfitPrice = self::PriceCalc('*', $ProfitPrice, 0.05);
                 $subsidy_type = 1;  //当收益为5%(0.05) 时  subsidy_type为1
-                $map =['user_id' => $ReferrerInfo['referrer_user_id'], "type" => $type, "ordernum" => $out_trade_no,
-                    'price' => $ProfitPrice, 'source_id'=>$twitter_id,'order_detail_id'=>$orderdtl_id,'subsidy_type'=>1];
-                if($type==5){
+                $map = ['user_id' => $ReferrerInfo['referrer_user_id'], "type" => $type, "ordernum" => $out_trade_no,
+                    'price' => $ProfitPrice, 'source_id' => $twitter_id, 'order_detail_id' => $orderdtl_id, 'subsidy_type' => 1];
+                if ($type == 5) {
                     $PrdInfo = PayRecordDetailStay::where([
-                        'ordernum'          => $out_trade_no,
-                        'user_id'           => $map['user_id'],
-                        'order_detail_id'   => $orderdtl_id,
-                        'type'              => 5,
+                        'ordernum' => $out_trade_no,
+                        'user_id' => $map['user_id'],
+                        'order_detail_id' => $orderdtl_id,
+                        'type' => 5,
                     ])->first();
                     if (empty($PrdInfo)) {
                         return PayRecordDetailStay::create($map);
                     }
-                }else{
+                } else {
                     $PrdInfo = PayRecordDetail::where([
-                        'ordernum'          => $map['ordernum'],
-                        'user_id'           => $map['user_id'],
-                        'type'              => $map['type'],
+                        'ordernum' => $map['ordernum'],
+                        'user_id' => $map['user_id'],
+                        'type' => $map['type'],
                     ])->first();
                     if (empty($PrdInfo)) {
                         return PayRecordDetail::create($map);

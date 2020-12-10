@@ -72,7 +72,12 @@ class MallGoods extends Base
 
         //价格类
         $getPriceTools = new GetPriceTools();
-        $getPriceTools->goodsList($list, $user['level'] ?? 0, $user['id'] ?? 0, $user['is_staff'] ?? 0);
+        $getPriceTools->goodsList(
+            $list,
+            $user['level'] ?? 0,
+            $user['id'] ?? 0,
+            $user['is_staff'] ?? 0
+        );
 
         return $list;
     }
@@ -250,12 +255,12 @@ class MallGoods extends Base
     }
 
     //获取商品全规格总库存
-    public function getGoodsAllStock($goods_id, $sku_id = 0,$sku_number=0)
+    public function getGoodsAllStock($goods_id, $sku_id = 0, $sku_number = 0)
     {
-        if ($sku_number){
-            return MallSku::where('sku_number','=',$sku_number)
+        if ($sku_number) {
+            return MallSku::where('sku_number', '=', $sku_number)
                 ->sum('stock');
-        }else{
+        } else {
             if ($sku_id) {
                 return MallSku::where('id', '=', $sku_id)
                     ->sum('stock');
@@ -412,15 +417,15 @@ class MallGoods extends Base
 
         $data['group_buy_id'] = $group_buy_id;
 
-        if(0){
+        if (0) {
             $data['order_num'] = MallOrder::where('sp_id', $group_buy_id)
                 ->where('status', '>', 1)
                 ->count();
-        }else{
+        } else {
             $data['order_num'] = DB::table('nlsg_mall_group_buy_list as gbl')
-                ->join('nlsg_mall_order_detail as od','gbl.order_id','=','od.order_id')
-                ->where('gbl.group_buy_id','=',$group_buy_id)
-                ->where('gbl.is_success','=',1)
+                ->join('nlsg_mall_order_detail as od', 'gbl.order_id', '=', 'od.order_id')
+                ->where('gbl.group_buy_id', '=', $group_buy_id)
+                ->where('gbl.is_success', '=', 1)
                 ->sum('od.num');
         }
 
@@ -445,7 +450,7 @@ class MallGoods extends Base
                     $v->group_num = $vv['group_num'];
                     $v->price = $vv['group_price'];
                     $v->normal_price = MallSku::where('sku_number', '=', $vv['sku_number'])->sum('price');
-                    $v->stock = $this->getGoodsAllStock($vv['goods_id'], 0,$vv['sku_number']);
+                    $v->stock = $this->getGoodsAllStock($vv['goods_id'], 0, $vv['sku_number']);
                 }
             }
         }
