@@ -37,35 +37,39 @@ class JobOfSocket implements ShouldQueue
     public function handle()
     {
 
-        $data['live_id'] = $this->job_data['live_id'];
-        $data['live_info_id'] = $this->job_data['live_info_id'];
+        if(1){
 
-        switch (intval($this->job_data['type'])) {
-            case 6:
-                $data['method'] = 'PushProduct';//产品
-                break;
-            case 8:
-                $data['method'] = 'pushEnd';//直播结束
-                break;
-            case 9:
-                $data['method'] = 'pushForbiddenWords';//禁言
-                break;
-            case 10:
-                $data['method'] = 'getLivePushOrder';//门票订单推送
-                break;
-            case 11:
-                $data['method'] = 'getLiveOrderRanking';//排行榜
-                break;
-            case 12:
-                $data['method'] = 'getLiveGiftOrder';//礼物订单
-                break;
-            default:
-                return;
+        }else{
+            $data['live_id'] = $this->job_data['live_id'];
+            $data['live_info_id'] = $this->job_data['live_info_id'];
+
+            switch (intval($this->job_data['type'])) {
+                case 6:
+                    $data['method'] = 'PushProduct';//产品
+                    break;
+                case 8:
+                    $data['method'] = 'pushEnd';//直播结束
+                    break;
+                case 9:
+                    $data['method'] = 'pushForbiddenWords';//禁言
+                    break;
+                case 10:
+                    $data['method'] = 'getLivePushOrder';//门票订单推送
+                    break;
+                case 11:
+                    $data['method'] = 'getLiveOrderRanking';//排行榜
+                    break;
+                case 12:
+                    $data['method'] = 'getLiveGiftOrder';//礼物订单
+                    break;
+                default:
+                    return;
+            }
+
+            $url_params = http_build_query($data);
+            $url = ConfigModel::getData(24) . '?' . $url_params;
+            Http::get($url);
         }
-
-        $url_params = http_build_query($data);
-        $url = ConfigModel::getData(24) . '?' . $url_params;
-        Http::get($url);
     }
 
 

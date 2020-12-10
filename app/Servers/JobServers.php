@@ -13,7 +13,7 @@ class JobServers
     public static function pushToSocket($live_id, $live_info_id, $type)
     {
         //$data = ['live_id' => $live_id, 'live_info_id' => $live_info_id, 'type' => $type];
-        //JobOfSocket::dispatch($data);
+//        JobOfSocket::dispatch($data);
     }
 
     //创业天下推送

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ConfigModel;
 use App\Models\CouponRuleList;
 use App\Models\MallGoodsMsg;
 use App\Servers\ChannelServers;
@@ -218,15 +219,19 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
+
+            JobServers::pushToCytx(rand(1,999));
+//            JobServers::pushToSocket($orderInfo['live_id'], $orderInfo['relation_id'], 12);
+
 //            $servers = new ChannelServers();
 //            $servers->cytxOrderList(1534);
-            $i = 0;
-            while ($i < 10){
-                JobServers::pushToCytx(time().rand(100,999));
-                $i++;
-            }
+//            $i = 0;
+//            while ($i < 10){
+//                JobServers::pushToCytx(time().rand(100,999));
+//                $i++;
+//            }
 
-            dd(__LINE__);
+//            dd(__LINE__);
 
 //            $c = new ChannelServers();
 //            $data = $c->getDouyinOrder();
