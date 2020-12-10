@@ -674,8 +674,8 @@ class MallOrderGroupBuy extends Base
             $query->where('nlsg_mall_group_buy_list.user_id', '<>', $user_id);
         }
 
-        $query->where('is_success', '=', 0)
-            ->where('is_captain', '=', 1)
+//        $query->where('is_success', '=', 0);
+        $query->where('is_captain', '=', 1)
             ->where('is_fail', '=', 0)
             ->where('end_at', '>', $now_date);
 
