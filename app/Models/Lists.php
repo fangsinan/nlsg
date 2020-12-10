@@ -56,6 +56,8 @@ class Lists extends Model
                         unset( $lists[$k]['list_works'][$kk] );
                     }
                 }
+                $lists[$k]['list_works'] = array_values($lists[$k]['list_works']);
+
             }
         }
         return $lists;
