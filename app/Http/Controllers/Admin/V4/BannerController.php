@@ -108,14 +108,16 @@ class BannerController extends Controller
         $url = $input['url'] ?? '';
         $rank = $input['rank'] ?? 99;
         $type = $input['type'] ?? 0;
-        $objid = $input['obj_id'] ?? 0;
+        $objid  = $input['obj_id'] ?? 0;
+        $jump_type = $input['jump_type'] ?? 0;
 
         $data = [
             'title' => $title,
             'pic' => $pic,
             'url' => $url,
             'rank' => $rank,
-            'jump_type' => $type,
+            'type' => $type,
+            'jump_type' => $jump_type,
             'obj_id'    => $objid
         ];
 
