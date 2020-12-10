@@ -267,6 +267,10 @@ class MallOrderGroupBuy extends Base
         $freight_money = ConfigModel::getData(7); //运费
         $coupon_freight = 0; //是否免邮券
         $freight_free_flag = false; //是否免邮
+        if (($user['new_vip']['level'] ?? 0) == 2) {
+            $freight_free_flag = true;
+        }
+
         $coupon_money = 0;
         //如果包邮
         if ($f_data->freight_free == 1) {
