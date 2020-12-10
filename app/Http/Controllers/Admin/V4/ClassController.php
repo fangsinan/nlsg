@@ -408,7 +408,7 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'subtitle', 'cover', 'detail_img', 'status', 'created_at', 'view_num')
+        $lists = $query->select('id', 'name','cover', 'detail_img', 'status', 'created_at', 'view_num')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -423,9 +423,9 @@ class ClassController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/wiki/add
      * @apiDescription 创建专栏
      *
-     * @apiParam {string} title   标题
-     * @apiParam {string} subtitle 副标题
+     * @apiParam {string} name   标题
      * @apiParam {string} category_id 分类id
+     * @apiParam {string} intro    简介
      * @apiParam {string} content  内容
      * @apiParam {string} cover   封面图片
      * @apiParam {string} detail_img 详情图片
@@ -445,27 +445,26 @@ class ClassController extends Controller
     public function addWiki(Request $request)
     {
         $input = $request->all();
-        $title = $input['title'] ?? '';
+        $title = $input['name'] ?? '';
         if (!$name) {
             return error('名称不能为空');
         }
-        $title = $input['title'] ?? '';
-        $subtitle = $input['subtitle'] ?? '';
+        $intro   = $input['intro'] ?? '';
         $content = $input['content'] ?? '';
-        $status = $input['status'] ?? 2;
-        $sort = $input['sort'] ?? 99;
+        $status  = $input['status'] ?? 2;
+        $sort    = $input['sort'] ?? 99;
         $category_id = $input['category_id'] ?? 0;
         $cover = !empty($input['cover']) ? covert_img($input['cover']) : '';
         $detail_img = !empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
 
         $data = [
-            'title' => $title ?? '',
-            'subtitle' => $subtitle,
+            'title'   => $title ?? '',
+            'intro'   => $intro,
             'content' => $content,
-            'status' => $status,
-            'sort' => $sort,
+            'status'  => $status,
+            'sort'    => $sort,
             'category_id' => $category_id,
-            'cover' => $cover,
+            'cover'       => $cover,
             'detail_img' => $detail_img
         ];
         if (!empty($input['id'])) {
