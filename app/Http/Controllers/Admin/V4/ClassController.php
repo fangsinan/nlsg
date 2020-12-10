@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\WikiCategory;
 use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
@@ -357,6 +358,153 @@ class ClassController extends Controller
     }
 
     /**
+     * @api {get} api/admin_v4/class/wiki 百科列表
+     * @apiVersion 4.0.0
+     * @apiName  wiki
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/wiki
+     * @apiDescription 百科列表
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} title 名称
+     * @apiParam {number} status 上下架
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
+     * @apiSuccess {string} title  标题
+     * @apiSuccess {string} subtitle  副标题
+     * @apiSuccess {string} cover    作者相关
+     * @apiSuccess {string}  info_num 作品数量
+     * @apiSuccess {string}  price  价格
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  创建时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function wiki(Request $request)
+    {
+        $title = $request->get('title');
+        $status = $request->get('status');
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $query = Wiki::when($status, function ($query) use ($status) {
+            $query->where('status', $status);
+        })
+            ->when($title, function ($query) use ($title) {
+                $query->where('name', 'like', '%' . $title . '%');
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                ]);
+            });
+
+        $lists = $query->select('id', 'title', 'subtitle', 'cover', 'detail_img', 'status', 'created_at', 'view_num')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($lists);
+    }
+
+    /**
+     * @api {post} api/admin_v4/wiki/add 创建/编辑百科
+     * @apiVersion 4.0.0
+     * @apiName  add-column
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/wiki/add
+     * @apiDescription 创建专栏
+     *
+     * @apiParam {string} title   标题
+     * @apiParam {string} subtitle 副标题
+     * @apiParam {string} category_id 分类id
+     * @apiParam {string} content  内容
+     * @apiParam {string} cover   封面图片
+     * @apiParam {string} detail_img 详情图片
+     * @apiParam {number} status 状态 1上架  2下架
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function addWiki(Request $request)
+    {
+        $input = $request->all();
+        $title = $input['title'] ?? '';
+        if (!$name) {
+            return error('名称不能为空');
+        }
+        $title = $input['title'] ?? '';
+        $subtitle = $input['subtitle'] ?? '';
+        $content = $input['content'] ?? '';
+        $status = $input['status'] ?? 2;
+        $sort = $input['sort'] ?? 99;
+        $category_id = $input['category_id'] ?? 0;
+        $cover = !empty($input['cover']) ? covert_img($input['cover']) : '';
+        $detail_img = !empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
+
+        $data = [
+            'title' => $title ?? '',
+            'subtitle' => $subtitle,
+            'content' => $content,
+            'status' => $status,
+            'sort' => $sort,
+            'category_id' => $category_id,
+            'cover' => $cover,
+            'detail_img' => $detail_img
+        ];
+        if (!empty($input['id'])) {
+            Wiki::where('id', $input['id'])->update($data);
+        } else {
+            Wiki::create($data);
+        }
+
+        return success();
+
+    }
+
+    /**
+     * @api {post} api/admin_v4/wiki/category 百科分类
+     * @apiVersion 4.0.0
+     * @apiName  wiki/category
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/wiki/category
+     * @apiDescription 百科分类
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getWikiCategory()
+    {
+        $lists = WikiCategory::select('id','name','sort')
+                ->where('status', 1)
+                ->orderBy('sort', 'desc')
+                ->get();
+        return success($lists);
+    }
+
+    /**
      * @api {post} api/admin_v4/class/add-column 创建专栏
      * @apiVersion 4.0.0
      * @apiName  add-column
@@ -398,7 +546,7 @@ class ClassController extends Controller
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
-        $price  = $input['price'] ?? 0;
+        $price = $input['price'] ?? 0;
         $status = $input['status'] ?? 2;
         $online_type = $input['online_type'] ?? 1;
 
@@ -412,7 +560,7 @@ class ClassController extends Controller
             'price' => $price,
             'original_price' => $original_price,
             'type' => 1,
-            'status'=>$status
+            'status' => $status
         ];
 
         if (!empty($input['id'])) {
@@ -467,7 +615,7 @@ class ClassController extends Controller
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
-        $price  = $input['price'] ?? 0;
+        $price = $input['price'] ?? 0;
         $status = $input['status'] ?? 2;
         $online_type = $input['online_type'] ?? 1;
 
@@ -481,7 +629,7 @@ class ClassController extends Controller
             'price' => $price,
             'original_price' => $original_price,
             'type' => 2,
-            'status'=>$status
+            'status' => $status
         ];
         if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
@@ -877,7 +1025,7 @@ class ClassController extends Controller
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-lecture-work-list
      * @apiDescription  专栏作品信息
-     * 
+     *
      * @apiParam {string} id   专栏id
      *
      * @apiSuccess {string}  type   1 视频 2音频 3 文章
@@ -1010,7 +1158,7 @@ class ClassController extends Controller
         $id = $request->get('id');
         $res = Works::where('id', $id)->update(['status' => 0]);
         if ($res) {
-            WorksInfo::where('pid', $id)->update(['status'=>0]);
+            WorksInfo::where('pid', $id)->update(['status' => 0]);
             return success();
         }
     }
@@ -1162,8 +1310,8 @@ class ClassController extends Controller
     {
         $id = $request->get('id');
         $type = $request->get('type');
-        if(!$type){
-            return  error(1000,'类型不能为空');
+        if (!$type) {
+            return error(1000, '类型不能为空');
         }
         if ($type) {
             switch ($type) {
@@ -1218,7 +1366,7 @@ class ClassController extends Controller
      */
     public function getSearchWorkCategory()
     {
-        $lists = WorksCategory::select('id','name')->where('level', 3)
+        $lists = WorksCategory::select('id', 'name')->where('level', 3)
             ->orderBy('id', 'desc')
             ->get();
         return success($lists);
