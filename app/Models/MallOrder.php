@@ -1611,7 +1611,7 @@ class MallOrder extends Base
             ->where('order_type', '=', 1)
             ->where('status', '=', 1)
             ->where('is_stop', '=', 0)
-            ->where('dead_time', '<', $time_line)
+            ->where('dead_time', '<=', $time_line)
             ->update(['is_stop' => 1, 'stop_by' => 0, 'stop_at' => $now_date]);
 
     }
