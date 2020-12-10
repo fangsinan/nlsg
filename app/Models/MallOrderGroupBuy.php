@@ -31,7 +31,6 @@ class MallOrderGroupBuy extends Base
         $dead_time = ConfigModel::getData(12);
         $dead_time = date('Y-m-d H:i:59', ($now + $dead_time * 60));
 
-
         $now_date = date('Y-m-d H:i:s', $now);
         if (!in_array($params['pay_type'], [1, 2, 3])) {
             return ['code' => false, 'msg' => '请选择支付方式', 'ps' => 'pay_type error'];
@@ -182,9 +181,7 @@ class MallOrderGroupBuy extends Base
             $gl_data['group_key'] = $this->createGroupBuyKey($user['id']);
             //如果是开团 需要指定开团有效期
             $gl_data['begin_at'] = $now_date;
-            $gl_data['end_at'] = date('Y-m-d H:i:59',
-                ($now + $data['sku_list']['group_life'] * 60)
-            );
+            $gl_data['end_at'] = $dead_time;
         } else {
             $gl_data['is_captain'] = 0;
             $gl_data['group_key'] = $params['group_key'];
@@ -899,6 +896,12 @@ class MallOrderGroupBuy extends Base
         }
 
         $data = $getData[0]->toArray();
+
+        //如果已经支付,倒计时为成团倒计时
+        if ($data['status'] > 1) {
+            $data['dead_time'] = $data['group_list_info']['end_at'];
+            $data['dead_timestamp'] = strtotime($data['dead_time']);
+        }
 
         foreach ($data['order_details'] as &$odv) {
             $temp_odv = [];

@@ -288,7 +288,7 @@ class MallOrder extends Base
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $dead_time = ConfigModel::getData(12);
-        $dead_time = date('Y-m-d H:i:00', ($now + ($dead_time + 1) * 60));
+        $dead_time = date('Y-m-d H:i:59', ($now + $dead_time * 60));
 
         if (!in_array($params['pay_type'], [1, 2, 3])) {
             return ['code' => false, 'msg' => '请选择支付方式', 'ps' => 'pay_type error'];
