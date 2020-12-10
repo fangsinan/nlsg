@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\jobOfCytx;
 use App\Models\ConfigModel;
 use App\Models\CouponRuleList;
 use App\Models\MallGoodsMsg;
