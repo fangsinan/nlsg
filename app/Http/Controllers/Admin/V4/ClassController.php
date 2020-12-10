@@ -671,6 +671,7 @@ class ClassController extends Controller
      * @apiParam {string} is_end 是否完结
      * @apiParam {number} timing_online 是否自动上架
      * @apiParam {string} status 上架状态
+     * @apiParam {string} type  类型 1 视频 2音频 3 文章
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -701,6 +702,7 @@ class ClassController extends Controller
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
         $content = $input['content'] ?? '';
         $is_pay = $input['is_pay'] ?? 0;
+        $type   = $input['type'] ?? 1;
 
 
         $data = [
@@ -713,7 +715,8 @@ class ClassController extends Controller
             'is_end' => $is_end,
             'status' => $status,
             'content' => $content,
-            'is_pay' => $is_pay
+            'is_pay' => $is_pay,
+            'type'   => $type
         ];
         if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
