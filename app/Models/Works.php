@@ -166,6 +166,7 @@ class Works extends Base
             $query->select('id', 'nickname');
         }])
             ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_pic', 'details_pic')
+            ->where('is_free', 1)
             ->where('type', 2)
             ->limit(5)
             ->get();
