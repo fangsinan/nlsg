@@ -534,7 +534,7 @@ class WechatPay extends Controller
 
 
             if ($temp_data->is_captain == 1){
-                $end_time = date('Y-m-d H:i:59',$now + $sp_info->group_life * 60);
+                $end_time = date('Y-m-d H:i:00',$now + $sp_info->group_life * 60);
 
                 $end_time_res = MallGroupBuyList::whereId($temp_data->id)
                     ->update(['end_at'=>$end_time]);

@@ -29,7 +29,7 @@ class MallOrderGroupBuy extends Base
     {
         $now = time();
         $dead_time = ConfigModel::getData(12);
-        $dead_time = date('Y-m-d H:i:59', ($now + $dead_time * 60));
+        $dead_time = date('Y-m-d H:i:00', ($now + $dead_time * 60));
 
         $now_date = date('Y-m-d H:i:s', $now);
         if (!in_array($params['pay_type'], [1, 2, 3])) {
@@ -1122,17 +1122,15 @@ class MallOrderGroupBuy extends Base
     //定时清理未成功订单
     public static function clear()
     {
-
         //查询过期订单
         $now = time();
-        $time_line = date('Y-m-d H:i:s', $now - 60);
         $now_date = date('Y-m-d H:i:s', $now);
 
         $gbl_list = DB::table('nlsg_mall_group_buy_list')
             ->where('is_captain', '=', 1)
             ->where('is_success', '=', 0)
             ->where('is_fail', '=', 0)
-            ->where('end_at', '<', $time_line)
+            ->where('end_at', '<=', $now_date)
             ->select(['id', 'group_key', 'order_id'])
             ->get();
         if ($gbl_list->isEmpty()) {
