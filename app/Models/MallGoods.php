@@ -74,7 +74,7 @@ class MallGoods extends Base
         $getPriceTools = new GetPriceTools();
         $getPriceTools->goodsList(
             $list,
-            $user['level'] ?? 0,
+            $user['true_level'] ?? 0,
             $user['id'] ?? 0,
             $user['is_staff'] ?? 0
         );
