@@ -31,23 +31,23 @@ class Lists extends Model
         if ($lists){
             foreach ($lists as &$v) {
                 foreach ($v['list_works'] as  $kk=>&$vv) {
-                    if ($vv['type'] == 2) {
+                    if($vv['type'] == 1 || $vv['type'] == 2) {
                         $listen = Works::select(['id', 'user_id', 'type', 'title', 'subtitle', 'cover_img', 'original_price', 'price', 'message', 'is_free'])
                             ->with(['user' => function ($query) {
                                 $query->select('id', 'nickname', 'headimg');
                             }])
                             ->where('id', $vv['works_id'])
-                            ->where('is_audio_book', 1)
+                            //->where('is_audio_book', 1)
                             ->where('status', 4)
                             ->first();
                         $v['list_works'][$kk]['works'] = $listen;
-                    } elseif ($vv['type'] == 4) {
+                    } elseif ( $vv['type'] == 3 || $vv['type'] == 4) {
                         $column = Column::select(['id', 'user_id', 'title', 'subtitle', 'cover_pic', 'original_price', 'price', 'message', 'is_free'])
                             ->with(['user' => function ($query) {
                                 $query->select('id', 'nickname', 'headimg');
                             }])
                             ->where('id', $vv['works_id'])
-                            ->where('type', 2)
+                            //->where('type', 2)
                             ->where('status', 1)
                             ->first();
                         $v['list_works'][$kk]['works'] = $column;
