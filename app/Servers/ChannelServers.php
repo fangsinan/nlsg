@@ -85,13 +85,10 @@ class ChannelServers
             $query->limit(10);
         }
 
-//        DB::connection()->enableQueryLog();
         $list = $query->select([
             'o.id', 'o.ordernum', 'u.phone as username',
             'u.nickname', 'p.price', 'o.cytx_job', 'w.title', 'o.pay_time'
         ])->get();
-//        dd(DB::getQueryLog());
-        dd($list);
 
         if ($list->isNotEmpty()) {
             $list = $list->toArray();
