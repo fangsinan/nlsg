@@ -43,6 +43,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('search/category', 'ClassController@getSearchWorkCategory');
     Route::get('class/wiki', 'ClassController@wiki');
     Route::get('wiki/category', 'ClassController@getWikiCategory');
+    Route::post('wiki/add','ClassController@addWiki');
 
     //广告
     Route::get('banner/list', 'BannerController@list');
