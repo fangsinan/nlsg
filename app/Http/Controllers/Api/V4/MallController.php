@@ -219,7 +219,6 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
-
             JobServers::pushToCytx(1534);
 
 //            $servers = new ChannelServers();
