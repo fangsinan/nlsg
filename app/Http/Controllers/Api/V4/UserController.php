@@ -742,10 +742,12 @@ class UserController extends Controller
     public function history(Request $request)
     {
         $user_id = $request->input('user_id', 0);
+
+        $user_id = $this->user['id'] ??0;
         $order = $request->input('order', 'desc');
 
         $lists = History::where(['user_id' => $user_id, 'is_del' => 0,])
-            ->orderBy('created_at', $order)->paginate($this->page_per_page)->toArray();
+            ->groupBy('relation_id','relation_type')->orderBy('updated_at', $order)->paginate($this->page_per_page)->toArray();
 
         if (empty($lists['data'])) {
             return $this->success();
