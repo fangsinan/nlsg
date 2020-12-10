@@ -46,6 +46,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('banner/list', 'BannerController@list');
     Route::post('banner/add','BannerController@add');
 
+    Route::get('index/works','IndexController@works');
+
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');
     Route::post('mall_order/send', 'MallOrderController@send');
