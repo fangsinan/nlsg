@@ -36,13 +36,8 @@ class JobOfSocket implements ShouldQueue
      */
     public function handle()
     {
-
-        if(1){
-            //废弃
-            ConfigModel::whereId(39)->update([
-                'name'=>$this->job_data['type']
-            ]);
-        }else{
+        //废弃
+        if (0) {
             $data['live_id'] = $this->job_data['live_id'];
             $data['live_info_id'] = $this->job_data['live_info_id'];
 

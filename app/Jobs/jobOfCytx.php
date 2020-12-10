@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\ConfigModel;
+use App\Servers\ChannelServers;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -31,8 +32,7 @@ class jobOfCytx implements ShouldQueue
      */
     public function handle()
     {
-        ConfigModel::whereId(39)->update([
-            'value'=>$this->job_data['id']
-        ]);
+        $servers = new ChannelServers();
+        $servers->cytxOrderList($this->job_data['id']);
     }
 }
