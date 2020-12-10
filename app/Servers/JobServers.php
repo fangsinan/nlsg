@@ -4,7 +4,7 @@
 namespace App\Servers;
 
 
-use App\Jobs\JobOfCytx;
+use App\Jobs\jobOfCytx;
 use App\Jobs\JobOfSocket;
 
 class JobServers
