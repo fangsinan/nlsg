@@ -57,6 +57,7 @@ class Lists extends Model
                     }
                 }
                 $lists[$k]['list_works'] = array_values($lists[$k]['list_works']);
+                $lists[$k]['num'] = count($lists[$k]['list_works']);
 
             }
         }
