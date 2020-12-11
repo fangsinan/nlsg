@@ -50,4 +50,9 @@ class ListsWork extends Model
         return $this->belongsTo('App\Models\Works', 'works_id', 'id');
     }
 
+    public function goods()
+    {
+        return $this->belongsTo('App\Models\MallGoods', 'works_id', 'id');
+    }
+
 }
