@@ -20,6 +20,7 @@ class SpecialPriceModel extends Base
 
         //获取所谓未结束活动信息
         $res = $this->getSpData($id, $goods_type);
+
         //筛选时间和库存
         foreach ($res as $k => $v) {
             if ($v->begin_time > $now_date || $v->end_time < $now_date) {
@@ -113,15 +114,56 @@ class SpecialPriceModel extends Base
         //config  活动优先顺序
         $sp_type_order = ConfigModel::getData(2);
 
-        return DB::table('nlsg_special_price')
+//        $this->getSqlBegin();
+//        $sp_id_list = DB::table('nlsg_special_price')
+//            ->where('goods_id', '=', $id)
+//            ->where('goods_type', '=', $goods_type)
+//            ->where('status', '=', 1)
+//            ->where('end_time', '>', date('Y-m-d H:i:s'))
+//            ->whereIn('type', [1, 2, 4])
+//            ->groupBy('type')
+//            ->orderByRaw('FIELD(type,' . $sp_type_order . ') asc')
+//            ->orderBy('id', 'desc')
+//            ->select([DB::raw('min(begin_time)')])
+//            ->get();
+//        $this->getSql();
+
+        $min_id_for_typ_1 = DB::table('nlsg_special_price')
             ->where('goods_id', '=', $id)
             ->where('goods_type', '=', $goods_type)
             ->where('status', '=', 1)
             ->where('end_time', '>', date('Y-m-d H:i:s'))
-            ->whereIn('type', [1, 2, 4])
-            ->groupBy('type')
-            ->orderByRaw('FIELD(type,' . $sp_type_order . ') asc')
-            ->orderBy('id', 'desc')
+            ->where('type','=',1)
+            ->orderBy('begin_time', 'asc')
+            ->orderBy('id','asc')
+            ->select(['id'])
+            ->first();
+        $min_id_for_typ_2 = DB::table('nlsg_special_price')
+            ->where('goods_id', '=', $id)
+            ->where('goods_type', '=', $goods_type)
+            ->where('status', '=', 1)
+            ->where('end_time', '>', date('Y-m-d H:i:s'))
+            ->where('type','=',2)
+            ->orderBy('begin_time', 'asc')
+            ->orderBy('id','asc')
+            ->select(['id'])
+            ->first();
+        $min_id_for_typ_4 = DB::table('nlsg_special_price')
+            ->where('goods_id', '=', $id)
+            ->where('goods_type', '=', $goods_type)
+            ->where('status', '=', 1)
+            ->where('end_time', '>', date('Y-m-d H:i:s'))
+            ->where('type','=',4)
+            ->orderBy('begin_time', 'asc')
+            ->orderBy('id','asc')
+            ->select(['id'])
+            ->first();
+
+        $id_list = [$min_id_for_typ_1->id??0,$min_id_for_typ_2->id??0,$min_id_for_typ_4->id??0];
+
+
+        $query = DB::table('nlsg_special_price')
+            ->whereIn('id',$id_list)
             ->select([
                 'id', 'goods_type', 'goods_id', 'goods_original_price',
                 'goods_price', 'sku_number', 'stock', 'use_stock',
@@ -135,6 +177,32 @@ class SpecialPriceModel extends Base
                 'freight_free', 'freight_free_line','flash_sale_max_num'
             ])
             ->get();
+
+
+//        $query = DB::table('nlsg_special_price')
+//            ->where('goods_id', '=', $id)
+//            ->where('goods_type', '=', $goods_type)
+//            ->where('status', '=', 1)
+//            ->where('end_time', '>', date('Y-m-d H:i:s'))
+//            ->whereIn('type', [1, 2, 4])
+//            ->groupBy('type')
+//            ->orderByRaw('FIELD(type,' . $sp_type_order . ') asc')
+//            ->orderBy('id', 'desc')
+//            ->select([
+//                'id', 'goods_type', 'goods_id', 'goods_original_price',
+//                'goods_price', 'sku_number', 'stock', 'use_stock',
+//                'sku_original_price', 'sku_price',
+//                'sku_price_black', 'sku_price_yellow',
+//                'group_price', 'sku_price_dealer',
+//                'is_set_t_money', 't_money', 't_money_black',
+//                't_money_yellow', 't_money_dealer',
+//                'begin_time', 'end_time', 'type',
+//                'use_coupon', 'group_name', 'group_num_type', 'group_num',
+//                'freight_free', 'freight_free_line','flash_sale_max_num'
+//            ])
+//            ->get();
+
+        return $query;
 
     }
 
