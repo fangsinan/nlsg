@@ -8,6 +8,9 @@ class Wiki extends Model
 {
     protected $table = 'nlsg_wiki';
 
+    protected $fillable = [
+          'category_id', 'name','intro','content','cover','detail_img','view_num', 'like_num', 'comment_num','collection_num','status'
+       ];
     /**
      * 首页百科推荐
      * @param $ids
