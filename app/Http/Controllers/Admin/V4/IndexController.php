@@ -49,13 +49,13 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/course  首页-课程集合
+     * @api {get} api/v4/index/rank  首页-课程集合
      * @apiVersion 4.0.0
      * @apiName  course
      * @apiGroup Index
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/course
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/rank
      *
-     *
+     * @apiParam {string}   type  4 课程 9 百科 10商品
      * @apiSuccess {string}  state 状态 1上架 下架
      * @apiSuccess {string}  works 听书作品
      * @apiSuccess {string}  works.works_id  作品id
@@ -72,25 +72,31 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function course(Request $request)
+    public function rank(Request $request)
     {
-        $type = $request->get('type') ??  4;
+        $type = $request->get('type') ?? 4;
         if ($type == 4) {
             $lists = ListsWork::with('works:id,title,cover_img,price')
                 ->select('id', 'lists_id', 'works_id', 'state')
                 ->where('lists_id', 4)
+                ->orderBy('sort', 'desc')
+                ->orderBy('created_at', 'desc')
                 ->get()
                 ->toArray();
         } elseif ($type == 9) {
             $lists = ListsWork::with('wiki:id,name,cover')
                 ->select('id', 'lists_id', 'works_id', 'state')
                 ->where('lists_id', 9)
+                ->orderBy('sort', 'desc')
+                ->orderBy('created_at', 'desc')
                 ->get()
                 ->toArray();
         } elseif ($type == 10) {
             $lists = ListsWork::with('goods:id,name,picture,price')
                 ->select('id', 'lists_id', 'works_id', 'state')
                 ->where('lists_id', 10)
+                ->orderBy('sort', 'desc')
+                ->orderBy('created_at', 'desc')
                 ->get()
                 ->toArray();
         }
