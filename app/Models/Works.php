@@ -177,7 +177,7 @@ class Works extends Base
             foreach ($lecture as &$v) {
                 $v['is_sub'] = 0;
                 if ($uid) {
-                    $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 2);;
+                    $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 6);;
                 }
                 $v['is_new'] = 1;
             }
