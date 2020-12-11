@@ -40,7 +40,7 @@ class IndexController extends Controller
     public function works()
     {
         $lists = Recommend::with('works:id,title,cover_img,price')
-            ->select('id', 'relation_id', 'sort', 'created_at')
+            ->select('id', 'relation_id', 'sort', 'created_at','status')
             ->where('position', 1)
             ->where('type', 2)
             ->orderBy('sort', 'desc')
@@ -49,7 +49,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/rank  首页-课程集合
+     * @api {get} api/v4/index/rank  首页-
      * @apiVersion 4.0.0
      * @apiName  course
      * @apiGroup Index
