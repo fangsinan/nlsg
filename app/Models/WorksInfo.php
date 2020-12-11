@@ -207,8 +207,9 @@ class WorksInfo extends Base
                         ->where('s.is_del', '=', 0);
                 })
                 ->where('w.id', '=', $column_id)
-                ->select(['w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img',
-                    DB::raw('if(s.id > 0,1,0) as is_sub')])
+                ->select(['w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img','w.comment_num',
+                    DB::raw('if(s.id > 0,1,0) as is_sub'),
+                    DB::raw('0 as is_sub')])
                 ->first();
 
         }else{
@@ -223,8 +224,9 @@ class WorksInfo extends Base
                         ->where('s.is_del', '=', 0);
                 })
                 ->where('w.id', '=', $works_id)
-                ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img',
-                    DB::raw('if(s.id > 0,1,0) as is_sub')])
+                ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num',
+                    DB::raw('if(s.id > 0,1,0) as is_sub'),
+                    DB::raw('0 as is_sub')])
                 ->first();
         }
         if($user['level'] > 2){
@@ -234,6 +236,13 @@ class WorksInfo extends Base
         $is_show_url = true;
         if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
             $is_show_url = false;
+        }
+        $collection = Collection::select()->where([
+            'user_id' => $user['id'],
+            'info_id' => $works_info_id,
+        ])->get();
+        if($collection){
+            $works_info->is_collection = 1;
         }
 
         $list['previous'] = $this->three2one($info_list[$info_key - 1], $is_show_url);

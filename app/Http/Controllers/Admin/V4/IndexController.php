@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lists;
+use App\Models\ListsWork;
 use App\Models\Recommend;
 use App\Models\Works;
 use Illuminate\Http\Request;
@@ -38,21 +39,13 @@ class IndexController extends Controller
      */
     public function works()
     {
-        $list = Recommend::where('position', 1)
+        $lists = Recommend::with('works:id,title,cover_img,price')
+            ->select('id', 'relation_id', 'sort', 'created_at')
+            ->where('position', 1)
             ->where('type', 2)
-            ->value('relation_id');
-        $ids = explode(',', $list);
-        if (!$ids) {
-            return error(1000, '还没有推荐');
-        }
-
-        $works = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'subtitle', 'price', 'is_free', 'status')
-            ->whereIn('id', $ids)
-            ->where('status', 4)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->toArray();
-        return success($works);
+            ->orderBy('sort', 'desc')
+            ->get();
+        return success($lists);
     }
 
     /**
@@ -62,10 +55,8 @@ class IndexController extends Controller
      * @apiGroup Index
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/course
      *
-     * @apiSuccess {string} title 标题
-     * @apiSuccess {string} subtitle 副标题
-     * @apiSuccess {string} cover 封面
-     * @apiSuccess {number}  num  数量
+     *
+     * @apiSuccess {string}  state 状态 1上架 下架
      * @apiSuccess {string}  works 听书作品
      * @apiSuccess {string}  works.works_id  作品id
      * @apiSuccess {string}  works.title  作品标题
@@ -81,28 +72,29 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function course()
+    public function course(Request $request)
     {
-        $list = Recommend::where('position', 1)
-            ->where('type', 10)
-            ->value('relation_id');
-        $ids = explode(',', $list);
-        if (!$ids) {
-            return error(1000, '还没有推荐');
+        $type = $request->get('type') ??  4;
+        if ($type == 4) {
+            $lists = ListsWork::with('works:id,title,cover_img,price')
+                ->select('id', 'lists_id', 'works_id', 'state')
+                ->where('lists_id', 4)
+                ->get()
+                ->toArray();
+        } elseif ($type == 9) {
+            $lists = ListsWork::with('wiki:id,name,cover')
+                ->select('id', 'lists_id', 'works_id', 'state')
+                ->where('lists_id', 9)
+                ->get()
+                ->toArray();
+        } elseif ($type == 10) {
+            $lists = ListsWork::with('goods:id,name,picture,price')
+                ->select('id', 'lists_id', 'works_id', 'state')
+                ->where('lists_id', 10)
+                ->get()
+                ->toArray();
         }
 
-        $lists = Lists::select('id', 'title', 'subtitle', 'cover', 'num')
-            ->with(['works' => function ($query) {
-                $query->select('works_id', 'user_id', 'title', 'cover_img')
-                    ->where('status', 4)
-                    ->limit(3)
-                    ->inRandomOrder();
-            }, 'works.user' => function ($query) {
-                $query->select('id', 'nickname', 'headimg');
-            }])->whereIn('id', $ids)
-            ->where('type', $type)
-            ->where('status', 1)
-            ->first();
         return success($lists);
     }
 
