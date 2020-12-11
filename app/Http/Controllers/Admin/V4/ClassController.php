@@ -396,8 +396,8 @@ class ClassController extends Controller
         $start = $request->get('start');
         $end = $request->get('end');
         $query = Wiki::when($status, function ($query) use ($status) {
-            $query->where('status', $status);
-        })
+                $query->where('status', $status);
+            })
             ->when($title, function ($query) use ($title) {
                 $query->where('name', 'like', '%' . $title . '%');
             })
@@ -408,10 +408,16 @@ class ClassController extends Controller
                 ]);
             });
 
-        $lists = $query->select('id', 'name','cover', 'detail_img', 'status', 'created_at', 'view_num')
+        $lists = $query->select('id','category_id','name','cover', 'detail_img', 'status', 'created_at', 'view_num')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
+        if ($lists['data']){
+            foreach ($lists['data'] as &$v) {
+                $name = WikiCategory::where('id', $v['category_id'])->value('name');
+                $v['category_name'] = $name;
+            }
+        }
         return success($lists);
     }
 
