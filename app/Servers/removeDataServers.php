@@ -296,21 +296,38 @@ class removeDataServers
     {
         $list = MallGoods::query()
             ->with(['sku_list'])
-            ->select(['id','name','original_price','price'])
+            ->select(['id', 'name', 'original_price', 'price'])
             ->get()->toArray();
 
-        foreach ($list as $v){
+        $res = [];
+
+        foreach ($list as $v) {
+            if (empty($v['sku_list'])) {
+                continue;
+            }
             $op = $v['original_price'];
             $p = $v['price'];
 
-            $op_list = array_column($v['sku_list'],'original_price');
-            $p_list = array_column($v['sku_list'],'price');
+            $op_list = array_column($v['sku_list'], 'original_price');
+            $p_list = array_column($v['sku_list'], 'price');
+            sort($op_list);
+            sort($p_list);
 
-
-
+            if (!in_array($op, $op_list) || !in_array($p, $p_list)) {
+                $g = MallGoods::find($v['id']);
+                $temp_res = [];
+                $temp_res['goods_id'] = $v['id'];
+                $new_op = array_shift($op_list);
+                $new_p = array_shift($p_list);
+                $temp_res['update'] = $g->original_price . '-' . $new_op . '|' . $g->price . '-' . $new_p;
+                $res[] = $temp_res;
+                $g->original_price = $new_op;
+                $g->price = $new_p;
+                $g->save();
+            }
         }
 
-        dd($list);
+        dd($res);
     }
 
 }

@@ -9,23 +9,25 @@ use App\Servers\removeDataServers;
 
 class RemoveDataController extends Controller
 {
-    public function goods(){
+    public function goods()
+    {
 
-        if(0){
+        if (0) {
+            //迁移商品,规格,图片,评论
             $servers = new removeDataServers();
             $servers->removeGoods();
         }
 
-        if(1){
+        if (1) {
+            //校验商品和规格的价格是否冲突
             $servers = new removeDataServers();
             $servers->updateGoodsSkuPrice();
         }
 
-
-
     }
 
-    public function mallOrders(){
+    public function mallOrders()
+    {
         $servers = new removeDataServers();
         $servers->removeMallOrders();
     }
