@@ -128,24 +128,25 @@ class SpecialPriceModel extends Base
 //            ->get();
 //        $this->getSql();
 
-        $min_id_for_typ_1 = DB::table('nlsg_special_price')
-            ->where('goods_id', '=', $id)
-            ->where('goods_type', '=', $goods_type)
-            ->where('status', '=', 1)
-            ->where('end_time', '>', date('Y-m-d H:i:s'))
-            ->where('type','=',1)
-            ->orderBy('begin_time', 'asc')
-            ->orderBy('id','asc')
-            ->select(['id'])
-            ->first();
+
         $min_id_for_typ_2 = DB::table('nlsg_special_price')
             ->where('goods_id', '=', $id)
             ->where('goods_type', '=', $goods_type)
             ->where('status', '=', 1)
             ->where('end_time', '>', date('Y-m-d H:i:s'))
-            ->where('type','=',2)
+            ->where('type', '=', 2)
             ->orderBy('begin_time', 'asc')
-            ->orderBy('id','asc')
+            ->orderBy('id', 'asc')
+            ->select(['id'])
+            ->first();
+        $min_id_for_typ_1 = DB::table('nlsg_special_price')
+            ->where('goods_id', '=', $id)
+            ->where('goods_type', '=', $goods_type)
+            ->where('status', '=', 1)
+            ->where('end_time', '>', date('Y-m-d H:i:s'))
+            ->where('type', '=', 1)
+            ->orderBy('begin_time', 'asc')
+            ->orderBy('id', 'asc')
             ->select(['id'])
             ->first();
         $min_id_for_typ_4 = DB::table('nlsg_special_price')
@@ -153,17 +154,17 @@ class SpecialPriceModel extends Base
             ->where('goods_type', '=', $goods_type)
             ->where('status', '=', 1)
             ->where('end_time', '>', date('Y-m-d H:i:s'))
-            ->where('type','=',4)
+            ->where('type', '=', 4)
             ->orderBy('begin_time', 'asc')
-            ->orderBy('id','asc')
+            ->orderBy('id', 'asc')
             ->select(['id'])
             ->first();
 
-        $id_list = [$min_id_for_typ_1->id??0,$min_id_for_typ_2->id??0,$min_id_for_typ_4->id??0];
+        $id_list = [$min_id_for_typ_2->id ?? 0, $min_id_for_typ_1->id ?? 0, $min_id_for_typ_4->id ?? 0];
 
 
         $query = DB::table('nlsg_special_price')
-            ->whereIn('id',$id_list)
+            ->whereIn('id', $id_list)
             ->select([
                 'id', 'goods_type', 'goods_id', 'goods_original_price',
                 'goods_price', 'sku_number', 'stock', 'use_stock',
@@ -174,7 +175,7 @@ class SpecialPriceModel extends Base
                 't_money_yellow', 't_money_dealer',
                 'begin_time', 'end_time', 'type',
                 'use_coupon', 'group_name', 'group_num_type', 'group_num',
-                'freight_free', 'freight_free_line','flash_sale_max_num'
+                'freight_free', 'freight_free_line', 'flash_sale_max_num'
             ])
             ->get();
 
@@ -226,7 +227,7 @@ class SpecialPriceModel extends Base
                 })
                 ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
                     'nsp.goods_original_price', 'nmg.picture',
-                    'nmg.original_price', 'nsp.use_stock','nsp.stock',
+                    'nmg.original_price', 'nsp.use_stock', 'nsp.stock',
 //                    DB::raw('if(nsp.stock=0,1,nsp.stock) as stock'),
                     'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
                     DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
@@ -374,7 +375,7 @@ class SpecialPriceModel extends Base
             ->join('nlsg_mall_order as nmo', 'gbl.order_id', '=', 'nmo.id')
             ->join('nlsg_user as nuser', 'gbl.user_id', '=', 'nuser.id')
             ->whereIn('gbl.group_name', $id)
-            ->where('is_success','=',1)
+            ->where('is_success', '=', 1)
             ->where('nmo.is_stop', '=', 0)
             ->where('nmo.is_del', '=', 0);
 
@@ -489,27 +490,28 @@ class SpecialPriceModel extends Base
     public function skuInfo()
     {
         return $this->hasOne('App\Models\MallSku', 'sku_number', 'sku_number')
-            ->select(['id', 'sku_number', 'picture', 'stock', 'status','original_price','price']);
+            ->select(['id', 'sku_number', 'picture', 'stock', 'status', 'original_price', 'price']);
     }
 
     public function goodsInfo()
     {
         return $this->hasOne('App\Models\MallGoods', 'id', 'goods_id')
-            ->select(['id', 'name', 'subtitle', 'status', 'original_price', 'price','picture']);
+            ->select(['id', 'name', 'subtitle', 'status', 'original_price', 'price', 'picture']);
     }
 
     public function spSkuList()
     {
         return $this->hasMany('App\Models\SpecialPriceModel', 'group_name', 'group_name')
             ->where('status', '<>', 3)
-            ->select(['sku_number', 'group_name','group_num','group_price','group_life']);
+            ->select(['sku_number', 'group_name', 'group_num', 'group_price', 'group_life']);
     }
 
-    public function flashSaleGoodsList(){
+    public function flashSaleGoodsList()
+    {
         return $this->hasMany(self::class, 'group_name', 'group_name')
             ->where('status', '<>', 3)
 //            ->groupBy('goods_id')
-            ->select(['goods_id', 'group_name','goods_price','sku_number','sku_price']);
+            ->select(['goods_id', 'group_name', 'goods_price', 'sku_number', 'sku_price']);
     }
 
     //临时添加
