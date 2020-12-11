@@ -79,7 +79,6 @@ class Lists extends Model
             $query->select('id','nickname','headimg');
         }])->whereIn('id',$ids)
             ->where('type', $type)
-            ->where('status', 1)
             ->limit(3)
             ->first();
         if($lists) $lists = $lists->toArray();
