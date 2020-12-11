@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Wiki extends Model
+class Wiki extends Base
 {
     protected $table = 'nlsg_wiki';
 
