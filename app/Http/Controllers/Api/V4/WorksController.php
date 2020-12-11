@@ -671,6 +671,7 @@ class WorksController extends Controller
      * @apiGroup works
      *
      * @apiParam {int} is_index  是否首页
+     * @apiParam {int} type  1课程  2 听书
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -706,14 +707,15 @@ class WorksController extends Controller
     public function worksCategory(Request $request){
 
         $is_index = $request->input('is_index',0);
+        $type = $request->input('type',1);
         if($is_index){
             $category = WorksCategory::select('id','name','pid','level')->where([
-                'type' => 1, 'status' => 1, 'is_index'=>1,
+                'type' => $type, 'status' => 1, 'is_index'=>1,
             ])->orderBy('order','desc')->get()->toArray();
             return $this->success($category);
         }
         $category = WorksCategory::select('id','name','pid','level')->where([
-            'type' => 1, 'status' => 1,
+            'type' => $type, 'status' => 1,
         ])->orderBy('sort','desc')->get()->toArray();
         $data = WorksCategory::getCategory($category,0,1);
         return $this->success($data);
