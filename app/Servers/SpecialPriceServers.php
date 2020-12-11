@@ -391,6 +391,7 @@ class SpecialPriceServers
             ->join('nlsg_mall_sku as s', 'g.id', '=', 's.goods_id')
             ->where('g.status', '=', 2)
             ->where('s.status', '=', 1)
+            ->where('s.stock','>',0)
             ->select(['g.id as goods_id', 'g.price as goods_price', 'sku_number', 's.price as sku_price'])
             ->get()->toArray();
 
