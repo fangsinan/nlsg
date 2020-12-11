@@ -418,17 +418,16 @@ class MallGoods extends Base
         $data['group_buy_id'] = $group_buy_id;
 
         if (0) {
-            $data['order_num'] = MallOrder::where('sp_id', $group_buy_id)
+            $data['order_num'] = MallOrder::where('sp_id', $check_id[0]['id'])
                 ->where('status', '>', 1)
                 ->count();
         } else {
             $data['order_num'] = DB::table('nlsg_mall_group_buy_list as gbl')
                 ->join('nlsg_mall_order_detail as od', 'gbl.order_id', '=', 'od.order_id')
-                ->where('gbl.group_buy_id', '=', $group_buy_id)
+                ->where('gbl.group_buy_id', '=', $check_id[0]['id'])
                 ->where('gbl.is_success', '=', 1)
                 ->sum('od.num');
         }
-
 
         if ($check_id[0]['begin_time'] > $now_data) {
             $data->is_begin = 0;
