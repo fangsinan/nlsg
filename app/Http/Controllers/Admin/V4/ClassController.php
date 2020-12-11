@@ -445,7 +445,7 @@ class ClassController extends Controller
     public function addWiki(Request $request)
     {
         $input = $request->all();
-        $title = $input['name'] ?? '';
+        $name  = $input['name'] ?? '';
         if (!$name) {
             return error('名称不能为空');
         }
@@ -458,7 +458,7 @@ class ClassController extends Controller
         $detail_img = !empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
 
         $data = [
-            'title'   => $title ?? '',
+            'name'    => $name,
             'intro'   => $intro,
             'content' => $content,
             'status'  => $status,
