@@ -503,6 +503,13 @@ class ClassController extends Controller
                 ->get();
         return success($lists);
     }
+    
+    public  function  editWiki(Request $request)
+    {
+        $id = $request->get('id');
+        $list = Wiki::where('id', $id)->first();
+        return success($list);
+    }
 
     /**
      * @api {post} api/admin_v4/class/add-column 创建专栏
