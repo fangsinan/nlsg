@@ -158,7 +158,7 @@ class BannerController extends Controller
     public function edit(Request $request)
     {
         $id = $request->get('id');
-        $list = Banner::select('id', 'title', 'pic', 'url', 'rank', 'type', 'jump_type', 'obj_id')
+        $list = Banner::select('id', 'title', 'pic', 'url', 'rank', 'type', 'jump_type', 'obj_id','status')
             ->where('id', $id)
             ->first();
         if (!$list){
