@@ -208,8 +208,7 @@ class WorksInfo extends Base
                 })
                 ->where('w.id', '=', $column_id)
                 ->select(['w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img','w.comment_num',
-                    DB::raw('if(s.id > 0,1,0) as is_sub'),
-                    DB::raw('0 as is_sub')])
+                    DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
 
         }else{
@@ -225,8 +224,7 @@ class WorksInfo extends Base
                 })
                 ->where('w.id', '=', $works_id)
                 ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num',
-                    DB::raw('if(s.id > 0,1,0) as is_sub'),
-                    DB::raw('0 as is_sub')])
+                    DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
         }
         if($user['level'] > 2){
@@ -237,6 +235,7 @@ class WorksInfo extends Base
         if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
             $is_show_url = false;
         }
+        $works_info->is_collection = 0;
         $collection = Collection::select()->where([
             'user_id' => $user['id'],
             'info_id' => $works_info_id,
