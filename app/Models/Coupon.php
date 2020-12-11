@@ -279,18 +279,22 @@ class Coupon extends Base
 
         $count['status_1'] = self::where('user_id', '=', $user_id)
             ->where('end_time', '>', $now_date)
+            ->whereIn('type',[1,2,3,4,5])
             ->where('status', '=', 1)
             ->count();
 
         $count['status_2'] = self::where('user_id', '=', $user_id)
             ->where('status', '=', 2)
+            ->whereIn('type',[1,2,3,4,5])
             ->count();
 
         $count['status_3'] = self::where('user_id', '=', $user_id)
             ->Where(function ($query) {
                 $query->where('status', '=', 3)
                     ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
-            })->count();
+            })
+            ->whereIn('type',[1,2,3,4,5])
+            ->count();
 
         $query = self::where('user_id', '=', $user_id)
             ->whereIn('type',[1,2,3,4,5]);
