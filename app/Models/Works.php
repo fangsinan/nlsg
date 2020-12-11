@@ -19,7 +19,7 @@ class Works extends Base
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
     const STATUS_TWO = 2;
-    
+
 
     /**
      * 首页课程推荐
@@ -273,6 +273,8 @@ class Works extends Base
             ->with(['columnInfo', 'user' => function ($query) {
                 $query->select('id', 'nickname', 'intro');
             },'cytxClick'])
+            ->orderBy('cytx_sort','asc')
+            ->orderBy('id','asc')
             ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
                 'detail_img', 'cytx_price as price', 'column_id', 'user_id','view_num'])
             ->get();

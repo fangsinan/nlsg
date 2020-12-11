@@ -3,6 +3,7 @@
 
 namespace App\Servers;
 
+use App\Models\MallGoods;
 use Illuminate\Support\Facades\DB;
 
 class removeDataServers
@@ -55,7 +56,7 @@ class removeDataServers
 
         $old_sku = DB::connection('mysql_old')
             ->table('nlsg_mall_sku')
-            ->groupBy('goods_id','status','sku_json')
+            ->groupBy('goods_id', 'status', 'sku_json')
             ->get()
             ->toArray();
 
@@ -265,7 +266,7 @@ class removeDataServers
             $sku_json = json_decode($v->sku_json);
             $temp_sku_json = [];
 
-            if (is_array($sku_json)){
+            if (is_array($sku_json)) {
                 foreach ($sku_json as $kk => $vv) {
                     $t = new class {
                     };
@@ -276,17 +277,40 @@ class removeDataServers
             }
 
             $temp_details['sku_history'] = json_encode([
-                'actual_num' => $v->num??0,
-                'actual_price' => $temp_check_sku->price??0,
-                'original_price' => $temp_check_sku->original_price??0,
+                'actual_num' => $v->num ?? 0,
+                'actual_price' => $temp_check_sku->price ?? 0,
+                'original_price' => $temp_check_sku->original_price ?? 0,
                 'sku_value' => $temp_sku_json,
-                'stock' => $temp_check_sku->stock??0,
+                'stock' => $temp_check_sku->stock ?? 0,
             ]);
             $details_data[] = $temp_details;
         }
 
         dd($details_data);
 
+    }
+
+
+    //修改商品价格和规格价格不匹配的临时方法
+    public function updateGoodsSkuPrice()
+    {
+        $list = MallGoods::query()
+            ->with(['sku_list'])
+            ->select(['id','name','original_price','price'])
+            ->get()->toArray();
+
+        foreach ($list as $v){
+            $op = $v['original_price'];
+            $p = $v['price'];
+
+            $op_list = array_column($v['sku_list'],'original_price');
+            $p_list = array_column($v['sku_list'],'price');
+
+
+
+        }
+
+        dd($list);
     }
 
 }
