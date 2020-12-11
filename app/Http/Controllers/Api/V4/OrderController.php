@@ -872,7 +872,6 @@ class OrderController extends Controller
                 return $this->error(0, '专栏不存在');
             }
             $price = $column_data->price;
-
         } else if ($send_type == 3 || $send_type == 4) {
             $works_data = Works::find($relation_id);
             if (empty($works_data)) {
@@ -883,6 +882,19 @@ class OrderController extends Controller
             return $this->error(0, '参数信息错误');
 
         }
+
+        $add_order_type = $send_type ;
+        switch ($send_type){
+            case 2:
+                $add_order_type = 6;
+                break;
+            case 3:
+                $add_order_type = 2;
+                break;
+            case 4:
+                $add_order_type = 2;
+                break;
+        };
 
 
         //优惠券
@@ -905,7 +917,7 @@ class OrderController extends Controller
             'coupon_id' => $coupon_id,
             'pay_type' => $pay_type,
             'live_id' => $live_id,
-            'send_type' => $send_type,
+            'send_type' => $add_order_type,
             'remark' => $remark,
         ];
         $order = Order::firstOrCreate($data);
