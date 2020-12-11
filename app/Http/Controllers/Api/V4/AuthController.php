@@ -382,7 +382,7 @@ class AuthController extends Controller
 
                 $code = rand(1000, 9999);
                 $result = $easySms->send($phone, [
-                    'template' => 'SMS_70300075',
+                    'template' => 'SMS_200714195',
                     'data' => [
                         'code' => $code,
                     ],
