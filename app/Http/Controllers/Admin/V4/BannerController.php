@@ -108,6 +108,7 @@ class BannerController extends Controller
         $url = $input['url'] ?? '';
         $rank = $input['rank'] ?? 99;
         $type = $input['type'] ?? 0;
+        $status = $input['status'] ?? 2;
         $objid = $input['obj_id'] ?? 0;
         $jump_type = $input['jump_type'] ?? 0;
 
@@ -118,7 +119,8 @@ class BannerController extends Controller
             'rank' => $rank,
             'type' => $type,
             'jump_type' => $jump_type,
-            'obj_id' => $objid
+            'obj_id' => $objid,
+            'status' => $status
         ];
 
         if (!empty($id)) {
@@ -158,7 +160,7 @@ class BannerController extends Controller
     public function edit(Request $request)
     {
         $id = $request->get('id');
-        $list = Banner::select('id', 'title', 'pic', 'url', 'rank', 'type', 'jump_type', 'obj_id')
+        $list = Banner::select('id', 'title', 'pic', 'url', 'rank', 'type', 'jump_type', 'obj_id','status')
             ->where('id', $id)
             ->first();
         if (!$list){

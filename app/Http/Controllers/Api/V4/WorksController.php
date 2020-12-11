@@ -225,8 +225,20 @@ class WorksController extends Controller
 
         $where = [];
         $newWorks = [];
+
+
         if($category_id){
-            $where = ['relation.category_id'=>$category_id];
+            //查看是否是一级分类   一级分类需展示其二级分类下的数据
+            $cate_id_arr = [];
+            $cate_data = WorksCategory::find($category_id);
+            if( $cate_data['level'] == 1 ){
+                $cate_arr = WorksCategory::select('id')->where(['pid'=>$cate_data['id']])->get()->toArray();
+                $cate_id_arr = array_column($cate_arr,'id');
+            }
+
+            if( empty($cate_id_arr)){
+                $where = ['relation.category_id'=>$category_id];
+            }
         }
 
 
@@ -251,15 +263,19 @@ class WorksController extends Controller
 
         $relationObj = new WorksCategoryRelation();
         $worksObj = new Works();
-        $worksData = DB::table($relationObj->getTable(), ' relation')
+        $worksDb = DB::table($relationObj->getTable(), ' relation')
             ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
             ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle',
                 'works.works_update_time','works.detail_img','works.content','relation.id as relation_id','relation.category_id','relation.work_id', 'works.column_id',
-                'works.comment_num','works.chapter_num','works.subscribe_num','works.collection_num')
+                'works.comment_num','works.chapter_num','works.subscribe_num','works.collection_num');
+        if(!empty($cate_id_arr)){
+            $worksDb->whereIn('relation.category_id',$cate_id_arr);
+        }
 //            ->select('works.*')
-            ->where($where)
+           $worksData = $worksDb->where($where)
             ->orderBy('works.'.$order_str,'desc')
             ->groupBy('works.id')->paginate($this->page_per_page)->toArray();
+
 
 
         $time =Config('web.is_new_time');
