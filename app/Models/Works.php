@@ -32,7 +32,7 @@ class Works extends Base
             return false;
         }
 
-        $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'subtitle', 'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num')
+        $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'detail_img','subtitle', 'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num')
             ->with(['user' => function ($query) {
                 $query->select('id', 'nickname', 'headimg');
             }])
@@ -54,6 +54,7 @@ class Works extends Base
                 $v['is_new'] = 1;
             }
             $v['is_sub'] = Subscribe::isSubscribe($user_id, $v['id'], 2);
+            $v['cover_img'] = $v['detail_img'] ?? '';
         }
         return $lists;
 
