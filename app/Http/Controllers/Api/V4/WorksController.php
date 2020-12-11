@@ -499,7 +499,7 @@ class WorksController extends Controller
             'history_data'   => $history_data,
             'is_sub'         => $is_sub ? 1: 0,
             'is_collection'  => $isCollect ? 1 : 0,
-            'free_trial_id'  => $free_trial['id'] ?? 0,
+            'free_trial_id'  => $free_trial['id'] ?? '',
         ];
         return $this->success($res);
     }
