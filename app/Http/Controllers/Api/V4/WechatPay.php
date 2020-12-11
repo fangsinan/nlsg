@@ -543,6 +543,20 @@ class WechatPay extends Controller
                     DB::rollBack();
                     return false;
                 }
+            }else{
+                $get_captain_data = MallGroupBuyList::where('group_key','=',$temp_data->group_key)
+                    ->where('is_captain','=',1)
+                    ->first();
+
+                $end_time_res = MallGroupBuyList::whereId($temp_data->id)
+                    ->update([
+                        'begin_at'=>$now_date,
+                        'end_at'=>$get_captain_data->end_at
+                    ]);
+                if ($end_time_res === false){
+                    DB::rollBack();
+                    return false;
+                }
             }
 
             $need_num = $sp_info->group_num;

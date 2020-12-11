@@ -221,9 +221,9 @@ class MallController extends Controller
         if ($request->input('aa', 0) == 1) {
 
 //            $data = [
-//                'out_trade_no'      => '20121000168934680385801', //获取订单号
+//                'out_trade_no'      => '20121100168934348909801', //获取订单号
 //                'total_fee'         => 0.01, //价格
-//                'transaction_id'    => '4200000833202012102833526945', //交易单号
+//                'transaction_id'    => '4200000788202012112283341226', //交易单号
 //                'attach'            => 8,
 //                'pay_type'          => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
 //            ];
