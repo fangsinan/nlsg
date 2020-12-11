@@ -292,7 +292,9 @@ class Coupon extends Base
                     ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
             })->count();
 
-        $query = self::where('user_id', '=', $user_id);
+        $query = self::where('user_id', '=', $user_id)
+            ->whereIn('type',[1,2,3,4,5]);
+
         switch ($status) {
             case 2:
                 $query->where('status', '=', 2);
