@@ -149,7 +149,7 @@ class ListenBookController extends Controller
         $works_data['is_collection'] = $isCollect ? 1 : 0;
         //免费试听的章节
         $free_trial = WorksInfo::select(['id'])->where(['pid'=>$listen_id, 'status' => 4,'free_trial'=>1])->first();
-        $works_data['free_trial_id']  = $free_trial['id'] ?? 0;
+        $works_data['free_trial_id']  = $free_trial['id'] ?? '';
 
         return $this->success($works_data);
     }
