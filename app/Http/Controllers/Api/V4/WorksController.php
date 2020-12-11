@@ -267,7 +267,7 @@ class WorksController extends Controller
             ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
             ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle',
                 'works.works_update_time','works.detail_img','works.content','relation.id as relation_id','relation.category_id','relation.work_id', 'works.column_id',
-                'works.comment_num','works.chapter_num','works.subscribe_num','works.collection_num');
+                'works.comment_num','works.chapter_num','works.subscribe_num','works.collection_num','works.is_free');
         if(!empty($cate_id_arr)){
             $worksDb->whereIn('relation.category_id',$cate_id_arr);
         }
