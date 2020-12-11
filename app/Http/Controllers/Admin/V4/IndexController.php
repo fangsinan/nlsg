@@ -40,10 +40,10 @@ class IndexController extends Controller
     public function works()
     {
         $lists = Recommend::with('works:id,title,cover_img,price')
-            ->select('id','relation_id','sort','created_at')
+            ->select('id', 'relation_id', 'sort', 'created_at')
             ->where('position', 1)
             ->where('type', 2)
-            ->orderBy('sort','desc')
+            ->orderBy('sort', 'desc')
             ->get();
         return success($lists);
     }
@@ -72,22 +72,31 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function course()
+    public function course(Request $request)
     {
-        $relation_id = Recommend::where('position', 1)
-            ->where('type', 10)
-            ->value('relation_id');
-        if ($relation_id){
+        $type = $request->get('type') ??  4;
+        if ($type == 4) {
             $lists = ListsWork::with('works:id,title,cover_img,price')
-                ->select('id','lists_id','works_id','state')
-                ->where('lists_id', $relation_id)
+                ->select('id', 'lists_id', 'works_id', 'state')
+                ->where('lists_id', 4)
+                ->get()
+                ->toArray();
+        } elseif ($type == 9) {
+            $lists = ListsWork::with('wiki:id,name,cover')
+                ->select('id', 'lists_id', 'works_id', 'state')
+                ->where('lists_id', 9)
+                ->get()
+                ->toArray();
+        } elseif ($type == 10) {
+            $lists = ListsWork::with('goods:id,name,picture,price')
+                ->select('id', 'lists_id', 'works_id', 'state')
+                ->where('lists_id', 10)
                 ->get()
                 ->toArray();
         }
+
         return success($lists);
     }
-
-
 
 
 }
