@@ -49,9 +49,9 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/rank  首页-
+     * @api {get} api/v4/index/rank  首页-排行榜
      * @apiVersion 4.0.0
-     * @apiName  course
+     * @apiName  index/rank
      * @apiGroup Index
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/rank
      *
