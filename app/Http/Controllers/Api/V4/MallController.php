@@ -216,7 +216,6 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            MallRefundJob::refundJob();
 //            $data = [
 //                'out_trade_no'      => '20121100168934348909801', //获取订单号
 //                'total_fee'         => 0.01, //价格

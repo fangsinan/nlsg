@@ -231,11 +231,11 @@ class Coupon extends Base
         }
 
         foreach ($temp_res as $k => $v) {
-            if ($v['type'] == 3 && $v['sub_list']) {
+            if ($v['type'] == 3 && !empty($v['sub_list'])) {
                 $del_flag = 1;
                 foreach ($v['sub_list'] as $vv) {
-                    if ($vv['use_type'] == 2) {
-                        if (!in_array($vv['goods_id'], $goods_id_list)) {
+                    if ($vv['use_type'] === 1) {
+                        if (in_array($vv['goods_id'], $goods_id_list)) {
                             $del_flag = 0;
                         }
                     }

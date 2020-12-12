@@ -833,7 +833,7 @@ class MallOrder extends Base
         }
 
         $res = [
-            'user' => $user,
+            'user' => User::onlySimpleInfo($user),
             'sku_list' => $sku_list_show,
             'price_list' => $price_list,
             'price_list_new' => $price_list_new,

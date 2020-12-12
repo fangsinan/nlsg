@@ -200,4 +200,17 @@ class User extends Authenticatable implements JWTSubject
             }
         }
     }
+
+    public static function onlySimpleInfo($user){
+        return [
+            'id'=>$user['id'],
+            'phone'=>$user['phone'],
+            'nickname'=>$user['nickname'],
+            'sex'=>$user['sex'],
+            'level'=>$user['level'],
+            'true_level'=>$user['true_level'],
+            'new_vip'=>$user['new_vip'],
+        ];
+
+    }
 }
