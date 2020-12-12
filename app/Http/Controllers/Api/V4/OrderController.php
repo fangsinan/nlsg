@@ -829,7 +829,7 @@ class OrderController extends Controller
      * @apiGroup order
      *
      * @apiParam {int} relation_id 目标id
-     * @apiParam {int} send_type   目标类型   1专栏  2讲座  3课程  4 听书
+     * @apiParam {int} send_type   目标类型   1 专栏  2课程|听书    6讲座
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
      * @apiParam {int} remark 增言
@@ -846,7 +846,7 @@ class OrderController extends Controller
     public function createSendOrder(Request $request)
     {
         $relation_id = $request->input('relation_id', 0);   //目标id
-        $send_type = $request->input('send_type', 0);   //目标类型  1 专栏   2讲座   3课程   4听书
+        $send_type = $request->input('send_type', 0);   //目标类型   1 专栏  2课程|听书    6讲座
         $os_type = $request->input('os_type', 0);
         $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
@@ -884,17 +884,17 @@ class OrderController extends Controller
         }
 
         $add_order_type = $send_type ;
-        switch ($send_type){
-            case 2:
-                $add_order_type = 6;
-                break;
-            case 3:
-                $add_order_type = 2;
-                break;
-            case 4:
-                $add_order_type = 2;
-                break;
-        };
+//        switch ($send_type){
+//            case 2:
+//                $add_order_type = 6;
+//                break;
+//            case 3:
+//                $add_order_type = 2;
+//                break;
+//            case 4:
+//                $add_order_type = 2;
+//                break;
+//        };
 
 
         //优惠券
