@@ -244,6 +244,41 @@ class IndexController extends Controller
         return success($lists);
     }
 
+    /**
+     * @api {get} api/v4/index/course  首页-课程集合
+     * @apiVersion 4.0.0
+     * @apiName  index/course
+     * @apiGroup  后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/course
+     *
+     * @apiSuccess {string}  state 状态 1上架 下架
+     * @apiSuccess {string}  works 听书作品
+     * @apiSuccess {string}  works.works_id  作品id
+     * @apiSuccess {string}  works.title  作品标题
+     * @apiSuccess {string}  works.cover_img  作品封面
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *         ]
+     *     }
+     *
+     */
+    public function course()
+    {
+        $lists = ListsWork::with('works:id,title,cover_img,price')
+            ->select('id', 'lists_id', 'works_id', 'state')
+            ->where('lists_id', 4)
+            ->orderBy('sort', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->toArray();
+
+        return success($lists);
+    }
 
 }
 

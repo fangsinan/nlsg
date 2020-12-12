@@ -124,8 +124,4 @@ class Recommend extends Base
         return $this->belongsTo('App\Models\MallGoods', 'relation_id', 'id');
     }
 
-    public function wiki()
-    {
-        return $this->belongsTo('App\Models\Wiki', 'relation_id', 'id');
-    }
 }

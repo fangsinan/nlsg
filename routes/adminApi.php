@@ -58,6 +58,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('list/works','IndexController@getListWorks');
     Route::get('index/goods','IndexController@goods');
     Route::get('index/wiki','IndexController@wiki');
+    Route::get('index/course','IndexController@course');
 
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');
