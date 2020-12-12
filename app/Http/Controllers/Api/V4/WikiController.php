@@ -195,7 +195,7 @@ class WikiController extends Controller
     public function related(Request $request)
     {
         $id = $request->input('id');
-        $lists = Wiki::select('name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
+        $lists = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
             ->where('id', '!=', $id)
             ->limit(2)
             ->get();
