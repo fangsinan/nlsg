@@ -488,7 +488,12 @@ class WorksController extends Controller
 
         $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$works_id,'type'=>2])->first();
 
-        $history_data = History::getHistoryData($works_data['id'],4,$user_id);
+        if($works_data['is_audio_book'] == 0){
+            $relation_type = 4;
+        }else{
+            $relation_type = 3;
+        }
+        $history_data = History::getHistoryData($works_data['id'],$relation_type,$user_id);
         //免费试听的章节
         $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works_id, 'status' => 4,'free_trial'=>1])->first();
 
