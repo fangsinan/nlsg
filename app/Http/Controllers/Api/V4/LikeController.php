@@ -46,7 +46,7 @@ class LikeController extends Controller
         $res = Like::create([
             'relation_id' => $id,
             'user_id'     => $this->user['id'],
-            'type'        => 1
+            'type'        => $type
         ]);
         if ($res){
             if ($type ==1){
