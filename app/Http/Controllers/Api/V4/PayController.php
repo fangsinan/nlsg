@@ -274,6 +274,7 @@ class PayController extends Controller {
       }
      */
     public function OrderFind(Request $request) {
+        return true;
         $id = $request->input('id', 0);
         $type = $request->input('type',0);
         if($type == 8){
