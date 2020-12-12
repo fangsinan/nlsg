@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\CouponRuleList;
 use App\Models\MallGoodsMsg;
+use App\Servers\MallRefundJob;
 use Illuminate\Http\Request;
 use App\Models\MallGoods;
 use App\Models\CouponRule;
@@ -215,6 +216,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
+            MallRefundJob::refundJob();
 //            $data = [
 //                'out_trade_no'      => '20121100168934348909801', //获取订单号
 //                'total_fee'         => 0.01, //价格

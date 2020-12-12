@@ -13,6 +13,16 @@ use Yansongda\Pay\Pay;
 
 class MallRefundJob
 {
+    public static function refundJob($job = 1)
+    {
+        $self = new self();
+        if ($job == 1) {
+            $self->mallRefund();
+        } else {
+            $self->mallRefundCheck();
+        }
+    }
+
     public function mallRefundCheck()
     {
         $list = MallRefundRecord::from('nlsg_mall_refund_record as mrr')

@@ -53,6 +53,11 @@ class ChannelServers
         $order->save();
     }
 
+    public static function cytxJob(){
+        $c = new self();
+        $c->cytxOrderList();
+    }
+
     //创业天下订单获取
     public function cytxOrderList($order_id = 0)
     {

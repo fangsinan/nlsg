@@ -38,15 +38,12 @@ class Kernel extends ConsoleKernel
             MallOrderGroupBuy::clear();//拼团超时订单处理和退款登记
             MallOrderFlashSale::clear();//秒杀订单处理
             Order::clear(); //线下课超时处理
-            $mrjModel = new MallRefundJob();
-            $mrjModel->mallRefund();
-            $mrjModel->mallRefundCheck();
-            $ChannelServers = new ChannelServers();
-            $ChannelServers->cytxOrderList();
-            Coupon::clear();
+            MallRefundJob::refundJob(1);//商城订单退款处理
+            ChannelServers::cytxJob();//创业天下推送
         })->everyMinute();//每分
 
         $schedule->call(function () {
+            MallRefundJob::refundJob(2);//商城订单退款查询
 //            $c = new ChannelServers();
 //            $c->getDouyinOrder();
 //            $c->supplementDouYinOrder();
@@ -57,7 +54,7 @@ class Kernel extends ConsoleKernel
         })->hourly();//每小时
 
         $schedule->call(function () {
-            Coupon::clear();
+            Coupon::clear();//失效优惠券清理
         })->dailyAt('03:00');//半夜清理
 
 
