@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Lists;
 use App\Models\ListsWork;
+use App\Models\MallGoods;
 use App\Models\Recommend;
 use App\Models\Works;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class IndexController extends Controller
      * @api {get} api/admin_v4/index/works 精选课程
      * @apiVersion 4.0.0
      * @apiName  index/works
-     * @apiGroup 后台-虚拟课程
+     * @apiGroup 后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/works
      * @apiDescription 精选课程
      *
@@ -40,7 +41,7 @@ class IndexController extends Controller
     public function works()
     {
         $lists = Recommend::with('works:id,title,cover_img,price')
-            ->select('id', 'relation_id', 'sort', 'created_at','status')
+            ->select('id', 'relation_id', 'sort', 'created_at', 'status')
             ->where('position', 1)
             ->where('type', 2)
             ->orderBy('sort', 'desc')
@@ -52,7 +53,7 @@ class IndexController extends Controller
      * @api {get} api/v4/index/rank  首页-排行榜
      * @apiVersion 4.0.0
      * @apiName  index/rank
-     * @apiGroup Index
+     * @apiGroup  后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/rank
      *
      * @apiParam {string}   type  4 课程 9 百科 10商品
@@ -104,5 +105,146 @@ class IndexController extends Controller
         return success($lists);
     }
 
+    /**
+     * @api {get} api/v4/index/lists  首页-书单推荐
+     * @apiVersion 4.0.0
+     * @apiName  index/lists
+     * @apiGroup  后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/lists
+     *
+     * @apiSuccess {string}  title    标题
+     * @apiSuccess {string}  subtitle 副标题
+     * @apiSuccess {string}  cover    封面
+     * @apiSuccess {string}  num      数量
+     * @apiSuccess {string}  status   状态  1上架 2下架
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *         ]
+     *     }
+     *
+     */
+    public function lists()
+    {
+        $lists = Lists::select('id', 'title', 'subtitle', 'cover', 'num', 'status')
+            ->where('type', 3)
+            ->get()
+            ->toArray();
+        return success($lists);
+    }
+
+    /**
+     * @api {get} api/v4/list/works  书单的作品列表
+     * @apiVersion 4.0.0
+     * @apiName   list/works
+     * @apiGroup  后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/list/works
+     *
+     * @apiParam {string}    list_id  书单id
+     * @apiSuccess {string}  state 状态 1上架 下架
+     * @apiSuccess {string}  works 听书作品
+     * @apiSuccess {string}  works.works_id  作品id
+     * @apiSuccess {string}  works.title  作品标题
+     * @apiSuccess {string}  works.cover_img  作品封面
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *         ]
+     *     }
+     *
+     */
+    public function getListWorks(Request $request)
+    {
+        $list_id = $request->get('list_id');
+        $lists = ListsWork::with('works:id,title,cover_img,price')
+            ->select('id', 'lists_id', 'works_id', 'state')
+            ->where('lists_id', $list_id)
+            ->orderBy('sort', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->toArray();
+        return success($lists);
+    }
+
+    /**
+     * @api {get} api/v4/index/goods  首页-推荐商品
+     * @apiVersion 4.0.0
+     * @apiName   index/goods
+     * @apiGroup  后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/goods
+     *
+     * @apiSuccess {string}  sort         排序
+     * @apiSuccess {string}  status       状态
+     * @apiSuccess {string}  goods        商品
+     * @apiSuccess {string}  goods.name   商品名称
+     * @apiSuccess {string}  goods.price  价格
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *         ]
+     *     }
+     *
+     */
+    public function goods()
+    {
+        $lists = Recommend::with('goods:id,name,picture,price,original_price')
+            ->select('id', 'relation_id', 'sort', 'created_at', 'status')
+            ->where('position', 1)
+            ->where('type', 8)
+            ->orderBy('sort', 'desc')
+            ->get();
+
+        return success($lists);
+    }
+
+    /**
+     * @api {get} api/v4/index/wiki  首页-推荐百科
+     * @apiVersion 4.0.0
+     * @apiName   index/wiki
+     * @apiGroup  后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/wiki
+     *
+     * @apiSuccess {string}  sort         排序
+     * @apiSuccess {string}  status       状态
+     * @apiSuccess {string}  goods        商品
+     * @apiSuccess {string}  goods.name   商品名称
+     * @apiSuccess {string}  goods.price  价格
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *         ]
+     *     }
+     *
+     */
+    public function wiki()
+    {
+        $lists = Recommend::with('wiki:id,name,cover,view_num,like_num')
+            ->select('id', 'relation_id', 'sort', 'created_at', 'status')
+            ->where('position', 1)
+            ->where('type', 5)
+            ->orderBy('sort', 'desc')
+            ->get();
+
+        return success($lists);
+    }
+
 
 }
+
+

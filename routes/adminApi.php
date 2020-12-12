@@ -54,6 +54,11 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('index/works','IndexController@works');
     Route::get('index/rank','IndexController@rank');
 
+    Route::get('index/lists','IndexController@lists');
+    Route::get('list/works','IndexController@getListWorks');
+    Route::get('index/goods','IndexController@goods');
+    Route::get('index/wiki','IndexController@wiki');
+
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');
     Route::post('mall_order/send', 'MallOrderController@send');
