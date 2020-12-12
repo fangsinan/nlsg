@@ -99,6 +99,7 @@ class GetPriceTools extends Base
         $sp_info['begin_time'] = '';
         $sp_info['end_time'] = '';
         $sp_info['list'] = []; //当前商品所有可参加活动
+
         //需要设置活动
         if (!empty($temp_sp_data)) {
             //活动type=4是拼团 只需要给出标记,并不显示在商品详情上
@@ -128,8 +129,9 @@ class GetPriceTools extends Base
                 if (floatval($temp_sp_goods_data->goods_original_price) > 0) {
                     $data->original_price = $temp_sp_goods_data->goods_original_price;
                 }
+                //列表和详情显示的价格  取第一个活动的价格
                 $data->price = $temp_sp_goods_data->goods_price;
-
+                $temp_sp_data = array_reverse($temp_sp_data);
                 $temp_sku_list = [];
                 foreach ($data->sku_list as $slv) {
                     $slv->sp_type = 0;
