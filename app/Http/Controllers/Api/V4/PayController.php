@@ -274,6 +274,7 @@ class PayController extends Controller {
       }
      */
     public function OrderFind(Request $request) {
+        //回调没问题,暂时关闭
         return true;
         $id = $request->input('id', 0);
         $type = $request->input('type',0);
@@ -296,6 +297,7 @@ class PayController extends Controller {
                 if($res['return_code'] == 'SUCCESS'){
                     if($res['trade_state'] == 'SUCCESS'){
                         $res['pay_type'] = 2;
+                        $res['total_fee'] = $res['total_fee']/100;
                     }
                 }else{
                     return $res;

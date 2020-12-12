@@ -476,6 +476,13 @@ class WechatPay extends Controller
         $pay_price = $data['total_fee'];
         $transaction_id = $data['transaction_id'];
 
+        $check_pay_record = PayRecord::where('ordernum', '=', $ordernum)
+            ->where('type', '=', 10)
+            ->first();
+        if (!empty($check_pay_record)) {
+            return true;
+        }
+
         $order_obj = MallOrder::where('ordernum', '=', strval($ordernum))
             ->first();
 
@@ -533,27 +540,27 @@ class WechatPay extends Controller
                 ->find($group_buy_id);
 
 
-            if ($temp_data->is_captain == 1){
-                $end_time = date('Y-m-d H:i:02',$now + $sp_info->group_life * 60);
+            if ($temp_data->is_captain == 1) {
+                $end_time = date('Y-m-d H:i:02', $now + $sp_info->group_life * 60);
 
                 $end_time_res = MallGroupBuyList::whereId($temp_data->id)
-                    ->update(['end_at'=>$end_time]);
+                    ->update(['end_at' => $end_time]);
 
-                if ($end_time_res === false){
+                if ($end_time_res === false) {
                     DB::rollBack();
                     return false;
                 }
-            }else{
-                $get_captain_data = MallGroupBuyList::where('group_key','=',$temp_data->group_key)
-                    ->where('is_captain','=',1)
+            } else {
+                $get_captain_data = MallGroupBuyList::where('group_key', '=', $temp_data->group_key)
+                    ->where('is_captain', '=', 1)
                     ->first();
 
                 $end_time_res = MallGroupBuyList::whereId($temp_data->id)
                     ->update([
-                        'begin_at'=>$now_date,
-                        'end_at'=>$get_captain_data->end_at
+                        'begin_at' => $now_date,
+                        'end_at' => $get_captain_data->end_at
                     ]);
-                if ($end_time_res === false){
+                if ($end_time_res === false) {
                     DB::rollBack();
                     return false;
                 }
@@ -562,9 +569,9 @@ class WechatPay extends Controller
             $need_num = $sp_info->group_num;
 
             $now_num = DB::table('nlsg_mall_group_buy_list as bl')
-                ->join('nlsg_mall_order as o','bl.order_id','=','o.id')
+                ->join('nlsg_mall_order as o', 'bl.order_id', '=', 'o.id')
                 ->where('group_key', '=', $temp_data->group_key)
-                ->where('o.status','>',1)
+                ->where('o.status', '>', 1)
                 ->count();
 
             if ($now_num >= $need_num) {
