@@ -105,10 +105,16 @@ class AuthController extends Controller
                 'headimg'=>'image/202009/13f952e04c720a550193e5655534be86.jpg',
             ]);
             $user = User::find($list->id);
-            $model->giveCoupon($list->id, 36);
-            if ($is_invite && $user_id){
-                $model->giveCoupon($user_id, 37);
 
+            //新人优惠券
+            $model->getCoupon(ConfigModel::getData(41),$list->id,false);
+
+            //$model->giveCoupon($list->id, 36);
+
+            if ($is_invite && $user_id){
+                //$model->giveCoupon($user_id, 37);
+                //邀请人优惠券
+                $model->getCoupon(ConfigModel::getData(42),$list->id,false);
                 UserInvite::create([
                     'from_uid' => $user_id,
                     'to_uid'   => $list->id,
