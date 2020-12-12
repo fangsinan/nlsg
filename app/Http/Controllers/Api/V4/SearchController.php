@@ -416,7 +416,7 @@ class SearchController extends Controller
         $user_id = $request->input('user_id',0);
         $flag = $request->input('flag','');
 
-        if( empty($keywords) ){
+        if($keywords === ''){
             return $this->error(0,'关键字为空');
         }
 
