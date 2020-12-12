@@ -217,9 +217,9 @@ class Coupon extends Base
             ->orderBy('end_time', 'asc')
             ->orderBy('id', 'asc')
             ->get();
-        if ($temp_res->isEmpty()){
+        if ($temp_res->isEmpty()) {
             $temp_res = [];
-        }else{
+        } else {
             $temp_res = $temp_res->toArray();
         }
 
@@ -279,13 +279,13 @@ class Coupon extends Base
 
         $count['status_1'] = self::where('user_id', '=', $user_id)
             ->where('end_time', '>', $now_date)
-            ->whereIn('type',[1,2,3,4,5,6])
+            ->whereIn('type', [1, 2, 3, 4, 5, 6])
             ->where('status', '=', 1)
             ->count();
 
         $count['status_2'] = self::where('user_id', '=', $user_id)
             ->where('status', '=', 2)
-            ->whereIn('type',[1,2,3,4,5,6])
+            ->whereIn('type', [1, 2, 3, 4, 5, 6])
             ->count();
 
         $count['status_3'] = self::where('user_id', '=', $user_id)
@@ -293,11 +293,11 @@ class Coupon extends Base
                 $query->where('status', '=', 3)
                     ->orWhere('end_time', '<=', date('Y-m-d H:i:s'));
             })
-            ->whereIn('type',[1,2,3,4,5,6])
+            ->whereIn('type', [1, 2, 3, 4, 5, 6])
             ->count();
 
         $query = self::where('user_id', '=', $user_id)
-            ->whereIn('type',[1,2,3,4,5,6]);
+            ->whereIn('type', [1, 2, 3, 4, 5, 6]);
 
         switch ($status) {
             case 2:
@@ -350,6 +350,16 @@ class Coupon extends Base
         ]);
 
         return success($res);
+    }
+
+    //清理过期优惠券(定时)
+    public static function clear()
+    {
+        Coupon::where('status', '=', 1)
+            ->whereRaw('end_time < now()')
+            ->update([
+                'status' => 3
+            ]);
     }
 
 }

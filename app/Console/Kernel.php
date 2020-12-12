@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\Coupon;
 use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\MallOrderFlashSale;
@@ -42,6 +43,7 @@ class Kernel extends ConsoleKernel
             $mrjModel->mallRefundCheck();
             $ChannelServers = new ChannelServers();
             $ChannelServers->cytxOrderList();
+            Coupon::clear();
         })->everyMinute();//每分
 
         $schedule->call(function () {
@@ -55,7 +57,7 @@ class Kernel extends ConsoleKernel
         })->hourly();//每小时
 
         $schedule->call(function () {
-
+            Coupon::clear();
         })->dailyAt('03:00');//半夜清理
 
 
