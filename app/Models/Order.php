@@ -91,10 +91,10 @@ class Order extends Base
                 $result[] = ['id'=>1,'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/poster_img/1581599882211_.pic.jpg','price'=>360.00];
                 break;
             case 17:
-                if($send_type == 1 || $send_type == 2){
+                if($send_type == 1 || $send_type == 6){
                     $model = new Column();
                     $result = $model->getIndexColumn([$relation_id]);
-                }else if($send_type == 3 || $send_type == 4){
+                }else if($send_type == 2){
                     $model = new Works();
                     $result = $model->getIndexWorks([$relation_id], 2,$user_id);
                 }
