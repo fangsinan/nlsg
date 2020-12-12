@@ -578,17 +578,20 @@ class WorksController extends Controller
             Works::where(['id'=>$relation_id])->increment('view_num');
         }
         if( empty($user_id) ) return $this->success();
-        // 学习记录数增一
-        User::where(['id'=>$user_id])->increment('history_num');
 
 
-        History::firstOrCreate([
+
+        $his= History::firstOrCreate([
             'relation_id' =>$relation_id,
             'relation_type'  =>$relation_type,
             'info_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
+        if($his->wasRecentlyCreated){
+            // 学习记录数增一
+            User::where(['id'=>$user_id])->increment('history_num');
+        }
         return $this->success();
     }
 
