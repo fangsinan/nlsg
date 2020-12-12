@@ -423,7 +423,7 @@ class WorksController extends Controller
             return $this->error(0,'works_id 不能为空');
         }
         //查询当前课程
-        $works_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','collection_num','comment_num','chapter_num','is_free'])
+        $works_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','collection_num','comment_num','chapter_num','is_free','is_audio_book'])
             ->where('status',4)->find($works_id);
 
         if(empty($works_data)){
