@@ -54,7 +54,6 @@ class Works extends Base
                 $v['is_new'] = 1;
             }
             $v['is_sub'] = Subscribe::isSubscribe($user_id, $v['id'], 2);
-            $v['cover_img'] = $v['detail_img'] ?? '';
         }
         return $lists;
 
