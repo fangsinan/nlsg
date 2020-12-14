@@ -447,11 +447,11 @@ class WorksController extends Controller
             return $this->success($res);
         }
 
-        // 身份价格
-        $works_data['twitter_price'] = GetPriceTools::Income(1,2,0,2,$works_data['user_id'],$works_id);
-        $works_data['black_price']   = GetPriceTools::Income(1,3,0,2,$works_data['user_id'],$works_id);
-        $works_data['emperor_price'] = GetPriceTools::Income(1,4,0,2,$works_data['user_id'],$works_id);
-        $works_data['service_price'] = GetPriceTools::Income(1,5,0,2,$works_data['user_id'],$works_id);
+        // 身份价格   转换成string保证json_encode 精确度
+        $works_data['twitter_price'] = (string)GetPriceTools::Income(1,2,0,2,$works_data['user_id'],$works_id);
+        $works_data['black_price']   = (string)GetPriceTools::Income(1,3,0,2,$works_data['user_id'],$works_id);
+        $works_data['emperor_price'] = (string)GetPriceTools::Income(1,4,0,2,$works_data['user_id'],$works_id);
+        $works_data['service_price'] = (string)GetPriceTools::Income(1,5,0,2,$works_data['user_id'],$works_id);
         $works_data['content']       = $works_data['content'];
 
 
@@ -734,13 +734,13 @@ class WorksController extends Controller
         $type = $request->input('type',1);
         if($is_index){
             $category = WorksCategory::select('id','name','pid','level')->where([
-                'type' => $type, 'status' => 1, 'is_index'=>1,
-            ])->orderBy('order','desc')->get()->toArray();
+                'type' => $type, 'status' => 1, 'is_index'=>1,'level'=>1,
+            ])->orderBy('order','asc')->get()->toArray();
             return $this->success($category);
         }
-        $category = WorksCategory::select('id','name','pid','level')->where([
-            'type' => $type, 'status' => 1,
-        ])->orderBy('sort','desc')->get()->toArray();
+        $category = WorksCategory::select('id','name','pid','level','sort')->where([
+            'type' => $type, 'status' => 1,'level'=>1,
+        ])->orderBy('sort','asc')->get()->toArray();
         $data = WorksCategory::getCategory($category,0,1);
         return $this->success($data);
     }

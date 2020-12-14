@@ -598,6 +598,7 @@ class OrderController extends Controller
             }
 
             $data[$key]['created_time'] = strtotime($val['created_at']);
+            $data[$key]['end_time'] = $data[$key]['created_time'] + 1800;
 
         }
 
@@ -674,7 +675,8 @@ class OrderController extends Controller
             $data['relation_data'] = $result;
         }
 
-
+        $data['created_time'] = strtotime($data['created_at']);
+        $data['end_time'] = $data['created_time'] + 1800;
         return $this->success($data);
 
     }
