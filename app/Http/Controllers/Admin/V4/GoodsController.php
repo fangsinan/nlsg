@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Live;
+use App\Servers\MallCommentServers;
 use Illuminate\Http\Request;
 use App\Servers\GoodsServers;
 
@@ -160,20 +161,26 @@ class GoodsController extends Controller
         return $this->getRes($data);
     }
 
+    public function addRobotComment(Request $request){
+        $servers = new MallCommentServers();
+        $data = $servers->addRobotComment($request->input());
+        return $this->getRes($data);
+    }
+
     public function tempTools(Request $request){
-        $type = $request->input('type',0);
-        $id = $request->input('id',0);
-        if ($type && $id){
-            switch ($type){
-                case 'live_pass':
-                    $check = Live::whereId($id)->first();
-                    if($check){
-                      $check->status = 4;
-                      $check->check_time = date('Y-m-d H:i:s');
-                      $check->save();
-                    }
-            }
-        }
+//        $type = $request->input('type',0);
+//        $id = $request->input('id',0);
+//        if ($type && $id){
+//            switch ($type){
+//                case 'live_pass':
+//                    $check = Live::whereId($id)->first();
+//                    if($check){
+//                      $check->status = 4;
+//                      $check->check_time = date('Y-m-d H:i:s');
+//                      $check->save();
+//                    }
+//            }
+//        }
     }
 }
 

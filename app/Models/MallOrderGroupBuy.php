@@ -1124,7 +1124,7 @@ class MallOrderGroupBuy extends Base
     {
         //查询过期订单
         $now = time();
-        $now_date = date('Y-m-d H:i:s', $now);
+        $now_date = date('Y-m-d H:i:59', $now);
 
         $gbl_list = DB::table('nlsg_mall_group_buy_list')
             ->where('is_captain', '=', 1)
