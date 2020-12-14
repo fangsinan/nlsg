@@ -95,9 +95,8 @@ class RedeemCode extends Base
     public function toRedeem($code, $user_id)
     {
         $use_type = intval($code->redeem_type);
-        $product_id = intval($code->goodes_id);
+        $product_id = intval($code->goods_id);
         $now_date = date('Y-m-d H:i:s');
-
         switch ($use_type) {
             case 1:
                 $col_info = Column::where('user_id', '=', $product_id)->first();
