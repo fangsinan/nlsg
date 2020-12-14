@@ -1136,9 +1136,14 @@ class MallOrderGroupBuy extends Base
         if ($gbl_list->isEmpty()) {
             return true;
         }
-
         $gbl_list = $gbl_list->toArray();
         $gbl_list = array_column($gbl_list, 'group_key');
+
+        MallGroupBuyList::whereIn('group_key', $gbl_list)
+            ->update([
+                'is_fail' => 1,
+                'fail_at' => $now_date,
+            ]);
 
         $list = MallGroupBuyList::whereIn('group_key', $gbl_list)
             ->select(['id', 'order_id'])
@@ -1148,13 +1153,13 @@ class MallOrderGroupBuy extends Base
             DB::beginTransaction();
 
             //group_buy_list部分
-            $v->is_fail = 1;
-            $v->fail_at = $now_date;
-            $v_res = $v->save();
-            if ($v_res === false) {
-                DB::rollBack();
-                continue;
-            }
+            //$v->is_fail = 1;
+            //$v->fail_at = $now_date;
+            //$v_res = $v->save();
+            //if ($v_res === false) {
+            //    DB::rollBack();
+            //    continue;
+            //}
             //mall_order
             $order_info = MallOrder::whereId($v->order_id)->where('is_stop', '=', 0)->first();
             if (empty($order_info)) {
@@ -1169,6 +1174,7 @@ class MallOrderGroupBuy extends Base
                 DB::rollBack();
                 continue;
             }
+
             if ($order_info->status > 1) {
                 //已经支付 需要写入 refund_record表
                 $refund_data['service_num'] = MallOrder::createOrderNumber($order_info->user_id, 2);

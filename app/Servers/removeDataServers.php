@@ -4,6 +4,7 @@
 namespace App\Servers;
 
 use App\Models\MallGoods;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class removeDataServers
@@ -328,6 +329,31 @@ class removeDataServers
         }
 
         dd($res);
+    }
+
+    //批量添加机器人
+    public function addRobot(){
+        //id 8000-11000  两千个虚拟用户位
+        $begin_num = [137,186,139,151];
+        $i = 8000;
+        while ($i <= 11000){
+            $now = date('Y-m-d H:i:s');
+            $temp_num = rand(10000000,99999999);
+            $num = $begin_num[rand(0,3)].$temp_num;
+            $num = substr_replace($num, '****', 3, 4);
+
+            $model = new User();
+            $model->id = $i;
+            $model->phone = $i;
+            $model->nickname = $num;
+            $model->created_at = $now;
+            $model->updated_at = $now;
+            $model->is_robot = 1;
+            $res = $model->save();
+            if ($res){
+                $i++;
+            }
+        }
     }
 
 }

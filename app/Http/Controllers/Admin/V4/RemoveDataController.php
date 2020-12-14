@@ -18,10 +18,16 @@ class RemoveDataController extends Controller
             $servers->removeGoods();
         }
 
-        if (1) {
+        if (0) {
             //校验商品和规格的价格是否冲突
             $servers = new removeDataServers();
             $servers->updateGoodsSkuPrice();
+        }
+
+        if(0){
+            //临时 批量添加机器人
+            $servers = new removeDataServers();
+            $servers->addRobot();
         }
 
     }

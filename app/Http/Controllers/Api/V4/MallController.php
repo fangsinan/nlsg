@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\CouponRuleList;
 use App\Models\MallGoodsMsg;
+use App\Models\MallOrderGroupBuy;
 use App\Servers\MallRefundJob;
 use Illuminate\Http\Request;
 use App\Models\MallGoods;
@@ -216,31 +217,8 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-//            $data = [
-//                'out_trade_no'      => '20121100168934348909801', //获取订单号
-//                'total_fee'         => 0.01, //价格
-//                'transaction_id'    => '4200000788202012112283341226', //交易单号
-//                'attach'            => 8,
-//                'pay_type'          => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
-//            ];
-//            $res = WechatPay::PayStatusUp($data);
-//            JobServers::pushToCytx(1534);
-
-//            $servers = new ChannelServers();
-//            $servers->cytxOrderList(1534);
-//            $i = 0;
-//            while ($i < 10){
-//                JobServers::pushToCytx(time().rand(100,999));
-//                $i++;
-//            }
-
-//            dd(__LINE__);
-
-//            $c = new ChannelServers();
-//            $data = $c->getDouyinOrder();
-//            $data = $c->supplementDouYinOrder();
-//            $data = $c->douYinJob();
-//            return $this->success($data);
+            MallOrderGroupBuy::clear();
+            return true;
         } else {
             $params = $request->input();
             $params['page'] = $params['page'] ?? 1;
