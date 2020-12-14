@@ -318,6 +318,8 @@ class WorksController extends Controller
             $newWorks[$key]['works'] = $worksData['data'][$key];
 
         }
+        $newWorks = array_values($newWorks);
+
         $res = [
             'works' => $newWorks,
             'total' => $worksData['total'],
