@@ -285,7 +285,12 @@ class WorksController extends Controller
 
             $is_sub = Subscribe::isSubscribe($user_id,$val['id'],2);
             if($hide == 1){
-                if($is_sub == 1){
+
+                //隐藏已购只判断nlsg_subscribe表
+                $sub_data = Subscribe::where(['type' => 2, 'user_id' => $user_id,'relation_id'=>$val['id']])
+                    ->where('end_time', '>', date('Y-m-d H:i:s'))
+                    ->first();
+                if($sub_data){
                     unset($worksData['data'][$key]);
                     continue;
                 }
