@@ -29,7 +29,7 @@ class MallOrderGroupBuy extends Base
     {
         $now = time();
         $dead_time = ConfigModel::getData(12);
-        $dead_time = date('Y-m-d H:i:02', ($now + $dead_time * 60));
+        $dead_time = date('Y-m-d H:i:03', ($now + $dead_time * 60));
 
         $now_date = date('Y-m-d H:i:s', $now);
         if (!in_array($params['pay_type'], [1, 2, 3])) {
