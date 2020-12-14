@@ -12,7 +12,7 @@ class Banner extends Base
     protected $table = 'nlsg_banner';
 
     protected $fillable = [
-        'title','pic','url','rank','type','obj_id','status','jump_type'
+        'title', 'pic', 'url', 'rank', 'type', 'obj_id', 'status', 'jump_type'
     ];
 
     /**
@@ -40,9 +40,6 @@ class Banner extends Base
             $res = self::mallBannerListFromDb();
             Cache::put($cache_key_name, $res, $expire_num);
         }
-
-        $keywords = ConfigModel::getData(21);
-        $res['keywords'] = explode(',',$keywords);
         return $res;
     }
 
@@ -80,6 +77,9 @@ class Banner extends Base
             ->limit($recommend_limit)
             ->get();
         $res['postage_line'] = ConfigModel::getData(1);
+
+        $keywords = ConfigModel::getData(21);
+        $res['keywords'] = explode(',', $keywords);
 
         foreach ($res['goods_list'] as $k => $v) {
             $temp_goods_list = [];
