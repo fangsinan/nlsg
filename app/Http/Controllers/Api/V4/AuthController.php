@@ -484,7 +484,7 @@ class AuthController extends Controller
     public function checkPhone(Request $request){
         $phone = $request->input('phone','');
         if (empty($phone)){
-            return error(400, '手机号错误');
+            return error(400);
         }
 
         //网上找的 待验证
@@ -492,14 +492,14 @@ class AuthController extends Controller
         $g2 = "/^19[89]\d{8}$/";
         $g3 = "/^166\d{8}$/";
         if(preg_match($g, $phone)){
-            return success(['code'=>200,'msg'=>'正确']);
+            return success();
         }else  if(preg_match($g2, $phone)){
-            return success(['code'=>200,'msg'=>'正确']);
+            return success();
         }else if(preg_match($g3, $phone)){
-            return success(['code'=>200,'msg'=>'正确']);
+            return success();
         }
 
-        return error(400, '手机号错误');
+        return error(400);
     }
 
 
