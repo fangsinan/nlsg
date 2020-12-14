@@ -639,6 +639,13 @@ class WorksController extends Controller
         if( empty($user_id) || empty($relation_id) || empty($relation_type)){
             return $this->success();
         }
+
+        $check_his = History::where('relation_id','=',$relation_id)
+            ->where('relation_type','=',$relation_type)
+            ->where('user_id','=',$user_id)
+            ->where('is_del','=',0)
+            ->first();
+
         //防止 show接口未请求
         $his = History::firstOrCreate([
             'relation_id' =>$relation_id,
@@ -647,6 +654,10 @@ class WorksController extends Controller
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
+        if(empty($check_his) && $his->wasRecentlyCreated){
+            // 学习记录数增一
+            User::where(['id'=>$user_id])->increment('history_num');
+        }
 
         //更新学习进度
         History::where('id',$his->id)->update([
