@@ -587,6 +587,11 @@ class WorksController extends Controller
         if( empty($user_id) ) return $this->success();
 
 
+        $check_his = History::where('relation_id','=',$relation_id)
+            ->where('relation_type','=',$relation_type)
+            ->where('user_id','=',$user_id)
+            ->where('is_del','=',0)
+            ->first();
 
         $his= History::firstOrCreate([
             'relation_id' =>$relation_id,
@@ -595,7 +600,8 @@ class WorksController extends Controller
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
-        if($his->wasRecentlyCreated){
+        //学习记录条数会只按relation_id算
+        if(empty($check_his) && $his->wasRecentlyCreated){
             // 学习记录数增一
             User::where(['id'=>$user_id])->increment('history_num');
         }
