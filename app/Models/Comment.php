@@ -56,8 +56,11 @@ class Comment extends Base
             foreach ($lists['data'] as &$v) {
                 $follow = UserFollow::where(['from_uid'=>$uid,'to_uid'=>$v['user_id']])->first();
                 $v['is_follow'] = $follow ? 1 : 0;
-
-                $isLike = Like::where(['relation_id'=>$v['id'], 'type'=>1,'user_id'=>$uid])->first();
+                $like_type = 1;
+                if($type == 5){ //百科
+                    $like_type = 2;
+                }
+                $isLike = Like::where(['relation_id'=>$v['id'], 'type'=>$like_type,'user_id'=>$uid])->first();
                 $v['is_like'] = $isLike ? 1 : 0;
             }
         }
@@ -118,7 +121,10 @@ class Comment extends Base
                  ->toArray();
         if($reply['data']){
             foreach ($reply['data'] as &$v) {
-                $isLike = Like::where(['relation_id'=>$v['id'], 'type'=>1,'user_id'=>$uid])->first();
+                if($comment['type'] == 5){ //百科
+                    $like_type = 2;
+                }
+                $isLike = Like::where(['relation_id'=>$v['id'], 'type'=>$like_type,'user_id'=>$uid])->first();
                 $v['is_like'] = $isLike ? 1 : 0;
             }
         }
