@@ -50,11 +50,11 @@ class AuthController extends Controller
         $phone = $request->input('phone');
         $code = $request->input('code');
         $is_invite = $request->input('is_invite');
-        $user_id   = $request->input('user_id');
+        $user_id = $request->input('user_id');
         $inviter = $request->input('inviter', 0);
         $ref = $request->input('ref', 0);
 
-        $sclass =  new \StdClass();
+        $sclass = new \StdClass();
         if (!$phone) {
             return error(400, '手机号不能为空', $sclass);
         }
@@ -63,19 +63,19 @@ class AuthController extends Controller
         }
 
         //todo 临时
-        $dont_check_phone = ConfigModel::getData(35,1);
-        $dont_check_phone = explode(',',$dont_check_phone);
-        if(in_array($phone,$dont_check_phone)){
-            if (intval($code) !== 6666){
-                return error(400, '验证码错误',$sclass);
+        $dont_check_phone = ConfigModel::getData(35, 1);
+        $dont_check_phone = explode(',', $dont_check_phone);
+        if (in_array($phone, $dont_check_phone)) {
+            if (intval($code) !== 6666) {
+                return error(400, '验证码错误', $sclass);
             }
-        }else{
+        } else {
             $res = Redis::get($phone);
             if (!$res) {
-                return error(400, '验证码已过期',$sclass);
+                return error(400, '验证码已过期', $sclass);
             }
             if ($code !== $res) {
-                return error(400, '验证码错误',$sclass);
+                return error(400, '验证码错误', $sclass);
             }
         }
 //        if (($phone != 18624078563 || $phone != 15811570751) && $code != 6666) {
@@ -102,23 +102,23 @@ class AuthController extends Controller
                 'login_flag' => ($inviter == 0) ? 0 : 1,
                 'nickname' => substr_replace($phone, '****', 3, 4),
                 'ref' => $ref,
-                'headimg'=>'image/202009/13f952e04c720a550193e5655534be86.jpg',
+                'headimg' => 'image/202009/13f952e04c720a550193e5655534be86.jpg',
             ]);
             $user = User::find($list->id);
 
             //新人优惠券
-            $model->getCoupon(ConfigModel::getData(41),$list->id,false);
+            $model->getCoupon(ConfigModel::getData(41), $list->id, false);
 
             //$model->giveCoupon($list->id, 36);
 
-            if ($is_invite && $user_id){
+            if ($is_invite && $user_id) {
                 //$model->giveCoupon($user_id, 37);
                 //邀请人优惠券
-                $model->getCoupon(ConfigModel::getData(42),$list->id,false);
+                $model->getCoupon(ConfigModel::getData(42), $list->id, false);
                 UserInvite::create([
                     'from_uid' => $user_id,
-                    'to_uid'   => $list->id,
-                    'type'     => 1
+                    'to_uid' => $list->id,
+                    'type' => 1
                 ]);
             }
 
@@ -136,8 +136,8 @@ class AuthController extends Controller
             'token' => $token,
             'nickname' => $user->nickname,
             'headimg' => $user->headimg ?? '',
-            'phone'=>$user->phone,
-            'level'=>$user->level
+            'phone' => $user->phone,
+            'level' => $user->level
         ];
         return success($data);
     }
@@ -164,6 +164,7 @@ class AuthController extends Controller
         auth('api')->logout();
         return success();
     }
+
     /**
      * @api {get} api/v4/auth/wechat 微信授权
      * @apiVersion 4.0.0
@@ -291,7 +292,7 @@ class AuthController extends Controller
     public function wechatInfo(Request $request)
     {
         $code = $request->input('code');
-        $type = $request->input('type',1);
+        $type = $request->input('type', 1);
         if (!$code) {
             return $this->error(1000, 'code不能为空');
         }
@@ -306,8 +307,8 @@ class AuthController extends Controller
             return $this->error(401, '授权失败');
         }
 
-        if($type == 1){
-            return $this->success(['openid' =>$res->openid,]);
+        if ($type == 1) {
+            return $this->success(['openid' => $res->openid,]);
         }
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res->access_token,
@@ -378,11 +379,11 @@ class AuthController extends Controller
         }
 
         //自己人不发验证码
-        $dont_check_phone = ConfigModel::getData(35,1);
-        $dont_check_phone = explode(',',$dont_check_phone);
-        if(in_array($phone,$dont_check_phone)){
+        $dont_check_phone = ConfigModel::getData(35, 1);
+        $dont_check_phone = explode(',', $dont_check_phone);
+        if (in_array($phone, $dont_check_phone)) {
             return success();
-        }else{
+        } else {
             $easySms = app('easysms');
             try {
 
@@ -481,25 +482,26 @@ class AuthController extends Controller
 
     }
 
-    public function checkPhone(Request $request){
-        $phone = $request->input('phone','');
-        if (empty($phone)){
-            return error(400);
+    public function checkPhone(Request $request)
+    {
+        $phone = $request->input('phone', '');
+        if (empty($phone)) {
+            return $this->success(['code' => false, 'msg' => '号码错误']);
         }
 
         //网上找的 待验证
         $g = "/^1[34578]\d{9}$/";
         $g2 = "/^19[89]\d{8}$/";
         $g3 = "/^166\d{8}$/";
-        if(preg_match($g, $phone)){
-            return success();
-        }else  if(preg_match($g2, $phone)){
-            return success();
-        }else if(preg_match($g3, $phone)){
-            return success();
+        if (preg_match($g, $phone)) {
+            return $this->success(['code' => true, 'msg' => '正确']);
+        } else if (preg_match($g2, $phone)) {
+            return $this->success(['code' => true, 'msg' => '正确']);
+        } else if (preg_match($g3, $phone)) {
+            return $this->success(['code' => true, 'msg' => '正确']);
         }
 
-        return error(400);
+        return $this->success(['code' => false, 'msg' => '号码错误']);
     }
 
 
