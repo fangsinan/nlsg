@@ -598,6 +598,7 @@ class OrderController extends Controller
             }
 
             $data[$key]['created_time'] = strtotime($val['created_at']);
+            $data[$key]['end_time'] = $data[$key]['created_time'] + 1800;
 
         }
 
