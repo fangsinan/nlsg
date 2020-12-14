@@ -314,7 +314,9 @@ class Coupon extends Base
         }
 
         $query->select([
-            'id', 'number', 'name', 'type', 'price', 'full_cut',
+            'id', 'number', 'name', 'type',
+            DB::raw('cast(price as signed) as price'),
+            DB::raw('cast(full_cut as signed) as full_cut'),
             'explain', 'begin_time', 'end_time'
         ]);
 
