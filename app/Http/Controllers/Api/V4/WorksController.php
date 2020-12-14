@@ -739,12 +739,12 @@ class WorksController extends Controller
         $type = $request->input('type',1);
         if($is_index){
             $category = WorksCategory::select('id','name','pid','level')->where([
-                'type' => $type, 'status' => 1, 'is_index'=>1,'level'=>1,
+                'type' => $type, 'status' => 1, 'is_index'=>1,
             ])->orderBy('order','asc')->get()->toArray();
             return $this->success($category);
         }
         $category = WorksCategory::select('id','name','pid','level','sort')->where([
-            'type' => $type, 'status' => 1,'level'=>1,
+            'type' => $type, 'status' => 1,
         ])->orderBy('sort','asc')->get()->toArray();
         $data = WorksCategory::getCategory($category,0,1);
         return $this->success($data);
