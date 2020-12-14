@@ -447,11 +447,11 @@ class WorksController extends Controller
             return $this->success($res);
         }
 
-        // 身份价格
-        $works_data['twitter_price'] = GetPriceTools::Income(1,2,0,2,$works_data['user_id'],$works_id);
-        $works_data['black_price']   = GetPriceTools::Income(1,3,0,2,$works_data['user_id'],$works_id);
-        $works_data['emperor_price'] = GetPriceTools::Income(1,4,0,2,$works_data['user_id'],$works_id);
-        $works_data['service_price'] = GetPriceTools::Income(1,5,0,2,$works_data['user_id'],$works_id);
+        // 身份价格   转换成string保证json_encode 精确度
+        $works_data['twitter_price'] = (string)GetPriceTools::Income(1,2,0,2,$works_data['user_id'],$works_id);
+        $works_data['black_price']   = (string)GetPriceTools::Income(1,3,0,2,$works_data['user_id'],$works_id);
+        $works_data['emperor_price'] = (string)GetPriceTools::Income(1,4,0,2,$works_data['user_id'],$works_id);
+        $works_data['service_price'] = (string)GetPriceTools::Income(1,5,0,2,$works_data['user_id'],$works_id);
         $works_data['content']       = $works_data['content'];
 
 

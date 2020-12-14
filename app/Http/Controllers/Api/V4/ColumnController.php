@@ -496,10 +496,10 @@ class ColumnController extends Controller
         $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works['id'], 'status' => 4,'free_trial'=>1])->first();
         $column['free_trial_id']  = $free_trial['id'] ?? '';
 
-        $column['twitter_price'] = GetPriceTools::Income(1,2,0,1,$column_id);
+        $column['twitter_price'] = (string)GetPriceTools::Income(1,2,0,1,$column_id);
 //        $column['black_price']   = GetPriceTools::Income(1,3,0,1,$column_id);
-        $column['emperor_price'] = GetPriceTools::Income(1,4,0,1,$column_id);
-        $column['service_price'] = GetPriceTools::Income(1,5,0,1,$column_id);
+        $column['emperor_price'] = (string)GetPriceTools::Income(1,4,0,1,$column_id);
+        $column['service_price'] = (string)GetPriceTools::Income(1,5,0,1,$column_id);
 
         return $this->success([
             'column_info'  =>$column,
