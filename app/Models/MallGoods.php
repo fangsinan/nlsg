@@ -500,14 +500,12 @@ class MallGoods extends Base
             Cache::put($cache_key_name, $id_list, $expire_num);
         }
 
-        $res = $this->getList([
+        return $this->getList([
             'ids_str' => $id_list,
             'page' => 1,
             'size' => 1,
             'get_all' => 1
         ], $user, false);
-
-        return $res;
     }
 
     //商城服务说明
