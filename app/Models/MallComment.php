@@ -168,4 +168,8 @@ class MallComment extends Base
         return $data;
     }
 
+    public function sku() {
+        return $this->hasOne('App\Models\MallSku', 'sku_number', 'sku_number')
+            ->select(['id', 'sku_number']);
+    }
 }

@@ -14,17 +14,24 @@ class MallCommentServers
     public function list($params)
     {
 
-        $size = 10;
+        $size = $params['size'] ?? 10;
 
-        $query = DB::table('nlsg_mall_comment as c')
+        $query = MallComment::from('nlsg_mall_comment as c')
             ->join('nlsg_mall_goods as g', 'c.goods_id', '=', 'g.id')
             ->join('nlsg_mall_sku as s', 'c.sku_number', '=', 's.sku_number')
             ->join('nlsg_user as u', 'c.user_id', '=', 'u.id');
 
+        if ($params['is_robot'] ?? 0 === 1) {
+            $query->where('u.is_robot', '=', 1);
+        } else {
+            $query->where('u.is_robot', '=', 0);
+        }
+
+        $query->with(['sku', 'sku.sku_value_list']);
 
         $query->select([
-            'c.id as comment_id', 'c.content', 'c.picture', 'c.star', 'g.name as goods_name', 'g.picture as goods_picture',
-            'u.nickname', 'u.phone'
+            'c.id as comment_id', 'c.content', 'c.picture', 'c.star', 'g.name as goods_name',
+            'g.picture as goods_picture', 'u.nickname', 'u.phone', 'c.sku_number'
         ]);
 
         $list = $query->paginate($size);
