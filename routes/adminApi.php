@@ -53,6 +53,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     Route::get('index/works','IndexController@works');
     Route::post('index/add-works','IndexController@addWorks');
+    Route::get('index/edit-works','IndexController@editWorks');
     Route::get('index/rank','IndexController@rank');
 
     Route::get('index/lists','IndexController@lists');

@@ -551,6 +551,38 @@ class IndexController extends Controller
         return success();
     }
 
+    /**
+     * @api {post} api/admin_v4/index/edit-works 编辑推荐课程
+     * @apiVersion 4.0.0
+     * @apiName  edit-works
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/edit-works
+     * @apiDescription 编辑推荐百科
+     *
+     * @apiParam {string}  id  推荐id
+     *
+     * @apiSuccess {string}  relation_id  作品id
+     * @apiSuccess {string}  sort   位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function editWorks(Request $request)
+    {
+        $id = $request->get('id');
+        $list = Recommend::where('id', $id)
+            ->select('id','relation_id','sort')
+            ->first();
+        return success($list);
+    }
+
 }
 
 
