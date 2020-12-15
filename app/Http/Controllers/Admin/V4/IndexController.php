@@ -245,7 +245,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/course  首页-课程集合
+     * @api {get} api/v4/index/course  首页-推荐课程集合【教育宝典】
      * @apiVersion 4.0.0
      * @apiName  index/course
      * @apiGroup  后台-首页推荐
@@ -286,7 +286,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-works 增加/编辑推荐课程
+     * @api {post} api/admin_v4/index/add-works 增加/更新推荐课程
      * @apiVersion 4.0.0
      * @apiName  add-works
      * @apiGroup 后台-首页推荐
@@ -328,7 +328,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-lists 增加/编辑推荐书单
+     * @api {post} api/admin_v4/index/add-lists 增加/更新推荐书单
      * @apiVersion 4.0.0
      * @apiName  add-lists
      * @apiGroup 后台-首页推荐
@@ -370,7 +370,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-listwork 增加/编辑推荐作品
+     * @api {post} api/admin_v4/index/add-listwork 增加/更新推荐作品
      * @apiVersion 4.0.0
      * @apiName  add-listwork
      * @apiGroup 后台-首页推荐
@@ -415,7 +415,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-goods 增加/编辑推荐商品
+     * @api {post} api/admin_v4/index/add-goods 增加/更新推荐商品
      * @apiVersion 4.0.0
      * @apiName  index/add-goods
      * @apiGroup  后台-首页推荐
@@ -511,7 +511,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-wiki 增加/编辑推荐百科
+     * @api {post} api/admin_v4/index/add-wiki 增加/更新推荐百科
      * @apiVersion 4.0.0
      * @apiName  add-wiki
      * @apiGroup 后台-首页推荐
