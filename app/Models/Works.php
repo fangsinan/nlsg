@@ -42,9 +42,10 @@ class Works extends Base
             $WorksObj->where('is_audio_book', $is_audio_book);
         }
 
-        $lists = $WorksObj->orderBy('created_at', 'desc')
-            ->get()
+        $lists = $WorksObj
+            ->orderByRaw('FIELD(id,' . implode(',', $ids) . ')')
             ->take(4)
+            ->get()
             ->toArray();
 
         $time = Config('web.is_new_time');
