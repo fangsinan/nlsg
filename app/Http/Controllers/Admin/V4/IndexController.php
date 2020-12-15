@@ -372,9 +372,9 @@ class IndexController extends Controller
     /**
      * @api {post} api/admin_v4/index/add-listwork 增加/编辑推荐书单
      * @apiVersion 4.0.0
-     * @apiName  add-works
+     * @apiName  add-listwork
      * @apiGroup 后台-首页推荐
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-works
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-listwork
      * @apiDescription 增加/编辑推荐课程
      *
      * @apiParam {string} lists_id 书单id
