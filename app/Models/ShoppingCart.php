@@ -134,6 +134,7 @@ class ShoppingCart extends Base
         $goods_id_list = array_column($cart, 'goods_id');
 
         $goodsModel = new MallGoods();
+
         $goods_list = $goodsModel->getList(
             [
                 'ids_str' => $goods_id_list,
@@ -145,8 +146,8 @@ class ShoppingCart extends Base
                 'invalid' => 1
             ], $user, false);
 
-
         foreach ($cart as &$v) {
+            $v['invalid'] = 1;
             foreach ($goods_list as $gv) {
                 if ($v['goods_id'] == $gv->id) {
                     $v['invalid'] = 0;
