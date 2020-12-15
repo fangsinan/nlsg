@@ -567,14 +567,16 @@ class IndexController extends Controller
         if (!empty($input['id'])) {
             Recommend::where('id', $input['id'])->update([
                 'relation_id' => $input['wiki_id'],
-                'sort' => $input['sort']
+                'sort' => $input['sort'],
+                'status' => $input['status'] ?? 2
             ]);
         } else {
             Recommend::create([
                 'relation_id' => $input['wiki_id'],
                 'position' => 1,
                 'type' => 5,
-                'sort' => $input['sort'] ?? 99
+                'sort' => $input['sort'] ?? 99,
+                'status' => $input['status'] ?? 2
             ]);
         }
 
