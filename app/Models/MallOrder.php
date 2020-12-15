@@ -980,6 +980,16 @@ class MallOrder extends Base
                         return ['code' => false, 'msg' => '失败', 'ps' => 'order error'];
                     }
 
+                    //库存加 销量减
+                    $order_detail = MallOrderDetails::where('order_id', '=', $check->id)
+                        ->get();
+                    foreach ($order_detail as $od_v) {
+                        MallSku::where('sku_number', '=', $od_v->sku_number)->increment('stock', $od_v->num);
+                        MallSku::where('sku_number', '=', $od_v->sku_number)->decrement('sales_num', $od_v->num);
+                        MallGoods::whereId($od_v->goods_id)->decrement('sales_num', $od_v->num);
+
+                    }
+
                     if ($check->status === 10 || $check->status === 20) {
                         //订单状态修改-写入后台审核
                         $refund_data['service_num'] = MallOrder::createOrderNumber($user_id, 2);
