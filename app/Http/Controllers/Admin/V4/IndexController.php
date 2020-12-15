@@ -578,7 +578,40 @@ class IndexController extends Controller
     {
         $id = $request->get('id');
         $list = Recommend::where('id', $id)
-            ->select('id','relation_id','sort')
+            ->select('id', 'relation_id', 'sort')
+            ->first();
+        return success($list);
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/edit-lists 编辑推荐书单
+     * @apiVersion 4.0.0
+     * @apiName  edit-lists
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/edit-lists
+     * @apiDescription 编辑推荐百科
+     *
+     * @apiParam {string}  id  书单id
+     *
+     * @apiSuccess {string}  title  标题
+     * @apiSuccess {string}  subtitle   副标题
+     * @apiSuccess {string}  status   状态
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function editLists(Request $request)
+    {
+        $id = $request->get('id');
+        $list = Lists::where('id', $id)
+            ->select('id', 'title', 'subtitle','status')
             ->first();
         return success($list);
     }
