@@ -334,7 +334,7 @@ class IndexController extends Controller
      *    }
      * }
      */
-    public function iorks(Request $request)
+    public function addWorks(Request $request)
     {
         $input = $request->all();
         if (!empty($input['id'])) {
