@@ -280,7 +280,7 @@ class IndexController extends Controller
         return success($lists);
     }
 
-    public function  live()
+    public function live()
     {
 
     }
@@ -463,8 +463,6 @@ class IndexController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-goods
      * @apiDescription 选择商品
      *
-     * @apiParam {string} goods_id 商品id
-     * @apiParam {string} sort 位置
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -480,6 +478,33 @@ class IndexController extends Controller
     {
         $lists = MallGoods::where('status', 2)
             ->select('id', 'name')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($lists);
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/get-works 选择作品
+     * @apiVersion 4.0.0
+     * @apiName  get-works
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-works
+     * @apiDescription 选择作品
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getWorks()
+    {
+        $lists = Works::where('status', 4)
+            ->select('id', 'title')
             ->orderBy('created_at', 'desc')
             ->get();
         return success($lists);
@@ -518,7 +543,7 @@ class IndexController extends Controller
             Recommend::create([
                 'relation_id' => $input['wiki_id'],
                 'position' => 1,
-                'type'     => 5,
+                'type' => 5,
                 'sort' => $input['sort'] ?? 99
             ]);
         }

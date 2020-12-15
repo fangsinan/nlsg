@@ -60,6 +60,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('list/works','IndexController@getListWorks');
     Route::get('index/goods','IndexController@goods');
     Route::get('index/get-goods','IndexController@getMallGoods');
+    Route::get('index/get-works','IndexController@getWorks');
     Route::post('index/add-goods','IndexController@addGoods');
     Route::get('index/wiki','IndexController@wiki');
     Route::get('index/course','IndexController@course');
