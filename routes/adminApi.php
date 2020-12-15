@@ -74,7 +74,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('goods/add', 'GoodsController@add');
     Route::get('goods/list', 'GoodsController@list');
     Route::get('goods/category_list', 'GoodsController@categoryList');
-
+    Route::post('goods/add_robot_comment','GoodsController@addRobotComment');
 
 
     //特价管理
