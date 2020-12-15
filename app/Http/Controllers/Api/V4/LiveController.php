@@ -178,7 +178,7 @@ class LiveController extends Controller
         $data = [
             'banner'     => 'nlsg/works/20201021110516843010.png',
             'live_lists' => $liveLists,
-            'back_lists' => $backLists,
+            'back_lists' => $backLists ?? [],
             'offline'    => $offline,
             'recommend'  => $recommend
         ];
