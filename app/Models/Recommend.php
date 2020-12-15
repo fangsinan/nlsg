@@ -13,6 +13,15 @@ class Recommend extends Base
 {
     protected $table = 'nlsg_recommend';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'relation_id','position','type','sort'
+    ];
+
     public function getIndexRecommend($type = 1, $position = '1', $limit = 5, $row = 1)
     {
         if (!$type) {

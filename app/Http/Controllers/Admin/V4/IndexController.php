@@ -280,6 +280,48 @@ class IndexController extends Controller
         return success($lists);
     }
 
+    /**
+     * @api {post} api/admin_v4/index/add-works 增加/编辑推荐课程
+     * @apiVersion 4.0.0
+     * @apiName  add-works
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-works
+     * @apiDescription 增加/编辑推荐课程
+     *
+     * @apiParam {string} work_id 作品id
+     * @apiParam {string} sort 位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function addWorks(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            Recommend::where('id', $input['id'])->update([
+                'relation_id' => $input['work_id'],
+                'sort' => $input['sort']
+            ]);
+        } else {
+            Recommend::create([
+                'relation_id' => $input['work_id'],
+                'position' => 1,
+                'type' => 2,
+                'sort' => $input['sort']
+            ]);
+        }
+
+        return success();
+
+    }
+
 }
 
 
