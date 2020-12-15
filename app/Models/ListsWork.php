@@ -8,6 +8,10 @@ class ListsWork extends Model
 {
     protected $table = 'nlsg_lists_work';
 
+    protected $fillable = [
+        'lists_id', 'works_id', 'sort', 'state'
+    ];
+
     /**
      * 首页听书推荐
      * @param $ids 相关作品id
