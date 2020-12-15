@@ -68,6 +68,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('index/wiki','IndexController@wiki');
     Route::get('index/course','IndexController@course');
     Route::get('index/live','IndexController@live');
+    Route::get('index/get-wiki','IndexController@getWiki');
 
     //商城订单
     Route::get('mall_order/list', 'MallOrderController@list');

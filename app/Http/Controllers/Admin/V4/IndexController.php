@@ -9,6 +9,7 @@ use App\Models\Live;
 use App\Models\MallGoods;
 use App\Models\Recommend;
 use App\Models\Works;
+use App\Models\Wiki;
 use Illuminate\Http\Request;
 
 class IndexController extends Controller
@@ -281,13 +282,36 @@ class IndexController extends Controller
         return success($lists);
     }
 
+    /**
+     * @api {get} api/v4/index/live   推荐百科
+     * @apiVersion 4.0.0
+     * @apiName   index/wiki
+     * @apiGroup  后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/wiki
+     *
+     * @apiSuccess {string}  sort         排序
+     * @apiSuccess {string}  status       状态
+     * @apiSuccess {string}  goods        商品
+     * @apiSuccess {string}  goods.name   商品名称
+     * @apiSuccess {string}  goods.price  价格
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *         ]
+     *     }
+     *
+     */
     public function live()
     {
         $ids = Recommend::where('type', 7)
             ->where('position', 1)
             ->value('relation_id');
-        if (!$ids){
-            return error(1000,'还没有推荐');
+        if (!$ids) {
+            return error(1000, '还没有推荐');
         }
         $model = new Live();
         $lists = $model->getIndexLive($ids);
@@ -658,6 +682,34 @@ class IndexController extends Controller
             ->first();
         return success($list);
     }
+
+    /**
+     * @api {post} api/admin_v4/index/get-wiki 选择百科
+     * @apiVersion 4.0.0
+     * @apiName  get-wiki
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-wiki
+     * @apiDescription 选择百科
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getWiki()
+    {
+        $lists = Wiki::where('status', 1)
+            ->select('id', 'name')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($lists);
+    }
+
 
 }
 
