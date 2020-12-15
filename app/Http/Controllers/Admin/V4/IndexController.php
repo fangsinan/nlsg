@@ -341,7 +341,7 @@ class IndexController extends Controller
             Recommend::where('id', $input['id'])->update([
                 'relation_id' => $input['work_id'],
                 'sort' => $input['sort'],
-                'status' => $input['status'] ?? 99
+                'status' => $input['status'] ?? 2
             ]);
         } else {
             Recommend::create([
@@ -349,7 +349,7 @@ class IndexController extends Controller
                 'position' => 1,
                 'type' => 2,
                 'sort' => $input['sort'] ?? 99,
-                'status' => $input['status'] ?? 99
+                'status' => $input['status'] ?? 2
             ]);
         }
 
