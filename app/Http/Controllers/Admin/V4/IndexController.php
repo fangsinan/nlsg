@@ -283,17 +283,12 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/live   推荐百科
+     * @api {get} api/v4/index/live   推荐直播
      * @apiVersion 4.0.0
-     * @apiName   index/wiki
+     * @apiName   index/live
      * @apiGroup  后台-首页推荐
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/wiki
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/live
      *
-     * @apiSuccess {string}  sort         排序
-     * @apiSuccess {string}  status       状态
-     * @apiSuccess {string}  goods        商品
-     * @apiSuccess {string}  goods.name   商品名称
-     * @apiSuccess {string}  goods.price  价格
      *
      * @apiSuccessExample  Success-Response:
      *     HTTP/1.1 200 OK
@@ -643,7 +638,7 @@ class IndexController extends Controller
     public function editLists(Request $request)
     {
         $id = $request->get('id');
-        $list = Lists::where('id', $id)
+        $list = Lists::where('id', $idy)
             ->select('id', 'title', 'subtitle', 'status')
             ->first();
         return success($list);
