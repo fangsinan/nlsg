@@ -174,6 +174,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('auth/apple', 'AuthController@apple');
     Route::post('bind/apple', 'AuthController@jwtApple');
     Route::get('auth/check_phone', 'AuthController@checkPhone');
+    Route::get('auth/module', 'AuthController@module');
 
     Route::get('order/reward/user', 'OrderController@getRewardUser');
 
