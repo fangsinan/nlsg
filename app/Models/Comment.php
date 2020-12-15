@@ -121,6 +121,7 @@ class Comment extends Base
                  ->toArray();
         if($reply['data']){
             foreach ($reply['data'] as &$v) {
+                $like_type = 1;
                 if($comment['type'] == 5){ //百科
                     $like_type = 2;
                 }
