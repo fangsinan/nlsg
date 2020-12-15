@@ -280,11 +280,16 @@ class IndexController extends Controller
         return success($lists);
     }
 
+    public function  live()
+    {
+
+    }
+
     /**
      * @api {post} api/admin_v4/index/add-works 增加/编辑推荐课程
      * @apiVersion 4.0.0
      * @apiName  add-works
-     * @apiGroup 后台-虚拟课程
+     * @apiGroup 后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-works
      * @apiDescription 增加/编辑推荐课程
      *
@@ -326,7 +331,7 @@ class IndexController extends Controller
      * @api {post} api/admin_v4/index/add-lists 增加/编辑推荐书单
      * @apiVersion 4.0.0
      * @apiName  add-lists
-     * @apiGroup 后台-虚拟课程
+     * @apiGroup 后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-lists
      * @apiDescription 增加/编辑推荐书单
      *
@@ -368,7 +373,7 @@ class IndexController extends Controller
      * @api {post} api/admin_v4/index/add-listwork 增加/编辑推荐书单
      * @apiVersion 4.0.0
      * @apiName  add-works
-     * @apiGroup 后台-虚拟课程
+     * @apiGroup 后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-works
      * @apiDescription 增加/编辑推荐课程
      *
@@ -413,7 +418,7 @@ class IndexController extends Controller
      * @api {post} api/admin_v4/index/add-goods 增加/编辑推荐好物
      * @apiVersion 4.0.0
      * @apiName  add-goods
-     * @apiGroup 后台-虚拟课程
+     * @apiGroup 后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-goods
      * @apiDescription 增加/编辑推荐好物
      *
@@ -454,7 +459,7 @@ class IndexController extends Controller
      * @api {post} api/admin_v4/index/get-goods 选择商品
      * @apiVersion 4.0.0
      * @apiName  add-goods
-     * @apiGroup 后台-虚拟课程
+     * @apiGroup 后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-goods
      * @apiDescription 选择商品
      *
@@ -484,7 +489,7 @@ class IndexController extends Controller
      * @api {post} api/admin_v4/index/add-wiki 增加/编辑推荐百科
      * @apiVersion 4.0.0
      * @apiName  add-wiki
-     * @apiGroup 后台-虚拟课程
+     * @apiGroup 后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-wiki
      * @apiDescription 增加/编辑推荐百科
      *
@@ -519,8 +524,8 @@ class IndexController extends Controller
         }
 
         return success();
-
     }
+
 }
 
 
