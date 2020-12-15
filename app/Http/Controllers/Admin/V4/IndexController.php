@@ -480,7 +480,47 @@ class IndexController extends Controller
         return success($lists);
     }
 
+    /**
+     * @api {post} api/admin_v4/index/add-wiki 增加/编辑推荐百科
+     * @apiVersion 4.0.0
+     * @apiName  add-wiki
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-wiki
+     * @apiDescription 增加/编辑推荐百科
+     *
+     * @apiParam {string} wiki_id 百科id
+     * @apiParam {string} sort 位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function addWiki(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            Recommend::where('id', $input['id'])->update([
+                'relation_id' => $input['wiki_id'],
+                'sort' => $input['sort']
+            ]);
+        } else {
+            Recommend::create([
+                'relation_id' => $input['wiki_id'],
+                'position' => 1,
+                'type'     => 5,
+                'sort' => $input['sort'] ?? 99
+            ]);
+        }
 
+        return success();
+
+    }
 }
 
 
