@@ -334,7 +334,7 @@ class IndexController extends Controller
      *    }
      * }
      */
-    public function addWorks(Request $request)
+    public function iorks(Request $request)
     {
         $input = $request->all();
         if (!empty($input['id'])) {
@@ -731,6 +731,7 @@ class IndexController extends Controller
             ->get();
         return success($lists);
     }
+
 
 
 }
