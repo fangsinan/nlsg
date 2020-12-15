@@ -705,6 +705,33 @@ class IndexController extends Controller
         return success($lists);
     }
 
+    /**
+     * @api {get} api/admin_v4/index/get-lives 选择直播
+     * @apiVersion 4.0.0
+     * @apiName  get-lives
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-lives
+     * @apiDescription 选择直播
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getLives()
+    {
+        $lists = Live::where('status', 4)
+            ->select('id', 'title')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($lists);
+    }
+
 
 }
 
