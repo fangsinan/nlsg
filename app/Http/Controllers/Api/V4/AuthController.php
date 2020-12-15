@@ -484,24 +484,39 @@ class AuthController extends Controller
 
     public function checkPhone(Request $request)
     {
-        $phone = $request->input('phone', '');
-        if (empty($phone)) {
-            return $this->success(['code' => false, 'msg' => '号码错误']);
+        $phone = strval($request->input('phone', ''));
+        if (empty($phone) || !is_numeric($phone) || strlen($phone) !== 11) {
+            return $this->getRes(['code' => false, 'msg' => '号码错误']);
         }
 
-        //网上找的 待验证
-        $g = "/^1[34578]\d{9}$/";
-        $g2 = "/^19[89]\d{8}$/";
-        $g3 = "/^166\d{8}$/";
-        if (preg_match($g, $phone)) {
-            return $this->success(['code' => true, 'msg' => '正确']);
-        } else if (preg_match($g2, $phone)) {
-            return $this->success(['code' => true, 'msg' => '正确']);
-        } else if (preg_match($g3, $phone)) {
-            return $this->success(['code' => true, 'msg' => '正确']);
+        if (0) {
+            $header = substr($phone, 0, 3);
+            $list = [
+                '130', '131', '132', '133', '134', '135', '136', '137', '138', '139',
+                '150', '151', '152', '153', '155', '156', '157', '158', '159',
+                '176', '177', '178',
+                '180', '181', '182', '183', '184', '185', '186', '187', '188', '189',
+            ];
+
+            if (in_array($header, $list)) {
+                return $this->getRes(['code' => true, 'msg' => '正确']);
+            } else {
+                return $this->getRes(['code' => false, 'msg' => '号码错误']);
+            }
+        } else {
+            $g = "/^1[34578]\d{9}$/";
+            $g2 = "/^19[89]\d{8}$/";
+            $g3 = "/^166\d{8}$/";
+            if (preg_match($g, $phone)) {
+                return $this->getRes(['code' => true, 'msg' => '正确']);
+            } else if (preg_match($g2, $phone)) {
+                return $this->getRes(['code' => true, 'msg' => '正确']);
+            } else if (preg_match($g3, $phone)) {
+                return $this->getRes(['code' => true, 'msg' => '正确']);
+            }
+            return $this->getRes(['code' => false, 'msg' => '号码错误']);
         }
 
-        return $this->success(['code' => false, 'msg' => '号码错误']);
     }
 
 
