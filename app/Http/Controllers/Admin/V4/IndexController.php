@@ -611,7 +611,41 @@ class IndexController extends Controller
     {
         $id = $request->get('id');
         $list = Lists::where('id', $id)
-            ->select('id', 'title', 'subtitle','status')
+            ->select('id', 'title', 'subtitle', 'status')
+            ->first();
+        return success($list);
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/edit-list-work 编辑书单作品
+     * @apiVersion 4.0.0
+     * @apiName  edit-list-work
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/edit-list-work
+     * @apiDescription 编辑书单作品
+     *
+     * @apiParam {string}  id  作品id
+     *
+     * @apiSuccess {string}  lists_id  书单id
+     * @apiSuccess {string}  works_id  副标题
+     * @apiSuccess {string}  sort      排序
+     * @apiSuccess {string}  state     状态
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function editListWork(Request $request)
+    {
+        $id = $request->get('id');
+        $list = ListsWork::where('id', $id)
+            ->select('id', 'lists_id', 'works_id', 'sort', 'state')
             ->first();
         return success($list);
     }
