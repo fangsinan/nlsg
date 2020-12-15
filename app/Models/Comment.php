@@ -64,7 +64,7 @@ class Comment extends Base
                 $v['is_like'] = $isLike ? 1 : 0;
                 //只展示五条
                 $v['reply'] = array_slice($v['reply'],0,5);
-                
+
             }
         }
         return $lists;

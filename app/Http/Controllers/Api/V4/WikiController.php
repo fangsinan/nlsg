@@ -54,7 +54,7 @@ class WikiController extends Controller
             $model = $model->where('category_id', $request->get('category_id'));
         }
         $lists = $model
-            ->select(['id', 'name', 'content', 'cover', 'view_num', 'like_num', 'comment_num','collection_num'])
+            ->select(['id', 'name', 'content','intro', 'cover', 'view_num', 'like_num', 'comment_num','collection_num'])
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -136,7 +136,7 @@ class WikiController extends Controller
         $id = $request->input('id');
         $uid = $this->user['id'] ?? 0;
 
-        $res = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num','collection_num')
+        $res = Wiki::select('id','name', 'content','intro', 'cover', 'view_num', 'like_num', 'comment_num','collection_num')
                 ->with([
                     'reward' => function($query){
                         $query->select('id','user_id','relation_id')
@@ -197,7 +197,7 @@ class WikiController extends Controller
     public function related(Request $request)
     {
         $id = $request->input('id');
-        $lists = Wiki::select('id','name', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
+        $lists = Wiki::select('id','name','intro', 'content', 'cover', 'view_num', 'like_num', 'comment_num')
             ->where('id', '!=', $id)
             ->limit(2)
             ->get();
