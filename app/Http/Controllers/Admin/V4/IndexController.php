@@ -370,7 +370,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-listwork 增加/编辑推荐书单
+     * @api {post} api/admin_v4/index/add-listwork 增加/编辑推荐作品
      * @apiVersion 4.0.0
      * @apiName  add-listwork
      * @apiGroup 后台-首页推荐
@@ -415,10 +415,10 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-goods 增加/编辑推荐好物
+     * @api {post} api/admin_v4/index/add-goods 增加/编辑推荐商品
      * @apiVersion 4.0.0
-     * @apiName  add-goods
-     * @apiGroup 后台-首页推荐
+     * @apiName  index/add-goods
+     * @apiGroup  后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-goods
      * @apiDescription 增加/编辑推荐好物
      *
