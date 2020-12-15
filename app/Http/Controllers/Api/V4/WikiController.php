@@ -91,6 +91,8 @@ class WikiController extends Controller
      */
     public function category()
     {
+        return success([]);
+
         $lists = WikiCategory::where('status', 1)
             ->select('id', 'name')
             ->orderBy('created_at')

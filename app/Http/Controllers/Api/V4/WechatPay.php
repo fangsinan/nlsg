@@ -224,6 +224,7 @@ class WechatPay extends Controller
                         ];
                     }
                     $newVip_rst = VipUser::where(['user_id' => $user_id])->update($VipUserData);
+                    $twitter_id = $user_id;
                 }
 
                 //服务商购买时已是优惠价格
