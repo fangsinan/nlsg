@@ -314,7 +314,7 @@ class IndexController extends Controller
                 'relation_id' => $input['work_id'],
                 'position' => 1,
                 'type' => 2,
-                'sort' => $input['sort']
+                'sort' => $input['sort'] ?? 99
             ]);
         }
 
@@ -394,20 +394,92 @@ class IndexController extends Controller
         if (!empty($input['id'])) {
             ListsWork::where('id', $input['id'])->update([
                 'works_id' => $input['works_id'],
-                'sort'     => $input['sort'],
-                'state'    => $input['state']
+                'sort' => $input['sort'],
+                'state' => $input['state']
             ]);
         } else {
             ListsWork::create([
                 'lists_id' => $input['lists_id'],
                 'works_id' => $input['works_id'],
-                'sort'     => $input['sort'],
-                'state'    => $input['state'] ?? 2
+                'sort' => $input['sort'] ?? 99,
+                'state' => $input['state'] ?? 2
             ]);
         }
         return success();
 
     }
+
+    /**
+     * @api {post} api/admin_v4/index/add-goods 增加/编辑推荐好物
+     * @apiVersion 4.0.0
+     * @apiName  add-goods
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-goods
+     * @apiDescription 增加/编辑推荐好物
+     *
+     * @apiParam {string} goods_id 商品id
+     * @apiParam {string} sort 位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function addGoods(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            Recommend::where('id', $input['id'])->update([
+                'relation_id' => $input['goods_id'],
+                'sort' => $input['sort']
+            ]);
+        } else {
+            Recommend::create([
+                'relation_id' => $input['goods_id'],
+                'position' => 1,
+                'type' => 8,
+                'sort' => $input['sort'] ?? 99
+            ]);
+        }
+        return success();
+
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/get-goods 选择商品
+     * @apiVersion 4.0.0
+     * @apiName  add-goods
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-goods
+     * @apiDescription 选择商品
+     *
+     * @apiParam {string} goods_id 商品id
+     * @apiParam {string} sort 位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getMallGoods()
+    {
+        $lists = MallGoods::where('status', 2)
+            ->select('id', 'name')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($lists);
+    }
+
 
 }
 
