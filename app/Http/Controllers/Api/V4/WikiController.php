@@ -91,7 +91,7 @@ class WikiController extends Controller
      */
     public function category()
     {
-        return success();
+        return success([]);
 
         $lists = WikiCategory::where('status', 1)
             ->select('id', 'name')
