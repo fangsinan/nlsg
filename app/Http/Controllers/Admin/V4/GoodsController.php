@@ -161,40 +161,7 @@ class GoodsController extends Controller
         return $this->getRes($data);
     }
 
-    /**
-     * 添加虚拟评论
-     * @api {post} /api/admin_v4/goods/add_robot_comment 添加虚拟评论
-     * @apiVersion 4.0.0
-     * @apiName /api/admin_v4/goods/add_robot_comment
-     * @apiGroup  后台-商品评论
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/add_robot_comment
-     * @apiDescription 添加虚拟评论
-     * @apiParamExample {json} Request-Example:
-     * {
-     * "goods_id":474,
-     * "sku_number":"1611238695",
-     * "list":[
-     * {
-     * "comment":"好啊",
-     * "picture":""
-     * },
-     * {
-     * "comment":"好啊11",
-     * "picture":""
-     * },
-     * {
-     * "comment":"好啊11",
-     * "picture":""
-     * }
-     * ]
-     * }
-     */
-    public function addRobotComment(Request $request)
-    {
-        $servers = new MallCommentServers();
-        $data = $servers->addRobotComment($request->input());
-        return $this->getRes($data);
-    }
+
 
     public function tempTools(Request $request)
     {

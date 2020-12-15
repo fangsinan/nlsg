@@ -65,8 +65,11 @@ class VipUser extends Base
         //师资阵容
         $author_order_str = ConfigModel::getData(30);
         $author_order_str = 'FIELD(id,' . $author_order_str . ') desc';
-        $author = User::where('is_author', '=', 1)->where('status', '=', 1)
+        $author = User::where('is_author', '=', 1)
+            ->where('status', '=', 1)
+            ->where('show_in_vip_page','=',1)
             ->where('headimg', '<>', '')
+            ->where('intro_for_360', '<>', '')
             ->select(['id', 'nickname', 'headimg', 'intro_for_360'])
             ->orderByRaw($author_order_str)
             ->orderBy('id', 'asc')

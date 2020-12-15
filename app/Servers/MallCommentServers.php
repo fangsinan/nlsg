@@ -11,6 +11,27 @@ use Illuminate\Support\Facades\DB;
 
 class MallCommentServers
 {
+    public function list($params)
+    {
+
+        $size = 10;
+
+        $query = DB::table('nlsg_mall_comment as c')
+            ->join('nlsg_mall_goods as g', 'c.goods_id', '=', 'g.id')
+            ->join('nlsg_mall_sku as s', 'c.sku_number', '=', 's.sku_number')
+            ->join('nlsg_user as u', 'c.user_id', '=', 'u.id');
+
+
+        $query->select([
+            'c.id as comment_id', 'c.content', 'c.picture', 'c.star', 'g.name as goods_name', 'g.picture as goods_picture',
+            'u.nickname', 'u.phone'
+        ]);
+
+        $list = $query->paginate($size);
+
+        return $list;
+    }
+
     public function addRobotComment($params)
     {
         $goods_id = $params['goods_id'] ?? 0;
