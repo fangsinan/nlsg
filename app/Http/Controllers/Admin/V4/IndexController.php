@@ -304,7 +304,7 @@ class IndexController extends Controller
     {
         $ids = Recommend::where('type', 7)
             ->where('position', 1)
-            ->value('relation_id');
+            ->pluck('relation_id');
         if (!$ids) {
             return error(1000, '还没有推荐');
         }
