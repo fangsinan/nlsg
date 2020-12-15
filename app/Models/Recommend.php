@@ -19,7 +19,7 @@ class Recommend extends Base
      * @var array
      */
     protected $fillable = [
-        'relation_id','position','type','sort'
+        'relation_id', 'position', 'type', 'sort'
     ];
 
     public function getIndexRecommend($type = 1, $position = '1', $limit = 5, $row = 1)
@@ -132,5 +132,11 @@ class Recommend extends Base
     {
         return $this->belongsTo('App\Models\MallGoods', 'relation_id', 'id');
     }
+
+    public function wiki()
+    {
+        return $this->belongsTo('App\Models\Wiki', 'relation_id', 'id');
+    }
+
 
 }

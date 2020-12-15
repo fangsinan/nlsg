@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Lists;
 use App\Models\ListsWork;
+use App\Models\Live;
 use App\Models\MallGoods;
 use App\Models\Recommend;
 use App\Models\Works;
@@ -282,7 +283,15 @@ class IndexController extends Controller
 
     public function live()
     {
-
+        $ids = Recommend::where('type', 7)
+            ->where('position', 1)
+            ->value('relation_id');
+        if (!$ids){
+            return error(1000,'还没有推荐');
+        }
+        $model = new Live();
+        $lists = $model->getIndexLive($ids);
+        return success($lists);
     }
 
     /**
