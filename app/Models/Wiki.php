@@ -24,6 +24,7 @@ class Wiki extends Base
         $lists= Wiki::select('id','name','intro','content','cover','view_num','like_num', 'comment_num','collection_num')
             ->whereIn('id',$ids)
             ->where('status',1)
+            ->orderByRaw('FIELD(id,' . implode(',', $ids) . ')')
             ->orderBy('created_at','desc')
             ->get()
             ->toArray();
