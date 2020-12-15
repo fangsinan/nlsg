@@ -525,9 +525,7 @@ class AuthController extends Controller
             'vipCode' => 1,
             'worksCode' => 1,
         ];
-
-        return $this->getRes(['code' => true, 'msg' => '正确', 'data' => $data]);
-
+        return success($data);
     }
 
 }
