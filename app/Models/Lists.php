@@ -9,7 +9,9 @@ use Illuminate\Support\Str;
 class Lists extends Model
 {
     protected $table = 'nlsg_lists';
-
+    protected $fillable = [
+        'title','subtitle','status'
+    ];
     /**
      * 首页听书推荐
      * @param $ids 相关作品id

@@ -322,6 +322,93 @@ class IndexController extends Controller
 
     }
 
+    /**
+     * @api {post} api/admin_v4/index/add-lists 增加/编辑推荐书单
+     * @apiVersion 4.0.0
+     * @apiName  add-lists
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-lists
+     * @apiDescription 增加/编辑推荐书单
+     *
+     * @apiParam {string} title 标题
+     * @apiParam {string} subtitle 副标题
+     * @apiParam {string} status   1上架  2下架
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function addLists(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            Lists::where('id', $input['id'])->update([
+                'title' => $input['title'],
+                'subtitle' => $input['subtitle'],
+            ]);
+        } else {
+            Lists::create([
+                'title' => $input['title'],
+                'subtitle' => $input['subtitle'],
+                'status' => $input['status']
+            ]);
+        }
+
+        return success();
+
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/add-listwork 增加/编辑推荐书单
+     * @apiVersion 4.0.0
+     * @apiName  add-works
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-works
+     * @apiDescription 增加/编辑推荐课程
+     *
+     * @apiParam {string} lists_id 书单id
+     * @apiParam {string} works_id 作品id
+     * @apiParam {string} sort 位置
+     * @apiParam {string} state 状态 1 上架 2下架
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function addListWork(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            ListsWork::where('id', $input['id'])->update([
+                'works_id' => $input['works_id'],
+                'sort'     => $input['sort'],
+                'state'    => $input['state']
+            ]);
+        } else {
+            ListsWork::create([
+                'lists_id' => $input['lists_id'],
+                'works_id' => $input['works_id'],
+                'sort'     => $input['sort'],
+                'state'    => $input['state'] ?? 2
+            ]);
+        }
+        return success();
+
+    }
+
 }
 
 
