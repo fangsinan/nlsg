@@ -606,7 +606,7 @@ class IndexController extends Controller
     {
         $id = $request->get('id');
         $list = Recommend::where('id', $id)
-            ->select('id', 'relation_id', 'sort')
+            ->select('id', 'relation_id', 'sort','status')
             ->first();
         return success($list);
     }
