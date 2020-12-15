@@ -522,8 +522,8 @@ class AuthController extends Controller
     public function module()
     {
         $data = [
-            'vipCode' => 1,
-            'worksCode' => 1,
+            'vipCode' => 0,
+            'worksCode' => 0,
         ];
         return success($data);
     }
