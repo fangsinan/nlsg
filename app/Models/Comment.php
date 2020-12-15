@@ -31,8 +31,8 @@ class Comment extends Base
         $query = Comment::with(['user:id,nickname,headimg','quote:id,pid,content', 'attach:id,relation_id,img',
                     'reply'=>function($query){
                         $query->select('id','comment_id','from_uid','to_uid','content','created_at')
-                            ->where('status', 1)
-                            ->limit(5);
+                            ->where('status', 1);
+                            //->limit(5); limit是只显示列表评论总体的5条回复
                     },
                     'reply.from_user:id,nickname', 'reply.to_user:id,nickname'])
                 ->select('id','pid', 'user_id', 'relation_id', 'info_id','content','forward_num',
@@ -62,6 +62,9 @@ class Comment extends Base
                 }
                 $isLike = Like::where(['relation_id'=>$v['id'], 'type'=>$like_type,'user_id'=>$uid])->first();
                 $v['is_like'] = $isLike ? 1 : 0;
+                //只展示五条
+                $v['reply'] = array_slice($v['reply'],0,5);
+
             }
         }
         return $lists;
@@ -121,6 +124,7 @@ class Comment extends Base
                  ->toArray();
         if($reply['data']){
             foreach ($reply['data'] as &$v) {
+                $like_type = 1;
                 if($comment['type'] == 5){ //百科
                     $like_type = 2;
                 }

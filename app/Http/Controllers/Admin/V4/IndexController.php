@@ -245,7 +245,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/course  首页-课程集合
+     * @api {get} api/v4/index/course  首页-推荐课程集合【教育宝典】
      * @apiVersion 4.0.0
      * @apiName  index/course
      * @apiGroup  后台-首页推荐
@@ -280,13 +280,13 @@ class IndexController extends Controller
         return success($lists);
     }
 
-    public function  live()
+    public function live()
     {
 
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-works 增加/编辑推荐课程
+     * @api {post} api/admin_v4/index/add-works 增加/更新推荐课程
      * @apiVersion 4.0.0
      * @apiName  add-works
      * @apiGroup 后台-首页推荐
@@ -328,7 +328,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-lists 增加/编辑推荐书单
+     * @api {post} api/admin_v4/index/add-lists 增加/更新推荐书单
      * @apiVersion 4.0.0
      * @apiName  add-lists
      * @apiGroup 后台-首页推荐
@@ -370,7 +370,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-listwork 增加/编辑推荐作品
+     * @api {post} api/admin_v4/index/add-listwork 增加/更新推荐作品
      * @apiVersion 4.0.0
      * @apiName  add-listwork
      * @apiGroup 后台-首页推荐
@@ -415,7 +415,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-goods 增加/编辑推荐商品
+     * @api {post} api/admin_v4/index/add-goods 增加/更新推荐商品
      * @apiVersion 4.0.0
      * @apiName  index/add-goods
      * @apiGroup  后台-首页推荐
@@ -463,8 +463,6 @@ class IndexController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-goods
      * @apiDescription 选择商品
      *
-     * @apiParam {string} goods_id 商品id
-     * @apiParam {string} sort 位置
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -486,7 +484,34 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/add-wiki 增加/编辑推荐百科
+     * @api {post} api/admin_v4/index/get-works 选择作品
+     * @apiVersion 4.0.0
+     * @apiName  get-works
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-works
+     * @apiDescription 选择作品
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getWorks()
+    {
+        $lists = Works::where('status', 4)
+            ->select('id', 'title')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($lists);
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/add-wiki 增加/更新推荐百科
      * @apiVersion 4.0.0
      * @apiName  add-wiki
      * @apiGroup 后台-首页推荐
@@ -518,12 +543,111 @@ class IndexController extends Controller
             Recommend::create([
                 'relation_id' => $input['wiki_id'],
                 'position' => 1,
-                'type'     => 5,
+                'type' => 5,
                 'sort' => $input['sort'] ?? 99
             ]);
         }
 
         return success();
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/edit-works 编辑推荐课程
+     * @apiVersion 4.0.0
+     * @apiName  edit-works
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/edit-works
+     * @apiDescription 编辑推荐百科
+     *
+     * @apiParam {string}  id  推荐id
+     *
+     * @apiSuccess {string}  relation_id  作品id
+     * @apiSuccess {string}  sort   位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function editWorks(Request $request)
+    {
+        $id = $request->get('id');
+        $list = Recommend::where('id', $id)
+            ->select('id', 'relation_id', 'sort')
+            ->first();
+        return success($list);
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/edit-lists 编辑推荐书单
+     * @apiVersion 4.0.0
+     * @apiName  edit-lists
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/edit-lists
+     * @apiDescription 编辑推荐百科
+     *
+     * @apiParam {string}  id  书单id
+     *
+     * @apiSuccess {string}  title  标题
+     * @apiSuccess {string}  subtitle   副标题
+     * @apiSuccess {string}  status   状态
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function editLists(Request $request)
+    {
+        $id = $request->get('id');
+        $list = Lists::where('id', $id)
+            ->select('id', 'title', 'subtitle', 'status')
+            ->first();
+        return success($list);
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/edit-list-work 编辑书单作品
+     * @apiVersion 4.0.0
+     * @apiName  edit-list-work
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/edit-list-work
+     * @apiDescription 编辑书单作品
+     *
+     * @apiParam {string}  id  作品id
+     *
+     * @apiSuccess {string}  lists_id  书单id
+     * @apiSuccess {string}  works_id  副标题
+     * @apiSuccess {string}  sort      排序
+     * @apiSuccess {string}  state     状态
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function editListWork(Request $request)
+    {
+        $id = $request->get('id');
+        $list = ListsWork::where('id', $id)
+            ->select('id', 'lists_id', 'works_id', 'sort', 'state')
+            ->first();
+        return success($list);
     }
 
 }

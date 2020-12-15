@@ -190,7 +190,7 @@ class RankController extends Controller
         }
         $works_id = ListsWork::where('lists_id', $lists->id)->pluck('works_id');
         $wikis = Wiki::whereIn('id', $works_id)
-            ->select('id','name','content','view_num','like_num','comment_num','cover')
+            ->select('id','name','content','intro', 'view_num','like_num','comment_num','cover')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
