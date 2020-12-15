@@ -31,7 +31,6 @@ class Works extends Base
         if (!$ids) {
             return false;
         }
-
         $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'detail_img','subtitle', 'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num')
             ->with(['user' => function ($query) {
                 $query->select('id', 'nickname', 'headimg');
@@ -45,6 +44,7 @@ class Works extends Base
 
         $lists = $WorksObj->orderBy('created_at', 'desc')
             ->get()
+            ->take(4)
             ->toArray();
 
         $time = Config('web.is_new_time');
