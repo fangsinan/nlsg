@@ -679,7 +679,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/index/get-wiki 选择百科
+     * @api {get} api/admin_v4/index/get-wiki 选择百科
      * @apiVersion 4.0.0
      * @apiName  get-wiki
      * @apiGroup 后台-首页推荐
