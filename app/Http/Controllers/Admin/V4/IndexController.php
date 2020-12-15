@@ -280,11 +280,16 @@ class IndexController extends Controller
         return success($lists);
     }
 
+    public function  live()
+    {
+
+    }
+
     /**
      * @api {post} api/admin_v4/index/add-works 增加/编辑推荐课程
      * @apiVersion 4.0.0
      * @apiName  add-works
-     * @apiGroup 后台-虚拟课程
+     * @apiGroup 后台-首页推荐
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-works
      * @apiDescription 增加/编辑推荐课程
      *
@@ -314,12 +319,211 @@ class IndexController extends Controller
                 'relation_id' => $input['work_id'],
                 'position' => 1,
                 'type' => 2,
-                'sort' => $input['sort']
+                'sort' => $input['sort'] ?? 99
             ]);
         }
 
         return success();
 
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/add-lists 增加/编辑推荐书单
+     * @apiVersion 4.0.0
+     * @apiName  add-lists
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-lists
+     * @apiDescription 增加/编辑推荐书单
+     *
+     * @apiParam {string} title 标题
+     * @apiParam {string} subtitle 副标题
+     * @apiParam {string} status   1上架  2下架
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function addLists(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            Lists::where('id', $input['id'])->update([
+                'title' => $input['title'],
+                'subtitle' => $input['subtitle'],
+            ]);
+        } else {
+            Lists::create([
+                'title' => $input['title'],
+                'subtitle' => $input['subtitle'],
+                'status' => $input['status']
+            ]);
+        }
+
+        return success();
+
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/add-listwork 增加/编辑推荐作品
+     * @apiVersion 4.0.0
+     * @apiName  add-listwork
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-listwork
+     * @apiDescription 增加/编辑推荐课程
+     *
+     * @apiParam {string} lists_id 书单id
+     * @apiParam {string} works_id 作品id
+     * @apiParam {string} sort 位置
+     * @apiParam {string} state 状态 1 上架 2下架
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function addListWork(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            ListsWork::where('id', $input['id'])->update([
+                'works_id' => $input['works_id'],
+                'sort' => $input['sort'],
+                'state' => $input['state']
+            ]);
+        } else {
+            ListsWork::create([
+                'lists_id' => $input['lists_id'],
+                'works_id' => $input['works_id'],
+                'sort' => $input['sort'] ?? 99,
+                'state' => $input['state'] ?? 2
+            ]);
+        }
+        return success();
+
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/add-goods 增加/编辑推荐商品
+     * @apiVersion 4.0.0
+     * @apiName  index/add-goods
+     * @apiGroup  后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-goods
+     * @apiDescription 增加/编辑推荐好物
+     *
+     * @apiParam {string} goods_id 商品id
+     * @apiParam {string} sort 位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function addGoods(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            Recommend::where('id', $input['id'])->update([
+                'relation_id' => $input['goods_id'],
+                'sort' => $input['sort']
+            ]);
+        } else {
+            Recommend::create([
+                'relation_id' => $input['goods_id'],
+                'position' => 1,
+                'type' => 8,
+                'sort' => $input['sort'] ?? 99
+            ]);
+        }
+        return success();
+
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/get-goods 选择商品
+     * @apiVersion 4.0.0
+     * @apiName  add-goods
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-goods
+     * @apiDescription 选择商品
+     *
+     * @apiParam {string} goods_id 商品id
+     * @apiParam {string} sort 位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getMallGoods()
+    {
+        $lists = MallGoods::where('status', 2)
+            ->select('id', 'name')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($lists);
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/add-wiki 增加/编辑推荐百科
+     * @apiVersion 4.0.0
+     * @apiName  add-wiki
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-wiki
+     * @apiDescription 增加/编辑推荐百科
+     *
+     * @apiParam {string} wiki_id 百科id
+     * @apiParam {string} sort 位置
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function addWiki(Request $request)
+    {
+        $input = $request->all();
+        if (!empty($input['id'])) {
+            Recommend::where('id', $input['id'])->update([
+                'relation_id' => $input['wiki_id'],
+                'sort' => $input['sort']
+            ]);
+        } else {
+            Recommend::create([
+                'relation_id' => $input['wiki_id'],
+                'position' => 1,
+                'type'     => 5,
+                'sort' => $input['sort'] ?? 99
+            ]);
+        }
+
+        return success();
     }
 
 }
