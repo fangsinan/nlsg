@@ -103,14 +103,14 @@ class Lists extends Model
     public function getRankWorks()
     {
         $lists = Lists::select('id', 'title','num','cover')
-            // ->with([
-            //     'works' => function ($query) {
-            //         $query->select('works_id', 'user_id', 'title','subtitle', 'cover_img','chapter_num', 'subscribe_num','is_free','price');
-            //     },
-            //     'works.user' =>function($query){
-            //         $query->select('id','nickname');
-            //     }
-            // ])
+             ->with([
+                 'works' => function ($query) {
+                     $query->select('works_id', 'user_id', 'title','subtitle', 'cover_img','chapter_num', 'subscribe_num','is_free','price');
+                 },
+                 'works.user' =>function($query){
+                     $query->select('id','nickname');
+                 }
+             ])
             ->where('type', 4)
             ->limit(3)
             ->get()
