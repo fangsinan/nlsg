@@ -867,14 +867,14 @@ class OrderController extends Controller
             return $this->error(0, '用户有误');
         }
 
-        if ($send_type == 1 || $send_type == 2) {
+        if ($send_type == 1 || $send_type == 6) {
             //$column_id 专栏信息
             $column_data = Column::find($relation_id);
             if (empty($column_data)) {
-                return $this->error(0, '专栏不存在');
+                return $this->error(0, '专栏或讲座不存在');
             }
             $price = $column_data->price;
-        } else if ($send_type == 3 || $send_type == 4) {
+        } else if ($send_type == 2 ) {
             $works_data = Works::find($relation_id);
             if (empty($works_data)) {
                 return $this->error(0, '当前课程不存在');
