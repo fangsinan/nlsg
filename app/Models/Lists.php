@@ -113,7 +113,7 @@ class Lists extends Model
             // ])
             ->where('type', 4)
             ->limit(3)
-            ->pluck('')
+            ->get()
             ->toArray();
         return $lists;
     }
