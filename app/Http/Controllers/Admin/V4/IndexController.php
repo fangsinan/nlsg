@@ -739,8 +739,7 @@ class IndexController extends Controller
             ->get();
         return success($lists);
     }
-
-
+    
 
 }
 
