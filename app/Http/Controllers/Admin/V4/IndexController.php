@@ -391,7 +391,8 @@ class IndexController extends Controller
             Lists::create([
                 'title' => $input['title'],
                 'subtitle' => $input['subtitle'],
-                'status' => $input['status']
+                'status' => $input['status'],
+                'type'   => 3
             ]);
         }
 
