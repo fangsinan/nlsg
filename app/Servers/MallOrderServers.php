@@ -9,6 +9,7 @@ namespace App\Servers;
  */
 
 use App\Models\ExpressCompany;
+use App\Models\MallOrderDetails;
 use Illuminate\Support\Facades\DB;
 use App\Models\MallOrder;
 use App\Models\MallOrderChild;
@@ -314,6 +315,15 @@ class MallOrderServers
         DB::beginTransaction();
 
         foreach ($params as $v) {
+            //检查order_id和order_detail_id是否匹配
+            $check_od_id = MallOrderDetails::whereId($v['order_detail_id'])
+                ->where('order_id','=',$v['order_id'])
+                ->first();
+            if (empty($check_od_id)){
+                DB::rollBack();
+                return ['code' => false, 'msg' => '订单id不匹配', 'ps' => ''];
+            }
+
             //只要有发货的  order状态就是已发货
             $order_obj = MallOrder::find($v['order_id']);
             $order_obj->status = 20;
