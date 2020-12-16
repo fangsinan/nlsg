@@ -584,7 +584,7 @@ class ColumnController extends Controller
             return $this->error(0,'参数有误：lecture_id ');
         }
         //IOS 通过审核后修改  并删除返回值works_data
-        $column_data = Column::select(['id','name', 'name as title', 'title','subtitle','cover_img','detail_img','message',
+        $column_data = Column::select(['id','name', 'name as title', 'title','subtitle','cover_pic as cover_img','details_pic as detail_img','message',
             'view_num','price','subscribe_num','is_free','is_end',])
             ->where(['id'=>$lecture_id,'type'=>2,'status'=>1])->first();
 
