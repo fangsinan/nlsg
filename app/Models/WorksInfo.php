@@ -20,7 +20,7 @@ class WorksInfo extends Base
         return time();
     }
 
-    // $type  1 单课程  2 多课程
+    // $type  1 单课程  2 多课程  3讲座
     public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0)
     {
         $where = ['status' => 4];
@@ -28,6 +28,9 @@ class WorksInfo extends Base
             $where['pid'] = $works_id;
         } else if ($type == 2) {
             $where['outline_id'] = $works_id;
+        } else if ($type == 3) {
+            $where['column_id'] = $works_id;
+            $where['type'] = 1; //纯视频类型
         }
         $query = WorksInfo::select([
             'id','pid', 'type', 'title', 'section', 'introduce', 'url', 'callback_url1', 'callback_url1', 'callback_url2',
@@ -153,10 +156,19 @@ class WorksInfo extends Base
         }
 
 
+        if($type == 6){
+            $query = self::where(['column_id' => $column_id,'type'=>1])
+                ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
+                    'introduce', 'section', 'type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
+            $works_id = $column_id;  // 讲座直接关联info表
+        }else{
+            $query = self::where('pid', '=', $works_id)
+                ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
+                    'introduce', 'section', 'type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
+        }
 
-        $query = self::where('pid', '=', $works_id)
-            ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                'introduce', 'section', 'type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
+
+
 
         $query->with(['infoHistory' => function ($query) use ($works_id, $user) {
             $query->where('relation_id', '=', $works_id)->where('user_id', '=', $user['id'])->where('is_del', 0);

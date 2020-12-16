@@ -492,8 +492,9 @@ class ColumnController extends Controller
 
 
         //免费试听的章节
-        $works = Works::select(['id'])->where(['column_id'=>$column_id, 'status' => 4])->first();
-        $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works['id'], 'status' => 4,'free_trial'=>1])->first();
+//        $works = Works::select(['id'])->where(['column_id'=>$column_id, 'status' => 4])->first();
+
+        $free_trial = WorksInfo::select(['id'])->where(['column_id'=>$column_id,'type'=>1, 'status' => 4,'free_trial'=>1])->first();
         $column['free_trial_id']  = (string)$free_trial['id'] ?? '';
 
         $column['twitter_price'] = (string)GetPriceTools::Income(1,2,0,1,$column_id);
@@ -582,14 +583,19 @@ class ColumnController extends Controller
         if(empty($lecture_id)){
             return $this->error(0,'参数有误：lecture_id ');
         }
-        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
+        //IOS 通过审核后修改  并删除返回值works_data
+        $column_data = Column::select(['id','name', 'name as title', 'title','subtitle','cover_pic as cover_img','details_pic as detail_img','message',
             'view_num','price','subscribe_num','is_free','is_end',])
-            ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
+            ->where(['id'=>$lecture_id,'type'=>2,'status'=>1])->first();
+
+//        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
+//            'view_num','price','subscribe_num','is_free','is_end',])
+//            ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
         $is_sub = Subscribe::isSubscribe($user_id,$lecture_id,6);
 
         //查询章节、
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,50,$page,$size);
+        $info = $infoObj->getInfo($lecture_id,$is_sub,$user_id,3,$order,50,$page,$size);
 
 //        if ($flag === 'catalog'){
 //            $res = [
@@ -598,16 +604,16 @@ class ColumnController extends Controller
 //            return $this->success($res);
 //        }
 
-        $works_data['info_num'] = count($info);
-        $works_data['is_sub'] = $is_sub;
+        $column_data['info_num'] = count($info);
+        $column_data['is_sub'] = $is_sub;
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($lecture_id,2,$user_id);  //讲座
 //        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
 
-        $works_data['history_count'] = 0;
-        if($works_data['info_num'] > 0){
-            $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
+        $column_data['history_count'] = 0;
+        if($column_data['info_num'] > 0){
+            $column_data['history_count'] = round($hisCount/$column_data['info_num']*100);
         }
 
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
@@ -624,7 +630,8 @@ class ColumnController extends Controller
 //        }
         if ($flag === 'catalog'){
             $res = [
-                'works_data'    => $works_data,
+                'works_data'    => $column_data,
+                'lecture_data'    => $column_data,
                 'info'          => $info,
             ];
             return $this->success($res);
@@ -632,7 +639,8 @@ class ColumnController extends Controller
         $historyData = History::getHistoryData($lecture_id,2,$user_id);
 
         return $this->success([
-            'works_data'    => $works_data,
+            'works_data'    => $column_data,
+            'lecture_data'    => $column_data,
             'info'          => $info,
             'historyData'   => $historyData
         ]);
