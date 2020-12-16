@@ -244,6 +244,7 @@ class WorksController extends Controller
 
 
         $where['works.status'] =4;
+        $where['works.type'] =2;  //课程只有音频
         if( $teacher_id )   { $where['works.user_id'] = $teacher_id;}
         if( $is_free )      { $where['works.is_free'] = $is_free;   }
 
