@@ -645,7 +645,7 @@ class IndexController extends Controller
     public function editLists(Request $request)
     {
         $id = $request->get('id');
-        $list = Lists::where('id', $idy)
+        $list = Lists::where('id', $id)
             ->select('id', 'title', 'subtitle', 'status')
             ->first();
         return success($list);
