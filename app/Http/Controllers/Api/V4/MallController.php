@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\CouponRuleList;
 use App\Models\MallGoodsMsg;
+use App\Models\MallOrder;
 use App\Models\MallOrderGroupBuy;
 use App\Servers\MallRefundJob;
 use Illuminate\Http\Request;
@@ -217,6 +218,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
+            MallOrder::receipt();
             //MallOrderGroupBuy::clear();
             return true;
         } else {

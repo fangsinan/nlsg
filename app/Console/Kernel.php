@@ -54,6 +54,7 @@ class Kernel extends ConsoleKernel
         })->hourly();//每小时
 
         $schedule->call(function () {
+            MallOrder::receipt();//自动收货
             Coupon::clear();//失效优惠券清理
         })->dailyAt('03:00');//半夜清理
 

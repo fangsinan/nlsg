@@ -1626,4 +1626,19 @@ class MallOrder extends Base
 
     }
 
+    //自动收货
+    public static function receipt()
+    {
+        DB::table('nlsg_mall_order as o')
+            ->join('nlsg_mall_order_child as c', 'o.id', '=', 'c.order_id')
+            ->where('o.status', '=', 20)
+            ->where('o.is_stop', '=', 0)
+            ->where('o.is_del', '=', 0)
+            ->whereRaw('TIMESTAMPDIFF(DAY,c.created_at,NOW()) > 3')
+            ->update([
+                'o.status' => 30,
+                'o.receipt_at' => date('Y-m-d H:i:s'),
+            ]);
+    }
+
 }
