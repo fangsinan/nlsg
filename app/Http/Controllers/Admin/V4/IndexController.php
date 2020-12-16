@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
 use App\Models\Lists;
 use App\Models\ListsWork;
 use App\Models\Live;
@@ -393,7 +394,7 @@ class IndexController extends Controller
                 'title' => $input['title'],
                 'subtitle' => $input['subtitle'],
                 'status' => $input['status'] ?? 2,
-                'type'   => 3
+                'type' => 3
             ]);
         }
 
@@ -474,15 +475,15 @@ class IndexController extends Controller
             Recommend::where('id', $input['id'])->update([
                 'relation_id' => $input['goods_id'],
                 'sort' => $input['sort'],
-                'status'=>$input['status'] ?? 2
+                'status' => $input['status'] ?? 2
             ]);
         } else {
             Recommend::create([
                 'relation_id' => $input['goods_id'],
                 'position' => 1,
                 'type' => 8,
-                'sort'  => $input['sort'] ?? 99,
-                'status'=> $input['status'] ?? 2
+                'sort' => $input['sort'] ?? 99,
+                'status' => $input['status'] ?? 2
             ]);
         }
         return success();
@@ -614,7 +615,7 @@ class IndexController extends Controller
     {
         $id = $request->get('id');
         $list = Recommend::where('id', $id)
-            ->select('id', 'relation_id', 'sort','status')
+            ->select('id', 'relation_id', 'sort', 'status')
             ->first();
         return success($list);
     }
@@ -739,7 +740,27 @@ class IndexController extends Controller
             ->get();
         return success($lists);
     }
-    
+
+    public function getListen()
+    {
+        $works = Works::select('id', 'title')
+            ->where('is_audio_book', 1)
+            ->where('status', 4)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($works);
+    }
+
+    public function getLecture()
+    {
+        $lists = Column::select('id', 'title')
+            ->where('type', 2)
+            ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($lists);
+    }
+
 
 }
 
