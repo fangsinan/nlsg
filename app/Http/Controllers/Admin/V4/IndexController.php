@@ -167,7 +167,7 @@ class IndexController extends Controller
     {
         $list_id = $request->get('list_id');
         $lists = ListsWork::with('works:id,title,cover_img,price')
-            ->select('id', 'lists_id', 'works_id', 'state')
+            ->select('id', 'lists_id', 'works_id', 'state', 'sort')
             ->where('lists_id', $list_id)
             ->orderBy('sort', 'desc')
             ->orderBy('created_at', 'desc')
@@ -647,7 +647,7 @@ class IndexController extends Controller
     {
         $id = $request->get('id');
         $list = Lists::where('id', $id)
-            ->select('id', 'title', 'subtitle', 'status')
+            ->select('id', 'title', 'subtitle', 'status','sort')
             ->first();
         return success($list);
     }
