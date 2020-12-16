@@ -48,4 +48,8 @@ class MallGroupBuyList extends Base {
             ->select(['id','phone','headimg']);
     }
 
+    public function spInfo(){
+        return $this->hasOne(SpecialPriceModel::class,'id','group_buy_id')
+            ->select(['id','group_num']);
+    }
 }

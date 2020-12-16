@@ -218,7 +218,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            MallOrder::receipt();
+            //MallOrder::receipt();
             //MallOrderGroupBuy::clear();
             return true;
         } else {

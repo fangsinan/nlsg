@@ -783,10 +783,15 @@ class MallOrderGroupBuy extends Base
                 when is_success = 0 then 95  ELSE nmo.`status` END) `status`'),
             'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type'
         ];
-        $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList', 'groupList.userInfo'];
+        $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList' => function ($q) use ($user_id) {
+            $q->orderBy('is_captain', 'desc')
+                ->orderByRaw('FIELD(user_id,' . $user_id . ') desc');
+        }];
+        $with[] = 'groupList.userInfo';
         $with[] = 'orderChild';
         $with[] = 'orderChild.expressInfoForList';
         $with[] = 'groupListInfo';
+        $with[] = 'groupListInfo.spInfo';
 
         if ($flag) {
             $field[] = 'address_history';
@@ -810,6 +815,7 @@ class MallOrderGroupBuy extends Base
             $now_date . '" then FALSE ELSE TRUE END) ');
 
         $query->orderBy('id', 'desc');
+
         $list = $query->with($with)->select($field)->get();
 
         foreach ($list as $k => $v) {
@@ -822,9 +828,16 @@ class MallOrderGroupBuy extends Base
 
             $headimg = [];
 
+            $headimg_count = $v->groupListInfo->spInfo['group_num'] ?? 2;
+
             foreach ($v->groupList as $glv) {
-                $headimg[] = $glv->userInfo->headimg ?? '';
+                if (count($headimg) < $headimg_count){
+                    $headimg[] = $glv->userInfo->headimg ?? '';
+                }else{
+                    break;
+                }
             }
+
             $v->headimg_list = $headimg;
             unset($list[$k]->groupList);
 
@@ -855,7 +868,7 @@ class MallOrderGroupBuy extends Base
     public function groupList()
     {
         return $this->hasMany('App\Models\MallGroupBuyList', 'group_key', 'group_key')
-            ->select(['group_key', 'user_id']);
+            ->select(['group_key', 'user_id', 'is_captain']);
     }
 
     public function orderChild()
@@ -896,6 +909,8 @@ class MallOrderGroupBuy extends Base
         }
 
         $data = $getData[0]->toArray();
+
+        return $data;
 
         //如果已经支付,倒计时为成团倒计时
         if ($data['status'] > 1) {
