@@ -337,6 +337,7 @@ class MallGoods extends Base
             ->select('id', 'name', 'picture', 'original_price', 'price')
             ->whereIn('id', $ids)
             ->where('status', 2)
+            ->orderByRaw('FIELD(id,' . implode(',', $ids) . ')')
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
