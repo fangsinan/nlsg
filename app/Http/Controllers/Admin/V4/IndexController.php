@@ -753,7 +753,7 @@ class IndexController extends Controller
 
     public function getLecture()
     {
-        $lists = Column::select('id', 'title')
+        $lists = Column::select('id', 'name')
             ->where('type', 2)
             ->where('status', 1)
             ->orderBy('created_at', 'desc')
