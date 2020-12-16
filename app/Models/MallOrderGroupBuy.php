@@ -831,11 +831,11 @@ class MallOrderGroupBuy extends Base
             $headimg_count = $v->groupListInfo->spInfo['group_num'] ?? 2;
 
             foreach ($v->groupList as $glv) {
-                if (count($headimg) < $headimg_count){
+//                if (count($headimg) < $headimg_count){
                     $headimg[] = $glv->userInfo->headimg ?? '';
-                }else{
-                    break;
-                }
+//                }else{
+//                    break;
+//                }
             }
 
             $v->headimg_list = $headimg;
