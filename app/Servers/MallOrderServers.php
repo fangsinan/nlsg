@@ -180,6 +180,11 @@ class MallOrderServers
         $query = MallOrder::from('nlsg_mall_order as nlsg_mall_order')
             ->join('nlsg_mall_group_buy_list as gbl', 'nlsg_mall_order.id', '=', 'gbl.order_id');
 
+        if (!empty($params['id'])) {
+            $query->where('nlsg_mall_order.id', '=', intval($params['id']));
+        }
+
+
         if (!empty($params['ordernum'])) {
             $query->where('nlsg_mall_order.ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
