@@ -386,12 +386,13 @@ class IndexController extends Controller
             Lists::where('id', $input['id'])->update([
                 'title' => $input['title'],
                 'subtitle' => $input['subtitle'],
+                'status' => $input['status'] ?? 2
             ]);
         } else {
             Lists::create([
                 'title' => $input['title'],
                 'subtitle' => $input['subtitle'],
-                'status' => $input['status'],
+                'status' => $input['status'] ?? 2,
                 'type'   => 3
             ]);
         }
