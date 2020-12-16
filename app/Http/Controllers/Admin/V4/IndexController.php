@@ -647,7 +647,7 @@ class IndexController extends Controller
     {
         $id = $request->get('id');
         $list = Lists::where('id', $id)
-            ->select('id', 'title', 'subtitle', 'status','sort')
+            ->select('id', 'title', 'subtitle', 'status')
             ->first();
         return success($list);
     }
