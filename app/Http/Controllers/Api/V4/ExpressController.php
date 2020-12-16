@@ -98,10 +98,10 @@ class ExpressController extends Controller
      * ]
      * }
      */
-    public function companyList()
+    public function companyList(Request $request)
     {
         $model = new ExpressCompany();
-        $data = $model->companyList();
+        $data = $model->companyList($request->input('flag',1));
         return $this->getRes($data);
     }
 

@@ -227,13 +227,22 @@ class ExpressCompany extends Base
         }
     }
 
-    public function companyList()
+    public function companyList($flag = 1)
     {
-        return self::where('status', '=', 1)
-            ->whereIn('show_frontend', [1, 3])
-            ->orderBy('rank', 'asc')
-            ->select(['id', 'name'])
-            ->get();
+        if ($flag === 1){
+            return self::where('status', '=', 1)
+                ->whereIn('show_frontend', [1, 3])
+                ->orderBy('rank', 'asc')
+                ->select(['id', 'name'])
+                ->get();
+        }else{
+            return self::where('status', '=', 1)
+                ->whereIn('show_frontend', [2, 3])
+                ->orderBy('rank', 'asc')
+                ->select(['id', 'name'])
+                ->get();
+        }
+
     }
 
 }
