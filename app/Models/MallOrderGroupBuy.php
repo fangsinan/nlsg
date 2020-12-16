@@ -783,16 +783,16 @@ class MallOrderGroupBuy extends Base
                 when is_success = 0 then 95  ELSE nmo.`status` END) `status`'),
             'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type'
         ];
-//        $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList' => function ($q) use ($user_id) {
-//            $q->orderBy('is_captain', 'desc')
-//                ->orderByRaw('FIELD(user_id,' . $user_id . ') desc');
-//        }];
-        $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList'];
+        $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList' => function ($q) use ($user_id) {
+            $q->orderBy('is_captain', 'desc')
+                ->orderByRaw('FIELD(user_id,' . $user_id . ') desc');
+        }];
+//        $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList'];
         $with[] = 'groupList.userInfo';
         $with[] = 'orderChild';
         $with[] = 'orderChild.expressInfoForList';
         $with[] = 'groupListInfo';
-//        $with[] = 'groupListInfo.spInfo';
+        $with[] = 'groupListInfo.spInfo';
 
         if ($flag) {
             $field[] = 'address_history';
@@ -829,14 +829,14 @@ class MallOrderGroupBuy extends Base
 
             $headimg = [];
 
-//            $headimg_count = $v->groupListInfo->spInfo['group_num'] ?? 2;
+            $headimg_count = $v->groupListInfo->spInfo['group_num'] ?? 2;
 
             foreach ($v->groupList as $glv) {
-//                if (count($headimg) < $headimg_count){
+                if (count($headimg) < $headimg_count){
                     $headimg[] = $glv->userInfo->headimg ?? '';
-//                }else{
-//                    break;
-//                }
+                }else{
+                    break;
+                }
             }
 
             $v->headimg_list = $headimg;
@@ -910,8 +910,6 @@ class MallOrderGroupBuy extends Base
         }
 
         $data = $getData[0]->toArray();
-
-        return $data;
 
         //如果已经支付,倒计时为成团倒计时
         if ($data['status'] > 1) {
