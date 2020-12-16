@@ -176,11 +176,11 @@ class MallOrderServers
         //全部0,拼团中95,待付款1,代发货10,待签收20,已完成30,已取消99
         //展示数据:订单编号,状态,商品列表,价格,数量,取消时间,金额
 
-        $query = MallOrder::from('nlsg_mall_order as nmo')
-            ->join('nlsg_mall_group_buy_list as gbl', 'nmo.id', '=', 'gbl.order_id');
+        $query = MallOrder::from('nlsg_mall_order as nlsg_mall_order')
+            ->join('nlsg_mall_group_buy_list as gbl', 'nlsg_mall_order.id', '=', 'gbl.order_id');
 
         if (!empty($params['ordernum'])) {
-            $query->where('nmo.ordernum', 'like', '%' . $params['ordernum'] . '%');
+            $query->where('nlsg_mall_order.ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
 
         //时间,支付时间,支付渠道,客户端类型 created_at,pay_time,pay_type,os_type
@@ -218,38 +218,39 @@ class MallOrderServers
             });
         }
 
-        $query->where('nmo.order_type', '=', 3)->where('nmo.is_del', '=', 0);
+        $query->where('nlsg_mall_order.order_type', '=', 3)->where('nlsg_mall_order.is_del', '=', 0);
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
-                $query->where('nmo.status', '=', 1);
+                $query->where('nlsg_mall_order.status', '=', 1);
                 break;
             case 10:
-                $query->where('nmo.status', '=', 10)
+                $query->where('nlsg_mall_order.status', '=', 10)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 20:
-                $query->where('nmo.status', '=', 20)
+                $query->where('nlsg_mall_order.status', '=', 20)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 30:
-                $query->where('nmo.status', '=', 30)
+                $query->where('nlsg_mall_order.status', '=', 30)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 95:
-                $query->where('nmo.status', '=', 10)
+                $query->where('nlsg_mall_order.status', '=', 10)
                     ->where('gbl.is_success', '=', 0);
                 break;
             case 99:
-                $query->where('nmo.is_stop', '=', 1);
+                $query->where('nlsg_mall_order.is_stop', '=', 1);
                 break;
         }
 
         $field = [
-            'nmo.id', 'nmo.ordernum', 'nmo.price', 'nmo.dead_time', 'nmo.user_id',
-            DB::raw('(case when nmo.`status` = 1 then 1
-                when is_success = 0 then 95 when nmo.is_stop = 1
-                then 99 ELSE nmo.`status` END) `status`')
+            'nlsg_mall_order.id', 'nlsg_mall_order.ordernum', 'nlsg_mall_order.price',
+            'nlsg_mall_order.dead_time', 'nlsg_mall_order.user_id',
+            DB::raw('(case when nlsg_mall_order.`status` = 1 then 1
+                when is_success = 0 then 95 when nlsg_mall_order.is_stop = 1
+                then 99 ELSE nlsg_mall_order.`status` END) `status`')
         ];
 
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo'];
