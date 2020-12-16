@@ -225,7 +225,19 @@ class removeDataServers
     {
         $now_date = date('Y-m-d H:i:s');
 
-        if (1) {
+        if(1) {
+            $order_list = Db::connection('mysql_old')
+                ->table('nlsg_mall_order')
+                ->where('status', '>', 10)
+                ->where('express_company', '<>', '')
+                ->where('express_number', '<>', '')
+                ->select(['express_company','express_number'])
+                ->get()
+                ->toArray();
+            dd($order_list);
+        }
+
+        if (0) {
             $old_order = DB::connection('mysql_old')
                 ->table('nlsg_mall_order')
 //                ->where('user_id', '=', 168934)
