@@ -84,7 +84,7 @@ class VipUser extends Base
             ->where('w.status', '=', 4)
             ->orderByRaw($works_order_str)
             ->select(['w.id', 'w.type as works_type', 'w.title', 'w.subtitle',
-                'w.cover_img', 'w.detail_img', 'w.price', 'c.type', 'c.column_type'])
+                'w.cover_img', 'w.image_for_vip_page as detail_img', 'w.price', 'c.type', 'c.column_type'])
             ->limit(6)
             ->get()
             ->toArray();
