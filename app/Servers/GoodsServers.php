@@ -388,17 +388,16 @@ class GoodsServers
 
     public function changeStock($params)
     {
-        $list = $params['list']??[];
-        if (empty($list)){
-            return ['code'=>false,'msg'=>'参数错误'];
+        $list = $params['list'] ?? [];
+        if (empty($list)) {
+            return ['code' => false, 'msg' => '参数错误'];
         }
-
 
         DB::beginTransaction();
 
         $flag = true;
 
-        foreach ($list as $v){
+        foreach ($list as $v) {
             $goods_id = $v['goods_id'] ?? 0;
             $sku_number = $v['sku_number'] ?? 0;
 
@@ -421,11 +420,11 @@ class GoodsServers
             }
         }
 
-        if ($flag===true){
+        if ($flag === true) {
             DB::commit();
             CacheServers::clear(1);
             return ['code' => false, 'msg' => '成功'];
-        }else{
+        } else {
             DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
