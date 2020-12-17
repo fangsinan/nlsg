@@ -127,6 +127,7 @@ class UserController extends Controller
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id', 'relation_type'])
                         ->limit(10)
+                        ->groupBy('relation_type','relation_id')
                         ->orderBy('created_at', 'desc');
                 },
                 'works' => function ($query) {
