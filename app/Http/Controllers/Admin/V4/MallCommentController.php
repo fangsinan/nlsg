@@ -10,8 +10,20 @@ use Illuminate\Http\Request;
 
 class MallCommentController extends Controller
 {
-    //评论列表
-    public function commentList(Request $request){
+    /**
+     * 评论列表
+     * @api {post} /api/admin_v4/goods/comment_list 评论列表
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/goods/comment_list
+     * @apiGroup  后台-商品评论
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/comment_list
+     * @apiParam {number} [is_robot] 1是虚拟评论 0不是
+     * @apiParam {string} [content] 评论内容
+     * @apiParam {string} [goods_name] 商品名称
+     * @apiDescription 评论列表
+     */
+    public function commentList(Request $request)
+    {
         $servers = new MallCommentServers();
         $data = $servers->list($request->input());
         return $this->getRes($data);
@@ -31,15 +43,15 @@ class MallCommentController extends Controller
      * "sku_number":"1611238695",
      * "list":[
      * {
-     * "comment":"好啊",
+     * "content":"好啊",
      * "picture":""
      * },
      * {
-     * "comment":"好啊11",
+     * "content":"好啊11",
      * "picture":""
      * },
      * {
-     * "comment":"好啊11",
+     * "content":"好啊11",
      * "picture":""
      * }
      * ]

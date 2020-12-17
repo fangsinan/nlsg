@@ -21,7 +21,19 @@ class MallCommentServers
             ->join('nlsg_mall_sku as s', 'c.sku_number', '=', 's.sku_number')
             ->join('nlsg_user as u', 'c.user_id', '=', 'u.id');
 
-        if ($params['is_robot'] ?? 0 === 1) {
+        if (!empty($params['id'] ?? 0)) {
+            $query->where('c.id', '=', $params['id']);
+        }
+
+        if (!empty($params['content']??'')){
+            $query->where('c.content','like','%'.trim($params['content']).'%');
+        }
+
+        if (!empty($params['goods_name']??'')){
+            $query->where('g.name','lie','%'.trim($params['goods_name']).'%');
+        }
+
+        if (intval($params['is_robot'] ?? 0) === 1) {
             $query->where('u.is_robot', '=', 1);
         } else {
             $query->where('u.is_robot', '=', 0);
