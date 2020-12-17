@@ -127,7 +127,7 @@ class UserController extends Controller
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id', 'relation_type'])
                         ->limit(10)
-                        ->groupBy('relation_type','relation_id')
+                        ->groupBy('relation_type', 'relation_id')
                         ->orderBy('created_at', 'desc');
                 },
                 'works' => function ($query) {
@@ -148,27 +148,27 @@ class UserController extends Controller
             $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $id])->first();
             $user['is_self'] = $id == $this->user['id'] ? 1 : 0;
             $user['is_follow'] = $isFollow ? 1 : 0;
-            if ($user['history']){
+            if ($user['history']) {
                 foreach ($user['history'] as &$v) {
-                    if ($v['relation_type'] ==1){
-                        $v['columns']  = Column::select('id','title','cover_pic')
-                                        ->where('id', $v['relation_id'])
-                                        ->where('type', 1)
-                                        ->first();
-                    } elseif($v['relation_type'] ==2){
-                        $v['lecture'] = Column::select('id','title','cover_pic')
-                                            ->where('id', $v['relation_id'])
-                                            ->where('type', 2)
-                                            ->first();
-                    } elseif($v['relation_type']==3){
-                        $v['listen'] = Works::select('id','title','cover_img','is_audio_book')
-                                           ->where('id', $v['relation_id'])
-                                           ->where('is_audio_book', 1)
-                                           ->first();
-                    } elseif($v['relation_type']==4){
-                        $v['works']  = Works::select('id','title','cover_img','is_audio_book')
-                                          ->where('id', $v['relation_id'])
-                                          ->first();
+                    if ($v['relation_type'] == 1) {
+                        $v['columns'] = Column::select('id', 'title', 'cover_pic')
+                            ->where('id', $v['relation_id'])
+                            ->where('type', 1)
+                            ->first();
+                    } elseif ($v['relation_type'] == 2) {
+                        $v['lecture'] = Column::select('id', 'title', 'cover_pic')
+                            ->where('id', $v['relation_id'])
+                            ->where('type', 2)
+                            ->first();
+                    } elseif ($v['relation_type'] == 3) {
+                        $v['listen'] = Works::select('id', 'title', 'cover_img', 'is_audio_book')
+                            ->where('id', $v['relation_id'])
+                            ->where('is_audio_book', 1)
+                            ->first();
+                    } elseif ($v['relation_type'] == 4) {
+                        $v['works'] = Works::select('id', 'title', 'cover_img', 'is_audio_book')
+                            ->where('id', $v['relation_id'])
+                            ->first();
                     }
                 }
             }
@@ -339,7 +339,7 @@ class UserController extends Controller
         ]);
 
         User::where('id', $uid)->increment('fan_num');
-        User::where('id',$this->user['id'])->increment('follow_num');
+        User::where('id', $this->user['id'])->increment('follow_num');
 
         return success();
     }
@@ -379,7 +379,7 @@ class UserController extends Controller
             return error(1000, '取消失败');
         }
         User::where('id', $uid)->decrement('fan_num');
-        User::where('id',$this->user['id'])->decrement('follow_num');
+        User::where('id', $this->user['id'])->decrement('follow_num');
 
         return success();
     }
@@ -744,11 +744,11 @@ class UserController extends Controller
     {
         $user_id = $request->input('user_id', 0);
 
-        $user_id = $this->user['id'] ??0;
+        $user_id = $this->user['id'] ?? 0;
         $order = $request->input('order', 'desc');
 
         $lists = History::where(['user_id' => $user_id, 'is_del' => 0,])
-            ->groupBy('relation_id','relation_type')->orderBy('updated_at', $order)->paginate($this->page_per_page)->toArray();
+            ->groupBy('relation_id', 'relation_type')->orderBy('updated_at', $order)->paginate($this->page_per_page)->toArray();
 
         if (empty($lists['data'])) {
             return $this->success();
@@ -770,13 +770,13 @@ class UserController extends Controller
             }
             if ($val['relation_type'] == 3 or $val['relation_type'] == 4) {
                 $works = Works::find($val['relation_id']);
-                $val['works_name'] = $works['title']??'';
-                $val['works_cover_img'] = $works['cover_img']??'';
+                $val['works_name'] = $works['title'] ?? '';
+                $val['works_cover_img'] = $works['cover_img'] ?? '';
             }
             if ($val['info_id']) {
                 $worksInfo = WorksInfo::find($val['info_id']);
-                $val['worksInfo_name'] = $worksInfo['title'] ??'';
-                $val['worksInfo_type'] = $worksInfo['type']??"";
+                $val['worksInfo_name'] = $worksInfo['title'] ?? '';
+                $val['worksInfo_type'] = $worksInfo['type'] ?? "";
             }
 
 
@@ -820,18 +820,18 @@ class UserController extends Controller
             $his_id = explode(',', $his_id);
 //            $res = History::where('user_id', $user_id)
 //                ->whereIn('id', $his_id)->update(['is_del' => 1]);
-            $relation_id_list = History::where('user_id','=',$user_id)
-                ->whereIn('id',$his_id)
+            $relation_id_list = History::where('user_id', '=', $user_id)
+                ->whereIn('id', $his_id)
                 ->select(['relation_id'])
                 ->get();
-            if (empty($relation_id_list)){
+            if (empty($relation_id_list)) {
                 return $this->error(0, 'fail');
             }
             $relation_id_list = $relation_id_list->toArray();
-            $relation_id_list = array_column($relation_id_list,'relation_id');
-            $res = History::where('user_id','=',$user_id)
-                ->whereIn('relation_id',$relation_id_list)
-                ->update(['is_del'=>1]);
+            $relation_id_list = array_column($relation_id_list, 'relation_id');
+            $res = History::where('user_id', '=', $user_id)
+                ->whereIn('relation_id', $relation_id_list)
+                ->update(['is_del' => 1]);
 
             User::where(['id' => $user_id])->decrement('history_num', count($relation_id_list));
 
@@ -960,13 +960,13 @@ class UserController extends Controller
                 ->first();
             $lists['is_live'] = $is_live ? 1 : 0;
             $vip = VipUser::where('user_id', $uid)
-                    ->where('status', 1)
-                    ->where('is_default', 1)
-                    ->first();
-            if ($vip){
-                $lists['is_vip'] =  $vip['level'] ==1 ? 1 : 2;
+                ->where('status', 1)
+                ->where('is_default', 1)
+                ->first();
+            if ($vip) {
+                $lists['is_vip'] = $vip['level'] == 1 ? 1 : 2;
             } else {
-                $lists['is_vip'] =  0;
+                $lists['is_vip'] = 0;
             }
 
         }
@@ -1007,39 +1007,42 @@ class UserController extends Controller
         $phone = $request->input('phone');
         $code = $request->input('code');
         $data = [
-            'id'=>0,
-            'token'=>''
+            'id' => 0,
+            'token' => ''
         ];
 
         if (!$phone) {
-            return error(1000, '手机号不能为空',$data);
+            return error(1000, '手机号不能为空', $data);
         }
         if (!$code) {
-            return error(1000, '验证码不能为空',$data);
+            return error(1000, '验证码不能为空', $data);
         }
 
-        $dont_check_phone = ConfigModel::getData(35,1);
-        $dont_check_phone = explode(',',$dont_check_phone);
-        if(in_array($phone,$dont_check_phone)){
-            if (intval($code) !== 6666){
-                return error(400, '验证码错误',$data);
+        $dont_check_phone = ConfigModel::getData(35, 1);
+        $dont_check_phone = explode(',', $dont_check_phone);
+        if (in_array($phone, $dont_check_phone)) {
+            if (intval($code) !== 6666) {
+                return error(400, '验证码错误', $data);
             }
-        }else{
+        } else {
             $res = Redis::get($phone);
             if (!$res) {
-                return error(1000, '验证码已过期',$data);
+                return error(1000, '验证码已过期', $data);
             }
 
             if ($code !== $res) {
-                return error(1000, '验证码错误',$data);
+                return error(1000, '验证码错误', $data);
             }
         }
 
         $list = User::where('phone', $phone)->first();
         if ($list) {
-            return error(1000, '该手机号码已存在',$data);
+            return error(1000, '该手机号码已存在', $data);
         }
         $res = User::where('id', $this->user['id'])->update(['phone' => $phone]);
+
+        VipUser::where('user_id', $this->user['id'])->update(['username' => $phone]);
+
         if ($res) {
             $user = User::where('id', $this->user['id'])->first();
 
@@ -1131,8 +1134,8 @@ class UserController extends Controller
         }
 
         $invite_num = UserInvite::where('from_uid', $this->user['id'])
-                    ->where('type', 1)
-                    ->count();
+            ->where('type', 1)
+            ->count();
         $invite_num = $invite_num ?? 0;
 
         $data = [
