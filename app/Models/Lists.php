@@ -126,6 +126,7 @@ class Lists extends Model
         if ($lists) {
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
+                    ->where('state', 1)
                     ->orderBy('sort')
                     ->orderBy('created_at', 'desc')
                     ->pluck('works_id')
@@ -154,6 +155,7 @@ class Lists extends Model
         if ($lists) {
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
+                    ->where('state', 1)
                     ->orderBy('sort')
                     ->orderBy('created_at', 'desc')
                     ->pluck('works_id')
@@ -180,6 +182,7 @@ class Lists extends Model
         if ($lists) {
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
+                    ->where('state', 1)
                     ->orderBy('sort')
                     ->orderBy('created_at', 'desc')
                     ->pluck('works_id')
