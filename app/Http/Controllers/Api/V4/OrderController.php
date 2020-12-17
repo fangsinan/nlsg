@@ -1045,7 +1045,7 @@ class OrderController extends Controller
             'live_id' => $live_id,
             'vip_order_type' => $type,  //1开通 2续费 3升级
             'remark' => $remark,
-            'tweeter_code' => $tweeter_code,
+            'twitter_id' => $tweeter_code,
         ];
 
         $order = Order::firstOrCreate($data);
@@ -1102,7 +1102,7 @@ class OrderController extends Controller
             'ip' => $request->getClientIp(),
             'os_type' => $os_type,
             'live_id' => $live_id,
-            'tweeter_id' => $tweeter_code,
+            'twitter_id' => $tweeter_code,
         ];
 
         $order = Order::firstOrCreate($data);

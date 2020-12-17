@@ -185,7 +185,7 @@ class WechatPay extends Controller
                                 //$newVipModel->update($newVipModel::$table,['is_default'=>0],['user_id'=>$user_id]);
                             }
                             $newVip_rst = VipUser::firstOrCreate($Userdata);
-                            $vip_id = $newVip_rst;  // 新增时写入
+                            $vip_id = $newVip_rst->id;  // 新增时写入
                         } else {
                             //过期时间延长一年   权益归属不发生改变
                             $Userdata = [
@@ -246,7 +246,7 @@ class WechatPay extends Controller
                         $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
                         $PrdInfo = PayRecordDetail::where($where)->first('id');
                         if (empty($PrdInfo)) {
-                            $Sy_Rst = VipUser::firstOrCreate($map);
+                            $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                         }
                     }
 
@@ -281,7 +281,6 @@ class WechatPay extends Controller
                 }
             } catch (\Exception $e) {
                 DB::rollBack();
-                dd($e);
                 return false;
             }
         } else {
