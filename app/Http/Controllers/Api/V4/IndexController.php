@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ConfigModel;
 use App\Models\Lists;
 use App\Models\Versions;
 use Illuminate\Http\Request;
@@ -958,5 +959,21 @@ class IndexController extends Controller
         $a = config('env.JWT_SECRET');
         echo $a;
     }
+
+
+    //api/v4/index/config
+    public function config()
+    {
+        //分享H5域名
+        //图片域名
+        $data = [
+            'h5_url' => ConfigModel::getData(45),
+            'img_url' => ConfigModel::getData(44),
+        ];
+
+        return success($data);
+
+    }
+
 
 }
