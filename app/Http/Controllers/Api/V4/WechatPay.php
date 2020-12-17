@@ -752,27 +752,29 @@ class WechatPay extends Controller
                                     $ProfitPrice = $ColumnInfo['price']; //返现处理
                                 } else { //支付金额已扣除分成
                                     $ProfitPrice = 0;
-                                    if ($orderInfo['SurplusPrice'] > 0) {
-                                        $LogData = [];
-                                        $LogData['ordernum'] = $out_trade_no;
-                                        $LogData['user_id'] = $twitter_id;
-                                        $LogData['type'] = 2;
-                                        $LogData['column_id'] = $teacher_id;
-                                        $LogData['num'] = 1;
-                                        $LogData['price'] = $orderInfo['SurplusPrice'];   //推广产品所获金额
-                                        $LogData['ctime'] = $time;
-//                                        $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
-                                        AgentProfitLog::create($LogData);
-//                                        $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
-                                        $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 1, $teacher_id);
+//                                    if ($orderInfo['SurplusPrice'] > 0) {
+//                                        $LogData = [];
+//                                        $LogData['ordernum'] = $out_trade_no;
+//                                        $LogData['user_id'] = $twitter_id;
+//                                        $LogData['type'] = 2;
+//                                        $LogData['column_id'] = $teacher_id;
+//                                        $LogData['num'] = 1;
+//                                        $LogData['price'] = $orderInfo['SurplusPrice'];   //推广产品所获金额
+//                                        $LogData['ctime'] = $time;
+////                                        $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
+//                                        AgentProfitLog::create($LogData);
+////                                        $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
+//                                        $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 1, $teacher_id);
+//
+//                                        $ProfitPrice = $ProfitPrice - $orderInfo['SurplusPrice'];//返回剩余款项
+//                                    } else {
+//                                        //                                      $ProfitPrice = Tool::RetainDecimal ($ProfitPrice, 0.45, 1);
+////                                        $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
+//                                        $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 1, $teacher_id);
+//
+//                                    }
+                                    $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 1, $teacher_id);
 
-                                        $ProfitPrice = $ProfitPrice - $orderInfo['SurplusPrice'];//返回剩余款项
-                                    } else {
-                                        //                                      $ProfitPrice = Tool::RetainDecimal ($ProfitPrice, 0.45, 1);
-//                                        $ProfitPrice = Profit::Income(0, 5, 0, 1, $teacher_id);
-                                        $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 1, $teacher_id);
-
-                                    }
                                 }
 
 
@@ -981,26 +983,29 @@ class WechatPay extends Controller
                             } else { //支付金额已经扣除分成
 //                                    $ProfitPrice = Tool::RetainDecimal ($WorksInfo['price'], 0.45, 1);
                                 $ProfitPrice = 0;
-                                if ($orderInfo['SurplusPrice'] > 0) {
-                                    $LogData = [];
-                                    $LogData['ordernum'] = $out_trade_no;
-                                    $LogData['user_id'] = $twitter_id;
-                                    $LogData['type'] = 3;
-                                    $LogData['works_id'] = $works_id;
-                                    $LogData['num'] = 1;
-                                    $LogData['price'] = $orderInfo['SurplusPrice'];
-                                    $LogData['ctime'] = $time;
-//                                        $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
-                                    AgentProfitLog::create($LogData);
+                                //没有服务商了
+//                                if ($orderInfo['SurplusPrice'] > 0) {
+//                                    $LogData = [];
+//                                    $LogData['ordernum'] = $out_trade_no;
+//                                    $LogData['user_id'] = $twitter_id;
+//                                    $LogData['type'] = 3;
+//                                    $LogData['works_id'] = $works_id;
+//                                    $LogData['num'] = 1;
+//                                    $LogData['price'] = $orderInfo['SurplusPrice'];
+//                                    $LogData['ctime'] = $time;
+////                                        $AgentProfitObj->add($AgentProfitObj::$table,$LogData);
+//                                    AgentProfitLog::create($LogData);
+//
+////                                        $ProfitPrice=Profit::IncomeController(0,5,0,2,$teacher_id,$works_id);
+//                                    $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 2, 0, $works_id);
+//                                    $ProfitPrice = $ProfitPrice - $orderInfo['SurplusPrice'];
+//                                } else {//海报
+////                                        $ProfitPrice=Profit::IncomeController(0,5,0,2,$teacher_id,$works_id);
+//                                    $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 2, 0, $works_id);
+//
+//                                }
+                                $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 2, 0, $works_id);
 
-//                                        $ProfitPrice=Profit::IncomeController(0,5,0,2,$teacher_id,$works_id);
-                                    $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 2, 0, $works_id);
-                                    $ProfitPrice = $ProfitPrice - $orderInfo['SurplusPrice'];
-                                } else {//海报
-//                                        $ProfitPrice=Profit::IncomeController(0,5,0,2,$teacher_id,$works_id);
-                                    $ProfitPrice = GetPriceTools::Income(0, $TwitterInfo['level'], 0, 2, 0, $works_id);
-
-                                }
 
                             }
                         }
