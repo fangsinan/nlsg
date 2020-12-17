@@ -464,14 +464,8 @@ class WechatPay extends Controller
 
     public static function mallOrder($data)
     {
-        $myfile = fopen("pay_cb.txt", "a+") or die("Unable to open file!");
-        $txt = date('Y-m-d H:i:s') . " \r\n" . json_encode($data) . "\r\n";
-        fwrite($myfile, $txt);
-        fclose($myfile);
-
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
-        //$ordernum = substr($data['out_trade_no'], 0, -5);
         $ordernum = $data['out_trade_no'];
         $pay_price = $data['total_fee'];
         $transaction_id = $data['transaction_id'];
@@ -483,12 +477,7 @@ class WechatPay extends Controller
             return true;
         }
 
-        $order_obj = MallOrder::where('ordernum', '=', strval($ordernum))
-            ->first();
-
-//        if ($order_obj->status > 1) {
-//            return true;
-//        }
+        $order_obj = MallOrder::where('ordernum', '=', strval($ordernum))->first();
 
         DB::beginTransaction();
         //修改订单支付状态
@@ -604,6 +593,14 @@ class WechatPay extends Controller
                     'user_id' => $od_v->inviter,
                     'price' => GetPriceTools::PriceCalc('*', $od_v->t_money, $od_v->num),
                 ];
+
+                if ($od_v->user_id == $od_v->inviter){
+                    continue;
+                }
+
+                if (empty($temp_stay_data['price'])){
+                    continue;
+                }
 
                 $check_stay = PayRecordDetailStay::where('ordernum', '=', $order_obj->ordernum)
                     ->where('order_detail_id', '=', $od_v->id)
