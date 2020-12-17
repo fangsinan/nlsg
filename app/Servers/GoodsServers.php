@@ -371,7 +371,7 @@ class GoodsServers
         } else {
             $list = $query->paginate($size);
         }
-        
+
         foreach ($list as $k => $v) {
             $v->category_string = ($v->categoryStr->categoryParent->id ?? 0) . ',' . ($v->categoryStr->id ?? 0);
             unset($list[$k]->categoryStr);
