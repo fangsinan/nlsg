@@ -183,7 +183,7 @@ class IndexController extends Controller
                         ->first();
                     $lists[$kk]['works'] = $listen;
                 } elseif ($vv['type'] == 4) {
-                    $column = Column::select(['id', 'title', 'cover_pic'])
+                    $column = Column::select(['id', 'name', 'cover_pic'])
                         ->where('id', $vv['works_id'])
                         ->where('type', 2)
                         ->where('status', 1)
