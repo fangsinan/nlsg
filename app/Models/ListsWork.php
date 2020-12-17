@@ -9,7 +9,7 @@ class ListsWork extends Model
     protected $table = 'nlsg_lists_work';
 
     protected $fillable = [
-        'lists_id', 'works_id', 'sort', 'state'
+        'lists_id', 'works_id', 'sort', 'state','type'
     ];
 
     /**
