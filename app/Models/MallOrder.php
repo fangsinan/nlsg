@@ -308,6 +308,7 @@ class MallOrder extends Base
         $order_data['cost_price'] = $data['price_list']['all_original_price'];
         $order_data['freight'] = $data['price_list']['freight_money'];
         $order_data['vip_cut'] = $data['price_list']['vip_cut_money'];
+        $order_data['normal_cut'] = $data['price_list']['normal_cut_money'];
         $order_data['coupon_freight_id'] = $params['coupon_freight_id'] ?? 0;
         $order_data['coupon_id'] = $params['coupon_goods_id'] ?? 0;
         $order_data['coupon_money'] = $data['price_list']['coupon_money'];
@@ -627,6 +628,7 @@ class MallOrder extends Base
         $all_price = 0; //所有商品的售价
         $freight_money = ConfigModel::getData(7); //运费
         $vip_cut_money = 0; //vip优惠金额
+        $normal_cut_money = 0;//普通优惠金额
         $sp_cut_money = 0; //活动优惠金额
         $coupon_money = 0; //优惠券金额
         $coupon_freight = 0; //是否免邮券
@@ -649,6 +651,9 @@ class MallOrder extends Base
                 GetPriceTools::PriceCalc(
                     '*', $v['actual_price'], $v['actual_num']
                 )
+            );
+            $normal_cut_money = GetPriceTools::PriceCalc('+',$normal_cut_money,
+                GetPriceTools::PriceCalc('-',$v['original_price'],$v['price'])
             );
             if (($v['sp_price'] ?? 0) > 0) {
                 $temp_sp_cut = GetPriceTools::PriceCalc('-', $v['original_price'], $v['actual_price']);
@@ -786,11 +791,14 @@ class MallOrder extends Base
 
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
 
+        $vip_cut_money = GetPriceTools::PriceCalc('-',$vip_cut_money,$normal_cut_money);
+
         $price_list = [
             'all_original_price' => $all_original_price,
             'all_price' => $all_price,
             'freight_money' => $freight_money,
             'vip_cut_money' => $vip_cut_money,
+            'normal_cut_money'=>$normal_cut_money,
             'sp_cut_money' => $sp_cut_money,
             'coupon_money' => $coupon_money,
             'freight_free_flag' => $freight_free_flag,
@@ -800,6 +808,7 @@ class MallOrder extends Base
         $price_list_new = [
             ['key' => '商品总额', 'value' => $all_original_price],
             ['key' => '运费', 'value' => $freight_money],
+            ['key' => '优惠金额', 'value' => $normal_cut_money],
 //            ['key' => '权益立减', 'value' => GetPriceTools::PriceCalc('-', 0, $vip_cut_money)],
             ['key' => '权益立减', 'value' => $vip_cut_money],
             ['key' => '活动立减', 'value' => $sp_cut_money],
