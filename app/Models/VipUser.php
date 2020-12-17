@@ -100,7 +100,7 @@ class VipUser extends Base
     }
 
 
-    public function IsNewVip($uid)
+    public static function IsNewVip($uid)
     {
         if (!$uid) return false;
         $UserInfo = VipUser::where(['user_id' => $uid, 'is_default' => 1, 'status' => 1])->get('level', 'expire_time');
