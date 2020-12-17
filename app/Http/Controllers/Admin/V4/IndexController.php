@@ -167,13 +167,32 @@ class IndexController extends Controller
     public function getListWorks(Request $request)
     {
         $list_id = $request->get('list_id');
-        $lists = ListsWork::with('works:id,title,cover_img,price')
-            ->select('id', 'lists_id', 'works_id', 'state', 'sort')
+        $lists = ListsWork::select('id', 'lists_id', 'works_id', 'state', 'sort','type')
             ->where('lists_id', $list_id)
             ->orderBy('sort', 'desc')
             ->orderBy('created_at', 'desc')
             ->get()
             ->toArray();
+        if ($lists) {
+            foreach ($lists as $kk => &$vv) {
+                if ($vv['type'] == 2) {
+                    $listen = Works::select(['id', 'title', 'cover_img'])
+                        ->where('id', $vv['works_id'])
+                        ->where('is_audio_book', 1)
+                        ->where('status', 4)
+                        ->first();
+                    $lists[$kk]['works'] = $listen;
+                } elseif ($vv['type'] == 4) {
+                    $column = Column::select(['id', 'title', 'cover_pic'])
+                        ->where('id', $vv['works_id'])
+                        ->where('type', 2)
+                        ->where('status', 1)
+                        ->first();
+                    $lists[$kk]['works'] = $column;
+                }
+            }
+
+        }
         return success($lists);
     }
 
@@ -306,7 +325,7 @@ class IndexController extends Controller
         $ids = Recommend::where('type', 7)
             ->where('position', 1)
             ->pluck('relation_id');
-        if (!$ids) {
+        if ( ! $ids) {
             return error(1000, '还没有推荐');
         }
         $model = new Live();
@@ -338,19 +357,19 @@ class IndexController extends Controller
     public function addWorks(Request $request)
     {
         $input = $request->all();
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             Recommend::where('id', $input['id'])->update([
                 'relation_id' => $input['work_id'],
-                'sort' => $input['sort'],
-                'status' => $input['status'] ?? 2
+                'sort'        => $input['sort'],
+                'status'      => $input['status'] ?? 2
             ]);
         } else {
             Recommend::create([
                 'relation_id' => $input['work_id'],
-                'position' => 1,
-                'type' => 2,
-                'sort' => $input['sort'] ?? 99,
-                'status' => $input['status'] ?? 2
+                'position'    => 1,
+                'type'        => 2,
+                'sort'        => $input['sort'] ?? 99,
+                'status'      => $input['status'] ?? 2
             ]);
         }
 
@@ -383,18 +402,18 @@ class IndexController extends Controller
     public function addLists(Request $request)
     {
         $input = $request->all();
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             Lists::where('id', $input['id'])->update([
-                'title' => $input['title'],
+                'title'    => $input['title'],
                 'subtitle' => $input['subtitle'],
-                'status' => $input['status'] ?? 2
+                'status'   => $input['status'] ?? 2
             ]);
         } else {
             Lists::create([
-                'title' => $input['title'],
+                'title'    => $input['title'],
                 'subtitle' => $input['subtitle'],
-                'status' => $input['status'] ?? 2,
-                'type' => 3
+                'status'   => $input['status'] ?? 2,
+                'type'     => 3
             ]);
         }
 
@@ -429,18 +448,18 @@ class IndexController extends Controller
     public function addListWork(Request $request)
     {
         $input = $request->all();
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             ListsWork::where('id', $input['id'])->update([
                 'works_id' => $input['works_id'],
-                'sort' => $input['sort'],
-                'state' => $input['state']
+                'sort'     => $input['sort'],
+                'state'    => $input['state']
             ]);
         } else {
             ListsWork::create([
                 'lists_id' => $input['lists_id'],
                 'works_id' => $input['works_id'],
-                'sort' => $input['sort'] ?? 99,
-                'state' => $input['state'] ?? 2
+                'sort'     => $input['sort'] ?? 99,
+                'state'    => $input['state'] ?? 2
             ]);
         }
         return success();
@@ -471,19 +490,19 @@ class IndexController extends Controller
     public function addGoods(Request $request)
     {
         $input = $request->all();
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             Recommend::where('id', $input['id'])->update([
                 'relation_id' => $input['goods_id'],
-                'sort' => $input['sort'],
-                'status' => $input['status'] ?? 2
+                'sort'        => $input['sort'],
+                'status'      => $input['status'] ?? 2
             ]);
         } else {
             Recommend::create([
                 'relation_id' => $input['goods_id'],
-                'position' => 1,
-                'type' => 8,
-                'sort' => $input['sort'] ?? 99,
-                'status' => $input['status'] ?? 2
+                'position'    => 1,
+                'type'        => 8,
+                'sort'        => $input['sort'] ?? 99,
+                'status'      => $input['status'] ?? 2
             ]);
         }
         return success();
@@ -569,19 +588,19 @@ class IndexController extends Controller
     public function addWiki(Request $request)
     {
         $input = $request->all();
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             Recommend::where('id', $input['id'])->update([
                 'relation_id' => $input['wiki_id'],
-                'sort' => $input['sort'],
-                'status' => $input['status'] ?? 2
+                'sort'        => $input['sort'],
+                'status'      => $input['status'] ?? 2
             ]);
         } else {
             Recommend::create([
                 'relation_id' => $input['wiki_id'],
-                'position' => 1,
-                'type' => 5,
-                'sort' => $input['sort'] ?? 99,
-                'status' => $input['status'] ?? 2
+                'position'    => 1,
+                'type'        => 5,
+                'sort'        => $input['sort'] ?? 99,
+                'status'      => $input['status'] ?? 2
             ]);
         }
 
