@@ -62,7 +62,6 @@ class AuthController extends Controller
             return error(400, '验证码不能为空', $sclass);
         }
 
-        //todo 临时
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
         if (in_array($phone, $dont_check_phone)) {
@@ -219,7 +218,6 @@ class AuthController extends Controller
         return success($data);
 
     }
-
 
     /**
      * 绑定手机号
