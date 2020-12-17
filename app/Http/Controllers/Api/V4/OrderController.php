@@ -129,7 +129,7 @@ class OrderController extends Controller
      * @apiParam {int} column_id 专栏id
      * @apiParam {int} user_id 用户id
      * @apiParam {int} coupon_id  优惠券id 默认0
-     * @apiParam {int} tweeter_code 推客id 默认0
+     * @apiParam {int} inviter 推客id 默认0
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id  直播间购买时传
      *
@@ -207,7 +207,7 @@ class OrderController extends Controller
      * @apiParam {int} work_id 课程id
      * @apiParam {int} user_id 用户id
      * @apiParam {int} coupon_id  优惠券id 默认0
-     * @apiParam {int} tweeter_code 推客id 默认0
+     * @apiParam {int} inviter 推客id 默认0
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id  直播间购买时传
      *
@@ -225,7 +225,7 @@ class OrderController extends Controller
 
         $work_id = $request->input('work_id', 0);
         $coupon_id = $request->input('coupon_id', 0);
-        $tweeter_code = $request->input('tweeter_code', 0);
+        $tweeter_code = $request->input('inviter', 0);
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
         $pay_type = $request->input('pay_type', 0);
@@ -937,7 +937,7 @@ class OrderController extends Controller
      * @apiParam {int} level      1 360会员  2钻石合伙人
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
-     * @apiParam {int} tweeter_code 推客id
+     * @apiParam {int} inviter 推客id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -952,7 +952,7 @@ class OrderController extends Controller
         $level = $request->input('level', 1);   //目标id
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
-        $tweeter_code = $request->input('tweeter_code', 0);  //推客id
+        $tweeter_code = $request->input('inviter', 0);  //推客id
         $user_id = $this->user['id'];
 
 
@@ -1053,7 +1053,7 @@ class OrderController extends Controller
      * @apiParam {int} product_id      产品id
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
-     * @apiParam {int} tweeter_code 推客id
+     * @apiParam {int} inviter 推客id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -1068,7 +1068,7 @@ class OrderController extends Controller
         $product_id = $request->input('product_id', 1);   //目标id
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
-        $tweeter_code = $request->input('tweeter_code', 0);  //推客id
+        $tweeter_code = $request->input('inviter', 0);  //推客id
         $num = $request->input('num', 0);  //推客id
         $user_id = $this->user['id'];
 
