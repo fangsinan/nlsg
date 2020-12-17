@@ -90,6 +90,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('goods/add', 'GoodsController@add');
     Route::get('goods/list', 'GoodsController@list');
     Route::get('goods/category_list', 'GoodsController@categoryList');
+    Route::put('goods/change_status', 'GoodsController@changeStatus');
+    Route::put('goods/change_stock', 'GoodsController@changeStock');
 
     //商品评论
     Route::post('goods/add_robot_comment','MallCommentController@addRobotComment');

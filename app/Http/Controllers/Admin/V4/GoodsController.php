@@ -162,6 +162,59 @@ class GoodsController extends Controller
     }
 
 
+    /**
+     * 修改商品状态
+     * @api {put} /api/admin_v4/goods/change_status 修改商品状态
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/goods/change_status
+     * @apiGroup  后台-商品管理
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/change_status
+     * @apiParam {number} goods_id 商品id
+     * @apiParam {string=on,off,del} flag 上下删
+     * @apiDescription 修改商品状态
+     */
+    public function changeStatus(Request $request)
+    {
+        $servers = new GoodsServers();
+        $data = $servers->changeStatus($request->input());
+        return $this->getRes($data);
+    }
+
+    /**
+     * 修改规格库存
+     * @api {put} /api/admin_v4/goods/change_stock 修改规格库存
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/goods/change_stock
+     * @apiGroup  后台-商品管理
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/change_stock
+     * @apiParam {string[]} list 数据
+     * @apiParam {number} list.goods_id 商品id
+     * @apiParam {number} list.sku_number sku_number
+     * @apiParam {number} list.stock 库存(可以是0,不能是空)
+     * @apiDescription 修改规格库存
+     * * @apiParamExample {json} Request-Example:
+     * {
+     * "list":[
+     * {
+     * "goods_id":48,
+     * "sku_number":"1732637347",
+     * "stock":11
+     * },
+     * {
+     * "goods_id":48,
+     * "sku_number":"1733744984",
+     * "stock":66
+     * }
+     * ]
+     * }
+     */
+    public function changeStock(Request $request)
+    {
+        $servers = new GoodsServers();
+        $data = $servers->changeStock($request->input());
+        return $this->getRes($data);
+    }
+
 
     public function tempTools(Request $request)
     {

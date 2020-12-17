@@ -75,11 +75,11 @@ class GoodsServers
         }
 
         $goods_model->keywords = $params['keywords'] ?? '';
-        if (!empty($goods_model->keywords)){
+        if (!empty($goods_model->keywords)) {
             $reg = "/[[:punct:]]/i";
             $goods_model->keywords = preg_replace($reg, ' ', $goods_model->keywords);
-            $goods_model->keywords = explode(' ',$goods_model->keywords);
-            $goods_model->keywords = implode(',',array_filter($goods_model->keywords));
+            $goods_model->keywords = explode(' ', $goods_model->keywords);
+            $goods_model->keywords = implode(',', array_filter($goods_model->keywords));
         }
 
         $goods_model->content = $params['content'] ?? '';
@@ -159,7 +159,7 @@ class GoodsServers
         }
 
         //如果是编辑,把之前存在,现在没提交的sku_id删除
-        if (($params['goods_id']??0) !== 0) {
+        if (($params['goods_id'] ?? 0) !== 0) {
             $del_sku_id_array = array_column($params['sku_list'], 'id');
             if (empty($del_sku_id_array)) {
                 $del_sku_res = DB::table('nlsg_mall_sku')
@@ -380,11 +380,90 @@ class GoodsServers
         return $list;
     }
 
-
     public function categoryList()
     {
         $model = new MallCategory();
         return $model->getAllList();
+    }
+
+    public function changeStock($params)
+    {
+        $list = $params['list']??[];
+        if (empty($list)){
+            return ['code'=>false,'msg'=>'参数错误'];
+        }
+
+
+        DB::beginTransaction();
+
+        $flag = true;
+
+        foreach ($list as $v){
+            $goods_id = $v['goods_id'] ?? 0;
+            $sku_number = $v['sku_number'] ?? 0;
+
+            if (empty($goods_id) || empty($sku_number) || !isset($v['stock'])) {
+                return ['code' => false, 'msg' => '参数错误'];
+            }
+
+            $check_sku = MallSku::where('sku_number', '=', $sku_number)
+                ->where('goods_id', '=', $goods_id)
+                ->first();
+            if (empty($check_sku)) {
+                $flag = false;
+                break;
+            }
+
+            $check_sku->stock = intval($v['stock']);
+            $res = $check_sku->save();
+            if ($res === false) {
+                $flag = false;
+            }
+        }
+
+        if ($flag===true){
+            DB::commit();
+            CacheServers::clear(1);
+            return ['code' => false, 'msg' => '成功'];
+        }else{
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
+    }
+
+    public function changeStatus($params)
+    {
+        $goods_id = $params['goods_id'] ?? 0;
+        $flag = $params['flag'] ?? '';
+        if (empty($goods_id) || empty($flag) || !in_array($flag, ['on', 'off', 'del'])) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $check_goods = MallGoods::whereId($goods_id)->first();
+        if (empty($check_goods)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        switch ($flag) {
+            case 'on':
+                $check_goods->status = 2;
+                break;
+            case 'off':
+                $check_goods->status = 1;
+                break;
+            case 'del':
+                $check_goods->status = 3;
+                break;
+        }
+
+        $res = $check_goods->save();
+        if ($res === false) {
+            return ['code' => false, 'msg' => '失败'];
+        } else {
+            CacheServers::clear(1);
+            return ['code' => false, 'msg' => '成功'];
+        }
+
     }
 
 }
