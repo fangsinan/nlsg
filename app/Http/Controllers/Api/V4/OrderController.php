@@ -1102,7 +1102,7 @@ class OrderController extends Controller
             'ip' => $request->getClientIp(),
             'os_type' => $os_type,
             'live_id' => $live_id,
-            'tweeter_code' => $tweeter_code,
+            'tweeter_id' => $tweeter_code,
         ];
 
         $order = Order::firstOrCreate($data);
