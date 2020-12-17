@@ -1327,6 +1327,7 @@ class MallOrder extends Base
 
         $price_list_new = [
             ['key' => '商品总额', 'value' => $data['cost_price']],
+            ['key' => '优惠金额', 'value' => $data['normal_cut']],
             ['key' => '权益立减', 'value' => $data['vip_cut']],
             ['key' => '活动立减', 'value' => $data['special_price_cut']],
             ['key' => '运费', 'value' => $data['freight']],
@@ -1358,7 +1359,7 @@ class MallOrder extends Base
         }
 
         foreach ($price_list_new as &$new_v) {
-            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额'])) {
+            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额','优惠金额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
             } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];
