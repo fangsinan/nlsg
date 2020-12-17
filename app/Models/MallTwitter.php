@@ -16,11 +16,11 @@ class MallTwitter extends Base
         //$host_url = Config::getInstance()->getConf('REQUEST_URI.INDEX_URL');
         $host_url = 'http://wechat.test.nlsgapp.com/';
         $url = '';
-
+        //$u_type 1专栏 5听书   6课程 12讲座
         switch (intval($type)) {
             case 1:
-                //专栏:http://wechat.test.nlsgapp.com/column/details?user_id=161904
-                $url = 'column/details?user_id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                //专栏:
+                $url = '/appv4/column-details?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
                 break;
             case 2:
                 //课程视频:http://wechat.test.nlsgapp.com/works/videoinfo?work_id=128&workinfo_id=181&type=1
@@ -37,13 +37,13 @@ class MallTwitter extends Base
                 $url = 'article?id=' . $gid . '&tweeter_code=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
                 break;
             case 5:
-                //听书:http://wechat.test.nlsgapp.com/listenBookDetails?work_id=477&workinfo_id=2980
-                $url = 'listenBookDetails?work_id=' . $gid . '&workinfo_id=' . $info_id . '&inviter=' .
+                //听书
+                $url = 'appv4/book-introduce?id=' . $gid . '&workinfo_id=' . $info_id . '&inviter=' .
                     $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
                 break;
             case 6:
-                //精品课视频:http://wechat.test.nlsgapp.com/excellent/video?status=class&work_id=479&workinfo_id=3003&type=1
-                $url = 'excellent/video?work_id=' . $gid . '&workinfo_id=' . $info_id .
+                //课程:appv4/course-introduce?id=课程id
+                $url = 'appv4/course-introduce?id=' . $gid . '&workinfo_id=' . $info_id .
                     '&type=1&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
                 break;
             case 7:
@@ -71,6 +71,10 @@ class MallTwitter extends Base
             case 11:
                 //直播:https://wechat.nlsgapp.com/liveList?id=4
                 $url = '/liveList?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                break;
+            case 12:
+                //讲座
+                $url = 'lecture-introduce?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
                 break;
             case 22: //三八邀请app注册
                 $url = '';
