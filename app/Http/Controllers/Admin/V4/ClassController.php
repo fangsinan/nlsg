@@ -509,7 +509,7 @@ class ClassController extends Controller
                 ->get();
         return success($lists);
     }
-    
+
     public  function  editWiki(Request $request)
     {
         $id = $request->get('id');
@@ -729,6 +729,7 @@ class ClassController extends Controller
             'status' => $status,
             'content' => $content,
             'is_pay' => $is_pay,
+            'is_free' => $price == 0 ? 1 : 0,
             'type'   => $type
         ];
         if (!empty($input['id'])) {

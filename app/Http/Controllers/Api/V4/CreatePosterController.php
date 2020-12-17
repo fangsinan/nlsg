@@ -1035,31 +1035,33 @@ class CreatePosterController extends Controller
                     $u_type = 5;
                 } else {
                     $m_t_type = 3;
-                    if ($temp_work['is_pay']) {
-                        switch (intval($temp_work['type'])) {
-                            case 1:
-                                $u_type = 6;
-                                break;
-                            case 2:
-                                $u_type = 7;
-                                break;
-                            case 3:
-                                $u_type = 4;
-                                break;
-                        }
-                    } else {
-                        switch (intval($temp_work['type'])) {
-                            case 1:
-                                $u_type = 2;
-                                break;
-                            case 2:
-                                $u_type = 3;
-                                break;
-                            case 3:
-                                $u_type = 4;
-                                break;
-                        }
-                    }
+                    $u_type = 6;
+//                    if ($temp_work['is_pay']) {
+//                        switch (intval($temp_work['type'])) {
+//                            case 1:
+//                                $u_type = 6;
+//                                break;
+//                            case 2:
+//                                $u_type = 7;
+//                                break;
+//                            case 3:
+//                                $u_type = 4;
+//                                break;
+//                        }
+//                    } else {
+//                        switch (intval($temp_work['type'])) {
+//                            case 1:
+//                                $u_type = 2;
+//                                break;
+//                            case 2:
+//                                $u_type = 3;
+//                                break;
+//                            case 3:
+//                                $u_type = 4;
+//                                break;
+//                        }
+//                    }
+
                 }
                 break;
             case 7://商品
@@ -1067,8 +1069,14 @@ class CreatePosterController extends Controller
                 $m_t_type = 2;
                 break;
             case 8://专栏
-                $u_type = 1;
                 $m_t_type = 1;
+                $u_type = 1;
+
+                $temp_work = Column::find($gid);
+                if($temp_work['type'] == 2 ){//讲座
+                    $u_type = 12;
+                }
+
                 break;
             case 10:
                 //直播
