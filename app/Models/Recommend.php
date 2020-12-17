@@ -29,6 +29,7 @@ class Recommend extends Base
         }
         $ids = Recommend::where('position', $position)
             ->where('type', $type)
+            ->where('status', 1)
             ->orderBy('sort')
             ->orderBy('created_at','desc')
             ->pluck('relation_id')

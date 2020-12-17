@@ -989,17 +989,27 @@ class OrderController extends Controller
 
 
         //判断推客身份是否过期
+
         if (!empty($tweeter_code)) {
-            // 钻石合伙人自己推广自己可以返佣!!!  其他不可以
-            //如果自己推广自己   必须是钻石合伙人
-            if ($tweeter_code == $user_id && $this->user['new_vip']['level'] < 2) {
-                $tweeter_code = 0;
-            }
-            //不是自己推广自己   必须身份 > 0
-            if ($tweeter_code != $user_id && $this->user['new_vip']['level'] < 1) {
+            $is_vip = VipUser::IsNewVip($tweeter_code);
+            if(!$is_vip){
                 $tweeter_code = 0;
             }
         }
+
+//        if (!empty($tweeter_code)) {
+//            // 钻石合伙人自己推广自己可以返佣!!!  其他不可以
+//            //如果自己推广自己   必须是钻石合伙人
+//            if ($tweeter_code == $user_id && $this->user['new_vip']['level'] < 2) {
+//                $tweeter_code = 0;
+//            }
+//            dd($this->user);
+//
+//            //不是自己推广自己   必须身份 > 0
+//            if ($tweeter_code != $user_id && $this->user['new_vip']['level'] < 1) {
+//                $tweeter_code = 0;
+//            }
+//        }
 
         /*********************** 校验推客身份   *********************/
 
