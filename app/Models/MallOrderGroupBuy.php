@@ -781,7 +781,7 @@ class MallOrderGroupBuy extends Base
             DB::raw('(case when nmo.is_stop = 1
                 then 99 when nmo.`status` = 1 then 1
                 when is_success = 0 then 95  ELSE nmo.`status` END) `status`'),
-            'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type'
+            'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type','nmo.normal_cut'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList' => function ($q) use ($user_id) {
             $q->orderBy('is_captain', 'desc')
