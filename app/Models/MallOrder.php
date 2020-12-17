@@ -1145,7 +1145,7 @@ class MallOrder extends Base
         $field = [
             'id', 'ordernum', 'price', 'dead_time', DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'created_at', 'pay_price',
-            'price', 'post_type', 'pay_type'
+            'price', 'post_type', 'pay_type','normal_cut',
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];
         $with[] = 'orderChild';
