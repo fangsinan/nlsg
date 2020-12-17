@@ -11,6 +11,40 @@ use Illuminate\Http\Request;
 class MallCommentController extends Controller
 {
     /**
+     * 回复评论
+     * @api {post} /api/admin_v4/goods/comment_reply 回复评论
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/goods/comment_reply
+     * @apiGroup  后台-商品评论
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/comment_reply
+     * @apiParam {number} id
+     * @apiParam {string} [content] 回复评论
+     * @apiDescription 评论列表
+     */
+    public function replyComment(Request $request){
+        $servers = new MallCommentServers();
+        $data = $servers->replyComment($request->input(),$this->user['id']);
+        return $this->getRes($data);
+    }
+
+    /**
+     * 评论状态变更
+     * @api {put} /api/admin_v4/goods/comment_status 评论状态变更
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/goods/comment_status
+     * @apiGroup  后台-商品评论
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/comment_status
+     * @apiParam {number} id
+     * @apiParam {string=on,off} flag on显示,off隐藏
+     * @apiDescription 评论状态变更
+     */
+    public function changeStatus(Request $request){
+        $servers = new MallCommentServers();
+        $data = $servers->changeStatus($request->input());
+        return $this->getRes($data);
+    }
+
+    /**
      * 评论列表
      * @api {post} /api/admin_v4/goods/comment_list 评论列表
      * @apiVersion 4.0.0

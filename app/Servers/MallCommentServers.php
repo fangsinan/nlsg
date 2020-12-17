@@ -11,6 +11,66 @@ use Illuminate\Support\Facades\DB;
 
 class MallCommentServers
 {
+    public function replyComment($params, $user_id)
+    {
+        if (empty($params['id'] ?? 0)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        $check_id = MallComment::whereId($params['id'])->first();
+        if (empty($check_id)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        if (empty($params['content'] ?? '')) {
+            $check_id->reply_comment = '';
+            $check_id->reply_user_id = 0;
+            $check_id->reply_at = null;
+        }else{
+            $check_id->reply_comment = $params['content'] ?? '';
+            $check_id->reply_user_id = $user_id;
+            $check_id->reply_at = date('Y-m-d H:i:s');
+        }
+
+        $res = $check_id->save();
+        if ($res === false) {
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败'];
+        }
+    }
+
+    public function changeStatus($params)
+    {
+        if (empty($params['id'] ?? 0)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        $check_id = MallComment::whereId($params['id'])->first();
+        if (empty($check_id)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        switch ($params['flag'] ?? '') {
+            case 'on':
+                $check_id->status = 1;
+                break;
+            case 'off':
+                $check_id->status = 0;
+                break;
+            default:
+                return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $res = $check_id->save();
+        if ($res === false) {
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败'];
+        }
+
+    }
+
     public function list($params)
     {
 
@@ -25,12 +85,12 @@ class MallCommentServers
             $query->where('c.id', '=', $params['id']);
         }
 
-        if (!empty($params['content']??'')){
-            $query->where('c.content','like','%'.trim($params['content']).'%');
+        if (!empty($params['content'] ?? '')) {
+            $query->where('c.content', 'like', '%' . trim($params['content']) . '%');
         }
 
-        if (!empty($params['goods_name']??'')){
-            $query->where('g.name','lie','%'.trim($params['goods_name']).'%');
+        if (!empty($params['goods_name'] ?? '')) {
+            $query->where('g.name', 'lie', '%' . trim($params['goods_name']) . '%');
         }
 
         if (intval($params['is_robot'] ?? 0) === 1) {
@@ -43,7 +103,7 @@ class MallCommentServers
 
         $query->select([
             'c.id as comment_id', 'c.content', 'c.picture', 'c.star', 'g.name as goods_name',
-            'g.picture as goods_picture', 'u.nickname', 'u.phone', 'c.sku_number'
+            'g.picture as goods_picture', 'u.nickname', 'u.phone', 'c.sku_number','c.status',
         ]);
 
         $list = $query->paginate($size);
