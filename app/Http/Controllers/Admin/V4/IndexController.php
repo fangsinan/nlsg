@@ -451,15 +451,18 @@ class IndexController extends Controller
         if ( ! empty($input['id'])) {
             ListsWork::where('id', $input['id'])->update([
                 'works_id' => $input['works_id'],
-                'sort'     => $input['sort'],
-                'state'    => $input['state']
+                'sort'     => $input['sort'] ?? 99,
+                'state'    => $input['state'] ?? 2,
+                'type'     => $input['type'] ?? 0
             ]);
         } else {
             ListsWork::create([
                 'lists_id' => $input['lists_id'],
                 'works_id' => $input['works_id'],
                 'sort'     => $input['sort'] ?? 99,
-                'state'    => $input['state'] ?? 2
+                'state'    => $input['state'] ?? 2,
+                'type'     => $input['type'] ?? 0
+
             ]);
         }
         return success();
