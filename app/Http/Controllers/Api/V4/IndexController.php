@@ -932,9 +932,9 @@ class IndexController extends Controller
     public  function  market()
     {
         $data = [
-            'id'   => 4,
+            'id'   => 16,
             'info_id' => 0,
-            'type' => 7,
+            'type' => 2,
             'url'  => '',
             'img'  => 'https://image.nlsgapp.com/nlsg/works/20201117155957451173.png'
         ];
