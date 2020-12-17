@@ -19,7 +19,7 @@ class PayRecordDetail extends Base
         }elseif($type==5) { //可提现余额
             $first_day=(date('Y-m-01')); //本月第一天
             $income = PayRecordDetail::where('user_id', $user_id)->where('created_at', '<', $first_day)
-                ->whereIn('type', [2,5,6,7,8,9])->sum('price');
+                ->whereIn('type', [2,5,6,7,8,9,10,11])->sum('price');
 
             $cash = PayRecord::where('user_id', $user_id)->whereIn('status', [1,2])
                 ->whereIn('order_type', [7,8,9,12])->sum('price');
@@ -27,7 +27,7 @@ class PayRecordDetail extends Base
         }else{
             $first_day=(date('Y-m-01')); //本月第一天
             $query = PayRecordDetail::where('user_id',$user_id)
-                ->whereIn('type',[2,5,6,7,8,9]);
+                ->whereIn('type',[2,5,6,7,8,9,10,11]);
 
             if($type==2){ //累计结算 电商 专栏 精品课
                 $query->where('created_at', '<',$first_day);

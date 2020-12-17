@@ -147,15 +147,18 @@ class IncomeController extends Controller
         $user_id = $this->user['id'] ?? 0;
 
         $cash_list = CashData::where(['user_id'=>$user_id])->first();
-        if ($cash_list['is_pass']==1 && $cash_list['org_type'] ==1 ) {
-            $user_status  =  1 ;
-            if ($cash_list['app_wx_account'] || $cash_list['zfb_account']) {
-                $user_status = 2;
+        $user_status  =  0 ;
+        if($cash_list){
+            if ($cash_list['is_pass']==1 && $cash_list['org_type'] ==1 ) {
+                $user_status  =  1 ;
+                if ($cash_list['app_wx_account'] || $cash_list['zfb_account']) {
+                    $user_status = 2;
+                }
+            } elseif ($cash_list['is_pass']==1 && $cash_list['org_type'] ==2){
+                $user_status  =  3 ;
+            } else {
+                $user_status  =  0 ;
             }
-        } elseif ($cash_list['is_pass']==1 && $cash_list['org_type'] ==2){
-            $user_status  =  3 ;
-        } else {
-            $user_status  =  0 ;
         }
 
         //获取当月
