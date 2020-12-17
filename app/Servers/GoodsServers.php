@@ -315,7 +315,7 @@ class GoodsServers
         }
 
         if (!empty($params['name'])) {
-            $query->where('name', 'like', '%' . intval($params['name'] . '%'));
+            $query->where('name', 'like', '%' . $params['name'] . '%');
         }
 
         $field = ['id', 'category_id', 'name', 'subtitle', 'picture', 'number',
@@ -362,6 +362,7 @@ class GoodsServers
                 $query->orderBy('price', 'desc');
                 break;
         }
+
         $query->orderBy('id', 'desc')->with($with)->select($field);
 
         if ($flag === 'simple') {
@@ -370,7 +371,7 @@ class GoodsServers
         } else {
             $list = $query->paginate($size);
         }
-
+        
         foreach ($list as $k => $v) {
             $v->category_string = ($v->categoryStr->categoryParent->id ?? 0) . ',' . ($v->categoryStr->id ?? 0);
             unset($list[$k]->categoryStr);
