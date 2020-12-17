@@ -103,7 +103,8 @@ class VipUser extends Base
     public static function IsNewVip($uid)
     {
         if (!$uid) return false;
-        $UserInfo = VipUser::where(['user_id' => $uid, 'is_default' => 1, 'status' => 1])->get('level', 'expire_time');
+        $UserInfo = VipUser::select('level', 'expire_time')->where(['user_id' => $uid, 'is_default' => 1, 'status' => 1])->first();
+        //$UserInfo = VipUser::where()->get();
 
         //return $model->getLastQuery();
         $time = date('Y-m-d', (time() + 86400));
