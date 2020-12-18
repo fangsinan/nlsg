@@ -14,10 +14,11 @@ class JwtBackendMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            $check_backend = BackendUser::where('username','=',$user->phone)->first();
-            if (empty($check_backend)){
-                return response()->json(['msg' => '无权限', 'code'=>401]);
-            }
+//            dd($user->toArray());
+//            $check_backend = BackendUser::where('username','=',$user->phone)->first();
+//            if (empty($check_backend)){
+//                return response()->json(['msg' => '无权限', 'code'=>401]);
+//            }
         } catch (Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
                 return response()->json(['msg' => 'TOKEN无效','code'=>401]);
