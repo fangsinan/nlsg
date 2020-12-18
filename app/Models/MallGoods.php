@@ -481,8 +481,10 @@ class MallGoods extends Base
 
     public function forYourReference($num, $user = [])
     {
+        $kind = 5;//可能性
         $key = substr(time(), 9);
-        $key = $key % 4;
+        $key = $key % $kind;
+
         $cache_key_name = 'fyr_' . $key;
         $id_list = Cache::get($cache_key_name);
 
