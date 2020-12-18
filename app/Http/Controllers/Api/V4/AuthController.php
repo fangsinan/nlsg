@@ -199,10 +199,25 @@ class AuthController extends Controller
         }
 
         $token = auth('api')->login($user);
+//        $data = [
+//            'id' => $user->id,
+//            'phone' => $user->phone ?? '',
+//            'token' => $token
+//        ];
+        //判断是否过期
+        $time = strtotime(date('Y-m-d', time())) + 86400;
+        if ( in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
+            $user->level = $user->level;
+        } else {
+            $user->level = 0;
+        }
         $data = [
             'id' => $user->id,
-            'phone' => $user->phone ?? '',
-            'token' => $token
+            'token' => $token,
+            'nickname' => $user->nickname,
+            'headimg' => $user->headimg ?? '',
+            'phone' => $user->phone,
+            'level' => $user->level
         ];
         return success($data);
     }
@@ -455,10 +470,26 @@ class AuthController extends Controller
         }
 
         $token = auth('api')->login($user);
+//        $data = [
+//            'id' => $user->id,
+//            'phone' => $user->phone ?? '',
+//            'token' => $token
+//        ];
+
+        //判断是否过期
+        $time = strtotime(date('Y-m-d', time())) + 86400;
+        if ( in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
+            $user->level = $user->level;
+        } else {
+            $user->level = 0;
+        }
         $data = [
             'id' => $user->id,
-            'phone' => $user->phone ?? '',
-            'token' => $token
+            'token' => $token,
+            'nickname' => $user->nickname,
+            'headimg' => $user->headimg ?? '',
+            'phone' => $user->phone,
+            'level' => $user->level
         ];
         return success($data);
     }

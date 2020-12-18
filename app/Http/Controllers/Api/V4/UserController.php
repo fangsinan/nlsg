@@ -975,7 +975,11 @@ class UserController extends Controller
             } else {
                 $lists['is_vip'] = 0;
             }
-
+            if (!empty($lists['level']) && !empty($lists['expire_time']) && $lists['expire_time'] > date('Y-m-d H:i:s')) {
+                $lists['level'] = $lists['level'];
+            }else{
+                $lists['level'] = 0;
+            }
         }
         return success($lists);
     }

@@ -76,6 +76,10 @@ class Collection extends Base
                 $model = new Works();
                 $result = $model->getIndexWorks($ids, 1,$user_id);
                 break;
+            case 7:   //专栏
+                $model = new Column();
+                $result = $model->getIndexColumn($ids);
+                break;
 
         }
         return $result;
