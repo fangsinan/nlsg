@@ -20,7 +20,7 @@ class MallTwitter extends Base
         switch (intval($type)) {
             case 1:
                 //专栏:
-                $url = '/appv4/column-details?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                $url = 'appv4/column-details?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
                 break;
             case 2:
                 //课程视频:http://wechat.test.nlsgapp.com/works/videoinfo?work_id=128&workinfo_id=181&type=1
@@ -74,7 +74,7 @@ class MallTwitter extends Base
                 break;
             case 12:
                 //讲座
-                $url = 'lecture-introduce?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                $url = 'appv4/lecture-introduce?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
                 break;
             case 22: //三八邀请app注册
                 $url = '';
