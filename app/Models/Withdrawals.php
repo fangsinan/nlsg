@@ -120,12 +120,11 @@ class Withdrawals extends Base
 
         $Test_User = Config('web.Withdrawals.Test_User');
         if(in_array($user_id, $Test_User)){
-            $amount=0.01;   // 元单位
+            $amount=1;   // 元单位
         }
-        $amount=1;   // 元单位
         if($channel == 'WeChat'){
             //微信提现
-/*            $config = Config('wechat.payment.default');
+            $config = Config('wechat.payment.default');
             $app    = Factory::payment($config);
             $result = $app->transfer->toBalance([
                 'partner_trade_no' => $orderid, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)
@@ -134,19 +133,19 @@ class Withdrawals extends Base
                 're_user_name' => $truename, // 如果 check_name 设置为FORCE_CHECK，则必填用户真实姓名
                 'amount' => ($amount* 100), // 企业付款金额，单位为分
                 'desc' => $orderid, // 企业付款操作说明信息。必填
-            ]);*/
+            ]);
     //成功后返回参数
-            $result=[
-              "return_code" => "SUCCESS",
-              "return_msg" => null,
-              "mch_appid" => "wx3296e2b7430df182",
-              "mchid" => "1460495202",
-              "nonce_str" => "5f053dcc9371f",
-              "result_code" => "SUCCESS",
-              "partner_trade_no" => "20200708113020",
-              "payment_no" => "10100244512772007083685544540676",
-              "payment_time" => "2020-07-08 11:30:21",
-            ];
+//            $result=[
+//              "return_code" => "SUCCESS",
+//              "return_msg" => null,
+//              "mch_appid" => "wx3296e2b7430df182",
+//              "mchid" => "1460495202",
+//              "nonce_str" => "5f053dcc9371f",
+//              "result_code" => "SUCCESS",
+//              "partner_trade_no" => "20200708113020",
+//              "payment_no" => "10100244512772007083685544540676",
+//              "payment_time" => "2020-07-08 11:30:21",
+//            ];
 
         }else if($channel == 'ali'){
             //支付宝提现
@@ -158,7 +157,7 @@ class Withdrawals extends Base
                 'payee_info' => [
                     'identity' => $zh_account,
                     'identity_type' => 'ALIPAY_LOGON_ID',
-                    'name' => '房思楠',
+                    'name' => $truename,
                 ],
             ];
             $config = Config('pay.alipay');
@@ -177,7 +176,7 @@ class Withdrawals extends Base
 $result['return_msg'] = $result['sub_msg'] ??'';
 
         }
-        dump($result);
+
         if ( ($channel == 'WeChat' && strtolower($result['result_code']) == 'success') ||
             ($channel == 'ali' && strtolower($result['msg']) == 'success')) {
             DB::beginTransaction();

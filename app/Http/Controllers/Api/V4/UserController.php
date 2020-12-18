@@ -661,6 +661,7 @@ class UserController extends Controller
             $uid = $this->user['id'];
         }
         $user = User::findOrFail($uid);
+        $lists = [];
         if ($user) {
             $lists = UserFollow::with('fromUser:id,nickname,intro,headimg')
                 ->select('id', 'from_uid', 'to_uid')
