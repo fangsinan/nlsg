@@ -975,7 +975,7 @@ class IncomeController extends Controller
             $info['price'] = $pay_info['price'];
             $info['content'] = $con['content'];
             $info['name'] = $con['name'];
-            $info['o_nick_name'] = $con['o_nick_name'];
+            $info['o_nick_name'] = $con['o_nick_name'] ?? '';
         }
         $UserInfo = User::find($user_id);
         $info['nick_name']=$UserInfo['nick_name'];
