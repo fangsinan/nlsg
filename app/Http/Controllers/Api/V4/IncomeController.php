@@ -836,6 +836,7 @@ class IncomeController extends Controller
                 $con = $this->detail_content($val['type'],$val['ordernum'],$val['order_detail_id']);
                 $val['content'] = $con['content'] ??'';
                 $val['name'] = $con['name'] ??'';
+                $val['o_nick_name'] = $con['o_nick_name'] ??'';
             }
 
         }
@@ -974,6 +975,7 @@ class IncomeController extends Controller
             $info['price'] = $pay_info['price'];
             $info['content'] = $con['content'];
             $info['name'] = $con['name'];
+            $info['o_nick_name'] = $con['o_nick_name'];
         }
         $UserInfo = User::find($user_id);
         $info['nick_name']=$UserInfo['nick_name'];
