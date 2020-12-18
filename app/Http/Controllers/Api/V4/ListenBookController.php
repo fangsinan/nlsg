@@ -264,7 +264,7 @@ class ListenBookController extends Controller
         $lists_info['is_collect'] = $is_collect ? 1 : 0;
 
         $lists = ListsWork::select('type','works_id')
-                ->where(['lists_id'=>$lists_id])
+                ->where(['lists_id'=>$lists_id,'status'=>1])
                 ->orderBy('created_at','desc')
                 ->get()
                 ->toArray();
