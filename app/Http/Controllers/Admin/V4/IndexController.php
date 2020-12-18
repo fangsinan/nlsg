@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Models\Column;
 use App\Models\Lists;
 use App\Models\ListsWork;
@@ -13,7 +14,7 @@ use App\Models\Works;
 use App\Models\Wiki;
 use Illuminate\Http\Request;
 
-class IndexController extends Controller
+class IndexController extends ControllerBackend
 {
     /**
      * @api {get} api/admin_v4/index/works 精选课程

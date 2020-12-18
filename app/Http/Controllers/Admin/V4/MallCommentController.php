@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Servers\MallCommentServers;
 use Illuminate\Http\Request;
 
-class MallCommentController extends Controller
+class MallCommentController extends ControllerBackend
 {
     /**
      * 回复评论

@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Servers\ConfigServers;
 use Illuminate\Http\Request;
 
-class ConfigController extends Controller
+class ConfigController extends ControllerBackend
 {
 
     /**

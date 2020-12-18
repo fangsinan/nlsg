@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use Illuminate\Http\Request;
 use App\Servers\MallOrderServers;
 
@@ -17,7 +18,7 @@ use App\Servers\MallOrderServers;
  *
  * @author wangxh
  */
-class MallOrderController extends Controller
+class MallOrderController extends ControllerBackend
 {
 
     /**

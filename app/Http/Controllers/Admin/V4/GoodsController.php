@@ -4,12 +4,13 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Models\Live;
 use App\Servers\MallCommentServers;
 use Illuminate\Http\Request;
 use App\Servers\GoodsServers;
 
-class GoodsController extends Controller
+class GoodsController extends ControllerBackend
 {
     /**
      * 添加商品

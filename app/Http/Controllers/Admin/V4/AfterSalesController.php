@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use Illuminate\Http\Request;
 use App\Servers\AfterSalesServers;
 
@@ -17,7 +18,7 @@ use App\Servers\AfterSalesServers;
  *
  * @author wangxh
  */
-class AfterSalesController extends Controller
+class AfterSalesController extends ControllerBackend
 {
 
     /**

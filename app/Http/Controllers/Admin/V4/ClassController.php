@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Models\Column;
 use App\Models\WikiCategory;
 use App\Models\Works;
@@ -14,7 +15,7 @@ use App\Models\WorksInfoContent;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class ClassController extends Controller
+class ClassController extends ControllerBackend
 {
 
 

@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Servers\SpecialPriceServers;
 use Illuminate\Http\Request;
 
-class SpecialPriceController extends Controller
+class SpecialPriceController extends ControllerBackend
 {
 
     /**

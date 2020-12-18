@@ -4,10 +4,11 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use Illuminate\Http\Request;
 use App\Servers\ActiveServers;
 
-class ActiveController extends Controller
+class ActiveController extends ControllerBackend
 {
     /**
      * 活动列表和详情

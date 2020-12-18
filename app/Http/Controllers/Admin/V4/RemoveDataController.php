@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Servers\removeDataServers;
 
-class RemoveDataController extends Controller
+class RemoveDataController extends ControllerBackend
 {
     public function goods()
     {

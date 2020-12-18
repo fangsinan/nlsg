@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mews\Captcha\Captcha;
 
-class AuthController extends Controller
+class AuthController extends ControllerBackend
 {
 
     /**
