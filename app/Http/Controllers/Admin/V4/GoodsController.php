@@ -3,12 +3,9 @@
 
 namespace App\Http\Controllers\Admin\V4;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\ControllerBackend;
-use App\Models\Live;
-use App\Servers\MallCommentServers;
-use Illuminate\Http\Request;
 use App\Servers\GoodsServers;
+use Illuminate\Http\Request;
 
 class GoodsController extends ControllerBackend
 {

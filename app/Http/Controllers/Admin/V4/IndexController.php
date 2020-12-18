@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin\V4;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Column;
 use App\Models\Lists;
@@ -10,8 +9,8 @@ use App\Models\ListsWork;
 use App\Models\Live;
 use App\Models\MallGoods;
 use App\Models\Recommend;
-use App\Models\Works;
 use App\Models\Wiki;
+use App\Models\Works;
 use Illuminate\Http\Request;
 
 class IndexController extends ControllerBackend
