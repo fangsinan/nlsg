@@ -893,7 +893,7 @@ class UserController extends Controller
 
         $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
-        if($user_id == 0){
+        if ($user_id == 0) {
             return $this->success();
         }
 
@@ -905,7 +905,7 @@ class UserController extends Controller
         ])->paginate($this->page_per_page)->toArray();
         $relation_id = array_column($collection['data'], 'relation_id');
 
-        if(empty($relation_id)){
+        if (empty($relation_id)) {
             return $this->success();
         }
         $list = Collection::getCollection($type, $relation_id, $user_id);
@@ -956,34 +956,62 @@ class UserController extends Controller
      */
     public function statistics()
     {
-        $uid = $this->user['id'];
-        $lists = User::select('id', 'nickname', 'headimg', 'phone', 'level', 'is_author','expire_time', 'notify_num', 'follow_num', 'fan_num', 'history_num')
-            ->find($uid);
-        if ($lists) {
-            $lists->phone = substr_replace($lists->phone, '****', 3, 4);
-            $is_live = LiveUserPrivilege::where('user_id', $this->user['id'])
-                ->where('privilege', 2)
-                ->where('is_del', 0)
-                ->first();
-            $lists['is_live'] = $is_live ? 1 : 0;
-            $vip = VipUser::where('user_id', $uid)
-                ->where('status', 1)
-                ->where('is_default', 1)
-                ->first();
-            if ($vip) {
-                $lists['is_vip'] = $vip['level'] == 1 ? 1 : 2;
+        if (1) {
+            $res['id'] = $this->user['id'] ?? 0;
+            $res['nickname'] = $this->user['nickname'] ?? '';
+            $res['headimg'] = $this->user['headimg'] ?? '';
+            $res['phone'] = substr_replace($this->user['phone'], '****', 3, 4) ?? '';
+            $res['level'] = $this->user['true_level'] ?? 0;
+            $res['is_author'] = $this->user['is_author'] ?? 0;
+            $res['expire_time'] = $this->user['expire_time'] ?? '';
+            $res['notify_num'] = $this->user['notify_num'] ?? 0;
+            $res['follow_num'] = $this->user['follow_num'] ?? 0;
+            $res['fan_num'] = $this->user['fan_num'] ?? 0;
+            $res['history_num'] = $this->user['history_num'] ?? 0;
+            $res['is_vip'] = $this->user['new_vip']['level'] ?? 0;
+
+            if ($res['id']) {
+                $is_live = LiveUserPrivilege::where('user_id', $this->user['id'])
+                    ->where('privilege', 2)
+                    ->where('is_del', 0)
+                    ->first();
+                $res['is_live'] = $is_live ? 1 : 0;
             } else {
-                $lists['is_vip'] = 0;
+                $res['is_live'] = 0;
             }
-            if (!empty($lists['level']) && !empty($lists['expire_time']) && $lists['expire_time'] > date('Y-m-d H:i:s')) {
-                $lists['level'] = $lists['level'];
-            }else{
+            return success($res);
 
-                $lists['level'] = 0;
+        } else {
+            $uid = $this->user['id'];
+            $lists = User::select('id', 'nickname', 'headimg', 'phone', 'level', 'is_author',
+                'expire_time', 'notify_num', 'follow_num', 'fan_num', 'history_num')
+                ->find($uid);
+            if ($lists) {
+                $lists->phone = substr_replace($lists->phone, '****', 3, 4);
+                $is_live = LiveUserPrivilege::where('user_id', $this->user['id'])
+                    ->where('privilege', 2)
+                    ->where('is_del', 0)
+                    ->first();
+                $lists['is_live'] = $is_live ? 1 : 0;
+                $vip = VipUser::where('user_id', $uid)
+                    ->where('status', 1)
+                    ->where('is_default', 1)
+                    ->first();
+                if ($vip) {
+                    $lists['is_vip'] = $vip['level'] == 1 ? 1 : 2;
+                } else {
+                    $lists['is_vip'] = 0;
+                }
+                if (!empty($lists['level']) && !empty($lists['expire_time']) &&
+                    $lists['expire_time'] > date('Y-m-d H:i:s')) {
+                    $lists['level'] = $lists['level'];
+                } else {
+                    $lists['level'] = 0;
+                }
             }
+
+            return success($lists);
         }
-
-        return success($lists);
     }
 
 
