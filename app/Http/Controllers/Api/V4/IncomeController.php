@@ -906,7 +906,7 @@ class IncomeController extends Controller
             case 11:
                 $val['content'] = '360幸福大使收益';
                 $val['name']='360幸福大使';
-                $val['o_nick_name'] = $val['username']; //360会员显示手机号
+                $val['o_nick_name'] = $val['phone']; //360会员显示手机号
                 break;
         }
         return $res;
