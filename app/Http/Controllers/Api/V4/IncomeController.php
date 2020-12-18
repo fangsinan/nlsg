@@ -904,9 +904,15 @@ class IncomeController extends Controller
                 $res['name']='纱画亲子体验';
                 break;
             case 11:
-                $val['content'] = '360幸福大使收益';
-                $val['name']='360幸福大使';
-                $val['o_nick_name'] = $val['phone']; //360会员显示手机号
+                $res['content'] = '360幸福大使收益';
+                $res['name']='360幸福大使';
+                $res['o_nick_name']='';
+
+                $teacherInfo = Order::select('relation_id')->where(['ordernum'=>$ordernum])->first();
+                if($teacherInfo){
+                    $userInfo = User::find($teacherInfo['user_id']);
+                    $res['o_nick_name']=$userInfo['phone'];
+                }
                 break;
         }
         return $res;
