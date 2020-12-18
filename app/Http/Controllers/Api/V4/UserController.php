@@ -893,6 +893,10 @@ class UserController extends Controller
 
         $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
+        if($user_id == 0){
+            return $this->success();
+        }
+
         //1专栏  2课程  3商品  4书单 5百科 6听书
 
         $collection = Collection::where([
@@ -901,6 +905,9 @@ class UserController extends Controller
         ])->paginate($this->page_per_page)->toArray();
         $relation_id = array_column($collection['data'], 'relation_id');
 
+        if(empty($relation_id)){
+            return $this->success();
+        }
         $list = Collection::getCollection($type, $relation_id, $user_id);
         if ($list == false) {
             $list = [];
