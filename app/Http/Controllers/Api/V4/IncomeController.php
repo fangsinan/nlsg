@@ -903,6 +903,11 @@ class IncomeController extends Controller
                 $res['content'] = '推广菩提沙画收益';
                 $res['name']='纱画亲子体验';
                 break;
+            case 11:
+                $val['content'] = '360幸福大使收益';
+                $val['name']='360幸福大使';
+                $val['o_nick_name'] = $val['phone']; //360会员显示手机号
+                break;
         }
         return $res;
     }
