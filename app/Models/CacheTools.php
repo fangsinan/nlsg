@@ -30,7 +30,7 @@ class CacheTools
         } else {
             $sort_expire = 60;
             $normal_expire = 120;
-            $long_expire = 180;
+            $long_expire = 3600;
         }
 
         switch (strtolower($flag)) {
@@ -39,6 +39,7 @@ class CacheTools
             case 'get_list':
             case 'mall_banner_list':
             case 'home_group_list':
+            case 'order_token':
                 $expire = $normal_expire;
                 break;
             case 'mall_comment_list':
@@ -53,7 +54,6 @@ class CacheTools
             case 'area_list':
             case 'freight_template_list':
             case 'freight_template':
-            case 'order_token':
                 $expire = $long_expire;
                 break;
             default :

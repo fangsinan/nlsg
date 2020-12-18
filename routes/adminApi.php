@@ -109,7 +109,12 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('freight/shop_list', 'FreightController@shopList');
         Route::post('freight/add_shop', 'FreightController@addShop');
         Route::get('freight/add', 'FreightController@add');
+
+        //配置管理
+        Route::get('config/mall_keywords', 'ConfigController@mallKeywords');
+        Route::post('config/edit_mall_keywords', 'ConfigController@editMallKeywords');
     });
+
 
 
     //定时任务
