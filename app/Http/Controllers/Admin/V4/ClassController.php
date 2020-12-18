@@ -677,6 +677,7 @@ class ClassController extends ControllerBackend
      * @apiDescription 创建精品课
      *
      * @apiParam {string} title 标题
+     * @apiParam {string} subtitle 副标题
      * @apiParam {string} user_id 作者
      * @apiParam {string} category_id    分类id
      * @apiParam {string} original_price 定价
@@ -716,10 +717,12 @@ class ClassController extends ControllerBackend
         $content = $input['content'] ?? '';
         $is_pay = $input['is_pay'] ?? 0;
         $type   = $input['type'] ?? 1;
+        $subtitle   = $input['subtitle'] ?? '';
 
 
         $data = [
             'title' => $title,
+            'subtitle' => $subtitle,
             'cover_img' => $cover_img,
             'detail_img' => $detail_img,
             'user_id' => $user_id,
