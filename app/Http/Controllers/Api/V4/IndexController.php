@@ -936,7 +936,7 @@ class IndexController extends Controller
             'info_id' => 0,
             'type' => 2,
             'url'  => '',
-            'img'  => 'https://image.nlsgapp.com/nlsg/works/20201117155957451173.png'
+            'img'  => 'https://image.nlsgapp.com/nlsg/authorpt/20201218152107911623.png'
         ];
         return  success($data);
     }
