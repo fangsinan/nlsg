@@ -763,8 +763,8 @@ class IncomeController extends Controller
         //现在只显示 提现和个税  用户分享收益     2：用户专栏分享提成  5电商推客收益  6专栏推客收益 7精品课 8会员 9沙画  12
         if($earn_type == 1){
             //earn_type==1时    type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现]
-            $order_type_val = [7,8,9,12,18];//默认全部查询
-            if( !empty($type) &&  in_array($type,[7,8,9,12,18]) ){
+            $order_type_val = [7,8,9,12];//默认全部查询
+            if( !empty($type) &&  in_array($type,[7,8,9,12]) ){
                 $order_type_val = [$type];
             }
 
@@ -843,7 +843,7 @@ class IncomeController extends Controller
 
         //计算总支出和总收入
         $res['expenditure_price']   = PayRecord::where(['user_id'=>$user_id,'status'=>2])->whereIn('order_type',[7,8,9,12])->sum('price');
-        $res['income_price']        = PayRecordDetail::where('user_id',$user_id)->whereIn('type',[2,5,6,7,8,9,10])->sum('price');
+        $res['income_price']        = PayRecordDetail::where('user_id',$user_id)->whereIn('type',[2,5,6,7,8,9,10,11])->sum('price');
         $res['list'] = $list['data'];
         return $this->success( $res );
     }
