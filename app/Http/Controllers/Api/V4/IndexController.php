@@ -974,9 +974,9 @@ class IndexController extends Controller
                 'Vip_Switch'                => 0,//提现开关   0关闭  1开启
             ],
             'default' => [
-                'money_switch'              => 0,//app赚钱开关   0关闭  1开启
-                'ExchangeCodeHtml_Switch'   => 0, //兑换码页面开关   0关闭  1开启
-                'Vip_Switch'                => 0,//提现开关   0关闭  1开启
+                'money_switch'              => 1,//app赚钱开关   0关闭  1开启
+                'ExchangeCodeHtml_Switch'   => 1, //兑换码页面开关   0关闭  1开启
+                'Vip_Switch'                => 1,//提现开关   0关闭  1开启
             ],
 
         ];
