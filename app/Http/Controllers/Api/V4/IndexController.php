@@ -966,7 +966,7 @@ class IndexController extends Controller
     {
 
         $version = $request->input('version', '');//1 获取是否有提交信息  2修改
-        $switchAll => [
+        $switchAll = [
             //精确版本
             '4.0.1' => [
                 'money_switch'              => 0,//app赚钱开关   0关闭  1开启
