@@ -962,18 +962,38 @@ class IndexController extends Controller
 
 
     //api/v4/index/config
-    public function config()
+    public function config(Request $request)
     {
+
+        $version = $request->input('version', '');//1 获取是否有提交信息  2修改
+        $switchAll => [
+            //精确版本
+            '4.0.1' => [
+                'money_switch'              => 0,//app赚钱开关   0关闭  1开启
+                'ExchangeCodeHtml_Switch'   => 0, //兑换码页面开关   0关闭  1开启
+                'Vip_Switch'                => 0,//提现开关   0关闭  1开启
+            ],
+            'default' => [
+                'money_switch'              => 0,//app赚钱开关   0关闭  1开启
+                'ExchangeCodeHtml_Switch'   => 0, //兑换码页面开关   0关闭  1开启
+                'Vip_Switch'                => 0,//提现开关   0关闭  1开启
+            ],
+
+        ];
+
+        
+        $res_switchAll = $switchAll[$version] ?? $switchAll['default'];
         //分享H5域名
         //图片域名
         $data = [
             'h5_url' => ConfigModel::getData(45),
             'img_url' => ConfigModel::getData(44),
+            'switch_all' => $res_switchAll,
         ];
-
         return success($data);
 
     }
+
 
 
 }
