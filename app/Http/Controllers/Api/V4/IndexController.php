@@ -922,7 +922,7 @@ class IndexController extends Controller
      */
     public  function  event()
     {
-        $list = Banner::select('id','title','pic', 'url', 'jump_type', 'obj_id')
+        $list = Banner::select('id','title','pic','h5_url', 'url', 'jump_type', 'obj_id')
                 ->where('type', 54)
                 ->first();
         return success($list);
