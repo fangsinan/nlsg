@@ -66,14 +66,18 @@ class Column extends Base
      * @param $ids
      * @return bool
      */
-    public function getIndexColumn($ids)
+    public function getIndexColumn($ids,$is_free=false)
     {
         if (!$ids){
             return false;
         }
+        $where = ['status'=>self::STATUS_ONE];
+        if($is_free !== false ){
+            $where['is_free'] = $is_free;
+        }
         $lists= $this->select('id','name', 'column_type', 'title','subtitle', 'message','price', 'cover_pic','info_num as chapter_num','is_free')
             ->whereIn('id', $ids)
-            ->where('status',self::STATUS_ONE)
+            ->where($where)
             ->orderBy('created_at', 'desc')
             ->take(2)
             ->get()

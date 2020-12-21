@@ -26,7 +26,7 @@ class Works extends Base
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0)
+    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0,$is_free = false)
     {
         if (!$ids) {
             return false;
@@ -40,6 +40,9 @@ class Works extends Base
         //2时   不考虑是否听书
         if ($is_audio_book !== 2) {
             $WorksObj->where('is_audio_book', $is_audio_book);
+        }
+        if($is_free !== false ){
+            $WorksObj->where('is_free', $is_free);
         }
 
         $lists = $WorksObj

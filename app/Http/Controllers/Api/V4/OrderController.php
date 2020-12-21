@@ -750,15 +750,15 @@ class OrderController extends Controller
             switch ($val['type']) {
                 case 1:
                     $model = new Column();
-                    $result = $model->getIndexColumn([$val['relation_id']]);
+                    $result = $model->getIndexColumn([$val['relation_id']],0);
                     break;
                 case 2:
                     $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book, $user_id);
+                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book, $user_id,0);
                     break;
                 case 6:
                     $model = new Column();
-                    $result = $model->getIndexColumn([$val['relation_id']]);
+                    $result = $model->getIndexColumn([$val['relation_id']],0);
                     break;
             }
             if ($result == false) {
