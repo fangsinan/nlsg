@@ -297,4 +297,41 @@ class Works extends Base
         ];
     }
 
+    /**
+     * 作品、书单数据统计
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function  statistic()
+    {
+        $works = Works::orderBy('created_at','desc')
+                ->get()
+                ->toArray();
+        if ($works){
+            foreach ($works as $v) {
+                $num = WorksInfo::where('status', 4)
+                    ->where('pid', $v['id'])
+                    ->count();
+                Works::where('id', $v['id'])->update([
+                    'chapter_num' => $num
+                ]);
+            }
+        }
+
+        $lists = Lists::orderBy('created_at','desc')
+                ->get()
+                ->toArray();
+        if ($lists){
+            foreach ($lists as $v) {
+                $num = ListsWork::where('lists_id', $v['id'])
+                        ->where('state', 1)
+                        ->count();
+                Lists::where('id', $v['id'])->update([
+                    'num' => $num
+                ]);
+            }
+        }
+
+        return success('成功');
+    }
+
 }

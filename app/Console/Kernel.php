@@ -7,6 +7,7 @@ use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
+use App\Models\Works;
 use App\Servers\ChannelServers;
 use App\Servers\MallRefundJob;
 use Illuminate\Console\Scheduling\Schedule;
@@ -56,6 +57,8 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             MallOrder::receipt();//自动收货
             Coupon::clear();//失效优惠券清理
+            Works::statistic(); //数据统计
+
         })->dailyAt('03:00');//半夜清理
 
 

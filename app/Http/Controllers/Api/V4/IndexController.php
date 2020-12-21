@@ -956,8 +956,7 @@ class IndexController extends Controller
 
     public function   test()
     {
-        $a = config('env.JWT_SECRET');
-        echo $a;
+        Works::statistic(); //数据统计
     }
 
 
