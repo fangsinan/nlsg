@@ -1040,6 +1040,8 @@ class OrderController extends Controller
             'user_id' => $user_id,
             'relation_id' => $level,
             'price' => $price,
+            'cost_price' => $price,
+
             'ip' => $request->getClientIp(),
             'os_type' => $os_type,
             'live_id' => $live_id,
@@ -1098,6 +1100,7 @@ class OrderController extends Controller
             'type' => 14,
             'user_id' => $user_id,
             'relation_id' => $product_id,
+            'cost_price' => $price,
             'price' => $price,
             'ip' => $request->getClientIp(),
             'os_type' => $os_type,
