@@ -449,13 +449,23 @@ class IndexController extends ControllerBackend
     {
         $input = $request->all();
         if ( ! empty($input['id'])) {
+            $list = ListsWork::where('id', $input['id'])->first();
             ListsWork::where('id', $input['id'])->update([
                 'works_id' => $input['works_id'],
                 'sort'     => $input['sort'] ?? 99,
                 'state'    => $input['state'] ?? 2,
                 'type'     => $input['type'] ?? 0
             ]);
+            if ($input['state'] ==2){
+                Lists::where('id', $list->lists_id)->decrement('num');
+            }
         } else {
+            $res = ListsWork::where('lists_id', $input['lists_id'])
+                    ->where('works_id', $input['works_id'])
+                    ->first();
+            if($res){
+                return error(1000,'不能添加重复数据');
+            }
             ListsWork::create([
                 'lists_id' => $input['lists_id'],
                 'works_id' => $input['works_id'],
@@ -464,6 +474,7 @@ class IndexController extends ControllerBackend
                 'type'     => $input['type'] ?? 0
 
             ]);
+            Lists::where('id', $input['lists_id'])->increment('num');
         }
         return success();
 
