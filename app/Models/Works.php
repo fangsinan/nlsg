@@ -74,6 +74,7 @@ class Works extends Base
             ->leftJoin($userObj->getTable() . ' as user', 'works.user_id', '=', 'user.id')
             ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle', 'user.nickname')
             ->where('works.status', 4)
+            ->where('works.type', 2)
             ->where('works.is_audio_book', $is_audio_book)
             ->where('info.status', 4)
             ->where(function ($query) use ($keywords) {
