@@ -595,7 +595,8 @@ class ColumnController extends Controller
 
         //查询章节、
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($lecture_id,$is_sub,$user_id,3,$order,50,$page,$size);
+        $info = $infoObj->getInfo($lecture_id,$is_sub,$user_id,3,$order,50,$page,$size,$column_data['is_free']);
+
 
 //        if ($flag === 'catalog'){
 //            $res = [

@@ -741,7 +741,7 @@ class OrderController extends Controller
     {
         $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
-        $is_audio_book = $request->input('is_audio_book', 0);
+        $is_audio_book = $request->input('is_audio_book', 2);
         $data = Subscribe::where(['type' => $type, 'user_id' => $user_id,])->paginate($this->page_per_page)->toArray();
         $data = $data['data'];
 

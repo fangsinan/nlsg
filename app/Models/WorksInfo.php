@@ -21,7 +21,7 @@ class WorksInfo extends Base
     }
 
     // $type  1 单课程  2 多课程  3讲座
-    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0)
+    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$is_free = 0)
     {
         $where = ['status' => 4];
         if ($type == 1) {
@@ -48,7 +48,7 @@ class WorksInfo extends Base
         foreach ($works_data as $key => $val) {
             //处理url  关注或试听
             $works_data[$key]['href_url'] = '';
-            if ($is_sub == 1 || $val['free_trial'] == 1) {
+            if ($is_sub == 1 || $val['free_trial'] == 1 || $is_free == 1) {
                 $works_data[$key]['href_url'] = $works_data[$key]['url'];
 
             } else {
