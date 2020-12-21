@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Column;
+use App\Models\Lists;
 use App\Models\Wiki;
 use App\Models\WikiCategory;
 use App\Models\Works;
@@ -632,6 +633,8 @@ class ClassController extends ControllerBackend
         $status = $input['status'] ?? 2;
         $online_type = $input['online_type'] ?? 1;
 
+
+
         $data = [
             'cover_pic' => $cover_pic,
             'details_pic' => $details_pic,
@@ -647,22 +650,11 @@ class ClassController extends ControllerBackend
         if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
         } else {
-            $res = Column::create($data);
-            if ($res) {
-                $work = [
-                    'column_id' => $res->id,
-                    'title' => $name,
-                    'subtitle' => $subtitle,
-                    'cover_img' => $cover_pic,
-                    'detail_img' => $details_pic,
-                    'user_id' => $user_id,
-                    'message' => $message,
-                    'price' => $price,
-                    'original_price' => $original_price,
-                    'type' => 1
-                ];
-                Works::create($work);
+            $lecture = Column::where('name', $name)->first();
+            if ($lecture){
+               return error(1000,'不能添加重复数据');
             }
+            Column::create($data);
         }
 
         return success();
@@ -742,6 +734,10 @@ class ClassController extends ControllerBackend
                 ->delete();
             $id = $input['id'];
         } else {
+            $res = Works::where('title', $title)->first();
+            if ($res){
+                return error(1000, '不能添加重复数据');
+            }
             $work = Works::create($data);
             $id = $work ? $work->id : 0;
         }
@@ -868,6 +864,14 @@ class ClassController extends ControllerBackend
 
         if (!empty($input['id'])) {
             WorksInfo::where('id', $input['id'])->update($data);
+
+            //作品章节数量
+            if ($input['status'] !=4){
+                Works::where('id', $work_id)->decrement('chapter_num');
+            } else {
+                Works::where('id', $work_id)->increment('chapter_num');
+            }
+
             $list = WorksInfoContent::where('works_info_id', $input['id'])->first();
             if ($list) {
                 WorksInfoContent::where('works_info_id', $input['id'])
@@ -879,8 +883,16 @@ class ClassController extends ControllerBackend
                 ]);
             }
         } else {
+            $info = WorksInfo::where('title', $input['title'])->first();
+            if ($info){
+                return error(1000,'不能添加重复数据');
+            }
+
             $res = WorksInfo::create($data);
             if ($res) {
+                if ($input['status'] ==4){
+                    Works::where('id', $work_id)->increment('chapter_num');
+                }
 
                 WorksInfoContent::create([
                     'works_info_id' => $res->id,
@@ -1208,6 +1220,9 @@ class ClassController extends ControllerBackend
         $id = $request->get('id');
         $res = WorksInfo::where('id', $id)->update(['status' => 0]);
         if ($res) {
+            $info = WorksInfo::where('id', $id)->first();
+            //减少章节总量
+            Works::where('id', $info->pid)->decrement('chapter_num');
             return success();
         }
     }
