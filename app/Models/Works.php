@@ -36,7 +36,7 @@ class Works extends Base
                 $query->select('id', 'nickname', 'headimg');
             }])
             ->whereIn('id', $ids)
-            ->where('type', 2) //课程只有音频
+            ->whereIn('type', [2,3]) //课程只有音频
             ->where('status', 4);
         //2时   不考虑是否听书
         if ($is_audio_book !== 2) {
