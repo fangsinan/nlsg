@@ -52,6 +52,7 @@ class OrderController extends ControllerBackend
         $level = $request->get('level');
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
+        $sort    = $request->get('sort');
         $query = Order::with(
             [
                 'user:id,nickname',
@@ -96,10 +97,11 @@ class OrderController extends ControllerBackend
                 ]);
             });
 
+        $direction = $sort =='asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
             'created_at', 'status')
             ->where('type', 9)
-            ->orderBy('id', 'desc')
+            ->orderBy('id', $direction)
             ->paginate(10)
             ->toArray();
 
