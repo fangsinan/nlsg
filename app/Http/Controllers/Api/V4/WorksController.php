@@ -220,14 +220,9 @@ class WorksController extends Controller
                 $order_str = 'collection_num';
                 break;
             default:
-                $order_str = 'created_at';
+                $order_str = 'updated_at';
         }
-
-        $sort = 'asc';
-        if($id = 556){
-            $order_str = 'created_at';
-            $sort = 'desc';
-        }
+        $sort = 'desc';
 
         $where = [];
         $newWorks = [];
@@ -433,6 +428,13 @@ class WorksController extends Controller
         $size = $request->input('size',10);
         $user_id   = $this->user['id'] ?? 0;
         $order   = $request->input('order','asc');
+
+        $order = 'asc'; //默认正序
+        if($id = 556){
+            $order = 'desc';
+        }
+
+
         if( empty($works_id) ){
             return $this->error(0,'works_id 不能为空');
         }
