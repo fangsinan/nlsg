@@ -173,7 +173,7 @@ class Works extends Base
         $lecture = Column::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_pic', 'details_pic')
+            ->select('id', 'user_id', 'is_free', 'name','title', 'subtitle', 'cover_pic', 'details_pic')
             ->where('is_free', 1)
             ->where('type', 2)
             ->where('status', 1)
