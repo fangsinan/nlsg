@@ -21,10 +21,12 @@ class Order extends Base
 
     protected $table = 'nlsg_order';
 
-    protected $fillable = [ 'id','live_num','pay_type','share_code','activity_tag','kun_said','refund_no','is_live_order_send',
+    protected $fillable = [
+        'id', 'live_num', 'pay_type', 'share_code', 'activity_tag', 'kun_said', 'refund_no', 'is_live_order_send',
         'ordernum', 'status', 'type', 'user_id', 'relation_id', 'cost_price', 'price', 'twitter_id', 'coupon_id', 'ip',
-        'os_type', 'live_id', 'reward_type','reward','service_id','reward_num','pay_time','start_time','end_time','pay_price','city','vip_order_type',
-        'send_type','send_user_id','remark','tweeter_code',
+        'os_type', 'live_id', 'reward_type', 'reward', 'service_id', 'reward_num', 'pay_time', 'start_time', 'end_time',
+        'pay_price', 'city', 'vip_order_type',
+        'send_type', 'send_user_id', 'remark', 'tweeter_code',
 
 
     ];
@@ -33,6 +35,11 @@ class Order extends Base
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function works()
+    {
+        return $this->belongsTo(Works::class, 'relation_id', 'id');
     }
 
     //下单check
@@ -66,7 +73,8 @@ class Order extends Base
 
     }
 
-    static function getInfo($type,$relation_id,$send_type,$user_id=0){
+    static function getInfo($type, $relation_id, $send_type, $user_id = 0)
+    {
         $result = false;
         switch ($type) {
             case 1:
@@ -75,28 +83,32 @@ class Order extends Base
                 break;
             case 9:
                 $model = new Works();
-                $result = $model->getIndexWorks([$relation_id], 2,$user_id);
+                $result = $model->getIndexWorks([$relation_id], 2, $user_id);
                 break;
             case 10:
-                $result = Live::where(['id'=>$relation_id])->get()->toArray();
+                $result = Live::where(['id' => $relation_id])->get()->toArray();
                 break;
             case 14:
-                $result = OfflineProducts::where(['id'=>$relation_id])->get()->toArray();
+                $result = OfflineProducts::where(['id' => $relation_id])->get()->toArray();
                 break;
             case 15:
                 $model = new Column();
                 $result = $model->getIndexColumn([$relation_id]);
                 break;
             case 16:
-                $result[] = ['id'=>1,'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/poster_img/1581599882211_.pic.jpg','price'=>360.00];
+                $result[] = ['id'  => 1, 'type' => 6, 'text' => '幸福360会员',
+                             'img' => '/nlsg/poster_img/1581599882211_.pic.jpg', 'price' => 360.00
+                ];
                 break;
             case 17:
-                if($send_type == 1 || $send_type == 6){
+                if ($send_type == 1 || $send_type == 6) {
                     $model = new Column();
                     $result = $model->getIndexColumn([$relation_id]);
-                }else if($send_type == 2){
-                    $model = new Works();
-                    $result = $model->getIndexWorks([$relation_id], 2,$user_id);
+                } else {
+                    if ($send_type == 2) {
+                        $model = new Works();
+                        $result = $model->getIndexWorks([$relation_id], 2, $user_id);
+                    }
                 }
                 break;
         }
@@ -106,10 +118,10 @@ class Order extends Base
     /**
      * 订单超时30分钟取消
      */
-    public  static function  clear()
+    public static function clear()
     {
         $past = Carbon::parse('-30 minutes')->toDateTimeString();
-        $res  = Order::where('status', 0)
+        $res = Order::where('status', 0)
             ->where('created_at', '<', $past)
             ->update([
                 'status' => 2
@@ -118,23 +130,24 @@ class Order extends Base
     }
 
     //todo 推送到创业天下
-    public static function pushToCytx(){
+    public static function pushToCytx()
+    {
         $list = DB::table('nlsg_order as o')
-            ->join('nlsg_pay_record as pr','o.ordernum','=','pr.ordernum')
-            ->join('nlsg_works as w','o.relation_id','=','w.id')
-            ->join('nlsg_user as u','o.user_id','=','u.id')
-            ->where('o.activity_tag','=','cytx')
-            ->where('o.status','=',1)
-            ->where('o.type','=',9)
-            ->where('cytx_job','<>',-1)
+            ->join('nlsg_pay_record as pr', 'o.ordernum', '=', 'pr.ordernum')
+            ->join('nlsg_works as w', 'o.relation_id', '=', 'w.id')
+            ->join('nlsg_user as u', 'o.user_id', '=', 'u.id')
+            ->where('o.activity_tag', '=', 'cytx')
+            ->where('o.status', '=', 1)
+            ->where('o.type', '=', 9)
+            ->where('cytx_job', '<>', -1)
             ->whereRaw(DB::raw(
                 'cytx_job =0 or (UNIX_TIMESTAMP(cytx_check_time)+cytx_job*600 <= UNIX_TIMESTAMP())'
             ))
-            ->where('pr.price','>',1)
-            ->where('u.is_staff','=',0)
-            ->where('o.is_shill','=',0)
-            ->where('cytx_job','<',11)
-            ->select(['o.id as order_id','o.ordernum','u.phone','u.nickname','pr.price','o.cytx_job','w.title'])
+            ->where('pr.price', '>', 1)
+            ->where('u.is_staff', '=', 0)
+            ->where('o.is_shill', '=', 0)
+            ->where('cytx_job', '<', 11)
+            ->select(['o.id as order_id', 'o.ordernum', 'u.phone', 'u.nickname', 'pr.price', 'o.cytx_job', 'w.title'])
             ->limit(50)
             ->get();
 
