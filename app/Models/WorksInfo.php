@@ -248,13 +248,34 @@ class WorksInfo extends Base
             $is_show_url = false;
         }
         $works_info->is_collection = 0;
-        $collection = Collection::select()->where([
+
+        $collection_type = $type;
+        if($type == 6){
+            $collection_type = 7; //type 与收藏表类型有出入
+        }
+
+
+
+        //  收藏按总id走
+        $collectionObj = Collection::select()->where([
             'user_id' => $user['id'],
-            'info_id' => $works_info_id,
-        ])->get();
+            //'info_id' => $works_info_id,
+            'relation_id' => $works_id,
+        ]);
+        if($type == 1 || $type == 6){
+            $collection = $collectionObj->whereIn('type',[1,7])->get();
+        }else if($type == 2){
+            $collection = $collectionObj->whereIn('type',[2,6])->get();
+        }else{
+            $collection = [];
+        }
         if($collection){
             $works_info->is_collection = 1;
         }
+
+
+
+
 
         $list['previous'] = $this->three2one($info_list[$info_key - 1], $is_show_url);
         $list['current'] = $this->three2one($info_list[$info_key], $is_show_url);

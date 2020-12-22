@@ -601,7 +601,7 @@ class WorksController extends Controller
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
-        //学习记录条数会只按relation_id算
+        //学习记录条数会只按relation_id算   不根据章节走
         if(empty($check_his) && $his->wasRecentlyCreated){
             // 学习记录数增一
             User::where(['id'=>$user_id])->increment('history_num');

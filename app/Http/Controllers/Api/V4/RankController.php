@@ -116,6 +116,7 @@ class RankController extends Controller
             ->toArray();
         $works = Works::with('user:id,nickname,headimg')
             ->whereIn('id', $works_id)
+            ->whereIn('type', [2,3])
             ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num', 'subscribe_num', 'is_free',
                 'price')
             ->orderByRaw('FIELD(id,'.implode(',', $works_id).')')
