@@ -114,8 +114,11 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //配置管理
         Route::get('config/mall_keywords', 'ConfigController@mallKeywords');
         Route::post('config/edit_mall_keywords', 'ConfigController@editMallKeywords');
-    });
 
+
+    });
+    //虚拟订单
+    Route::get('order/list', 'OrderController@list');
 
 
     //定时任务
