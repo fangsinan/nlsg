@@ -138,9 +138,9 @@ class UserController extends Controller
                     $query->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'subscribe_num', 'original_price'])
                         ->where('is_audio_book', 1);
                 },
-                'columns' => function ($query) {
-                    $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'original_price', 'subscribe_num', 'cover_pic');
-                },
+//                'columns' => function ($query) {
+//                    $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'original_price', 'subscribe_num', 'cover_pic');
+//                },
 
             ])
             ->find($id);
@@ -151,11 +151,12 @@ class UserController extends Controller
             if ($user['history']) {
                 foreach ($user['history'] as &$v) {
                     if ($v['relation_type'] == 1) {
-                        $v['columns'] = Column::select('id', 'title', 'cover_pic')
-                            ->where('id', $v['relation_id'])
-                            ->where('status', 1)
-                            ->where('type', 1)
-                            ->first();
+                        $v['columns'] = [];//不显示专栏
+//                        Column::select('id', 'title', 'cover_pic')
+//                            ->where('id', $v['relation_id'])
+//                            ->where('status', 1)
+//                            ->where('type', 1)
+//                            ->first();
                     } elseif ($v['relation_type'] == 2) {
                         $v['lecture'] = Column::select('id', 'title', 'cover_pic')
                             ->where('id', $v['relation_id'])

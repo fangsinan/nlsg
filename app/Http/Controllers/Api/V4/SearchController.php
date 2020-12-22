@@ -425,7 +425,7 @@ class SearchController extends Controller
             $res['goods'] = MallGoods::search($keywords);
         }else{
             //搜索专栏
-            $res['column'] = Column::search($keywords,1);
+            $res['column'] = ['res' => [], 'count'=> 0 ];//Column::search($keywords,1);
             //课程
             $res['works'] = Works::search($keywords,0);
             //讲座
