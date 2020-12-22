@@ -814,7 +814,7 @@ class OrderController extends Controller
 
         $lists = Order::with('user:id,nickname,headimg')
             ->select('id', 'user_id', 'reward_num', 'price')
-            ->where(['type' => 5, 'reward_type' => $type, 'status' => 1])
+            ->where(['type' => 5, 'reward_type' => $type, 'status' => 1,'relation_id' => $id])
             ->groupBy('user_id')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
