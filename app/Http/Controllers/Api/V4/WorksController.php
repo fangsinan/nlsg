@@ -427,12 +427,15 @@ class WorksController extends Controller
         $page = $request->input('page',1);
         $size = $request->input('size',10);
         $user_id   = $this->user['id'] ?? 0;
-        $order   = $request->input('order','asc');
-//
-//        $order = 'asc'; //默认正序
-//        if($works_id == 566){
-//            $order = 'desc';
-//        }
+        $order   = $request->input('order','');
+
+        if($order == ''){  //默认
+            $order = 'asc';
+            if($works_id == 566){
+                $order = 'desc';
+            }
+        }
+
 
 
         if( empty($works_id) ){
