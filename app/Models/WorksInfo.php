@@ -159,12 +159,12 @@ class WorksInfo extends Base
         if($type == 6){
             $query = self::where(['column_id' => $column_id,'type'=>1])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section', 'type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
+                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
             $works_id = $column_id;  // 讲座直接关联info表
         }else{
             $query = self::where('pid', '=', $works_id)
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section', 'type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
+                    'introduce', 'section', 'size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
         }
 
 
