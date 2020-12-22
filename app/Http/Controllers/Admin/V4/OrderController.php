@@ -6,6 +6,7 @@ use App\Http\Controllers\ControllerBackend;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends ControllerBackend
 {
@@ -52,7 +53,7 @@ class OrderController extends ControllerBackend
         $level = $request->get('level');
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
-        $sort    = $request->get('sort');
+        $sort = $request->get('sort');
         $query = Order::with(
             [
                 'user:id,nickname',
@@ -97,7 +98,7 @@ class OrderController extends ControllerBackend
                 ]);
             });
 
-        $direction = $sort =='asc' ? 'asc' : 'desc';
+        $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
             'created_at', 'status')
             ->where('type', 9)
@@ -106,6 +107,36 @@ class OrderController extends ControllerBackend
             ->toArray();
 
         return success($lists);
+
+    }
+
+    public function getOrderStatistic(Request $request)
+    {
+        $type = $request->get('type') ?? 1;
+        $list = Order::select([
+                DB::raw('sum(pay_price) as price'),
+                DB::raw('count(id) as total')
+            ])
+            ->where('status', 1)
+            ->where('type', $type)
+            ->groupBy('type')
+            ->first();
+        $today = Order::select([
+                DB::raw('sum(pay_price) as price'),
+                DB::raw('count(id) as total')
+            ])
+            ->where('status', 1)
+            ->where('type', $type)
+            ->where('created_at', '>=', Carbon::today())
+            ->groupBy('type')
+            ->first();
+        $data = [
+            'total_num'   => $list['price'] ?? 0,
+            'total_price' => $list['total'] ?? 0,
+            'today_num'   => $today['total'] ?? 0,
+            'totday_price'=> $today['price'] ?? 0
+        ];
+        return success($data);
 
     }
 }
