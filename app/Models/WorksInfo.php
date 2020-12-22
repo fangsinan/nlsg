@@ -135,12 +135,9 @@ class WorksInfo extends Base
         $now_date = date('Y-m-d H:i:s');
         $works_id = $params['works_id'] ?? 0;
         $works_info_id = $params['works_info_id'] ?? 0;
-        //$ob = $params['ob'] ?? 'desc';
+        $ob = $params['ob'] ?? 'asc';
 
-        $ob = 'asc'; //默认正序
-        if($works_id == 556){
-            $ob = 'desc';
-        }
+
         //1 专栏  2作品 3直播  4会员 5线下产品  6讲座
         $type = $params['type'] ?? 0;
         if($type == 1 || $type == 6){
