@@ -516,7 +516,7 @@ class ColumnController extends Controller
      *
      * @apiParam {int} lecture_id  讲座id
      * @apiParam {int} user_id 用户id  默认0
-     * @apiParam {int} order asc和 desc  默认desc
+     * @apiParam {int} order asc和 desc  默认asc
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -577,7 +577,7 @@ class ColumnController extends Controller
         $flag = $request->input('flag','');
         $page = $request->input('page',1);
         $size = $request->input('size',10);
-        $order = $order ?? 'desc';
+        $order = $order ?? 'asc';
 
         $user_id   = $this->user['id'] ?? 0;
         if(empty($lecture_id)){

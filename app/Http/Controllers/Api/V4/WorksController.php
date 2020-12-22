@@ -430,7 +430,7 @@ class WorksController extends Controller
         $order   = $request->input('order','asc');
 
         $order = 'asc'; //默认正序
-        if($id = 556){
+        if($works_id == 556){
             $order = 'desc';
         }
 
