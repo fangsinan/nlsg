@@ -144,6 +144,7 @@ class UserController extends Controller
 
             ])
             ->find($id);
+        $user->columns = []; //不显示专栏
         if ($user) {
             $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $id])->first();
             $user['is_self'] = $id == $this->user['id'] ? 1 : 0;
