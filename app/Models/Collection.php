@@ -17,7 +17,7 @@ class Collection extends Base
         if( !in_array($type,[1,2,3,4,5,6,7]) ){
             return 0;
         }
-        $where = ['type' => $type, 'user_id' => $user_id,'relation_id'=>$target_id, 'info_id'=>$info_id];
+        $where = ['type' => $type, 'user_id' => $user_id,'relation_id'=>$target_id, ];
         $data = Collection::where($where)->first();
         if($data){
             //直接物理删除
@@ -44,7 +44,7 @@ class Collection extends Base
                 Wiki::where(['id' => $target_id])->increment('collection_num');
             }
 
-
+            $where['info_id'] = $info_id;
             return Collection::create($where);
         }
     }
