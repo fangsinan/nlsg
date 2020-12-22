@@ -167,7 +167,7 @@ class IndexController extends ControllerBackend
     public function getListWorks(Request $request)
     {
         $list_id = $request->get('list_id');
-        $lists = ListsWork::select('id', 'lists_id', 'works_id', 'state', 'sort','type')
+        $lists = ListsWork::select('id', 'lists_id', 'works_id', 'state', 'sort', 'type')
             ->where('lists_id', $list_id)
             ->orderBy('sort', 'desc')
             ->orderBy('created_at', 'desc')
@@ -456,15 +456,15 @@ class IndexController extends ControllerBackend
                 'state'    => $input['state'] ?? 2,
                 'type'     => $input['type'] ?? 0
             ]);
-            if ($input['state'] ==2){
+            if ($input['state'] == 2) {
                 Lists::where('id', $list->lists_id)->decrement('num');
             }
         } else {
             $res = ListsWork::where('lists_id', $input['lists_id'])
-                    ->where('works_id', $input['works_id'])
-                    ->first();
-            if($res){
-                return error(1000,'不能添加重复数据');
+                ->where('works_id', $input['works_id'])
+                ->first();
+            if ($res) {
+                return error(1000, '不能添加重复数据');
             }
             ListsWork::create([
                 'lists_id' => $input['lists_id'],
@@ -789,6 +789,34 @@ class IndexController extends ControllerBackend
         $lists = Column::select('id', 'name')
             ->where('type', 2)
             ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return success($lists);
+    }
+
+    /**
+     * @api {post} api/admin_v4/index/get-rank-works 选择榜单作品
+     * @apiVersion 4.0.0
+     * @apiName  get-rank-works
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/get-rank-works
+     * @apiDescription 选择作品
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getRankWorks()
+    {
+        $lists = Works::where('status', 4)
+            ->where('type', 2)
+            ->select('id', 'title')
             ->orderBy('created_at', 'desc')
             ->get();
         return success($lists);
