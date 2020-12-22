@@ -117,6 +117,7 @@ class RankController extends Controller
             ->whereIn('id', $works_id)
             ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num', 'subscribe_num', 'is_free',
                 'price')
+            ->orderByRaw('FIELD(id,'.implode(',', $works_id).')')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -200,6 +201,7 @@ class RankController extends Controller
             ->pluck('works_id');
         $wikis = Wiki::whereIn('id', $works_id)
             ->select('id', 'name', 'content', 'intro', 'view_num', 'like_num', 'comment_num', 'cover')
+            ->orderByRaw('FIELD(id,'.implode(',', $works_id).')')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -225,6 +227,7 @@ class RankController extends Controller
         if ($works_id) {
             $goods = MallGoods::whereIn('id', $works_id)
                 ->select('id', 'name', 'price', 'subtitle', 'picture')
+                ->orderByRaw('FIELD(id,'.implode(',', $works_id).')')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10)
                 ->toArray();
