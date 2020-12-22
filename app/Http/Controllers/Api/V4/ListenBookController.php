@@ -173,12 +173,12 @@ class ListenBookController extends Controller
      */
     public function getBookList(Request $request){
 
-        $list = Lists::select(['id', 'title', 'subtitle', 'cover' ])
+        $list = Lists::select(['id', 'title', 'subtitle', 'cover','num as lists_count' ])
             ->where(['status'=>1,'type'=>3])->paginate($this->page_per_page)->toArray();
 
-        foreach ($list['data'] as $key => &$val){
-            $val['lists_count'] = ListsWork::where(['lists_id'=>$val['id']])->count();
-        }
+//        foreach ($list['data'] as $key => &$val){
+//            $val['lists_count'] = ListsWork::where(['lists_id'=>$val['id']])->count();
+//        }
         return $this->success($list);
     }
 

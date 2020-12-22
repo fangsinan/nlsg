@@ -153,21 +153,25 @@ class UserController extends Controller
                     if ($v['relation_type'] == 1) {
                         $v['columns'] = Column::select('id', 'title', 'cover_pic')
                             ->where('id', $v['relation_id'])
+                            ->where('status', 1)
                             ->where('type', 1)
                             ->first();
                     } elseif ($v['relation_type'] == 2) {
                         $v['lecture'] = Column::select('id', 'title', 'cover_pic')
                             ->where('id', $v['relation_id'])
+                            ->where('status', 1)
                             ->where('type', 2)
                             ->first();
                     } elseif ($v['relation_type'] == 3) {
                         $v['listen'] = Works::select('id', 'title', 'cover_img', 'is_audio_book')
                             ->where('id', $v['relation_id'])
+                            ->where('status', 2)
                             ->where('is_audio_book', 1)
                             ->first();
                     } elseif ($v['relation_type'] == 4) {
                         $v['works'] = Works::select('id', 'title', 'cover_img', 'is_audio_book')
                             ->where('id', $v['relation_id'])
+                            ->where('status', 4)
                             ->first();
                     }
                 }
