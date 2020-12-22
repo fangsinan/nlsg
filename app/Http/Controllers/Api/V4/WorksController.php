@@ -220,7 +220,13 @@ class WorksController extends Controller
                 $order_str = 'collection_num';
                 break;
             default:
-                $order_str = 'updated_at';
+                $order_str = 'created_at';
+        }
+
+        $sort = 'asc';
+        if($id = 556){
+            $order_str = 'created_at';
+            $sort = 'desc';
         }
 
         $where = [];
@@ -272,9 +278,9 @@ class WorksController extends Controller
         if(!empty($cate_id_arr)){
             $worksDb->whereIn('relation.category_id',$cate_id_arr);
         }
-//            ->select('works.*')
+
            $worksData = $worksDb->where($where)
-            ->orderBy('works.'.$order_str,'desc')
+            ->orderBy('works.'.$order_str,$sort)
             ->groupBy('works.id')->paginate($this->page_per_page)->toArray();
 
 
