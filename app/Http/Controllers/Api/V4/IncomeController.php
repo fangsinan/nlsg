@@ -1022,7 +1022,7 @@ class IncomeController extends Controller
             $info['order_type'] = $pay_info['order_type'];
             $info['ctime'] = date('Y-m-d H:i',$pay_info['ctime']);
             $info['price'] = $pay_info['price'];
-            $con = $this->detail_content($type,$pay_info['type']);
+            $con = $this->detail_content($type,$pay_info['order_type']);
             $info['content'] = $con['content'] ??'';
             $info['pay_content'] = $con['pay_content']??'';
 
@@ -1039,7 +1039,7 @@ class IncomeController extends Controller
             $info['o_nick_name'] = $con['o_nick_name'] ?? '';
         }
         $UserInfo = User::find($user_id);
-        $info['nick_name']=$UserInfo['nick_name'];
+        $info['nickname']=$UserInfo['nickname'];
 
         return $this->success($info);
     }
