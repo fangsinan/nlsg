@@ -139,7 +139,9 @@ class GetPriceTools extends Base
                     foreach ($temp_sp_data as $spdv) {
                         if ($slv->sku_number == $spdv->sku_number) {
                             $temp_sku_list_s->sp_type = $spdv->type;
-                            $temp_sku_list_s->original_price = $spdv->sku_original_price;
+                            if (intval($spdv->sku_original_price) !== 0){
+                                $temp_sku_list_s->original_price = $spdv->sku_original_price;
+                            }
                             switch (intval($user_level)) {
                                 case 2:
                                 case 3:

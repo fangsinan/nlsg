@@ -221,7 +221,7 @@ class MallController extends Controller
         if ($request->input('aa', 0) == 1) {
             //MallOrder::receipt();
             //MallOrderGroupBuy::clear();
-            MallOrderFlashSale::clear();
+            //MallOrderFlashSale::clear();
             return true;
         } else {
             $params = $request->input();
@@ -742,7 +742,7 @@ class MallController extends Controller
     public function flashSaleList()
     {
         $model = new SpecialPriceModel();
-        $data = $model->getSecList(2,$this->user['id']??0);
+        $data = $model->getSecList(2);
         return $this->success($data);
     }
 
