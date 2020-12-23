@@ -476,6 +476,7 @@ class MallGoods extends Base
         $data['group_num'] = $check_id[0]['group_num'];
 
         $stock = 0;
+
         foreach ($data['sku_list'] as $k => $v) {
             if (!in_array($v->sku_number, $sku_number_list)) {
                 unset($data['sku_list'][$k]);
@@ -490,6 +491,14 @@ class MallGoods extends Base
                 }
             }
         }
+
+        $temp_sku_list = [];
+        foreach ( $data['sku_list'] as $v){
+            $temp_sku_list[]  = $v;
+        }
+        unset($data['sku_list']);
+        $data['sku_list'] = $temp_sku_list;
+
         $data['normal_price'] = MallGoods::where('id', '=', $data['id'])->sum('price');
         //$data['stock'] = $this->getGoodsAllStock($data['id']);
         $data['stock'] = $stock;
