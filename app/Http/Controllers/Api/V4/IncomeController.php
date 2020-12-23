@@ -707,8 +707,8 @@ class IncomeController extends Controller
      *
      * @apiParam {int} user_id
      * @apiParam {int} earn_type 1支出 2收入
-     * @apiParam {int} type 收支类型 earn_type=1时type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现  18能量币充值]
-     *                             earn_type=2时 type 2：用户专栏分享提成 5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画 10直播分享收益
+     * @apiParam {int} type 收支类型 earn_type=1时type[type类型  1电商支付    2内容支付   3 会员       4 所有提现]
+     *                             earn_type=2时 type [type类型  1 电商收益   2内容收益   3会员收益  4直播收益]
      * @apiParam {int} date 格式化的时间精确到月
      *
      * @apiSuccess {string} result json
