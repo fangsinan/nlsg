@@ -140,12 +140,12 @@ class MallCommentServers
 
         $add_data = [];
         foreach ($list as $key => $v) {
-            if (empty($v['comment'])) {
+            if (empty($v['content'])) {
                 continue;
             }
             $temp_data = [];
             $temp_data['user_id'] = $robot[$key] ?? 0;
-            $temp_data['content'] = $v['comment'] ?? '';
+            $temp_data['content'] = $v['content'] ?? '';
             $temp_data['picture'] = $v['picture'] ?? '';
             $temp_data['goods_id'] = $goods_id;
             $temp_data['sku_number'] = $sku_number;
