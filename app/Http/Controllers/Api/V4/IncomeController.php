@@ -762,10 +762,26 @@ class IncomeController extends Controller
         //获取 1 支出 和 2收入
         //现在只显示 提现和个税  用户分享收益     2：用户专栏分享提成  5电商推客收益  6专栏推客收益 7精品课 8会员 9沙画  12
         if($earn_type == 1){
-            //earn_type==1时    type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现]
-            $order_type_val = [7,8,9,12,18];//默认全部查询
+            //earn_type==1时    type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现  18能量币充值 19讲座 20赠送  21线下门票]
+
+            $order_type_val = [7,8,9,10,12,18];//默认全部查询
             if( !empty($type) &&  in_array($type,[7,8,9,12,18]) ){
-                $order_type_val = [$type];
+                // 改需求后的 type类型  1电商支付   2内容支付   3 会员  4 所有提现
+                switch ($type){
+                    case 1:
+                        $order_type_val = [10];
+                        break;
+                    case 2:
+                        $order_type_val = [1,11,19,20,21];
+                        break;
+                    case 3:
+                        $order_type_val = [2];
+                        break;
+                    case 4:
+                        $order_type_val = [7,8,9];
+                        break;
+
+                }
             }
 
             $query = PayRecord::select('id','ordernum','created_at','order_type as type','user_id','price','status'
@@ -779,7 +795,22 @@ class IncomeController extends Controller
             //earn_type==2时 type[ 2：用户专栏分享提成 5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画 10直播分享收益]
             $order_type_val = [2,5,6,7,8,9,10,11];//默认全部查询
             if( !empty($type) &&  in_array($type,[2,5,6,7,8,9,10,11]) ){
-                $order_type_val = [$type];
+                // 改需求后的 type类型  1 电商收益   2内容收益 3会员收益  4直播收益
+                switch ($type){
+                    case 1:
+                        $order_type_val = [5];
+                        break;
+                    case 2:
+                        $order_type_val = [6,7,];
+                        break;
+                    case 3:
+                        $order_type_val = [8,11];
+                        break;
+                    case 4:
+                        $order_type_val = [10];
+                        break;
+
+                }
             }
             $query = PayRecordDetail::select(
                 'id','ordernum','created_at','type','user_id','price', 'order_detail_id','subsidy_type'
@@ -804,7 +835,7 @@ class IncomeController extends Controller
         foreach($list['data'] as $key=>&$val){
             //记录前面图片 7支付宝提现 8 微信提现
             //记录状态 earn_type 1支出 2收入
-            //  type 1 专栏 2 会员  3充值  4财务打款 5 打赏  6分享赚钱订单 7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现
+            //  type 1 专栏 2 会员  3充值  4财务打款 5 打赏  6分享赚钱订单 7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现 18能量币充值 19讲座 20赠送  21线下门票]
             if($val['earn_type']==1 && in_array($val['type'],[7,8])){  //提现
                 if($val['status']==2){
                     $val['pay_content'] = '提现成功';
@@ -819,15 +850,28 @@ class IncomeController extends Controller
             //记录名称   支出
             if($val['earn_type']==1){
                 switch($val['type']){
-                    case 7:$val['content'] = '收益提现';
+                    case 1:$val['content'] = '专栏支付';
                         break;
-                    case 8:$val['content'] = '收益提现';
+                    case 2:$val['content'] = '会员支付';
+                        break;
+                    case 7:$val['content'] = '支付宝收益提现';
+                        break;
+                    case 8:$val['content'] = '微信收益提现';
                         break;
                     case 9:$val['content'] = '代扣个税';
                         $val['pay_content'] = '扣税成功';
                         break;
+                    case 11:$val['content'] = '精品课支付';
+                        break;
+                    case 12:$val['content'] = '机构提现';
+                        break;
                     case 18:$val['content'] = '能量币充值';
-                        $val['pay_content'] = '充值成功';
+                        break;
+                    case 19:$val['content'] = '讲座支付';
+                        break;
+                    case 20:$val['content'] = '赠送购买';
+                        break;
+                    case 21:$val['content'] = '线下门票购买';
                         break;
                 }
             }else{
@@ -904,6 +948,10 @@ class IncomeController extends Controller
                 $res['content'] = '推广菩提沙画收益';
                 $res['name']='纱画亲子体验';
                 break;
+            case 10:
+                $res['content'] = '直播分享收益';
+                $res['name']='直播分享';
+                break;
             case 11:
                 $res['content'] = '360幸福大使收益';
                 $res['name']='360幸福大使';
@@ -915,6 +963,7 @@ class IncomeController extends Controller
                     $res['o_nick_name']=$userInfo['phone'];
                 }
                 break;
+
         }
         return $res;
     }
