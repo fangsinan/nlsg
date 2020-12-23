@@ -781,11 +781,8 @@ class OrderController extends Controller
 
                 }
                 //学至最新章节
-                $history_data = History::getHistoryData($result[0]['id'], $hist_type, $user_id);
-                $result[0]['info_title'] = '';
-                if ((array)($history_data)) {
-                    $result[0]['info_title'] = $history_data['title'] ?? '';
-                }
+                $result[0]['historyData'] = History::getHistoryData($result[0]['id'], $hist_type, $user_id);
+
 
 
                 if ($val['type'] == 2) {
