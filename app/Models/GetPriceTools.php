@@ -277,6 +277,11 @@ class GetPriceTools extends Base
 
         $res = trim($res,'0');
         $res = trim($res,'.');
+
+        if (empty($res)){
+            $res = 0;
+        }
+
         return $res;
     }
 
