@@ -149,8 +149,8 @@ class WikiController extends Controller
         if ( ! $res) {
             return error(1000, '百科不存在');
         }
-        
-        Wiki::where('id', $id)->increment('view_num');
+
+
 
         if ($uid){
             $list    = Collection::where(['type' => 5, 'user_id' => $uid,'relation_id'=>$id])->first();
@@ -159,6 +159,18 @@ class WikiController extends Controller
             $res->is_collection =  0;
         }
         return success($res);
+    }
+
+    public function  updateWikiView(Request $request)
+    {
+        $id = $request->get('id');
+        $wiki = Wiki::where('id', $id)->first();
+        if (!$wiki){
+            return error(1000, '百科不存在');
+        }
+        Wiki::where('id', $id)->increment('view_num');
+
+        return success();
     }
 
     /**
@@ -204,6 +216,6 @@ class WikiController extends Controller
         return success($lists);
     }
 
-   
+
 
 }
