@@ -1010,7 +1010,7 @@ class IncomeController extends Controller
 
 
         if ($type == 1) { //支出
-            $pay_info = PayRecord::where(['id'=>$id,'user_id'=>$user_id])->first();
+            $pay_info = PayRecord::where(['id'=>$id,'user_id'=>$user_id])->first()->toArray();
             if(empty($pay_info)) return $this->success();
 
             if($pay_info['order_type']==9){ //个税
