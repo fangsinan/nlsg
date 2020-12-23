@@ -383,7 +383,7 @@ class WorksController extends Controller
         }
 
         //精品名师
-        $Teacher = Works::select('user_id')->with([
+        $Teacher = Works::select(DB::raw('max(subscribe_num) subscribe_num'),'user_id')->with([
             'userName'=>function($query){
                 $query->select('id','nickname');
             }])->where('status',4)
