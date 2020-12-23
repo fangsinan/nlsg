@@ -143,8 +143,8 @@ class UserController extends Controller
 //                },
 
             ])
-            ->find($id);
-        $user->columns = []; //不显示专栏
+            ->find($id)->toArray();
+        $user['columns'] = []; //不显示专栏
 
         if ($user) {
             $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $id])->first();
@@ -159,7 +159,7 @@ class UserController extends Controller
 //                            ->where('id', $v['relation_id'])
 //                            ->where('status', 1)
 //                            ->where('type', 1)
-//                            ->first();
+
                     } elseif ($v['relation_type'] == 2) {
                         $v['lecture'] = Column::select('id', 'title', 'cover_pic')
                             ->where('id', $v['relation_id'])
@@ -178,12 +178,13 @@ class UserController extends Controller
                             ->where('status', 4)
                             ->first();
                     }
-                    if(empty($v['columns']) && $v['lecture'] && $v['listen']&& $v['works']){
+                    if(empty($v['columns']) && empty($v['lecture']) && empty( $v['listen']) && empty($v['works'])){
                         unset($user['history'][$k]);
 
                     }
 
                 }
+
                 $user['history'] = array_values($user['history']);
             }
 
