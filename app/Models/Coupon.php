@@ -59,7 +59,7 @@ class Coupon extends Base
 
         $coupon_rule_list = CouponRule::whereIn('id', $flag)
             ->where('status', '=', 1)
-            ->whereIN('use_type', [3, 4])
+            ->whereIN('use_type', [3, 4, 5])
             ->where('buffet', '=', 1)
             ->where('get_begin_time', '<=', $now)
             ->where('get_end_time', '>=', $now)
@@ -337,6 +337,9 @@ class Coupon extends Base
         }
 
         $created_at = User::where('id', $user_id)->value('created_at');
+        if (empty($created_at)) {
+            $created_at = date('Y-m-d H:i:s');
+        }
         $res = Coupon::create([
             'name' => $rule->name,
             'number' => self::createCouponNum($rule->buffet, $cid),
@@ -345,7 +348,7 @@ class Coupon extends Base
             'full_cut' => $rule->full_cut,
             'explain' => $rule->remarks,
             'begin_time' => date('Y-m-d H:i:s', strtotime($created_at)),
-            'end_time' => date('Y-m-d H:i:s', strtotime('+1 month', strtotime($created_at))),
+            'end_time' => date('Y-m-d 23:59:59', strtotime('+1 month', strtotime($created_at))),
             'get_way' => 1,
             'user_id' => $user_id,
             'cr_id' => $cid
