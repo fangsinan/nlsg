@@ -223,4 +223,127 @@ class OrderController extends ControllerBackend
             ->first();
         return success($list);
     }
+
+    /**
+     * @api {get} api/admin_v4/order/user 会员订单
+     * @apiVersion 4.0.0
+     * @apiName  order
+     * @apiGroup 后台-虚拟订单
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/user
+     * @apiDescription 会员订单
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} title 名称
+     * @apiParam {number} status   0 待支付  1已支付
+     * @apiParam {string} nickname 昵称
+     * @apiParam {string} phone    账号
+     * @apiParam {string} ordernum 订单号
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
+     * @apiParam {string} os_type  订单来源
+     * @apiParam {string} pay_type  支付方式
+     * @apiParam {string} vip_order_type  1开通 2续费 3升级
+     * @apiParam {string} user        用户
+     * @apiParam {string} user.level  1 早期366老会员 2 推客 3黑钻 4皇钻 5代理
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function user(Request $request)
+    {
+        $phone = $request->get('phone');
+        $nickname = $request->get('nickname');
+        $ordernum = $request->get('ordernum');
+        $title = $request->get('title');
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $status = $request->get('status');
+        $pay_type = $request->get('pay_type');
+        $os_type = $request->get('os_type');
+        $sort = $request->get('sort');
+        $query = Order::with(
+            [
+                'user:id,nickname,level',
+                'works:id,title'
+            ])
+            ->when(! is_null($status), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when(! is_null($pay_type), function ($query) use ($pay_type) {
+                $query->where('pay_type', $pay_type);
+            })
+            ->when(! is_null($os_type), function ($query) use ($os_type) {
+                $query->where('os_type', $os_type);
+            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                });
+            })
+            ->when($phone, function ($query) use ($phone) {
+                $query->whereHas('user', function ($query) use ($phone) {
+                    $query->where('phone', 'like', '%'.$phone.'%');
+                });
+            })
+            ->when($title, function ($query) use ($title) {
+                $query->whereHas('works', function ($query) use ($title) {
+                    $query->where('title', 'like', '%'.$title.'%');
+                });
+            })
+            ->when($ordernum, function ($query) use ($ordernum) {
+                $query->where('ordernum', 'like', '%'.$ordernum.'%');
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                ]);
+            });
+
+        $direction = $sort == 'asc' ? 'asc' : 'desc';
+        $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
+            'vip_order_type',
+            'created_at', 'status')
+            ->where('type', 9)
+            ->orderBy('id', $direction)
+            ->paginate(10)
+            ->toArray();
+
+        $item = [
+            'yellow'       => 0,
+            'yellow_today' => 0,
+            'black'        => 0,
+            'black_today'  => 0,
+            'money'        => 0,
+            'money_today'  => 0,
+        ];
+        $orders = Order::getOrderPrice(16);
+        if ($orders['relation_id'] == 1) {
+            $item['yellow'] = $orders['total'];
+        } elseif ($v['relation_id'] == 2) {
+            $item['black'] = $orders['total'];
+        }
+        $item['money'] = $orders['price'];
+
+        $today = Order::getOrderPrice(16, true);
+        if ($today['relation_id'] == 1) {
+            $item['yellow_today'] = $today['total'];
+        } elseif ($today['relation_id'] == 2) {
+            $item['black_today'] = $today['total'];
+        }
+        $item['money_today'] = $today['price'];
+        $data = [
+            'lists' => $lists,
+            'rank'  => $item
+        ];
+        return success($data);
+    }
 }

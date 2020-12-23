@@ -96,8 +96,9 @@ class Order extends Base
                 $result = $model->getIndexColumn([$relation_id]);
                 break;
             case 16:
-                $result[] = ['id'  => 1, 'type' => 6, 'text' => '幸福360会员',
-                             'img' => '/nlsg/poster_img/1581599882211_.pic.jpg', 'price' => 360.00
+                $result[] = [
+                    'id'  => 1, 'type' => 6, 'text' => '幸福360会员',
+                    'img' => '/nlsg/poster_img/1581599882211_.pic.jpg', 'price' => 360.00
                 ];
                 break;
             case 17:
@@ -153,6 +154,28 @@ class Order extends Base
 
         dd($list);
 
+    }
+
+    public static function getOrderPrice($type=16, $today=false)
+    {
+        $query = Order::query();
+        if ($type){
+            $query->where('type', $type);
+        }
+        if ($today){
+            $query->where('created_at', '>=', Carbon::today());
+        }
+        $list = $query->select([
+                    DB::raw('count(*) as total'),
+                    DB::raw('sum(pay_price) as price'),
+                    'user_id',
+                    'relation_id'
+                ])
+                ->where('status', 1)
+                ->orderBy('total', 'desc')
+                ->groupBy('relation_id')
+                ->first();
+        return $list;
     }
 
 }
