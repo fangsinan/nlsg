@@ -145,6 +145,7 @@ class UserController extends Controller
             ])
             ->find($id);
         $user->columns = []; //不显示专栏
+
         if ($user) {
             $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $id])->first();
             $user['is_self'] = $id == $this->user['id'] ? 1 : 0;
@@ -176,9 +177,12 @@ class UserController extends Controller
                             ->where('id', $v['relation_id'])
                             ->where('status', 4)
                             ->first();
-                    }else{
-                        unset($user['history'][$k]);
                     }
+                    if(empty($v['columns']) && $v['lecture'] && $v['listen']&& $v['works']){
+                        unset($user['history'][$k]);
+
+                    }
+
                 }
                 $user['history'] = array_values($user['history']);
             }
