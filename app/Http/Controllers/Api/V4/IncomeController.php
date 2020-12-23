@@ -854,7 +854,7 @@ class IncomeController extends Controller
                 $val['pay_content'] = $con['pay_content'] ??'';
             }else{
                 //2：用户专栏分享提成    5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画
-                $con = $this->detail_content($val['type'],$val['ordernum'],$val['order_detail_id']);
+                $con = $this->detail_content($val['earn_type'],$val['type'],$val['ordernum'],$val['order_detail_id']);
                 $val['content'] = $con['content'] ??'';
                 $val['name'] = $con['name'] ??'';
                 $val['o_nick_name'] = $con['o_nick_name'] ??'';
