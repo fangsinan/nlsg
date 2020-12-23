@@ -121,6 +121,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('order/list', 'OrderController@list');
     Route::get('order/statistic', 'OrderController@getOrderStatistic');
     Route::get('order/detail', 'OrderController@getOrderDetail');
+    Route::get('order/user', 'OrderController@user');
 
 
     //定时任务
