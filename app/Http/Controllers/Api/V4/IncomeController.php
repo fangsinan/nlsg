@@ -1020,8 +1020,8 @@ class IncomeController extends Controller
             }
             $info['tx_status'] = $pay_info['status'];
             $info['order_type'] = $pay_info['order_type'];
-            $info['ctime'] = date('Y-m-d H:i',$pay_info['ctime']);
             $info['price'] = $pay_info['price'];
+            $info['created_at'] = $pay_info['created_at'];
             $con = $this->detail_content($type,$pay_info['order_type']);
             $info['content'] = $con['content'] ??'';
             $info['pay_content'] = $con['pay_content']??'';
