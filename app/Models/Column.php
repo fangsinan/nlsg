@@ -51,12 +51,13 @@ class Column extends Base
             //$column['user_count'] = Subscribe::where(['relation_id'=> $column_id, 'type' => 6, 'is_del' => 0,])->count();
             //是否购买
             $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,6);
+            $collection = Collection::where(['type'=>7,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
         }else{
             //是否购买
             $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
+            $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
         }
         //是否收藏
-        $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
         $column['is_collection'] = $collection ? 1 : 0;
         return $column;
     }

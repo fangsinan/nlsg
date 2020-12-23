@@ -587,8 +587,8 @@ class AuthController extends Controller
             'default' => [
                 'money_switch'              => '1',//app赚钱开关   0关闭  1开启
                 'Vip_Switch'                => '1',//提现开关   0关闭  1开启
-                'vipCode'                   => '0',
-                'worksCode'                 => '0',
+                'vipCode'                   => '1',
+                'worksCode'                 => '1',
             ],
 
         ];

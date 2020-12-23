@@ -764,18 +764,41 @@ class OrderController extends Controller
             if ($result == false) {
                 unset($data[$key]);
             } else {
+                switch ($val['type']){
+                    case 1:
+                        $hist_type = 1;
+                        break;
+                    case 2:
+                        if($result[0]['is_audio_book'] == 0){
+                            $hist_type = 4; // 课程
+                        }else{
+                            $hist_type = 3;
+                        }
+                        break;
+                    case 6:
+                        $hist_type = 2;
+                        break;
+
+                }
+                //学至最新章节
+                $result[0]['historyData'] = History::getHistoryData($result[0]['id'], $hist_type, $user_id);
+
+
+
                 if ($val['type'] == 2) {
                     //专栏头衔
                     $column = Column::find($result[0]['column_id']);
                     $result[0]['column_title'] = $column['title'];
-                    //学至最新章节
-                    $history_data = History::getHistoryData($result[0]['id'], 2, $user_id);
-                    $result[0]['info_introduce'] = '';
-                    if ((array)($history_data)) {
-                        $result[0]['info_introduce'] = $history_data['introduce'] ?? '';
-                    }
+//                    //学至最新章节
+//                    $history_data = History::getHistoryData($result[0]['id'], 2, $user_id);
+//                    $result[0]['info_introduce'] = '';
+//                    if ((array)($history_data)) {
+//                        $result[0]['info_introduce'] = $history_data['introduce'] ?? '';
+//                    }
                 }
                 $data[$key]['relation_data'] = $result;
+
+
             }
         }
         $data = array_values($data);

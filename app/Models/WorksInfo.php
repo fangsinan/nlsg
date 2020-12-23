@@ -150,9 +150,9 @@ class WorksInfo extends Base
             if (empty($column_id)) {
                 return ['code' => false, 'msg' => 'id不存在'];
             }
-            $column_data = Works::select('id')->where(['column_id'=>$column_id])->first();
-            $works_id = $column_data['id'];
-            $sub_relation_id = $column_id;
+//            $column_data = Works::select('id')->where(['column_id'=>$column_id])->first();
+//            $works_id = $column_data['id'];
+
 
         }else{
             if (empty($works_id) || empty($works_info_id)) {
@@ -225,7 +225,7 @@ class WorksInfo extends Base
                         ->where('s.is_del', '=', 0);
                 })
                 ->where('w.id', '=', $column_id)
-                ->select(['w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img','w.comment_num',
+                ->select(['w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img','w.comment_num','w.collection_num',
                     DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
 
@@ -241,7 +241,7 @@ class WorksInfo extends Base
                         ->where('s.is_del', '=', 0);
                 })
                 ->where('w.id', '=', $works_id)
-                ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num',
+                ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num','w.collection_num',
                     DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
         }
