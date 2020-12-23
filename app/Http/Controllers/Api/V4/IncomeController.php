@@ -849,7 +849,7 @@ class IncomeController extends Controller
             }
             //记录名称   支出
             if($val['earn_type']==1){
-                $con = $this->detail_content($val['earn_type'],$val['type'],$val['ordernum'],$val['order_detail_id']);
+                $con = $this->detail_content($val['earn_type'],$val['type']);
                 $val['content'] = $con['content'] ??'';
                 $val['pay_content'] = $con['pay_content'] ??'';
             }else{
@@ -870,7 +870,7 @@ class IncomeController extends Controller
     }
 
     //根据收益类型返回对应文案
-    public function detail_content($earn_type,$type,$ordernum,$order_detail_id){
+    public function detail_content($earn_type,$type,$ordernum=0,$order_detail_id=0){
         $res = [];
         if($earn_type ==1){
             switch($type){
@@ -1022,7 +1022,7 @@ class IncomeController extends Controller
             $info['order_type'] = $pay_info['order_type'];
             $info['ctime'] = date('Y-m-d H:i',$pay_info['ctime']);
             $info['price'] = $pay_info['price'];
-            $con = $this->detail_content($type,$pay_info['type'],$pay_info['ordernum'],$pay_info['order_detail_id']);
+            $con = $this->detail_content($type,$pay_info['type']);
             $info['content'] = $con['content'] ??'';
             $info['pay_content'] = $con['pay_content']??'';
 
