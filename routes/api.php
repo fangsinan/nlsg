@@ -141,6 +141,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('wiki/category', 'WikiController@category');
     Route::get('wiki/show', 'WikiController@show');
     Route::get('wiki/related', 'WikiController@related');
+    Route::post('wiki/update-views', 'WikiController@updateWikiView');
 
 
     //排行榜

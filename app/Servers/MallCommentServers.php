@@ -100,6 +100,7 @@ class MallCommentServers
         }
 
         $query->with(['sku', 'sku.sku_value_list']);
+        $query->orderBy('c.id','desc');
 
         $query->select([
             'c.id as comment_id', 'c.content', 'c.picture', 'c.star', 'g.name as goods_name',
@@ -140,12 +141,12 @@ class MallCommentServers
 
         $add_data = [];
         foreach ($list as $key => $v) {
-            if (empty($v['comment'])) {
+            if (empty($v['content'])) {
                 continue;
             }
             $temp_data = [];
             $temp_data['user_id'] = $robot[$key] ?? 0;
-            $temp_data['content'] = $v['comment'] ?? '';
+            $temp_data['content'] = $v['content'] ?? '';
             $temp_data['picture'] = $v['picture'] ?? '';
             $temp_data['goods_id'] = $goods_id;
             $temp_data['sku_number'] = $sku_number;
