@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\ColumnOutline;
 use App\Models\GetPriceTools;
 use App\Models\History;
+use App\Models\OfflineProducts;
 use App\Models\Recommend;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -415,6 +416,11 @@ class ColumnController extends Controller
             return $this->success();
         }
         $recommendLists = [];
+        if($target_id == 593){
+            $offline_data = OfflineProducts::find(1);
+            $offline_data['recommend_type'] = 100; // 单一课程推荐
+            $recommendLists[] = $offline_data;
+        }
         $recommendModel = new Recommend();
         foreach ($list as $key=>$val){
             $recommend = $recommendModel->getIndexRecommend($val['type'], $position);

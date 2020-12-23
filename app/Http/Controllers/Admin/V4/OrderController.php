@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Order;
+use App\Models\Works;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,12 +12,12 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends ControllerBackend
 {
     /**
-     * @api {get} api/admin_v4/order/list 虚拟订单列表
+     * @api {get} api/admin_v4/order/list 精品课订单
      * @apiVersion 4.0.0
      * @apiName  order
      * @apiGroup 后台-虚拟订单
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/list
-     * @apiDescription 虚拟订单列表
+     * @apiDescription 精品课订单
      *
      * @apiParam {number} page 分页
      * @apiParam {string} title 名称
@@ -106,10 +107,50 @@ class OrderController extends ControllerBackend
             ->paginate(10)
             ->toArray();
 
-        return success($lists);
+        $rank = Order::with('works:id,title,cover_img')
+                ->select([
+                    DB::raw('count(*) as total'),
+                    'user_id',
+                    'relation_id'
+                ])
+                ->where('type',9)
+                ->where('status', 1)
+                ->orderBy('total','desc')
+                ->groupBy('relation_id')
+                ->get();
+        $data = [
+            'lists' => $lists,
+            'rank'  => $rank
+        ];
+        return success($data);
 
     }
 
+    /**
+     * @api {get} api/admin_v4/order/statistic 订单统计
+     * @apiVersion 4.0.0
+     * @apiName  order/statistic
+     * @apiGroup 后台-虚拟订单
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/statistic
+     * @apiDescription  订单统计
+     *
+     * @apiParam   {number}  type 类型 1 专栏 2 会员  3充值  4财务打款 5 打赏 6分享赚钱 7支付宝提现 8微信提现  9精品课  10直播回放 12直播预约   13能量币  14 线下产品(门票类)  16新vip
+     *
+     * @apiSuccess {string}  total_num     总订单数
+     * @apiSuccess {string}  total_price   总订单金额
+     * @apiSuccess {string}  today_num     今日订单数
+     * @apiSuccess {string}  totday_price  今日订单金额
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
     public function getOrderStatistic(Request $request)
     {
         $type = $request->get('type') ?? 1;
