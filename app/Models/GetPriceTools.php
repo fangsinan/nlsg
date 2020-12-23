@@ -274,6 +274,9 @@ class GetPriceTools extends Base
                 $res = bcmod($n1, $n2, $scale);
                 break;
         }
+
+        $res = trim($res,'0');
+        $res = trim($res,'.');
         return $res;
     }
 
