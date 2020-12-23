@@ -742,7 +742,7 @@ class MallController extends Controller
     public function flashSaleList()
     {
         $model = new SpecialPriceModel();
-        $data = $model->getSecList(2);
+        $data = $model->getSecList(2,$this->user['id']??0);
         return $this->success($data);
     }
 

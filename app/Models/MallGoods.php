@@ -79,6 +79,24 @@ class MallGoods extends Base
             $user['is_staff'] ?? 0
         );
 
+//        foreach ($list as $v) {
+//            $temp_sku_list = $v->sku_list;
+//            $cnt = count($temp_sku_list);
+//
+//            for ($i = 0; $i < $cnt - 1; $i++) {
+//                for ($j = 0; $j < $cnt - $i - 1; $j++) {
+//                    if ($temp_sku_list[$j]['sp_type'] == 2) {
+//                        $temp = $temp_sku_list[$j];
+//                        $temp_sku_list[$i] = $temp;
+//                        $temp_sku_list[$j - 1] = $temp;
+//                    }
+//                }
+//            }
+//
+//            return $temp_sku_list;
+//            $v->sku_list = $temp_sku_list;
+//        }
+
         return $list;
     }
 
@@ -106,7 +124,7 @@ class MallGoods extends Base
         $cache_name = implode('_', $cache_name_arr);
         $expire_num = CacheTools::getExpire('get_list');
         $list = Cache::tags($cache_key_name)->get($cache_name);
-        if (empty($list)) {
+        if (true || empty($list)) {
             $list = $this->getListDataFromDb($params);
             if ($cache) {
                 Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
@@ -206,8 +224,7 @@ class MallGoods extends Base
             $query->limit($params['size'])->offset(($params['page'] - 1) * $params['size']);
         }
 
-        $select_field = ['id', 'name', 'subtitle', 'picture',
-            'original_price', 'price', 'category_id'];
+        $select_field = ['id', 'name', 'subtitle', 'picture', 'original_price', 'price', 'category_id', 'sales_num'];
         if (($params['invalid'] ?? 0) == 1) {
             $select_field[] = 'status';
         }

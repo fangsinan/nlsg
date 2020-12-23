@@ -207,13 +207,13 @@ class SpecialPriceModel extends Base
 
     }
 
-    public function getSecList($flag = 1)
+    public function getSecList($flag = 1,$user_id = 0)
     {
         $cache_key_name = 'set_kill_list';
         $expire_num = CacheTools::getExpire('set_kill_list');
 
         $sec_date_list = Cache::get($cache_key_name);
-        if (empty($sec_date_list)) {
+        if (true || empty($sec_date_list)) {
 
             $sec_date_list = $this->getSecDateList();
 
@@ -303,12 +303,7 @@ class SpecialPriceModel extends Base
         $now = date('Y-m-d H:i:00');
         $res = [];
         foreach ($list as $k => $v) {
-            if ($k >= $now) {
-                //$temp['time'] = $k;
-                //$temp['list'] = $v;
-                //$res = $temp;
-                //$res[] = $v;
-                //break;
+            if ($k <= $now) {
                 $res = array_merge($res, $v);
             }
         }

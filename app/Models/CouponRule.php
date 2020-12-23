@@ -16,7 +16,7 @@ class CouponRule extends Base
 
         $expire_num = CacheTools::getExpire('coupon_rule_list');
         $res = Cache::get($cache_key_name);
-        if (empty($res)) {
+        if (true || empty($res)) {
             $res = self::getListFromDbNew();
             Cache::put($cache_key_name, $res, $expire_num);
         }
@@ -164,11 +164,12 @@ class CouponRule extends Base
     //ORM重写
     public static function getListFromDbNew()
     {
+        //todo 免邮券临时开放
         //查询所有当前时间没下线的规则
         $res = self::where('status', '=', 1)
             ->where('buffet', '=', 1)
             ->where('get_end_time', '>', date('Y-m-d H:i:s'))
-            ->whereIn('use_type', [3])
+            ->whereIn('use_type', [3,4])
             ->with(['sub_list', 'sub_list.goods_list'])
             ->select(['id', 'name', 'infinite', 'stock', 'used_stock',
                 'price', 'restrict', 'full_cut',
