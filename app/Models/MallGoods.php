@@ -458,12 +458,14 @@ class MallGoods extends Base
         }
         $data['group_num'] = $check_id[0]['group_num'];
 
+        $stock = 0;
         foreach ($data['sku_list'] as $k => $v) {
             if (!in_array($v->sku_number, $sku_number_list)) {
                 unset($data['sku_list'][$k]);
             }
             foreach ($check_id as $vv) {
                 if ($v->sku_number == $vv['sku_number']) {
+                    $stock += $v['stock'];
                     $v->group_num = $vv['group_num'];
                     $v->price = $vv['group_price'];
                     $v->normal_price = MallSku::where('sku_number', '=', $vv['sku_number'])->sum('price');
@@ -472,7 +474,8 @@ class MallGoods extends Base
             }
         }
         $data['normal_price'] = MallGoods::where('id', '=', $data['id'])->sum('price');
-        $data['stock'] = $this->getGoodsAllStock($data['id']);
+        //$data['stock'] = $this->getGoodsAllStock($data['id']);
+        $data['stock'] = $stock;
         $data['service_description'] = $this->mallServiceDescription();
         $data['buyer_reading'] = $this->buyerReading();
 

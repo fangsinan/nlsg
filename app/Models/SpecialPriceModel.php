@@ -101,7 +101,7 @@ class SpecialPriceModel extends Base
 
         $list = Cache::tags($cache_key_name)->get($cache_name);
 
-        if (true || empty($list)) {
+        if (empty($list)) {
             $list = $this->getSpDataFromDb($id, $goods_type);
             Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);
         }
