@@ -861,6 +861,8 @@ class IncomeController extends Controller
                     case 9:$val['content'] = '代扣个税';
                         $val['pay_content'] = '扣税成功';
                         break;
+                    case 10:$val['content'] = '商城支付';
+                        break;
                     case 11:$val['content'] = '精品课支付';
                         break;
                     case 12:$val['content'] = '机构提现';
