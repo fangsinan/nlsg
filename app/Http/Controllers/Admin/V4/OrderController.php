@@ -14,7 +14,7 @@ class OrderController extends ControllerBackend
     /**
      * @api {get} api/admin_v4/order/list 精品课订单
      * @apiVersion 4.0.0
-     * @apiName  order
+     * @apiName  order/list
      * @apiGroup 后台-虚拟订单
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/list
      * @apiDescription 精品课订单
@@ -227,7 +227,7 @@ class OrderController extends ControllerBackend
     /**
      * @api {get} api/admin_v4/order/user 会员订单
      * @apiVersion 4.0.0
-     * @apiName  order
+     * @apiName  order/user
      * @apiGroup 后台-虚拟订单
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/user
      * @apiDescription 会员订单
