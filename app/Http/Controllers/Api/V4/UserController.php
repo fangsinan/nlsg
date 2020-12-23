@@ -149,6 +149,7 @@ class UserController extends Controller
             $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $id])->first();
             $user['is_self'] = $id == $this->user['id'] ? 1 : 0;
             $user['is_follow'] = $isFollow ? 1 : 0;
+
             if ($user['history']) {
                 foreach ($user['history'] as &$v) {
                     if ($v['relation_type'] == 1) {

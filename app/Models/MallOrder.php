@@ -633,7 +633,7 @@ class MallOrder extends Base
         $coupon_money = 0; //优惠券金额
         $coupon_freight = 0; //是否免邮券
         $freight_free_flag = false; //是否免邮
-        if (($user['new_vip']['level'] ?? 0) == 2) {
+        if (($user['new_vip']['level'] ?? 0) == 1) {
             $freight_free_flag = true;
         }
         //****************开始计算金额*********************
