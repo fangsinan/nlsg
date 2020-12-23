@@ -202,7 +202,10 @@ class GetPriceTools extends Base
         $sku_price = DB::table('nlsg_mall_sku')
             ->where('goods_id', '=', $goods_id)
             ->where('status', '=', 1)
-            ->select(['id', 'sku_number', 'price', 'original_price',
+            ->select(['id', 'sku_number',
+//                'price', 'original_price',
+                DB::raw('0+cast(price as char) as price'),
+                DB::raw('0+cast(original_price as char) as original_price'),
                 'cost', 'promotion_cost'])
             ->get();
 
