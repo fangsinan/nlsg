@@ -139,7 +139,10 @@ class MallGoods extends Base
         return DB::table(MallSku::$table)
             ->where('goods_id', '=', $id)
             ->where('status', '=', 1)
-            ->select(['id', 'sku_number', 'price', 'original_price',
+            ->select(['id', 'sku_number',
+//                'price', 'original_price',
+                DB::raw('0+cast(price as char) as price'),
+                DB::raw('0+cast(original_price as char) as original_price'),
                 'cost', 'promotion_cost'])
             ->get();
     }
@@ -224,7 +227,11 @@ class MallGoods extends Base
             $query->limit($params['size'])->offset(($params['page'] - 1) * $params['size']);
         }
 
-        $select_field = ['id', 'name', 'subtitle', 'picture', 'original_price', 'price', 'category_id', 'sales_num'];
+        $select_field = ['id', 'name', 'subtitle', 'picture',
+//            'original_price', 'price',
+            DB::raw('0+cast(price as char) as price'),
+            DB::raw('0+cast(original_price as char) as original_price'),
+            'category_id', 'sales_num'];
         if (($params['invalid'] ?? 0) == 1) {
             $select_field[] = 'status';
         }
@@ -295,7 +302,10 @@ class MallGoods extends Base
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
             ->where('status', '=', 1)
             ->select(['id', 'goods_id', 'sku_number', 'picture',
-                'original_price', 'price', 'stock']);
+//                'original_price', 'price',
+                DB::raw('0+cast(price as char) as price'),
+                DB::raw('0+cast(original_price as char) as original_price'),
+                'stock']);
     }
 
     public function sku_list_back()
@@ -309,7 +319,10 @@ class MallGoods extends Base
     {
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
             ->select(['id', 'goods_id', 'sku_number', 'picture',
-                'original_price', 'price', 'stock', 'status']);
+//                'original_price', 'price',
+                DB::raw('0+cast(price as char) as price'),
+                DB::raw('0+cast(original_price as char) as original_price'),
+                'stock', 'status']);
     }
 
     public function tos_bind_list()
@@ -351,7 +364,11 @@ class MallGoods extends Base
     public function getIndexGoods($ids)
     {
         $lists = MallGoods::query()
-            ->select('id', 'name', 'picture', 'original_price', 'price')
+            ->select('id', 'name', 'picture',
+//                'original_price', 'price'
+                DB::raw('0+cast(price as char) as price'),
+                DB::raw('0+cast(original_price as char) as original_price')
+            )
             ->whereIn('id', $ids)
             ->where('status', 2)
             ->orderByRaw('FIELD(id,' . implode(',', $ids) . ')')
@@ -488,7 +505,11 @@ class MallGoods extends Base
     // 全局搜索用 $keywords
     static function search($keywords)
     {
-        $res = MallGoods::select('id', 'name', 'subtitle', 'original_price', 'price', 'picture')
+        $res = MallGoods::select('id', 'name', 'subtitle', 'original_price',
+//            'price', 'picture'
+            DB::raw('0+cast(price as char) as price'),
+            DB::raw('0+cast(original_price as char) as original_price')
+        )
             ->where('status', 2)
             //->where('can_sale', 1)
             ->where(function ($query) use ($keywords) {
