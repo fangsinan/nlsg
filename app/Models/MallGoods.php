@@ -505,8 +505,7 @@ class MallGoods extends Base
     // 全局搜索用 $keywords
     static function search($keywords)
     {
-        $res = MallGoods::select('id', 'name', 'subtitle', 'original_price',
-//            'price', 'picture'
+        $res = MallGoods::select('id', 'name', 'subtitle', 'original_price', 'picture',
             DB::raw('0+cast(price as char) as price'),
             DB::raw('0+cast(original_price as char) as original_price')
         )
