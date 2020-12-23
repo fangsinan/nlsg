@@ -293,13 +293,13 @@ class LiveController extends Controller
     {
         $lists = LiveInfo::with('user:id,nickname','live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
                    ->select('id','live_pid','user_id')
-                   ->where('status', 4)
+                   ->where('status', 1)
                    ->whereNotNull('playback_url')
                    ->orderBy('begin_at','desc')
                    ->paginate(10)
                    ->toArray();
+        $backLists = [];
         if ( !empty($lists['data'])) {
-           $backLists = [];
            foreach ($lists['data'] as &$v) {
                 $backLists[] = [
                     'id'          => $v['live']['id'],

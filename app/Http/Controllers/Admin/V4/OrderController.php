@@ -108,16 +108,16 @@ class OrderController extends ControllerBackend
             ->toArray();
 
         $rank = Order::with('works:id,title,cover_img')
-                ->select([
-                    DB::raw('count(*) as total'),
-                    'user_id',
-                    'relation_id'
-                ])
-                ->where('type',9)
-                ->where('status', 1)
-                ->orderBy('total','desc')
-                ->groupBy('relation_id')
-                ->get();
+            ->select([
+                DB::raw('count(*) as total'),
+                'user_id',
+                'relation_id'
+            ])
+            ->where('type', 9)
+            ->where('status', 1)
+            ->orderBy('total', 'desc')
+            ->groupBy('relation_id')
+            ->get();
         $data = [
             'lists' => $lists,
             'rank'  => $rank
@@ -155,29 +155,72 @@ class OrderController extends ControllerBackend
     {
         $type = $request->get('type') ?? 1;
         $list = Order::select([
-                DB::raw('sum(pay_price) as price'),
-                DB::raw('count(id) as total')
-            ])
+            DB::raw('sum(pay_price) as price'),
+            DB::raw('count(id) as total')
+        ])
             ->where('status', 1)
             ->where('type', $type)
             ->groupBy('type')
             ->first();
         $today = Order::select([
-                DB::raw('sum(pay_price) as price'),
-                DB::raw('count(id) as total')
-            ])
+            DB::raw('sum(pay_price) as price'),
+            DB::raw('count(id) as total')
+        ])
             ->where('status', 1)
             ->where('type', $type)
             ->where('created_at', '>=', Carbon::today())
             ->groupBy('type')
             ->first();
         $data = [
-            'total_num'   => $list['price'] ?? 0,
-            'total_price' => $list['total'] ?? 0,
-            'today_num'   => $today['total'] ?? 0,
-            'totday_price'=> $today['price'] ?? 0
+            'total_num'    => $list['price'] ?? 0,
+            'total_price'  => $list['total'] ?? 0,
+            'today_num'    => $today['total'] ?? 0,
+            'totday_price' => $today['price'] ?? 0
         ];
         return success($data);
 
+    }
+
+    /**
+     * @api {get} api/admin_v4/order/detial 精品课-订单详情
+     * @apiVersion 4.0.0
+     * @apiName  order/detial
+     * @apiGroup 后台-虚拟订单
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/detial
+     * @apiDescription  精品课-订单详情
+     *
+     * @apiParam   {number}  id 订单id
+     *
+     * @apiSuccess {string}  ordernum      订单号
+     * @apiSuccess {string}  os_type       1 安卓 2ios 3微信
+     * @apiSuccess {string}  pay_price     支付价格
+     * @apiSuccess {string}  created_at    支付时间
+     * @apiSuccess {string}  user           下单用户信息
+     * @apiSuccess {string}  works          精品课相关
+     * @apiSuccess {string}  works.user     精品课作者
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getOrderDetail(Request $request)
+    {
+        $id = $request->get('id');
+        $list = Order::with(
+            [
+                'user:id,nickname,phone',
+                'works:id,title,user_id,cover_img,price',
+                'works.user:id,nickname'
+            ])
+            ->select('id', 'user_id', 'relation_id', 'ordernum', 'os_type', 'pay_price', 'created_at')
+            ->where('id', $id)
+            ->first();
+        return success($list);
     }
 }

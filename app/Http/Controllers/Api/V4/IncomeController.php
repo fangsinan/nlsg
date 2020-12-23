@@ -849,35 +849,12 @@ class IncomeController extends Controller
             }
             //记录名称   支出
             if($val['earn_type']==1){
-                switch($val['type']){
-                    case 1:$val['content'] = '专栏支付';
-                        break;
-                    case 2:$val['content'] = '会员支付';
-                        break;
-                    case 7:$val['content'] = '支付宝收益提现';
-                        break;
-                    case 8:$val['content'] = '微信收益提现';
-                        break;
-                    case 9:$val['content'] = '代扣个税';
-                        $val['pay_content'] = '扣税成功';
-                        break;
-                    case 11:$val['content'] = '精品课支付';
-                        break;
-                    case 12:$val['content'] = '机构提现';
-                        break;
-                    case 18:$val['content'] = '能量币充值';
-                        break;
-                    case 19:$val['content'] = '讲座支付';
-                        break;
-                    case 20:$val['content'] = '赠送购买';
-                        break;
-                    case 21:$val['content'] = '线下门票购买';
-                        break;
-                }
+                $con = $this->detail_content($val['earn_type'],$val['type']);
+                $val['content'] = $con['content'] ??'';
+                $val['pay_content'] = $con['pay_content'] ??'';
             }else{
                 //2：用户专栏分享提成    5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画
-
-                $con = $this->detail_content($val['type'],$val['ordernum'],$val['order_detail_id']);
+                $con = $this->detail_content($val['earn_type'],$val['type'],$val['ordernum'],$val['order_detail_id']);
                 $val['content'] = $con['content'] ??'';
                 $val['name'] = $con['name'] ??'';
                 $val['o_nick_name'] = $con['o_nick_name'] ??'';
@@ -893,78 +870,109 @@ class IncomeController extends Controller
     }
 
     //根据收益类型返回对应文案
-    public function detail_content($type,$ordernum,$order_detail_id){
+    public function detail_content($earn_type,$type,$ordernum=0,$order_detail_id=0){
         $res = [];
-        switch($type){
-            case 2:$res['content'] = '分享收益';
-                $teacherInfo = Order::select('relation_id')->where(['ordernum'=>$ordernum])->first();
-                if($teacherInfo){
-                    $ColumnInfo = Column::find($teacherInfo['relation_id']);
-                    $res['name']=$ColumnInfo['name'];
-                }
+        if($earn_type ==1){
+            switch($type){
+                case 1:$res['content'] = '专栏支付';
+                    break;
+                case 2:$res['content'] = '会员支付';
+                    break;
+                case 7:$res['content'] = '支付宝收益提现';
+                    break;
+                case 8:$res['content'] = '微信收益提现';
+                    break;
+                case 9:$res['content'] = '代扣个税';
+                    $res['pay_content'] = '扣税成功';
+                    break;
+                case 10:$res['content'] = '商城支付';
+                    break;
+                case 11:$res['content'] = '精品课支付';
+                    break;
+                case 12:$res['content'] = '机构提现';
+                    break;
+                case 18:$res['content'] = '能量币充值';
+                    break;
+                case 19:$res['content'] = '讲座支付';
+                    break;
+                case 20:$res['content'] = '赠送购买';
+                    break;
+                case 21:$res['content'] = '线下门票购买';
+                    break;
+            }
+        }else{
+            switch($type){
+                case 2:$res['content'] = '分享收益';
+                    $teacherInfo = Order::select('relation_id')->where(['ordernum'=>$ordernum])->first();
+                    if($teacherInfo){
+                        $ColumnInfo = Column::find($teacherInfo['relation_id']);
+                        $res['name']=$ColumnInfo['name'];
+                    }
 
-                break;
-            case 5:$res['content'] = '推客收益'; //电商
-                $goodsInfo = MallOrderDetails::find($order_detail_id);
-                if($goodsInfo){
-                    $name = MallGoods::find($goodsInfo['goods_id']);
-                    if($name) $name = $name->toArray();
-                    //$val['name']=Tool::SubStr($name['name'],10);
-                    $res['name']=$name['name'];
-                }
+                    break;
+                case 5:$res['content'] = '推客收益'; //电商
+                    $goodsInfo = MallOrderDetails::find($order_detail_id);
+                    if($goodsInfo){
+                        $name = MallGoods::find($goodsInfo['goods_id']);
+                        if($name) $name = $name->toArray();
+                        //$val['name']=Tool::SubStr($name['name'],10);
+                        $res['name']=$name['name'];
+                    }
 
 
-                break;
-            case 6:$res['content'] = '推客收益'; //专栏
+                    break;
+                case 6:$res['content'] = '推客收益'; //专栏
 
-                $teacherInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
-                if($teacherInfo){
-                    $ColumnInfo = Column::find($teacherInfo['relation_id']);
-                    $res['name']=$ColumnInfo['name'];
-                }
+                    $teacherInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
+                    if($teacherInfo){
+                        $ColumnInfo = Column::find($teacherInfo['relation_id']);
+                        $res['name']=$ColumnInfo['name'];
+                    }
 
-                break;
-            case 7:$res['content'] = '精品课收益';
-                $OrderInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
-                if($OrderInfo){
-                    $works_id=$OrderInfo['relation_id'];
+                    break;
+                case 7:$res['content'] = '精品课收益';
+                    $OrderInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
+                    if($OrderInfo){
+                        $works_id=$OrderInfo['relation_id'];
 
-                    $workName = Works::find($works_id);;
-                    //$val['name']=Tool::SubStr($workName,8); //截取名称13
-                    $res['name']=$workName['title']; //截取名称13
-                }
+                        $workName = Works::find($works_id);;
+                        //$val['name']=Tool::SubStr($workName,8); //截取名称13
+                        $res['name']=$workName['title']; //截取名称13
+                    }
 
-                break;
-            case 8:
-                $supremacyInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
-                if($supremacyInfo['relation_id']==1){
-                    $res['content'] = '推广皇钻收益';
-                }else{
-                    $res['content'] = '推广黑钻收益';
-                }
-                $res['name']='会员';
-                break;
-            case 9:
-                $res['content'] = '推广菩提沙画收益';
-                $res['name']='纱画亲子体验';
-                break;
-            case 10:
-                $res['content'] = '直播分享收益';
-                $res['name']='直播分享';
-                break;
-            case 11:
-                $res['content'] = '360幸福大使收益';
-                $res['name']='360幸福大使';
-                $res['o_nick_name']='';
+                    break;
+                case 8:
+                    $supremacyInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
+                    if($supremacyInfo['relation_id']==1){
+                        $res['content'] = '推广皇钻收益';
+                    }else{
+                        $res['content'] = '推广黑钻收益';
+                    }
+                    $res['name']='会员';
+                    break;
+                case 9:
+                    $res['content'] = '推广菩提沙画收益';
+                    $res['name']='纱画亲子体验';
+                    break;
+                case 10:
+                    $res['content'] = '直播分享收益';
+                    $res['name']='直播分享';
+                    break;
+                case 11:
+                    $res['content'] = '360幸福大使收益';
+                    $res['name']='360幸福大使';
+                    $res['o_nick_name']='';
 
-                $teacherInfo = Order::select('user_id')->where(['ordernum'=>$ordernum])->first();
-                if($teacherInfo){
-                    $userInfo = User::find($teacherInfo['user_id']);
-                    $res['o_nick_name']=$userInfo['phone'];
-                }
-                break;
+                    $teacherInfo = Order::select('user_id')->where(['ordernum'=>$ordernum])->first();
+                    if($teacherInfo){
+                        $userInfo = User::find($teacherInfo['user_id']);
+                        $res['o_nick_name']=$userInfo['phone'];
+                    }
+                    break;
 
+            }
         }
+
         return $res;
     }
 
@@ -1002,7 +1010,7 @@ class IncomeController extends Controller
 
 
         if ($type == 1) { //支出
-            $pay_info = PayRecord::where(['id'=>$id,'user_id'=>$user_id])->first();
+            $pay_info = PayRecord::where(['id'=>$id,'user_id'=>$user_id])->first()->toArray();
             if(empty($pay_info)) return $this->success();
 
             if($pay_info['order_type']==9){ //个税
@@ -1012,13 +1020,17 @@ class IncomeController extends Controller
             }
             $info['tx_status'] = $pay_info['status'];
             $info['order_type'] = $pay_info['order_type'];
-            $info['ctime'] = date('Y-m-d H:i',$pay_info['ctime']);
             $info['price'] = $pay_info['price'];
+            $info['created_at'] = $pay_info['created_at'];
+            $con = $this->detail_content($type,$pay_info['order_type']);
+            $info['content'] = $con['content'] ??'';
+            $info['pay_content'] = $con['pay_content']??'';
+
         } else { //收入
             $pay_info = PayRecordDetail::where(['id'=>$id,'user_id'=>$user_id])->first();
             if(empty($pay_info)) return $this->success();
 
-            $con = $this->detail_content($pay_info['type'],$pay_info['ordernum'],$pay_info['order_detail_id']);
+            $con = $this->detail_content($type,$pay_info['type'],$pay_info['ordernum'],$pay_info['order_detail_id']);
             $info['type'] = $pay_info['type'];
             $info['created_at'] = $pay_info['created_at'];
             $info['price'] = $pay_info['price'];
@@ -1027,7 +1039,7 @@ class IncomeController extends Controller
             $info['o_nick_name'] = $con['o_nick_name'] ?? '';
         }
         $UserInfo = User::find($user_id);
-        $info['nick_name']=$UserInfo['nick_name'];
+        $info['nickname']=$UserInfo['nickname'];
 
         return $this->success($info);
     }
