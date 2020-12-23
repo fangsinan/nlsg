@@ -94,11 +94,11 @@ class AuthController extends Controller
             $user = User::find($list->id);
 
             //新人优惠券
-            $model->getCoupon(ConfigModel::getData(41), $list->id, false);
+            $model->giveCoupon($list->id, ConfigModel::getData(41));
 
             if ($is_invite && $user_id) {
                 //邀请人优惠券
-                $model->getCoupon(ConfigModel::getData(42), $user_id, false);
+                $model->giveCoupon($user_id, ConfigModel::getData(42));
                 UserInvite::create([
                     'from_uid' => $user_id,
                     'to_uid' => $list->id,
