@@ -79,23 +79,23 @@ class MallGoods extends Base
             $user['is_staff'] ?? 0
         );
 
-//        foreach ($list as $v) {
-//            $temp_sku_list = $v->sku_list;
-//            $cnt = count($temp_sku_list);
-//
-//            for ($i = 0; $i < $cnt - 1; $i++) {
-//                for ($j = 0; $j < $cnt - $i - 1; $j++) {
-//                    if ($temp_sku_list[$j]['sp_type'] == 2) {
-//                        $temp = $temp_sku_list[$j];
-//                        $temp_sku_list[$i] = $temp;
-//                        $temp_sku_list[$j - 1] = $temp;
-//                    }
-//                }
-//            }
-//
-//            return $temp_sku_list;
-//            $v->sku_list = $temp_sku_list;
-//        }
+        //临时 秒杀放第一个
+        foreach ($list as $k => $v) {
+            $temp_sku_list = [];
+            foreach ($v->sku_list as $vv) {
+                if ($vv['sp_type'] == 2) {
+                    array_push($temp_sku_list, $vv);
+                }
+            }
+            foreach ($v->sku_list as $vv) {
+                if ($vv['sp_type'] != 2) {
+                    array_push($temp_sku_list, $vv);
+                }
+            }
+            unset($list[$k]->sku_list);
+            $list[$k]->sku_list = $temp_sku_list;
+        }
+
 
         return $list;
     }
