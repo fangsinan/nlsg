@@ -275,13 +275,7 @@ class GetPriceTools extends Base
                 break;
         }
 
-        $res = trim($res,'0');
-        $res = trim($res,'.');
-
-        if (empty($res)){
-            $res = 0;
-        }
-
+        $res = $res + 0;
         return $res;
     }
 
