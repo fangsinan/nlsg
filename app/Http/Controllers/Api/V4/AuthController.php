@@ -266,12 +266,14 @@ class AuthController extends Controller
             'sex' => $input['sex'] == '男' ? 1 : 2,
             'province' => $input['province'],
             'city' => $input['city'],
-            'headimg' => $input['headimg'] ?? '',
             'unionid' => $input['unionid'] ?? '',
             'is_wx' => 1
         ];
         $user = User::where('phone', $phone)->first();
         if ($user) {
+            if(empty($user['headimg'])){
+                $data['headimg'] = $input['headimg'] ?? '';
+            }
             User::where('phone', $phone)->update($data);
         } else {
             $data['phone'] = $phone;
