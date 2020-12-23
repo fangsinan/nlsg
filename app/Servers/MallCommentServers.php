@@ -100,6 +100,7 @@ class MallCommentServers
         }
 
         $query->with(['sku', 'sku.sku_value_list']);
+        $query->orderBy('c.id','desc');
 
         $query->select([
             'c.id as comment_id', 'c.content', 'c.picture', 'c.star', 'g.name as goods_name',
