@@ -161,7 +161,7 @@ class UserController extends Controller
 //                            ->where('type', 1)
 
                     } elseif ($v['relation_type'] == 2) {
-                        $v['lecture'] = Column::select('id', 'title', 'cover_pic')
+                        $v['lecture'] = Column::select('id', 'name','title', 'cover_pic')
                             ->where('id', $v['relation_id'])
                             ->where('status', 1)
                             ->where('type', 2)
