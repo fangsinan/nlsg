@@ -77,18 +77,6 @@ class AuthController extends Controller
                 return error(400, '验证码错误', $sclass);
             }
         }
-//        if (($phone != 18624078563 || $phone != 15811570751) && $code != 6666) {
-//
-//            $res = Redis::get($phone);
-//            if (!$res) {
-//                return error(400, '验证码已过期',$sclass);
-//            }
-//
-//            if ($code !== $res) {
-//                return error(400, '验证码错误',$sclass);
-//            }
-//
-//        }
 
         //新注册用户发送优惠券
         $model = new Coupon();
@@ -108,10 +96,7 @@ class AuthController extends Controller
             //新人优惠券
             $model->getCoupon(ConfigModel::getData(41), $list->id, false);
 
-            //$model->giveCoupon($list->id, 36);
-
             if ($is_invite && $user_id) {
-                //$model->giveCoupon($user_id, 37);
                 //邀请人优惠券
                 $model->getCoupon(ConfigModel::getData(42), $user_id, false);
                 UserInvite::create([
@@ -132,7 +117,7 @@ class AuthController extends Controller
 
         //判断是否过期
         $time = strtotime(date('Y-m-d', time())) + 86400;
-        if ( in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
+        if (in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
             $user->level = $user->level;
         } else {
             $user->level = 0;
@@ -206,7 +191,7 @@ class AuthController extends Controller
 //        ];
         //判断是否过期
         $time = strtotime(date('Y-m-d', time())) + 86400;
-        if ( in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
+        if (in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
             $user->level = $user->level;
         } else {
             $user->level = 0;
@@ -478,7 +463,7 @@ class AuthController extends Controller
 
         //判断是否过期
         $time = strtotime(date('Y-m-d', time())) + 86400;
-        if ( in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
+        if (in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
             $user->level = $user->level;
         } else {
             $user->level = 0;
@@ -579,16 +564,16 @@ class AuthController extends Controller
         $switchAll = [
             //精确版本
             '3.4.6' => [
-                'money_switch'              => '0',//app赚钱开关   0关闭  1开启
-                'Vip_Switch'                => '0',//提现开关   0关闭  1开启
-                'vipCode'                   => '0', //钻石兑换码
-                'worksCode'                 => '0',//课程兑换码
+                'money_switch' => '0',//app赚钱开关   0关闭  1开启
+                'Vip_Switch' => '0',//提现开关   0关闭  1开启
+                'vipCode' => '0', //钻石兑换码
+                'worksCode' => '0',//课程兑换码
             ],
             'default' => [
-                'money_switch'              => '1',//app赚钱开关   0关闭  1开启
-                'Vip_Switch'                => '1',//提现开关   0关闭  1开启
-                'vipCode'                   => '1',
-                'worksCode'                 => '1',
+                'money_switch' => '1',//app赚钱开关   0关闭  1开启
+                'Vip_Switch' => '1',//提现开关   0关闭  1开启
+                'vipCode' => '1',
+                'worksCode' => '1',
             ],
 
         ];
