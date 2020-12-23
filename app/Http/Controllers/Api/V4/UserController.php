@@ -151,7 +151,7 @@ class UserController extends Controller
             $user['is_follow'] = $isFollow ? 1 : 0;
 
             if ($user['history']) {
-                foreach ($user['history'] as &$v) {
+                foreach ($user['history'] as $k=>&$v) {
                     if ($v['relation_type'] == 1) {
                         $v['columns'] = [];//不显示专栏
 //                        Column::select('id', 'title', 'cover_pic')
@@ -176,8 +176,11 @@ class UserController extends Controller
                             ->where('id', $v['relation_id'])
                             ->where('status', 4)
                             ->first();
+                    }else{
+                        unset($user['history'][$k]);
                     }
                 }
+                $user['history'] = array_values($user['history']);
             }
 
         }
