@@ -92,6 +92,7 @@ class MallOrderGroupBuy extends Base
         $details_data['num'] = $data['sku_list']['num'];
         $details_data['created_at'] = $now_date;
         $details_data['updated_at'] = $now_date;
+        $details_data['sp_id'] = $data['sku_list']['group_buy_id'];
         $details_data['inviter'] = $data['sku_list']['inviter'];
         if ($data['sku_list']['inviter']) {
             $details_data['inviter_history'] = json_encode($data['sku_list']['inviter_info']);

@@ -352,6 +352,7 @@ class MallOrder extends Base
             $temp_datails_data['created_at'] = $now_date;
             $temp_datails_data['updated_at'] = $now_date;
             $temp_datails_data['inviter'] = $v['inviter'];
+            $temp_datails_data['sp_id'] = $v['sp_id'] ?? 0;
             if ($v['inviter']) {
                 $temp_datails_data['inviter_history'] = json_encode($v['inviter_info']);
             } else {
@@ -498,6 +499,7 @@ class MallOrder extends Base
                 }
             }
 
+
             foreach ($temp_sl_v->twitter_money_list as $vv) {
                 if ($vv['sku_number'] == $sl_v['sku_number']) {
                     //初始推客金额(不是活动单独设定)
@@ -606,6 +608,8 @@ class MallOrder extends Base
             $temp_v['sku_value_list'] = $v['sku_value'];
             $temp_v['goods_id'] = $v['goods_id'];
             $temp_v['sku_number'] = $v['sku_number'];
+            $temp_v['sp_id'] = $v['sp_id'] ?? 0;
+
             if (1 && $v['num'] > $v['stock']) {
                 return ['code' => false, 'msg' => $v['name'] . '库存不足', 'ps' => $v['num'] . '-' . $v['stock']];
             } else {
@@ -637,6 +641,7 @@ class MallOrder extends Base
             $freight_free_flag = true;
         }
         //****************开始计算金额*********************
+
         foreach ($sku_list as $k => $v) {
             $all_original_price = GetPriceTools::PriceCalc(
                 '+',
@@ -652,9 +657,12 @@ class MallOrder extends Base
                     '*', $v['actual_price'], $v['actual_num']
                 )
             );
-            $normal_cut_money = GetPriceTools::PriceCalc('+',$normal_cut_money,
-                GetPriceTools::PriceCalc('-',$v['original_price'],$v['price'])
-            );
+
+//            $temp_normal_cut = GetPriceTools::PriceCalc('-',$v['original_price'],$v['price']);
+//            $normal_cut_money = GetPriceTools::PriceCalc('+',$normal_cut_money,
+//                GetPriceTools::PriceCalc('*',$temp_normal_cut,$v['actual_num'])
+//            );
+
             if (($v['sp_price'] ?? 0) > 0) {
                 $temp_sp_cut = GetPriceTools::PriceCalc('-', $v['original_price'], $v['actual_price']);
                 $sp_cut_money = GetPriceTools::PriceCalc(
@@ -665,16 +673,28 @@ class MallOrder extends Base
                     )
                 );
             } else {
-                $temp_vip_cut = GetPriceTools::PriceCalc('-', $v['original_price'], $v['level_price']);
-                $vip_cut_money = GetPriceTools::PriceCalc(
-                    '+',
-                    $vip_cut_money,
-                    GetPriceTools::PriceCalc(
-                        '*', $temp_vip_cut, $v['actual_num']
-                    )
-                );
+                if ($v['level_price'] < $v['price']) {
+                    $temp_vip_cut = GetPriceTools::PriceCalc('-', $v['original_price'], $v['level_price']);
+                    $vip_cut_money = GetPriceTools::PriceCalc(
+                        '+',
+                        $vip_cut_money,
+                        GetPriceTools::PriceCalc(
+                            '*', $temp_vip_cut, $v['actual_num']
+                        )
+                    );
+                } else {
+                    $temp_normal_cut = GetPriceTools::PriceCalc('-', $v['original_price'], $v['price']);
+                    $normal_cut_money = GetPriceTools::PriceCalc(
+                        '+',
+                        $normal_cut_money,
+                        GetPriceTools::PriceCalc(
+                            '*', $temp_normal_cut, $v['actual_num']
+                        )
+                    );
+                }
             }
         }
+
         //****************可用优惠券*********************
         $goods_id_list = array_column($sku_list, 'goods_id');
 
@@ -753,9 +773,6 @@ class MallOrder extends Base
         if ($freight_free_flag === false) {
             if (!empty($used_address)) {
                 foreach ($sku_list as $k => $v) {
-//                    $sku_list[$k]['freight_money'] = FreightTemplate::getFreightMoney(
-//                        $v, $used_address
-//                    );
                     $temp_freight_money = FreightTemplate::getFreightMoney(
                         $v, $used_address
                     );
@@ -791,14 +808,21 @@ class MallOrder extends Base
 
         $order_price = GetPriceTools::PriceCalc('+', $order_price, $freight_money);
 
-        $vip_cut_money = GetPriceTools::PriceCalc('-',$vip_cut_money,$normal_cut_money);
+//        if ($vip_cut_money>0){
+//            $vip_cut_money = GetPriceTools::PriceCalc('-',$vip_cut_money,$normal_cut_money);
+//        }
+//
+//        if ($sp_cut_money>0){
+//            $sp_cut_money = GetPriceTools::PriceCalc('-',$sp_cut_money,$normal_cut_money);
+//        }
+
 
         $price_list = [
             'all_original_price' => $all_original_price,
             'all_price' => $all_price,
             'freight_money' => $freight_money,
             'vip_cut_money' => $vip_cut_money,
-            'normal_cut_money'=>$normal_cut_money,
+            'normal_cut_money' => $normal_cut_money,
             'sp_cut_money' => $sp_cut_money,
             'coupon_money' => $coupon_money,
             'freight_free_flag' => $freight_free_flag,
@@ -822,7 +846,7 @@ class MallOrder extends Base
         }
 
         foreach ($price_list_new as &$new_v) {
-            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额','优惠金额'])) {
+            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额', '优惠金额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
             } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];
@@ -1145,7 +1169,7 @@ class MallOrder extends Base
         $field = [
             'id', 'ordernum', 'price', 'dead_time', DB::raw('unix_timestamp(dead_time) as dead_timestamp'),
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'created_at', 'pay_price',
-            'price', 'post_type', 'pay_type','normal_cut',
+            'price', 'post_type', 'pay_type', 'normal_cut',
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo'];
         $with[] = 'orderChild';
@@ -1359,7 +1383,7 @@ class MallOrder extends Base
         }
 
         foreach ($price_list_new as &$new_v) {
-            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额','优惠金额'])) {
+            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额', '优惠金额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
             } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];

@@ -94,6 +94,7 @@ class MallOrderFlashSale extends Base
         $details_data['created_at'] = $now_date;
         $details_data['updated_at'] = $now_date;
         $details_data['inviter'] = $data['sku_list']['inviter'];
+        $details_data['sp_id'] = $data['sku_list']['flash_sale_id'];
         if ($data['sku_list']['inviter']) {
             $details_data['inviter_history'] = json_encode($data['sku_list']['inviter_info']);
         } else {

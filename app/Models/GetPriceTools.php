@@ -250,6 +250,7 @@ class GetPriceTools extends Base
                 }
             }
         }
+
         return $temp_data;
     }
 
