@@ -120,6 +120,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     //虚拟订单
     Route::get('order/list', 'OrderController@list');
     Route::get('order/statistic', 'OrderController@getOrderStatistic');
+    Route::get('order/detail', 'OrderController@getOrderDetail');
 
 
     //定时任务
