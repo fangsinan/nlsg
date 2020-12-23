@@ -827,6 +827,7 @@ class UserController extends Controller
             $his_id = explode(',', $his_id);
 //            $res = History::where('user_id', $user_id)
 //                ->whereIn('id', $his_id)->update(['is_del' => 1]);
+            //历史记录展示的是按课程 非章节 删除时需按课程id删除
             $relation_id_list = History::where('user_id', '=', $user_id)
                 ->whereIn('id', $his_id)
                 ->select(['relation_id'])
@@ -840,7 +841,7 @@ class UserController extends Controller
                 ->whereIn('relation_id', $relation_id_list)
                 ->update(['is_del' => 1]);
 
-            User::where(['id' => $user_id])->decrement('history_num', count($relation_id_list));
+            User::where(['id' => $user_id])->decrement('history_num', count($his_id));
 
         }
         if ($res) {
