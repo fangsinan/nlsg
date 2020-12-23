@@ -626,5 +626,7 @@ class MallOrderFlashSale extends Base
             ->where('dead_time', '<=', $time_line)
             ->update(['is_stop' => 1, 'stop_by' => 0, 'stop_at' => $now_date, 'is_del' => 1, 'del_at' => $now_date]);
 
+
+
     }
 }

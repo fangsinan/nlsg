@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CouponRuleList;
 use App\Models\MallGoodsMsg;
 use App\Models\MallOrder;
+use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
 use App\Servers\MallRefundJob;
 use Illuminate\Http\Request;
@@ -220,6 +221,7 @@ class MallController extends Controller
         if ($request->input('aa', 0) == 1) {
             //MallOrder::receipt();
             //MallOrderGroupBuy::clear();
+            MallOrderFlashSale::clear();
             return true;
         } else {
             $params = $request->input();
