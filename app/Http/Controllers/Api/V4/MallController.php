@@ -3,20 +3,16 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
-use App\Models\CouponRuleList;
-use App\Models\MallGoodsMsg;
-use App\Models\MallOrder;
-use App\Models\MallOrderFlashSale;
-use App\Models\MallOrderGroupBuy;
-use App\Servers\MallRefundJob;
-use Illuminate\Http\Request;
-use App\Models\MallGoods;
-use App\Models\CouponRule;
-use App\Models\MallComment;
-use App\Models\MallCategory;
 use App\Models\Banner;
-use App\Models\SpecialPriceModel;
+use App\Models\CouponRule;
+use App\Models\CouponRuleList;
+use App\Models\MallCategory;
+use App\Models\MallComment;
+use App\Models\MallGoods;
+use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
+use App\Models\SpecialPriceModel;
+use Illuminate\Http\Request;
 
 class MallController extends Controller
 {
@@ -222,6 +218,16 @@ class MallController extends Controller
             //MallOrder::receipt();
             //MallOrderGroupBuy::clear();
             //MallOrderFlashSale::clear();
+//            $data = [
+//                'out_trade_no'      => '20122300423380694267601', //获取订单号
+//                'total_fee'         => 0.01, //价格
+//                'transaction_id'    => '4200000783202012235031760554', //交易单号
+//                'attach'            => 8,
+//                'pay_type'          => 1,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
+//            ];
+//
+//            $res = WechatPay::PayStatusUp($data);
+
             return true;
         } else {
             $params = $request->input();

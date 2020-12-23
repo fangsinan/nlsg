@@ -584,7 +584,7 @@ class WechatPay extends Controller
 
         foreach ($order_details as $od_v) {
 
-            if ($od_v->inviter) {
+            if ($od_v->inviter > 0) {
 
                 $temp_stay_data = [
                     'type' => 5, //电商推客
