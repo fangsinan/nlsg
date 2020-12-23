@@ -245,9 +245,11 @@ class SpecialPriceModel extends Base
                 })
                 ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
                     'nsp.goods_original_price', 'nmg.picture',
-                    'nmg.original_price', 'nsp.use_stock', 'nsp.stock',
-//                    DB::raw('if(nsp.stock=0,1,nsp.stock) as stock'),
-                    'nsp.goods_price', 'nsp.begin_time', 'nsp.end_time',
+                    'nsp.use_stock', 'nsp.stock',
+//                    'nmg.original_price','nsp.goods_price',
+                    DB::raw('0+cast(nmg.original_price as char) as original_price'),
+                    DB::raw('0+cast(nsp.goods_price as char) as goods_price'),
+                    'nsp.begin_time', 'nsp.end_time',
                     DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
                     DB::raw('unix_timestamp(end_time) as end_timestamp'),
                     DB::raw('convert((nsp.goods_price/nmg.original_price)*10,'
@@ -436,7 +438,10 @@ class SpecialPriceModel extends Base
                         ->where('nmg.status', '=', 2);
                 })
                 ->select(['nsp.group_name as group_buy_id', 'nsp.goods_id', 'nmg.name',
-                    'nmg.subtitle', 'nmg.picture', 'nmg.original_price', 'group_num', 'group_price',
+                    'nmg.subtitle', 'nmg.picture', 'group_num',
+                    //'nmg.original_price','group_price',
+                    DB::raw('0+cast(nmg.original_price as char) as original_price'),
+                    DB::raw('0+cast(nsp.group_price as char) as group_price'),
                     'nsp.begin_time', 'nsp.end_time', 'group_name'])
                 ->orderBy('begin_time', 'asc')
                 ->groupBy('nsp.group_name')
