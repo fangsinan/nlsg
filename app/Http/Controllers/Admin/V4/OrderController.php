@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends ControllerBackend
 {
     /**
-     * @api {get} api/admin_v4/order/list 虚拟订单列表
+     * @api {get} api/admin_v4/order/list 精品课订单
      * @apiVersion 4.0.0
      * @apiName  order
      * @apiGroup 后台-虚拟订单
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/list
-     * @apiDescription 虚拟订单列表
+     * @apiDescription 精品课订单
      *
      * @apiParam {number} page 分页
      * @apiParam {string} title 名称
