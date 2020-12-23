@@ -298,8 +298,8 @@ class LiveController extends Controller
                    ->orderBy('begin_at','desc')
                    ->paginate(10)
                    ->toArray();
+        $backLists = [];
         if ( !empty($lists['data'])) {
-           $backLists = [];
            foreach ($lists['data'] as &$v) {
                 $backLists[] = [
                     'id'          => $v['live']['id'],
