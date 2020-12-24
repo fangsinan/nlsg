@@ -183,7 +183,7 @@ class UserController extends Controller
                             ->where('status', 4)
                             ->first();
                     }
-                    if(empty($v['columns']) && empty($v['lecture']) && empty( $v['listen']) && empty($v['works'])){
+                    if(empty($v['columns']) && empty($v['lecture']) && empty( $v['listens']) && empty($v['works'])){
                         unset($user['history'][$k]);
 
                     }
