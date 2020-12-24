@@ -620,13 +620,43 @@ class MallOrderFlashSale extends Base
         $time_line = date('Y-m-d H:i:s', $now - 60);
         $now_date = date('Y-m-d H:i:s', $now);
 
-        DB::table('nlsg_mall_order')
+
+        $list = DB::table('nlsg_mall_order')
             ->where('order_type', '=', 2)
             ->where('status', '=', 1)
             ->where('is_stop', '=', 0)
             ->where('dead_time', '<=', $time_line)
+            ->select(['id', 'sp_id'])
+            ->get();
+
+        if ($list->isEmpty()) {
+            return true;
+        }
+
+        $list = $list->toArray();
+
+        $id_list = array_column($list, 'id');
+        $sp_id_list = array_column($list, 'sp_id');
+        $sp_id_list = array_count_values($sp_id_list);
+
+
+        MallOrder::whereIn('id', $id_list)
             ->update(['is_stop' => 1, 'stop_by' => 0, 'stop_at' => $now_date, 'is_del' => 1, 'del_at' => $now_date]);
 
+
+        foreach ($sp_id_list as $k => $v) {
+            SpecialPriceModel::whereId($k)
+                ->decrement('use_stock', $v);
+        }
+        return true;
+
+
+//        DB::table('nlsg_mall_order')
+//            ->where('order_type', '=', 2)
+//            ->where('status', '=', 1)
+//            ->where('is_stop', '=', 0)
+//            ->where('dead_time', '<=', $time_line)
+//            ->update(['is_stop' => 1, 'stop_by' => 0, 'stop_at' => $now_date, 'is_del' => 1, 'del_at' => $now_date]);
 
 
     }

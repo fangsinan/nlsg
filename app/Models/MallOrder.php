@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 
 class MallOrder extends Base
 {
@@ -1021,6 +1019,16 @@ class MallOrder extends Base
                         MallSku::where('sku_number', '=', $od_v->sku_number)->decrement('sales_num', $od_v->num);
                         MallGoods::whereId($od_v->goods_id)->decrement('sales_num', $od_v->num);
 
+                    }
+
+                    //如果是秒杀订单,额外需要修改秒杀数量
+                    if ($check->order_type === 2 && $check->sp_id !== 0) {
+                        $check_details = MallOrderDetails::where('order_id', '=', $check->id)
+                            ->select(['id', 'sp_id', 'num'])->get();
+
+                        foreach ($check_details as $cd_v) {
+                            SpecialPriceModel::whereId($cd_v->sp_id)->decrement('use_stock', $cd_v->num);
+                        }
                     }
 
                     if ($check->status === 10 || $check->status === 20) {
