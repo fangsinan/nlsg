@@ -132,15 +132,19 @@ class UserController extends Controller
                 },
                 'works' => function ($query) {
                     $query->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'subscribe_num', 'original_price'])
+                        ->where('status', 4)
+                        ->where('type', 2)
                         ->where('is_audio_book', 0);
                 },
                 'listens' => function ($query) {
                     $query->select(['id', 'user_id', 'title', 'subtitle', 'cover_img', 'subscribe_num', 'original_price'])
+                        ->where('status', 4)
                         ->where('is_audio_book', 1);
                 },
-//                'columns' => function ($query) {
-//                    $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'original_price', 'subscribe_num', 'cover_pic');
-//                },
+                'lecture' => function ($query) {
+                    $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'original_price', 'subscribe_num', 'cover_pic')
+                    ->where(['status'=>1, 'type'=>2]);
+                },
 
             ])
             ->find($id)->toArray();
@@ -167,7 +171,7 @@ class UserController extends Controller
                             ->where('type', 2)
                             ->first();
                     } elseif ($v['relation_type'] == 3) {
-                        $v['listen'] = Works::select('id', 'title', 'cover_img', 'is_audio_book')
+                        $v['listens'] = Works::select('id', 'title', 'cover_img', 'is_audio_book')
                             ->where('id', $v['relation_id'])
                             ->where('status', 2)
                             ->where('is_audio_book', 1)

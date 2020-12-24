@@ -292,7 +292,7 @@ class WorksController extends Controller
                 $sub_data = Subscribe::where(['type' => 2, 'user_id' => $user_id,'relation_id'=>$val['id']])
                     ->where('end_time', '>', date('Y-m-d H:i:s'))
                     ->first();
-                if($sub_data){
+                if($sub_data && $val['is_free'] == 0 ){
                     unset($worksData['data'][$key]);
                     continue;
                 }
