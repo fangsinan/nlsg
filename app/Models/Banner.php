@@ -24,7 +24,8 @@ class Banner extends Base
         return $this->select('id', 'pic', 'title', 'url', 'jump_type', 'obj_id')
             ->where('status', 1)
             ->where('type', 1)
-            ->orderBy('rank', 'desc')
+            ->orderBy('rank')
+            ->orderBy('created_at','desc')
             ->take(5)
             ->get()
             ->toArray();
