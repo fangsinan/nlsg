@@ -80,7 +80,7 @@ class Works extends Base
             ->where(function ($query) use ($keywords) {
                 $query->orwhere('works.title', 'like', "%{$keywords}%");
 //                $query->orwhere('info.title', 'like', "%{$keywords}%");
-            })->groupBy('works.id')->paginate(10)->toArray();
+            })->groupBy('works.id')->paginate(100)->toArray();
         //->get();
         return ['res' => $res['data'], 'count' => $res['total']];
         return ['res' => $res, 'count' => $res->count()];

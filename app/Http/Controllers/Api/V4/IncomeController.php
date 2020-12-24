@@ -826,6 +826,7 @@ class IncomeController extends Controller
             $query->where('created_at', '<', $time_arr[1]);
 
         }
+        $query->orderBy('created_at','desc');
         $list = $query->paginate($this->page_per_page);
 
         //处理数据
