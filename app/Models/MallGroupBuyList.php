@@ -40,7 +40,7 @@ class MallGroupBuyList extends Base {
 
     public function teamOrderCount() {
         return $this->hasOne('App\Models\MallGroupBuyList', 'group_key', 'group_key')
-                        ->select([DB::raw('count(1) counts'), 'group_key']);
+                        ->select([DB::raw('count(1) counts'), 'group_key'])->groupBy('group_key');
     }
 
     public function userInfo() {
