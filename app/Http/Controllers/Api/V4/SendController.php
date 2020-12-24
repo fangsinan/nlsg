@@ -94,6 +94,9 @@ class SendController extends Controller
         try {
             $orderRst = Order::where(['ordernum' => $data['ordernum']])->update(['send_user_id'=>$user_id]);
 
+            $starttime = strtotime(date('Y-m-d', time()));
+            $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
+
             $subscribe = [
                 'user_id' => $user_id, //会员id
                 'pay_time' => $data['pay_time'], //支付时间
@@ -101,6 +104,8 @@ class SendController extends Controller
                 'status' => 1,
                 'order_id' => $data['id'], //订单id
                 'relation_id' => $data['relation_id'],
+                'start_time' => date("Y-m-d H:i:s", $starttime),
+                'end_time' => date("Y-m-d H:i:s", $endtime),
             ];
             $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
