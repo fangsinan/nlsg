@@ -25,11 +25,11 @@ class MallCommentServers
         if (empty($params['content'] ?? '')) {
             $check_id->reply_comment = '';
             $check_id->reply_user_id = 0;
-            $check_id->reply_at = null;
+            $check_id->replied_at = null;
         }else{
             $check_id->reply_comment = $params['content'] ?? '';
             $check_id->reply_user_id = $user_id;
-            $check_id->reply_at = date('Y-m-d H:i:s');
+            $check_id->replied_at = date('Y-m-d H:i:s');
         }
 
         $res = $check_id->save();
@@ -64,9 +64,9 @@ class MallCommentServers
 
         $res = $check_id->save();
         if ($res === false) {
-            return ['code' => true, 'msg' => '成功'];
-        } else {
             return ['code' => false, 'msg' => '失败'];
+        } else {
+            return ['code' => true, 'msg' => '成功'];
         }
 
     }
