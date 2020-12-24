@@ -99,7 +99,7 @@ class Column extends Base
                 $query->orWhere('title','LIKE',"%$keywords%");
                 $query->orWhere('name','LIKE',"%$keywords%");
                 $query->orWhere('subtitle','LIKE',"%$keywords%");
-            })->paginate(10)->toArray();
+            })->paginate(100)->toArray();
             //->get();
         return ['res' => $res['data'], 'count'=> $res['total'] ];
 //        return ['res' => $res, 'count'=> $res->count() ];
