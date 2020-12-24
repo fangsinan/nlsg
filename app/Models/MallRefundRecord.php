@@ -424,6 +424,11 @@ class MallRefundRecord extends Base
             ->select(['id', 'order_id', 'goods_id', 'sku_history']);
     }
 
+    public function userInfo(){
+        return $this->hasOne(User::class, 'id', 'user_id')
+            ->select(['id','phone','nickname','headimg']);
+    }
+
     public function orderInfo($params, $user)
     {
         if (empty($params['id'] ?? 0)) {
@@ -516,7 +521,7 @@ class MallRefundRecord extends Base
         $info['status'] = 50;
 
         if ($info['status'] == 15) {
-            $before_arr[] = ['i' => $i, 'time' => $this->dateDelSec($info['check_reject_at']), 'status' => '驳回文本'];
+            $before_arr[] = ['time' => $this->dateDelSec($info['check_reject_at']), 'status' => '驳回文本'];
             $before_arr[] = ['time' => $this->dateDelSec($info['created_at']), 'status' => '提交申请'];
         } else {
             switch ($i = intval($info['status'])) {

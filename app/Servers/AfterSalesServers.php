@@ -30,11 +30,17 @@ class AfterSalesServers
     {
         $size = $params['size'] ?? 10;
         $field = ['id', 'service_num', 'order_id', 'order_detail_id',
-            'type', 'num', 'cost_price', 'refe_price', 'price', 'status',
+            'type', 'num', 'cost_price', 'refe_price', 'price', 'status', 'user_id',
             'user_cancel', 'user_cancel_time', 'created_at'];
 
-        $with = ['infoOrder', 'infoOrder.infoOrderDetail',
-            'infoOrder.infoOrderDetail.goodsInfo', 'infoDetail', 'infoDetail.goodsInfo', 'expressInfo'
+        $with = [
+            'infoOrder',
+            'infoOrder.infoOrderDetail',
+            'userInfo',
+            'infoOrder.infoOrderDetail.goodsInfo',
+            'infoDetail',
+            'infoDetail.goodsInfo',
+            'expressInfo'
         ];
 
         if ($params['id'] ?? 0) {
@@ -100,11 +106,11 @@ class AfterSalesServers
         $list = $query->select($field)
             ->with($with)
             ->limit($size)
-            ->orderBy('id','desc')
+            ->orderBy('id', 'desc')
             ->paginate($size);
 
         //如果type=1  读取infoOrder   =2读取infoDetail
-        foreach ($list as $k => $v) {
+        foreach ($list as $k => &$v) {
             if ($v->user_cancel == 1 || $v->status == 70) {
                 $v->status = 99;
             }
@@ -138,7 +144,7 @@ class AfterSalesServers
             if (!empty($v->expressInfo)) {
                 $v->expressInfo->history_array = json_decode($v->expressInfo->history);
             }
-            unset($list[$k]->infoOrder, $list[$k]->infoDetail);
+//            unset($list[$k]->infoOrder, $list[$k]->infoDetail);
         }
         return $list;
     }

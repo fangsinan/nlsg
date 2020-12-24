@@ -28,6 +28,7 @@ class AfterSalesController extends ControllerBackend
      * @apiGroup  后台-售后
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/after_sales/list
      * @apiDescription 售后列表和详情
+     * @apiSuccess {number} id id
      */
     public function list(Request $request)
     {
@@ -52,11 +53,9 @@ class AfterSalesController extends ControllerBackend
      */
     public function statusChange(Request $request)
     {
-        $this->user['id'] = 168934;
         if (empty($this->user['id'] ?? 0)) {
             return $this->error(0, '未登录');
         }
-
         $model = new AfterSalesServers();
         $data = $model->statusChange($request->input(), $this->user['id']);
         return $this->getRes($data);

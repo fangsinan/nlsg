@@ -49,9 +49,17 @@ class MallAddress extends Base
         DB::beginTransaction();
 
         if (($params['is_default'] ?? 0) == 1) {
-            $update_res = self::where('user_id', '=', $user_id)
-                ->where('is_default', '=', 1)
-                ->update(['is_default' => 0]);
+            if (!empty($params['id']??0)){
+                $update_res = self::where('user_id', '=', $user_id)
+                    ->where('id','<>',$params['id'])
+                    ->where('is_default', '=', 1)
+                    ->update(['is_default' => 0]);
+            }else{
+                $update_res = self::where('user_id', '=', $user_id)
+                    ->where('is_default', '=', 1)
+                    ->update(['is_default' => 0]);
+            }
+
             if ($update_res === false) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '失败'];
@@ -67,7 +75,7 @@ class MallAddress extends Base
         $address->city = $city;
         $address->area = $area;
         $address->user_id = $user_id;
-
+        
         $res = $address->save();
 
         if ($res) {
