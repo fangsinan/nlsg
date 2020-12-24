@@ -765,7 +765,7 @@ class IncomeController extends Controller
             //earn_type==1时    type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现  18能量币充值 19讲座 20赠送  21线下门票]
 
             $order_type_val = [7,8,9,10,12,18];//默认全部查询
-            if( !empty($type) &&  in_array($type,[1,2,3,4]) ){
+            if( !empty($type) &&  in_array($type,[1,2,3,4,18]) ){
                 // 改需求后的 type类型  1电商支付   2内容支付   3 会员  4 所有提现 5能量币充值记录
                 switch ($type){
                     case 1:
@@ -780,7 +780,7 @@ class IncomeController extends Controller
                     case 4:
                         $order_type_val = [7,8,9];
                         break;
-                    case 5:
+                    case 18:
                         $order_type_val = [18];
                         break;
 
