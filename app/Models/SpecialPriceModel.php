@@ -162,37 +162,14 @@ class SpecialPriceModel extends Base
 
         $id_list = [$min_id_for_typ_2->id ?? 0, $min_id_for_typ_1->id ?? 0, $min_id_for_typ_4->id ?? 0];
 
-//        DB::raw('0+cast(price as char) as price'),
-//        DB::raw('0+cast(original_price as char) as original_price'),
-
         $query = DB::table('nlsg_special_price')
             ->whereIn('id', $id_list)
             ->select([
-                'id', 'goods_type', 'goods_id',
-
-//                'goods_original_price',
-//                'goods_price',
-//                'sku_original_price', 'sku_price',
-//                'sku_price_black', 'sku_price_yellow',
-//                'group_price', 'sku_price_dealer',
-//                'is_set_t_money', 't_money', 't_money_black',
-//                't_money_yellow', 't_money_dealer',
-
-                DB::raw('0+cast(goods_original_price as char) as goods_original_price'),
-                DB::raw('0+cast(goods_price as char) as goods_price'),
-                DB::raw('0+cast(sku_original_price as char) as sku_original_price'),
-                DB::raw('0+cast(sku_price as char) as sku_price'),
-                DB::raw('0+cast(sku_price_black as char) as sku_price_black'),
-                DB::raw('0+cast(sku_price_yellow as char) as sku_price_yellow'),
-                DB::raw('0+cast(group_price as char) as group_price'),
-                DB::raw('0+cast(sku_price_dealer as char) as sku_price_dealer'),
-                DB::raw('0+cast(t_money as char) as t_money'),
-                DB::raw('0+cast(t_money_black as char) as t_money_black'),
-                DB::raw('0+cast(t_money_yellow as char) as t_money_yellow'),
-                DB::raw('0+cast(t_money_dealer as char) as t_money_dealer'),
-                'sku_number', 'stock', 'use_stock',
-                'begin_time', 'end_time', 'type','is_set_t_money',
-                'use_coupon', 'group_name', 'group_num_type', 'group_num',
+                'id', 'goods_type', 'goods_id','goods_original_price','goods_price','sku_original_price', 'sku_price',
+                'sku_price_black', 'sku_price_yellow','group_price', 'sku_price_dealer',
+                'is_set_t_money', 't_money', 't_money_black',
+                't_money_yellow', 't_money_dealer','sku_number', 'stock', 'use_stock',
+                'begin_time', 'end_time', 'type','use_coupon', 'group_name', 'group_num_type', 'group_num',
                 'freight_free', 'freight_free_line', 'flash_sale_max_num'
             ])
             ->get();
@@ -246,9 +223,7 @@ class SpecialPriceModel extends Base
                 ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
                     'nsp.goods_original_price', 'nmg.picture',
                     'nsp.use_stock', 'nsp.stock',
-//                    'nmg.original_price','nsp.goods_price',
-                    DB::raw('0+cast(nmg.original_price as char) as original_price'),
-                    DB::raw('0+cast(nsp.goods_price as char) as goods_price'),
+                    'nmg.original_price','nsp.goods_price',
                     'nsp.begin_time', 'nsp.end_time',
                     DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
                     DB::raw('unix_timestamp(end_time) as end_timestamp'),
@@ -438,10 +413,7 @@ class SpecialPriceModel extends Base
                         ->where('nmg.status', '=', 2);
                 })
                 ->select(['nsp.group_name as group_buy_id', 'nsp.goods_id', 'nmg.name',
-                    'nmg.subtitle', 'nmg.picture', 'group_num',
-                    //'nmg.original_price','group_price',
-                    DB::raw('0+cast(nmg.original_price as char) as original_price'),
-                    DB::raw('0+cast(nsp.group_price as char) as group_price'),
+                    'nmg.subtitle', 'nmg.picture', 'group_num','nmg.original_price','group_price',
                     'nsp.begin_time', 'nsp.end_time', 'group_name'])
                 ->orderBy('begin_time', 'asc')
                 ->groupBy('nsp.group_name')
