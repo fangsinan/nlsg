@@ -35,7 +35,17 @@ class Lists extends Model
         if ($lists) {
             foreach ($lists as $k => &$v) {
                 foreach ($v['list_works'] as $kk => &$vv) {
-                    if ($vv['type'] == 2) {
+
+                    if ($vv['type']==1){
+                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
+                            ->with(['user'=>function($query){
+                                $query->select('id','nickname', 'headimg');
+                            }])
+                            ->where('id', $vv['works_id'])
+                            ->first();
+                        //->get()->toArray();
+                        $v['list_works'][$kk]['works'] = $works;
+                    }else if ($vv['type'] == 2) {
                         $listen = Works::select([
                             'id', 'user_id', 'type', 'title', 'subtitle', 'cover_img', 'original_price', 'price',
                             'message', 'is_free'
