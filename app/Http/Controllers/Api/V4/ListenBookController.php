@@ -265,7 +265,7 @@ class ListenBookController extends Controller
 
         $lists = ListsWork::select('type','works_id')
                 ->where(['lists_id'=>$lists_id,'state'=>1])
-                ->orderBy('created_at','desc')
+//                ->orderBy('created_at','desc')
                 ->get()
                 ->toArray();
 
