@@ -126,6 +126,7 @@ class UserController extends Controller
             ->with([
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id', 'relation_type'])
+                        ->where('is_del',0)
                         ->limit(10)
                         ->groupBy('relation_type', 'relation_id')
                         ->orderBy('created_at', 'desc');
@@ -173,7 +174,7 @@ class UserController extends Controller
                     } elseif ($v['relation_type'] == 3) {
                         $v['listens'] = Works::select('id', 'title', 'cover_img', 'is_audio_book')
                             ->where('id', $v['relation_id'])
-                            ->where('status', 2)
+                            ->where('status', 4)
                             ->where('is_audio_book', 1)
                             ->first();
                     } elseif ($v['relation_type'] == 4) {
@@ -182,7 +183,7 @@ class UserController extends Controller
                             ->where('status', 4)
                             ->first();
                     }
-                    if(empty($v['columns']) && empty($v['lecture']) && empty( $v['listen']) && empty($v['works'])){
+                    if(empty($v['columns']) && empty($v['lecture']) && empty( $v['listens']) && empty($v['works'])){
                         unset($user['history'][$k]);
 
                     }
