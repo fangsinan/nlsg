@@ -386,7 +386,7 @@ class WorksController extends Controller
         $Teacher = Works::select(DB::raw('max(subscribe_num) subscribe_num'),'user_id')->with([
             'userName'=>function($query){
                 $query->select('id','nickname');
-            }])->where('status',4)
+            }])->where('status',4)->where('type',2)
             ->orderBy('subscribe_num','desc')->groupBy('user_id')
             ->paginate(6)->toArray();
         $newTeacher[] = ['id'=>0,'nickname'=>'全部'];

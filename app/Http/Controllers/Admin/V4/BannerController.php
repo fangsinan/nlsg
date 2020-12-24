@@ -62,7 +62,7 @@ class BannerController extends ControllerBackend
             });
 
         $lists = $query->select('id', 'title', 'pic', 'rank', 'url', 'type', 'jump_type', 'obj_id', 'created_at', 'status')
-            ->orderBy('rank', 'desc')
+            ->orderBy('rank')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
