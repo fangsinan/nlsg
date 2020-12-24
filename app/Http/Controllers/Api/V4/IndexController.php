@@ -932,7 +932,7 @@ class IndexController extends Controller
     {
         //(1).直播详情   (2).精品课  (3).商品  (4).h5页面  (5).讲座  (6).听书 7 专栏
         $data = [
-            'id'   => 17,
+            'id'   => 297,
             'info_id' => 0,
             'type' => 5,
             'url'  => '',
