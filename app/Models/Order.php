@@ -42,6 +42,11 @@ class Order extends Base
         return $this->belongsTo(Works::class, 'relation_id', 'id');
     }
 
+    public function column()
+    {
+        return $this->belongsTo(Column::class, 'relation_id', 'id');
+    }
+
     //下单check
     public function addOrderCheck($user_id, $tweeter_code, $target_id, $type)
     {
@@ -156,25 +161,25 @@ class Order extends Base
 
     }
 
-    public static function getOrderPrice($type=16, $today=false)
+    public static function getOrderPrice($type = 16, $today = false)
     {
         $query = Order::query();
-        if ($type){
+        if ($type) {
             $query->where('type', $type);
         }
-        if ($today){
+        if ($today) {
             $query->where('created_at', '>=', Carbon::today());
         }
         $list = $query->select([
-                    DB::raw('count(*) as total'),
-                    DB::raw('sum(pay_price) as price'),
-                    'user_id',
-                    'relation_id'
-                ])
-                ->where('status', 1)
-                ->orderBy('total', 'desc')
-                ->groupBy('relation_id')
-                ->first();
+            DB::raw('count(*) as total'),
+            DB::raw('sum(pay_price) as price'),
+            'user_id',
+            'relation_id'
+        ])
+            ->where('status', 1)
+            ->orderBy('total', 'desc')
+            ->groupBy('relation_id')
+            ->first();
         return $list;
     }
 
