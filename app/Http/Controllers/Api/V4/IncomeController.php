@@ -1031,7 +1031,7 @@ class IncomeController extends Controller
             $info['pay_content'] = $con['pay_content']??'';
 
         } else { //收入
-            $pay_info = PayRecordDetail::where(['id'=>$id,'user_id'=>$user_id])->first();
+            $pay_info = PayRecordDetail::where(['id'=>$id,'user_id'=>$user_id])->first()->toArray();
             if(empty($pay_info)) return $this->success();
 
             $con = $this->detail_content($type,$pay_info['type'],$pay_info['ordernum'],$pay_info['order_detail_id']);
