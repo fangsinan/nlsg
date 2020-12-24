@@ -355,7 +355,7 @@ class UserController extends Controller
 
         User::where('id', $uid)->increment('fan_num');
         User::where('id', $this->user['id'])->increment('follow_num');
-
+        return $this->getRes(['code' => true, 'msg' => '关注成功']);
         return success();
     }
 
@@ -395,6 +395,8 @@ class UserController extends Controller
         }
         User::where('id', $uid)->decrement('fan_num');
         User::where('id', $this->user['id'])->decrement('follow_num');
+
+        return $this->getRes(['code' => true, 'msg' => '取消成功']);
 
         return success();
     }
