@@ -766,7 +766,7 @@ class IncomeController extends Controller
 
             $order_type_val = [7,8,9,10,12,18];//默认全部查询
             if( !empty($type) &&  in_array($type,[1,2,3,4]) ){
-                // 改需求后的 type类型  1电商支付   2内容支付   3 会员  4 所有提现
+                // 改需求后的 type类型  1电商支付   2内容支付   3 会员  4 所有提现 5能量币充值记录
                 switch ($type){
                     case 1:
                         $order_type_val = [10];
@@ -779,6 +779,9 @@ class IncomeController extends Controller
                         break;
                     case 4:
                         $order_type_val = [7,8,9];
+                        break;
+                    case 5:
+                        $order_type_val = [18];
                         break;
 
                 }
