@@ -351,6 +351,7 @@ class MallOrder extends Base
             $temp_datails_data['updated_at'] = $now_date;
             $temp_datails_data['inviter'] = $v['inviter'];
             $temp_datails_data['sp_id'] = $v['sp_id'] ?? 0;
+            $temp_datails_data['t_money'] = $v['t_money'] ?? 0;
             if ($v['inviter']) {
                 $temp_datails_data['inviter_history'] = json_encode($v['inviter_info']);
             } else {
