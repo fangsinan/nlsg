@@ -7,6 +7,7 @@ use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
+use App\Models\PayRecordDetailStay;
 use App\Models\Works;
 use App\Servers\ChannelServers;
 use App\Servers\MallRefundJob;
@@ -58,7 +59,7 @@ class Kernel extends ConsoleKernel
             MallOrder::receipt();//自动收货
             Coupon::clear();//失效优惠券清理
             Works::statistic(); //数据统计
-
+            PayRecordDetailStay::remove();//商城待到帐收益划转
         })->dailyAt('03:00');//半夜清理
 
 
