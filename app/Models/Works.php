@@ -135,7 +135,7 @@ class Works extends Base
         $works = Works::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num')
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num','chapter_num as info_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 0)
             ->where('status', 4)
@@ -154,7 +154,7 @@ class Works extends Base
         $book = Works::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num')
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num','chapter_num as info_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 1)
             ->where('status', 4)
@@ -173,7 +173,7 @@ class Works extends Base
         $lecture = Column::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'is_free', 'name','title', 'subtitle', 'cover_pic', 'details_pic')
+            ->select('id', 'user_id', 'is_free', 'name','title', 'subtitle', 'cover_pic', 'details_pic','info_num')
             ->where('is_free', 1)
             ->where('type', 2)
             ->where('status', 1)
