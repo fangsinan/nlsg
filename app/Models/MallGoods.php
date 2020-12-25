@@ -54,7 +54,7 @@ class MallGoods extends Base
             if ($count_list == 1) {
                 //详情时候获取一条评论
                 $mcModel = new MallComment();
-                $v->comment_list = $mcModel->getList(['goods_id' => $v->id, 'page' => 1, 'size' => 1]);
+                $v->comment_list = $mcModel->getList(['goods_id' => $v->id, 'page' => 1, 'size' => 1,'for_goods_info'=>1]);
             } else {
                 $v->comment_list = new class {
                 };

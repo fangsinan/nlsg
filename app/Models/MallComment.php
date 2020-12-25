@@ -20,7 +20,7 @@ class MallComment extends Base
         $pid = intval($params['pid'] ?? 0);
 
         $list = [];
-        self::getDataByGidPid($list, $goods_id, $pid, $params['page'], $params['size']);
+        self::getDataByGidPid($list, $goods_id, $pid, $params['page'], $params['size'],$params['for_goods_info']);
 
         $res['count'] = DB::table('nlsg_mall_comment as nmc')
             ->join('nlsg_user as nu', 'nmc.user_id', '=', 'nu.id')
@@ -33,7 +33,7 @@ class MallComment extends Base
         return $res;
     }
 
-    public static function getDataByGidPid(&$list, $goods_id, $pid = 0, $page = 1, $size = 10)
+    public static function getDataByGidPid(&$list, $goods_id, $pid = 0, $page = 1, $size = 10,$for_goods_info = 0)
     {
 
         $now_date = date('Y-m-d H:i:s');
@@ -60,6 +60,10 @@ class MallComment extends Base
             ['nmc.status', '=', 1],
             ['nmc.pid', '=', $pid]
         ]);
+
+        if ($for_goods_info == 1){
+            $query->where('nmc.star','=',5);
+        }
 
         if ($pid == 0) {
             $query->orderBy('rank', 'asc');
@@ -123,9 +127,9 @@ class MallComment extends Base
         }
         $params['size'] = $params['size'] ?? 4;
         $params['page'] = $params['page'] ?? 1;
-
+        $params['for_goods_info'] = $params['for_goods_info'] ?? 0;
         $cache_key_name = 'mall_comment_goods_' . $params['goods_id'] . '_'
-            . $params['size'] . '_' . $params['page'];
+            . $params['size'] . '_' . $params['page'].'_'.$params['for_goods_info'];
 
         $expire_num = CacheTools::getExpire('mall_comment_list');
         $res = Cache::get($cache_key_name);
