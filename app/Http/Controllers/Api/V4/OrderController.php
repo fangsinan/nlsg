@@ -73,7 +73,7 @@ class OrderController extends Controller
      */
     public function getCoupon(Request $request)
     {
-        $price = $request->input('price', 0);
+        $price = $request->input('price') ?? 0;
         $type = $request->input('type', 0);
         $user_id = $this->user['id'] ?? 0;//->input('user_id',0);
         $where_type = [0];
