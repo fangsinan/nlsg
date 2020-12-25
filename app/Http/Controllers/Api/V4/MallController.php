@@ -215,7 +215,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            dd($request->getClientIp());
+            dd(json_decode(json_encode($request),true));
             return true;
         } else {
             $params = $request->input();
