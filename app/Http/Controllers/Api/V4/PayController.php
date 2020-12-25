@@ -90,7 +90,7 @@ class PayController extends Controller {
             //app 支付不需要openid
             $pay_info['openid'] = '';
         }
-        $pay_info['price'] = '0.01';
+        //$pay_info['price'] = '0.01';
 
         $result = $app->order->unify([
             'body' => $pay_info['body'],
@@ -183,6 +183,9 @@ class PayController extends Controller {
         }
 
         $userInfo = User::find($OrderInfo['user_id']);
+        if($userInfo['is_test_pay'] == 1 ){
+            $OrderInfo['price'] = 0.01;
+        }
 
         return [
             'body' => $body,
@@ -224,7 +227,7 @@ class PayController extends Controller {
         }
 
         $pay_info = $this->getPayInfo($order_id, $attach);
-        $pay_info['price'] = '0.01';
+
         if ($pay_info == false) {
             return $this->error(0, '订单信息错误');
         }
