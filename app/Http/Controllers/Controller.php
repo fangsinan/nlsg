@@ -23,9 +23,6 @@ class Controller extends BaseController
     public function __construct(Request $request)
     {
         $this->user = auth('api')->user();
-        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-        $this->user->ip = $request->getClientIp();
-
         if ($this->user) {
             $this->user = $this->user->toArray();
             $this->user['true_level'] = 0;
@@ -34,6 +31,8 @@ class Controller extends BaseController
                 $this->user['level'] = $this->user['level'];
             }
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
+            $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+            $this->user['ip'] = $request->getClientIp();
         }
     }
 
