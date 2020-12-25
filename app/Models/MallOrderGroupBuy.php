@@ -702,17 +702,17 @@ class MallOrderGroupBuy extends Base
 
         foreach ($team_list as $k => $v) {
             //临时 待优化   过滤掉用户已经参加的队伍
-            if ($user_id){
+            if ($user_id) {
                 $check_show = DB::table('nlsg_mall_group_buy_list as g')
-                    ->join('nlsg_mall_order as o','o.id','=','g.order_id')
-                    ->where('g.group_key','=',$v->group_key)
-                    ->where('g.user_id','=',$user_id)
-                    ->where('g.is_fail','=',0)
-                    ->where('o.is_stop','=',0)
-                    ->where('o.status','>',1)
+                    ->join('nlsg_mall_order as o', 'o.id', '=', 'g.order_id')
+                    ->where('g.group_key', '=', $v->group_key)
+                    ->where('g.user_id', '=', $user_id)
+                    ->where('g.is_fail', '=', 0)
+                    ->where('o.is_stop', '=', 0)
+                    ->where('o.status', '>', 1)
                     ->select(['g.id'])
                     ->first();
-                if ($check_show){
+                if ($check_show) {
                     unset($team_list[$k]);
                     continue;
                 }
@@ -722,7 +722,7 @@ class MallOrderGroupBuy extends Base
         }
 
         $res = [];
-        foreach ($team_list as $v){
+        foreach ($team_list as $v) {
             $res[] = $v;
         }
 
@@ -757,30 +757,45 @@ class MallOrderGroupBuy extends Base
         switch (intval($params['status'] ?? 0)) {
             case 1:
                 $query->where('nmo.status', '=', 1)
-                    ->where('nmo.is_stop', '=', 0);
+                    ->where('nmo.is_stop', '=', 0)
+                    ->whereRaw('(`status` = 1 AND dead_time < "' .
+                        $now_date . '" ) ');
                 break;
             case 10:
                 $query->where('nmo.status', '=', 10)
                     ->where('nmo.is_stop', '=', 0)
-                    ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1)
+                    ->whereRaw('(`status` = 1 AND dead_time < "' .
+                        $now_date . '" ) ');
                 break;
             case 20:
                 $query->where('nmo.status', '=', 20)
                     ->where('nmo.is_stop', '=', 0)
-                    ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1)
+                    ->whereRaw('(`status` = 1 AND dead_time < "' .
+                        $now_date . '" ) ');
                 break;
             case 30:
                 $query->where('nmo.status', '=', 30)
                     ->where('nmo.is_stop', '=', 0)
-                    ->where('gbl.is_success', '=', 1);
+                    ->where('gbl.is_success', '=', 1)
+                    ->whereRaw('(`status` = 1 AND dead_time < "' .
+                        $now_date . '" ) ');
                 break;
             case 95:
                 $query->where('nmo.status', '=', 10)
                     ->where('nmo.is_stop', '=', 0)
-                    ->where('gbl.is_success', '=', 0);
+                    ->where('gbl.is_success', '=', 0)
+                    ->whereRaw('(`status` = 1 AND dead_time < "' .
+                        $now_date . '" ) ');
                 break;
             case 99:
                 $query->where('nmo.is_stop', '=', 1);
+                $query->where(function ($q) use ($now_date) {
+                    $q->where('nmo.is_stop', '=', 1)
+                        ->orwhereRaw('(`status` = 1 AND dead_time < "' .
+                            $now_date . '" ) ');
+                });
                 break;
         }
 
@@ -789,8 +804,8 @@ class MallOrderGroupBuy extends Base
             DB::raw('unix_timestamp(nmo.dead_time) as dead_timestamp'),
             DB::raw('(case when nmo.is_stop = 1
                 then 99 when nmo.`status` = 1 then 1
-                when is_success = 0 then 95  ELSE nmo.`status` END) `status`'),
-            'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type','nmo.normal_cut'
+                when is_success = 0 then 95  when ( nmo.is_stop = 0 and dead_time < "' . $now_date . '" ) then 99 ELSE nmo.`status` END) `status`'),
+            'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type', 'nmo.normal_cut'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList' => function ($q) use ($user_id) {
             $q->orderBy('is_captain', 'desc')
@@ -821,12 +836,14 @@ class MallOrderGroupBuy extends Base
             $with[] = 'orderChild.expressInfo';
         }
 
-        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
-            $now_date . '" then FALSE ELSE TRUE END) ');
+//        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
+//            $now_date . '" then FALSE ELSE TRUE END) ');
 
         $query->orderBy('id', 'desc');
 
+        $this->getSqlBegin();
         $list = $query->with($with)->select($field)->get();
+//        $this->getSql();
 
         foreach ($list as $k => $v) {
             $v->goods_count = 0;
@@ -841,9 +858,9 @@ class MallOrderGroupBuy extends Base
             $headimg_count = $v->groupListInfo->spInfo['group_num'] ?? 2;
 
             foreach ($v->groupList as $glv) {
-                if (count($headimg) < $headimg_count){
+                if (count($headimg) < $headimg_count) {
                     $headimg[] = $glv->userInfo->headimg ?? '';
-                }else{
+                } else {
                     break;
                 }
             }
@@ -1042,7 +1059,7 @@ class MallOrderGroupBuy extends Base
         }
 
         foreach ($price_list_new as &$new_v) {
-            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额','优惠金额'])) {
+            if (in_array($new_v['key'], ['权益立减', '活动立减', '优惠券总额', '优惠金额'])) {
                 $new_v['value'] = '- ¥' . $new_v['value'];
             } elseif (in_array($new_v['key'], ['运费'])) {
                 $new_v['value'] = '+ ¥' . $new_v['value'];
