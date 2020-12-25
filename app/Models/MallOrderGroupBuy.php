@@ -735,6 +735,7 @@ class MallOrderGroupBuy extends Base
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $user_id = $user['id'];
+//        $user_id = 257121;
         $params['page'] = $params['page'] ?? 1;
         $params['size'] = $params['size'] ?? 10;
         //库数据:订单状态 1待付款  10待发货 20待收货 30已完成
@@ -803,7 +804,8 @@ class MallOrderGroupBuy extends Base
             DB::raw('unix_timestamp(nmo.dead_time) as dead_timestamp'),
             DB::raw('(case when nmo.is_stop = 1
                 then 99 when nmo.`status` = 1 then 1
-                when is_success = 0 then 95  when ( nmo.is_stop = 0 and dead_time < "' . $now_date . '" ) then 99 ELSE nmo.`status` END) `status`'),
+                when is_success = 0 then 95  when ( nmo.is_stop = 0 AND nmo.`status` = 1 and dead_time < "' .
+                $now_date . '" ) then 99 ELSE nmo.`status` END) `status`'),
             'nmo.created_at', 'nmo.pay_price', 'nmo.price', 'nmo.post_type', 'nmo.pay_type', 'nmo.normal_cut'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList' => function ($q) use ($user_id) {
