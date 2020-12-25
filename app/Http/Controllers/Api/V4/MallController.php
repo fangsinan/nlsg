@@ -215,7 +215,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            $request->setTrustedProxies($request->getClientIps());
+       
             dd([
                 $request->getClientIp(),
                 $request->getClientIps()
