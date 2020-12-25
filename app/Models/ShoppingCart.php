@@ -9,7 +9,6 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Description of ShoppingCart
@@ -146,6 +145,7 @@ class ShoppingCart extends Base
                 'invalid' => 1
             ], $user, false);
 
+
         foreach ($cart as &$v) {
             $v['invalid'] = 1;
             foreach ($goods_list as $gv) {
@@ -153,13 +153,13 @@ class ShoppingCart extends Base
                     $v['invalid'] = 0;
                     $v['goods_name'] = $gv->name;
                     $v['goods_subtitle'] = $gv->subtitle;
-                    $v['original_price'] = $gv->original_price;
-                    $v['price'] = $gv->price;
                     if ($gv->status != 2) {
                         $v['invalid'] = 1;
                     }
-                    foreach ($gv->sku_list_all as $sv) {
+                    foreach ($gv->sku_list as $sv) {
                         if ($v['sku_number'] == $sv->sku_number) {
+                            $v['original_price'] = $sv->original_price;
+                            $v['price'] = $sv->price;
                             $v['sku_list'] = $sv;
                             if ($sv->status == 0 || $sv->stock < 1) {
                                 $v['invalid'] = 1;

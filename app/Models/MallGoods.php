@@ -293,7 +293,7 @@ class MallGoods extends Base
     {
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
             ->where('status', '=', 1)
-            ->select(['id', 'goods_id', 'sku_number', 'picture','original_price', 'price','stock']);
+            ->select(['id', 'goods_id', 'sku_number', 'picture','original_price', 'price','stock','status']);
     }
 
     public function sku_list_back()

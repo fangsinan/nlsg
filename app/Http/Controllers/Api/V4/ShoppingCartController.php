@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\ShoppingCart;
+use Illuminate\Http\Request;
 
 class ShoppingCartController extends Controller
 {
@@ -191,9 +191,10 @@ class ShoppingCartController extends Controller
     }
 
 
-    public function getCount(){
+    public function getCount()
+    {
         $model = new ShoppingCart();
-        $data = $model->getCount($this->user['id']??0);
+        $data = $model->getCount($this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 }
