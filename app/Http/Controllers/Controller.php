@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\VipUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
 class Controller extends BaseController
@@ -20,9 +20,12 @@ class Controller extends BaseController
     protected $show_ps = false;
     public $user;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
         $this->user = auth('api')->user();
+        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+        $this->user->ip = $request->getClientIp();
+
         if ($this->user) {
             $this->user = $this->user->toArray();
             $this->user['true_level'] = 0;
