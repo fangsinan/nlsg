@@ -31,9 +31,13 @@ class Controller extends BaseController
                 $this->user['level'] = $this->user['level'];
             }
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
-//            $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
             $this->user['ip'] = $request->getClientIp();
         }
+    }
+
+    public static function getIp(Request $request){
+        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+        return $request->getClientIp();
     }
 
     protected function success($data = [], $flag = 0, $msg = '成功')
