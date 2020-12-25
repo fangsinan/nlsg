@@ -28,7 +28,16 @@ class AfterSalesController extends ControllerBackend
      * @apiGroup  后台-售后
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/after_sales/list
      * @apiDescription 售后列表和详情
-     * @apiSuccess {number} id id
+     * @apiSuccess {string} service_num 售后订单
+     * @apiSuccess {string} user_info 用户信息
+     * @apiSuccess {string} os_type 订单来源(1安卓 2ios 3微信 )
+     * @apiSuccess {string} pay_type 支付渠道(1 微信端 2app微信 3app支付宝 4ios)
+     * @apiSuccess {string} info_order 售前单号信息
+     * @apiSuccess {string} type  申请类型( 1退款 2退货)
+     * @apiSuccess {string} reason_id 申请原因(1,商品问题,2客服问题,3物流问题,4其他问题
+     * @apiSuccess {string} description 申请描述
+     * @apiSuccess {string} picture 凭证
+     * @apiSuccess {string} created_at 时间
      */
     public function list(Request $request)
     {
