@@ -215,8 +215,12 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            $request::setTrustedProxies(request()->getClientIps, \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-            dd([
+            var_dump([
+                $request->getClientIp(),
+                $request->getClientIps()
+            ]);
+            $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+            var_dump([
                 $request->getClientIp(),
                 $request->getClientIps()
             ]);
