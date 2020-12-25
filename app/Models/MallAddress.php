@@ -75,7 +75,6 @@ class MallAddress extends Base
         $address->city = $city;
         $address->area = $area;
         $address->user_id = $user_id;
-        
         $res = $address->save();
 
         if ($res) {

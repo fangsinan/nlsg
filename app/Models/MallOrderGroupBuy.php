@@ -650,29 +650,16 @@ class MallOrderGroupBuy extends Base
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
 
-        //成功队伍数量
-//        $team_success_count = DB::table('nlsg_mall_group_buy_list as gbl')
-//            ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
-//            ->where('gbl.group_name', '=', $group_buy_id)
-//            ->where('gbl.is_success', '=', 1)
-//            ->where('gbl.is_captain', '=', 1)
-//            ->count();
-        //队伍数量
-//        $team_count = DB::table('nlsg_mall_group_buy_list as gbl')
-//            ->join('nlsg_mall_order as nmo', 'nmo.id', '=', 'gbl.order_id')
-//            ->where('gbl.group_name', '=', $group_buy_id)
-//            ->where('gbl.is_captain', '=', 1)
-//            ->where('gbl.is_fail', '=', 0)
-//            ->count();
         //开团列表 所差人数  剩余时间
-        //todo  已经成团的是否要过滤
         $query = MallGroupBuyList::where('nlsg_mall_group_buy_list.group_name', '=', $group_buy_id);
 
         if (($params['show_self'] ?? 0) == 0) {
             $query->where('nlsg_mall_group_buy_list.user_id', '<>', $user_id);
         }
 
-//        $query->where('is_success', '=', 0);
+        //已经成团的是否要过滤
+        //$query->where('is_success', '=', 0);
+
         $query->where('is_captain', '=', 1)
             ->where('is_fail', '=', 0)
             ->where('end_at', '>', $now_date);
@@ -714,11 +701,32 @@ class MallOrderGroupBuy extends Base
         $team_list = $query->get();
 
         foreach ($team_list as $k => $v) {
+            //临时 待优化   过滤掉用户已经参加的队伍
+            if ($user_id){
+                $check_show = DB::table('nlsg_mall_group_buy_list as g')
+                    ->join('nlsg_mall_order as o','o.id','=','g.order_id')
+                    ->where('g.group_key','=',$v->group_key)
+                    ->where('g.user_id','=',$user_id)
+                    ->where('g.is_fail','=',0)
+                    ->where('o.is_stop','=',0)
+                    ->where('o.status','>',1)
+                    ->select(['g.id'])
+                    ->first();
+                if ($check_show){
+                    unset($team_list[$k]);
+                    continue;
+                }
+            }
             $v->order_count = $v->teamOrderCount->counts ?? 0;
             unset($team_list[$k]->teamOrderCount);
         }
 
-        return $team_list;
+        $res = [];
+        foreach ($team_list as $v){
+            $res[] = $v;
+        }
+
+        return $res;
     }
 
     //用户拼团订单列表
