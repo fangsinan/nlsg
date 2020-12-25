@@ -215,7 +215,12 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            dd(json_decode(json_encode($request),true));
+            $request->setTrustedProxies($request->getClientIps());
+            dd([
+                $request->getClientIp(),
+                $request->getClientIps()
+            ]);
+
             return true;
         } else {
             $params = $request->input();
