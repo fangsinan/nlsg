@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\Column;
 use App\Models\Order;
 use App\Models\Works;
+use App\Models\Live;
+use App\Models\Comment;
+use App\Models\Wiki;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -474,6 +478,128 @@ class OrderController extends ControllerBackend
             'rank'  => $rank
         ];
         return success($data);
+    }
+
+    /**
+     * @api {get} api/admin_v4/order/reward  打赏订单
+     * @apiVersion 4.0.0
+     * @apiName  order/lecture
+     * @apiGroup 后台-虚拟订单
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/reward
+     * @apiDescription 打赏订单
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} title 名称
+     * @apiParam {number} status   0 待支付  1已支付
+     * @apiParam {string} nickname 昵称
+     * @apiParam {string} phone    账号
+     * @apiParam {string} ordernum 订单号
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
+     * @apiParam {string} os_type  订单来源
+     * @apiParam {string} pay_type  支付方式
+     * @apiParam {string} reward_type  打赏类型  1专栏  2课程  3想法 4 百科  5直播礼物
+     * @apiParam {string} level    推者类型
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function reward(Request $request)
+    {
+        $phone = $request->get('phone');
+        $nickname = $request->get('nickname');
+        $ordernum = $request->get('ordernum');
+        $title = $request->get('title');
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $status = $request->get('status');
+        $level = $request->get('level');
+        $pay_type = $request->get('pay_type');
+        $reward_type = $request->get('reward_type');
+        $os_type = $request->get('os_type');
+        $sort = $request->get('sort');
+
+        $query = Order::when(! is_null($status), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when(! is_null($pay_type), function ($query) use ($pay_type) {
+                $query->where('pay_type', $pay_type);
+            })
+            ->when(! is_null($os_type), function ($query) use ($os_type) {
+                $query->where('os_type', $os_type);
+            })
+            ->when(! is_null($reward_type), function ($query) use ($reward_type) {
+                $query->where('reward_type', $reward_type);
+            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                });
+            })
+            ->when($phone, function ($query) use ($phone) {
+                $query->whereHas('user', function ($query) use ($phone) {
+                    $query->where('phone', 'like', '%'.$phone.'%');
+                });
+            })
+            ->when($level, function ($query) use ($level) {
+                $query->whereHas('user', function ($query) use ($level) {
+                    $query->where('level', 'like', '%'.$level.'%');
+                });
+            })
+            ->when($title, function ($query) use ($title) {
+                $query->whereHas('works', function ($query) use ($title) {
+                    $query->where('title', 'like', '%'.$title.'%');
+                });
+            })
+            ->when($ordernum, function ($query) use ($ordernum) {
+                $query->where('ordernum', 'like', '%'.$ordernum.'%');
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                ]);
+            });
+
+        $direction = $sort == 'asc' ? 'asc' : 'desc';
+        $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
+            'created_at', 'status', 'reward_type', 'reward_num', 'reward')
+            ->where('type', 5)
+            ->orderBy('id', $direction)
+            ->paginate(20)
+            ->toArray();
+        if ($lists['data']){
+            foreach ($lists['data'] as &$v) {
+                if ($v['reward_type']==1){
+                    $v['title'] = Column::where('id', $v['relation_id'])->value('name');
+                    $v['type']  = '讲座';
+                } elseif($v['reward_type'] ==2){
+                    $v['title'] = Works::where('id', $v['relation_id'])->value('title');
+                    $v['type']  = '课程';
+                } elseif($v['reward_type'] ==3){
+                    $v['title'] = Comment::where('id', $v['relation_id'])->value('content');
+                    $v['type']  ='想法';
+                }  elseif($v['reward_type']==4){
+                    $v['title'] = Wiki::where('id', $v['relation_id'])->value('name');
+                    $v['type']  ='百科';
+                } elseif($v['reward_type'] ==5) {
+                    $v['title'] = Live::where('id', $v['relation_id'])->value('title');
+                    $v['type']  ='直播';
+                }
+            }
+        }
+
+        return success($lists);
+
+
     }
 
 }
