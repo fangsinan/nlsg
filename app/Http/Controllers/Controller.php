@@ -19,9 +19,12 @@ class Controller extends BaseController
     protected $page_per_page = 20;
     protected $show_ps = false;
     public $user;
+    public $ip;
 
     public function __construct(Request $request)
     {
+        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+        $this->ip =  $request->getClientIp();
         $this->user = auth('api')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
@@ -33,11 +36,6 @@ class Controller extends BaseController
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
             $this->user['ip'] = $request->getClientIp();
         }
-    }
-
-    public static function getIp(Request $request){
-        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-        return $request->getClientIp();
     }
 
     protected function success($data = [], $flag = 0, $msg = '成功')
