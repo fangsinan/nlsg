@@ -215,10 +215,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-
-            dd($this->user);
-
-
+            dd([$this->user,$request->getClientIp()]);
             return true;
         } else {
             $params = $request->input();
