@@ -415,7 +415,8 @@ class MallRefundRecord extends Base
     public function infoOrder()
     {
         return $this->hasOne('App\Models\MallOrder', 'id', 'order_id')
-            ->select(['id', 'ordernum']);
+            ->select(['id', 'ordernum','cost_price','freight','normal_cut','vip_cut','coupon_money',
+                'coupon_freight_id','special_price_cut','price','pay_price','os_type','status']);
     }
 
     public function infoDetail()
@@ -426,7 +427,7 @@ class MallRefundRecord extends Base
 
     public function userInfo(){
         return $this->hasOne(User::class, 'id', 'user_id')
-            ->select(['id','phone','nickname','headimg']);
+            ->select(['id','phone','nickname','headimg','level','expire_time']);
     }
 
     public function orderInfo($params, $user)
