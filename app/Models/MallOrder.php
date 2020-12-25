@@ -608,8 +608,8 @@ class MallOrder extends Base
             $temp_v['sku_number'] = $v['sku_number'];
             $temp_v['sp_id'] = $v['sp_id'] ?? 0;
 
-            if (1 && $v['num'] > $v['stock']) {
-                return ['code' => false, 'msg' => $v['name'] . '库存不足', 'ps' => $v['num'] . '-' . $v['stock']];
+            if ($v['num'] > $v['stock']) {
+                return ['code' => false, 'msg' => '库存不足', 'ps' => $v['num'] . '-' . $v['stock']];
             } else {
                 $temp_v['num'] = $v['num'] > $v['stock'] ? $v['stock'] : $v['num'];
             }
