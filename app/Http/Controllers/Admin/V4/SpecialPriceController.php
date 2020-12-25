@@ -266,6 +266,18 @@ class SpecialPriceController extends ControllerBackend
         return $this->getRes($data);
     }
 
+
+    /**
+     * 修改状态
+     * @api {put} /api/admin_v4/special_price/status_change 修改状态
+     * @apiVersion 1.0.0
+     * @apiName /api/admin_v4/special_price/status_change
+     * @apiGroup 后台管理-商品价格设置
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/special_price/status_change
+     * @apiDescription 修改状态
+     * @apiParam {number} id id
+     * @apiParam {string='on', 'off', 'del'} flag 依次上架下架删除
+     */
     public function statusChange(Request $request)
     {
         $servers = new SpecialPriceServers();
