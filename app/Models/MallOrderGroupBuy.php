@@ -790,7 +790,6 @@ class MallOrderGroupBuy extends Base
                         $now_date . '" ) ');
                 break;
             case 99:
-                $query->where('nmo.is_stop', '=', 1);
                 $query->where(function ($q) use ($now_date) {
                     $q->where('nmo.is_stop', '=', 1)
                         ->orwhereRaw('(`status` = 1 AND dead_time < "' .
@@ -841,9 +840,9 @@ class MallOrderGroupBuy extends Base
 
         $query->orderBy('id', 'desc');
 
-        $this->getSqlBegin();
+//$this->getSqlBegin();
         $list = $query->with($with)->select($field)->get();
-//        $this->getSql();
+//$this->getSql();
 
         foreach ($list as $k => $v) {
             $v->goods_count = 0;
