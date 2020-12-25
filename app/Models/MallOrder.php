@@ -499,11 +499,11 @@ class MallOrder extends Base
 
 
             foreach ($temp_sl_v->twitter_money_list as $vv) {
-                if ($vv['sku_number'] == $sl_v['sku_number']) {
+                if ($vv['sku_number'] === $sl_v['sku_number']) {
                     //初始推客金额(不是活动单独设定)
                     $sku_list[$sl_k]['t_money'] = 0;
                     if (!empty($sl_v['inviter']) && !empty($sl_v['inviter_info'])) {
-                        if ($sl_v['inviter_info']['is_staff'] == 0) {
+                        if ($sl_v['inviter_info']['is_staff'] == 1) {
                             $sku_list[$sl_k]['t_money'] = $vv['twitter_money']['t_staff_money'];
                         } else {
                             if ($sl_v['inviter_info']['expire_time'] > $now_date) {
