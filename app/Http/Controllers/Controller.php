@@ -34,7 +34,6 @@ class Controller extends BaseController
                 $this->user['level'] = $this->user['level'];
             }
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
-            $this->user['ip'] = $request->getClientIp();
         }
     }
 
