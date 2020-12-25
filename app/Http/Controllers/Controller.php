@@ -17,7 +17,7 @@ class Controller extends BaseController
         ValidatesRequests;
 
     protected $page_per_page = 20;
-    protected $show_ps = true;
+    protected $show_ps = false;
     public $user;
 
     public function __construct()
