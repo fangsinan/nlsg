@@ -90,7 +90,6 @@ class PayController extends Controller {
             //app 支付不需要openid
             $pay_info['openid'] = '';
         }
-        //$pay_info['price'] = '0.01';
 
         $result = $app->order->unify([
             'body' => $pay_info['body'],
@@ -168,8 +167,6 @@ class PayController extends Controller {
                 $body = "能量时光-线下课购买-" . $OrderInfo['ordernum'];
             } else if ($attach == 8) {
                 $body = "能量时光-电商订单-" . $OrderInfo['ordernum'];
-                //todo 临时:商城支付一分
-                $OrderInfo['price'] = 0.01;
             } else if ($attach == 15) {
                 $ColumnInfo = Column::find($OrderInfo['relation_id']);
                 $body = "能量时光-讲座购买-" . $ColumnInfo['name'];
