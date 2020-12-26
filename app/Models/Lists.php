@@ -10,7 +10,7 @@ class Lists extends Model
 {
     protected $table = 'nlsg_lists';
     protected $fillable = [
-        'title', 'subtitle', 'status', 'type'
+        'title', 'subtitle', 'status', 'type','cover','details_pic'
     ];
 
     /**

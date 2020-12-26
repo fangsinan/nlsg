@@ -24,6 +24,7 @@ class OrderController extends ControllerBackend
      * @apiDescription 精品课订单
      *
      * @apiParam {number} page 分页
+     * @apiParam {number} type 类型   1 精品课排行 2讲座排行
      * @apiParam {string} title 名称
      * @apiParam {number} status   0 待支付  1已支付
      * @apiParam {string} nickname 昵称
@@ -58,6 +59,7 @@ class OrderController extends ControllerBackend
         $level = $request->get('level');
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
+        $type    = $request->get('type');
         $sort = $request->get('sort');
         $query = Order::with(
             [
