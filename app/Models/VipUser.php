@@ -115,4 +115,20 @@ class VipUser extends Base
             return 0;
         }
     }
+
+    public function orderHistory()
+    {
+        return $this->hasOne(Order::class, 'user_id', 'user_id')
+            ->where('type','=',16)
+            ->where('status','=',1)
+            ->select(['id', 'user_id','created_at'])
+            ->orderBy('id','desc');
+    }
+
+    public function codeHistory(){
+        return $this->hasOne(VipRedeemUser::class, 'user_id', 'user_id')
+            ->where('status','=',2)
+            ->select(['id', 'user_id','updated_at'])
+            ->orderBy('updated_at','desc');
+    }
 }
