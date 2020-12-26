@@ -333,7 +333,7 @@ class OrderController extends ControllerBackend
         $orders = Order::getOrderPrice(16);
         if ($orders['relation_id'] == 1) {
             $item['yellow'] = $orders['total'];
-        } elseif ($v['relation_id'] == 2) {
+        } elseif ($orders['relation_id'] == 2) {
             $item['black'] = $orders['total'];
         }
         $item['money'] = $orders['price'];
