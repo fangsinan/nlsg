@@ -248,8 +248,7 @@ class OrderController extends ControllerBackend
      * @apiParam {string} os_type  订单来源
      * @apiParam {string} pay_type  支付方式
      * @apiParam {string} vip_order_type  1开通 2续费 3升级
-     * @apiParam {string} user        用户
-     * @apiParam {string} user.level  1 早期366老会员 2 推客 3黑钻 4皇钻 5代理
+     * @apiParam {string} level  1 早期366老会员 2 推客 3黑钻 4皇钻 5代理
      *
      *
      * @apiSuccessExample  Success-Response:
@@ -273,7 +272,8 @@ class OrderController extends ControllerBackend
         $status = $request->get('status');
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
-        $sort = $request->get('sort');
+        $sort  = $request->get('sort');
+        $level = $request->get('level');
         $query = Order::with(
             [
                 'user:id,nickname,level',
@@ -293,6 +293,11 @@ class OrderController extends ControllerBackend
                     $query->where('nickname', 'like', '%'.$nickname.'%');
                 });
             })
+            ->when(! is_null($level), function ($query) use ($level) {
+                 $query->whereHas('user', function ($query) use ($level) {
+                     $query->where('level', $level);
+                 });
+             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
                     $query->where('phone', 'like', '%'.$phone.'%');
