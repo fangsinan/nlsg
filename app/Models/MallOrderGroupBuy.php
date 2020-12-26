@@ -596,6 +596,7 @@ class MallOrderGroupBuy extends Base
         $sp_data = SpecialPriceModel::where('goods_id', '=', $goods_id)
             ->where('sku_number', '=', $sku)
             ->where('type', '=', 4)
+            ->where('status','=',1)
             ->where('goods_type', '=', 1)
             ->where('begin_time', '<=', $now_date)
             ->where('end_time', '>=', $now_date)
