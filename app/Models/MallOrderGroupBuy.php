@@ -699,7 +699,7 @@ class MallOrderGroupBuy extends Base
         }
 
         $team_list = $query->get();
-
+return $team_list;
         foreach ($team_list as $k => $v) {
             //临时 待优化   过滤掉用户已经参加的队伍
             if ($user_id) {
