@@ -388,6 +388,9 @@ class IndexController extends ControllerBackend
      * @apiParam {string} title 标题
      * @apiParam {string} subtitle 副标题
      * @apiParam {string} status   1上架  2下架
+     * @apiParam {string} cover   封面
+     * @apiParam {string} details_pic   详情图
+     * @apiParam {string} sort   位置
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -402,18 +405,27 @@ class IndexController extends ControllerBackend
     public function addLists(Request $request)
     {
         $input = $request->all();
+        $sort  = $input['sort'] ?? 99;
+        $cover = !empty($input['cover']) ? covert_img($input['cover']) : '';
+        $details_pic = !empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
         if ( ! empty($input['id'])) {
             Lists::where('id', $input['id'])->update([
                 'title'    => $input['title'],
                 'subtitle' => $input['subtitle'],
-                'status'   => $input['status'] ?? 2
+                'status'   => $input['status'] ?? 2,
+                'cover'    => $cover,
+                'sort'     => $sort,
+                'details_pic' => $details_pic
             ]);
         } else {
             Lists::create([
                 'title'    => $input['title'],
                 'subtitle' => $input['subtitle'],
                 'status'   => $input['status'] ?? 2,
-                'type'     => 3
+                'type'     => 3,
+                'sort'     => $sort,
+                'cover'    => $cover,
+                'details_pic' => $details_pic
             ]);
         }
 
