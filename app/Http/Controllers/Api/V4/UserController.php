@@ -688,11 +688,12 @@ class UserController extends Controller
             $lists = UserFollow::with('fromUser:id,nickname,intro,headimg')
                 ->select('id', 'from_uid', 'to_uid')
                 ->where('from_uid', $uid)
+                ->where('status', 1)
                 ->paginate(10)->toArray();
             if ($lists['data']) {
                 foreach ($lists['data'] as &$v) {
                     if ($v['to_uid'] !== $this->user['id']) {
-                        $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $v['to_uid']])->first();
+                        $isFollow = UserFollow::where(['from_uid' => $this->user['id'], 'to_uid' => $v['to_uid'],'status'=>1])->first();
                         $v['is_follow'] = $isFollow ? 1 : 0;
                     }
                 }
