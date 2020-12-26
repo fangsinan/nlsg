@@ -19,6 +19,7 @@ class Controller extends BaseController
     protected $page_per_page = 20;
     protected $show_ps = false;
     public $user;
+    public $ip;
 
     public function __construct(Request $request)
     {
