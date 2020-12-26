@@ -223,7 +223,7 @@ class OrderController extends ControllerBackend
                 'works:id,title,user_id,cover_img,price',
                 'works.user:id,nickname'
             ])
-            ->select('id', 'user_id', 'relation_id', 'ordernum', 'os_type', 'pay_price', 'created_at')
+            ->select('id', 'user_id', 'relation_id', 'ordernum', 'os_type','pay_type','pay_price', 'created_at')
             ->where('id', $id)
             ->first();
         return success($list);
