@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\VipUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
 class Controller extends BaseController
@@ -19,19 +19,16 @@ class Controller extends BaseController
     protected $page_per_page = 20;
     protected $show_ps = false;
     public $user;
-    public $ip;
 
-    public function __construct(Request $request)
+    public function __construct()
     {
-        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-        $this->ip =  $request->getClientIp();
         $this->user = auth('api')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
             $this->user['true_level'] = 0;
             if (!empty($this->user['level']) && !empty($this->user['expire_time']) && $this->user['expire_time'] > date('Y-m-d H:i:s')) {
                 $this->user['true_level'] = $this->user['level'];
-                $this->user['level'] = $this->user['true_level'];
+                $this->user['level'] = $this->user['level'];
             }
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
         }
