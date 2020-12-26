@@ -3,6 +3,8 @@
 
 namespace App\Servers;
 
+use App\Models\ExpressCompany;
+use App\Models\ExpressInfo;
 use App\Models\MallGoods;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -221,46 +223,193 @@ class removeDataServers
         }
     }
 
+    //发货记录迁移
+    public function removeExpress()
+    {
+        $express_data = ExpressCompany::query()->get()->toArray();
+
+        $data = DB::connection('mysql_old_zs')
+            ->table('nlsg_mall_order')
+            ->where('express_company', '<>', '')
+            ->where('express_number', '<>', '')
+            ->select(['express_company', 'express_number', 'deliver_goods_time', 'receive_goods_time', 'ctime'])
+            ->get()
+            ->toArray();
+
+        $add_data = [];
+        foreach ($data as &$v) {
+            foreach ($express_data as $vv) {
+                if (strtolower($v->express_company) == strtolower($vv['code'])) {
+                    $temp_add_data = [];
+
+                    $temp_add_data['express_id'] = $vv['id'];
+                    $temp_add_data['express_num'] = trim($v->express_number);
+
+
+                    if (empty($v->deliver_goods_time)) {
+                        $temp_add_data['created_at'] = date('Y-m-d H:i:s', $v->ctime);
+                    } else {
+                        $temp_add_data['created_at'] = date('Y-m-d H:i:s', $v->deliver_goods_time);
+                    }
+
+                    if (empty($v->receive_goods_time)) {
+                        $temp_add_data['delivery_status'] = 1;
+                        $temp_history = [
+                            "number" => trim($v->express_number),
+                            "type" => $vv['code'],
+                            "typename" => $vv['name'],
+                            "logo" => $vv['logo'],
+                            "delivery_status" => 1,
+                            "express_phone" => $vv['phone'],
+                            "list" => [
+                                [
+                                    "time" => date('Y-m-d H:i:s', $v->deliver_goods_time),
+                                    "status" => '商家已发货'
+                                ]
+                            ]
+                        ];
+                    } else {
+                        $temp_add_data['delivery_status'] = 4;
+                        $temp_history = [
+                            "number" => trim($v->express_number),
+                            "type" => $vv['code'],
+                            "typename" => $vv['name'],
+                            "logo" => $vv['logo'],
+                            "delivery_status" => 1,
+                            "express_phone" => $vv['phone'],
+                            "list" => [
+                                [
+                                    "time" => date('Y-m-d H:i:s', $v->receive_goods_time),
+                                    "status" => '客户已签收'
+                                ],
+                                [
+                                    "time" => date('Y-m-d H:i:s', $v->deliver_goods_time),
+                                    "status" => '商家已发货'
+                                ]
+                            ]
+                        ];
+                    }
+                    $temp_add_data['history'] = json_encode($temp_history);
+                    $add_data[] = $temp_add_data;
+                }
+            }
+        }
+
+        $add_data = array_chunk($add_data, 100);
+        foreach ($add_data as $ad_v) {
+            $res = DB::table('nlsg_express_info')->insert($ad_v);
+            var_dump($res);
+        }
+
+    }
+
+    //商城订单迁移
     public function removeMallOrders()
+    {
+
+        // $this->removeExpress();//迁移快递信息
+
+        $data = $this->getOrderData(1,10);
+        dd($data);
+    }
+
+    public function getOrderData($page = 1, $size = 50)
+    {
+        $old_order = DB::connection('mysql_old_zs')
+            ->table('nlsg_mall_order')
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->orderBy('id', 'desc')
+            ->get()
+            ->toArray();
+
+        $old_id_list = array_column($old_order, 'id');
+        $old_details = DB::connection('mysql_old')
+            ->table('nlsg_mall_order_detail')
+            ->whereIn('order_id', $old_id_list)
+            ->get()
+            ->toArray();
+
+        foreach ($old_order as &$v) {
+            $temp_details = [];
+            foreach ($old_details as $vv) {
+                if ($v->id === $vv->order_id) {
+                    $temp_details[] = $vv;
+                }
+            }
+            $v->details = $temp_details;
+        }
+
+dd([$old_order,$old_details]);
+        $order_data = [];
+        $order_detail_data = [];
+        $order_child_data = [];
+
+        foreach ($old_order as $ov) {
+            if ($ov->status > 10 && !empty($ov->express_company) && !empty($ov->express_number)) {
+                foreach ($ov->details as $odv) {
+                    $temp_order_child_data = [];
+                    $temp_order_child_data['order_id'] = $ov->id;
+                    $temp_order_child_data['order_detail_id'] = $odv->id;
+                    $temp_order_child_data['created_at'] = date('Y-m-d H:i:s', $ov->ctime);
+                    if (!empty($ov->receive_goods_time)) {
+                        $temp_order_child_data['status'] = 2;
+                        $temp_order_child_data['receipt_at'] = date('Y-m-d H:i:s', $ov->receive_goods_time);
+                    } else {
+                        $temp_order_child_data['status'] = 1;
+                        $temp_order_child_data['receipt_at'] = null;
+                    }
+                    $order_child_data[] = $temp_order_child_data;
+                }
+            }
+        }
+
+
+        return [$order_data, $order_detail_data, $order_child_data];
+    }
+
+
+    public function removeMallOrdersOld()
     {
         $now_date = date('Y-m-d H:i:s');
 
-        if(1) {
+        if (0) {
             $order_list = Db::connection('mysql_old')
                 ->table('nlsg_mall_order')
                 ->where('status', '>', 10)
                 ->where('express_company', '<>', '')
                 ->where('express_number', '<>', '')
-                ->select(['express_company','express_number'])
+                ->select(['express_company', 'express_number'])
                 ->get()
                 ->toArray();
             dd($order_list);
         }
 
-        if (0) {
+        if (1) {
             $old_order = DB::connection('mysql_old')
                 ->table('nlsg_mall_order')
-//                ->where('user_id', '=', 168934)
-                ->where('status', '<>', 0)
-                ->where('status','=',30)
-                ->where('express_number','<>','')
-                ->get()->toArray();
+                ->where('user_id', '=', 168934)
+//                ->where('status', '<>', 0)
+//                ->where('status','=',30)
+//                ->where('express_number','<>','')
+                ->get()
+                ->toArray();
 
             $order_data = [];
             $order_child_data = [];
 
             foreach ($old_order as $v) {
 
-                if ($v->status > 10 && !empty($v->express_company) &&!empty($v->express_number)){
+                if ($v->status > 10 && !empty($v->express_company) && !empty($v->express_number)) {
                     //有发货信息,需要写入child表
                     $get_all_details_id = DB::connection('mysql_old')
                         ->table('nlsg_mall_order_detail')
-                        ->where('order_id','=',$v->id)
+                        ->where('order_id', '=', $v->id)
                         ->select(['id'])
                         ->get()->toArray();
-                    $get_all_details_id = array_column($get_all_details_id,'id');
+                    $get_all_details_id = array_column($get_all_details_id, 'id');
 
-                    foreach ($get_all_details_id as $di_v){
+                    foreach ($get_all_details_id as $di_v) {
                         $temp_di_v = [];
 
                         $temp_di_v['order_id'] = $v->id;
@@ -268,12 +417,12 @@ class removeDataServers
 
                         $temp_di_v['express_info_id'] = 0;
 
-                        $temp_di_v['created_at'] = date('Y-m-d H:i:s',$v->deliver_goods_time);
-                        $temp_di_v['updated_at'] = date('Y-m-d H:i:s',$v->deliver_goods_time);
-                        if (!empty($v->receive_goods_time)){
+                        $temp_di_v['created_at'] = date('Y-m-d H:i:s', $v->deliver_goods_time);
+                        $temp_di_v['updated_at'] = date('Y-m-d H:i:s', $v->deliver_goods_time);
+                        if (!empty($v->receive_goods_time)) {
                             $temp_di_v['status'] = 2;
-                            $temp_di_v['receipt_at'] = date('Y-m-d H:i:s',$v->receive_goods_time);
-                        }else{
+                            $temp_di_v['receipt_at'] = date('Y-m-d H:i:s', $v->receive_goods_time);
+                        } else {
                             $temp_di_v['status'] = 1;
                             $temp_di_v['receipt_at'] = null;
                         }
@@ -356,10 +505,12 @@ class removeDataServers
         }
 
 
-        if (0) {
+        if (1) {
             $old_details = DB::connection('mysql_old')
                 ->table('nlsg_mall_order_detail')
-                ->get()->toArray();
+                ->where('user_id', '=', 168934)
+                ->get()
+                ->toArray();
             $details_data = [];
             foreach ($old_details as $v) {
                 $temp_details = [];
@@ -407,9 +558,9 @@ class removeDataServers
                 $details_data[] = $temp_details;
             }
 
-            dd($details_data);
         }
 
+        dd([$details_data, $order_data]);
 
     }
 
