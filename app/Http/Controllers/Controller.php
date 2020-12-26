@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Providers\Auth\Illuminate;
 
 
 class Controller extends BaseController
@@ -23,10 +24,8 @@ class Controller extends BaseController
     public $user;
     public $ip;
 
-    public function __construct(Request $request)
+    public function __construct()
     {
-        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-        $this->ip =  $request->getClientIp();
         $this->user = auth('api')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
@@ -37,6 +36,11 @@ class Controller extends BaseController
             $this->user['level'] = $this->user['true_level'];
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
         }
+    }
+
+    public function getIp(Request $request){
+        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+        $this->ip =  $request->getClientIp();
     }
 
     protected function success($data = [], $flag = 0, $msg = '成功')
