@@ -187,11 +187,11 @@ class OrderController extends ControllerBackend
     }
 
     /**
-     * @api {get} api/admin_v4/order/detial 精品课-订单详情
+     * @api {get} api/admin_v4/order/detail 精品课-订单详情
      * @apiVersion 4.0.0
      * @apiName  order/detial
      * @apiGroup 后台-虚拟订单
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/detial
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/detail
      * @apiDescription  精品课-订单详情
      *
      * @apiParam   {number}  id 订单id
