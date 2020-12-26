@@ -1228,7 +1228,7 @@ class MallOrderGroupBuy extends Base
                 DB::rollBack();
                 continue;
             }
-            
+
             $stock_res = MallSku::where('sku_number', '=', $order_detail->sku_number)->increment('stock', $order_detail->num);
 
             if ($order_info->status > 1) {

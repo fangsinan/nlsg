@@ -134,6 +134,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     //数据迁移
     Route::get('remove_data/goods', 'RemoveDataController@goods');
     Route::get('remove_data/mall_orders', 'RemoveDataController@mallOrders');
+    Route::get('remove_data/a_e', 'RemoveDataController@addressExpress');
 
     //测试临时用,之后要删除
     Route::get('live/pass', 'GoodsController@tempTools');//商城退款

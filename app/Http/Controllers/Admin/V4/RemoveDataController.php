@@ -37,4 +37,9 @@ class RemoveDataController extends ControllerBackend
         $servers = new removeDataServers();
         $servers->removeMallOrders();
     }
+
+    public function addressExpress(){
+        $servers = new removeDataServers();
+        $servers->addressExpress();
+    }
 }

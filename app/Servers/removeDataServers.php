@@ -3,6 +3,7 @@
 
 namespace App\Servers;
 
+use App\Models\Area;
 use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
 use App\Models\MallGoods;
@@ -303,32 +304,87 @@ class removeDataServers
 
     }
 
+    //地址和快递信息
+    public function addressExpress(){
+        $this->removeAddress();
+        //$this->removeExpress();//迁移快递信息
+    }
+
+    public function removeAddress(){
+        $list = DB::connection('mysql_old_zs')
+            ->table('nlsg_mall_address')
+            ->where('is_del','=',0)
+            ->limit(10)
+            ->get()->toArray();
+
+        $area = Area::get()->toArray();
+
+        foreach ($list as &$v){
+            $v->province_code = 0;
+            $v->city_code = 0;
+            $v->county_code = 0;
+
+            foreach ($area as $vv){
+                if ($v->province == $vv['name'] || $v->province == $vv['fullname']){
+                    $v->province_code = $vv['id'];
+                }
+                if ($v->city == $vv['name'] || $v->city == $vv['fullname']){
+                    $v->city_code = $vv['id'];
+                }
+                if ($v->county == $vv['name'] || $v->county == $vv['fullname']){
+                    $v->county_code = $vv['id'];
+                }
+            }
+            if ($v->county_code == 0){
+                $v->detail = $v->county.$v->detail;
+            }
+
+            $v->province = $v->province_code;
+            $v->city = $v->city_code;
+            $v->area = $v->county_code;
+            $v->details = $v->detail;
+            $v->created_at = date('Y-m-d H:i:s',$v->ctime);
+            unset($v->province_code,$v->city_code,$v->county_code,$v->county,$v->detail,$v->ctime);
+        }
+
+
+        $array = array_chunk($list,50);
+        dd($array);
+
+        foreach ($array as $av){
+            DB::table('nlsg_mall_address_v3')->insert($av);
+        }
+    }
+
     //商城订单迁移
     public function removeMallOrders()
     {
-
-        // $this->removeExpress();//迁移快递信息
-
-        $data = $this->getOrderData(1, 100);
-        dd($data);
+        set_time_limit(0);
+        $i = 1;
+        $w = true;
+        $flag = '_v3';
+        while ($w) {
+            $data = $this->getOrderData($i, 50, $flag);
+            $i++;
+            if ($data === false) {
+                $w = false;
+            }
+        }
     }
 
-    public function getOrderData($page = 1, $size = 50)
+    public function getOrderData($page = 1, $size = 50, $flag = '')
     {
         $now = time();
-        $now_date = date('Y-m-d H:i:s',$now);
+        $now_date = date('Y-m-d H:i:s', $now);
+
         $old_order = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order')
-            ->where('user_id', '=', 168934)
-            ->where('status','>',1)
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->orderBy('id', 'desc')
-            ->get()
-            ->toArray();
+            ->get()->toArray();
 
         $old_id_list = array_column($old_order, 'id');
-
 
         $old_details = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order_detail')
@@ -345,82 +401,130 @@ class removeDataServers
             }
             $v->details = $temp_details;
         }
-return $old_order;
+
         $order_data = [];
         $order_detail_data = [];
         $order_child_data = [];
 
         foreach ($old_order as $ov) {
-//            $temp_order = [];
-//            $temp_order['id'] = $ov->id;
-//            $temp_order['ordernum'] = $ov->ordernum;
-//            $temp_order['user_id'] = $ov->user_id;
-//            $temp_order['order_type'] = 1;
-//            $temp_order['status'] = $ov->status;
-//            $temp_order['cost_price'] = $ov->cost_price;
-//            $temp_order['freight'] = $ov->freight;
-//            $temp_order['vip_cut'] = $ov->vip_cut;
-//            $temp_order['coupon_id'] = $ov->coupon_id;
-//            $temp_order['coupon_money'] = $ov->coupon_money;
-//            $temp_order['coupon_freight_id'] = 0;
-//            $temp_order['special_price_cut'] = $ov->special_price_cut;
-//            $temp_order['price'] = $ov->price;
-//            $temp_order['pay_price'] = $ov->pay_price;
-//            if (!empty($ov->pay_time)) {
-//                $temp_order['pay_time'] = date('Y-m-d H:i:s', $ov->pay_time);
-//            } else {
-//                $temp_order['pay_time'] = null;
-//            }
-//            $temp_order['pay_type'] = $ov->pay_type;
-//            $temp_order['os_type'] = $ov->os_type;
-//            $temp_order['messages'] = $ov->messages;
-//            $temp_order['remark'] = $ov->remark;
-//            if ($ov->address_method) {
-//                $temp_order['post_type'] = 2;
-//            } else {
-//                $temp_order['post_type'] = 1;
-//            }
-//            $temp_order['address_id'] = 0;
-//            $temp_order['address_history'] = json_encode([
-//                'id' => 0,
-//                "name" => $ov->address_name,
-//                "phone" => $ov->address_phone,
-//                "details" => $ov->address_detail,
-//                "is_default" => 0,
-//                "province" => 0,
-//                "city" => 0,
-//                "area" => 0,
-//                "province_name" => $ov->address_province,
-//                "city_name" => $ov->address_city,
-//                "area_name" => $ov->address_county,
-//            ]);
-//            $temp_order['bill_type'] = $ov->bill_title_type;
-//            $temp_order['bill_title'] = $ov->bill_title;
-//            $temp_order['bill_number'] = $ov->bill_number;
-//            $temp_order['bill_format'] = $ov->bill_format;
-//            $temp_order['active_flag'] = $ov->active_flag;
-//            $temp_order['created_at'] = date('Y-m-d H:i:s', $ov->ctime);
-//            $temp_order['updated_at'] = $now_date;
-//            $temp_order['is_stop'] = $ov->is_stop;
-//            $temp_order['stop_by'] = $ov->stop_by;
-//            if (!empty($ov->stop_at)) {
-//                $temp_order['stop_at'] = date('Y-m-d H:i:s', $ov->stop_at);
-//            } else {
-//                $temp_order['stop_at'] = null;
-//            }
-//            $temp_order['stop_reason'] = $ov->stop_reason;
-//            $temp_order['is_del'] = $ov->is_del;
-//            if (!empty($ov->del_at)) {
-//                $temp_order['del_at'] = date('Y-m-d H:i:s', $ov->del_at);
-//            } else {
-//                $temp_order['del_at'] = null;
-//            }
-//            if (!empty($ov->receive_goods_time)) {
-//                $temp_order['receipt_at'] = date('Y-m-d H:i:s', $v->receive_goods_time);
-//            } else {
-//                $temp_order['receipt_at'] = null;
-//            }
-//            $order_data[] = $temp_order;
+            $temp_order = [];
+            $temp_order['id'] = $ov->id;
+            $temp_order['ordernum'] = $ov->ordernum;
+            $temp_order['user_id'] = $ov->user_id;
+            $temp_order['order_type'] = 1;
+            $temp_order['status'] = $ov->status;
+            $temp_order['cost_price'] = $ov->cost_price;
+            $temp_order['freight'] = $ov->freight;
+            $temp_order['vip_cut'] = $ov->vip_cut;
+            $temp_order['coupon_id'] = $ov->coupon_id;
+            $temp_order['coupon_money'] = $ov->coupon_money;
+            $temp_order['coupon_freight_id'] = 0;
+            $temp_order['special_price_cut'] = $ov->special_price_cut;
+            $temp_order['price'] = $ov->price;
+            $temp_order['pay_price'] = $ov->pay_price;
+            if (!empty($ov->pay_time)) {
+                $temp_order['pay_time'] = date('Y-m-d H:i:s', $ov->pay_time);
+            } else {
+                $temp_order['pay_time'] = null;
+            }
+            $temp_order['pay_type'] = $ov->pay_type;
+            $temp_order['os_type'] = $ov->os_type;
+            $temp_order['messages'] = $ov->messages;
+            $temp_order['remark'] = $ov->remark;
+            if ($ov->address_method) {
+                $temp_order['post_type'] = 2;
+            } else {
+                $temp_order['post_type'] = 1;
+            }
+            $temp_order['address_id'] = 0;
+            $temp_order['address_history'] = json_encode([
+                'id' => 0,
+                "name" => $ov->address_name,
+                "phone" => $ov->address_phone,
+                "details" => $ov->address_detail,
+                "is_default" => 0,
+                "province" => 0,
+                "city" => 0,
+                "area" => 0,
+                "province_name" => $ov->address_province,
+                "city_name" => $ov->address_city,
+                "area_name" => $ov->address_county,
+            ]);
+            $temp_order['bill_type'] = $ov->bill_title_type;
+            $temp_order['bill_title'] = $ov->bill_title;
+            $temp_order['bill_number'] = $ov->bill_number;
+            $temp_order['bill_format'] = $ov->bill_format;
+            $temp_order['active_flag'] = $ov->active_flag;
+            $temp_order['created_at'] = date('Y-m-d H:i:s', $ov->ctime);
+            $temp_order['updated_at'] = $now_date;
+            $temp_order['is_stop'] = $ov->is_stop;
+            $temp_order['stop_by'] = $ov->stop_by;
+            if (!empty($ov->stop_at)) {
+                $temp_order['stop_at'] = date('Y-m-d H:i:s', $ov->stop_at);
+            } else {
+                $temp_order['stop_at'] = null;
+            }
+            $temp_order['stop_reason'] = $ov->stop_reason;
+            $temp_order['is_del'] = $ov->is_del;
+            if (!empty($ov->del_at)) {
+                $temp_order['del_at'] = date('Y-m-d H:i:s', $ov->del_at);
+            } else {
+                $temp_order['del_at'] = null;
+            }
+            if (!empty($ov->receive_goods_time)) {
+                $temp_order['receipt_at'] = date('Y-m-d H:i:s', $ov->receive_goods_time);
+            } else {
+                $temp_order['receipt_at'] = null;
+            }
+            $order_data[] = $temp_order;
+
+            foreach ($ov->details as $odv) {
+                $temp_details = [];
+                $temp_details['id'] = $odv->id;
+                $temp_details['order_id'] = $odv->order_id;
+                $temp_details['order_child_id'] = $odv->order_child_id;
+                $temp_details['user_id'] = $odv->user_id;
+                $temp_details['status'] = $odv->status;
+                $temp_details['goods_id'] = $odv->goods_id ?? 0;
+                $temp_details['sku_number'] = $odv->sku_number ?? '';
+                $temp_details['num'] = $odv->num ?? 1;
+                if ($temp_details['num'] < 1) {
+                    $temp_details['num'] = 1;
+                }
+                $temp_details['after_sale_used_num'] = 0;
+                $temp_details['comment_id'] = $odv->comment_id ?? 0;
+                $temp_details['inviter'] = $odv->twitter_id ?? 0;
+                $temp_details['created_at'] = date('Y-m-d H:i:s', $odv->ctime);
+                $temp_details['updated_at'] = $now_date;
+                $temp_details['t_money'] = 0;
+                $temp_details['special_price_type'] = 0;
+                $temp_check_sku = DB::connection('mysql_old')
+                    ->table('nlsg_mall_sku')
+                    ->where('sku_number', '=', $odv->sku_number)
+                    ->first();
+
+                $sku_json = json_decode($odv->sku_json, true);
+
+                $temp_sku_json = [];
+
+                if (is_array($sku_json)) {
+                    foreach ($sku_json as $kk => $vv) {
+                        $t = [];
+                        $t['key_name'] = $kk;
+                        $t['value_name'] = $vv;
+                        $temp_sku_json[] = $t;
+                    }
+                }
+
+                $temp_details['sku_history'] = json_encode([
+                    'actual_num' => $odv->num ?? 0,
+                    'actual_price' => $temp_check_sku->price ?? 0,
+                    'original_price' => $temp_check_sku->original_price ?? 0,
+                    'sku_value' => $temp_sku_json,
+                    'stock' => $temp_check_sku->stock ?? 0,
+                ]);
+                $order_detail_data[] = $temp_details;
+            }
 
             if ($ov->status > 1 && !empty($ov->express_company) && !empty($ov->express_number)) {
                 foreach ($ov->details as $odv) {
@@ -435,7 +539,7 @@ return $old_order;
                         $temp_order_child_data['status'] = 1;
                         $temp_order_child_data['receipt_at'] = null;
                     }
-                    $get_express_info = ExpressInfo::where('express_num','=',trim($ov->express_number))
+                    $get_express_info = ExpressInfo::where('express_num', '=', trim($ov->express_number))
                         ->select(['id'])->first();
                     $temp_order_child_data['express_info_id'] = $get_express_info->id;
                     $order_child_data[] = $temp_order_child_data;
@@ -443,8 +547,25 @@ return $old_order;
             }
         }
 
+        //DB::beginTransaction();
 
-        return [$order_data, $order_detail_data, $order_child_data];
+        if (!empty($order_data)) {
+            DB::table('nlsg_mall_order' . $flag)->insert($order_data);
+        }
+
+        if (!empty($order_detail_data)) {
+            DB::table('nlsg_mall_order_detail' . $flag)->insert($order_detail_data);
+        }
+
+        if (!empty($order_child_data)) {
+            DB::table('nlsg_mall_order_child' . $flag)->insert($order_child_data);
+        }
+
+        if (empty($order_data)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 
