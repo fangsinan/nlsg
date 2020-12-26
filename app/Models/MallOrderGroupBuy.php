@@ -1219,6 +1219,16 @@ class MallOrderGroupBuy extends Base
                 continue;
             }
 
+            //归还库存
+            $order_detail = MallOrderDetails::wherre('order_id','=',$order_info->id)
+                ->select(['sku_number','num'])
+                ->first();
+            if (empty($order_detail)){
+                DB::rollBack();
+                continue;
+            }
+            $stock_res = MallSku::where('sku_number', '=', $order_detail->sku_number)->increment('stock', $order_detail->num);
+
             if ($order_info->status > 1) {
                 //已经支付 需要写入 refund_record表
                 $refund_data['service_num'] = MallOrder::createOrderNumber($order_info->user_id, 2);
