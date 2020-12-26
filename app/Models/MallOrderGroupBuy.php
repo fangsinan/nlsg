@@ -1177,6 +1177,7 @@ class MallOrderGroupBuy extends Base
             ->where('end_at', '<=', $now_date)
             ->select(['id', 'group_key', 'order_id'])
             ->get();
+
         if ($gbl_list->isEmpty()) {
             return true;
         }
@@ -1220,13 +1221,14 @@ class MallOrderGroupBuy extends Base
             }
 
             //归还库存
-            $order_detail = MallOrderDetails::wherre('order_id','=',$order_info->id)
+            $order_detail = MallOrderDetails::where('order_id','=',$order_info->id)
                 ->select(['sku_number','num'])
                 ->first();
             if (empty($order_detail)){
                 DB::rollBack();
                 continue;
             }
+            
             $stock_res = MallSku::where('sku_number', '=', $order_detail->sku_number)->increment('stock', $order_detail->num);
 
             if ($order_info->status > 1) {

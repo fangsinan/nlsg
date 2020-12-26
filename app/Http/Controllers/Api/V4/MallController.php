@@ -10,6 +10,7 @@ use App\Models\MallCategory;
 use App\Models\MallComment;
 use App\Models\MallGoods;
 use App\Models\MallGoodsMsg;
+use App\Models\MallOrderGroupBuy;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use Illuminate\Http\Request;
@@ -215,6 +216,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
+            MallOrderGroupBuy::clear();
             return true;
         } else {
             $params = $request->input();
