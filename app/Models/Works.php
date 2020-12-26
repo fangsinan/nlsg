@@ -13,7 +13,7 @@ class Works extends Base
     protected $table = 'nlsg_works';
 
     protected $fillable = [
-       'column_id', 'title', 'subtitle','type', 'cover_img', 'detail_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content','is_pay','is_free','chapter_num','comment_num','collection_num'
+       'column_id', 'title', 'subtitle','type', 'cover_img', 'detail_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content','is_pay','is_free','chapter_num','comment_num','collection_num','duration'
     ];
 
     //状态 1上架  2 下架
