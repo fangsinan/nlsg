@@ -177,8 +177,8 @@ class OrderController extends ControllerBackend
             ->groupBy('type')
             ->first();
         $data = [
-            'total_num'    => $list['price'] ?? 0,
-            'total_price'  => $list['total'] ?? 0,
+            'total_num'    => $list['total'] ?? 0,
+            'total_price'  => $list['price'] ?? 0,
             'today_num'    => $today['total'] ?? 0,
             'totday_price' => $today['price'] ?? 0
         ];
