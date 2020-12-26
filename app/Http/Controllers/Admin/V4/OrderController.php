@@ -34,6 +34,7 @@ class OrderController extends ControllerBackend
      * @apiParam {string} os_type  订单来源
      * @apiParam {string} pay_type  支付方式
      * @apiParam {string} level    推者类型
+     * @apiParam {string} rank     排行列表
      *
      *
      * @apiSuccessExample  Success-Response:
