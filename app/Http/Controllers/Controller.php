@@ -29,8 +29,6 @@ class Controller extends BaseController
             if (!empty($this->user['level']) && !empty($this->user['expire_time']) && $this->user['expire_time'] > date('Y-m-d H:i:s')) {
                 $this->user['true_level'] = $this->user['level'];
                 $this->user['level'] = $this->user['level'];
-            }else{
-                $this->user['level'] = 0;
             }
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
         }
