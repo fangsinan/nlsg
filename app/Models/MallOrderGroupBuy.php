@@ -700,8 +700,9 @@ class MallOrderGroupBuy extends Base
         }
 
         $team_list = $query->get();
-return $team_list;
+
         foreach ($team_list as $k => $v) {
+            $team_list[$k]->order_count = $v->teamOrderCount->counts;
             //临时 待优化   过滤掉用户已经参加的队伍
             if ($user_id) {
                 $check_show = DB::table('nlsg_mall_group_buy_list as g')
@@ -718,7 +719,7 @@ return $team_list;
                     continue;
                 }
             }
-            $v->order_count = $v->teamOrderCount->counts ?? 0;
+//            $v->order_count = $v->teamOrderCount->counts ?? 0;
             unset($team_list[$k]->teamOrderCount);
         }
 
