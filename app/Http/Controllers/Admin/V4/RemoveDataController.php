@@ -42,4 +42,10 @@ class RemoveDataController extends ControllerBackend
         $servers = new removeDataServers();
         $servers->addressExpress();
     }
+
+    //补全vip表新加字段
+    public function vip(){
+        $servers = new removeDataServers();
+        $servers->vip();
+    }
 }

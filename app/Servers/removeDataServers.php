@@ -8,6 +8,7 @@ use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
 use App\Models\MallGoods;
 use App\Models\User;
+use App\Models\VipUser;
 use Illuminate\Support\Facades\DB;
 
 class removeDataServers
@@ -304,54 +305,66 @@ class removeDataServers
 
     }
 
+    public function vip()
+    {
+        $list = VipUser::query()->get()->toArray();
+
+
+        dd($list);
+    }
+
     //地址和快递信息
-    public function addressExpress(){
-        $this->removeAddress();
+    public function addressExpress()
+    {
+        //$this->removeAddress();//迁移收货地址
         //$this->removeExpress();//迁移快递信息
     }
 
-    public function removeAddress(){
+    public function removeAddress()
+    {
         $list = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_address')
-            ->where('is_del','=',0)
-            ->limit(10)
+            ->where('is_del', '=', 0)
             ->get()->toArray();
 
         $area = Area::get()->toArray();
 
-        foreach ($list as &$v){
+        $add_data = [];
+        foreach ($list as &$v) {
             $v->province_code = 0;
             $v->city_code = 0;
             $v->county_code = 0;
 
-            foreach ($area as $vv){
-                if ($v->province == $vv['name'] || $v->province == $vv['fullname']){
+            foreach ($area as $vv) {
+                if ($v->province == $vv['name'] || $v->province == $vv['fullname']) {
                     $v->province_code = $vv['id'];
                 }
-                if ($v->city == $vv['name'] || $v->city == $vv['fullname']){
+                if ($v->city == $vv['name'] || $v->city == $vv['fullname']) {
                     $v->city_code = $vv['id'];
                 }
-                if ($v->county == $vv['name'] || $v->county == $vv['fullname']){
+                if ($v->county == $vv['name'] || $v->county == $vv['fullname']) {
                     $v->county_code = $vv['id'];
                 }
             }
-            if ($v->county_code == 0){
-                $v->detail = $v->county.$v->detail;
+            if ($v->county_code == 0) {
+                $v->detail = $v->county . $v->detail;
             }
 
-            $v->province = $v->province_code;
-            $v->city = $v->city_code;
-            $v->area = $v->county_code;
-            $v->details = $v->detail;
-            $v->created_at = date('Y-m-d H:i:s',$v->ctime);
-            unset($v->province_code,$v->city_code,$v->county_code,$v->county,$v->detail,$v->ctime);
+            $temp_data = [];
+            $temp_data['id'] = $v->id;
+            $temp_data['name'] = $v->name;
+            $temp_data['phone'] = $v->phone;
+            $temp_data['province'] = $v->province_code;
+            $temp_data['city'] = $v->city_code;
+            $temp_data['area'] = $v->county_code;
+            $temp_data['user_id'] = $v->user_id;
+            $temp_data['is_default'] = $v->is_default;
+            $temp_data['details'] = $v->detail;
+            $temp_data['created_at'] = date('Y-m-d H:i:s', $v->ctime);
+            $add_data[] = $temp_data;
         }
-
-
-        $array = array_chunk($list,50);
-        dd($array);
-
-        foreach ($array as $av){
+        $add_data = array_chunk($add_data, 50);
+        foreach ($add_data as $av) {
             DB::table('nlsg_mall_address_v3')->insert($av);
         }
     }
