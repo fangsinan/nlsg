@@ -34,6 +34,7 @@ class OrderController extends ControllerBackend
      * @apiParam {string} os_type  订单来源
      * @apiParam {string} pay_type  支付方式
      * @apiParam {string} level    推者类型
+     * @apiParam {string} rank     排行列表
      *
      *
      * @apiSuccessExample  Success-Response:
@@ -110,8 +111,7 @@ class OrderController extends ControllerBackend
             ->orderBy('id', $direction)
             ->paginate(10)
             ->toArray();
-        if ($type == 1) {
-            $rank = Order::with('works:id,title,cover_img')
+        $rank = Order::with('works:id,title,cover_img')
                 ->select([
                     DB::raw('count(*) as total'),
                     'user_id',
@@ -122,19 +122,6 @@ class OrderController extends ControllerBackend
                 ->orderBy('total', 'desc')
                 ->groupBy('relation_id')
                 ->get();
-        } elseif ($type == 2) {
-            $rank = Order::with('column:id,name,cover_pic')
-                ->select([
-                    DB::raw('count(*) as total'),
-                    'user_id',
-                    'relation_id'
-                ])
-                ->where('type', 15)
-                ->where('status', 1)
-                ->orderBy('total', 'desc')
-                ->groupBy('relation_id')
-                ->get();
-        }
 
         $data = [
             'lists' => $lists,
@@ -190,8 +177,8 @@ class OrderController extends ControllerBackend
             ->groupBy('type')
             ->first();
         $data = [
-            'total_num'    => $list['price'] ?? 0,
-            'total_price'  => $list['total'] ?? 0,
+            'total_num'    => $list['total'] ?? 0,
+            'total_price'  => $list['price'] ?? 0,
             'today_num'    => $today['total'] ?? 0,
             'totday_price' => $today['price'] ?? 0
         ];

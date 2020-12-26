@@ -109,9 +109,13 @@ class ColumnController extends Controller
         //7天前的时间
         $time = Config('web.is_new_time');
         $uid = $this->user['id'] ?? 0;
+        $sub_type = 1;  //专栏
+        if($type == 2){
+            $sub_type = 6;   //讲座
+        }
         foreach ($list['data'] as &$v) {
             $user_info = User::find($v['user_id']);
-            $v['is_sub'] = Subscribe::isSubscribe($uid,$v['id']);
+            $v['is_sub'] = Subscribe::isSubscribe($uid,$v['id'],$sub_type);
             $v['is_new'] = 0;
             if($v['works_update_time'] > $time){
                 $v['is_new'] = 1;
