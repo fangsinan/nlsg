@@ -36,3 +36,14 @@
         }
         return $url;
     }
+
+    function covert_time($seconds)
+    {
+        if ($seconds > 3600) {
+            $hours = intval($seconds / 3600);
+            $time = $hours . ":" . gmstrftime('%M:%S', $seconds);
+        } else {
+            $time = gmstrftime('%H:%M:%S', $seconds);
+        }
+        return $time;
+    }
