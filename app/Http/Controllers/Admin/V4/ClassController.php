@@ -710,7 +710,6 @@ class ClassController extends ControllerBackend
         $is_pay = $input['is_pay'] ?? 0;
         $type   = $input['type'] ?? 1;
         $subtitle   = $input['subtitle'] ?? '';
-        $duration   = $input['duration'] ?? '';
 
 
         $data = [
@@ -729,7 +728,6 @@ class ClassController extends ControllerBackend
             'type'   => $type
         ];
         if (!empty($input['id'])) {
-            $data['duration'] += $duration;
             Works::where('id', $input['id'])->update($data);
             //增加分类
             WorksCategoryRelation::where('work_id', $input['id'])
@@ -740,7 +738,6 @@ class ClassController extends ControllerBackend
             if ($res){
                 return error(1000, '不能添加重复数据');
             }
-            $data['duration'] = $duration;
             $work = Works::create($data);
             $id = $work ? $work->id : 0;
         }
