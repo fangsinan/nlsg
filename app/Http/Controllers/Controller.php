@@ -20,8 +20,10 @@ class Controller extends BaseController
     protected $show_ps = false;
     public $user;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
+        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+        $this->ip =  $request->getClientIp();
         $this->user = auth('api')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
