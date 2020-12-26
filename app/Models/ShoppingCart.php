@@ -143,7 +143,8 @@ class ShoppingCart extends Base
                 'page' => 1,
                 'size' => 1,
                 'invalid' => 1
-            ], $user, false);
+            ], $user, false,1);
+
 
 
         foreach ($cart as &$v) {

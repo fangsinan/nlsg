@@ -12,15 +12,15 @@ class GetPriceTools extends Base
     public $level_4_off = 0.85;
     public $level_5_off = 0.65;
 
-    public function goodsList($list, $user_level, $user_id, $is_staff)
+    public function goodsList($list, $user_level, $user_id, $is_staff, $hide = 0)
     {
         foreach ($list as $v) {
-            $this->getGoodsPrice($v, $user_level, $user_id, $is_staff);
+            $this->getGoodsPrice($v, $user_level, $user_id, $is_staff, false, $hide);
         }
     }
 
     //获取计算价格
-    public function getGoodsPrice($data, $user_level, $user_id, $is_staff = 0, $for_order = false)
+    public function getGoodsPrice($data, $user_level, $user_id, $is_staff = 0, $for_order = false, $hide = 0)
     {
         //计算推客的常规购买价格和收益
         if ($for_order) {
@@ -137,9 +137,9 @@ class GetPriceTools extends Base
                     $slv->sp_type = 0;
                     $temp_sku_list_s = $slv;
                     foreach ($temp_sp_data as $spdv) {
-                        if ($slv->sku_number == $spdv->sku_number) {
+                        if ($hide == 0 && $slv->sku_number == $spdv->sku_number) {
                             $temp_sku_list_s->sp_type = $spdv->type;
-                            if (intval($spdv->sku_original_price) !== 0){
+                            if (intval($spdv->sku_original_price) !== 0) {
                                 $temp_sku_list_s->original_price = $spdv->sku_original_price;
                             }
                             switch (intval($user_level)) {
@@ -202,7 +202,7 @@ class GetPriceTools extends Base
         $sku_price = DB::table('nlsg_mall_sku')
             ->where('goods_id', '=', $goods_id)
             ->where('status', '=', 1)
-            ->select(['id', 'sku_number','price', 'original_price','cost', 'promotion_cost'])
+            ->select(['id', 'sku_number', 'price', 'original_price', 'cost', 'promotion_cost'])
             ->get();
 
         $res->level_3 = self::PriceCalc('*', $res->price, $this->level_3_off);

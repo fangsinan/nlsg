@@ -10,7 +10,7 @@ class MallGoods extends Base
 
     protected $table = 'nlsg_mall_goods';
 
-    public function getList($params, $user = [], $cache = true)
+    public function getList($params, $user = [], $cache = true, $hide = 0)
     {
         $list = $this->getListData($params, $cache);
 
@@ -54,7 +54,7 @@ class MallGoods extends Base
             if ($count_list == 1) {
                 //详情时候获取一条评论
                 $mcModel = new MallComment();
-                $v->comment_list = $mcModel->getList(['goods_id' => $v->id, 'page' => 1, 'size' => 1,'for_goods_info'=>1]);
+                $v->comment_list = $mcModel->getList(['goods_id' => $v->id, 'page' => 1, 'size' => 1, 'for_goods_info' => 1]);
             } else {
                 $v->comment_list = new class {
                 };
@@ -76,7 +76,8 @@ class MallGoods extends Base
             $list,
             $user['true_level'] ?? 0,
             $user['id'] ?? 0,
-            $user['is_staff'] ?? 0
+            $user['is_staff'] ?? 0,
+            $hide
         );
 
         //临时 秒杀放第一个
@@ -139,7 +140,7 @@ class MallGoods extends Base
         return DB::table(MallSku::$table)
             ->where('goods_id', '=', $id)
             ->where('status', '=', 1)
-            ->select(['id', 'sku_number','price', 'original_price','cost', 'promotion_cost'])
+            ->select(['id', 'sku_number', 'price', 'original_price', 'cost', 'promotion_cost'])
             ->get();
     }
 
@@ -293,7 +294,7 @@ class MallGoods extends Base
     {
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
             ->where('status', '=', 1)
-            ->select(['id', 'goods_id', 'sku_number', 'picture','original_price', 'price','stock','status']);
+            ->select(['id', 'goods_id', 'sku_number', 'picture', 'original_price', 'price', 'stock', 'status']);
     }
 
     public function sku_list_back()
@@ -306,7 +307,7 @@ class MallGoods extends Base
     public function sku_list_all()
     {
         return $this->hasMany('App\Models\MallSku', 'goods_id', 'id')
-            ->select(['id', 'goods_id', 'sku_number', 'picture','original_price', 'price','stock', 'status']);
+            ->select(['id', 'goods_id', 'sku_number', 'picture', 'original_price', 'price', 'stock', 'status']);
     }
 
     public function tos_bind_list()
@@ -348,7 +349,7 @@ class MallGoods extends Base
     public function getIndexGoods($ids)
     {
         $lists = MallGoods::query()
-            ->select('id', 'name', 'picture','original_price', 'price')
+            ->select('id', 'name', 'picture', 'original_price', 'price')
             ->whereIn('id', $ids)
             ->where('status', 2)
             ->orderByRaw('FIELD(id,' . implode(',', $ids) . ')')
@@ -473,8 +474,8 @@ class MallGoods extends Base
         }
 
         $temp_sku_list = [];
-        foreach ( $data['sku_list'] as $v){
-            $temp_sku_list[]  = $v;
+        foreach ($data['sku_list'] as $v) {
+            $temp_sku_list[] = $v;
         }
         unset($data['sku_list']);
         $data['sku_list'] = $temp_sku_list;
@@ -494,7 +495,7 @@ class MallGoods extends Base
     // 全局搜索用 $keywords
     static function search($keywords)
     {
-        $res = MallGoods::select('id', 'name', 'subtitle', 'original_price', 'picture','price')
+        $res = MallGoods::select('id', 'name', 'subtitle', 'original_price', 'picture', 'price')
             ->where('status', 2)
             //->where('can_sale', 1)
             ->where(function ($query) use ($keywords) {

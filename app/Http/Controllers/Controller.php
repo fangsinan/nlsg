@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\VipUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Providers\Auth\Illuminate;
+use Illuminate\Routing\Controller as BaseController;
 
 
 class Controller extends BaseController
@@ -26,6 +24,8 @@ class Controller extends BaseController
 
     public function __construct()
     {
+//        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+//        $this->ip =  $request->getClientIp();
         $this->user = auth('api')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
@@ -38,10 +38,13 @@ class Controller extends BaseController
         }
     }
 
-    public function getIp(Request $request){
-        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-        $this->ip =  $request->getClientIp();
-    }
+//    public function getIp(){
+//        $r = new \Illuminate\Http\Request();
+//        \Illuminate\Http\Request::setTrustedProxies($r->getClientIps(),\Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+//        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+//        $this->ip =  $request->getClientIp();
+//        $this->ip =  $r->getClientIp();
+//    }
 
     protected function success($data = [], $flag = 0, $msg = '成功')
     {

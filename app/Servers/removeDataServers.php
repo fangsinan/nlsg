@@ -309,7 +309,7 @@ class removeDataServers
 
         // $this->removeExpress();//迁移快递信息
 
-        $data = $this->getOrderData(1,10);
+        $data = $this->getOrderData(1, 10);
         dd($data);
     }
 
@@ -317,6 +317,8 @@ class removeDataServers
     {
         $old_order = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order')
+            ->where('user_id', '=', 234217)
+//            ->where('status','>',1)
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->orderBy('id', 'desc')
@@ -324,29 +326,29 @@ class removeDataServers
             ->toArray();
 
         $old_id_list = array_column($old_order, 'id');
+
         $old_details = DB::connection('mysql_old')
             ->table('nlsg_mall_order_detail')
             ->whereIn('order_id', $old_id_list)
             ->get()
             ->toArray();
-
+dd($old_order,$old_details);
         foreach ($old_order as &$v) {
             $temp_details = [];
             foreach ($old_details as $vv) {
-                if ($v->id === $vv->order_id) {
+                if ($v->id == $vv->order_id) {
                     $temp_details[] = $vv;
                 }
             }
             $v->details = $temp_details;
         }
 
-dd([$old_order,$old_details]);
         $order_data = [];
         $order_detail_data = [];
         $order_child_data = [];
-
+return $old_order;
         foreach ($old_order as $ov) {
-            if ($ov->status > 10 && !empty($ov->express_company) && !empty($ov->express_number)) {
+            if ($ov->status > 1 && !empty($ov->express_company) && !empty($ov->express_number)) {
                 foreach ($ov->details as $odv) {
                     $temp_order_child_data = [];
                     $temp_order_child_data['order_id'] = $ov->id;
@@ -359,6 +361,9 @@ dd([$old_order,$old_details]);
                         $temp_order_child_data['status'] = 1;
                         $temp_order_child_data['receipt_at'] = null;
                     }
+                    $get_express_info = ExpressInfo::where('express_num','=',trim($ov->express_number))
+                        ->select(['id'])->first();
+                    $temp_order_child_data['express_info_id'] = $get_express_info->id;
                     $order_child_data[] = $temp_order_child_data;
                 }
             }
