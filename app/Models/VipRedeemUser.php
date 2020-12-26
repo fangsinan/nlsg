@@ -165,7 +165,7 @@ class VipRedeemUser extends Base
             return ['code' => false, 'msg' => '兑换券不存在'];
         }
         if ($check->status != 3) {
-            return ['code' => false, 'msg' => '兑换券状态错误'];
+            return ['code' => false, 'msg' => '兑换券已被使用'];
         }
         $check->status = 1;
         $res = $check->save();
@@ -191,7 +191,7 @@ class VipRedeemUser extends Base
             return ['code' => false, 'msg' => '兑换券不存在'];
         }
         if ($check->status != 3) {
-            return ['code' => false, 'msg' => '兑换券状态错误'];
+            return ['code' => false, 'msg' => '兑换券已被使用'];
         }
         if ($check->user_id == $user['id']) {
             return ['code' => false, 'msg' => '兑换券错误'];
