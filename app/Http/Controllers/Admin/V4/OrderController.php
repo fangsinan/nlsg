@@ -112,16 +112,16 @@ class OrderController extends ControllerBackend
             ->paginate(10)
             ->toArray();
         $rank = Order::with('works:id,title,cover_img')
-                ->select([
-                    DB::raw('count(*) as total'),
-                    'user_id',
-                    'relation_id'
-                ])
-                ->where('type', 9)
-                ->where('status', 1)
-                ->orderBy('total', 'desc')
-                ->groupBy('relation_id')
-                ->get();
+            ->select([
+                DB::raw('count(*) as total'),
+                'user_id',
+                'relation_id'
+            ])
+            ->where('type', 9)
+            ->where('status', 1)
+            ->orderBy('total', 'desc')
+            ->groupBy('relation_id')
+            ->get();
 
         $data = [
             'lists' => $lists,
@@ -223,7 +223,7 @@ class OrderController extends ControllerBackend
                 'works:id,title,user_id,cover_img,price',
                 'works.user:id,nickname'
             ])
-            ->select('id', 'user_id', 'relation_id', 'ordernum', 'os_type','pay_type','pay_price', 'created_at')
+            ->select('id', 'user_id', 'relation_id', 'ordernum', 'os_type', 'pay_type', 'pay_price', 'created_at')
             ->where('id', $id)
             ->first();
         return success($list);
@@ -270,10 +270,11 @@ class OrderController extends ControllerBackend
         $start = $request->get('start');
         $end = $request->get('end');
         $status = $request->get('status');
-        $pay_type = $request->get('pay_type');
+        $pay_type    = $request->get('pay_type');
+        $vip_order_type = $request->get('vip_order_type');
         $os_type = $request->get('os_type');
-        $sort  = $request->get('sort');
-        $level = $request->get('level');
+        $sort = $request->get('sort');
+        $level = $request->get('level') ?? 0;
         $query = Order::with(
             [
                 'user:id,nickname,level',
@@ -285,6 +286,9 @@ class OrderController extends ControllerBackend
             ->when(! is_null($pay_type), function ($query) use ($pay_type) {
                 $query->where('pay_type', $pay_type);
             })
+            ->when(! is_null($vip_order_type), function ($query) use ($vip_order_type) {
+                $query->where('vip_order_type', $vip_order_type);
+            })
             ->when(! is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
@@ -294,10 +298,10 @@ class OrderController extends ControllerBackend
                 });
             })
             ->when(! is_null($level), function ($query) use ($level) {
-                 $query->whereHas('user', function ($query) use ($level) {
-                     $query->where('level', $level);
-                 });
-             })
+                $query->whereHas('user', function ($query) use ($level) {
+                    $query->where('level', $level);
+                });
+            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
                     $query->where('phone', 'like', '%'.$phone.'%');
