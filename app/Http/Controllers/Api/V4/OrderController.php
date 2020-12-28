@@ -21,6 +21,7 @@ use App\Models\VipUser;
 use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 /**
@@ -836,7 +837,7 @@ class OrderController extends Controller
         $type = $request->input('type') ?? 3;
 
         $lists = Order::with('user:id,nickname,headimg')
-            ->select('id', 'user_id', 'reward_num', 'pay_price')
+            ->select('id', 'user_id', DB::raw('sum(reward_num) reward_num'), DB::raw('sum(pay_price) pay_price'))
             ->where(['type' => 5, 'reward_type' => $type, 'status' => 1,'relation_id' => $id])
             ->groupBy('user_id')
             ->orderBy('created_at', 'desc')
