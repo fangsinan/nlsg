@@ -667,10 +667,10 @@ class WorksController extends Controller
             'user_id'   =>$user_id,
             'is_del'    =>0,
         ]);
-        if(empty($check_his) && $his->wasRecentlyCreated){
-            // 学习记录数增一
-            User::where(['id'=>$user_id])->increment('history_num');
-        }
+//        if(empty($check_his) && $his->wasRecentlyCreated){
+//            // 学习记录数增一
+//            User::where(['id'=>$user_id])->increment('history_num');
+//        }
 
         //更新学习进度
         History::where('id',$his->id)->update([
