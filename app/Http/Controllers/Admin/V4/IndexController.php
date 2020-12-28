@@ -83,7 +83,7 @@ class IndexController extends ControllerBackend
             $lists = ListsWork::with('works:id,title,cover_img,price')
                 ->select('id', 'lists_id', 'works_id', 'state')
                 ->where('lists_id', 8)
-                ->orderBy('sort', 'desc')
+                ->orderBy('sort')
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->toArray();
@@ -91,7 +91,7 @@ class IndexController extends ControllerBackend
             $lists = ListsWork::with('wiki:id,name,cover')
                 ->select('id', 'lists_id', 'works_id', 'state')
                 ->where('lists_id', 9)
-                ->orderBy('sort', 'desc')
+                ->orderBy('sort')
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->toArray();
@@ -99,7 +99,7 @@ class IndexController extends ControllerBackend
             $lists = ListsWork::with('goods:id,name,picture,price')
                 ->select('id', 'lists_id', 'works_id', 'state')
                 ->where('lists_id', 10)
-                ->orderBy('sort', 'desc')
+                ->orderBy('sort')
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->toArray();
