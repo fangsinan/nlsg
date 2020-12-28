@@ -842,9 +842,9 @@ class OrderController extends Controller
             ->select('id', 'user_id','reward_num')
             ->where(['type' => 5, 'reward_type' => $type, 'status' => 1,'relation_id' => $id])
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
+            ->paginate(30)
             ->toArray();
-        
+
         return success($lists['data']);
     }
 
