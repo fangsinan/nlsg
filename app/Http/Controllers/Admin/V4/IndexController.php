@@ -78,8 +78,8 @@ class IndexController extends ControllerBackend
      */
     public function rank(Request $request)
     {
-        $type = $request->get('type') ?? 4;
-        if ($type == 4) {
+        $type = $request->get('type') ?? 8;
+        if ($type == 8) {
             $lists = ListsWork::with('works:id,title,cover_img,price')
                 ->select('id', 'lists_id', 'works_id', 'state')
                 ->where('lists_id', 8)
