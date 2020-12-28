@@ -136,6 +136,7 @@ class Works extends Base
             $query->select('id', 'nickname');
         }])
             ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num','chapter_num as info_num')
+            ->where('type', 2)
             ->where('is_free', 1)
             ->where('is_audio_book', 0)
             ->where('status', 4)
