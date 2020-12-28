@@ -794,7 +794,7 @@ class MallOrder extends Base
 
         $order_price = GetPriceTools::PriceCalc('-', $all_price, $coupon_money);
 
-        if ($freight_money > 0 && $order_price > ConfigModel::getData(1)) {
+        if ($freight_money > 0 && $order_price >= ConfigModel::getData(1)) {
             //$freight_money = $freight_money - ConfigModel::getData(7);
             $freight_money = $add_freight_money;
             if ($freight_money < 0) {
