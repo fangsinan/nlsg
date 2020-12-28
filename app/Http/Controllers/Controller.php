@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Cache;
 
 
 class Controller extends BaseController
@@ -27,6 +28,7 @@ class Controller extends BaseController
 //        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
 //        $this->ip =  $request->getClientIp();
         $this->user = auth('api')->user();
+        $this->ip = Cache::get($this->user['id'] . '_ip');
         if ($this->user) {
             $this->user = $this->user->toArray();
             $this->user['true_level'] = 0;
@@ -37,14 +39,6 @@ class Controller extends BaseController
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
         }
     }
-
-//    public function getIp(){
-//        $r = new \Illuminate\Http\Request();
-//        \Illuminate\Http\Request::setTrustedProxies($r->getClientIps(),\Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-//        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-//        $this->ip =  $request->getClientIp();
-//        $this->ip =  $r->getClientIp();
-//    }
 
     protected function success($data = [], $flag = 0, $msg = '成功')
     {
