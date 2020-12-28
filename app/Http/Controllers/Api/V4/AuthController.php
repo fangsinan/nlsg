@@ -566,10 +566,10 @@ class AuthController extends Controller
         $switchAll = [
             //精确版本
             '3.4.6' => [
-                'money_switch' => '0',//app赚钱开关   0关闭  1开启
-                'Vip_Switch' => '0',//提现开关   0关闭  1开启
-                'vipCode' => '0', //钻石兑换码
-                'worksCode' => '0',//课程兑换码
+                'money_switch' => '1',//app赚钱开关   0关闭  1开启
+                'Vip_Switch' => '1',//提现开关   0关闭  1开启
+                'vipCode' => '1', //钻石兑换码
+                'worksCode' => '1',//课程兑换码
             ],
             'default' => [
                 'money_switch' => '1',//app赚钱开关   0关闭  1开启
