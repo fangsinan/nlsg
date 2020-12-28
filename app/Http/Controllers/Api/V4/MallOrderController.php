@@ -720,8 +720,6 @@ class MallOrderController extends Controller
      */
     public function flashSalePayFail(Request $request)
     {
-        $m = new MallOrder();
-        $m->orderPaySuccess([]);
         $order_id = $request->input('order_id', 0);
         if (empty($order_id)) {
             return $this->error(0, '参数错误');
