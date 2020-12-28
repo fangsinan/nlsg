@@ -815,7 +815,7 @@ class MallOrder extends Base
 //            $sp_cut_money = GetPriceTools::PriceCalc('-',$sp_cut_money,$normal_cut_money);
 //        }
 
-        if (empty($freight_money)) {
+        if (intval($freight_money) == 0) {
             $coupon_list['coupon_freight'] = [];
         }
 
