@@ -938,6 +938,7 @@ class IndexController extends Controller
             'url'  => '',
             'img'  => 'https://image.nlsgapp.com/nlsg/authorpt/20201218152107911623.png'
         ];
+        $data = (object)[];
         return  success($data);
     }
 
