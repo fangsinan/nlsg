@@ -1035,11 +1035,11 @@ class IncomeController extends Controller
             if(empty($pay_info)) return $this->success();
 
             $con = $this->detail_content($type,$pay_info['type'],$pay_info['ordernum'],$pay_info['order_detail_id']);
-            $info['type'] = $pay_info['type'];
-            $info['created_at'] = $pay_info['created_at'];
-            $info['price'] = $pay_info['price'];
-            $info['content'] = $con['content'];
-            $info['name'] = $con['name'];
+            $info['type'] = $pay_info['type'] ?? 0;
+            $info['created_at'] = $pay_info['created_at'] ?? 0;
+            $info['price'] = $pay_info['price'] ?? 0;
+            $info['content'] = $con['content'] ?? '';
+            $info['name'] = $con['name'] ?? '';
             $info['o_nick_name'] = $con['o_nick_name'] ?? '';
         }
         $UserInfo = User::find($user_id);
