@@ -839,7 +839,7 @@ class OrderController extends Controller
         $lists = Order::with('user:id,nickname,headimg')
             ->select('id', 'user_id', DB::raw('sum(reward_num) reward_num'), DB::raw('sum(pay_price) pay_price'))
             ->where(['type' => 5, 'reward_type' => $type, 'status' => 1,'relation_id' => $id])
-            ->groupBy('user_id')
+//            ->groupBy('user_id')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
