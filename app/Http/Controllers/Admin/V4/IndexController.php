@@ -693,7 +693,7 @@ class IndexController extends ControllerBackend
     {
         $id = $request->get('id');
         $list = Lists::where('id', $id)
-            ->select('id', 'title', 'subtitle', 'status')
+            ->select('id', 'title', 'subtitle', 'status','cover','details_pic')
             ->first();
         return success($list);
     }
