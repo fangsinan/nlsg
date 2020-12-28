@@ -411,7 +411,7 @@ class ColumnController extends Controller
         /************    因为要临时更新 不改变数据结构的情况先这么处理   ********************/
 
         // 查询所属推荐有几种类型
-        $list = Recommend::select('relation_id','type')->where('position', $position)
+        $list = Recommend::select('relation_id','type')->where(['position' => $position,'status'=>1 ])
             ->groupBy('type')
             ->get();
         if($list){
