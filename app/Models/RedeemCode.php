@@ -25,6 +25,7 @@ class RedeemCode extends Base
 
         return $query->select(['id', 'code', 'name', 'status'])
             ->limit($size)
+            ->orderBy('status','asc')
             ->offset(($page - 1) * $size)
             ->get();
 
