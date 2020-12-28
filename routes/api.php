@@ -228,6 +228,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('goods/collect', 'MallController@collect');//商品收藏
         Route::post('goods/sub', 'MallController@sub');//商品补货提醒
         Route::post('home/redeem_code', 'MallController@redeemCode');//兑换码
+        Route::get('home/redeem_code_list', 'MallController@redeemCodeList');//兑换码
 
         Route::post('mall/prepare_create_order', 'MallOrderController@prepareCreateOrder');//普通预下单
         Route::post('mall/create_order', 'MallOrderController@createOrder');//普通下单

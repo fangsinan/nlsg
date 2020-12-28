@@ -982,7 +982,7 @@ class MallController extends Controller
      * @apiName /api/v4/home/redeem_code
      * @apiGroup  Home
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeem_code
-     * @apiDescription 兑换码,假接口
+     * @apiDescription 兑换码
      * @apiParam {number} code 兑换码
      * @apiParam {number=1,2,3} os_type 系统( 1 安卓 2ios 3微信)
      *
@@ -991,6 +991,25 @@ class MallController extends Controller
     {
         $model = new RedeemCode();
         $data = $model->redeem($request->input(), $this->user);
+        return $this->getRes($data);
+    }
+
+    /**
+     * 兑换码列表
+     * @api {post} /api/v4/home/redeem_code 兑换码列表
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/home/redeem_code
+     * @apiGroup  Home
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeem_code
+     * @apiDescription 兑换码列表
+     * @apiParam {number} page 页数
+     * @apiParam {number} size 条数
+     * @apiParam {number} status 筛选(不传都饭,1是已使用,0是未使用)
+     *
+     */
+    public function redeemCodeList(Request $request){
+        $model = new RedeemCode();
+        $data = $model->redeemList($request->input(), $this->user);
         return $this->getRes($data);
     }
 }

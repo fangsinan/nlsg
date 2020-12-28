@@ -10,6 +10,26 @@ class RedeemCode extends Base
 {
     protected $table = 'nlsg_redeem_code';
 
+    public function redeemList($params, $user)
+    {
+        $page = intval($params['page'] ?? 1);
+        $size = intval($params['size'] ?? 10);
+        $status = intval($params['status'] ?? -1);
+
+        $query = self::where('user_id', '=', $user['id'])
+            ->where('can_use', '=', 1);
+
+        if ($status !== -1){
+            $query->where('status','=',$status);
+        }
+
+        return $query->select(['id', 'code', 'name', 'status'])
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get();
+
+    }
+
     //兑换
     public function redeem($params, $user)
     {
