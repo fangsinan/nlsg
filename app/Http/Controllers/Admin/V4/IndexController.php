@@ -472,12 +472,12 @@ class IndexController extends ControllerBackend
                 Lists::where('id', $list->lists_id)->decrement('num');
             }
         } else {
-            $res = ListsWork::where('lists_id', $input['lists_id'])
-                ->where('works_id', $input['works_id'])
-                ->first();
-            if ($res) {
-                return error(1000, '不能添加重复数据');
-            }
+//            $res = ListsWork::where('lists_id', $input['lists_id'])
+//                ->where('works_id', $input['works_id'])
+//                ->first();
+//            if ($res) {
+//                return error(1000, '不能添加重复数据');
+//            }
             ListsWork::create([
                 'lists_id' => $input['lists_id'],
                 'works_id' => $input['works_id'],
