@@ -176,7 +176,7 @@ class LiveController extends Controller
         $liveWork = new LiveWorks();
         $recommend = $liveWork->getLiveWorks(0, 1, 3);
         $data = [
-            'banner'     => 'nlsg/works/20201021110516843010.png',
+            'banner'     => 'nlsg/works/20201228165453965824.jpg',
             'live_lists' => $liveLists,
             'back_lists' => $backLists ?? [],
             'offline'    => $offline,
