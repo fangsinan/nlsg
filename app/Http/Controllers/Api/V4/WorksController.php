@@ -659,17 +659,18 @@ class WorksController extends Controller
             ->where('is_del','=',0)
             ->first();
 
-        if(empty($check_his)){
-            //防止 show接口未请求
-            $his = History::firstOrCreate([
-                'relation_id' =>$relation_id,
-                'relation_type'  =>$relation_type,
-                'info_id' =>$works_info_id,
-                'user_id'   =>$user_id,
-                'is_del'    =>0,
-            ]);
-        }
-
+        //防止 show接口未请求
+        $his = History::firstOrCreate([
+            'relation_id' =>$relation_id,
+            'relation_type'  =>$relation_type,
+            'info_id' =>$works_info_id,
+            'user_id'   =>$user_id,
+            'is_del'    =>0,
+        ]);
+//        if(empty($check_his) && $his->wasRecentlyCreated){
+//            // 学习记录数增一
+//            User::where(['id'=>$user_id])->increment('history_num');
+//        }
 
         //更新学习进度
         History::where('id',$his->id)->update([
