@@ -4,13 +4,22 @@
 namespace App\Models;
 
 
+use Illuminate\Support\Facades\Cache;
+
 class VipWorksList extends Base
 {
     protected $table = 'nlsg_vip_works_list';
 
     public function getList($flag = 1, $category_id = 0, $size = 0)
     {
-        $data = $this->getListFromDB();
+        $cache_key_name = 'vip_works_list';
+        $expire_num = CacheTools::getExpire('vip_works_list');
+        $data = Cache::get($cache_key_name);
+        if (empty($data)) {
+            $data = $this->getListFromDB();
+            Cache::put($cache_key_name, $data, $expire_num);
+        }
+
         if ($flag === 1) {
             if (empty($size)) {
                 return $data['list'];

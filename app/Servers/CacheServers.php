@@ -16,6 +16,9 @@ class CacheServers
             case 1:
                 self::clearGoods();
                 break;
+            case 2:
+                self::clearWorks();
+                break;
         }
     }
 
@@ -27,6 +30,9 @@ class CacheServers
         Cache::forget('set_kill_list');
     }
 
+    protected static function clearWorks(){
+        Cache::forget('vip_works_list');
+    }
 
     //coupon_rule_list  商品优惠券的缓存
 
