@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\VipRedeemCode;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
-use App\Models\Works;
+use App\Models\VipWorksList;
 use Illuminate\Http\Request;
 
 class VipController extends Controller
@@ -116,9 +116,10 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
-    public function redeemCodeInfo(Request $request){
+    public function redeemCodeInfo(Request $request)
+    {
         $model = new VipRedeemUser();
-        $data = $model->info($this->user,$request->input());
+        $data = $model->info($this->user, $request->input());
         return $this->getRes($data);
     }
 
@@ -350,8 +351,12 @@ class VipController extends Controller
      */
     public function allWorks(Request $request)
     {
-        $model = new Works();
-        $data = $model->getAllVipWorks($request->input());
+//        $model = new Works();
+//        $data = $model->getAllVipWorks($request->input());
+
+        $model = new VipWorksList();
+        $data = $model->getList(2, $request->input('category_id', 0));
+
         return $this->getRes($data);
     }
 

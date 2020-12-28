@@ -218,4 +218,26 @@ class User extends Authenticatable implements JWTSubject
         ];
 
     }
+
+    public static function getTeacherInfo($user_id){
+
+        $res['name'] = '';
+        $res['title'] = '';
+        $res['subtitle'] = '';
+
+
+        $user = self::where('id','=',$user_id)->first('nickname');
+        $col = Column::where('user_id','=',$user_id)->where('type','=',1)->select(['title','subtitle'])->first();
+
+        if (!empty($user->nickname)){
+            $res['name'] = $user->nickname;
+        }
+
+        if (!empty($col)){
+            $res['title'] = $col->title;
+            $res['subtitle'] = $col->subtitle;
+        }
+
+        return $res;
+    }
 }

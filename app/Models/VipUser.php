@@ -67,7 +67,7 @@ class VipUser extends Base
         $author_order_str = 'FIELD(id,' . $author_order_str . ') desc';
         $author = User::where('is_author', '=', 1)
             ->where('status', '=', 1)
-            ->where('show_in_vip_page','=',1)
+            ->where('show_in_vip_page', '=', 1)
             ->select(['id', 'nickname', 'image_for_vip_page as headimg', 'intro_for_360'])
             ->orderByRaw($author_order_str)
             ->orderBy('id', 'asc')
@@ -75,19 +75,26 @@ class VipUser extends Base
             ->get()
             ->toArray();
 
-        //精品课
-        $works_id_list = ConfigModel::getData(27);
-        $works_order_str = 'FIELD(w.id,' . $works_id_list . ') asc';
-        $works_list = DB::table('nlsg_works as w')
-            ->leftJoin('nlsg_column as c', 'w.column_id', '=', 'c.id')
-            ->whereIn('w.id', explode(',', $works_id_list))
-            ->where('w.status', '=', 4)
-            ->orderByRaw($works_order_str)
-            ->select(['w.id', 'w.type as works_type', 'w.title', 'w.subtitle',
-                'w.cover_img', 'w.image_for_vip_page as detail_img', 'w.price', 'c.type', 'c.column_type'])
-            ->limit(6)
-            ->get()
-            ->toArray();
+        if (0) {
+            //精品课
+            $works_id_list = ConfigModel::getData(27);
+            $works_order_str = 'FIELD(w.id,' . $works_id_list . ') asc';
+            $works_list = DB::table('nlsg_works as w')
+                ->leftJoin('nlsg_column as c', 'w.column_id', '=', 'c.id')
+                ->whereIn('w.id', explode(',', $works_id_list))
+                ->where('w.status', '=', 4)
+                ->orderByRaw($works_order_str)
+                ->select(['w.id', 'w.type as works_type', 'w.title', 'w.subtitle',
+                    'w.cover_img', 'w.image_for_vip_page as detail_img', 'w.price', 'c.type', 'c.column_type'])
+                ->limit(6)
+                ->get()
+                ->toArray();
+        } else {
+            //精品课
+            $vwlModel = new VipWorksList();
+            $works_list = $vwlModel->getList(1);
+        }
+
 
         //长图
         $detail_image = ConfigModel::getData(28);
@@ -119,16 +126,17 @@ class VipUser extends Base
     public function orderHistory()
     {
         return $this->hasOne(Order::class, 'user_id', 'user_id')
-            ->where('type','=',16)
-            ->where('status','=',1)
-            ->select(['id', 'user_id','created_at'])
-            ->orderBy('id','desc');
+            ->where('type', '=', 16)
+            ->where('status', '=', 1)
+            ->select(['id', 'user_id', 'created_at'])
+            ->orderBy('id', 'desc');
     }
 
-    public function codeHistory(){
+    public function codeHistory()
+    {
         return $this->hasOne(VipRedeemUser::class, 'user_id', 'user_id')
-            ->where('status','=',2)
-            ->select(['id', 'user_id','updated_at'])
-            ->orderBy('updated_at','desc');
+            ->where('status', '=', 2)
+            ->select(['id', 'user_id', 'updated_at'])
+            ->orderBy('updated_at', 'desc');
     }
 }
