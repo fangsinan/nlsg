@@ -136,6 +136,40 @@ class RedeemCode extends Base
             case 2:
                 $check_sub = Subscribe::where('user_id', '=', $user_id)
                     ->where('relation_id', '=', $product_id)
+                    ->where('type', '=', 6)
+                    ->first();
+                if (empty($check_sub)) {
+                    $temp_data['type'] = 6;
+                    $temp_data['user_id'] = $user_id;
+                    $temp_data['relation_id'] = $product_id;
+                    $temp_data['start_time'] = $now_date;
+                    $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    $temp_data['status'] = 1;
+                    $temp_data['give'] = 4;
+                    $temp_data['created_at'] = $temp_data['updated_at'] = $now_date;
+                    $temp_res = DB::table('nlsg_subscribe')->insert($temp_data);
+                    if ($temp_res) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    if ($check_sub->end_time > $now_date) {
+                        $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime($check_sub->end_time . ' +1 year'));
+                    } else {
+                        $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    }
+                    $temp_res = Subscribe::whereId($check_sub->id)
+                        ->update($temp_data);
+                    if ($temp_res === false) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            case 3:
+                $check_sub = Subscribe::where('user_id', '=', $user_id)
+                    ->where('relation_id', '=', $product_id)
                     ->where('type', '=', 2)
                     ->first();
                 if (empty($check_sub)) {
@@ -168,8 +202,6 @@ class RedeemCode extends Base
                     }
                 }
         }
-
-
     }
 
 
