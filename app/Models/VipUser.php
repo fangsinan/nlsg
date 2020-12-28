@@ -92,7 +92,7 @@ class VipUser extends Base
         } else {
             //精品课
             $vwlModel = new VipWorksList();
-            $works_list = $vwlModel->getList(1);
+            $works_list = $vwlModel->getList(1,0,6);
         }
 
 

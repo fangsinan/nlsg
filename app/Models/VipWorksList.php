@@ -8,11 +8,16 @@ class VipWorksList extends Base
 {
     protected $table = 'nlsg_vip_works_list';
 
-    public function getList($flag = 1, $category_id = 0)
+    public function getList($flag = 1, $category_id = 0, $size = 0)
     {
         $data = $this->getListFromDB();
         if ($flag === 1) {
-            return array_slice($data['list'], 0, 6);
+            if (empty($size)) {
+                return $data['list'];
+            } else {
+                return array_slice($data['list'], 0, 6);
+            }
+
         } else {
             $list = [];
             if (empty($category_id)) {

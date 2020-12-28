@@ -13,6 +13,7 @@ use App\Models\MallGoodsMsg;
 use App\Models\MallOrderGroupBuy;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
+use App\Models\VipRedeemUser;
 use Illuminate\Http\Request;
 
 class MallController extends Controller
@@ -216,7 +217,6 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            MallOrderGroupBuy::clear();
             return true;
         } else {
             $params = $request->input();

@@ -15,8 +15,10 @@ class VipRedeemUser extends Base
     public function list($user, $params)
     {
         if (empty($user['id'] ?? 0)) {
-            $res['statistics'] = new class{};
-            $res['count'] = new class{};
+            $res['statistics'] = new class {
+            };
+            $res['count'] = new class {
+            };
             $res['list'] = [];
             return $res;
         }
@@ -366,89 +368,198 @@ class VipRedeemUser extends Base
     //(加事务调用)360课程订阅和生成兑换券
     public static function subWorksOrGetRedeemCode($user_id)
     {
-        $now_date = date('Y-m-d H:i:s');
-        $all_works_ids = explode(',', ConfigModel::getData(27));
 
-        //查询已订阅的课程
-        $sub_list = Subscribe::where('user_id', '=', $user_id)
-            ->whereIn('relation_id', $all_works_ids)
-            ->where('type', '=', 2)
-            ->select(['id', 'relation_id as works_id'])
-            ->get();
+        if (0) {
+            //旧的,废弃
+            $now_date = date('Y-m-d H:i:s');
+            $all_works_ids = explode(',', ConfigModel::getData(27));
 
-        if ($sub_list->isEmpty()) {
-            $sub_list = [];
-        } else {
-            $sub_list = $sub_list->toArray();
-        }
+            //查询已订阅的课程
+            $sub_list = Subscribe::where('user_id', '=', $user_id)
+                ->whereIn('relation_id', $all_works_ids)
+                ->where('type', '=', 2)
+                ->select(['id', 'relation_id as works_id'])
+                ->get();
 
-        //需要创建优惠券的课程
-        $sub_works_id = array_column($sub_list, 'works_id');
-
-        //未订阅的课程
-        $not_sub_works_id = array_diff($all_works_ids, $sub_works_id);
-
-        if (!empty($not_sub_works_id)) {
-            $add_sub = [];
-            foreach ($not_sub_works_id as $k => $v) {
-                $subscribe = [
-                    'user_id' => $user_id,                //会员id
-                    'type' => 2, //作品
-                    'status' => 1,
-                    'relation_id' => $v, //精品课
-                    'pay_time' => $now_date,                            //支付时间
-                    'created_at' => $now_date,                            //添加时间
-                    'updated_at' => $now_date,                            //添加时间
-                    'give' => 14,                            //添加时间,
-                    'start_time' => $now_date,
-                    'end_time' => date('Y-m-d 23:59:59', strtotime("+1 years"))
-                ];
-                $add_sub[] = $subscribe;
+            if ($sub_list->isEmpty()) {
+                $sub_list = [];
+            } else {
+                $sub_list = $sub_list->toArray();
             }
 
-            $sub_res = DB::table('nlsg_subscribe')->insert($add_sub);
-            if (!$sub_res) {
-                return false;
-            }
-        }
+            //需要创建优惠券的课程
+            $sub_works_id = array_column($sub_list, 'works_id');
 
-        if (!empty($sub_works_id)) {
-            $group_name = RedeemCode::createGroupName();
-            $new_code = [];
-            $i = 0;
-            while ($i < count($sub_works_id)) {
-                $temp_code = $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5);
-                if (!in_array($temp_code, $new_code)) {
-                    $new_code[] = $temp_code;
-                    $i++;
+            //未订阅的课程
+            $not_sub_works_id = array_diff($all_works_ids, $sub_works_id);
+
+            if (!empty($not_sub_works_id)) {
+                $add_sub = [];
+                foreach ($not_sub_works_id as $k => $v) {
+                    $subscribe = [
+                        'user_id' => $user_id,                //会员id
+                        'type' => 2, //作品
+                        'status' => 1,
+                        'relation_id' => $v, //精品课
+                        'pay_time' => $now_date,                            //支付时间
+                        'created_at' => $now_date,                            //添加时间
+                        'updated_at' => $now_date,                            //添加时间
+                        'give' => 14,                            //添加时间,
+                        'start_time' => $now_date,
+                        'end_time' => date('Y-m-d 23:59:59', strtotime("+1 years"))
+                    ];
+                    $add_sub[] = $subscribe;
+                }
+
+                $sub_res = DB::table('nlsg_subscribe')->insert($add_sub);
+                if (!$sub_res) {
+                    return false;
                 }
             }
 
-            $add_code = [];
-            foreach ($sub_works_id as $k => $v) {
-                $temp_title = Works::whereId($v)->select(['title'])->first();
-                $add = [
-                    'code' => $new_code[$k],
-                    'name' => $temp_title->title ?? '' . '-兑换券',
-                    'new_group' => $group_name,
-                    'can_use' => 1,
-                    'redeem_type' => 2,
-                    'goods_id' => $v,
-                    'user_id' => $user_id,
-                    'is_new_code' => 1,
-                    'created_at' => $now_date,
-                    'updated_at' => $now_date
-                ];
-                $add_code[] = $add;
+            if (!empty($sub_works_id)) {
+                $group_name = RedeemCode::createGroupName();
+                $new_code = [];
+                $i = 0;
+                while ($i < count($sub_works_id)) {
+                    $temp_code = $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5);
+                    if (!in_array($temp_code, $new_code)) {
+                        $new_code[] = $temp_code;
+                        $i++;
+                    }
+                }
+
+                $add_code = [];
+                foreach ($sub_works_id as $k => $v) {
+                    $temp_title = Works::whereId($v)->select(['title'])->first();
+                    $add = [
+                        'code' => $new_code[$k],
+                        'name' => $temp_title->title ?? '' . '-兑换券',
+                        'new_group' => $group_name,
+                        'can_use' => 1,
+                        'redeem_type' => 2,
+                        'goods_id' => $v,
+                        'user_id' => $user_id,
+                        'is_new_code' => 1,
+                        'created_at' => $now_date,
+                        'updated_at' => $now_date
+                    ];
+                    $add_code[] = $add;
+                }
+
+                $sub_res = DB::table('nlsg_redeem_code')->insert($add_code);
+                if (!$sub_res) {
+                    return false;
+                }
             }
 
-            $sub_res = DB::table('nlsg_redeem_code')->insert($add_code);
-            if (!$sub_res) {
-                return false;
+            return true;
+
+        } else {
+            $model = new VipWorksList();
+            $list = $model->getList(1);
+
+            $now = time();
+            $now_date = date('Y-m-d H:i:s', $now);
+            $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
+            $group_name = RedeemCode::createGroupName();
+
+            $add_code_data = [];
+            $add_sub_data = [];
+
+            foreach ($list as $v) {
+                if ($v['type'] == 1) {
+                    //讲座订阅
+                    $check = Subscribe::where('user_id', '=', $user_id)
+                        ->where('relation_id', '=', $v['id'])
+                        ->where('type', '=', 6)
+                        ->where('status', '=', 1)
+                        ->where('end_time', '>=', $now_date)
+                        ->first();
+                    if (empty($check)) {
+                        $add_sub_data[] = [
+                            'user_id' => $user_id,
+                            'type' => 6,
+                            'status' => 1,
+                            'relation_id' => $v['id'],
+                            'pay_time' => $now_date,
+                            'created_at' => $now_date,
+                            'updated_at' => $now_date,
+                            'give' => 14,
+                            'start_time' => $now_date,
+                            'end_time' => $end_date
+                        ];
+                    } else {
+                        $add_code_data[] = [
+                            'code' => $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5),
+                            'name' => ($v['title'] ?? '讲座') . '-兑换券',
+                            'new_group' => $group_name,
+                            'can_use' => 1,
+                            'redeem_type' => 2,
+                            'goods_id' => $v['id'],
+                            'user_id' => $user_id,
+                            'is_new_code' => 1,
+                            'created_at' => $now_date,
+                            'updated_at' => $now_date
+                        ];
+                    }
+
+                } else {
+                    //作品订阅
+                    $check = Subscribe::where('user_id', '=', $user_id)
+                        ->where('relation_id', '=', $v['id'])
+                        ->where('type', '=', 2)
+                        ->where('status', '=', 1)
+                        ->where('end_time', '>=', $now_date)
+                        ->first();
+                    if (empty($check)) {
+                        $add_sub_data[] = [
+                            'user_id' => $user_id,
+                            'type' => 2,
+                            'status' => 1,
+                            'relation_id' => $v['id'],
+                            'pay_time' => $now_date,
+                            'created_at' => $now_date,
+                            'updated_at' => $now_date,
+                            'give' => 14,
+                            'start_time' => $now_date,
+                            'end_time' => $end_date
+                        ];
+                    } else {
+                        $add_code_data[] = [
+                            'code' => $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5),
+                            'name' => ($v['title'] ?? '课程') . '-兑换券',
+                            'new_group' => $group_name,
+                            'can_use' => 1,
+                            'redeem_type' => 3,
+                            'goods_id' => $v['id'],
+                            'user_id' => $user_id,
+                            'is_new_code' => 1,
+                            'created_at' => $now_date,
+                            'updated_at' => $now_date
+                        ];
+                    }
+                }
             }
+
+            if (!empty($add_code_data)) {
+                $sub_res = DB::table('nlsg_redeem_code')->insert($add_code_data);
+                if (!$sub_res) {
+                    return false;
+                }
+            }
+
+            if (!empty($add_sub_data)) {
+                $sub_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                if (!$sub_res) {
+                    return false;
+                }
+
+            }
+
+            return true;
         }
 
-        return true;
     }
 
     public function codeInfo()
