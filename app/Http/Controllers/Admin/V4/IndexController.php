@@ -82,7 +82,7 @@ class IndexController extends ControllerBackend
         if ($type == 4) {
             $lists = ListsWork::with('works:id,title,cover_img,price')
                 ->select('id', 'lists_id', 'works_id', 'state')
-                ->where('lists_id', 4)
+                ->where('lists_id', 8)
                 ->orderBy('sort', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->get()
