@@ -996,11 +996,11 @@ class MallController extends Controller
 
     /**
      * 兑换码列表
-     * @api {post} /api/v4/home/redeem_code 兑换码列表
+     * @api {get} /api/v4/home/redeem_code_list 兑换码列表
      * @apiVersion 4.0.0
-     * @apiName /api/v4/home/redeem_code
+     * @apiName /api/v4/home/redeem_code_list
      * @apiGroup  Home
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeem_code
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/home/redeem_code_list
      * @apiDescription 兑换码列表
      * @apiParam {number} page 页数
      * @apiParam {number} size 条数
