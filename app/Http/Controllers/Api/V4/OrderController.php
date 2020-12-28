@@ -743,7 +743,9 @@ class OrderController extends Controller
         $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
         $is_audio_book = $request->input('is_audio_book', 2);
-        $data = Subscribe::where(['type' => $type, 'user_id' => $user_id,])->paginate($this->page_per_page)->toArray();
+        $data = Subscribe::select('*')->where('end_time' ,'>=', date('Y-m-d H:i:s'))
+            ->where(['type' => $type, 'user_id' => $user_id,])->paginate($this->page_per_page)->toArray();
+
         $data = $data['data'];
 
 
@@ -837,13 +839,12 @@ class OrderController extends Controller
         $type = $request->input('type') ?? 3;
 
         $lists = Order::with('user:id,nickname,headimg')
-            ->select('id', 'user_id', DB::raw('sum(reward_num) reward_num'), DB::raw('sum(pay_price) pay_price'))
+            ->select('id', 'user_id','reward_num')
             ->where(['type' => 5, 'reward_type' => $type, 'status' => 1,'relation_id' => $id])
-            ->groupBy('user_id')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-
+        
         return success($lists['data']);
     }
 
