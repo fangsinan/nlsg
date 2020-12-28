@@ -59,7 +59,7 @@ class VipWorksList extends Base
                 $temp_res['subtitle'] = $v['column']['subtitle'];
                 $temp_res['price'] = $v['column']['price'];
                 $temp_res['cover_img'] = $v['cover_img'];
-                $temp_res['detail_img'] = $v['column']['detail_img'];
+                $temp_res['detail_img'] = $v['column']['cover_img'];
                 $temp_res['type'] = 1;
                 $temp_res['column_type'] = $v['column']['column_type'];
                 $temp_res['category_id'] = [0];
@@ -84,7 +84,7 @@ class VipWorksList extends Base
                 $temp_res['subtitle'] = $v['works']['subtitle'];
                 $temp_res['price'] = $v['works']['price'];
                 $temp_res['cover_img'] = $v['cover_img'];
-                $temp_res['detail_img'] = $v['works']['detail_img'];
+                $temp_res['detail_img'] = $v['works']['cover_img'];
                 $temp_res['type'] = $v['works']['type'];
                 $temp_res['column_type'] = 1;
                 $temp_res['category_id'] = $temp_res_category_id;
