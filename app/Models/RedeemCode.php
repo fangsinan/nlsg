@@ -15,7 +15,7 @@ class RedeemCode extends Base
         $page = intval($params['page'] ?? 1);
         $size = intval($params['size'] ?? 10);
         $status = intval($params['status'] ?? -1);
-
+        
         $query = self::where('user_id', '=', $user['id'])
             ->where('can_use', '=', 1);
 
@@ -84,7 +84,7 @@ class RedeemCode extends Base
         $check_code->status = 1;
         $check_code->exchange_time = $now_date;
         $check_code->phone = $phone;
-        $check_code->user_id = $user['id'];
+        //$check_code->user_id = $user['id'];
         $check_code->to_user_id = $to_user_id;
         $check_code->os_type = $os_type;
         $code_res = $check_code->save();
