@@ -1279,7 +1279,7 @@ class UserController extends Controller
         $phone = $request->input('phone');
         $list = User::where('phone', $phone)->first();
         if ($list) {
-            return error(1000, '该手机号码已存在', $data);
+            return error(1000, '该手机号码已存在');
         }
         return success();
     }
