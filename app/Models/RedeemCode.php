@@ -15,7 +15,7 @@ class RedeemCode extends Base
         $page = intval($params['page'] ?? 1);
         $size = intval($params['size'] ?? 10);
         $status = intval($params['status'] ?? -1);
-
+        
         $query = self::where('user_id', '=', $user['id'])
             ->where('can_use', '=', 1);
 
@@ -26,6 +26,7 @@ class RedeemCode extends Base
         return $query->select(['id', 'code', 'name', 'status'])
             ->limit($size)
             ->orderBy('status','asc')
+            ->orderBy('id','asc')
             ->offset(($page - 1) * $size)
             ->get();
 
