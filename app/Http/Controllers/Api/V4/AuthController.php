@@ -128,7 +128,9 @@ class AuthController extends Controller
             'nickname' => $user->nickname,
             'headimg' => $user->headimg ?? '',
             'phone' => $user->phone,
-            'level' => $user->level
+            'level' => $user->level,
+            'sex' => $user->sex,
+            'children_age' => $user->children_age,
         ];
         return success($data);
     }
@@ -202,7 +204,9 @@ class AuthController extends Controller
             'nickname' => $user->nickname,
             'headimg' => $user->headimg ?? '',
             'phone' => $user->phone,
-            'level' => $user->level
+            'level' => $user->level,
+            'sex' => $user->sex,
+            'children_age' => $user->children_age,
         ];
         return success($data);
     }
