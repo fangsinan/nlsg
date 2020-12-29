@@ -595,7 +595,7 @@ class ColumnController extends Controller
         }
         //IOS 通过审核后修改  并删除返回值works_data
         $column_data = Column::select(['id','name', 'name as title', 'title','subtitle','cover_pic as cover_img','details_pic as detail_img','message',
-            'view_num','price','subscribe_num','is_free','is_end',])
+            'view_num','price','subscribe_num','is_free','is_end','info_num'])
             ->where(['id'=>$lecture_id,'type'=>2,'status'=>1])->first();
 
 //        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
@@ -615,7 +615,7 @@ class ColumnController extends Controller
 //            return $this->success($res);
 //        }
 
-        $column_data['info_num'] = count($info);
+
         $column_data['is_sub'] = $is_sub;
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($lecture_id,2,$user_id);  //讲座
