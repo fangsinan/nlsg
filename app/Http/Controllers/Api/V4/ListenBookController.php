@@ -94,8 +94,9 @@ class ListenBookController extends Controller
         $flag = $request->input('flag','');
         $page = $request->input('page',1);
         $size = $request->input('size',10);
-        $order = $request->input('order','desc');
-        $order = $order ?? 'desc';
+        $order = $request->input('order','asc');
+        $order = $order ?? 'asc';
+
         $user_id = $this->user['id'] ?? 0;
         $works_data = Works::select([
             'id', 'user_id', 'column_id' ,'type','title','subtitle', 'cover_img','detail_img','message',
