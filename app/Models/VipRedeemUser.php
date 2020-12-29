@@ -498,7 +498,7 @@ class VipRedeemUser extends Base
                             'redeem_type' => 2,
                             'goods_id' => $v['id'],
                             'user_id' => $user_id,
-                            'is_new_code' => 2,
+                            'is_new_code' => 1,
                             'created_at' => $now_date,
                             'updated_at' => $now_date
                         ];
@@ -534,7 +534,7 @@ class VipRedeemUser extends Base
                             'redeem_type' => 3,
                             'goods_id' => $v['id'],
                             'user_id' => $user_id,
-                            'is_new_code' => 2,
+                            'is_new_code' => 1,
                             'created_at' => $now_date,
                             'updated_at' => $now_date
                         ];
