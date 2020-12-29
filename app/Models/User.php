@@ -178,6 +178,7 @@ class User extends Authenticatable implements JWTSubject
         return DB::table('nlsg_user_invite as i')
             ->join('nlsg_user as u','i.to_uid','=','u.id')
             ->where('i.from_uid','=',$uid)
+            ->orderBy('i.id','desc')
             ->select(['u.id','u.nickname','u.headimg','i.created_at'])
             ->get();
 
