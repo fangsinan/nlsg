@@ -88,8 +88,7 @@ class AuthController extends Controller
                 'inviter' => $inviter,
                 'login_flag' => ($inviter == 0) ? 0 : 1,
                 'nickname' => substr_replace($phone, '****', 3, 4),
-                'ref' => $ref,
-                'headimg' => 'image/202009/13f952e04c720a550193e5655534be86.jpg',
+                'ref' => $ref
             ]);
             $user = User::find($list->id);
 
