@@ -136,6 +136,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('remove_data/mall_orders', 'RemoveDataController@mallOrders');
     Route::get('remove_data/a_e', 'RemoveDataController@addressExpress');
     Route::get('remove_data/vip', 'RemoveDataController@vip');
+    Route::get('remove_data/redeem_code', 'RemoveDataController@redeemCode');
 
     //测试临时用,之后要删除
     Route::get('live/pass', 'GoodsController@tempTools');//商城退款

@@ -308,30 +308,30 @@ class removeDataServers
     public function vip()
     {
         $list = VipUser::query()
-            ->where('level','=',2)
-            ->where('status','=',1)
-            ->where('is_default','=',1)
-            ->where('is_open_360','=',0)
-            ->with(['orderHistory','codeHistory'])
+            ->where('level', '=', 2)
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->where('is_open_360', '=', 0)
+            ->with(['orderHistory', 'codeHistory'])
             ->get()->toArray();
 
-        foreach($list as $v){
-            if (!empty($v['order_history']) || !empty($v['code_history'])){
+        foreach ($list as $v) {
+            if (!empty($v['order_history']) || !empty($v['code_history'])) {
                 $update_data = [];
                 $update_data['is_open_360'] = 1;
 
                 $begin_time = '2020-09-01';
-                if (!empty($v['order_history']['created_at']) && $begin_time < $v['order_history']['created_at']){
+                if (!empty($v['order_history']['created_at']) && $begin_time < $v['order_history']['created_at']) {
                     $begin_time = $v['order_history']['created_at'];
                 }
 
-                if (!empty($v['code_history']['updated_at']) && $begin_time < $v['code_history']['updated_at']){
+                if (!empty($v['code_history']['updated_at']) && $begin_time < $v['code_history']['updated_at']) {
                     $begin_time = $v['code_history']['updated_at'];
                 }
                 $update_data['time_begin_360'] = $begin_time;
-                $update_data['time_end_360'] = date('Y-m-d 23:59:59',strtotime(" +1 years",strtotime($begin_time)));
+                $update_data['time_end_360'] = date('Y-m-d 23:59:59', strtotime(" +1 years", strtotime($begin_time)));
 
-                DB::table('nlsg_vip_user')->where('id','=',$v['id'])
+                DB::table('nlsg_vip_user')->where('id', '=', $v['id'])
                     ->update($update_data);
             }
         }
@@ -605,7 +605,6 @@ class removeDataServers
         }
     }
 
-
     public function removeMallOrdersOld()
     {
         $now_date = date('Y-m-d H:i:s');
@@ -801,5 +800,10 @@ class removeDataServers
 
     }
 
+    public function redeemCode()
+    {
+
+
+    }
 
 }
