@@ -218,7 +218,7 @@ class Lists extends Model
     public function works()
     {
         return $this->belongsToMany('App\Models\Works',
-            'nlsg_lists_work', 'lists_id', 'works_id');
+            'nlsg_lists_work', 'lists_id', 'works_id')->where('state',1);
     }
 
     public function wiki()
