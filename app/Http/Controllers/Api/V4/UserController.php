@@ -1136,6 +1136,11 @@ class UserController extends Controller
             'is_wx' => 1
         ];
 
+        $user = User::where('unionid', $input['unionid'])->first();
+        if ($user){
+            return error(1000, '微信已绑定');
+        }
+
         $res = User::where('id', $this->user['id'])->update($data);
         if ($res) {
             return success();
