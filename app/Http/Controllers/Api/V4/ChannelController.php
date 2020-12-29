@@ -44,7 +44,7 @@ class ChannelController extends Controller
     public function click(Request $request)
     {
         $model = new Click();
-        $data = $model->add($request->input(), $this->user, $this->ip);
+        $data = $model->add($request->input(), $this->user, $this->getIp($request));
         return $this->getRes($data);
     }
 

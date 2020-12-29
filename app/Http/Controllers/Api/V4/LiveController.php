@@ -873,7 +873,7 @@ class LiveController extends Controller
             'price'       => $list['price'],
             'twitter_id'  => $tweeter_code,
             'coupon_id'   => 0,
-            'ip'          => $request->getClientIp(),
+            'ip'          => $this->getIp($request),
             'os_type'     => $osType,
             'live_id'     => $liveId,
             'pay_type'    => $payType,

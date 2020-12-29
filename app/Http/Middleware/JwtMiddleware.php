@@ -21,9 +21,6 @@ class JwtMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            //todo 临时 获取ip
-            $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
-            Cache::put($user->id . '_ip', $request->getClientIp(), 60);
         } catch (Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
                 return response()->json(['msg' => '登录失效，请重新登录', 'code' => 401]);
