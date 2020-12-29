@@ -1253,6 +1253,36 @@ class UserController extends Controller
         }
     }
 
+    /**
+    * @api {get} api/v4/user/check-phone   验证手机号是否已经存在
+    * @apiVersion 4.0.0
+    * @apiName  check-phone
+    * @apiGroup User
+    * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/coupon
+    *
+    * @apiParam {string}   token  当前用户token
+    * @apiParam {string}   phone  手机号
+    *
+    * @apiSuccessExample  Success-Response:
+    *     HTTP/1.1 200 OK
+    *     {
+    *       "code": 200,
+    *       "msg" : '成功',
+    *       "data":[
+    *
+    *         ]
+    *     }
+    *
+    */
+    public function checkPhone(Request $request)
+    {
+        $phone = $request->input('phone');
+        $list = User::where('phone', $phone)->first();
+        if ($list) {
+            return error(1000, '该手机号码已存在', $data);
+        }
+        return success();
+    }
 
 
 
