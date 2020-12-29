@@ -1126,15 +1126,19 @@ class UserController extends Controller
     public function bindWechat(Request $request)
     {
         $input = $request->all();
+
         $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex' => $input['sex'] == '男' ? 1 : 2,
-            'province' => $input['province'],
-            'city' => $input['city'],
-            'headimg' => $input['headimg'] ?? '',
+            'province' => $input['province'] ?? '',
+            'city' => $input['city'] ?? '',
             'unionid' => $input['unionid'] ?? '',
             'is_wx' => 1
         ];
+        $list = User::where('id', $this->user['id'])->first();
+        if (is_null($list['headimg']) || $list['headimg'] =='image/202009/13f952e04c720a550193e5655534be86.jpg'){
+            $data['headimg'] =  $input['headimg'] ?? '';
+        }
 
         $user = User::where('unionid', $input['unionid'])->first();
         if ($user){
