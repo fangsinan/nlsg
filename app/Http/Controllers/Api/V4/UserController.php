@@ -1254,7 +1254,7 @@ class UserController extends Controller
     }
 
     /**
-    * @api {get} api/v4/user/check-phone   验证手机号是否已经存在
+    * @api {post} api/v4/user/check-phone   验证手机号是否已经存在
     * @apiVersion 4.0.0
     * @apiName  check-phone
     * @apiGroup User
