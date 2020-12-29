@@ -1277,6 +1277,9 @@ class UserController extends Controller
     public function checkPhone(Request $request)
     {
         $phone = $request->input('phone');
+        if (!$phone){
+            return  error(1000, '手机号不能为空');
+        }
         $list = User::where('phone', $phone)->first();
         if ($list) {
             return error(1000, '该手机号码已存在');
