@@ -234,7 +234,9 @@ class OrderController extends Controller
         $user_id = $this->user['id'] ?? 0;
 
         //$work_id 课程信息
-        $works_data = Works::find($work_id);
+        //$works_data = Works::find($work_id);
+        $works_data = Works::where(['id'=>$work_id,'type'=>2])->first();//音频课程
+
         if (empty($works_data)) {
             return $this->error(0, '当前课程不存在');
         }
@@ -900,7 +902,8 @@ class OrderController extends Controller
             }
             $price = $column_data->price;
         } else if ($send_type == 2 ) {
-            $works_data = Works::find($relation_id);
+            //$works_data = Works::find($relation_id);
+            $works_data = Works::where(['id'=>$relation_id,'type'=>2])->first();//音频课程
             if (empty($works_data)) {
                 return $this->error(0, '当前课程不存在');
             }
