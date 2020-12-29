@@ -119,6 +119,7 @@ class IndexController extends Controller
      */
     public function live()
     {
+        return success();
         $recommendModel = new Recommend();
         $lists = $recommendModel->getIndexRecommend(7, 1);
         return success($lists);
