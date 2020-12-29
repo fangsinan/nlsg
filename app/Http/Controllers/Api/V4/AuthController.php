@@ -270,6 +270,7 @@ class AuthController extends Controller
             'province' => $input['province'],
             'city' => $input['city'],
             'unionid' => $input['unionid'] ?? '',
+            'headimg' => $input['headimg'] ?? '',
             'is_wx' => 1
         ];
         $user = User::where('phone', $phone)->first();
