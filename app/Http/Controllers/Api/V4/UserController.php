@@ -1138,7 +1138,7 @@ class UserController extends Controller
 
         $user = User::where('unionid', $input['unionid'])->first();
         if ($user){
-            return error(1000, '微信已绑定');
+            return error(1000, '该微信已被其他账号绑定');
         }
 
         $res = User::where('id', $this->user['id'])->update($data);
