@@ -217,7 +217,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            dd($this->ip);
+            //VipRedeemUser::subWorksOrGetRedeemCode(211172);
             return true;
         } else {
             $params = $request->input();

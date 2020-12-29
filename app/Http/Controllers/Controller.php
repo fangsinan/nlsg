@@ -28,7 +28,7 @@ class Controller extends BaseController
 //        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
 //        $this->ip =  $request->getClientIp();
         $this->user = auth('api')->user();
-        $this->ip = Cache::get($this->user['id'] . '_ip');
+        //$this->ip = Cache::get($this->user['id'] ?? 0 . '_ip');
         if ($this->user) {
             $this->user = $this->user->toArray();
             $this->user['true_level'] = 0;
