@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Medz\Laravel\Notifications\JPush\Sender as JPushSender;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -173,10 +174,18 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function getInvitationRecord($uid){
-        return User::where('inviter','=',$uid)
-            ->orderBy('id','desc')
-            ->select(['id','nickname','headimg','created_at'])
+
+        return DB::table('nlsg_user_invite as i')
+            ->join('nlsg_user as u','i.to_uid','=','u.id')
+            ->where('i.from_uid','=',$uid)
+            ->select(['u.id','u.nickname','u.headimg','i.created_at'])
             ->get();
+
+//        return User::where('inviter','=',$uid)
+//            ->orderBy('id','desc')
+//            ->select(['id','nickname','headimg','created_at'])
+//            ->get();
+
     }
 
     public function getHeadimgAttribute($field)
