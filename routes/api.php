@@ -200,7 +200,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('change/phone', 'UserController@changePhone');
         Route::post('bind/wechat', 'UserController@bindWechat');
         Route::post('remove/wechat', 'UserController@removeWechat');
-
+        Route::get('user/edit_user', 'UserController@editUserInfo');
         //切歌
         Route::get('works/neighbor','WorksController@neighbor');
 

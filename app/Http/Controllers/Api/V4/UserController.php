@@ -1212,4 +1212,50 @@ class UserController extends Controller
     }
 
 
+
+
+
+
+
+    /**
+     * @api {get} api/v4/user/edit_user   用户信息采集
+     * @apiVersion 4.0.0
+     * @apiName  coupon
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/coupon
+     *
+     * @apiParam {string}   sex   性别  0 未知 1 男 2 女
+     * @apiParam {string}   children_age  孩子年龄范围  0:无  1: 0~6岁  2:7~18岁   3: 18岁以上
+     *
+     * @apiSuccessExample  Success-Response:
+     * {
+     *    "code": 200,
+     *    "msg" : '成功',
+     *    "data":[]
+     * }
+     *
+     */
+    public function editUserInfo(Request $request){
+        $uid = $this->user['id'] ?? 211172;
+
+        //sex 性别  0 未知 1 男 2 女
+        $sex = $request->input('sex') ?? 0;
+        $children_age = $request->input('children_age') ?? 0;
+
+        $res = User::where('id', $uid)->update([
+            'sex'           => $sex,
+            'children_age'  => $children_age,
+        ]);
+        if ($res) {
+            return $this->getRes(['code'=>0,'msg'=>'收集成功']);
+        }else{
+            return error(1000, '收集失败');
+        }
+    }
+
+
+
+
+
+
 }
