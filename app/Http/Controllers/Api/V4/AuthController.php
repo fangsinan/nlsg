@@ -263,7 +263,10 @@ class AuthController extends Controller
 //            return error(1000, '验证码错误');
 //        }
         Redis::del($phone);
-
+        $is_wx = 0;
+        if($input['unionid']){
+            $is_wx = 1;
+        }
         $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex' => $input['sex'] == '男' ? 1 : 2,
@@ -271,13 +274,10 @@ class AuthController extends Controller
             'city' => $input['city'],
             'unionid' => $input['unionid'] ?? '',
             'headimg' => $input['headimg'] ?? '',
-            'is_wx' => 1
+            'is_wx' => $is_wx
         ];
         $user = User::where('phone', $phone)->first();
         if ($user) {
-            if (empty($user['headimg'])) {
-                $data['headimg'] = $input['headimg'] ?? '';
-            }
             User::where('phone', $phone)->update($data);
         } else {
             $data['phone'] = $phone;
@@ -289,7 +289,9 @@ class AuthController extends Controller
         $token = auth('api')->login($user);
         $arra = [
             'id' => $user->id,
-            'token' => $token
+            'token' => $token,
+            'sex' => $user->sex,
+            'children_age' => $user->children_age,
         ];
         return success($arra);
 
@@ -480,7 +482,9 @@ class AuthController extends Controller
             'nickname' => $user->nickname,
             'headimg' => $user->headimg ?? '',
             'phone' => $user->phone,
-            'level' => $user->level
+            'level' => $user->level,
+            'sex' => $user->sex,
+            'children_age' => $user->children_age,
         ];
         return success($data);
     }
