@@ -503,6 +503,9 @@ class AuthController extends Controller
         $fullName = $request->input('fullName') ?? '';
         $authorizationCode = $request->input('authorizationCode');
         $identityToken = $request->input('identityToken');
+        if(empty($identityToken) || empty($appleid)){
+            return error(1000, '参数错误');
+        }
         $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
         $isValid = $appleSignInPayload->verifyUser($appleid);
 
