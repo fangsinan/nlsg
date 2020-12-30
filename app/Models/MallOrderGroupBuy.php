@@ -596,7 +596,7 @@ class MallOrderGroupBuy extends Base
         $sp_data = SpecialPriceModel::where('goods_id', '=', $goods_id)
             ->where('sku_number', '=', $sku)
             ->where('type', '=', 4)
-            ->where('status','=',1)
+            ->where('status', '=', 1)
             ->where('goods_type', '=', 1)
             ->where('begin_time', '<=', $now_date)
             ->where('end_time', '>=', $now_date)
@@ -761,36 +761,27 @@ class MallOrderGroupBuy extends Base
             case 1:
                 $query->where('nmo.status', '=', 1)
                     ->where('nmo.is_stop', '=', 0)
-                    ->whereRaw('(`status` = 1 AND dead_time < "' .
-                        $now_date . '" ) ');
+                    ->whereRaw('(`status` = 1 AND dead_time >= "' . $now_date . '" ) ');
                 break;
             case 10:
                 $query->where('nmo.status', '=', 10)
                     ->where('nmo.is_stop', '=', 0)
-                    ->where('gbl.is_success', '=', 1)
-                    ->whereRaw('(`status` = 1 AND dead_time < "' .
-                        $now_date . '" ) ');
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 20:
                 $query->where('nmo.status', '=', 20)
                     ->where('nmo.is_stop', '=', 0)
-                    ->where('gbl.is_success', '=', 1)
-                    ->whereRaw('(`status` = 1 AND dead_time < "' .
-                        $now_date . '" ) ');
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 30:
                 $query->where('nmo.status', '=', 30)
                     ->where('nmo.is_stop', '=', 0)
-                    ->where('gbl.is_success', '=', 1)
-                    ->whereRaw('(`status` = 1 AND dead_time < "' .
-                        $now_date . '" ) ');
+                    ->where('gbl.is_success', '=', 1);
                 break;
             case 95:
                 $query->where('nmo.status', '=', 10)
                     ->where('nmo.is_stop', '=', 0)
-                    ->where('gbl.is_success', '=', 0)
-                    ->whereRaw('(`status` = 1 AND dead_time < "' .
-                        $now_date . '" ) ');
+                    ->where('gbl.is_success', '=', 0);
                 break;
             case 99:
                 $query->where(function ($q) use ($now_date) {
@@ -814,7 +805,7 @@ class MallOrderGroupBuy extends Base
             $q->orderBy('is_captain', 'desc')
                 ->orderByRaw('FIELD(user_id,' . $user_id . ') desc');
         }];
-//        $with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList'];
+        //$with = ['orderDetails', 'orderDetails.goodsInfo', 'groupList'];
         $with[] = 'groupList.userInfo';
         $with[] = 'orderChild';
         $with[] = 'orderChild.expressInfoForList';
@@ -1221,10 +1212,10 @@ class MallOrderGroupBuy extends Base
             }
 
             //归还库存
-            $order_detail = MallOrderDetails::where('order_id','=',$order_info->id)
-                ->select(['sku_number','num'])
+            $order_detail = MallOrderDetails::where('order_id', '=', $order_info->id)
+                ->select(['sku_number', 'num'])
                 ->first();
-            if (empty($order_detail)){
+            if (empty($order_detail)) {
                 DB::rollBack();
                 continue;
             }
