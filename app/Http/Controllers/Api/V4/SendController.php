@@ -52,7 +52,7 @@ class SendController extends Controller
         } elseif($data['send_type'] == 1 || $data['send_type'] == 6 ){
             $field = ['id', 'name', 'column_type', 'title', 'subtitle', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num','collection_num','comment_num','info_num','is_free','category_id','info_num'];
             $relation_data = Column::getColumnInfo($data['relation_id'],$field,$user_id);
-            if( empty($column) ) {
+            if( empty($relation_data) ) {
                 return $this->error(0,'该信息不存在');
             }
         }
