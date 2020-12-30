@@ -31,7 +31,7 @@ class Works extends Base
         if (!$ids) {
             return false;
         }
-        $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'detail_img','subtitle', 'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num' ,'is_audio_book')
+        $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'detail_img','subtitle', 'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num' ,'is_audio_book', 'cover_img as cover_pic', 'detail_img as detail_pic')
             ->with(['user' => function ($query) {
                 $query->select('id', 'nickname', 'headimg');
             }])
