@@ -158,7 +158,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
     Route::post('auth/bind', 'AuthController@bind');
-    Route::post('user/check-phone', 'UserController@checkPhone');
+    Route::post('user/check_phone', 'UserController@checkPhone');
 
     //历史记录
     Route::get('user/history', 'UserController@history');

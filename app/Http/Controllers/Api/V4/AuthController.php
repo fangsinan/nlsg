@@ -406,6 +406,9 @@ class AuthController extends Controller
         if (!$phone) {
             return $this->error(400, '手机号不能为空');
         }
+        if(!preg_match('/^1[345789]\d{9}$/', $phone)){
+            return $this->error(400, '手机号格式错误');
+        }
 
         //自己人不发验证码
         $dont_check_phone = ConfigModel::getData(35, 1);
@@ -428,6 +431,7 @@ class AuthController extends Controller
                 return success();
             } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
                 $message = $exception->getResults();
+                return $this->error(400, '验证码发送错误,请一分钟后重试');
                 return $message;
             }
         }
@@ -499,6 +503,9 @@ class AuthController extends Controller
         $fullName = $request->input('fullName') ?? '';
         $authorizationCode = $request->input('authorizationCode');
         $identityToken = $request->input('identityToken');
+        if(empty($identityToken) || empty($appleid)){
+            return error(1000, '参数错误');
+        }
         $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
         $isValid = $appleSignInPayload->verifyUser($appleid);
 
@@ -508,7 +515,8 @@ class AuthController extends Controller
             if (!$user) {
                 $list = User::create([
                     'appleid' => $appleid ?? '',
-                    'phone' => $phone
+                    'phone' => $phone,
+                    'nickname' => substr_replace($phone, '****', 3, 4),
                 ]);
                 $user = User::find($list->id);
 

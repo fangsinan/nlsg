@@ -1128,7 +1128,6 @@ class UserController extends Controller
         $input = $request->all();
 
         $data = [
-            'nickname' => $input['nickname'] ?? '',
             'sex' => $input['sex'] == '男' ? 1 : 2,
             'province' => $input['province'] ?? '',
             'city' => $input['city'] ?? '',
@@ -1138,6 +1137,9 @@ class UserController extends Controller
         $list = User::where('id', $this->user['id'])->first();
         if (is_null($list['headimg']) || $list['headimg'] =='image/202009/13f952e04c720a550193e5655534be86.jpg'){
             $data['headimg'] =  $input['headimg'] ?? '';
+        }
+        if ( empty($list['nickname']) ){
+            $data['nickname'] = $input['nickname'] ?? '';
         }
 
         $user = User::where('unionid', $input['unionid'])->first();
@@ -1263,7 +1265,7 @@ class UserController extends Controller
     }
 
     /**
-    * @api {post} api/v4/user/check-phone   验证手机号是否已经存在
+    * @api {post} api/v4/user/check_phone   验证手机号是否已经存在
     * @apiVersion 4.0.0
     * @apiName  check-phone
     * @apiGroup User
