@@ -431,6 +431,7 @@ class AuthController extends Controller
                 return success();
             } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
                 $message = $exception->getResults();
+                return $this->error(400, '验证码发送错误,请一分钟后重试');
                 return $message;
             }
         }
