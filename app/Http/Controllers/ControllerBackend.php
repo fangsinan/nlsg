@@ -7,6 +7,7 @@ use App\Models\VipUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
 class ControllerBackend extends BaseController
@@ -26,6 +27,11 @@ class ControllerBackend extends BaseController
         if ($this->user) {
             $this->user = $this->user->toArray();
         }
+    }
+
+    public function getIp(Request $request){
+        $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
+        return $request->getClientIp();
     }
 
     protected function success($data = [], $flag = 0, $msg = '成功')

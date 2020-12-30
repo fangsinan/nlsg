@@ -92,7 +92,7 @@ class VipUser extends Base
         } else {
             //精品课
             $vwlModel = new VipWorksList();
-            $works_list = $vwlModel->getList(1,0,6);
+            $works_list = $vwlModel->getList(1, 0, 6);
         }
 
 
@@ -105,7 +105,6 @@ class VipUser extends Base
         $res['detail_image'] = $detail_image;
         return $res;
     }
-
 
     public static function IsNewVip($uid)
     {
@@ -139,4 +138,53 @@ class VipUser extends Base
             ->select(['id', 'user_id', 'updated_at'])
             ->orderBy('updated_at', 'desc');
     }
+
+    public function nowLevel()
+    {
+        return $this->hasOne(VipUser::class, 'user_id', 'user_id')
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->whereRaw('expire_time > NOW()')
+            ->select(['id', 'user_id', 'level', 'expire_time']);
+    }
+
+    public function assignCount()
+    {
+        return $this->hasOne(VipRedeemAssign::class, 'receive_vip_id', 'id')
+            ->where('status', '=', 1)
+            ->select('receive_vip_id', DB::raw('sum(num) as count'));
+    }
+
+    public function assignHistory()
+    {
+        return $this->hasMany(VipRedeemAssign::class, 'receive_vip_id', 'id');
+    }
+
+    public function openHistory($user_id)
+    {
+        if (empty($user_id)) {
+            return [];
+        }
+
+        $sql = 'select * from (
+SELECT a.id,1 as type,a.live_id as flag_id,a.pay_time,u.id as inviter_id,u.phone as inviter_phone,v.level as inviter_level,a.ordernum
+from nlsg_order as a
+left join nlsg_user as u on a.twitter_id = u.id
+left join nlsg_vip_user as v on u.id = v.user_id and v.status = 1 and v.is_default = 1 and v.expire_time > now()
+where a.user_id = ' . $user_id . ' and  a.type = 16 and a.status = 1
+
+UNION ALL
+
+SELECT a.id,2 as type,a.redeem_code_id as flag_id,a.updated_at as pay_time,
+u.id as inviter_id,u.phone as inviter_phone,v.level as inviter_level ,\'\' as ordernum
+from nlsg_vip_redeem_user as a
+left join nlsg_vip_user as v on v.id = a.vip_id
+left join nlsg_user as u on v.user_id = u.id
+where a.user_id = ' . $user_id . ' and a.status = 2
+) as z ORDER BY pay_time asc,id ASC';
+
+        return DB::select($sql);
+
+    }
+
 }

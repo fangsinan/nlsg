@@ -126,6 +126,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('order/reward', 'OrderController@reward');
     Route::get('order/vip', 'OrderController@vip');
 
+    //360模块
+    Route::get('vip/list', 'VipController@list');
 
     //定时任务
     Route::get('crontab/mall_refund', 'CrontabController@mallRefund');//商城退款
