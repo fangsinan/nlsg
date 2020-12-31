@@ -21,6 +21,9 @@ class JwtMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
+            if ($user === false) {
+                return response()->json(['msg' => '没有登录', 'code' => 401]);
+            }
         } catch (Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
                 return response()->json(['msg' => '登录失效，请重新登录', 'code' => 401]);

@@ -11,6 +11,7 @@ class RemoveDataController extends ControllerBackend
 {
     public function goods()
     {
+        set_time_limit(0);
 
         $servers = new removeDataServers();
         if (0) {

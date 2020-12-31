@@ -809,13 +809,28 @@ class removeDataServers
 
     public function countUserData()
     {
-        $list = UserFollow::query()
-            ->groupBy('from_uid')
-            ->select(['from_uid'])
-            ->groupBy('from_uid')
-            ->get()->toArray();
+        $sql = 'select from_uid as uid from nlsg_user_follow
+                UNION
+                SELECT to_uid as uid from nlsg_user_follow';
 
-        dd($list);
+        $list = DB::select($sql);
+
+        $list = array_column($list,'uid');
+        $list = array_unique($list);
+
+        foreach ($list as $v){
+            $from_count = UserFollow::where('from_uid','=',$v)->where('status','=',1)->count();
+            $to_count = UserFollow::where('to_uid','=',$v)->where('status','=',1)->count();
+
+            DB::table('nlsg_user')
+                ->where('id','=',$v)
+                ->update([
+                    'follow_num'=>$from_count,
+                    'fan_num'=>$to_count
+                ]);
+        }
+
+
     }
 
 }
