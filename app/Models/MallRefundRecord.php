@@ -539,11 +539,11 @@ class MallRefundRecord extends Base
                 case $i > 40:
                     $after_arr[] = ['time' => $this->dateDelSec($info['succeed_at']), 'status' => '退款完毕'];
                 case $i > 30:
-                    $after_arr[] = ['time' => $this->dateDelSec($info['authenticate_reject_at']), 'status' => '鉴定待退款'];
+                    $after_arr[] = ['time' => $this->dateDelSec($info['authenticate_reject_at']), 'status' => '待退款'];
                 case $i > 20:
-                    $after_arr[] = ['time' => $this->dateDelSec($info['receive_at']), 'status' => '收货但鉴定'];
+                    $after_arr[] = ['time' => $this->dateDelSec($info['receive_at']), 'status' => '待鉴定'];
                 case $i > 15:
-                    $before_arr[] = ['time' => $this->dateDelSec($info['pass_at']), 'status' => '通过待寄回'];
+                    $before_arr[] = ['time' => $this->dateDelSec($info['pass_at']), 'status' => '待寄回'];
                 case $i > 0:
                     $before_arr[] = ['time' => $this->dateDelSec($info['created_at']), 'status' => '提交申请'];
             }
