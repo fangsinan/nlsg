@@ -82,6 +82,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //售后
         Route::get('after_sales/list', 'AfterSalesController@list');
         Route::post('after_sales/status_change', 'AfterSalesController@statusChange');
+        Route::get('after_sales/address_list', 'AfterSalesController@addressList');
 
         //商品管理
         Route::post('goods/add', 'GoodsController@add');

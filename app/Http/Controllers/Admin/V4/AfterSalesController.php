@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\FreightTemplate;
 use App\Servers\AfterSalesServers;
 use Illuminate\Http\Request;
 
@@ -68,6 +69,16 @@ class AfterSalesController extends ControllerBackend
         $model = new AfterSalesServers();
         $data = $model->statusChange($request->input(), $this->user['id']);
         return $this->getRes($data);
+    }
+
+    public function addressList(Request $request){
+        $flag = $request->input('flag', 0);
+        if (!in_array($flag, [2, 3])) {
+            return $this->error(0, '参数错误');
+        }
+        $model = new FreightTemplate();
+        $data = $model->listOfShop($flag);
+        return $this->success($data);
     }
 
 }
