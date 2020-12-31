@@ -258,6 +258,17 @@ class MallRefundRecord extends Base
         return ['code' => true, 'msg' => '成功', 'id' => $rr_res];
     }
 
+    protected $casts = [
+        'created_at' => 'date:Y-m-d H:i:s',
+        'pass_at' => 'date:Y-m-d H:i:s',
+        'check_at' => 'date:Y-m-d H:i:s',
+        'receive_at' => 'date:Y-m-d H:i:s',
+        'succeed_at' => 'date:Y-m-d H:i:s',
+        'check_reject_at' => 'date:Y-m-d H:i:s',
+        'authenticate_reject_at' => 'date:Y-m-d H:i:s',
+
+    ];
+
     public function list($params, $user)
     {
 
