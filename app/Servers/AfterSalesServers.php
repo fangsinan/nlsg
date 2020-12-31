@@ -165,7 +165,7 @@ class AfterSalesServers
         $now_date = date('Y-m-d H:i:s');
         DB::beginTransaction();
         if ($flag == 'check') {
-            if ($check->status == 10) {
+            if ($check->status === 10) {
                 if ($value == 1) {
                     //通过
                     if ($check->type === 2) {
@@ -214,7 +214,7 @@ class AfterSalesServers
                 return ['code' => false, 'msg' => '状态错误'];
             }
         } elseif ($flag == 'identify') {
-            if ($check->status == 30) {
+            if ($check->status === 30) {
                 $check->status = 40;
                 $check->is_authenticate_reject = 2;
                 $check->authenticate_reject_at = $now_date;
