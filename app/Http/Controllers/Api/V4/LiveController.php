@@ -573,7 +573,7 @@ class LiveController extends Controller
         $id = $request->get('id');
         $list = OfflineProducts::where(['id' => $id, 'is_del' => 0])
             ->first();
-        $array = [5];
+        $array = [1];
         if (in_array($id,$array)){
             $list->describe_type = 2;
             $list->url = 'appv4/offLineAppDesc';
