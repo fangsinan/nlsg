@@ -484,13 +484,13 @@ class MallRefundRecord extends Base
         if (in_array($data->status, [40, 50, 60])) {
             $header[] = ['key' => '鉴定结果', 'value' => '同意退款'];
             if ($data->authenticate_reject_at) {
-                $header[] = ['key' => '鉴定时间', 'value' => $data->authenticate_reject_at];
+                $header[] = ['key' => '鉴定时间', 'value' => date('Y-m-d H:i:s',strtotime($data->authenticate_reject_at))];
             }
             if ($data->status == 50 && $data->refund_sub_at) {
-                $header[] = ['key' => '完成时间', 'value' => $data->refund_sub_at];
+                $header[] = ['key' => '完成时间', 'value' => date('Y-m-d H:i:s',strtotime($data->refund_sub_at))];
             }
             if ($data->status == 60 && $data->succeed_at) {
-                $header[] = ['key' => '完成时间', 'value' => $data->succeed_at];
+                $header[] = ['key' => '完成时间', 'value' => date('Y-m-d H:i:s',strtotime($data->succeed_at))];
             }
             if ($data->status == 40) {
                 $header[] = ['key' => '退款金额', 'value' => $data->refe_price];
@@ -501,7 +501,7 @@ class MallRefundRecord extends Base
 
         $footer = [
             ['key' => '服务单号', 'value' => $data->service_num],
-            ['key' => '提交时间', 'value' => $data->created_at],
+            ['key' => '提交时间', 'value' => date('Y-m-d H:i:s',strtotime($data->created_at))],
             ['key' => '商品单号', 'value' => $data->ordernum],
         ];
 
@@ -530,22 +530,20 @@ class MallRefundRecord extends Base
         $after_arr = []; //30:待鉴定  40待退款  50:退款中 60:已退款
         //顺序  10 15 20 () 30 40 50 60
 
-        $info['status'] = 50;
-
         if ($info['status'] == 15) {
-            $before_arr[] = ['time' => $this->dateDelSec($info['check_reject_at']), 'status' => '驳回文本'];
+            $before_arr[] = ['time' => $this->dateDelSec($info['check_reject_at']), 'status' => '驳回'];
             $before_arr[] = ['time' => $this->dateDelSec($info['created_at']), 'status' => '提交申请'];
         } else {
             switch ($i = intval($info['status'])) {
                 case $i > 50:
                 case $i > 40:
-                    $after_arr[] = ['time' => $this->dateDelSec($info['succeed_at']), 'status' => '退款完毕文本'];
+                    $after_arr[] = ['time' => $this->dateDelSec($info['succeed_at']), 'status' => '退款完毕'];
                 case $i > 30:
-                    $after_arr[] = ['time' => $this->dateDelSec($info['authenticate_reject_at']), 'status' => '鉴定待退款文本'];
+                    $after_arr[] = ['time' => $this->dateDelSec($info['authenticate_reject_at']), 'status' => '鉴定待退款'];
                 case $i > 20:
-                    $after_arr[] = ['time' => $this->dateDelSec($info['receive_at']), 'status' => '收货但鉴定文本'];
+                    $after_arr[] = ['time' => $this->dateDelSec($info['receive_at']), 'status' => '收货但鉴定'];
                 case $i > 15:
-                    $before_arr[] = ['time' => $this->dateDelSec($info['pass_at']), 'status' => '通过,寄回文本'];
+                    $before_arr[] = ['time' => $this->dateDelSec($info['pass_at']), 'status' => '通过待寄回'];
                 case $i > 0:
                     $before_arr[] = ['time' => $this->dateDelSec($info['created_at']), 'status' => '提交申请'];
             }
