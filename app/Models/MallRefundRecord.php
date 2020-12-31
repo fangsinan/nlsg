@@ -259,13 +259,13 @@ class MallRefundRecord extends Base
     }
 
     protected $casts = [
-        'created_at' => 'date:Y-m-d H:i:s',
-        'pass_at' => 'date:Y-m-d H:i:s',
-        'check_at' => 'date:Y-m-d H:i:s',
-        'receive_at' => 'date:Y-m-d H:i:s',
-        'succeed_at' => 'date:Y-m-d H:i:s',
-        'check_reject_at' => 'date:Y-m-d H:i:s',
-        'authenticate_reject_at' => 'date:Y-m-d H:i:s',
+        'created_at' => 'date:Y-m-d H:i',
+        'pass_at' => 'date:Y-m-d H:i',
+        'check_at' => 'date:Y-m-d H:i',
+        'receive_at' => 'date:Y-m-d H:i',
+        'succeed_at' => 'date:Y-m-d H:i',
+        'check_reject_at' => 'date:Y-m-d H:i',
+        'authenticate_reject_at' => 'date:Y-m-d H:i',
 
     ];
 
