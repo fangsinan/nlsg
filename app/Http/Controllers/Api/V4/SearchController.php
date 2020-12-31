@@ -420,6 +420,8 @@ class SearchController extends Controller
             return $this->error(0,'关键字为空');
         }
 
+        $keywords = $this->filterEmoji($keywords);
+
         if($flag == 'only_goods'){
             //商品
             $res['goods'] = MallGoods::search($keywords);
@@ -457,6 +459,15 @@ class SearchController extends Controller
         return $this->success($res);
     }
 
+    function filterEmoji($str) {
+        $str = preg_replace_callback(
+            '/./u',
+            function (array $match) {
+                return strlen($match[0]) >= 4 ? '' : $match[0];
+            },
+            $str);
+        return $str;
+    }
 
 
 }

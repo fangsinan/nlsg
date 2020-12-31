@@ -29,7 +29,7 @@ class RemoveDataController extends ControllerBackend
             $servers->addRobot();
         }
 
-        if(1){
+        if(0){
             //临时 计算用户的关注和历史数量
             $servers->countUserData();
         }

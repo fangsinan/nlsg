@@ -6,6 +6,7 @@ namespace App\Servers;
 use App\Models\Area;
 use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
+use App\Models\History;
 use App\Models\MallGoods;
 use App\Models\User;
 use App\Models\UserFollow;
@@ -809,27 +810,48 @@ class removeDataServers
 
     public function countUserData()
     {
-        $sql = 'select from_uid as uid from nlsg_user_follow
+        if (0) {
+            $sql = 'select from_uid as uid from nlsg_user_follow
                 UNION
                 SELECT to_uid as uid from nlsg_user_follow';
 
-        $list = DB::select($sql);
+            $list = DB::select($sql);
 
-        $list = array_column($list,'uid');
-        $list = array_unique($list);
+            $list = array_column($list, 'uid');
+            $list = array_unique($list);
 
-        foreach ($list as $v){
-            $from_count = UserFollow::where('from_uid','=',$v)->where('status','=',1)->count();
-            $to_count = UserFollow::where('to_uid','=',$v)->where('status','=',1)->count();
+            foreach ($list as $v) {
+                $from_count = UserFollow::where('from_uid', '=', $v)->where('status', '=', 1)->count();
+                $to_count = UserFollow::where('to_uid', '=', $v)->where('status', '=', 1)->count();
 
-            DB::table('nlsg_user')
-                ->where('id','=',$v)
-                ->update([
-                    'follow_num'=>$from_count,
-                    'fan_num'=>$to_count
-                ]);
+                DB::table('nlsg_user')
+                    ->where('id', '=', $v)
+                    ->update([
+                        'follow_num' => $from_count,
+                        'fan_num' => $to_count
+                    ]);
+            }
         }
 
+        if (1) {
+            $list = History::where('is_del', '=', 0)
+                ->select(['user_id'])
+                ->groupBy('user_id')
+                ->get()->toArray();
+
+            foreach ($list as $v) {
+                $count = History::where('user_id', '=', $v['user_id'])
+                    ->groupBy('relation_id', 'relation_type')
+                    ->count();
+                DB::table('nlsg_user')
+                    ->where('id', '=', $v['user_id'])
+                    ->update([
+                        'history_num' => $count
+                    ]);
+            }
+
+            dd($list);
+        }
 
     }
 
