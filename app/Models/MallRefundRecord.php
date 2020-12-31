@@ -176,7 +176,7 @@ class MallRefundRecord extends Base
 
         $data['num'] = $params['num'] ?? 0;
 
-        if ($type == 2) {
+        if (true || $type == 2) {
             //退货
             $data['order_detail_id'] = $order_detail_id;
             if ($data['num'] == 0 || $data['num'] > $get_data->num) {
