@@ -159,9 +159,9 @@ class VipRedeemUser extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        if (empty($user['new_vip']['level'] ?? 0)) {
-            return ['code' => false, 'msg' => '会员信息错误'];
-        }
+//        if (empty($user['new_vip']['level'] ?? 0)) {
+//            return ['code' => false, 'msg' => '会员信息错误'];
+//        }
         $check = self::query()->whereId($params['id'])->where('user_id', '=', $user['id'])->first();
         if (empty($check)) {
             return ['code' => false, 'msg' => '兑换券不存在'];

@@ -8,6 +8,7 @@ use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
 use App\Models\MallGoods;
 use App\Models\User;
+use App\Models\UserFollow;
 use App\Models\VipUser;
 use Illuminate\Support\Facades\DB;
 
@@ -804,6 +805,17 @@ class removeDataServers
     {
 
 
+    }
+
+    public function countUserData()
+    {
+        $list = UserFollow::query()
+            ->groupBy('from_uid')
+            ->select(['from_uid'])
+            ->groupBy('from_uid')
+            ->get()->toArray();
+
+        dd($list);
     }
 
 }

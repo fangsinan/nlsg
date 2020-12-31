@@ -12,22 +12,25 @@ class RemoveDataController extends ControllerBackend
     public function goods()
     {
 
+        $servers = new removeDataServers();
         if (0) {
             //迁移商品,规格,图片,评论
-            $servers = new removeDataServers();
             $servers->removeGoods();
         }
 
         if (0) {
             //校验商品和规格的价格是否冲突
-            $servers = new removeDataServers();
             $servers->updateGoodsSkuPrice();
         }
 
         if(0){
             //临时 批量添加机器人
-            $servers = new removeDataServers();
             $servers->addRobot();
+        }
+
+        if(1){
+            //临时 计算用户的关注和历史数量
+            $servers->countUserData();
         }
 
     }
