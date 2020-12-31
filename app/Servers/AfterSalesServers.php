@@ -63,8 +63,6 @@ class AfterSalesServers
 
         if (in_array($params['type'] ?? 0, [1, 2])) {
             $query->where('type', '=', $params['type']);
-        } else {
-            $query->where('type', '=', 1);
         }
 
         $query->where('status', '<>', 80);
