@@ -168,7 +168,7 @@ class AfterSalesServers
             if ($check->status == 10) {
                 if ($value == 1) {
                     //通过
-                    if ($check->type == 2) {
+                    if ($check->type === 2) {
                         //退货
                         $check->status = 20;
                     } else {
