@@ -359,7 +359,7 @@ class MallRefundRecord extends Base
                 }
             }
             $temp_data = [];
-            if ($v->type == 1) {
+            if (false && $v->type == 1) {
                 foreach ($v->infoOrder->infoOrderDetail as $vv) {
                     $temp = [];
                     $temp['goods_id'] = $vv->goods_id;
