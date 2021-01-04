@@ -34,7 +34,9 @@ class PayRecordDetail extends Base
             }elseif($type==3){//本月当前收益
                 $query->where('created_at', '>=',$first_day);
             }elseif($type==4){ //上月收益
-                $Last_monthtime=(date('Y-m-01').' -1 month'); //上月第一天
+                $Last_monthtime = date('Y-m-d',strtotime(date('Y-m-01').' -1 month'));
+                //$Last_monthtime=(date('Y-m-01').' -1 month'); //上月第一天
+
                 $query->where('created_at', '<',$first_day);
                 $query->where('created_at', '>=',$Last_monthtime);
 
