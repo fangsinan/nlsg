@@ -600,7 +600,7 @@ class ColumnController extends Controller
 
 
 
-        if($column_data){
+        if(empty($column_data)){
             return $this->error(0,'参数有误：无此信息');
 
         }
