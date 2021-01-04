@@ -133,6 +133,7 @@ class Comment extends Base
             }
         }
         $comment['reply'] = $reply['data'];
+        $comment['reward_num']   =  $comment['reward'] ? count($comment['reward']) : 0;
 
         return $comment;
 
