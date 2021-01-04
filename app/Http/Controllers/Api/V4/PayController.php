@@ -24,7 +24,7 @@ class PayController extends Controller {
      * @apiGroup pay
      *
      * @apiParam {int} id 订单id
-     * @apiParam {int} type  1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
+     * @apiParam {int} type  1专栏 2会员 5打赏 8  电商   9精品课 11直播 14线下课购买 15讲座  16幸福360购买   17赠送
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -198,7 +198,7 @@ class PayController extends Controller {
      * @apiVersion 1.0.0
      * @apiGroup pay
      *
-     * @apiParam {int} type 类型 1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
+     * @apiParam {int} type 类型 1专栏 2会员 5打赏 8  电商   9精品课 11直播 14线下课购买 15讲座  16幸福360购买   17赠送
      * @apiParam {int} id 订单id
      *
      * @apiSuccess {string} result json
