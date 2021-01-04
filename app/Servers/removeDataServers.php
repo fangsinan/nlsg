@@ -20,8 +20,9 @@ class removeDataServers
 //        $copy_flag = '_copy1';
         $copy_flag = '';
 
-        $old_comment = DB::connection('mysql_old')
+        $old_comment = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_comment')
+            ->where('id','<=',1808)
             ->get()->toArray();
         $comment_data = [];
         foreach ($old_comment as $v) {
