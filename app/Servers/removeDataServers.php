@@ -922,7 +922,6 @@ class removeDataServers
 
     public function countUserData()
     {
-        return false;
         if (0) {
             $sql = 'select from_uid as uid from nlsg_user_follow
                 UNION
@@ -946,7 +945,7 @@ class removeDataServers
             }
         }
 
-        if (1) {
+        if (0) {
             $list = History::where('is_del', '=', 0)
                 ->select(['user_id'])
                 ->groupBy('user_id')
