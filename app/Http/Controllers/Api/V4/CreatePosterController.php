@@ -1284,6 +1284,7 @@ class CreatePosterController extends Controller
         }
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $file_base64, $match)) {
             $accessKeyId = Config('web.ACCESS_KEY_ALI');
+            dd($accessKeyId);
             $accessKeySecret = Config('web.SECRET_KEY_ALI');
             $endpoint = "oss-cn-beijing.aliyuncs.com";
 
