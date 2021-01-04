@@ -589,7 +589,9 @@ class OrderController extends Controller
         foreach ($data as $key => $val) {
 
             $result = Order::getInfo($val['type'], $val['relation_id'], $val['send_type'], $user_id);
-
+            if ($result == false) {
+                unset($data[$key]);  //过滤老订单数据  
+            }
             if ($val['send_user_id'] > 0) {
                 $userData = User::select('phone')->where(['id' => $val['send_user_id']])->first()->toArray();
                 $data[$key]['send_user_phone'] = $userData['phone'];
@@ -604,6 +606,7 @@ class OrderController extends Controller
             $data[$key]['end_time'] = $data[$key]['created_time'] + 1800;
 
         }
+        $data = array_values($data);
 
         return $this->success($data);
 
