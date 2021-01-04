@@ -14,7 +14,7 @@ class RemoveDataController extends ControllerBackend
         set_time_limit(0);
 
         $servers = new removeDataServers();
-        if (0) {
+        if (1) {
             //迁移商品,规格,图片,评论
             $servers->removeGoods();
         }
@@ -38,7 +38,7 @@ class RemoveDataController extends ControllerBackend
 
     public function mallOrders()
     {
-        if (0) {
+        if (1) {
             //需要先执行 addressExpress
             $servers = new removeDataServers();
             $servers->removeMallOrders();
