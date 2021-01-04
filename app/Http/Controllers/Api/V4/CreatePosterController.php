@@ -20,7 +20,6 @@ use Illuminate\Http\Request;
 
 class CreatePosterController extends Controller
 {
-    public static $Api_url = 'http://app.v4.api.nlsgapp.com/';
     public static $IMAGES_URL = 'https://image.nlsgapp.com/';
 
 
@@ -76,7 +75,7 @@ class CreatePosterController extends Controller
             $QR_url = $this->getGetQRUrl($post_type, $gid, $uid,$flag,$live_id,$live_info_id);
             $temp_9_res = $this->createQRcode($QR_url, false, true, true);
             $src = '';
-            $url = self::$Api_url . 'public/image/' . $temp_9_res;
+            $url = config('env.APP_URL') . '/public/image/' . $temp_9_res;
             if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
             }
@@ -122,7 +121,7 @@ class CreatePosterController extends Controller
                 $QR_url = $this->getGetQRUrl(4, $gid, $uid);
                 $temp_9_res = $this->createQRcode($QR_url, false, true, true);
                 $src = '';
-                $url = self::$Api_url . 'temp_poster/' . $temp_9_res;
+                $url = config('env.APP_URL').  '/temp_poster/' . $temp_9_res;
                 return ['url' => $url, 'src' => $src];
             //                return $temp_9_res;
             case 20://优品海报
@@ -162,7 +161,7 @@ class CreatePosterController extends Controller
         $res_data = false;
         if ($fp = fopen($file_path, "rb", 0)) {
             $src = '';
-            $domain = self::$Api_url . 'temp_poster/';
+            $domain = config('env.APP_URL') . '/temp_poster/';
             $res_data = ['url' => $domain . $res, 'src' => $src, 'qr_url' => $domain . $temp_qr_new_url];
         }
         return $res_data;
