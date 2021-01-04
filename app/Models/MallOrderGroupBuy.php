@@ -737,7 +737,6 @@ class MallOrderGroupBuy extends Base
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $user_id = $user['id'];
-//        $user_id = 257121;
         $params['page'] = $params['page'] ?? 1;
         $params['size'] = $params['size'] ?? 10;
         //库数据:订单状态 1待付款  10待发货 20待收货 30已完成
