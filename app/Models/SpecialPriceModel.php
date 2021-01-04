@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class SpecialPriceModel extends Base
 {
@@ -165,11 +164,11 @@ class SpecialPriceModel extends Base
         $query = DB::table('nlsg_special_price')
             ->whereIn('id', $id_list)
             ->select([
-                'id', 'goods_type', 'goods_id','goods_original_price','goods_price','sku_original_price', 'sku_price',
-                'sku_price_black', 'sku_price_yellow','group_price', 'sku_price_dealer',
+                'id', 'goods_type', 'goods_id', 'goods_original_price', 'goods_price', 'sku_original_price', 'sku_price',
+                'sku_price_black', 'sku_price_yellow', 'group_price', 'sku_price_dealer',
                 'is_set_t_money', 't_money', 't_money_black',
-                't_money_yellow', 't_money_dealer','sku_number', 'stock', 'use_stock',
-                'begin_time', 'end_time', 'type','use_coupon', 'group_name', 'group_num_type', 'group_num',
+                't_money_yellow', 't_money_dealer', 'sku_number', 'stock', 'use_stock',
+                'begin_time', 'end_time', 'type', 'use_coupon', 'group_name', 'group_num_type', 'group_num',
                 'freight_free', 'freight_free_line', 'flash_sale_max_num'
             ])
             ->get();
@@ -202,7 +201,7 @@ class SpecialPriceModel extends Base
 
     }
 
-    public function getSecList($flag = 1,$user_id = 0)
+    public function getSecList($flag = 1, $user_id = 0)
     {
         $cache_key_name = 'set_kill_list';
         $expire_num = CacheTools::getExpire('set_kill_list');
@@ -223,14 +222,13 @@ class SpecialPriceModel extends Base
                 ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
                     'nsp.goods_original_price', 'nmg.picture',
                     'nsp.use_stock', 'nsp.stock',
-                    'nmg.original_price','nsp.goods_price',
+                    'nmg.original_price', 'nsp.goods_price',
                     'nsp.begin_time', 'nsp.end_time',
                     DB::raw('unix_timestamp(begin_time) as begin_timestamp'),
                     DB::raw('unix_timestamp(end_time) as end_timestamp'),
                     DB::raw('convert((nsp.goods_price/nmg.original_price)*10,'
                         . 'decimal(15,2)) as price_off')])
                 ->get();
-
             $sec_date_list = array_fill_keys($sec_date_list, []);
             foreach ($sec_date_list as $k => &$v) {
                 foreach ($res as $vv) {
@@ -311,12 +309,14 @@ class SpecialPriceModel extends Base
         $now = Date('Y-m-d H:i:00');
         $list_pass = self::where('begin_time', '<', $now)
             ->where('type', '=', 2)
+            ->where('status', '=', 1)
             ->orderBy('begin_time', 'desc')
             ->select(DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d %H:%i:00\') as time'))
             ->limit(2)
             ->get()->toArray();
         $list = self::where('begin_time', '>=', $now)
             ->where('type', '=', 2)
+            ->where('status', '=', 1)
             ->orderBy('begin_time', 'asc')
             ->select(DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d %H:%i:00\') as time'))
             ->limit(30)
@@ -413,7 +413,7 @@ class SpecialPriceModel extends Base
                         ->where('nmg.status', '=', 2);
                 })
                 ->select(['nsp.group_name as group_buy_id', 'nsp.goods_id', 'nmg.name',
-                    'nmg.subtitle', 'nmg.picture', 'group_num','nmg.original_price','group_price',
+                    'nmg.subtitle', 'nmg.picture', 'group_num', 'nmg.original_price', 'group_price',
                     'nsp.begin_time', 'nsp.end_time', 'group_name'])
                 ->orderBy('begin_time', 'asc')
                 ->groupBy('nsp.group_name')
@@ -445,6 +445,9 @@ class SpecialPriceModel extends Base
 
         if ($limit && $key_array) {
             $key_array = array_rand($key_array, count($key_array) > 2 ? 2 : count($key_array));
+            if (!is_array($key_array)) {
+                $key_array = [$key_array, $key_array];
+            }
             foreach ($res as $k => $v) {
                 if (!in_array($k, $key_array)) {
                     unset($res[$k]);
