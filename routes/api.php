@@ -87,6 +87,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     //生成海报
     Route::get('create/create_poster', 'CreatePosterController@CreatePoster');
+    Route::post('create/upload_push', 'CreatePosterController@uploadPush');
 
 
     //*******************************商城部分开始*******************************
