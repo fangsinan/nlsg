@@ -420,7 +420,7 @@ class ColumnController extends Controller
             return $this->success();
         }
         $recommendLists = [];
-        if( $target_id == 374 ){
+        if( $target_id == 450 ){
             $offline_data = OfflineProducts::find(1);
             $offline_data['recommend_type'] = 100; // 单一课程推荐
             $recommendLists[] = $offline_data;
