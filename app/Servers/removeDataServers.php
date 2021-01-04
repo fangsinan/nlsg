@@ -576,8 +576,8 @@ class removeDataServers
 
                 $temp_details['sku_history'] = json_encode([
                     'actual_num' => $odv->num ?? 0,
-                    'actual_price' => $temp_check_sku->price ?? 0,
-                    'original_price' => $temp_check_sku->original_price ?? 0,
+                    'actual_price' => $odv->price ?? 0,
+                    'original_price' => $odv->price ?? 0,
                     'sku_value' => $temp_sku_json,
                     'stock' => $temp_check_sku->stock ?? 0,
                 ]);
@@ -833,7 +833,7 @@ class removeDataServers
         $old_data = DB::connection('mysql_old_zs')
             ->table('nlsg_coupon')
             ->where('id', '<=', 102130)
-            ->where('user_id','>',0)
+            ->where('user_id', '>', 0)
             ->whereIn('status', [1, 2])
             ->limit($size)
             ->offset(($page - 1) * $size)
