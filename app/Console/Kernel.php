@@ -4,9 +4,9 @@ namespace App\Console;
 
 use App\Models\Coupon;
 use App\Models\MallOrder;
-use App\Models\Order;
 use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
+use App\Models\Order;
 use App\Models\PayRecordDetailStay;
 use App\Models\Works;
 use App\Servers\ChannelServers;
@@ -37,12 +37,21 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
             MallOrder::clear();//超时订单处理
-            MallOrderGroupBuy::clear();//拼团超时订单处理和退款登记
-            MallOrderFlashSale::clear();//秒杀订单处理
             Order::clear(); //线下课超时处理
             MallRefundJob::refundJob(1);//商城订单退款处理
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
             ChannelServers::cytxJob();//创业天下推送
-        })->everyMinute();//每分
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            MallOrderGroupBuy::clear();//拼团超时订单处理和退款登记
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            MallOrderFlashSale::clear();//秒杀订单处理
+        })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
             MallRefundJob::refundJob(2);//商城订单退款查询
