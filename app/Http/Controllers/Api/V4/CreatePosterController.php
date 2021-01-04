@@ -1284,13 +1284,9 @@ class CreatePosterController extends Controller
         }
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $file_base64, $match)) {
             $accessKeyId = Config('web.Ali.ACCESS_KEY_ALI');
-            //Config('web.ACCESS_KEY_ALI');
-            dd($accessKeyId);
             $accessKeySecret = Config('web.Ali.SECRET_KEY_ALI');
             $endpoint = "oss-cn-beijing.aliyuncs.com";
-
             //上传阿里
-
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
             $dir=$dir.'/'.date('YmdHis');
 
