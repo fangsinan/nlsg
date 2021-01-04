@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use OSS\OssClient;
 
 class CreatePosterController extends Controller
 {
@@ -75,17 +76,37 @@ class CreatePosterController extends Controller
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
             $QR_url = $this->getGetQRUrl($post_type, $gid, $uid,$flag,$live_id,$live_info_id);
-            $temp_9_res = $this->createQRcode($QR_url, false, true, true);
+            $temp_9_res = $this->createQRcode($QR_url, true, true, true);
             $src = '';
-            $url = config('env.APP_URL') . '/public/image/' . $temp_9_res;
+            $res = $this->base64Upload(100,$temp_9_res);
             if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
             }
             $user_info = [
-                'nickname' => $this->user['nickname'],
-                'headimg' => $this->user['headimg'],
+                'nickname' => $this->user['nickname'] ??'',
+                'headimg' => $this->user['headimg']??'',
             ];
-            return $this->success(['url' => $url, 'src' => $src, 'user_info' => $user_info]);
+
+            if($res['code'] == 0){
+                return $this->success(['url' => $res['url'].$res['name'], 'src' => $src, 'user_info' => $user_info]);
+
+            }else{
+                return $this->error(0,$res['msg']);
+
+            }
+//
+//            $temp_9_res = $this->createQRcode($QR_url, false, true, true);
+//
+//            $src = '';
+//            $url = config('env.APP_URL') . '/public/image/' . $temp_9_res;
+//            if ($post_type == 23) {
+//                $src = ConfigModel::getData(34);
+//            }
+//            $user_info = [
+//                'nickname' => $this->user['nickname']??'',
+//                'headimg' => $this->user['headimg']??'',
+//            ];
+//            return $this->success(['url' => $url, 'src' => $src, 'user_info' => $user_info]);
         }
 
 
@@ -189,13 +210,24 @@ class CreatePosterController extends Controller
 
         if ($b64) {
             $file = $path . $name;
-            if ($fp = fopen($file, "rb", 0)) {
+
+//            if ($fp = fopen($file, "rb", 0)) {
+//                $gambar = fread($fp, filesize($file));
+//                fclose($fp);
+//                $base64 = chunk_split(base64_encode($gambar));
+//                unlink($file);
+//                return 'data:image/jpg/png/gif;base64,' . $base64;
+//            }
+
+            if($fp = fopen($file,"rb", 0)){
                 $gambar = fread($fp, filesize($file));
                 fclose($fp);
                 $base64 = chunk_split(base64_encode($gambar));
                 unlink($file);
-                return 'data:image/jpg/png/gif;base64,' . $base64;
+                return 'data:image/jpg;base64,' . $base64 ;
             }
+
+
         } else {
             if ($web) {
                 return $name;
@@ -1217,8 +1249,25 @@ class CreatePosterController extends Controller
         //1 头像 10评论 9退货 5身份证审核  8 企业  100发票 9吐槽
         if(!in_array($type_flag,[1,2,3,4,5,6,7,8,9,10,100])){
             return $this->error(0,'上传类型有误');
+        }
+
+        $res = $this->base64Upload($type_flag,$file_base64);
+        if($res['code'] == 0){
+            return $this->success([
+                'url'=>$res['url'],
+                'name' => $res['name']
+            ]);
+        }else{
+            return $this->error(0,$res['msg']);
 
         }
+
+    }
+
+    //上传操作
+    function base64Upload($type_flag,$file_base64){
+
+
         $dir='nlsg/';
         switch($type_flag){
             case 1:$dir.='headimg';break;
@@ -1233,13 +1282,13 @@ class CreatePosterController extends Controller
             case 10:$dir.='evaluate';break;
             case 100:$dir.='other';break;
         }
-
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $file_base64, $match)) {
             $accessKeyId = Config('web.ACCESS_KEY_ALI');
             $accessKeySecret = Config('web.SECRET_KEY_ALI');
             $endpoint = "oss-cn-beijing.aliyuncs.com";
 
             //上传阿里
+
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
             $dir=$dir.'/'.date('YmdHis');
 
@@ -1252,23 +1301,20 @@ class CreatePosterController extends Controller
             // 文件内容
             $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
             if($doesres){
-                return $this->error(0,'文件已存在');
+                return ['code'=>1,'msg' => '文件已存在'];
             }else{
                 $object=$dir.rand(100000,999999).'.'.$ext;
             }
             $ossClient->putObject($bucket, $object, $content);
-
-
-            return $this->success( [
+            return [
+                'code'=>0,
                 'url'=>Config('web.IMAGES_URL'),
                 'name' => $object
-            ]);
+            ];
 
         }else{
-            return $this->error(0,'上传错误');
-
+            return ['code'=>1,'msg' => 'base64码解析错误'];
         }
-
     }
 
 
