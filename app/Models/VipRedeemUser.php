@@ -98,7 +98,7 @@ class VipRedeemUser extends Base
 
                         $qrModel = new CreatePosterController();
                         $qr_data = $qrModel->createQRcode($qr_url, false, true, true);
-                        $qr_data = CreatePosterController::$Api_url . 'public/image/' . $qr_data;
+                        $qr_data = config('env.APP_URL'). '/public/image/' . $qr_data;
                         $v->qr_code = $qr_data;
                     }
                 }
