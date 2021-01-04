@@ -1,10 +1,14 @@
 <?php
 
 return [
-    'ACCESS_KEY_ALI'=>'LTAIIjgUHVU6rbFx',
-    'SECRET_KEY_ALI'=>'UuX8gATLBpaXUjWeArwMfwxpaW48KD',
-    'BUCKET_ALI'=>'nlsgapp',
-    'IMAGES_URL' => 'https://image.nlsgapp.com/', //阿里图片地址
+
+
+    'Ali' =>[
+        'ACCESS_KEY_ALI'=>'LTAIIjgUHVU6rbFx',
+        'SECRET_KEY_ALI'=>'UuX8gATLBpaXUjWeArwMfwxpaW48KD',
+        'BUCKET_ALI'=>'nlsgapp',
+        'IMAGES_URL' => 'https://image.nlsgapp.com/', //阿里图片地址
+    ],
     'is_new_time' => date('Y-m-d H:i:s',strtotime("-1 week")),
 
     //提现

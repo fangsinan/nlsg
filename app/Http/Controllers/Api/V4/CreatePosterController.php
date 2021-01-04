@@ -1283,9 +1283,10 @@ class CreatePosterController extends Controller
             case 100:$dir.='other';break;
         }
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $file_base64, $match)) {
-            $accessKeyId = Config('web.ACCESS_KEY_ALI');
+            $accessKeyId = Config('web.Ali.ACCESS_KEY_ALI');
+            //Config('web.ACCESS_KEY_ALI');
             dd($accessKeyId);
-            $accessKeySecret = Config('web.SECRET_KEY_ALI');
+            $accessKeySecret = Config('web.Ali.SECRET_KEY_ALI');
             $endpoint = "oss-cn-beijing.aliyuncs.com";
 
             //上传阿里
@@ -1294,7 +1295,7 @@ class CreatePosterController extends Controller
             $dir=$dir.'/'.date('YmdHis');
 
             // 存储空间名称
-            $bucket= Config('web.BUCKET_ALI');
+            $bucket= Config('web.Ali.BUCKET_ALI');
             $ext = self::$MIME_TYPE_TO_TYPE["image/" . $match[2]] ?? 'jpg'; //扩展名
             $content=base64_decode(str_replace($match[1], '', $file_base64));
             // 文件名称
@@ -1309,7 +1310,7 @@ class CreatePosterController extends Controller
             $ossClient->putObject($bucket, $object, $content);
             return [
                 'code'=>0,
-                'url'=>Config('web.IMAGES_URL'),
+                'url'=>Config('web.Ali.IMAGES_URL'),
                 'name' => $object
             ];
 
