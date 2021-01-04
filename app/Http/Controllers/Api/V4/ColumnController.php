@@ -598,6 +598,13 @@ class ColumnController extends Controller
             'view_num','price','subscribe_num','is_free','is_end','info_num'])
             ->where(['id'=>$lecture_id,'type'=>2,'status'=>1])->first();
 
+
+
+        if($column_data){
+            return $this->error(0,'参数有误：无此信息');
+
+        }
+
 //        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
 //            'view_num','price','subscribe_num','is_free','is_end',])
 //            ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
