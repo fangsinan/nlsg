@@ -207,6 +207,7 @@ class SpecialPriceModel extends Base
         $expire_num = CacheTools::getExpire('set_kill_list');
 
         $sec_date_list = Cache::get($cache_key_name);
+
         if (empty($sec_date_list)) {
 
             $sec_date_list = $this->getSecDateList();

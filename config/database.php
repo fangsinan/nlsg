@@ -43,45 +43,16 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-//        'mysql' => [
-//            'driver' => 'mysql',
-//            'url' => env('DATABASE_URL'),
-//            'host' => env('DB_HOST', '39.105.214.152'),
-//            'port' => env('DB_PORT', '3306'),
-//            'database' => env('DB_DATABASE', 'nlsg_v4'),
-//            'username' => env('DB_USERNAME', 'bj_root'),
-//            'password' => env('DB_PASSWORD', 'NLSG_2019cs*beijin.0410BJ'),
-//
-//            'unix_socket' => env('DB_SOCKET', ''),
-//            'charset' => 'utf8mb4',
-//            'collation' => 'utf8mb4_unicode_ci',
-//            'prefix' => '',
-//            'prefix_indexes' => true,
-//            'strict' => true,
-//            //添加model  解决mysql5.7的only_full_group_by问题
-//            'modes' => [
-//                'STRICT_ALL_TABLES',
-//                'ERROR_FOR_DIVISION_BY_ZERO',
-//                'NO_ZERO_DATE',
-//                'NO_ZERO_IN_DATE',
-//                'NO_AUTO_CREATE_USER',
-//            ],
-//            'engine' => null,
-//            'options' => extension_loaded('pdo_mysql') ? array_filter([
-//                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-//            ]) : [],
-//        ],
-
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => 'rm-2ze0owc97gckfqz8qko.mysql.rds.aliyuncs.com',
-            'port' => '3306',
-            'database' => 'nlsg_v4',
-            'username' => 'fangsinan',
-            'password' => 'Rds&1014$NLSG^v3=',
+            'host' => env('DB_HOST', '39.105.214.152'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'nlsg_v4'),
+            'username' => env('DB_USERNAME', 'bj_root'),
+            'password' => env('DB_PASSWORD', 'NLSG_2019cs*beijin.0410BJ'),
 
-            'unix_socket' => env('DB_OLD_SOCKET', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
@@ -100,6 +71,35 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+
+//        'mysql' => [
+//            'driver' => 'mysql',
+//            'url' => env('DATABASE_URL'),
+//            'host' => 'rm-2ze0owc97gckfqz8qko.mysql.rds.aliyuncs.com',
+//            'port' => '3306',
+//            'database' => 'nlsg_v4',
+//            'username' => 'fangsinan',
+//            'password' => 'Rds&1014$NLSG^v3=',
+//
+//            'unix_socket' => env('DB_OLD_SOCKET', ''),
+//            'charset' => 'utf8mb4',
+//            'collation' => 'utf8mb4_unicode_ci',
+//            'prefix' => '',
+//            'prefix_indexes' => true,
+//            'strict' => true,
+//            //添加model  解决mysql5.7的only_full_group_by问题
+//            'modes' => [
+//                'STRICT_ALL_TABLES',
+//                'ERROR_FOR_DIVISION_BY_ZERO',
+//                'NO_ZERO_DATE',
+//                'NO_ZERO_IN_DATE',
+//                'NO_AUTO_CREATE_USER',
+//            ],
+//            'engine' => null,
+//            'options' => extension_loaded('pdo_mysql') ? array_filter([
+//                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+//            ]) : [],
+//        ],
 
         'mysql_old' => [
             'driver' => 'mysql',

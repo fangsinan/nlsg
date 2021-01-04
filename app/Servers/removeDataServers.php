@@ -19,37 +19,89 @@ class removeDataServers
 //        $copy_flag = '_copy1';
         $copy_flag = '';
 
-        $old_comment = DB::connection('mysql_old_zs')
-            ->table('nlsg_mall_comment')
-            ->where('id', '<=', 1808)
-            ->get()->toArray();
-        $comment_data = [];
-        foreach ($old_comment as $v) {
-            $temp_comment = [];
-            $temp_comment['id'] = $v->id;
-            $temp_comment['user_id'] = $v->user_id;
-            $temp_comment['content'] = $v->content;
-            $temp_comment['picture'] = $v->picture;
-            $temp_comment['order_id'] = $v->order_id;
-            $temp_comment['order_detail_id'] = $v->order_detail_id;
-            $temp_comment['goods_id'] = $v->goods_id;
-            $temp_comment['sku_number'] = $v->sku_number;
-            $temp_comment['star'] = $v->star;
-            $temp_comment['status'] = $v->status;
-            $temp_comment['reply_comment'] = $v->reply_comment;
-            $temp_comment['reply_user_id'] = $v->reply_user_id;
-            if (!empty($v->reply_time)) {
-                $temp_comment['replied_at'] = date('Y-m-d H:i:s');
-            } else {
-                $temp_comment['replied_at'] = null;
+        if (0) {
+            //商品评论
+            $old_comment = DB::connection('mysql_old_zs')
+                ->table('nlsg_mall_comment')
+                ->where('id', '<=', 1808)
+                ->get()->toArray();
+            $comment_data = [];
+            foreach ($old_comment as $v) {
+                $temp_comment = [];
+                $temp_comment['id'] = $v->id;
+                $temp_comment['user_id'] = $v->user_id;
+                $temp_comment['content'] = $v->content;
+                $temp_comment['picture'] = $v->picture;
+                $temp_comment['order_id'] = $v->order_id;
+                $temp_comment['order_detail_id'] = $v->order_detail_id;
+                $temp_comment['goods_id'] = $v->goods_id;
+                $temp_comment['sku_number'] = $v->sku_number;
+                $temp_comment['star'] = $v->star;
+                $temp_comment['status'] = $v->status;
+                $temp_comment['reply_comment'] = $v->reply_comment;
+                $temp_comment['reply_user_id'] = $v->reply_user_id;
+                if (!empty($v->reply_time)) {
+                    $temp_comment['replied_at'] = date('Y-m-d H:i:s');
+                } else {
+                    $temp_comment['replied_at'] = null;
+                }
+                $comment_data[] = $temp_comment;
             }
-            $comment_data[] = $temp_comment;
+            $r5 = DB::connection('mysql_new_zs')
+                ->table('nlsg_mall_comment' . $copy_flag)->insert($comment_data);
+            dd($r5);
         }
-        $r5 = DB::connection('mysql_new_zs')
-            ->table('nlsg_mall_comment' . $copy_flag)->insert($comment_data);
-        dd($r5);
 
         if (0) {
+            //单独补全sku
+            $list = DB::connection('mysql_old_zs')
+                ->table('nlsg_mall_sku')
+                ->get()
+                ->toArray();
+            $sku_data = [];
+            $sku_value_data = [];
+            foreach ($list as $v) {
+                $check = DB::table('nlsg_mall_sku')
+                    ->where('sku_number', '=', $v->sku_number)
+                    ->first();
+                if ($check) {
+                    continue;
+                }
+                $temp_sku = [];
+                $temp_sku['id'] = $v->id;
+                $temp_sku['goods_id'] = $v->goods_id;
+                $temp_sku['sku_number'] = $v->sku_number;
+                $temp_sku['picture'] = $v->picture;
+                $temp_sku['original_price'] = $v->original_price;
+                $temp_sku['price'] = $v->price;
+                $temp_sku['cost'] = $v->cost;
+                $temp_sku['promotion_cost'] = $v->promotion_cost;
+                $temp_sku['stock'] = $v->stock;
+                $temp_sku['warning_stock'] = $v->warning_stock;
+                $temp_sku['status'] = $v->status;
+                $temp_sku['erp_enterprise_code'] = $v->erp_enterprise_code ?? '';
+                $temp_sku['erp_goods_code'] = $v->erp_goods_code ?? '';
+                $sku_data[] = $temp_sku;
+
+                $temp_sku_json = $v->sku_json;
+                $temp_sku_json = json_decode($temp_sku_json);
+                foreach ($temp_sku_json as $kk => $vv) {
+                    $temp_sku_value = [];
+                    $temp_sku_value['goods_id'] = $v->goods_id;
+                    $temp_sku_value['sku_id'] = $v->id;
+                    $temp_sku_value['key_name'] = $kk;
+                    $temp_sku_value['value_name'] = $vv;
+                    $sku_value_data[] = $temp_sku_value;
+                }
+            }
+
+            $r2 = DB::table('nlsg_mall_sku')->insert($sku_data);
+            $r3 = DB::table('nlsg_mall_sku_value')->insert($sku_value_data);
+            dd([$r2, $r3]);
+        }
+
+        if (0) {
+            //商品信息
             $old_picture = DB::connection('mysql_old')
                 ->table('nlsg_mall_picture')
                 ->where('status', '=', 1)
@@ -870,7 +922,6 @@ class removeDataServers
 
     public function countUserData()
     {
-        return false;
         if (0) {
             $sql = 'select from_uid as uid from nlsg_user_follow
                 UNION
@@ -894,7 +945,7 @@ class removeDataServers
             }
         }
 
-        if (1) {
+        if (0) {
             $list = History::where('is_del', '=', 0)
                 ->select(['user_id'])
                 ->groupBy('user_id')

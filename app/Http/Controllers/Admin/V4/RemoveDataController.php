@@ -19,20 +19,20 @@ class RemoveDataController extends ControllerBackend
             $servers->removeGoods();
         }
 
-//        if (0) {
-//            //校验商品和规格的价格是否冲突
-//            $servers->updateGoodsSkuPrice();
-//        }
+        if (0) {
+            //校验商品和规格的价格是否冲突
+            $servers->updateGoodsSkuPrice();
+        }
 
         if (0) {
             //临时 批量添加机器人
             $servers->addRobot();
         }
 
-//        if(0){
-//            //临时 计算用户的关注和历史数量
-//            $servers->countUserData();
-//        }
+        if (0) {
+            //临时 计算用户的关注和历史数量
+            $servers->countUserData();
+        }
 
     }
 
