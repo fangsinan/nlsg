@@ -24,7 +24,7 @@ class RemoveDataController extends ControllerBackend
 //            $servers->updateGoodsSkuPrice();
 //        }
 
-        if(0){
+        if (0) {
             //临时 批量添加机器人
             $servers->addRobot();
         }
@@ -38,19 +38,28 @@ class RemoveDataController extends ControllerBackend
 
     public function mallOrders()
     {
-        $servers = new removeDataServers();
-        $servers->removeMallOrders();
+        if (0) {
+            //需要先执行 addressExpress
+            $servers = new removeDataServers();
+            $servers->removeMallOrders();
+        }
     }
 
-    public function addressExpress(){
-        $servers = new removeDataServers();
-        $servers->addressExpress();
+    public function addressExpress()
+    {
+        if (0) {
+            $servers = new removeDataServers();
+            $servers->addressExpress();
+        }
     }
 
     //补全vip表新加字段
-    public function vip(){
-        $servers = new removeDataServers();
-        $servers->vip();
+    public function vip()
+    {
+        if (0) {
+            $servers = new removeDataServers();
+            $servers->vip();
+        }
     }
 
 //    public function redeemCode(){

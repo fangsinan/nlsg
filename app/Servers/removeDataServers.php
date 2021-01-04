@@ -8,7 +8,6 @@ use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
 use App\Models\History;
 use App\Models\MallGoods;
-use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\VipUser;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +21,7 @@ class removeDataServers
 
         $old_comment = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_comment')
-            ->where('id','<=',1808)
+            ->where('id', '<=', 1808)
             ->get()->toArray();
         $comment_data = [];
         foreach ($old_comment as $v) {
@@ -46,8 +45,11 @@ class removeDataServers
             }
             $comment_data[] = $temp_comment;
         }
+        $r5 = DB::connection('mysql_new_zs')
+            ->table('nlsg_mall_comment' . $copy_flag)->insert($comment_data);
+        dd($r5);
 
-        if(0){
+        if (0) {
             $old_picture = DB::connection('mysql_old')
                 ->table('nlsg_mall_picture')
                 ->where('status', '=', 1)
@@ -158,9 +160,6 @@ class removeDataServers
             $r3 = DB::table('nlsg_mall_sku_value' . $copy_flag)->insert($sku_value_data);
             $r4 = DB::table('nlsg_mall_picture' . $copy_flag)->insert($picture_data);
         }
-
-        $r5 = DB::table('nlsg_mall_comment' . $copy_flag)->insert($comment_data);
-        dd($r5);
     }
 
     //修改商品价格和规格价格不匹配的临时方法
@@ -214,14 +213,23 @@ class removeDataServers
             $num = $begin_num[rand(0, 3)] . $temp_num;
             $num = substr_replace($num, '****', 3, 4);
 
-            $model = new User();
-            $model->id = $i;
-            $model->phone = $i;
-            $model->nickname = $num;
-            $model->created_at = $now;
-            $model->updated_at = $now;
-            $model->is_robot = 1;
-            $res = $model->save();
+//            $model = new User();
+//            $model->id = $i;
+//            $model->phone = $i;
+//            $model->nickname = $num;
+//            $model->created_at = $now;
+//            $model->updated_at = $now;
+//            $model->is_robot = 1;
+//            $res = $model->save();
+
+            $temp_data = [];
+            $temp_data['id'] = $i;
+            $temp_data['phone'] = $i;
+            $temp_data['nickname'] = $num;
+            $temp_data['created_at'] = $temp_data['updated_at'] = $now;
+            $temp_data['is_robot'] = 1;
+            $res = DB::connection('mysql_new_zs')
+                ->table('nlsg_user')->insert($temp_data);
             if ($res) {
                 $i++;
             }
@@ -235,6 +243,7 @@ class removeDataServers
 
         $data = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order')
+            ->where('id', '<=', 11752)
             ->where('express_company', '<>', '')
             ->where('express_number', '<>', '')
             ->select(['express_company', 'express_number', 'deliver_goods_time', 'receive_goods_time', 'ctime'])
@@ -302,7 +311,7 @@ class removeDataServers
 
         $add_data = array_chunk($add_data, 100);
         foreach ($add_data as $ad_v) {
-            $res = DB::table('nlsg_express_info')->insert($ad_v);
+            $res = DB::connection('mysql_new_zs')->table('nlsg_express_info')->insert($ad_v);
             var_dump($res);
         }
 
@@ -334,7 +343,8 @@ class removeDataServers
                 $update_data['time_begin_360'] = $begin_time;
                 $update_data['time_end_360'] = date('Y-m-d 23:59:59', strtotime(" +1 years", strtotime($begin_time)));
 
-                DB::table('nlsg_vip_user')->where('id', '=', $v['id'])
+                DB::connection('mysql_new_zs')
+                    ->table('nlsg_vip_user')->where('id', '=', $v['id'])
                     ->update($update_data);
             }
         }
@@ -343,14 +353,15 @@ class removeDataServers
     //地址和快递信息
     public function addressExpress()
     {
-        //$this->removeAddress();//迁移收货地址
-        //$this->removeExpress();//迁移快递信息
+        $this->removeAddress();//迁移收货地址
+        $this->removeExpress();//迁移快递信息
     }
 
     public function removeAddress()
     {
         $list = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_address')
+            ->where('id', '<=', 4998)
             ->where('is_del', '=', 0)
             ->get()->toArray();
 
@@ -392,7 +403,7 @@ class removeDataServers
         }
         $add_data = array_chunk($add_data, 50);
         foreach ($add_data as $av) {
-            DB::table('nlsg_mall_address_v3')->insert($av);
+            DB::connection('mysql_new_zs')->table('nlsg_mall_address')->insert($av);
         }
     }
 
@@ -402,7 +413,8 @@ class removeDataServers
         set_time_limit(0);
         $i = 1;
         $w = true;
-        $flag = '_v3';
+        //$flag = '_v3';
+        $flag = '';
         while ($w) {
             $data = $this->getOrderData($i, 50, $flag);
             $i++;
@@ -416,9 +428,11 @@ class removeDataServers
     {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
+        $begin_order_id = 11752;
 
         $old_order = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order')
+            ->where('id', '<=', $begin_order_id)
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->orderBy('id', 'desc')
@@ -428,6 +442,7 @@ class removeDataServers
 
         $old_details = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order_detail')
+            ->where('order_id', '<=', $begin_order_id)
             ->whereIn('order_id', $old_id_list)
             ->get()
             ->toArray();
@@ -538,7 +553,7 @@ class removeDataServers
                 $temp_details['updated_at'] = $now_date;
                 $temp_details['t_money'] = 0;
                 $temp_details['special_price_type'] = 0;
-                $temp_check_sku = DB::connection('mysql_old')
+                $temp_check_sku = DB::connection('mysql_new_zs')
                     ->table('nlsg_mall_sku')
                     ->where('sku_number', '=', $odv->sku_number)
                     ->first();
@@ -579,9 +594,10 @@ class removeDataServers
                         $temp_order_child_data['status'] = 1;
                         $temp_order_child_data['receipt_at'] = null;
                     }
+
                     $get_express_info = ExpressInfo::where('express_num', '=', trim($ov->express_number))
                         ->select(['id'])->first();
-                    $temp_order_child_data['express_info_id'] = $get_express_info->id;
+                    $temp_order_child_data['express_info_id'] = $get_express_info->id ?? 0;
                     $order_child_data[] = $temp_order_child_data;
                 }
             }
@@ -590,15 +606,18 @@ class removeDataServers
         //DB::beginTransaction();
 
         if (!empty($order_data)) {
-            DB::table('nlsg_mall_order' . $flag)->insert($order_data);
+            DB::connection('mysql_new_zs')
+                ->table('nlsg_mall_order' . $flag)->insert($order_data);
         }
 
         if (!empty($order_detail_data)) {
-            DB::table('nlsg_mall_order_detail' . $flag)->insert($order_detail_data);
+            DB::connection('mysql_new_zs')
+                ->table('nlsg_mall_order_detail' . $flag)->insert($order_detail_data);
         }
 
         if (!empty($order_child_data)) {
-            DB::table('nlsg_mall_order_child' . $flag)->insert($order_child_data);
+            DB::connection('mysql_new_zs')
+                ->table('nlsg_mall_order_child' . $flag)->insert($order_child_data);
         }
 
         if (empty($order_data)) {

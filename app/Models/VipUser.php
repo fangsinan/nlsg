@@ -31,6 +31,22 @@ class VipUser extends Base
         }
     }
 
+    public static function IsNewVip($uid)
+    {
+        if (!$uid) return false;
+        $UserInfo = VipUser::select('level', 'expire_time')->where(['user_id' => $uid, 'is_default' => 1, 'status' => 1])->first();
+        //$UserInfo = VipUser::where()->get();
+
+        //return $model->getLastQuery();
+        $time = date('Y-m-d', (time() + 86400));
+        //判断会员
+        if (!empty($UserInfo) && in_array($UserInfo->level, [1, 2,]) && $UserInfo->expire_time > $time) { //会员
+            return $UserInfo->level;
+        } else {
+            return 0;
+        }
+    }
+
     public function homePage($user, $params)
     {
         //卡片(昵称,是否开通,到期天数,价格)
@@ -104,22 +120,6 @@ class VipUser extends Base
         $res['works_list'] = ['cover_img' => ConfigModel::getData(32), 'list' => $works_list];
         $res['detail_image'] = $detail_image;
         return $res;
-    }
-
-    public static function IsNewVip($uid)
-    {
-        if (!$uid) return false;
-        $UserInfo = VipUser::select('level', 'expire_time')->where(['user_id' => $uid, 'is_default' => 1, 'status' => 1])->first();
-        //$UserInfo = VipUser::where()->get();
-
-        //return $model->getLastQuery();
-        $time = date('Y-m-d', (time() + 86400));
-        //判断会员
-        if (!empty($UserInfo) && in_array($UserInfo->level, [1, 2,]) && $UserInfo->expire_time > $time) { //会员
-            return $UserInfo->level;
-        } else {
-            return 0;
-        }
     }
 
     public function orderHistory()
