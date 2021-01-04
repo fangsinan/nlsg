@@ -237,6 +237,98 @@ class removeDataServers
     }
 
     //发货记录迁移
+
+    public function vip()
+    {
+        $list = VipUser::query()
+            ->where('level', '=', 2)
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->where('is_open_360', '=', 0)
+            ->with(['orderHistory', 'codeHistory'])
+            ->get()->toArray();
+
+        foreach ($list as $v) {
+            if (!empty($v['order_history']) || !empty($v['code_history'])) {
+                $update_data = [];
+                $update_data['is_open_360'] = 1;
+
+                $begin_time = '2020-09-01';
+                if (!empty($v['order_history']['created_at']) && $begin_time < $v['order_history']['created_at']) {
+                    $begin_time = $v['order_history']['created_at'];
+                }
+
+                if (!empty($v['code_history']['updated_at']) && $begin_time < $v['code_history']['updated_at']) {
+                    $begin_time = $v['code_history']['updated_at'];
+                }
+                $update_data['time_begin_360'] = $begin_time;
+                $update_data['time_end_360'] = date('Y-m-d 23:59:59', strtotime(" +1 years", strtotime($begin_time)));
+
+                DB::connection('mysql_new_zs')
+                    ->table('nlsg_vip_user')->where('id', '=', $v['id'])
+                    ->update($update_data);
+            }
+        }
+    }
+
+    public function addressExpress()
+    {
+        $this->removeAddress();//迁移收货地址
+        $this->removeExpress();//迁移快递信息
+    }
+
+    //地址和快递信息
+
+    public function removeAddress()
+    {
+        $list = DB::connection('mysql_old_zs')
+            ->table('nlsg_mall_address')
+            ->where('id', '<=', 4998)
+            ->where('is_del', '=', 0)
+            ->get()->toArray();
+
+        $area = Area::get()->toArray();
+
+        $add_data = [];
+        foreach ($list as &$v) {
+            $v->province_code = 0;
+            $v->city_code = 0;
+            $v->county_code = 0;
+
+            foreach ($area as $vv) {
+                if ($v->province == $vv['name'] || $v->province == $vv['fullname']) {
+                    $v->province_code = $vv['id'];
+                }
+                if ($v->city == $vv['name'] || $v->city == $vv['fullname']) {
+                    $v->city_code = $vv['id'];
+                }
+                if ($v->county == $vv['name'] || $v->county == $vv['fullname']) {
+                    $v->county_code = $vv['id'];
+                }
+            }
+            if ($v->county_code == 0) {
+                $v->detail = $v->county . $v->detail;
+            }
+
+            $temp_data = [];
+            $temp_data['id'] = $v->id;
+            $temp_data['name'] = $v->name;
+            $temp_data['phone'] = $v->phone;
+            $temp_data['province'] = $v->province_code;
+            $temp_data['city'] = $v->city_code;
+            $temp_data['area'] = $v->county_code;
+            $temp_data['user_id'] = $v->user_id;
+            $temp_data['is_default'] = $v->is_default;
+            $temp_data['details'] = $v->detail;
+            $temp_data['created_at'] = date('Y-m-d H:i:s', $v->ctime);
+            $add_data[] = $temp_data;
+        }
+        $add_data = array_chunk($add_data, 50);
+        foreach ($add_data as $av) {
+            DB::connection('mysql_new_zs')->table('nlsg_mall_address')->insert($av);
+        }
+    }
+
     public function removeExpress()
     {
         $express_data = ExpressCompany::query()->get()->toArray();
@@ -317,97 +409,8 @@ class removeDataServers
 
     }
 
-    public function vip()
-    {
-        $list = VipUser::query()
-            ->where('level', '=', 2)
-            ->where('status', '=', 1)
-            ->where('is_default', '=', 1)
-            ->where('is_open_360', '=', 0)
-            ->with(['orderHistory', 'codeHistory'])
-            ->get()->toArray();
-
-        foreach ($list as $v) {
-            if (!empty($v['order_history']) || !empty($v['code_history'])) {
-                $update_data = [];
-                $update_data['is_open_360'] = 1;
-
-                $begin_time = '2020-09-01';
-                if (!empty($v['order_history']['created_at']) && $begin_time < $v['order_history']['created_at']) {
-                    $begin_time = $v['order_history']['created_at'];
-                }
-
-                if (!empty($v['code_history']['updated_at']) && $begin_time < $v['code_history']['updated_at']) {
-                    $begin_time = $v['code_history']['updated_at'];
-                }
-                $update_data['time_begin_360'] = $begin_time;
-                $update_data['time_end_360'] = date('Y-m-d 23:59:59', strtotime(" +1 years", strtotime($begin_time)));
-
-                DB::connection('mysql_new_zs')
-                    ->table('nlsg_vip_user')->where('id', '=', $v['id'])
-                    ->update($update_data);
-            }
-        }
-    }
-
-    //地址和快递信息
-    public function addressExpress()
-    {
-        $this->removeAddress();//迁移收货地址
-        $this->removeExpress();//迁移快递信息
-    }
-
-    public function removeAddress()
-    {
-        $list = DB::connection('mysql_old_zs')
-            ->table('nlsg_mall_address')
-            ->where('id', '<=', 4998)
-            ->where('is_del', '=', 0)
-            ->get()->toArray();
-
-        $area = Area::get()->toArray();
-
-        $add_data = [];
-        foreach ($list as &$v) {
-            $v->province_code = 0;
-            $v->city_code = 0;
-            $v->county_code = 0;
-
-            foreach ($area as $vv) {
-                if ($v->province == $vv['name'] || $v->province == $vv['fullname']) {
-                    $v->province_code = $vv['id'];
-                }
-                if ($v->city == $vv['name'] || $v->city == $vv['fullname']) {
-                    $v->city_code = $vv['id'];
-                }
-                if ($v->county == $vv['name'] || $v->county == $vv['fullname']) {
-                    $v->county_code = $vv['id'];
-                }
-            }
-            if ($v->county_code == 0) {
-                $v->detail = $v->county . $v->detail;
-            }
-
-            $temp_data = [];
-            $temp_data['id'] = $v->id;
-            $temp_data['name'] = $v->name;
-            $temp_data['phone'] = $v->phone;
-            $temp_data['province'] = $v->province_code;
-            $temp_data['city'] = $v->city_code;
-            $temp_data['area'] = $v->county_code;
-            $temp_data['user_id'] = $v->user_id;
-            $temp_data['is_default'] = $v->is_default;
-            $temp_data['details'] = $v->detail;
-            $temp_data['created_at'] = date('Y-m-d H:i:s', $v->ctime);
-            $add_data[] = $temp_data;
-        }
-        $add_data = array_chunk($add_data, 50);
-        foreach ($add_data as $av) {
-            DB::connection('mysql_new_zs')->table('nlsg_mall_address')->insert($av);
-        }
-    }
-
     //商城订单迁移
+
     public function removeMallOrders()
     {
         set_time_limit(0);
@@ -824,12 +827,50 @@ class removeDataServers
 
     public function redeemCode()
     {
+        $page = 1;
+        $size = 1000;
 
+        $old_data = DB::connection('mysql_old_zs')
+            ->table('nlsg_coupon')
+            ->where('id', '<=', 102130)
+            ->where('user_id','>',0)
+            ->whereIn('status', [1, 2])
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get()->toArray();
+        $now_date = date('Y-m-d H:i:s');
+
+        $add_data = [];
+
+        foreach ($old_data as $v) {
+            $temp_data = [];
+            $temp_data['id'] = $v->id;
+            $temp_data['name'] = $v->name;
+            $temp_data['number'] = $v->number;
+            $temp_data['type'] = $v->type;
+            $temp_data['user_id'] = $v->user_id;
+            $temp_data['status'] = $v->status;
+            $temp_data['price'] = $v->money;
+            $temp_data['full_cut'] = $v->fullcut_price;
+            $temp_data['explain'] = $v->explain;
+            $temp_data['order_id'] = $v->order_id;
+            $temp_data['flag'] = $v->flag;
+            $temp_data['get_way'] = $v->get_way;
+            $temp_data['cr_id'] = $v->cr_id;
+            $temp_data['created_at'] = $v->ctime > 0 ? (date('Y-m-d H:i:s', $v->ctime)) : ($now_date);
+            $temp_data['begin_time'] = date('Y-m-d H:i:s', $v->starttime);
+            $temp_data['end_time'] = date('Y-m-d H:i:s', $v->deadline);
+            $temp_data['used_time'] = $v->use_time > 0 ? (date('Y-m-d H:i:s', $v->use_time)) : null;
+            $add_data[] = $temp_data;
+        }
+
+        DB::connection('mysql_new_zs')->table('nlsg_coupon')->insert($add_data);
 
     }
 
     public function countUserData()
     {
+        return false;
         if (0) {
             $sql = 'select from_uid as uid from nlsg_user_follow
                 UNION

@@ -62,8 +62,11 @@ class RemoveDataController extends ControllerBackend
         }
     }
 
-//    public function redeemCode(){
-//        $servers = new removeDataServers();
-//        $servers->redeemCode();
-//    }
+    public function redeemCode()
+    {
+        if (0) {
+            $servers = new removeDataServers();
+            $servers->redeemCode();
+        }
+    }
 }
