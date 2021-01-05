@@ -950,7 +950,6 @@ class ClassController extends ControllerBackend
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
         $content  = $input['content'] ?? '';
         $subtitle = $input['subtitle'] ?? '';
-        $message = $input['message'] ?? '';
 
         $data = [
             'title' => $title,
@@ -961,7 +960,6 @@ class ClassController extends ControllerBackend
             'is_end' => $is_end,
             'status' => $status,
             'timing_online' => $timing_online,
-            'message' => $message,
             'content' => $content,
             'is_audio_book' => 1,
             'type'    => 2
