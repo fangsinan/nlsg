@@ -78,6 +78,7 @@ class VipWorksList extends Base
                 $temp_res['column_type'] = $v['column']['column_type'];
                 $temp_res['category_id'] = [0];
                 $temp_res['user_id'] = $v['column']['user_id'];
+                $temp_res['view_num'] = $v['column']['view_num'];
 
             } else if ($v['type'] == 2) {
                 if (empty($v['works'])) {
@@ -103,6 +104,7 @@ class VipWorksList extends Base
                 $temp_res['column_type'] = 1;
                 $temp_res['category_id'] = $temp_res_category_id;
                 $temp_res['user_id'] = $v['works']['user_id'];
+                $temp_res['view_num'] = $v['works']['view_num'];
             } else {
                 continue;
             }
@@ -118,12 +120,12 @@ class VipWorksList extends Base
     {
         return $this->hasOne(Column::class, 'id', 'works_id')
             ->select(['id', 'name as title', 'subtitle', 'cover_pic as cover_img',
-                'details_pic as detail_img', 'column_type', 'price', 'user_id']);
+                'details_pic as detail_img', 'column_type', 'price', 'user_id','view_num']);
     }
 
     public function works()
     {
         return $this->hasOne(Works::class, 'id', 'works_id')
-            ->select(['id', 'title', 'subtitle', 'cover_img', 'detail_img', 'type', 'price', 'user_id']);
+            ->select(['id', 'title', 'subtitle', 'cover_img', 'detail_img', 'type', 'price', 'user_id','view_num']);
     }
 }

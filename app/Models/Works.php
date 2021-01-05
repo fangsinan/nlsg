@@ -4,8 +4,6 @@
 namespace App\Models;
 
 
-use EasyWeChat\Work\ExternalContact\Client;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 class Works extends Base
@@ -13,7 +11,7 @@ class Works extends Base
     protected $table = 'nlsg_works';
 
     protected $fillable = [
-       'column_id', 'title', 'subtitle','type', 'cover_img', 'detail_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content','is_pay','is_free','chapter_num','comment_num','collection_num','duration'
+        'column_id', 'title', 'subtitle', 'type', 'cover_img', 'detail_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content', 'is_pay', 'is_free', 'chapter_num', 'comment_num', 'collection_num', 'duration'
     ];
 
     //状态 1上架  2 下架
@@ -26,23 +24,23 @@ class Works extends Base
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0,$is_free = false)
+    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0, $is_free = false)
     {
         if (!$ids) {
             return false;
         }
-        $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'detail_img','subtitle', 'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num' ,'is_audio_book', 'cover_img as cover_pic', 'detail_img as detail_pic')
+        $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'detail_img', 'subtitle', 'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num', 'is_audio_book', 'cover_img as cover_pic', 'detail_img as detail_pic')
             ->with(['user' => function ($query) {
                 $query->select('id', 'nickname', 'headimg');
             }])
             ->whereIn('id', $ids)
-            ->whereIn('type', [2,3]) //课程只有音频
+            ->whereIn('type', [2, 3]) //课程只有音频
             ->where('status', 4);
         //2时   不考虑是否听书
         if ($is_audio_book !== 2) {
             $WorksObj->where('is_audio_book', $is_audio_book);
         }
-        if($is_free !== false ){
+        if ($is_free !== false) {
             $WorksObj->where('is_free', $is_free);
         }
 
@@ -135,7 +133,7 @@ class Works extends Base
         $works = Works::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num','chapter_num as info_num')
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num', 'chapter_num as info_num')
             ->where('type', 2)
             ->where('is_free', 1)
             ->where('is_audio_book', 0)
@@ -155,7 +153,7 @@ class Works extends Base
         $book = Works::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num','chapter_num as info_num')
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num', 'chapter_num as info_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 1)
             ->where('status', 4)
@@ -174,7 +172,7 @@ class Works extends Base
         $lecture = Column::with(['user' => function ($query) {
             $query->select('id', 'nickname');
         }])
-            ->select('id', 'user_id', 'is_free', 'name','title', 'subtitle', 'cover_pic', 'details_pic','info_num')
+            ->select('id', 'user_id', 'is_free', 'name', 'title', 'subtitle', 'cover_pic', 'details_pic', 'info_num')
             ->where('is_free', 1)
             ->where('type', 2)
             ->where('status', 1)
@@ -266,36 +264,44 @@ class Works extends Base
             ->select(['id', 'type', 'column_type', 'subtitle', 'title']);
     }
 
-    public function cytxClick(){
-        return $this->hasOne(Click::class,'cpid','works_id')
-            ->where('flag','=','cytx')
+    public function cytxClick()
+    {
+        return $this->hasOne(Click::class, 'cpid', 'works_id')
+            ->where('flag', '=', 'cytx')
             ->groupBy('cpid')
-            ->select([DB::raw('count(1) as counts'),'cpid']);
+            ->select([DB::raw('count(1) as counts'), 'cpid']);
     }
 
     public function listForCytx($params)
     {
         $banner = 'http://image.nlsgapp.com/nlsg/works/20210105111246728830.png';
-        $list = Works::where('for_cytx', '=', 1)
-            ->with(['columnInfo', 'user' => function ($query) {
-                $query->select('id', 'nickname', 'intro');
-            },'cytxClick'])
-            ->orderBy('cytx_sort','asc')
-            ->orderBy('id','asc')
-            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
-                'detail_img', 'cytx_price as price', 'column_id', 'user_id','view_num'])
-            ->get();
-        foreach ($list as $v){
-            if($v->view_num >= 10000){
+
+        $model = new VipWorksList();
+        $list = $model->getList(1);
+
+//        $list = $list['list'];
+
+//        $list1 = Works::where('for_cytx', '=', 1)
+//            ->with(['columnInfo', 'user' => function ($query) {
+//                $query->select('id', 'nickname', 'intro');
+//            },'cytxClick'])
+//            ->orderBy('cytx_sort','asc')
+//            ->orderBy('id','asc')
+//            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
+//                'detail_img', 'cytx_price as price', 'column_id', 'user_id','view_num'])
+//            ->get();
+        foreach ($list as &$v) {
+            $v['works_id'] = $v['id'];
+            if ($v['view_num'] >= 10000) {
                 $leftNumber = floor($v['view_num'] / 10000);
                 $rightNumber = round(($v['view_num'] % 10000) / 10000, 2);
-                $v->view_num = floatval($leftNumber + $rightNumber) . '万';
+                $v['view_num'] = floatval($leftNumber + $rightNumber) . '万';
             }
         }
 
         return [
             'banner' => $banner,
-            'list' => $list,
+            'list' => $list
         ];
     }
 
@@ -303,12 +309,12 @@ class Works extends Base
      * 作品、书单数据统计
      * @return \Illuminate\Http\JsonResponse
      */
-    public static function  statistic()
+    public static function statistic()
     {
-        $works = Works::orderBy('created_at','desc')
-                ->get()
-                ->toArray();
-        if ($works){
+        $works = Works::orderBy('created_at', 'desc')
+            ->get()
+            ->toArray();
+        if ($works) {
             foreach ($works as $v) {
                 $num = WorksInfo::where('status', 4)
                     ->where('pid', $v['id'])
@@ -319,14 +325,14 @@ class Works extends Base
             }
         }
 
-        $lists = Lists::orderBy('created_at','desc')
-                ->get()
-                ->toArray();
-        if ($lists){
+        $lists = Lists::orderBy('created_at', 'desc')
+            ->get()
+            ->toArray();
+        if ($lists) {
             foreach ($lists as $v) {
                 $num = ListsWork::where('lists_id', $v['id'])
-                        ->where('state', 1)
-                        ->count();
+                    ->where('state', 1)
+                    ->count();
                 Lists::where('id', $v['id'])->update([
                     'num' => $num
                 ]);
