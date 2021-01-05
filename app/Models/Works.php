@@ -274,39 +274,47 @@ class Works extends Base
 
     public function listForCytx($params)
     {
-        $banner = 'http://image.nlsgapp.com/nlsg/works/20210105111246728830.png';
 
-        $list = Works::where('for_cytx', '=', 1)
-            ->where('status', '=', 4)
-            ->where('type', '=', 2)
-            ->with(['columnInfo', 'user' => function ($query) {
-                $query->select('id', 'nickname', 'intro');
-            }, 'cytxClick'])
-            ->orderBy('cytx_sort', 'asc')
-            ->orderBy('id', 'asc')
-            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
-                'column_id', DB::raw('2 as type'),
-                'detail_img', 'cytx_price as price', 'column_id', 'user_id', 'view_num'])
-            ->get();
+        if (1) {
+            $m = new ChannelWorksList();
+            $list = $m->getList(0, 0, 0, 1, $this->user['id'] ?? 0);
+            $list['banner'] = ConfigModel::getData(47);
+            return $list;
+        }else{
+            $banner = ConfigModel::getData(47);
+            $list = Works::where('for_cytx', '=', 1)
+                ->where('status', '=', 4)
+                ->where('type', '=', 2)
+                ->with(['columnInfo', 'user' => function ($query) {
+                    $query->select('id', 'nickname', 'intro');
+                }, 'cytxClick'])
+                ->orderBy('cytx_sort', 'asc')
+                ->orderBy('id', 'asc')
+                ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
+                    'column_id', DB::raw('2 as type'),
+                    'detail_img', 'cytx_price as price', 'column_id', 'user_id', 'view_num'])
+                ->get();
 
-        foreach ($list as &$v) {
-            $v->id = $v->works_id;
-            if ($v['view_num'] >= 10000) {
-                $leftNumber = floor($v['view_num'] / 10000);
-                $rightNumber = round(($v['view_num'] % 10000) / 10000, 2);
-                $v['view_num'] = floatval($leftNumber + $rightNumber) . '万';
+            foreach ($list as &$v) {
+                $v->id = $v->works_id;
+                if ($v['view_num'] >= 10000) {
+                    $leftNumber = floor($v['view_num'] / 10000);
+                    $rightNumber = round(($v['view_num'] % 10000) / 10000, 2);
+                    $v['view_num'] = floatval($leftNumber + $rightNumber) . '万';
+                }
+                $user_info = [];
+                $user_info['name'] = $v['user']['nickname'];
+                $user_info['title'] = $v['columnInfo']['title'];
+                $user_info['subtitle'] = $v['columnInfo']['subtitle'];
+                $v->userInfo = $user_info;
             }
-            $user_info = [];
-            $user_info['name'] = $v['user']['nickname'];
-            $user_info['title'] = $v['columnInfo']['title'];
-            $user_info['subtitle'] = $v['columnInfo']['subtitle'];
-            $v->userInfo = $user_info;
+
+            return [
+                'banner' => $banner,
+                'list' => $list
+            ];
         }
 
-        return [
-            'banner' => $banner,
-            'list' => $list
-        ];
     }
 
     /**

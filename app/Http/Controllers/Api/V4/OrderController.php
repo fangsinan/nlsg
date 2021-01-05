@@ -590,7 +590,7 @@ class OrderController extends Controller
 
             $result = Order::getInfo($val['type'], $val['relation_id'], $val['send_type'], $user_id);
             if ($result == false) {
-                unset($data[$key]);  //过滤老订单数据  
+                unset($data[$key]);  //过滤老订单数据
             }
             if ($val['send_user_id'] > 0) {
                 $userData = User::select('phone')->where(['id' => $val['send_user_id']])->first()->toArray();
