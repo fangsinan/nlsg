@@ -275,7 +275,7 @@ class Works extends Base
 
     public function listForCytx($params)
     {
-        $banner = 'https://wechat.nlsgapp.com/static/img/zhibo-ditu@2x.06e5e95.png';
+        $banner = 'http://image.nlsgapp.com/nlsg/works/20210105111246728830.png';
         $list = Works::where('for_cytx', '=', 1)
             ->with(['columnInfo', 'user' => function ($query) {
                 $query->select('id', 'nickname', 'intro');
