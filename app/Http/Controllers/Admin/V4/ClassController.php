@@ -943,30 +943,49 @@ class ClassController extends ControllerBackend
         }
         $cover_img = covert_img($input['cover_img']) ?? '';
         $user_id = $input['user_id'] ?? 0;
+        $category_id = $input['category_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $is_end = $input['is_end'] ? 1 : 0;
         $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
-        $content = $input['content'] ?? '';
+        $content  = $input['content'] ?? '';
+        $subtitle = $input['subtitle'] ?? '';
+        $message = $input['message'] ?? '';
 
         $data = [
             'title' => $title,
+            'subtitle'  => $subtitle,
             'cover_img' => $cover_img,
             'user_id' => $user_id,
             'original_price' => $original_price,
             'is_end' => $is_end,
             'status' => $status,
             'timing_online' => $timing_online,
+            'message' => $message,
             'content' => $content,
             'is_audio_book' => 1,
             'type'    => 2
         ];
 
         if (!empty($input['id'])) {
-            Works::where('id', $input['id'])->update($data);
-        } else {
-            Works::create($data);
-        }
+             Works::where('id', $input['id'])->update($data);
+             //增加分类
+             WorksCategoryRelation::where('work_id', $input['id'])
+                 ->delete();
+             $id = $input['id'];
+         } else {
+             $res = Works::where('title', $title)->first();
+             if ($res){
+                 return error(1000, '不能添加重复数据');
+             }
+             $work = Works::create($data);
+             $id = $work ? $work->id : 0;
+         }
+         WorksCategoryRelation::create([
+             'work_id' => $id,
+             'category_id' => $input['category_id'] ?? 0
+         ]);
+
         return success();
     }
 
