@@ -276,27 +276,29 @@ class Works extends Base
     {
         $banner = 'http://image.nlsgapp.com/nlsg/works/20210105111246728830.png';
 
-        $model = new VipWorksList();
-        $list = $model->getList(1);
+        $list = Works::where('for_cytx', '=', 1)
+            ->where('status', '=', 4)
+            ->with(['columnInfo', 'user' => function ($query) {
+                $query->select('id', 'nickname', 'intro');
+            }, 'cytxClick'])
+            ->orderBy('cytx_sort', 'asc')
+            ->orderBy('id', 'asc')
+            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img', DB::raw('1 as type'),
+                'detail_img', 'cytx_price as price', 'column_id', 'user_id', 'view_num'])
+            ->get();
 
-//        $list = $list['list'];
-
-//        $list1 = Works::where('for_cytx', '=', 1)
-//            ->with(['columnInfo', 'user' => function ($query) {
-//                $query->select('id', 'nickname', 'intro');
-//            },'cytxClick'])
-//            ->orderBy('cytx_sort','asc')
-//            ->orderBy('id','asc')
-//            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
-//                'detail_img', 'cytx_price as price', 'column_id', 'user_id','view_num'])
-//            ->get();
         foreach ($list as &$v) {
-            $v['works_id'] = $v['id'];
+            $v->id = $v->works_id;
             if ($v['view_num'] >= 10000) {
                 $leftNumber = floor($v['view_num'] / 10000);
                 $rightNumber = round(($v['view_num'] % 10000) / 10000, 2);
                 $v['view_num'] = floatval($leftNumber + $rightNumber) . '万';
             }
+            $user_info = [];
+            $user_info['name'] = $v['user']['nickname'];
+            $user_info['title'] = $v['columnInfo']['title'];
+            $user_info['subtitle'] = $v['columnInfo']['subtitle'];
+            $v->userInfo = $user_info;
         }
 
         return [
