@@ -10,8 +10,8 @@ use App\Models\ConfigModel;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class ChannelServers
 {
@@ -53,7 +53,8 @@ class ChannelServers
         $order->save();
     }
 
-    public static function cytxJob(){
+    public static function cytxJob()
+    {
         $c = new self();
         $c->cytxOrderList();
     }
@@ -86,8 +87,7 @@ class ChannelServers
             ->whereRaw('(cytx_job = 0 or ((cytx_job*600) + UNIX_TIMESTAMP(cytx_check_time) <= UNIX_TIMESTAMP()))');
 
         if (empty($order_id)) {
-            $query->whereRaw('(UNIX_TIMESTAMP() - UNIX_TIMESTAMP(o.pay_time) > 600)');
-            $query->limit(10);
+            $query->limit(1000);
         }
 
         $list = $query->select([
