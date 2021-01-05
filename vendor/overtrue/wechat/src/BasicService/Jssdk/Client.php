@@ -129,7 +129,8 @@ class Client extends BaseClient
      */
     protected function configSignature(string $url = null, string $nonce = null, $timestamp = null): array
     {
-        $url = $url ?: $this->getUrl();
+//        $url = $url ?: $this->getUrl();
+        $url   ='http://wechat.test.nlsgapp.com/appv4/course-introduce?id=460&time=154';
         $nonce = $nonce ?: Support\Str::quickRandom(10);
         $timestamp = $timestamp ?: time();
 
