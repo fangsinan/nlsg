@@ -16,12 +16,14 @@ class PayRecord extends Base
         switch ($flag) {
             case 'cytx':
                 $line = ConfigModel::getData(36);
-                $line = GetPriceTools::PriceCalc('+', $line, $money);
-
+                $line = GetPriceTools::PriceCalc('-', $line, $money);
+                if ($line < 0) {
+                    return 0;
+                }
                 $money = DB::table('nlsg_order as o')
                     ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
                     ->where('p.user_id', '=', $user_id)
-                    ->where('o.type', '=', 9)
+                    ->whereIn('o.type', [9, 15])
                     ->where('o.activity_tag', '=', 'cytx')
                     ->where('o.status', '=', 1)
                     ->where('o.is_shill', '=', 0)

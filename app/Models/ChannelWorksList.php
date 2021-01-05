@@ -9,6 +9,16 @@ class ChannelWorksList extends Base
 {
     protected $table = 'nlsg_channel_works_list';
 
+    public static function getPrice($type, $id)
+    {
+        $price = self::where('works_id', '=', $id)->where('type', '=', $type)->first();
+        if (empty($price)) {
+            return 0;
+        } else {
+            return $price->price;
+        }
+    }
+
     public function getList($page = 1, $size = 10, $category_id = 0, $channel = 0, $user_id)
     {
         if (empty($channel)) {
