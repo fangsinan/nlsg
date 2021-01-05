@@ -881,20 +881,24 @@ class IndexController extends Controller
      */
     public function  version(Request $request)
     {
+
         $version = $request->get('version');
-        $list =  Versions::select('id','number','content','url')
+        $os_type = $request->get('os_type') ?? 1;
+
+        $list =  Versions::select('id','number','content','url','is_force','str_at')
                 ->where('status', 1)
+                ->where('os_type', $os_type)
                 ->orderBy('created_at','desc')
                 ->first();
-        if (version_compare($version, $list->number, '>=')) {
-            return success(['is_force'=>0]);
-        }
-        if ($list){
-            $list->is_force = 1;
-            $list->content =  $list->content ? explode('；', $list->content) : '';
-        }
 
-        return success($list);
+        if(date('Y-m-d H:i:s',time()) >= $list['str_at']){
+            if (version_compare($version, $list->number, '>=')) {
+                return success($list);
+            }
+        }
+        return success(['is_force' => 0]);
+
+
     }
 
     /**
