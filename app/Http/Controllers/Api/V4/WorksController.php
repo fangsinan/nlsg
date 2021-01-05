@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChannelWorksList;
 use App\Models\Collection;
 use App\Models\Column;
-use App\Models\ColumnOutline;
 use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Materials;
@@ -428,6 +428,7 @@ class WorksController extends Controller
         $size = $request->input('size',10);
         $user_id   = $this->user['id'] ?? 0;
         $order   = $request->input('order','');
+        $activity_tag = $request->input('activity_tag', '');
 
         if($order == ''){  //默认
             $order = 'asc';
@@ -442,8 +443,17 @@ class WorksController extends Controller
             return $this->error(0,'works_id 不能为空');
         }
         //查询当前课程
-        $works_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price', 'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num','collection_num','comment_num','chapter_num','is_free','is_audio_book','view_num'])
+        $works_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price',
+            'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num',
+            'collection_num','comment_num','chapter_num','is_free','is_audio_book','view_num'])
             ->where('status',4)->find($works_id);
+        if ($activity_tag === 'cytx') {
+            $temp_price = ChannelWorksList::getPrice(2, $works_id);
+            if (!empty($price)) {
+                $works_data->price = $temp_price;
+                $works_data->original_price = $temp_price;
+            }
+        }
 
         if(empty($works_data)){
             return $this->error(0,'课程不存在或已下架');
