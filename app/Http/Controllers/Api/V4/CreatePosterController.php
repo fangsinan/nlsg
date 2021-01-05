@@ -22,9 +22,7 @@ use OSS\OssClient;
 class CreatePosterController extends Controller
 {
     public static $IMAGES_URL = 'https://image.nlsgapp.com/';
-    protected static $MIME_TYPE_TO_TYPE = [
-        'image/jpeg' => 'jpg', 'image/png' => 'png'
-    ];
+
 
     /**
      * @api {get} /api/v4/create/create_poster   制作专属海报
@@ -78,7 +76,7 @@ class CreatePosterController extends Controller
             $QR_url = $this->getGetQRUrl($post_type, $gid, $uid,$flag,$live_id,$live_info_id);
             $temp_9_res = $this->createQRcode($QR_url, true, true, true);
             $src = '';
-            $res = $this->base64Upload(100,$temp_9_res);
+            $res = ConfigModel::base64Upload(100,$temp_9_res);
             if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
             }
@@ -1248,7 +1246,7 @@ class CreatePosterController extends Controller
             return $this->error(0,'上传类型有误');
         }
 
-        $res = $this->base64Upload($type_flag,$file_base64);
+        $res = ConfigModel::base64Upload($type_flag,$file_base64);
         if($res['code'] == 0){
             return $this->success([
                 'url'=>$res['url'],
@@ -1260,58 +1258,6 @@ class CreatePosterController extends Controller
         }
 
     }
-
-    //上传操作
-    function base64Upload($type_flag,$file_base64){
-
-
-        $dir='nlsg/';
-        switch($type_flag){
-            case 1:$dir.='headimg';break;
-            case 2:$dir.='works';break;
-            case 3:$dir.='authorpt';break;
-            case 4:$dir.='goods';break;
-            case 5:$dir.='idcard';break;
-            case 6:$dir.='banner';break;
-            case 7:$dir.='booklist';break;
-            case 8:$dir.='company';break;
-            case 9:$dir.='feedback';break;
-            case 10:$dir.='evaluate';break;
-            case 100:$dir.='other';break;
-        }
-        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $file_base64, $match)) {
-            $accessKeyId = Config('web.Ali.ACCESS_KEY_ALI');
-            $accessKeySecret = Config('web.Ali.SECRET_KEY_ALI');
-            $endpoint = "oss-cn-beijing.aliyuncs.com";
-            //上传阿里
-            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-            $dir=$dir.'/'.date('YmdHis');
-
-            // 存储空间名称
-            $bucket= Config('web.Ali.BUCKET_ALI');
-            $ext = self::$MIME_TYPE_TO_TYPE["image/" . $match[2]] ?? 'jpg'; //扩展名
-            $content=base64_decode(str_replace($match[1], '', $file_base64));
-            // 文件名称
-            $object=$dir.rand(100000,999999).'.'.$ext;
-            // 文件内容
-            $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
-            if($doesres){
-                return ['code'=>1,'msg' => '文件已存在'];
-            }else{
-                $object=$dir.rand(100000,999999).'.'.$ext;
-            }
-            $ossClient->putObject($bucket, $object, $content);
-            return [
-                'code'=>0,
-                'url'=>Config('web.Ali.IMAGES_URL'),
-                'name' => $object
-            ];
-
-        }else{
-            return ['code'=>1,'msg' => 'base64码解析错误'];
-        }
-    }
-
 
 
 
