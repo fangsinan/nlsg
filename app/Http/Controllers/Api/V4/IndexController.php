@@ -953,7 +953,7 @@ class IndexController extends Controller
         ];
 
         $app = Factory::officialAccount($config);
-        $app->jssdk->setUrl($url);
+        $app->jssdk->setUrl('http://wechat.test.nlsgapp.com/appv4/course-introduce?id=460&time=154');
         $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'],$debug = true, $beta = false, $json = true);
         return success($jssdk);
     }
