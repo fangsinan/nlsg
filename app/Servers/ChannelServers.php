@@ -73,7 +73,7 @@ class ChannelServers
 
         $query->where('o.activity_tag', '=', 'cytx')
             ->where('o.status', '=', 1)
-            ->where('o.type', '=', 9)
+            ->whereIn('o.type', [9, 15])
             ->where('cytx_job', '<>', -1);
 
         $is_test = intval(ConfigModel::getData(37));
