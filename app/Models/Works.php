@@ -283,7 +283,7 @@ class Works extends Base
             }, 'cytxClick'])
             ->orderBy('cytx_sort', 'asc')
             ->orderBy('id', 'asc')
-            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img', DB::raw('1 as type'),
+            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img', DB::raw('2 as type'),
                 'detail_img', 'cytx_price as price', 'column_id', 'user_id', 'view_num'])
             ->get();
 
