@@ -278,12 +278,14 @@ class Works extends Base
 
         $list = Works::where('for_cytx', '=', 1)
             ->where('status', '=', 4)
+            ->where('type', '=', 2)
             ->with(['columnInfo', 'user' => function ($query) {
                 $query->select('id', 'nickname', 'intro');
             }, 'cytxClick'])
             ->orderBy('cytx_sort', 'asc')
             ->orderBy('id', 'asc')
-            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img', DB::raw('2 as type'),
+            ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
+                'column_id', DB::raw('2 as type'),
                 'detail_img', 'cytx_price as price', 'column_id', 'user_id', 'view_num'])
             ->get();
 
