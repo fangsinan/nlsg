@@ -945,7 +945,8 @@ class IndexController extends Controller
 
     public function  share(Request $request)
     {
-        $url = $request->get('url');
+        $input = $request->all();
+        $url   = $input['url'] ?? '';
         $config = [
             'app_id' => 'wxe24a425adb5102f6',
             'secret' => '2ded804b74f99ae2f342423dd7952620',
@@ -953,7 +954,7 @@ class IndexController extends Controller
         ];
 
         $app = Factory::officialAccount($config);
-        $app->jssdk->setUrl('http://wechat.test.nlsgapp.com/appv4/course-introduce?id=460&time=154');
+        $app->jssdk->setUrl($url);
         $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'],$debug = true, $beta = false, $json = true);
         return success($jssdk);
     }
