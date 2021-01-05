@@ -959,7 +959,8 @@ class ClassController extends ControllerBackend
             'is_end' => $is_end,
             'status' => $status,
             'timing_online' => $timing_online,
-            'content' => $content
+            'content' => $content,
+            'type'    => 2
         ];
 
         if (!empty($input['id'])) {
