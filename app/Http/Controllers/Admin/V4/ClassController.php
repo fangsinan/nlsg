@@ -1401,7 +1401,7 @@ class ClassController extends ControllerBackend
      */
     public function getSearchWorkCategory()
     {
-        $lists = WorksCategory::select('id', 'name')->where('level', 3)
+        $lists = WorksCategory::select('id', 'name')->where('level', 2)
             ->orderBy('id', 'desc')
             ->get();
         return success($lists);
