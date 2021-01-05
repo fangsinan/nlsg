@@ -788,12 +788,14 @@ class UserController extends Controller
 
 
             if ($val['relation_type'] == 1 or $val['relation_type'] == 2) {
-                $column = Column::find($val['relation_id']);
-                $val['column_name'] = $column['name'];
-                $val['column_cover_img'] = $column['cover_pic'];
+//                $column = Column::find($val['relation_id']);
+                $column = Column::where(['id'=>$val['relation_id'],'status'=>1])->first();
+                $val['column_name'] = $column['name'] ?? '';
+                $val['column_cover_img'] = $column['cover_pic'] ?? '';
             }
             if ($val['relation_type'] == 3 or $val['relation_type'] == 4) {
-                $works = Works::find($val['relation_id']);
+//                $works = Works::find($val['relation_id']);
+                $works = Works::where(['id'=>$val['relation_id'],'status'=>4])->first();
                 $val['works_name'] = $works['title'] ?? '';
                 $val['works_cover_img'] = $works['cover_img'] ?? '';
             }
@@ -802,9 +804,11 @@ class UserController extends Controller
                 $val['worksInfo_name'] = $worksInfo['title'] ?? '';
                 $val['worksInfo_type'] = $worksInfo['type'] ?? "";
             }
+//            $new_list[History::DateTime($val['created_at'])][] = $val;
 
-
-            $new_list[History::DateTime($val['created_at'])][] = $val;
+            if($val['column_name'] || $val['works_name'] ){
+                $new_list[History::DateTime($val['created_at'])][] = $val;
+            }
         }
 
 
