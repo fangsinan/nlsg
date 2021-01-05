@@ -483,7 +483,7 @@ class removeDataServers
     {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
-        $begin_order_id = 11752;
+        $begin_order_id = 11755;//11755
 
         $old_order = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order')
