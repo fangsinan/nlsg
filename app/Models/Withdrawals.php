@@ -46,7 +46,7 @@ class Withdrawals extends Base
     }
 
     //提现操作
-    public function TxRecord($amount,$zh_account,$user_id,$truename,$orderid,$tax=0,$order_type=0,$ip){
+    public function TxRecord($amount,$zh_account,$user_id,$truename,$orderid,$tax=0,$order_type=0,$ip,$os_type=1){
 
         DB::beginTransaction();
 
@@ -55,9 +55,18 @@ class Withdrawals extends Base
             $record=[];
             $record['order_type']=$order_type; //12机构提现  8微信  7支付宝
 
+            if($os_type == 1 ){  //1 安卓 2ios 3微信
+                $type = $order_type == 7?3:2;
+            }else if($os_type == 2){
+                $type = 4;
+            }else{
+                $type = 1;
+            }
+
+
             $record['status']=1; //提现  1处理中  2成功
             $record['price']=$amount;
-            $record['type']=3; //扣款
+            $record['type']=$type; //1微信端   2app微信    3app支付宝  4ios
             $record['ordernum']=$orderid; //订单号
             $record['product_id']=$truename.':'.$zh_account;
             $record['user_id']=$user_id; //用户id
@@ -76,7 +85,7 @@ class Withdrawals extends Base
             $data['user_id'] = $user_id;
             $data['ordernum'] = $orderid;
             $data['ip'] = $ip;
-            $data['os_type'] = 3; //微信
+            $data['os_type'] = $os_type; //x
             $data['cost_price'] = $amount;
             $data['price'] = $amount;
             //$status = $OrderObj->add($OrderObj::$table, $data);
@@ -99,17 +108,25 @@ class Withdrawals extends Base
     }
 
     //https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_2
-    public function Pay($user_id,$zh_account, $amount, $desc,$truename, $orderid,$pay_id,$ip='127.0.0.1',$channel)
+    public function Pay($user_id,$zh_account, $amount, $desc,$truename, $orderid,$pay_id,$ip='127.0.0.1',$channel,$order_type,$os_type)
     {
 
         $amount = ($amount/100);     // 0.01-0时候 会得到0
 
         //查询是否有添加过订单，防止多次点击
+        //$order_type  7
+        if($os_type == 1 ){  //1 安卓 2ios 3微信
+            $type = $order_type == 7?3:2;
+        }else if($os_type == 2){
+            $type = 4;
+        }else{
+            $type = 1;
+        }
+
         $Submission_flag = PayRecord::where([
             'user_id'=>$user_id,
-            'type'=>3,
-            'order_type'=>8,
-            'client'=>1,
+            'type'=>$type,
+            'order_type'=>$order_type,
             'price'=>$amount,
         ])->where('created_at','>',(date('Y-m-01')))
             ->whereIn('status',[1,2])->count();

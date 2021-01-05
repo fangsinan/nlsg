@@ -505,6 +505,7 @@ class IncomeController extends Controller
         $type = $request->input('type', 0);
         $amount = $request->input('money', 0);
         $channel = $request->input('channel', 0);//ali  |  WeChat
+        $os_type = $request->input('os_type', 1);//  1 安卓 2ios 3微信
 
 
 
@@ -611,13 +612,13 @@ class IncomeController extends Controller
 
         $WithdrawalsObj= new Withdrawals();
         //加入处理中数据 防止多平台重复提现  提现金额  下订单
-        $Record_Id = $WithdrawalsObj->TxRecord($amount, $zh_account, $user_id, $Info['truename'], $orderid, $tax,$order_type,$ip);
+        $Record_Id = $WithdrawalsObj->TxRecord($amount, $zh_account, $user_id, $Info['truename'], $orderid, $tax,$order_type,$ip,$os_type);
         if (!$Record_Id) {
             $this->RedisFlag($user_id,3);
             return $this->error(0,'提现失败请重试');
         }
         //处理提现操作
-        $pay_res = $WithdrawalsObj->Pay($user_id, $zh_account, ($amount - $tax) * 100, $Info['truename'], $Info['truename'], $orderid, $Record_Id->id,$ip,$channel,$Info['zfb_account']);
+        $pay_res = $WithdrawalsObj->Pay($user_id, $zh_account, ($amount - $tax) * 100, $Info['truename'], $Info['truename'], $orderid, $Record_Id->id,$ip,$channel,$order_type,$os_type);
 
 
 
