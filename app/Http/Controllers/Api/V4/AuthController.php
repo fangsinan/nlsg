@@ -406,7 +406,7 @@ class AuthController extends Controller
         if (!$phone) {
             return $this->error(400, '手机号不能为空');
         }
-        if(!preg_match('/^1[345789]\d{9}$/', $phone)){
+        if(!preg_match('/^1[3456789]\d{9}$/', $phone)){
             return $this->error(400, '手机号格式错误');
         }
 
