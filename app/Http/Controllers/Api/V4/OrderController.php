@@ -5,12 +5,11 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\ChannelWorksList;
 use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\History;
-use App\Models\Live;
 use App\Models\LiveCountDown;
-use App\Models\LiveInfo;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
@@ -21,7 +20,6 @@ use App\Models\VipUser;
 use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 
 /**
@@ -154,6 +152,7 @@ class OrderController extends Controller
         $os_type = !empty($params['os_type']) ? intval($params['os_type']) : 1;
         $live_id = !empty($params['live_id']) ? intval($params['live_id']) : 0;
         $pay_type = !empty($params['pay_type']) ? intval($params['pay_type']) : 0;
+        $activity_tag = $request->input('activity_tag', '');
         $user_id = $this->user['id'] ?? 0;
 
         //检测下单参数有效性
@@ -171,8 +170,23 @@ class OrderController extends Controller
             return $this->error(0, '专栏不存在');
         }
 
-        //优惠券
-        $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $column_data->price, 1);
+        if ($activity_tag === 'cytx') {
+            $price = ChannelWorksList::getPrice(1, $column_id);
+            if (empty($price)) {
+                return $this->error(0, '参数错误' . __LINE__, 0);
+            }
+            //校验用户本月是否能继续花钱
+            $check_this_money = PayRecord::thisMoneyCanSpendMoney($user_id, 'cytx', $price);
+            if ($check_this_money == 0) {
+                return $this->error(0, '本月已超消费金额', 0);
+            }
+            $coupon_id = 0;
+            $coupon_price = 0;
+        } else {
+            //优惠券
+            $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $column_data->price, 1);
+        }
+
         $type = 1;
         if ($column_data['type'] == 2) {
             $type = 15;
@@ -191,6 +205,7 @@ class OrderController extends Controller
             'os_type' => $os_type,
             'live_id' => $live_id,
             'pay_type' => $pay_type,
+            'activity_tag' => $activity_tag,
 
         ];
         $order = Order::firstOrCreate($data);
@@ -235,7 +250,7 @@ class OrderController extends Controller
 
         //$work_id 课程信息
         //$works_data = Works::find($work_id);
-        $works_data = Works::where(['id'=>$work_id,'type'=>2])->first();//音频课程
+        $works_data = Works::where(['id' => $work_id, 'type' => 2])->first();//音频课程
 
         if (empty($works_data)) {
             return $this->error(0, '当前课程不存在');
@@ -249,11 +264,14 @@ class OrderController extends Controller
         $tweeter_code = $checked['tweeter_code'];
 
         if ($activity_tag === 'cytx') {
-            $price = $works_data->cytx_price;
+            $price = ChannelWorksList::getPrice(2, $work_id);
+            if (empty($price)) {
+                return $this->error(0, '参数错误' . __LINE__, 0);
+            }
             //校验用户本月是否能继续花钱
-            $check_this_money = PayRecord::thisMoneyCanSpendMoney($user_id,'cytx',$price);
-            if($check_this_money == 0){
-                return $this->error(0,'本月已超消费金额',0);
+            $check_this_money = PayRecord::thisMoneyCanSpendMoney($user_id, 'cytx', $price);
+            if ($check_this_money == 0) {
+                return $this->error(0, '本月已超消费金额', 0);
             }
             $coupon_id = 0;
         } else {
@@ -571,8 +589,8 @@ class OrderController extends Controller
             $where = ['user_id' => $user_id, 'type' => $type];
         }
 
-        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status','cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id')
-            ->whereIn('type', [1,  9, 10, 13, 14, 15, 16, 17])
+        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id')
+            ->whereIn('type', [1, 9, 10, 13, 14, 15, 16, 17])
             ->where($where);
 
         //  订单状态
@@ -590,7 +608,7 @@ class OrderController extends Controller
 
             $result = Order::getInfo($val['type'], $val['relation_id'], $val['send_type'], $user_id);
             if ($result == false) {
-                unset($data[$key]);  //过滤老订单数据  
+                unset($data[$key]);  //过滤老订单数据
             }
             if ($val['send_user_id'] > 0) {
                 $userData = User::select('phone')->where(['id' => $val['send_user_id']])->first()->toArray();
@@ -659,7 +677,7 @@ class OrderController extends Controller
     {
         $user_id = $this->user['id'] ?? 0;
         $order_id = $request->input('id', 0);
-        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status','cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type', 'send_type', 'send_user_id')
+        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type', 'send_type', 'send_user_id')
             ->where(['id' => $order_id, 'user_id' => $user_id])->first()->toArray();
 
         //查询优惠券金额
@@ -748,7 +766,7 @@ class OrderController extends Controller
         $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
         $is_audio_book = $request->input('is_audio_book', 2);
-        $data = Subscribe::select('*')->where('end_time' ,'>=', date('Y-m-d H:i:s'))
+        $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
             ->where(['type' => $type, 'user_id' => $user_id,])
             ->orderBy('created_at', 'desc')->paginate($this->page_per_page)->toArray();
 
@@ -759,28 +777,28 @@ class OrderController extends Controller
             switch ($val['type']) {
                 case 1:
                     $model = new Column();
-                    $result = $model->getIndexColumn([$val['relation_id']],0);
+                    $result = $model->getIndexColumn([$val['relation_id']], 0);
                     break;
                 case 2:
                     $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book, $user_id,0);
+                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book, $user_id, 0);
                     break;
                 case 6:
                     $model = new Column();
-                    $result = $model->getIndexColumn([$val['relation_id']],0);
+                    $result = $model->getIndexColumn([$val['relation_id']], 0);
                     break;
             }
             if ($result == false) {
                 unset($data[$key]);
             } else {
-                switch ($val['type']){
+                switch ($val['type']) {
                     case 1:
                         $hist_type = 1;
                         break;
                     case 2:
-                        if($result[0]['is_audio_book'] == 0){
+                        if ($result[0]['is_audio_book'] == 0) {
                             $hist_type = 4; // 课程
-                        }else{
+                        } else {
                             $hist_type = 3;
                         }
                         break;
@@ -791,7 +809,6 @@ class OrderController extends Controller
                 }
                 //学至最新章节
                 $result[0]['historyData'] = History::getHistoryData($result[0]['id'], $hist_type, $user_id);
-
 
 
                 if ($val['type'] == 2) {
@@ -845,8 +862,8 @@ class OrderController extends Controller
         $type = $request->input('type') ?? 3;
 
         $lists = Order::with('user:id,nickname,headimg')
-            ->select('id', 'user_id','reward_num')
-            ->where(['type' => 5, 'reward_type' => $type, 'status' => 1,'relation_id' => $id])
+            ->select('id', 'user_id', 'reward_num')
+            ->where(['type' => 5, 'reward_type' => $type, 'status' => 1, 'relation_id' => $id])
             ->orderBy('created_at', 'desc')
             ->paginate(30)
             ->toArray();
@@ -905,9 +922,9 @@ class OrderController extends Controller
                 return $this->error(0, '专栏或讲座不存在');
             }
             $price = $column_data->price;
-        } else if ($send_type == 2 ) {
+        } else if ($send_type == 2) {
             //$works_data = Works::find($relation_id);
-            $works_data = Works::where(['id'=>$relation_id,'type'=>2])->first();//音频课程
+            $works_data = Works::where(['id' => $relation_id, 'type' => 2])->first();//音频课程
             if (empty($works_data)) {
                 return $this->error(0, '当前课程不存在');
             }
@@ -917,7 +934,7 @@ class OrderController extends Controller
 
         }
 
-        $add_order_type = $send_type ;
+        $add_order_type = $send_type;
 //        switch ($send_type){
 //            case 2:
 //                $add_order_type = 6;
@@ -1024,7 +1041,7 @@ class OrderController extends Controller
 
         if (!empty($tweeter_code)) {
             $is_vip = VipUser::IsNewVip($tweeter_code);
-            if(!$is_vip){
+            if (!$is_vip) {
                 $tweeter_code = 0;
             }
         }
@@ -1115,7 +1132,6 @@ class OrderController extends Controller
         $tweeter_code = $request->input('inviter', 0);  //推客id
         $num = $request->input('num', 0);  //推客id
         $user_id = $this->user['id'];
-
 
 
         $ProductInfo = OfflineProducts::find($product_id);

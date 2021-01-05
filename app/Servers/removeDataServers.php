@@ -483,7 +483,7 @@ class removeDataServers
     {
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
-        $begin_order_id = 11752;
+        $begin_order_id = 11755;//11755
 
         $old_order = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order')
@@ -965,6 +965,29 @@ class removeDataServers
             dd($list);
         }
 
+    }
+
+    //迁移兑换券
+    public function normalCode(){
+        $page = 1;
+        $size = 100;
+
+        $old_data = DB::connection('mysql_old_zs')
+            ->table('nlsg_redeem_code')
+            ->where('id', '<=', 102130)
+            ->where('user_id', '>', 0)
+            ->whereIn('status', [1, 2])
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get()->toArray();
+        $add_data = [];
+        foreach ($old_data as $v){
+            $temp_add_data = [];
+            $temp_add_data['id'] = $v->id;
+            $temp_add_data['number'] = $v->number;
+
+        }
+        dd($old_data);
     }
 
 }

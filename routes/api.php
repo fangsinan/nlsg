@@ -35,7 +35,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/version', 'IndexController@version');
     Route::get('index/event', 'IndexController@event');
     Route::get('index/market', 'IndexController@market');
-    Route::get('index/share', 'IndexController@share');
+    Route::post('index/share', 'IndexController@share');
     Route::get('index/test', 'IndexController@test');
     Route::get('config', 'IndexController@config');
 

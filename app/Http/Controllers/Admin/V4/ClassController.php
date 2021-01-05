@@ -959,7 +959,8 @@ class ClassController extends ControllerBackend
             'is_end' => $is_end,
             'status' => $status,
             'timing_online' => $timing_online,
-            'content' => $content
+            'content' => $content,
+            'type'    => 2
         ];
 
         if (!empty($input['id'])) {
@@ -1401,7 +1402,7 @@ class ClassController extends ControllerBackend
      */
     public function getSearchWorkCategory()
     {
-        $lists = WorksCategory::select('id', 'name')->where('level', 3)
+        $lists = WorksCategory::select('id', 'name')->where('level', 2)
             ->orderBy('id', 'desc')
             ->get();
         return success($lists);

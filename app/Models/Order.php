@@ -103,7 +103,7 @@ class Order extends Base
             case 16:
                 $result[] = [
                     'id'  => 1, 'type' => 6, 'text' => '幸福360会员',
-                    'img' => '/nlsg/poster_img/1581599882211_.pic.jpg', 'price' => 360.00
+                    'img' => '/nlsg/works/20210105102849884378.png', 'price' => 360.00
                 ];
                 break;
             case 17:

@@ -943,8 +943,10 @@ class IndexController extends Controller
         return  success($data);
     }
 
-    public function  share()
+    public function  share(Request $request)
     {
+        $input = $request->all();
+        $url   = $input['url'] ?? '';
         $config = [
             'app_id' => 'wxe24a425adb5102f6',
             'secret' => '2ded804b74f99ae2f342423dd7952620',
@@ -952,7 +954,8 @@ class IndexController extends Controller
         ];
 
         $app = Factory::officialAccount($config);
-        $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'],$debug = false, $beta = false, $json = true);
+        $app->jssdk->setUrl($url);
+        $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'],$debug = true, $beta = false, $json = true);
         return success($jssdk);
     }
 

@@ -49,6 +49,7 @@ class CacheTools
             case 'post_info':
             case 'fyr_list':
             case 'vip_works_list':
+            case 'channel_works_list':
                 $expire = $sort_expire;
                 break;
             case 'goods_category_list':
