@@ -967,27 +967,87 @@ class removeDataServers
 
     }
 
-    //迁移兑换券
-    public function normalCode(){
-        $page = 1;
-        $size = 100;
-
+    public function normalCodeRun($page, $size)
+    {
         $old_data = DB::connection('mysql_old_zs')
             ->table('nlsg_redeem_code')
-            ->where('id', '<=', 102130)
-            ->where('user_id', '>', 0)
-            ->whereIn('status', [1, 2])
+            ->where('id', '>', 407373)
             ->limit($size)
             ->offset(($page - 1) * $size)
-            ->get()->toArray();
+            ->get();
+        if ($old_data->isEmpty()) {
+            return false;
+        }
+        $old_data = $old_data->toArray();
         $add_data = [];
-        foreach ($old_data as $v){
+        foreach ($old_data as $v) {
             $temp_add_data = [];
             $temp_add_data['id'] = $v->id;
             $temp_add_data['number'] = $v->number;
+            $temp_add_data['code'] = $v->code;
+            $temp_add_data['name'] = $v->name;
+            $temp_add_data['status'] = $v->status;
+            $temp_add_data['phone'] = $v->phone;
+            $temp_add_data['user_id'] = $v->user_id ?? 0;
+            if ($v->status === 1) {
+                //已使用
+                $temp_add_data['to_user_id'] = $v->user_id;
+            } else {
+                $temp_add_data['to_user_id'] = 0;
+            }
+            $temp_add_data['service_id'] = $v->service_id ?? 0;
+            $temp_add_data['is_new_code'] = $v->is_new_code ?? 0;
+            $temp_add_data['new_group'] = $v->new_group ?? 0;
+            $temp_add_data['can_use'] = $v->can_use ?? 0;
+            $temp_add_data['redeem_type'] = $v->redeem_type;
+            $temp_add_data['goods_id'] = $v->goods_id;
+            $temp_add_data['add_admin_id'] = $v->add_admin_id;
+            $temp_add_data['os_type'] = $v->os_type;
 
+            if (empty($v->ctime)) {
+                $temp_add_data['created_at'] = date('Y-m-d H:i:s');
+            } else {
+                $temp_add_data['created_at'] = date('Y-m-d H:i:s', $v->ctime);
+            }
+
+            if (empty($v->exchange_time)) {
+                $temp_add_data['exchange_time'] = null;
+            } else {
+                $temp_add_data['exchange_time'] = date('Y-m-d H:i:s', $v->exchange_time);
+            }
+
+            if (empty($v->start_time)) {
+                $temp_add_data['start_at'] = null;
+            } else {
+                $temp_add_data['start_at'] = date('Y-m-d H:i:s', $v->start_time);
+            }
+
+            if (empty($v->end_time)) {
+                $temp_add_data['end_at'] = null;
+            } else {
+                $temp_add_data['end_at'] = date('Y-m-d H:i:s', $v->end_time);
+            }
+
+            $add_data[] = $temp_add_data;
         }
-        dd($old_data);
+        DB::connection('mysql_new_zs')->table('nlsg_redeem_code')->insert($add_data);
+    }
+
+    //迁移兑换券
+    public function normalCode()
+    {
+        $page = 1;
+        $size = 200;
+
+        $flag = true;
+        while ($flag) {
+            $res = $this->normalCodeRun($page, $size);
+            if ($res === false) {
+                $flag = false;
+            }
+            $page++;
+        }
+
     }
 
 }

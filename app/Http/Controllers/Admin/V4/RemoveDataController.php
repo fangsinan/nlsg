@@ -64,12 +64,14 @@ class RemoveDataController extends ControllerBackend
 
     public function redeemCode()
     {
+        set_time_limit(0);
+
         if (0) {
             $servers = new removeDataServers();
             $servers->redeemCode();
         }
 
-        if (1) {
+        if (0) {
             $servers = new removeDataServers();
             $servers->normalCode();
         }
