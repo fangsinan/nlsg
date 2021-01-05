@@ -960,6 +960,7 @@ class ClassController extends ControllerBackend
             'status' => $status,
             'timing_online' => $timing_online,
             'content' => $content,
+            'is_audios_book' => 1,
             'type'    => 2
         ];
 
