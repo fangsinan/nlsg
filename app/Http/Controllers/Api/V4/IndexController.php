@@ -891,7 +891,8 @@ class IndexController extends Controller
                 ->orderBy('created_at','desc')
                 ->first();
 
-        if(date('Y-m-d H:i:s',time()) >= $list['str_at']){
+
+        if($list && date('Y-m-d H:i:s',time()) >= $list->str_at){
             if (version_compare($version, $list->number, '>=')) {
                 return success($list);
             }
