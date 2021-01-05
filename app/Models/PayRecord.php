@@ -28,7 +28,7 @@ class PayRecord extends Base
                     ->where('o.status', '=', 1)
                     ->where('o.is_shill', '=', 0)
                     ->whereRaw('DATE_FORMAT(p.created_at,\'%Y%m\') = DATE_FORMAT(CURDATE(),"%Y%m")')
-                    ->sum('p.price');
+                    ->sum('o.price');
 
                 if (intval($money ?? 0) <= intval($line)) {
                     return 1;
