@@ -953,6 +953,7 @@ class IndexController extends Controller
         ];
 
         $app = Factory::officialAccount($config);
+        $app->jssdk->setUrl($url);
         $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'],$debug = true, $beta = false, $json = true);
         return success($jssdk);
     }
