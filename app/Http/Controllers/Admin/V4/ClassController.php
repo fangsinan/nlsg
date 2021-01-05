@@ -942,7 +942,6 @@ class ClassController extends ControllerBackend
             return error('标题不能为空');
         }
         $cover_img = covert_img($input['cover_img']) ?? '';
-        $detail_img = covert_img($input['detail_img']) ?? '';
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $is_end = $input['is_end'] ? 1 : 0;
@@ -953,7 +952,6 @@ class ClassController extends ControllerBackend
         $data = [
             'title' => $title,
             'cover_img' => $cover_img,
-            'detail_img' => $detail_img,
             'user_id' => $user_id,
             'original_price' => $original_price,
             'is_end' => $is_end,
