@@ -23,8 +23,14 @@ class Column extends Base
     }
 
     //获取专栏相关信息
-    static function getColumnInfo($column_id,$field,$user_id=0){
-        $column = Column::where('id',$column_id)->first($field);
+    static function getColumnInfo($column_id,$field,$user_id=0, $teacher_id=0){
+        //兼容老师id (仅限专栏)
+        if($column_id){
+            $column = Column::where('id',$column_id)->first($field);
+        }else{
+            $column = Column::where(['type'=>1,'user_id'=>$teacher_id])->first($field);
+        }
+
         if( empty($column) )    {
             return [];
         }

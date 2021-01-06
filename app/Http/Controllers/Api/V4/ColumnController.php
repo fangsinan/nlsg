@@ -188,18 +188,19 @@ class ColumnController extends Controller
     {
         //排序
         $column_id = $request->input('column_id', 0);
+        $teacher_id = $request->input('teacher_id', 0);
         $flag = $request->input('flag', '');
         $page = $request->input('page', 1);
         $size = $request->input('size', 10);
         $order = $request->input('order', 'asc');
-        $user_id = $this->user['id'] ?? 0;
+        $user_id = $this->user['id']    ?? 0;
 
         if (empty($column_id)) {
             return $this->error(0, 'column_id 不能为空');
         }
 
         $field = ['id', 'name', 'column_type', 'title', 'subtitle', 'type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num', 'collection_num', 'comment_num', 'info_num', 'is_free', 'category_id', 'info_num'];
-        $column = Column::getColumnInfo($column_id, $field, $user_id);
+        $column = Column::getColumnInfo($column_id, $field, $user_id,$teacher_id);
         if (empty($column)) {
             return $this->error(0, '该信息不存在');
         }
