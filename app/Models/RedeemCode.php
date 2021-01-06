@@ -155,7 +155,7 @@ class RedeemCode extends Base
                         return true;
                     }
                 }
-            case 2:
+            case 3:
                 $check_sub = Subscribe::where('user_id', '=', $user_id)
                     ->where('relation_id', '=', $product_id)
                     ->where('type', '=', 6)
@@ -189,7 +189,7 @@ class RedeemCode extends Base
                         return true;
                     }
                 }
-            case 3:
+            case 2:
                 $check_sub = Subscribe::where('user_id', '=', $user_id)
                     ->where('relation_id', '=', $product_id)
                     ->where('type', '=', 2)
