@@ -949,12 +949,11 @@ class IndexController extends Controller
     {
         //(1).直播详情   (2).精品课  (3).商品  (4).h5页面  (5).讲座  (6).听书 7 专栏
         $data = [
-            'id'   => 297,
+            'id'   => 538,
             'info_id' => 0,
-            'type' => 5,
-            'url'  => '',
-            'img'  => 'https://image.nlsgapp.com/nlsg/authorpt/20201218152107911623.png',
-            'img'  => ''
+            'type' => 4,
+            'url'  => 'https://wechat.nlsgapp.com/appv4/shop-details?id=538&inviter=174858&live_id=&live_info_id=&time=155',
+            'img'  => 'https://image.nlsgapp.com/nlsg/authorpt/20210106142306594001.jpg'
         ];
         return  success($data);
     }
