@@ -249,6 +249,7 @@ class ClassController extends ControllerBackend
 
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num', 'is_pay')
             ->where('status', '>', 0)
+            ->where('is_audio_book', 0)
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
