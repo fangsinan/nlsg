@@ -121,7 +121,7 @@ class RedeemCode extends Base
         $now_date = date('Y-m-d H:i:s');
         switch ($use_type) {
             case 1:
-                $col_info = Column::where('user_id', '=', $product_id)->first();
+                $col_info = Column::where('user_id', '=', $product_id)->where('type','=',1)->first();
                 $check_sub = Subscribe::where('user_id', '=', $user_id)
                     ->where('relation_id', '=', $col_info->id)
                     ->where('type', '=', 1)
@@ -129,7 +129,7 @@ class RedeemCode extends Base
                 if (empty($check_sub)) {
                     $temp_data['type'] = 1;
                     $temp_data['user_id'] = $user_id;
-                    $temp_data['relation_id'] = $product_id;
+                    $temp_data['relation_id'] = $col_info->id;
                     $temp_data['start_time'] = $now_date;
                     $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
                     $temp_data['status'] = 1;
