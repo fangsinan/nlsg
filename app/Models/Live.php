@@ -26,7 +26,8 @@ class Live extends Model
                         ->first();
             $list['info_id'] =  $channel->id;
         }
-        return $list;
+        $sclass = new \StdClass();
+        return $list ?: $sclass ;
     }
 
     public function getLiveLists()
