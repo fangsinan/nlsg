@@ -905,6 +905,7 @@ class IndexController extends Controller
 
         if($list && date('Y-m-d H:i:s',time()) >= $list->str_at){
             if (version_compare($version, $list->number, '>=')) {
+                $list->content =  $list->content ? explode('；', $list->content) : '';
                 return success($list);
             }
         }
