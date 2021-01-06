@@ -1050,4 +1050,54 @@ class removeDataServers
 
     }
 
+    //老兑换券的视频转讲座
+    public function editCode()
+    {
+        $w_list = DB::connection('mysql_new_zs')
+            ->table('nlsg_column')
+            ->where('type', '=', 2)
+            ->where('works_id', '>', 0)
+            ->select(['id', 'name', 'works_id'])
+            ->get()->toArray();
+
+        $w_ids = array_column($w_list, 'works_id');
+
+        $r = DB::connection('mysql_new_zs')
+            ->table('nlsg_redeem_code')
+            ->whereIn('goods_id', $w_ids)
+            ->where('is_new_code', '=', 1)
+            ->where('status', '=', 0)
+            ->where('can_use', '<>', 3)
+            ->where('redeem_type', '=', 2)
+            ->select(['goods_id'])
+            ->groupBy('goods_id')
+            ->get()->toArray();
+
+        $to_edit_goods_id = array_column($r, 'goods_id');
+
+        foreach ($to_edit_goods_id as $v) {
+            $change_id = 0;
+            foreach ($w_list as $vv) {
+                if ($vv->works_id === $v) {
+                    $change_id = $vv->id;
+                }
+            }
+            if (empty($change_id)) {
+                continue;
+            }
+
+            DB::connection('mysql_new_zs')
+                ->table('nlsg_redeem_code')
+                ->where('goods_id', '=', $v)
+                ->where('redeem_type', '=', 2)
+                ->where('can_use', '<>', 3)
+                ->where('is_new_code', '=', 1)
+                ->update([
+                    'goods_id' => $change_id,
+                    'redeem_type' => 3
+                ]);
+        }
+
+    }
+
 }

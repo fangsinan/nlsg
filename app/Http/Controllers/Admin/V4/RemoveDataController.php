@@ -66,14 +66,18 @@ class RemoveDataController extends ControllerBackend
     {
         set_time_limit(0);
 
+        $servers = new removeDataServers();
+
         if (0) {
-            $servers = new removeDataServers();
             $servers->redeemCode();
         }
 
         if (0) {
-            $servers = new removeDataServers();
             $servers->normalCode();
+        }
+
+        if (0) {
+            $servers->editCode();
         }
     }
 }
