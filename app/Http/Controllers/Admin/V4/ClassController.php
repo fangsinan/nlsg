@@ -851,6 +851,7 @@ class ClassController extends ControllerBackend
 
         $data = [
             'pid' => $work_id,
+            'rank' => $input['rank'] ?? 99,
             'type' => $input['type'] ?? 0,
             'title' => $input['title'] ?? '',
             'section' => $input['section'] ?? '',
@@ -1327,7 +1328,7 @@ class ClassController extends ControllerBackend
     {
         $id = $request->get('id');
         $list = WorksInfo::select('id', 'type', 'title', 'section', 'url', 'online_time', 'timing_online', 'timing_time',
-            'status', 'introduce', 'video_id', 'free_trial')
+            'status', 'introduce', 'video_id', 'free_trial','rank')
             ->where('id', $id)
             ->first();
         if ($list) {
