@@ -195,7 +195,7 @@ class ColumnController extends Controller
         $order = $request->input('order', 'asc');
         $user_id = $this->user['id']    ?? 0;
 
-        if (empty($column_id)) {
+        if (empty($column_id) || empty($teacher_id)) {
             return $this->error(0, 'column_id 不能为空');
         }
 
