@@ -26,10 +26,12 @@ class CacheTools
         if (0) {
             $sort_expire = 300;
             $normal_expire = 3600;
+            $ten_expire = 600;
             $long_expire = 86400;
         } else {
             $sort_expire = 60;
             $normal_expire = 120;
+            $ten_expire = 600;
             $long_expire = 3600;
         }
 
@@ -56,7 +58,13 @@ class CacheTools
             case 'area_list':
             case 'freight_template_list':
             case 'freight_template':
+            case 'index_works_category':
                 $expire = $long_expire;
+                break;
+
+            case 'index_recommend':
+            case 'index_rank_data':
+                $expire = $ten_expire;
                 break;
             default :
                 $expire = 0;

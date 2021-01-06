@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\CacheTools;
 use App\Models\ConfigModel;
 use App\Models\Lists;
 use App\Models\Versions;
@@ -13,6 +14,7 @@ use App\Models\Live;
 use App\Models\Recommend;
 use App\Models\Works;
 use EasyWeChat\Factory;
+use Illuminate\Support\Facades\Cache;
 
 class IndexController extends Controller
 {
@@ -607,12 +609,21 @@ class IndexController extends Controller
     public function rank(Request $request)
     {
 
-        $model = new Lists();
-        $data = [
-            'works' => $model->getRankWorks(),
-            'wiki'  => $model->getRankWiki(),
-            'goods' => $model->getRankGoods()
-        ];
+        $cache_key_name = 'index_rank_data';
+        $data = Cache::get($cache_key_name);
+
+        if(empty($data)){
+            $model = new Lists();
+            $data = [
+                'works' => $model->getRankWorks(),
+                'wiki'  => $model->getRankWiki(),
+                'goods' => $model->getRankGoods()
+            ];
+
+            $expire_num = CacheTools::getExpire($cache_key_name);
+            Cache::put($cache_key_name, $data, $expire_num);
+        }
+
 
         return $this->success($data);
     }

@@ -5,9 +5,11 @@ namespace App\Models;
 use App\Models\Lists;
 use App\Models\Works;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Models\Wiki;
 use App\Models\Column;
+use Illuminate\Support\Facades\Redis;
 
 class Recommend extends Base
 {
@@ -27,6 +29,14 @@ class Recommend extends Base
         if (!$type) {
             return false;
         }
+        //添加缓存\
+        $cache_key_name = 'index_recommend_'.$type.'_'.$position;
+        $result = Cache::get($cache_key_name);
+        if($result){
+            return $result;
+        }
+
+
         $ids = Recommend::where('position', $position)
             ->where('type', $type)
             ->where('status', 1)
@@ -75,6 +85,9 @@ class Recommend extends Base
                 break;
 
         }
+        $expire_num = CacheTools::getExpire('index_recommend');
+        Cache::put($cache_key_name, $result, $expire_num);
+
         return $result;
     }
 

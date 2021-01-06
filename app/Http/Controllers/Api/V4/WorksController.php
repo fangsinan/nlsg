@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\CacheTools;
 use App\Models\ChannelWorksList;
 use App\Models\Collection;
 use App\Models\Column;
@@ -17,6 +18,7 @@ use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
 use App\Models\WorksInfoContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class WorksController extends Controller
@@ -371,8 +373,14 @@ class WorksController extends Controller
     }
      */
     public function getWorksCategoryTeacher(Request $request){
-//        DB::enableQueryLog();
-//        dd(DB::getQueryLog());
+
+        $cache_key_name = 'index_works_category';
+        $res = Cache::get($cache_key_name);
+        if ($res) {
+            return $this->success($res);
+        }
+
+
         //分类
         $category = WorksCategory::select('id','name')->where([
             'type' => 1, 'status' => 1,'level'=>1
@@ -395,8 +403,12 @@ class WorksController extends Controller
                 $newTeacher[] = $val['user_name'];
             }
         }
+        $res = ['category'=>$category,'teacher'=>$newTeacher];
 
-        return $this->success(['category'=>$category,'teacher'=>$newTeacher]);
+        $expire_num = CacheTools::getExpire('index_works_category');
+        Cache::put($cache_key_name, $res, $expire_num);
+
+        return $this->success($res);
     }
 
 
