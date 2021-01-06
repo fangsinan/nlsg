@@ -6,9 +6,11 @@ namespace App\Servers;
 
 use App\Models\ChannelOrder;
 use App\Models\ChannelSku;
+use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Works;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -64,8 +66,8 @@ class ChannelServers
     {
         $query = DB::table('nlsg_user as u')
             ->join('nlsg_order as o', 'u.id', '=', 'o.user_id')
-            ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
-            ->join('nlsg_works as w', 'o.relation_id', '=', 'w.id');
+            ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum');
+//            ->join('nlsg_works as w', 'o.relation_id', '=', 'w.id');
 
         if ($order_id) {
             $query->where('o.id', '=', $order_id);
@@ -90,10 +92,22 @@ class ChannelServers
             $query->limit(1000);
         }
 
+        //DB::connection()->enableQueryLog();
         $list = $query->select([
-            'o.id', 'o.ordernum', 'u.phone as username',
-            'u.nickname', 'p.price', 'o.cytx_job', 'w.title', 'o.pay_time'
+            'o.id', 'o.ordernum', 'u.phone as username', 'o.type', 'o.relation_id', 'u.nickname', 'p.price', 'o.cytx_job', 'o.pay_time'
         ])->get();
+        //dd(DB::getQueryLog());
+
+        foreach ($list as $v) {
+            $v->title = '';
+            if ($v->type == 9) {
+                $temp_info = Works::whereId($v->relation_id)->select('id', 'title')->first();
+                $v->title = $temp_info->title;
+            } else {
+                $temp_info = Column::whereId($v->relation_id)->select(['id', 'name'])->first();
+                $v->title = $temp_info->name;
+            }
+        }
 
         if ($list->isNotEmpty()) {
             $list = $list->toArray();
