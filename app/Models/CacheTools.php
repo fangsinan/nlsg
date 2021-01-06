@@ -26,10 +26,12 @@ class CacheTools
         if (0) {
             $sort_expire = 300;
             $normal_expire = 3600;
+            $ten_expire = 600;
             $long_expire = 86400;
         } else {
             $sort_expire = 60;
             $normal_expire = 120;
+            $ten_expire = 600;
             $long_expire = 3600;
         }
 
@@ -40,6 +42,7 @@ class CacheTools
             case 'mall_banner_list':
             case 'home_group_list':
             case 'order_token':
+            case 'works_index':
                 $expire = $normal_expire;
                 break;
             case 'mall_comment_list':
@@ -56,7 +59,13 @@ class CacheTools
             case 'area_list':
             case 'freight_template_list':
             case 'freight_template':
+            case 'index_works_category':
                 $expire = $long_expire;
+                break;
+
+            case 'index_recommend':
+            case 'index_rank_data':
+                $expire = $ten_expire;
                 break;
             default :
                 $expire = 0;

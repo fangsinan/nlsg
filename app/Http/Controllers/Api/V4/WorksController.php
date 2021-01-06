@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\CacheTools;
 use App\Models\ChannelWorksList;
 use App\Models\Collection;
 use App\Models\Column;
@@ -17,6 +18,7 @@ use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
 use App\Models\WorksInfoContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class WorksController extends Controller
@@ -203,80 +205,89 @@ class WorksController extends Controller
         $teacher_id = $request->input('teacher_id',0);
         $is_free = $request->input('is_free',0);
         $is_audio_book = $request->input('is_audio_book',0);
+        $page = $request->input('page',0);
 
         $user_id = $this->user['id'] ?? 0;
 
-        switch ($order){
-            case 1:
-                $order_str = 'subscribe_num';
-                break;
-            case 2:
-                $order_str = 'online_time';
-                break;
-            case 3:
-                $order_str = 'collection_num';
-                break;
-            case 4:  //分享
-                $order_str = 'collection_num';
-                break;
-            default:
-                $order_str = 'updated_at';
-        }
-        $sort = 'desc';
-
-        $where = [];
         $newWorks = [];
+        $cache_key_name = 'get_works_index_'.$order.'_'.$hide.'_'.$category_id.'_'.$teacher_id.'_'.$is_free.'_'.$is_audio_book.'_'.$page;
+        $worksData = [];
+        if($page  < 3){  //只做两页缓存
+            $worksData = Cache::get($cache_key_name);
+        }
+
+        if(empty($worksData)){
+
+            switch ($order){
+                case 1:
+                    $order_str = 'subscribe_num';
+                    break;
+                case 2:
+                    $order_str = 'online_time';
+                    break;
+                case 3:
+                    $order_str = 'collection_num';
+                    break;
+                case 4:  //分享
+                    $order_str = 'collection_num';
+                    break;
+                default:
+                    $order_str = 'updated_at';
+            }
+            $sort = 'desc';
+
+            $where = [];
 
 
-        if($category_id){
-            //查看是否是一级分类   一级分类需展示其二级分类下的数据
-            $cate_id_arr = [];
-            $cate_data = WorksCategory::find($category_id);
-            if( $cate_data['level'] == 1 ){
-                $cate_arr = WorksCategory::select('id')->where(['pid'=>$cate_data['id']])->get()->toArray();
-                $cate_id_arr = array_column($cate_arr,'id');
+            if($category_id){
+                //查看是否是一级分类   一级分类需展示其二级分类下的数据
+                $cate_id_arr = [];
+                $cate_data = WorksCategory::find($category_id);
+                if( $cate_data['level'] == 1 ){
+                    $cate_arr = WorksCategory::select('id')->where(['pid'=>$cate_data['id']])->get()->toArray();
+                    $cate_id_arr = array_column($cate_arr,'id');
+                }
+
+                if( empty($cate_id_arr)){
+                    $where = ['relation.category_id'=>$category_id];
+                }
             }
 
-            if( empty($cate_id_arr)){
-                $where = ['relation.category_id'=>$category_id];
+
+
+            $where['works.status'] =4;
+            $where['works.type'] =2;  //课程只有音频
+            if( $teacher_id )   { $where['works.user_id'] = $teacher_id;}
+            if( $is_free )      { $where['works.is_free'] = $is_free;   }
+
+            if($is_audio_book != 0){
+                //  0全部  1 听书 2课程
+                $is_audio_book_arr = ['1' => 1, '2' => 0,];
+                $where['works.is_audio_book'] = $is_audio_book_arr[$is_audio_book];
             }
+
+            $relationObj = new WorksCategoryRelation();
+            $worksObj = new Works();
+            $worksDb = DB::table($relationObj->getTable(), ' relation')
+                ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
+                ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle',
+                    'works.works_update_time','works.detail_img','works.content','relation.id as relation_id','relation.category_id','relation.work_id', 'works.column_id',
+                    'works.comment_num','works.chapter_num','works.subscribe_num','works.collection_num','works.is_free');
+            if(!empty($cate_id_arr)){
+                $worksDb->whereIn('relation.category_id',$cate_id_arr);
+            }
+
+            $worksData = $worksDb->where($where)
+                ->orderBy('works.'.$order_str,$sort)
+                ->groupBy('works.id')->paginate($this->page_per_page)->toArray();
+
+
+            if($page < 3 ){  //只做第两页缓存
+                $expire_num = CacheTools::getExpire('works_index');
+                Cache::put($cache_key_name, $worksData, $expire_num);
+            }
+
         }
-
-
-
-        $where['works.status'] =4;
-        $where['works.type'] =2;  //课程只有音频
-        if( $teacher_id )   { $where['works.user_id'] = $teacher_id;}
-        if( $is_free )      { $where['works.is_free'] = $is_free;   }
-
-        if($is_audio_book != 0){
-            //  0全部  1 听书 2课程
-            $is_audio_book_arr = ['1' => 1, '2' => 0,];
-            $where['works.is_audio_book'] = $is_audio_book_arr[$is_audio_book];
-        }
-
-
-//        $worksData = WorksCategoryRelation::with(['works' => function($query) use($order_str){
-//            $query->select("*")->orderBy($order_str,'desc')->groupBy('id');
-//        }])->whereHas('works', function ($query) use ($works_where){
-//                 $query->where($works_where);
-//        })->select("*")->where($where)->orderBy('works.'.$order_str,'desc')->groupBy('work_id')
-//        ->paginate($this->page_per_page)->toArray();
-
-        $relationObj = new WorksCategoryRelation();
-        $worksObj = new Works();
-        $worksDb = DB::table($relationObj->getTable(), ' relation')
-            ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
-            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle',
-                'works.works_update_time','works.detail_img','works.content','relation.id as relation_id','relation.category_id','relation.work_id', 'works.column_id',
-                'works.comment_num','works.chapter_num','works.subscribe_num','works.collection_num','works.is_free');
-        if(!empty($cate_id_arr)){
-            $worksDb->whereIn('relation.category_id',$cate_id_arr);
-        }
-
-           $worksData = $worksDb->where($where)
-            ->orderBy('works.'.$order_str,$sort)
-            ->groupBy('works.id')->paginate($this->page_per_page)->toArray();
 
 
 
@@ -371,8 +382,14 @@ class WorksController extends Controller
     }
      */
     public function getWorksCategoryTeacher(Request $request){
-//        DB::enableQueryLog();
-//        dd(DB::getQueryLog());
+
+        $cache_key_name = 'index_works_category';
+        $res = Cache::get($cache_key_name);
+        if ($res) {
+            return $this->success($res);
+        }
+
+
         //分类
         $category = WorksCategory::select('id','name')->where([
             'type' => 1, 'status' => 1,'level'=>1
@@ -395,8 +412,12 @@ class WorksController extends Controller
                 $newTeacher[] = $val['user_name'];
             }
         }
+        $res = ['category'=>$category,'teacher'=>$newTeacher];
 
-        return $this->success(['category'=>$category,'teacher'=>$newTeacher]);
+        $expire_num = CacheTools::getExpire('index_works_category');
+        Cache::put($cache_key_name, $res, $expire_num);
+
+        return $this->success($res);
     }
 
 
