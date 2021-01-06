@@ -10,15 +10,12 @@ use App\Models\MallCategory;
 use App\Models\MallComment;
 use App\Models\MallGoods;
 use App\Models\MallGoodsMsg;
-use App\Models\MallOrderGroupBuy;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
-use App\Models\VipRedeemUser;
 use Illuminate\Http\Request;
 
 class MallController extends Controller
 {
-
     /**
      * 获取商品信息
      * @api {get} /api/v4/goods/info 获取商品信息(列表,详情)
@@ -1008,7 +1005,8 @@ class MallController extends Controller
      * @apiParam {number} status 筛选(不传都饭,1是已使用,0是未使用)
      *
      */
-    public function redeemCodeList(Request $request){
+    public function redeemCodeList(Request $request)
+    {
         $model = new RedeemCode();
         $data = $model->redeemList($request->input(), $this->user);
         return $this->getRes($data);

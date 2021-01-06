@@ -19,14 +19,14 @@ class RedeemCode extends Base
         $query = self::where('user_id', '=', $user['id'])
             ->where('can_use', '=', 1);
 
-        if ($status !== -1){
-            $query->where('status','=',$status);
+        if ($status !== -1) {
+            $query->where('status', '=', $status);
         }
 
         return $query->select(['id', 'code', 'name', 'status'])
             ->limit($size)
-            ->orderBy('status','asc')
-            ->orderBy('id','asc')
+            ->orderBy('status', 'asc')
+            ->orderBy('id', 'asc')
             ->offset(($page - 1) * $size)
             ->get();
 
@@ -97,7 +97,6 @@ class RedeemCode extends Base
         if ($check_code->is_new_code == 1) {
             $r_res = $this->toRedeem($check_code, $to_user_id);
         } else {
-            //todo 兑换过程
             $r_res = $this->toRedeemOld($check_code, $to_user_id);
         }
         if ($r_res === false) {
@@ -111,7 +110,223 @@ class RedeemCode extends Base
 
     public function toRedeemOld($code, $user_id)
     {
-        return false;
+        $code = $code->code;
+        //活动编号
+        $hd = substr($code, 0, 3);
+        //兑换类型   1：兑换优惠券   2：兑换产品
+        $deem_type = intval(substr($code, 3, 1));
+        //适用范围  1：专栏  2：精品课  3：商品 4会员
+        $use_type = intval(substr($code, 4, 1));
+        //适用产品
+        $product_id = substr($code, 5, 3);
+
+        $user_info = User::whereId($user_id)->first();
+        $yard_info = self::where('code', '=', $code)->first();
+
+        DB::beginTransaction();
+
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+        $time = 365 * 24 * 3600;
+        $end_date = date('Y-m-d', strtotime("+1 year +1 day"));
+
+        $update_code_data['user_id'] = $user_id;
+        $update_code_data['phone'] = $user_info->phone;
+        $update_code_data['status'] = 1;
+        $update_code_data['exchange_time'] = $now_date;
+        $update_res = self::where('id', '=', $yard_info->id)
+            ->update($update_code_data);
+        if ($update_res === false) {
+            DB::rollBack();
+            return false;
+        }
+
+        if ($deem_type === 2) {
+            if ($yard_info->id > 343812 && $yard_info->id < 346313) {
+                $use_type = 2;
+                switch ($product_id) {
+                    case 396:
+                        $product_id = 531;
+                        break; //数学盒子
+                    case 395:
+                        $product_id = 0;
+                        break; //扎染
+                    case 394:
+                        $product_id = 529;
+                        break; //科学盒子基础版
+                    case 393:
+                        $product_id = 530;
+                        break; //益智拼插积木套装
+                    case 392:
+                        $product_id = 528;
+                        break; //艺术启蒙粘土套装
+                }
+            } elseif (
+                ($yard_info->id >= 346313 && $yard_info->id <= 347312) ||
+                ($yard_info->id >= 347313 && $yard_info->id <= 348312)
+            ) {
+                $product_id = substr($product_id, 0, -1); //此精品课是两位数
+            }
+
+            switch ($use_type) {
+                case 1:
+                    //专栏
+                    $col_info = Column::whereId($product_id)->first();
+                    $check_sub = Subscribe::where('user_id', '=', $user_id)
+                        ->where('relation_id', '=', $col_info->id)
+                        ->where('type', '=', 1)
+                        ->where('end_time', '>', $now_date)
+                        ->where('status', '=', 1)
+                        ->first();
+
+                    if ($yard_info->id > 357007 && $yard_info->id <= 357508) {
+                        $time = 90 * 24 * 3600;
+                        $end_date = date('Y-m-d', strtotime("+3 months +1 day"));
+                        $end_time = strtotime($end_date);
+                    }
+
+                    if (empty($check_sub)) {
+                        $add_sub_data['type'] = 1;
+                        $add_sub_data['relation_id'] = $col_info->id;
+                        $add_sub_data['user_id'] = $user_id;
+                        $add_sub_data['end_time'] = $end_date;
+                        $add_sub_data['start_time'] = $now_date;
+                        $add_sub_data['created_at'] = $now_date;
+                        $add_sub_data['exchange_time'] = $now_date;
+                        $add_sub_data['give'] = 4;
+                        $add_sub_data['status'] = 1;
+                        $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                    } else {
+                        $add_sub_data['end_time'] = date('Y-m-d 23:59:59', strtotime($check_sub->end_time) + $time);
+                        $add_sub_data['exchange_time'] = $now_date;
+                        $add_sub_data['status'] = 1;
+                        $add_res = Subscribe::where('id', '=', $check_sub->id)
+                            ->update($add_sub_data);
+                    }
+                    if ($add_res === false) {
+                        DB::rollBack();
+                        return false;
+                    }
+                    DB::commit();
+                    return true;
+                case 2;
+                    //课程 视频是讲座
+                    $works_info = Works::whereId($product_id)->first();
+                    if ($works_info->type == 1) {
+                        //讲座
+                        $col_info = Column::where('works_id', '=', $product_id)->where('type', '=', 2)->first();
+                        $check_sub = Subscribe::where('user_id', '=', $user_id)
+                            ->where('relation_id', '=', $col_info->id)
+                            ->where('type', '=', 6)
+                            ->where('end_time', '>', $now_date)
+                            ->where('status', '=', 1)
+                            ->first();
+                        if (empty($check_sub)) {
+                            $add_sub_data['type'] = 6;
+                            $add_sub_data['relation_id'] = $col_info->id;
+                            $add_sub_data['user_id'] = $user_id;
+                            $add_sub_data['end_time'] = $end_date;
+                            $add_sub_data['start_time'] = $now_date;
+                            $add_sub_data['created_at'] = $now_date;
+                            $add_sub_data['exchange_time'] = $now_date;
+                            $add_sub_data['give'] = 4;
+                            $add_sub_data['status'] = 1;
+                            $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                        } else {
+                            $add_sub_data['end_time'] = date('Y-m-d 23:59:59', strtotime($check_sub->end_time) + $time);
+                            $add_sub_data['exchange_time'] = $now_date;
+                            $add_sub_data['status'] = 1;
+                            $add_res = Subscribe::where('id', '=', $check_sub->id)
+                                ->update($add_sub_data);
+                        }
+                    } else {
+                        $check_sub = Subscribe::where('user_id', '=', $user_id)
+                            ->where('relation_id', '=', $product_id)
+                            ->where('type', '=', 2)
+                            ->where('end_time', '>', $now_date)
+                            ->where('status', '=', 1)
+                            ->first();
+                        if (empty($check_sub)) {
+                            $add_sub_data['type'] = 2;
+                            $add_sub_data['relation_id'] = $product_id;
+                            $add_sub_data['user_id'] = $user_id;
+                            $add_sub_data['end_time'] = $end_date;
+                            $add_sub_data['start_time'] = $now_date;
+                            $add_sub_data['created_at'] = $now_date;
+                            $add_sub_data['exchange_time'] = $now_date;
+                            $add_sub_data['give'] = 4;
+                            $add_sub_data['status'] = 1;
+                            $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                        } else {
+                            $add_sub_data['end_time'] = date('Y-m-d 23:59:59', strtotime($check_sub->end_time) + $time);
+                            $add_sub_data['exchange_time'] = $now_date;
+                            $add_sub_data['status'] = 1;
+                            $add_res = Subscribe::where('id', '=', $check_sub->id)
+                                ->update($add_sub_data);
+                        }
+                    }
+                    if ($add_res === false) {
+                        DB::rollBack();
+                        return false;
+                    }
+                    DB::commit();
+                    return true;
+                default:
+                    return false;
+            }
+
+        } else {
+            //优惠券部分
+            $add_coupon_data = [];
+            switch ($hd) {
+                case 100:
+                case 101:
+                case 0:
+                    $add_coupon_data['full_cut'] = 100;
+                    $add_coupon_data['price'] = 10;
+            }
+            switch ($product_id) {
+                case 102:
+                    $add_coupon_data['full_cut'] = 199;
+                    $add_coupon_data['price'] = 10;
+                    break;
+                case 103:
+                    $add_coupon_data['full_cut'] = 99;
+                    $add_coupon_data['price'] = 5;
+                    break;
+            }
+            //适用范围  1：专栏  2：精品课  3：商品
+            switch ($use_type) {
+                case 1:
+                    $add_coupon_data['type'] = 1;
+                    $add_coupon_data['name'] = '专栏兑换优惠券活动';
+                    break;
+                case 2:
+                    $add_coupon_data['type'] = 5;
+                    $add_coupon_data['name'] = '课程兑换优惠券活动';
+                    break;
+                case 3:
+                    $add_coupon_data['type'] = 3;
+                    $add_coupon_data['name'] = '商城兑换优惠券活动';
+                    break;
+            }
+            $add_coupon_data['user_id'] = $user_id;
+            $add_coupon_data['begin_time'] = $now_date;
+            $add_coupon_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+7 days"));
+            $add_coupon_data['status'] = 1;
+            $add_coupon_data['get_way'] = 1;
+            $add_coupon_data['number'] = Coupon::createCouponNum(2, 0);
+
+            $coupon_res = DB::table('nlsg_coupon')->insert($add_coupon_data);
+            if ($coupon_res === false) {
+                DB::rollBack();
+                return false;
+            }
+
+            DB::commit();
+            return true;
+        }
+
     }
 
     public function toRedeem($code, $user_id)
@@ -121,7 +336,7 @@ class RedeemCode extends Base
         $now_date = date('Y-m-d H:i:s');
         switch ($use_type) {
             case 1:
-                $col_info = Column::where('user_id', '=', $product_id)->where('type','=',1)->first();
+                $col_info = Column::where('user_id', '=', $product_id)->where('type', '=', 1)->first();
                 $check_sub = Subscribe::where('user_id', '=', $user_id)
                     ->where('relation_id', '=', $col_info->id)
                     ->where('type', '=', 1)
