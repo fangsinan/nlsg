@@ -212,7 +212,7 @@ class Withdrawals extends Base
                 ];
                 $payRst=PayRecord::where(['id'=>$pay_id])->update($map);
                 //提现成功更改订单
-                $OrderRst=Order::where(['ordernum'=>$orderid,'user_id'=>$user_id])->update(['status'=>1,'pay_price'=>$amount/100,'pay_time'=>date('Y-m-d H:i:s',time())]);
+                $OrderRst=Order::where(['ordernum'=>$orderid,'user_id'=>$user_id])->update(['status'=>1,'pay_price'=>$amount,'pay_time'=>date('Y-m-d H:i:s',time())]);
 
                 //处理提现节点
                 $CashRst=true;
