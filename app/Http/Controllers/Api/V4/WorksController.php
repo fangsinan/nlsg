@@ -602,7 +602,7 @@ class WorksController extends Controller
         }
         //课程和章节自增
         WorksInfo::where(['id'=>$works_info_id])->increment('view_num');
-        if($relation_type == 1 || $relation_type == 3){
+        if($relation_type == 1 || $relation_type == 2){
             Column::where(['id'=>$relation_id])->increment('view_num');
         }else{
             Works::where(['id'=>$relation_id])->increment('view_num');
