@@ -42,6 +42,7 @@ class CacheTools
             case 'mall_banner_list':
             case 'home_group_list':
             case 'order_token':
+            case 'works_index':
                 $expire = $normal_expire;
                 break;
             case 'mall_comment_list':
