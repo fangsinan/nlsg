@@ -202,6 +202,8 @@ class WorksInfo extends Base
             if ($v['works_info_id'] == $works_info_id) {
                 $info_key = $k;
             }
+            $info_list[$k]['url'] = self::GetWorksUrl($v);
+
         }
         if ($info_key == -1) {
             return ['code' => false, 'msg' => '章节不存在'];
@@ -300,6 +302,153 @@ class WorksInfo extends Base
             'works' => $works_info,
         ];
 
+    }
+
+    /**
+     * 转换音视频
+     */
+    public static function  covertVideo()
+    {
+        $SecretId  = "AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
+        $SECRET_KEY= "MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
+        $ids = WorksInfo::select('id','title','type','video_id','url','callback_url1','callback_url2','callback_url3')
+                ->where('video_adopt', 0)
+                ->where('video_id','!=', '')
+                ->pluck('video_id')
+                ->toArray();
+        if ($ids){
+            foreach ($ids as $v) {
+                $video_id = $v;
+                //加密
+                $rand   = rand (100, 10000000); //9031868223070871051
+                $time   = time ();
+                $Region = "gz";
+                $Region = "ap-guangzhou";
+                $data_key = [
+                    'Action' => 'GetVideoInfo',
+                    'fileId' => $video_id,
+                    'infoFilter.0' => 'transcodeInfo',
+                    'Region' => $Region,
+                    'SecretId' => $SecretId,
+                    'Timestamp' => $time,
+                    'Nonce' => $rand,
+                    'SignatureMethod' => 'HmacSHA256',
+                ];
+                ksort ($data_key); //排序
+               // 计算签名
+               $srcStr    = "POSTvod.api.qcloud.com/v2/index.php?" . http_build_query ($data_key);
+               $signature = base64_encode (hash_hmac ('sha256', $srcStr, $SECRET_KEY, true)); //SHA1  sha256
+               $data_key['Signature'] = $signature;
+               ksort ($data_key); //排序
+
+               //拉取转码成功信息
+               $url = "https://vod.api.qcloud.com/v2/index.php"; //?Action=PullEvent&COMMON_PARAMS
+               $info = self::curlPost ($url, $data_key);  //post
+               if ( !empty($info) ) {
+                   $info = json_decode ($info, true);
+                   if ( isset($info['code']) && isset($info['codeDesc']) && $info['code'] == 0 && $info['codeDesc'] == 'Success' ) {
+                       $map = [];
+                       //获取所有视频参数
+                       foreach($info['transcodeInfo']['transcodeList'] as $k=>$v){
+                           //音频
+                           if(isset($info['transcodeInfo']['transcodeList'][0]['container']) &&
+                               stristr($info['transcodeInfo']['transcodeList'][0]['url'],".mp3")){
+                               $type=2;
+                           }else{
+                               if (stristr ($v['url'], ".f10.mp4") ) {
+                                   $map['callback_url1'] = $v['url'];
+                                   $map['attribute_url1'] = $v['width']."#".$v['height'];
+                               } elseif (stristr ($v['url'], ".f20.mp4") ) {
+                                   $map['callback_url2'] = $v['url'];
+                                   $map['attribute_url2'] = $v['width']."#".$v['height'];
+                               } elseif (stristr ($v['url'], ".f30.mp4") ) {
+                                   $map['callback_url3'] = $v['url'];
+                                   $map['attribute_url3'] = $v['width']."#".$v['height'];
+                               }else{
+                                   $map['attribute_url'] = $v['width']."#".$v['height']; //原视频
+                                   $map['url'] = $v['url']; //原视频
+                               }
+                               $type=1;
+                           }
+
+                       }
+                       if ( (!empty($map) && (!empty($map['callback_url1']) || !empty($map['callback_url2']) || !empty($map['callback_url3']))) || $type==2) {
+                           $map['video_adopt'] = 1;
+
+                           $seconds = $v['duration'];
+                           $second = $seconds % 60;
+                           $minit = floor($seconds / 60);
+
+                           $m_num=mb_strlen($minit, 'utf-8');
+                           $s_num=mb_strlen($second, 'utf-8');
+                           if($m_num==1){
+                               $minit='0'.$minit;
+                           }
+                           if($s_num==1){
+                               $second='0'.$second;
+                           }
+
+                           $map['duration'] = $minit . ':' . $second;
+
+                           gmstrftime("%H:%M:%S",$time); //转换视频时间
+
+                           $map['size']=round($v['size']/(1024*1024), 2);  //大小
+
+                           //处理防止腾讯传回参数不符合 检查转换链接是否包含视频id
+                           if((isset($map['callback_url3']) && stristr ($map['callback_url3'], "$video_id")) || $type==2) {
+                               WorksInfo::where('video_id', $video_id)->update($map);
+                               echo 'OK';
+                           }
+                       }
+
+                   } else {
+                       echo 'fail';
+                   }
+
+               } else {
+                   echo 'fail';
+               }
+            }
+        }
+    }
+
+    /**
+     * @curl抓取页面数据
+     * @param $url 访问地址
+     * @param null $isPost 是否post
+     * @param null $data post数据
+     * @return array
+     */
+    public static function curlPost($url, $data = [])
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        //显示获取的头部信息必须为true否则无法看到cookie
+        //curl_setopt($curl, CURLOPT_HEADER, true);
+//        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);// 模拟用户使用的浏览器
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // 对认证证书来源的检查
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false); // 从证书中检查SSL加密算法是否存在
+        @curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);// 使用自动跳转
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);// 获取的信息以文件流的形式返回
+        if (!empty($data)) {
+            curl_setopt($curl, CURLOPT_POST, 1);// 发送一个常规的Post请求
+            if (is_array($data)) {
+                curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));// Post提交的数据包
+            } else {
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);// Post提交的数据包 可以是json数据
+            }
+        }
+        curl_setopt($curl, CURLOPT_COOKIESESSION, true); // 读取上面所储存的Cookie信息
+        curl_setopt($curl, CURLOPT_SSLVERSION, 1);
+        //curl_setopt($curl, CURLOPT_TIMEOUT, 30);// 设置超时限制防止死循环
+        //curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
+        //curl_setopt($curl, CURLOPT_HEADER, 0); // 显示返回的Header区域内容
+        $tmpInfo = curl_exec($curl);
+        curl_close($curl);
+        if (empty($tmpInfo)) {
+            return false;
+        }
+        return $tmpInfo;
     }
 
 }

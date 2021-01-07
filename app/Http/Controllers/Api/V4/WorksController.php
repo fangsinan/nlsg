@@ -948,4 +948,10 @@ class WorksController extends Controller
         return $this->success();
     }
 
+
+    public function convert()
+    {
+        WorksInfo::covertVideo();
+    }
+
 }

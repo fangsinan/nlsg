@@ -186,7 +186,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('live/lists', 'LiveController@getLiveLists');
     Route::get('live/back_lists', 'LiveController@getLiveBackLists');
 
-    Route::post('send/get_send_order', 'SendController@getSendOrder');        //获取订单详情
+    Route::post('send/get_send_order', 'SendController@getSendOrder');
+
+    Route::get('work/convert','WorksController@convert');//获取订单详情
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/coupon', 'UserController@getUserCoupon');
@@ -350,7 +352,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
         //赠送流程
         Route::post('order/create_send_order', 'OrderController@createSendOrder'); //赠送下单
-        Route::post('send/send_edit', 'SendController@getSendEdit');             //点击领取操作
+        Route::post('send/send_edit', 'SendController@getSendEdit');
 
     });
 
