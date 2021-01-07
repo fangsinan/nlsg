@@ -9,12 +9,12 @@ namespace App\Servers;
  */
 
 use App\Models\ExpressCompany;
-use App\Models\MallOrderDetails;
-use Illuminate\Support\Facades\DB;
+use App\Models\ExpressInfo;
 use App\Models\MallOrder;
 use App\Models\MallOrderChild;
-use App\Models\ExpressInfo;
+use App\Models\MallOrderDetails;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Description of MallOrder
@@ -68,11 +68,23 @@ class MallOrderServers
 
         //时间,支付时间,支付渠道,客户端类型 created_at,pay_time,pay_type,os_type
         if (!empty($params['created_at'])) {
-            $created_at = implode(',', $params['created_at']);
+            $created_at = explode(',', $params['created_at']);
+            $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
+            if (empty($created_at[1] ?? '')) {
+                $created_at[1] = $now_date;
+            } else {
+                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[0]));
+            }
             $query->whereBetween('created_at', [$created_at[0], $created_at[1] ?? $now_date]);
         }
         if (!empty($params['pay_time'])) {
-            $pay_time = implode(',', $params['pay_time']);
+            $pay_time = explode(',', $params['pay_time']);
+            $pay_time[0] = date('Y-m-d 00:00:00', strtotime($pay_time[0]));
+            if (empty($pay_time[1] ?? '')) {
+                $pay_time[1] = $now_date;
+            } else {
+                $pay_time[1] = date('Y-m-d 23:59:59', strtotime($pay_time[0]));
+            }
             $query->whereBetween('pay_time', [$pay_time[0], $pay_time[1] ?? $now_date]);
         }
         if (!empty($params['pay_type'])) {
@@ -122,7 +134,7 @@ class MallOrderServers
         }
 
         $field = [
-            'id', 'ordernum', 'price', 'dead_time', 'user_id','order_type','pay_price','messages',
+            'id', 'ordernum', 'price', 'dead_time', 'user_id', 'order_type', 'pay_price', 'messages',
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`')
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo'];
@@ -150,7 +162,7 @@ class MallOrderServers
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
             $now_date . '" then FALSE ELSE TRUE END) ');
 
-        $query->orderBy('id','desc');
+        $query->orderBy('id', 'desc');
 
         $list = $query->with($with)->select($field)->paginate($size);
 
@@ -254,9 +266,9 @@ class MallOrderServers
         }
 
         $field = [
-            'nlsg_mall_order.id', 'nlsg_mall_order.ordernum', 'nlsg_mall_order.price','nlsg_mall_order.pay_price',
+            'nlsg_mall_order.id', 'nlsg_mall_order.ordernum', 'nlsg_mall_order.price', 'nlsg_mall_order.pay_price',
             'nlsg_mall_order.messages',
-            'nlsg_mall_order.dead_time', 'nlsg_mall_order.user_id',DB::raw('3 as order_type'),
+            'nlsg_mall_order.dead_time', 'nlsg_mall_order.user_id', DB::raw('3 as order_type'),
             DB::raw('(case when nlsg_mall_order.`status` = 1 then 1
                 when is_success = 0 then 95 when nlsg_mall_order.is_stop = 1
                 then 99 ELSE nlsg_mall_order.`status` END) `status`')
@@ -286,7 +298,7 @@ class MallOrderServers
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
             $now_date . '" then FALSE ELSE TRUE END) ');
 
-        $query->orderBy('nlsg_mall_order.id','desc');
+        $query->orderBy('nlsg_mall_order.id', 'desc');
 
         $list = $query->with($with)->select($field)->paginate($size);
 
@@ -327,9 +339,9 @@ class MallOrderServers
         foreach ($params as $v) {
             //检查order_id和order_detail_id是否匹配
             $check_od_id = MallOrderDetails::whereId($v['order_detail_id'])
-                ->where('order_id','=',$v['order_id'])
+                ->where('order_id', '=', $v['order_id'])
                 ->first();
-            if (empty($check_od_id)){
+            if (empty($check_od_id)) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '订单id不匹配', 'ps' => ''];
             }
@@ -362,8 +374,8 @@ class MallOrderServers
                 $history['logo'] = $express_company_info->logo;
                 $history['list'] = [
                     [
-                        'time'=>$now_date,
-                        'status'=>'商家发货'
+                        'time' => $now_date,
+                        'status' => '商家发货'
                     ]
                 ];
 
@@ -373,7 +385,7 @@ class MallOrderServers
                 $express_info_id = DB::table('nlsg_express_info')->insertGetId($ex_data);
                 if (!$express_info_id) {
                     DB::rollBack();
-                    return ['code' => false, 'msg' => '错误','ps' => $v['order_id'] . ' ex error'];
+                    return ['code' => false, 'msg' => '错误', 'ps' => $v['order_id'] . ' ex error'];
                 }
             }
             //order_detail发货
@@ -391,21 +403,21 @@ class MallOrderServers
             $child_res = $check_oc->save();
 
             $notify_data = [
-                'from_uid'=>0,
-                'to_uid'=>$order_obj->user_id,
-                'type'=>5,
-                'relation_type'=>6,
-                'content'=>'',
-                'source_id'=>$order_obj->id,
-                'created_at'=>$now_date,
-                'updated_at'=>$now_date
+                'from_uid' => 0,
+                'to_uid' => $order_obj->user_id,
+                'type' => 5,
+                'relation_type' => 6,
+                'content' => '',
+                'source_id' => $order_obj->id,
+                'created_at' => $now_date,
+                'updated_at' => $now_date
             ];
             DB::table('nlsg_notify')->insert($notify_data);
             //todo 极光推送
             /**
              * JPush::pushNow('别名', '通知', '附加信息');
-            JPush::pushNow(['别名数组'], '通知', '附加信息');
-            JPush::pushNow('all', '通知', '附加信息');
+             * JPush::pushNow(['别名数组'], '通知', '附加信息');
+             * JPush::pushNow('all', '通知', '附加信息');
              */
 
 
