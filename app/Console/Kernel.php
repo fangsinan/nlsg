@@ -9,6 +9,7 @@ use App\Models\MallOrderGroupBuy;
 use App\Models\Order;
 use App\Models\PayRecordDetailStay;
 use App\Models\Works;
+use App\Models\WorksInfo;
 use App\Servers\ChannelServers;
 use App\Servers\MallRefundJob;
 use Illuminate\Console\Scheduling\Schedule;
@@ -39,6 +40,7 @@ class Kernel extends ConsoleKernel
             MallOrder::clear();//超时订单处理
             Order::clear(); //线下课超时处理
             MallRefundJob::refundJob(1);//商城订单退款处理
+            WorksInfo::covertVideo(); //转换音频视频
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
