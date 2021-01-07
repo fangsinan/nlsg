@@ -212,7 +212,7 @@ class MallOrder extends Base
     /**
      * 生成订单编号
      * @param $uid 用户id
-     * @param $type 1:普通商品订单 2:售后
+     * @param $type 1:普通商品订单 2:售后 3:虚拟shill
      * @return string
      */
     public static function createOrderNumber($uid, $type)

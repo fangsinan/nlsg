@@ -5,10 +5,10 @@ namespace App\Servers;
 
 
 use App\Models\GetPriceTools;
+use App\Models\MallOrder;
 use App\Models\MallRefundRecord;
 use App\Models\RunRefundRecord;
-use Illuminate\Support\Str;
-use Yansongda\Pay\Log;
+use Illuminate\Support\Facades\DB;
 use Yansongda\Pay\Pay;
 
 class MallRefundJob
@@ -413,5 +413,83 @@ class MallRefundJob
             curl_close($ch);
             return false;
         }
+    }
+
+    //todo 虚拟订单表退款
+    public static function shillJob($type = 1)
+    {
+        $s = new self();
+        if ($type == 1) {
+            $s->shillRefund();
+        } else {
+            $s->shillCheck();
+        }
+    }
+
+    private function shillRefund()
+    {
+        $list = DB::table('nlsg_order as o')
+            ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
+            ->where('o.user_id', '=', 168934)
+            ->where('o.is_shill', '=', 1)
+            ->where('o.status', '=', 1)
+            ->where('o.is_refund', '=', 0)
+            ->limit(1)
+            ->select(['o.id', 'o.user_id', 'o.ordernum', 'p.transaction_id', 'p.client', 'o.pay_price as all_price',
+                'p.type', 'p.price as refund_price'])
+            ->get();
+        if ($list->isEmpty()) {
+            return true;
+        }
+
+        foreach ($list as $v) {
+            $v->service_num = MallOrder::createOrderNumber($v->user_id, 3);
+        }
+
+//        foreach ($list as $v) {
+//            switch ($v->client) {
+//                case 1:
+//                    //微信公众号
+//                    $temp_res = $this->weChatRefund($v, 1, 1);
+//                    break;
+//                case 2:
+//                    //微信app
+//                    $temp_res = $this->weChatRefund($v, 2, 1);
+//                    break;
+//                case 3:
+//                    //支付宝app
+//                    $temp_res = $this->aliRefundGrace($v, 1);
+//                    break;
+//                default:
+//                    continue;
+//            }
+//            echo PHP_EOL,'===================================================',PHP_EOL;
+//            var_dump($temp_res);
+//            $update_data = [];
+//            if (($temp_res['code'] ?? false) === true) {
+//                $update_data['is_refund'] = 2;
+//                $update_data['refund_no'] = $v->service_num;
+//
+//                $prModel = new OrderPayRefund();
+//                $prModel->service_num = $v->service_num;
+//                $prModel->user_id = $v->user_id;
+//                $prModel->order_id = $v->ordernum;
+//                $prModel->serial_number = $v->transaction_id;
+//                $prModel->refund_id = $temp_res['refund_id'] ?? 0;
+//                $prModel->pay_price = $v->pay_price;
+//                $prModel->refund_price = $v->refund_price;
+//                $prModel->status = 1;
+//                $prModel->save();
+//            } else {
+//                $update_data['is_refund'] = 9;
+//            }
+//            Order::where('id', '=', $v->id)->update($update_data);
+//        }
+        dd($list);
+    }
+
+    private function shillCheck()
+    {
+
     }
 }
