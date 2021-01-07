@@ -77,4 +77,8 @@ return [
     'Live_API_KEY' => env('Live_API_KEY'),
     'DOUYIN_APP_KEY' => env('DOUYIN_APP_KEY'),
     'DOUYIN_APP_SECRET' => env('DOUYIN_APP_SECRET'),
+    'toQColudIsTest'   => env('toQColudIsTest'),
+    'QSECRET_ID'    => env('QSECRET_ID'),
+    'QSECRET_KEY'   => env('QSECRET_KEY')
+
 ];
