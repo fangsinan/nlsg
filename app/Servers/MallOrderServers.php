@@ -122,7 +122,7 @@ class MallOrderServers
         }
 
         $field = [
-            'id', 'ordernum', 'price', 'dead_time', 'user_id','order_type','pay_price',
+            'id', 'ordernum', 'price', 'dead_time', 'user_id','order_type','pay_price','messages',
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`')
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo'];
@@ -255,6 +255,7 @@ class MallOrderServers
 
         $field = [
             'nlsg_mall_order.id', 'nlsg_mall_order.ordernum', 'nlsg_mall_order.price','nlsg_mall_order.pay_price',
+            'nlsg_mall_order.messages',
             'nlsg_mall_order.dead_time', 'nlsg_mall_order.user_id',DB::raw('3 as order_type'),
             DB::raw('(case when nlsg_mall_order.`status` = 1 then 1
                 when is_success = 0 then 95 when nlsg_mall_order.is_stop = 1
