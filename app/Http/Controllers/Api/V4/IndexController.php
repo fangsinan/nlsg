@@ -952,8 +952,8 @@ class IndexController extends Controller
         $data = [
             'id'   => 538,
             'info_id' => 0,
-            'type' => 4,
-            'url'  => 'https://wechat.nlsgapp.com/appv4/shop-details?id=538&inviter=174858&live_id=&live_info_id=&time=155',
+            'type' => 3,
+            'url'  => '',
             'img'  => 'https://image.nlsgapp.com/nlsg/authorpt/20210106142306594001.jpg'
         ];
         return  success($data);
