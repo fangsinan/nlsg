@@ -202,6 +202,8 @@ class WorksInfo extends Base
             if ($v['works_info_id'] == $works_info_id) {
                 $info_key = $k;
             }
+            $info_list[$k]['url'] = self::GetWorksUrl($v);
+
         }
         if ($info_key == -1) {
             return ['code' => false, 'msg' => '章节不存在'];
