@@ -216,7 +216,7 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
             //VipRedeemUser::subWorksOrGetRedeemCode(303376);
-            MallRefundJob::shillJob(1);
+            MallRefundJob::shillJob(2);
             return true;
         } else {
             $params = $request->input();

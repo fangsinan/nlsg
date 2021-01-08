@@ -432,12 +432,10 @@ class MallRefundJob
     {
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
-            ->where('o.user_id', '=', 168934)
             ->where('o.is_shill', '=', 1)
             ->where('o.status', '=', 1)
             ->whereIn('p.type', [1, 2, 3])
             ->where('o.is_refund', '=', 0)
-            ->limit(1)
             ->select(['o.id', 'o.user_id', 'o.ordernum', 'p.transaction_id',
                 'p.type as client', 'o.pay_price as all_price',
                 'p.type', 'p.price as refund_price'])
@@ -446,9 +444,15 @@ class MallRefundJob
             return true;
         }
 
+        $id_list = [];
         foreach ($list as $v) {
+            $id_list[] = $v->id;
             $v->service_num = MallOrder::createOrderNumber($v->user_id, 3);
         }
+
+        DB::table('nlsg_order')
+            ->whereIn('id', $id_list)
+            ->update(['is_refund' => 1]);
 
         foreach ($list as $v) {
             switch ($v->client) {
@@ -503,7 +507,6 @@ class MallRefundJob
         ];
         try {
             $result = $pay->refund($order);
-            var_dump($result);
             if (intval($result->code) === 10000) {
                 return ['code' => true, 'refund_id' => 0];
             } else {
@@ -546,6 +549,98 @@ class MallRefundJob
 
     private function shillCheck()
     {
+        $list = DB::table('nlsg_order as o')
+            ->join('nlsg_order_pay_refund as op', 'o.ordernum', '=', 'op.order_id')
+            ->join('nlsg_pay_record as pr', 'o.ordernum', '=', 'pr.ordernum')
+            ->where('o.is_shill', '=', 1)
+            ->where('o.is_refund', '=', 2)
+            ->where('o.status', '=', 1)
+            ->select(['o.id', 'o.user_id', 'o.ordernum', 'o.refund_no as service_num',
+                'op.pay_price', 'op.refund_price', 'pr.type as client'])
+            ->get();
 
+        if ($list->isEmpty()) {
+            return true;
+        }
+
+        foreach ($list as $v) {
+            switch ($v->client) {
+                case 1:
+                    //微信公众号
+                    $temp_res = $this->wechatRefundCheckMethod($v, 1);
+                    break;
+                case 2:
+                    //微信app
+                    $temp_res = $this->wechatRefundCheckMethod($v, 2);
+                    break;
+                case 3:
+                    //支付宝app
+                    $temp_res = $this->aliPayRefundCheckMethod($v);
+                    break;
+                default:
+                    continue;
+            }
+        }
+    }
+
+
+    private function aliPayRefundCheckMethod($v): array
+    {
+        $config = Config('pay.alipay');
+        $pay = Pay::alipay($config);
+        $order = [
+            'out_trade_no' => $v->ordernum,
+            'out_request_no' => $v->service_num,
+        ];
+        try {
+            $result = $pay->find($order,'refund');
+            var_dump($result);
+            if (intval($result->code) === 10000) {
+                return ['code' => true, 'refund_id' => 0];
+            } else {
+                return ['code' => false, 'refund_id' => 0];
+            }
+        } catch (\Exception $e) {
+            return ['code' => false, 'refund_id' => 0];
+        }
+    }
+
+    //微信退款(单独)
+    private function wechatRefundCheckMethod($v, $flag): array
+    {
+        if ($flag == 1) {
+            //h5
+            $config = Config('wechat.payment.wx_wechat');
+        } else {
+            //微信app
+            $config = Config('wechat.payment.default');
+        }
+
+        $app = Factory::payment($config);
+        $result = $app->refund->queryByOutRefundNumber($v->service_num);
+        var_dump($result);
+        return ['code'=>true,'msg'=>''];
+
+//微信订单号 => queryByTransactionId($transactionId)
+//商户订单号 => queryByOutTradeNumber($outTradeNumber)
+//商户退款单号 => queryByOutRefundNumber($outRefundNumber)
+//微信退款单号 => queryByRefundId($refundId)
+
+
+//        $result = $app->refund->byTransactionId(
+//            $v->transaction_id,
+//            $v->service_num,
+//            intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)),
+//            intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)),
+//            [
+//                // 可在此处传入其他参数，详细参数见微信支付文档
+//                'refund_desc' => '课程退款',
+//            ]
+//        );
+//        if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {
+//            return ['code' => true, 'refund_id' => $result['refund_id']];
+//        } else {
+//            return ['code' => false, 'refund_id' => 0];
+//        }
     }
 }
