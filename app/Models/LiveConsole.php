@@ -176,7 +176,7 @@ class LiveConsole extends Base
         $live_data['describe'] = $params['describe'];
         $live_data['cover_img'] = $params['cover_img'];
         $live_data['msg'] = $params['msg'];
-        $live_data['content'] = $params['content'];
+        //$live_data['content'] = $params['content'];
         $live_data['can_push'] = $params['can_push'] ?? 0;
         $live_data['is_free'] = $params['is_free'];
         $live_begin_at = 0;
