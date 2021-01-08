@@ -449,6 +449,7 @@ class MallRefundJob
         }
 
         foreach ($list as $v) {
+            var_dump($v);
             switch ($v->client) {
                 case 1:
                     //微信公众号
