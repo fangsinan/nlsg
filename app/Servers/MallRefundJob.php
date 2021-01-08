@@ -478,7 +478,7 @@ class MallRefundJob
                 $prModel->order_id = $v->ordernum;
                 $prModel->serial_number = $v->transaction_id;
                 $prModel->refund_id = $temp_res['refund_id'] ?? 0;
-                $prModel->pay_price = $v->pay_price;
+                $prModel->pay_price = $v->all_price;
                 $prModel->refund_price = $v->refund_price;
                 $prModel->status = 1;
                 $prModel->save();
