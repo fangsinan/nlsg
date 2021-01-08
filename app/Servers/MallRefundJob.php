@@ -7,6 +7,7 @@ namespace App\Servers;
 use App\Models\GetPriceTools;
 use App\Models\MallOrder;
 use App\Models\MallRefundRecord;
+use App\Models\OrderPayRefund;
 use App\Models\RunRefundRecord;
 use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
@@ -466,29 +467,28 @@ class MallRefundJob
                 default:
                     continue;
             }
-//            echo PHP_EOL,'===================================================',PHP_EOL;
-//            var_dump($temp_res);
-//            $update_data = [];
-//            if (($temp_res['code'] ?? false) === true) {
-//                $update_data['is_refund'] = 2;
-//                $update_data['refund_no'] = $v->service_num;
-//
-//                $prModel = new OrderPayRefund();
-//                $prModel->service_num = $v->service_num;
-//                $prModel->user_id = $v->user_id;
-//                $prModel->order_id = $v->ordernum;
-//                $prModel->serial_number = $v->transaction_id;
-//                $prModel->refund_id = $temp_res['refund_id'] ?? 0;
-//                $prModel->pay_price = $v->pay_price;
-//                $prModel->refund_price = $v->refund_price;
-//                $prModel->status = 1;
-//                $prModel->save();
-//            } else {
-//                $update_data['is_refund'] = 9;
-//            }
-//            Order::where('id', '=', $v->id)->update($update_data);
+
+            $update_data = [];
+            if ($temp_res['code'] === true) {
+                $update_data['is_refund'] = 2;
+                $update_data['refund_no'] = $v->service_num;
+                $prModel = new OrderPayRefund();
+                $prModel->service_num = $v->service_num;
+                $prModel->user_id = $v->user_id;
+                $prModel->order_id = $v->ordernum;
+                $prModel->serial_number = $v->transaction_id;
+                $prModel->refund_id = $temp_res['refund_id'] ?? 0;
+                $prModel->pay_price = $v->pay_price;
+                $prModel->refund_price = $v->refund_price;
+                $prModel->status = 1;
+                $prModel->save();
+            } else {
+                $update_data['is_refund'] = 9;
+            }
+            DB::table('nlsg_order')
+                ->where('id','=',$v->id)
+                ->update($update_data);
         }
-        dd($list);
     }
 
     //支付宝退款(单独)
@@ -536,10 +536,11 @@ class MallRefundJob
                 'refund_desc' => '课程退款',
             ]
         );
-        echo PHP_EOL,'======================',PHP_EOL;
-        var_dump($result);
-        echo PHP_EOL,'======================',PHP_EOL;
-//        dd($result);
+        if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     private function shillCheck()
