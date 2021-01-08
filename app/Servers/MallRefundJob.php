@@ -628,7 +628,7 @@ class MallRefundJob
         $result = $app->refund->queryByOutRefundNumber($v->service_num);
 
         if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {
-            return ['code' => true, 'refund_id' => $result['refund_id']];
+            return ['code' => true, 'refund_id' => 0];
         } else {
             return ['code' => false, 'refund_id' => 0];
         }
