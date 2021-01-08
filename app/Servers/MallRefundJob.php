@@ -228,7 +228,7 @@ class MallRefundJob
 
         try {
             $result = $alipay->refund($order);
-            if ($result->code == 10000) {
+            if (intval($result->code) === 10000) {
                 $mrr = MallRefundRecord::find($v->service_id);
                 $mrr->status = 50;
                 $mrr->refund_sub_at = $now_date;
@@ -504,7 +504,7 @@ class MallRefundJob
         try {
             $result = $pay->refund($order);
             var_dump($result);
-            if ($result->code == 10000) {
+            if (intval($result->code) === 10000) {
                 return true;
             } else {
                 return false;
