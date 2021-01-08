@@ -515,7 +515,7 @@ class LiveController extends Controller
             $list['is_sub'] = $subLive ?? 0;
             $list['is_sub_column'] = $isSub ?? 0;
             $list['level'] = $user->getLevel($userId);
-            $list['welcome'] = '欢迎进入直播间';
+            $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
             $list['nick_name'] = $this->user['nickname'] ?? '';
             $list['is_password'] = $list->live->password ? 1 : 0;
 
