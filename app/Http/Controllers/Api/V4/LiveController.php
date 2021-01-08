@@ -887,10 +887,14 @@ class LiveController extends Controller
 
         ];
         $order = Order::firstOrCreate($data);
-        $data = [
-            'order_id' => $order['id']
-        ];
-        return success($data);
+        if ($order){
+            Live::where('id', $liveId)->increment('order_num');
+            $data = [
+                'order_id' => $order['id']
+            ];
+            return success($data);
+        }
+        return error(1004, '下单失败');
     }
 
     /**
