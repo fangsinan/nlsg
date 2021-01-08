@@ -208,7 +208,7 @@ class SpecialPriceModel extends Base
 
         $sec_date_list = Cache::get($cache_key_name);
 
-        if (empty($sec_date_list)) {
+        if (true || empty($sec_date_list)) {
 
             $sec_date_list = $this->getSecDateList();
 
@@ -219,8 +219,7 @@ class SpecialPriceModel extends Base
                 ->join('nlsg_mall_goods as nmg', function ($join) {
                     $join->on('nsp.goods_id', '=', 'nmg.id')
                         ->where('nmg.status', '=', 2);
-                })
-                ->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
+                })->select(['nsp.goods_id', 'nmg.name', 'nmg.subtitle',
                     'nsp.goods_original_price', 'nmg.picture',
                     'nsp.use_stock', 'nsp.stock',
                     'nmg.original_price', 'nsp.goods_price',
@@ -229,7 +228,9 @@ class SpecialPriceModel extends Base
                     DB::raw('unix_timestamp(end_time) as end_timestamp'),
                     DB::raw('convert((nsp.goods_price/nmg.original_price)*10,'
                         . 'decimal(15,2)) as price_off')])
+                ->groupBy('nsp.begin_time', 'nsp.goods_id')
                 ->get();
+
             $sec_date_list = array_fill_keys($sec_date_list, []);
             foreach ($sec_date_list as $k => &$v) {
                 foreach ($res as $vv) {
