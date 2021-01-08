@@ -454,15 +454,15 @@ class MallRefundJob
             switch ($v->client) {
                 case 1:
                     //微信公众号
-                    $temp_res = $this->wechatRefundMethod($v, 1, 1);
+                    $temp_res = $this->wechatRefundMethod($v, 1);
                     break;
                 case 2:
                     //微信app
-                    $temp_res = $this->wechatRefundMethod($v, 2, 1);
+                    $temp_res = $this->wechatRefundMethod($v, 2);
                     break;
                 case 3:
                     //支付宝app
-                    $temp_res = $this->aliPayRefundMethod($v, 1);
+                    $temp_res = $this->aliPayRefundMethod($v);
                     break;
                 default:
                     continue;
@@ -492,7 +492,7 @@ class MallRefundJob
     }
 
     //支付宝退款(单独)
-    private function aliPayRefundMethod($v)
+    private function aliPayRefundMethod($v): bool
     {
         $config = Config('pay.alipay');
         $pay = Pay::alipay($config);
@@ -515,7 +515,7 @@ class MallRefundJob
     }
 
     //微信退款(单独)
-    private function wechatRefundMethod($v, $flag)
+    private function wechatRefundMethod($v, $flag): bool
     {
         if ($flag == 1) {
             //h5
