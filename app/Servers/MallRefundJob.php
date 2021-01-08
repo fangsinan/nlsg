@@ -429,15 +429,16 @@ class MallRefundJob
 
     private function shillRefund()
     {
-        $this->wechatRefundMethod([], 1);
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
             ->where('o.user_id', '=', 168934)
             ->where('o.is_shill', '=', 1)
             ->where('o.status', '=', 1)
+            ->whereIn('p.type',[1,2,3])
             ->where('o.is_refund', '=', 0)
             ->limit(1)
-            ->select(['o.id', 'o.user_id', 'o.ordernum', 'p.transaction_id', 'p.client', 'o.pay_price as all_price',
+            ->select(['o.id', 'o.user_id', 'o.ordernum', 'p.transaction_id',
+                'p.type as client', 'o.pay_price as all_price',
                 'p.type', 'p.price as refund_price'])
             ->get();
         if ($list->isEmpty()) {
@@ -449,7 +450,6 @@ class MallRefundJob
         }
 
         foreach ($list as $v) {
-            var_dump($v);
             switch ($v->client) {
                 case 1:
                     //微信公众号
@@ -523,6 +523,7 @@ class MallRefundJob
             //微信app
             $config = Config('wechat.payment.default');
         }
+
         $app = Factory::payment($config);
 
         $result = $app->refund->byTransactionId(
@@ -535,7 +536,10 @@ class MallRefundJob
                 'refund_desc' => '课程退款',
             ]
         );
-        dd($result);
+        echo PHP_EOL,'======================',PHP_EOL;
+        var_dump($result);
+        echo PHP_EOL,'======================',PHP_EOL;
+//        dd($result);
     }
 
     private function shillCheck()
