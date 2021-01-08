@@ -265,6 +265,7 @@ class WorksController extends Controller
                 $is_audio_book_arr = ['1' => 1, '2' => 0,];
                 $where['works.is_audio_book'] = $is_audio_book_arr[$is_audio_book];
             }
+            $where['works.is_audio_book'] = 0;// 先写死  目前只有课程
 
             $relationObj = new WorksCategoryRelation();
             $worksObj = new Works();
