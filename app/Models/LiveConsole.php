@@ -163,9 +163,9 @@ class LiveConsole extends Base
         if (empty($params['msg'] ?? '')) {
             return ['code' => false, 'msg' => '直播预约公告错误'];
         }
-        if (empty($params['content'] ?? '')) {
-            return ['code' => false, 'msg' => '直播内容介绍错误'];
-        }
+//        if (empty($params['content'] ?? '')) {
+//            return ['code' => false, 'msg' => '直播内容介绍错误'];
+//        }
         if (!empty($params['helper'] ?? '')) {
             $live_data['helper'] = preg_replace('/[^0-9]/i', ',', $params['helper']);
         }
