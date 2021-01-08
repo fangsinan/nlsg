@@ -567,22 +567,22 @@ class MallRefundJob
         }
 
         foreach ($list as $v) {
-//            switch ($v->client) {
-//                case 1:
-//                    //微信公众号
-//                    $temp_res = $this->wechatRefundCheckMethod($v, 1);
-//                    break;
-//                case 2:
-//                    //微信app
-//                    $temp_res = $this->wechatRefundCheckMethod($v, 2);
-//                    break;
-//                case 3:
-//                    //支付宝app
-//                    $temp_res = $this->aliPayRefundCheckMethod($v);
-//                    break;
-//                default:
-//                    continue;
-//            }
+            switch ($v->client) {
+                case 1:
+                    //微信公众号
+                    $temp_res = $this->wechatRefundCheckMethod($v, 1);
+                    break;
+                case 2:
+                    //微信app
+                    $temp_res = $this->wechatRefundCheckMethod($v, 2);
+                    break;
+                case 3:
+                    //支付宝app
+                    $temp_res = $this->aliPayRefundCheckMethod($v);
+                    break;
+                default:
+                    continue;
+            }
             $temp_res['code'] = true;
 
             if ($temp_res['code'] === true) {
