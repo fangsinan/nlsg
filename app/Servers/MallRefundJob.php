@@ -8,6 +8,7 @@ use App\Models\GetPriceTools;
 use App\Models\MallOrder;
 use App\Models\MallRefundRecord;
 use App\Models\RunRefundRecord;
+use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
 use Yansongda\Pay\Pay;
 
@@ -428,7 +429,7 @@ class MallRefundJob
 
     private function shillRefund()
     {
-        $this->wechatRefundMethod([],1);
+        $this->wechatRefundMethod([], 1);
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
             ->where('o.user_id', '=', 168934)
@@ -447,23 +448,23 @@ class MallRefundJob
             $v->service_num = MallOrder::createOrderNumber($v->user_id, 3);
         }
 
-//        foreach ($list as $v) {
-//            switch ($v->client) {
-//                case 1:
-//                    //微信公众号
-//                    $temp_res = $this->weChatRefund($v, 1, 1);
-//                    break;
-//                case 2:
-//                    //微信app
-//                    $temp_res = $this->weChatRefund($v, 2, 1);
-//                    break;
-//                case 3:
-//                    //支付宝app
-//                    $temp_res = $this->aliRefundGrace($v, 1);
-//                    break;
-//                default:
-//                    continue;
-//            }
+        foreach ($list as $v) {
+            switch ($v->client) {
+                case 1:
+                    //微信公众号
+                    $temp_res = $this->wechatRefundMethod($v, 1, 1);
+                    break;
+                case 2:
+                    //微信app
+                    $temp_res = $this->wechatRefundMethod($v, 2, 1);
+                    break;
+                case 3:
+                    //支付宝app
+                    $temp_res = $this->aliPayRefundMethod($v, 1);
+                    break;
+                default:
+                    continue;
+            }
 //            echo PHP_EOL,'===================================================',PHP_EOL;
 //            var_dump($temp_res);
 //            $update_data = [];
@@ -485,7 +486,7 @@ class MallRefundJob
 //                $update_data['is_refund'] = 9;
 //            }
 //            Order::where('id', '=', $v->id)->update($update_data);
-//        }
+        }
         dd($list);
     }
 
@@ -514,10 +515,6 @@ class MallRefundJob
     //微信退款(单独)
     private function wechatRefundMethod($v, $flag)
     {
-        $config = Config('pay.wechat');
-        dd($config);
-
-
         if ($flag == 1) {
             //h5
             $config = Config('wechat.payment.wx_wechat');
@@ -525,18 +522,19 @@ class MallRefundJob
             //微信app
             $config = Config('wechat.payment.default');
         }
-        $pay = Pay::wechat($config);
-        $order = [
-            'appid' => $config['app_id'], //公众账号ID
-            'mch_id' => $config['mch_id'], //商户号
-            'refund_account' => 'REFUND_SOURCE_RECHARGE_FUNDS',
-            'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
-            'out_refund_no' => $v->service_num, //商户退款单号
-            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
-            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
-            'transaction_id' => $v->transaction_id, //微信订单号
-        ];
+        $app = Factory::payment($config);
 
+        $result = $app->refund->byTransactionId(
+            $v->transaction_id,
+            $v->service_num,
+            intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)),
+            intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)),
+            [
+                // 可在此处传入其他参数，详细参数见微信支付文档
+                'refund_desc' => '课程退款',
+            ]
+        );
+        dd($result);
     }
 
     private function shillCheck()
