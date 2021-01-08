@@ -91,6 +91,55 @@ class Recommend extends Base
         return $result;
     }
 
+    /**
+     * 首页直播
+     * @param $uid
+     * @param  int  $type
+     * @param  int  $position
+     * @return bool
+     */
+    public  function  getLiveRecommend($uid, $type=7, $position=1)
+    {
+        if (!$type) {
+           return false;
+        }
+
+        $ids = Recommend::where('position', $position)
+                 ->where('type', $type)
+                 ->where('status', 1)
+                 ->orderBy('sort')
+                 ->orderBy('created_at','desc')
+                 ->pluck('relation_id')
+                 ->toArray();
+        if (!$ids) {
+            return false;
+        }
+        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at','price','order_num','is_free')
+                  ->whereIn('id', $ids)
+                  ->where('is_del', 0)
+                  ->orderBy('created_at', 'desc')
+                  ->first();
+          if ($list) {
+              $channel = LiveInfo::where('live_pid', $list->id)
+                          ->where('status', 1)
+                          ->orderBy('id','desc')
+                          ->first();
+              $isSub = Subscribe::isSubscribe($uid, $channel['id'], 3);
+              if (strtotime($channel['begin_at']) > time()) {
+                 $list['live_status'] = '1';
+              } else {
+                 if (strtotime($channel['end_at']) < time()) {
+                     $list['live_status'] = '2';
+                 } else {
+                     $list['live_status'] = '3';
+                 }
+              }
+              $list['info_id'] =  $channel->id;
+              $list['is_sub']  =  $isSub ?? 0;
+          }
+          return $list;
+
+    }
 
     public function getEditorWorks($uid = false)
     {

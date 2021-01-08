@@ -121,9 +121,9 @@ class IndexController extends Controller
      */
     public function live()
     {
-//        return success();
+        $user_id =  $this->user['id']  ?? 0;
         $recommendModel = new Recommend();
-        $lists = $recommendModel->getIndexRecommend(7, 1);
+        $lists = $recommendModel->getLiveRecommend($user_id,7, 1);
         return success($lists);
     }
 
