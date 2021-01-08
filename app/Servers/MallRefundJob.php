@@ -9,6 +9,8 @@ use App\Models\MallOrder;
 use App\Models\MallRefundRecord;
 use App\Models\OrderPayRefund;
 use App\Models\RunRefundRecord;
+use App\Models\Subscribe;
+use App\Models\VipUser;
 use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
 use Yansongda\Pay\Pay;
@@ -417,7 +419,7 @@ class MallRefundJob
         }
     }
 
-    //todo 虚拟订单表退款
+    //虚拟订单表退款
     public static function shillJob($type = 1)
     {
         $s = new self();
@@ -436,6 +438,7 @@ class MallRefundJob
             ->where('o.status', '=', 1)
             ->whereIn('p.type', [1, 2, 3])
             ->where('o.is_refund', '=', 0)
+            ->limit(30)
             ->select(['o.id', 'o.user_id', 'o.ordernum', 'p.transaction_id',
                 'p.type as client', 'o.pay_price as all_price',
                 'p.type', 'p.price as refund_price'])
@@ -556,7 +559,7 @@ class MallRefundJob
             ->where('o.is_refund', '=', 2)
             ->where('o.status', '=', 1)
             ->select(['o.id', 'op.id as op_id', 'o.user_id', 'o.ordernum', 'o.refund_no as service_num',
-                'op.pay_price', 'op.refund_price', 'pr.type as client', 'o.type as order_type'])
+                'op.pay_price', 'op.refund_price', 'pr.type as client', 'o.type as order_type', 'o.relation_id'])
             ->get();
 
         if ($list->isEmpty()) {
@@ -564,22 +567,23 @@ class MallRefundJob
         }
 
         foreach ($list as $v) {
-            switch ($v->client) {
-                case 1:
-                    //微信公众号
-                    $temp_res = $this->wechatRefundCheckMethod($v, 1);
-                    break;
-                case 2:
-                    //微信app
-                    $temp_res = $this->wechatRefundCheckMethod($v, 2);
-                    break;
-                case 3:
-                    //支付宝app
-                    $temp_res = $this->aliPayRefundCheckMethod($v);
-                    break;
-                default:
-                    continue;
-            }
+//            switch ($v->client) {
+//                case 1:
+//                    //微信公众号
+//                    $temp_res = $this->wechatRefundCheckMethod($v, 1);
+//                    break;
+//                case 2:
+//                    //微信app
+//                    $temp_res = $this->wechatRefundCheckMethod($v, 2);
+//                    break;
+//                case 3:
+//                    //支付宝app
+//                    $temp_res = $this->aliPayRefundCheckMethod($v);
+//                    break;
+//                default:
+//                    continue;
+//            }
+            $temp_res['code'] = true;
 
             if ($temp_res['code'] === true) {
                 DB::table('nlsg_order')
@@ -589,6 +593,51 @@ class MallRefundJob
                 DB::table('nlsg_order_pay_refund')
                     ->where('id', '=', $v->op_id)
                     ->update(['status' => 2]);
+
+                if ($v->order_type == 9 || $v->order_type == 15) {
+                    $check_sub = Subscribe::where('user_id', '=', $v->user_id)
+                        ->where('relation_id', '=', $v->relation_id)
+                        ->where('type', '=', $v->order_type == 9 ? 2 : 6)
+                        ->where('status', '=', 1)
+                        ->first();
+
+                    if ($check_sub) {
+                        $end_date = date('Y-m-d 23:59:59', strtotime('-1 years', strtotime($check_sub->end_time)));
+                        if ($check_sub->start_time <= $end_date) {
+                            //减少一年
+                            DB::table('nlsg_subscribe')
+                                ->where('id', '=', $check_sub->id)
+                                ->update(['end_time' => $end_date]);
+                        } else {
+                            //取消
+                            DB::table('nlsg_subscribe')
+                                ->where('id', '=', $check_sub->id)
+                                ->update(['status' => 0]);
+                        }
+                    }
+                } elseif ($v->order_type == 16) {
+                    //360
+                    $check_sub = VipUser::where('user_id', '=', $v->user_id)
+                        ->where('level', '=', 1)
+                        ->where('status', '=', 1)
+                        ->where('is_default', '=', 1)
+                        ->first();
+                    if ($check_sub) {
+                        $end_date = date('Y-m-d 23:59:59', strtotime('-1 years', strtotime($check_sub->expire_time)));
+                        if ($check_sub->start_time <= $end_date) {
+                            //减少一年
+                            DB::table('nlsg_vip_user')
+                                ->where('id', '=', $check_sub->id)
+                                ->update(['expire_time' => $end_date]);
+                        } else {
+                            //取消
+                            DB::table('nlsg_vip_user')
+                                ->where('id', '=', $check_sub->id)
+                                ->update(['status' => 0]);
+                        }
+                    }
+                }
+
             }
 
         }

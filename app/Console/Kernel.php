@@ -56,11 +56,19 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
+            MallRefundJob::shillJob(1);
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
             MallRefundJob::refundJob(2);//商城订单退款查询
 //            $c = new ChannelServers();
 //            $c->getDouyinOrder();
 //            $c->supplementDouYinOrder();
         })->everyFiveMinutes();//每五分
+
+        $schedule->call(function () {
+            MallRefundJob::shillJob(2);
+        })->everyFiveMinutes()->runInBackground();
 
         $schedule->call(function () {
 

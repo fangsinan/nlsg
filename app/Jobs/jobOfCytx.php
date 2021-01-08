@@ -32,7 +32,7 @@ class jobOfCytx implements ShouldQueue
      */
     public function handle()
     {
-        $servers = new ChannelServers();
-        $servers->cytxOrderList($this->job_data['id']);
+//        $servers = new ChannelServers();
+//        $servers->cytxOrderList($this->job_data['id']);
     }
 }
