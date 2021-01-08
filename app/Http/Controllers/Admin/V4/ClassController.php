@@ -711,11 +711,14 @@ class ClassController extends ControllerBackend
         $is_pay = $input['is_pay'] ?? 0;
         $type   = $input['type'] ?? 1;
         $subtitle   = $input['subtitle'] ?? '';
+        $des      = $input['des'] ?? '';
+        $timing_online = $input['online_type'] ?? 0;
 
 
         $data = [
             'title' => $title,
             'subtitle' => $subtitle,
+            'des'      => $des,
             'cover_img' => $cover_img,
             'detail_img' => $detail_img,
             'user_id' => $user_id,
