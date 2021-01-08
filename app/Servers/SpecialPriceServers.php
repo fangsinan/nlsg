@@ -391,7 +391,7 @@ class SpecialPriceServers
             ->join('nlsg_mall_sku as s', 'g.id', '=', 's.goods_id')
             ->where('g.status', '=', 2)
             ->where('s.status', '=', 1)
-            ->where('s.stock','>',0)
+            ->where('s.stock', '>', 0)
             ->select(['g.id as goods_id', 'g.price as goods_price', 'sku_number', 's.price as sku_price'])
             ->get()->toArray();
 
@@ -434,7 +434,7 @@ class SpecialPriceServers
     public function addFlashSaleNew($params)
     {
         $team_id = $params['team_id'] ?? 0;
-        if (!in_array($team_id, [1, 2, 3, 4])) {
+        if (!in_array($team_id, [1, 2])) {
             return ['code' => false, 'msg' => 'team_id错误'];
         }
         $date = $params['date'] ?? '';
@@ -455,21 +455,30 @@ class SpecialPriceServers
 
         switch (intval($team_id)) {
             case 1:
-                $begin = $date . ' ' . '09:00:00';
-                $end = $date . ' ' . '12:59:59';
+                $begin = $date . ' ' . '10:00:00';
+                $end = $date . ' ' . '19:59:59';
                 break;
             case 2:
-                $begin = $date . ' ' . '13:00:00';
-                $end = $date . ' ' . '18:59:59';
+                $begin = $date . ' ' . '20:00:00';
+                $end = date('Y-m-d', strtotime("$date +1 days")) . ' ' . '09:59:59';
                 break;
-            case 3:
-                $begin = $date . ' ' . '19:00:00';
-                $end = $date . ' ' . '20:59:59';
-                break;
-            case 4:
-                $begin = $date . ' ' . '21:00:00';
-                $end = date('Y-m-d', strtotime("$date +1 days")) . ' ' . '08:59:59';
-                break;
+
+//            case 1:
+//                $begin = $date . ' ' . '09:00:00';
+//                $end = $date . ' ' . '12:59:59';
+//                break;
+//            case 2:
+//                $begin = $date . ' ' . '13:00:00';
+//                $end = $date . ' ' . '18:59:59';
+//                break;
+//            case 3:
+//                $begin = $date . ' ' . '19:00:00';
+//                $end = $date . ' ' . '20:59:59';
+//                break;
+//            case 4:
+//                $begin = $date . ' ' . '21:00:00';
+//                $end = date('Y-m-d', strtotime("$date +1 days")) . ' ' . '08:59:59';
+//                break;
         }
 
         $now = time();
