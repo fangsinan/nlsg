@@ -208,7 +208,7 @@ class MallRefundJob
 
     }
 
-    //优雅的支付宝退款
+    //优雅的支付宝退款  待修改
     public function aliRefundGrace($v)
     {
         $config = Config('pay.alipay');
@@ -249,7 +249,7 @@ class MallRefundJob
     }
 
     /**
-     * 微信退款
+     * 微信退款  待修改
      * @param $v
      * @param $flag
      * @return bool
@@ -428,6 +428,7 @@ class MallRefundJob
 
     private function shillRefund()
     {
+        $this->wechatRefundMethod([],1);
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
             ->where('o.user_id', '=', 168934)
@@ -486,6 +487,56 @@ class MallRefundJob
 //            Order::where('id', '=', $v->id)->update($update_data);
 //        }
         dd($list);
+    }
+
+    //支付宝退款(单独)
+    private function aliPayRefundMethod($v)
+    {
+        $config = Config('pay.alipay');
+        $pay = Pay::alipay($config);
+        $order = [
+            'out_trade_no' => $v->ordernum,
+            'refund_amount' => $v->refund_price,
+            'out_request_no' => $v->service_num,
+        ];
+        try {
+            $result = $pay->refund($order);
+            if ($result->code == 10000) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    //微信退款(单独)
+    private function wechatRefundMethod($v, $flag)
+    {
+        $config = Config('pay.wechat');
+        dd($config);
+
+
+        if ($flag == 1) {
+            //h5
+            $config = Config('wechat.payment.wx_wechat');
+        } else {
+            //微信app
+            $config = Config('wechat.payment.default');
+        }
+        $pay = Pay::wechat($config);
+        $order = [
+            'appid' => $config['app_id'], //公众账号ID
+            'mch_id' => $config['mch_id'], //商户号
+            'refund_account' => 'REFUND_SOURCE_RECHARGE_FUNDS',
+            'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
+            'out_refund_no' => $v->service_num, //商户退款单号
+            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
+            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
+            'transaction_id' => $v->transaction_id, //微信订单号
+        ];
+
     }
 
     private function shillCheck()
