@@ -583,7 +583,6 @@ class MallRefundJob
                 default:
                     continue;
             }
-            $temp_res['code'] = true;
 
             if ($temp_res['code'] === true) {
                 DB::table('nlsg_order')
