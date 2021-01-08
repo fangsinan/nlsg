@@ -232,7 +232,7 @@ class WorksController extends Controller
                     $order_str = 'collection_num';
                     break;
                 default:
-                    $order_str = 'updated_at';
+                    $order_str = 'created_at';
             }
             $sort = 'desc';
 
