@@ -503,6 +503,7 @@ class MallRefundJob
         ];
         try {
             $result = $pay->refund($order);
+            var_dump($result);
             if ($result->code == 10000) {
                 return true;
             } else {
