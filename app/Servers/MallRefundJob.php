@@ -435,7 +435,7 @@ class MallRefundJob
             ->where('o.user_id', '=', 168934)
             ->where('o.is_shill', '=', 1)
             ->where('o.status', '=', 1)
-            ->whereIn('p.type',[1,2,3])
+            ->whereIn('p.type', [1, 2, 3])
             ->where('o.is_refund', '=', 0)
             ->limit(1)
             ->select(['o.id', 'o.user_id', 'o.ordernum', 'p.transaction_id',
@@ -486,13 +486,13 @@ class MallRefundJob
                 $update_data['is_refund'] = 9;
             }
             DB::table('nlsg_order')
-                ->where('id','=',$v->id)
+                ->where('id', '=', $v->id)
                 ->update($update_data);
         }
     }
 
     //支付宝退款(单独)
-    private function aliPayRefundMethod($v): bool
+    private function aliPayRefundMethod($v): array
     {
         $config = Config('pay.alipay');
         $pay = Pay::alipay($config);
@@ -505,17 +505,17 @@ class MallRefundJob
             $result = $pay->refund($order);
             var_dump($result);
             if (intval($result->code) === 10000) {
-                return true;
+                return ['code' => true, 'refund_id' => 0];
             } else {
-                return false;
+                return ['code' => false, 'refund_id' => 0];
             }
         } catch (\Exception $e) {
-            return false;
+            return ['code' => false, 'refund_id' => 0];
         }
     }
 
     //微信退款(单独)
-    private function wechatRefundMethod($v, $flag): bool
+    private function wechatRefundMethod($v, $flag): array
     {
         if ($flag == 1) {
             //h5
@@ -537,10 +537,10 @@ class MallRefundJob
                 'refund_desc' => '课程退款',
             ]
         );
-        if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
-            return true;
-        }else{
-            return false;
+        if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {
+            return ['code' => true, 'refund_id' => $result['refund_id']];
+        } else {
+            return ['code' => false, 'refund_id' => 0];
         }
     }
 
