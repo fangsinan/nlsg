@@ -602,7 +602,7 @@ class MallRefundJob
                         ->first();
 
                     if ($check_sub) {
-                        $end_date = date('Y-m-d 23:59:59', strtotime('-1 years', strtotime($check_sub->end_time)));
+                        $end_date = date('Y-m-d 00:00:00', strtotime('-1 years', strtotime($check_sub->end_time)));
                         if ($check_sub->start_time <= $end_date) {
                             //减少一年
                             DB::table('nlsg_subscribe')
@@ -623,7 +623,7 @@ class MallRefundJob
                         ->where('is_default', '=', 1)
                         ->first();
                     if ($check_sub) {
-                        $end_date = date('Y-m-d 23:59:59', strtotime('-1 years', strtotime($check_sub->expire_time)));
+                        $end_date = date('Y-m-d 00:00:00', strtotime('-1 years', strtotime($check_sub->expire_time)));
                         if ($check_sub->start_time <= $end_date) {
                             //减少一年
                             DB::table('nlsg_vip_user')
