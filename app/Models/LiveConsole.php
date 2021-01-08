@@ -163,9 +163,6 @@ class LiveConsole extends Base
         if (empty($params['msg'] ?? '')) {
             return ['code' => false, 'msg' => '直播预约公告错误'];
         }
-//        if (empty($params['content'] ?? '')) {
-//            return ['code' => false, 'msg' => '直播内容介绍错误'];
-//        }
         if (!empty($params['helper'] ?? '')) {
             $live_data['helper'] = preg_replace('/[^0-9]/i', ',', $params['helper']);
         }
@@ -176,7 +173,7 @@ class LiveConsole extends Base
         $live_data['describe'] = $params['describe'];
         $live_data['cover_img'] = $params['cover_img'];
         $live_data['msg'] = $params['msg'];
-        //$live_data['content'] = $params['content'];
+        $live_data['content'] = $params['content'] ?? '';
         $live_data['can_push'] = $params['can_push'] ?? 0;
         $live_data['is_free'] = $params['is_free'];
         $live_begin_at = 0;
