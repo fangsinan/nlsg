@@ -12,6 +12,7 @@ use App\Models\MallGoods;
 use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
+use App\Models\VipRedeemUser;
 use App\Servers\MallRefundJob;
 use Illuminate\Http\Request;
 
@@ -216,6 +217,7 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
             //MallRefundJob::shillJob(2);
+            //VipRedeemUser::subWorksOrGetRedeemCode(692095);
             return true;
         } else {
             $params = $request->input();
