@@ -816,7 +816,7 @@ class ClassController extends ControllerBackend
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'subtitle', 'des','cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price', 'is_pay', 'message', 'timing_online')
+                'price', 'original_price', 'is_pay', 'message', 'timing_online','timing_time')
             ->where('id', $id)
             ->first();
         if ($work) {
