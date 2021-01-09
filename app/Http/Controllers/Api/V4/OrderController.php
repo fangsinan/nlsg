@@ -1163,12 +1163,12 @@ class OrderController extends Controller
     //创业天下下单
     public function createColumnCytxOrder(Request  $request){
         $request->offsetSet('activity_tag','cytx');
-        $this->createColumnOrder($request);
+        return $this->createColumnOrder($request);
     }
 
     public function createWorksCytxOrder(Request  $request){
         $request->offsetSet('activity_tag','cytx');
-        $this->createWorksOrder($request);
+        return $this->createWorksOrder($request);
     }
 
 }
