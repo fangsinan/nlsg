@@ -634,8 +634,6 @@ class ClassController extends ControllerBackend
         $status = $input['status'] ?? 2;
         $online_type = $input['online_type'] ?? 1;
 
-
-
         $data = [
             'cover_pic' => $cover_pic,
             'details_pic' => $details_pic,
@@ -644,10 +642,20 @@ class ClassController extends ControllerBackend
             'message' => $message,
             'user_id' => $user_id,
             'price' => $price,
+            'timing_online'  => $online_type,
             'original_price' => $original_price,
             'type' => 2,
             'status' => $status
         ];
+        //是否自动上架
+       if ($timing_online==1){
+           $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+           $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+       } else {
+           if ($status==4){
+               $data['online_time'] =  date('Y-m-d H:i:s', time());
+           }
+       }
         if (!empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
         } else {
@@ -712,7 +720,6 @@ class ClassController extends ControllerBackend
         $type   = $input['type'] ?? 1;
         $subtitle   = $input['subtitle'] ?? '';
         $des      = $input['des'] ?? '';
-        $timing_online = $input['online_type'] ?? 0;
 
 
         $data = [
@@ -723,6 +730,7 @@ class ClassController extends ControllerBackend
             'detail_img' => $detail_img,
             'user_id' => $user_id,
             'original_price' => $original_price,
+            'timing_online'  => $timing_online,
             'price' => $price,
             'is_end' => $is_end,
             'status' => $status,
@@ -731,6 +739,16 @@ class ClassController extends ControllerBackend
             'is_free' => $price == 0 ? 1 : 0,
             'type'   => $type
         ];
+        //是否自动上架
+       if ($timing_online==1){
+           $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+           $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+       } else {
+           if ($status==4){
+               $data['online_time'] =  date('Y-m-d H:i:s', time());
+           }
+       }
+
         if (!empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
             //增加分类
@@ -848,10 +866,7 @@ class ClassController extends ControllerBackend
         }
 
         $content = $input['content'] ?? ''; //文稿
-        $timing_online = $input['timing_online'] ?? 0;
-        if ($timing_online == 1) {
-            $data['timing_time'] = date('Y-m-d H:i:s', time());
-        }
+        $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
 
         $data = [
             'pid' => $work_id,
@@ -866,6 +881,16 @@ class ClassController extends ControllerBackend
             'free_trial' => $input['free_trial'] ?? 0,
             'timing_online' => $timing_online ?? 0
         ];
+
+        //是否自动上架
+        if ($timing_online==1){
+            $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+            $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+        } else {
+           if ($status==4){
+               $data['online_time'] =  date('Y-m-d H:i:s', time());
+           }
+        }
 
         if (!empty($input['id'])) {
             WorksInfo::where('id', $input['id'])->update($data);
@@ -969,6 +994,16 @@ class ClassController extends ControllerBackend
             'is_audio_book' => 1,
             'type'    => 2
         ];
+
+        //是否自动上架
+        if ($timing_online==1){
+            $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+            $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+        } else {
+           if ($status==4){
+              $data['online_time'] =  date('Y-m-d H:i:s', time());
+           }
+        }
 
         if (!empty($input['id'])) {
              Works::where('id', $input['id'])->update($data);

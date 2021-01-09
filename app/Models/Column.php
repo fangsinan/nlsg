@@ -9,13 +9,13 @@ class Column extends Base
     protected $table = 'nlsg_column';
 
     // 允许批量赋值
-    protected  $fillable = ['name','type','user_id','subtitle','price','original_price','cover_pic','details_pic','message','status'];
+    protected  $fillable = ['name','type','user_id','subtitle','price','original_price','cover_pic','details_pic','message','status','online_type', 'online_time','timing_time'];
 
     //状态 1上架  2 下架
     const STATUS_ONE = 1;
     const STATUS_TWO = 2;
 
- 
+
 
     public function user()
     {
