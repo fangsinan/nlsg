@@ -141,7 +141,7 @@ class Recommend extends Base
                  }
               }
               $user = User::find($uid);
-              if ($user->phone == $list->helper){
+              if ( $user && $user->phone == $list->helper){
                   $list['is_helper'] = 1;
               } else {
                   $list['is_helper'] = 0;
