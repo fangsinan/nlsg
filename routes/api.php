@@ -306,6 +306,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('works/subscribe', 'WorksController@subscribe');
         Route::get('works/works_sub_works','WorksController@worksSubWorks');
 
+        //创业天下下单
+        Route::post('order/create_column_cytx_order', 'OrderController@createColumnCytxOrder');
+        Route::post('order/create_works_cytx_order', 'OrderController@createWorksCytxOrder');
+
         //虚拟订单  end
 
 

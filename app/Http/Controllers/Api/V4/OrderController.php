@@ -238,7 +238,6 @@ class OrderController extends Controller
     public function createWorksOrder(Request $request)
     {
 
-
         $work_id = $request->input('work_id', 0);
         $coupon_id = $request->input('coupon_id', 0);
         $tweeter_code = $request->input('inviter', 0);
@@ -300,7 +299,6 @@ class OrderController extends Controller
         return $this->success($order['id']);
 
     }
-
 
     /**
      * @api {post} /api//v4/order/create_reward_order 打赏下单
@@ -1159,6 +1157,18 @@ class OrderController extends Controller
         $order = Order::firstOrCreate($data);
         return $this->success($order['id']);
 
+    }
+
+
+    //创业天下下单
+    public function createColumnCytxOrder(Request  $request){
+        $request->offsetSet('activity_tag','cytx');
+        $this->createColumnOrder($request);
+    }
+
+    public function createWorksCytxOrder(Request  $request){
+        $request->offsetSet('activity_tag','cytx');
+        $this->createWorksOrder($request);
     }
 
 }
