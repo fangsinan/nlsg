@@ -3,18 +3,17 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Announce;
+use App\Models\Banner;
 use App\Models\CacheTools;
 use App\Models\ConfigModel;
 use App\Models\Lists;
-use App\Models\Versions;
-use App\Servers\statisticsServers;
-use Illuminate\Http\Request;
-use App\Models\Announce;
-use App\Models\Banner;
-use App\Models\Live;
 use App\Models\Recommend;
+use App\Models\Versions;
 use App\Models\Works;
+use App\Servers\StatisticsServers;
 use EasyWeChat\Factory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class IndexController extends Controller
@@ -122,9 +121,9 @@ class IndexController extends Controller
      */
     public function live()
     {
-        $user_id =  $this->user['id']  ?? 0;
+        $user_id = $this->user['id'] ?? 0;
         $recommendModel = new Recommend();
-        $lists = $recommendModel->getLiveRecommend($user_id,7, 1);
+        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
         return success($lists);
     }
 
@@ -567,42 +566,42 @@ class IndexController extends Controller
      * }
      * ]
      *  "goods": [
-                 {
-                     "id": 10,
-                     "title": "热门商品榜单",
-                     "num": 2,
-                     "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
-                     "goods": [
-                         {
-                             "works_id": 48,
-                             "name": " 香港Mcomb儿童专用智能牙刷",
-                             "price": "220.00",
-                             "pivot": {
-                                 "lists_id": 10,
-                                 "works_id": 48
-                             }
-                         },
-                         {
-                             "works_id": 58,
-                             "name": "得力 儿童益智绘画套装",
-                             "price": "90.00",
-                             "pivot": {
-                                 "lists_id": 10,
-                                 "works_id": 58
-                             }
-                         },
-                         {
-                             "works_id": 60,
-                             "name": "汉字奇遇-识字启蒙卡片",
-                             "price": "198.00",
-                             "pivot": {
-                                 "lists_id": 10,
-                                 "works_id": 60
-                             }
-                         }
-                     ]
-                 }
-             ]
+     * {
+     * "id": 10,
+     * "title": "热门商品榜单",
+     * "num": 2,
+     * "cover": "/wechat/works/video/161627/2017121117503851065.jpg",
+     * "goods": [
+     * {
+     * "works_id": 48,
+     * "name": " 香港Mcomb儿童专用智能牙刷",
+     * "price": "220.00",
+     * "pivot": {
+     * "lists_id": 10,
+     * "works_id": 48
+     * }
+     * },
+     * {
+     * "works_id": 58,
+     * "name": "得力 儿童益智绘画套装",
+     * "price": "90.00",
+     * "pivot": {
+     * "lists_id": 10,
+     * "works_id": 58
+     * }
+     * },
+     * {
+     * "works_id": 60,
+     * "name": "汉字奇遇-识字启蒙卡片",
+     * "price": "198.00",
+     * "pivot": {
+     * "lists_id": 10,
+     * "works_id": 60
+     * }
+     * }
+     * ]
+     * }
+     * ]
      * }
      *     }
      *
@@ -613,11 +612,11 @@ class IndexController extends Controller
         $cache_key_name = 'index_rank_data';
         $data = Cache::get($cache_key_name);
 
-        if(empty($data)){
+        if (empty($data)) {
             $model = new Lists();
             $data = [
                 'works' => $model->getRankWorks(),
-                'wiki'  => $model->getRankWiki(),
+                'wiki' => $model->getRankWiki(),
                 'goods' => $model->getRankGoods()
             ];
 
@@ -684,9 +683,9 @@ class IndexController extends Controller
 
     public function recommend()
     {
-        $user_id =  $this->user['id']  ?? 0;
+        $user_id = $this->user['id'] ?? 0;
         $works = new Works();
-        $lists = $works->getRecommendWorks( 566, $user_id);
+        $lists = $works->getRecommendWorks(566, $user_id);
         return success($lists);
     }
 
@@ -864,7 +863,7 @@ class IndexController extends Controller
      */
     public function editor()
     {
-        $uid =  $this->user['id'] ?? 0;
+        $uid = $this->user['id'] ?? 0;
         $recommendModel = new Recommend();
         $lists = $recommendModel->getEditorWorks($uid);
         return $this->success($lists);
@@ -891,25 +890,25 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function  version(Request $request)
+    public function version(Request $request)
     {
 
         $version = $request->get('version');
         $os_type = $request->get('os_type') ?? 1;
 
 
-        $list =  Versions::select('id','number','content','url','is_force','str_at')
-                ->where('status', 1)
-                ->where('os_type', $os_type)
-                ->orderBy('created_at','desc')
-                ->first();
+        $list = Versions::select('id', 'number', 'content', 'url', 'is_force', 'str_at')
+            ->where('status', 1)
+            ->where('os_type', $os_type)
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-        if($list && version_compare($version, $list->number, '>=')){
+        if ($list && version_compare($version, $list->number, '>=')) {
             //当实际版本大于储存版本号时   默认不更新
             return success(['is_force' => 0]);
         }
         //否则按照数据库进行更新状态
-        $list->content =  $list->content ? explode('；', $list->content) : '';
+        $list->content = $list->content ? explode('；', $list->content) : '';
         return success($list);
 
 
@@ -938,32 +937,32 @@ class IndexController extends Controller
      *     }
      *
      */
-    public  function  event()
+    public function event()
     {
-        $list = Banner::select('id','title','pic','h5_url', 'url', 'jump_type', 'obj_id')
-                ->where('type', 54)
-                ->first();
+        $list = Banner::select('id', 'title', 'pic', 'h5_url', 'url', 'jump_type', 'obj_id')
+            ->where('type', 54)
+            ->first();
         return success($list);
 
     }
 
-    public  function  market()
+    public function market()
     {
         //(1).直播详情   (2).精品课  (3).商品  (4).h5页面  (5).讲座  (6).听书 7 专栏
         $data = [
-            'id'   => 538,
+            'id' => 538,
             'info_id' => 0,
             'type' => 3,
-            'url'  => '',
-            'img'  => 'https://image.nlsgapp.com/nlsg/authorpt/20210106142306594001.jpg'
+            'url' => '',
+            'img' => 'https://image.nlsgapp.com/nlsg/authorpt/20210106142306594001.jpg'
         ];
-        return  success($data);
+        return success($data);
     }
 
-    public function  share(Request $request)
+    public function share(Request $request)
     {
         $input = $request->all();
-        $url   = $input['url'] ?? '';
+        $url = $input['url'] ?? '';
         $config = [
             'app_id' => 'wxe24a425adb5102f6',
             'secret' => '2ded804b74f99ae2f342423dd7952620',
@@ -972,11 +971,11 @@ class IndexController extends Controller
 
         $app = Factory::officialAccount($config);
         $app->jssdk->setUrl($url);
-        $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'],$debug = true, $beta = false, $json = true);
+        $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'], $debug = true, $beta = false, $json = true);
         return success($jssdk);
     }
 
-    public function   test()
+    public function test()
     {
         Works::statistic(); //数据统计
     }
@@ -995,8 +994,9 @@ class IndexController extends Controller
 
     }
 
-    public function kunSaid(Request $request){
-        $servers = new statisticsServers();
+    public function kunSaid(Request $request)
+    {
+        $servers = new StatisticsServers();
         $data = $servers->kunSaid($request->input());
         return $this->getRes($data);
     }
