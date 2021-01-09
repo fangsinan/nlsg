@@ -128,9 +128,9 @@ class Order extends Base
     {
         $past     = Carbon::parse('-30 minutes')->toDateTimeString();
         $subHour  = now()->subHours(5);
-        $res = Order::where('status', 0)
-            ->where('created_at', '<', $past)
+        $res = Order::where('created_at', '<', $past)
             ->where('created_at', '>', $subHour)
+            ->where('status', 0)
             ->update([
                 'status' => 2
             ]);
