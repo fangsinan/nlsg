@@ -51,6 +51,7 @@ class PayController extends Controller {
         $order_id = $request->input('id', 0);
         $is_h5 = $request->input('is_h5', 0);
         $openid = $request->input('open_id', '');
+        $activity_tag = $request->input('activity_tag', '');
 
 
         if (empty($order_id) || empty($attach)) { //订单id有误
@@ -61,6 +62,11 @@ class PayController extends Controller {
         if ($pay_info == false) {
             return $this->error(0, '订单信息错误');
         }
+
+        if ($activity_tag === 'cytx') {
+            Order::where('id','=',$order_id)->update(['activity_tag'=>'cytx']);
+        }
+        
         $config = Config('wechat.payment.default');
 
         if($is_h5 == 1 || $is_h5 == 2 ){ // 公众号openid
