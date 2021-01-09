@@ -323,13 +323,19 @@ class IndexController extends ControllerBackend
      */
     public function live()
     {
-        $lists = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num')
-            ->where('is_del', 0)
-            ->where('status', 4)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->toArray();
-
+        $ids = Recommend::where('type', 7)
+                   ->where('position', 1)
+                   ->pluck('relation_id');
+        if (!$ids) {
+           return error(1000, '还没有推荐');
+        }
+        $lists = Live::with('user:id,nickname')
+                   ->select('id','user_id','title','created_at')
+                   ->where('status', 4)
+                   ->whereIn('id', $ids)
+                   ->orderBy('begin_at','desc')
+                   ->get()
+                   ->toArray();
         return success($lists);
     }
 
