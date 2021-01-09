@@ -126,9 +126,11 @@ class Order extends Base
      */
     public static function clear()
     {
-        $past = Carbon::parse('-30 minutes')->toDateTimeString();
+        $past     = Carbon::parse('-30 minutes')->toDateTimeString();
+        $subHour  = now()->subHours(5);
         $res = Order::where('status', 0)
             ->where('created_at', '<', $past)
+            ->where('created_at', '>', $subHour)
             ->update([
                 'status' => 2
             ]);
