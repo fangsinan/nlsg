@@ -650,8 +650,8 @@ class ClassController extends ControllerBackend
         ];
         //是否自动上架
        if ($timing_online==1){
-           $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
-           $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+           $data['online_time'] = $input['timing_time'];
+           $data['timing_time'] = $input['timing_time'];
        } else {
            if ($status==4){
                $data['online_time'] =  date('Y-m-d H:i:s', time());
@@ -742,8 +742,8 @@ class ClassController extends ControllerBackend
         ];
         //是否自动上架
        if ($timing_online==1){
-           $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
-           $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+           $data['online_time'] = $input['timing_time'];
+           $data['timing_time'] = $input['timing_time'];
        } else {
            if ($status==4){
                $data['online_time'] =  date('Y-m-d H:i:s', time());
@@ -816,7 +816,7 @@ class ClassController extends ControllerBackend
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'subtitle', 'des','cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price', 'is_pay', 'message', 'timing_online')
+                'price', 'original_price', 'is_pay', 'message', 'timing_online','timing_time')
             ->where('id', $id)
             ->first();
         if ($work) {
@@ -885,8 +885,8 @@ class ClassController extends ControllerBackend
 
         //是否自动上架
         if ($timing_online==1){
-            $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
-            $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+            $data['online_time'] = $input['timing_time'];
+            $data['timing_time'] = $input['timing_time'];
         } else {
            if ($status==4){
                $data['online_time'] =  date('Y-m-d H:i:s', time());
@@ -998,8 +998,8 @@ class ClassController extends ControllerBackend
 
         //是否自动上架
         if ($timing_online==1){
-            $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
-            $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+            $data['online_time'] = $input['timing_time'];
+            $data['timing_time'] = $input['timing_time'];
         } else {
            if ($status==4){
               $data['online_time'] =  date('Y-m-d H:i:s', time());
