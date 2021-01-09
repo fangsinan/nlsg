@@ -39,6 +39,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/test', 'IndexController@test');
     Route::get('config', 'IndexController@config');
 
+    //统计
+    Route::get('index/Kunsaid', 'IndexController@kunSaid');
+
     //专栏
     Route::get('column/get_column_list', 'ColumnController@getColumnList');
     Route::get('column/get_column_detail', 'ColumnController@getColumnDetail');

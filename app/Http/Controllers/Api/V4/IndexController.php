@@ -7,6 +7,7 @@ use App\Models\CacheTools;
 use App\Models\ConfigModel;
 use App\Models\Lists;
 use App\Models\Versions;
+use App\Servers\statisticsServers;
 use Illuminate\Http\Request;
 use App\Models\Announce;
 use App\Models\Banner;
@@ -994,6 +995,10 @@ class IndexController extends Controller
 
     }
 
-
+    public function kunSaid(Request $request){
+        $servers = new statisticsServers();
+        $data = $servers->kunSaid($request->input());
+        return $this->getRes($data);
+    }
 
 }
