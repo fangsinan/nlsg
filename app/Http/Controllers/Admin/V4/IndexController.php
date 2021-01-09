@@ -874,7 +874,8 @@ class IndexController extends ControllerBackend
         Recommend::create([
             'relation_id' => $input['live_id'],
             'position'    => 1,
-            'type'        => 7
+            'type'        => 7,
+            'sort'        => $input['sort'] ?? 99
         ]);
         return success();
     }
