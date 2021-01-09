@@ -42,6 +42,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::post('wiki/add', 'ClassController@addWiki');
         Route::get('wiki/edit', 'ClassController@editWiki');
 
+
         //广告
         Route::get('banner/list', 'BannerController@list');
         Route::post('banner/add', 'BannerController@add');
@@ -73,6 +74,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('index/get-lives', 'IndexController@getLives');
         Route::get('index/get-wiki', 'IndexController@getWiki');
         Route::post('index/add-wiki', 'IndexController@addWiki');
+        Route::post('index/add-live', 'IndexController@addLive');
+        Route::post('index/delete-live', 'IndexController@delLive');
 
         //商城订单
         Route::get('mall_order/list', 'MallOrderController@list');

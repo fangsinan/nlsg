@@ -7,6 +7,7 @@ use App\Models\Column;
 use App\Models\Lists;
 use App\Models\ListsWork;
 use App\Models\Live;
+use App\Models\LiveInfo;
 use App\Models\MallGoods;
 use App\Models\Recommend;
 use App\Models\Wiki;
@@ -322,14 +323,13 @@ class IndexController extends ControllerBackend
      */
     public function live()
     {
-        $ids = Recommend::where('type', 7)
-            ->where('position', 1)
-            ->pluck('relation_id');
-        if ( ! $ids) {
-            return error(1000, '还没有推荐');
-        }
-        $model = new Live();
-        $lists = $model->getIndexLive($ids);
+        $lists = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num')
+            ->where('is_del', 0)
+            ->where('status', 4)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+
         return success($lists);
     }
 
@@ -405,26 +405,26 @@ class IndexController extends ControllerBackend
     public function addLists(Request $request)
     {
         $input = $request->all();
-        $sort  = $input['sort'] ?? 99;
-        $cover = !empty($input['cover']) ? covert_img($input['cover']) : '';
-        $details_pic = !empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
+        $sort = $input['sort'] ?? 99;
+        $cover = ! empty($input['cover']) ? covert_img($input['cover']) : '';
+        $details_pic = ! empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
         if ( ! empty($input['id'])) {
             Lists::where('id', $input['id'])->update([
-                'title'    => $input['title'],
-                'subtitle' => $input['subtitle'],
-                'status'   => $input['status'] ?? 2,
-                'cover'    => $cover,
-                'sort'     => $sort,
+                'title'       => $input['title'],
+                'subtitle'    => $input['subtitle'],
+                'status'      => $input['status'] ?? 2,
+                'cover'       => $cover,
+                'sort'        => $sort,
                 'details_pic' => $details_pic
             ]);
         } else {
             Lists::create([
-                'title'    => $input['title'],
-                'subtitle' => $input['subtitle'],
-                'status'   => $input['status'] ?? 2,
-                'type'     => 3,
-                'sort'     => $sort,
-                'cover'    => $cover,
+                'title'       => $input['title'],
+                'subtitle'    => $input['subtitle'],
+                'status'      => $input['status'] ?? 2,
+                'type'        => 3,
+                'sort'        => $sort,
+                'cover'       => $cover,
                 'details_pic' => $details_pic
             ]);
         }
@@ -693,7 +693,7 @@ class IndexController extends ControllerBackend
     {
         $id = $request->get('id');
         $list = Lists::where('id', $id)
-            ->select('id', 'title', 'subtitle', 'status','cover','details_pic','sort')
+            ->select('id', 'title', 'subtitle', 'status', 'cover', 'details_pic', 'sort')
             ->first();
         return success($list);
     }
@@ -780,6 +780,7 @@ class IndexController extends ControllerBackend
     public function getLives()
     {
         $lists = Live::where('status', 4)
+            ->where('is_del', 0)
             ->select('id', 'title')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -834,7 +835,57 @@ class IndexController extends ControllerBackend
         return success($lists);
     }
 
+    /**
+     * @api {post} api/admin_v4/index/add-lives 增加/更新推荐直播
+     * @apiVersion 4.0.0
+     * @apiName  add-lives
+     * @apiGroup 后台-首页推荐
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/index/add-lives
+     * @apiDescription 增加/编辑推荐直播
+     *
+     * @apiParam {string} live_id 直播id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function addLive(Request $request)
+    {
+        $input = $request->all();
+        $res = Recommend::where('relation_id', $input['live_id'])
+                ->where('position', 1)
+                ->where('type', 7)
+                ->first();
+        if ($res){
+            return  error(1004, '不能重复推荐');
+        }
+        Recommend::create([
+            'relation_id' => $input['live_id'],
+            'position'    => 1,
+            'type'        => 7
+        ]);
+        return success();
+    }
+
+
+    public function delLive(Request $request)
+    {
+        $id = $request->get('id');
+        $res = Recommend::where('id', $id)->delete();
+        if ($res){
+            return success();
+        }
+        return error(1004, '删除失败');
+    }
+
 
 }
+
 
 
