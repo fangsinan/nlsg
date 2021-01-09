@@ -977,7 +977,8 @@ class IndexController extends Controller
 
     public function test()
     {
-        Works::statistic(); //数据统计
+
+        Works::deal(); //数据统计
     }
 
 
