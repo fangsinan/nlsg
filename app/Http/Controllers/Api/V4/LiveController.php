@@ -851,8 +851,8 @@ class LiveController extends Controller
     {
         $input = $request->all();
         $tweeterCode = $input['tweeter_code'] ?? 0;
-        $id     = $input['id'] ?? 0;
-        $liveId = $input['live_id'] ?? 0;
+        $liveId      = $input['live_id'] ?? 0;
+        $liveInfoId  = $input['info_id'] ?? 0;
         $osType = $input['os_type'] ?? 1;
         $payType = $input['pay_type'] ?? 0;
         $model = new Order();
@@ -865,7 +865,7 @@ class LiveController extends Controller
         $tweeter_code = $checked['tweeter_code'];
 
         $list = Live::select('id', 'title', 'price', 'twitter_money', 'is_free')
-            ->where('id', $id)
+            ->where('id', $liveId)
             ->first();
         if (!$list) {
             return error('直播不存在');
@@ -876,20 +876,20 @@ class LiveController extends Controller
             'ordernum' => $ordernum,
             'type' => 10,
             'user_id' => $this->user['id'],
-            'relation_id' => $liveId,
+            'relation_id' => $liveInfoId,
             'cost_price' => $list['price'],
             'price' => $list['price'],
             'twitter_id' => $tweeter_code,
             'coupon_id' => 0,
             'ip' => $this->getIp($request),
             'os_type' => $osType,
-            'live_id' => $id,
+            'live_id' => $liveId,
             'pay_type' => $payType,
 
         ];
         $order = Order::firstOrCreate($data);
         if ($order){
-            Live::where('id', $id)->increment('order_num');
+            Live::where('id', $liveId)->increment('order_num');
             $data = [
                 'order_id' => $order['id']
             ];
