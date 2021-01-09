@@ -650,8 +650,8 @@ class ClassController extends ControllerBackend
         ];
         //是否自动上架
        if ($timing_online==1){
-           $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
-           $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+           $data['online_time'] = $input['timing_time'];
+           $data['timing_time'] = $input['timing_time'];
        } else {
            if ($status==4){
                $data['online_time'] =  date('Y-m-d H:i:s', time());
@@ -742,8 +742,8 @@ class ClassController extends ControllerBackend
         ];
         //是否自动上架
        if ($timing_online==1){
-           $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
-           $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+           $data['online_time'] = $input['timing_time'];
+           $data['timing_time'] = $input['timing_time'];
        } else {
            if ($status==4){
                $data['online_time'] =  date('Y-m-d H:i:s', time());
@@ -885,8 +885,8 @@ class ClassController extends ControllerBackend
 
         //是否自动上架
         if ($timing_online==1){
-            $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
-            $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+            $data['online_time'] = $input['timing_time'];
+            $data['timing_time'] = $input['timing_time'];
         } else {
            if ($status==4){
                $data['online_time'] =  date('Y-m-d H:i:s', time());
@@ -998,8 +998,8 @@ class ClassController extends ControllerBackend
 
         //是否自动上架
         if ($timing_online==1){
-            $data['online_time'] = date('Y-m-d H:i:s', $input['timing_time']);
-            $data['timing_time'] = date('Y-m-d H:i:s', $input['timing_time']);
+            $data['online_time'] = $input['timing_time'];
+            $data['timing_time'] = $input['timing_time'];
         } else {
            if ($status==4){
               $data['online_time'] =  date('Y-m-d H:i:s', time());
