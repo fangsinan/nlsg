@@ -103,6 +103,12 @@ class Recommend extends Base
         if (!$type) {
            return false;
         }
+        //添加缓存\
+        $cache_key_name = 'index_recommend_'.$type.'_'.$position;
+        $list = Cache::get($cache_key_name);
+        if($list){
+            return $list;
+        }
 
         $ids = Recommend::where('position', $position)
                  ->where('type', $type)
@@ -114,7 +120,7 @@ class Recommend extends Base
         if (!$ids) {
             return false;
         }
-        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at','price','order_num','is_free')
+        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at','price','order_num','is_free','helper')
                   ->whereIn('id', $ids)
                   ->where('is_del', 0)
                   ->orderBy('created_at', 'desc')
@@ -134,9 +140,19 @@ class Recommend extends Base
                      $list['live_status'] = '3';
                  }
               }
+              $user = User::find($uid);
+              if ($user->phone == $list->helper){
+                  $list['is_helper'] = 1;
+              } else {
+                  $list['is_helper'] = 0;
+              }
               $list['info_id'] =  $channel->id;
               $list['is_sub']  =  $isSub ?? 0;
           }
+
+          $expire_num = CacheTools::getExpire('index_recommend');
+          Cache::put($cache_key_name, $list, $expire_num);
+
           return $list;
 
     }

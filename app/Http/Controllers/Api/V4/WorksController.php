@@ -260,12 +260,17 @@ class WorksController extends Controller
             if( $teacher_id )   { $where['works.user_id'] = $teacher_id;}
             if( $is_free )      { $where['works.is_free'] = $is_free;   }
 
-            if($is_audio_book != 0){
-                //  0全部  1 听书 2课程
-                $is_audio_book_arr = ['1' => 1, '2' => 0,];
-                $where['works.is_audio_book'] = $is_audio_book_arr[$is_audio_book];
+//            if($is_audio_book != 0){
+//                //  0全部  1 听书 2课程
+//                $is_audio_book_arr = ['1' => 1, '2' => 0,];
+//                $where['works.is_audio_book'] = $is_audio_book_arr[$is_audio_book];
+//            }
+            if( $is_audio_book == 1){  //ios传参有问题
+                $where['works.is_audio_book'] = 1;// 先写死  目前只有课程
+            }else{
+                $where['works.is_audio_book'] = 0;
             }
-            $where['works.is_audio_book'] = 0;// 先写死  目前只有课程
+
 
             $relationObj = new WorksCategoryRelation();
             $worksObj = new Works();
