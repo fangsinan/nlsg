@@ -135,7 +135,7 @@ class Order extends Base
         return success('取消成功');
     }
 
-    //todo 推送到创业天下
+    //推送到创业天下
     public static function pushToCytx()
     {
         $list = DB::table('nlsg_order as o')
