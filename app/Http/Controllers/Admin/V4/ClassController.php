@@ -461,7 +461,7 @@ class ClassController extends ControllerBackend
         $content = $input['content'] ?? '';
         $status  = $input['status'] ?? 2;
         $sort    = $input['sort'] ?? 99;
-        $category_id = $input['category_id'] ?? 0;
+        $category_id   = $input['category_id'] ?? 0;
         $cover = !empty($input['cover']) ? covert_img($input['cover']) : '';
         $detail_img = !empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
 
@@ -475,6 +475,7 @@ class ClassController extends ControllerBackend
             'cover'       => $cover,
             'detail_img' => $detail_img
         ];
+
         if (!empty($input['id'])) {
             Wiki::where('id', $input['id'])->update($data);
         } else {
@@ -632,7 +633,7 @@ class ClassController extends ControllerBackend
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
         $status = $input['status'] ?? 2;
-        $online_type = $input['online_type'] ?? 1;
+        $timing_online = $input['online_type'] ?? 1;
 
         $data = [
             'cover_pic' => $cover_pic,
@@ -642,7 +643,7 @@ class ClassController extends ControllerBackend
             'message' => $message,
             'user_id' => $user_id,
             'price' => $price,
-            'timing_online'  => $online_type,
+            'timing_online'  => $timing_online,
             'original_price' => $original_price,
             'type' => 2,
             'status' => $status
@@ -815,7 +816,7 @@ class ClassController extends ControllerBackend
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
             ->select('id', 'title', 'subtitle', 'des','cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
-                'price', 'original_price', 'is_pay', 'message')
+                'price', 'original_price', 'is_pay', 'message', 'timing_online')
             ->where('id', $id)
             ->first();
         if ($work) {
