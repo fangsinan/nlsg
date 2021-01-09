@@ -1,17 +1,18 @@
 <?php
 
-
 namespace App\Models;
 
-
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class Works extends Base
 {
     protected $table = 'nlsg_works';
 
     protected $fillable = [
-        'column_id', 'title', 'subtitle', 'des', 'type', 'cover_img', 'detail_img', 'user_id', 'original_price', 'price', 'is_end', 'status', 'timing_online', 'content','message', 'is_pay', 'is_free', 'chapter_num', 'comment_num', 'collection_num', 'duration','is_audio_book','online_time','timing_time'
+        'column_id', 'title', 'subtitle', 'des', 'type', 'cover_img', 'detail_img', 'user_id', 'original_price',
+        'price', 'is_end', 'status', 'timing_online', 'content', 'message', 'is_pay', 'is_free', 'chapter_num',
+        'comment_num', 'collection_num', 'duration', 'is_audio_book', 'online_time', 'timing_time'
     ];
 
     //状态 1上架  2 下架
@@ -26,13 +27,17 @@ class Works extends Base
      */
     public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0, $is_free = false)
     {
-        if (!$ids) {
+        if ( ! $ids) {
             return false;
         }
-        $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'detail_img', 'subtitle', 'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num', 'is_audio_book', 'cover_img as cover_pic', 'detail_img as detail_pic')
-            ->with(['user' => function ($query) {
-                $query->select('id', 'nickname', 'headimg');
-            }])
+        $WorksObj = Works::select('id', 'column_id', 'type', 'user_id', 'title', 'cover_img', 'detail_img', 'subtitle',
+            'price', 'is_free', 'is_pay', 'works_update_time', 'chapter_num', 'subscribe_num as sub_num',
+            'is_audio_book', 'cover_img as cover_pic', 'detail_img as detail_pic')
+            ->with([
+                'user' => function ($query) {
+                    $query->select('id', 'nickname', 'headimg');
+                }
+            ])
             ->whereIn('id', $ids)
             ->whereIn('type', [2, 3]) //课程只有音频
             ->where('status', 4);
@@ -45,7 +50,7 @@ class Works extends Base
         }
 
         $lists = $WorksObj
-            ->orderByRaw('FIELD(id,' . implode(',', $ids) . ')')
+            ->orderByRaw('FIELD(id,'.implode(',', $ids).')')
             ->take(4)
             ->get()
             ->toArray();
@@ -68,9 +73,10 @@ class Works extends Base
         $infoObj = new WorksInfo();
         $userObj = new User();
         $res = DB::table($worksObj->getTable(), 'works')
-            ->leftJoin($infoObj->getTable() . ' as info', 'works.id', '=', 'info.pid')
-            ->leftJoin($userObj->getTable() . ' as user', 'works.user_id', '=', 'user.id')
-            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price', 'works.original_price', 'works.subtitle', 'user.nickname')
+            ->leftJoin($infoObj->getTable().' as info', 'works.id', '=', 'info.pid')
+            ->leftJoin($userObj->getTable().' as user', 'works.user_id', '=', 'user.id')
+            ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price',
+                'works.original_price', 'works.subtitle', 'user.nickname')
             ->where('works.status', 4)
             ->where('works.type', 2)
             ->where('works.is_audio_book', $is_audio_book)
@@ -92,16 +98,17 @@ class Works extends Base
      */
     public function getRecommendWorks($id, $user_id = 0)
     {
-        if (!$id) {
+        if ( ! $id) {
             return false;
         }
 
-        $list = Works::with(['workInfo' => function ($query) {
-            $query->select('id', 'pid', 'rank', 'title', 'duration', 'view_num', 'online_time')
-                ->orderBy('rank', 'desc')
-                ->orderBy('id', 'desc')
-                ->limit(2);
-        },
+        $list = Works::with([
+            'workInfo' => function ($query) {
+                $query->select('id', 'pid', 'rank', 'title', 'duration', 'view_num', 'online_time')
+                    ->orderBy('rank', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->limit(2);
+            },
             'user:id,nickname,headimg'
         ])
             ->select('id', 'user_id', 'title', 'subscribe_num')
@@ -130,10 +137,13 @@ class Works extends Base
      */
     public function getFreeWorks($uid = 0)
     {
-        $works = Works::with(['user' => function ($query) {
-            $query->select('id', 'nickname');
-        }])
-            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num', 'chapter_num as info_num')
+        $works = Works::with([
+            'user' => function ($query) {
+                $query->select('id', 'nickname');
+            }
+        ])
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num',
+                'chapter_num as info_num')
             ->where('type', 2)
             ->where('is_free', 1)
             ->where('is_audio_book', 0)
@@ -150,10 +160,13 @@ class Works extends Base
             }
         }
 
-        $book = Works::with(['user' => function ($query) {
-            $query->select('id', 'nickname');
-        }])
-            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num', 'chapter_num as info_num')
+        $book = Works::with([
+            'user' => function ($query) {
+                $query->select('id', 'nickname');
+            }
+        ])
+            ->select('id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'chapter_num',
+                'chapter_num as info_num')
             ->where('is_free', 1)
             ->where('is_audio_book', 1)
             ->where('status', 4)
@@ -169,9 +182,11 @@ class Works extends Base
             }
         }
 
-        $lecture = Column::with(['user' => function ($query) {
-            $query->select('id', 'nickname');
-        }])
+        $lecture = Column::with([
+            'user' => function ($query) {
+                $query->select('id', 'nickname');
+            }
+        ])
             ->select('id', 'user_id', 'is_free', 'name', 'title', 'subtitle', 'cover_pic', 'details_pic', 'info_num')
             ->where('is_free', 1)
             ->where('type', 2)
@@ -228,19 +243,23 @@ class Works extends Base
     public function getAllVipWorks($params)
     {
         $works_id_list = ConfigModel::getData(27);
-        $works_order_str = 'FIELD(id,' . $works_id_list . ') asc';
+        $works_order_str = 'FIELD(id,'.$works_id_list.') asc';
         $works_id_list_arr = explode(',', $works_id_list);
 
         $query = Works::whereIn('id', $works_id_list_arr)
-            ->with(['categoryRelation', 'categoryRelation.categoryName' => function ($query) {
-                $query->select(['id', 'name']);
-            }, 'columnInfo', 'user' => function ($query) {
-                $query->select('id', 'nickname', 'intro');
-            }])
-            ->select(['id', 'type as works_type', 'title', 'subtitle', 'cover_img',
-                'detail_img', 'price', 'column_id', 'user_id']);
+            ->with([
+                'categoryRelation', 'categoryRelation.categoryName' => function ($query) {
+                    $query->select(['id', 'name']);
+                }, 'columnInfo', 'user'                             => function ($query) {
+                    $query->select('id', 'nickname', 'intro');
+                }
+            ])
+            ->select([
+                'id', 'type as works_type', 'title', 'subtitle', 'cover_img',
+                'detail_img', 'price', 'column_id', 'user_id'
+            ]);
 
-        if (!empty($params['category_id'] ?? 0)) {
+        if ( ! empty($params['category_id'] ?? 0)) {
             $query->whereHas('categoryRelation', function (\Illuminate\Database\Eloquent\Builder $query) use ($params) {
                 $query->where('category_id', '=', $params['category_id']);
             });
@@ -280,19 +299,23 @@ class Works extends Base
             $list = $m->getList(0, 0, 0, 1, $this->user['id'] ?? 0);
             $list['banner'] = ConfigModel::getData(47);
             return $list;
-        }else{
+        } else {
             $banner = ConfigModel::getData(47);
             $list = Works::where('for_cytx', '=', 1)
                 ->where('status', '=', 4)
                 ->where('type', '=', 2)
-                ->with(['columnInfo', 'user' => function ($query) {
-                    $query->select('id', 'nickname', 'intro');
-                }, 'cytxClick'])
+                ->with([
+                    'columnInfo', 'user' => function ($query) {
+                        $query->select('id', 'nickname', 'intro');
+                    }, 'cytxClick'
+                ])
                 ->orderBy('cytx_sort', 'asc')
                 ->orderBy('id', 'asc')
-                ->select(['id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
+                ->select([
+                    'id as works_id', 'type as works_type', 'title', 'subtitle', 'cover_img',
                     'column_id', DB::raw('2 as type'),
-                    'detail_img', 'cytx_price as price', 'column_id', 'user_id', 'view_num'])
+                    'detail_img', 'cytx_price as price', 'column_id', 'user_id', 'view_num'
+                ])
                 ->get();
 
             foreach ($list as &$v) {
@@ -300,7 +323,7 @@ class Works extends Base
                 if ($v['view_num'] >= 10000) {
                     $leftNumber = floor($v['view_num'] / 10000);
                     $rightNumber = round(($v['view_num'] % 10000) / 10000, 2);
-                    $v['view_num'] = floatval($leftNumber + $rightNumber) . '万';
+                    $v['view_num'] = floatval($leftNumber + $rightNumber).'万';
                 }
                 $user_info = [];
                 $user_info['name'] = $v['user']['nickname'];
@@ -311,7 +334,7 @@ class Works extends Base
 
             return [
                 'banner' => $banner,
-                'list' => $list
+                'list'   => $list
             ];
         }
 
@@ -352,6 +375,23 @@ class Works extends Base
         }
 
         return success('成功');
+    }
+
+    public static function deal()
+    {
+        Works::where('status', 5)
+            ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
+            ->update(['status' => 4, 'online_time' => date('Y-m-d H:i:s')]);
+
+        WorksInfo::where('status', 5)
+            ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
+            ->update(['status' => 4, 'online_time' => date('Y-m-d H:i:s')]);
+
+        Column::where('status', 2)
+            ->where('type', 2)
+            ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
+            ->update(['status' => 1, 'online_time' => date('Y-m-d H:i:s')]);
+
     }
 
 }
