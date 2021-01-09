@@ -5,6 +5,7 @@ namespace App\Servers;
 
 
 use App\Models\History;
+use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -194,10 +195,17 @@ class StatisticsServers
                     }
                 }
 
-                //todo 商品订单
+                //商品订单
+                $mall_info = MallOrder::where('pay_time', '>=', $starttime)
+                    ->where('pay_time', '<=', $endtime)
+                    ->where('status', '>=', 10)
+                    ->where('is_stop', '=', 0)
+                    ->where('is_del', '=', 0)
+                    ->select([
+                        DB::raw('count(id) as num'), DB::raw('sum(pay_price) as price')
+                    ])->first();
 
-
-                $data['商品订单']='成交单量：0 成交金额：0';
+                $data['商品订单'] = '成交单量：' . ($mall_info->num ?? 0) . ' 成交金额：' . ($mall_info->price ?? 0);
                 break;
         }
 

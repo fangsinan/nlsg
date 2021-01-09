@@ -244,7 +244,7 @@ class WorksController extends Controller
                 $cate_id_arr = [];
                 $cate_data = WorksCategory::find($category_id);
                 if( $cate_data['level'] == 1 ){
-                    $cate_arr = WorksCategory::select('id')->where(['pid'=>$cate_data['id']])->get()->toArray();
+                    $cate_arr = WorksCategory::select('id')->where(['pid'=>$cate_data['id'],'status'=>1])->get()->toArray();
                     $cate_id_arr = array_column($cate_arr,'id');
                 }
 
