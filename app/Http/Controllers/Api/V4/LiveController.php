@@ -481,7 +481,7 @@ class LiveController extends Controller
             'user:id,nickname,headimg,intro,honor',
             'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish'
         ])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id')
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id','is_finish')
             ->where('id', $id)
             ->first();
         if ($list) {
@@ -499,11 +499,7 @@ class LiveController extends Controller
             $is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
                 ->where('user_id', '=', 0)->where('is_forbid', '=', 1)
                 ->first();
-            if ($is_forbid) {
-                $list['is_forbid'] = 1;
-            } else {
-                $list['is_forbid'] = 0;
-            }
+            $list['is_forbid']  = $is_forbid ? 1 : 0;
 
             $is_silence = LiveForbiddenWords::where('live_info_id', '=', $id)
                 ->where('user_id', '=', $this->user['id'])
@@ -520,11 +516,7 @@ class LiveController extends Controller
             $is_appmt = LiveCountDown::where(['user_id' => $this->user['id'], 'live_id' => $id])->first();
             $list['is_appmt'] = $is_appmt ? 1 : 0;
             $is_admin = LiveConsole::isAdmininLive($this->user['id'] ?? 0, $list['live_pid']);
-            if ($is_admin) {
-                $list['is_admin'] = 1;
-            } else {
-                $list['is_admin'] = 0;
-            }
+            $list['is_admin']  = $is_admin ? 1 : 0;
 
             $list['column_id'] = $columnId;
             $list['is_sub'] = $subLive ?? 0;
@@ -535,7 +527,7 @@ class LiveController extends Controller
 
             if ($list->user_id == $userId){
                 $list['is_password'] = 0 ;
-            } elseif ($is_admin == 1){
+            } elseif ($is_admin){
                 $list['is_password'] = 0;
             } else {
                 $list['is_password'] = $list->live->password ? 1 : 0;
