@@ -749,7 +749,7 @@ class ClassController extends ControllerBackend
                $data['online_time'] =  date('Y-m-d H:i:s', time());
            } elseif ($status ==5){
                $data['timing_online'] = 0;
-               $data['online_time']   = '';
+               $data['online_time']   = NULL;
            }
        }
 
