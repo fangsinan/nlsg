@@ -124,15 +124,15 @@ class LiveController extends Controller
                     ->where('status', 1)
                     ->orderBy('id', 'desc')
                     ->first();
-                if (strtotime($channel['begin_at']) > time()) {
-                    $v['live_status'] = '1';
-                } else {
-                    if (strtotime($channel['end_at']) < time()) {
-                        $v['live_status'] = '2';
-                    } else {
-                        $v['live_status'] = '3';
-                    }
+
+                if ($channel->is_begin ==0 && $channel->is_finish==0){
+                    $list['live_status'] = 1;
+                }elseif($channel->is_begin ==1 && $channel->is_finish==0){
+                    $list['live_status'] = 3;
+                }elseif($channel->is_begin ==0 && $channel->is_finish==1){
+                    $list['live_status'] = 2;
                 }
+
                 $v['info_id'] = $channel->id;
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
@@ -236,14 +236,12 @@ class LiveController extends Controller
                     ->where('status', 1)
                     ->orderBy('id', 'desc')
                     ->first();
-                if (strtotime($channel['begin_at']) > time()) {
-                    $v['live_status'] = '1';
-                } else {
-                    if (strtotime($channel['end_at']) < time()) {
-                        $v['live_status'] = '2';
-                    } else {
-                        $v['live_status'] = '3';
-                    }
+                if ($channel->is_begin ==0 && $channel->is_finish==0){
+                    $v['live_status'] = 1;
+                }elseif($channel->is_begin ==1 && $channel->is_finish==0){
+                    $v['live_status'] = 3;
+                }elseif($channel->is_begin ==0 && $channel->is_finish==1){
+                    $v['live_status'] = 2;
                 }
                 $v['info_id'] = $channel->id;
                 $v['is_password'] = $v['password'] ? 1 : 0;
@@ -367,7 +365,7 @@ class LiveController extends Controller
     {
         $id = $request->get('id');
         $lists = LiveInfo::with(['user:id,nickname', 'live:id,title,price,cover_img'])
-            ->select('id', 'user_id', 'live_pid', 'begin_at', 'end_at')
+            ->select('id', 'user_id', 'live_pid', 'begin_at', 'end_at','is_begin','is_finish')
             ->where('status', 1)
             ->where('live_pid', $id)
             ->orderBy('begin_at', 'desc')
@@ -376,14 +374,12 @@ class LiveController extends Controller
 
         if (!empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
-                if (strtotime($v['begin_at']) > time()) {
-                    $v['live_status'] = '1';
-                } else {
-                    if (strtotime($v['end_at']) < time()) {
-                        $v['live_status'] = '2';
-                    } else {
-                        $v['live_status'] = '3';
-                    }
+                if ($v->is_begin ==0 && $v->is_finish==0){
+                   $v['live_status'] = 1;
+                }elseif($v->is_begin ==1 && $v->is_finish==0){
+                   $v['live_status'] = 3;
+                }elseif($v->is_begin ==0 && $v->is_finish==1){
+                   $v['live_status'] = 2;
                 }
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
