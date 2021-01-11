@@ -784,12 +784,12 @@ class LiveController extends Controller
     public function freeLiveOrder(Request $request)
     {
         $input = $request->all();
-        $live = LiveInfo::where('id', $input['live_id'])->first();
+        $live = LiveInfo::where('id', $input['info_id'])->first();
         if (!$live) {
             return error('直播不存在');
         }
 
-        $list = LiveCountDown::where(['live_id' => $input['live_id'], 'user_id' => $this->user['id']])
+        $list = LiveCountDown::where(['live_id' => $input['info_id'], 'user_id' => $this->user['id']])
             ->first();
         if ($list) {
             return error('已经预约');
@@ -800,11 +800,11 @@ class LiveController extends Controller
                 $user->phone)) {
 
             LiveCountDown::create([
-                'live_id' => $input['live_id'],
+                'live_id' => $input['info_id'],
                 'user_id' => $this->user['id'],
                 'phone' => $user->phone
             ]);
-            Live::where(['id' => $live['live_pid']])->increment('order_num');
+            Live::where(['id' => $input['live_id']])->increment('order_num');
 
             $easySms = app('easysms');
             try {
