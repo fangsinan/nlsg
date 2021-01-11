@@ -17,6 +17,9 @@ class CallbackController extends Controller
         $config = Config('wechat.payment.default');
         $app = Factory::payment($config);
         $response = $app->handlePaidNotify(function ($message, $fail) {
+
+            Log::info('wechat notify', $message);
+
             // 你的逻辑
             $data = [
                 'out_trade_no'      => $message['out_trade_no'], //获取订单号
@@ -32,6 +35,7 @@ class CallbackController extends Controller
                 return true;
             }
             // $fail 为一个函数，触发该函数可向微信服务器返回对应的错误信息，微信会稍后重试再通知。
+            Log::debug('wechat notify', [ $message ]);
             $fail('Order not exists.');
         });
 
