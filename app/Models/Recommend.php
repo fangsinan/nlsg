@@ -130,7 +130,7 @@ class Recommend extends Base
                           ->where('status', 1)
                           ->orderBy('id','desc')
                           ->first();
-              $isSub = Subscribe::isSubscribe($uid, $channel['id'], 3);
+              $isSub = Subscribe::isSubscribe($uid, $list->id, 3);
               if (strtotime($channel['begin_at']) > time()) {
                  $list['live_status'] = '1';
               } else {
