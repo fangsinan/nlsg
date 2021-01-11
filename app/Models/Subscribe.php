@@ -24,27 +24,6 @@ class Subscribe extends Base
     static function isSubscribe ($user_id=0,$target_id=0,$type=0){
         $is_sub = 0;
 
-        //is_free 免费
-//        $result['is_free'] = 0;
-//        switch ($type) {
-//            case 1:
-//                $result = Column::find($target_id);
-//                break;
-//            case 2:
-//                $result = Works::find($target_id);
-//                break;
-//            case 3:
-//                $result = Live::find($target_id);
-//                break;
-//            case 6:
-//                $result = Column::find($target_id);
-//                break;
-//        }
-//        if($result['is_free'] == 1){
-//            return 1;
-//        }
-
-
 
         //会员都免费
         $level = User::getLevel($user_id);
@@ -69,6 +48,33 @@ class Subscribe extends Base
 
             if( $sub_data ){
                 $is_sub = 1;
+            }
+
+            //特殊 作品和讲座的情况下需要校验是否订阅专栏
+            if($is_sub==0 && in_array($type,[2,6])){
+                switch ($type) {
+                    case 1:
+                        $result = Column::find($target_id);
+                        break;
+                    case 2:
+                        $result = Works::find($target_id);
+                        break;
+                    case 3:
+                        $result = Live::find($target_id);
+                        break;
+                    case 6:
+                        $result = Column::find($target_id);
+                        break;
+                }
+                $id = Column::where( [ 'user_id'=> $result['user_id'],'type'=> 1] )->first();
+                $sub_data = Subscribe::where([
+                    'type' => 1,  //专栏
+                    'user_id' => $user_id,
+                    'relation_id' => $id,
+                    ])->where('end_time', '>', date('Y-m-d H:i:s'))->first();
+                if($sub_data){
+                    $is_sub = 1;
+                }
             }
         }
         return $is_sub;
