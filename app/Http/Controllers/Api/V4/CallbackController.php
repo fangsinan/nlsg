@@ -17,7 +17,7 @@ class CallbackController extends Controller
         $config = Config('wechat.payment.default');
         $app = Factory::payment($config);
         $response = $app->handlePaidNotify(function ($message, $fail) {
-            Log::debug("Wechat notify", $message);
+            \Log::info('Wechat notify'.json_encode($message));
             // 你的逻辑
             $data = [
                 'out_trade_no'      => $message['out_trade_no'], //获取订单号
