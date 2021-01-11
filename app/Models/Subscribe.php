@@ -66,11 +66,13 @@ class Subscribe extends Base
                         $result = Column::find($target_id);
                         break;
                 }
-                $id = Column::where( [ 'user_id'=> $result['user_id'],'type'=> 1] )->first();
+
+                $id = Column::select('id')->where( [ 'user_id'=> $result['user_id'],'type'=> 1] )->first();
+
                 $sub_data = Subscribe::where([
                     'type' => 1,  //专栏
                     'user_id' => $user_id,
-                    'relation_id' => $id,
+                    'relation_id' => $id['id'],
                     ])->where('end_time', '>', date('Y-m-d H:i:s'))->first();
                 if($sub_data){
                     $is_sub = 1;
