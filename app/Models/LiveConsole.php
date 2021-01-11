@@ -619,12 +619,15 @@ class LiveConsole extends Base
         switch ($flag) {
             case 'on':
                 $data['is_begin'] = 1;
+                $data['begin_status'] = 0;//推送状态
                 break;
             case 'off':
                 $data['is_begin'] = 0;
+                $data['begin_status'] = 1;//推送状态
                 break;
             case 'finish':
                 $data['is_begin'] = 0;
+                $data['begin_status'] = 1;//推送状态
                 $data['is_finish'] = 1;
                 $data['finished_at'] = date('Y-m-d H:i:s');
                 break;
