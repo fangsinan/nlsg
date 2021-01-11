@@ -479,7 +479,7 @@ class LiveController extends Controller
             $columnId = $column ? $column->id : 0;
 
             $isSub = Subscribe::isSubscribe($userId, $columnId, 1);
-            $subLive = Subscribe::isSubscribe($userId, $id, 3);
+            $subLive = Subscribe::isSubscribe($userId, $list->live_pid, 3);
 
             $is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
                 ->where('user_id', '=', 0)->where('is_forbid', '=', 1)
