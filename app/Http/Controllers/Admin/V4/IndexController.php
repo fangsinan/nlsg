@@ -327,7 +327,8 @@ class IndexController extends ControllerBackend
                    ->select('id','relation_id','created_at')
                    ->where('type', 7)
                    ->where('position', 1)
-                   ->get();
+                   ->paginate(10)
+                   ->toArray();
         return success($lists);
     }
 
