@@ -107,8 +107,10 @@ class Recommend extends Base
         $cache_key_name = 'index_recommend_'.$type.'_'.$position;
         $list = Cache::get($cache_key_name);
         if($list){
+            $list =  $this->getLiveRelation($uid, $list);
             return $list;
         }
+
 
         $ids = Recommend::where('position', $position)
                  ->where('type', $type)
@@ -125,37 +127,46 @@ class Recommend extends Base
                   ->where('is_del', 0)
                   ->orderBy('created_at', 'desc')
                   ->first();
-          if ($list) {
-              $channel = LiveInfo::where('live_pid', $list->id)
-                          ->where('status', 1)
-                          ->orderBy('id','desc')
-                          ->first();
-              $isSub = Subscribe::isSubscribe($uid, $list->id, 3);
-              if (strtotime($channel['begin_at']) > time()) {
-                 $list['live_status'] = '1';
-              } else {
-                 if (strtotime($channel['end_at']) < time()) {
-                     $list['live_status'] = '2';
-                 } else {
-                     $list['live_status'] = '3';
-                 }
-              }
-              $user = User::find($uid);
-              if ( $user && $user->phone == $list->helper){
-                  $list['is_helper'] = 1;
-              } else {
-                  $list['is_helper'] = 0;
-              }
-              $list['info_id'] =  $channel->id;
-              $list['is_sub']  =  $isSub ?? 0;
-          }
+        $expire_num = CacheTools::getExpire('index_recommend');
+        Cache::put($cache_key_name, $list, $expire_num);
 
-          $expire_num = CacheTools::getExpire('index_recommend');
-          Cache::put($cache_key_name, $list, $expire_num);
-
-          return $list;
+        $list = $this->getLiveRelation($uid, $list);
+        return $list;
 
     }
+
+    public  function getLiveRelation($uid, $list)
+    {
+        if (!$uid){
+            return  false;
+        }
+
+         $channel = LiveInfo::where('live_pid', $list->id)
+                     ->where('status', 1)
+                     ->orderBy('id','desc')
+                     ->first();
+         $isSub = Subscribe::isSubscribe($uid, $list->id, 3);
+         if (strtotime($channel['begin_at']) > time()) {
+            $list['live_status'] = '1';
+         } else {
+            if (strtotime($channel['end_at']) < time()) {
+                $list['live_status'] = '2';
+            } else {
+                $list['live_status'] = '3';
+            }
+         }
+         $user = User::find($uid);
+         if ( $user && $user->phone == $list->helper){
+             $list['is_helper'] = 1;
+         } else {
+             $list['is_helper'] = 0;
+         }
+         $list['info_id'] =  $channel->id;
+         $list['is_sub']  =  $isSub ?? 0;
+
+        return $list;
+    }
+
 
     public function getEditorWorks($uid = false)
     {
