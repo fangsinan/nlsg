@@ -519,9 +519,9 @@ class LiveController extends Controller
             } elseif ($is_admin == 1){
                 $list['is_password'] = 0;
             } else {
-                $list['is_password'] = 1;
+                $list['is_password'] = $list->live->password ? 1 : 0;
             }
-//            $list['is_password'] = $list->live->password ? 1 : 0;
+//
         }
 
         $liveWork = new LiveWorks();
