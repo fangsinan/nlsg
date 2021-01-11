@@ -888,7 +888,7 @@ class ClassController extends ControllerBackend
             $data['online_time'] = $input['timing_time'];
             $data['timing_time'] = $input['timing_time'];
         } else {
-           if ($status==4){
+           if ($input['status'] ==4){
                $data['online_time'] =  date('Y-m-d H:i:s', time());
            }
         }
