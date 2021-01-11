@@ -110,6 +110,7 @@ class LiveController extends Controller
      */
     public function index()
     {
+        $uid = $this->user['id'] ?? 0;
         $liveLists = Live::with('user:id,nickname')
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
                 'playback_price', 'is_free', 'password')
@@ -132,7 +133,11 @@ class LiveController extends Controller
                 }elseif($channel->is_begin ==0 && $channel->is_finish==1){
                     $v['live_status'] = 2;
                 }
+                $isSub = Subscribe::isSubscribe($uid, $v['id'], 3);
+                $v['is_sub']  =  $isSub ?? 0;
 
+                $isAdmin = LiveConsole::isAdmininLive($uid, $v['id']);
+                $v['is_admin'] = $isAdmin ? 1 : 0;
                 $v['info_id'] = $channel->id;
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
@@ -150,6 +155,8 @@ class LiveController extends Controller
         if (!empty($lists)) {
             $backLists = [];
             foreach ($lists as &$v) {
+                $isSub   = Subscribe::isSubscribe($uid, $v['live_pid'], 3);
+                $isAdmin = LiveConsole::isAdmininLive($uid, $v['live_pid']);
                 $backLists[] = [
                     'id' => $v['live']['id'],
                     'title' => $v['live']['title'],
@@ -160,7 +167,9 @@ class LiveController extends Controller
                     'playback_price' => $v['live']['playback_price'],
                     'live_time' => date('Y.m.d H:i', strtotime($v['live']['begin_at'])),
                     'is_free' => $v['live']['is_free'],
-                    'info_id' => $v['id']
+                    'info_id' => $v['id'],
+                    'is_sub'  =>  $isSub ?? 0,
+                    'is_admin'=>  $isAdmin ? 1 : 0
                 ];
             }
         }
@@ -223,6 +232,7 @@ class LiveController extends Controller
      */
     public function getLiveLists()
     {
+        $uid = $this->user['id'] ?? 0;
         $lists = Live::with('user:id,nickname')
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
                 'playback_price', 'is_free', 'password')
@@ -243,6 +253,10 @@ class LiveController extends Controller
                 }elseif($channel->is_begin ==0 && $channel->is_finish==1){
                     $v['live_status'] = 2;
                 }
+                $isSub   = Subscribe::isSubscribe($uid, $v['id'], 3);
+                $isAdmin = LiveConsole::isAdmininLive($uid, $v['id']);
+                $v['is_sub']   = $isSub ?? 0;
+                $v['is_admin'] = $isAdmin ? 1 : 0;
                 $v['info_id'] = $channel->id;
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
@@ -289,6 +303,7 @@ class LiveController extends Controller
      */
     public function getLiveBackLists()
     {
+        $uid = $this->user['id'] ?? 0;
         $lists = LiveInfo::with('user:id,nickname', 'live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
             ->select('id', 'live_pid', 'user_id')
             ->where('status', 1)
@@ -299,6 +314,8 @@ class LiveController extends Controller
         $backLists = [];
         if (!empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
+                $isSub   = Subscribe::isSubscribe($uid, $v['live_pid'], 3);
+                $isAdmin = LiveConsole::isAdmininLive($uid, $v['live_pid']);
                 $backLists[] = [
                     'id' => $v['live']['id'],
                     'title' => $v['live']['title'],
@@ -309,7 +326,9 @@ class LiveController extends Controller
                     'playback_price' => $v['live']['playback_price'],
                     'live_time' => date('Y.m.d H:i', strtotime($v['live']['begin_at'])),
                     'is_free' => $v['live']['is_free'],
-                    'info_id' => $v['id']
+                    'info_id' => $v['id'],
+                    'is_sub'  => $isSub ?? 0,
+                    'is_admin'=>  $isAdmin ? 1 : 0
                 ];
             }
         }

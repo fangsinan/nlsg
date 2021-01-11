@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Lists;
+use App\Models\LiveConsole;
 use App\Models\Works;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -26,13 +27,13 @@ class Recommend extends Base
 
     public function getIndexRecommend($type = 1, $position = '1', $limit = 5, $row = 1)
     {
-        if (!$type) {
+        if ( ! $type) {
             return false;
         }
         //添加缓存\
         $cache_key_name = 'index_recommend_'.$type.'_'.$position;
         $result = Cache::get($cache_key_name);
-        if($result){
+        if ($result) {
             return $result;
         }
 
@@ -41,7 +42,7 @@ class Recommend extends Base
             ->where('type', $type)
             ->where('status', 1)
             ->orderBy('sort')
-            ->orderBy('created_at','desc')
+            ->orderBy('created_at', 'desc')
             ->pluck('relation_id')
             ->toArray();
 
@@ -98,35 +99,36 @@ class Recommend extends Base
      * @param  int  $position
      * @return bool
      */
-    public  function  getLiveRecommend($uid, $type=7, $position=1)
+    public function getLiveRecommend($uid, $type = 7, $position = 1)
     {
-        if (!$type) {
-           return false;
+        if ( ! $type) {
+            return false;
         }
         //添加缓存\
         $cache_key_name = 'index_recommend_'.$type.'_'.$position;
         $list = Cache::get($cache_key_name);
-        if($list){
-            $list =  $this->getLiveRelation($uid, $list);
+        if ($list) {
+            $list = $this->getLiveRelation($uid, $list);
             return $list;
         }
 
 
         $ids = Recommend::where('position', $position)
-                 ->where('type', $type)
-                 ->where('status', 1)
-                 ->orderBy('sort')
-                 ->orderBy('created_at','desc')
-                 ->pluck('relation_id')
-                 ->toArray();
-        if (!$ids) {
+            ->where('type', $type)
+            ->where('status', 1)
+            ->orderBy('sort')
+            ->orderBy('created_at', 'desc')
+            ->pluck('relation_id')
+            ->toArray();
+        if ( ! $ids) {
             return false;
         }
-        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at','price','order_num','is_free','helper')
-                  ->whereIn('id', $ids)
-                  ->where('is_del', 0)
-                  ->orderBy('created_at', 'desc')
-                  ->first();
+        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
+            'is_free', 'helper')
+            ->whereIn('id', $ids)
+            ->where('is_del', 0)
+            ->orderBy('created_at', 'desc')
+            ->first();
         $expire_num = CacheTools::getExpire('index_recommend');
         Cache::put($cache_key_name, $list, $expire_num);
 
@@ -135,31 +137,26 @@ class Recommend extends Base
 
     }
 
-    public  function getLiveRelation($uid, $list)
+    public function getLiveRelation($uid, $list)
     {
-         $channel = LiveInfo::where('live_pid', $list->id)
-                     ->where('status', 1)
-                     ->orderBy('id','desc')
-                     ->first();
-         $isSub = Subscribe::isSubscribe($uid, $list->id, 3);
+        $channel = LiveInfo::where('live_pid', $list->id)
+            ->where('status', 1)
+            ->orderBy('id', 'desc')
+            ->first();
 
-         if ($channel->is_begin ==0 && $channel->is_finish==0){
-             $list['live_status'] = 1;
-         } elseif ($channel->is_begin ==1 && $channel->is_finish==0){
-             $list['live_status'] = 3;
-         } elseif ($channel->is_begin ==0 && $channel->is_finish==1){
-             $list['live_status'] = 2;
-         }
+        if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+            $list['live_status'] = 1;
+        } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+            $list['live_status'] = 3;
+        } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+            $list['live_status'] = 2;
+        }
+        $isSub = Subscribe::isSubscribe($uid, $list->id, 3);
+        $isAdmin = LiveConsole::isAdmininLive($uid, $list->id);
 
-         $user = User::find($uid);
-         if ( $user && $user->phone == $list->helper){
-             $list['is_helper'] = 1;
-         } else {
-             $list['is_helper'] = 0;
-         }
-         $list['info_id'] =  $channel->id;
-         $list['is_sub']  =  $isSub ?? 0;
-
+        $list['info_id'] = $channel->id;
+        $list['is_sub'] = $isSub ?? 0;
+        $list['is_admin'] = $isAdmin ? 1 : 0;
         return $list;
     }
 
@@ -181,8 +178,12 @@ class Recommend extends Base
                     $lists[$k]['works'] = Works::with([
                         'user' => function ($query) {
                             $query->select('id', 'nickname', 'headimg');
-                        }])
-                        ->select(['id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'price', 'chapter_num', 'subscribe_num'])
+                        }
+                    ])
+                        ->select([
+                            'id', 'user_id', 'is_free', 'title', 'subtitle', 'cover_img', 'price', 'chapter_num',
+                            'subscribe_num'
+                        ])
                         ->where('id', $v['relation_id'])
                         ->where('status', 4)
                         ->first();
@@ -194,7 +195,8 @@ class Recommend extends Base
                     $lists[$k]['works'] = Column::with([
                         'user' => function ($query) {
                             $query->select('id', 'nickname', 'headimg');
-                        }])
+                        }
+                    ])
                         ->select(['id', 'user_id', 'is_free', 'name', 'title', 'subtitle', 'cover_pic', 'price'])
                         ->where('id', $v['relation_id'])
                         ->where('status', 1)
@@ -226,9 +228,10 @@ class Recommend extends Base
     {
         return $this->belongsTo('App\Models\Wiki', 'relation_id', 'id');
     }
+
     public function live()
     {
-       return $this->belongsTo('App\Models\Live', 'relation_id', 'id');
+        return $this->belongsTo('App\Models\Live', 'relation_id', 'id');
     }
 
 
