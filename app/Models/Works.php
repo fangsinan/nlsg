@@ -380,15 +380,18 @@ class Works extends Base
     public static function deal()
     {
         Works::where('status', 5)
+            ->where('timing_online', 1)
             ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
             ->update(['status' => 4, 'online_time' => date('Y-m-d H:i:s')]);
 
         WorksInfo::where('status', 5)
+            ->where('timing_online', 1)
             ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
             ->update(['status' => 4, 'online_time' => date('Y-m-d H:i:s')]);
 
         Column::where('status', 2)
             ->where('type', 2)
+            ->where('timing_online', 1)
             ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
             ->update(['status' => 1, 'online_time' => date('Y-m-d H:i:s')]);
 
