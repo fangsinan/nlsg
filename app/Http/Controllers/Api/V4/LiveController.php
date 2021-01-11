@@ -126,11 +126,11 @@ class LiveController extends Controller
                     ->first();
 
                 if ($channel->is_begin ==0 && $channel->is_finish==0){
-                    $list['live_status'] = 1;
+                    $v['live_status'] = 1;
                 }elseif($channel->is_begin ==1 && $channel->is_finish==0){
-                    $list['live_status'] = 3;
+                    $v['live_status'] = 3;
                 }elseif($channel->is_begin ==0 && $channel->is_finish==1){
-                    $list['live_status'] = 2;
+                    $v['live_status'] = 2;
                 }
 
                 $v['info_id'] = $channel->id;
