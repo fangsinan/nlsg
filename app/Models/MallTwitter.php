@@ -70,7 +70,7 @@ class MallTwitter extends Base
                 break;
             case 11:
                 //直播:https://wechat.nlsgapp.com/liveList?id=4
-                $url = '/liveList?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                $url = 'appv4/liveBroadcast?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id;
                 break;
             case 12:
                 //讲座

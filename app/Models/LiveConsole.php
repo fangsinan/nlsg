@@ -619,7 +619,7 @@ class LiveConsole extends Base
         switch ($flag) {
             case 'on':
                 $data['is_begin'] = 1;
-                $data['begin_status'] = 0;//推送状态
+                $data['begin_status'] = 0;//socket推送状态
                 break;
             case 'off':
                 $data['is_begin'] = 0;
