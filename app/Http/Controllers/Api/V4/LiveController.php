@@ -850,7 +850,7 @@ class LiveController extends Controller
     public function payLiveOrder(Request $request)
     {
         $input = $request->all();
-        $tweeterCode = $input['tweeter_code'] ?? 0;
+        $tweeterCode = $input['inviter'] ?? 0;
         $liveId      = $input['live_id'] ?? 0;
         $liveInfoId  = $input['info_id'] ?? 0;
         $osType = $input['os_type'] ?? 1;
