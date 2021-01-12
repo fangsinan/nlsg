@@ -230,6 +230,7 @@ class WorksInfo extends Base
                 ->select(['w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img','w.comment_num','w.collection_num',
                     DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
+            $sub_type = 6;
 
         }else{
             $works_info = DB::table('nlsg_works as w')
@@ -246,10 +247,14 @@ class WorksInfo extends Base
                 ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num','w.collection_num','w.is_audio_book',
                     DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
+            $sub_type = 2;
         }
-        if($user['level'] > 2){
-            $works_info->is_sub = 1;
-        }
+//        if($user['level'] > 2){
+//            $works_info->is_sub = 1;
+//        }
+
+        $works_info->is_sub = Subscribe::isSubscribe($user['id'],$works_info->id,$sub_type);
+
 
         $is_show_url = true;
         if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
