@@ -28,6 +28,6 @@ class LiveWorks extends Base
                 }
             }
         }
-        return $data;
+        return $data ?? [];
     }
 }
