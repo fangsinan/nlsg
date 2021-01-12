@@ -440,33 +440,32 @@ class WechatPay extends Controller
                 $twitter_id = $orderInfo['twitter_id'];
                 $Profit_Rst = true;
 
-//                if ( !empty($twitter_id) && $twitter_id != $user_id ) {
-//                    //固定收益50
-//                    $live = Live::find($live_id);
-//                    $ProfitPrice = $live['twitter_money'];
-//                    $map = array('user_id' => $twitter_id, "type" => 10, "ordernum" => $out_trade_no, 'price' => $ProfitPrice,);
-//                    if (!empty($map)) {
-//                        //$PayRDObj = new PayRecordDetail();
-//                        //防止重复添加收入
-//                        $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
-//                        $PrdInfo = PayRecordDetail::where($where)->first();
-//                        if (empty($PrdInfo)) {
-//                            $Profit_Rst = PayRecordDetail::create($map);
-//                        }
-//                    }
-//                }
+                if ( !empty($twitter_id) && $twitter_id != $user_id ) {
+                    //固定收益50
+                    $ProfitPrice = $liveData['twitter_money'];
+                    $map = array('user_id' => $twitter_id, "type" => 10, "ordernum" => $out_trade_no, 'price' => $ProfitPrice,);
+                    if (!empty($map)) {
+                        //防止重复添加收入
+                        $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
+                        $PrdInfo = PayRecordDetail::where($where)->first();
+                        if (empty($PrdInfo)) {
+                            $Profit_Rst = PayRecordDetail::create($map);
+                        }
+                    }
+                }
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $Profit_Rst) {
                     DB::commit();
 
-                    //调用直播分账
-                    if ( !empty($twitter_id) && $twitter_id != $user_id ) {
-                        if( $liveData['profit_sharing'] == 1 && $liveData['twitter_money'] > 0 ){
-                            self::OrderProfit($transaction_id,$out_trade_no,$liveData['twitter_money'],$twitter_id);
-                        }
-                    }
+                    //暂时先不启用直接分账
+//                    //调用直播分账
+//                    if ( !empty($twitter_id) && $twitter_id != $user_id ) {
+//                        if( $liveData['profit_sharing'] == 1 && $liveData['twitter_money'] > 0 ){
+//                            self::OrderProfit($transaction_id,$out_trade_no,$liveData['twitter_money'],$twitter_id);
+//                        }
+//                    }
 
                     return true;
 
