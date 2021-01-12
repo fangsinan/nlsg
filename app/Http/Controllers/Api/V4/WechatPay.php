@@ -23,7 +23,9 @@ use App\Models\VipUser;
 use App\Models\Works;
 use App\Models\MallOrder;
 use App\Servers\JobServers;
+use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
+use Yansongda\Pay\Log;
 
 class WechatPay extends Controller
 {
@@ -425,8 +427,9 @@ class WechatPay extends Controller
                 //推客收益
                 $twitter_id = $orderInfo['twitter_id'];
                 $Profit_Rst = true;
-                if ( !empty($twitter_id) && $twitter_id != $user_id ) {
-                    //固定收益50
+
+//                if ( !empty($twitter_id) && $twitter_id != $user_id ) {
+//                    //固定收益50
 //                    $live = Live::find($live_id);
 //                    $ProfitPrice = $live['twitter_money'];
 //                    $map = array('user_id' => $twitter_id, "type" => 10, "ordernum" => $out_trade_no, 'price' => $ProfitPrice,);
@@ -439,12 +442,21 @@ class WechatPay extends Controller
 //                            $Profit_Rst = PayRecordDetail::create($map);
 //                        }
 //                    }
-                }
+//                }
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $Profit_Rst) {
                     DB::commit();
+
+                    //调用直播分账
+                    if ( !empty($twitter_id) && $twitter_id != $user_id ) {
+                        $liveData = Live::find($live_id);
+                        if( $liveData['profit_sharing'] == 1 && $liveData['twitter_money'] > 0 ){
+                            self::OrderProfit($transaction_id,$out_trade_no,$liveData['twitter_money'],$twitter_id);
+                        }
+                    }
+
                     return true;
 
                 } else {
@@ -460,6 +472,75 @@ class WechatPay extends Controller
         } else {
             //订单状态已更新，直接返回
             return true;
+        }
+    }
+
+    /**
+     * 分账
+     *
+     * @param string $transaction_id    微信支付订单号
+     * @param string $out_trade_no      商户系统内部的分账单号
+     * @param array  $amount            分账金额  此处单位为元
+     * @param array  $twitterData       分账人员信息
+     */
+    public  static function OrderProfit($transaction_id,$out_trade_no,$amount,$twitter_id){
+
+        $twitterData = User::find($twitter_id);
+
+        if(empty($twitterData['openid'])){
+            return ;
+        }
+
+        $config = Config('wechat.payment.wx_wechat');
+        $app = Factory::payment($config);
+
+        //添加分账账号
+        $app->profit_sharing->addReceiver([
+            'type' => 'PERSONAL_OPENID',
+            'account' => $twitterData['openid'],
+            'relation_type' => "USER",
+        ]);
+
+//                dump($addRes);
+//                $addRes = [
+//                      "return_code" => "SUCCESS",
+//                      "result_code" => "SUCCESS",
+//                      "mch_id" => "1460495202",
+//                      "appid" => "wxe24a425adb5102f6",
+//                      "receiver" => '"{"type":"PERSONAL_OPENID","account":"oVWHQwegrYvlUC4qwqdfte4DsJc8","relation_type":"USER"}"',
+//                      "nonce_str" => "c7ea74540376e2cb",
+//                      "sign" => "2AC52D6F7B55D8158FE515FCB10B4C4E33A19DDBA9145AD3D045D53CD80760D2",
+//                    ];
+        //分账
+        $return_data = $app->profit_sharing->share( $transaction_id,'NLSGFZ'.$out_trade_no,[
+            'type' => 'PERSONAL_OPENID',
+            'account' => $twitterData['openid'],
+            'amount' => $amount*100,  //此处金额 分为单位
+            'description' => '直播分账-个人-'.$twitterData['nickname'],
+//                                'name' => '个人名称',  //非必填
+        ]);
+        //分账返回信息
+//                $return_data = [
+//                    "return_code" => "SUCCESS",
+//                    "result_code" => "SUCCESS",
+//                    "mch_id" => "1460495202",
+//                    "appid" => "wxe24a425adb5102f6",
+//                    "nonce_str" => "f5efdc2d94dc0f3c",
+//                    "sign" => "5C5654E5CAA2C174BF586367A643D3C188C3A2675EFAC1B48813086D0CA0CF0B",
+//                    "transaction_id" => "4200000793202101124499850971",
+//                    "out_order_no" => "NLSGFZ21011200211172503223703",  //自己的分账orderid
+//                    "order_id" => "30000300342021011206844776406",        微信平台的分账订单
+//                ];
+
+        \Log::info('Wechat profit sharing'.json_encode($return_data));
+
+        if($return_data['result_code'] == 'SUCCESS'){
+            //成功后 单次分账 不需要进行完结分账  多次需要请求完结接口
+            Order::where(['ordernum' => $out_trade_no])->update([
+                'profit_ordernum'    => $return_data['out_order_no'],
+                'wx_profit_ordernum' => $return_data['order_id'],
+            ]);
+
         }
     }
 
