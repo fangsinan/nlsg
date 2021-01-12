@@ -112,7 +112,6 @@ class Recommend extends Base
             return $list;
         }
 
-
         $ids = Recommend::where('position', $position)
             ->where('type', $type)
             ->where('status', 1)
