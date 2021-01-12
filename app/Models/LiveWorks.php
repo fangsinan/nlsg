@@ -46,17 +46,19 @@ class LiveWorks extends Base
                         'type' => 4
                     ];
                 } elseif ($v['type'] ==5 && $live_id){
-                        $lists = [
-                            'id'    => 4,
-                            'title' => '幸福套餐',
-                            'price' => 1360.00,
-                            'cover_img' => 'live/recommend/xingfutaoc_tc.png',
-                            'cover_details' => 'live/recommend/xingfutaoc_tc.png',
-                            'type' => 5
-                        ];
+                    $lists = [
+                        'id'    => 4,
+                        'title' => '幸福套餐',
+                        'price' => 1360.00,
+                        'cover_img' => 'live/recommend/xingfutaoc_tc.png',
+                        'cover_details' => 'live/recommend/xingfutaoc_tc.png',
+                        'type' => 5
+                    ];
 
                 }
-                $data[] = $lists;
+                if($lists)
+                    $data[] = $lists;
+                
             }
         }
         return $data ?? [];
