@@ -129,7 +129,7 @@ class Recommend extends Base
             ->where('is_del', 0)
             ->orderBy('created_at', 'desc')
             ->first();
-        $expire_num = CacheTools::getExpire('index_recommend');
+        $expire_num = CacheTools::getExpire('index_recommend_live');
         Cache::put($cache_key_name, $list, $expire_num);
 
         $list = $this->getLiveRelation($uid, $list);
