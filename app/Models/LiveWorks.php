@@ -44,6 +44,13 @@ class LiveWorks extends Base
                         'cover_img' => 'nlsg/works/20201215165707565448.png',
                         'type' => 4
                     ];
+                } elseif ($v['type'] ==5){
+                    $lists = [
+                          'title' => '幸福套餐',
+                          'price' => 1360.00,
+                          'cover_img' => 'live/recommend/xingfutaoc_tc.png',
+                          'type' => 4
+                      ];
                 }
                 $data[] = $lists;
             }

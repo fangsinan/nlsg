@@ -183,7 +183,7 @@ class LiveController extends Controller
             ->toArray();
 
         $liveWork = new LiveWorks();
-        $recommend = $liveWork->getLiveWorks(0, 1, 4);
+        $recommend = $liveWork->getLiveWorks(0, 1, 6);
         $data = [
             'banner' => 'nlsg/works/20201228165453965824.jpg',
             'live_lists' => $liveLists,
@@ -545,7 +545,7 @@ class LiveController extends Controller
     {
         $id = $request->get('live_id');
         $liveWork = new LiveWorks();
-        $recommend = $liveWork->getLiveWorks($id, 2, 4);
+        $recommend = $liveWork->getLiveWorks($id, 2, 6);
         return success($recommend);
     }
 
