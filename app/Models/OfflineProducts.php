@@ -20,4 +20,20 @@ class OfflineProducts extends Base
 
         return ['res' => $res, 'count' => $res->count()];
     }
+
+    /**
+     * 直播首页线下课程
+     * @return mixed
+     */
+    public function getIndexLists()
+    {
+        $offline = OfflineProducts::where('is_del', 0)
+                   ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
+                   ->orderBy('created_at', 'desc')
+                   ->limit(3)
+                   ->get()
+                   ->toArray();
+        return $offline;
+
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\CacheTools;
 use App\Models\Column;
 use App\Models\LiveConsole;
 use App\Models\LiveForbiddenWords;
@@ -16,6 +17,7 @@ use App\Models\LiveCountDown;
 use App\Models\User;
 use App\Models\LiveWorks;
 use App\Models\Order;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -111,86 +113,35 @@ class LiveController extends Controller
     public function index()
     {
         $uid = $this->user['id'] ?? 0;
-        $liveLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
-                'playback_price', 'is_free', 'password')
-            ->where('status', 4)
-            ->orderBy('begin_at')
-            ->limit(3)
-            ->get()
-            ->toArray();
-        if (!empty($liveLists)) {
-            foreach ($liveLists as &$v) {
-                $channel = LiveInfo::where('live_pid', $v['id'])
-                    ->where('status', 1)
-                    ->orderBy('id', 'desc')
-                    ->first();
 
-                if ($channel->is_begin ==0 && $channel->is_finish==0){
-                    $v['live_status'] = 1;
-                }elseif($channel->is_begin ==1 && $channel->is_finish==0){
-                    $v['live_status'] = 3;
-                }elseif($channel->is_begin ==0 && $channel->is_finish==1){
-                    $v['live_status'] = 2;
-                }
-                $isSub = Subscribe::isSubscribe($uid, $v['id'], 3);
-                $v['is_sub']  =  $isSub ?? 0;
-
-                $isAdmin = LiveConsole::isAdmininLive($uid, $v['id']);
-                $v['is_admin'] = $isAdmin ? 1 : 0;
-                $v['info_id'] = $channel->id;
-                $v['is_password'] = $v['password'] ? 1 : 0;
-                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
-            }
+        $cache_live_name = 'live_index_list';
+        $data = Cache::get($cache_live_name);
+        if ($data) {
+           return success($data);
         }
 
-        $lists = LiveInfo::with('user:id,nickname', 'live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
-            ->select('id', 'live_pid', 'user_id')
-            ->where('status', 1)
-            ->where('playback_url','!=','')
-            ->orderBy('begin_at', 'desc')
-            ->limit(2)
-            ->get()
-            ->toArray();
-        if (!empty($lists)) {
-            $backLists = [];
-            foreach ($lists as &$v) {
-                $isSub   = Subscribe::isSubscribe($uid, $v['live_pid'], 3);
-                $isAdmin = LiveConsole::isAdmininLive($uid, $v['live_pid']);
-                $backLists[] = [
-                    'id' => $v['live']['id'],
-                    'title' => $v['live']['title'],
-                    'is_password' => $v['live']['password'] ? 1 : 0,
-                    'describe' => $v['live']['describe'],
-                    'price' => $v['live']['price'],
-                    'cover_img' => $v['live']['cover_img'],
-                    'playback_price' => $v['live']['playback_price'],
-                    'live_time' => date('Y.m.d H:i', strtotime($v['live']['begin_at'])),
-                    'is_free' => $v['live']['is_free'],
-                    'info_id' => $v['id'],
-                    'is_sub'  =>  $isSub ?? 0,
-                    'is_admin'=>  $isAdmin ? 1 : 0
-                ];
-            }
-        }
+        $live  = new Live();
+        $liveLists = $live->getRecommendLive($uid);
 
+        $info  = new LiveInfo();
+        $lists = $info->getBackLists($uid);
 
-        $offline = OfflineProducts::where('is_del', 0)
-            ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
-            ->orderBy('created_at', 'desc')
-            ->limit(3)
-            ->get()
-            ->toArray();
+        $product = new OfflineProducts();
+        $offline = $product->getIndexLists();
 
         $liveWork = new LiveWorks();
         $recommend = $liveWork->getLiveWorks(0, 1, 6);
         $data = [
-            'banner' => 'nlsg/works/20201228165453965824.jpg',
+            'banner'     => 'nlsg/works/20201228165453965824.jpg',
             'live_lists' => $liveLists,
             'back_lists' => $backLists ?? [],
-            'offline' => $offline,
-            'recommend' => $recommend
+            'offline'    => $offline,
+            'recommend'  => $recommend
         ];
+
+        $expire_num = CacheTools::getExpire('live_index_list');
+        Cache::put($cache_live_name, $data, $expire_num);
+
         return success($data);
     }
 
