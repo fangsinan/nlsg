@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\Live;
 use App\Models\MallOrderDetails;
 use App\Models\Order;
 use App\Models\MallOrder;
@@ -106,7 +107,10 @@ class PayController extends Controller {
             'openid' => $pay_info['openid'],
         ]);
 
-
+        if($pay_info['profit_sharing'] == 1){    //直播下单需要分账
+            //查询  分账的直播id
+            $result['profit_sharing'] = 'Y';
+        }
         if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
             if($is_h5 == 1 ){
                 //h5  直接返回
@@ -156,6 +160,7 @@ class PayController extends Controller {
             if (empty($OrderInfo)) { //订单有误
                 return false;
             }
+            $profit_sharing = 0;
 
             $OrderInfo = $OrderInfo->toArray();
             if ($attach == 1) {
@@ -168,6 +173,9 @@ class PayController extends Controller {
             } else if ($attach == 9) {
                 $body = "能量时光-精品课购买-" . $OrderInfo['ordernum'];
             } else if ($attach == 11) {
+                $live = Live::find($OrderInfo['live_id']);
+                $profit_sharing = $live['profit_sharing'];
+
                 $body = "能量时光-直播购买-" . $OrderInfo['ordernum'];
             } else if ($attach == 14) {
                 $body = "能量时光-线下课购买-" . $OrderInfo['ordernum'];
@@ -195,6 +203,7 @@ class PayController extends Controller {
             'price' => $OrderInfo['price'],
             'ordernum' => $OrderInfo['ordernum'],
             'openid' => $userInfo['openid'],
+            'profit_sharing' => $profit_sharing,
         ];
     }
 
