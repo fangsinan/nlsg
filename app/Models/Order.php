@@ -56,7 +56,11 @@ class Order extends Base
 //        if ($rst > 2) {
 //            return ['code' => 0, 'msg' => '您已是vip用户,可免费观看'];
 //        }
-
+        //管理员不用购买
+        $is_admin = LiveConsole::isAdmininLive($tweeter_code ?? 0, $target_id);
+        if ($is_admin) {
+            return ['code' => 1, 'tweeter_code' => $tweeter_code];
+        }
         //校验下单用户是否关注
         $is_sub = Subscribe::isSubscribe($user_id, $target_id, $type);
         if ($is_sub) {
