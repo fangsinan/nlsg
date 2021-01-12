@@ -18,6 +18,7 @@ class LiveWorks extends Base
             ->get()
             ->toArray();
         if ($recommend) {
+//            dd($recommend);
             $data = [];
             foreach ($recommend as &$v) {
                 if ($v['type'] == 1) {
@@ -45,7 +46,7 @@ class LiveWorks extends Base
                         'cover_img' => 'nlsg/works/20201215165707565448.png',
                         'type' => 4
                     ];
-                } elseif ($v['type'] ==5 && $live_id){
+                } elseif ($v['type'] ==5 ){
                     $lists = [
                         'id'    => 4,
                         'title' => '幸福套餐',
@@ -54,11 +55,14 @@ class LiveWorks extends Base
                         'cover_details' => 'live/recommend/xingfutaoc_tc.png',
                         'type' => 5
                     ];
+                    if($live_id == 0){  //临时改动 客户端直播首页不展示 01-12 22:15:00
+                        $lists = [];
+                    }
 
                 }
                 if($lists)
                     $data[] = $lists;
-                
+
             }
         }
         return $data ?? [];
