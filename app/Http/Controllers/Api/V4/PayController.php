@@ -98,19 +98,22 @@ class PayController extends Controller {
             $pay_info['openid'] = '';
         }
 
-        $result = $app->order->unify([
+
+        $data = [
             'body' => $pay_info['body'],
             'out_trade_no' => $pay_info['ordernum'],
             'total_fee' => $pay_info['price']*100,
             'trade_type' => $trade_type, // 请对应换成你的支付方式对应的值类型
             'attach' => $attach,
             'openid' => $pay_info['openid'],
-        ]);
+            ];
 
-        if($pay_info['profit_sharing'] == 1){    //直播下单需要分账
+        if($pay_info['profit_sharing'] == 1){    //下单需要分账
             //查询  分账的直播id
-            $result['profit_sharing'] = 'Y';
+            $data['profit_sharing'] = 'Y';
         }
+        $result = $app->order->unify($data);
+
         if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
             if($is_h5 == 1 ){
                 //h5  直接返回
