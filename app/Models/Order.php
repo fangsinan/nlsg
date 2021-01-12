@@ -48,14 +48,14 @@ class Order extends Base
     }
 
     //下单check
-    public function addOrderCheck($user_id, $tweeter_code, $target_id, $type)
+    public function addOrderLiveCheck($user_id, $tweeter_code, $target_id, $type)
     {
 
-        //校验用户等级
-        $rst = User::getLevel($user_id);
-        if ($rst > 2) {
-            return ['code' => 0, 'msg' => '您已是vip用户,可免费观看'];
-        }
+//        //校验用户等级
+//        $rst = User::getLevel($user_id);
+//        if ($rst > 2) {
+//            return ['code' => 0, 'msg' => '您已是vip用户,可免费观看'];
+//        }
 
         //校验下单用户是否关注
         $is_sub = Subscribe::isSubscribe($user_id, $target_id, $type);
@@ -63,17 +63,12 @@ class Order extends Base
             return ['code' => 0, 'msg' => '您已订阅过'];
         }
 
-        //校验推客信息有效
-        $tweeter_level = User::getLevel($tweeter_code);
-        if ($tweeter_level > 0) {
-            //推客是否订阅
-            $is_sub = Subscribe::isSubscribe($tweeter_code, $target_id, $type);
-            if ($is_sub == 0) {
-                $tweeter_code = 0;
-            }
-        } else {
+        //推客是否订阅
+        $is_sub = Subscribe::isSubscribe($tweeter_code, $target_id, $type);
+        if ($is_sub == 0) {
             $tweeter_code = 0;
         }
+
         return ['code' => 1, 'tweeter_code' => $tweeter_code];
 
     }

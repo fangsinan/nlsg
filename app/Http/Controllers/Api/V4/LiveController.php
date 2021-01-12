@@ -875,7 +875,7 @@ class LiveController extends Controller
         $payType = $input['pay_type'] ?? 0;
         $model = new Order();
 
-        $checked = $model->addOrderCheck($this->user['id'], $tweeterCode, $liveId, 3);
+        $checked = $model->addOrderLiveCheck($this->user['id'], $tweeterCode, $liveId, 3);
         if ($checked['code'] == 0) {
             return error($checked['msg']);
         }
