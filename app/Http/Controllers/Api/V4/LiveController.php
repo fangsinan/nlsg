@@ -115,7 +115,7 @@ class LiveController extends Controller
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
                 'playback_price', 'is_free', 'password')
             ->where('status', 4)
-            ->orderBy('begin_at', 'desc')
+            ->orderBy('begin_at')
             ->limit(3)
             ->get()
             ->toArray();
@@ -148,7 +148,7 @@ class LiveController extends Controller
             ->select('id', 'live_pid', 'user_id')
             ->where('status', 1)
             ->where('playback_url','!=','')
-            ->orderBy('id')
+            ->orderBy('begin_at', 'desc')
             ->limit(2)
             ->get()
             ->toArray();
@@ -237,7 +237,7 @@ class LiveController extends Controller
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
                 'playback_price', 'is_free', 'password')
             ->where('status', 4)
-            ->orderBy('begin_at', 'desc')
+            ->orderBy('begin_at')
             ->paginate(10)
             ->toArray();
         if (!empty($lists['data'])) {
