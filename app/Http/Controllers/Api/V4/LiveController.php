@@ -738,7 +738,7 @@ class LiveController extends Controller
     {
         $liveinfo_id = $request->input('live_id', 0);
         //$liveinfo_id = $request->input('liveinfo_id', 0);
-        $user_id = 1;//$this->user['id'];
+        $user_id =  $this->user['id'] ??0;
 
 
         //获取自己的邀请人数
