@@ -498,7 +498,7 @@ class WechatPay extends Controller
 
         $twitterData = User::find($twitter_id);
 
-        if(empty($twitterData['openid'])){
+        if(empty($twitterData['wxopenid'])){
             return ;
         }
 
@@ -508,7 +508,7 @@ class WechatPay extends Controller
         //添加分账账号
         $app->profit_sharing->addReceiver([
             'type' => 'PERSONAL_OPENID',
-            'account' => $twitterData['openid'],
+            'account' => $twitterData['wxopenid'],
             'relation_type' => "USER",
         ]);
 
@@ -525,7 +525,7 @@ class WechatPay extends Controller
         //分账
         $return_data = $app->profit_sharing->share( $transaction_id,'NLSGFZ'.$out_trade_no,[
             'type' => 'PERSONAL_OPENID',
-            'account' => $twitterData['openid'],
+            'account' => $twitterData['wxopenid'],
             'amount' => $amount*100,  //此处金额 分为单位
             'description' => '直播分账-个人-'.$twitterData['nickname'],
 //                                'name' => '个人名称',  //非必填

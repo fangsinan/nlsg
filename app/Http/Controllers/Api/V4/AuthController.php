@@ -53,7 +53,7 @@ class AuthController extends Controller
         $user_id = $request->input('user_id');
         $inviter = $request->input('inviter', 0);
         $ref = $request->input('ref', 0);
-        $wx_openid = $request->input('wx_openid', 0);
+        $wx_openid = $request->input('wx_openid', 0);//h5公众号
 
         $sclass = new \StdClass();
         if (!$phone) {
@@ -611,6 +611,20 @@ class AuthController extends Controller
         $res_switchAll = $switchAll[$version] ?? $switchAll['default'];
 
         return success($res_switchAll);
+    }
+
+
+
+
+    //收集用户信息
+    public function checkWx(Request $request){
+        $uid = $request->input('user_id')??0;//
+        $wx_openid = $request->input('wx_openid');
+        $user = User::find($uid);
+        if( empty($user['wxopenid']) ){
+            User::where('id', '=', $uid)->update(['wxopenid' => $wx_openid]);
+        }
+        return success();
     }
 
 }
