@@ -33,7 +33,7 @@ class LiveWorks extends Base
                         ->first();
                     $lists->type = 2;
                 } elseif ($v['type'] ==3){
-                    $lists = OfflineProducts::select('id', 'title','subtitle', 'cover_img', 'total_price as original_price', 'price')
+                    $lists = MallGoods::select('id', 'name as title','subtitle', 'picture as cover_img', 'original_price', 'price')
                         ->where('id', $v['rid'])
                         ->first();
                     $lists->type = 3;

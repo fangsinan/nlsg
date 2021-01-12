@@ -183,7 +183,7 @@ class LiveController extends Controller
             ->toArray();
 
         $liveWork = new LiveWorks();
-        $recommend = $liveWork->getLiveWorks(0, 1, 3);
+        $recommend = $liveWork->getLiveWorks(0, 1, 4);
         $data = [
             'banner' => 'nlsg/works/20201228165453965824.jpg',
             'live_lists' => $liveLists,
