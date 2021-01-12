@@ -728,7 +728,7 @@ class LiveController extends Controller
             }
         }
         $data = [
-            'user_ranking' => $num['total']+1,
+            'user_ranking' => $num['total'],
             'user_invite_num' => $user_ranking['c'],
             'ranking' => $new_data
         ];
