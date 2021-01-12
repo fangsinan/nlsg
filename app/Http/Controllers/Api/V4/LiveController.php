@@ -727,13 +727,16 @@ class LiveController extends Controller
                 $new_data[$key]['is_self'] = 1;
             }
         }
-
-
         $data = [
-            'user_ranking' => $num['total'],
+            'user_ranking' => $num['total']+1,
             'user_invite_num' => $user_ranking['c'],
             'ranking' => $new_data
         ];
+        if($data['user_invite_num'] == 0){
+            $data['user_ranking'] = 0;
+        }
+
+
         return success($data);
     }
 
