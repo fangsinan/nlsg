@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\GetPriceTools;
 use App\Models\Live;
+use App\Models\LiveCountDown;
 use App\Models\MallGroupBuyList;
 use App\Models\MallOrderDetails;
 use App\Models\MallOrderGroupBuy;
@@ -424,6 +425,7 @@ class WechatPay extends Controller
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
                 $liveData = Live::find($live_id);
 
+
                 if($liveData['relation_live'] > 0){
                     $subscribe = [
                         'user_id' => $user_id, //会员id
@@ -436,11 +438,20 @@ class WechatPay extends Controller
                     Subscribe::firstOrCreate($subscribe);
                 }
 
+                $userdata = User::find($user_id);
+
+                //添加短信数据
+                $liveCountDown = [
+                    'live_id' => $orderInfo['relation_id'],
+                    'user_id' => $user_id,
+                    'phone' => $userdata['phone'],
+                ];
                 //推客收益
                 $twitter_id = $orderInfo['twitter_id'];
                 $Profit_Rst = true;
 
                 if ( !empty($twitter_id) && $twitter_id != $user_id ) {
+                    $liveCountDown['new_vip_uid'] = $twitter_id;
                     //固定收益50
                     $ProfitPrice = $liveData['twitter_money'];
                     $map = array('user_id' => $twitter_id, "type" => 10, "ordernum" => $out_trade_no, 'price' => $ProfitPrice,);
@@ -450,9 +461,11 @@ class WechatPay extends Controller
                         $PrdInfo = PayRecordDetail::where($where)->first();
                         if (empty($PrdInfo)) {
                             $Profit_Rst = PayRecordDetail::create($map);
+
                         }
                     }
                 }
+                LiveCountDown::create($liveCountDown);
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
