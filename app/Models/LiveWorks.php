@@ -12,6 +12,7 @@ class LiveWorks extends Base
         $recommend = LiveWorks::select('id', 'rid', 'type')
             ->where('status', 1)
             ->where('pos', $pos)
+            ->where('live_id', $live_id)
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get()
