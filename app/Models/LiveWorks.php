@@ -31,15 +31,18 @@ class LiveWorks extends Base
                         ->where('id', $v['rid'])
                         ->where('status', 4)
                         ->first();
+                    $lists->type = 2;
                 } elseif ($v['type'] ==3){
                     $lists = OfflineProducts::select('id', 'title','subtitle', 'cover_img', 'total_price', 'price')
                         ->where('id', $v['rid'])
                         ->first();
+                    $lists->type = 3;
                 } elseif ($v['type'] ==4){
                     $lists = [
                         'title' => '幸福360会员',
                         'price' => 360.00,
-                        'cover_img' => 'nlsg/works/20201215165707565448.png'
+                        'cover_img' => 'nlsg/works/20201215165707565448.png',
+                        'type' => 4
                     ];
                 }
                 $data[] = $lists;
