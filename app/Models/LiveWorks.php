@@ -46,10 +46,11 @@ class LiveWorks extends Base
                     ];
                 } elseif ($v['type'] ==5){
                     $lists = [
+                          'id'    => 4,
                           'title' => '幸福套餐',
                           'price' => 1360.00,
                           'cover_img' => 'live/recommend/xingfutaoc_tc.png',
-                          'type' => 4
+                          'type' => 5
                       ];
                 }
                 $data[] = $lists;
