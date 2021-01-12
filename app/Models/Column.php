@@ -4,6 +4,8 @@
 namespace App\Models;
 
 
+use Illuminate\Support\Facades\DB;
+
 class Column extends Base
 {
     protected $table = 'nlsg_column';
@@ -98,13 +100,19 @@ class Column extends Base
 
 
     static function search($keywords,$type){
-        $res = Column::select('id', 'name', 'user_id', 'subtitle', 'original_price', 'price', 'cover_pic')
-            ->where('type',$type)
-            ->where('status',1)
+        $columnObj = new Column();
+        $userObj = new User();
+
+        $res = DB::table($columnObj->getTable(), 'column')->
+        select('column.id', 'column.name', 'user_id', 'subtitle', 'original_price', 'price', 'cover_pic')
+            ->leftJoin($userObj->getTable().' as user', 'column.user_id', '=', 'user.id')
+            ->where('column.type',$type)
+            ->where('column.status',1)
             ->where(function ($query)use($keywords){
-                $query->orWhere('title','LIKE',"%$keywords%");
-                $query->orWhere('name','LIKE',"%$keywords%");
-                $query->orWhere('subtitle','LIKE',"%$keywords%");
+                $query->orWhere('column.title','LIKE',"%$keywords%");
+                $query->orWhere('column.name','LIKE',"%$keywords%");
+                $query->orWhere('column.subtitle','LIKE',"%$keywords%");
+                $query->orWhere('user.nickname','LIKE',"%$keywords%");
             })->paginate(100)->toArray();
             //->get();
         return ['res' => $res['data'], 'count'=> $res['total'] ];

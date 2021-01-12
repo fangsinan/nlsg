@@ -83,6 +83,7 @@ class Works extends Base
             ->where('info.status', 4)
             ->where(function ($query) use ($keywords) {
                 $query->orwhere('works.title', 'like', "%{$keywords}%");
+                $query->orwhere('user.nickname', 'like', "%{$keywords}%");
 //                $query->orwhere('info.title', 'like', "%{$keywords}%");
             })->groupBy('works.id')->paginate(100)->toArray();
         //->get();
