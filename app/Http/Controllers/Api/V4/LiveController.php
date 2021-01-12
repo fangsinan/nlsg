@@ -534,15 +534,19 @@ class LiveController extends Controller
             }
 //
         }
-
-        $liveWork = new LiveWorks();
-        $recommend = $liveWork->getLiveWorks($id, 2, 2);
         $data = [
             'info' => $list,
-            'recomment' => $recommend
         ];
         return success($data);
 
+    }
+    
+    public function  recommend(Request $request)
+    {
+        $id = $request->get('live_id');
+        $liveWork = new LiveWorks();
+        $recommend = $liveWork->getLiveWorks($id, 2, 2);
+        return success($recommend);
     }
 
     /**
