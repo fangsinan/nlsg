@@ -183,7 +183,7 @@ class LiveController extends Controller
             ->toArray();
 
         $liveWork = new LiveWorks();
-        $recommend = $liveWork->getLiveWorks(0, 1, 3);
+        $recommend = $liveWork->getLiveWorks(0, 1, 4);
         $data = [
             'banner' => 'nlsg/works/20201228165453965824.jpg',
             'live_lists' => $liveLists,
@@ -540,12 +540,12 @@ class LiveController extends Controller
         return success($data);
 
     }
-    
+
     public function  recommend(Request $request)
     {
         $id = $request->get('live_id');
         $liveWork = new LiveWorks();
-        $recommend = $liveWork->getLiveWorks($id, 2, 2);
+        $recommend = $liveWork->getLiveWorks($id, 2, 4);
         return success($recommend);
     }
 
@@ -591,6 +591,9 @@ class LiveController extends Controller
         $id = $request->get('id');
         $list = OfflineProducts::where(['id' => $id, 'is_del' => 0])
             ->first();
+        if (!$list){
+            return  error(1000,'没有数据');
+        }
         $array = [1];
         if (in_array($id, $array)) {
             $list->describe_type = 2;
