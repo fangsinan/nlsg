@@ -422,7 +422,19 @@ class WechatPay extends Controller
                     'relation_id' => $live_id,
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
+                $liveData = Live::find($live_id);
 
+                if($liveData['relation_live'] > 0){
+                    $subscribe = [
+                        'user_id' => $user_id, //会员id
+                        'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+                        'type' => 3, //直播
+                        'status' => 1,
+                        'order_id' => $orderId, //订单id
+                        'relation_id' => $liveData['relation_live'],
+                    ];
+                    Subscribe::firstOrCreate($subscribe);
+                }
 
                 //推客收益
                 $twitter_id = $orderInfo['twitter_id'];
@@ -451,7 +463,6 @@ class WechatPay extends Controller
 
                     //调用直播分账
                     if ( !empty($twitter_id) && $twitter_id != $user_id ) {
-                        $liveData = Live::find($live_id);
                         if( $liveData['profit_sharing'] == 1 && $liveData['twitter_money'] > 0 ){
                             self::OrderProfit($transaction_id,$out_trade_no,$liveData['twitter_money'],$twitter_id);
                         }
