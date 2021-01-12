@@ -39,7 +39,7 @@ class LiveWorks extends Base
                     $lists = [
                         'title' => '幸福360会员',
                         'price' => 360.00,
-                        'cover_img' => ''
+                        'cover_img' => 'nlsg/works/20201215165707565448.png'
                     ];
                 }
                 $data[] = $lists;
