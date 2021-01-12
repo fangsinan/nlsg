@@ -591,6 +591,9 @@ class LiveController extends Controller
         $id = $request->get('id');
         $list = OfflineProducts::where(['id' => $id, 'is_del' => 0])
             ->first();
+        if (!$list){
+            return  error(1000,'没有数据');
+        }
         $array = [1];
         if (in_array($id, $array)) {
             $list->describe_type = 2;
