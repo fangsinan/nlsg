@@ -114,11 +114,11 @@ class LiveController extends Controller
     {
         $uid = $this->user['id'] ?? 0;
 
-        $cache_live_name = 'live_index_list';
-        $data = Cache::get($cache_live_name);
-        if ($data) {
-           return success($data);
-        }
+//        $cache_live_name = 'live_index_list';
+//        $data = Cache::get($cache_live_name);
+//        if ($data) {
+//           return success($data);
+//        }
 
         $live  = new Live();
         $liveLists = $live->getRecommendLive($uid);
@@ -139,8 +139,8 @@ class LiveController extends Controller
             'recommend'  => $recommend
         ];
 
-        $expire_num = CacheTools::getExpire('live_index_list');
-        Cache::put($cache_live_name, $data, $expire_num);
+//        $expire_num = CacheTools::getExpire('live_index_list');
+//        Cache::put($cache_live_name, $data, $expire_num);
 
         return success($data);
     }
