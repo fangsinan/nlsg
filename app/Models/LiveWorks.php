@@ -45,8 +45,7 @@ class LiveWorks extends Base
                         'cover_img' => 'nlsg/works/20201215165707565448.png',
                         'type' => 4
                     ];
-                } elseif ($v['type'] ==5){
-                    if(!empty($live_id)) {   //临时改动   直播首页暂时不展示recommend
+                } elseif ($v['type'] ==5 && $live_id){
                         $lists = [
                             'id'    => 4,
                             'title' => '幸福套餐',
@@ -55,7 +54,6 @@ class LiveWorks extends Base
                             'cover_details' => 'live/recommend/xingfutaoc_tc.png',
                             'type' => 5
                         ];
-                    }
 
                 }
                 $data[] = $lists;
