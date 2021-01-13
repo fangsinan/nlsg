@@ -87,9 +87,13 @@ class IndexController extends Controller
         return $this->success($lists);
     }
 
+    public  function  live()
+    {
+        return success();
+    }
 
     /**
-     * @api {get} api/v4/index/live  首页-直播推荐
+     * @api {get} api/v4/index/lives  首页-直播推荐
      * @apiVersion 4.0.0
      * @apiName  live
      * @apiGroup Index
@@ -120,8 +124,17 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function live()
+    public function lives(Request $request)
     {
+
+/*        $version = $request->get('version');
+        $os_type = $request->get('os_type') ?? 1;
+
+        //4.0.2以前版本不展示
+        if (version_compare($version, '4.0.2', '<')) {
+            return success();
+        }*/
+
         $user_id = $this->user['id'] ?? 0;
         $testers = explode(',', ConfigModel::getData(35, 1));
         $user = User::where('id', $user_id)->first();

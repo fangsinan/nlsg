@@ -10,6 +10,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 
 class LiveInfo extends Model
@@ -32,17 +33,25 @@ class LiveInfo extends Model
      * @param  int  $uid
      * @return array
      */
-    public function getBackLists($uid=0)
+    public function getBackLists($uid = 0)
     {
-        $lists = LiveInfo::with('user:id,nickname',
-            'live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
-            ->select('id', 'live_pid', 'user_id')
-            ->where('status', 1)
-            ->where('playback_url', '!=', '')
-            ->orderBy('begin_at', 'desc')
-            ->limit(2)
-            ->get()
-            ->toArray();
+
+        $cache_live_name = 'live_back_list';
+        $lists = Cache::get($cache_live_name);
+        if (empty($liveLists)) {
+            $lists = LiveInfo::with('user:id,nickname',
+                'live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
+                ->select('id', 'live_pid', 'user_id')
+                ->where('status', 1)
+                ->where('playback_url', '!=', '')
+                ->orderBy('begin_at', 'desc')
+                ->limit(2)
+                ->get()
+                ->toArray();
+            $expire_num = CacheTools::getExpire('live_back_list');
+            Cache::put($cache_live_name, $lists, $expire_num);
+        }
+
         if ( ! empty($lists)) {
             $backLists = [];
             foreach ($lists as &$v) {

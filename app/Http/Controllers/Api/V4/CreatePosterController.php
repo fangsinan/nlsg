@@ -31,8 +31,10 @@ class CreatePosterController extends Controller
      * @apiGroup create
      *
      * @apiParam {int} post_type  类型 post_type   5精品课/听书     7优品海报   8 专栏/讲座
-     * @apiParam {int} relation_id  对应 课程或专栏id
+     * @apiParam {int} relation_id  对应 课程或专栏id或商品
      * @apiParam {int} is_qrcode   1 生成纯二维码
+     * @apiParam {int} live_id
+     * @apiParam {int} live_info_id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -56,7 +58,7 @@ class CreatePosterController extends Controller
         $live_id = $request->input('live_id',0);
         $live_info_id = $request->input('live_info_id',0);
 
-
+        //3:好书  4:会员  5:精品课  7商品   8:专栏  10:直播  23:360分享海报
         $level = User::getLevel($uid);
 
         //分享360海报,不校验推客身份

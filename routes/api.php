@@ -22,6 +22,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/announce', 'IndexController@announce');
     Route::get('index/banner', 'IndexController@banner');
     Route::get('index/live', 'IndexController@live');
+    Route::get('index/lives', 'IndexController@lives');
     Route::get('index/column', 'IndexController@column');
     Route::get('index/works', 'IndexController@works');
     Route::get('index/wiki', 'IndexController@wiki');
