@@ -34,7 +34,7 @@ class OfflineProducts extends Base
             $offline = OfflineProducts::where('is_del', 0)
                       ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
                       ->orderBy('created_at', 'desc')
-                      ->limit(4)
+                      ->limit(3)
                       ->get()
                       ->toArray();
             $expire_num = CacheTools::getExpire('live_off_product');
