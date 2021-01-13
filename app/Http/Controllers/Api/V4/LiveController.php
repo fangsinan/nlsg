@@ -3,25 +3,21 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
-use App\Models\CacheTools;
 use App\Models\Column;
+use App\Models\Live;
 use App\Models\LiveConsole;
+use App\Models\LiveCountDown;
 use App\Models\LiveForbiddenWords;
+use App\Models\LiveInfo;
+use App\Models\LiveWorks;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
-use App\Models\Subscribe;
-use Illuminate\Http\Request;
-use App\Models\Live;
-use App\Models\LiveInfo;
-use App\Models\LiveCountDown;
-use App\Models\User;
-use App\Models\LiveWorks;
 use App\Models\Order;
-use Illuminate\Support\Facades\Cache;
+use App\Models\Subscribe;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Redis;
 
 class LiveController extends Controller
 {
@@ -114,10 +110,10 @@ class LiveController extends Controller
     {
         $uid = $this->user['id'] ?? 0;
 
-        $live  = new Live();
+        $live = new Live();
         $liveLists = $live->getRecommendLive($uid);
 
-        $info  = new LiveInfo();
+        $info = new LiveInfo();
         $lists = $info->getBackLists($uid);
 
         $product = new OfflineProducts();
@@ -126,11 +122,11 @@ class LiveController extends Controller
         $liveWork = new LiveWorks();
         $recommend = $liveWork->getLiveWorks(0, 1, 6);
         $data = [
-            'banner'     => 'nlsg/works/20201228165453965824.jpg',
+            'banner' => 'nlsg/works/20201228165453965824.jpg',
             'live_lists' => $liveLists,
             'back_lists' => $backLists ?? [],
-            'offline'    => $offline,
-            'recommend'  => $recommend
+            'offline' => $offline,
+            'recommend' => $recommend
         ];
 
         return success($data);
@@ -188,16 +184,16 @@ class LiveController extends Controller
                     ->where('status', 1)
                     ->orderBy('id', 'desc')
                     ->first();
-                if ($channel->is_begin ==0 && $channel->is_finish==0){
+                if ($channel->is_begin == 0 && $channel->is_finish == 0) {
                     $v['live_status'] = 1;
-                }elseif($channel->is_begin ==1 && $channel->is_finish==0){
+                } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
                     $v['live_status'] = 3;
-                }elseif($channel->is_begin ==0 && $channel->is_finish==1){
+                } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
                     $v['live_status'] = 2;
                 }
-                $isSub   = Subscribe::isSubscribe($uid, $v['id'], 3);
+                $isSub = Subscribe::isSubscribe($uid, $v['id'], 3);
                 $isAdmin = LiveConsole::isAdmininLive($uid, $v['id']);
-                $v['is_sub']   = $isSub ?? 0;
+                $v['is_sub'] = $isSub ?? 0;
                 $v['is_admin'] = $isAdmin ? 1 : 0;
                 $v['info_id'] = $channel->id;
                 $v['is_password'] = $v['password'] ? 1 : 0;
@@ -249,14 +245,14 @@ class LiveController extends Controller
         $lists = LiveInfo::with('user:id,nickname', 'live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
             ->select('id', 'live_pid', 'user_id')
             ->where('status', 1)
-            ->where('playback_url','!=','')
+            ->where('playback_url', '!=', '')
             ->orderBy('begin_at', 'desc')
             ->paginate(10)
             ->toArray();
         $backLists = [];
         if (!empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
-                $isSub   = Subscribe::isSubscribe($uid, $v['live_pid'], 3);
+                $isSub = Subscribe::isSubscribe($uid, $v['live_pid'], 3);
                 $isAdmin = LiveConsole::isAdmininLive($uid, $v['live_pid']);
                 $backLists[] = [
                     'id' => $v['live']['id'],
@@ -269,8 +265,8 @@ class LiveController extends Controller
                     'live_time' => date('Y.m.d H:i', strtotime($v['live']['begin_at'])),
                     'is_free' => $v['live']['is_free'],
                     'info_id' => $v['id'],
-                    'is_sub'  => $isSub ?? 0,
-                    'is_admin'=>  $isAdmin ? 1 : 0
+                    'is_sub' => $isSub ?? 0,
+                    'is_admin' => $isAdmin ? 1 : 0
                 ];
             }
         }
@@ -326,7 +322,7 @@ class LiveController extends Controller
     {
         $id = $request->get('id');
         $lists = LiveInfo::with(['user:id,nickname', 'live:id,title,price,cover_img'])
-            ->select('id', 'user_id', 'live_pid', 'begin_at', 'end_at','is_begin','is_finish')
+            ->select('id', 'user_id', 'live_pid', 'begin_at', 'end_at', 'is_begin', 'is_finish')
             ->where('status', 1)
             ->where('live_pid', $id)
             ->orderBy('begin_at', 'desc')
@@ -335,12 +331,12 @@ class LiveController extends Controller
 
         if (!empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
-                if ($v->is_begin ==0 && $v->is_finish==0){
-                   $v['live_status'] = 1;
-                }elseif($v->is_begin ==1 && $v->is_finish==0){
-                   $v['live_status'] = 3;
-                }elseif($v->is_begin ==0 && $v->is_finish==1){
-                   $v['live_status'] = 2;
+                if ($v->is_begin == 0 && $v->is_finish == 0) {
+                    $v['live_status'] = 1;
+                } elseif ($v->is_begin == 1 && $v->is_finish == 0) {
+                    $v['live_status'] = 3;
+                } elseif ($v->is_begin == 0 && $v->is_finish == 1) {
+                    $v['live_status'] = 2;
                 }
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
@@ -423,7 +419,7 @@ class LiveController extends Controller
             'user:id,nickname,headimg,intro,honor',
             'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish'
         ])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id','is_finish')
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish')
             ->where('id', $id)
             ->first();
         if ($list) {
@@ -441,7 +437,7 @@ class LiveController extends Controller
             $is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
                 ->where('user_id', '=', 0)->where('is_forbid', '=', 1)
                 ->first();
-            $list['is_forbid']  = $is_forbid ? 1 : 0;
+            $list['is_forbid'] = $is_forbid ? 1 : 0;
 
             $is_silence = LiveForbiddenWords::where('live_info_id', '=', $id)
                 ->where('user_id', '=', $this->user['id'])
@@ -458,7 +454,7 @@ class LiveController extends Controller
             $is_appmt = LiveCountDown::where(['user_id' => $this->user['id'], 'live_id' => $id])->first();
             $list['is_appmt'] = $is_appmt ? 1 : 0;
             $is_admin = LiveConsole::isAdmininLive($this->user['id'] ?? 0, $list['live_pid']);
-            $list['is_admin']  = $is_admin ? 1 : 0;
+            $list['is_admin'] = $is_admin ? 1 : 0;
 
             $list['column_id'] = $columnId;
             $list['is_sub'] = $subLive ?? 0;
@@ -467,9 +463,9 @@ class LiveController extends Controller
             $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
             $list['nick_name'] = $this->user['nickname'] ?? '';
 
-            if ($list->user_id == $userId){
-                $list['is_password'] = 0 ;
-            } elseif ($is_admin){
+            if ($list->user_id == $userId) {
+                $list['is_password'] = 0;
+            } elseif ($is_admin) {
                 $list['is_password'] = 0;
             } else {
                 $list['is_password'] = $list->live->password ? 1 : 0;
@@ -483,7 +479,7 @@ class LiveController extends Controller
 
     }
 
-    public function  recommend(Request $request)
+    public function recommend(Request $request)
     {
         $id = $request->get('live_id');
         $liveWork = new LiveWorks();
@@ -533,8 +529,8 @@ class LiveController extends Controller
         $id = $request->get('id');
         $list = OfflineProducts::where(['id' => $id, 'is_del' => 0])
             ->first();
-        if (!$list){
-            return  error(1000,'没有数据');
+        if (!$list) {
+            return error(1000, '没有数据');
         }
         $array = [1];
         if (in_array($id, $array)) {
@@ -680,7 +676,7 @@ class LiveController extends Controller
     {
         $live_id = $request->input('live_id', 0);
         $liveinfo_id = $request->input('liveinfo_id', 0);
-        $user_id =  $this->user['id'] ??0;
+        $user_id = $this->user['id'] ?? 0;
 
 
         //获取自己的邀请人数
@@ -723,7 +719,7 @@ class LiveController extends Controller
             'user_invite_num' => $user_ranking['c'],
             'ranking' => $new_data
         ];
-        if($data['user_invite_num'] == 0){
+        if ($data['user_invite_num'] == 0) {
             $data['user_ranking'] = 0;
         }
 
@@ -817,16 +813,16 @@ class LiveController extends Controller
     {
         $input = $request->all();
         $tweeterCode = $input['inviter'] ?? 0;
-        $liveId      = $input['live_id'] ?? 0;
-        $liveInfoId  = $input['info_id'] ?? 0;
+        $liveId = $input['live_id'] ?? 0;
+        $liveInfoId = $input['info_id'] ?? 0;
         $osType = $input['os_type'] ?? 1;
         $payType = $input['pay_type'] ?? 0;
-        $activity_tag = $input['activity_tag']??'';
+        $activity_tag = $input['activity_tag'] ?? '';
         $model = new Order();
 
         $checked = $model->addOrderLiveCheck($this->user['id'], $tweeterCode, $liveId, 3);
         if ($checked['code'] == 0) {
-            return error(0,$checked['msg']);
+            return error(0, $checked['msg']);
         }
         //校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
@@ -835,7 +831,7 @@ class LiveController extends Controller
             ->where('id', $liveId)
             ->first();
         if (!$list) {
-            return error(0,'直播不存在');
+            return error(0, '直播不存在');
         }
 
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
@@ -856,7 +852,7 @@ class LiveController extends Controller
 
         ];
         $order = Order::firstOrCreate($data);
-        if ($order){
+        if ($order) {
             Live::where('id', $liveId)->increment('order_num');
             $data = [
                 'order_id' => $order['id']
@@ -884,6 +880,13 @@ class LiveController extends Controller
             }
         }
         return;
+    }
+
+    public function checkLiveSub(Request $request)
+    {
+        $model = new Order();
+        $data = $model->checkLiveSub($request->input('live_id', 0), $this->user['id'] ?? 0);
+        return $this->getRes($data);
     }
 
 }

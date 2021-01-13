@@ -192,6 +192,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('live/lists', 'LiveController@getLiveLists');
     Route::get('live/recommend', 'LiveController@recommend');
     Route::get('live/back_lists', 'LiveController@getLiveBackLists');
+    Route::get('live/check_sub', 'LiveController@checkLiveSub');
 
     Route::post('send/get_send_order', 'SendController@getSendOrder');
 

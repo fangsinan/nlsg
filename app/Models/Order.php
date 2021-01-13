@@ -102,7 +102,7 @@ class Order extends Base
                 break;
             case 16:
                 $result[] = [
-                    'id'  => 1, 'type' => 6, 'text' => '幸福360会员',
+                    'id' => 1, 'type' => 6, 'text' => '幸福360会员',
                     'img' => '/nlsg/works/20210105102849884378.png', 'price' => 360.00
                 ];
                 break;
@@ -126,8 +126,8 @@ class Order extends Base
      */
     public static function clear()
     {
-        $past     = Carbon::parse('-30 minutes')->toDateTimeString();
-        $subHour  = now()->subHours(5);
+        $past = Carbon::parse('-30 minutes')->toDateTimeString();
+        $subHour = now()->subHours(5);
         $res = Order::where('created_at', '<', $past)
             ->where('created_at', '>', $subHour)
             ->where('status', 0)
@@ -185,4 +185,21 @@ class Order extends Base
         return $list;
     }
 
+    public function checkLiveSub($live_id, $user_id)
+    {
+        if (empty($live_id) || empty($user_id)) {
+            return ['code' => true, 'is_sub' => 0];
+        }
+
+        $check = Order::where('live_id', '=', $live_id)
+            ->where('type', '=', 10)
+            ->where('status', '=', 1)
+            ->first();
+        if ($check) {
+            return ['code' => true, 'is_sub' => 1];
+        } else {
+            return ['code' => true, 'is_sub' => 0];
+        }
+
+    }
 }
