@@ -532,14 +532,14 @@ class LiveController extends Controller
         if (!$list) {
             return error(1000, '没有数据');
         }
-        $array = [1];
-        if (in_array($id, $array)) {
-            $list->describe_type = 2;
-            $list->url = 'appv4/offLineAppDesc';
-        } else {
-            $list->describe_type = 1;
-            $list->url = '';
-        }
+//        $array = [1];
+//        if (in_array($id, $array)) {
+//            $list->describe_type = 2;
+//            $list->url = 'appv4/offLineAppDesc';
+//        } else {
+//            $list->describe_type = 1;
+//            $list->url = '';
+//        }
         return success($list);
     }
 
