@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class OfflineProducts extends Base
 {
@@ -27,12 +28,19 @@ class OfflineProducts extends Base
      */
     public function getIndexLists()
     {
-        $offline = OfflineProducts::where('is_del', 0)
-                   ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
-                   ->orderBy('created_at', 'desc')
-                   ->limit(4)
-                   ->get()
-                   ->toArray();
+        $cache_live_name = 'live_off_product';
+        $offline = Cache::get($cache_live_name);
+        if (empty($offline)){
+            $offline = OfflineProducts::where('is_del', 0)
+                      ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
+                      ->orderBy('created_at', 'desc')
+                      ->limit(4)
+                      ->get()
+                      ->toArray();
+            $expire_num = CacheTools::getExpire('live_off_product');
+            Cache::put($cache_live_name, $offline, $expire_num);
+        }
+
         return $offline;
 
     }
