@@ -277,6 +277,7 @@ class MallOrderServers
 				WHEN (is_success = 0 AND is_fail = 0 AND nlsg_mall_order.STATUS) > 1 THEN nlsg_mall_order.`status`
 				WHEN is_fail = 1 THEN 99
 				WHEN is_stop = 1 THEN 99
+                ELSE nlsg_mall_order.status
 				END ) status')
         ];
 
@@ -305,9 +306,9 @@ class MallOrderServers
             $now_date . '" then FALSE ELSE TRUE END) ');
 
         $query->orderBy('nlsg_mall_order.id', 'desc');
-
+        DB::connection()->enableQueryLog();
         $list = $query->with($with)->select($field)->paginate($size);
-
+        dd(DB::getQueryLog());
         foreach ($list as $v) {
             $v->goods_count = 0;
             foreach ($v->orderDetails as $vv) {
