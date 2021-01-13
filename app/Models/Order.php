@@ -90,7 +90,8 @@ class Order extends Base
                 $result = $model->getIndexWorks([$relation_id], 2, $user_id);
                 break;
             case 10:
-                $result = Live::where(['id' => $relation_id])->get()->toArray();
+                $liveinfo = LiveInfo::find($relation_id);
+                $result = Live::where(['id' => $liveinfo['live_pid']])->get()->toArray();
                 break;
             case 14:
                 $result = OfflineProducts::where(['id' => $relation_id])->get()->toArray();

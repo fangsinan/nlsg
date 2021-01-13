@@ -1126,6 +1126,7 @@ class OrderController extends Controller
     {
         $product_id = $request->input('product_id', 1);   //目标id
         $os_type = $request->input('os_type', 0);
+        $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
         $tweeter_code = $request->input('inviter', 0);  //推客id
         $num = $request->input('num', 0);  //推客id
@@ -1150,6 +1151,7 @@ class OrderController extends Controller
             'price' => $price,
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
+            'pay_type' => $pay_type,
             'live_id' => $live_id,
             'twitter_id' => $tweeter_code,
         ];
