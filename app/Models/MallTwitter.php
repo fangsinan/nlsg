@@ -14,7 +14,7 @@ class MallTwitter extends Base
     {
         //精品课(视频,音频),专栏,商品,听书,课程(视频,音频),会员,好书
         //$host_url = Config::getInstance()->getConf('REQUEST_URI.INDEX_URL');
-        $host_url = 'http://wechat.test.nlsgapp.com/';
+        $host_url = ConfigModel::getData(45)?? 'https://wechat.nlsgapp.com/';
         $url = '';
         //$u_type 1专栏 5听书   6课程 12讲座
         switch (intval($type)) {
