@@ -47,14 +47,10 @@ class LiveWorks extends Base
                         'type' => 4
                     ];
                 } elseif ($v['type'] ==5 ){
-                    $lists = [
-                        'id'    => 4,
-                        'title' => '幸福套餐',
-                        'price' => 1360.00,
-                        'cover_img' => 'live/recommend/xingfutaoc_tc.png',
-                        'cover_details' => 'live/recommend/xingfutaoc_tc.png',
-                        'type' => 5
-                    ];
+                    $lists = OfflineProducts::select('id','title','subtitle','cover_img', 'total_price as original_price','price')
+                        ->where('id', $v['rid'])
+                        ->first();
+                    $lists->type = 5;
                     if($live_id == 0){  //临时改动 客户端直播首页不展示 01-12 22:15:00
                         $lists = [];
                     }

@@ -30,7 +30,7 @@ class OfflineProducts extends Base
         $offline = OfflineProducts::where('is_del', 0)
                    ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
                    ->orderBy('created_at', 'desc')
-                   ->limit(3)
+                   ->limit(4)
                    ->get()
                    ->toArray();
         return $offline;

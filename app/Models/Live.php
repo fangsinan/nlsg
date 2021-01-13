@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Live extends Model
 {
@@ -52,14 +53,21 @@ class Live extends Model
      */
     public function getRecommendLive($uid=0)
     {
-        $liveLists = Live::with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
-                'playback_price', 'is_free', 'password')
-            ->where('status', 4)
-            ->orderBy('begin_at')
-            ->limit(3)
-            ->get()
-            ->toArray();
+        $cache_live_name = 'live_index_list';
+        $liveLists = Cache::get($cache_live_name);
+        if (empty($liveLists)){
+            $liveLists = Live::with('user:id,nickname')
+                       ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
+                           'playback_price', 'is_free', 'password')
+                       ->where('status', 4)
+                       ->orderBy('begin_at')
+                       ->limit(3)
+                       ->get()
+                       ->toArray();
+            $expire_num = CacheTools::getExpire('live_index_list');
+            Cache::put($cache_live_name, $liveLists, $expire_num);
+        }
+
         if ( ! empty($liveLists)) {
             foreach ($liveLists as &$v) {
                 $channel = LiveInfo::where('live_pid', $v['id'])
