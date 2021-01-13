@@ -9,9 +9,9 @@ use App\Models\CacheTools;
 use App\Models\ConfigModel;
 use App\Models\Lists;
 use App\Models\Recommend;
+use App\Models\User;
 use App\Models\Versions;
 use App\Models\Works;
-use App\Models\User;
 use App\Servers\StatisticsServers;
 use EasyWeChat\Factory;
 use Illuminate\Http\Request;
@@ -122,10 +122,10 @@ class IndexController extends Controller
      */
     public function live()
     {
-        $user_id  = $this->user['id'] ?? 0;
-        $testers  = explode(',', ConfigModel::getData(35, 1));
-        $user = User::where('id',$user_id)->first();
-        if (!$user || !in_array($user->phone, $testers)){
+        $user_id = $this->user['id'] ?? 0;
+        $testers = explode(',', ConfigModel::getData(35, 1));
+        $user = User::where('id', $user_id)->first();
+        if (!$user || !in_array($user->phone, $testers)) {
             return success();
         }
         $recommendModel = new Recommend();
@@ -999,6 +999,13 @@ class IndexController extends Controller
         ];
         return success($data);
 
+    }
+
+    public function tempConfig(Request $request)
+    {
+        $model = new ConfigModel();
+        $res = $model->tempConfig($request->input('id', 0), $this->user['id'] ?? 0);
+        return $this->success($res);
     }
 
     public function kunSaid(Request $request)

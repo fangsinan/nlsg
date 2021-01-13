@@ -8,7 +8,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use OSS\OssClient;
 
@@ -25,6 +24,7 @@ class ConfigModel extends Base
     protected static $MIME_TYPE_TO_TYPE = [
         'image/jpeg' => 'jpg', 'image/png' => 'png'
     ];
+
     //1:邮费  2:特价优先级
     public static function getData($id, $flag = 0)
     {
@@ -42,29 +42,71 @@ class ConfigModel extends Base
 
     protected static function getFromDb($id)
     {
-        $res = ConfigModel::find($id)->toArray();
+        $res = ConfigModel::find($id);
+        if (empty($res)) {
+            return '';
+        }
+        $res = $res->toArray();
         return $res['value'];
     }
 
-
+    public function tempConfig($id, $user_id)
+    {
+        switch (intval($id)) {
+            case 1:
+                if (empty($user_id)) {
+                    return ['code' => true, 'data' => ''];
+                }
+                $list = ConfigModel::getData(48);
+                $list = explode(',', $list);
+                $count = count($list);
+                $key = $user_id % $count;
+                return ['code' => true, 'data' => $list[$key]];
+            default:
+                return ['code' => true, 'data' => ''];
+        }
+    }
 
     //上传操作
-    public static function base64Upload($type_flag,$file_base64){
+    public static function base64Upload($type_flag, $file_base64)
+    {
 
 
-        $dir='nlsg/';
-        switch($type_flag){
-            case 1:$dir.='headimg';break;
-            case 2:$dir.='works';break;
-            case 3:$dir.='authorpt';break;
-            case 4:$dir.='goods';break;
-            case 5:$dir.='idcard';break;
-            case 6:$dir.='banner';break;
-            case 7:$dir.='booklist';break;
-            case 8:$dir.='company';break;
-            case 9:$dir.='feedback';break;
-            case 10:$dir.='evaluate';break;
-            case 100:$dir.='other';break;
+        $dir = 'nlsg/';
+        switch ($type_flag) {
+            case 1:
+                $dir .= 'headimg';
+                break;
+            case 2:
+                $dir .= 'works';
+                break;
+            case 3:
+                $dir .= 'authorpt';
+                break;
+            case 4:
+                $dir .= 'goods';
+                break;
+            case 5:
+                $dir .= 'idcard';
+                break;
+            case 6:
+                $dir .= 'banner';
+                break;
+            case 7:
+                $dir .= 'booklist';
+                break;
+            case 8:
+                $dir .= 'company';
+                break;
+            case 9:
+                $dir .= 'feedback';
+                break;
+            case 10:
+                $dir .= 'evaluate';
+                break;
+            case 100:
+                $dir .= 'other';
+                break;
         }
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $file_base64, $match)) {
             $accessKeyId = Config('web.Ali.ACCESS_KEY_ALI');
@@ -72,33 +114,32 @@ class ConfigModel extends Base
             $endpoint = "oss-cn-beijing.aliyuncs.com";
             //上传阿里
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-            $dir=$dir.'/'.date('YmdHis');
+            $dir = $dir . '/' . date('YmdHis');
 
             // 存储空间名称
-            $bucket= Config('web.Ali.BUCKET_ALI');
+            $bucket = Config('web.Ali.BUCKET_ALI');
             $ext = self::$MIME_TYPE_TO_TYPE["image/" . $match[2]] ?? 'jpg'; //扩展名
-            $content=base64_decode(str_replace($match[1], '', $file_base64));
+            $content = base64_decode(str_replace($match[1], '', $file_base64));
             // 文件名称
-            $object=$dir.rand(100000,999999).'.'.$ext;
+            $object = $dir . rand(100000, 999999) . '.' . $ext;
             // 文件内容
             $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
-            if($doesres){
-                return ['code'=>1,'msg' => '文件已存在'];
-            }else{
-                $object=$dir.rand(100000,999999).'.'.$ext;
+            if ($doesres) {
+                return ['code' => 1, 'msg' => '文件已存在'];
+            } else {
+                $object = $dir . rand(100000, 999999) . '.' . $ext;
             }
             $ossClient->putObject($bucket, $object, $content);
             return [
-                'code'=>0,
-                'url'=>Config('web.Ali.IMAGES_URL'),
+                'code' => 0,
+                'url' => Config('web.Ali.IMAGES_URL'),
                 'name' => $object
             ];
 
-        }else{
-            return ['code'=>1,'msg' => 'base64码解析错误'];
+        } else {
+            return ['code' => 1, 'msg' => 'base64码解析错误'];
         }
     }
-
 
 
 }

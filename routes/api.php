@@ -38,6 +38,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('index/share', 'IndexController@share');
     Route::get('index/test', 'IndexController@test');
     Route::get('config', 'IndexController@config');
+    Route::get('temp_config', 'IndexController@tempConfig');
 
     //统计
     Route::get('index/Kunsaid', 'IndexController@kunSaid');
