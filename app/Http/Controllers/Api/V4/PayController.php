@@ -67,7 +67,7 @@ class PayController extends Controller {
         if ($activity_tag === 'cytx') {
             Order::where('id','=',$order_id)->update(['activity_tag'=>'cytx']);
         }
-        
+
         $config = Config('wechat.payment.default');
 
         if($is_h5 == 1 || $is_h5 == 2 ){ // 公众号openid
@@ -127,7 +127,7 @@ class PayController extends Controller {
             }
         }else{
             Log::error('微信支付签名失败:'.var_export($result,1));
-            return $this->error(0,$result['err_code_des']);
+            return $this->error(0,$result['err_code_des']??'');
 
         }
 
