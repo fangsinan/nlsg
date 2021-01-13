@@ -21,7 +21,7 @@ class LiveConsole extends Base
 
             $check_user = User::whereIn('phone', $helper)->select(['id', 'phone'])->get();
             if ($check_user->isEmpty()) {
-                return ['code' => false, 'msg' => '助手数据错误'];
+                return ['code' => false, 'msg' => '未查询到该手机号信息'];
             } else {
                 $check_user = $check_user->toArray();
                 $check_user = array_column($check_user, 'phone');
