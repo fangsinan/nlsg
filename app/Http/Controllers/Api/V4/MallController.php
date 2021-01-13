@@ -216,6 +216,13 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
+            $go = $request->input('go',0);
+            if ($go == 1){
+                MallRefundJob::shillJob(1);
+            }
+            if ($go == 2){
+                MallRefundJob::shillJob(2);
+            }
             //MallRefundJob::shillJob(2);
             //VipRedeemUser::subWorksOrGetRedeemCode(692095);
             return true;
