@@ -60,7 +60,7 @@ class PayController extends Controller {
         }
 
         $pay_info = $this->getPayInfo($order_id, $attach);
-        return $pay_info;
+
         if ($pay_info == false) {
             return $this->error(0, '订单信息错误');
         }
@@ -128,7 +128,7 @@ class PayController extends Controller {
             }
         }else{
             Log::error('微信支付签名失败:'.var_export($result,1));
-            return $this->error(0,$result['err_code_des']??'');
+            return $this->error(0,$result['err_code_des']??'微信支付签名失败');
 
         }
 
