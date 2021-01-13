@@ -191,7 +191,8 @@ class Order extends Base
             return ['code' => true, 'is_sub' => 0];
         }
 
-        $check = Order::where('live_id', '=', $live_id)
+        $check = Order::where('user_id', '=', $user_id)
+            ->where('live_id', '=', $live_id)
             ->where('type', '=', 10)
             ->where('status', '=', 1)
             ->first();
