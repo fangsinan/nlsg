@@ -58,10 +58,12 @@ class ConfigModel extends Base
                     return ['code' => true, 'data' => ''];
                 }
                 $list = ConfigModel::getData(48);
-                $list = explode(',', $list);
+                $list = explode(';', $list);
+                $list = array_filter($list);
                 $count = count($list);
                 $key = $user_id % $count;
-                return ['code' => true, 'data' => $list[$key]];
+                $res = explode(',', $list[$key]);
+                return ['code' => true, 'url' => $res[0], 'str' => $res[1]];
             default:
                 return ['code' => true, 'data' => ''];
         }
