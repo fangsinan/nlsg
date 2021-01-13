@@ -401,6 +401,11 @@ class WechatPay extends Controller
                 ];
                 $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
 
+                //发送短信
+                if (intval($live_id) === 1){
+                    $couponModel = new Coupon();
+                    $couponModel->giveCoupon($user_id, 50);
+                }
 
                 //添加支付记录
                 $record = [
