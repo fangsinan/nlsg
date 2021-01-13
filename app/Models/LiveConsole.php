@@ -380,16 +380,19 @@ class LiveConsole extends Base
     //todo 直播的相关统计
     public function liveStatistisc($live_id, $user_id)
     {
+        $live_info = LiveInfo::where('live_pid','=',$live_id)->select(['id'])->get()->toArray();
+        $live_info_id = array_column($live_info,'id');
+
         return [
-            ['key' => '预约人数', 'value' => '1人'],
-            ['key' => '观看人数', 'value' => '1人'],
-            ['key' => '打赏人数', 'value' => '1人'],
-            ['key' => '打赏金额', 'value' => '100元'],
-            ['key' => '分销收入', 'value' => '100元'],
-            ['key' => '报名收入', 'value' => '100元'],
-            ['key' => '回放收入', 'value' => '100元'],
-            ['key' => '报名流水', 'value' => '100元'],
-            ['key' => '回放流水', 'value' => '100元'],
+            ['key' => '预约人数', 'value' => LiveCountDown::whereIn('live_id',$live_info_id)->count()],
+            ['key' => '观看人数', 'value' => LiveWatchRecord::where('live_id','=',$live_id)->count()],
+            ['key' => '打赏人数', 'value' => Order::where('type','=',5)->where('relation_id','=',$live_id)->where('status','=',1)->count()],
+            ['key' => '打赏金额', 'value' => Order::where('type','=',5)->where('relation_id','=',$live_id)->where('status','=',1)->sum('price')],
+//            ['key' => '分销收入', 'value' => '100元'],
+//            ['key' => '报名收入', 'value' => '100元'],
+//            ['key' => '回放收入', 'value' => '100元'],
+            ['key' => '报名流水', 'value' => Order::where('type','=',10)->where('relation_id','=',$live_id)->where('status','=',1)->sum('price')],
+//            ['key' => '回放流水', 'value' => '100元'],
         ];
     }
 
