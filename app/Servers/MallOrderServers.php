@@ -269,9 +269,9 @@ class MallOrderServers
             'nlsg_mall_order.id', 'nlsg_mall_order.ordernum', 'nlsg_mall_order.price', 'nlsg_mall_order.pay_price',
             'nlsg_mall_order.messages',
             'nlsg_mall_order.dead_time', 'nlsg_mall_order.user_id', DB::raw('3 as order_type'),
-            DB::raw('(case when nlsg_mall_order.`status` = 1 then 1
-                when is_success = 0 then 95 when nlsg_mall_order.is_stop = 1
-                then 99 ELSE nlsg_mall_order.`status` END) `status_old`'),
+//            DB::raw('(case when nlsg_mall_order.`status` = 1 then 1
+//                when is_success = 0 then 95 when nlsg_mall_order.is_stop = 1
+//                then 99 ELSE nlsg_mall_order.`status` END) `status_old`'),
             DB::raw('(CASE
 				WHEN (nlsg_mall_order.STATUS = 1 AND is_success = 0) THEN 1
 				WHEN (is_success = 0 AND is_fail = 0 AND nlsg_mall_order.STATUS) > 1 THEN nlsg_mall_order.`status`
