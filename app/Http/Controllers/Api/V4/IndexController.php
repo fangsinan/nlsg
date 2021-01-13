@@ -924,7 +924,7 @@ class IndexController extends Controller
 
         if ($list && version_compare($version, $list->number, '>=')) {
             //当实际版本大于储存版本号时   默认不更新
-            return success(['is_force' => 2]);
+            return success(['is_force' => 0]);
         }
         //否则按照数据库进行更新状态
         $list->content = $list->content ? explode('；', $list->content) : '';
