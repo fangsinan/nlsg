@@ -354,7 +354,7 @@ class LiveConsole extends Base
         }
 
         DB::commit();
-        return ['code' => true, 'msg' => '添加成功'];
+        return ['code' => true, 'msg' => '已提交，请您耐心等待审核。'];
     }
 
     public function info($id, $user_id)
