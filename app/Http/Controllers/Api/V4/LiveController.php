@@ -826,7 +826,7 @@ class LiveController extends Controller
 
         $checked = $model->addOrderLiveCheck($this->user['id'], $tweeterCode, $liveId, 3);
         if ($checked['code'] == 0) {
-            return error($checked['msg']);
+            return error(0,$checked['msg']);
         }
         //校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
@@ -835,7 +835,7 @@ class LiveController extends Controller
             ->where('id', $liveId)
             ->first();
         if (!$list) {
-            return error('直播不存在');
+            return error(0,'直播不存在');
         }
 
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
