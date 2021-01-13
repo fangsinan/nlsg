@@ -68,7 +68,6 @@ class Coupon extends Base
         if (count($flag) !== count($coupon_rule_list)) {
             return ['code' => false, 'msg' => '优惠券参数错误'];
         }
-
         foreach ($coupon_rule_list as $k => $v) {
             switch (intval($v->restrict)) {
                 case 1:

@@ -508,8 +508,8 @@ class WechatPay extends Controller
      *
      * @param string $transaction_id    微信支付订单号
      * @param string $out_trade_no      商户系统内部的分账单号
-     * @param array  $amount            分账金额  此处单位为元
-     * @param array  $twitterData       分账人员信息
+     * @param   $amount            分账金额  此处单位为元
+     * @param   $twitterData       分账人员信息
      */
     public  static function OrderProfit($transaction_id,$out_trade_no,$amount,$twitter_id){
 

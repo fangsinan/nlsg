@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
+use App\Models\Coupon;
 use App\Models\CouponRule;
 use App\Models\CouponRuleList;
 use App\Models\MallCategory;
@@ -215,13 +216,15 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            $go = $request->input('go', 0);
-            if ($go == 1) {
-                MallRefundJob::shillJob();
-            }
-            if ($go == 2) {
-                MallRefundJob::shillJob(2);
-            }
+            $m = new Coupon();
+            $m->getCoupon([50],168934);
+//            $go = $request->input('go', 0);
+//            if ($go == 1) {
+//                MallRefundJob::shillJob();
+//            }
+//            if ($go == 2) {
+//                MallRefundJob::shillJob(2);
+//            }
             //MallRefundJob::shillJob(2);
             //VipRedeemUser::subWorksOrGetRedeemCode(692095);
             return true;
