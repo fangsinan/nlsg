@@ -86,4 +86,59 @@ class Live extends Model
         }
         return $liveLists;
     }
+
+
+
+
+    public static function sendLiveCountDown(){
+
+        $flag = true;
+        $title = "能量时光直播";
+        $size = 3;
+        $live_id = 643;
+
+
+        $live_data = Live::where(['id'=>$live_id,'status'=>4])->first();
+        if(time() < (strtotime($live_data['begin_at']) - 600) ){
+            return;
+        }
+
+        while ($flag) {
+            $phone = [];
+            $params = [];
+            $name = [];
+            $up_where = [];
+            $user_phone = LiveCountDown::select('id','phone')->where(['live_id' => $live_id, 'is_send' => 0])->limit($size)->get()->toArray();
+
+            if (!empty($user_phone)) {
+                foreach ($user_phone as $key => $val) {
+                    if ($val['phone']) {
+                        $phone[] = $val['phone'];
+                        $params[$key]['name'] = $title;
+                        $name[] = '能量时光';
+                        //改状态
+                        $up_where[] = $val['id'];
+
+
+                        //发送短信
+                        $easySms = app('easysms');
+                        $result = $easySms->send($val['phone'], [
+                            'template' => 'SMS_168311509',
+                            'data' => ['name'=>$title],
+                        ], ['aliyun']);
+
+                    }
+                }
+                if ( !empty($up_where) ) {
+                    LiveCountDown::whereIn('id',$up_where)->update(['is_send' => 1]);
+                }
+            } else {
+                $flag = false;
+            }
+
+
+        }
+
+    }
+
 }
