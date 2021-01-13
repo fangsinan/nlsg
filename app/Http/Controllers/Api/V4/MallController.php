@@ -12,7 +12,6 @@ use App\Models\MallGoods;
 use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
-use App\Models\VipRedeemUser;
 use App\Servers\MallRefundJob;
 use Illuminate\Http\Request;
 
@@ -216,11 +215,11 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            $go = $request->input('go',0);
-            if ($go == 1){
-                MallRefundJob::shillJob(1);
+            $go = $request->input('go', 0);
+            if ($go == 1) {
+                MallRefundJob::shillJob();
             }
-            if ($go == 2){
+            if ($go == 2) {
                 MallRefundJob::shillJob(2);
             }
             //MallRefundJob::shillJob(2);
