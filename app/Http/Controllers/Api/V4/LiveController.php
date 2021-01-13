@@ -821,6 +821,7 @@ class LiveController extends Controller
         $liveInfoId  = $input['info_id'] ?? 0;
         $osType = $input['os_type'] ?? 1;
         $payType = $input['pay_type'] ?? 0;
+        $activity_tag = $input['activity_tag']??'';
         $model = new Order();
 
         $checked = $model->addOrderLiveCheck($this->user['id'], $tweeterCode, $liveId, 3);
@@ -851,6 +852,7 @@ class LiveController extends Controller
             'os_type' => $osType,
             'live_id' => $liveId,
             'pay_type' => $payType,
+            'activity_tag' => $activity_tag,
 
         ];
         $order = Order::firstOrCreate($data);
