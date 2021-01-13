@@ -14,7 +14,13 @@ class LiveWorks extends Base
         $cache_live_name = 'live_live_works_'.$live_id.'_'.$pos;
         $data = Cache::get($cache_live_name);
         if (empty($data)) {
-            $recommend = LiveWorks::select('id', 'rid', 'type','status')
+            $query = LiveWorks::query();
+            if ($pos==2){
+                $query->whereIn('type', [1, 2, 3, 4, 5]);
+            } else {
+                $query->whereIn('type', [1, 2, 3, 4]);
+            }
+            $recommend = $query->select('id', 'rid', 'type','status')
                 ->where('status', 1)
                 ->where('pos', $pos)
                 ->where('live_id', $live_id)
@@ -62,8 +68,7 @@ class LiveWorks extends Base
                             ->first();
                         $lists->type = 5;
                     }
-
-                    $data[] = $lists ?? [];
+                    $data[] = $lists;
 
                 }
             }
