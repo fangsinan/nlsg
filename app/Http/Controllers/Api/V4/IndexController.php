@@ -123,13 +123,13 @@ class IndexController extends Controller
     public function live(Request $request)
     {
 
-        $version = $request->get('version');
+/*        $version = $request->get('version');
         $os_type = $request->get('os_type') ?? 1;
 
         //4.0.2以前版本不展示
         if (version_compare($version, '4.0.2', '<')) {
             return success();
-        }
+        }*/
 
         $user_id = $this->user['id'] ?? 0;
         $testers = explode(',', ConfigModel::getData(35, 1));
