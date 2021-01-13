@@ -75,7 +75,8 @@ class Handler extends ExceptionHandler
             'message' => $exception->getMessage(),
             'code'    =>  $exception->getCode(),
             'file'    =>  $exception->getFile(),
-            'line'    =>  $exception->getLine()
+            'line'    =>  $exception->getLine(),
+            'created_at' =>date('Y-m-d H:i:s', time())
         ]);
         return parent::render($request, $exception);
     }
