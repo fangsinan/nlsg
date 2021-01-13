@@ -50,7 +50,8 @@ class LiveWorks extends Base
                         $lists = [
                             'title'     => '幸福360会员',
                             'price'     => 360.00,
-                            'cover_img' => 'nlsg/works/20201215165707565448.png',
+                            'cover_img'     => '/live/recommend/360_xhc.png',
+                            'cover_details' => '/live/recommend/360_tc.png',
                             'type'      => 4
                         ];
                     } elseif ($v['type'] == 5 && $pos==2) {

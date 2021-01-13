@@ -113,7 +113,7 @@ class LiveController extends Controller
     public function index()
     {
         $uid = $this->user['id'] ?? 0;
-        
+
         $live  = new Live();
         $liveLists = $live->getRecommendLive($uid);
 
