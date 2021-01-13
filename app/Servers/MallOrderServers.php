@@ -306,9 +306,9 @@ class MallOrderServers
             $now_date . '" then FALSE ELSE TRUE END) ');
 
         $query->orderBy('nlsg_mall_order.id', 'desc');
-        DB::connection()->enableQueryLog();
+
         $list = $query->with($with)->select($field)->paginate($size);
-        dd(DB::getQueryLog());
+
         foreach ($list as $v) {
             $v->goods_count = 0;
             foreach ($v->orderDetails as $vv) {
