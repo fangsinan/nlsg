@@ -14,7 +14,7 @@ class LiveWorks extends Base
         $cache_live_name = 'live_live_works_'.$live_id.'_'.$pos;
         $data = Cache::get($cache_live_name);
         if (empty($data)) {
-            $recommend = LiveWorks::select('id', 'rid', 'type')
+            $recommend = LiveWorks::select('id', 'rid', 'type','status')
                 ->where('status', 1)
                 ->where('pos', $pos)
                 ->where('live_id', $live_id)
@@ -22,6 +22,7 @@ class LiveWorks extends Base
                 ->limit($limit)
                 ->get()
                 ->toArray();
+
             if ($recommend) {
                 //            dd($recommend);
                 $data = [];
@@ -54,17 +55,15 @@ class LiveWorks extends Base
                             'cover_details' => '/live/recommend/360_tc.png',
                             'type'      => 4
                         ];
-                    } elseif ($v['type'] == 5 && $pos==2) {
+                    } elseif ($v['type'] == 5 && $pos ==2) {
                         $lists = OfflineProducts::select('id', 'title', 'subtitle', 'cover_img',
                             'image as cover_details', 'total_price as original_price', 'price')
                             ->where('id', $v['rid'])
                             ->first();
                         $lists->type = 5;
+                    }
 
-                    }
-                    if ($lists) {
-                        $data[] = $lists;
-                    }
+                    $data[] = $lists ?? [];
 
                 }
             }
