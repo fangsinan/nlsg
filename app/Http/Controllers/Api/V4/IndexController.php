@@ -11,6 +11,7 @@ use App\Models\Lists;
 use App\Models\Recommend;
 use App\Models\Versions;
 use App\Models\Works;
+use App\Models\User;
 use App\Servers\StatisticsServers;
 use EasyWeChat\Factory;
 use Illuminate\Http\Request;
@@ -121,7 +122,12 @@ class IndexController extends Controller
      */
     public function live()
     {
-        $user_id = $this->user['id'] ?? 0;
+        $user_id  = $this->user['id'] ?? 0;
+        $testers  = explode(',', ConfigModel::getData(35, 1));
+        $user = User::where('id',$user_id)->first();
+        if (!$user || !in_array($user->phone, $testers)){
+            return success();
+        }
         $recommendModel = new Recommend();
         $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
         return success($lists);
