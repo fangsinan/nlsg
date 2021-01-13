@@ -87,9 +87,13 @@ class IndexController extends Controller
         return $this->success($lists);
     }
 
+    public  function  live()
+    {
+        return success();
+    }
 
     /**
-     * @api {get} api/v4/index/live  首页-直播推荐
+     * @api {get} api/v4/index/lives  首页-直播推荐
      * @apiVersion 4.0.0
      * @apiName  live
      * @apiGroup Index
@@ -120,7 +124,7 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function live(Request $request)
+    public function lives(Request $request)
     {
 
 /*        $version = $request->get('version');
