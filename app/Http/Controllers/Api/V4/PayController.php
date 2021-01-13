@@ -114,7 +114,7 @@ class PayController extends Controller {
             $data['profit_sharing'] = 'Y';
         }
         $result = $app->order->unify($data);
-
+return $result;
         if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
             if($is_h5 == 1 ){
                 //h5  直接返回
