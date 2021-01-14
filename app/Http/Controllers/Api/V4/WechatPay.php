@@ -10,23 +10,20 @@ use App\Models\GetPriceTools;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\MallGroupBuyList;
+use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
-use App\Models\MallOrderGroupBuy;
 use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
 use App\Models\PayRecordDetailStay;
-use App\Models\RedeemCode;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Models\Works;
-use App\Models\MallOrder;
 use App\Servers\JobServers;
 use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
-use Yansongda\Pay\Log;
 
 class WechatPay extends Controller
 {
@@ -401,10 +398,10 @@ class WechatPay extends Controller
                 ];
                 $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
 
-                //发送短信
-                if (intval($live_id) === 1){
+                //发送优惠券
+                if (intval($live_id) === 1) {
                     $couponModel = new Coupon();
-                    $couponModel->giveCoupon($user_id, 50);
+                    $couponModel->sendCouponRun([50], $user_id);
                 }
 
                 //添加支付记录
@@ -431,7 +428,7 @@ class WechatPay extends Controller
                 $liveData = Live::find($live_id);
 
 
-                if($liveData['relation_live'] > 0){
+                if ($liveData['relation_live'] > 0) {
                     $subscribe = [
                         'user_id' => $user_id, //会员id
                         'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
@@ -455,7 +452,7 @@ class WechatPay extends Controller
                 $twitter_id = $orderInfo['twitter_id'];
                 $Profit_Rst = true;
 
-                if ( !empty($twitter_id) && $twitter_id != $user_id ) {
+                if (!empty($twitter_id) && $twitter_id != $user_id) {
                     $liveCountDown['new_vip_uid'] = $twitter_id;
                     //固定收益50
                     $ProfitPrice = $liveData['twitter_money'];
@@ -506,17 +503,18 @@ class WechatPay extends Controller
     /**
      * 分账
      *
-     * @param string $transaction_id    微信支付订单号
-     * @param string $out_trade_no      商户系统内部的分账单号
+     * @param string $transaction_id 微信支付订单号
+     * @param string $out_trade_no 商户系统内部的分账单号
      * @param   $amount            分账金额  此处单位为元
      * @param   $twitterData       分账人员信息
      */
-    public  static function OrderProfit($transaction_id,$out_trade_no,$amount,$twitter_id){
+    public static function OrderProfit($transaction_id, $out_trade_no, $amount, $twitter_id)
+    {
 
         $twitterData = User::find($twitter_id);
 
-        if(empty($twitterData['wxopenid'])){
-            return ;
+        if (empty($twitterData['wxopenid'])) {
+            return;
         }
 
         $config = Config('wechat.payment.wx_wechat');
@@ -540,11 +538,11 @@ class WechatPay extends Controller
 //                      "sign" => "2AC52D6F7B55D8158FE515FCB10B4C4E33A19DDBA9145AD3D045D53CD80760D2",
 //                    ];
         //分账
-        $return_data = $app->profit_sharing->share( $transaction_id,'NLSGFZ'.$out_trade_no,[
+        $return_data = $app->profit_sharing->share($transaction_id, 'NLSGFZ' . $out_trade_no, [
             'type' => 'PERSONAL_OPENID',
             'account' => $twitterData['wxopenid'],
-            'amount' => $amount*100,  //此处金额 分为单位
-            'description' => '直播分账-个人-'.$twitterData['nickname'],
+            'amount' => $amount * 100,  //此处金额 分为单位
+            'description' => '直播分账-个人-' . $twitterData['nickname'],
 //                                'name' => '个人名称',  //非必填
         ]);
         //分账返回信息
@@ -560,12 +558,12 @@ class WechatPay extends Controller
 //                    "order_id" => "30000300342021011206844776406",        微信平台的分账订单
 //                ];
 
-        \Log::info('Wechat profit sharing'.json_encode($return_data));
+        \Log::info('Wechat profit sharing' . json_encode($return_data));
 
-        if($return_data['result_code'] == 'SUCCESS'){
+        if ($return_data['result_code'] == 'SUCCESS') {
             //成功后 单次分账 不需要进行完结分账  多次需要请求完结接口
             Order::where(['ordernum' => $out_trade_no])->update([
-                'profit_ordernum'    => $return_data['out_order_no'],
+                'profit_ordernum' => $return_data['out_order_no'],
                 'wx_profit_ordernum' => $return_data['order_id'],
             ]);
 
@@ -705,11 +703,11 @@ class WechatPay extends Controller
                     'price' => GetPriceTools::PriceCalc('*', $od_v->t_money, $od_v->num),
                 ];
 
-                if ($od_v->user_id == $od_v->inviter){
+                if ($od_v->user_id == $od_v->inviter) {
                     continue;
                 }
 
-                if (empty($temp_stay_data['price'])){
+                if (empty($temp_stay_data['price'])) {
                     continue;
                 }
 

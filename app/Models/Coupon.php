@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * Description of Coupon
@@ -49,6 +48,75 @@ class Coupon extends Base
         }
 
         return self::getCouponRun($flag, $uid, $must_all_true, $get_info);
+    }
+
+    public function sendCouponRun($flag, $uid)
+    {
+        if (!is_array($flag)) {
+            $flag = explode(',', $flag);
+            $flag = array_unique($flag);
+        }
+
+        $check_uid = User::find($uid);
+        if (!$check_uid) {
+            return ['code' => false, 'msg' => '用户不存在'];
+        }
+        $coupon_rule_list = CouponRule::whereIn('id', $flag)
+            ->where('status', '=', 1)
+            ->whereIN('use_type', [3, 4, 5])
+            ->get();
+
+        $today_time = date('Y-m-d 00:00:00');
+        $now = date('Y-m-d H:i:s');
+
+        DB::beginTransaction();
+        $used_stock = true;
+        $add_data = [];
+        foreach ($coupon_rule_list as $v) {
+            $temp_used_stock = DB::table('nlsg_coupon_rule')
+                ->where('id', '=', $v->id)
+                ->increment('used_stock');
+            if (!$temp_used_stock) {
+                $used_stock = false;
+            }
+            $data = [];
+            $data['name'] = $v->name;
+            $data['number'] = self::createCouponNum($v->buffet, $v->id);
+            $data['type'] = $v->use_type;
+            $data['price'] = $v->price;
+            $data['full_cut'] = $v->full_cut;
+            $data['explain'] = $v->remarks;
+            if ($v->use_time_begin) {
+                $data['begin_time'] = $v->use_time_begin;
+            } else {
+                $data['begin_time'] = $today_time;
+            }
+            if ($v->use_time_end) {
+                $data['end_time'] = $v->use_time_end;
+            } else {
+                $data['end_time'] = date('Y-m-d H:i:s', strtotime($today_time) + ($v->past + 1) * 86400 - 1);
+            }
+            $data['get_way'] = 1;
+            $data['user_id'] = $uid;
+            $data['cr_id'] = $v->id;
+            $data['created_at'] = $data['updated_at'] = $now;
+            $add_data[] = $data;
+        }
+
+        if ($used_stock === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '领取失败'];
+        }
+
+        $add_res = DB::table('nlsg_coupon')->insert($add_data);
+
+        if (!$add_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '领取失败'];
+        }
+
+        DB::commit();
+        return ['code' => true, 'msg' => '领取成功'];
     }
 
     protected static function getCouponRun($flag, $uid, $must_all_true, $get_info = 0)
