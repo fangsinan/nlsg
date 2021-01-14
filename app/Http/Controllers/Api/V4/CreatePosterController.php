@@ -50,8 +50,8 @@ class CreatePosterController extends Controller
     public function CreatePoster(Request $request)
     {
         $uid = $this->user['id'] ?? 0;
-        $gid = $request->input('relation_id', 0);
-        $post_type = $request->input('post_type', 0);
+        $gid = intval($request->input('relation_id', 0));
+        $post_type = intval($request->input('post_type', 0));
         $is_qrcode = $request->input('is_qrcode', 0);
         $flag = $request->input('flag', 0);
         $live_id = $request->input('live_id', 0);
@@ -171,6 +171,7 @@ class CreatePosterController extends Controller
         } else {
             $draw = $this->getDraw($uid, $post_type, $gid, $level, $g_t_id);
         }
+        dd([$uid,$post_type,$gid,$level,$live_id,$live_info_id,$draw]);
         $temp_del_path = $draw['QR']['path'];
         $res = $cp::draw($draw);
         if (!empty($draw['QR']['path'])) {
