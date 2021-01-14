@@ -875,7 +875,7 @@ class IndexController extends ControllerBackend
             'sort'        => $input['sort'] ?? 99
         ]);
 
-//        Cache::pull('index_recommend_7_1');
+        Cache::forget('index_recommend_7_1');
 
         return success();
     }
@@ -886,7 +886,7 @@ class IndexController extends ControllerBackend
         $id = $request->get('id');
         $res = Recommend::where('id', $id)->delete();
         if ($res){
-//            Cache::pull('index_recommend_7_1');
+            Cache::forget('index_recommend_7_1');
             return success();
         }
         return error(1004, '删除失败');
