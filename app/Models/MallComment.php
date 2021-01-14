@@ -133,7 +133,7 @@ class MallComment extends Base
 
         $expire_num = CacheTools::getExpire('mall_comment_list');
         $res = Cache::get($cache_key_name);
-        if (true || empty($res)) {
+        if (empty($res)) {
             $res = self::getListFromDb($params);
             Cache::add($cache_key_name, $res, $expire_num);
         }

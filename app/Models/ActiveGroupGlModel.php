@@ -60,7 +60,7 @@ class ActiveGroupGlModel extends Base
         if ($list === '0') {
             return [];
         } else {
-            if (true || empty($list)) {
+            if (empty($list)) {
                 $list = $this->getListDataFromDb();
                 if (empty($list)) {
                     $list = '0';
