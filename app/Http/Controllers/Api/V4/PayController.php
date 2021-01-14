@@ -264,6 +264,11 @@ class PayController extends Controller {
 //        ];
 
         if($is_h5){
+            $OrderInfo = Order::where('status', '=', 0)->find($order_id);
+            if ($OrderInfo->type == 10 && $OrderInfo->live_id == 1){
+                $config['return_url'] = 'http://wechat.test.nlsgapp.com/liveExtension?time=163&qd=10&test=1111';
+                $config['quit_url'] = 'http://wechat.test.nlsgapp.com/liveExtension?time=163&qd=10&test=2222';
+            }
             $alipay = Pay::alipay($config)->wap($order);
             return $alipay;
         }else{
