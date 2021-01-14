@@ -905,6 +905,7 @@ class CreatePosterController extends Controller
                 $QR_url = $this->getGetQRUrl(10, $gid, $uid, 0, $live_id, $live_info_id);
 
                 $QR_path = $this->createQRcode($QR_url, false, false);
+                dd([$QR_url,$QR_path]);
                 $res['QR'] = [
                     'type' => 'image',
                     'path' => $QR_path,
