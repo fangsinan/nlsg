@@ -17,7 +17,6 @@ use App\Models\User;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
-use OSS\OssClient;
 
 class CreatePosterController extends Controller
 {
@@ -54,9 +53,9 @@ class CreatePosterController extends Controller
         $gid = $request->input('relation_id', 0);
         $post_type = $request->input('post_type', 0);
         $is_qrcode = $request->input('is_qrcode', 0);
-        $flag = $request->input('flag',0);
-        $live_id = $request->input('live_id',0);
-        $live_info_id = $request->input('live_info_id',0);
+        $flag = $request->input('flag', 0);
+        $live_id = $request->input('live_id', 0);
+        $live_info_id = $request->input('live_info_id', 0);
 
         //3:好书  4:会员  5:精品课  7商品   8:专栏  10:直播  23:360分享海报
         $level = User::getLevel($uid);
@@ -75,23 +74,23 @@ class CreatePosterController extends Controller
 
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
-            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid,$flag,$live_id,$live_info_id);
+            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id);
             $temp_9_res = $this->createQRcode($QR_url, true, true, true);
             $src = '';
-            $res = ConfigModel::base64Upload(100,$temp_9_res);
+            $res = ConfigModel::base64Upload(100, $temp_9_res);
             if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
             }
             $user_info = [
-                'nickname' => $this->user['nickname'] ??'',
-                'headimg' => $this->user['headimg']??'',
+                'nickname' => $this->user['nickname'] ?? '',
+                'headimg' => $this->user['headimg'] ?? '',
             ];
 
-            if($res['code'] == 0){
-                return $this->success(['url' => $res['url'].$res['name'], 'src' => $src, 'user_info' => $user_info]);
+            if ($res['code'] == 0) {
+                return $this->success(['url' => $res['url'] . $res['name'], 'src' => $src, 'user_info' => $user_info]);
 
-            }else{
-                return $this->error(0,$res['msg']);
+            } else {
+                return $this->error(0, $res['msg']);
 
             }
 //
@@ -108,7 +107,6 @@ class CreatePosterController extends Controller
 //            ];
 //            return $this->success(['url' => $url, 'src' => $src, 'user_info' => $user_info]);
         }
-
 
         $source_name = '';
         switch ($post_type) {
@@ -144,7 +142,7 @@ class CreatePosterController extends Controller
                 $QR_url = $this->getGetQRUrl(4, $gid, $uid);
                 $temp_9_res = $this->createQRcode($QR_url, false, true, true);
                 $src = '';
-                $url = config('env.APP_URL').  '/temp_poster/' . $temp_9_res;
+                $url = config('env.APP_URL') . '/temp_poster/' . $temp_9_res;
                 return ['url' => $url, 'src' => $src];
             //                return $temp_9_res;
             case 20://优品海报
@@ -165,31 +163,63 @@ class CreatePosterController extends Controller
         ];
 
         $cp = new CreatePost($init);
-
         if (empty($g_t_id)) {
-            $draw = $this->getDraw($uid, $post_type, $gid, $level);
+            $draw = $this->getDraw($uid, $post_type, $gid, $level, 0, $live_id, $live_info_id);
         } else {
             $draw = $this->getDraw($uid, $post_type, $gid, $level, $g_t_id);
         }
         $temp_del_path = $draw['QR']['path'];
         $res = $cp::draw($draw);
-        $return_qr_url = '';
         if (!empty($draw['QR']['path'])) {
-            $temp_qr_new_url = str_replace(storage_path() . '/app/public/PosterMaterial/', '', $temp_del_path);
-            $c_res = copy($temp_del_path, $save_path . $temp_qr_new_url);
-
             unlink($temp_del_path);
         }
         $file_path = $save_path . $res;
-        $res_data = false;
         if ($fp = fopen($file_path, "rb", 0)) {
-            $src = '';
-            $domain = config('env.APP_URL') . '/temp_poster/';
-            $res_data = ['url' => $domain . $res, 'src' => $src, 'qr_url' => $domain . $temp_qr_new_url];
+            $base64 = $this->imgToBase64($file_path);
+            $res = ConfigModel::base64Upload(100, $base64);
+            fclose($fp);
+            unlink($file_path);
+            return $res;
         }
-        return $res_data;
+        return $this->error(0, '错误');
 
     }
+
+    function imgToBase64($img_file)
+    {
+        $img_base64 = '';
+        if (file_exists($img_file)) {
+            $app_img_file = $img_file; // 图片路径
+            $img_info = getimagesize($app_img_file); // 取得图片的大小，类型等
+
+            //echo '<pre>' . print_r($img_info, true) . '</pre><br>';
+            $fp = fopen($app_img_file, "r"); // 图片是否可读权限
+
+            if ($fp) {
+                $filesize = filesize($app_img_file);
+                $content = fread($fp, $filesize);
+                $file_content = chunk_split(base64_encode($content)); // base64编码
+                switch ($img_info[2]) {           //判读图片类型
+                    case 1:
+                        $img_type = "gif";
+                        break;
+                    case 2:
+                        $img_type = "jpg";
+                        break;
+                    case 3:
+                        $img_type = "png";
+                        break;
+                }
+
+                $img_base64 = 'data:image/' . $img_type . ';base64,' . $file_content;//合成图片的base64编码
+
+            }
+            fclose($fp);
+        }
+
+        return $img_base64; //返回图片的base64
+    }
+
 
     //生成二维码
     public function createQRcode($value, $b64 = true, $online = true, $web = false)
@@ -219,12 +249,12 @@ class CreatePosterController extends Controller
 //                return 'data:image/jpg/png/gif;base64,' . $base64;
 //            }
 
-            if($fp = fopen($file,"rb", 0)){
+            if ($fp = fopen($file, "rb", 0)) {
                 $gambar = fread($fp, filesize($file));
                 fclose($fp);
                 $base64 = chunk_split(base64_encode($gambar));
                 unlink($file);
-                return 'data:image/jpg;base64,' . $base64 ;
+                return 'data:image/jpg;base64,' . $base64;
             }
 
 
@@ -262,7 +292,7 @@ class CreatePosterController extends Controller
     }
 
     //按类型生成坐标数组
-    public function getDraw($uid, $type, $gid, $level, $g_t_id = 0)
+    public function getDraw($uid, $type, $gid, $level, $g_t_id = 0, $live_id = 0, $live_info_id = 0)
     {
         //帽子&图标  2 推客 3黑钻 4皇钻
         $cap_img = '';
@@ -830,13 +860,13 @@ class CreatePosterController extends Controller
                     'x' => 160,
                     'y' => 70,
                     'font' => $font,
-                    'text' => $user_info['nick_name'],
+                    'text' => $user_info->nickname,
                     'rgb' => '0,0,0',
                 ];
                 //身份文字图标
                 if (!empty($sign_img)) {
                     //计算名字所用长度
-                    $nick_name_len = $this->calculateTextBox($user_info['nick_name'], $font, $nickname_font_size, 0);
+                    $nick_name_len = $this->calculateTextBox($user_info->nickname, $font, $nickname_font_size, 0);
                     $sign_img_x = 140 + $nick_name_len + 30;
                     $res['sign'] = [
                         'type' => 'image',
@@ -860,14 +890,6 @@ class CreatePosterController extends Controller
                     'corners' => 50,
                     'scaling' => ['w' => 100, 'h' => 100],
                 ];
-//                $res['headimg_bg'] = [
-//                    'type' => 'image',
-//                    'path' => $headimg_bg_path,
-//                    'dst_x' => 35,
-//                    'dst_y' => 27,
-//                    'src_w' => 110,
-//                    'src_h' => 110,
-//                ];
                 //身份帽子图标
                 if (!empty($cap_img)) {
                     $res['cap'] = [
@@ -879,7 +901,9 @@ class CreatePosterController extends Controller
                         'src_h' => 30,
                     ];
                 }
-                $QR_url = $this->getGetQRUrl(10, $gid, $uid);
+
+                $QR_url = $this->getGetQRUrl(10, $gid, $uid, 0, $live_id, $live_info_id);
+
                 $QR_path = $this->createQRcode($QR_url, false, false);
                 $res['QR'] = [
                     'type' => 'image',
@@ -910,10 +934,17 @@ class CreatePosterController extends Controller
                 //计算需要些几行
                 $temp_title = $main_info['title'];
                 $temp_title_len = mb_strlen($temp_title);
-
-                $temp_title_len = mb_strlen($temp_title);
                 if ($temp_title_len > 9) {
-                    $arr = str_split($temp_title, 38);
+                    //$arr = str_split($temp_title, 38);
+                    $arr[] = mb_substr($temp_title, 0, 13);
+                    if ($temp_title_len > 26) {
+                        $arr[] = mb_substr($temp_title, 14, 12) . '...';
+                    } else {
+                        $arr[] = mb_substr($temp_title, 14, 13);
+                    }
+
+                    //$arr = array_filter($arr);
+
                     $str_s_y = 537;
                     foreach ($arr as $key => $val) {
                         if ($key >= 2) {
@@ -933,41 +964,15 @@ class CreatePosterController extends Controller
                     }
 
                     $main_text_3 = 3;
-                    if ($main_info['id'] == 4) {
-                        $res['main_text_' . $main_text_3] = [
-                            'type' => 'text',
-                            'size' => 16,
-                            'x' => 40,
-                            'y' => $str_s_y,
-                            'font' => $font,
-                            'text' => "   全程本人现场直播",
-                            'rgb' => '3,3,3',
-                        ];
-                        $str_s_y += 30;
-                        $main_text_3++;
-                    }
                     $res['main_text_' . $main_text_3] = [
                         'type' => 'text',
                         'size' => 16,
                         'x' => 40,
                         'y' => $str_s_y,
                         'font' => $font,
-                        'text' => date('m月d日 H:i', $main_info['str_time']) . ' - ' . date('m月d日 H:i', $main_info['end_time']),
+                        'text' => date('m-d H:i', strtotime($main_info->begin_at)) . ' - ' . date('m-d H:i', strtotime($main_info->end_at)),
                         'rgb' => '3,3,3',
                     ];
-                    if ($main_info['id'] == 4) {
-                        $str_s_y += 30;
-                        $res['main_text_' . $main_text_3]['text'] = '   ' . date('m月d日', $main_info['str_time']) . ' - ' . date('m月d日', $main_info['end_time']);
-                        $res['main_text_' . ($main_text_3 + 1)] = [
-                            'type' => 'text',
-                            'size' => 16,
-                            'x' => 40,
-                            'y' => $str_s_y,
-                            'font' => $font,
-                            'text' => '   每晚' . date('H:i', $main_info['str_time']) . ' - ' . date('H:i', $main_info['end_time']),
-                            'rgb' => '3,3,3',
-                        ];
-                    }
                 } else {
                     $res['main_text_1'] = [
                         'type' => 'text',
@@ -980,48 +985,22 @@ class CreatePosterController extends Controller
                     ];
                     $str_s_y = 550;
                     $main_text_2 = 2;
-                    if ($main_info['id'] == 4) {
-                        $res['main_text_' . $main_text_2] = [
-                            'type' => 'text',
-                            'size' => 16,
-                            'x' => 40,
-                            'y' => $str_s_y,
-                            'font' => $font,
-                            'text' => "   全程本人现场直播",
-                            'rgb' => '3,3,3',
-                        ];
-                        $str_s_y += 30;
-                        $main_text_2++;
-                    }
-
                     $res['main_text_' . $main_text_2] = [
                         'type' => 'text',
                         'size' => 16,
                         'x' => 40,
                         'y' => $str_s_y,
                         'font' => $font,
-                        'text' => date('m月d日 H:i', $main_info['str_time']) . ' - ' . date('m月d日 H:i', $main_info['end_time']),
+                        'text' => date('m-d H:i', strtotime($main_info->begin_at)) . ' - ' . date('m-d H:i', strtotime($main_info->end_at)),
                         'rgb' => '3,3,3',
                     ];
-                    if ($main_info['id'] == 4) {
-                        $str_s_y += 30;
-                        $res['main_text_' . $main_text_2]['text'] = '   ' . date('m月d日', $main_info['str_time']) . ' - ' . date('m月d日', $main_info['end_time']);
-                        $res['main_text_' . ($main_text_2 + 1)] = [
-                            'type' => 'text',
-                            'size' => 16,
-                            'x' => 40,
-                            'y' => $str_s_y,
-                            'font' => $font,
-                            'text' => '   每晚' . date('H:i', $main_info['str_time']) . ' - ' . date('H:i', $main_info['end_time']),
-                            'rgb' => '3,3,3',
-                        ];
-                    }
                 }
                 break;
 
         }
         return $res;
     }
+
 
     //计算名字长度像素
     function calculateTextBox($text, $fontFile, $fontSize, $fontAngle)
@@ -1045,7 +1024,7 @@ class CreatePosterController extends Controller
     }
 
     //获取二维码网址
-    protected function getGetQRUrl($type, $gid, $uid,$flag = 0,$live_id=0,$live_info_id=0)
+    protected function getGetQRUrl($type, $gid, $uid, $flag = 0, $live_id = 0, $live_info_id = 0)
     {
 
         $info_id = 0;
@@ -1106,7 +1085,7 @@ class CreatePosterController extends Controller
                 $u_type = 1;
 
                 $temp_work = Column::find($gid);
-                if($temp_work['type'] == 2 ){//讲座
+                if ($temp_work['type'] == 2) {//讲座
                     $u_type = 12;
                 }
 
@@ -1121,12 +1100,12 @@ class CreatePosterController extends Controller
                 // return $res;
                 return 'https://a.app.qq.com/o/simple.jsp?pkgname=com.huiyujiaoyu.powertime';
             case 23://360分享海报
-                return ConfigModel::getData(33) . '?time=' . time() . '&inviter=' . $uid.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                return ConfigModel::getData(33) . '?time=' . time() . '&inviter=' . $uid . '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
         }
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
         //  6:精品课视频  7:精品课音频  8:书籍  9:商品  10:会员
-        $res = $twitterObj->createJumpUrl($u_type, $gid, $info_id, $uid,$flag,$live_id,$live_info_id);
+        $res = $twitterObj->createJumpUrl($u_type, $gid, $info_id, $uid, $flag, $live_id, $live_info_id);
 
         //添加 mallTwitter Twitter_add
         // 1：专栏   2：商品  3：精品课 4听书 5线下课 6邀请卡(有且只有一条记录当前用户)
@@ -1210,8 +1189,6 @@ class CreatePosterController extends Controller
     }
 
 
-
-
     /**
      * @api {post} /api/v4/create/upload_push   制作专属海报
      * @apiName create_poster
@@ -1233,34 +1210,33 @@ class CreatePosterController extends Controller
      * }
      */
 
-    public function uploadPush(Request $request){
+    public function uploadPush(Request $request)
+    {
 
         $params = $request->input();
-        $type_flag = $params['type_flag'] ??0;
-        $file_base64 = $params['file_base64']??'';
-        $type_flag=intval($type_flag);
-
+        $type_flag = $params['type_flag'] ?? 0;
+        $file_base64 = $params['file_base64'] ?? '';
+        $type_flag = intval($type_flag);
 
 
         //type_flag1 头像  2 作品  3 专栏  4 商品  5身份证审核  6 banner  7 书单 8 企业 9问题反馈  10晒单评价  100其他
         //1 头像 10评论 9退货 5身份证审核  8 企业  100发票 9吐槽
-        if(!in_array($type_flag,[1,2,3,4,5,6,7,8,9,10,100])){
-            return $this->error(0,'上传类型有误');
+        if (!in_array($type_flag, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100])) {
+            return $this->error(0, '上传类型有误');
         }
 
-        $res = ConfigModel::base64Upload($type_flag,$file_base64);
-        if($res['code'] == 0){
+        $res = ConfigModel::base64Upload($type_flag, $file_base64);
+        if ($res['code'] == 0) {
             return $this->success([
-                'url'=>$res['url'],
+                'url' => $res['url'],
                 'name' => $res['name']
             ]);
-        }else{
-            return $this->error(0,$res['msg']);
+        } else {
+            return $this->error(0, $res['msg']);
 
         }
 
     }
-
 
 
 }
