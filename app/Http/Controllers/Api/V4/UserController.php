@@ -1262,9 +1262,9 @@ class UserController extends Controller
             'children_age'  => $children_age,
         ]);
         if ($res) {
-            return $this->getRes(['code'=>0,'msg'=>'收集成功']);
+            return $this->getRes(['code'=>0,'msg'=>'提交成功']);
         }else{
-            return error(1000, '收集失败');
+            return error(1000, '提交失败');
         }
     }
 
