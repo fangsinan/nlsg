@@ -324,7 +324,10 @@ class IndexController extends ControllerBackend
      */
     public function live()
     {
-        $lists = Recommend::with('live:id,title')
+        $lists = Recommend::whereHas('live', function($q){
+                        $q->select('id','title')->where('status', '=', 4);
+                   })
+                   ->with('live:id,title')
                    ->select('id','relation_id','created_at')
                    ->where('type', 7)
                    ->where('position', 1)
