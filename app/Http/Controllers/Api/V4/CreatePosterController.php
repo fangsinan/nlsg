@@ -57,6 +57,7 @@ class CreatePosterController extends Controller
         $live_id = $request->input('live_id', 0);
         $live_info_id = $request->input('live_info_id', 0);
 
+        dd($request->input());
         //3:好书  4:会员  5:精品课  7商品   8:专栏  10:直播  23:360分享海报
         $level = User::getLevel($uid);
 
