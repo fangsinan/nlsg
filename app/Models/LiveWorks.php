@@ -20,11 +20,11 @@ class LiveWorks extends Base
             } else {
                 $query->whereIn('type', [1, 2, 3, 4]);
             }
-            $recommend = $query->select('id', 'rid', 'type','status')
+            $recommend = $query->select('id', 'rid', 'type','status','sort')
                 ->where('status', 1)
                 ->where('pos', $pos)
                 ->where('live_id', $live_id)
-                ->orderBy('created_at', 'desc')
+                ->orderBy('sort')
                 ->limit($limit)
                 ->get()
                 ->toArray();
