@@ -792,6 +792,12 @@ class IncomeController extends Controller
                 ,DB::raw('1 as `earn_type`','0 as order_detail_id','0 subsidy_type'))
                 ->where('user_id',$user_id)->whereIn('order_type',$order_type_val)->where('status',2);
 
+//            $payRecordObj = new PayRecord();
+//            $query = DB::table($payRecordObj->getTable(), 'c')
+//                    ->select('id','ordernum','created_at','order_type as type','user_id','price','status'
+//                        ,DB::raw('1 as `earn_type`','0 as order_detail_id','0 subsidy_type'))
+//                    ->where('user_id',$user_id)->whereIn('order_type',$order_type_val)->where('status',2);
+//
 
             //计算总支出和总收入
 
@@ -820,6 +826,20 @@ class IncomeController extends Controller
                 'id','ordernum','created_at','type','user_id','price', 'order_detail_id','subsidy_type'
             ,DB::raw('2 as `earn_type`','2 as status'))
                 ->where('user_id',$user_id)->whereIn('type',$order_type_val);
+
+
+
+//            $payRecordObj = new PayRecordDetail();
+//            $orderObj = new Order();
+//            $userObj = new User();
+//                DB::table($payRecordObj->getTable(), 'c')
+//                ->leftJoin($orderObj->getTable().' as o', 'o.ordernum', '=', 'c.ordernum')
+//                ->leftJoin($userObj->getTable().' as s', 's.id', '=', 'o.user_id')
+//                ->select('id','ordernum','created_at','type','user_id','price', 'order_detail_id','subsidy_type'
+//                    ,'s.headimg','s.nick_name o_nick_name','s.username'
+//            ,DB::raw('2 as `earn_type`','2 as status'))
+//                ->where('user_id',$user_id)->whereIn('type',$order_type_val);
+
 
         }
 
@@ -1034,8 +1054,19 @@ class IncomeController extends Controller
             $info['pay_content'] = $con['pay_content']??'';
 
         } else { //收入
+
+
             $pay_info = PayRecordDetail::where(['id'=>$id,'user_id'=>$user_id])->first()->toArray();
+
+            $orderObj = new Order();
+            $userObj = new User();
+            $pay_info_order = DB::table($orderObj->getTable(), 'o')
+                ->leftJoin($userObj->getTable().' as s', 's.id', '=', 'o.user_id')
+                ->select('s.headimg','s.nickname as o_nick_name','s.phone')
+                ->where(['o.ordernum'=>$pay_info['ordernum']])->first();
+
             if(empty($pay_info)) return $this->success();
+            $o_nick_name = $pay_info_order->o_nick_name ?? '';
 
             $con = $this->detail_content($type,$pay_info['type'],$pay_info['ordernum'],$pay_info['order_detail_id']);
             $info['type'] = $pay_info['type'] ?? 0;
@@ -1043,7 +1074,8 @@ class IncomeController extends Controller
             $info['price'] = $pay_info['price'] ?? 0;
             $info['content'] = $con['content'] ?? '';
             $info['name'] = $con['name'] ?? '';
-            $info['o_nick_name'] = $con['o_nick_name'] ?? '';
+            $info['ordernum'] = $pay_info['ordernum'] ?? '';
+            $info['o_nick_name'] = $con['o_nick_name'] ?? $o_nick_name;
         }
         $UserInfo = User::find($user_id);
         $info['nickname']=$UserInfo['nickname'];
