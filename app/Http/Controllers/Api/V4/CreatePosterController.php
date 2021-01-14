@@ -57,7 +57,6 @@ class CreatePosterController extends Controller
         $live_id = $request->input('live_id', 0);
         $live_info_id = $request->input('live_info_id', 0);
 
-        dd($request->input());
         //3:好书  4:会员  5:精品课  7商品   8:专栏  10:直播  23:360分享海报
         $level = User::getLevel($uid);
 
@@ -172,7 +171,6 @@ class CreatePosterController extends Controller
         } else {
             $draw = $this->getDraw($uid, $post_type, $gid, $level, $g_t_id);
         }
-        dd([$uid,$post_type,$gid,$level,$live_id,$live_info_id,$draw]);
         $temp_del_path = $draw['QR']['path'];
         $res = $cp::draw($draw);
         if (!empty($draw['QR']['path'])) {
