@@ -712,10 +712,11 @@ class LiveController extends Controller
             $new_data[$key]['is_self'] = 0;
             if ($val['new_vip_uid'] == $user_id) {
                 $new_data[$key]['is_self'] = 1;
+                $self_ranking = $new_data[$key]['user_ranking'];
             }
         }
         $data = [
-            'user_ranking' => $num['total'],
+            'user_ranking' => $self_ranking ?? $num['total'],
             'user_invite_num' => $user_ranking['c'],
             'ranking' => $new_data
         ];
