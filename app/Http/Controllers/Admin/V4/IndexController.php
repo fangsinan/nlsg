@@ -12,6 +12,7 @@ use App\Models\MallGoods;
 use App\Models\Recommend;
 use App\Models\Wiki;
 use App\Models\Works;
+use Illuminate\Filesystem\Cache;
 use Illuminate\Http\Request;
 
 class IndexController extends ControllerBackend
@@ -870,6 +871,9 @@ class IndexController extends ControllerBackend
             'type'        => 7,
             'sort'        => $input['sort'] ?? 99
         ]);
+
+        Cache::pull('index_recommend_7_1');
+
         return success();
     }
 
@@ -879,6 +883,7 @@ class IndexController extends ControllerBackend
         $id = $request->get('id');
         $res = Recommend::where('id', $id)->delete();
         if ($res){
+            Cache::pull('index_recommend_7_1');
             return success();
         }
         return error(1004, '删除失败');
