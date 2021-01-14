@@ -108,6 +108,9 @@ class CreatePosterController extends Controller
 //            return $this->success(['url' => $url, 'src' => $src, 'user_info' => $user_info]);
         }
 
+        if(empty($uid)){
+            return $this->error(0, '请登录');
+        }
         $source_name = '';
         switch ($post_type) {
             case 1://黑钻邀请卡
@@ -905,7 +908,6 @@ class CreatePosterController extends Controller
                 $QR_url = $this->getGetQRUrl(10, $gid, $uid, 0, $live_id, $live_info_id);
 
                 $QR_path = $this->createQRcode($QR_url, false, false);
-                dd([$QR_url,$QR_path]);
                 $res['QR'] = [
                     'type' => 'image',
                     'path' => $QR_path,
