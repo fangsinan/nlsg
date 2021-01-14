@@ -51,19 +51,19 @@ class Live extends Model
      * @param  int  $uid
      * @return array
      */
-    public function getRecommendLive($uid=0)
+    public function getRecommendLive($uid = 0)
     {
         $cache_live_name = 'live_index_list';
         $liveLists = Cache::get($cache_live_name);
-        if (empty($liveLists)){
+        if (empty($liveLists)) {
             $liveLists = Live::with('user:id,nickname')
-                       ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
-                           'playback_price', 'is_free', 'password')
-                       ->where('status', 4)
-                       ->orderBy('begin_at')
-                       ->limit(3)
-                       ->get()
-                       ->toArray();
+                ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
+                    'playback_price', 'is_free', 'password')
+                ->where('status', 4)
+                ->orderBy('begin_at')
+                ->limit(3)
+                ->get()
+                ->toArray();
             $expire_num = CacheTools::getExpire('live_index_list');
             Cache::put($cache_live_name, $liveLists, $expire_num);
         }
@@ -74,20 +74,22 @@ class Live extends Model
                     ->where('status', 1)
                     ->orderBy('id', 'desc')
                     ->first();
-
-                if ($channel->is_begin == 0 && $channel->is_finish == 0) {
-                    $v['live_status'] = 1;
-                } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
-                    $v['live_status'] = 3;
-                } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
-                    $v['live_status'] = 2;
+                if ($channel) {
+                    if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                        $v['live_status'] = 1;
+                    } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                        $v['live_status'] = 3;
+                    } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                        $v['live_status'] = 2;
+                    }
+                    $v['info_id'] = $channel->id;
                 }
                 $isSub = Subscribe::isSubscribe($uid, $v['id'], 3);
                 $v['is_sub'] = $isSub ?? 0;
 
                 $isAdmin = LiveConsole::isAdmininLive($uid, $v['id']);
                 $v['is_admin'] = $isAdmin ? 1 : 0;
-                $v['info_id'] = $channel->id;
+
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
@@ -96,9 +98,8 @@ class Live extends Model
     }
 
 
-
-
-    public static function sendLiveCountDown(){
+    public static function sendLiveCountDown()
+    {
 
         $flag = true;
         $title = "能量时光直播";
@@ -106,8 +107,8 @@ class Live extends Model
         $live_id = 643;
 
 
-        $live_data = Live::where(['id'=>$live_id,'status'=>4])->first();
-        if(time() < (strtotime($live_data['begin_at']) - 600) ){
+        $live_data = Live::where(['id' => $live_id, 'status' => 4])->first();
+        if (time() < (strtotime($live_data['begin_at']) - 600)) {
             return;
         }
 
@@ -116,9 +117,11 @@ class Live extends Model
             $params = [];
             $name = [];
             $up_where = [];
-            $user_phone = LiveCountDown::select('id','phone')->where(['live_id' => $live_id, 'is_send' => 0])->limit($size)->get()->toArray();
+            $user_phone = LiveCountDown::select('id', 'phone')->where([
+                'live_id' => $live_id, 'is_send' => 0
+            ])->limit($size)->get()->toArray();
 
-            if (!empty($user_phone)) {
+            if ( ! empty($user_phone)) {
                 foreach ($user_phone as $key => $val) {
                     if ($val['phone']) {
                         $phone[] = $val['phone'];
@@ -132,13 +135,13 @@ class Live extends Model
                         $easySms = app('easysms');
                         $result = $easySms->send($val['phone'], [
                             'template' => 'SMS_168311509',
-                            'data' => ['name'=>$title],
+                            'data'     => ['name' => $title],
                         ], ['aliyun']);
 
                     }
                 }
-                if ( !empty($up_where) ) {
-                    LiveCountDown::whereIn('id',$up_where)->update(['is_send' => 1]);
+                if ( ! empty($up_where)) {
+                    LiveCountDown::whereIn('id', $up_where)->update(['is_send' => 1]);
                 }
             } else {
                 $flag = false;

@@ -104,7 +104,7 @@ class Recommend extends Base
         if ( ! $type) {
             return false;
         }
-        //添加缓存\
+        //添加缓存
         $cache_key_name = 'index_recommend_'.$type.'_'.$position;
         $list = Cache::get($cache_key_name);
         if ($list) {
@@ -128,6 +128,7 @@ class Recommend extends Base
             ->where('is_del', 0)
             ->orderBy('created_at', 'desc')
             ->first();
+
         $expire_num = CacheTools::getExpire('index_recommend_live');
         Cache::put($cache_key_name, $list, $expire_num);
 
@@ -142,18 +143,19 @@ class Recommend extends Base
             ->where('status', 1)
             ->orderBy('id', 'desc')
             ->first();
-
-        if ($channel->is_begin == 0 && $channel->is_finish == 0) {
-            $list['live_status'] = 1;
-        } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
-            $list['live_status'] = 3;
-        } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
-            $list['live_status'] = 2;
+        if ($channel){
+            if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                $list['live_status'] = 1;
+            } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                $list['live_status'] = 3;
+            } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                $list['live_status'] = 2;
+            }
+            $list['info_id'] = $channel->id;
         }
         $isSub = Subscribe::isSubscribe($uid, $list->id, 3);
         $isAdmin = LiveConsole::isAdmininLive($uid, $list->id);
 
-        $list['info_id'] = $channel->id;
         $list['is_sub'] = $isSub ?? 0;
         $list['is_admin'] = $isAdmin ? 1 : 0;
         return $list;
