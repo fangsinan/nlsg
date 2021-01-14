@@ -936,6 +936,9 @@ class CreatePosterController extends Controller
 
                 //计算需要些几行
                 $temp_title = $main_info['title'];
+                $temp_title = str_replace('—','-',$temp_title);
+                $temp_title = explode('-',$temp_title);
+                $temp_title = $temp_title[0];
                 $temp_title_len = mb_strlen($temp_title);
                 if ($temp_title_len > 9) {
                     //$arr = str_split($temp_title, 38);
