@@ -256,7 +256,7 @@ class PayController extends Controller {
             'goods_type' => $attach
         ];
 
-//
+
 //        $order = [
 //            'out_trade_no' => time(),
 //            'total_amount' => '1',
@@ -264,7 +264,7 @@ class PayController extends Controller {
 //        ];
 
         if($is_h5){
-            $alipay = Pay::alipay($config)->web($order);
+            $alipay = Pay::alipay($config)->wap($order);
             return $alipay;
         }else{
             $alipay = Pay::alipay($config)->app($order);
