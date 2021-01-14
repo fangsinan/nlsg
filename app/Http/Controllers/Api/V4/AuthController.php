@@ -430,6 +430,7 @@ class AuthController extends Controller
             return success();
         } else {
             $easySms = app('easysms');
+            
             try {
                 if ($phone =='18600179874'){
                     $code = 6666;
