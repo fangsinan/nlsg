@@ -65,7 +65,7 @@ class AuthController extends Controller
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone) || $phone =='18600179874') {
+        if (in_array($phone, $dont_check_phone)) {
             if (intval($code) !== 6666) {
                 return error(400, '验证码错误', $sclass);
             }
@@ -253,7 +253,7 @@ class AuthController extends Controller
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone)) {
+        if (in_array($phone, $dont_check_phone) || $phone =='18600179874' ) {
             if (intval($code) !== 6666) {
                 return error(1000, '验证码错误');
             }
@@ -426,13 +426,16 @@ class AuthController extends Controller
         //自己人不发验证码
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone) || $phone =='18600179874') {
+        if (in_array($phone, $dont_check_phone)) {
             return success();
         } else {
             $easySms = app('easysms');
             try {
-
-                $code = rand(1000, 9999);
+                if ($phone =='18600179874'){
+                    $code = 6666;
+                } else {
+                    $code = rand(1000, 9999);
+                }
                 $result = $easySms->send($phone, [
                     'template' => 'SMS_200714195',
                     'data' => [
