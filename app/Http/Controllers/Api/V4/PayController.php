@@ -5,18 +5,17 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Live;
-use App\Models\MallOrderDetails;
-use App\Models\Order;
 use App\Models\MallOrder;
+use App\Models\Order;
 use App\Models\User;
 use EasyWeChat\Factory;
 use GuzzleHttp\Client;
-use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Request;
 use Yansongda\Pay\Log;
 use Yansongda\Pay\Pay;
 
-class PayController extends Controller {
+class PayController extends Controller
+{
 
     /**
      * @api {get} api/v4/pay/wechat_pay   微信支付-统一下单
@@ -29,23 +28,24 @@ class PayController extends Controller {
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
-      {
-      "code": 200,
-      "msg": "成功",
-      "data": {
-      "return_code": "SUCCESS",
-      "return_msg": "OK",
-      "appid": "wx3296e2b7430df182",
-      "mch_id": "1460495202",
-      "nonce_str": "mUXLVUSyafnOzjA4",
-      "sign": "729C4C7B8D489945637D0BF61B333316",
-      "result_code": "SUCCESS",
-      "prepay_id": "wx1819455494088084c893b29c1290375800",
-      "trade_type": "APP"
-      }
-      }
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "return_code": "SUCCESS",
+     * "return_msg": "OK",
+     * "appid": "wx3296e2b7430df182",
+     * "mch_id": "1460495202",
+     * "nonce_str": "mUXLVUSyafnOzjA4",
+     * "sign": "729C4C7B8D489945637D0BF61B333316",
+     * "result_code": "SUCCESS",
+     * "prepay_id": "wx1819455494088084c893b29c1290375800",
+     * "trade_type": "APP"
+     * }
+     * }
      */
-    public function prePay(Request $request) {
+    public function prePay(Request $request)
+    {
 
         //1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放 8商城
         $attach = $request->input('type', 0);
@@ -66,12 +66,12 @@ class PayController extends Controller {
         }
 
         if ($activity_tag === 'cytx') {
-            Order::where('id','=',$order_id)->update(['activity_tag'=>'cytx']);
+            Order::where('id', '=', $order_id)->update(['activity_tag' => 'cytx']);
         }
 
         $config = Config('wechat.payment.default');
 
-        if($is_h5 == 1 || $is_h5 == 2 ){ // 公众号openid
+        if ($is_h5 == 1 || $is_h5 == 2) { // 公众号openid
             $config = Config('wechat.payment.wx_wechat');
         }
         $app = Factory::payment($config);
@@ -85,16 +85,16 @@ class PayController extends Controller {
 //    'openid' => $pay_info['openid'],
 //]);
 
-        if($openid){  //如果传参的话  优先用传递的openid
+        if ($openid) {  //如果传参的话  优先用传递的openid
             $pay_info['openid'] = $openid;
         }
         $trade_type = 'APP';
-        if($is_h5 == 1){
+        if ($is_h5 == 1) {
             $trade_type = 'MWEB';
             $pay_info['openid'] = '';
-        }else if($is_h5 == 2){
+        } else if ($is_h5 == 2) {
             $trade_type = 'JSAPI';
-        }else{
+        } else {
             //app 支付不需要openid
             $pay_info['openid'] = '';
         }
@@ -103,32 +103,32 @@ class PayController extends Controller {
         $data = [
             'body' => $pay_info['body'],
             'out_trade_no' => $pay_info['ordernum'],
-            'total_fee' => $pay_info['price']*100,
+            'total_fee' => $pay_info['price'] * 100,
             'trade_type' => $trade_type, // 请对应换成你的支付方式对应的值类型
             'attach' => $attach,
             'openid' => $pay_info['openid'],
-            ];
+        ];
 
-        if($pay_info['profit_sharing'] == 1){    //下单需要分账
+        if ($pay_info['profit_sharing'] == 1) {    //下单需要分账
             //查询  分账的直播id
             $data['profit_sharing'] = 'Y';
         }
         $result = $app->order->unify($data);
 
-        if( $result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS'){
-            if($is_h5 == 1 ){
+        if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {
+            if ($is_h5 == 1) {
                 //h5  直接返回
                 return $this->success($result);
-            }else if($is_h5 == 2){
-                $result = $app->jssdk->bridgeConfig($result['prepay_id'],false);//第二次签名
+            } else if ($is_h5 == 2) {
+                $result = $app->jssdk->bridgeConfig($result['prepay_id'], false);//第二次签名
                 return $this->success($result);
-            }else{
+            } else {
                 $result = $app->jssdk->appConfig($result['prepay_id']);//第二次签名
                 return $this->success($result);
             }
-        }else{
-            Log::error('微信支付签名失败:'.var_export($result,1));
-            return $this->error(0,$result['err_code_des']??'微信支付签名失败');
+        } else {
+            Log::error('微信支付签名失败:' . var_export($result, 1));
+            return $this->error(0, $result['err_code_des'] ?? '微信支付签名失败');
 
         }
 
@@ -147,16 +147,17 @@ class PayController extends Controller {
         return $this->success($result);
     }
 
-    function getPayInfo($order_id, $attach) {
+    function getPayInfo($order_id, $attach)
+    {
 
         $body = '';
         if (in_array($attach, [1, 2, 5, 9, 11, 14, 8, 15, 16, 17])) { //1专栏 2会员 5打赏 9精品课 听课
             if ($attach == 8) {
                 $OrderInfo = MallOrder::where('status', '=', 1)
-                        ->where('is_stop', '=', 0)
-                        ->where('is_del', '=', 0)
-                        ->where('dead_time', '>', date('Y-m-d H:i:s'))
-                        ->find($order_id);
+                    ->where('is_stop', '=', 0)
+                    ->where('is_del', '=', 0)
+                    ->where('dead_time', '>', date('Y-m-d H:i:s'))
+                    ->find($order_id);
             } else {
                 $OrderInfo = Order::where('status', '=', 0)->find($order_id);
             }
@@ -198,7 +199,7 @@ class PayController extends Controller {
         }
 
         $userInfo = User::find($OrderInfo['user_id']);
-        if($userInfo['is_test_pay'] == 1 ){
+        if ($userInfo['is_test_pay'] == 1) {
             $OrderInfo['price'] = 0.01;
         }
 
@@ -223,20 +224,21 @@ class PayController extends Controller {
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
      * {
-      "code": 200,
-      "msg": "成功",
-      "data": [
-      ]
-      }
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * ]
+     * }
      */
-    public function aliPay(Request $request) {
-
+    public function aliPay(Request $request)
+    {
 
 
         //1专栏 2会员 5打赏 9精品课 听课  11直播 12预约回放
         $attach = $request->input('type', 0);
         $order_id = $request->input('id', 0);
         $is_h5 = $request->input('is_h5', 0);
+        $return_url = $request->input('return_url', '');
 
         if (empty($order_id) || empty($attach)) { //订单id有误
             return $this->error(0, '订单信息为空');
@@ -263,15 +265,14 @@ class PayController extends Controller {
 //            'subject' => 'test subject - 测试',
 //        ];
 
-        if($is_h5){
+        if ($is_h5) {
             $OrderInfo = Order::where('status', '=', 0)->find($order_id);
-            if ($OrderInfo->type == 10 && $OrderInfo->live_id == 1){
-                $config['return_url'] = 'http://wechat.test.nlsgapp.com/liveExtension?time=163&qd=10&test=1111';
-                $config['quit_url'] = 'http://wechat.test.nlsgapp.com/liveExtension?time=163&qd=10&test=2222';
+            if ($OrderInfo->type == 10 && $OrderInfo->live_id == 1 && !empty($return_url)) {
+                $config['return_url'] = $config['quit_url'] = $return_url;
             }
             $alipay = Pay::alipay($config)->wap($order);
             return $alipay;
-        }else{
+        } else {
             $alipay = Pay::alipay($config)->app($order);
             //return $alipay; // laravel 框架中请直接 `return $alipay`
             return $this->success($alipay->getContent());
@@ -291,19 +292,20 @@ class PayController extends Controller {
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
      * {
-      "code": 200,
-      "msg": "成功",
-      "data": [
-      ]
-      }
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * ]
+     * }
      */
-    public function OrderFind(Request $request) {
+    public function OrderFind(Request $request)
+    {
         //回调没问题,暂时关闭
         $id = $request->input('id', 0);
-        $type = $request->input('type',0);
-        if($type == 8){
+        $type = $request->input('type', 0);
+        if ($type == 8) {
             $orderData = MallOrder::find($id);
-        }else{
+        } else {
             $orderData = Order::find($id);
         }
         if (!$orderData) {
@@ -317,12 +319,12 @@ class PayController extends Controller {
                 $config = Config('wechat.payment.default');
                 $app = Factory::payment($config);
                 $res = $app->order->queryByOutTradeNumber($orderData['ordernum']); //"商户系统内部的订单号（out_trade_no）"
-                if($res['return_code'] == 'SUCCESS'){
-                    if($res['trade_state'] == 'SUCCESS'){
+                if ($res['return_code'] == 'SUCCESS') {
+                    if ($res['trade_state'] == 'SUCCESS') {
                         $res['pay_type'] = 2;
-                        $res['total_fee'] = $res['total_fee']/100;
+                        $res['total_fee'] = $res['total_fee'] / 100;
                     }
-                }else{
+                } else {
                     return $res;
                 }
 
@@ -330,17 +332,17 @@ class PayController extends Controller {
                 //支付宝
                 $config = Config('pay.alipay');
                 $res = Pay::alipay($config)->find(['out_trade_no' => $orderData['ordernum']]);
-                $res = json_decode(json_encode($res),true);
-                $temp_attach = substr($res['out_trade_no'],-2);
-                switch ($temp_attach){
+                $res = json_decode(json_encode($res), true);
+                $temp_attach = substr($res['out_trade_no'], -2);
+                switch ($temp_attach) {
                     //todo 其他类型也需要配一下
                     case '01':
                         $res['attach'] = 8;
                         break;
                 }
-                if($res['trade_status'] == 'TRADE_SUCCESS'){
+                if ($res['trade_status'] == 'TRADE_SUCCESS') {
                     $res['pay_type'] = 3;
-                }else{
+                } else {
                     return $res;
                 }
             }
@@ -366,14 +368,14 @@ class PayController extends Controller {
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
      * {
-      "code": 200,
-      "msg": "成功",
-      "data": [
-      ]
-      }
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * ]
+     * }
      */
-    public function ApplePay(Request $request) {
-
+    public function ApplePay(Request $request)
+    {
 
 
         $params = $request->input();
@@ -403,7 +405,6 @@ class PayController extends Controller {
         $data = $check_data['data'];
 
 
-
         //成功后获取数据
         preg_match('/(\d)+/', $data['receipt']['in_app'][0]['product_id'], $arr);
         $money = $arr[0];
@@ -427,7 +428,8 @@ class PayController extends Controller {
     }
 
     //验证苹果支付
-    public function CheckApple($endpoint, $params) {
+    public function CheckApple($endpoint, $params)
+    {
 
         $client = new Client();
 //        $client->post($endpoint,[
@@ -442,7 +444,7 @@ class PayController extends Controller {
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["receipt-data" => $params['receipt-data']]));
         $result = curl_exec($ch);
         curl_close($ch);
-        $data = json_decode($result,true);
+        $data = json_decode($result, true);
 
 //        //判断返回的数据是否是对象
 //        if (!is_object($data)) {
@@ -480,15 +482,16 @@ class PayController extends Controller {
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
      * {
-      "code": 200,
-      "msg": "成功",
-      "data": [
-      ]
-      }
+     * "code": 200,
+     * "msg": "成功",
+     * "data": [
+     * ]
+     * }
      */
-    public function PayCoin(Request $request) {
+    public function PayCoin(Request $request)
+    {
         //$uid = $request->input('user_id', 0);
-        $uid = $this->user['id']??0;
+        $uid = $this->user['id'] ?? 0;
 
         $order_id = $request->input('order_id', 0);
         $pay_type = $request->input('pay_type', 0);
@@ -512,7 +515,7 @@ class PayController extends Controller {
             if ($type == 10) { //type 与order_deposit 的 $attach重复了
                 $attach = 11;
             }
-            if (!in_array($type, [1, 2, 5, 9, 10, 14,15,16, 17])) {
+            if (!in_array($type, [1, 2, 5, 9, 10, 14, 15, 16, 17])) {
                 //商品不支持能量币支付
                 return $this->error(0, '当前产品不支持能量币支付');
             }
