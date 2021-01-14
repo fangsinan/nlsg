@@ -187,8 +187,9 @@ class Order extends Base
 
     public function checkLiveSub($live_id, $user_id)
     {
+        $time = time();
         if (empty($live_id) || empty($user_id)) {
-            return ['code' => true, 'is_sub' => 0, 'p' => $user_id];
+            return ['code' => true, 'is_sub' => 0, 'p' => $time . $user_id];
         }
 
         $check = Order::where('user_id', '=', $user_id)
@@ -197,9 +198,9 @@ class Order extends Base
             ->where('status', '=', 1)
             ->first();
         if ($check) {
-            return ['code' => true, 'is_sub' => 1, 'p' => $user_id];
+            return ['code' => true, 'is_sub' => 1, 'p' => $time . $user_id];
         } else {
-            return ['code' => true, 'is_sub' => 0, 'p' => $user_id];
+            return ['code' => true, 'is_sub' => 0, 'p' => $time . $user_id];
         }
 
     }
