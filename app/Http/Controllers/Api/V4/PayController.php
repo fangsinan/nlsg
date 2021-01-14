@@ -264,7 +264,7 @@ class PayController extends Controller {
 //        ];
 
         if($is_h5){
-            $alipay = Pay::alipay($config)->wap($order);
+            $alipay = Pay::alipay($config)->web($order);
             return $alipay;
         }else{
             $alipay = Pay::alipay($config)->app($order);
