@@ -74,7 +74,9 @@ class Live extends Model
                     ->where('status', 1)
                     ->orderBy('id', 'desc')
                     ->first();
-
+                if (!$channel){
+                    break;
+                }
                 if ($channel->is_begin == 0 && $channel->is_finish == 0) {
                     $v['live_status'] = 1;
                 } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
