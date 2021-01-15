@@ -239,7 +239,7 @@ class CreatePosterController extends Controller
 
 
         $QRcode = new CreateQRcode();
-        $QRcode::Create($value, $path, $name, $logo, 'L', 10, 2, 2);
+        $QRcode::Create($value, $path, $name, $logo, 'H', 10, 2, 2);
 
         if ($b64) {
             $file = $path . $name;
