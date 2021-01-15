@@ -932,10 +932,10 @@ class CreatePosterController extends Controller
 //                    'src_h' => 320,
 //                    'corners' => 0,
 //                    'scaling' => ['w' => 560, 'h' => 320],
-                    'src_w' => 750,
-                    'src_h' => 424,
+                    'src_w' => 560,
+                    'src_h' => 316,
                     'corners' => 0,
-                    'scaling' => ['w' => 560, 'h' => 315],
+                    'scaling' => ['w' => 560, 'h' => 316],
                 ];
 
                 //计算需要些几行
