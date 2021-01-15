@@ -258,7 +258,7 @@ class WechatPay extends Controller
                 if ($twitter_top[0] > 0) {
                     $twitter_top_vip_id = VipUser::where(['user_id' => $twitter_top[0], 'is_default' => 1, 'status' => 1])->first('id');
                     $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id);
-                    $top_Sy_Rst = VipUser::firstOrCreate($top_map);
+                    $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
                 }
 
                 //  升级续费都需要进行精品课赠送     已经购买的需要折算兑换码
