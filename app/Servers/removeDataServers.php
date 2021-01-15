@@ -497,7 +497,7 @@ class removeDataServers
 
         $old_details = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order_detail')
-            ->where('order_id', '<=', $begin_order_id)
+            ->where('order_id', '>', $begin_order_id)
             ->whereIn('order_id', $old_id_list)
             ->get()
             ->toArray();
