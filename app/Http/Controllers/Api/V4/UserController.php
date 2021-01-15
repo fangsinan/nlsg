@@ -989,7 +989,11 @@ class UserController extends Controller
             $res['id'] = $this->user['id'] ?? 0;
             $res['nickname'] = $this->user['nickname'] ?? '';
             $res['headimg'] = $this->user['headimg'] ?? '';
-            $res['phone'] = substr_replace($this->user['phone'], '****', 3, 4) ?? '';
+            if (is_numeric($this->user['phone'])){
+                $res['phone'] = substr_replace($this->user['phone'], '****', 3, 4) ?? '';
+            } else {
+                $res['phone'] = $this->user['phone'];
+            }
             $res['level'] = $this->user['true_level'] ?? 0;
             $res['is_author'] = $this->user['is_author'] ?? 0;
             $res['expire_time'] = $this->user['expire_time'] ?? '';
@@ -1016,7 +1020,9 @@ class UserController extends Controller
                 'expire_time', 'notify_num', 'follow_num', 'fan_num', 'history_num')
                 ->find($uid);
             if ($lists) {
-                $lists->phone = substr_replace($lists->phone, '****', 3, 4);
+                if (is_numeric($lists->phone)){
+                    $lists->phone = substr_replace($lists->phone, '****', 3, 4);
+                }
                 $is_live = LiveUserPrivilege::where('user_id', $this->user['id'])
                     ->where('privilege', 2)
                     ->where('is_del', 0)
