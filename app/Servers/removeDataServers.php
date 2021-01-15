@@ -487,7 +487,7 @@ class removeDataServers
 
         $old_order = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_order')
-            ->where('id', '<=', $begin_order_id)
+            ->where('id', '>', $begin_order_id)
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->orderBy('id', 'desc')
