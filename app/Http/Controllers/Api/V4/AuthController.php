@@ -135,7 +135,7 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'level' => $user->level,
             'sex' => $user->sex,
-            'children_age' => $user->children_age,
+            'children_age' => 10,//$user->children_age,
         ];
         return success($data);
     }
@@ -217,7 +217,7 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'level' => $user->level,
             'sex' => $user->sex,
-            'children_age' => $user->children_age,
+            'children_age' => 10,//$user->children_age,
         ];
         return success($data);
     }
@@ -304,7 +304,7 @@ class AuthController extends Controller
             'id' => $user->id,
             'token' => $token,
             'sex' => $user->sex,
-            'children_age' => $user->children_age,
+            'children_age' => 10,//$user->children_age,
         ];
         return success($arra);
 
@@ -505,7 +505,7 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'level' => $user->level,
             'sex' => $user->sex,
-            'children_age' => $user->children_age,
+            'children_age' => 10,//$user->children_age,
         ];
         return success($data);
     }
