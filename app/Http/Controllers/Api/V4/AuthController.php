@@ -430,7 +430,7 @@ class AuthController extends Controller
             return success();
         } else {
             $easySms = app('easysms');
-            
+
             try {
                 if ($phone =='18600179874'){
                     $code = 6666;
@@ -526,20 +526,16 @@ class AuthController extends Controller
         $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
         $isValid = $appleSignInPayload->verifyUser($appleid);
 
-        // 当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
+         当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
         if ($isValid === true) {
-            $user = User::where('phone', $phone)->first();
+            $user = User::where('appleid', $appleid)->first();
             if (!$user) {
                 $list = User::create([
-                    'appleid' => $appleid ?? '',
-                    'phone' => $phone,
-                    'nickname' => substr_replace($phone, '****', 3, 4),
+                    'appleid' => $appleid ?? ''
                 ]);
+                User::where('id', $list->id)->update(['phone'=>'苹果用户'.$list->id, 'nickname'=>'苹果用户'.$list->id]);
                 $user = User::find($list->id);
-
-            } else {
-                User::where('phone', $phone)->update(['appleid' => $appleid]);
-            };
+            }
 
             $token = auth('api')->login($user);
             $data = [
