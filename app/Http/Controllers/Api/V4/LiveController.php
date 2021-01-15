@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\ConfigModel;
 use App\Models\Live;
 use App\Models\LiveConsole;
 use App\Models\LiveCountDown;
@@ -171,13 +172,22 @@ class LiveController extends Controller
     public function getLiveLists()
     {
         $uid = $this->user['id'] ?? 0;
-        $lists = Live::with('user:id,nickname')
+
+        $testers = explode(',', ConfigModel::getData(35, 1));
+        $user    = User::where('id', $uid)->first();
+
+        $query   = Live::query();
+        if (is_numeric($user->phone) && !in_array($user->phone, $testers)){
+            $query->where('id', '!=', 3);
+        }
+        $lists = $query->with('user:id,nickname')
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
                 'playback_price', 'is_free', 'password')
             ->where('status', 4)
             ->orderBy('begin_at')
             ->paginate(10)
             ->toArray();
+
         if (!empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
                 $channel = LiveInfo::where('live_pid', $v['id'])
