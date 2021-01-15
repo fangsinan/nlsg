@@ -41,6 +41,39 @@ class CallbackController extends Controller
 
     }
 
+
+    //H5端   接收微信发送的异步支付结果通知
+    public function WechatNotifyJsapi(Request $request){
+
+
+        $config = Config('wechat.payment.default');
+        $app = Factory::payment($config);
+        $response = $app->handlePaidNotify(function ($message, $fail) {
+            \Log::info('Wechat h5 notify'.json_encode($message));
+            // 你的逻辑
+            $data = [
+                'out_trade_no'      => $message['out_trade_no'], //获取订单号
+                'total_fee'         => $message['total_fee']/100, //价格
+                'transaction_id'    => $message['transaction_id'], //交易单号
+                'attach'            => $message['attach'],
+                'pay_type'          => 1,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
+            ];
+            $res = WechatPay::PayStatusUp($data);
+
+            if($res == true){
+                //在闭包函数里 return true; 才代表处理完成。
+                return true;
+            }
+            // $fail 为一个函数，触发该函数可向微信服务器返回对应的错误信息，微信会稍后重试再通知。
+
+            $fail('Order not exists.');
+        });
+
+        return $response;
+
+    }
+
+
     //APP端   支付宝回调
     public function AliNotify(Request $request)
     {
@@ -77,6 +110,20 @@ class CallbackController extends Controller
         }
 
         //return $alipay->success();// laravel 框架中请直接 `return $alipay->success()`
+    }
+
+
+    function test(){
+
+        $message = json_decode('{"appid":"wxe24a425adb5102f6","attach":"16","bank_type":"OTHERS","cash_fee":"36000","fee_type":"CNY","is_subscribe":"Y","mch_id":"1460495202","nonce_str":"60003c2adb8eb","openid":"oVWHQwXwxV3VC5-SIjHUPC4TJC5s","out_trade_no":"21011400213374745387403","result_code":"SUCCESS","return_code":"SUCCESS","sign":"A285AB8D28C17334E0F28AEB7BF907DB","time_end":"20210114204232","total_fee":"36000","trade_type":"JSAPI","transaction_id":"4200000835202101141779019305"}',true);
+        $data = [
+            'out_trade_no'      => $message['out_trade_no'], //获取订单号
+            'total_fee'         => $message['total_fee']/100, //价格
+            'transaction_id'    => $message['transaction_id'], //交易单号
+            'attach'            => $message['attach'],
+            'pay_type'          => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
+        ];
+        $res = WechatPay::PayStatusUp($data);
     }
 
 }

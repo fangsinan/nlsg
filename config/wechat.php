@@ -123,7 +123,7 @@ return [
              'key'                => env('WECHAT_PAYMENT_KEY', 'key-for-signature'),
              'cert_path'          => base_path().env('WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
              'key_path'           => base_path().env('WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
-             'notify_url'         => env('APP_URL').env('WECHAT_PAYMENT_CALLBACK_URL', 'wechat_pay/notify'),                           // 默认支付结果通知地址
+             'notify_url'         => env('APP_URL').env('WECHAT_PAYMENT_CALLBACK_URL_H5', 'wechat_pay/notify'),                           // 默认支付结果通知地址
              'refund_url'         => env('WECHAT_PAYMENT_REFUND_URL','https://api.mch.weixin.qq.com/secapi/pay/refund'),
          ],
          // ...
