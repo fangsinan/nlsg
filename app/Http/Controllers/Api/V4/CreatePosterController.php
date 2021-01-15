@@ -928,10 +928,14 @@ class CreatePosterController extends Controller
                     'path' => $img_url_share . $main_info['cover_img'],
                     'dst_x' => 40,
                     'dst_y' => 152,
-                    'src_w' => 560,
-                    'src_h' => 320,
+//                    'src_w' => 560,
+//                    'src_h' => 320,
+//                    'corners' => 0,
+//                    'scaling' => ['w' => 560, 'h' => 320],
+                    'src_w' => 750,
+                    'src_h' => 424,
                     'corners' => 0,
-                    'scaling' => ['w' => 560, 'h' => 320],
+                    'scaling' => ['w' => 560, 'h' => 315],
                 ];
 
                 //计算需要些几行
