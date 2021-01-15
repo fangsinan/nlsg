@@ -676,6 +676,11 @@ class LiveController extends Controller
     {
         $live_id = $request->input('live_id', 0);
         $liveinfo_id = $request->input('liveinfo_id', 0);
+        $page = $request->input('page', 0);
+
+        if($page > 1){
+            return success();
+        }
         $user_id = $this->user['id'] ?? 0;
 
 
