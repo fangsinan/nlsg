@@ -56,7 +56,15 @@ class Live extends Model
         $cache_live_name = 'live_index_list';
         $liveLists = Cache::get($cache_live_name);
         if (empty($liveLists)) {
-            $liveLists = Live::with('user:id,nickname')
+            $testers = explode(',', ConfigModel::getData(35, 1));
+            $user    = User::where('id', $uid)->first();
+            
+            $query   = Live::query();
+            if (is_numeric($user->phone) && !in_array($user->phone, $testers)){
+                $query->where('id', '!=', 3);
+            }
+
+            $liveLists = $query->with('user:id,nickname')
                 ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
                     'playback_price', 'is_free', 'password')
                 ->where('status', 4)
