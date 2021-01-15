@@ -479,9 +479,9 @@ class AuthController extends Controller
     {
         $input = $request->all();
         $user = User::where('appleid', $input['user'])->first();
-        if (!$user) {
-            return error(1000, '苹果还未绑定');
-        }
+//        if (!$user) {
+//            return error(1000, '苹果还未绑定');
+//        }
 
         $token = auth('api')->login($user);
 //        $data = [
