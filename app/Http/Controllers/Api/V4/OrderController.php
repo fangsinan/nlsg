@@ -310,7 +310,7 @@ class OrderController extends Controller
      * @apiParam {int} user_id 用户id
      * @apiParam {int} reward  //1 鲜花 2爱心 3书籍 4咖啡  默认1
      * @apiParam {int} reward_num 数量 默认1
-     * @apiParam {int} reward_type 打赏类型1专栏|讲座 2课程|听书  3想法   4百科  (每个类型只需要传对应id)
+     * @apiParam {int} reward_type 打赏类型1专栏|讲座 2课程|听书  3想法   4百科  5直播 (每个类型只需要传对应id)
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
      *

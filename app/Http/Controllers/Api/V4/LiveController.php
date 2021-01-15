@@ -854,7 +854,6 @@ class LiveController extends Controller
         ];
         $order = Order::firstOrCreate($data);
         if ($order) {
-            Live::where('id', $liveId)->increment('order_num');
             $data = [
                 'order_id' => $order['id']
             ];

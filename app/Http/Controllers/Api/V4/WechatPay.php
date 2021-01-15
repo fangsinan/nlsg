@@ -427,7 +427,7 @@ class WechatPay extends Controller
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
                 $liveData = Live::find($live_id);
 
-
+                Live::where('id', $live_id)->increment('order_num');
                 if ($liveData['relation_live'] > 0) {
                     $subscribe = [
                         'user_id' => $user_id, //会员id
@@ -438,6 +438,7 @@ class WechatPay extends Controller
                         'relation_id' => $liveData['relation_live'],
                     ];
                     Subscribe::firstOrCreate($subscribe);
+                    Live::where('id', $liveData['relation_live'])->increment('order_num');
                 }
 
                 $userdata = User::find($user_id);
