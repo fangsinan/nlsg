@@ -999,7 +999,7 @@ class OrderController extends Controller
         $level = $request->input('level', 1);   //目标id
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
-        $tweeter_code = $request->input('inviter', 0);  //推客id
+        $tweeter_code = intval($request->input('inviter', 0));  //推客id
         $user_id = $this->user['id'];
 
 
