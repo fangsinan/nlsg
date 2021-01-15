@@ -126,6 +126,12 @@ class IndexController extends Controller
      */
     public function lives(Request $request)
     {
+        $os_type = $request->get('os_type') ?? 1;
+
+        if($os_type == 2){
+            return success();
+        }
+
         $user_id = $this->user['id'] ?? 0;
         $recommendModel = new Recommend();
         $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
