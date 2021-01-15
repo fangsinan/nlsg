@@ -526,7 +526,7 @@ class AuthController extends Controller
         $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
         $isValid = $appleSignInPayload->verifyUser($appleid);
 
-         当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
+         //当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
         if ($isValid === true) {
             $user = User::where('appleid', $appleid)->first();
             if (!$user) {
