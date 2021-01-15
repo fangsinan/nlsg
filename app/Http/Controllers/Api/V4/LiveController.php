@@ -697,10 +697,10 @@ class LiveController extends Controller
             ->where(['live_id' => $liveinfo_id])
             ->where('new_vip_uid', '>', 0)
             ->groupBy('new_vip_uid')
-            ->orderBy('c', 'desc')->orderBy('new_vip_uid', 'desc')->paginate($this->page_per_page)->toArray();
+            ->orderBy('c', 'desc')->orderBy('new_vip_uid', 'desc')->take($this->page_per_page)->get()->toArray();
 
         $new_data = [];
-        foreach ($ranking_data ['data'] as $key => $val) {
+        foreach ($ranking_data  as $key => $val) {
             $new_data[$key]['user_ranking'] = ($key + 1);
             $new_data[$key]['invite_num'] = $val['c'];
             $userdata = User::find($val['new_vip_uid']);
