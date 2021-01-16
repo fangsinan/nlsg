@@ -196,18 +196,21 @@ class LiveController extends Controller
                     ->where('status', 1)
                     ->orderBy('id', 'desc')
                     ->first();
-                if ($channel->is_begin == 0 && $channel->is_finish == 0) {
-                    $v['live_status'] = 1;
-                } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
-                    $v['live_status'] = 3;
-                } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
-                    $v['live_status'] = 2;
+                if ($channel) {
+                    if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                        $v['live_status'] = 1;
+                    } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                        $v['live_status'] = 3;
+                    } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                        $v['live_status'] = 2;
+                    }
+                    $v['info_id'] = $channel->id;
                 }
                 $isSub = Subscribe::isSubscribe($uid, $v['id'], 3);
                 $isAdmin = LiveConsole::isAdmininLive($uid, $v['id']);
                 $v['is_sub'] = $isSub ?? 0;
                 $v['is_admin'] = $isAdmin ? 1 : 0;
-                $v['info_id'] = $channel->id;
+
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
             }
