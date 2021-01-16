@@ -119,19 +119,20 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('config/mall_keywords', 'ConfigController@mallKeywords');
         Route::post('config/edit_mall_keywords', 'ConfigController@editMallKeywords');
 
+        //虚拟订单
+        Route::get('order/list', 'OrderController@list');
+        Route::get('order/statistic', 'OrderController@getOrderStatistic');
+        Route::get('order/detail', 'OrderController@getOrderDetail');
+        Route::get('order/user', 'OrderController@user');
+        Route::get('order/lecture', 'OrderController@lecture');
+        Route::get('order/reward', 'OrderController@reward');
+        Route::get('order/vip', 'OrderController@vip');
 
+        //360模块
+        Route::get('vip/list', 'VipController@list');
+        Route::post('vip/assign', 'VipController@assign');
     });
-    //虚拟订单
-    Route::get('order/list', 'OrderController@list');
-    Route::get('order/statistic', 'OrderController@getOrderStatistic');
-    Route::get('order/detail', 'OrderController@getOrderDetail');
-    Route::get('order/user', 'OrderController@user');
-    Route::get('order/lecture', 'OrderController@lecture');
-    Route::get('order/reward', 'OrderController@reward');
-    Route::get('order/vip', 'OrderController@vip');
 
-    //360模块
-    Route::get('vip/list', 'VipController@list');
 
     //定时任务
     Route::get('crontab/mall_refund', 'CrontabController@mallRefund');//商城退款

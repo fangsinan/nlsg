@@ -29,17 +29,35 @@ class VipController extends ControllerBackend
      * @apiSuccess {string} assign_count 配额总数
      * @apiSuccess {string} assign_history 配额记录
      */
-    public function list(Request $request)
+    public function list(Request $request): \Illuminate\Http\JsonResponse
     {
         $servers = new VipServers();
-        $data = $servers->list($request->input());
+        $data = $servers->list($request->input(), $this->user);
         return $this->getRes($data);
     }
 
-    //todo 配额
-    public function assign(Request $request){
+    /**
+     * 360兑换码配额修改
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @api {get} /api/admin_v4/vip/assign 兑换码配额修改
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/vip/assign
+     * @apiGroup  后台-VIP
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/vip/assign
+     * @apiDescription 兑换码配额修改
+     *
+     * @apiParam {string} user_id 用户id
+     * @apiParam {string} vip_id 用户vip_id
+     * @apiParam {string} num 数量
+     * @apiParam {string=1,2} status 状态(1生效 2失效)
+     * @apiParam {string=edit,add} flag 添加或修改
+     * @apiParam {string} assign_history_id 历史记录的id
+     */
+    public function assign(Request $request): \Illuminate\Http\JsonResponse
+    {
         $servers = new VipServers();
-        $data = $servers->assign($request->input(),$this->user['id']??0);
+        $data = $servers->assign($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 
