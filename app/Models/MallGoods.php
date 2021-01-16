@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class MallGoods extends Base
 {
@@ -15,20 +15,7 @@ class MallGoods extends Base
         $list = $this->getListData($params, $cache);
 
         //收藏
-        if ($user['id'] ?? 0) {
-            $col_list = Collection::where('user_id', '=', $user['id'])
-                ->where('type', '=', 3)
-                ->select(['relation_id as goods_id'])
-                ->get();
-            if ($col_list->isEmpty()) {
-                $col_list = [];
-            } else {
-                $col_list = $col_list->toArray();
-                $col_list = array_column($col_list, 'goods_id');
-            }
-        } else {
-            $col_list = [];
-        }
+        $col_list = Collection::getGoodsColByUid($user['id'] ?? 0);
 
         $count_list = count($list);
 
@@ -125,7 +112,7 @@ class MallGoods extends Base
         $cache_name = implode('_', $cache_name_arr);
         $expire_num = CacheTools::getExpire('get_list');
         $list = Cache::tags($cache_key_name)->get($cache_name);
-        if (true || empty($list)) {
+        if (empty($list)) {
             $list = $this->getListDataFromDb($params);
             if ($cache) {
                 Cache::tags($cache_key_name)->put($cache_name, $list, $expire_num);

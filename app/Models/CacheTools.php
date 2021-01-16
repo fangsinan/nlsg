@@ -55,6 +55,7 @@ class CacheTools
             case 'vip_works_list':
             case 'channel_works_list':
             case 'index_recommend_live':
+            case 'goods_col':
                 $expire = $sort_expire;
                 break;
             case 'goods_category_list':
