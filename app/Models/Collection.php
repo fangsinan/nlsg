@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Collection extends Base
 {
@@ -20,7 +21,7 @@ class Collection extends Base
         $where = ['type' => $type, 'user_id' => $user_id, 'relation_id' => $target_id,];
         $data = Collection::where($where)->first();
         //用户商品收藏缓存清理
-        Cache::forget('user_goods_col_'.$user_id);
+
         if ($data) {
             //直接物理删除
             if ($type == 1 || $type == 7) {
@@ -32,6 +33,7 @@ class Collection extends Base
             } else if ($type == 5) {
                 Wiki::where(['id' => $target_id])->decrement('collection_num');
             }
+            Cache::forget('user_goods_col_'.$user_id);
             return Collection::destroy($data['id']);
         } else {
             //创建
@@ -47,6 +49,7 @@ class Collection extends Base
             }
 
             $where['info_id'] = $info_id;
+            Cache::forget('user_goods_col_'.$user_id);
             return Collection::create($where);
         }
     }
