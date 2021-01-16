@@ -61,7 +61,7 @@ class Live extends Model
 
             $query   = Live::query();
             if (!$uid ||  ($user && !in_array($user->phone, $testers))){
-                $query->where('id', '!=', 1);
+                $query->where('id', '!=', 3);
             }
 
             $liveLists = $query->with('user:id,nickname')
