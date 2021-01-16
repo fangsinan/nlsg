@@ -21,7 +21,6 @@ class Collection extends Base
         $data = Collection::where($where)->first();
         //用户商品收藏缓存清理
         Cache::forget('user_goods_col_'.$user_id);
-        return true;
         if ($data) {
             //直接物理删除
             if ($type == 1 || $type == 7) {
