@@ -177,8 +177,8 @@ class LiveController extends Controller
         $user    = User::where('id', $uid)->first();
 
         $query   = Live::query();
-        if (is_numeric($user->phone) && !in_array($user->phone, $testers)){
-            $query->where('id', '!=', 3);
+        if (!$uid || ($user && !in_array($user->phone, $testers))){
+            $query->where('id', '!=', 1);
         }
         $lists = $query->with('user:id,nickname')
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
