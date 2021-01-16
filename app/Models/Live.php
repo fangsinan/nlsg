@@ -53,14 +53,14 @@ class Live extends Model
      */
     public function getRecommendLive($uid = 0)
     {
-        $cache_live_name = 'live_index_list';
-        $liveLists = Cache::get($cache_live_name);
-        if (empty($liveLists)) {
+//        $cache_live_name = 'live_index_list';
+//        $liveLists = Cache::get($cache_live_name);
+//        if (empty($liveLists)) {
             $testers = explode(',', ConfigModel::getData(35, 1));
             $user    = User::where('id', $uid)->first();
-            
+
             $query   = Live::query();
-            if (is_numeric($user->phone) && !in_array($user->phone, $testers)){
+            if (!$uid ||  ($user && !in_array($user->phone, $testers))){
                 $query->where('id', '!=', 3);
             }
 
@@ -72,9 +72,9 @@ class Live extends Model
                 ->limit(3)
                 ->get()
                 ->toArray();
-            $expire_num = CacheTools::getExpire('live_index_list');
-            Cache::put($cache_live_name, $liveLists, $expire_num);
-        }
+//            $expire_num = CacheTools::getExpire('live_index_list');
+//            Cache::put($cache_live_name, $liveLists, $expire_num);
+//        }
 
         if ( ! empty($liveLists)) {
             foreach ($liveLists as &$v) {
