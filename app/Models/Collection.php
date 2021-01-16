@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-
 class Collection extends Base
 {
     protected $table = 'nlsg_collection';
@@ -33,7 +30,6 @@ class Collection extends Base
             } else if ($type == 5) {
                 Wiki::where(['id' => $target_id])->decrement('collection_num');
             }
-            Cache::forget('user_goods_col_'.$user_id);
             return Collection::destroy($data['id']);
         } else {
             //创建
@@ -49,7 +45,6 @@ class Collection extends Base
             }
 
             $where['info_id'] = $info_id;
-            Cache::forget('user_goods_col_'.$user_id);
             return Collection::create($where);
         }
     }
@@ -93,28 +88,28 @@ class Collection extends Base
 
     public static function getGoodsColByUid($user_id = 0)
     {
-        $cache_key_name = 'user_goods_col_' . $user_id;
-        $expire_num = CacheTools::getExpire('goods_col');
-        $expire_num = 600;
-        $res = Cache::get($cache_key_name);
+//        $cache_key_name = 'user_goods_col_' . $user_id;
+//        $expire_num = CacheTools::getExpire('goods_col');
+//        $expire_num = 600;
+//        $res = Cache::get($cache_key_name);
 
-        if (empty($res)) {
-            if (empty($user_id)) {
+//        if (empty($res)) {
+        if (empty($user_id)) {
+            $res = [];
+        } else {
+            $res = Collection::where('user_id', '=', $user_id)
+                ->where('type', '=', 3)
+                ->select(['relation_id as goods_id'])
+                ->get();
+            if ($res->isEmpty()) {
                 $res = [];
             } else {
-                $res = Collection::where('user_id', '=', $user_id)
-                    ->where('type', '=', 3)
-                    ->select(['relation_id as goods_id'])
-                    ->get();
-                if ($res->isEmpty()) {
-                    $res = [];
-                } else {
-                    $res = $res->toArray();
-                    $res = array_column($res, 'goods_id');
-                }
+                $res = $res->toArray();
+                $res = array_column($res, 'goods_id');
             }
-            Cache::put($cache_key_name, $res, $expire_num);
         }
+//            Cache::put($cache_key_name, $res, $expire_num);
+//        }
 
         return $res;
     }
