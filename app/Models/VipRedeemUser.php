@@ -197,9 +197,9 @@ class VipRedeemUser extends Base
         if ($check->status != 3) {
             return ['code' => false, 'msg' => '兑换券已被使用'];
         }
-        if ($check->user_id == $user['id']) {
-            return ['code' => false, 'msg' => '兑换券错误'];
-        }
+//        if ($check->user_id == $user['id']) {
+//            return ['code' => false, 'msg' => '兑换券错误'];
+//        }
         $price = ConfigModel::getData(25);
         $res = self::whereId($params['id'])
             ->with(['userInfo', 'codeInfo'])
