@@ -134,11 +134,9 @@ class ChannelServers
             }
             $begin_date = date('Y-m-d H:i:00', strtotime($begin_date));
             $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +300 minutes"));
-            ConfigModel::whereId(38)->update(['value' => $end_date]);
         }
 
-        $begin_date = '2021-01-17 10:00:00';
-        $end_date = '2021-01-17 12:00:00';
+        ConfigModel::whereId(38)->update(['value' => $end_date]);
 
         $page = 0;
         $size = 100;
@@ -153,7 +151,6 @@ class ChannelServers
         while ($go_on) {
             $args['page'] = strval($page);
             $temp_res = $this->douYinQuery($args);
-            dd($temp_res);
             $page++;
             if (empty($temp_res['err_no'])) {
                 $this->insertDouYinOrder($temp_res['data']['list']);
