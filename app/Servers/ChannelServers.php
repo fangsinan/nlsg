@@ -28,8 +28,8 @@ class ChannelServers
         if (empty($order_data['id'] ?? 0)) {
             return true;
         }
-        $is_test = intval(ConfigModel::getData(37));
-        if ($is_test) {
+        $is_test = intval(ConfigModel::getData(37,1));
+        if (!empty($is_test)) {
             $url = 'http://39.107.71.116:8081/v1/partner/notify';
         } else {
             $url = 'https://api.chuangyetianxia.com/v1/partner/notify';
@@ -92,11 +92,9 @@ class ChannelServers
             $query->limit(1000);
         }
 
-        //DB::connection()->enableQueryLog();
         $list = $query->select([
             'o.id', 'o.ordernum', 'u.phone as username', 'o.type', 'o.relation_id', 'u.nickname', 'p.price', 'o.cytx_job', 'o.pay_time'
         ])->get();
-        //dd(DB::getQueryLog());
 
         foreach ($list as $v) {
             $v->title = '';

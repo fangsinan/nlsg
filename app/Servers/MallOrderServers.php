@@ -73,7 +73,7 @@ class MallOrderServers
             if (empty($created_at[1] ?? '')) {
                 $created_at[1] = $now_date;
             } else {
-                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[0]));
+                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[1]));
             }
             $query->whereBetween('created_at', [$created_at[0], $created_at[1] ?? $now_date]);
         }
@@ -83,7 +83,7 @@ class MallOrderServers
             if (empty($pay_time[1] ?? '')) {
                 $pay_time[1] = $now_date;
             } else {
-                $pay_time[1] = date('Y-m-d 23:59:59', strtotime($pay_time[0]));
+                $pay_time[1] = date('Y-m-d 23:59:59', strtotime($pay_time[1]));
             }
             $query->whereBetween('pay_time', [$pay_time[0], $pay_time[1] ?? $now_date]);
         }
@@ -159,10 +159,14 @@ class MallOrderServers
             $with[] = 'orderChild.expressInfo';
         }
 
-        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
-            $now_date . '" then FALSE ELSE TRUE END) ');
+//        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
+//            $now_date . '" then FALSE ELSE TRUE END) ');
 
         $query->orderBy('id', 'desc');
+
+        DB::connection()->enableQueryLog();
+        $list = $query->select($field)->get();
+        dd(DB::getQueryLog());
 
         $list = $query->with($with)->select($field)->paginate($size);
 
@@ -205,12 +209,29 @@ class MallOrderServers
 
         //时间,支付时间,支付渠道,客户端类型 created_at,pay_time,pay_type,os_type
         if (!empty($params['created_at'])) {
-            $created_at = implode(',', $params['created_at']);
+//            $created_at = explode(',', $params['created_at']);
+//            $query->whereBetween('nlsg_mall_order.created_at', [$created_at[0], $created_at[1] ?? $now_date]);
+            $created_at = explode(',', $params['created_at']);
+            $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
+            if (empty($created_at[1] ?? '')) {
+                $created_at[1] = $now_date;
+            } else {
+                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[1]));
+            }
             $query->whereBetween('created_at', [$created_at[0], $created_at[1] ?? $now_date]);
         }
         if (!empty($params['pay_time'])) {
-            $pay_time = implode(',', $params['pay_time']);
+//            $pay_time = explode(',', $params['pay_time']);
+//            $query->whereBetween('pay_time', [$pay_time[0], $pay_time[1] ?? $now_date]);
+            $pay_time = explode(',', $params['pay_time']);
+            $pay_time[0] = date('Y-m-d 00:00:00', strtotime($pay_time[0]));
+            if (empty($pay_time[1] ?? '')) {
+                $pay_time[1] = $now_date;
+            } else {
+                $pay_time[1] = date('Y-m-d 23:59:59', strtotime($pay_time[1]));
+            }
             $query->whereBetween('pay_time', [$pay_time[0], $pay_time[1] ?? $now_date]);
+
         }
         if (!empty($params['pay_type'])) {
             $query->where('pay_type', '=', $params['pay_type']);
@@ -306,7 +327,6 @@ class MallOrderServers
             $now_date . '" then FALSE ELSE TRUE END) ');
 
         $query->orderBy('nlsg_mall_order.id', 'desc');
-
         $list = $query->with($with)->select($field)->paginate($size);
 
         foreach ($list as $v) {
