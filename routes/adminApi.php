@@ -131,6 +131,10 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //360模块
         Route::get('vip/list', 'VipController@list');
         Route::post('vip/assign', 'VipController@assign');
+
+        //直播
+        Route::get('live/index', 'LiveController@index');
+        Route::post('live/pass', 'LiveController@pass');
     });
 
 
@@ -146,7 +150,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('remove_data/redeem_code', 'RemoveDataController@redeemCode');
 
     //测试临时用,之后要删除
-    Route::get('live/pass', 'GoodsController@tempTools');//商城退款
+//    Route::get('live/pass', 'GoodsController@tempTools');//商城退款
 
     Route::post('upload/file', 'UploadController@file');//上传视频/音频
 });
