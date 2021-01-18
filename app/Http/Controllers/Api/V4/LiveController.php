@@ -432,20 +432,13 @@ class LiveController extends Controller
     public function show(Request $request)
     {
         $id = $request->get('live_id');
-
-        $cache_live_name = 'live_info_'.$id;
-        $list = Cache::get($cache_live_name);
-        if (empty($list)){
-            $list = LiveInfo::with([
+        $list = LiveInfo::with([
                        'user:id,nickname,headimg,intro,honor',
                        'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish'
                    ])
                    ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish')
                    ->where('id', $id)
                    ->first();
-            $expire_num = CacheTools::getExpire('live_info');
-            Cache::put($cache_live_name, $list, $expire_num);
-        }
 
         if ($list) {
             $column = Column::where('user_id', $list['user_id'])
