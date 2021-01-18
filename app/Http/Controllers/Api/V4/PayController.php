@@ -377,8 +377,6 @@ class PayController extends Controller
     public function ApplePay(Request $request)
     {
 
-
-
         $params = $request->input();
         Log::debug('ApplePay notify', [ $params ]);
         if (empty($params['ordernum']) || empty($params['receipt-data'])) {
