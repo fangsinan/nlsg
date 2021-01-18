@@ -984,6 +984,11 @@ class IncomeController extends Controller
                 case 10:
                     $res['content'] = '直播分享收益';
                     $res['name']='直播分享';
+                    $teacherInfo = Order::select('user_id')->where(['ordernum'=>$ordernum])->first();
+                    if($teacherInfo){
+                        $userInfo = User::find($teacherInfo['user_id']);
+                        $res['o_nick_name']=$userInfo['phone'];
+                    }
                     break;
                 case 11:
                     $res['content'] = '360幸福大使收益';
