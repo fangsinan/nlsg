@@ -217,8 +217,8 @@ class MallController extends Controller
         if ($request->input('aa', 0) == 1) {
             //MallRefundJob::shillJob(2);
             //VipRedeemUser::subWorksOrGetRedeemCode(692095);
-            $c = new ChannelServers();
-            $c->getDouyinOrder();
+//            $c = new ChannelServers();
+//            $c->getDouyinOrder();
             return true;
         } else {
             $params = $request->input();
