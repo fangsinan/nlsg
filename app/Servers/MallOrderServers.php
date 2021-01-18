@@ -214,7 +214,7 @@ class MallOrderServers
             } else {
                 $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[1]));
             }
-            $query->whereBetween('created_at', [$created_at[0], $created_at[1] ?? $now_date]);
+            $query->whereBetween('nlsg_mall_order.created_at', [$created_at[0], $created_at[1] ?? $now_date]);
         }
         if (!empty($params['pay_time'])) {
 //            $pay_time = explode(',', $params['pay_time']);
@@ -226,7 +226,7 @@ class MallOrderServers
             } else {
                 $pay_time[1] = date('Y-m-d 23:59:59', strtotime($pay_time[1]));
             }
-            $query->whereBetween('pay_time', [$pay_time[0], $pay_time[1] ?? $now_date]);
+            $query->whereBetween('nlsg_mall_order.pay_time', [$pay_time[0], $pay_time[1] ?? $now_date]);
 
         }
         if (!empty($params['pay_type'])) {
