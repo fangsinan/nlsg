@@ -154,6 +154,7 @@ class ChannelServers
         while ($go_on) {
             $args['page'] = strval($page);
             $temp_res = $this->douYinQuery($args);
+            echo '<pre>';
             echo PHP_EOL,'返回结果:',PHP_EOL;
             var_dump($temp_res);
             $page++;
