@@ -150,6 +150,7 @@ class ChannelServers
         while ($go_on) {
             $args['page'] = strval($page);
             $temp_res = $this->douYinQuery($args);
+            dd($temp_res);
             $page++;
             if (empty($temp_res['err_no'])) {
                 $this->insertDouYinOrder($temp_res['data']['list']);
