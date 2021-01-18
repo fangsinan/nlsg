@@ -71,6 +71,7 @@ class CacheTools
             case 'live_index_list':
             case 'live_back_list':
             case 'live_live_works':
+            case 'live_info':
                 $expire = $ten_expire;
                 break;
             default :
