@@ -179,10 +179,11 @@ class ChannelServers
 
         foreach ($list as $v) {
             foreach ($v['child'] as $vv) {
-                $check_sku = ChannelSku::checkSku($vv['product_id'], 1);
-                if (!$check_sku) {
-                    continue;
-                }
+                //不过滤sku先
+//                $check_sku = ChannelSku::checkSku($vv['product_id'], 1);
+//                if (!$check_sku) {
+//                    continue;
+//                }
 
                 $temp_data = ChannelOrder::where('order_id', '=', $v['order_id'])
                     ->where('channel', '=', 1)
