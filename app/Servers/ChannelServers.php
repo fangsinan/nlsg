@@ -151,6 +151,8 @@ class ChannelServers
         while ($go_on) {
             $args['page'] = strval($page);
             $temp_res = $this->douYinQuery($args);
+            echo PHP_EOL,'返回结果:',PHP_EOL;
+            var_dump($temp_res);
             $page++;
             if (empty($temp_res['err_no'])) {
                 $this->insertDouYinOrder($temp_res['data']['list']);
@@ -192,7 +194,9 @@ class ChannelServers
                 $temp_data->create_time = date('Y-m-d H:i:s', $v['create_time']);
                 $temp_data->pay_time = $v['pay_time'];
                 $temp_data->update_time = date('Y-m-d H:i:s', $v['update_time']);
-                $temp_data->save();
+                $temp_res = $temp_data->save();
+                echo PHP_EOL,'写入部分',PHP_EOL;
+                var_dump([$v,$temp_res]);
             }
         }
     }
