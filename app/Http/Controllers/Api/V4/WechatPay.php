@@ -274,8 +274,8 @@ class WechatPay extends Controller
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
                 if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst && $add_sub_Rst && $top_Sy_Rst) {
-                    self::LiveRedis(16,1,$AdminInfo['nickname'],$live_id,$orderId);
                     DB::commit();
+                    self::LiveRedis(16,1,$AdminInfo['nickname'],$live_id,$orderId);
                     return true;
                 } else {
                     DB::rollBack();
@@ -350,9 +350,9 @@ class WechatPay extends Controller
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
                 if ($orderRst && $recordRst && $subscribeRst && $userRst) {
+                    DB::commit();
                     $AdminInfo = User::find($user_id);
                     self::LiveRedis(14,1,$AdminInfo['nickname'],$live_id,$orderId);
-                    DB::commit();
                     return true;
 
                 } else {
