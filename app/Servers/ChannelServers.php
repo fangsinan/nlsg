@@ -137,6 +137,9 @@ class ChannelServers
             ConfigModel::whereId(38)->update(['value' => $end_date]);
         }
 
+        $begin_date = '2021-01-17 10:00:00';
+        $end_date = '2021-01-17 12:00:00';
+
         $page = 0;
         $size = 100;
         $args = [
