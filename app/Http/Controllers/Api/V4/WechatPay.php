@@ -24,6 +24,7 @@ use App\Models\Works;
 use App\Servers\JobServers;
 use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class WechatPay extends Controller
 {
@@ -273,6 +274,7 @@ class WechatPay extends Controller
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
                 if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst && $add_sub_Rst && $top_Sy_Rst) {
+                    self::LiveRedis(16,1,$AdminInfo['nickname'],$live_id,$orderId);
                     DB::commit();
                     return true;
                 } else {
@@ -348,6 +350,8 @@ class WechatPay extends Controller
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
                 if ($orderRst && $recordRst && $subscribeRst && $userRst) {
+                    $AdminInfo = User::find($user_id);
+                    self::LiveRedis(14,1,$AdminInfo['nickname'],$live_id,$orderId);
                     DB::commit();
                     return true;
 
@@ -365,6 +369,44 @@ class WechatPay extends Controller
             return true;
         }
     }
+
+
+    static function LiveRedis($type,$relation_id,$nickname,$live_id=0,$orderid=0){
+
+        if($live_id == 0){
+            return 0;
+        }
+        //  向直播间 设置直播间 redis
+        $key = 'live_PushOrder_'.$live_id;
+        Redis::select(0);
+
+        if($type == 16){
+            $res=$nickname.':您已成功购买幸福360会员';
+        }else{
+            switch ( $relation_id ) {
+                case 1: //经营能量
+                    $res=$nickname.':您已成功购买1张经营能量门票';
+                    break;
+                case 2: //一代天骄
+                    $res=$nickname.':您已支付成功一代天骄定金';
+                    break;
+                case 3: //演说能量
+                    $res=$nickname.':您已支付成功演说能量定金';
+                    break;
+                case 4: //幸福套餐
+                    $res=$nickname.':您已支付成功幸福套餐';
+                    break;
+            }
+        }
+        Redis::rpush($key,$res);
+//        Redis::setex($key,600,json_encode($res,true));
+        if($orderid){
+            Order::where(['id' => $orderid])->update(['is_live_order_send'=>1]);
+        }
+
+    }
+
+
 
     //微信购买直播
     public static function PayLive($data)
