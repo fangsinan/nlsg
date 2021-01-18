@@ -164,10 +164,6 @@ class MallOrderServers
 
         $query->orderBy('id', 'desc');
 
-        DB::connection()->enableQueryLog();
-        $list = $query->select($field)->get();
-        dd(DB::getQueryLog());
-
         $list = $query->with($with)->select($field)->paginate($size);
 
         foreach ($list as $v) {

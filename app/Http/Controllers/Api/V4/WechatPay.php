@@ -402,6 +402,20 @@ class WechatPay extends Controller
                 if (intval($live_id) === 1) {
                     $couponModel = new Coupon();
                     $couponModel->sendCouponRun([50], $user_id);
+
+                    $easySms = app('easysms');
+                    try {
+                        $user_info = User::whereId($user_id)->first();
+                        $phone = $user_info->phone ?? '';
+                        if (!empty($phone)) {
+                            $easySms->send($phone, [
+                                'template' => 'SMS_209470584',
+                                'data' => [],
+                            ], ['aliyun']);
+                        }
+                    } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
+                    }
+
                 }
 
                 //添加支付记录
