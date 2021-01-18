@@ -138,6 +138,9 @@ class ChannelServers
 
         ConfigModel::whereId(38)->update(['value' => $end_date]);
 
+        $begin_date = '2021-01-17 11:00:00';
+        $end_date = '2021-01-17 12:00:00';
+
         $page = 0;
         $size = 100;
         $args = [
@@ -168,6 +171,7 @@ class ChannelServers
     //抖音订单入库
     private function insertDouYinOrder($list)
     {
+        var_dump($list);
         if (!is_array($list) || empty($list)) {
             return true;
         }
