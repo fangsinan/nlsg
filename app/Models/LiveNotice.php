@@ -189,11 +189,15 @@ class LiveNotice extends Base
         }
         $check = self::whereId($id)
             ->where('is_del', '=', 0)
-            ->select(['id', 'is_send', 'type'])
+            ->select(['id', 'is_send', 'type','user_id'])
             ->first();
 
         if (empty($check)){
             return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        if (intval($check->user_id) !== intval($user_id)){
+            return ['code'=>false,'msg'=>'非本人创建,不可删除.'];
         }
 
         switch ($params['flag'] ?? '') {
