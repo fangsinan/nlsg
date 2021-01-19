@@ -8,6 +8,7 @@ use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
 use App\Models\History;
 use App\Models\MallGoods;
+use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\VipUser;
 use Illuminate\Support\Facades\DB;
@@ -917,6 +918,43 @@ class removeDataServers
         }
 
         DB::connection('mysql_new_zs')->table('nlsg_coupon')->insert($add_data);
+
+    }
+
+    public function douyinLiveOrder()
+    {
+        $list = DB::table('wwtest as wt')
+            ->leftJoin('nlsg_user as u', 'wt.phone', '=', 'u.phone')
+            ->select(['wt.phone', 'u.id as user_id'])
+            ->get()->toArray();
+
+        foreach ($list as $v) {
+            if (!is_numeric($v->user_id)) {
+                $userModel = new User();
+                $userModel->phone = $v->phone;
+                $userModel->nickname = substr_replace($v->phone, '****', 3, 4);
+                $userModel->save();
+                $v->user_id = $userModel->id;
+            }
+        }
+
+        $now_date = date('Y-m-d H:i:s');
+        $add_data = [];
+        foreach ($list as $v) {
+            $w = 1;
+            while ($w < 3) {
+                $temp_data = [];
+                $temp_data['type'] = 3;
+                $temp_data['user_id'] = $v->user_id;
+                $temp_data['relation_id'] = $w;
+                $temp_data['pay_time'] = $now_date;
+                $temp_data['status'] = 1;
+                $temp_data['give'] = 3;
+                $add_data[] = $temp_data;
+                $w++;
+            }
+        }
+        DB::table('nlsg_subscribe')->insert($add_data);
 
     }
 
