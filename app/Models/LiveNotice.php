@@ -191,6 +191,10 @@ class LiveNotice extends Base
             ->where('is_del', '=', 0)
             ->select(['id', 'is_send', 'type'])
             ->first();
+        
+        if (empty($check)){
+            return ['code' => false, 'msg' => 'id错误'];
+        }
 
         switch ($params['flag'] ?? '') {
             case 'off':
