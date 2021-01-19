@@ -291,7 +291,8 @@ class MallOrderServers
 //                then 99 ELSE nlsg_mall_order.`status` END) `status_old`'),
             DB::raw('(CASE
 				WHEN (nlsg_mall_order.STATUS = 1 AND is_success = 0) THEN 1
-				WHEN (is_success = 0 AND is_fail = 0 AND nlsg_mall_order.STATUS) > 1 THEN nlsg_mall_order.`status`
+				WHEN (is_success = 0 AND is_fail = 0 AND nlsg_mall_order.STATUS > 1) THEN 95
+				WHEN (is_success = 1 AND is_fail = 0 AND nlsg_mall_order.STATUS > 1) THEN nlsg_mall_order.`status`
 				WHEN is_fail = 1 THEN 99
 				WHEN is_stop = 1 THEN 99
                 ELSE nlsg_mall_order.status
