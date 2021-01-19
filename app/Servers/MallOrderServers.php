@@ -198,15 +198,12 @@ class MallOrderServers
             $query->where('nlsg_mall_order.id', '=', intval($params['id']));
         }
 
-
         if (!empty($params['ordernum'])) {
             $query->where('nlsg_mall_order.ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
 
         //时间,支付时间,支付渠道,客户端类型 created_at,pay_time,pay_type,os_type
         if (!empty($params['created_at'])) {
-//            $created_at = explode(',', $params['created_at']);
-//            $query->whereBetween('nlsg_mall_order.created_at', [$created_at[0], $created_at[1] ?? $now_date]);
             $created_at = explode(',', $params['created_at']);
             $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
             if (empty($created_at[1] ?? '')) {
@@ -217,8 +214,6 @@ class MallOrderServers
             $query->whereBetween('nlsg_mall_order.created_at', [$created_at[0], $created_at[1] ?? $now_date]);
         }
         if (!empty($params['pay_time'])) {
-//            $pay_time = explode(',', $params['pay_time']);
-//            $query->whereBetween('pay_time', [$pay_time[0], $pay_time[1] ?? $now_date]);
             $pay_time = explode(',', $params['pay_time']);
             $pay_time[0] = date('Y-m-d 00:00:00', strtotime($pay_time[0]));
             if (empty($pay_time[1] ?? '')) {
@@ -242,6 +237,7 @@ class MallOrderServers
                 $query->where('phone', 'like', '%' . $params['phone'] . '%');
             });
         }
+
         if (!empty($params['nickname'])) {
             $query->whereHas('userInfo', function (Builder $query) use ($params) {
                 $query->where('nickname', 'like', '%' . $params['nickname'] . '%');
@@ -286,13 +282,10 @@ class MallOrderServers
             'nlsg_mall_order.id', 'nlsg_mall_order.ordernum', 'nlsg_mall_order.price', 'nlsg_mall_order.pay_price',
             'nlsg_mall_order.messages',
             'nlsg_mall_order.dead_time', 'nlsg_mall_order.user_id', DB::raw('3 as order_type'),
-//            DB::raw('(case when nlsg_mall_order.`status` = 1 then 1
-//                when is_success = 0 then 95 when nlsg_mall_order.is_stop = 1
-//                then 99 ELSE nlsg_mall_order.`status` END) `status_old`'),
             DB::raw('(CASE
-				WHEN (nlsg_mall_order.STATUS = 1 AND is_success = 0) THEN 1
-				WHEN (is_success = 0 AND is_fail = 0 AND nlsg_mall_order.STATUS > 1) THEN 95
-				WHEN (is_success = 1 AND is_fail = 0 AND nlsg_mall_order.STATUS > 1) THEN nlsg_mall_order.`status`
+				WHEN (nlsg_mall_order.STATUS = 1 AND is_success = 0 AND is_stop = 0 ) THEN 1
+				WHEN (is_success = 0 AND is_fail = 0 AND nlsg_mall_order.STATUS > 1 AND is_stop = 0 ) THEN 95
+				WHEN (is_success = 1 AND is_fail = 0 AND nlsg_mall_order.STATUS > 1 AND is_stop = 0 ) THEN nlsg_mall_order.`status`
 				WHEN is_fail = 1 THEN 99
 				WHEN is_stop = 1 THEN 99
                 ELSE nlsg_mall_order.status
@@ -324,6 +317,11 @@ class MallOrderServers
             $now_date . '" then FALSE ELSE TRUE END) ');
 
         $query->orderBy('nlsg_mall_order.id', 'desc');
+
+//        DB::connection()->enableQueryLog();
+//        $query->select($field)->get();
+//        dd(DB::getQueryLog());
+
         $list = $query->with($with)->select($field)->paginate($size);
 
         foreach ($list as $v) {
