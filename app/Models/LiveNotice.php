@@ -187,11 +187,11 @@ class LiveNotice extends Base
         if (empty($id)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
-        $check = self::whereId($id)->where('user_id', '=', $user_id)
+        $check = self::whereId($id)
             ->where('is_del', '=', 0)
             ->select(['id', 'is_send', 'type'])
             ->first();
-        
+
         if (empty($check)){
             return ['code' => false, 'msg' => 'id错误'];
         }
