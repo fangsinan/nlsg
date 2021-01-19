@@ -128,9 +128,9 @@ class IndexController extends Controller
     {
         $os_type = $request->get('os_type') ?? 1;
 
-//        if($os_type == 2){
-//            return success();
-//        }
+        if($os_type == 2){
+            return success();
+        }
 
         $user_id = $this->user['id'] ?? 0;
         $recommendModel = new Recommend();
