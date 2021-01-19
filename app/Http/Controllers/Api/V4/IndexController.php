@@ -127,8 +127,9 @@ class IndexController extends Controller
     public function lives(Request $request)
     {
         $os_type = $request->get('os_type') ?? 1;
+        $version = $request->get('version') ?? 1;
 
-        if($os_type == 2){
+        if($os_type == 2 && $version == '4.0.5'){
             return success();
         }
 
