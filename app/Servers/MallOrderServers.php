@@ -255,22 +255,27 @@ class MallOrderServers
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
-                $query->where('nlsg_mall_order.status', '=', 1);
+                $query->where('nlsg_mall_order.status', '=', 1)
+                    ->where('nlsg_mall_order.is_stop', '=', 0);
                 break;
             case 10:
                 $query->where('nlsg_mall_order.status', '=', 10)
+                    ->where('nlsg_mall_order.is_stop', '=', 0)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 20:
                 $query->where('nlsg_mall_order.status', '=', 20)
+                    ->where('nlsg_mall_order.is_stop', '=', 0)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 30:
                 $query->where('nlsg_mall_order.status', '=', 30)
+                    ->where('nlsg_mall_order.is_stop', '=', 0)
                     ->where('gbl.is_success', '=', 1);
                 break;
             case 95:
                 $query->where('nlsg_mall_order.status', '=', 10)
+                    ->where('nlsg_mall_order.is_stop', '=', 0)
                     ->where('gbl.is_success', '=', 0);
                 break;
             case 99:
