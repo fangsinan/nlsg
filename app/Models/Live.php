@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class Live extends Model
+class Live extends Base
 {
     protected $table = 'nlsg_live';
 
