@@ -4,7 +4,9 @@
 namespace App\Servers;
 
 
+use App\Models\User;
 use App\Models\VipRedeemAssign;
+use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -124,6 +126,53 @@ class VipServers
         } else {
             return ['code' => false, 'msg' => '失败'];
         }
+
+    }
+
+    public function openVip($user_id, $phone)
+    {
+        $now_date = date('Y-m-d H:i:s');
+        $user_info = User::where('id', '=', $user_id)->first();
+        $check_vip = VipUser::where('user_id', '=', $user_id)
+            ->where('username', $phone)
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->first();
+        if ($check_vip) {
+            if ($check_vip->level == 1) {
+                //是360,续期
+                if ($check_vip->expire_time > $now_date) {
+                    $check_vip->expire_time = date('Y-m-d 23:59:59', strtotime($check_vip->expire_time . '+1 years'));
+                } else {
+                    $check_vip->expire_time = date('Y-m-d 23:59:59', strtotime('+1 years'));
+                }
+            } else {
+                //是钻石
+                if ($check_vip->is_open_360 == 1) {
+                    if ($check_vip->time_end_360 > $now_date) {
+                        $check_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($check_vip->time_end_360 . '+1 years'));
+                    } else {
+                        $check_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime('+1 years'));
+                    }
+                } else {
+                    $check_vip->is_open_360 = 1;
+                    $check_vip->time_begin_360 = $now_date;
+                    $check_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime('+1 years'));
+                }
+            }
+        } else {
+            $check_vip = new VipUser();
+            $check_vip->user_id = $user_id;
+            $check_vip->nickname = $user_info->nickname;
+            $check_vip->username = $phone;
+            $check_vip->level = 1;
+            $check_vip->start_time = $now_date;
+            $check_vip->expire_time = date('Y-m-d 23:59:59', strtotime('+1 years'));
+            $check_vip->status = 1;
+            $check_vip->is_default = 1;
+        }
+        $check_vip->save();
+        VipRedeemUser::subWorksOrGetRedeemCode($user_id);
 
     }
 

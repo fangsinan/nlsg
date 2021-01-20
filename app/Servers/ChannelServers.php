@@ -8,6 +8,7 @@ use App\Models\ChannelOrder;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Order;
+use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\Works;
 use Illuminate\Support\Facades\Cache;
@@ -115,7 +116,7 @@ class ChannelServers
 
     }
 
-    //抖音订单拉取
+    //抖音订单拉取(定时任务)
     public function getDouYinOrder()
     {
         $begin_date = ConfigModel::getData(38, 1);
@@ -199,12 +200,9 @@ class ChannelServers
     //抖音订单补全(定时任务)
     public function supplementDouYinOrder()
     {
-        $list = ChannelOrder::where('channel', '=', 1)
-            ->where('type', '=', 0)
+        $list = ChannelOrder::where('user_id', '=', 0)
             ->where('status', '=', 0)
-            ->with(['skuInfo' => function ($query) {
-                $query->where('channel', '=', 1);
-            }])
+            ->with(['skuInfo'])
             ->limit(50)
             ->get();
         if ($list->isEmpty()) {
@@ -219,9 +217,6 @@ class ChannelServers
                     'phone' => $v->phone
                 ]);
                 $v->user_id = $user->id;
-                $v->to_id = $v->skuInfo->to_id;
-                $v->to_info_id = $v->skuInfo->to_info_id;
-                $v->type = $v->skuInfo->type;
             }
             $v->save();
         }
@@ -287,20 +282,195 @@ class ChannelServers
         return $access_token;
     }
 
-
-    //todo 抖音开通(定时任务)
+    //抖音开通(定时任务)
     public function douYinJob()
     {
         //抖音订单 order_status=3,5  就可以执行
-        $begin_date = date('Y-m-d 00:00:00',strtotime('-5 days'));
-        dd($begin_date);
-        $list = ChannelOrder::where('type', '>', 0)->where('status', '=', 0)
-            ->select(['id', 'type', 'user_id', 'order_status'])
+        $begin_date = date('Y-m-d 00:00:00', strtotime('-20 days'));
+        $now_date = date('Y-m-d H:i:s');
+
+        $list = ChannelOrder::where('create_time', '>', $begin_date)
+            ->where('user_id', '>', 0)
+            ->whereIn('order_status', [3, 5])
+            ->where('channel', '=', 1)
+            ->where('status', '=', 0)
+            ->with('skuInfo')
+            ->select(['id', 'user_id', 'phone', 'order_status', 'order_id', 'sku'])
             ->get();
 
-        dd($list->toArray());
+        $invalid_id_list = [];
 
-        return $list;
+        foreach ($list as $v) {
+            if (empty($v->skuInfo)) {
+                $invalid_id_list[] = $v->id;
+            } else {
+                $v->skuInfo->to_id = explode(',', $v->skuInfo->to_id);
+                $v->skuInfo->to_id = array_filter($v->skuInfo->to_id);
+                //1:讲座 2:课程 3:直播  4:360会员
+                switch (intval($v->skuInfo->type)) {
+                    case 1:
+                        $add_sub_data = [];
+                        DB::beginTransaction();
+                        foreach ($v->skuInfo->to_id as $tv) {
+                            $check = Subscribe::where('user_id', '=', $v->user_id)
+                                ->where('created_at', '>', '2021-01-05')
+                                ->where('relation_id', '=', $tv)
+                                ->where('end_time', '>=', $now_date)
+                                ->where('type', '=', 6)
+                                ->where('status', '=', 1)
+                                ->first();
+                            if (empty($check)) {
+                                $temp_data = [];
+                                $temp_data['type'] = 6;
+                                $temp_data['user_id'] = $v->user_id;
+                                $temp_data['relation_id'] = $tv;
+                                $temp_data['pay_time'] = $now_date;
+                                $temp_data['status'] = 1;
+                                $temp_data['give'] = 15;
+                                $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 years'));
+                                $temp_data['channel_order_id'] = $v->order_id;
+                                $temp_data['channel_order_sku'] = $v->sku;
+                                $add_sub_data[] = $temp_data;
+                            } else {
+                                $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +1 years"));
+                                $check->end_time = $temp_end_time;
+                                $edit_res = $check->save();
+                                if ($edit_res === false) {
+                                    DB::rollBack();
+                                    break;
+                                }
+                            }
+                        }
+                        $edit_res = DB::table('nlsg_channel_order')
+                            ->where('id', '=', $v->id)
+                            ->update([
+                                'status' => 1
+                            ]);
+                        if ($edit_res === false) {
+                            DB::rollBack();
+                            break;
+                        }
+                        if (!empty($add_sub_data)) {
+                            $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                            if ($add_res === false) {
+                                DB::rollBack();
+                                break;
+                            }
+                        }
+                        DB::commit();
+                        break;
+                    case 2:
+                        $add_sub_data = [];
+                        DB::beginTransaction();
+                        foreach ($v->skuInfo->to_id as $tv) {
+                            $check = Subscribe::where('user_id', '=', $v->user_id)
+                                ->where('created_at', '>', '2021-01-05')
+                                ->where('relation_id', '=', $tv)
+                                ->where('end_time', '>=', $now_date)
+                                ->where('type', '=', 2)
+                                ->where('status', '=', 1)
+                                ->first();
+                            if (empty($check)) {
+                                $temp_data = [];
+                                $temp_data['type'] = 2;
+                                $temp_data['user_id'] = $v->user_id;
+                                $temp_data['relation_id'] = $tv;
+                                $temp_data['pay_time'] = $now_date;
+                                $temp_data['status'] = 1;
+                                $temp_data['give'] = 15;
+                                $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 years'));
+                                $temp_data['channel_order_id'] = $v->order_id;
+                                $temp_data['channel_order_sku'] = $v->sku;
+                                $add_sub_data[] = $temp_data;
+                            } else {
+                                $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +1 years"));
+                                $check->end_time = $temp_end_time;
+                                $edit_res = $check->save();
+                                if ($edit_res === false) {
+                                    DB::rollBack();
+                                    break;
+                                }
+                            }
+                        }
+                        $edit_res = DB::table('nlsg_channel_order')
+                            ->where('id', '=', $v->id)
+                            ->update([
+                                'status' => 1
+                            ]);
+                        if ($edit_res === false) {
+                            DB::rollBack();
+                            break;
+                        }
+                        if (!empty($add_sub_data)) {
+                            $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                            if ($add_res === false) {
+                                DB::rollBack();
+                                break;
+                            }
+                        }
+                        DB::commit();
+                        break;
+                    case 3:
+                        $add_sub_data = [];
+                        DB::beginTransaction();
+                        foreach ($v->skuInfo->to_id as $tv) {
+                            $check = Subscribe::where('user_id', '=', $v->user_id)
+                                ->where('created_at', '>', '2021-01-05')
+                                ->where('relation_id', '=', $tv)
+                                ->where('type', '=', 3)
+                                ->where('status', '=', 1)
+                                ->first();
+                            if (empty($check)) {
+                                $temp_data = [];
+                                $temp_data['type'] = 3;
+                                $temp_data['user_id'] = $v->user_id;
+                                $temp_data['relation_id'] = $tv;
+                                $temp_data['pay_time'] = $now_date;
+                                $temp_data['status'] = 1;
+                                $temp_data['give'] = 15;
+                                $temp_data['channel_order_id'] = $v->order_id;
+                                $temp_data['channel_order_sku'] = $v->sku;
+                                $add_sub_data[] = $temp_data;
+                            }
+                        }
+                        $edit_res = DB::table('nlsg_channel_order')
+                            ->where('id', '=', $v->id)
+                            ->update([
+                                'status' => 1
+                            ]);
+                        if ($edit_res === false) {
+                            DB::rollBack();
+                            break;
+                        }
+                        if (!empty($add_sub_data)) {
+                            $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                            if ($add_res === false) {
+                                DB::rollBack();
+                                break;
+                            }
+                        }
+                        DB::commit();
+                        break;
+                    case 4:
+                        $servers = new VipServers();
+                        $servers->openVip($v->user_id, $v->phone);
+                        DB::table('nlsg_channel_order')
+                            ->where('id', '=', $v->id)
+                            ->update([
+                                'status' => 1
+                            ]);
+                        break;
+                }
+            }
+        }
+
+        if (!empty($invalid_id_list)) {
+            DB::table('nlsg_channel_order')
+                ->whereIn('id', $invalid_id_list)
+                ->update([
+                    'status' => 9
+                ]);
+        }
     }
 
 

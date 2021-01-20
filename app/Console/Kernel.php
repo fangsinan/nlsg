@@ -62,10 +62,14 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             MallRefundJob::refundJob(2);//商城订单退款查询
-//            $c = new ChannelServers();
-//            $c->getDouyinOrder();
-//            $c->supplementDouYinOrder();
         })->everyFiveMinutes();//每五分
+
+        $schedule->call(function () {
+            $cs = new ChannelServers();
+            $cs->getDouyinOrder();
+            $cs->supplementDouYinOrder();
+            $cs->douYinJob();
+        })->everyTenMinutes();//每十分钟
 
         $schedule->call(function () {
             MallRefundJob::shillJob(2);
