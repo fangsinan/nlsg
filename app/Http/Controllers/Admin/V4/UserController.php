@@ -35,7 +35,7 @@ class UserController extends Controller
                  });
 
         $lists = $query
-                ->select('id','user_id','truename','idcard_cover','zfb_account','phone','created_at','status')
+                ->select('id','user_id','truename','idcard_cover','zfb_account','phone','created_at','is_pass')
                 ->orderBy('created_at','desc')
                 ->paginate(10)
                 ->toArray();
