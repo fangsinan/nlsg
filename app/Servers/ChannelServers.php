@@ -305,7 +305,7 @@ class ChannelServers
             if (empty($v->skuInfo)) {
                 $invalid_id_list[] = $v->id;
             } else {
-                if (!is_array($v->skuInfo->to_id)){
+                if (!is_array($v->skuInfo->to_id)) {
                     $v->skuInfo->to_id = explode(',', $v->skuInfo->to_id);
                 }
                 $v->skuInfo->to_id = array_filter($v->skuInfo->to_id);
@@ -347,7 +347,8 @@ class ChannelServers
                         $edit_res = DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1
+                                'status' => 1,
+                                'success_at' => $now_date
                             ]);
                         if ($edit_res === false) {
                             DB::rollBack();
@@ -398,7 +399,8 @@ class ChannelServers
                         $edit_res = DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1
+                                'status' => 1,
+                                'success_at' => $now_date
                             ]);
                         if ($edit_res === false) {
                             DB::rollBack();
@@ -439,7 +441,8 @@ class ChannelServers
                         $edit_res = DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1
+                                'status' => 1,
+                                'success_at' => $now_date
                             ]);
                         if ($edit_res === false) {
                             DB::rollBack();
@@ -460,7 +463,8 @@ class ChannelServers
                         DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1
+                                'status' => 1,
+                                'success_at' => $now_date
                             ]);
                         break;
                 }
