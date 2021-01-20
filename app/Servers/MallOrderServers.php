@@ -10,6 +10,7 @@ namespace App\Servers;
 
 use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
+use App\Models\MallGroupBuyList;
 use App\Models\MallOrder;
 use App\Models\MallOrderChild;
 use App\Models\MallOrderDetails;
@@ -37,6 +38,18 @@ class MallOrderServers
         }
 
         return $res;
+    }
+
+    public function makeGroupSuccess($params)
+    {
+        $order_id = $params['id'] ?? 0;
+        if (empty($order_id)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+        $check_order = MallOrder::where('id','=',$order_id)->where('status','>',1)->where('order_type','=',3)->first();
+        $check_group = MallGroupBuyList::where('order_id','=',$order_id)->first();
+
+
     }
 
     protected function listOfNormal($params)

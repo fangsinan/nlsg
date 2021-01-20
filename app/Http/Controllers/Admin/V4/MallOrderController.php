@@ -56,6 +56,12 @@ class MallOrderController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function makeGroupSuccess(Request $request){
+        $servers = new MallOrderServers();
+        $data = $servers->makeGroupSuccess($request->input());
+        return $this->getRes($data);
+    }
+
     /**
      * 发货
      * @api {post} /api/admin_v4/mall_order/send 发货
