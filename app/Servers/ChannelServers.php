@@ -296,6 +296,7 @@ class ChannelServers
             ->where('status', '=', 0)
             ->with('skuInfo')
             ->select(['id', 'user_id', 'phone', 'order_status', 'order_id', 'sku'])
+            ->limit(100)
             ->get();
 
         $invalid_id_list = [];
@@ -304,7 +305,9 @@ class ChannelServers
             if (empty($v->skuInfo)) {
                 $invalid_id_list[] = $v->id;
             } else {
-                $v->skuInfo->to_id = explode(',', $v->skuInfo->to_id);
+                if (!is_array($v->skuInfo->to_id)){
+                    $v->skuInfo->to_id = explode(',', $v->skuInfo->to_id);
+                }
                 $v->skuInfo->to_id = array_filter($v->skuInfo->to_id);
                 //1:讲座 2:课程 3:直播  4:360会员
                 switch (intval($v->skuInfo->type)) {
