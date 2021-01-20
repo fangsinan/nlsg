@@ -955,7 +955,7 @@ class removeDataServers
             }
         }
         DB::table('nlsg_subscribe')->insert($add_data);
-
+        dd($add_data);
     }
 
     public function countUserData()

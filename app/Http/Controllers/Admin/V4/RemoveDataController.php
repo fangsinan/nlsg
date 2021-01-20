@@ -34,7 +34,7 @@ class RemoveDataController extends ControllerBackend
             $servers->countUserData();
         }
 
-        if(0){
+        if (0) {
             //临时 抖音得直播预约
             $servers->douyinLiveOrder();
         }
