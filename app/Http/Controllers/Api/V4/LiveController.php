@@ -109,15 +109,20 @@ class LiveController extends Controller
      *     }
      *
      */
-    public function index()
+    public function index(Request $request)
     {
         $uid = $this->user['id'] ?? 0;
 
         $live = new Live();
         $liveLists = $live->getRecommendLive($uid);
-
-        $info = new LiveInfo();
-        $lists = $info->getBackLists($uid);
+        
+        $os_type = intval($request->input('os_tpye',0));
+        if ($os_type === 3){
+            $info = new LiveInfo();
+            $backLists = $info->getBackLists($uid);
+        }else{
+            $backLists = [];
+        }
 
         $product = new OfflineProducts();
         $offline = $product->getIndexLists();
