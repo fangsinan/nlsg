@@ -163,4 +163,29 @@ class Comment extends Base
         return $this->hasMany(Attach::class, 'relation_id', 'id')->where('type', 1);
     }
 
+    public static function  convert($lists)
+    {
+        if (!$lists){
+            return false;
+        }
+        if ($lists){
+            foreach ($lists as &$v) {
+                if ($v['type']==1){
+                    $title = Column::where(['id'=>$v['relation_id'], 'type'=>1])->value('name');
+                } elseif ($v['type'] ==2) {
+                    $title = Column::where(['id'=>$v['relation_id'], 'type'=>2])->value('name');
+                } elseif ($v['type']==3) {
+                    $title = Works::where(['id'=>$v['relation_id'], 'is_audio_book'=>1])->value('title');
+                } elseif ($v['type'] ==4) {
+                    $title = Works::where(['id'=>$v['relation_id']])->value('title');
+                } elseif ($v['type'] ==5) {
+                    $title = Wiki::where(['id'=>$v['relation_id']])->value('name');
+                }
+                $v['title'] = $title ?: '';
+            }
+        }
+        return  $lists;
+
+    }
+
 }
