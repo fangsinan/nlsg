@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
-use App\Models\CacheTools;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
@@ -18,7 +17,6 @@ use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -116,11 +114,11 @@ class LiveController extends Controller
         $live = new Live();
         $liveLists = $live->getRecommendLive($uid);
 
-        $os_type = intval($request->input('os_type',0));
-        if ($os_type === 3){
+        $os_type = intval($request->input('os_type', 0));
+        if ($os_type === 3) {
             $info = new LiveInfo();
             $backLists = $info->getBackLists($uid);
-        }else{
+        } else {
             $backLists = [];
         }
 
@@ -181,10 +179,10 @@ class LiveController extends Controller
         $uid = $this->user['id'] ?? 0;
 
         $testers = explode(',', ConfigModel::getData(35, 1));
-        $user    = User::where('id', $uid)->first();
+        $user = User::where('id', $uid)->first();
 
-        $query   = Live::query();
-        if (!$uid || ($user && !in_array($user->phone, $testers))){
+        $query = Live::query();
+        if (!$uid || ($user && !in_array($user->phone, $testers))) {
             $query->where('is_test', '=', 0);
         } else {
             $query->whereIn('is_test', [0, 1]);
@@ -261,38 +259,45 @@ class LiveController extends Controller
      *     }
      *
      */
-    public function getLiveBackLists()
+    public function getLiveBackLists(Request $request)
     {
-        $uid = $this->user['id'] ?? 0;
-        $lists = LiveInfo::with('user:id,nickname', 'live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
-            ->select('id', 'live_pid', 'user_id')
-            ->where('status', 1)
-            ->where('playback_url', '!=', '')
-            ->orderBy('begin_at', 'desc')
-            ->paginate(10)
-            ->toArray();
-        $backLists = [];
-        if (!empty($lists['data'])) {
-            foreach ($lists['data'] as &$v) {
-                $isSub = Subscribe::isSubscribe($uid, $v['live_pid'], 3);
-                $isAdmin = LiveConsole::isAdmininLive($uid, $v['live_pid']);
-                $backLists[] = [
-                    'id' => $v['live']['id'],
-                    'title' => $v['live']['title'],
-                    'is_password' => $v['live']['password'] ? 1 : 0,
-                    'describe' => $v['live']['describe'],
-                    'price' => $v['live']['price'],
-                    'cover_img' => $v['live']['cover_img'],
-                    'playback_price' => $v['live']['playback_price'],
-                    'live_time' => date('Y.m.d H:i', strtotime($v['live']['begin_at'])),
-                    'is_free' => $v['live']['is_free'],
-                    'info_id' => $v['id'],
-                    'is_sub' => $isSub ?? 0,
-                    'is_admin' => $isAdmin ? 1 : 0
-                ];
+        $os_type = intval($request->input('os_type', 0));
+        if ($os_type === 3) {
+            $uid = $this->user['id'] ?? 0;
+            $lists = LiveInfo::with('user:id,nickname',
+                'live:id,title,describe,price,cover_img,begin_at,type,playback_price,is_free,password')
+                ->select('id', 'live_pid', 'user_id')
+                ->where('status', 1)
+                ->where('playback_url', '!=', '')
+                ->orderBy('begin_at', 'desc')
+                ->paginate(10)
+                ->toArray();
+            $backLists = [];
+            if (!empty($lists['data'])) {
+                foreach ($lists['data'] as &$v) {
+                    $isSub = Subscribe::isSubscribe($uid, $v['live_pid'], 3);
+                    $isAdmin = LiveConsole::isAdmininLive($uid, $v['live_pid']);
+                    $backLists[] = [
+                        'id' => $v['live']['id'],
+                        'title' => $v['live']['title'],
+                        'is_password' => $v['live']['password'] ? 1 : 0,
+                        'describe' => $v['live']['describe'],
+                        'price' => $v['live']['price'],
+                        'cover_img' => $v['live']['cover_img'],
+                        'playback_price' => $v['live']['playback_price'],
+                        'live_time' => date('Y.m.d H:i', strtotime($v['live']['begin_at'])),
+                        'is_free' => $v['live']['is_free'],
+                        'info_id' => $v['id'],
+                        'is_sub' => $isSub ?? 0,
+                        'is_admin' => $isAdmin ? 1 : 0
+                    ];
+                }
             }
+            return success($backLists);
+        } else {
+            $backLists = [];
+            return success($backLists);
         }
-        return success($backLists);
     }
 
     /**
@@ -438,12 +443,12 @@ class LiveController extends Controller
     {
         $id = $request->get('live_id');
         $list = LiveInfo::with([
-                       'user:id,nickname,headimg,intro,honor',
-                       'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish'
-                   ])
-                   ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish')
-                   ->where('id', $id)
-                   ->first();
+            'user:id,nickname,headimg,intro,honor',
+            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish'
+        ])
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish')
+            ->where('id', $id)
+            ->first();
 
         if ($list) {
             $column = Column::where('user_id', $list['user_id'])
@@ -701,7 +706,7 @@ class LiveController extends Controller
         $liveinfo_id = $request->input('liveinfo_id', 0);
         $page = $request->input('page', 0);
 
-        if($page > 1){
+        if ($page > 1) {
             return success();
         }
         $user_id = $this->user['id'] ?? 0;
@@ -728,7 +733,7 @@ class LiveController extends Controller
             ->orderBy('c', 'desc')->orderBy('new_vip_uid', 'desc')->take($this->page_per_page)->get()->toArray();
 
         $new_data = [];
-        foreach ($ranking_data  as $key => $val) {
+        foreach ($ranking_data as $key => $val) {
             $new_data[$key]['user_ranking'] = ($key + 1);
             $new_data[$key]['invite_num'] = $val['c'];
             $userdata = User::find($val['new_vip_uid']);
