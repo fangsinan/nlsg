@@ -764,6 +764,8 @@ class ClassController extends ControllerBackend
             if ($res){
                 return error(1000, '不能添加重复数据');
             }
+            $column = Column::where('user_id', $user_id)->first();
+            $data['column_id'] = $column ? $column->id : 0;
             $work = Works::create($data);
             $id = $work ? $work->id : 0;
         }
