@@ -5,7 +5,6 @@ namespace App\Servers;
 
 
 use App\Models\ChannelOrder;
-use App\Models\ChannelSku;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Order;
@@ -28,7 +27,7 @@ class ChannelServers
         if (empty($order_data['id'] ?? 0)) {
             return true;
         }
-        $is_test = intval(ConfigModel::getData(37,1));
+        $is_test = intval(ConfigModel::getData(37, 1));
         if (!empty($is_test)) {
             $url = 'http://39.107.71.116:8081/v1/partner/notify';
         } else {
@@ -292,9 +291,14 @@ class ChannelServers
     //todo 抖音开通(定时任务)
     public function douYinJob()
     {
+        //抖音订单 order_status=3,5  就可以执行
+        $begin_date = date('Y-m-d 00:00:00',strtotime('-5 days'));
+        dd($begin_date);
         $list = ChannelOrder::where('type', '>', 0)->where('status', '=', 0)
-            ->select(['id', 'type', 'user_id', 'order_status', 'to_id', 'to_info_id'])
+            ->select(['id', 'type', 'user_id', 'order_status'])
             ->get();
+
+        dd($list->toArray());
 
         return $list;
     }
