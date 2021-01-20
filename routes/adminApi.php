@@ -139,6 +139,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //用户
         Route::get('user/apply', 'UserController@apply');
         Route::post('user/pass', 'UserController@pass');
+
+        //评论
+        Route::get('comment/index', 'CommentController@index');
     });
 
 
