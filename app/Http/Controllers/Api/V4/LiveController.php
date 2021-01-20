@@ -115,8 +115,8 @@ class LiveController extends Controller
 
         $live = new Live();
         $liveLists = $live->getRecommendLive($uid);
-        
-        $os_type = intval($request->input('os_tpye',0));
+
+        $os_type = intval($request->input('os_type',0));
         if ($os_type === 3){
             $info = new LiveInfo();
             $backLists = $info->getBackLists($uid);
