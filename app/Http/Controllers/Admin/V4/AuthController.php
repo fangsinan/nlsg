@@ -26,7 +26,7 @@ class AuthController extends ControllerBackend
      */
     public function captcha(Captcha $captcha)
     {
-        $time_out = time() + Config('captcha.default.expire');
+        $time_out = time() + Config('captcha.flat.expire');
         $data = $captcha->create('flat', true);
         $data['expire'] = $time_out;
         return $this->getRes($data);
