@@ -72,13 +72,21 @@ class CreatePosterController extends Controller
             mkdir($save_path, 0777, true);
         }
 
+        $expire_num = 86400;
 
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
-            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id);
-            $temp_9_res = $this->createQRcode($QR_url, true, true, true);
-            $src = '';
-            $res = ConfigModel::base64Upload(100, $temp_9_res);
+            $cache_key_name = 'qr_' . $is_qrcode . '_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid . '_' . $flag;
+            $res = Cache::get($cache_key_name);
+
+            if (empty($res)){
+                $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id);
+                $temp_9_res = $this->createQRcode($QR_url, true, true, true);
+                $src = '';
+                $res = ConfigModel::base64Upload(100, $temp_9_res);
+                Cache::put($cache_key_name, $res, $expire_num);
+            }
+
             if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
             }
@@ -92,28 +100,13 @@ class CreatePosterController extends Controller
 
             } else {
                 return $this->error(0, $res['msg']);
-
             }
-//
-//            $temp_9_res = $this->createQRcode($QR_url, false, true, true);
-//
-//            $src = '';
-//            $url = config('env.APP_URL') . '/public/image/' . $temp_9_res;
-//            if ($post_type == 23) {
-//                $src = ConfigModel::getData(34);
-//            }
-//            $user_info = [
-//                'nickname' => $this->user['nickname']??'',
-//                'headimg' => $this->user['headimg']??'',
-//            ];
-//            return $this->success(['url' => $url, 'src' => $src, 'user_info' => $user_info]);
         }
 
         if (empty($uid)) {
             return $this->error(0, '请登录');
         }
 
-        $expire_num = 86400;
         $cache_key_name = 'poster_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id;
 
         $res = Cache::get($cache_key_name);
