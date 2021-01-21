@@ -93,6 +93,9 @@ class Order extends Base
                 $liveinfo = LiveInfo::find($relation_id);
                 $result = Live::where(['id' => $liveinfo['live_pid']])->get()->toArray();
                 break;
+            case 13:
+                $result = [];
+                break;
             case 14:
                 $result = OfflineProducts::where(['id' => $relation_id])->get()->toArray();
                 break;
