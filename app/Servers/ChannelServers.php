@@ -8,7 +8,6 @@ use App\Models\ChannelOrder;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
-use App\Models\LiveCountDown;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -121,17 +120,35 @@ class ChannelServers
     //抖音订单拉取(定时任务)
     public function getDouYinOrder()
     {
+        $is_test = intval(ConfigModel::getData(37, 1));
+        if (!empty($is_test)) {
+            ConfigModel::where('id', '=', 49)->update([
+                'value' => "测试不执行任务"
+            ]);
+            return true;
+        }
+
         $begin_date = ConfigModel::getData(38, 1);
         if (empty($begin_date)) {
             $min = date('i');
-            if ($min % 2 === 0) {
-                $begin_date = date('Y-m-d H:i:00', strtotime("-30 minutes"));
-            } else {
-                $begin_date = date('Y-m-d H:i:00', strtotime("-1470 minutes"));
+            $job_type = $min % 3;
+            switch ($job_type) {
+                case 0:
+                    $begin_date = date('Y-m-d H:i:00', strtotime("-30 minutes"));
+                    break;
+                case 1:
+                    $begin_date = date('Y-m-d H:i:00', strtotime("-300 minutes"));
+                    break;
+                case 2:
+                    $begin_date = date('Y-m-d H:i:00', strtotime("-1470 minutes"));
+                    break;
+                default:
+                    $begin_date = date('Y-m-d H:i:00', strtotime("-30 minutes"));
             }
-            $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +10 minutes"));
-            ConfigModel::where('id','=',49)->update([
-                'value'=>"$begin_date - $end_date"
+
+            $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +20 minutes"));
+            ConfigModel::where('id', '=', 49)->update([
+                'value' => "$begin_date - $end_date"
             ]);
         } else {
             if (strtotime($begin_date) >= time()) {
@@ -141,9 +158,6 @@ class ChannelServers
             $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +300 minutes"));
             ConfigModel::whereId(38)->update(['value' => $end_date]);
         }
-
-//        $begin_date = '2021-01-20 21:00:00';
-//        $end_date = '2021-01-20 22:00:00';
 
         $page = 0;
         $size = 100;
@@ -212,6 +226,14 @@ class ChannelServers
     //抖音订单补全(定时任务)
     public function supplementDouYinOrder()
     {
+        $is_test = intval(ConfigModel::getData(37, 1));
+        if (!empty($is_test)) {
+            ConfigModel::where('id', '=', 49)->update([
+                'value' => "测试不执行任务"
+            ]);
+            return true;
+        }
+
         $list = ChannelOrder::where('user_id', '=', 0)
             ->where('status', '=', 0)
             ->with(['skuInfo'])
@@ -297,6 +319,14 @@ class ChannelServers
     //抖音开通(定时任务)
     public function douYinJob()
     {
+        $is_test = intval(ConfigModel::getData(37, 1));
+        if (!empty($is_test)) {
+            ConfigModel::where('id', '=', 49)->update([
+                'value' => "测试不执行任务"
+            ]);
+            return true;
+        }
+
         //抖音订单 order_status=3,5  就可以执行
         $begin_date = date('Y-m-d 00:00:00', strtotime('-20 days'));
         $now_date = date('Y-m-d H:i:s');
