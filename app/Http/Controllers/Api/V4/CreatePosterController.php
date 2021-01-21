@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CreatePosterController extends Controller
 {
@@ -108,82 +109,93 @@ class CreatePosterController extends Controller
 //            return $this->success(['url' => $url, 'src' => $src, 'user_info' => $user_info]);
         }
 
-        if(empty($uid)){
+        if (empty($uid)) {
             return $this->error(0, '请登录');
         }
-        $source_name = '';
-        switch ($post_type) {
-            case 1://黑钻邀请卡
-                $source_name = 'black_vip.png';
-                break;
-            case 2://皇钻钻邀请卡
-                $source_name = 'yellow_vip.png';
-                break;
-            case 3://好书
-                $source_name = 'haoshu@2x.png';
-                break;
-            case 4://会员海报
-                $source_name = 'huiyuan@2x.png';
-                break;
-            case 5://精品课海报
-                $source_name = 'jingpinke@2x.png';
-                break;
-            case 6://线下课海报
-                $source_name = 'xianxiake@2x.png';
-                break;
-            case 7://优品海报
-                $source_name = 'shangpin@2x.png';
-                break;
-            case 8://专栏
-                $temp_get_gid = Column::find($gid);
-                $gid = $temp_get_gid['id'];
-                $g_t_id = $temp_get_gid['id'];
+
+        $expire_num = 86400;
+        $cache_key_name = 'poster_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id;
+
+        $res = Cache::get($cache_key_name);
+        if (empty($res)) {
+            $source_name = '';
+            switch ($post_type) {
+                case 1://黑钻邀请卡
+                    $source_name = 'black_vip.png';
+                    break;
+                case 2://皇钻钻邀请卡
+                    $source_name = 'yellow_vip.png';
+                    break;
+                case 3://好书
+                    $source_name = 'haoshu@2x.png';
+                    break;
+                case 4://会员海报
+                    $source_name = 'huiyuan@2x.png';
+                    break;
+                case 5://精品课海报
+                    $source_name = 'jingpinke@2x.png';
+                    break;
+                case 6://线下课海报
+                    $source_name = 'xianxiake@2x.png';
+                    break;
+                case 7://优品海报
+                    $source_name = 'shangpin@2x.png';
+                    break;
+                case 8://专栏
+                    $temp_get_gid = Column::find($gid);
+                    $gid = $temp_get_gid['id'];
+                    $g_t_id = $temp_get_gid['id'];
 //                $g_t_id       = $temp_get_gid['user_id'];
-                $source_name = 'zhuanlan@2x.png';
-                break;
-            case 9://二维码
-                $QR_url = $this->getGetQRUrl(4, $gid, $uid);
-                $temp_9_res = $this->createQRcode($QR_url, false, true, true);
-                $src = '';
-                $url = config('env.APP_URL') . '/temp_poster/' . $temp_9_res;
-                return ['url' => $url, 'src' => $src];
-            //                return $temp_9_res;
-            case 20://优品海报
-                $source_name = 'temp_qiancheng.png';
-                break;
-            case 21: //直播海报
-                $source_name = 'zhibo.png';
-                break;
-            case 22: //免费送精品课(三八赠课活动)
-                $source_name = 'poster_38_bg.png';
-                break;
-        }
-        $source = storage_path() . '/app/public/PosterMaterial/' . $source_name;
+                    $source_name = 'zhuanlan@2x.png';
+                    break;
+                case 9://二维码
+                    $QR_url = $this->getGetQRUrl(4, $gid, $uid);
+                    $temp_9_res = $this->createQRcode($QR_url, false, true, true);
+                    $src = '';
+                    $url = config('env.APP_URL') . '/temp_poster/' . $temp_9_res;
+                    return ['url' => $url, 'src' => $src];
+                //                return $temp_9_res;
+                case 20://优品海报
+                    $source_name = 'temp_qiancheng.png';
+                    break;
+                case 21: //直播海报
+                    $source_name = 'zhibo.png';
+                    break;
+                case 22: //免费送精品课(三八赠课活动)
+                    $source_name = 'poster_38_bg.png';
+                    break;
+            }
+            $source = storage_path() . '/app/public/PosterMaterial/' . $source_name;
 
-        $init = [
-            'path' => $save_path,
-            'source' => $source,
-        ];
+            $init = [
+                'path' => $save_path,
+                'source' => $source,
+            ];
 
-        $cp = new CreatePost($init);
-        if (empty($g_t_id)) {
-            $draw = $this->getDraw($uid, $post_type, $gid, $level, 0, $live_id, $live_info_id);
+            $cp = new CreatePost($init);
+            if (empty($g_t_id)) {
+                $draw = $this->getDraw($uid, $post_type, $gid, $level, 0, $live_id, $live_info_id);
+            } else {
+                $draw = $this->getDraw($uid, $post_type, $gid, $level, $g_t_id);
+            }
+            $temp_del_path = $draw['QR']['path'];
+            $res = $cp::draw($draw);
+            if (!empty($draw['QR']['path'])) {
+                unlink($temp_del_path);
+            }
+            $file_path = $save_path . $res;
+            if ($fp = fopen($file_path, "rb", 0)) {
+                $base64 = $this->imgToBase64($file_path);
+                $res = ConfigModel::base64Upload(100, $base64);
+                fclose($fp);
+                unlink($file_path);
+                Cache::put($cache_key_name, $res, $expire_num);
+                return $res;
+            }
         } else {
-            $draw = $this->getDraw($uid, $post_type, $gid, $level, $g_t_id);
-        }
-        $temp_del_path = $draw['QR']['path'];
-        $res = $cp::draw($draw);
-        if (!empty($draw['QR']['path'])) {
-            unlink($temp_del_path);
-        }
-        $file_path = $save_path . $res;
-        if ($fp = fopen($file_path, "rb", 0)) {
-            $base64 = $this->imgToBase64($file_path);
-            $res = ConfigModel::base64Upload(100, $base64);
-            fclose($fp);
-            unlink($file_path);
             return $res;
         }
+
         return $this->error(0, '错误');
 
     }
@@ -940,8 +952,8 @@ class CreatePosterController extends Controller
 
                 //计算需要些几行
                 $temp_title = $main_info['title'];
-                $temp_title = str_replace('—','-',$temp_title);
-                $temp_title = explode('-',$temp_title);
+                $temp_title = str_replace('—', '-', $temp_title);
+                $temp_title = explode('-', $temp_title);
                 $temp_title = $temp_title[0];
                 $temp_title_len = mb_strlen($temp_title);
                 if ($temp_title_len > 9) {
