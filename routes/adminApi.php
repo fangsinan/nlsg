@@ -80,6 +80,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //商城订单
         Route::get('mall_order/list', 'MallOrderController@list');
         Route::post('mall_order/send', 'MallOrderController@send');
+        Route::post('mall_order/make_group_success', 'MallOrderController@makeGroupSuccess');
         Route::get('mall_order/tos', 'MallOrderController@tos');
 
         //售后

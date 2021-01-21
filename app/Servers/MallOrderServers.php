@@ -10,10 +10,13 @@ namespace App\Servers;
 
 use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
+use App\Models\MallGoods;
 use App\Models\MallGroupBuyList;
 use App\Models\MallOrder;
 use App\Models\MallOrderChild;
 use App\Models\MallOrderDetails;
+use App\Models\SpecialPriceModel;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -46,10 +49,100 @@ class MallOrderServers
         if (empty($order_id)) {
             return ['code' => false, 'msg' => 'id错误'];
         }
-        $check_order = MallOrder::where('id','=',$order_id)->where('status','>',1)->where('order_type','=',3)->first();
-        $check_group = MallGroupBuyList::where('order_id','=',$order_id)->first();
+
+        $check_group = MallGroupBuyList::where('order_id', '=', $order_id)->first();
+        if (empty($check_group)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+        if ($check_group->is_success == 1 || $check_group->is_fail == 1) {
+            return ['code' => false, 'msg' => '状态错误,无法操作.'];
+        }
+
+        $now_date = date('Y-m-d H:i:s');
+        $group_key = $check_group->group_key;
+        $group_name = $check_group->group_name;
+
+        //拼团活动的详情
+        $price_info = SpecialPriceModel::where('group_name', '=', $group_name)
+            ->where('type', '=', 4)
+            ->first();
+
+        //计算已有订单数量
+        $count = DB::table('nlsg_mall_group_buy_list as gb')
+            ->join('nlsg_mall_order as o', 'gb.order_id', '=', 'o.id')
+            ->where('gb.group_key', '=', $group_key)
+            ->where('o.status', '>', 1)
+            ->where('o.is_stop', '=', 0)
+            ->count();
+
+        //需要虚拟生成的数量
+        $add_count = $price_info->group_num - $count;
+        if ($add_count < 1) {
+            return ['code' => false, 'msg' => '数据错误'];
+        }
+
+        $robot = User::where('is_robot', '=', 1)
+            ->select(['id'])
+            ->orderByRaw('rand()')
+            ->limit($add_count)
+            ->get()->toArray();
+
+        DB::beginTransaction();
+
+        $tr_flag = true;
+        foreach ($robot as $v) {
+            $oModel = new MallOrder();
+            $oModel->ordernum = MallOrder::createOrderNumber($v['id'], 1);
+            $oModel->user_id = $v['id'];
+            $oModel->order_type = 3;
+            $oModel->status = 30;
+            $oModel->cost_price = $price_info->group_price;
+            $oModel->price = $price_info->group_price;
+            $oModel->pay_price = $price_info->group_price;
+            $oModel->pay_time = $now_date;
+            $o_res = $oModel->save();
+            if ($o_res === false) {
+                $tr_flag = false;
+                continue;
+            }
+            $gModel = new MallGroupBuyList();
+            $gModel->group_buy_id = $check_group->group_buy_id;
+            $gModel->group_key = $check_group->group_key;
+            $gModel->group_name = $check_group->group_name;
+            $gModel->order_id = $oModel->id;
+            $gModel->created_at = $now_date;
+            $gModel->updated_at = $now_date;
+            $gModel->user_id = $v['id'];
+            $gModel->begin_at = $check_group->begin_at;
+            $gModel->end_at = $check_group->end_at;
+            $g_res = $gModel->save();
+            if ($g_res === false) {
+                $tr_flag = false;
+                continue;
+            }
+        }
 
 
+        $update_res = MallGroupBuyList::where('group_key', '=', $group_key)
+            ->where('is_fail', '=', 0)
+            ->update([
+                'is_success' => 1,
+                'success_at' => $now_date
+            ]);
+
+        if ($update_res === false) {
+            $tr_flag = false;
+        }
+
+        MallGoods::where('id', '=', $price_info->goods_id)->increment('sales_num_virtual', $add_count);
+
+        if ($tr_flag === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        } else {
+            DB::commit();
+            return ['code' => true, 'msg' => '成功'];
+        }
     }
 
     protected function listOfNormal($params)

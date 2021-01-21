@@ -5,6 +5,7 @@ namespace App\Servers;
 
 
 use App\Models\MallComment;
+use App\Models\MallGoods;
 use App\Models\MallSku;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -154,6 +155,9 @@ class MallCommentServers
         }
 
         $res = DB::table('nlsg_mall_comment')->insert($add_data);
+
+        MallGoods::where('id', '=', $goods_id)->increment('sales_num_virtual', $count);
+
         if ($res) {
             return ['code' => true, 'msg' => '成功'];
         } else {
