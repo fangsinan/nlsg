@@ -308,6 +308,10 @@ class MallOrderServers
             $query->where('nlsg_mall_order.ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
 
+        $query->whereHas('userInfo', function (Builder $query) use ($params) {
+            $query->where('is_robot', '=', 0);
+        });
+
         //时间,支付时间,支付渠道,客户端类型 created_at,pay_time,pay_type,os_type
         if (!empty($params['created_at'])) {
             $created_at = explode(',', $params['created_at']);
