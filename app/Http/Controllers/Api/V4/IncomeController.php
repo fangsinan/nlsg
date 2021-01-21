@@ -1093,7 +1093,7 @@ class IncomeController extends Controller
 
     //
     /**
-     * @api {get} /api/v4/income/detail  充值记录
+     * @api {get} /api/v4/income/get_deposit  充值记录
      * @apiName detail
      * @apiVersion 1.0.0
      * @apiGroup income
