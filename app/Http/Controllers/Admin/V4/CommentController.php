@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Comment;
+use App\Models\Wiki;
 use App\Models\Works;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -47,13 +48,14 @@ class CommentController extends Controller
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
-        $lists = $query->select('id', 'user_id', 'relation_id', 'info_id', 'content', 'type', 'created_at')
+        $comments = $query->select('id', 'user_id', 'relation_id', 'info_id', 'content', 'type', 'created_at')
             ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
-        if ($lists) {
-            $lists = Comment::convert($lists['data']);
-            return success($lists);
+
+        if ($comments['data']) {
+            $comments['data'] = Comment::convert($comments);
+            return success($comments);
         }
 
     }
