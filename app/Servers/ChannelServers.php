@@ -137,6 +137,9 @@ class ChannelServers
             ConfigModel::whereId(38)->update(['value' => $end_date]);
         }
 
+//        $begin_date = '2021-01-20 21:00:00';
+//        $end_date = '2021-01-20 22:00:00';
+
         $page = 0;
         $size = 100;
         $args = [
@@ -186,11 +189,15 @@ class ChannelServers
 
                 $temp_data->order_id = $v['order_id'];
                 $temp_data->channel = 1;
-                $temp_data->sku = $vv['product_id'];
-                $temp_data->phone = $v['post_tel'];
+                $temp_data->sku = $vv['product_id'] ?? 0;
+                $temp_data->phone = $v['post_tel'] ?? 0;
                 $temp_data->order_status = $v['order_status'];
                 $temp_data->create_time = date('Y-m-d H:i:s', $v['create_time']);
-                $temp_data->pay_time = $v['pay_time'];
+                if (empty($v['pay_time'])) {
+                    $temp_data->pay_time = null;
+                } else {
+                    $temp_data->pay_time = $v['pay_time'];
+                }
                 $temp_data->update_time = date('Y-m-d H:i:s', $v['update_time']);
                 $temp_data->save();
             }
@@ -210,7 +217,7 @@ class ChannelServers
         }
 
         foreach ($list as $v) {
-            if (empty($v->skuInfo)) {
+            if (empty($v->skuInfo) || $v->order_status == 4) {
                 $v->status = 9;
             } else {
                 $user = User::firstOrCreate([
