@@ -130,6 +130,9 @@ class ChannelServers
                 $begin_date = date('Y-m-d H:i:00', strtotime("-1470 minutes"));
             }
             $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +10 minutes"));
+            ConfigModel::where('id','=',49)->update([
+                'value'=>"$begin_date - $end_date"
+            ]);
         } else {
             if (strtotime($begin_date) >= time()) {
                 return true;
