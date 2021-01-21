@@ -7,6 +7,8 @@ namespace App\Servers;
 use App\Models\ChannelOrder;
 use App\Models\Column;
 use App\Models\ConfigModel;
+use App\Models\Live;
+use App\Models\LiveCountDown;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -426,6 +428,7 @@ class ChannelServers
                         $add_sub_data = [];
                         DB::beginTransaction();
                         foreach ($v->skuInfo->to_id as $tv) {
+                            Live::where('id', $tv)->increment('order_num');
                             $check = Subscribe::where('user_id', '=', $v->user_id)
                                 ->where('created_at', '>', '2021-01-05')
                                 ->where('relation_id', '=', $tv)
