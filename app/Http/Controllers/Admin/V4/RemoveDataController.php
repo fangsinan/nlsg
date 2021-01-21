@@ -38,6 +38,10 @@ class RemoveDataController extends ControllerBackend
             //临时 抖音得直播预约
             $servers->douyinLiveOrder();
         }
+
+        if (0) {
+            $servers->do_1360_job();
+        }
     }
 
     public function mallOrders()

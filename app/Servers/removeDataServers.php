@@ -8,8 +8,10 @@ use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
 use App\Models\History;
 use App\Models\MallGoods;
+use App\Models\PayRecordDetail;
 use App\Models\User;
 use App\Models\UserFollow;
+use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use Illuminate\Support\Facades\DB;
 
@@ -918,6 +920,169 @@ class removeDataServers
         }
 
         DB::connection('mysql_new_zs')->table('nlsg_coupon')->insert($add_data);
+
+    }
+
+    public function do_1360_job()
+    {
+        $now_date = date('Y-m-d H:i:s');
+        $ctime = time();
+
+        $sql = "SELECT o.ordernum,o.user_id,u.phone,o.pay_price,c.new_vip_uid t_id,bind.parent from nlsg_order as o
+LEFT JOIN nlsg_live_count_down as c on o.user_id = c.user_id and c.live_id = 1
+LEFT JOIN nlsg_user as u on o.user_id = u.id
+LEFT JOIN nlsg_vip_user_bind as bind on u.phone = bind.son
+
+where o.pay_time > '2021-01-21' and o.type = 14 and o.live_id = 1
+and o.status = 1 and o.pay_price > 1";
+
+        $list = DB::select($sql);
+
+        foreach ($list as $v) {
+            $temp_user_vip_info = DB::table('nlsg_vip_user')
+                ->where('user_id', '=', $v->user_id)
+                ->where('expire_time', '>', $now_date)
+                ->where('status', '=', 1)
+                ->where('is_default', '=', 1)
+                ->first();
+            if (empty($temp_user_vip_info)) {
+                $v->user_level = 0;
+                $v->user_vip_id = 0;
+            } else {
+                $v->user_level = $temp_user_vip_info->level;
+                $v->user_vip_id = $temp_user_vip_info->id;
+            }
+
+            $temp_vip_info = DB::table('nlsg_vip_user')
+                ->where('user_id', '=', $v->t_id)
+                ->where('expire_time', '>', $now_date)
+                ->where('status', '=', 1)
+                ->where('is_default', '=', 1)
+                ->first();
+            if (empty($temp_vip_info)) {
+                $v->t_level = 0;
+                $v->t_vip_id = 0;
+            } else {
+                $v->t_level = $temp_vip_info->level;
+                $v->t_vip_id = $temp_vip_info->id;
+            }
+            if (empty($v->parent)) {
+                $v->parent_level = 0;
+                $v->parent_vip_id = 0;
+                $v->parent_uid = 0;
+            } else {
+                $temp_vip_info = DB::table('nlsg_vip_user')
+                    ->where('username', '=', $v->parent)
+                    ->where('expire_time', '>', $now_date)
+                    ->where('status', '=', 1)
+                    ->where('is_default', '=', 1)
+                    ->first();
+                if (empty($temp_vip_info)) {
+                    $v->parent_level = 0;
+                    $v->parent_vip_id = 0;
+                    $v->parent_uid = 0;
+                } else {
+                    $v->parent_level = $temp_vip_info->level;
+                    $v->parent_vip_id = $temp_vip_info->id;
+                    $v->parent_uid = $temp_vip_info->user_id;
+                }
+            }
+        }
+
+        //DB::beginTransaction();
+
+        foreach ($list as $v) {
+            //课程与兑换卡
+            VipRedeemUser::subWorksOrGetRedeemCode($v->user_id);
+            switch (intval($v->user_level)) {
+                case 0:
+                    //不是360  开通
+                    $pdModel = new PayRecordDetail();
+                    $pdModel->type = 11;
+                    $pdModel->ordernum = $v->ordernum;
+                    $pdModel->ctime = $ctime;
+                    if ($v->parent_level > 0 && $v->parent_vip_id > 0) {
+                        $source_info = VipUser::whereId($v->parent_vip_id)->first();
+                        $temp_source_id = $source_info->user_id;
+                        $temp_source_vip_id = $source_info->id;
+                        $pdModel->user_id = $v->parent_uid;
+                        $pdModel->user_vip_id = $v->parent_vip_id;
+                        if ($v->parent_level == 1) {
+                            $pdModel->price = 108;
+                        } else {
+                            $pdModel->price = 180;
+                        }
+                        //如果有绑定的并且绑定是vip就走绑定
+                    } elseif ($v->t_level > 0 && $v->t_vip_id > 0) {
+                        //没有绑定并且推荐人是vip就走推荐
+                        $source_info = VipUser::whereId($v->t_vip_id)->first();
+                        $temp_source_id = $source_info->user_id;
+                        $temp_source_vip_id = $source_info->id;
+                        $pdModel->user_id = $v->t_id;
+                        $pdModel->user_vip_id = $v->t_vip_id;
+                        if ($v->t_level == 1) {
+                            $pdModel->price = 108;
+                        } else {
+                            $pdModel->price = 180;
+                        }
+                    } else {
+                        $temp_source_id = 0;
+                        $temp_source_vip_id = 0;
+                    }
+                    $vip_add_data['user_id'] = $v->user_id;
+                    $vip_add_data['nickname'] = substr_replace($v->phone, '****', 3, 4);
+                    $vip_add_data['username'] = $v->phone;
+                    $vip_add_data['level'] = 1;
+                    $vip_add_data['inviter'] = $temp_source_id;
+                    $vip_add_data['inviter_vip_id'] = $temp_source_vip_id;
+                    $vip_add_data['source'] = $temp_source_id;
+                    $vip_add_data['source_vip_id'] = $temp_source_vip_id;
+                    $vip_add_data['is_default'] = 1;
+                    $vip_add_data['created_at'] = $now_date;
+                    $vip_add_data['start_time'] = $now_date;
+                    $vip_add_data['updated_at'] = $now_date;
+                    $vip_add_data['expire_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    $add_res = DB::table('nlsg_vip_user')->insertGetId($vip_add_data);
+
+                    $pdModel->vip_id = $add_res;
+                    if (($v->parent_level > 0 && $v->parent_vip_id > 0) || ($v->t_level > 0 && $v->t_vip_id > 0)) {
+                        $pdModel->save();
+                    }else{
+                        $pdModel = null;
+                    }
+                    break;
+                case 1:
+                    //是360 延长
+                    $this_vip = VipUser::whereId($v->user_vip_id)->first();
+                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . ' +1 year'));
+                    $this_vip->save();
+                    break;
+                case 2:
+                    //钻石 修改
+                    $this_vip = VipUser::whereId($v->user_vip_id)->first();
+                    $this_vip->is_open_360 = 1;
+                    if (empty($this_vip->time_begin_360)) {
+                        $this_vip->time_begin_360 = $now_date;
+                    }
+                    if (empty($this_vip->time_end_360)) {
+                        $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    } else {
+                        $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . ' +1 year'));
+                    }
+                    $this_vip->save();
+
+                    $pdModel = new PayRecordDetail();
+                    $pdModel->type = 11;
+                    $pdModel->ordernum = $v->ordernum;
+                    $pdModel->ctime = $ctime;
+                    $pdModel->user_id = $this_vip->user_id;
+                    $pdModel->user_vip_id = $this_vip->id;
+                    $pdModel->vip_id = $this_vip->id;
+                    $pdModel->price = 180;
+                    $pdModel->save();
+                    break;
+            }
+        }
 
     }
 
