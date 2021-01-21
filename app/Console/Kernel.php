@@ -65,7 +65,7 @@ class Kernel extends ConsoleKernel
 //            $cs->getDouyinOrder();
 //            $cs->supplementDouYinOrder();
 //            $cs->douYinJob();
-        })->everyMinute()->runInBackground()->withoutOverlapping(3);//每分
+        })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
             MallRefundJob::refundJob(2);//商城订单退款查询
