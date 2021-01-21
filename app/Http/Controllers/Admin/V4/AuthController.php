@@ -52,20 +52,20 @@ class AuthController extends ControllerBackend
         $captcha = $request->input('captcha', '');
         $key = $request->input('key', '');
 
-        if (empty($username) || empty($password) || empty($captcha) || empty($key)){
-            return $this->getRes(['code'=>false,'msg'=>'参数错误']);
+        if (empty($username) || empty($password) || empty($captcha) || empty($key)) {
+            return $this->getRes(['code' => false, 'msg' => '参数错误']);
         }
 
-        $captcha_res = captcha_api_check($captcha, $key);
+        $captcha_res = captcha_api_check($captcha, $key, 'flat');
         if ($captcha_res === false) {
             return $this->getRes(['code' => false, 'msg' => '验证码错误']);
         }
 
-        $check_user = BackendUser::where('username','=',$username)->first();
-        if (empty($check_user)){
+        $check_user = BackendUser::where('username', '=', $username)->first();
+        if (empty($check_user)) {
             return $this->getRes(['code' => false, 'msg' => '账号或密码错误']);
         }
-        if(Hash::check($password,$check_user->password)){
+        if (Hash::check($password, $check_user->password)) {
             $token = auth('backendApi')->login($check_user);;
             $data = [
                 'id' => $check_user->id,
@@ -73,7 +73,7 @@ class AuthController extends ControllerBackend
                 'token' => $token
             ];
             return $this->getRes($data);
-        }else{
+        } else {
             return $this->getRes(['code' => false, 'msg' => '账号或密码错误']);
         }
 
