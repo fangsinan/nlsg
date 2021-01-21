@@ -199,7 +199,7 @@ class Comment extends Base
 
     public function work()
     {
-        return $this->belongsTo(Column::class, 'relation_id', 'id');
+        return $this->belongsTo(Works::class, 'relation_id', 'id');
     }
     public function wiki()
     {
