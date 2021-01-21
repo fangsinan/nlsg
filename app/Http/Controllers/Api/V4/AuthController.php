@@ -594,7 +594,7 @@ class AuthController extends Controller
         $version = $request->input('version', '');//1 获取是否有提交信息  2修改
         $switchAll = [
             //精确版本
-            '4.0.6' => [
+            '4.0.8' => [
                 'money_switch' => '0',//app赚钱开关   0关闭  1开启
                 'Vip_Switch' => '0',//提现开关   0关闭  1开启
                 'vipCode' => '0', //钻石兑换码
