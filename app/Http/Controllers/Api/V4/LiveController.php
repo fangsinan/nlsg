@@ -513,7 +513,7 @@ class LiveController extends Controller
     {
         $id = $request->get('live_id');
         $liveWork = new LiveWorks();
-        $recommend = $liveWork->getLiveWorks($id, 2, 6);
+        $recommend = $liveWork->getLiveWorks($id, 2, 10);
         return success($recommend);
     }
 

@@ -47,10 +47,11 @@ class UserController extends Controller
     {
         $type = $request->get('type') ??  1;
         $id   = $request->get('id');
+        $reason = $request->get('reason');
         if ($type ==1) {
             CashData::where('id', $id)->update(['is_pass'=>1]);
         } elseif ($type ==2) {
-            CashData::where('id', $id)->update(['is_pass'=>2]);
+            CashData::where('id', $id)->update(['is_pass'=>2, 'reason'=> $reason]);
         }
         return success();
     }
