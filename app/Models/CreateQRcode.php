@@ -37,6 +37,9 @@ class CreateQRcode
         }
 
         $QR = $file;//已经生成的原始二维码图
+        if (!$OR){
+            return  false;
+        }
 
         if ($logo !== FALSE) {
 
