@@ -73,17 +73,35 @@ class LiveNotice extends Base
 
         if ($type == 1) {
 
-            $check_push = LiveNotice::where('live_id', '=', $live_id)
-                ->where('live_info_id', '=', $live_info_id)
-                ->where('is_del', '=', 0)
-                //->whereRaw("'$send_at' BETWEEN send_at and
-                // FROM_UNIXTIME( UNIX_TIMESTAMP( send_at) + CEILING( 80 / 60 ) * 60, '%Y-%m-%d %H:%i:00' ) ")
-                ->whereBetween('send_at', [
-                    date('Y-m-d H:i:s', strtotime("$send_at -$length_temp second")),
-                    date('Y-m-d H:i:s', strtotime("$send_at +$length_temp second"))
-                ])
-                ->select(['id'])
-                ->first();
+//            $check_push = LiveNotice::where('live_id', '=', $live_id)
+//                ->where('live_info_id', '=', $live_info_id)
+//                ->where('is_del', '=', 0)
+//                //->whereRaw("'$send_at' BETWEEN send_at and
+//                // FROM_UNIXTIME( UNIX_TIMESTAMP( send_at) + CEILING( 80 / 60 ) * 60, '%Y-%m-%d %H:%i:00' ) ")
+//                ->whereBetween('send_at', [
+//                    date('Y-m-d H:i:s', strtotime("$send_at -$length_temp second")),
+//                    date('Y-m-d H:i:s', strtotime("$send_at +$length_temp second"))
+//                ])
+//                ->select(['id'])
+//                ->first();
+
+$send_timestamp = strtotime($send_at) + 5;
+
+            $check_sql = "SELECT * from (
+SELECT
+	id,
+	user_id,
+	length,
+	send_at,
+	UNIX_TIMESTAMP( send_at )+ length as s_end,
+	UNIX_TIMESTAMP( send_at ) as s_begin
+FROM
+	nlsg_live_notice
+WHERE
+	live_id = $live_id
+	AND live_info_id = $live_info_id
+	AND is_del = 0) as a where $send_timestamp > s_begin and $send_timestamp < s_end";
+            $check_push = DB::select($check_sql);
 
             //是否对直播公告发送做出1分钟限制
             $check_send_time = ConfigModel::getData(23);
