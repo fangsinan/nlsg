@@ -108,19 +108,21 @@ class Live extends Base
     }
 
 
+
+    //Route::get('live/send_test', 'LiveController@test');
     public static function sendLiveCountDown()
     {
 
         $flag = true;
-        $title = "能量时光直播";
-        $size = 3;
-        $live_id = 643;
+        $title = "经营家庭和孩子的秘密";
+        $size = 100;
+        $live_id = 1;
 
 
-        $live_data = Live::where(['id' => $live_id, 'status' => 4])->first();
-        if (time() < (strtotime($live_data['begin_at']) - 600)) {
-            return;
-        }
+//        $live_data = Live::where(['id' => $live_id, 'status' => 4])->first();
+//        if (time() < (strtotime($live_data['begin_at']) - 600)) {
+//            return;
+//        }
 
         while ($flag) {
             $phone = [];
