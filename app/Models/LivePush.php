@@ -10,9 +10,7 @@
 namespace App\Models;
 
 use App\Servers\JobServers;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 
 class LivePush extends Base
@@ -68,7 +66,7 @@ class LivePush extends Base
         $check_push = LivePush::where('live_id', '=', $live_id)
             ->where('live_info_id', '=', $live_info_id)
             ->where('is_del', '=', 0)
-            ->where('push_at', 'like', date('Y-m-d H:i', strtotime($push_at)) . '%')
+            ->whereBetween('push_at', [$push_at - 60, $push_at + 60])
             ->select(['id'])
             ->first();
 
