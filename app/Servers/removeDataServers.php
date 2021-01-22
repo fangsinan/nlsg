@@ -984,6 +984,26 @@ class removeDataServers
 
     }
 
+    public function changeVipSource(){
+        $sql = "SELECT id,user_id,inviter,inviter_vip_id,source,source_vip_id
+from nlsg_vip_user where created_at > '2021-01-22 00:00:00' and inviter > 0 and inviter = source";
+
+        $list = DB::select($sql);
+
+        foreach ($list as $v){
+            $check_inviter = VipUser::where('id','=',$v->inviter_vip_id)->first();
+            if ($check_inviter->level == 1){
+                DB::table('nlsg_vip_user')
+                    ->where('id','=',$v->id)
+                    ->update([
+                        'source'=>$check_inviter->source,
+                        'source_vip_id'=>$check_inviter->source_vip_id
+                    ]);
+            }
+        }
+
+    }
+
     public function do_1360_job()
     {
         $now_date = date('Y-m-d H:i:s');
@@ -1066,6 +1086,7 @@ and o.status = 1 and o.pay_price > 1";
                         $source_info = VipUser::whereId($v->parent_vip_id)->first();
                         $temp_source_id = $source_info->user_id;
                         $temp_source_vip_id = $source_info->id;
+
                         $pdModel->user_id = $v->parent_uid;
                         $pdModel->user_vip_id = $v->parent_vip_id;
                         if ($v->parent_level == 1) {
@@ -1079,6 +1100,7 @@ and o.status = 1 and o.pay_price > 1";
                         $source_info = VipUser::whereId($v->t_vip_id)->first();
                         $temp_source_id = $source_info->user_id;
                         $temp_source_vip_id = $source_info->id;
+
                         $pdModel->user_id = $v->t_id;
                         $pdModel->user_vip_id = $v->t_vip_id;
                         if ($v->t_level == 1) {
@@ -1098,6 +1120,7 @@ and o.status = 1 and o.pay_price > 1";
                     $vip_add_data['inviter_vip_id'] = $temp_source_vip_id;
                     $vip_add_data['source'] = $temp_source_id;
                     $vip_add_data['source_vip_id'] = $temp_source_vip_id;
+
                     $vip_add_data['is_default'] = 1;
                     $vip_add_data['created_at'] = $now_date;
                     $vip_add_data['start_time'] = $now_date;

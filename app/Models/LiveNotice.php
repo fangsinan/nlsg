@@ -49,6 +49,8 @@ class LiveNotice extends Base
             }
         }
 
+        $length = $length + 5;
+
         $check_live_info = LiveInfo::whereId($live_info_id)->where('status', '=', 1)
             ->select(['id', 'is_begin', 'is_finish', 'user_id'])->first();
 
@@ -74,7 +76,12 @@ class LiveNotice extends Base
             $check_push = LiveNotice::where('live_id', '=', $live_id)
                 ->where('live_info_id', '=', $live_info_id)
                 ->where('is_del', '=', 0)
-                ->whereRaw("'$send_at' BETWEEN send_at and FROM_UNIXTIME( UNIX_TIMESTAMP( send_at) + CEILING( 80 / 60 ) * 60, '%Y-%m-%d %H:%i:00' ) ")
+                //->whereRaw("'$send_at' BETWEEN send_at and
+                // FROM_UNIXTIME( UNIX_TIMESTAMP( send_at) + CEILING( 80 / 60 ) * 60, '%Y-%m-%d %H:%i:00' ) ")
+                ->whereBetween('send_at', [
+                    date('Y-m-d H:i:s', strtotime("$send_at -$length second")),
+                    date('Y-m-d H:i:s', strtotime("$send_at +$length second"))
+                ])
                 ->select(['id'])
                 ->first();
 

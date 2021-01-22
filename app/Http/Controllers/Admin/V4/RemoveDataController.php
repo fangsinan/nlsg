@@ -44,6 +44,10 @@ class RemoveDataController extends ControllerBackend
         }
 
         if (0) {
+            $servers->changeVipSource();
+        }
+
+        if (0) {
             $servers->runPoster();
         }
     }
