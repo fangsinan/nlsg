@@ -80,10 +80,10 @@ class CreatePosterController extends Controller
 //            $res = Cache::get($cache_key_name);
 //
 //            if (empty($res)){
-                $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id);
-                $temp_9_res = $this->createQRcode($QR_url, true, true, true);
-                $src = '';
-                $res = ConfigModel::base64Upload(100, $temp_9_res);
+            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id);
+            $temp_9_res = $this->createQRcode($QR_url, true, true, true);
+            $src = '';
+            $res = ConfigModel::base64Upload(100, $temp_9_res);
 //                Cache::put($cache_key_name, $res, $expire_num);
 //            }
 
@@ -107,8 +107,7 @@ class CreatePosterController extends Controller
             return $this->error(0, '请登录');
         }
 
-        $cache_key_name = 'poster_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id;
-
+        $cache_key_name = 'poster_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid;
         $res = Cache::get($cache_key_name);
         if (empty($res)) {
             $source_name = '';
