@@ -161,6 +161,7 @@ class Live extends Base
 
 
         }
+        return $flag;
 
     }
 
