@@ -303,11 +303,16 @@ class IncomeController extends Controller
 
             //新增时验证是否被认证
             $obj = CashData::where(['idcard'=>$idcard,'org_type'=>$status])->first();
-            if ( empty($cash_info) && !empty($obj)) {
-                if ($obj['user_id'] != $user_id) {
-                    return $this->error(0, '该身份证已被认证，请尝试其他身份证绑定');
-                }
+
+            if (  !empty($obj) && $obj['user_id'] != $user_id ) {
+                return $this->error(0, '该身份证已被认证，请尝试其他身份证绑定');
             }
+            
+//            if ( empty($cash_info) && !empty($obj)) {
+//                if ($obj['user_id'] != $user_id) {
+//                    return $this->error(0, '该身份证已被认证，请尝试其他身份证绑定');
+//                }
+//            }
             if(!empty($cash_info)){
                 $data=[
                     'truename'=>$truename,
