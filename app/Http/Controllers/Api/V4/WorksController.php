@@ -914,8 +914,9 @@ class WorksController extends Controller
         $sub_type = $request->input('sub_type',0);
         $user_id = $this->user['id'] ?? 0;
 
-
-
+        if( !is_numeric($relation_id) ){
+            return $this->success();
+        }
         //校验是否免费
         if($sub_type == 1 || $sub_type ==6){
             $model = new Column();
