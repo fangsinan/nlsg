@@ -944,13 +944,15 @@ class WorksController extends Controller
             'end_time' => date("Y-m-d H:i:s", $endtime),
             'relation_id' => $relation_id,
         ];
-        Subscribe::firstOrCreate($subscribe);
-
-        if($sub_type == 1 || $sub_type ==6){
-            Column::where(['id' => $relation_id])->increment('subscribe_num');
-        }else if($sub_type == 2){
-            Works::where(['id' => $relation_id])->increment('subscribe_num', 1);
+        $sub_res = Subscribe::firstOrCreate($subscribe);
+        if($sub_res->wasRecentlyCreated){
+            if($sub_type == 1 || $sub_type ==6){
+                Column::where(['id' => $relation_id])->increment('subscribe_num');
+            }else if($sub_type == 2){
+                Works::where(['id' => $relation_id])->increment('subscribe_num', 1);
+            }
         }
+
 
         return $this->success();
     }
