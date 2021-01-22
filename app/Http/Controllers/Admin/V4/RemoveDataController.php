@@ -42,6 +42,10 @@ class RemoveDataController extends ControllerBackend
         if (0) {
             $servers->do_1360_job();
         }
+
+        if (0) {
+            $servers->runPoster();
+        }
     }
 
     public function mallOrders()

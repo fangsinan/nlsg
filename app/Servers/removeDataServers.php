@@ -3,16 +3,21 @@
 
 namespace App\Servers;
 
+use App\Http\Controllers\Api\V4\CreatePosterController;
 use App\Models\Area;
+use App\Models\ConfigModel;
+use App\Models\CreatePost;
 use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
 use App\Models\History;
 use App\Models\MallGoods;
 use App\Models\PayRecordDetail;
+use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class removeDataServers
@@ -923,6 +928,62 @@ class removeDataServers
 
     }
 
+    public function runPoster()
+    {
+        $list = Subscribe::where('type', '=', 3)
+            ->where('relation_id', '=', 1)
+            ->select(['user_id'])
+            ->groupBy('user_id')
+            ->get()->toArray();
+
+        $cpC = new CreatePosterController();
+        $expire_num = 86400;
+
+        foreach ($list as $v) {
+            //post_type=21&relation_id=1&uid=168934&live_id=1&live_info_id=1
+            $post_type = 21;
+            $gid = 1;
+            $uid = $v['user_id'];
+            $live_id = 1;
+            $live_info_id = 1;
+            $level = User::getLevel($v['user_id']);
+            $save_path = base_path() . '/public/image/';//存储路径
+            if (!file_exists($save_path)) {
+                mkdir($save_path, 0777, true);
+            }
+            $cache_key_name = 'poster_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid;
+            $source_name = 'zhibo.png';
+            $source = storage_path() . '/app/public/PosterMaterial/' . $source_name;
+            $init = [
+                'path' => $save_path,
+                'source' => $source,
+            ];
+
+            $cp = new CreatePost($init);
+            if (empty($g_t_id)) {
+                $draw = $cpC->getDraw($uid, $post_type, $gid, $level, 0, $live_id, $live_info_id);
+            } else {
+                $draw = $cpC->getDraw($uid, $post_type, $gid, $level, $g_t_id);
+            }
+            //dd($draw);
+            $temp_del_path = $draw['QR']['path'];
+            $res = $cp::draw($draw);
+            if (!empty($draw['QR']['path'])) {
+                unlink($temp_del_path);
+            }
+            $file_path = $save_path . $res;
+            if ($fp = fopen($file_path, "rb", 0)) {
+                $base64 = $cpC->imgToBase64($file_path);
+                $res = ConfigModel::base64Upload(101, $base64);
+                fclose($fp);
+                //unlink($file_path);
+                Cache::put($cache_key_name, $res, $expire_num);
+            }
+            sleep(3);
+        }
+
+    }
+
     public function do_1360_job()
     {
         $now_date = date('Y-m-d H:i:s');
@@ -1047,7 +1108,7 @@ and o.status = 1 and o.pay_price > 1";
                     $pdModel->vip_id = $add_res;
                     if (($v->parent_level > 0 && $v->parent_vip_id > 0) || ($v->t_level > 0 && $v->t_vip_id > 0)) {
                         $pdModel->save();
-                    }else{
+                    } else {
                         $pdModel = null;
                     }
                     break;
