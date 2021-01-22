@@ -18,7 +18,7 @@ class LiveNotice extends Base
 
     public function add($params, $user_id)
     {
-        $now_date = date('Y-m-d H:i:00', strtotime(date('Y-m-d H:i:s') . ' +1 minutes'));
+        $now_date = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 minutes'));
         $live_id = $params['live_id'] ?? 0;
         $live_info_id = $params['live_info_id'] ?? 0;
         $type = $params['type'] ?? 0;
@@ -49,7 +49,7 @@ class LiveNotice extends Base
             }
         }
 
-        $length = $length + 5;
+        $length_temp = $length + 5;
 
         $check_live_info = LiveInfo::whereId($live_info_id)->where('status', '=', 1)
             ->select(['id', 'is_begin', 'is_finish', 'user_id'])->first();
