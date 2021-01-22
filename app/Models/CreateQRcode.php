@@ -31,15 +31,15 @@ class CreateQRcode
         }
 
         $file = $path . $name;
-        if (file_exists($file)) {
-        } else {
+        if (!file_exists($file)) {
             \QRcode::png($value, $file, $level, $size, $margin);
+            if (!file_exists($file)) {
+                return false;
+            }
         }
 
         $QR = $file;//已经生成的原始二维码图
-        if (!$OR){
-            return  false;
-        }
+
 
         if ($logo !== FALSE) {
 
