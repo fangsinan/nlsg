@@ -352,7 +352,7 @@ class WechatPay extends Controller
                 if ($orderRst && $recordRst && $subscribeRst && $userRst) {
                     DB::commit();
                     $AdminInfo = User::find($user_id);
-                    self::LiveRedis(14,1,$AdminInfo['nickname'],$live_id,$orderId);
+                    self::LiveRedis(14,$orderInfo['relation_id'],$AdminInfo['nickname'],$live_id,$orderId);
                     return true;
 
                 } else {
