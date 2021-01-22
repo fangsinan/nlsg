@@ -100,7 +100,7 @@ FROM
 WHERE
 	live_id = $live_id
 	AND live_info_id = $live_info_id
-	AND is_del = 0 and is_done = 0) as a where $send_timestamp > s_begin and $send_timestamp < s_end";
+	AND is_del = 0 ) as a where $send_timestamp > s_begin and $send_timestamp < s_end";
             $check_push = DB::select($check_sql);
 
             //是否对直播公告发送做出1分钟限制
