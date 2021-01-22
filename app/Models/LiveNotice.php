@@ -85,7 +85,7 @@ class LiveNotice extends Base
 //                ->select(['id'])
 //                ->first();
 
-$send_timestamp = strtotime($send_at) + 5;
+$send_timestamp = strtotime($send_at) + 13;
 
             $check_sql = "SELECT * from (
 SELECT
