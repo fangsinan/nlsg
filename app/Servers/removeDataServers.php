@@ -984,20 +984,21 @@ class removeDataServers
 
     }
 
-    public function changeVipSource(){
+    public function changeVipSource()
+    {
         $sql = "SELECT id,user_id,inviter,inviter_vip_id,source,source_vip_id
 from nlsg_vip_user where created_at > '2021-01-22 00:00:00' and inviter > 0 and inviter = source";
 
         $list = DB::select($sql);
 
-        foreach ($list as $v){
-            $check_inviter = VipUser::where('id','=',$v->inviter_vip_id)->first();
-            if ($check_inviter->level == 1){
+        foreach ($list as $v) {
+            $check_inviter = VipUser::where('id', '=', $v->inviter_vip_id)->first();
+            if ($check_inviter->level == 1) {
                 DB::table('nlsg_vip_user')
-                    ->where('id','=',$v->id)
+                    ->where('id', '=', $v->id)
                     ->update([
-                        'source'=>$check_inviter->source,
-                        'source_vip_id'=>$check_inviter->source_vip_id
+                        'source' => $check_inviter->source,
+                        'source_vip_id' => $check_inviter->source_vip_id
                     ]);
             }
         }
@@ -1112,21 +1113,39 @@ and o.status = 1 and o.pay_price > 1";
                         $temp_source_id = 0;
                         $temp_source_vip_id = 0;
                     }
-                    $vip_add_data['user_id'] = $v->user_id;
-                    $vip_add_data['nickname'] = substr_replace($v->phone, '****', 3, 4);
-                    $vip_add_data['username'] = $v->phone;
-                    $vip_add_data['level'] = 1;
-                    $vip_add_data['inviter'] = $temp_source_id;
-                    $vip_add_data['inviter_vip_id'] = $temp_source_vip_id;
-                    $vip_add_data['source'] = $temp_source_id;
-                    $vip_add_data['source_vip_id'] = $temp_source_vip_id;
 
-                    $vip_add_data['is_default'] = 1;
-                    $vip_add_data['created_at'] = $now_date;
-                    $vip_add_data['start_time'] = $now_date;
-                    $vip_add_data['updated_at'] = $now_date;
-                    $vip_add_data['expire_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
-                    $add_res = DB::table('nlsg_vip_user')->insertGetId($vip_add_data);
+                    //判断当前需要添加的用户 是不是已经有会员
+                    $check_add_user_vip = VipUser::where('user_id', '=', $v->user_id)
+                        ->where('level','=',1)
+                        ->where('status', '=', 1)
+                        ->where('is_default', '=', 1)
+                        ->first();
+                    if (empty($check_add_user_vip)) {
+                        $vip_add_data['user_id'] = $v->user_id;
+                        $vip_add_data['nickname'] = substr_replace($v->phone, '****', 3, 4);
+                        $vip_add_data['username'] = $v->phone;
+                        $vip_add_data['level'] = 1;
+                        $vip_add_data['inviter'] = $temp_source_id;
+                        $vip_add_data['inviter_vip_id'] = $temp_source_vip_id;
+
+                        if ($source_info->level == 1) {
+                            $vip_add_data['source'] = $source_info->source;
+                            $vip_add_data['source_vip_id'] = $source_info->source_vip_id;
+                        } else {
+                            $vip_add_data['source'] = $source_info->user_id;
+                            $vip_add_data['source_vip_id'] = $source_info->id;
+                        }
+
+                        $vip_add_data['is_default'] = 1;
+                        $vip_add_data['created_at'] = $now_date;
+                        $vip_add_data['start_time'] = $now_date;
+                        $vip_add_data['updated_at'] = $now_date;
+                        $vip_add_data['expire_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                        $add_res = DB::table('nlsg_vip_user')->insertGetId($vip_add_data);
+                    } else {
+                        $check_add_user_vip->expire_time = date('Y-m-d 23:59:59', strtotime($check_add_user_vip->expire_time . ' +1 year'));
+                        $check_add_user_vip->save();
+                    }
 
                     $pdModel->vip_id = $add_res;
                     if (($v->parent_level > 0 && $v->parent_vip_id > 0) || ($v->t_level > 0 && $v->t_vip_id > 0)) {
