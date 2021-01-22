@@ -1015,7 +1015,7 @@ LEFT JOIN nlsg_live_count_down as c on o.user_id = c.user_id and c.live_id = 1
 LEFT JOIN nlsg_user as u on o.user_id = u.id
 LEFT JOIN nlsg_vip_user_bind as bind on u.phone = bind.son
 
-where o.pay_time > '2021-01-21' and o.type = 14 and o.live_id = 1
+where o.pay_time > '2021-01-22 12:00:00' and o.type = 14 and o.live_id = 1
 and o.status = 1 and o.pay_price > 1";
 
         $list = DB::select($sql);
@@ -1116,7 +1116,7 @@ and o.status = 1 and o.pay_price > 1";
 
                     //判断当前需要添加的用户 是不是已经有会员
                     $check_add_user_vip = VipUser::where('user_id', '=', $v->user_id)
-                        ->where('level','=',1)
+                        ->where('level', '=', 1)
                         ->where('status', '=', 1)
                         ->where('is_default', '=', 1)
                         ->first();
@@ -1128,13 +1128,19 @@ and o.status = 1 and o.pay_price > 1";
                         $vip_add_data['inviter'] = $temp_source_id;
                         $vip_add_data['inviter_vip_id'] = $temp_source_vip_id;
 
-                        if ($source_info->level == 1) {
-                            $vip_add_data['source'] = $source_info->source;
-                            $vip_add_data['source_vip_id'] = $source_info->source_vip_id;
+                        if (!isset($source_info->level)) {
+                            $vip_add_data['source'] = 0;
+                            $vip_add_data['source_vip_id'] = 0;
                         } else {
-                            $vip_add_data['source'] = $source_info->user_id;
-                            $vip_add_data['source_vip_id'] = $source_info->id;
+                            if ($source_info->level == 1) {
+                                $vip_add_data['source'] = $source_info->source ?? 0;
+                                $vip_add_data['source_vip_id'] = $source_info->source_vip_id ?? 0;
+                            } else {
+                                $vip_add_data['source'] = $source_info->user_id ?? 0;
+                                $vip_add_data['source_vip_id'] = $source_info->id ?? 0;
+                            }
                         }
+
 
                         $vip_add_data['is_default'] = 1;
                         $vip_add_data['created_at'] = $now_date;
@@ -1186,7 +1192,7 @@ and o.status = 1 and o.pay_price > 1";
                     break;
             }
         }
-
+        dd($list);
     }
 
     public function douyinLiveOrder()

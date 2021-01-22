@@ -39,7 +39,7 @@ class RemoveDataController extends ControllerBackend
             $servers->douyinLiveOrder();
         }
 
-        if (0) {
+        if (1) {
             $servers->do_1360_job();
         }
 
