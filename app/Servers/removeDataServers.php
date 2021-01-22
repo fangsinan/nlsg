@@ -1015,7 +1015,7 @@ LEFT JOIN nlsg_live_count_down as c on o.user_id = c.user_id and c.live_id = 1
 LEFT JOIN nlsg_user as u on o.user_id = u.id
 LEFT JOIN nlsg_vip_user_bind as bind on u.phone = bind.son
 
-where o.pay_time > '2021-01-22 12:00:00' and o.type = 14 and o.live_id = 1
+where o.id > 408257 and o.pay_time > '2021-01-22 12:00:00' and o.type = 14 and o.live_id = 1 and o.relation_id =4
 and o.status = 1 and o.pay_price > 1";
 
         $list = DB::select($sql);
