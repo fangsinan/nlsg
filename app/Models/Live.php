@@ -159,7 +159,6 @@ class Live extends Base
                 $flag = false;
             }
 
-
         }
         return $flag;
 
