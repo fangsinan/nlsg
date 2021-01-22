@@ -79,8 +79,8 @@ class LiveNotice extends Base
                 //->whereRaw("'$send_at' BETWEEN send_at and
                 // FROM_UNIXTIME( UNIX_TIMESTAMP( send_at) + CEILING( 80 / 60 ) * 60, '%Y-%m-%d %H:%i:00' ) ")
                 ->whereBetween('send_at', [
-                    date('Y-m-d H:i:s', strtotime("$send_at -$length second")),
-                    date('Y-m-d H:i:s', strtotime("$send_at +$length second"))
+                    date('Y-m-d H:i:s', strtotime("$send_at -$length_temp second")),
+                    date('Y-m-d H:i:s', strtotime("$send_at +$length_temp second"))
                 ])
                 ->select(['id'])
                 ->first();
