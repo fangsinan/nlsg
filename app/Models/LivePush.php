@@ -67,8 +67,8 @@ class LivePush extends Base
             ->where('live_info_id', '=', $live_info_id)
             ->where('is_del', '=', 0)
             ->whereBetween('push_at', [
-                date('Y-m-d H:i:s', strtotime("$push_at -60 second")),
-                date('Y-m-d H:i:s', strtotime("$push_at +60 second"))
+                date('Y-m-d H:i:s', strtotime("$push_at -65 second")),
+                date('Y-m-d H:i:s', strtotime("$push_at +65 second"))
             ])
             ->select(['id'])
             ->first();

@@ -28,7 +28,7 @@ class LiveNotice extends Base
         if (empty($params['send_at'] ?? '')) {
             $send_at = $now_date;
         } else {
-            $send_at = date('Y-m-d H:i:00', strtotime($params['send_at']));
+            $send_at = date('Y-m-d H:i:s', strtotime($params['send_at']));
         }
 
         if (empty($live_id) || empty($live_info_id) || empty($content)) {
