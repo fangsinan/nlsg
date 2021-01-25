@@ -24,6 +24,7 @@ class LivePush extends Base
         $push_type = $params['type'] ?? 0;
         $push_gid = $params['gid'] ?? 0;
         $push_at = $params['time'] ?? 0;
+        $length = $params['length'] ?? 0;
         $now = time();
         $now_date = date('Y-m-d H:i:s', $now);
         $check_date = date('Y-m-d H:i:s', $now + 10);
@@ -63,15 +64,35 @@ class LivePush extends Base
             return ['code' => false, 'msg' => '需要管理员权限'];
         }
 
-        $check_push = LivePush::where('live_id', '=', $live_id)
-            ->where('live_info_id', '=', $live_info_id)
-            ->where('is_del', '=', 0)
-            ->whereBetween('push_at', [
-                date('Y-m-d H:i:s', strtotime("$push_at -65 second")),
-                date('Y-m-d H:i:s', strtotime("$push_at +65 second"))
-            ])
-            ->select(['id'])
-            ->first();
+//        $check_push = LivePush::where('live_id', '=', $live_id)
+//            ->where('live_info_id', '=', $live_info_id)
+//            ->where('is_del', '=', 0)
+//            ->whereBetween('push_at', [
+//                date('Y-m-d H:i:s', strtotime("$push_at -65 second")),
+//                date('Y-m-d H:i:s', strtotime("$push_at +65 second"))
+//            ])
+//            ->select(['id'])
+//            ->first();
+
+        $send_timestamp = strtotime($push_at) + 3;
+
+        $check_sql = "select * from (
+SELECT
+	id,
+	live_id,
+	live_info_id,
+	push_at,
+	UNIX_TIMESTAMP( push_at ) + length AS s_end,
+	UNIX_TIMESTAMP( push_at ) AS s_begin
+FROM
+	nlsg_live_push
+WHERE
+	live_id = 1
+	AND live_info_id = 1
+	AND is_push = 1) as a
+	where s_begin  <= $send_timestamp
+	and s_end > $send_timestamp limit 1";
+        $check_push = DB::select($check_sql);
 
         if (empty($params['id'] ?? 0)) {
             if (!empty($check_push)) {
@@ -101,6 +122,7 @@ class LivePush extends Base
         $model->push_type = $push_type;
         $model->push_gid = $push_gid;
         $model->push_at = $push_at;
+        $model->length = $length;;
 
         $res = $model->save();
 

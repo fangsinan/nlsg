@@ -99,8 +99,8 @@ FROM
 	nlsg_live_notice
 WHERE
 	live_id = $live_id
-	AND live_info_id = $live_info_id
-	AND is_del = 0 ) as a where $send_timestamp > s_begin and $send_timestamp < s_end";
+	AND live_info_id = $live_info_id and is_send = 1
+	AND is_del = 0 ) as a where $send_timestamp > s_begin and $send_timestamp < s_end limit 1";
             $check_push = DB::select($check_sql);
 
             //是否对直播公告发送做出1分钟限制
