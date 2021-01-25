@@ -24,10 +24,8 @@ class LivePush extends Base
         $push_type = $params['type'] ?? 0;
         $push_gid = $params['gid'] ?? 0;
         $push_at = $params['time'] ?? 0;
-        $length = $params['length'] ?? 0;
+        $length = $params['length'] ?? 60;
         $now = time();
-        $now_date = date('Y-m-d H:i:s', $now);
-        $check_date = date('Y-m-d H:i:s', $now + 10);
 
         if (empty($live_id) || empty($live_info_id) || empty($push_gid) || empty($push_type)) {
             return ['code' => false, 'msg' => '参数错误'];
