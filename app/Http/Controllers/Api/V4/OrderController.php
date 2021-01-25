@@ -1156,7 +1156,7 @@ class OrderController extends Controller
             'os_type' => $os_type,
             'pay_type' => $pay_type,
             'live_id' => $live_id,
-            'live_num' => 1,
+            'live_num' => $num,
             'twitter_id' => $tweeter_code,
         ];
 
