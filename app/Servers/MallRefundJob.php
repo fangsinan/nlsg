@@ -472,7 +472,7 @@ class MallRefundJob
                     $temp_res = $this->aliPayRefundMethod($v);
                     break;
                 default:
-                    continue;
+                    break;
             }
 
             $update_data = [];
@@ -581,7 +581,7 @@ class MallRefundJob
                     $temp_res = $this->aliPayRefundCheckMethod($v);
                     break;
                 default:
-                    continue;
+                    break;
             }
 
             if ($temp_res['code'] === true) {
