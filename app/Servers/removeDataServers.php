@@ -1071,7 +1071,7 @@ and o.status = 1 and o.pay_price > 1";
             }
         }
 
-        //DB::beginTransaction();
+        DB::beginTransaction();
 
         foreach ($list as $v) {
             //课程与兑换卡
