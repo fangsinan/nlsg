@@ -72,18 +72,36 @@ class SpecialPriceServers
             return ['code' => false, 'msg' => 'id错误'];
         }
 
-        switch ($params['flag']) {
-            case 'on':
-                $model->status = 1;
-                break;
-            case 'off':
-                $model->status = 2;
-                break;
-            default:
-                $model->status = 3;
+        if($model->type == 2){
+            //秒杀
+            $status = 0;
+            switch ($params['flag']) {
+                case 'on':
+                    $status = 1;
+                    break;
+                case 'off':
+                    $status = 2;
+                    break;
+                default:
+                    $status = 3;
+            }
+            $update_data = ['status'=>$status];
+            $res = SpecialPriceModel::where('group_name','=',$model->group_name)
+                ->update($update_data);
+        }else{
+            switch ($params['flag']) {
+                case 'on':
+                    $model->status = 1;
+                    break;
+                case 'off':
+                    $model->status = 2;
+                    break;
+                default:
+                    $model->status = 3;
+            }
+            $res = $model->save();
         }
-
-        $res = $model->save();
+        
         if ($res) {
             CacheServers::clear(1);
             return ['code' => true, 'msg' => '成功'];
