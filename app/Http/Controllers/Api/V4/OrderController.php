@@ -10,6 +10,7 @@ use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\History;
 use App\Models\LiveCountDown;
+use App\Models\LiveInfo;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
@@ -1135,7 +1136,13 @@ class OrderController extends Controller
         $num = $request->input('num', 0);  //推客id
         $user_id = $this->user['id'];
 
-
+        if( $tweeter_code > 0 && $live_id > 0 ){  //需要校验推客id
+            $info = LiveInfo::where(['live_pid'=>$live_id])->first();
+            $count_data = LiveCountDown::where(['user_id'=>$user_id,'live_id'=>$info['id']])->first();
+            if($count_data['new_vip_uid']){
+                $tweeter_code = $count_data['new_vip_uid'];  //推客id 为邀约人id
+            }
+        }
         $ProductInfo = OfflineProducts::find($product_id);
         //检测下单参数有效性
         if (empty($ProductInfo)) {

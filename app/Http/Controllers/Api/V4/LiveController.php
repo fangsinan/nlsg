@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
+use App\Models\LiveCheckPhone;
 use App\Models\LiveConsole;
 use App\Models\LiveCountDown;
 use App\Models\LiveForbiddenWords;
@@ -786,9 +787,23 @@ class LiveController extends Controller
     public function freeLiveOrder(Request $request)
     {
         $input = $request->all();
+
         $live = LiveInfo::where('id', $input['info_id'])->first();
         if (!$live) {
             return error('直播不存在');
+        }
+
+
+        $live_data = Live::where('id', $live['p_id'])->first();
+        if( $live_data['flag'] > 0 ){   //flag > 0 为限定直播  限定值与flag一致
+            $flag = LiveCheckPhone::where([
+                'phone' =>  $this->user['phone'],
+                'flag'  =>  $live_data['flag'],
+            ])->first();
+
+            if(empty($flag)){
+                return error('您不可参与该直播');
+            }
         }
 
         $list = LiveCountDown::where(['live_id' => $input['info_id'], 'user_id' => $this->user['id']])
