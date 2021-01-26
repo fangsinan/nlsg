@@ -13,7 +13,6 @@ use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
-use App\Servers\ChannelServers;
 use Illuminate\Http\Request;
 
 class MallController extends Controller
@@ -216,26 +215,33 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            //MallRefundJob::shillJob(2);
-            //VipRedeemUser::subWorksOrGetRedeemCode(692095);
-//            $c = new ChannelServers();
-//            $c->getDouyinOrder();//获取抖音订单
-//            $c->supplementDouYinOrder();//补全订单信息
-//            $c->douYinJob();
 
-//            $data = [
-//                'out_trade_no'      => '21011400423414621164003', //获取订单号
-//                'total_fee'         => 1360, //价格
-//                'transaction_id'    => 6666666, //交易单号
-//                'attach'            => 14,
-//                'pay_type'          => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
-//            ];
-//            $res = WechatPay::PayStatusUp($data);
+//                MallRefundJob::shillJob(2);
+//                VipRedeemUser::subWorksOrGetRedeemCode(692095);
 
+//                $c = new ChannelServers();
+//                $c->getDouyinOrder();//获取抖音订单
+//                $c->supplementDouYinOrder();//补全订单信息
+//                $c->douYinJob();
 
-//            $vipModel = new VipUser();
-//            $res = $vipModel->jobOf1360(168934,376481,645);
-//            dd($res);
+            if (0) {
+                $data = [
+                    'out_trade_no' => '21011400423414621164003', //获取订单号
+                    'total_fee' => 1360, //价格
+                    'transaction_id' => 6666666, //交易单号
+                    'attach' => 14,
+                    'pay_type' => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
+                ];
+                $res = WechatPay::PayStatusUp($data);
+                dd($res);
+            }
+
+            if (0) {
+                $vipModel = new VipUser();
+                $res = $vipModel->jobOf1360(168934, 376481, 645);
+                dd($res);
+            }
+
             exit(date('Y-m-d H:i:s'));
         } else {
             $params = $request->input();

@@ -294,12 +294,32 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                 }
                 $this_vip_res = $this_vip->save();
 
-                if(0){
-                    //自己续费给自己收益
-                    $inviter = $user_vip_info->user_id;
-                    $inviter_vip_id = $user_vip_info->id;
-                    $inviter_level = 1;
-                }else{
+                if (1) {
+                    if (0) {
+                        //自己续费给自己收益
+                        $inviter = $user_vip_info->user_id;
+                        $inviter_vip_id = $user_vip_info->id;
+                        $inviter_level = 1;
+                    } else {
+                        if (empty($user_vip_info->inviter_vip_id ?? 0)) {
+                            //之前没有推荐人,就没有收益
+                            $inviter = $inviter_vip_id = $inviter_level = 0;
+                        } else {
+                            //之前有收益,就给老上家
+                            $temp_inviter_info = VipUser::where('user_id', '=', $user_vip_info->inviter)
+                                ->where('status', '=', 1)
+                                ->where('is_default', '=', 1)
+                                ->first();
+                            if (empty($temp_inviter_info)) {
+                                $inviter = $inviter_vip_id = $inviter_level = 0;
+                            } else {
+                                $inviter = $temp_inviter_info->user_id;
+                                $inviter_vip_id = $temp_inviter_info->id;
+                                $inviter_level = $temp_inviter_info->level;
+                            }
+                        }
+                    }
+                } else {
                     //自己续费没有收益
                     $inviter = $inviter_vip_id = $inviter_level = 0;
                 }
