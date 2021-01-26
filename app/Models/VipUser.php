@@ -187,4 +187,177 @@ where a.user_id = ' . $user_id . ' and a.status = 2
 
     }
 
+    public function jobOf1360($user_id, $order_id, $live_id)
+    {
+        $now_date = date('Y-m-d H:i:s');
+        $user_info = User::whereId($user_id)->select(['id', 'phone'])->first();
+
+        $user_vip_info = VipUser::where('username', '=', $user_info->phone)
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->first();
+
+        $order_info = Order::whereId($order_id)->select(['id', 'ordernum'])->first();
+
+        $inviter_info = DB::table('nlsg_live_count_down as cd')
+            ->join('nlsg_vip_user as vu', 'cd.phone', '=', 'vu.username')
+            ->where('cd.user_id', '=', $user_id)
+            ->where('vu.status', '=', 1)
+            ->where('vu.is_default', '=', 1)
+            ->where('vu.expire_time', '>', $now_date)
+            ->where('cd.live_id', '=', $live_id)
+            ->select(['vu.id', 'vu.user_id', 'vu.username', 'vu.level',
+                'vu.inviter', 'vu.inviter_vip_id',
+                'source', 'source_vip_id'])
+            ->first();
+
+        $bind_info = DB::table('nlsg_vip_user_bind as ub')
+            ->join('nlsg_vip_user as vu', 'ub.parent', '=', 'vu.username')
+            ->where('ub.son', '=', $user_info->phone)
+            ->whereRaw('(ub.life = 1 or (ub.life = 2 and ub.begin_at > now() and ub.end_at < now()))')
+            ->where('vu.status', '=', 1)
+            ->where('vu.is_default', '=', 1)
+            ->where('vu.expire_time', '>', $now_date)
+            ->select(['vu.id', 'vu.user_id', 'vu.username', 'vu.level',
+                'vu.inviter', 'vu.inviter_vip_id',
+                'source', 'source_vip_id'])
+            ->first();
+
+        $inviter = 0;
+        $inviter_vip_id = 0;
+        $inviter_level = 0;
+        $source = 0;
+        $source_vip_id = 0;
+
+        if (!empty($bind_info)) {
+            //优先绑定的
+            $inviter = $bind_info->user_id;
+            $inviter_vip_id = $bind_info->id;
+            $inviter_level = $bind_info->level;
+            if ($bind_info->level == 2) {
+                $source = $bind_info->user_id;
+                $source_vip_id = $bind_info->id;
+            } else {
+                $source = $bind_info->source;
+                $source_vip_id = $bind_info->source_vip_id;
+            }
+        } else {
+            //没有绑定才走推荐
+            if (!empty($inviter_info)) {
+                $inviter = $inviter_info->user_id;
+                $inviter_vip_id = $inviter_info->id;
+                $inviter_level = $inviter_info->level;
+                if ($inviter_info->level == 2) {
+                    $source = $inviter_info->user_id;
+                    $source_vip_id = $inviter_info->id;
+                } else {
+                    $source = $inviter_info->source;
+                    $source_vip_id = $inviter_info->source_vip_id;
+                }
+            }
+        }
+
+        DB::beginTransaction();
+
+        //开通或延长
+        switch (intval($user_vip_info->level ?? 0)) {
+            case 0:
+                $this_vip_data = [];
+                $this_vip_data['user_id'] = $user_id;
+                $this_vip_data['nickname'] = substr_replace($user_info->phone, '****', 3, 4);
+                $this_vip_data['username'] = $user_info->phone;
+                $this_vip_data['level'] = 1;
+                $this_vip_data['inviter'] = $inviter;
+                $this_vip_data['inviter_vip_id'] = $inviter_vip_id;
+                $this_vip_data['source'] = $source;
+                $this_vip_data['source_vip_id'] = $source_vip_id;
+                $this_vip_data['is_default'] = 1;
+                $this_vip_data['created_at'] = $now_date;
+                $this_vip_data['start_time'] = $now_date;
+                $this_vip_data['updated_at'] = $now_date;
+                $this_vip_data['channel'] = $order_info->activity_tag;
+                $this_vip_data['expire_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                $this_vip_res = DB::table('nlsg_vip_user')->insertGetId($this_vip_data);
+                if ($this_vip_res) {
+                    $user_vip_info = VipUser::where('username', '=', $user_info->phone)
+                        ->where('status', '=', 1)
+                        ->where('is_default', '=', 1)
+                        ->first();
+                }
+                break;
+            case 1:
+                $this_vip = VipUser::whereId($user_vip_info->id)->first();
+                if ($this_vip->expire_time > $now_date) {
+                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . ' +1 year'));
+                } else {
+                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                }
+                $this_vip_res = $this_vip->save();
+
+                if(0){
+                    //自己续费给自己收益
+                    $inviter = $user_vip_info->user_id;
+                    $inviter_vip_id = $user_vip_info->id;
+                    $inviter_level = 1;
+                }else{
+                    //自己续费没有收益
+                    $inviter = $inviter_vip_id = $inviter_level = 0;
+                }
+                break;
+            case 2:
+                $this_vip = VipUser::whereId($user_vip_info->id)->first();
+                $this_vip->is_open_360 = 1;
+                if (empty($this_vip->time_begin_360)) {
+                    $this_vip->time_begin_360 = $now_date;
+                }
+                if (empty($this_vip->time_end_360)) {
+                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                } else {
+                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . ' +1 year'));
+                }
+                $this_vip_res = $this_vip->save();
+                $inviter = $user_vip_info->user_id;
+                $inviter_vip_id = $user_vip_info->id;
+                $inviter_level = 2;
+                break;
+        }
+
+        if ($this_vip_res === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => 'error:' . __LINE__];
+        }
+
+        //收益
+        if (!empty($inviter) && !empty($inviter_level)) {
+            $check_pd = PayRecordDetail::where('ordernum', '=', $order_info->ordernum)
+                ->where('type', '=', 11)
+                ->first();
+            if (empty($check_pd)) {
+                $pdModel = new PayRecordDetail();
+                $pdModel->type = 11;
+                $pdModel->ordernum = $order_info->ordernum;
+                $pdModel->ctime = time();
+                $pdModel->user_id = $inviter;
+                $pdModel->user_vip_id = $inviter_vip_id;
+                if ($inviter_level == 1) {
+                    $pdModel->price = 108;
+                } else {
+                    $pdModel->price = 180;
+                }
+                $pdModel->vip_id = $user_vip_info->id;
+                $pd_res = $pdModel->save();
+                if ($pd_res === false) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => 'error:' . __LINE__];
+                }
+            }
+        }
+
+        //开通订阅课程
+        VipRedeemUser::subWorksOrGetRedeemCode($user_id);
+
+        DB::commit();
+        return ['code' => true, 'msg' => 'ok'];
+    }
+
 }
