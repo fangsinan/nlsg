@@ -200,7 +200,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
         $order_info = Order::whereId($order_id)->select(['id', 'ordernum'])->first();
 
         $inviter_info = DB::table('nlsg_live_count_down as cd')
-            ->join('nlsg_vip_user as vu', 'cd.phone', '=', 'vu.username')
+            ->join('nlsg_vip_user as vu', 'cd.new_vip_uid', '=', 'vu.user_id')
             ->where('cd.user_id', '=', $user_id)
             ->where('vu.status', '=', 1)
             ->where('vu.is_default', '=', 1)
