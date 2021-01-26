@@ -51,7 +51,10 @@ class SpecialPriceServers
             $query->where('status', '=', intval($params['status']));
         }
 
-        $list = $query->where('status', '<>', 3)->groupBy('group_name')->orderBy('id', 'desc');
+        $list = $query->where('status', '<>', 3)->groupBy('group_name')
+            ->orderBy('begin_time', 'asc')
+            ->orderBy('id', 'desc');
+
         foreach ($list as $v) {
             if ($v->goods_original_price > 0) {
                 $v->goodsInfo->original_price = $v->goods_original_price;
@@ -72,7 +75,7 @@ class SpecialPriceServers
             return ['code' => false, 'msg' => 'id错误'];
         }
 
-        if($model->type == 2){
+        if ($model->type == 2) {
             //秒杀
             $status = 0;
             switch ($params['flag']) {
@@ -85,10 +88,10 @@ class SpecialPriceServers
                 default:
                     $status = 3;
             }
-            $update_data = ['status'=>$status];
-            $res = SpecialPriceModel::where('group_name','=',$model->group_name)
+            $update_data = ['status' => $status];
+            $res = SpecialPriceModel::where('group_name', '=', $model->group_name)
                 ->update($update_data);
-        }else{
+        } else {
             switch ($params['flag']) {
                 case 'on':
                     $model->status = 1;
@@ -101,7 +104,7 @@ class SpecialPriceServers
             }
             $res = $model->save();
         }
-        
+
         if ($res) {
             CacheServers::clear(1);
             return ['code' => true, 'msg' => '成功'];
