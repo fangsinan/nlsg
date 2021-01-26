@@ -935,25 +935,33 @@ class removeDataServers
 
         $list = DB::table('nlsg_live_count_down as cd')
             ->join('nlsg_user as u', 'cd.user_id', '=', 'u.id')
+            ->join('nlsg_user as u2','cd.new_vip_uid','=','u2.id')
             ->leftJoin('nlsg_vip_user_bind as ub', 'ub.son', '=', 'u.phone')
             ->where('cd.created_at', '<', '2021-01-22 23:59:59')
-            ->select(['u.phone as son', 'cd.phone as parent', 'ub.id as ubid'])
+            ->select(['u.phone as son', 'u2.phone as parent', 'ub.id as ubid'])
             ->groupBy('u.phone')
             ->get()
             ->toArray();
 
         $add_data = [];
         foreach ($list as $v) {
+            if ($v->parent == $v->son){
+                continue;
+            }
+
             if (empty($v->ubid)) {
                 $temp_data = [];
                 $temp_data['parent'] = $v->parent;
                 $temp_data['son'] = $v->son;
-                $temp_data['life'] = 2;
+                $temp_data['life'] = 5;
                 $temp_data['begin_at'] = $now_date;
                 $temp_data['end_at'] = $end_date;
                 $add_data[] = $temp_data;
             }
         }
+
+
+        //DB::beginTransaction();
 
         $res = DB::table('nlsg_vip_user_bind')->insert($add_data);
 
