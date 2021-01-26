@@ -51,10 +51,7 @@ class SpecialPriceServers
             $query->where('status', '=', intval($params['status']));
         }
 
-        $list = $query->where('status', '<>', 3)->groupBy('group_name')
-            ->orderBy('begin_time', 'asc')
-            ->orderBy('id', 'desc');
-
+        $list = $query->where('status', '<>', 3)->groupBy('group_name')->orderBy('id', 'desc');
         foreach ($list as $v) {
             if ($v->goods_original_price > 0) {
                 $v->goodsInfo->original_price = $v->goods_original_price;
@@ -75,7 +72,7 @@ class SpecialPriceServers
             return ['code' => false, 'msg' => 'id错误'];
         }
 
-        if ($model->type == 2) {
+        if($model->type == 2){
             //秒杀
             $status = 0;
             switch ($params['flag']) {
@@ -88,10 +85,10 @@ class SpecialPriceServers
                 default:
                     $status = 3;
             }
-            $update_data = ['status' => $status];
-            $res = SpecialPriceModel::where('group_name', '=', $model->group_name)
+            $update_data = ['status'=>$status];
+            $res = SpecialPriceModel::where('group_name','=',$model->group_name)
                 ->update($update_data);
-        } else {
+        }else{
             switch ($params['flag']) {
                 case 'on':
                     $model->status = 1;
@@ -611,6 +608,10 @@ class SpecialPriceServers
             'id', 'group_name', 'team_id', 'status',
             DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d\') as date')
         ]);
+
+        $query->orderBy('begin_time','asc')
+            ->orderBy('team_id','asc')
+            ->orderBy('id','desc');
 
         $list = $query->paginate($size)->toArray();
 
