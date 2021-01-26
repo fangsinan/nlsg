@@ -50,6 +50,10 @@ class RemoveDataController extends ControllerBackend
         if (0) {
             $servers->runPoster();
         }
+
+        if (0) {
+            $servers->add_live_to_bind();
+        }
     }
 
     public function mallOrders()

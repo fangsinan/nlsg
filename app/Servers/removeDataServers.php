@@ -928,6 +928,38 @@ class removeDataServers
 
     }
 
+    public function add_live_to_bind()
+    {
+        $now_date = date('Y-m-d H:i:s');
+        $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
+
+        $list = DB::table('nlsg_live_count_down as cd')
+            ->join('nlsg_user as u', 'cd.user_id', '=', 'u.id')
+            ->leftJoin('nlsg_vip_user_bind as ub', 'ub.son', '=', 'u.phone')
+            ->where('cd.created_at', '<', '2021-01-22 23:59:59')
+            ->select(['u.phone as son', 'cd.phone as parent', 'ub.id as ubid'])
+            ->groupBy('u.phone')
+            ->get()
+            ->toArray();
+
+        $add_data = [];
+        foreach ($list as $v) {
+            if (empty($v->ubid)) {
+                $temp_data = [];
+                $temp_data['parent'] = $v->parent;
+                $temp_data['son'] = $v->son;
+                $temp_data['life'] = 2;
+                $temp_data['begin_at'] = $now_date;
+                $temp_data['end_at'] = $end_date;
+                $add_data[] = $temp_data;
+            }
+        }
+
+        $res = DB::table('nlsg_vip_user_bind')->insert($add_data);
+
+        dd([count($list), count($add_data), $res]);
+    }
+
     public function runPoster()
     {
         $list = Subscribe::where('type', '=', 3)
