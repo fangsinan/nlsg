@@ -928,6 +928,158 @@ class removeDataServers
 
     }
 
+    public function check_1360_job()
+    {
+        $now = time();
+        $now_date = date('Y-m-d H:i:s', $now);
+
+        $list = DB::table('nlsg_order as o')
+            ->join('nlsg_user as u', 'o.user_id', '=', 'u.id')
+            ->where('o.pay_time', '>', '2021-01-21 12:00:00')
+            ->where('o.pay_time', '<', '2021-01-23 12:00:00')
+            ->where('o.type', '=', 14)
+            ->where('o.live_id', '=', 1)
+            ->where('o.relation_id', '=', 4)
+            ->where('o.status', '=', 1)
+            ->where('o.pay_price', '>', 1)
+            ->where('o.is_shill', '=', 0)
+            ->select(['o.id', 'o.user_id', 'u.phone', 'o.pay_price', 'o.ordernum'])
+            ->get()
+            ->toArray();
+
+        $temp_list = [];
+        foreach ($list as $v) {
+            //获取邀约人信息
+            $temp_inviter = DB::table('nlsg_live_count_down as cd')
+                ->join('nlsg_vip_user as v', 'cd.new_vip_uid', '=', 'v.user_id')
+                ->where('cd.user_id', '=', $v->user_id)
+                ->where('cd.live_id', '=', 1)
+                ->where('v.status', '=', 1)
+                ->where('v.is_default', '=', 1)
+                ->where('v.expire_time', '>', $now_date)
+                ->select('v.id as vip_id', 'v.username', 'v.user_id', 'v.level',
+                    'v.inviter', 'v.inviter_vip_id',
+                    'v.source', 'v.source_vip_id')
+                ->first();
+
+            //获取保护人信息
+            $temp_parent = DB::table('nlsg_vip_user_bind as ub')
+                ->join('nlsg_vip_user as v', 'ub.parent', '=', 'v.username')
+                ->where('ub.son', '=', $v->phone)
+                ->where('v.status', '=', 1)
+                ->where('v.is_default', '=', 1)
+                ->where('v.expire_time', '>', $now_date)
+                ->select('v.id as vip_id', 'v.username', 'v.user_id', 'v.level',
+                    'v.inviter', 'v.inviter_vip_id',
+                    'v.source', 'v.source_vip_id')
+                ->first();
+
+            if (empty($temp_inviter) && empty($temp_parent)) {
+                continue;
+            } else {
+                if (!empty($temp_parent)) {
+                    $v->t_vip_id = $temp_parent->vip_id;
+                    $v->t_name = $temp_parent->username;
+                    $v->t_uid = $temp_parent->user_id;
+                    $v->t_level = $temp_parent->level;
+                    $v->t_inviter = $temp_parent->inviter;
+                    $v->t_inviter_vip_id = $temp_parent->inviter_vip_id;
+                    $v->t_source = $temp_parent->source;
+                    $v->t_source_vip_id = $temp_parent->source_vip_id;
+                } else {
+                    $v->t_vip_id = $temp_inviter->vip_id;
+                    $v->t_name = $temp_inviter->username;
+                    $v->t_uid = $temp_inviter->user_id;
+                    $v->t_level = $temp_inviter->level;
+                    $v->t_inviter = $temp_inviter->inviter;
+                    $v->t_inviter_vip_id = $temp_inviter->inviter_vip_id;
+                    $v->t_source = $temp_inviter->source;
+                    $v->t_source_vip_id = $temp_inviter->source_vip_id;
+                }
+                $temp_list[] = $v;
+            }
+        }
+
+        DB::beginTransaction();
+        //先校验用户是否已经开通360
+        foreach ($temp_list as $v) {
+            $check_open_vip = VipUser::where('user_id', '=', $v->user_id)
+                ->where('level', '=', 1)
+                ->where('status', '=', 1)
+                ->where('is_default', '=', 1)
+                ->first();
+
+            if (empty($check_open_vip)) {
+                $check_open_zs = VipUser::where('user_id', '=', $v->user_id)
+                    ->where('level', '=', 2)
+                    ->where('status', '=', 1)
+                    ->where('is_default', '=', 1)
+                    ->first();
+
+                if (empty($check_open_zs)) {
+                    echo PHP_EOL, $v->phone, '没有开通360', PHP_EOL;
+                } else {
+                    $v->vip_id = $check_open_zs->id;
+                    if ($check_open_zs->is_open_360 == 0) {
+                        echo PHP_EOL, $v->phone, '没有开通360', PHP_EOL;
+                    }
+                }
+            } else {
+                $v->vip_id = $check_open_vip->id;
+
+                if ($v->t_uid != $check_open_vip->inviter) {
+                    $check_open_vip->inviter = $v->t_uid;
+                    $check_open_vip->inviter_vip_id = $v->t_vip_id;
+                    if ($v->t_level == 1) {
+                        $check_open_vip->source = $v->t_source;
+                        $check_open_vip->source_vip_id = $v->t_source_vip_id;
+                    } else {
+                        $check_open_vip->source = $v->t_uid;
+                        $check_open_vip->source_vip_id = $v->t_vip_id;
+                    }
+                    $check_open_vip->save();
+                }
+            }
+        }
+
+        //校验收益表
+        foreach ($temp_list as $v) {
+            $check_prd = PayRecordDetail::where('ordernum', '=', $v->ordernum)
+                ->where('type', '=', 11)
+                ->first();
+            if (empty($check_prd)) {
+
+                $pdModel = new PayRecordDetail();
+                $pdModel->type = 11;
+                $pdModel->ordernum = $v->ordernum;
+                $pdModel->ctime = $now;
+                if ($v->t_level == 1) {
+                    $pdModel->price = 108;
+                } else {
+                    $pdModel->price = 180;
+                }
+                $pdModel->user_id = $v->t_uid;
+                $pdModel->user_vip_id = $v->t_vip_id;
+                $pdModel->vip_id = $v->vip_id;
+                $pdModel->save();
+                echo $v->ordernum, '添加收益', PHP_EOL;
+            } else {
+                if ($v->t_uid != $check_prd->user_id) {
+                    $check_prd->user_id = $v->t_uid;
+                    $check_prd->user_vip_id = $v->t_vip_id;
+                    $check_prd->vip_id = $v->vip_id;
+                    $check_prd->save();
+                    echo $v->ordernum, '修改收益', PHP_EOL;
+                }
+            }
+        }
+
+
+        dd($temp_list);
+
+
+    }
+
     public function add_live_to_bind()
     {
         $now_date = date('Y-m-d H:i:s');
@@ -935,7 +1087,7 @@ class removeDataServers
 
         $list = DB::table('nlsg_live_count_down as cd')
             ->join('nlsg_user as u', 'cd.user_id', '=', 'u.id')
-            ->join('nlsg_user as u2','cd.new_vip_uid','=','u2.id')
+            ->join('nlsg_user as u2', 'cd.new_vip_uid', '=', 'u2.id')
             ->leftJoin('nlsg_vip_user_bind as ub', 'ub.son', '=', 'u.phone')
             ->where('cd.created_at', '<', '2021-01-22 23:59:59')
             ->select(['u.phone as son', 'u2.phone as parent', 'ub.id as ubid'])
@@ -945,7 +1097,7 @@ class removeDataServers
 
         $add_data = [];
         foreach ($list as $v) {
-            if ($v->parent == $v->son){
+            if ($v->parent == $v->son) {
                 continue;
             }
 
