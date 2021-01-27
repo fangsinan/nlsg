@@ -381,7 +381,11 @@ where a.user_id = ' . $user_id . ' and a.status = 2
         }
 
         //开通订阅课程
-        VipRedeemUser::subWorksOrGetRedeemCode($user_id);
+        $sub_i = 1;
+        while ($sub_i <= $buy_num){
+            VipRedeemUser::subWorksOrGetRedeemCode($user_id);
+            $sub_i++;
+        }
 
         DB::commit();
         return ['code' => true, 'msg' => 'ok'];
