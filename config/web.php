@@ -38,6 +38,8 @@ return [
         'merchant.NLSGApplePay.298nlb' => 298,
         'merchant.NLSGApplePay.488nlb' => 488,
         'merchant.NLSGApplePay.998nlb' => 998,
+        'merchant.NLSGApplePay.1398nlb' => 1398,
+        'merchant.NLSGApplePay.2998nlb' => 2998,
     ],
 
 
