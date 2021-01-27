@@ -110,6 +110,20 @@ class BannerController extends ControllerBackend
         $status = $input['status'] ?? 2;
         $objid = $input['obj_id'] ?? 0;
         $jump_type = $input['jump_type'] ?? 0;
+        $start_time = $input['start_time'] ?? 0;
+        $end_time = $input['end_time'] ?? 0;
+
+        if (empty($start_time)) {
+            $start_time = null;
+        } else {
+            $start_time = date('Y-m-d 00:00:00', strtotime($start_time));
+        }
+
+        if (empty($end_time)) {
+            $end_time = null;
+        } else {
+            $end_time = date('Y-m-d 23:59:59', strtotime($end_time));
+        }
 
         $data = [
             'title' => $title,
@@ -119,7 +133,9 @@ class BannerController extends ControllerBackend
             'type' => $type,
             'jump_type' => $jump_type,
             'obj_id' => $objid,
-            'status' => $status
+            'status' => $status,
+            'start_time' => $start_time,
+            'end_time' => $end_time
         ];
 
         if (!empty($id)) {
@@ -159,11 +175,12 @@ class BannerController extends ControllerBackend
     public function edit(Request $request)
     {
         $id = $request->get('id');
-        $list = Banner::select('id', 'title', 'pic', 'url', 'rank', 'type', 'jump_type', 'obj_id','status')
+        $list = Banner::select('id', 'title', 'pic', 'url', 'rank', 'type',
+            'jump_type', 'obj_id', 'status', 'start_time', 'end_time')
             ->where('id', $id)
             ->first();
-        if (!$list){
-            return error(1000,'广告不存在');
+        if (!$list) {
+            return error(1000, '广告不存在');
         }
         return success($list);
     }
