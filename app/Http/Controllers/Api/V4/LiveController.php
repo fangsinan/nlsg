@@ -794,7 +794,7 @@ class LiveController extends Controller
         }
 
 
-        $live_data = Live::where('id', $live['p_id'])->first();
+        $live_data = Live::where('id', $live['live_pid'])->first();
         if( $live_data['flag'] > 0 ){   //flag > 0 为限定直播  限定值与flag一致
             $flag = LiveCheckPhone::where([
                 'phone' =>  $this->user['phone'],
