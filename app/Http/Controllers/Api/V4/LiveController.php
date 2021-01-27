@@ -790,7 +790,7 @@ class LiveController extends Controller
 
         $live = LiveInfo::where('id', $input['info_id'])->first();
         if (!$live) {
-            return error('直播不存在');
+            return error(0,'直播不存在');
         }
 
 
@@ -802,14 +802,14 @@ class LiveController extends Controller
             ])->first();
 
             if(empty($flag)){
-                return error('您不可参与该直播');
+                return error(0,'您不可参与该直播');
             }
         }
 
         $list = LiveCountDown::where(['live_id' => $input['info_id'], 'user_id' => $this->user['id']])
             ->first();
         if ($list) {
-            return error('已经预约');
+            return error(0,'已经预约');
         }
 
         $user = User::where('id', $this->user['id'])->first();
@@ -836,7 +836,7 @@ class LiveController extends Controller
             }
 
         } else {
-            return error('手机号不存在或者错误');
+            return error(0,'手机号不存在或者错误');
         }
     }
 
