@@ -1004,6 +1004,7 @@ class OrderController extends Controller
         $level = $request->input('level', 1);   //目标id
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
+        $live_num = $request->input('live_num',1);
         $tweeter_code = intval($request->input('inviter', 0));  //推客id
         $user_id = $this->user['id'];
 
@@ -1093,7 +1094,7 @@ class OrderController extends Controller
             'relation_id' => $level,
             'price' => $price,
             'cost_price' => $price,
-
+            'live_num'=>$live_num,
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
             'live_id' => $live_id,
