@@ -349,12 +349,12 @@ class WechatPay extends Controller
 
                 //todo pay_price > 1
                 //1360
-                if ($orderInfo['relation_id'] == 4 && $orderInfo['pay_price'] > 0 && $orderInfo['type'] == 14){
+                if ($orderInfo['relation_id'] == 4 && $total_fee > 0 && $orderInfo['type'] == 14){
                     $vipModel = new VipUser();
                     $vip_res = $vipModel->jobOf1360($orderInfo['user_id'],$orderInfo['id'],$orderInfo['live_id']);
                     $vip_res = $vip_res['code'];
                 }else{
-                    $vip_res = false;
+                    $vip_res = true;
                 }
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);

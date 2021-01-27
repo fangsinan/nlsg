@@ -226,8 +226,8 @@ class MallController extends Controller
 
             if (0) {
                 $data = [
-                    'out_trade_no' => '21011400423414621164003', //获取订单号
-                    'total_fee' => 1360, //价格
+                    'out_trade_no' => '21012700283427386675603', //获取订单号
+                    'total_fee' => 0.01, //价格
                     'transaction_id' => 6666666, //交易单号
                     'attach' => 14,
                     'pay_type' => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
