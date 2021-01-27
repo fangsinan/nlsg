@@ -370,7 +370,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('send/send_edit', 'SendController@getSendEdit');
 
     });
-    Route::get('live/send_test', 'LiveController@test');
 
 
 });
