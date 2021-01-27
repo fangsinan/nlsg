@@ -1134,7 +1134,7 @@ class OrderController extends Controller
         $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
         $tweeter_code = $request->input('inviter', 0);  //推客id
-        $num = $request->input('num', 0);  //推客id
+        $num = $request->input('num', 0);  //
         $user_id = $this->user['id'];
 
         if( $tweeter_code > 0 && $live_id > 0 ){  //需要校验推客id
@@ -1159,7 +1159,7 @@ class OrderController extends Controller
             'user_id' => $user_id,
             'relation_id' => $product_id,
             'cost_price' => $price,
-            'price' => $price,
+            'price' => ($price*$num),
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
             'pay_type' => $pay_type,
