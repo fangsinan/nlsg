@@ -216,10 +216,11 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                 'source', 'source_vip_id'])
             ->first();
 
+
         $bind_info = DB::table('nlsg_vip_user_bind as ub')
             ->join('nlsg_vip_user as vu', 'ub.parent', '=', 'vu.username')
             ->where('ub.son', '=', $user_info->phone)
-            ->whereRaw('(ub.life = 1 or (ub.life = 2 and ub.begin_at > now() and ub.end_at < now()))')
+            ->whereRaw('(ub.life = 1 or (ub.life = 2 and ub.begin_at < now() and ub.end_at > now()))')
             ->where('vu.status', '=', 1)
             ->where('vu.is_default', '=', 1)
             ->where('vu.expire_time', '>', $now_date)
