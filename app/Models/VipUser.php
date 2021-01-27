@@ -307,8 +307,13 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                         $inviter_level = 1;
                     } else {
                         if (empty($user_vip_info->inviter_vip_id ?? 0)) {
-                            //之前没有推荐人,就没有收益
-                            $inviter = $inviter_vip_id = $inviter_level = 0;
+                            //之前没有推荐人,需要添加推荐人为现在的推荐人
+                            $this_vip = VipUser::whereId($user_vip_info->id)->first();
+                            $this_vip->inviter = $inviter;
+                            $this_vip->inviter_vip_id = $inviter_vip_id;
+                            $this_vip->source = $source;
+                            $this_vip->source_vip_id = $source_vip_id;
+                            $this_vip->save();
                         } else {
                             //之前有收益,就给老上家
                             $temp_inviter_info = VipUser::where('user_id', '=', $user_vip_info->inviter)
