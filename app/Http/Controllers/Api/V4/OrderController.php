@@ -439,10 +439,11 @@ class OrderController extends Controller
             return $this->error(0, '用户id有误');
         }
 
-        $price = $coin_arr[$coin_id];
         if (empty($coin_id) || empty($coin_arr[$coin_id])) {
             return $this->error(0, '产品id有误');
         }
+        $price = $coin_arr[$coin_id];
+
         $loginUserInfo = User::find($user_id);
         if (empty($loginUserInfo)) {
             return $this->error(0, '用户有误');
