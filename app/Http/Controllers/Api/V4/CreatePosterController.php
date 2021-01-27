@@ -72,7 +72,7 @@ class CreatePosterController extends Controller
             mkdir($save_path, 0777, true);
         }
 
-        $expire_num = 86400;
+        $expire_num = 600;
 
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
