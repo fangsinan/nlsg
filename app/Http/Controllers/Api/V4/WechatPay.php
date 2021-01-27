@@ -276,7 +276,7 @@ class WechatPay extends Controller
 
                 if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst && $add_sub_Rst && $top_Sy_Rst) {
                     DB::commit();
-                    self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId);
+                    self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
                     return true;
                 } else {
                     DB::rollBack();
@@ -367,7 +367,7 @@ class WechatPay extends Controller
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $vip_res) {
                     DB::commit();
                     $AdminInfo = User::find($user_id);
-                    self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId);
+                    self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
                     return true;
 
                 } else {
@@ -386,7 +386,7 @@ class WechatPay extends Controller
     }
 
 
-    static function LiveRedis($type, $relation_id, $nickname, $live_id = 0, $orderid = 0)
+    static function LiveRedis($type, $relation_id, $nickname, $live_id = 0, $orderid = 0, $live_num=1)
     {
 
         if ($live_id == 0) {
@@ -397,20 +397,20 @@ class WechatPay extends Controller
         Redis::select(0);
 
         if ($type == 16) {
-            $res = $nickname . ':您已成功购买幸福360会员';
+            $res = $nickname . ':您已成功购买'.$live_num.'个幸福360会员';
         } else {
             switch ($relation_id) {
                 case 1: //经营能量
-                    $res = $nickname . ':您已成功购买1张经营能量门票';
+                    $res = $nickname . ':您已成功购买'.$live_num.'张经营能量门票';
                     break;
                 case 2: //一代天骄
-                    $res = $nickname . ':您已支付成功一代天骄定金';
+                    $res = $nickname . ':您已支付'.$live_num.'单一代天骄定金';
                     break;
                 case 3: //演说能量
-                    $res = $nickname . ':您已支付成功演说能量定金';
+                    $res = $nickname . ':您已支付'.$live_num.'单演说能量定金';
                     break;
                 case 4: //幸福套餐
-                    $res = $nickname . ':您已支付成功幸福套餐';
+                    $res = $nickname . ':您已支付'.$live_num.'张成功幸福套餐';
                     break;
             }
         }
