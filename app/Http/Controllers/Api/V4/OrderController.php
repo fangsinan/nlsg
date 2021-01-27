@@ -439,6 +439,8 @@ class OrderController extends Controller
             return $this->error(0, '用户id有误');
         }
 
+        dump($coin_id);
+        dd($coin_arr);
 
         if (empty($coin_id) || empty($coin_arr[$coin_id])) {
             return $this->error(0, '产品id有误');
