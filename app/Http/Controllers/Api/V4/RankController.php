@@ -106,7 +106,7 @@ class RankController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
         if ( ! $lists) {
-            return error('还没有数据');
+            return error(0,'还没有数据');
         }
         $works_id = ListsWork::where('lists_id', $lists->id)
             ->where('state', 1)
@@ -194,7 +194,7 @@ class RankController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
         if ( ! $lists) {
-            return error('还没有数据');
+            return error(0,'还没有数据');
         }
         $works_id = ListsWork::where('lists_id', $lists->id)
             ->where('state', 1)
@@ -220,7 +220,7 @@ class RankController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
         if ( ! $lists) {
-            return error('还没有排行榜');
+            return error(0,'还没有排行榜');
         }
         $works_id = ListsWork::where('lists_id', $lists->id)
             ->where('state', 1)

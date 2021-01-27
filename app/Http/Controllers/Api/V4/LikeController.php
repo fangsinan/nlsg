@@ -99,7 +99,7 @@ class LikeController extends Controller
             Comment::where('id', $id)->decrement('like_num');
             return success('操作成功');
         }
-        return error('操作失败');
+        return error(0,'操作失败');
 
     }
 }
