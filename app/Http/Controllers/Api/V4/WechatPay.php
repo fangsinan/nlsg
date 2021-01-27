@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\AgentProfitLog;
 use App\Models\Column;
+use App\Models\ConfigModel;
 use App\Models\Coupon;
 use App\Models\GetPriceTools;
 use App\Models\Live;
@@ -275,7 +276,7 @@ class WechatPay extends Controller
 
                 if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst && $add_sub_Rst && $top_Sy_Rst) {
                     DB::commit();
-                    self::LiveRedis(16,1,$AdminInfo['nickname'],$live_id,$orderId);
+                    self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId);
                     return true;
                 } else {
                     DB::rollBack();
@@ -347,13 +348,18 @@ class WechatPay extends Controller
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
-                //todo pay_price > 1
+                $total_fee_line = ConfigModel::getData(50, 1);
+                if (empty($total_fee_line)) {
+                    $total_fee_line = 0;
+                } else {
+                    $total_fee_line = 1;
+                }
                 //1360
-                if ($orderInfo['relation_id'] == 4 && $total_fee > 0 && $orderInfo['type'] == 14){
+                if ($orderInfo['relation_id'] == 4 && $total_fee > $total_fee_line && $orderInfo['type'] == 14) {
                     $vipModel = new VipUser();
-                    $vip_res = $vipModel->jobOf1360($orderInfo['user_id'],$orderInfo['id'],$orderInfo['live_id']);
+                    $vip_res = $vipModel->jobOf1360($orderInfo['user_id'], $orderInfo['id'], $orderInfo['live_id']);
                     $vip_res = $vip_res['code'];
-                }else{
+                } else {
                     $vip_res = true;
                 }
 
@@ -361,7 +367,7 @@ class WechatPay extends Controller
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $vip_res) {
                     DB::commit();
                     $AdminInfo = User::find($user_id);
-                    self::LiveRedis(14,$orderInfo['relation_id'],$AdminInfo['nickname'],$live_id,$orderId);
+                    self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId);
                     return true;
 
                 } else {
@@ -380,41 +386,41 @@ class WechatPay extends Controller
     }
 
 
-    static function LiveRedis($type,$relation_id,$nickname,$live_id=0,$orderid=0){
+    static function LiveRedis($type, $relation_id, $nickname, $live_id = 0, $orderid = 0)
+    {
 
-        if($live_id == 0){
+        if ($live_id == 0) {
             return 0;
         }
         //  向直播间 设置直播间 redis
-        $key = 'live_PushOrder_'.$live_id;
+        $key = 'live_PushOrder_' . $live_id;
         Redis::select(0);
 
-        if($type == 16){
-            $res=$nickname.':您已成功购买幸福360会员';
-        }else{
-            switch ( $relation_id ) {
+        if ($type == 16) {
+            $res = $nickname . ':您已成功购买幸福360会员';
+        } else {
+            switch ($relation_id) {
                 case 1: //经营能量
-                    $res=$nickname.':您已成功购买1张经营能量门票';
+                    $res = $nickname . ':您已成功购买1张经营能量门票';
                     break;
                 case 2: //一代天骄
-                    $res=$nickname.':您已支付成功一代天骄定金';
+                    $res = $nickname . ':您已支付成功一代天骄定金';
                     break;
                 case 3: //演说能量
-                    $res=$nickname.':您已支付成功演说能量定金';
+                    $res = $nickname . ':您已支付成功演说能量定金';
                     break;
                 case 4: //幸福套餐
-                    $res=$nickname.':您已支付成功幸福套餐';
+                    $res = $nickname . ':您已支付成功幸福套餐';
                     break;
             }
         }
-        Redis::rpush($key,$res);
+        Redis::rpush($key, $res);
 //        Redis::setex($key,600,json_encode($res,true));
-        if($orderid){
-            Order::where(['id' => $orderid])->update(['is_live_order_send'=>1]);
+        if ($orderid) {
+            Order::where(['id' => $orderid])->update(['is_live_order_send' => 1]);
         }
 
     }
-
 
 
     //微信购买直播
