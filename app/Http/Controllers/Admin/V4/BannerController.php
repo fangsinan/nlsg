@@ -98,7 +98,6 @@ class BannerController extends ControllerBackend
     public function add(Request $request)
     {
         $input = $request->all();
-        return $this->success($input);
         $title = $input['title'] ?? '';
         if (!$title) {
             return error(1000, '标题不能为空');
