@@ -524,7 +524,7 @@ class WechatPay extends Controller
                 $twitter_id = $orderInfo['twitter_id'];
                 $Profit_Rst = true;
 
-                if (!empty($twitter_id) && $twitter_id != $user_id) {
+                if (!empty($twitter_id) && $twitter_id != $user_id && $liveData['twitter_money'] > 0) {
                     $liveCountDown['new_vip_uid'] = $twitter_id;
                     //固定收益50
                     $ProfitPrice = $liveData['twitter_money'];
