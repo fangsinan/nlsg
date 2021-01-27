@@ -199,6 +199,11 @@ where a.user_id = ' . $user_id . ' and a.status = 2
 
         $order_info = Order::whereId($order_id)->select(['id', 'ordernum'])->first();
 
+        $buy_num = $order_info->live_num;
+        if ($buy_num == 0){
+            $buy_num = 1;
+        }
+
         $inviter_info = DB::table('nlsg_live_count_down as cd')
             ->join('nlsg_vip_user as vu', 'cd.new_vip_uid', '=', 'vu.user_id')
             ->where('cd.user_id', '=', $user_id)
@@ -276,7 +281,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                 $this_vip_data['start_time'] = $now_date;
                 $this_vip_data['updated_at'] = $now_date;
                 $this_vip_data['channel'] = $order_info->activity_tag;
-                $this_vip_data['expire_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                $this_vip_data['expire_time'] = date('Y-m-d 23:59:59', strtotime("+$buy_num years"));
                 $this_vip_res = DB::table('nlsg_vip_user')->insertGetId($this_vip_data);
                 if ($this_vip_res) {
                     $user_vip_info = VipUser::where('username', '=', $user_info->phone)
@@ -288,9 +293,9 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             case 1:
                 $this_vip = VipUser::whereId($user_vip_info->id)->first();
                 if ($this_vip->expire_time > $now_date) {
-                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . ' +1 year'));
+                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . "+$buy_num years"));
                 } else {
-                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime("+$buy_num years"));
                 }
                 $this_vip_res = $this_vip->save();
 
@@ -331,9 +336,9 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                     $this_vip->time_begin_360 = $now_date;
                 }
                 if (empty($this_vip->time_end_360)) {
-                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime("+$buy_num years"));
                 } else {
-                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . ' +1 year'));
+                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . "+$buy_num years"));
                 }
                 $this_vip_res = $this_vip->save();
                 $inviter = $user_vip_info->user_id;
@@ -360,9 +365,11 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                 $pdModel->user_id = $inviter;
                 $pdModel->user_vip_id = $inviter_vip_id;
                 if ($inviter_level == 1) {
-                    $pdModel->price = 108;
+                    //$pdModel->price = 108;
+                    $pdModel->price = GetPriceTools::PriceCalc('*', $buy_num, 108);
                 } else {
-                    $pdModel->price = 180;
+                    //$pdModel->price = 180;
+                    $pdModel->price = GetPriceTools::PriceCalc('*', $buy_num, 180);
                 }
                 $pdModel->vip_id = $user_vip_info->id;
                 $pd_res = $pdModel->save();
