@@ -226,11 +226,11 @@ class MallController extends Controller
 
             if (0) {
                 $data = [
-                    'out_trade_no' => '21012700283427386267303', //获取订单号
+                    'out_trade_no' => '21012700257326506036803', //获取订单号
                     'total_fee' => 0.01, //价格
-                    'transaction_id' => 777777, //交易单号
+                    'transaction_id' => 8888, //交易单号
                     'attach' => 14,
-                    'pay_type' => 2,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
+                    'pay_type' => 4,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
                 ];
                 $res = WechatPay::PayStatusUp($data);
                 dd($res);

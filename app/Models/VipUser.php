@@ -197,7 +197,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             ->where('is_default', '=', 1)
             ->first();
 
-        $order_info = Order::whereId($order_id)->select(['id', 'ordernum'])->first();
+        $order_info = Order::whereId($order_id)->select(['id', 'ordernum','live_num'])->first();
 
         $buy_num = $order_info->live_num;
         if ($buy_num == 0){
