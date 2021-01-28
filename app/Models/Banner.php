@@ -102,4 +102,44 @@ class Banner extends Base
         return $res;
     }
 
+    public function appPopup(){
+        $now_date = date('Y-m-d H:i:s');
+        $data = Banner::where('type','=','60')
+            ->where('status','=',1)
+            ->where('start_time','<=',$now_date)
+            ->where('end_time','>',$now_date)
+            ->first();
+        //1:h5(走url,其他都object_id)  2:商品  3:优惠券领取页面4精品课 5.讲座 6.听书 7 360
+        $res = [];
+        if (!empty($data)){
+            $res['id'] = $data->obj_id;
+            $res['info_id'] = 0;
+            switch (intval($data->jump_type)){
+                case 2:
+                    $res['type'] = 3;
+                    break;
+                case 3:
+                    $res['type'] = 0;
+                    break;
+                case 4:
+                    $res['type'] = 2;
+                    break;
+                case 5:
+                    $res['type'] = 5;
+                    break;
+                case 6:
+                    $res['type'] = 6;
+                    break;
+                case 8:
+                    $res['type'] = 1;
+                    break;
+                default:
+                    $res['type'] = 0;
+            }
+            $res['url'] = $data->url;
+            $res['img'] = 'https://image.nlsgapp.com/'.$data->pic;
+        }
+
+        return $res;
+    }
 }

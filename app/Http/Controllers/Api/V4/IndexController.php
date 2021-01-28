@@ -960,15 +960,18 @@ class IndexController extends Controller
 
     public function market()
     {
-        //(1).直播详情   (2).精品课  (3).商品  (4).h5页面  (5).讲座  (6).听书 7 专栏
-        $data = [
-            'id' => 538,
-            'info_id' => 0,
-            'type' => 3,
-            'url' => '',
-            'img' => 'https://image.nlsgapp.com/nlsg/authorpt/20210106142306594001.jpg'
-        ];
+        $bannerModel = new Banner();
+        $data = $bannerModel->appPopup();
         return success($data);
+        //(1).直播详情   (2).精品课  (3).商品  (4).h5页面  (5).讲座  (6).听书 7 专栏
+//        $data = [
+//            'id' => 538,
+//            'info_id' => 0,
+//            'type' => 3,
+//            'url' => '',
+//            'img' => 'https://image.nlsgapp.com/nlsg/authorpt/20210106142306594001.jpg'
+//        ];
+//        return success($data);
     }
 
     public function share(Request $request)

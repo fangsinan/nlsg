@@ -935,6 +935,7 @@ class removeDataServers
 
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_user as u', 'o.user_id', '=', 'u.id')
+            //->where('o.user_id','=',281277)
             ->where('o.pay_time', '>', '2021-01-21 12:00:00')
             ->where('o.pay_time', '<', '2021-01-23 12:00:00')
             ->where('o.type', '=', 14)
@@ -975,8 +976,18 @@ class removeDataServers
                 ->first();
 
             if (empty($temp_inviter) && empty($temp_parent)) {
-                continue;
+                //continue;
+                $v->t_vip_id = 0;
+                $v->t_name = 0;
+                $v->t_uid = 0;
+                $v->t_level = 0;
+                $v->t_inviter = 0;
+                $v->t_inviter_vip_id = 0;
+                $v->t_source = 0;
+                $v->t_source_vip_id = 0;
+                $temp_list[] = $v;
             } else {
+                continue;
                 if (!empty($temp_parent)) {
                     $v->t_vip_id = $temp_parent->vip_id;
                     $v->t_name = $temp_parent->username;
@@ -1025,6 +1036,7 @@ class removeDataServers
                     }
                 }
             } else {
+                echo PHP_EOL, $v->phone, '修改了归属', PHP_EOL;
                 $v->vip_id = $check_open_vip->id;
 
                 if ($v->t_uid != $check_open_vip->inviter) {
@@ -1048,29 +1060,35 @@ class removeDataServers
                 ->where('type', '=', 11)
                 ->first();
             if (empty($check_prd)) {
-
-                $pdModel = new PayRecordDetail();
-                $pdModel->type = 11;
-                $pdModel->ordernum = $v->ordernum;
-                $pdModel->ctime = $now;
-                if ($v->t_level == 1) {
-                    $pdModel->price = 108;
-                } else {
-                    $pdModel->price = 180;
+                echo $v->ordernum, '没有收益是对的', PHP_EOL;
+                if (0) {
+                    $pdModel = new PayRecordDetail();
+                    $pdModel->type = 11;
+                    $pdModel->ordernum = $v->ordernum;
+                    $pdModel->ctime = $now;
+                    if ($v->t_level == 1) {
+                        $pdModel->price = 108;
+                    } else {
+                        $pdModel->price = 180;
+                    }
+                    $pdModel->user_id = $v->t_uid;
+                    $pdModel->user_vip_id = $v->t_vip_id;
+                    $pdModel->vip_id = $v->vip_id;
+                    $pdModel->save();
+                    echo $v->ordernum, '添加收益', PHP_EOL;
                 }
-                $pdModel->user_id = $v->t_uid;
-                $pdModel->user_vip_id = $v->t_vip_id;
-                $pdModel->vip_id = $v->vip_id;
-                $pdModel->save();
-                echo $v->ordernum, '添加收益', PHP_EOL;
             } else {
-                if ($v->t_uid != $check_prd->user_id) {
-                    $check_prd->user_id = $v->t_uid;
-                    $check_prd->user_vip_id = $v->t_vip_id;
-                    $check_prd->vip_id = $v->vip_id;
-                    $check_prd->save();
-                    echo $v->ordernum, '修改收益', PHP_EOL;
-                }
+                PayRecordDetail::where('ordernum', '=', $v->ordernum)
+                    ->where('type', '=', 11)
+                    ->delete();
+                echo $v->ordernum, '删除收益', PHP_EOL;
+//                if ($v->t_uid != $check_prd->user_id) {
+//                    $check_prd->user_id = $v->t_uid;
+//                    $check_prd->user_vip_id = $v->t_vip_id;
+//                    $check_prd->vip_id = $v->vip_id;
+//                    $check_prd->save();
+//                    echo $v->ordernum, '修改收益', PHP_EOL;
+//                }
             }
         }
 
