@@ -108,6 +108,7 @@ class Works extends Base
                 $query->select('id', 'pid', 'rank', 'title', 'duration', 'view_num', 'online_time')
                     ->orderBy('rank', 'desc')
                     ->orderBy('id', 'desc')
+                    ->where('status', 4)
                     ->limit(2);
             },
             'user:id,nickname,headimg'
