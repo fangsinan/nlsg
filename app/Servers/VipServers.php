@@ -176,4 +176,58 @@ class VipServers
 
     }
 
+    public function createVip_1($params, $admin_id)
+    {
+
+        $parent = $params['parent'] ?? 0;
+        $son = $params['son'] ?? 0;
+
+        $check_parent = '';
+        if (!empty($parent)) {
+            $check_parent = VipUser::where('username', '=', $params)
+                ->where('status', '=', 1)
+                ->where('is_default', '=', 1)
+                ->first();
+            if (empty($check_parent)) {
+                return ['code' => false, 'msg' => $params['parent'] . '上级不是会员,无法绑定'];
+            }
+        }
+
+        if (empty($son)) {
+            return ['code' => false, 'msg' => '开通人不能为空'];
+        } else {
+            $check_son = VipUser::where('username', '=', $son)
+                ->where('status', '=', 1)
+                ->where('is_default', '=', 1)
+                ->first();
+            //如果已经是会员 且上家不为空
+            if (!empty($check_son) && !empty($check_parent)) {
+                return ['code' => false, 'msg' => '开通人已经是会员,不能指定新的上级'];
+            }
+
+
+
+        }
+    }
+
+    public function createVip_2($params, $admin_id)
+    {
+
+    }
+
+    public function createVip($params, $admin_id = 0)
+    {
+        $flag = $params['flag'] ?? 0;
+
+        switch (intval($flag)) {
+            case 1:
+                return $this->createVip_1($params, $admin_id);
+            case 2:
+                return $this->createVip_2($params, $admin_id);
+            default:
+                return ['code' => false, 'msg' => '开通类型错误'];
+        }
+
+    }
+
 }

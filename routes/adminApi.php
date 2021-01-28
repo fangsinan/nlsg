@@ -145,6 +145,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('comment/index', 'CommentController@index');
     });
 
+    Route::post('vip/create_vip', 'VipController@createVip');
 
     //定时任务
     Route::get('crontab/mall_refund', 'CrontabController@mallRefund');//商城退款

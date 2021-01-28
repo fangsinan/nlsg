@@ -61,6 +61,13 @@ class VipController extends ControllerBackend
         return $this->getRes($data);
     }
 
-    //todo 状态修改
+    //todo 开通360
+    public function createVip(Request $request){
+        $servers = new VipServers();
+        $data = $servers->createVip($request->input(), $this->user['id'] ?? 0);
+        return $this->getRes($data);
+    }
+
+    //todo 划转收益或关系
 
 }
