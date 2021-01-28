@@ -17,6 +17,7 @@ use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
+use App\Models\VipUserBind;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -926,6 +927,45 @@ class removeDataServers
 
         DB::connection('mysql_new_zs')->table('nlsg_coupon')->insert($add_data);
 
+    }
+
+    public function del_bind_not_vip()
+    {
+
+        $now_date = date('Y-m-d H:i:s');
+        $end_date = date('Y-m-d 17:59:59', strtotime('+1 years'));
+        $list = DB::table('nlsg_live_count_down as cd')
+            ->join('nlsg_vip_user as vu', 'cd.new_vip_uid', '=', 'vu.user_id')
+            ->where('cd.created_at', '<=', '2021-01-22 23:00:00')
+            ->where('vu.level', '=', 2)
+            ->where('vu.status', '=', 1)
+            ->where('vu.is_default', '=', 1)
+            ->select(['vu.username', 'cd.phone'])
+            ->get()
+            ->toArray();
+
+        //DB::beginTransaction();
+
+        $add_data = [];
+        foreach ($list as $v) {
+            $temp_add_data = [];
+            $temp_add_data['parent'] = $v->username;
+            $temp_add_data['son'] = $v->phone;
+            $temp_add_data['life'] = 5;
+            $add_data[] = $temp_add_data;
+        }
+
+        foreach ($add_data as $vv) {
+            try {
+                DB::table('nlsg_vip_user_bind')->insert($vv);
+                echo PHP_EOL,$vv['son'],'成功',PHP_EOL;
+            } catch (\Exception $e) {
+                echo PHP_EOL,$vv['son'],'错误',PHP_EOL;
+            }
+        }
+
+
+        //dd($add_data);
     }
 
     public function check_1360_job()

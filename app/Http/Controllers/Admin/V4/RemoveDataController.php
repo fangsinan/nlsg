@@ -58,6 +58,10 @@ class RemoveDataController extends ControllerBackend
         if (0) {
             $servers->check_1360_job();
         }
+
+        if (0) {
+            $servers->del_bind_not_vip();
+        }
     }
 
     public function mallOrders()
