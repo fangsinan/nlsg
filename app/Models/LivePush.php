@@ -85,8 +85,8 @@ SELECT
 FROM
 	nlsg_live_push
 WHERE
-	live_id = 1
-	AND live_info_id = 1
+	live_id = $live_id
+	AND live_info_id = $live_info_id
 	AND is_push = 1) as a
 	where s_begin  <= $send_timestamp
 	and s_end > $send_timestamp limit 1";
