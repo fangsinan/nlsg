@@ -9,7 +9,6 @@
 namespace App\Models;
 
 use App\Servers\JobServers;
-use Illuminate\Database\Eloquent\Model;
 
 
 class LiveForbiddenWords extends Base
@@ -22,6 +21,12 @@ class LiveForbiddenWords extends Base
         $live_info_id = $params['live_info_id'] ?? 0;
         $flag = $params['flag'] ?? 0;
         $obj_id = $params['user_id'] ?? 0;
+
+        if (!empty($obj_id) && !empty($user_id)) {
+            if ($obj_id == $user_id) {
+                return ['code' => false, 'msg' => '对象是管理员'];
+            }
+        }
 
         if (empty($live_id) || empty($live_info_id)) {
             return ['code' => false, 'msg' => '参数错误'];
