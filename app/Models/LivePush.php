@@ -72,7 +72,7 @@ class LivePush extends Base
 //            ->select(['id'])
 //            ->first();
 
-        $send_timestamp = strtotime($push_at) + 3;
+        $send_timestamp = strtotime($push_at) + 4;
 
         $check_sql = "select * from (
 SELECT
@@ -119,7 +119,7 @@ WHERE
         $model->user_id = $user_id;
         $model->push_type = $push_type;
         $model->push_gid = $push_gid;
-        $model->push_at = $push_at;
+        $model->push_at = date('Y-m-d H:i:s',strtotime($push_at) + 4);
         $model->length = $length;;
 
         $res = $model->save();

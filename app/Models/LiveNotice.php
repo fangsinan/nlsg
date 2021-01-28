@@ -139,7 +139,7 @@ WHERE
         $model->content = $content;
         $model->length = $length;
         $model->is_send = 1;
-        $model->send_at = $send_at;
+        $model->send_at = date('Y-m-d H:i:s',strtotime($send_at) + 13);
 
         $res = $model->save();
 
