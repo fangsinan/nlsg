@@ -939,10 +939,5 @@ class LiveController extends Controller
         return $this->getRes($data);
     }
 
-    function test(){
-        $a = Live::sendLiveCountDown();
-        return success($a);
-
-    }
 
 }

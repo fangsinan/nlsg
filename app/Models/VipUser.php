@@ -197,7 +197,12 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             ->where('is_default', '=', 1)
             ->first();
 
-        $order_info = Order::whereId($order_id)->select(['id', 'ordernum'])->first();
+        $order_info = Order::whereId($order_id)->select(['id', 'ordernum','live_num'])->first();
+
+        $buy_num = $order_info->live_num;
+        if ($buy_num == 0){
+            $buy_num = 1;
+        }
 
         $inviter_info = DB::table('nlsg_live_count_down as cd')
             ->join('nlsg_vip_user as vu', 'cd.new_vip_uid', '=', 'vu.user_id')
@@ -211,10 +216,11 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                 'source', 'source_vip_id'])
             ->first();
 
+
         $bind_info = DB::table('nlsg_vip_user_bind as ub')
             ->join('nlsg_vip_user as vu', 'ub.parent', '=', 'vu.username')
             ->where('ub.son', '=', $user_info->phone)
-            ->whereRaw('(ub.life = 1 or (ub.life = 2 and ub.begin_at > now() and ub.end_at < now()))')
+            ->whereRaw('(ub.life = 1 or (ub.life = 2 and ub.begin_at < now() and ub.end_at > now()))')
             ->where('vu.status', '=', 1)
             ->where('vu.is_default', '=', 1)
             ->where('vu.expire_time', '>', $now_date)
@@ -276,7 +282,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                 $this_vip_data['start_time'] = $now_date;
                 $this_vip_data['updated_at'] = $now_date;
                 $this_vip_data['channel'] = $order_info->activity_tag;
-                $this_vip_data['expire_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                $this_vip_data['expire_time'] = date('Y-m-d 23:59:59', strtotime("+$buy_num years"));
                 $this_vip_res = DB::table('nlsg_vip_user')->insertGetId($this_vip_data);
                 if ($this_vip_res) {
                     $user_vip_info = VipUser::where('username', '=', $user_info->phone)
@@ -288,9 +294,9 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             case 1:
                 $this_vip = VipUser::whereId($user_vip_info->id)->first();
                 if ($this_vip->expire_time > $now_date) {
-                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . ' +1 year'));
+                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . "+$buy_num years"));
                 } else {
-                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime("+$buy_num years"));
                 }
                 $this_vip_res = $this_vip->save();
 
@@ -302,8 +308,13 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                         $inviter_level = 1;
                     } else {
                         if (empty($user_vip_info->inviter_vip_id ?? 0)) {
-                            //之前没有推荐人,就没有收益
-                            $inviter = $inviter_vip_id = $inviter_level = 0;
+                            //之前没有推荐人,需要添加推荐人为现在的推荐人
+                            $this_vip = VipUser::whereId($user_vip_info->id)->first();
+                            $this_vip->inviter = $inviter;
+                            $this_vip->inviter_vip_id = $inviter_vip_id;
+                            $this_vip->source = $source;
+                            $this_vip->source_vip_id = $source_vip_id;
+                            $this_vip->save();
                         } else {
                             //之前有收益,就给老上家
                             $temp_inviter_info = VipUser::where('user_id', '=', $user_vip_info->inviter)
@@ -331,9 +342,9 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                     $this_vip->time_begin_360 = $now_date;
                 }
                 if (empty($this_vip->time_end_360)) {
-                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime('+1 year'));
+                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime("+$buy_num years"));
                 } else {
-                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . ' +1 year'));
+                    $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . "+$buy_num years"));
                 }
                 $this_vip_res = $this_vip->save();
                 $inviter = $user_vip_info->user_id;
@@ -360,9 +371,11 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                 $pdModel->user_id = $inviter;
                 $pdModel->user_vip_id = $inviter_vip_id;
                 if ($inviter_level == 1) {
-                    $pdModel->price = 108;
+                    //$pdModel->price = 108;
+                    $pdModel->price = GetPriceTools::PriceCalc('*', $buy_num, 108);
                 } else {
-                    $pdModel->price = 180;
+                    //$pdModel->price = 180;
+                    $pdModel->price = GetPriceTools::PriceCalc('*', $buy_num, 180);
                 }
                 $pdModel->vip_id = $user_vip_info->id;
                 $pd_res = $pdModel->save();
@@ -374,7 +387,11 @@ where a.user_id = ' . $user_id . ' and a.status = 2
         }
 
         //开通订阅课程
-        VipRedeemUser::subWorksOrGetRedeemCode($user_id);
+        $sub_i = 1;
+        while ($sub_i <= $buy_num){
+            VipRedeemUser::subWorksOrGetRedeemCode($user_id);
+            $sub_i++;
+        }
 
         DB::commit();
         return ['code' => true, 'msg' => 'ok'];

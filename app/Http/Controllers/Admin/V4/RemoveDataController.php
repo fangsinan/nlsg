@@ -51,8 +51,12 @@ class RemoveDataController extends ControllerBackend
             $servers->runPoster();
         }
 
-        if (1) {
+        if (0) {
             $servers->add_live_to_bind();
+        }
+
+        if (0) {
+            $servers->check_1360_job();
         }
     }
 

@@ -1004,6 +1004,7 @@ class OrderController extends Controller
         $level = $request->input('level', 1);   //目标id
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
+        $live_num = $request->input('live_num',1);
         $tweeter_code = intval($request->input('inviter', 0));  //推客id
         $user_id = $this->user['id'];
 
@@ -1093,7 +1094,7 @@ class OrderController extends Controller
             'relation_id' => $level,
             'price' => $price,
             'cost_price' => $price,
-
+            'live_num'=>$live_num,
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
             'live_id' => $live_id,
@@ -1134,7 +1135,7 @@ class OrderController extends Controller
         $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
         $tweeter_code = $request->input('inviter', 0);  //推客id
-        $num = $request->input('num', 0);  //推客id
+        $num = $request->input('num', 1);  //
         $user_id = $this->user['id'];
 
         if( $tweeter_code > 0 && $live_id > 0 ){  //需要校验推客id
@@ -1159,7 +1160,7 @@ class OrderController extends Controller
             'user_id' => $user_id,
             'relation_id' => $product_id,
             'cost_price' => $price,
-            'price' => $price,
+            'price' => ($price*$num),
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
             'pay_type' => $pay_type,

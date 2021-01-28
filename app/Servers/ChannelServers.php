@@ -509,6 +509,29 @@ class ChannelServers
                                 'status' => 1,
                                 'success_at' => $now_date
                             ]);
+
+                        foreach ($v->skuInfo->to_id as $to_id){
+                            if ($to_id == 2){
+                                //如果是2  表示为1360订单 需要写入order表
+                                $orderModel = new Order();
+                                $orderModel->type = 14;
+                                $orderModel->live_num = 1;
+                                $orderModel->relation_id = 4;
+                                $orderModel->live_id = 0;
+                                $orderModel->user_id = $v->user_id;
+                                $orderModel->status = 1;
+                                $orderModel->pay_time = $now_date;
+                                $orderModel->cost_price = 1360;
+                                $orderModel->price = 1360;
+                                $orderModel->pay_price = 1360;
+                                $orderModel->ordernum = $v->order_id;
+                                $orderModel->activity_tag = 'dy_1360';
+                                $orderModel->save();
+                                dd(__LINE__);
+                            }
+                        }
+
+
                         break;
                 }
             }
