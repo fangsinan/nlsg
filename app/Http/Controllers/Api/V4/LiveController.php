@@ -802,7 +802,7 @@ class LiveController extends Controller
             ])->first();
 
             if(empty($flag)){
-                return error(0,'您不可参与该直播');
+                return error(0,'您不可参与该直播，请联系慧宇服务顾问');
             }
         }
 
