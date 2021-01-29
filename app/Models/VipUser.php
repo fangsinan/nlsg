@@ -195,6 +195,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
         $user_vip_info = VipUser::where('username', '=', $user_info->phone)
             ->where('status', '=', 1)
             ->where('is_default', '=', 1)
+            ->where('expire_time', '>=', $now_date)
             ->first();
 
         $order_info = Order::whereId($order_id)->select(['id', 'ordernum','live_num'])->first();
