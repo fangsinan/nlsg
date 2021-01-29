@@ -10,6 +10,7 @@
 namespace App\Models;
 
 use App\Servers\JobServers;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 
@@ -119,10 +120,13 @@ WHERE
         $model->user_id = $user_id;
         $model->push_type = $push_type;
         $model->push_gid = $push_gid;
-        $model->push_at = date('Y-m-d H:i:s',strtotime($push_at) + 4);
+        $model->push_at = date('Y-m-d H:i:s', strtotime($push_at) + 4);
         $model->length = $length;;
 
         $res = $model->save();
+
+        $cache_key_name = 'live_live_works_' . $live_id . '_2';
+        Cache::forget($cache_key_name);
 
         if ($res) {
             JobServers::pushToSocket($live_id, $live_info_id, 6);

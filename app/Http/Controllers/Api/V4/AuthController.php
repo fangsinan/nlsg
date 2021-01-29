@@ -530,10 +530,12 @@ class AuthController extends Controller
         if ($isValid === true) {
             $user = User::where('appleid', $appleid)->first();
             if (!$user) {
+                $rand =  uniqid();
                 $list = User::create([
+                    'nickname'=> '苹果用户'. $rand,
+                    'phone'   => '苹果用户'. $rand,
                     'appleid' => $appleid ?? ''
                 ]);
-                User::where('id', $list->id)->update(['phone'=>'苹果用户'.$list->id, 'nickname'=>'苹果用户'.$list->id]);
                 $user = User::find($list->id);
             }
 
