@@ -129,7 +129,7 @@ class IndexController extends Controller
         $os_type = $request->get('os_type') ?? 1;
         $version = $request->get('version') ?? 1;
 
-        if($os_type == 2 && $version == '4.0.8'){
+        if($os_type == 2 && $version == '4.0.9'){
             return success();
         }
 
