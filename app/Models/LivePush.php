@@ -125,7 +125,7 @@ WHERE
 
         $res = $model->save();
 
-        $this->getPushWorks($live_id,$push_type,$push_gid);
+//        $this->getPushWorks($live_id, $push_type, $push_gid);
 
         if ($res) {
             JobServers::pushToSocket($live_id, $live_info_id, 6);
@@ -268,32 +268,40 @@ WHERE
     public function infoOfColumn()
     {
         return $this->hasOne(Column::class, 'id', 'push_gid')
-            ->select(['id', 'name as title', 'subtitle', 'cover_pic as cover_img', 'price',
-                DB::raw('if(type=1,1,7) as with_type')]);
+            ->select([
+                'id', 'name as title', 'subtitle', 'cover_pic as cover_img', 'price',
+                DB::raw('if(type=1,1,7) as with_type')
+            ]);
     }
 
     //精品课和听书
     public function infoOfWorks()
     {
         return $this->hasOne(Works::class, 'id', 'push_gid')
-            ->select(['id', 'title', 'subtitle', 'cover_img', 'price',
-                DB::raw('if(is_audio_book=1,8,2) as with_type')]);
+            ->select([
+                'id', 'title', 'subtitle', 'cover_img', 'price',
+                DB::raw('if(is_audio_book=1,8,2) as with_type')
+            ]);
     }
 
     //商品
     public function infoOfGoods()
     {
         return $this->hasOne(MallGoods::class, 'id', 'push_gid')
-            ->select(['id', 'name as title', 'subtitle', 'picture as cover_img', 'price',
-                DB::raw('3 as with_type')]);
+            ->select([
+                'id', 'name as title', 'subtitle', 'picture as cover_img', 'price',
+                DB::raw('3 as with_type')
+            ]);
     }
 
     //线下课
     public function infoOfOffline()
     {
         return $this->hasOne(OfflineProducts::class, 'id', 'push_gid')
-            ->select(['id', 'title', 'subtitle', 'cover_img', 'price',
-                DB::raw('4 as with_type')]);
+            ->select([
+                'id', 'title', 'subtitle', 'cover_img', 'price',
+                DB::raw('4 as with_type')
+            ]);
     }
 
     public function liveInfo()
@@ -302,5 +310,87 @@ WHERE
             ->select(['id', 'title']);
     }
 
+    public function getPushWorks($live_id = 0, $push_type = 7, $push_id = 0)
+    {
+        $cache_live_name = 'live_push_works_'.$live_id;
+        $data = Cache::get($cache_live_name);
+        if ($data) {
+            foreach ($data as $v) {
+                if ($v['id'] != $push_id && $v['type'] != $push_type) {
+                    Cache::forget('live_push_works_'.$live_id);
+                    $this->getWorksList($live_id);
+                    break;
+                }
+            }
+        }
+        $data = $this->getWorksList($live_id);
+        return $data;
+    }
 
+    public function getWorksList($live_id = 0)
+    {
+        if ( ! $live_id) {
+            return false;
+        }
+        $cache_live_name = 'live_push_works_'.$live_id;
+        $data = Cache::get($cache_live_name);
+
+        $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del')
+            ->where('live_id', $live_id)
+            ->orderBy('push_at')
+            ->groupBy('push_type', 'push_gid')
+            ->get()
+            ->toArray();
+        if ($lists) {
+            $data = [];
+            foreach ($lists as $v) {
+                if ($v['push_type'] == 7) {
+                    $res = Column::select('id', 'name as title', 'subtitle', 'original_price', 'price',
+                        'cover_pic as cover_img')
+                        ->where('id', $v['push_gid'])
+                        ->where('type', 2)
+                        ->where('status', 1)
+                        ->first();
+                    $res->type = 1;
+                    $res = $res->toArray();
+                } elseif ($v['push_type'] == 2) {
+                    $res = Works::select('id', 'title', 'subtitle', 'cover_img', 'original_price', 'price')
+                        ->where('id', $v['push_gid'])
+                        ->where('status', 4)
+                        ->first();
+                    $res->type = 2;
+                    $res = $res->toArray();
+                } elseif ($v['push_type'] == 3) {
+                    $res = MallGoods::select('id', 'name as title', 'subtitle', 'picture as cover_img',
+                        'original_price', 'price')
+                        ->where('id', $v['push_gid'])
+                        ->first();
+                    $res->type = 3;
+                    $res = $res->toArray();
+                } elseif ($v['push_type'] == 6) {
+                    $res = [
+                        'id'            => 999999,
+                        'title'         => '幸福360会员',
+                        'price'         => 360.00,
+                        'cover_img'     => '/live/recommend/360_xhc.png',
+                        'cover_details' => '/live/recommend/360_tc.png',
+                        'type'          => 4
+                    ];
+                } elseif ($v['push_type'] == 4) {
+                    $res = OfflineProducts::select('id', 'title', 'subtitle', 'cover_img',
+                        'image as cover_details', 'total_price as original_price', 'price')
+                        ->where('id', $v['rid'])
+                        ->first();
+                    $res->type = 5;
+                    $res = $res->toArray();
+                }
+                $data[] = $res ?? [];
+            }
+            $expire_num = CacheTools::getExpire('live_push_works');
+            Cache::put($cache_live_name, $data, $expire_num);
+
+            return $data;
+        }
+
+    }
 }
