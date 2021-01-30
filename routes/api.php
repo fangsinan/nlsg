@@ -197,6 +197,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('live/back_lists', 'LiveController@getLiveBackLists');
     Route::get('live/check_sub', 'LiveController@checkLiveSub');
 
+    Route::get('check_phone_add_sub', 'LiveController@checkPhoneAddSub');
+
+
     Route::post('send/get_send_order', 'SendController@getSendOrder');
 
     Route::get('work/convert','WorksController@convert');//获取订单详情

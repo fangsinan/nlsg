@@ -939,10 +939,100 @@ class LiveController extends Controller
         return $this->getRes($data);
     }
 
-    function test(){
-        $a = Live::sendLiveCountDown();
-        return success($a);
+//    function test(){
+//        $a = Live::sendLiveCountDown();
+//        return success($a);
+//
+//    }
+
+
+
+
+
+    //nlsg_live_check_phone表关注
+    public function checkPhoneAddSub(){
+
+        $checkArr = LiveCheckPhone::select('*')->where(['is_sub'=>0])->get()->toArray();
+        //先校验是否注册用户
+        if(empty($checkArr)){
+            return $this->getRes([-1]);
+
+        }
+        DB::beginTransaction();
+        //所有用户手机号
+        $checkPhoneArr = array_column($checkArr,'phone');
+        //已注册用户手机号
+        $user = User::whereIn('phone',$checkPhoneArr)->get()->toArray();
+        $UserPhoneArr = array_column($user,'phone');
+        $resultPhone = array_diff($checkPhoneArr,$UserPhoneArr);
+        $ures = true;
+        if($resultPhone){
+            //进行注册操作createMany
+            $addUser = [];
+            foreach ($resultPhone as $k=>$v){
+
+
+                $addUser[] = [
+                    "phone"     =>  $v,
+                    "nickname"  =>  substr_replace($v, '****', 3, 4),
+                ];
+            }
+            $ures = User::insert($addUser);
+        }
+
+        //重新查询所有用户的uid
+        $LiveCountDownUser = [];
+        $subscribeUser = [];
+        $up_ids = [];
+        foreach ($checkArr as $k=>$v){
+            $up_ids[] = $v['id'];
+            //查询用户信息
+            $user = User::where('phone',$v['phone'])->first();
+            $info_id = LiveInfo::where(['live_pid'=>$v['live_id']])->first();
+
+            $LiveCountDownUser[] = [
+                "live_id"   =>  $info_id['id'],  //info表id
+                "user_id"   =>  $user['id'],
+                "phone"     =>  $v['phone'],
+            ];
+            $subscribeUser[] = [
+                'user_id' => $user['id'], //会员id
+                'pay_time' => date("Y-m-d H:i:s", time()), //支付时间
+                'type' => 3, //直播
+                'status' => 1,
+                'relation_id' => $v['live_id'],  //live表id
+            ];
+        }
+
+        if($LiveCountDownUser){
+            //直播预约表
+            $dres = LiveCountDown::insert($LiveCountDownUser);
+            $lres = Live::where(['id' => $v['live_id']])->increment('order_num',count($checkArr));
+        }
+
+        if($subscribeUser){
+            //直播关注表
+            $sres = Subscribe::insert($subscribeUser);
+        }
+
+        //修改标记
+        $lupres = true;
+        if($up_ids){
+            $lupres = LiveCheckPhone::whereIn('id',$up_ids)->update([
+                'is_sub' => 1,
+            ]);
+        }
+
+
+        if($ures && $dres && $lres && $sres && $lupres){
+            DB::commit();
+            return $this->getRes([1]);
+        }else{
+            DB::rollBack();
+            return $this->getRes([0]);
+        }
 
     }
+
 
 }
