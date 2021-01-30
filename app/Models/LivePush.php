@@ -9,6 +9,7 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\Api\V4\LiveController;
 use App\Servers\JobServers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -125,9 +126,8 @@ WHERE
 
         $res = $model->save();
 
-        $cache_key_name = 'live_live_works_' . $live_id . '_2';
-        Cache::forget($cache_key_name);
-
+        $this->getPushWorks($live_id,$push_type,$push_gid);
+        
         if ($res) {
             JobServers::pushToSocket($live_id, $live_info_id, 6);
             return ['code' => true, 'msg' => '添加成功'];
