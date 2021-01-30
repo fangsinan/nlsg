@@ -551,46 +551,6 @@ class MallController extends Controller
      * "name": "家庭图书",
      * "icon": "nlsg/goods/20200827114214174967.png",
      * "ids_str": "230,231,255,261,262,263,265,324,325,327"
-     * },
-     * {
-     * "id": 1,
-     * "name": "时光文创",
-     * "icon": "nlsg/goods/20200827113712536228.png",
-     * "ids_str": "66,67,81,86,91,96,98,116,117,122,148,149,153,155"
-     * }
-     * ],
-     * "hot_sale": [
-     * {
-     * "id": 420,
-     * "title": "活动测试",
-     * "pic": "nlsg/banner/20200521142524320648.png",
-     * "url": "/pages/activity/sixOne",
-     * "jump_type": 0,
-     * "obj_id": 0
-     * },
-     * {
-     * "id": 419,
-     * "title": "欢乐中国年",
-     * "pic": "wechat/mall/goods/20190110155411_338.png",
-     * "url": "/mall/shop-details?goods_id=338",
-     * "jump_type": 0,
-     * "obj_id": 0
-     * },
-     * {
-     * "id": 418,
-     * "title": "儿童情商社交游戏绘本",
-     * "pic": "wechat/mall/goods/20190110155407_333.png",
-     * "url": "/mall/shop-details?goods_id=333",
-     * "jump_type": 0,
-     * "obj_id": 0
-     * },
-     * {
-     * "id": 417,
-     * "title": "乌合之众",
-     * "pic": "wechat/mall/goods/20190110155401_327.png",
-     * "url": "/mall/shop-details?goods_id=327",
-     * "jump_type": 0,
-     * "obj_id": 0
      * }
      * ],
      * "postage_line": "88"

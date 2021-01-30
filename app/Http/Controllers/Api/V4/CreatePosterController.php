@@ -76,16 +76,17 @@ class CreatePosterController extends Controller
 
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
-//            $cache_key_name = 'qr_' . $is_qrcode . '_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid . '_' . $flag;
-//            $res = Cache::get($cache_key_name);
-//
-//            if (empty($res)){
-            $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id);
-            $temp_9_res = $this->createQRcode($QR_url, true, true, true);
+
+            $cache_key_name = 'qr_' . $is_qrcode . '_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid . '_' . $flag;
+            $res = Cache::get($cache_key_name);
             $src = '';
-            $res = ConfigModel::base64Upload(100, $temp_9_res);
-//                Cache::put($cache_key_name, $res, $expire_num);
-//            }
+            if (empty($res)) {
+                $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id);
+                $temp_9_res = $this->createQRcode($QR_url, true, true, true);
+                $src = '';
+                $res = ConfigModel::base64Upload(100, $temp_9_res);
+                Cache::put($cache_key_name, $res, $expire_num);
+            }
 
             if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
