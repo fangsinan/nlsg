@@ -138,6 +138,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::post('live/pass', 'LiveController@pass');
 
         //用户
+        Route::get('user/index', 'UserController@index');
         Route::get('user/apply', 'UserController@apply');
         Route::post('user/pass', 'UserController@pass');
 
