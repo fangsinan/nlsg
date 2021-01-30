@@ -54,7 +54,7 @@ class UserController extends Controller
     {
         $idcard = $request->get('idcard');
         $name = $request->get('name');
-        $phone = $request->get('phone');
+        $idcard = $request->get('idcard');
         $status = $request->get('status');
         $query = CashData::with('user:id,nickname')
             ->when($name, function ($query) use ($name) {
