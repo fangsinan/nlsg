@@ -36,6 +36,10 @@ class MallAddress extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
 
+        if (strlen($phone) > 11){
+            return ['code'=>false,'msg'=>'手机号格式错误'];
+        }
+
         if (!empty(($params['id'] ?? 0))) {
             $address = self::where('user_id', '=', $user_id)
                 ->find($params['id']);
