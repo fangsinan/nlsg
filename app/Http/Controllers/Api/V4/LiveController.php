@@ -952,7 +952,7 @@ class LiveController extends Controller
     //nlsg_live_check_phone表关注
     public function checkPhoneAddSub(){
 
-        $checkArr = LiveCheckPhone::select('*')->where(['is_sub'=>0])->get()->toArray();
+        $checkArr = LiveCheckPhone::select('*')->where(['is_scanning'=>0,'status'=>1])->get()->toArray();
         //先校验是否注册用户
         if(empty($checkArr)){
             return $this->getRes([-1]);
@@ -1019,7 +1019,7 @@ class LiveController extends Controller
         $lupres = true;
         if($up_ids){
             $lupres = LiveCheckPhone::whereIn('id',$up_ids)->update([
-                'is_sub' => 1,
+                'is_scanning' => 1,
             ]);
         }
 
