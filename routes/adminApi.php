@@ -141,6 +141,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('user/apply', 'UserController@apply');
         Route::post('user/pass', 'UserController@pass');
 
+        //课程兑换码
+        Route::post('redeem_code/create', 'RedeemCodeController@create');
+
         //评论
         Route::get('comment/index', 'CommentController@index');
     });
@@ -151,7 +154,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('crontab/mall_refund', 'CrontabController@mallRefund');//商城退款
     Route::get('crontab/mall_refund_check', 'CrontabController@mallRefundCheck');//商城退款查询
 
-    Route::post('redeem_code/create', 'RedeemCodeController@create');
+
 
     //数据迁移
     Route::get('remove_data/goods', 'RemoveDataController@goods');
