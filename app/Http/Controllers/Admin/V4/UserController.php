@@ -67,7 +67,7 @@ class UserController extends Controller
                 $query->where('idcard', 'like', '%'.$idcard.'%');
             })
             ->when(! is_null($status), function ($query) use ($status) {
-                $query->where('status', $status);
+                $query->where('is_pass', $status);
             });
 
         $lists = $query
