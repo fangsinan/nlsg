@@ -60,9 +60,6 @@ class UserController extends Controller
             ->when($name, function ($query) use ($name) {
                 $query->where('truename', 'like', '%'.$name.'%');
             })
-            ->when($phone, function ($query) use ($phone) {
-                $query->where('phone', 'like', '%'.$phone.'%');
-            })
             ->when($idcard, function ($query) use ($idcard) {
                 $query->where('idcard', 'like', '%'.$idcard.'%');
             })
