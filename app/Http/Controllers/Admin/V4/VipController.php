@@ -74,7 +74,7 @@ class VipController extends ControllerBackend
      *
      * @apiParam {string} [parent] 上级账号(添加360时可选)
      * @apiParam {string} phone 开通账号
-     * @apiParam {string} [send_money] 是否生成收益(1生成,0不生成)
+     * @apiParam {string} [send_money] 是否生成收益(添加360时可用.1生成,0不生成)
      * @apiParam {string=1,2} flag 类型(1是360 , 2是钻石)
      *
      * @apiSuccess {string[]} success_msg 操作信息
