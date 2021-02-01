@@ -337,10 +337,11 @@ WHERE
 
         $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del')
             ->where('live_id', $live_id)
-            ->orderBy('push_at')
+            ->orderBy('push_at','desc')
             ->groupBy('push_type', 'push_gid')
             ->get()
             ->toArray();
+
         if ($lists) {
             $data = [];
             foreach ($lists as $v) {
