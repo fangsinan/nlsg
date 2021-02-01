@@ -23,8 +23,11 @@ class UserController extends Controller
         $start = $request->get('start');
         $end = $request->get('end');
         $query = User::when($id, function ($query) use ($id) {
-            $query->where('id', $id);
-        })
+                $query->where('id', $id);
+            })
+            ->when($nickname, function ($query) use ($nickname) {
+               $query->where('nickname', 'like', '%' . $nickname . '%');
+            })
             ->when(! is_null($sex), function ($query) use ($sex) {
                 $query->where('sex', $sex);
             })
