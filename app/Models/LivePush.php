@@ -125,7 +125,7 @@ WHERE
 
         $res = $model->save();
 
-//        $this->getPushWorks($live_id, $push_type, $push_gid);
+        $this->getPushWorks($live_id, $push_type, $push_gid);
 
         if ($res) {
             JobServers::pushToSocket($live_id, $live_info_id, 6);
