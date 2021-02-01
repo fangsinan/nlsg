@@ -17,6 +17,7 @@ use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\LivePush;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -510,13 +511,21 @@ class LiveController extends Controller
 
     }
 
-    public function recommend(Request $request)
-    {
-        $id = $request->get('live_id');
-        $liveWork = new LiveWorks();
-        $recommend = $liveWork->getLiveWorks($id, 2, 10);
-        return success($recommend);
-    }
+//    public function recommend(Request $request)
+//    {
+//        $id = $request->get('live_id');
+//        $liveWork = new LiveWorks();
+//        $recommend = $liveWork->getLiveWorks($id, 2, 10);
+//        return success($recommend);
+//    }
+
+     public function  recommend(Request $request)
+     {
+         $id       = $request->get('live_id');
+         $livePush = new LivePush();
+         $recommend = $livePush->getPushWorks($id);
+         return success($recommend);
+     }
 
     /**
      * @api {get} api/v4/offline/info  线下课程详情

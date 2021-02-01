@@ -125,7 +125,7 @@ WHERE
 
         $res = $model->save();
 
-//        $this->getPushWorks($live_id, $push_type, $push_gid);
+        $this->getPushWorks($live_id, $push_type, $push_gid);
 
         if ($res) {
             JobServers::pushToSocket($live_id, $live_info_id, 6);
@@ -337,10 +337,11 @@ WHERE
 
         $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del')
             ->where('live_id', $live_id)
-            ->orderBy('push_at')
+            ->orderBy('push_at','desc')
             ->groupBy('push_type', 'push_gid')
             ->get()
             ->toArray();
+
         if ($lists) {
             $data = [];
             foreach ($lists as $v) {
@@ -379,7 +380,7 @@ WHERE
                 } elseif ($v['push_type'] == 4) {
                     $res = OfflineProducts::select('id', 'title', 'subtitle', 'cover_img',
                         'image as cover_details', 'total_price as original_price', 'price')
-                        ->where('id', $v['rid'])
+                        ->where('id', $v['push_gid'])
                         ->first();
                     $res->type = 5;
                     $res = $res->toArray();
