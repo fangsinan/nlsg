@@ -4,6 +4,7 @@
 namespace App\Servers;
 
 
+use App\Models\PayRecordDetail;
 use App\Models\User;
 use App\Models\VipRedeemAssign;
 use App\Models\VipRedeemUser;
@@ -93,6 +94,10 @@ class VipServers
             return ['code' => false, 'msg' => '数量错误'];
         }
 
+        $success_msg = [];
+
+        DB::beginTransaction();
+
         switch ($params['flag'] ?? '') {
             case 'add':
                 $data['type'] = 1;
@@ -102,6 +107,7 @@ class VipServers
                 $data['num'] = $params['num'];
                 $data['status'] = $params['status'];
                 $res = DB::table('nlsg_vip_redeem_assign')->insert($data);
+                $success_msg[] = '添加配额' . $params['num'];
                 break;
             case 'edit':
                 $id = $params['assign_history_id'] ?? 0;
@@ -111,6 +117,7 @@ class VipServers
                 if (empty($check)) {
                     return ['code' => false, 'msg' => '参数错误'];
                 }
+                $success_msg[] = '修改配额' . $check->num . '->' . $params['num'];
                 $update = [];
                 $update['num'] = $params['num'];
                 $res = DB::table('nlsg_vip_redeem_assign')
@@ -121,9 +128,23 @@ class VipServers
                 return ['code' => false, 'msg' => '参数错误'];
         }
 
+        $log_data = [];
+        $log_data['admin_id'] = $admin_id;
+        $log_data['phone'] = $check_vip->username;
+        $log_data['user_id'] = $check_vip->user_id;
+        $log_data['vip_id'] = $check_vip->id;
+        $log_data['record'] = implode(';', $success_msg);
+        $log_res = DB::table('nlsg_vip_admin_log')->insert($log_data);
+        if (!$log_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '日志写入失败'];
+        }
+
         if ($res) {
+            DB::commit();
             return ['code' => true, 'msg' => '成功'];
         } else {
+            DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
 
@@ -178,20 +199,127 @@ class VipServers
 
     public function createVip_2($params, $admin_id)
     {
+        $phone = $params['phone'] ?? 0;
+        $now = time();
+        $now_date = date('Y-m-h H:i:s', $now);
+        $end_date = date('Y-m-d 23:59:59', strtotime("+2 years"));
 
+        $check_vip = VipUser::where('username', '=', $phone)
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->where('expire_time', '>=', $now_date)
+            ->first();
+
+        $check_user = User::where('phone', '=', $phone)->first();
+        if (empty($check_user)) {
+            return ['code' => false, 'msg' => '该用户没有注册'];
+        }
+
+        $success_msg = [];
+
+        if (empty($check_vip)) {
+            //开通
+            $this_vip_data = [];
+            $this_vip_data['user_id'] = $check_user->id;
+            $this_vip_data['nickname'] = substr_replace($phone, '****', 3, 4);
+            $this_vip_data['username'] = $phone;
+            $this_vip_data['level'] = 2;
+            $this_vip_data['is_default'] = 1;
+            $this_vip_data['created_at'] = $now_date;
+            $this_vip_data['start_time'] = $now_date;
+            $this_vip_data['updated_at'] = $now_date;
+            $this_vip_data['channel'] = 'backend_open';
+            $this_vip_data['expire_time'] = $end_date;
+            $success_msg[] = $phone . '开通钻石.有效期' . $now_date . '至' . $this_vip_data['expire_time'];
+            $this_vip_res = DB::table('nlsg_vip_user')->insertGetId($this_vip_data);
+            if ($this_vip_res) {
+                $check_vip = VipUser::where('id', '=', $this_vip_res)->first();
+            }
+
+        } else {
+            if ($check_vip->level == 1) {
+                //升级
+                $this_old_vip = VipUser::whereId($check_vip->id)->first();
+                $this_old_vip->status = 0;
+                $this_old_vip->is_default = 0;
+                $this_vip_360_res = $this_old_vip->save();
+                if (!$this_vip_360_res) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '修改原vip信息错误'];
+                }
+
+                $this_vip_data = [];
+                $this_vip_data['user_id'] = $check_user->id;
+                $this_vip_data['nickname'] = substr_replace($phone, '****', 3, 4);
+                $this_vip_data['username'] = $phone;
+                $this_vip_data['level'] = 2;
+                $this_vip_data['is_default'] = 1;
+                $this_vip_data['created_at'] = $now_date;
+                $this_vip_data['start_time'] = $now_date;
+                $this_vip_data['updated_at'] = $now_date;
+                $this_vip_data['channel'] = 'backend_open';
+                $this_vip_data['expire_time'] = $end_date;
+                $this_vip_data['is_open_360'] = 1;
+                $this_vip_data['time_begin_360'] = $this_old_vip->start_time;
+                $this_vip_data['time_end_360'] = $this_old_vip->expire_time;
+
+                $success_msg[] = $phone . '开通钻石.有效期' . $now_date . '至' . $this_vip_data['expire_time'];
+                $success_msg[] = $phone . '钻石同时订阅360,有效期:' . $this_vip_data['time_begin_360'] . '至' . $this_vip_data['time_end_360'];
+                $this_vip_res = DB::table('nlsg_vip_user')->insertGetId($this_vip_data);
+                if ($this_vip_res) {
+                    $check_vip = VipUser::where('id', '=', $this_vip_res)->first();
+                }
+
+            } else {
+                //续费
+                $this_vip = VipUser::whereId($check_vip->id)->first();
+                $old_expire_time = $this_vip->expire_time;
+                if ($this_vip->expire_time > $now_date) {
+                    $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . "+2 years"));
+                } else {
+                    $this_vip->expire_time = $end_date;
+                }
+                if ($this_vip->expire_time > '2038-01-01 00:00:00') {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '已达开通上限'];
+                }
+                $success_msg[] = $phone . '续费钻石.有效期由' . $old_expire_time . '延长至' . $this_vip->expire_time;
+                $this_vip_res = $this_vip->save();
+            }
+        }
+
+        if (!$this_vip_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '写入会员信息失败'];
+        }
+
+        $log_data = [];
+        $log_data['admin_id'] = $admin_id;
+        $log_data['phone'] = $phone;
+        $log_data['user_id'] = $check_user->id;
+        $log_data['vip_id'] = $check_vip->id;
+        $log_data['record'] = implode(';', $success_msg);
+
+        $log_res = DB::table('nlsg_vip_admin_log')->insert($log_data);
+        if (!$log_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '日志写入失败'];
+        }
+
+        DB::commit();
+        return ['code' => true, 'msg' => '成功', 'success_msg' => $success_msg];
     }
 
     public function createVip_1($params, $admin_id)
     {
         $parent = $params['parent'] ?? 0;
-        $son = $params['son'] ?? 0;
+        $son = $params['phone'] ?? 0;
         $send_money = $params['send_money'] ?? 0;
         $now = time();
         $now_date = date('Y-m-h H:i:s', $now);
         $end_date = date('Y-m-d 23:59:59', strtotime("+1 years"));
 
         //新开通会员
-
         $inviter_level = 0;
         $inviter = 0;
         $inviter_vip_id = 0;
@@ -238,10 +366,6 @@ class VipServers
             ->where('expire_time', '>=', $now_date)
             ->first();
 
-//        if (!empty($check_son) && $check_son->level == 2) {
-//            return ['code' => false, 'msg' => '开通人已经是钻石经销商,不能开通.'];
-//        }
-
         $bind_info = DB::table('nlsg_vip_user_bind as ub')
             ->join('nlsg_vip_user as vu', 'ub.parent', '=', 'vu.username')
             ->where('ub.son', '=', $son)
@@ -273,6 +397,7 @@ class VipServers
         }
 
         $success_msg = [];
+        $this_vip_res = false;
 
         DB::beginTransaction();
 
@@ -312,6 +437,12 @@ class VipServers
                 } else {
                     $this_vip->expire_time = $end_date;
                 }
+
+                if ($this_vip->expire_time > '2038-01-01 00:00:00') {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '已达开通上限'];
+                }
+
                 $success_msg[] = $son . '续费360.有效期由' . $old_expire_time . '延长至' . $this_vip->expire_time;
 
                 $this_vip_res = $this_vip->save();
@@ -361,6 +492,10 @@ class VipServers
                 } else {
                     $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . "+1 years"));
                 }
+                if ($this_vip->expire_time > '2038-01-01 00:00:00') {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '已达开通上限'];
+                }
                 $temp_msg .= '至' . $this_vip->time_end_360;
                 $success_msg[] = $temp_msg;
                 $this_vip_res = $this_vip->save();
@@ -370,10 +505,13 @@ class VipServers
                 $inviter_level = 2;
                 break;
         }
+        if (!$this_vip_res) {
+            return ['code' => false, 'msg' => '失败,请重试.' . __LINE__];
+        }
 
         VipRedeemUser::subWorksOrGetRedeemCode($check_phone->id);
 
-        if ($send_money && !empty($inviter)){
+        if ($send_money && !empty($inviter)) {
             //添加虚拟订单
             $add_order_data['type'] = 16;
             $add_order_data['user_id'] = $check_phone->id;
@@ -388,23 +526,58 @@ class VipServers
             $add_order_data['vip_order_type'] = 1;
             $add_order_data['remark'] = 'uc_remove';
             $add_order_data['ordernum'] = date('YmdHis') . rand(1000, 9999);
-            $add_order_data['activity_tag'] =  'backend_open';
+            $add_order_data['activity_tag'] = 'backend_open';
             $add_order_res = DB::table('nlsg_order')->insertGetId($add_order_data);
-            if ($add_order_res){
-
+            if ($add_order_res) {
+                $success_msg[] = '成功创建虚拟vip订单:' . $add_order_data['ordernum'];
+            } else {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '创建虚拟订单失败'];
             }
 
-
-        }else{
+            //收益动作
+            if (!empty($inviter) && !empty($inviter_level)) {
+                $pdModel = new PayRecordDetail();
+                $pdModel->type = 11;
+                $pdModel->ordernum = $add_order_data['ordernum'];
+                $pdModel->ctime = $now;
+                $pdModel->user_id = $inviter;
+                $pdModel->user_vip_id = $inviter_vip_id;
+                if ($inviter_level == 1) {
+                    $pdModel->price = 108;
+                } else {
+                    $pdModel->price = 180;
+                }
+                $pdModel->vip_id = $check_son->id;
+                $pd_res = $pdModel->save();
+                if ($pd_res === false) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '添加收益失败'];
+                } else {
+                    $success_msg[] = '添加收益成功:' . $inviter . '获得' . $pdModel->price;
+                }
+            } else {
+                $success_msg[] = '没有有效受益人,无法添加收益';
+            }
+        } else {
             $success_msg[] = '没有收益划分动作';
         }
 
+        $log_data = [];
+        $log_data['admin_id'] = $admin_id;
+        $log_data['phone'] = $son;
+        $log_data['user_id'] = $check_son->user_id;
+        $log_data['vip_id'] = $check_son->id;
+        $log_data['record'] = implode(';', $success_msg);
 
+        $log_res = DB::table('nlsg_vip_admin_log')->insert($log_data);
+        if (!$log_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '日志写入失败'];
+        }
 
-
-        dd($bind_info);
-
-
+        DB::commit();
+        return ['code' => true, 'msg' => '成功', 'success_msg' => $success_msg];
     }
 
 

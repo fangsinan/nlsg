@@ -32,7 +32,7 @@ class VipController extends ControllerBackend
     public function list(Request $request): \Illuminate\Http\JsonResponse
     {
         $servers = new VipServers();
-        $data = $servers->list($request->input(), $this->user['id']??0);
+        $data = $servers->list($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 
@@ -61,8 +61,27 @@ class VipController extends ControllerBackend
         return $this->getRes($data);
     }
 
-    //todo 开通360
-    public function createVip(Request $request){
+    /**
+     * 开通360或钻石
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @api {get} /api/admin_v4/vip/create_vip 开通360或钻石
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/vip/create_vip
+     * @apiGroup  后台-VIP
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/vip/create_vip
+     * @apiDescription 开通360或钻石
+     *
+     * @apiParam {string} [parent] 上级账号(添加360时可选)
+     * @apiParam {string} phone 开通账号
+     * @apiParam {string} [send_money] 是否生成收益(1生成,0不生成)
+     * @apiParam {string=1,2} flag 类型(1是360 , 2是钻石)
+     *
+     * @apiSuccess {string[]} success_msg 操作信息
+     *
+     */
+    public function createVip(Request $request)
+    {
         $servers = new VipServers();
         $data = $servers->createVip($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
