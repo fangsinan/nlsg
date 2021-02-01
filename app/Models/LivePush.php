@@ -379,7 +379,7 @@ WHERE
                 } elseif ($v['push_type'] == 4) {
                     $res = OfflineProducts::select('id', 'title', 'subtitle', 'cover_img',
                         'image as cover_details', 'total_price as original_price', 'price')
-                        ->where('id', $v['rid'])
+                        ->where('id', $v['push_gid'])
                         ->first();
                     $res->type = 5;
                     $res = $res->toArray();
