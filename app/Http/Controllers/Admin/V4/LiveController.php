@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
 use App\Models\Live;
+use App\Models\LivePush;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class LiveController extends Controller
@@ -62,5 +65,23 @@ class LiveController extends Controller
             return success();
         }
         return error(1000, '审核失败');
+    }
+
+
+    public function push(Request $request)
+    {
+        $live_id  = $request->get('live_id');
+        $query = LivePush::when($live_id, function ($query) use ($live_id) {
+                $query->where('live_id', $live_id);
+            });
+
+        $lists = $query->select('id', 'live_id', 'push_type', 'push_gid', 'is_push', 'is_done', 'push_at')
+            ->orderBy('push_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        if ($lists){
+            $push = LivePush::parsePushList($lists['data']);
+        }
+        return success($push);
     }
 }
