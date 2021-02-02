@@ -553,7 +553,6 @@ class ChannelServers
                                 $orderModel->ordernum = $v->order_id;
                                 $orderModel->activity_tag = 'dy_1360';
                                 $orderModel->save();
-                                dd(__LINE__);
                             }
                         }
 
