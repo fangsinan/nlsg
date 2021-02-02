@@ -517,6 +517,14 @@ class ChannelServers
                             }
                         }
                         DB::commit();
+                        try {
+                            $easySms = app('easysms');
+                            $easySms->send($v->phone, [
+                                'template' => 'SMS_210996538',
+                            ], ['aliyun']);
+                        } catch (\Exception $e) {
+
+                        }
                         break;
                     case 4:
                         $servers = new VipServers();
@@ -549,6 +557,14 @@ class ChannelServers
                             }
                         }
 
+                        try {
+                            $easySms = app('easysms');
+                            $easySms->send($v->phone, [
+                                'template' => 'SMS_211026570',
+                            ], ['aliyun']);
+                        } catch (\Exception $e) {
+
+                        }
 
                         break;
                 }
