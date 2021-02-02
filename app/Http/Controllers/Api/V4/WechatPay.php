@@ -277,6 +277,13 @@ class WechatPay extends Controller
                 if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst && $add_sub_Rst && $top_Sy_Rst) {
                     DB::commit();
                     self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
+
+                    //短信
+                    $easySms = app('easysms');
+                    $result = $easySms->send($AdminInfo['phone'], [
+                        'template' => 'SMS_211001614',
+                    ], ['aliyun']);
+
                     return true;
                 } else {
                     DB::rollBack();
