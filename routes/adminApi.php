@@ -136,6 +136,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //直播
         Route::get('live/index', 'LiveController@index');
         Route::post('live/pass', 'LiveController@pass');
+        Route::get('live/push', 'LiveController@push');
 
         //用户
         Route::get('user/index', 'UserController@index');

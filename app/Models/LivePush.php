@@ -36,7 +36,7 @@ class LivePush extends Base
             return ['code' => false, 'msg' => '时间错误'];
         }
 
-        if (!in_array($push_type, [1, 2, 3, 4, 6, 7, 8])) {
+        if ( ! in_array($push_type, [1, 2, 3, 4, 6, 7, 8])) {
             return ['code' => false, 'msg' => '类型错误'];
         }
 
@@ -94,7 +94,7 @@ WHERE
         $check_push = DB::select($check_sql);
 
         if (empty($params['id'] ?? 0)) {
-            if (!empty($check_push)) {
+            if ( ! empty($check_push)) {
                 return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
             }
         } else {
@@ -241,11 +241,11 @@ WHERE
                     break;
                 case 6:
                     $v['info'] = [
-                        'id' => 0,
-                        'title' => '360幸福大使',
-                        'subtitle' => '',
+                        'id'        => 0,
+                        'title'     => '360幸福大使',
+                        'subtitle'  => '',
                         'cover_img' => ConfigModel::getData(22),
-                        'price' => 360,
+                        'price'     => 360,
                         'with_type' => 6
                     ];
                     break;
@@ -337,7 +337,7 @@ WHERE
 
         $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del')
             ->where('live_id', $live_id)
-            ->orderBy('push_at','desc')
+            ->orderBy('push_at', 'desc')
             ->groupBy('push_type', 'push_gid')
             ->get()
             ->toArray();
@@ -393,5 +393,58 @@ WHERE
             return $data;
         }
 
+
+    }
+
+    public static function parsePushList($data =[])
+    {
+        if (!$data){
+            return  false;
+        }
+        foreach ($data as $v) {
+            if ($v['push_type'] == 7) {
+                $res = Column::select('id', 'name as title', 'subtitle', 'original_price', 'price',
+                    'cover_pic as cover_img')
+                    ->where('id', $v['push_gid'])
+                    ->where('type', 2)
+                    ->where('status', 1)
+                    ->first();
+                $res->type = 1;
+                $res = $res->toArray();
+            } elseif ($v['push_type'] == 2) {
+                $res = Works::select('id', 'title', 'subtitle', 'cover_img', 'original_price', 'price')
+                    ->where('id', $v['push_gid'])
+                    ->where('status', 4)
+                    ->first();
+                $res->type = 2;
+                $res = $res->toArray();
+            } elseif ($v['push_type'] == 3) {
+                $res = MallGoods::select('id', 'name as title', 'subtitle', 'picture as cover_img',
+                    'original_price', 'price')
+                    ->where('id', $v['push_gid'])
+                    ->first();
+                $res->type = 3;
+                $res = $res->toArray();
+            } elseif ($v['push_type'] == 6) {
+                $res = [
+                    'id'            => 999999,
+                    'title'         => '幸福360会员',
+                    'price'         => 360.00,
+                    'cover_img'     => '/live/recommend/360_xhc.png',
+                    'cover_details' => '/live/recommend/360_tc.png',
+                    'type'          => 4
+                ];
+            } elseif ($v['push_type'] == 4) {
+                $res = OfflineProducts::select('id', 'title', 'subtitle', 'cover_img',
+                    'image as cover_details', 'total_price as original_price', 'price')
+                    ->where('id', $v['push_gid'])
+                    ->first();
+                $res->type = 5;
+                $res = $res->toArray();
+            }
+            $arr[] = $res ?? [];
+        }
+
+        return  $arr;
     }
 }
