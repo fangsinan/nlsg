@@ -62,6 +62,10 @@ class RemoveDataController extends ControllerBackend
         if (0) {
             $servers->del_bind_not_vip();
         }
+
+        if (0) {
+            $servers->douyinAddCD();
+        }
     }
 
     public function mallOrders()

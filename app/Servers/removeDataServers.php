@@ -17,7 +17,6 @@ use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
-use App\Models\VipUserBind;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -929,6 +928,43 @@ class removeDataServers
 
     }
 
+    public function douyinAddCD()
+    {
+        $sku = [
+            '3459490029796208385',
+            '3460757032397854130'
+        ];
+
+        $list = DB::table('nlsg_subscribe as s')
+            ->join('nlsg_user as u', 's.user_id', '=', 'u.id')
+            ->whereIn('s.channel_order_sku', $sku)
+            ->select(['s.user_id', 'u.phone'])
+            ->get()->toArray();
+
+        $add_data = [];
+        foreach ($list as $v) {
+            $check = DB::table('nlsg_live_count_down')
+                ->where('user_id', '=', $v->user_id)
+                ->where('phone', '=', $v->phone)
+                ->where('live_id', '=', 8)
+                ->first();
+            if (empty($check)) {
+                $temp_data = [];
+                $temp_data['live_id'] = 8;
+                $temp_data['user_id'] = $v->user_id;
+                $temp_data['phone'] = $v->phone;
+                $add_data[] = $temp_data;
+            }
+        }
+
+        DB::beginTransaction();
+
+        DB::table('nlsg_live_count_down')->insert($add_data);
+
+        dd($add_data);
+
+    }
+
     public function del_bind_not_vip()
     {
 
@@ -958,9 +994,9 @@ class removeDataServers
         foreach ($add_data as $vv) {
             try {
                 DB::table('nlsg_vip_user_bind')->insert($vv);
-                echo PHP_EOL,$vv['son'],'成功',PHP_EOL;
+                echo PHP_EOL, $vv['son'], '成功', PHP_EOL;
             } catch (\Exception $e) {
-                echo PHP_EOL,$vv['son'],'错误',PHP_EOL;
+                echo PHP_EOL, $vv['son'], '错误', PHP_EOL;
             }
         }
 
