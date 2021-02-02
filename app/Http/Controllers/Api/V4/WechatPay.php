@@ -279,10 +279,12 @@ class WechatPay extends Controller
                     self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 
                     //短信
-                    $easySms = app('easysms');
-                    $result = $easySms->send($AdminInfo['phone'], [
-                        'template' => 'SMS_211001614',
-                    ], ['aliyun']);
+                    if($AdminInfo['phone']){
+                        $easySms = app('easysms');
+                        $result = $easySms->send($AdminInfo['phone'], [
+                            'template' => 'SMS_211001614',
+                        ], ['aliyun']);
+                    }
 
                     return true;
                 } else {
