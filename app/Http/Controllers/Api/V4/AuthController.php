@@ -575,8 +575,9 @@ class AuthController extends Controller
             }
         } else {
             $g = "/^1[34578]\d{9}$/";
-            $g2 = "/^19[89]\d{8}$/";
+            $g2 = "/^19[0126789]\d{8}$/";
             $g3 = "/^166\d{8}$/";
+            
             if (preg_match($g, $phone)) {
                 return $this->getRes(['code' => true, 'msg' => '正确']);
             } else if (preg_match($g2, $phone)) {
