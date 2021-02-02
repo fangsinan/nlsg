@@ -107,6 +107,7 @@ class PayController extends Controller
             'trade_type' => $trade_type, // 请对应换成你的支付方式对应的值类型
             'attach' => $attach,
             'openid' => $pay_info['openid'],
+            'device_info' => $pay_info['device_info']
         ];
 
         if ($pay_info['profit_sharing'] == 1) {    //下单需要分账
@@ -152,6 +153,7 @@ class PayController extends Controller
 
         $body = '';
         if (in_array($attach, [1, 2, 5, 9, 11, 14, 8, 15, 16, 17])) { //1专栏 2会员 5打赏 9精品课 听课
+            $device_info = '';
             if ($attach == 8) {
                 $OrderInfo = MallOrder::where('status', '=', 1)
                     ->where('is_stop', '=', 0)
@@ -160,6 +162,9 @@ class PayController extends Controller
                     ->find($order_id);
             } else {
                 $OrderInfo = Order::where('status', '=', 0)->find($order_id);
+                if (($OrderInfo->activity_tag ?? '') == 'cytx') {
+                    $device_info = 'cytx';
+                }
             }
 
             if (empty($OrderInfo)) { //订单有误
@@ -209,6 +214,7 @@ class PayController extends Controller
             'ordernum' => $OrderInfo['ordernum'],
             'openid' => $userInfo['openid'],
             'profit_sharing' => $profit_sharing,
+            'device_info' => $device_info,
         ];
     }
 
@@ -378,7 +384,7 @@ class PayController extends Controller
     {
 
         $params = $request->input();
-        Log::debug('ApplePay notify', [ $params ]);
+        Log::debug('ApplePay notify', [$params]);
         if (empty($params['ordernum']) || empty($params['receipt-data'])) {
             return $this->error(0, 'ordernum 或者 receipt-data 为空');
         }
