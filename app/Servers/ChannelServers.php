@@ -320,13 +320,13 @@ class ChannelServers
     //抖音开通(定时任务)
     public function douYinJob()
     {
-//        $is_test = intval(ConfigModel::getData(37, 1));
-//        if (!empty($is_test)) {
-//            ConfigModel::where('id', '=', 49)->update([
-//                'value' => "测试不执行任务"
-//            ]);
-//            return true;
-//        }
+        $is_test = intval(ConfigModel::getData(37, 1));
+        if (!empty($is_test)) {
+            ConfigModel::where('id', '=', 49)->update([
+                'value' => "测试不执行任务"
+            ]);
+            return true;
+        }
 
         //抖音订单 order_status=3,5  就可以执行
         $begin_date = date('Y-m-d 00:00:00', strtotime('-20 days'));
