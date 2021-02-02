@@ -8,6 +8,7 @@ use App\Models\ChannelOrder;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
+use App\Models\LiveCountDown;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -319,13 +320,13 @@ class ChannelServers
     //抖音开通(定时任务)
     public function douYinJob()
     {
-        $is_test = intval(ConfigModel::getData(37, 1));
-        if (!empty($is_test)) {
-            ConfigModel::where('id', '=', 49)->update([
-                'value' => "测试不执行任务"
-            ]);
-            return true;
-        }
+//        $is_test = intval(ConfigModel::getData(37, 1));
+//        if (!empty($is_test)) {
+//            ConfigModel::where('id', '=', 49)->update([
+//                'value' => "测试不执行任务"
+//            ]);
+//            return true;
+//        }
 
         //抖音订单 order_status=3,5  就可以执行
         $begin_date = date('Y-m-d 00:00:00', strtotime('-20 days'));
@@ -459,6 +460,7 @@ class ChannelServers
                         break;
                     case 3:
                         $add_sub_data = [];
+                        $add_cd_data = [];
                         DB::beginTransaction();
                         foreach ($v->skuInfo->to_id as $tv) {
                             Live::where('id', $tv)->increment('order_num');
@@ -480,6 +482,17 @@ class ChannelServers
                                 $temp_data['channel_order_sku'] = $v->sku;
                                 $add_sub_data[] = $temp_data;
                             }
+                            $check_cd = LiveCountDown::where('user_id', '=', $v->user_id)
+                                ->where('phone', '=', $v->phone)
+                                ->where('live_id', '=', $tv)
+                                ->first();
+                            if (empty($check_cd)) {
+                                $temp_cd_data = [];
+                                $temp_cd_data['live_id'] = 8;
+                                $temp_cd_data['user_id'] = $v->user_id;
+                                $temp_cd_data['phone'] = $v->phone;
+                                $add_cd_data[] = $temp_cd_data;
+                            }
                         }
                         $edit_res = DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
@@ -497,6 +510,11 @@ class ChannelServers
                                 DB::rollBack();
                                 break;
                             }
+                            $add_cd_res = DB::table('nlsg_live_count_down')->insert($add_cd_data);
+                            if ($add_cd_res === false) {
+                                DB::rollBack();
+                                break;
+                            }
                         }
                         DB::commit();
                         break;
@@ -510,8 +528,8 @@ class ChannelServers
                                 'success_at' => $now_date
                             ]);
 
-                        foreach ($v->skuInfo->to_id as $to_id){
-                            if ($to_id == 2){
+                        foreach ($v->skuInfo->to_id as $to_id) {
+                            if ($to_id == 2) {
                                 //如果是2  表示为1360订单 需要写入order表
                                 $orderModel = new Order();
                                 $orderModel->type = 14;
