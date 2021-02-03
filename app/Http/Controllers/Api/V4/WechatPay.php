@@ -554,6 +554,14 @@ class WechatPay extends Controller
 
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $Profit_Rst) {
                     DB::commit();
+                    //SMS_211275363
+                    //短信
+                    if($userdata['phone'] && $live_id == 12 ){
+                        $easySms = app('easysms');
+                        $easySms->send($userdata['phone'], [
+                            'template' => 'SMS_211275363',
+                        ], ['aliyun']);
+                    }
 
                     //暂时先不启用直接分账
 //                    //调用直播分账
