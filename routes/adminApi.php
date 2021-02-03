@@ -73,6 +73,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('index/live', 'IndexController@live');
         Route::get('index/get-lives', 'IndexController@getLives');
         Route::get('index/get-wiki', 'IndexController@getWiki');
+        Route::get('index/get-offline', 'IndexController@getOfflineProduct');
         Route::post('index/add-wiki', 'IndexController@addWiki');
         Route::post('index/add-live', 'IndexController@addLive');
         Route::post('index/delete-live', 'IndexController@delLive');
@@ -137,6 +138,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('live/index', 'LiveController@index');
         Route::post('live/pass', 'LiveController@pass');
         Route::get('live/push', 'LiveController@push');
+        Route::get('live/push', 'LiveController@push');
+        Route::post('live/create', 'LiveController@create');
 
         //用户
         Route::get('user/index', 'UserController@index');

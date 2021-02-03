@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\DB;
 class LivePush extends Base
 {
     protected $table = 'nlsg_live_push';
-
+   protected $fillable = [
+       'id', 'live_id', 'live_info_id','user_id','push_type', 'push_gid','is_push','is_done','push_at', 'done_at'
+   ];
     public function add($params, $user_id)
     {
         $live_id = $params['live_id'] ?? 0;

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Live;
 use App\Models\LivePush;
+use App\Models\Wiki;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -83,5 +84,40 @@ class LiveController extends Controller
             $push = LivePush::parsePushList($lists['data']);
         }
         return success($push);
+    }
+
+    public  function  create(Request $request)
+    {
+        $id     = $request->get('id');
+        $type   = $request->get('type');
+        $relationId = $request->get('relation_id');
+        $liveId = $request->get('live_id');
+
+        $data = [
+            'live_id'   => $liveId,
+            'push_type' => $type,
+            'push_gid'  => $relationId,
+            'is_push'   => 1,
+            'is_done'   => 1,
+            'push_at'   => date('Y-m-d H:i:s', time()),
+            'done_at'   => date('Y-m-d H:i:s', time())
+        ];
+        if (!empty($id)) {
+            LivePush::where('id', $id)->update($data);
+        } else {
+            LivePush::create($data);
+        }
+        return success();
+    }
+
+    public  function delete(Request $request)
+    {
+        $id = $request->get('id');
+        $res = LivePush::where('id', $id)->delete();
+        if ($res){
+            return success('删除成功');
+        }
+
+        return error(1000,'删除失败');
     }
 }
