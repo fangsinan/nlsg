@@ -968,7 +968,7 @@ class LiveController extends Controller
 
             $checkArr = LiveCheckPhone::select('*')->where(['is_scanning'=>0,'status'=>1])->limit(100)->get()->toArray();
 
-            dd($checkArr);
+//            dd($checkArr);/
             //先校验是否注册用户
             if(empty($checkArr)){
                 $flag = false;
