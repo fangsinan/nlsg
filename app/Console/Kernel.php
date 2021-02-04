@@ -57,7 +57,7 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
-            MallRefundJob::shillJob(1);
+//            MallRefundJob::shillJob(1);
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
@@ -72,7 +72,7 @@ class Kernel extends ConsoleKernel
         })->everyFiveMinutes();//每五分
 
         $schedule->call(function () {
-            MallRefundJob::shillJob(2);
+//            MallRefundJob::shillJob(2);
         })->everyFiveMinutes()->runInBackground();
 
         $schedule->call(function () {
