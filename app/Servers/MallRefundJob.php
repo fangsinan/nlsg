@@ -441,7 +441,7 @@ class MallRefundJob
             ->limit(30)
             ->select(['o.id', 'o.user_id', 'o.ordernum', 'p.transaction_id',
                 'p.type as client', 'o.pay_price as all_price',
-                'p.type', 'p.price as refund_price'])
+                'p.type', 'p.price as refund_price', 'o.shill_job_price', 'o.shill_refund_sum'])
             ->get();
         if ($list->isEmpty()) {
             return true;
@@ -450,6 +450,9 @@ class MallRefundJob
         $id_list = [];
         foreach ($list as $v) {
             $id_list[] = $v->id;
+            if ($v->shill_job_price > 0 && $v->shill_job_price <= $v->refund_price) {
+                $v->refund_price = $v->shill_job_price;
+            }
             $v->service_num = MallOrder::createOrderNumber($v->user_id, 3);
         }
 
@@ -479,6 +482,8 @@ class MallRefundJob
             if ($temp_res['code'] === true) {
                 $update_data['is_refund'] = 2;
                 $update_data['refund_no'] = $v->service_num;
+                $update_data['shill_refund_sum'] = GetPriceTools::PriceCalc('+', $v->shill_refund_sum, $v->refund_price);
+                $update_data['shill_job_price'] = $v->refund_price;
                 $prModel = new OrderPayRefund();
                 $prModel->service_num = $v->service_num;
                 $prModel->user_id = $v->user_id;
