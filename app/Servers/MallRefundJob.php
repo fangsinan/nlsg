@@ -542,10 +542,10 @@ class MallRefundJob
             $v->transaction_id,
             $v->service_num,
             intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)),
-            intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)),
+            intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
             [
                 // 可在此处传入其他参数，详细参数见微信支付文档
-                'refund_desc' => '课程退款',
+                'refund_desc' => '退款',
             ]
         );
         if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {
