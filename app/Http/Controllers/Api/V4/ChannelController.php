@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\ChannelWorksList;
 use App\Models\Click;
 use App\Models\User;
 use App\Models\Works;
@@ -25,6 +26,13 @@ class ChannelController extends Controller
     {
         $model = new Works();
         $data = $model->listForCytx($request->input());
+        return $this->getRes($data);
+    }
+
+    public function cytxNew(Request $request)
+    {
+        $model = new ChannelWorksList();
+        $data = $model->cytxNew($request->input(),$this->user);
         return $this->getRes($data);
     }
 

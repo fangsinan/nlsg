@@ -19,6 +19,10 @@ class ChannelWorksList extends Base
         }
     }
 
+    public function cytxNew($params,$user){
+
+    }
+
     public function getList($page = 1, $size = 10, $category_id = 0, $channel = 0, $user_id)
     {
         if (empty($channel)) {
