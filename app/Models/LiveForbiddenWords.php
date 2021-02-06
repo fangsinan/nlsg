@@ -60,7 +60,7 @@ class LiveForbiddenWords extends Base
             $check->is_forbid = 2;
         }
         if ($obj_id) {
-            $check->length = 300;
+            $check->length = 7200;
         } else {
             $check->length = 0;
         }
