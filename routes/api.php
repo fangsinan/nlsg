@@ -130,6 +130,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     //创业天下
     Route::get('channel/cytx', 'ChannelController@cytx');
+    Route::get('channel/cytx_new', 'ChannelController@cytxNew');
     Route::post('channel/click', 'ChannelController@click');
     Route::post('channel/login', 'ChannelController@login');
 

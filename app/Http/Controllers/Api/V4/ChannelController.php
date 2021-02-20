@@ -32,7 +32,7 @@ class ChannelController extends Controller
     public function cytxNew(Request $request)
     {
         $model = new ChannelWorksList();
-        $data = $model->cytxNew($request->input(),$this->user);
+        $data = $model->listForCytx($request->input(),$this->user);
         return $this->getRes($data);
     }
 

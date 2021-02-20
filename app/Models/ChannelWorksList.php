@@ -19,8 +19,24 @@ class ChannelWorksList extends Base
         }
     }
 
-    public function cytxNew($params,$user){
+    public function listForCytx($params,$user){
+        //排序:默认,价格,最多学习,上架
+        $list = self::where('status', '=', 1)
+            ->where('channel_type', '=', 1)
+            ->with([
+                'column',
+                'works',
+                'categoryBind',
+                'categoryBind.categoryName',
+            ])
+            ->orderBy('rank', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
 
+
+
+
+        dd($list->toArray());
     }
 
     public function getList($page = 1, $size = 10, $category_id = 0, $channel = 0, $user_id)
@@ -133,6 +149,11 @@ class ChannelWorksList extends Base
         }
 
         return ['list' => $res, 'category' => $category_res];
+    }
+
+    public function categoryBind(){
+        return $this->hasMany(ChannelCategoryBind::class,'works_list_id','id')
+            ->select(['id','works_list_id','category_id']);
     }
 
     public function column()
