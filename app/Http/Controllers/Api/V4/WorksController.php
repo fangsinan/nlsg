@@ -563,6 +563,7 @@ class WorksController extends Controller
             'is_sub'         => $is_sub ? 1: 0,
             'is_collection'  => $isCollect ? 1 : 0,
             'free_trial_id'  => (string)$free_trial['id'] ?? '',
+            'c'=>$channel_tag,
         ];
         return $this->success($res);
     }
