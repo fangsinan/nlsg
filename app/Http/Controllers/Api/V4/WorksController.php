@@ -456,6 +456,7 @@ class WorksController extends Controller
         $user_id   = $this->user['id'] ?? 0;
         $order   = $request->input('order','');
         $activity_tag = $request->input('activity_tag', '');
+        $channel_tag = $request->header('channel_tag','');
 
         if($order == ''){  //默认
             $order = 'asc';
@@ -474,9 +475,9 @@ class WorksController extends Controller
             'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num',
             'collection_num','comment_num','chapter_num','is_free','is_audio_book','view_num'])
             ->where('status',4)->find($works_id);
-        if ($activity_tag === 'cytx') {
+        if ($channel_tag === 'cytx') {
             $temp_price = ChannelWorksList::getPrice(2, $works_id);
-            if (!empty($price)) {
+            if (!empty($temp_price)) {
                 $works_data->price = $temp_price;
                 $works_data->original_price = $temp_price;
             }
