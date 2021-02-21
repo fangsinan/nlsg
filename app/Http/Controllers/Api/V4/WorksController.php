@@ -457,12 +457,13 @@ class WorksController extends Controller
         $order   = $request->input('order','');
         $activity_tag = $request->input('activity_tag', '');
         $channel_tag = $request->header('channel_tag','');
-        dd([
+
+        $req = [
             $request->input(),
             $request->header(),
             $channel_tag,
             $request,
-        ]);
+        ];
 
         if($order == ''){  //默认
             $order = 'asc';
@@ -570,6 +571,7 @@ class WorksController extends Controller
             'is_collection'  => $isCollect ? 1 : 0,
             'free_trial_id'  => (string)$free_trial['id'] ?? '',
             'c'=>$channel_tag,
+            'req'=>$req,
         ];
         return $this->success($res);
     }
