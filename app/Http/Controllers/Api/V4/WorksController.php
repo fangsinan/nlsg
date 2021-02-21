@@ -456,14 +456,8 @@ class WorksController extends Controller
         $user_id   = $this->user['id'] ?? 0;
         $order   = $request->input('order','');
         $activity_tag = $request->input('activity_tag', '');
-        $channel_tag = $request->header('channel_tag','');
-
-        $req = [
-            $request->input(),
-            $request->header(),
-            $channel_tag,
-            $request,
-        ];
+        //服务器配置了header参数过滤 不能用下划线
+        $channel_tag = $request->header('channel-tag','');
 
         if($order == ''){  //默认
             $order = 'asc';
@@ -571,7 +565,6 @@ class WorksController extends Controller
             'is_collection'  => $isCollect ? 1 : 0,
             'free_trial_id'  => (string)$free_trial['id'] ?? '',
             'c'=>$channel_tag,
-            'req'=>$req,
         ];
         return $this->success($res);
     }
