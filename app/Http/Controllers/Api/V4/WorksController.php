@@ -457,6 +457,10 @@ class WorksController extends Controller
         $order   = $request->input('order','');
         $activity_tag = $request->input('activity_tag', '');
         $channel_tag = $request->header('channel_tag','');
+        dd([
+            $request->input(),
+            $request->header(),
+        ]);
 
         if($order == ''){  //默认
             $order = 'asc';
