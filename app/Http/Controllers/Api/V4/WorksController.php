@@ -460,6 +460,8 @@ class WorksController extends Controller
         dd([
             $request->input(),
             $request->header(),
+            $channel_tag,
+            $request,
         ]);
 
         if($order == ''){  //默认
