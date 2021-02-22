@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\AgentProfitLog;
+use App\Models\ChannelWorksList;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Coupon;
@@ -1017,6 +1018,14 @@ class WechatPay extends Controller
                 if ($orderInfo['type'] == 15) {
                     $sub_type = 6;  //讲座
                 }
+                $check_channel_works_list = ChannelWorksList::where('works_id','=',$teacher_id)
+                    ->where('type','=',1)
+                    ->first();
+                if (empty($check_channel_works_list)){
+                    $channel_works_list_id = 0;
+                }else{
+                    $channel_works_list_id = $check_channel_works_list->id;
+                }
                 $subscribe = [
                     'user_id' => $user_id, //会员id
                     'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
@@ -1027,6 +1036,7 @@ class WechatPay extends Controller
                     'end_time' => date("Y-m-d H:i:s", $endtime),
                     'relation_id' => $teacher_id,
                     'service_id' => $orderInfo['service_id'],
+                    'channel_works_list_id'=>$channel_works_list_id,
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
@@ -1233,6 +1243,14 @@ class WechatPay extends Controller
                 }
 
                 //添加订阅记录
+                $check_channel_works_list = ChannelWorksList::where('works_id','=',$works_id)
+                    ->where('type','=',2)
+                    ->first();
+                if (empty($check_channel_works_list)){
+                    $channel_works_list_id = 0;
+                }else{
+                    $channel_works_list_id = $check_channel_works_list->id;
+                }
                 $subscribe = [
                     'user_id' => $user_id, //会员id
                     'type' => 2, //作品
@@ -1243,6 +1261,7 @@ class WechatPay extends Controller
                     'service_id' => $orderInfo['service_id'],
                     'start_time' => date("Y-m-d H:i:s", $starttime),
                     'end_time' => date("Y-m-d H:i:s", $endtime),
+                    'channel_works_list_id' =>$channel_works_list_id,
                 ];
 
 

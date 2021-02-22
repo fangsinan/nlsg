@@ -29,6 +29,18 @@ class ChannelController extends Controller
         return $this->getRes($data);
     }
 
+    /**
+     * 创业天下课程列表
+     * @api {get} /api/v4/channel/cytx_new 创业天下课程列表
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/channel/cytx_new
+     * @apiGroup  创业天下
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/channel/cytx_new
+     * @apiParam {number=0,1,2} [is_buy] 是否已购(0全部 1已购 2未购)
+     * @apiParam {number=0,1,2} [works_type] 类型(0全部 1视频 2音频)
+     * @apiParam {number} [category_id] 分类id
+     * @apiDescription 创业天下课程列表
+     * */
     public function cytxNew(Request $request)
     {
         $model = new ChannelWorksList();

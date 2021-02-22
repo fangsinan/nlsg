@@ -12,7 +12,7 @@ class ChannelCategoryBind extends Base
     public function categoryName()
     {
         return $this->hasOne(ChannelCategory::class, 'id', 'category_id')
-            ->select(['id','name']);
+            ->select(['id','id as category_id','name']);
     }
 
 }
