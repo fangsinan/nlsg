@@ -307,7 +307,7 @@ class IncomeController extends Controller
             if (  !empty($obj) && $obj['user_id'] != $user_id ) {
                 return $this->error(0, '该身份证已被认证，请尝试其他身份证绑定');
             }
-            
+
 //            if ( empty($cash_info) && !empty($obj)) {
 //                if ($obj['user_id'] != $user_id) {
 //                    return $this->error(0, '该身份证已被认证，请尝试其他身份证绑定');
@@ -513,7 +513,11 @@ class IncomeController extends Controller
         $os_type = $request->input('os_type', 1);//  1 安卓 2ios 3微信
 
 
-
+        if (in_array($user_id, [317437,60895,92931,158291,164463,171507,174858,215209,229413,233148,234965,238291,247036,250593,303717,306448,314220,
+            303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291])) { //禁止提现
+            return $this->error(0,'此账号被锁定提现,请联系客服');
+        }
+        
         //加锁操作  防止多端口同时提现
         //提现操作加锁
         self::lock($user_id);
