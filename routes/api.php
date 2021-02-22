@@ -129,8 +129,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('vip/all_works', 'VipController@allWorks');
 
     //创业天下
-    Route::get('channel/cytx', 'ChannelController@cytx');
-    Route::get('channel/cytx_new', 'ChannelController@cytxNew');
     Route::post('channel/click', 'ChannelController@click');
     Route::post('channel/login', 'ChannelController@login');
 
@@ -266,6 +264,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('mall/sub_comment', 'MallOrderController@subComment');//评论
         Route::get('mall/get_comment', 'MallOrderController@getComment');//获取评论内容
         //商城结束
+
+        //创业天下
+        Route::get('channel/cytx', 'ChannelController@cytx');
+        Route::get('channel/cytx_new', 'ChannelController@cytxNew');
 
         //*******************************新会员部分*******************************
 

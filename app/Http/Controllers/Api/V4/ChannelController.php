@@ -31,6 +31,8 @@ class ChannelController extends Controller
 
     /**
      * 创业天下课程列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      * @api {get} /api/v4/channel/cytx_new 创业天下课程列表
      * @apiVersion 4.0.0
      * @apiName /api/v4/channel/cytx_new
@@ -40,7 +42,7 @@ class ChannelController extends Controller
      * @apiParam {number=0,1,2} [works_type] 类型(0全部 1视频 2音频)
      * @apiParam {number} [category_id] 分类id
      * @apiDescription 创业天下课程列表
-     * */
+     */
     public function cytxNew(Request $request)
     {
         $model = new ChannelWorksList();
