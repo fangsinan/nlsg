@@ -95,8 +95,15 @@ class IncomeController extends Controller
             $is_pass=-1;
         }
 
+        $is_withdrawal=0;
+        if (in_array($user_id, [317437,60895,92931,158291,164463,171507,174858,215209,229413,233148,234965,238291,247036,250593,303717,306448,314220,
+            303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291])) { //禁止提现
+            $is_withdrawal=1;
+        }
+
         $data = [
             'is_pass'           => $is_pass,//-1信息未认证  1已认证 2 拒绝
+            'is_withdrawal'     => $is_withdrawal,//1 隐藏提现按钮
             'nick_name'         => $nickname,//昵称
             'not_pass_reason'   => $not_pass_reason,//拒绝理由
             'bind_tx'           => $bind_tx,//1 已绑定
@@ -517,7 +524,7 @@ class IncomeController extends Controller
             303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291])) { //禁止提现
             return $this->error(0,'此账号被锁定提现,请联系客服');
         }
-        
+
         //加锁操作  防止多端口同时提现
         //提现操作加锁
         self::lock($user_id);
