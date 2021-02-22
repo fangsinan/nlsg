@@ -496,6 +496,8 @@ class ColumnController extends Controller
 
         $column_id = $request->input('column_id', 0);
         $activity_tag = $request->input('activity_tag', '');
+        $channel_tag = $request->header('channel-tag','');
+
         $user_id = $this->user['id'] ?? 0;
         if (empty($column_id)) {
             return $this->error(0, 'column_id 不能为空');
@@ -508,9 +510,9 @@ class ColumnController extends Controller
             return $this->error(0, '专栏不存在不能为空');
         }
 
-        if ($activity_tag === 'cytx') {
+        if ($channel_tag === 'cytx') {
             $temp_price = ChannelWorksList::getPrice(1, $column_id);
-            if (!empty($price)) {
+            if (!empty($temp_price)) {
                 $column['price'] = $temp_price;
                 $column['original_price'] = $temp_price;
             }
