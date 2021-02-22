@@ -183,6 +183,7 @@ class OrderController extends Controller
             }
             $coupon_id = 0;
             $coupon_price = 0;
+            $column_data->price = $price;
         } else {
             //优惠券
             $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $column_data->price, 1);
