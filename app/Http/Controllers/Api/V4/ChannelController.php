@@ -41,6 +41,7 @@ class ChannelController extends Controller
      * @apiParam {number=0,1,2} [is_buy] 是否已购(0全部 1已购 2未购)
      * @apiParam {number=0,1,2} [works_type] 类型(0全部 1视频 2音频)
      * @apiParam {number} [category_id] 分类id
+     * @apiParam {string} [ob] 排序(view_num,created,price)
      * @apiDescription 创业天下课程列表
      */
     public function cytxNew(Request $request)
