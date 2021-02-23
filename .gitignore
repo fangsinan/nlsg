@@ -1,1 +1,10 @@
-.idea/*
+.env
+.env_bak
+.idea/
+node_modules/
+package-lock.json
+public/eclist.txt
+public/pay_cb.txt
+public/
+bootstrap/
+vendor/mews/captcha/.gitignore
