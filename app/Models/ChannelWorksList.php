@@ -191,6 +191,66 @@ class ChannelWorksList extends Base
 
     }
 
+    public function cytxOrder($params, $user)
+    {
+        $page = $params['page'] ?? 1;
+        $size = $params['size'] ?? 10;
+
+        $list = Order::query()
+            ->where('user_id','=',$user['id'])
+            ->where('activity_tag', '=', 'cytx')
+            ->whereIn('type', [9, 15])
+            ->where('status', '=', 1)
+            ->where('is_shill', '=', 0)
+            ->with([
+                'works' => function ($q) {
+                    $q->select(['id', 'title', 'type', 'subtitle',
+                        'cover_img', 'detail_img']);
+                },
+                'column' => function ($q) {
+                    $q->select(['id', 'name as title', 'type', 'subtitle',
+                        'cover_pic as cover_img', 'details_pic as detail_img']);
+                },
+                'payRecord' => function ($q) {
+                    $q->select(['ordernum', 'price', 'type', 'created_at']);
+                }])
+            ->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'pay_price', 'pay_type', 'ordernum'])
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get();
+
+        foreach ($list as &$v){
+            if ($v->type == 9){
+                $v->title = $v->works->title;
+                $v->subtitle  = $v->works->subtitle;
+                $v->cover_img = $v->works->cover_img;
+                $v->detail_img = $v->works->detail_img;
+            }else{
+                $v->title = $v->column->title;
+                $v->subtitle  = $v->column->subtitle;
+                $v->cover_img = $v->column->cover_img;
+                $v->detail_img = $v->column->detail_img;
+            }
+            unset($v->works,$v->column);
+        }
+
+//        $list = DB::table('nlsg_order as o')
+//            ->join('nlsg_pay_record as pr', 'o.ordernum', '=', 'pr.ordernum')
+//            ->where('o.user_id','=',$user['id'])
+//            ->whereIn('o.type', [9, 15])
+//            ->where('o.activity_tag', '=', 'cytx')
+//            ->where('o.status', '=', 1)
+//            ->where('o.is_shill', '=', 0)
+//            ->select(['o.id', 'o.type', 'o.relation_id', 'o.pay_time', 'o.price', 'pr.price as pay_price', 'pr.type as pay_type'])
+//            ->limit($size)
+//            ->offset(($page - 1) * $size)
+//            ->orderBy('pr.created_at', 'desc')
+//            ->get();
+
+
+        return $list;
+    }
+
     public function getList($page = 1, $size = 10, $category_id = 0, $channel = 0, $user_id)
     {
         if (empty($channel)) {
@@ -313,12 +373,12 @@ class ChannelWorksList extends Base
     {
         return $this->hasOne(Column::class, 'id', 'works_id')
             ->select(['id', 'name as title', 'subtitle', 'cover_pic as cover_img',
-                'details_pic as detail_img', 'column_type', 'price', 'user_id', 'view_num','info_num']);
+                'details_pic as detail_img', 'column_type', 'price', 'user_id', 'view_num', 'info_num']);
     }
 
     public function works()
     {
         return $this->hasOne(Works::class, 'id', 'works_id')
-            ->select(['id', 'title', 'subtitle', 'cover_img', 'detail_img', 'type', 'price', 'user_id', 'view_num','chapter_num as info_num']);
+            ->select(['id', 'title', 'subtitle', 'cover_img', 'detail_img', 'type', 'price', 'user_id', 'view_num', 'chapter_num as info_num']);
     }
 }

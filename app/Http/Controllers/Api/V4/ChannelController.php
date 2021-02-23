@@ -14,13 +14,13 @@ use Illuminate\Http\Request;
 class ChannelController extends Controller
 {
     /**
-     * 创业天下课程列表
-     * @api {get} /api/v4/channel/cytx 创业天下课程列表
+     * 创业天下课程列表(旧)
+     * @api {get} /api/v4/channel/cytx 创业天下课程列表(旧)
      * @apiVersion 4.0.0
      * @apiName /api/v4/channel/cytx
      * @apiGroup  创业天下
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/channel/cytx
-     * @apiDescription 创业天下课程列表
+     * @apiDescription 创业天下课程列表(旧)
      * */
     public function cytx(Request $request)
     {
@@ -51,6 +51,22 @@ class ChannelController extends Controller
         return $this->getRes($data);
     }
 
+    /**
+     * 创业天下消费记录
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @api {get} /api/v4/channel/cytx_order 创业天下消费记录
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/channel/cytx_order
+     * @apiGroup  创业天下
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/channel/cytx_order
+     * @apiDescription 创业天下消费记录
+     */
+    public function cytxOrder(Request $request){
+        $model = new ChannelWorksList();
+        $data = $model->cytxOrder($request->input(),$this->user);
+        return $this->getRes($data);
+    }
 
     /**
      * 点击统计

@@ -207,4 +207,11 @@ class Order extends Base
         }
 
     }
+
+    public function payRecord()
+    {
+        return $this->hasOne(PayRecord::class, 'ordernum', 'ordernum')
+            ->where('status','=',1);
+    }
+
 }
