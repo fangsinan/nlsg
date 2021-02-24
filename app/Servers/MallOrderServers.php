@@ -241,12 +241,11 @@ class MallOrderServers
 
         $field = [
             'id', 'ordernum', 'price', 'dead_time', 'user_id', 'order_type', 'pay_price', 'messages',
-            DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`')
+            DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'),'address_history'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo'];
 
-        if (($params['flag'] ?? 0) == 1) {
-            $field[] = 'address_history';
+//        if (($params['flag'] ?? 0) == 1) {
             $field[] = 'cost_price';
             $field[] = 'freight';
             $field[] = 'vip_cut';
@@ -263,7 +262,7 @@ class MallOrderServers
             $field[] = 'bill_format';
             $with[] = 'orderChild';
             $with[] = 'orderChild.expressInfo';
-        }
+//        }
 
 //        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
 //            $now_date . '" then FALSE ELSE TRUE END) ');

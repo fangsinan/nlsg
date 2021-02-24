@@ -1256,7 +1256,7 @@ class MallOrder extends Base
     public function userInfo()
     {
         return $this->hasOne('App\Models\User', 'id', 'user_id')
-            ->select(['id', 'phone', 'nickname', 'headimg']);
+            ->select(['id', 'phone', 'nickname', 'headimg','is_test_pay']);
     }
 
     public function orderChild()
