@@ -69,6 +69,23 @@ class ChannelController extends Controller
     }
 
     /**
+     * 创业天下banner
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @api {get} /api/v4/channel/banner 创业天下banner
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/channel/banner
+     * @apiGroup  创业天下
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/channel/banner
+     * @apiDescription 创业天下banner
+     */
+    public function cytxBanner(){
+        $model = new ChannelWorksList();
+        $data = $model->cytxBanner();
+        return $this->getRes($data);
+    }
+
+    /**
      * 点击统计
      * @api {get} /api/v4/channel/click 点击统计
      * @apiVersion 4.0.0

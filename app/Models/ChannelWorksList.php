@@ -181,12 +181,22 @@ class ChannelWorksList extends Base
         //分类信息和banner列表
         $channelCategoryModel = new ChannelCategory();
         $category_res = $channelCategoryModel->getCategoryList(1);
-        $banner = ConfigModel::getData(47);
-
+        
         return [
-            'banner' => explode(',', $banner),
+            'banner' => [],
             'category' => $category_res,
             'list' => $works_list,
+        ];
+
+    }
+
+    public function cytxBanner(){
+        $banner_index = ConfigModel::getData(47);
+        $banner_home = ConfigModel::getData(47);
+
+        return [
+            'index'=>array_filter(explode(',',$banner_index)),
+            'home'=>array_filter(explode(',',$banner_home)),
         ];
 
     }
