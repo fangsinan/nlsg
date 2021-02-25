@@ -447,7 +447,7 @@ class IndexController extends Controller
     public function course()
     {
         $recommendModel = new Recommend();
-        $lists = $recommendModel->getIndexRecommend(10, 1);
+        $lists = $recommendModel->getCourseLists();
         return success($lists);
     }
 

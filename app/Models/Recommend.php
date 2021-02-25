@@ -92,6 +92,23 @@ class Recommend extends Base
         return $result;
     }
 
+    public function  getCourseLists()
+    {
+        $ids = Recommend::where('position', 1)
+               ->where('type', 10)
+               ->where('status', 1)
+               ->orderBy('sort')
+               ->orderBy('created_at', 'desc')
+               ->pluck('relation_id')
+               ->toArray();
+        if (!$ids){
+            return  [];
+        }
+        $model = new Lists();
+        $result = $model->getIndexListCourse($ids, 1);
+        return $result;
+    }
+
     /**
      * 首页直播
      * @param $uid
