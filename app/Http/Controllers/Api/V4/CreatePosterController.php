@@ -1211,7 +1211,7 @@ class CreatePosterController extends Controller
 
 
     /**
-     * @api {post} /api/v4/create/upload_push   上传图片
+     * @api {post} /api/v4/create/upload_push   制作专属海报
      * @apiName create_poster
      * @apiVersion 1.0.0
      * @apiGroup create
