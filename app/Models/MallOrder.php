@@ -1259,6 +1259,11 @@ class MallOrder extends Base
             ->select(['id', 'phone', 'nickname', 'headimg','is_test_pay']);
     }
 
+    //关联拼团表 一对一
+    public function groupBuy(){
+        return $this->hasOne(MallGroupBuyList::class, 'order_id','id');
+    }
+
     public function orderChild()
     {
         return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')

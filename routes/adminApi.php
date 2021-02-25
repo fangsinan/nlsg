@@ -79,10 +79,11 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::post('index/delete-live', 'IndexController@delLive');
 
         //商城订单
-        Route::get('mall_order/list', 'MallOrderController@list');
         Route::post('mall_order/send', 'MallOrderController@send');
         Route::post('mall_order/make_group_success', 'MallOrderController@makeGroupSuccess');
         Route::get('mall_order/tos', 'MallOrderController@tos');
+        Route::get('mall_order/list_new', 'MallOrderController@listNew');
+        Route::get('mall_order/list', 'MallOrderController@list');
 
         //售后
         Route::get('after_sales/list', 'AfterSalesController@list');

@@ -56,6 +56,12 @@ class MallOrderController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function listNew(Request $request){
+        $servers = new MallOrderServers();
+        $data = $servers->listNew($request->input());
+        return $this->getRes($data);
+    }
+
     public function makeGroupSuccess(Request $request){
         $servers = new MallOrderServers();
         $data = $servers->makeGroupSuccess($request->input());

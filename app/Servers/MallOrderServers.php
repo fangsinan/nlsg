@@ -28,6 +28,81 @@ use Illuminate\Support\Facades\DB;
 class MallOrderServers
 {
 
+    public function listNew($params)
+    {
+        $query = MallOrder::query();
+
+        $query->where('status', '>', 1);
+
+        //订单类型
+        $order_type = $params['order_type'] ?? 0;
+        switch ($order_type) {
+            case '2':
+            case 'flash_sale':
+                $query->where('order_type', '=', 2);
+                break;
+            case '3':
+            case 'group_buy':
+                $query->where('order_type', '=', 3);
+                break;
+            case '1':
+            case 'normal':
+                $query->where('order_type', '=', 1);
+                break;
+        }
+
+        if (!empty($params['id'])) {
+            $query->where('id', '=', intval($params['id']));
+        }
+
+        if (!empty($params['ordernum'])) {
+            $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
+        }
+
+        //todo 修改拼团下单流程后继续
+        //订单状态 1待付款  10待发货 20待收货 30已完成 95拼团中 99已取消
+        switch (intval($params['status']??0)){
+            case 1:
+                $query->where(function($q){
+                    $q->where('status','=',1)
+                        ->orWhere('status','=',11);
+                });
+                break;
+            case 10:
+                break;
+            case 20:
+                break;
+            case 30:
+                break;
+            case 95:
+                break;
+            case 99:
+                break;
+        }
+
+
+
+
+        $query->with([
+//            'orderDetails', 'orderDetails.goodsInfo',
+//            'userInfo',
+//            'orderChild', 'orderChild.expressInfo',
+            'groupBuy'
+        ]);
+
+
+//        $query->where('order_type','<>',3);
+//        $query->where('ordernum', '=', '21012200008157523257401');
+
+        DB::connection()->enableQueryLog();
+        $list = $query->select()->orderBy('id', 'desc')->limit(10)->get();
+        dd(DB::getQueryLog());
+
+
+        return $list;
+
+    }
+
     public function getList($params)
     {
         $order_type = $params['order_type'] ?? 0;
@@ -240,28 +315,28 @@ class MallOrderServers
         }
 
         $field = [
-            'id', 'ordernum', 'price', 'dead_time', 'user_id', 'order_type', 'pay_price', 'messages','created_at',
-            DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'),'address_history'
+            'id', 'ordernum', 'price', 'dead_time', 'user_id', 'order_type', 'pay_price', 'messages', 'created_at',
+            DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'address_history'
         ];
         $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo'];
 
 //        if (($params['flag'] ?? 0) == 1) {
-            $field[] = 'cost_price';
-            $field[] = 'freight';
-            $field[] = 'vip_cut';
-            $field[] = 'coupon_money';
-            $field[] = 'special_price_cut';
-            $field[] = 'price';
-            $field[] = 'pay_time';
-            $field[] = 'pay_type';
-            $field[] = 'messages';
-            $field[] = 'post_type';
-            $field[] = 'bill_type';
-            $field[] = 'bill_title';
-            $field[] = 'bill_number';
-            $field[] = 'bill_format';
-            $with[] = 'orderChild';
-            $with[] = 'orderChild.expressInfo';
+        $field[] = 'cost_price';
+        $field[] = 'freight';
+        $field[] = 'vip_cut';
+        $field[] = 'coupon_money';
+        $field[] = 'special_price_cut';
+        $field[] = 'price';
+        $field[] = 'pay_time';
+        $field[] = 'pay_type';
+        $field[] = 'messages';
+        $field[] = 'post_type';
+        $field[] = 'bill_type';
+        $field[] = 'bill_title';
+        $field[] = 'bill_number';
+        $field[] = 'bill_format';
+        $with[] = 'orderChild';
+        $with[] = 'orderChild.expressInfo';
 //        }
 
 //        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
@@ -403,7 +478,7 @@ class MallOrderServers
 
         $field = [
             'nlsg_mall_order.id', 'nlsg_mall_order.ordernum', 'nlsg_mall_order.price', 'nlsg_mall_order.pay_price',
-            'nlsg_mall_order.messages','nlsg_mall_order.created_at',
+            'nlsg_mall_order.messages', 'nlsg_mall_order.created_at',
             'nlsg_mall_order.dead_time', 'nlsg_mall_order.user_id', DB::raw('3 as order_type'),
             DB::raw('(CASE
 				WHEN (nlsg_mall_order.STATUS = 1 AND is_success = 0 AND is_stop = 0 ) THEN 1
