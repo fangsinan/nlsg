@@ -383,12 +383,14 @@ class ChannelWorksList extends Base
     {
         return $this->hasOne(Column::class, 'id', 'works_id')
             ->select(['id', 'name as title', 'subtitle', 'cover_pic as cover_img',
-                'details_pic as detail_img', 'column_type', 'price', 'user_id', 'view_num', 'info_num']);
+                'details_pic as detail_img', 'column_type', 'price', 'user_id', 'view_num',
+                'info_num','subscribe_num']);
     }
 
     public function works()
     {
         return $this->hasOne(Works::class, 'id', 'works_id')
-            ->select(['id', 'title', 'subtitle', 'cover_img', 'detail_img', 'type', 'price', 'user_id', 'view_num', 'chapter_num as info_num']);
+            ->select(['id', 'title', 'subtitle', 'cover_img', 'detail_img', 'type', 'price', 'user_id', 'view_num',
+                'chapter_num as info_num','subscribe_num']);
     }
 }
