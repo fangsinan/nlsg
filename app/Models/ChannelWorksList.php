@@ -115,6 +115,7 @@ class ChannelWorksList extends Base
             $temp_res['view_num'] = $v['view_num'];
             $temp_res['created_at'] = $v['created_at'];
             $temp_res['info_num'] = $v['info_num'];
+            $temp_res['subscribe_num'] = $v['subscribe_num'];
             $temp_res['is_buy'] = ($v['check_sub_count'] > 0) ? 1 : 0;
 
             $temp_res['category_info'] = [];
