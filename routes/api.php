@@ -41,6 +41,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('config', 'IndexController@config');
     Route::get('temp_config', 'IndexController@tempConfig');
 
+    Route::get('meeting_sales/index', 'MeetingController@salesIndex');
+    Route::get('meeting_sales/bind_record', 'MeetingController@bindDealerRecord');
+    Route::post('meeting_sales/bind_dealer', 'MeetingController@bindDealer');
+
     //统计
     Route::get('index/Kunsaid', 'IndexController@kunSaid');
 

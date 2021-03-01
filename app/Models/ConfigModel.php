@@ -112,6 +112,9 @@ class ConfigModel extends Base
             case 101:
                 $dir .= 'temp';
                 break;
+            case 102:
+                $dir .= 'meeting';
+                break;
         }
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $file_base64, $match)) {
             $accessKeyId = Config('web.Ali.ACCESS_KEY_ALI');
