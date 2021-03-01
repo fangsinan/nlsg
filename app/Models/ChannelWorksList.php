@@ -115,7 +115,7 @@ class ChannelWorksList extends Base
             $temp_res['view_num'] = $v['view_num'];
             $temp_res['created_at'] = $v['created_at'];
             $temp_res['info_num'] = $v['info_num'];
-            $temp_res['is_buy'] = ($v['is_buy'] == 0) ? 0 : 1;
+            $temp_res['is_buy'] = ($v['check_sub_count'] > 0) ? 1 : 0;
 
             $temp_res['category_info'] = [];
             foreach ($v['categoryBind'] as $cbv) {
@@ -181,7 +181,7 @@ class ChannelWorksList extends Base
         //分类信息和banner列表
         $channelCategoryModel = new ChannelCategory();
         $category_res = $channelCategoryModel->getCategoryList(1);
-        
+
         return [
             'banner' => [],
             'category' => $category_res,
