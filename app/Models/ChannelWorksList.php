@@ -31,7 +31,6 @@ class ChannelWorksList extends Base
 
     private function listForCytxFromDB($page, $size, $ob, $category_id, $works_type, $is_buy, $user_id, $is_coll)
     {
-        $user_id = 168934;
         //查询出用户已经订阅的数据
         $sub_list = Subscribe::where('user_id', '=', $user_id)
             ->where('channel_works_list_id', '>', 0)
