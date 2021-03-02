@@ -61,7 +61,24 @@ class CommentController extends Controller
     }
 
     /**
-     * 隐藏评论
+     * @api {post} api/admin_v4/comment/forbid 删除想法
+     * @apiVersion 4.0.0
+     * @apiName  comment
+     * @apiGroup 后台-评论
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/comment/forbid 删除想法
+     * @apiDescription 删除想法
+     *
+     * @apiParam {number} id  评论id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
      */
     public function forbid(Request $request)
     {
@@ -74,10 +91,30 @@ class CommentController extends Controller
         }
     }
 
+    /**
+     * @api {post} api/admin_v4/comment/reply 评论想法
+     * @apiVersion 4.0.0
+     * @apiName  comment
+     * @apiGroup 后台-评论
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/comment/reply
+     * @apiDescription 评论想法
+     *
+     * @apiParam {number} id  评论id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
     public function reply(Request $request)
     {
         $user_id = $this->user['id'];
-        $input   = $request->all();
+        $input = $request->all();
 
         $comment = Comment::where('id', $input['comment_id'])->first();
         if ( ! $comment) {
@@ -89,10 +126,10 @@ class CommentController extends Controller
             'to_uid'     => $comment->user_id,
             'content'    => $input['content']
         ]);
-        if ($result){
-          Comment::where('id', $input['comment_id'])->increment('reply_num');
-          //发送通知
-          return success();
-      }
+        if ($result) {
+            Comment::where('id', $input['comment_id'])->increment('reply_num');
+            //发送通知
+            return success();
+        }
     }
 }
