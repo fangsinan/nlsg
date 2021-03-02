@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Comment;
+use App\Models\CommentReply;
 use App\Models\Wiki;
 use App\Models\Works;
 use Carbon\Carbon;
@@ -65,9 +66,33 @@ class CommentController extends Controller
     public function forbid(Request $request)
     {
         $id = $request->get('id');
-        $res= Comment::where('id', $id)->update(['status'=>0]);
-        if($res){
-            return  success();
+        $res = Comment::where('id', $id)->update(['status' => 0]);
+        if ($res) {
+            Comment::where('id', $id)->decrement('reply_num');
+            CommentReply::where('comment_id', $id)->update(['status' => 0]);
+            return success();
         }
+    }
+
+    public function reply(Request $request)
+    {
+        $user_id = $this->user['id'];
+        $input   = $request->all();
+
+        $comment = Comment::where('id', $input['comment_id'])->first();
+        if ( ! $comment) {
+            return error(1000, '评论不存在');
+        }
+        $result = CommentReply::create([
+            'comment_id' => $input['comment_id'],
+            'from_uid'   => $user_id,
+            'to_uid'     => $comment->user_id,
+            'content'    => $input['content']
+        ]);
+        if ($result){
+          Comment::where('id', $input['comment_id'])->increment('reply_num');
+          //发送通知
+          return success();
+      }
     }
 }
