@@ -10,7 +10,7 @@ use App\Models\MeetingSalesBind;
 use App\Models\VipUser;
 use Illuminate\Http\Request;
 
-class MeetingController  extends Controller
+class MeetingController extends Controller
 {
 
     /**
@@ -24,9 +24,10 @@ class MeetingController  extends Controller
      * @apiSuccess {string[]} bind 当前生效的绑定经销商,如果空表示没有
      * @apiSuccess {string} bind.end_at 失效时间
      */
-    public function salesIndex(Request $request){
+    public function salesIndex(Request $request)
+    {
         $model = new MeetingSales();
-        $data = $model->salesIndex($request->input(), $this->user['id']??0);
+        $data = $model->salesIndex($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 
@@ -42,10 +43,13 @@ class MeetingController  extends Controller
      * @apiParam {number} size 条数
      *
      * @apiSuccess {number} status 状态(1当前生效 2已过期)
+     * @apiSuccess {number} bind_count 绑定数
+     * @apiSuccess {number} dealer_count 经销商数
      */
-    public function bindDealerRecord(Request $request){
+    public function bindDealerRecord(Request $request)
+    {
         $model = new MeetingSalesBind();
-        $data = $model->bindDealerRecord($request->input(), $this->user['id']??0);
+        $data = $model->bindDealerRecord($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 
@@ -61,9 +65,10 @@ class MeetingController  extends Controller
      *
      * @apiSuccess {number} status 状态(1当前生效 2已过期)
      */
-    public function checkDealer(Request $request){
+    public function checkDealer(Request $request)
+    {
         $model = new VipUser();
-        $data = $model->checkDealer($request->input('phone',''));
+        $data = $model->checkDealer($request->input('phone', ''));
         return $this->getRes($data);
     }
 
@@ -79,9 +84,10 @@ class MeetingController  extends Controller
      * @apiParam {string} dealer_name 经销商名称
      * @apiParam {string} remark 场次备注
      */
-    public function bindDealer(Request $request){
+    public function bindDealer(Request $request)
+    {
         $model = new MeetingSalesBind();
-        $data = $model->bindDealer($request->input(), $this->user['id']??0);
+        $data = $model->bindDealer($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 

@@ -24,7 +24,7 @@ class MeetingSalesBind extends Base
             return ['code' => false, 'msg' => '没有权限'];
         }
 
-        return MeetingSalesBind::query()
+        $res['list'] = MeetingSalesBind::query()
             ->where('sales_id', '=', $check->id)
             ->orderBy('status', 'asc')
             ->orderBy('end_at', 'desc')
@@ -34,6 +34,15 @@ class MeetingSalesBind extends Base
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->get();
+
+        $res['bind_count'] = MeetingSalesBind::where('sales_id', '=', $check->id)->count();
+
+        $res['dealer_count'] = MeetingSalesBind::where('sales_id', '=', $check->id)
+            ->groupBy('dealer_vip_id')
+            ->get()
+            ->count();
+
+        return $res;
     }
 
     public function order()
