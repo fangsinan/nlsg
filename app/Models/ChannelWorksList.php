@@ -83,7 +83,7 @@ class ChannelWorksList extends Base
         }
 
         //过滤收藏
-        if ($is_coll === 1) {
+        if ($is_coll === 1 && !empty($coll_list)) {
             $query->whereRaw(DB::raw("CONCAT(type,'-',works_id) in ($coll_list)"));
         }
 
