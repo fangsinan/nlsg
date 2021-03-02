@@ -46,6 +46,10 @@ class MeetingSales extends Base
             ->where('end_at', '>=', $now_date)
             ->first();
 
+        if (empty($check->bind)){
+            $check->bind = new class{};
+        }
+
         return $check;
     }
 
