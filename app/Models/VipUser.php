@@ -408,7 +408,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             ->where('status', '=', 1)
             ->where('start_time', '<=', $now_date)
             ->where('expire_time', '>=', $now_date)
-            ->select(['id','user_id','nickname'])
+            ->select(['id','user_id','nickname as dealer_name'])
             ->first();
 
         if (empty($check_dealer)) {
