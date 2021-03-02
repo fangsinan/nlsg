@@ -14,13 +14,15 @@ class MeetingController  extends Controller
 {
 
     /**
-     * 二维码和身份判断
-     * @api {get} /api/v4/meeting_sales/index 二维码和身份判断
+     * 老师二维码
+     * @api {get} /api/v4/meeting_sales/index 老师二维码
      * @apiVersion 4.0.0
      * @apiName /api/v4/meeting_sales/index
      * @apiGroup  会场销售
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/meeting_sales/index
-     * @apiDescription 二维码和身份判断
+     * @apiDescription 老师二维码
+     * @apiSuccess {string[]} bind 当前生效的绑定经销商,如果空表示没有
+     * @apiSuccess {string} bind.end_at 失效时间
      */
     public function salesIndex(Request $request){
         $model = new MeetingSales();

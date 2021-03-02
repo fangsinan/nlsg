@@ -13,9 +13,10 @@ class MeetingSales extends Base
 
     public function salesIndex($params, $user_id)
     {
+        $now_date = date('Y-m-d H:i:s');
         $check = self::where('user_id', '=', $user_id)
             ->where('status', '=', 1)
-            ->select(['id','user_id','phone','nickname','qr_code'])
+            ->select(['id', 'user_id', 'phone', 'nickname', 'qr_code'])
             ->first();
 
         if (empty($check)) {
@@ -38,6 +39,12 @@ class MeetingSales extends Base
             $check->qr_code = $qr_url['url'] . $qr_url['name'];
             $check->save();
         }
+
+        $check->bind = MeetingSalesBind::where('sales_id', '=', $check->id)
+            ->where('status', '=', 1)
+            ->where('begin_at', '<=', $now_date)
+            ->where('end_at', '>=', $now_date)
+            ->first();
 
         return $check;
     }

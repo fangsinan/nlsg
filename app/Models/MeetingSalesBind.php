@@ -28,10 +28,18 @@ class MeetingSalesBind extends Base
             ->where('sales_id', '=', $check->id)
             ->orderBy('status', 'asc')
             ->orderBy('end_at', 'desc')
+            ->withCount(['order' => function ($q) {
+                $q->where('status', '=', 1)->where('type', '=', 16);
+            }])
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->get();
+    }
 
+    public function order()
+    {
+        return $this->hasMany(Order::class, 'sales_bind_id', 'id')
+            ->where('status', '=', 1);
     }
 
     public function bindDealer($params, $user_id)
