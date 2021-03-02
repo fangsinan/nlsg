@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 include __DIR__ . '/adminApi.php';
@@ -40,10 +39,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/test', 'IndexController@test');
     Route::get('config', 'IndexController@config');
     Route::get('temp_config', 'IndexController@tempConfig');
-
-    Route::get('meeting_sales/index', 'MeetingController@salesIndex');
-    Route::get('meeting_sales/bind_record', 'MeetingController@bindDealerRecord');
-    Route::post('meeting_sales/bind_dealer', 'MeetingController@bindDealer');
 
     //统计
     Route::get('index/Kunsaid', 'IndexController@kunSaid');
@@ -94,7 +89,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('wechat_pay/wechat_jsapi_notify', 'CallbackController@WechatNotifyJsapi');
     Route::post('wechat_pay/ali_notify', 'CallbackController@AliNotify');
     Route::post('wechat_pay/test', 'CallbackController@test');
-
 
 
     //生成海报
@@ -205,7 +199,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::post('send/get_send_order', 'SendController@getSendOrder');
 
-    Route::get('work/convert','WorksController@convert');//获取订单详情
+    Route::get('work/convert', 'WorksController@convert');//获取订单详情
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/coupon', 'UserController@getUserCoupon');
@@ -223,8 +217,12 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('remove/wechat', 'UserController@removeWechat');
         Route::get('user/edit_user', 'UserController@editUserInfo');
         //切歌
-        Route::get('works/neighbor','WorksController@neighbor');
+        Route::get('works/neighbor', 'WorksController@neighbor');
 
+        //会场销售
+        Route::get('meeting_sales/index', 'MeetingController@salesIndex');
+        Route::get('meeting_sales/bind_record', 'MeetingController@bindDealerRecord');
+        Route::post('meeting_sales/bind_dealer', 'MeetingController@bindDealer');
 
         //商城开始
         Route::post('shopping_cart/create', 'ShoppingCartController@create');//添加购物车
@@ -323,7 +321,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('order/close_order', 'OrderController@closeOrder');
 
         Route::post('works/subscribe', 'WorksController@subscribe');
-        Route::get('works/works_sub_works','WorksController@worksSubWorks');
+        Route::get('works/works_sub_works', 'WorksController@worksSubWorks');
 
         //创业天下下单
         Route::post('order/create_column_cytx_order', 'OrderController@createColumnCytxOrder');

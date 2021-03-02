@@ -27,6 +27,19 @@ class MeetingController  extends Controller
         return $this->getRes($data);
     }
 
+    /**
+     * 经销商绑定记录
+     * @api {get} /api/v4/meeting_sales/bind_record 经销商绑定记录
+     * @apiVersion 4.0.0
+     * @apiName /api/v4/meeting_sales/bind_record
+     * @apiGroup  会场销售
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/meeting_sales/bind_record
+     * @apiDescription 经销商绑定记录
+     * @apiParam {number} page 页数
+     * @apiParam {number} size 条数
+     *
+     * @apiSuccess {number} status 状态(1当前生效 2已过期)
+     */
     public function bindDealerRecord(Request $request){
         $model = new MeetingSalesBind();
         $data = $model->bindDealerRecord($request->input(), $this->user['id']??0);

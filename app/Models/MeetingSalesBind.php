@@ -15,7 +15,22 @@ class MeetingSalesBind extends Base
         $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
 
+        $check = MeetingSales::where('user_id', '=', $user_id)
+            ->where('status', '=', 1)
+            ->select(['id', 'user_id', 'phone', 'nickname', 'qr_code'])
+            ->first();
 
+        if (empty($check)) {
+            return ['code' => false, 'msg' => '没有权限'];
+        }
+
+        return MeetingSalesBind::query()
+            ->where('sales_id','=',$check->id)
+            ->orderBy('status','asc')
+            ->orderBy('end_at','desc')
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get();
 
     }
 
