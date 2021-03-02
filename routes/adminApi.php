@@ -152,6 +152,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
         //评论
         Route::get('comment/index', 'CommentController@index');
+        Route::post('comment/reply', 'CommentController@reply');
+        Route::post('comment/forbid', 'CommentController@forbid');
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');
