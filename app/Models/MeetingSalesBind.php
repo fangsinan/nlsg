@@ -25,9 +25,9 @@ class MeetingSalesBind extends Base
         }
 
         return MeetingSalesBind::query()
-            ->where('sales_id','=',$check->id)
-            ->orderBy('status','asc')
-            ->orderBy('end_at','desc')
+            ->where('sales_id', '=', $check->id)
+            ->orderBy('status', 'asc')
+            ->orderBy('end_at', 'desc')
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->get();
@@ -36,6 +36,14 @@ class MeetingSalesBind extends Base
 
     public function bindDealer($params, $user_id)
     {
+        if (isEmpty($params['remark'] ?? '')) {
+            return ['code' => false, 'msg' => '场次信息必填'];
+        }
+
+        if (isEmpty($params['dealer_name'] ?? '')) {
+            return ['code' => false, 'msg' => '经销商名称必填'];
+        }
+
         $check = MeetingSales::where('user_id', '=', $user_id)
             ->where('status', '=', 1)
             ->select(['id', 'user_id', 'phone', 'nickname', 'qr_code'])
@@ -85,7 +93,8 @@ class MeetingSalesBind extends Base
         $m->dealer_user_id = $check_dealer->user_id;
         $m->begin_at = $now_date;
         $m->end_at = $end_date;
-        $m->remark = $params['remark'] ?? '';
+        $m->remark = $params['remark'];
+        $m->dealer_name = $params['dealer_name'];
         $m->status = 1;
 
         DB::beginTransaction();

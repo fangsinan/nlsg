@@ -222,6 +222,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         //会场销售
         Route::get('meeting_sales/index', 'MeetingController@salesIndex');
         Route::get('meeting_sales/bind_record', 'MeetingController@bindDealerRecord');
+        Route::get('meeting_sales/check_dealer', 'MeetingController@checkDealer');
         Route::post('meeting_sales/bind_dealer', 'MeetingController@bindDealer');
 
         //商城开始
