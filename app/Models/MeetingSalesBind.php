@@ -53,11 +53,11 @@ class MeetingSalesBind extends Base
 
     public function bindDealer($params, $user_id)
     {
-        if (isEmpty($params['remark'] ?? '')) {
+        if (empty($params['remark'] ?? '')) {
             return ['code' => false, 'msg' => '场次信息必填'];
         }
 
-        if (isEmpty($params['dealer_name'] ?? '')) {
+        if (empty($params['dealer_name'] ?? '')) {
             return ['code' => false, 'msg' => '经销商名称必填'];
         }
 
