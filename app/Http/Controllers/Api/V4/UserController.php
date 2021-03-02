@@ -284,18 +284,25 @@ class UserController extends Controller
     public function feed(Request $request)
     {
         $id = $request->get('user_id');
+        $activity_tag = $request->input('activity_tag','');
         if (!$id) {
             return error('参数不能为空');
         }
 
-        $comments = Comment::with(['user:id,nickname,headimg', 'attach:id,relation_id,img'])
+        $query = Comment::with(['user:id,nickname,headimg', 'attach:id,relation_id,img'])
             ->select('id', 'pid', 'user_id', 'relation_id', 'type', 'content', 'forward_num', 'share_num', 'like_num', 'flower_num',
                 'reply_num', 'created_at')
             ->where('user_id', $id)
             ->where('status', 1)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
+            ->orderBy('created_at', 'desc');
+
+        if ($activity_tag === 'cytx'){
+            $query->whereIn('type',[2,4]);
+        }
+
+        $comments = $query->paginate(10)
             ->toArray();
+
         if ($comments['data']) {
             foreach ($comments['data'] as &$v) {
                 if ($v['type'] == 1 || $v['type'] == 2) {
