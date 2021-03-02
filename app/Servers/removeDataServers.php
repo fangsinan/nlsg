@@ -5,6 +5,7 @@ namespace App\Servers;
 
 use App\Http\Controllers\Api\V4\CreatePosterController;
 use App\Models\Area;
+use App\Models\ChannelOrder;
 use App\Models\ConfigModel;
 use App\Models\CreatePost;
 use App\Models\ExpressCompany;
@@ -926,6 +927,40 @@ class removeDataServers
 
         DB::connection('mysql_new_zs')->table('nlsg_coupon')->insert($add_data);
 
+    }
+
+    public function douyinLiveError()
+    {
+        exit();
+        $begin_id = 3345;
+        $end_id = 3822;
+
+        $list = ChannelOrder::query()
+            ->where('id', '>=', $begin_id)
+            ->where('id', '<=', $end_id)
+            ->where('sku', '=', '3412364163681537433')
+            ->where('status', '=', 1)
+            ->where('created_at', '>', '2021-03-02')
+            ->get();
+
+        $add_data = [];
+        foreach ($list as $v){
+            $temp_data = [];
+            $temp_data['type'] = 3;
+            $temp_data['user_id'] = $v->user_id;
+            $temp_data['relation_id'] = 17;
+            $temp_data['pay_time'] = $v->success_at;
+            $temp_data['status'] = 1;
+            $temp_data['channel_order_id'] = $v->order_id;
+            $temp_data['channel_order_sku'] = $v->sku;
+
+            $add_data[] = $temp_data;
+        }
+
+        DB::beginTransaction();
+        $res = DB::table('nlsg_subscribe')->insert($add_data);
+
+        dd($res);
     }
 
     public function douyinAddCD()

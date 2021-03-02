@@ -66,6 +66,10 @@ class RemoveDataController extends ControllerBackend
         if (0) {
             $servers->douyinAddCD();
         }
+
+        if(1){
+            $servers->douyinLiveError();
+        }
     }
 
     public function mallOrders()
