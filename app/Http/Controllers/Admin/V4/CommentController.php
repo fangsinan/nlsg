@@ -57,6 +57,17 @@ class CommentController extends Controller
             $comments['data'] = Comment::convert($comments);
             return success($comments);
         }
+    }
 
+    /**
+     * 隐藏评论
+     */
+    public function forbid(Request $request)
+    {
+        $id = $request->get('id');
+        $res= Comment::where('id', $id)->update(['status'=>0]);
+        if($res){
+            return  success();
+        }
     }
 }
