@@ -4,6 +4,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ChannelWorksList extends Base
 {
@@ -28,8 +29,9 @@ class ChannelWorksList extends Base
             ->select(['id', 'type', 'user_id', 'relation_id', 'start_time', 'end_time', 'channel_works_list_id',]);
     }
 
-    private function listForCytxFromDB($page, $size, $ob, $category_id, $works_type, $is_buy, $user_id)
+    private function listForCytxFromDB($page, $size, $ob, $category_id, $works_type, $is_buy, $user_id, $is_coll)
     {
+        $user_id = 168934;
         //查询出用户已经订阅的数据
         $sub_list = Subscribe::where('user_id', '=', $user_id)
             ->where('channel_works_list_id', '>', 0)
@@ -43,6 +45,23 @@ class ChannelWorksList extends Base
         } else {
             $sub_list = $sub_list->toArray();
             $sub_list = array_column($sub_list, 'channel_works_list_id');
+        }
+
+        //查询出用户收藏的数据
+        $coll_list = Collection::where('user_id', '=', $user_id)
+            ->whereIn('type', [2, 7])
+            ->select([DB::raw("CONCAT(if(type = 7,1,2),'-',relation_id) as coll_id")])
+            ->get();
+
+        if ($coll_list->isEmpty()) {
+            $coll_list = '';
+        } else {
+            $coll_list = array_column($coll_list->toArray(), 'coll_id');
+            $temp_coll_list = '';
+            foreach ($coll_list as $cllv) {
+                $temp_coll_list .= ",'" . $cllv . "'";
+            }
+            $coll_list = trim($temp_coll_list, ',');
         }
 
         $query = self::where('status', '=', 1)
@@ -62,6 +81,11 @@ class ChannelWorksList extends Base
             $query->whereIn('id', $sub_list);
         } elseif ($is_buy === 2) {
             $query->whereNotIn('id', $sub_list);
+        }
+
+        //过滤收藏
+        if ($is_coll === 1) {
+            $query->whereRaw(DB::raw("CONCAT(type,'-',works_id) in ($coll_list)"));
         }
 
         //视频,音频过滤
@@ -175,9 +199,10 @@ class ChannelWorksList extends Base
         $category_id = $params['category_id'] ?? 0;
         $works_type = $params['works_type'] ?? 0;
         $is_buy = intval($params['is_buy'] ?? 0);
+        $is_coll = intval($params['is_coll'] ?? 0);
         $user_id = $user['id'] ?? 0;
 
-        $works_list = $this->listForCytxFromDB($page, $size, $ob, $category_id, $works_type, $is_buy, $user_id);
+        $works_list = $this->listForCytxFromDB($page, $size, $ob, $category_id, $works_type, $is_buy, $user_id, $is_coll);
 
         //分类信息和banner列表
         $channelCategoryModel = new ChannelCategory();
@@ -191,13 +216,14 @@ class ChannelWorksList extends Base
 
     }
 
-    public function cytxBanner(){
+    public function cytxBanner()
+    {
         $banner_index = ConfigModel::getData(47);
         $banner_home = ConfigModel::getData(47);
 
         return [
-            'index'=>array_filter(explode(',',$banner_index)),
-            'home'=>array_filter(explode(',',$banner_home)),
+            'index' => array_filter(explode(',', $banner_index)),
+            'home' => array_filter(explode(',', $banner_home)),
         ];
 
     }
@@ -208,7 +234,7 @@ class ChannelWorksList extends Base
         $size = $params['size'] ?? 10;
 
         $list = Order::query()
-            ->where('user_id','=',$user['id'])
+            ->where('user_id', '=', $user['id'])
             ->where('activity_tag', '=', 'cytx')
             ->whereIn('type', [9, 15])
             ->where('status', '=', 1)
@@ -230,19 +256,19 @@ class ChannelWorksList extends Base
             ->offset(($page - 1) * $size)
             ->get();
 
-        foreach ($list as &$v){
-            if ($v->type == 9){
+        foreach ($list as &$v) {
+            if ($v->type == 9) {
                 $v->title = $v->works->title;
-                $v->subtitle  = $v->works->subtitle;
+                $v->subtitle = $v->works->subtitle;
                 $v->cover_img = $v->works->cover_img;
                 $v->detail_img = $v->works->detail_img;
-            }else{
+            } else {
                 $v->title = $v->column->title;
-                $v->subtitle  = $v->column->subtitle;
+                $v->subtitle = $v->column->subtitle;
                 $v->cover_img = $v->column->cover_img;
                 $v->detail_img = $v->column->detail_img;
             }
-            unset($v->works,$v->column);
+            unset($v->works, $v->column);
         }
 
 //        $list = DB::table('nlsg_order as o')
@@ -385,13 +411,13 @@ class ChannelWorksList extends Base
         return $this->hasOne(Column::class, 'id', 'works_id')
             ->select(['id', 'name as title', 'subtitle', 'cover_pic as cover_img',
                 'details_pic as detail_img', 'column_type', 'price', 'user_id', 'view_num',
-                'info_num','subscribe_num']);
+                'info_num', 'subscribe_num']);
     }
 
     public function works()
     {
         return $this->hasOne(Works::class, 'id', 'works_id')
             ->select(['id', 'title', 'subtitle', 'cover_img', 'detail_img', 'type', 'price', 'user_id', 'view_num',
-                'chapter_num as info_num','subscribe_num']);
+                'chapter_num as info_num', 'subscribe_num']);
     }
 }
