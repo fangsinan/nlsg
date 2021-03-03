@@ -207,7 +207,7 @@ class ChannelWorksList extends Base
         $is_buy = intval($params['is_buy'] ?? 0);
         $is_coll = intval($params['is_coll'] ?? 0);
         $user_id = $user['id'] ?? 0;
-        
+
         $works_list = $this->listForCytxFromDB($page, $size, $ob, $category_id, $works_type, $is_buy, $user_id, $is_coll);
 
         //分类信息和banner列表
@@ -238,7 +238,7 @@ class ChannelWorksList extends Base
     {
         $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
-
+        
         $list = Order::query()
             ->where('user_id', '=', $user['id'])
             ->where('activity_tag', '=', 'cytx')
