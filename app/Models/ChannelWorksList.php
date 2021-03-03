@@ -83,8 +83,12 @@ class ChannelWorksList extends Base
         }
 
         //过滤收藏
-        if ($is_coll === 1 && !empty($coll_list)) {
-            $query->whereRaw(DB::raw("CONCAT(type,'-',works_id) in ($coll_list)"));
+        if ($is_coll === 1) {
+            if (!empty($coll_list)) {
+                $query->whereRaw(DB::raw("CONCAT(type,'-',works_id) in ($coll_list)"));
+            } else {
+                $query->whereRaw(DB::raw("CONCAT(type,'-',works_id) in ('0-0')"));
+            }
         }
 
         //视频,音频过滤
@@ -160,7 +164,7 @@ class ChannelWorksList extends Base
                 $temp_res['column_type'] = $v['column']['column_type'];
                 $temp_res['user_id'] = $v['column']['user_id'];
                 $temp_res['subscribe_num'] = $v['column']['subscribe_num'];
-                $temp_res['history'] = History::getHistoryCount($v['works_id'],2,$user_id);
+                $temp_res['history'] = History::getHistoryCount($v['works_id'], 2, $user_id);
             } else if ($v['type'] == 2) {
                 if (empty($v['works'])) {
                     continue;
@@ -174,7 +178,7 @@ class ChannelWorksList extends Base
                 $temp_res['column_type'] = 1;
                 $temp_res['user_id'] = $v['works']['user_id'];
                 $temp_res['subscribe_num'] = $v['works']['subscribe_num'];
-                $temp_res['history'] = History::getHistoryCount($v['works_id'],4,$user_id);
+                $temp_res['history'] = History::getHistoryCount($v['works_id'], 4, $user_id);
             } else {
                 continue;
             }
@@ -202,7 +206,7 @@ class ChannelWorksList extends Base
         $is_buy = intval($params['is_buy'] ?? 0);
         $is_coll = intval($params['is_coll'] ?? 0);
         $user_id = $user['id'] ?? 0;
-
+        
         $works_list = $this->listForCytxFromDB($page, $size, $ob, $category_id, $works_type, $is_buy, $user_id, $is_coll);
 
         //分类信息和banner列表
