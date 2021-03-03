@@ -308,7 +308,7 @@ class UserController extends Controller
             foreach ($comments['data'] as &$v) {
                 if ($v['type'] == 1 || $v['type'] == 2) {
                     $v['column'] = Column::where('id', $v['relation_id'])
-                        ->select('id', 'title', 'subtitle', 'price', 'subscribe_num', 'cover_pic', 'type')
+                        ->select('id', 'name as title', 'subtitle', 'price', 'subscribe_num', 'cover_pic', 'type')
                         ->first();
                 } elseif ($v['type'] == 3 || $v['type'] == 4) {
                     $v['works'] = Works::where('id', $v['relation_id'])
