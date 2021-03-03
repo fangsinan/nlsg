@@ -24,19 +24,28 @@ class MeetingSalesBind extends Base
             return ['code' => false, 'msg' => '没有权限'];
         }
 
-        $res['list'] = MeetingSalesBind::query()
+        $list = MeetingSalesBind::query()
             ->where('sales_id', '=', $check->id)
             ->orderBy('status', 'asc')
             ->orderBy('end_at', 'desc')
-            ->withCount(['order' => function ($q) {
-                $q->where('status', '=', 1)->where('type', '=', 16);
-            }])
+//            ->withCount(['order' => function ($q) {
+//                $q->where('status', '=', 1)->where('type', '=', 16);
+//            }])
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->get();
 
-        $res['bind_count'] = MeetingSalesBind::where('sales_id', '=', $check->id)->count();
+        foreach ($list as $v) {
+            $v->order_count = DB::table('nlsg_order as o')
+                ->join('nlsg_pay_record_detail as d', 'o.ordernum', '=', 'd.ordernum')
+                ->where('d.user_id', '=', $user_id)
+                ->where('o.sales_bind_id', '=', $v->id)
+                ->where('o.status', '=', 1)
+                ->count();
+        }
 
+        $res['list'] = $list;
+        $res['bind_count'] = MeetingSalesBind::where('sales_id', '=', $check->id)->count();
         $res['dealer_count'] = MeetingSalesBind::where('sales_id', '=', $check->id)
             ->groupBy('dealer_vip_id')
             ->get()
