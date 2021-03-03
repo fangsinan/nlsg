@@ -5,6 +5,7 @@ namespace App\Models;
 
 
 use App\Http\Controllers\Api\V4\CreatePosterController;
+use Illuminate\Support\Facades\DB;
 
 class MeetingSales extends Base
 {
@@ -44,13 +45,17 @@ class MeetingSales extends Base
             ->where('status', '=', 1)
             ->where('begin_at', '<=', $now_date)
             ->where('end_at', '>=', $now_date)
+            ->select(['*', DB::raw('"" as headimg')])
             ->first();
 
-        if (empty($check->bind)){
-            $check->bind = new class{};
-        }else{
-            $bind_user = User::where('id','=',$check->dealer_user_id)->select(['id','headimg'])->first();
-            $check->bind->headimg = $bind_user->headimg;
+        if (empty($check->bind)) {
+            $check->bind = new class {
+            };
+        } else {
+            $bind_user = User::where('id', '=', $check->dealer_user_id)->select(['id', 'headimg'])->first();
+            if (!empty($bind_user)) {
+                $check->bind['headimg'] = $bind_user->headimg;
+            }
         }
 
         return $check;
