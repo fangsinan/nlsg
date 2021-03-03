@@ -52,7 +52,7 @@ class MeetingSales extends Base
             $check->bind = new class {
             };
         } else {
-            $bind_user = User::where('id', '=', $check->dealer_user_id)->select(['id', 'headimg'])->first();
+            $bind_user = User::where('id', '=', $check->bind->dealer_user_id)->select(['id', 'headimg'])->first();
             if (!empty($bind_user)) {
                 $check->bind['headimg'] = $bind_user->headimg;
             }

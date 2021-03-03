@@ -9,6 +9,7 @@ use App\Models\ConfigModel;
 use App\Models\Coupon;
 use App\Models\History;
 use App\Models\LiveUserPrivilege;
+use App\Models\MeetingSales;
 use App\Models\UserInvite;
 use App\Models\Works;
 use App\Models\WorksInfo;
@@ -1019,6 +1020,17 @@ class UserController extends Controller
             } else {
                 $res['is_live'] = 0;
             }
+
+            //判断是否为会场销售老师
+            $res['is_meeting_sales'] = 0;
+            $check_meeting_sales = MeetingSales::where('user_id', '=', $this->user['id'])
+                ->where('status', '=', 1)
+                ->select(['id', 'user_id', 'phone', 'nickname', 'qr_code'])
+                ->first();
+            if (!empty($check_meeting_sales)) {
+                $res['is_meeting_sales'] = 1;
+            }
+
             return success($res);
 
         } else {

@@ -198,10 +198,10 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             ->where('expire_time', '>=', $now_date)
             ->first();
 
-        $order_info = Order::whereId($order_id)->select(['id', 'ordernum','live_num'])->first();
+        $order_info = Order::whereId($order_id)->select(['id', 'ordernum', 'live_num'])->first();
 
         $buy_num = $order_info->live_num;
-        if ($buy_num == 0){
+        if ($buy_num == 0) {
             $buy_num = 1;
         }
 
@@ -389,7 +389,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
 
         //开通订阅课程
         $sub_i = 1;
-        while ($sub_i <= $buy_num){
+        while ($sub_i <= $buy_num) {
             VipRedeemUser::subWorksOrGetRedeemCode($user_id);
             $sub_i++;
         }
@@ -398,7 +398,8 @@ where a.user_id = ' . $user_id . ' and a.status = 2
         return ['code' => true, 'msg' => 'ok'];
     }
 
-    public function checkDealer($phone){
+    public function checkDealer($phone)
+    {
         $now = time();
         $now_date = date('Y-m-d H:i:00', $now);
 
@@ -408,12 +409,16 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             ->where('status', '=', 1)
             ->where('start_time', '<=', $now_date)
             ->where('expire_time', '>=', $now_date)
-            ->select(['id','user_id','nickname as dealer_name'])
+            ->select(['id', 'user_id', 'nickname as dealer_name', 'username'])
             ->first();
 
         if (empty($check_dealer)) {
             return ['code' => false, 'msg' => '该账号不是经销商'];
-        }else{
+        } else {
+            $bind_user = User::where('id', '=', $check_dealer->user_id)->select(['id', 'headimg'])->first();
+            if (!empty($bind_user)) {
+                $check_dealer->headimg = $bind_user->headimg;
+            }
             return $check_dealer;
         }
     }
