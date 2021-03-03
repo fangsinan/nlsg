@@ -179,6 +179,8 @@ class WechatPay extends Controller
 
                 $vip_id = 0;
                 $newVip_rst = true;
+                $Sales_Rst = true;
+
                 //当有效身份不是钻石合伙人，对vip_user表进行任何处理
 
                 if ($level != 2) {
@@ -253,7 +255,6 @@ class WechatPay extends Controller
 
                     /*****************     开通360   有销讲老师的划分收益【】  ****************/
                     $sales_id = $orderInfo['sales_id']; //销讲老师
-                    $Sales_Rst = true;
                     if( !empty($map)  && ( empty($sales_id) || $vip_order_type == 2) ){  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程
                         //防止重复添加收入
                         $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
