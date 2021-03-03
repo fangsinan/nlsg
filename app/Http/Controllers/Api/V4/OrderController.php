@@ -12,6 +12,8 @@ use App\Models\History;
 use App\Models\LiveCountDown;
 use App\Models\LiveInfo;
 use App\Models\MallOrder;
+use App\Models\MeetingSales;
+use App\Models\MeetingSalesBind;
 use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\PayRecord;
@@ -982,7 +984,7 @@ class OrderController extends Controller
 
 
     /**
-     * @api {post} /api//v4/order/create_new_vip_order 幸福360下单
+     * @api {post} /api/v4/order/create_new_vip_order 幸福360下单
      * @apiName create_new_vip_order
      * @apiVersion 1.0.0
      * @apiGroup order
@@ -1026,6 +1028,31 @@ class OrderController extends Controller
                 }
             }
         }
+        /***********************   销讲老师绑定经销商   *********************/
+        $sales_id = $request->input('sales_id') ?? 0;
+        $sales_bind_id = 0;
+        if( isset($sales_id) && $sales_id > 0 ){
+            $now_date = date('Y-m-d H:i:s', time());
+            $sales_bind = MeetingSalesBind::where(['sales_id'=>$sales_id,'status'=>1])
+                ->where('begin_at', '<=', $now_date)
+                ->where('end_at', '>=', $now_date)->first();
+
+
+            if( !empty($sales_bind) ){
+                $check_dealer = VipUser::where('id', '=', $sales_bind['dealer_vip_id'])
+                    ->where('level', '=', 2)
+                    ->where('is_default', '=', 1)
+                    ->where('status', '=', 1)
+                    ->where('expire_time', '>=', $now_date)
+                    ->first();
+                if($check_dealer){
+                    $tweeter_code = $sales_bind['dealer_user_id'];  //经销商id
+                }
+                $sales_bind_id = $sales_bind['id'];
+            }
+        }
+        /***********************   销讲老师绑定经销商   *********************/
+
 
 
         //新会员关系保护
@@ -1102,6 +1129,8 @@ class OrderController extends Controller
             'vip_order_type' => $type,  //1开通 2续费 3升级
             'remark' => $remark,
             'twitter_id' => $tweeter_code,
+            'sales_id' => $sales_id,
+            'sales_bind_id' => $sales_bind_id,
         ];
 
         $order = Order::firstOrCreate($data);

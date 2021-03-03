@@ -14,6 +14,7 @@ use App\Models\LiveCountDown;
 use App\Models\MallGroupBuyList;
 use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
+use App\Models\MeetingSales;
 use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
@@ -101,6 +102,7 @@ class WechatPay extends Controller
                 $endtime = date("Y-m-d 23:59:59", strtotime("+1years", time()));
 
                 $user_id = $orderInfo['user_id']; //用户
+
                 //更新订单状态
                 $data1 = [
                     'status' => 1,
@@ -153,11 +155,11 @@ class WechatPay extends Controller
                 $Userdata['level'] = $supremacy_vip;
                 $Userdata['username'] = $AdminInfo['phone'];
                 $Userdata['nickname'] = $AdminInfo['nickname'];
-                $Userdata['inviter'] = $twitter_id;
-                $Userdata['source'] = $source;
-                $Userdata['source_vip_id'] = $source_vip_id;
+                $Userdata['inviter'] = $twitter_id;         //推荐人user_id
+                $Userdata['source'] = $source;              //代理商user_id
+                $Userdata['source_vip_id'] = $source_vip_id;//代理商的vip表id
                 $Userdata['is_default'] = 1;
-                $Userdata['inviter_vip_id'] = $twitter['id'];
+                $Userdata['inviter_vip_id'] = $twitter['id'];//推荐人的vip_user表id
                 $Userdata['expire_time'] = $endtime;
                 $Userdata['start_time'] = $starttime;
                 $Userdata['status'] = 1;
@@ -190,6 +192,7 @@ class WechatPay extends Controller
                             }
                             $newVip_rst = VipUser::firstOrCreate($Userdata);
                             $vip_id = $newVip_rst->id;  // 新增时写入
+
                         } else {
                             //过期时间延长一年   权益归属不发生改变
                             $Userdata = [
@@ -245,13 +248,26 @@ class WechatPay extends Controller
 
                         }
                     }
-                    if (!empty($map)) {
+
+
+
+                    /*****************     开通360   有销讲老师的划分收益【】  ****************/
+                    $sales_id = $orderInfo['sales_id']; //销讲老师
+                    $Sales_Rst = true;
+                    if( empty($sales_id)  && !empty($map) ){  //销讲老师表id为空 并且有收益存在 正常执行收益流程
                         //防止重复添加收入
                         $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
                         $PrdInfo = PayRecordDetail::where($where)->first('id');
                         if (empty($PrdInfo)) {
                             $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                         }
+                    }else if( !empty($sales_id) && $vip_order_type == 1 ) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
+                        $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
+                        $Sy_Rst = PayRecordDetail::firstOrCreate($map);
+                        $salesData = MeetingSales::where(['id'=>$sales_id,'status'=>1])->first();
+                        $sales_map = array('user_id' => $salesData['user_id'], "type" => 11, "ordernum" => $out_trade_no, 'price' => 100, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
+                        $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
+
                     }
 
                 }
@@ -275,7 +291,7 @@ class WechatPay extends Controller
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
-                if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst && $add_sub_Rst && $top_Sy_Rst) {
+                if ($newVip_rst && $orderRst && $recordRst && $Sy_Rst && $userRst && $add_sub_Rst && $top_Sy_Rst && $Sales_Rst) {
                     DB::commit();
                     self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 
