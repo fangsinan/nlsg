@@ -106,10 +106,10 @@ class ChannelWorksList extends Base
         //最多学习,最新上架,价格
         switch ($ob) {
             case 'view_num_asc':
-                $query->orderBy('view_num', 'asc');
+                $query->orderBy('subscribe_num', 'asc');
                 break;
             case 'view_num_desc':
-                $query->orderBy('view_num', 'desc');
+                $query->orderBy('subscribe_num', 'desc');
                 break;
             case 'created_asc':
                 $query->orderBy('created_at', 'asc');
@@ -188,6 +188,12 @@ class ChannelWorksList extends Base
                 $leftNumber = floor($temp_res['view_num'] / 10000);
                 $rightNumber = round(($temp_res['view_num'] % 10000) / 10000, 2);
                 $temp_res['view_num'] = floatval($leftNumber + $rightNumber) . '万';
+            }
+
+            if ($temp_res['subscribe_num'] >= 10000) {
+                $leftNumber = floor($temp_res['subscribe_num'] / 10000);
+                $rightNumber = round(($temp_res['subscribe_num'] % 10000) / 10000, 2);
+                $temp_res['subscribe_num'] = floatval($leftNumber + $rightNumber) . '万';
             }
 
             $temp_res['user_info'] = User::getTeacherInfo($temp_res['user_id']);
