@@ -962,6 +962,7 @@ class IndexController extends Controller
     {
         $bannerModel = new Banner();
         $data = $bannerModel->appPopup();
+        $data  = !empty($data) ? $data : new \StdClass();
         return success($data);
         //(1).直播详情   (2).精品课  (3).商品  (4).h5页面  (5).讲座  (6).听书 7 专栏
 //        $data = [
