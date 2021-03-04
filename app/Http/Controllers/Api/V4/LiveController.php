@@ -133,7 +133,7 @@ class LiveController extends Controller
             'banner' => 'nlsg/works/20201228165453965824.jpg',
             'live_lists' => $liveLists,
             'back_lists' => $backLists ?? [],
-            'offline' => $offline,
+            'offline'    => [],
             'recommend' => $recommend
         ];
 
