@@ -21,20 +21,23 @@ class Banner extends Base
      */
     public function getIndexBanner()
     {
-        $cache_key_name = 'index_banner_list';
-        $expire_num = CacheTools::getExpire('mall_banner_list');
-        $res = Cache::get($cache_key_name);
-        if (empty($res)) {
-            $res = $this->select('id', 'pic', 'title', 'url', 'jump_type', 'obj_id')
-                ->where('status', 1)
-                ->where('type', 1)
-                ->orderBy('rank')
-                ->orderBy('created_at','desc')
-                ->take(5)
-                ->get()
-                ->toArray();
-            Cache::put($cache_key_name, $res, $expire_num);
-        }
+//        $cache_key_name = 'index_banner_list';
+//        $expire_num = CacheTools::getExpire('mall_banner_list');
+//        $res = Cache::get($cache_key_name);
+//        if (empty($res)) {
+        $today = date('Y-m-d H:i:s', time());
+        $res = $this->select('id', 'pic', 'title', 'url', 'jump_type', 'obj_id')
+            ->where('status', 1)
+            ->where('type', 1)
+            ->where('start_time', '<=', $today)
+            ->where('end_time', '>=', $today)
+            ->orderBy('rank')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->toArray();
+//            Cache::put($cache_key_name, $res, $expire_num);
+//        }
         return $res;
 
     }
