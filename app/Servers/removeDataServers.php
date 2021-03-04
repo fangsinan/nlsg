@@ -944,7 +944,7 @@ class removeDataServers
             ->get();
 
         $add_data = [];
-        foreach ($list as $v){
+        foreach ($list as $v) {
             $temp_data = [];
             $temp_data['type'] = 3;
             $temp_data['user_id'] = $v->user_id;
@@ -961,6 +961,51 @@ class removeDataServers
         $res = DB::table('nlsg_subscribe')->insert($add_data);
 
         dd($res);
+    }
+
+    public function addVipWorksToSub()
+    {
+        $sql = 'SELECT user_id,username,`level`,start_time,expire_time,is_open_360,time_begin_360,time_end_360,
+floor((UNIX_TIMESTAMP(expire_time) - UNIX_TIMESTAMP(start_time)) / 31536000 ) as l_1,
+floor((UNIX_TIMESTAMP(time_end_360) - UNIX_TIMESTAMP(time_begin_360)) / 31536000 ) as l_2
+from nlsg_vip_user where status = 1 and is_default = 1
+and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
+
+        $list = DB::select($sql);
+
+        $now_data = date('Y-m-d H:i:s');
+        //2是作品 6是讲座
+        $works_list = [
+            ['type' => 2, 'id' => 630]
+        ];
+
+        $add_data = [];
+
+        foreach ($list as $v) {
+            foreach ($works_list as $wlv) {
+                $temp_data = [];
+                $temp_data['type'] = $wlv['type'];
+                $temp_data['user_id'] = $v->user_id;
+                $temp_data['relation_id'] = $wlv['id'];
+                $temp_data['pay_time'] = $now_data;
+                if ($v->level == 1) {
+                    $temp_data['start_time'] = $v->start_time;
+                    $temp_data['end_time'] = $v->expire_time;
+                } else {
+                    $temp_data['start_time'] = $v->time_begin_360;
+                    $temp_data['end_time'] = $v->time_end_360;
+                }
+                $temp_data['give'] = 3;
+                $add_data[] = $temp_data;
+            }
+        }
+
+        DB::beginTransaction();
+        $res = DB::table('nlsg_subscribe')->insert($add_data);
+        DB::rollBack();
+
+        dd($res);
+
     }
 
     public function douyinAddCD()

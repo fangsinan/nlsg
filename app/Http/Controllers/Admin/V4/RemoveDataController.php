@@ -67,8 +67,12 @@ class RemoveDataController extends ControllerBackend
             $servers->douyinAddCD();
         }
 
-        if(1){
+        if (0) {
             $servers->douyinLiveError();
+        }
+
+        if (0) {
+            $servers->addVipWorksToSub();
         }
     }
 
