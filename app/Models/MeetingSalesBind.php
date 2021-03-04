@@ -26,8 +26,9 @@ class MeetingSalesBind extends Base
 
         $list = MeetingSalesBind::query()
             ->where('sales_id', '=', $check->id)
-            ->orderBy('status', 'asc')
-            ->orderBy('end_at', 'desc')
+            ->orderBy('id','desc')
+//            ->orderBy('status', 'asc')
+//            ->orderBy('end_at', 'desc')
 //            ->withCount(['order' => function ($q) {
 //                $q->where('status', '=', 1)->where('type', '=', 16);
 //            }])
