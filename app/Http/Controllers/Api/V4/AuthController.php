@@ -618,7 +618,7 @@ class AuthController extends Controller
             ],
 
         ];
-        dd($switchAll);
+        
         $res_switchAll = $switchAll[$version] ?? $switchAll['default'];
 
         return success($res_switchAll);
