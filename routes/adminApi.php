@@ -144,6 +144,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
         //用户
         Route::get('user/index', 'UserController@index');
+        Route::get('user/intro', 'UserController@intro');
         Route::get('user/apply', 'UserController@apply');
         Route::post('user/pass', 'UserController@pass');
 

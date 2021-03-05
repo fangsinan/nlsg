@@ -95,4 +95,14 @@ class UserController extends Controller
         }
         return success();
     }
+
+    public function  intro(Request $request)
+    {
+        $id = $request->get('id');
+        $user = User::select('intro')->where('id', $id)->first();
+        if ($user){
+            $intro = $user->intro ?? '';
+            return  success($intro);
+        }
+    }
 }
