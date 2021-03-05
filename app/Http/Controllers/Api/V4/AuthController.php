@@ -595,9 +595,16 @@ class AuthController extends Controller
 
 
         $version = $request->input('version', '');//1 获取是否有提交信息  2修改
+        $config_version = ConfigModel::getData(52);
         $switchAll = [
             //精确版本
-            '4.0.9' => [
+//            '4.1.0' => [
+//                'money_switch' => '0',//app赚钱开关   0关闭  1开启
+//                'Vip_Switch' => '0',//提现开关   0关闭  1开启
+//                'vipCode' => '0', //钻石兑换码
+//                'worksCode' => '0',//课程兑换码
+//            ],
+            $config_version => [
                 'money_switch' => '0',//app赚钱开关   0关闭  1开启
                 'Vip_Switch' => '0',//提现开关   0关闭  1开启
                 'vipCode' => '0', //钻石兑换码
@@ -611,6 +618,7 @@ class AuthController extends Controller
             ],
 
         ];
+        dd($switchAll);
         $res_switchAll = $switchAll[$version] ?? $switchAll['default'];
 
         return success($res_switchAll);
