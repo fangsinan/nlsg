@@ -90,6 +90,10 @@ class StatisticsServers
                     ->select(['id', 'title as "名称"', 'view_num as "浏览量"'])
                     ->get();
 
+                $start_year  = date('Y', strtotime($starttime));
+                $end_year    = date('Y', strtotime($endtime));
+                $start_month = date('m', strtotime($starttime));
+                $end_month   = date('m', strtotime($endtime));
                 //每天的阅读量和收听人数
                 $history_info = History::where('relation_id', '=', 566)
                     ->where('relation_type', '=', 4)
@@ -108,12 +112,19 @@ class StatisticsServers
                 $listenTotalNum = 0;
                 $shareTotalNum = 0;
                 foreach ($works_info as $key => &$val) {
-                    $listennum = $history_arr[$val['id']] + 0;
+                    if (!empty($history_arr[$val['id']])){
+                        $listennum = ($history_arr[$val['id']]) + 0;
+                    } else {
+                        $listennum = 0;
+                    }
                     //处理收听数量
                     $val['收听人数'] = $listennum;
-
                     $listenTotalNum += $listennum;
+
                     unset($val['id']);
+                }
+                if ( ($start_year ==2020 && $start_month ==01) && ($end_year ==2020 && $end_month ==12)){
+                    $listenTotalNum = $listenTotalNum + 369583;
                 }
 
                 $data['琨说'] = [
