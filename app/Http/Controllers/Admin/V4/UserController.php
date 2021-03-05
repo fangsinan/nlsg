@@ -20,6 +20,7 @@ class UserController extends Controller
         $nickname = $request->get('nickname');
         $sex = $request->get('sex');
         $level = $request->get('level');
+        $is_author = $request->get('is_author');
         $start = $request->get('start');
         $end = $request->get('end');
         $query = User::when($id, function ($query) use ($id) {
@@ -33,6 +34,9 @@ class UserController extends Controller
             })
             ->when(! is_null($level), function ($query) use ($level) {
                 $query->where('level', $level);
+            })
+            ->when(! is_null($is_author), function ($query) use ($is_author) {
+                $query->where('is_author', $is_author);
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
