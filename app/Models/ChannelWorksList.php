@@ -231,7 +231,7 @@ class ChannelWorksList extends Base
     public function cytxBanner()
     {
         $banner_index = ConfigModel::getData(47);
-        $banner_home = ConfigModel::getData(47);
+        $banner_home = ConfigModel::getData(51);
 
         return [
             'index' => array_filter(explode(',', $banner_index)),
