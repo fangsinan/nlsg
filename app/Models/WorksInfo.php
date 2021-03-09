@@ -181,9 +181,12 @@ class WorksInfo extends Base
         }]);
 
         if ($ob == 'desc') {
-            $query->orderBy('id', 'desc');
+            //$query->orderBy('id', 'desc');
+            $query->orderBy('rank','desc')
+                    ->orderBy('id', 'desc');
         } else {
-            $query->orderBy('id', 'asc');
+            $query->orderBy('rank','asc')
+                    ->orderBy('id', 'asc');
         }
 
         $info_list = $query->get();
