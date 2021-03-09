@@ -371,6 +371,7 @@ class ChannelServers
                                 $temp_data['user_id'] = $v->user_id;
                                 $temp_data['relation_id'] = $tv;
                                 $temp_data['pay_time'] = $now_date;
+                                $temp_data['start_time'] = $now_date;
                                 $temp_data['status'] = 1;
                                 $temp_data['give'] = 15;
                                 $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 years'));
@@ -423,6 +424,7 @@ class ChannelServers
                                 $temp_data['user_id'] = $v->user_id;
                                 $temp_data['relation_id'] = $tv;
                                 $temp_data['pay_time'] = $now_date;
+                                $temp_data['start_time'] = $now_date;
                                 $temp_data['status'] = 1;
                                 $temp_data['give'] = 15;
                                 $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 years'));

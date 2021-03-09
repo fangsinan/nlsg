@@ -74,6 +74,10 @@ class RemoveDataController extends ControllerBackend
         if (0) {
             $servers->addVipWorksToSub();
         }
+
+        if (0) {
+            $servers->worksListOfSub();
+        }
     }
 
     public function mallOrders()

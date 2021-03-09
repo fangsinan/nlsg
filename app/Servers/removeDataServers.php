@@ -1778,4 +1778,77 @@ and o.status = 1 and o.pay_price > 1";
 
     }
 
+    public function worksListOfSub()
+    {
+        $now_date = date('Y-m-d H:i:s');
+
+        $list = DB::table('works_list_of_sub')
+            ->where('status', '=', 1)
+            ->whereIn('works_type', [2, 6])
+            ->limit(100)
+            ->get();
+
+        foreach ($list as $v) {
+
+            DB::beginTransaction();
+
+            $temp_user = User::firstOrCreate([
+                'phone' => $v->phone
+            ]);
+            $temp_user_id = $temp_user->id;
+
+            $check = Subscribe::where('user_id', '=', $temp_user_id)
+                ->where('created_at', '>', '2021-01-05')
+                ->where('relation_id', '=', $v->works_id)
+                ->where('end_time', '>=', $now_date)
+                ->where('type', '=', $v->works_type)
+                ->where('status', '=', 1)
+                ->first();
+
+            $add_sub_data = [];
+
+            if (empty($check)) {
+                $temp_data = [];
+                $temp_data['type'] = $v->works_type;
+                $temp_data['user_id'] = $temp_user_id;
+                $temp_data['relation_id'] = $v->works_id;
+                $temp_data['pay_time'] = $now_date;
+                $temp_data['start_time'] = $now_date;
+                $temp_data['status'] = 1;
+                $temp_data['give'] = 3;
+                $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
+                $add_sub_data[] = $temp_data;
+            } else {
+                $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +$v->years  years"));
+                $check->end_time = $temp_end_time;
+                $edit_res = $check->save();
+                if ($edit_res === false) {
+                    DB::rollBack();
+                    break;
+                }
+            }
+
+            $edit_res = DB::table('works_list_of_sub')
+                ->where('id', '=', $v->id)
+                ->update([
+                    'user_id' => $temp_user_id,
+                    'status' => 2
+                ]);
+            if ($edit_res === false) {
+                DB::rollBack();
+                continue;
+            }
+            if (!empty($add_sub_data)) {
+                $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                if ($add_res === false) {
+                    DB::rollBack();
+                    continue;
+                }
+            }
+            DB::commit();
+
+        }
+
+    }
+
 }
