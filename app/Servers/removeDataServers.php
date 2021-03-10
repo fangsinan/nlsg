@@ -1011,37 +1011,71 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
     public function douyinAddCD()
     {
         $sku = [
-            '3459490029796208385',
-            '3460757032397854130'
+            '3467290641875230890',
+            '3412364163681537433'
         ];
 
-        $list = DB::table('nlsg_subscribe as s')
-            ->join('nlsg_user as u', 's.user_id', '=', 'u.id')
-            ->whereIn('s.channel_order_sku', $sku)
-            ->select(['s.user_id', 'u.phone'])
+//        $list = DB::table('nlsg_subscribe as s')
+//            ->join('nlsg_user as u', 's.user_id', '=', 'u.id')
+//            ->whereIn('s.channel_order_sku', $sku)
+//            ->select(['s.user_id', 'u.phone'])
+//            ->get()->toArray();
+
+        $list = DB::table('nlsg_channel_order')
+            ->whereIn('sku',$sku)
+            ->where('status','=',1)
+            ->where('pay_time','>','2021-03-01 00:00:00')
             ->get()->toArray();
 
+
+
         $add_data = [];
+
+//        DB::beginTransaction();
+
         foreach ($list as $v) {
-            $check = DB::table('nlsg_live_count_down')
-                ->where('user_id', '=', $v->user_id)
-                ->where('phone', '=', $v->phone)
-                ->where('live_id', '=', 8)
+            $check = Subscribe::where('user_id','=',$v->user_id)
+                ->where('type','=',3)
+                ->where('relation_id','=',17)
                 ->first();
-            if (empty($check)) {
+            if (empty($check)){
                 $temp_data = [];
-                $temp_data['live_id'] = 8;
+                $temp_data['type'] = 3;
                 $temp_data['user_id'] = $v->user_id;
-                $temp_data['phone'] = $v->phone;
+                $temp_data['relation_id'] = 17;
+                $temp_data['pay_time'] = $v->pay_time;
+                $temp_data['status'] = 1;
+                $temp_data['give'] = 15;
+                $temp_data['channel_order_id'] = $v->order_id;
+                $temp_data['channel_order_sku'] = $v->sku;
                 $add_data[] = $temp_data;
+            }else{
+//                if ($check->channel_order_sku != '3467290641875230890'){
+//                    $check->channel_order_sku = '3467290641875230890';
+//                    $check->save();
+//                }
             }
+
+//            $check = DB::table('nlsg_live_count_down')
+//                ->where('user_id', '=', $v->user_id)
+//                ->where('phone', '=', $v->phone)
+//                ->where('live_id', '=', 8)
+//                ->first();
+//            if (empty($check)) {
+//                $temp_data = [];
+//                $temp_data['live_id'] = 8;
+//                $temp_data['user_id'] = $v->user_id;
+//                $temp_data['phone'] = $v->phone;
+//                $add_data[] = $temp_data;
+//            }
         }
 
-        DB::beginTransaction();
 
-        DB::table('nlsg_live_count_down')->insert($add_data);
-
-        dd($add_data);
+dd($add_data);
+//        DB::table('nlsg_live_count_down')->insert($add_data);
+//        DB::table('nlsg_subscribe')->insert($add_data);
+//        DB::commit();
+//        dd($add_data);
 
     }
 
