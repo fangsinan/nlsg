@@ -249,7 +249,9 @@ class ChannelServers
                 $v->status = 9;
             } else {
                 $user = User::firstOrCreate([
-                    'phone' => $v->phone
+                    'phone' => $v->phone,
+                ], [
+                    'nickname' => substr_replace($v->phone, '****', 3, 4)
                 ]);
                 $v->user_id = $user->id;
             }
