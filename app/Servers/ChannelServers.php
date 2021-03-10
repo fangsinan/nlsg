@@ -251,7 +251,8 @@ class ChannelServers
                 $user = User::firstOrCreate([
                     'phone' => $v->phone,
                 ], [
-                    'nickname' => substr_replace($v->phone, '****', 3, 4)
+                    'nickname' => substr_replace($v->phone, '****', 3, 4),
+                    'ref' => 11,
                 ]);
                 $v->user_id = $user->id;
             }
