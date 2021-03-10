@@ -384,7 +384,9 @@ class Coupon extends Base
             'id', 'number', 'name', 'type',
             DB::raw('cast(price as signed) as price'),
             DB::raw('cast(full_cut as signed) as full_cut'),
-            'explain', 'begin_time', 'end_time'
+            'explain',
+            DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_time),\'%Y-%m-%d\') as begin_time'),
+            DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(end_time),\'%Y-%m-%d\') as end_time')
         ]);
 
         $list = $query->limit($size)->offset(($page - 1) * $size)->get();
