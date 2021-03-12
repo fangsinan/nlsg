@@ -24,22 +24,29 @@ class MeetingSales extends Base
             return ['code' => false, 'msg' => '没有权限'];
         }
 
-        if (empty($check->qr_code)) {
+//        if (empty($check->qr_code)) {
             //生成二维码
 
-            $QR_url = ConfigModel::getData(33) . '?time=' . time() . '&sales_id=' . $check->id;
-            $cpModel = new CreatePosterController();
-            $qr_data = $cpModel->createQRcode($QR_url, true, true, true);
+            $sales_id_list = self::where('user_id', '=', $user_id)
+                ->where('status', '=', 1)
+                ->where('qr_code','=','')
+                ->select(['id'])
+                ->get();
 
-            $qr_url = ConfigModel::base64Upload(102, $qr_data);
-
-            if (empty($qr_url['url'] ?? '') || empty($qr_url['name'] ?? '')) {
-                return ['code' => false, 'msg' => '创建二维码失败,请重试'];
+            foreach ($sales_id_list as $si) {
+                $QR_url = ConfigModel::getData(33) . '?time=' . time() . '&sales_id=' . $si->id;
+                $cpModel = new CreatePosterController();
+                $qr_data = $cpModel->createQRcode($QR_url, true, true, true);
+                $qr_url = ConfigModel::base64Upload(102, $qr_data);
+                if (empty($qr_url['url'] ?? '') || empty($qr_url['name'] ?? '')) {
+                    return ['code' => false, 'msg' => '创建二维码失败,请重试'];
+                }
+                $check_temp = self::where('id', '=', $si->id)->first();
+                $check_temp->qr_code = $qr_url['url'] . $qr_url['name'];
+                $check_temp->save();
             }
 
-            $check->qr_code = $qr_url['url'] . $qr_url['name'];
-            $check->save();
-        }
+//        }
 
         $check->bind = MeetingSalesBind::where('sales_id', '=', $check->id)
             ->where('status', '=', 1)
