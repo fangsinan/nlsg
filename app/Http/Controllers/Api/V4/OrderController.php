@@ -1033,12 +1033,13 @@ class OrderController extends Controller
         $sales_bind_id = 0;
         if( isset($sales_id) && $sales_id > 0 ){
             $now_date = date('Y-m-d H:i:s', time());
+            $sales_data = MeetingSales::where(['id'=>$sales_id,'status'=>1])->first();
             $sales_bind = MeetingSalesBind::where(['sales_id'=>$sales_id,'status'=>1])
                 ->where('begin_at', '<=', $now_date)
                 ->where('end_at', '>=', $now_date)->first();
 
 
-            if( !empty($sales_bind) ){
+            if($sales_data['type'] == 1 && !empty($sales_bind) ){
                 $check_dealer = VipUser::where('id', '=', $sales_bind['dealer_vip_id'])
                     ->where('level', '=', 2)
                     ->where('is_default', '=', 1)

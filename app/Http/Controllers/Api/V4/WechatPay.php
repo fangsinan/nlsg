@@ -263,12 +263,31 @@ class WechatPay extends Controller
                             $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                         }
                     }else if( !empty($sales_id) && $vip_order_type == 1 ) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
-                        $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
-                        $Sy_Rst = PayRecordDetail::firstOrCreate($map);
+                        //老师收益
                         $salesData = MeetingSales::where(['id'=>$sales_id,'status'=>1])->first();
                         $sales_map = array('user_id' => $salesData['user_id'], "type" => 11, "ordernum" => $out_trade_no, 'price' => 100, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
                         $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
 
+                        //正常是 代理商收益126  公司134
+                        $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
+                        if( $salesData['type'] == 2 ){ //需要查绑定关系   钻石合伙人是126   360是54  没有则只有老师有收益
+                            $is_vip = VipUser::IsNewVip($twitter_id);
+                            switch ($is_vip){
+                                case 1:
+                                    $map['price'] = 126;
+                                    break;
+                                case 2:
+                                    $map['price'] = 54;
+                                    break;
+                                default :
+                                    $map = [];  // 如果没有绑定  则只有老师有收益
+                                    break;
+                            }
+                        }
+                        //代理商收益
+                        if($map){
+                            $Sy_Rst = PayRecordDetail::firstOrCreate($map);
+                        }
                     }
 
                 }
