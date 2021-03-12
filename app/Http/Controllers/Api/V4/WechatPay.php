@@ -240,6 +240,7 @@ class WechatPay extends Controller
                 //购买必须为360会员
                 $PayRDObj = new PayRecordDetail();
                 // 开通续费为360   并且  推客id有 或者  销讲老师id有[推客可能为空]
+                $sales_id = $orderInfo['sales_id']; //销讲老师
                 if ($supremacy_vip == 1 && (!empty($twitter_id) || !empty($sales_id)) ) { //推客是自己不算 服务商赠送不返利
                     $tk_vip = VipUser::IsNewVip($twitter_id);
 
@@ -254,7 +255,7 @@ class WechatPay extends Controller
                     
 
                     /*****************     开通360   有销讲老师的划分收益【】  ****************/
-                    $sales_id = $orderInfo['sales_id']; //销讲老师
+
                     if( !empty($map)  && ( empty($sales_id) || $vip_order_type == 2) ){  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程
                         //防止重复添加收入
                         $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
