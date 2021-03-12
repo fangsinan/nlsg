@@ -275,10 +275,10 @@ class WechatPay extends Controller
                             $is_vip = VipUser::IsNewVip($twitter_id);
                             switch ($is_vip){
                                 case 1:
-                                    $map['price'] = 126;
+                                    $map['price'] = 54;
                                     break;
                                 case 2:
-                                    $map['price'] = 54;
+                                    $map['price'] = 126;
                                     break;
                                 default :
                                     $map = [];  // 如果没有绑定  则只有老师有收益
