@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\CouponRule;
 use App\Models\CouponRuleList;
+use App\Models\Live;
 use App\Models\MallCategory;
 use App\Models\MallComment;
 use App\Models\MallGoods;
@@ -216,7 +217,8 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-
+            $res = Live::teamInfo(1,1);
+            return $this->getRes($res);
 //                MallRefundJob::shillJob(1);
 //                VipRedeemUser::subWorksOrGetRedeemCode(692095);
 
