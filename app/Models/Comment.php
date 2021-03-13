@@ -45,6 +45,10 @@ class Comment extends Base
             $query->where('info_id', $info_id);
         }
 
+        $query->whereHas('user', function ($q){
+            $q->where('id', '>', 0);
+        });
+
         $lists = $query
             ->where('type', $type)
             ->where('status', 1)
