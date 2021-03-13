@@ -77,6 +77,7 @@ class ChannelServers
 
         $query->where('o.activity_tag', '=', 'cytx')
             ->where('o.status', '=', 1)
+            ->where('p.price','>',0.01)
             ->whereIn('o.type', [9, 15])
             ->where('cytx_job', '<>', -1);
 

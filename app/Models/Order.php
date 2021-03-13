@@ -194,10 +194,15 @@ class Order extends Base
             return ['code' => true, 'is_sub' => 0, 'p' => $time . $user_id];
         }
 
-        $check = Order::where('user_id', '=', $user_id)
-            ->where('live_id', '=', $live_id)
-            ->where('type', '=', 10)
-            ->where('status', '=', 1)
+//        $check = Order::where('user_id', '=', $user_id)
+//            ->where('live_id', '=', $live_id)
+//            ->where('type', '=', 10)
+//            ->where('status', '=', 1)
+//            ->first();
+        $check = Subscribe::where('user_id','=',$user_id)
+            ->where('relation_id','=',$live_id)
+            ->where('type','=',3)
+            ->where('status','=',1)
             ->first();
         if ($check) {
             return ['code' => true, 'is_sub' => 1, 'p' => $time . $user_id];
