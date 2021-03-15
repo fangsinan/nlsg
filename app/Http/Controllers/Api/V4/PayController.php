@@ -508,6 +508,7 @@ class PayController extends Controller
 
         //  1 专栏 2 会员 5 打赏  9精品课      pay_type = 1
         //  1 月卡 2 季卡 3押金 4 违约金 5退押金      pay_type = 2
+        $type = 0;
         if ($pay_type == 1) {
             //验证能量币是否充足
             $order = Order::find($order_id);
@@ -561,7 +562,7 @@ class PayController extends Controller
         if ($res == false) {
             return $this->error(0, 'fail:系统订单有误，重试');
         }
-        return $this->Success();
+        return $this->Success(['type'=>$type]);
     }
 
 }
