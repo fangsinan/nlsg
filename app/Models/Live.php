@@ -188,10 +188,12 @@ class Live extends Base
         $res = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'user_id', 'price')
             ->where('status', 4)
             ->where('is_del', 0)
-            ->where(function ($query) use ($keywords) {
-                $query->orWhere('title', 'LIKE', "%$keywords%");
-                $query->orWhere('describe', 'LIKE', "%$keywords%");
-            })->get();
+            ->where('is_test', 0)
+//            ->where(function ($query) use ($keywords) {
+//                $query->orWhere('title', 'LIKE', "%$keywords%");
+//                $query->orWhere('describe', 'LIKE', "%$keywords%");
+//            })
+            ->get();
 
         return ['res' => $res, 'count' => $res->count()];
     }
