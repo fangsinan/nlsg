@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\Live;
 use App\Models\MallGoods;
 use App\Models\OfflineProducts;
 use App\Models\Search;
