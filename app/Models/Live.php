@@ -160,20 +160,6 @@ class Live extends Base
 
     }
 
-<<<<<<< HEAD
-
-    static function search($keywords)
-    {
-        $res = Live::select('id', 'title', 'describe', 'cover_img', 'str_time', 'end_time','user_id','price')
-            ->where('status', 2)
-            ->where('is_del', 0)
-            ->where(function ($query) use ($keywords) {
-                $query->orWhere('title', 'LIKE', "%$keywords%");
-                $query->orWhere('describe', 'LIKE', "%$keywords%");
-            })->get();
-
-        return ['res' => $res, 'count' => $res->count()];
-=======
     public function liveInfo()
     {
         return $this->hasOne(LiveInfo::class, 'live_pid', 'id');
@@ -195,7 +181,18 @@ class Live extends Base
 
         return $query->get();
 
->>>>>>> 7d6259cc1f003e2758c8ccdb89667fa7c010de81
     }
 
+    static function search($keywords)
+    {
+        $res = Live::select('id', 'title', 'describe', 'cover_img', 'str_time', 'end_time', 'user_id', 'price')
+            ->where('status', 2)
+            ->where('is_del', 0)
+            ->where(function ($query) use ($keywords) {
+                $query->orWhere('title', 'LIKE', "%$keywords%");
+                $query->orWhere('describe', 'LIKE', "%$keywords%");
+            })->get();
+
+        return ['res' => $res, 'count' => $res->count()];
+    }
 }
