@@ -976,7 +976,7 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
         $now_data = date('Y-m-d H:i:s');
         //2是作品 6是讲座
         $works_list = [
-            ['type' => 2, 'id' => 630]
+            ['type' => 6, 'id' => 508]
         ];
 
         $add_data = [];

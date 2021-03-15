@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
-
 class Live extends Base
 {
     protected $table = 'nlsg_live';
 
     public function getIndexLive($ids)
     {
-        if ( ! $ids) {
+        if (!$ids) {
             return false;
         }
         $list = $this->select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num')
@@ -48,7 +45,7 @@ class Live extends Base
 
     /**
      * 直播首页直播列表
-     * @param  int  $uid
+     * @param int $uid
      * @return array
      */
     public function getRecommendLive($uid = 0)
@@ -56,29 +53,29 @@ class Live extends Base
 //        $cache_live_name = 'live_index_list';
 //        $liveLists = Cache::get($cache_live_name);
 //        if (empty($liveLists)) {
-            $testers = explode(',', ConfigModel::getData(35, 1));
-            $user    = User::where('id', $uid)->first();
+        $testers = explode(',', ConfigModel::getData(35, 1));
+        $user = User::where('id', $uid)->first();
 
-            $query   = Live::query();
-            if (!$uid ||  ($user && !in_array($user->phone, $testers))){
-                $query->where('is_test', '=', 0);
-            } else {
-                $query->whereIn('is_test', [0, 1]);
-            }
+        $query = Live::query();
+        if (!$uid || ($user && !in_array($user->phone, $testers))) {
+            $query->where('is_test', '=', 0);
+        } else {
+            $query->whereIn('is_test', [0, 1]);
+        }
 
-            $liveLists = $query->with('user:id,nickname')
-                ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
-                    'playback_price', 'is_free', 'password')
-                ->where('status', 4)
-                ->orderBy('begin_at')
-                ->limit(3)
-                ->get()
-                ->toArray();
+        $liveLists = $query->with('user:id,nickname')
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
+                'playback_price', 'is_free', 'password')
+            ->where('status', 4)
+            ->orderBy('begin_at')
+            ->limit(3)
+            ->get()
+            ->toArray();
 //            $expire_num = CacheTools::getExpire('live_index_list');
 //            Cache::put($cache_live_name, $liveLists, $expire_num);
 //        }
 
-        if ( ! empty($liveLists)) {
+        if (!empty($liveLists)) {
             foreach ($liveLists as &$v) {
                 $channel = LiveInfo::where('live_pid', $v['id'])
                     ->where('status', 1)
@@ -108,7 +105,6 @@ class Live extends Base
     }
 
 
-
     //Route::get('live/send_test', 'LiveController@test');
     public static function sendLiveCountDown()
     {
@@ -133,7 +129,7 @@ class Live extends Base
                 'live_id' => $live_id, 'is_send' => 0
             ])->limit($size)->get()->toArray();
 
-            if ( ! empty($user_phone)) {
+            if (!empty($user_phone)) {
                 foreach ($user_phone as $key => $val) {
                     if ($val['phone']) {
                         $phone[] = $val['phone'];
@@ -147,12 +143,12 @@ class Live extends Base
                         $easySms = app('easysms');
                         $result = $easySms->send($val['phone'], [
                             'template' => 'SMS_168311509',
-                            'data'     => ['name' => $title],
+                            'data' => ['name' => $title],
                         ], ['aliyun']);
 
                     }
                 }
-                if ( ! empty($up_where)) {
+                if (!empty($up_where)) {
                     LiveCountDown::whereIn('id', $up_where)->update(['is_send' => 1]);
                 }
             } else {
@@ -164,6 +160,7 @@ class Live extends Base
 
     }
 
+<<<<<<< HEAD
 
     static function search($keywords)
     {
@@ -176,6 +173,29 @@ class Live extends Base
             })->get();
 
         return ['res' => $res, 'count' => $res->count()];
+=======
+    public function liveInfo()
+    {
+        return $this->hasOne(LiveInfo::class, 'live_pid', 'id');
+    }
+
+    public static function teamInfo($team_id = 0, $flag = 1)
+    {
+        $now_date = date('Y-m-d H:i:s');
+
+        $query = self::where('team_id', '=', $team_id)->where('status', '=', 4);
+
+        if ($flag == 1) {
+            $query->where('team_end_time', '>', $now_date);
+        }
+
+        $query->with(['liveInfo:id,live_pid']);
+        $query->orderBy('team_begin_time', 'asc')->orderBy('id', 'asc');
+        $query->select(['id', 'title', 'begin_at', 'team_id', 'team_begin_time', 'team_end_time']);
+
+        return $query->get();
+
+>>>>>>> 7d6259cc1f003e2758c8ccdb89667fa7c010de81
     }
 
 }

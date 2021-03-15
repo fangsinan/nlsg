@@ -875,7 +875,6 @@ class ClassController extends ControllerBackend
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
 
         $data = [
-            'pid' => $work_id,
             'rank' => $input['rank'] ?? 99,
             'type' => $input['type'] ?? 0,
             'title' => $input['title'] ?? '',
@@ -887,7 +886,11 @@ class ClassController extends ControllerBackend
             'free_trial' => $input['free_trial'] ?? 0,
             'timing_online' => $timing_online ?? 0
         ];
-
+        if ($input['type'] ==1) {
+            $data['column_id'] = $work_id;
+        } elseif($input['type'] ==2) {
+            $data['pid']  = $work_id;
+        }
         //是否自动上架
         if ($timing_online==1){
             $data['online_time'] = $input['timing_time'];
