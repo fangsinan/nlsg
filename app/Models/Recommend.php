@@ -171,13 +171,13 @@ class Recommend extends Base
             $list['info_id'] = $channel->id;
         }
         if($list->is_free==1){
-            $isSub = LiveCountDown::where(['user_id' => $uid, 'live_id' => $list->id])->first();
+            $isSub = LiveCountDown::where(['user_id' => $uid, 'live_id' => $channel->id])->first();
         } else {
             $isSub = Subscribe::isSubscribe($uid, $list->id, 3);
         }
         $isAdmin = LiveConsole::isAdmininLive($uid, $list->id);
 
-        $list['is_sub'] = $isSub ?? 0;
+        $list['is_sub'] = $isSub ? 1 : 0;
         $list['is_admin'] = $isAdmin ? 1 : 0;
         return $list;
     }
