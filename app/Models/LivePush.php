@@ -316,7 +316,7 @@ WHERE
     {
         $cache_live_name = 'live_push_works_'.$live_id;
         $data = Cache::get($cache_live_name);
-        if ($data) {
+        if (false && $data) {
             foreach ($data as $v) {
                 if ($v['id'] != $push_id && $v['type'] != $push_type) {
                     Cache::forget('live_push_works_'.$live_id);
