@@ -165,13 +165,13 @@ class Live extends Base
         return $this->hasOne(LiveInfo::class, 'live_pid', 'id');
     }
 
-    public static function teamInfo($team_id = 0, $flag = 1)
+    public static function teamInfo($team_id = 0, $only_not_start = 1,$first=1)
     {
         $now_date = date('Y-m-d H:i:s');
 
         $query = self::where('team_id', '=', $team_id)->where('status', '=', 4);
 
-        if ($flag == 1) {
+        if ($only_not_start == 1) {
             $query->where('team_end_time', '>', $now_date);
         }
 
