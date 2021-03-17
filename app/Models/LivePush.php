@@ -387,9 +387,12 @@ WHERE
                     $res->type = 5;
                     $res = $res->toArray();
                 } elseif ($v['push_type'] == 9) {
-                    $res = Live::select('id', 'title', 'describe as subtitle', 'cover_img', 'price as original_price','price')
+                    $res = Live::select('id', 'title', 'describe as subtitle', 'cover_img','is_free','price as original_price','price')
                         ->where('id', $v['push_gid'])
                         ->first();
+                    if ($res){
+                        $res->live_info_id =LiveInfo::where('live_pid', $res->id)->value('id');
+                    }
                     $res->type = 9;
                     $res = $res->toArray();
                 }
