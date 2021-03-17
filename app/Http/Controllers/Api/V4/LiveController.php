@@ -968,7 +968,7 @@ class LiveController extends Controller
 
             $checkArr = LiveCheckPhone::select('*')->where(['is_scanning'=>0,'status'=>1])->limit(100)->get()->toArray();
 
-//            dd($checkArr);/
+            //dd($checkArr);
             //先校验是否注册用户
             if(empty($checkArr)){
                 $flag = false;
@@ -1012,26 +1012,41 @@ class LiveController extends Controller
                 $user = User::where('phone',$v['phone'])->first();
                 $info_id = LiveInfo::where(['live_pid'=>$v['live_id']])->first();
 
-                $LiveCountDownUser[] = [
-                    "live_id"   =>  $info_id['id'],  //info表id
-                    "user_id"   =>  $user['id'],
-                    "phone"     =>  $v['phone'],
-                ];
-                $subscribeUser[] = [
-                    'user_id' => $user['id'], //会员id
-                    'pay_time' => date("Y-m-d H:i:s", time()), //支付时间
-                    'type' => 3, //直播
-                    'status' => 1,
-                    'relation_id' => $v['live_id'],  //live表id
-                ];
+
+
+                $liveCountDown = LiveCountDown::where('phone',$v['phone'])->first();
+                if(empty($liveCountDown)){
+                    $LiveCountDownUser[] = [
+                        "live_id"   =>  $info_id['id'],  //info表id
+                        "user_id"   =>  $user['id'],
+                        "phone"     =>  $v['phone'],
+                    ];
+                }
+
+
+                $subscribe = Subscribe::where([
+                    'user_id' => $user['id'],'type' => 3,'status' => 1, 'relation_id' => $v['live_id'],])->first();
+                if(empty($subscribe)){
+                    $subscribeUser[] = [
+                        'user_id' => $user['id'], //会员id
+                        'pay_time' => date("Y-m-d H:i:s", time()), //支付时间
+                        'type' => 3, //直播
+                        'status' => 1,
+                        'relation_id' => $v['live_id'],  //live表id
+                    ];
+                }
+
             }
 
+            $lres=true;
+            $dres=true;
             if($LiveCountDownUser){
                 //直播预约表
                 $dres = LiveCountDown::insert($LiveCountDownUser);
                 $lres = Live::where(['id' => $v['live_id']])->increment('order_num',count($checkArr));
             }
 
+            $sres = true;
             if($subscribeUser){
                 //直播关注表
                 $sres = Subscribe::insert($subscribeUser);
