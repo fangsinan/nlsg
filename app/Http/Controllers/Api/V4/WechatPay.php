@@ -1078,7 +1078,8 @@ class WechatPay extends Controller
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
                 //订阅量处理
-                Column::where(['id' => $teacher_id])->increment('subscribe_num');
+                Column::where(['id' => $teacher_id])->increment('real_subscribe_num');
+                Works::edit_view_num($teacher_id,2,2); //虚拟数 3000以下1：50   以上1：5
 //                $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
 //                $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
@@ -1305,7 +1306,8 @@ class WechatPay extends Controller
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
                 //精品课购买数量 自增1
-                $class_Rst = Works::where(['id' => $works_id])->increment('subscribe_num', 1);
+                $class_Rst = Works::where(['id' => $works_id])->increment('real_subscribe_num', 1);
+                Works::edit_view_num($works_id,1,2); //虚拟数 3000以下1：50   以上1：5
 
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);

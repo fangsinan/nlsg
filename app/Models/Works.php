@@ -399,4 +399,61 @@ class Works extends Base
 
     }
 
+
+    /**
+     * 首页推荐的课程
+     * @param $option   1 阅读数   2订阅数
+     * @param $type   1课程   2专栏|讲座   3 章节 (针对阅读量)
+     *
+     * @return bool
+     */
+    public static function edit_view_num($relation_id,$type,$option)
+    {
+
+        if(empty($option)){
+            return ;
+        }
+        //  3000以下1：50   以上1：5
+        //1课程  2专栏|讲座   3章节
+        $edit_num = 1;
+        switch ($type){
+            case 1:
+                $model = new Works();
+                break;
+            case 2:
+                $model = new Column();
+                break;
+            case 3:
+                $model = new WorksInfo();
+                break;
+        }
+        if( !empty($model) ){
+            $data = $model::find($relation_id);
+
+            //  阅读数
+            if($option = 1){
+                $num = $data['view_num'];
+            }else if($option = 2){//订阅数
+                $num = $data['subscribe_num'];
+            }
+
+
+            if($num < 3000){
+                $edit_num *= 50;
+            }else{
+                $edit_num *= 5;
+            }
+
+            if($option = 1){
+                $model::where(['id'=>$relation_id])->increment('view_num',$edit_num);
+            }else if($option = 2){//订阅数
+                $model::where(['id'=>$relation_id])->increment('subscribe_num',$edit_num);;
+            }
+
+        }
+        return ;
+    }
+
+
+
 }
