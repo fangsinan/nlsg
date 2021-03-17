@@ -816,7 +816,7 @@ class UserController extends Controller
 
             if($val['column_name'] || $val['works_name'] ){
                 $list['date'] = History::DateTime($val['created_at']);
-                $list['his_arr'] = History::DateTime($val['created_at']);
+                $list['his_arr'] = $val;
             }
             //防止有空key  数组变成对象 前端报错
             if( !empty($list) ){
