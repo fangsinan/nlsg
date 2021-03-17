@@ -121,13 +121,13 @@ class Recommend extends Base
         if ( ! $type) {
             return false;
         }
-        //添加缓存
-        $cache_key_name = 'index_recommend_'.$type.'_'.$position;
-        $list = Cache::get($cache_key_name);
-        if ($list) {
-            $list = $this->getLiveRelation($uid, $list);
-            return $list;
-        }
+//        //添加缓存
+//        $cache_key_name = 'index_recommend_'.$type.'_'.$position;
+//        $list = Cache::get($cache_key_name);
+//        if ($list) {
+//            $list = $this->getLiveRelation($uid, $list);
+//            return $list;
+//        }
 
         $ids = Recommend::where('position', $position)
             ->where('type', $type)
@@ -146,8 +146,8 @@ class Recommend extends Base
             ->orderBy('created_at', 'desc')
             ->first();
 
-        $expire_num = CacheTools::getExpire('index_recommend_live');
-        Cache::put($cache_key_name, $list, $expire_num);
+//        $expire_num = CacheTools::getExpire('index_recommend_live');
+//        Cache::put($cache_key_name, $list, $expire_num);
 
         $list = $this->getLiveRelation($uid, $list);
         return $list;
