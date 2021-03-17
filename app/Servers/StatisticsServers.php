@@ -153,12 +153,12 @@ class StatisticsServers
                     ->where('is_robot', '=', 0)
                     ->count();
 
-                $typeArr = [1, 2, 9, 10, 12, 14, 15, 16, 17];
+                $typeArr = [1, 2, 9, 10, 12, 14, 15, 16, 17]; //type  1 专栏 2 会员   9精品课  10直播    14 线下产品(门票类)   15讲座  16新vip  17 赠送下单
                 $data['成交总额'] = Order::where('pay_time', '>=', $starttime)
                     ->where('pay_time', '<=', $endtime)
                     ->whereIn('type', $typeArr)
                     ->where('status', '=', 1)
-                    ->sum('price');
+                    ->sum('pay_price');
                 $data['购买用户'] = Order::where('pay_time', '>=', $starttime)
                     ->where('pay_time', '<=', $endtime)
                     ->whereIn('type', $typeArr)
