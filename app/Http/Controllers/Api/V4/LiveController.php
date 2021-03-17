@@ -193,7 +193,7 @@ class LiveController extends Controller
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
                 'playback_price', 'is_free', 'password')
             ->where('status', 4)
-            ->orderBy('begin_at')
+            ->orderBy('begin_at','desc')
             ->paginate(10)
             ->toArray();
 
