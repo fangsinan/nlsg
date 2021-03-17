@@ -815,15 +815,29 @@ class UserController extends Controller
 //            $new_list[History::DateTime($val['created_at'])][] = $val;
 
             if($val['column_name'] || $val['works_name'] ){
-                $list['date'] = History::DateTime($val['created_at']);
-                $list['his_arr'] = $val;
-            }
-            //防止有空key  数组变成对象 前端报错
-            if( !empty($list) ){
-                $new_list[] = $list;
+                $list[History::DateTime($val['created_at'])][] = $val;
+//                $list['date'] = History::DateTime($val['created_at']);
+//                $list['his_arr'] = $val;
             }
         }
 
+        // 处理数组
+        //{
+        //   [date]     => '日期'
+        //   [his_arr]  =>  当前日期对应的数组
+        //}
+
+        if(!empty($list)){
+            $new_list = [];
+            foreach ($list as $k => $v ){
+                $min_list['date'] = $k;
+                $min_list['his_arr'] = $v;
+                //防止有空key  数组变成对象 前端报错
+                if( !empty($min_list) ){
+                    $new_list[] = $min_list;
+                }
+            }
+        }
 
         return $this->success($new_list);
     }
