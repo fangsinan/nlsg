@@ -386,6 +386,12 @@ WHERE
                         ->first();
                     $res->type = 5;
                     $res = $res->toArray();
+                } elseif ($v['push_type'] == 9) {
+                    $res = Live::select('id', 'title', 'describe as subtitle', 'cover_img', 'price as original_price','price')
+                        ->where('id', $v['push_gid'])
+                        ->first();
+                    $res->type = 9;
+                    $res = $res->toArray();
                 }
                 $data[] = $res ?? [];
             }
