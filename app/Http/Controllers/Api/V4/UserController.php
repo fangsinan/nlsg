@@ -815,7 +815,12 @@ class UserController extends Controller
 //            $new_list[History::DateTime($val['created_at'])][] = $val;
 
             if($val['column_name'] || $val['works_name'] ){
-                $new_list[History::DateTime($val['created_at'])][] = $val;
+                $list['date'] = History::DateTime($val['created_at']);
+                $list['his_arr'] = History::DateTime($val['created_at']);
+            }
+            //防止有空key  数组变成对象 前端报错
+            if( !empty($list) ){
+                $new_list[] = $list;
             }
         }
 
