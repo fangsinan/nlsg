@@ -391,7 +391,8 @@ WHERE
                         ->where('id', $v['push_gid'])
                         ->first();
                     if ($res){
-                        $res->live_info_id =LiveInfo::where('live_pid', $res->id)->value('id');
+                        $infoid =LiveInfo::where('live_pid', $res->id)->value('id');
+                        $res->live_info_id = $infoid ??  0;
                     }
                     $res->type = 9;
                     $res = $res->toArray();
