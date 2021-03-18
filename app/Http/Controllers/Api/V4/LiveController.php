@@ -888,9 +888,9 @@ class LiveController extends Controller
         //校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
 
-        $from_live_info_id = $input['from_live_info_id'] ?? 0;
-        if( $from_live_info_id > 0 ){   //大于0 时说明在直播间买的
-
+        $from_live_info_id = '';
+        if( $input['from_live_info_id'] > 0 ){   //大于0 时说明在直播间买的
+            $from_live_info_id = $input['from_live_info_id'];
             //查看是否有免费直播间的推荐人
             $liveCountDown = LiveCountDown::select('live_id', 'user_id', 'new_vip_uid')
                 ->where('live_id', $from_live_info_id)
