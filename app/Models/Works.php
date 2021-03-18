@@ -431,7 +431,7 @@ class Works extends Base
             $data = $model::find($relation_id);
 
             //  阅读数
-            if($option = 1){
+            if($option == 1){
                 $num = $data['view_num'];
             }else if($option = 2){//订阅数
                 $num = $data['subscribe_num'];
@@ -444,9 +444,9 @@ class Works extends Base
                 $edit_num *= 5;
             }
 
-            if($option = 1){
+            if($option == 1){
                 $model::where(['id'=>$relation_id])->increment('view_num',$edit_num);
-            }else if($option = 2){//订阅数
+            }else if($option == 2){//订阅数
                 $model::where(['id'=>$relation_id])->increment('subscribe_num',$edit_num);;
             }
 
