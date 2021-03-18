@@ -829,7 +829,7 @@ class LiveController extends Controller
                 'live_id'       => $input['info_id'],
                 'user_id'       => $this->user['id'],
                 'phone'         => $user->phone,
-                'new_vip_uid'   => $input['inviter'],
+                'new_vip_uid'   => $input['inviter'] ?? 0,
             ]);
             Live::where(['id' => $input['live_id']])->increment('order_num');
 
