@@ -1885,4 +1885,8 @@ and o.status = 1 and o.pay_price > 1";
 
     }
 
+    public function mysqlTest(){
+
+    }
+
 }

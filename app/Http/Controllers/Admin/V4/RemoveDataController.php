@@ -78,6 +78,11 @@ class RemoveDataController extends ControllerBackend
         if (0) {
             $servers->worksListOfSub();
         }
+
+        if (1) {
+            $servers->mysqlTest();
+        }
+
     }
 
     public function mallOrders()

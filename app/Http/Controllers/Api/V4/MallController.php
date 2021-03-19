@@ -14,6 +14,7 @@ use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
+use App\Servers\ChannelServers;
 use App\Servers\MallRefundJob;
 use Illuminate\Http\Request;
 
@@ -217,8 +218,11 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-            $res = Live::teamInfo(1,1);
-            return $this->getRes($res);
+
+            ChannelServers::cytxJob();
+
+//            $res = Live::teamInfo(1,1);
+//            return $this->getRes($res);
 //                MallRefundJob::shillJob(1);
 //                VipRedeemUser::subWorksOrGetRedeemCode(692095);
 
