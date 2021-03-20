@@ -889,7 +889,7 @@ class LiveController extends Controller
         $tweeter_code = $checked['tweeter_code'];
 
         $from_live_info_id = '';
-        if( $input['from_live_info_id'] > 0 ){   //大于0 时说明在直播间买的
+        if( isset($input['from_live_info_id']) && $input['from_live_info_id'] > 0 ){   //大于0 时说明在直播间买的
             $from_live_info_id = $input['from_live_info_id'];
             //查看是否有免费直播间的推荐人
             $liveCountDown = LiveCountDown::select('live_id', 'user_id', 'new_vip_uid')
