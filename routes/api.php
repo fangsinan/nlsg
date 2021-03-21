@@ -169,6 +169,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     //历史记录
     Route::get('user/history', 'UserController@history');
+    Route::get('user/new_history', 'UserController@new_history');
     Route::get('user/clear_history', 'UserController@clearHistory');
     Route::get('user/collection', 'UserController@collection');
 
