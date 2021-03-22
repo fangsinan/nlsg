@@ -116,7 +116,7 @@ class Subscribe extends Base
 
         $add_data = [];
         $now_date = date('Y-m-d H:i:s');
-        $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
+        $end_date = date('Y-m-d 23:59:59', strtotime('+10 years'));
 
         $update_res = true;
         DB::beginTransaction();
