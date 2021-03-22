@@ -142,13 +142,13 @@ class Subscribe extends Base
                     $temp_data['give'] = 3;
                     $add_data[] = $temp_data;
                 }else{
-                    $temp_update_res = Subscribe::whereId($check->id)
-                        ->update([
-                            'end_time'=>date('Y-m-d 23:59:59',strtotime("$check->end_time +1 years")),
-                        ]);
-                    if ($temp_update_res === false){
-                        $update_res = false;
-                    }
+//                    $temp_update_res = Subscribe::whereId($check->id)
+//                        ->update([
+//                            'end_time'=>date('Y-m-d 23:59:59',strtotime("$check->end_time +1 years")),
+//                        ]);
+//                    if ($temp_update_res === false){
+//                        $update_res = false;
+//                    }
                 }
             }
         }
@@ -158,7 +158,7 @@ class Subscribe extends Base
             $add_res = DB::table('nlsg_subscribe')->insert($add_data);
         }
 
-        if ($add_res && $update_res){
+        if ($add_res){
             DB::commit();
             return ['code'=>true,'msg'=>'成功'];
         }else{

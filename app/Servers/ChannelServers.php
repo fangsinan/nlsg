@@ -465,6 +465,8 @@ class ChannelServers
                         DB::commit();
                         break;
                     case 3:
+                        //21-03-22 补充的课程
+                        Subscribe::appendSub([$v->user_id],1);
                         $add_sub_data = [];
                         $add_cd_data = [];
                         DB::beginTransaction();
@@ -575,8 +577,7 @@ class ChannelServers
                 }
             }
 
-            //21-03-22 补充的课程
-            Subscribe::appendSub([$v->user_id],1);
+
         }
 
         if (!empty($invalid_id_list)) {
