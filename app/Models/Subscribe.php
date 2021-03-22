@@ -3,6 +3,8 @@
 namespace App\Models;
 
 
+use Illuminate\Support\Facades\DB;
+
 class Subscribe extends Base
 {
     protected $table = 'nlsg_subscribe';
@@ -81,6 +83,88 @@ class Subscribe extends Base
             }
         }
         return $is_sub;
+    }
+
+    //用户补充订阅方法
+    static public function appendSub($user_id, $team = 1)
+    {
+
+        if (!is_array($user_id)){
+            $user_id = explode(',',$user_id);
+        }
+
+        if (empty($user_id)){
+            return ['code'=>false,'msg'=>'用户错误'];
+        }
+
+        //2是作品表 6是讲座表
+        switch (intval($team)) {
+            case 1:
+                $works_list = [
+                    ['type' => 2, 'id' => 566],
+                    ['type' => 6, 'id' => 379],
+                    ['type' => 6, 'id' => 438],
+                ];
+                break;
+            default:
+                $works_list = [];
+        }
+
+        if (empty($works_list)) {
+            return ['code' => false, 'msg' => '课程信息错误'];
+        }
+
+        $add_data = [];
+        $now_date = date('Y-m-d H:i:s');
+        $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
+
+        $update_res = true;
+        DB::beginTransaction();
+
+        foreach ($user_id as $v) {
+            foreach ($works_list as $wlv) {
+                $check = Subscribe::where('user_id', '=', $v)
+                    ->where('relation_id', '=',$wlv['id'])
+                    ->where('type', '=', $wlv['type'])
+                    ->where('status', '=', 1)
+                    ->where('end_time', '>=', $now_date)
+                    ->first();
+
+                if (empty($check)){
+                    $temp_data = [];
+                    $temp_data['type'] = $wlv['type'];
+                    $temp_data['user_id'] = $v;
+                    $temp_data['relation_id'] = $wlv['id'];
+                    $temp_data['pay_time'] = $now_date;
+                    $temp_data['start_time'] = $now_date;
+                    $temp_data['end_time'] = $end_date;
+                    $temp_data['status'] = 1;
+                    $temp_data['give'] = 3;
+                    $add_data[] = $temp_data;
+                }else{
+                    $temp_update_res = Subscribe::whereId($check->id)
+                        ->update([
+                            'end_time'=>date('Y-m-d 23:59:59',strtotime("$check->end_time +1 years")),
+                        ]);
+                    if ($temp_update_res === false){
+                        $update_res = false;
+                    }
+                }
+            }
+        }
+        if (empty($add_data)){
+            $add_res = true;
+        }else{
+            $add_res = DB::table('nlsg_subscribe')->insert($add_data);
+        }
+
+        if ($add_res && $update_res){
+            DB::commit();
+            return ['code'=>true,'msg'=>'成功'];
+        }else{
+            DB::rollBack();
+            return ['code'=>false,'msg'=>'失败'];
+        }
     }
 
 }

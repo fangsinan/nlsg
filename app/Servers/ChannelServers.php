@@ -574,6 +574,9 @@ class ChannelServers
                         break;
                 }
             }
+
+            //21-03-22 补充的课程
+            Subscribe::appendSub([$v->user_id],1);
         }
 
         if (!empty($invalid_id_list)) {
