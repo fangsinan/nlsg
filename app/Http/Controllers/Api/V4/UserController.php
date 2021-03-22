@@ -921,9 +921,13 @@ class UserController extends Controller
             return $this->error(0, 'fail:his_id参数有误');
         }
 
+        $history_num = User::where(['id'=>$user_id])->value('history_num');
+
         if ($his_id == 'all') {
             $res = History::where('user_id', $user_id)->update(['is_del' => 1]);
-            User::where(['id' => $user_id])->update(['history_num' => 0]);
+            if ($history_num >0){
+                User::where(['id' => $user_id])->update(['history_num' => 0]);
+            }
 
         } else {
             $his_id = explode(',', $his_id);
@@ -942,8 +946,9 @@ class UserController extends Controller
             $res = History::where('user_id', '=', $user_id)
                 ->whereIn('relation_id', $relation_id_list)
                 ->update(['is_del' => 1]);
-
-            User::where(['id' => $user_id])->decrement('history_num', count($his_id));
+            if ($history_num >0){
+                User::where(['id' => $user_id])->decrement('history_num', count($his_id));
+            }
 
         }
         return $this->success();
