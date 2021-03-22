@@ -252,7 +252,7 @@ class WechatPay extends Controller
 
                         }
                     }
-                    
+
 
                     /*****************     开通360   有销讲老师的划分收益【】  ****************/
 
@@ -544,6 +544,12 @@ class WechatPay extends Controller
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
                 $liveData = Live::find($live_id);
+
+                //21-03-22 补充的课程
+                if (in_array($liveData['user_id']??0,[161904,250550,423403])){
+                    Subscribe::appendSub([$user_id],1);
+                }
+
 
                 Live::where('id', $live_id)->increment('order_num');
                 if ($liveData['relation_live'] > 0) {
