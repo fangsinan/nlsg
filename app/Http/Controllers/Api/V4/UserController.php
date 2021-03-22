@@ -946,11 +946,7 @@ class UserController extends Controller
             User::where(['id' => $user_id])->decrement('history_num', count($his_id));
 
         }
-        if ($res) {
-            return $this->success();
-        } else {
-            return $this->error(0, 'fail');
-        }
+        return $this->success();
     }
 
 
