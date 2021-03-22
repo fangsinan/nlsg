@@ -219,7 +219,7 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
-            ChannelServers::cytxJob();
+//            ChannelServers::cytxJob();
 
 //            $res = Live::teamInfo(1,1);
 //            return $this->getRes($res);
