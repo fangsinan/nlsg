@@ -922,10 +922,10 @@ class ClassController extends ControllerBackend
                 ]);
             }
         } else {
-            $info = WorksInfo::where('title', $input['title'])->first();
-            if ($info){
-                return error(1000,'不能添加重复数据');
-            }
+//            $info = WorksInfo::where('title', $input['title'])->first();
+//            if ($info){
+//                return error(1000,'不能添加重复数据');
+//            }
 
             $res = WorksInfo::create($data);
             if ($res) {
