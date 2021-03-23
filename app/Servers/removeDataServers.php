@@ -1850,13 +1850,17 @@ and o.status = 1 and o.pay_price > 1";
             $temp_user_id = $temp_user->id;
             $temp_user_phone = $temp_user->phone;
 
-            $check = Subscribe::where('user_id', '=', $temp_user_id)
+            $query = Subscribe::where('user_id', '=', $temp_user_id)
                 ->where('created_at', '>', '2021-01-05')
                 ->where('relation_id', '=', $v->works_id)
-                ->where('end_time', '>=', $now_date)
                 ->where('type', '=', $v->works_type)
-                ->where('status', '=', 1)
-                ->first();
+                ->where('status', '=', 1);
+
+            if ($v->works_type != 3) {
+                $query->where('end_time', '>=', $now_date);
+            }
+
+            $check = $query->first();
 
             $add_sub_data = [];
 
@@ -1866,42 +1870,43 @@ and o.status = 1 and o.pay_price > 1";
                 $temp_data['user_id'] = $temp_user_id;
                 $temp_data['relation_id'] = $v->works_id;
                 $temp_data['pay_time'] = $now_date;
-                $temp_data['start_time'] = $now_date;
                 $temp_data['status'] = 1;
                 $temp_data['give'] = 3;
-                $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
+                if ($v->works_type != 3) {
+                    $temp_data['start_time'] = $now_date;
+                    $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
+                }
                 $add_sub_data[] = $temp_data;
             } else {
-                $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +$v->years  years"));
-                $check->end_time = $temp_end_time;
-                $edit_res = $check->save();
-                if ($edit_res === false) {
-                    DB::rollBack();
-                    break;
+                if ($v->works_type != 3) {
+                    $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +$v->years  years"));
+                    $check->end_time = $temp_end_time;
+                    $edit_res = $check->save();
+                    if ($edit_res === false) {
+                        DB::rollBack();
+                        break;
+                    }
                 }
             }
 
             //如果是直播,需要记录liveCountDown和live预约人数
-            if($v->works_type == 3){
-
+            if ($v->works_type == 3) {
                 $check_cd = LiveCountDown::query()
-                    ->where('user_id','=',$temp_user_id)
-                    ->where('live_id','=',$v->works_id)
+                    ->where('user_id', '=', $temp_user_id)
+                    ->where('live_id', '=', $v->works_id)
                     ->first();
-                if (empty($check_cd)){
+                if (empty($check_cd)) {
                     $cd_data['live_id'] = $v->works_id;
                     $cd_data['user_id'] = $temp_user_id;
                     $cd_data['phone'] = $temp_user_phone;
                     $cd_res = DB::table('nlsg_live_count_down')->insert($cd_data);
-                    if (!$cd_res){
+                    if (!$cd_res) {
                         DB::rollBack();
                         continue;
                     }
                 }
-
-                Live::where('id','=',$v->works_id)->increment('order_num');
+                Live::where('id', '=', $v->works_id)->increment('order_num');
             }
-
 
             $edit_res = DB::table('works_list_of_sub')
                 ->where('id', '=', $v->id)
