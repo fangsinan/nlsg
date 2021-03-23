@@ -79,7 +79,7 @@ class RemoveDataController extends ControllerBackend
             $servers->worksListOfSub();
         }
 
-        if (1) {
+        if (0) {
             $servers->mysqlTest();
         }
 

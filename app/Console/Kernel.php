@@ -12,6 +12,7 @@ use App\Models\Works;
 use App\Models\WorksInfo;
 use App\Servers\ChannelServers;
 use App\Servers\MallRefundJob;
+use App\Servers\removeDataServers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -58,6 +59,11 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             MallRefundJob::shillJob(1);
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            $servers = new removeDataServers();
+            $servers->worksListOfSub();
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {

@@ -1022,11 +1022,10 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 //            ->get()->toArray();
 
         $list = DB::table('nlsg_channel_order')
-            ->whereIn('sku',$sku)
-            ->where('status','=',1)
-            ->where('pay_time','>','2021-03-01 00:00:00')
+            ->whereIn('sku', $sku)
+            ->where('status', '=', 1)
+            ->where('pay_time', '>', '2021-03-01 00:00:00')
             ->get()->toArray();
-
 
 
         $add_data = [];
@@ -1034,11 +1033,11 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 //        DB::beginTransaction();
 
         foreach ($list as $v) {
-            $check = Subscribe::where('user_id','=',$v->user_id)
-                ->where('type','=',3)
-                ->where('relation_id','=',17)
+            $check = Subscribe::where('user_id', '=', $v->user_id)
+                ->where('type', '=', 3)
+                ->where('relation_id', '=', 17)
                 ->first();
-            if (empty($check)){
+            if (empty($check)) {
                 $temp_data = [];
                 $temp_data['type'] = 3;
                 $temp_data['user_id'] = $v->user_id;
@@ -1049,7 +1048,7 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
                 $temp_data['channel_order_id'] = $v->order_id;
                 $temp_data['channel_order_sku'] = $v->sku;
                 $add_data[] = $temp_data;
-            }else{
+            } else {
 //                if ($check->channel_order_sku != '3467290641875230890'){
 //                    $check->channel_order_sku = '3467290641875230890';
 //                    $check->save();
@@ -1071,7 +1070,7 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
         }
 
 
-dd($add_data);
+        dd($add_data);
 //        DB::table('nlsg_live_count_down')->insert($add_data);
 //        DB::table('nlsg_subscribe')->insert($add_data);
 //        DB::commit();
@@ -1818,7 +1817,7 @@ and o.status = 1 and o.pay_price > 1";
 
         $list = DB::table('works_list_of_sub')
             ->where('status', '=', 1)
-            ->whereIn('works_type', [2, 6])
+            ->whereIn('works_type', [2, 6, 3])
             ->limit(100)
             ->get();
 
@@ -1826,10 +1825,28 @@ and o.status = 1 and o.pay_price > 1";
 
             DB::beginTransaction();
 
-            $temp_user = User::firstOrCreate([
-                'phone' => $v->phone
-            ]);
+            if (empty($v->user_id) && empty($v->phone)) {
+                DB::table('works_list_of_sub')
+                    ->where('id', '=', $v->id)
+                    ->update([
+                        'status' => 3
+                    ]);
+                DB::commit();
+                continue;
+            }
+
+            if (!empty($v->phone)) {
+                $temp_user = User::firstOrCreate([
+                    'phone' => $v->phone
+                ]);
+            } else {
+                $temp_user = User::firstOrCreate([
+                    'id' => $v->user_id
+                ]);
+            }
+
             $temp_user_id = $temp_user->id;
+            $temp_user_phone = $temp_user->phone;
 
             $check = Subscribe::where('user_id', '=', $temp_user_id)
                 ->where('created_at', '>', '2021-01-05')
@@ -1866,7 +1883,8 @@ and o.status = 1 and o.pay_price > 1";
                 ->where('id', '=', $v->id)
                 ->update([
                     'user_id' => $temp_user_id,
-                    'status' => 2
+                    'phone' => $temp_user_phone,
+                    'status' => 2,
                 ]);
             if ($edit_res === false) {
                 DB::rollBack();
@@ -1885,7 +1903,8 @@ and o.status = 1 and o.pay_price > 1";
 
     }
 
-    public function mysqlTest(){
+    public function mysqlTest()
+    {
 
     }
 
