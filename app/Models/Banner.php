@@ -3,7 +3,6 @@
 namespace App\Models;
 
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 class Banner extends Base
@@ -12,7 +11,7 @@ class Banner extends Base
     protected $table = 'nlsg_banner';
 
     protected $fillable = [
-        'title', 'pic', 'url', 'rank', 'type', 'obj_id', 'status', 'jump_type','start_time','end_time'
+        'title', 'pic', 'url', 'rank', 'type', 'obj_id', 'status', 'jump_type', 'start_time', 'end_time'
     ];
 
     /**
@@ -105,19 +104,20 @@ class Banner extends Base
         return $res;
     }
 
-    public function appPopup(){
+    public function appPopup()
+    {
         $now_date = date('Y-m-d H:i:s');
-        $data = Banner::where('type','=','60')
-            ->where('status','=',1)
-            ->where('start_time','<=',$now_date)
-            ->where('end_time','>',$now_date)
+        $data = Banner::where('type', '=', '60')
+            ->where('status', '=', 1)
+            ->where('start_time', '<=', $now_date)
+            ->where('end_time', '>', $now_date)
             ->first();
         //1:h5(走url,其他都object_id)  2:商品  3:优惠券领取页面4精品课 5.讲座 6.听书 7 360
         $res = [];
-        if (!empty($data)){
+        if (!empty($data)) {
             $res['id'] = $data->obj_id;
             $res['info_id'] = 0;
-            switch (intval($data->jump_type)){
+            switch (intval($data->jump_type)) {
                 case 2:
                     $res['type'] = 3;
                     break;
@@ -140,9 +140,49 @@ class Banner extends Base
                     $res['type'] = 0;
             }
             $res['url'] = $data->url;
-            $res['img'] = 'https://image.nlsgapp.com/'.$data->pic;
+            $res['img'] = 'https://image.nlsgapp.com/' . $data->pic;
         }
 
         return $res;
+    }
+
+    public function cytxBanner()
+    {
+        $res['index'] = Banner::where('type', '=', 71)
+            ->where('status', '=', 1)
+            ->orderBy('rank', 'asc')
+            ->orderBy('id', 'desc')
+            ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
+            ->first();
+
+        $res['home'] = Banner::where('type', '=', 72)
+            ->where('status', '=', 1)
+            ->orderBy('rank', 'asc')
+            ->orderBy('id', 'desc')
+            ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
+            ->first();
+
+        if (empty($res['index'])) {
+            $res['index'] = [];
+        } else {
+            $res['index'] = $res['index']->toArray();
+        }
+
+        if (empty($res['home'])) {
+            $res['home'] = [];
+        } else {
+            $res['home'] = $res['home']->toArray();
+        }
+
+        foreach ($res as &$v) {
+            if ($v['jump_type'] == 10) {
+                $v['live'] = Live::teamInfo($v['obj_id'], 1);
+            } else {
+                $v['live'] = [];
+            }
+        }
+
+        return $res;
+
     }
 }

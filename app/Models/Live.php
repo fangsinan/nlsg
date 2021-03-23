@@ -175,9 +175,18 @@ class Live extends Base
             $query->where('team_end_time', '>', $now_date);
         }
 
-        $query->with(['liveInfo:id,live_pid']);
+        $query->with(['liveInfo:id,live_pid','user:id,nickname']);
         $query->orderBy('team_begin_time', 'asc')->orderBy('id', 'asc');
-        $query->select(['id', 'title', 'begin_at', 'team_id', 'team_begin_time', 'team_end_time']);
+        $query->select([
+            'id', 'title','user_id',
+            'cover_img','teacher_img',
+            'begin_at', 'team_id',
+            'team_begin_time', 'team_end_time'
+        ]);
+
+        if ($first == 1){
+            $query->limit(1);
+        }
 
         return $query->get();
 

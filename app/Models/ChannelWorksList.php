@@ -233,9 +233,17 @@ class ChannelWorksList extends Base
         $banner_index = ConfigModel::getData(47);
         $banner_home = ConfigModel::getData(51);
 
+        $bannerModel = new Banner();
+        $banner = $bannerModel->cytxBanner();
+
+
+        $live_team = Live::teamInfo(1,1);
+
         return [
             'index' => array_filter(explode(',', $banner_index)),
             'home' => array_filter(explode(',', $banner_home)),
+            'banner'=>$banner,
+            'live'=>$live_team
         ];
 
     }
