@@ -831,6 +831,13 @@ class LiveController extends Controller
                 'phone'         => $user->phone,
                 'new_vip_uid'   => $input['inviter'] ?? 0,
             ]);
+
+            Subscribe::create([
+                'user_id' => $this->user['id'],
+                'type'    => 3,
+                'relation_id' => $input['info_id'],
+            ]);
+
             Live::where(['id' => $input['live_id']])->increment('order_num');
 
             $easySms = app('easysms');
