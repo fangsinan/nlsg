@@ -1875,6 +1875,9 @@ and o.status = 1 and o.pay_price > 1";
                 if ($v->works_type != 3) {
                     $temp_data['start_time'] = $now_date;
                     $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
+                }else{
+                    $temp_data['start_time'] = $now_date;
+                    $temp_data['end_time'] = $now_date;
                 }
                 $add_sub_data[] = $temp_data;
             } else {
