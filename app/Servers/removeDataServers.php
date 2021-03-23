@@ -11,6 +11,8 @@ use App\Models\CreatePost;
 use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
 use App\Models\History;
+use App\Models\Live;
+use App\Models\LiveCountDown;
 use App\Models\MallGoods;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
@@ -1878,6 +1880,28 @@ and o.status = 1 and o.pay_price > 1";
                     break;
                 }
             }
+
+            //如果是直播,需要记录liveCountDown和live预约人数
+            if($v->works_type == 3){
+
+                $check_cd = LiveCountDown::query()
+                    ->where('user_id','=',$temp_user_id)
+                    ->where('live_id','=',$v->works_id)
+                    ->first();
+                if (empty($check_cd)){
+                    $cd_data['live_id'] = $v->works_id;
+                    $cd_data['user_id'] = $temp_user_id;
+                    $cd_data['phone'] = $temp_user_phone;
+                    $cd_res = DB::table('nlsg_live_count_down')->insert($cd_data);
+                    if (!$cd_res){
+                        DB::rollBack();
+                        continue;
+                    }
+                }
+
+                Live::where('id','=',$v->works_id)->increment('order_num');
+            }
+
 
             $edit_res = DB::table('works_list_of_sub')
                 ->where('id', '=', $v->id)
