@@ -836,6 +836,7 @@ class LiveController extends Controller
                 'user_id' => $this->user['id'],
                 'type'    => 3,
                 'relation_id' => $input['info_id'],
+                'status' => 1,
             ]);
 
             Live::where(['id' => $input['live_id']])->increment('order_num');
@@ -916,6 +917,9 @@ class LiveController extends Controller
             return error(0, '直播不存在');
         }
 
+        if($activity_tag=='qt'){ //企图线下活动 只需付费4.9
+            $list['price']=4.9;
+        }
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
         $data = [
             'ordernum' => $ordernum,
