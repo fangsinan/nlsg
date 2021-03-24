@@ -13,6 +13,7 @@ use App\Models\MallGoods;
 use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
+use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Servers\ChannelServers;
 use App\Servers\MallRefundJob;
@@ -224,7 +225,7 @@ class MallController extends Controller
 //            $res = Live::teamInfo(1,1);
 //            return $this->getRes($res);
 //                MallRefundJob::shillJob(1);
-//                VipRedeemUser::subWorksOrGetRedeemCode(692095);
+//                VipRedeemUser::subWorksOrGetRedeemCode(694258);
 
 //                $c = new ChannelServers();
 //                $c->getDouyinOrder();//获取抖音订单
