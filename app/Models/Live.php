@@ -179,7 +179,7 @@ class Live extends Base
         $query->orderBy('team_begin_time', 'asc')->orderBy('id', 'asc');
         $query->select([
             'id', 'title','user_id','order_num',
-            'cover_img','teacher_img',
+            'cover_img','teacher_img','banner_img',
             'begin_at', 'team_id',
             'team_begin_time', 'team_end_time'
         ]);
