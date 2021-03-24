@@ -178,7 +178,7 @@ class Live extends Base
         $query->with(['liveInfo:id,live_pid','user:id,nickname']);
         $query->orderBy('team_begin_time', 'asc')->orderBy('id', 'asc');
         $query->select([
-            'id', 'title','user_id',
+            'id', 'title','user_id','order_num',
             'cover_img','teacher_img',
             'begin_at', 'team_id',
             'team_begin_time', 'team_end_time'
