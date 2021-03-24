@@ -1096,5 +1096,11 @@ class LiveController extends Controller
 
     }
 
+    public function liveTeam(Request $request){
+        $live_team = Live::teamInfo($request->input('id',1),1);
+        return [
+            'live'=>$live_team
+        ];
+    }
 
 }

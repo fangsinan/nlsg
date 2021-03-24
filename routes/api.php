@@ -194,6 +194,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('live/recommend', 'LiveController@recommend');
     Route::get('live/back_lists', 'LiveController@getLiveBackLists');
     Route::get('live/check_sub', 'LiveController@checkLiveSub');
+    Route::get('live/team_info', 'LiveController@liveTeam');
+
 
     Route::get('check_phone_add_sub', 'LiveController@checkPhoneAddSub');
 
@@ -366,7 +368,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('live/retype', 'LiveController@reLiveType');
         Route::post('live/free_order', 'LiveController@freeLiveOrder');
         Route::post('live/pay_order', 'LiveController@payLiveOrder');
-
         //通知列表
         Route::get('notify/list', 'NotifyController@index');
         Route::get('notify/fans', 'NotifyController@fans');
