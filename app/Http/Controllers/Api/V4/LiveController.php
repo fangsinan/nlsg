@@ -916,10 +916,7 @@ class LiveController extends Controller
         if (!$list) {
             return error(0, '直播不存在');
         }
-
-        if($activity_tag=='qt'){ //企图线下活动 只需付费4.9
-            $list['price']=4.9;
-        }
+        
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
         $data = [
             'ordernum' => $ordernum,
