@@ -916,7 +916,7 @@ class LiveController extends Controller
         if (!$list) {
             return error(0, '直播不存在');
         }
-        
+
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
         $data = [
             'ordernum' => $ordernum,
