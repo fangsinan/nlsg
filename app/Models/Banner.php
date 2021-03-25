@@ -175,7 +175,7 @@ class Banner extends Base
         }
 
         foreach ($res as &$v) {
-            if ($v['jump_type'] == 10) {
+            if ( $v['jump_type'] == 10) {
                 $v['live'] = Live::teamInfo($v['obj_id'], 1);
             } else {
                 $v['live'] = [];

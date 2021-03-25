@@ -239,6 +239,10 @@ class ChannelWorksList extends Base
 
         $live_team = Live::teamInfo(1,1);
 
+        if(isset($live_team[0]['order_num'])){
+            $live_team[0]['order_num']=$live_team[0]['order_num']+5000;
+        }
+
         return [
             'index' => array_filter(explode(',', $banner_index)),
             'home' => array_filter(explode(',', $banner_home)),
