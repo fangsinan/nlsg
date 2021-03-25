@@ -10,7 +10,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class LiveComment extends Model
+class LiveComment extends Base
 {
     protected $table = 'nlsg_live_comment';
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function live()
+    {
+        return $this->belongsTo(Live::class, 'live_id', 'id');
+    }
+
 }
