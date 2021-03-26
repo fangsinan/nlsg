@@ -17,7 +17,19 @@ class Subscribe extends Base
         'start_time','end_time', 'relation_id', 'service_id','channel_works_list_id' ];
 
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
+    public function live()
+    {
+        return $this->belongsTo(Live::class, 'relation_id', 'id')->where('status',4);
+    }
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id')->where('status',1);
+    }
 
     /**
      * $user_id  登录者用户
