@@ -354,6 +354,9 @@ WHERE
                         ->where('type', 2)
                         ->where('status', 1)
                         ->first();
+                    if (!$res){
+                        continue;
+                    }
                     $res->type = 1;
                     $res = $res->toArray();
                 } elseif ($v['push_type'] == 2) {
