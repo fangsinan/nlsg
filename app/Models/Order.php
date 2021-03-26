@@ -45,6 +45,10 @@ class Order extends Base
     {
         return $this->belongsTo(Column::class, 'relation_id', 'id');
     }
+    public function pay_record_detail()
+    {
+        return $this->belongsTo(PayRecordDetail::class, 'ordernum', 'ordernum');
+    }
 
     //下单check
     public function addOrderLiveCheck($user_id, $tweeter_code, $target_id, $type)

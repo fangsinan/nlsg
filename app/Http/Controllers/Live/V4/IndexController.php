@@ -6,7 +6,10 @@ use App\Http\Controllers\ControllerBackend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Live;
+use App\Models\Order;
+use App\Models\PayRecordDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class IndexController extends ControllerBackend
 {
@@ -54,6 +57,25 @@ class IndexController extends ControllerBackend
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
+
+
+
+        //  直播收益   直播推广收益
+        foreach ($lists['data'] as &$val){
+            //直播收益
+            $val['live_price_sum'] = Order::where([
+                'type'      => 10,
+                'live_id'   => $val['id'],
+                'status'    => 1,
+            ])->sum('pay_price');
+
+            $val['live_twitter_price_sum'] = Order::join('nlsg_pay_record_detail as d','d.ordernum','=','nlsg_order.ordernum')
+                        ->where([
+                        'nlsg_order.type'      => 10,
+                        'nlsg_order.live_id'   => $val['id'],
+                        'nlsg_order.status'    => 1,
+                    ])->where('nlsg_order.twitter_id','>',0)->sum('d.price');
+        }
         return success($lists);
     }
 
