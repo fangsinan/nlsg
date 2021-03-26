@@ -145,6 +145,9 @@ class Recommend extends Base
             ->where('is_del', 0)
             ->orderBy('created_at', 'desc')
             ->first();
+        if (!$list){
+            return  [];
+        }
 
 //        $expire_num = CacheTools::getExpire('index_recommend_live');
 //        Cache::put($cache_key_name, $list, $expire_num);
