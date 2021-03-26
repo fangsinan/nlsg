@@ -47,3 +47,16 @@
         }
         return $time;
     }
+
+     function float_number($number){
+        $length = strlen($number);  //数字长度
+        if($length > 8){ //亿单位
+            $str = substr_replace(strstr($number,substr($number,-7),' '),'.',-1,0)."亿";
+        } elseif($length > 4){ //万单位
+            //截取前俩为
+            $str = substr_replace(strstr($number,substr($number,-3),' '),'.',-1,0)."万";
+        } else{
+            return $number;
+        }
+        return $str;
+    }

@@ -41,10 +41,10 @@ class IndexController extends ControllerBackend
         $watchNum   = LiveLogin::count();
 
         $data = [
-            'subscribe_num' => $subscribeNum,
-            'watch_num'     => $watchNum,
-            'order_num'     => 10,
-            'order_income'  => 1000
+            'subscribe_num' => float_number($subscribeNum),
+            'watch_num'     => float_number($watchNum),
+            'order_num'     => float_number(10),
+            'order_income'  => float_number(23456)
         ];
         return success($data);
     }
