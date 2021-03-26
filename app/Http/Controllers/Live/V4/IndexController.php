@@ -8,14 +8,45 @@ use App\Http\Controllers\Controller;
 use App\Models\Live;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
+use App\Models\Subscribe;
+use App\Models\LiveLogin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class IndexController extends ControllerBackend
 {
+    /**
+    * @api {get} api/live_v4/index/statistics 数据统计
+    * @apiVersion 4.0.0
+    * @apiName  index/statistics
+    * @apiGroup 直播后台-数据统计
+    * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/statistics
+    * @apiDescription  数据统计
+    *
+    *
+    *
+    * @apiSuccessExample  Success-Response:
+    * HTTP/1.1 200 OK
+    * {
+    *   "code": 200,
+    *   "msg" : '成功',
+    *   "data": {
+    *
+    *    }
+    * }
+    */
     public function index()
     {
-        echo '直播后台首页';
+        $subscribeNum =  Subscribe::where('status', 1)->count();
+        $watchNum   = LiveLogin::count();
+
+        $data = [
+            'subscribe_num' => $subscribeNum,
+            'watch_num'     => $watchNum,
+            'order_num'     => 10,
+            'order_income'  => 1000
+        ];
+        return success($data);
     }
 
     /**
@@ -79,6 +110,6 @@ class IndexController extends ControllerBackend
         return success($lists);
     }
 
-    
+
 
 }
