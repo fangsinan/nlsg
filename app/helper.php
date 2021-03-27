@@ -49,6 +49,6 @@
     }
 
     function float_number($number){
-        $str = floor($number * 0.001) * 0.1."万";
+        $str = round($number * 0.001 * 0.1, 2)."万";
         return $str;
     }
