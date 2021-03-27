@@ -76,10 +76,18 @@ class ChannelServers
             $query->where('o.id', '=', $order_id);
         }
 
+        //是否推送直播预约订单
+        $type_config = ConfigModel::getData(53, 1);
+        if ($type_config == 1) {
+            $type_list = [9, 15, 10];
+        } else {
+            $type_list = [9, 15];
+        }
+
         $query->where('o.activity_tag', '=', 'cytx')
             ->where('o.status', '=', 1)
             ->where('p.price', '>', 0.01)
-            ->whereIn('o.type', [9, 15])
+            ->whereIn('o.type', $type_list)
             ->where('cytx_job', '<>', -1);
 
         $is_test = intval(ConfigModel::getData(37));
@@ -105,9 +113,12 @@ class ChannelServers
             if ($v->type == 9) {
                 $temp_info = Works::whereId($v->relation_id)->select('id', 'title')->first();
                 $v->title = $temp_info->title;
-            } else {
+            } elseif ($v->type == 15) {
                 $temp_info = Column::whereId($v->relation_id)->select(['id', 'name'])->first();
                 $v->title = $temp_info->name;
+            } elseif ($v->type == 10) {
+                $temp_info = Live::whereId($v->relation_id)->select(['id', 'title'])->first();
+                $v->title = $temp_info->title;
             }
         }
 

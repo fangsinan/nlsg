@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChannelWorksList;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
@@ -15,6 +16,7 @@ use App\Models\LiveWorks;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
+use App\Models\PayRecord;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
@@ -133,7 +135,7 @@ class LiveController extends Controller
             'banner' => 'nlsg/works/20201228165453965824.jpg',
             'live_lists' => $liveLists,
             'back_lists' => $backLists ?? [],
-            'offline'    => [],
+            'offline' => [],
             'recommend' => $recommend
         ];
 
@@ -193,7 +195,7 @@ class LiveController extends Controller
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
                 'playback_price', 'is_free', 'password')
             ->where('status', 4)
-            ->orderBy('begin_at','desc')
+            ->orderBy('begin_at', 'desc')
             ->paginate(10)
             ->toArray();
 
@@ -450,7 +452,7 @@ class LiveController extends Controller
             'user:id,nickname,headimg,intro,honor',
             'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish'
         ])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish','pre_video')
+            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video')
             ->where('id', $id)
             ->first();
 
@@ -519,13 +521,13 @@ class LiveController extends Controller
 //        return success($recommend);
 //    }
 
-     public function  recommend(Request $request)
-     {
-         $id       = $request->get('live_id');
-         $livePush = new LivePush();
-         $recommend = $livePush->getPushWorks($id);
-         return success($recommend);
-     }
+    public function recommend(Request $request)
+    {
+        $id = $request->get('live_id');
+        $livePush = new LivePush();
+        $recommend = $livePush->getPushWorks($id);
+        return success($recommend);
+    }
 
     /**
      * @api {get} api/v4/offline/info  线下课程详情
@@ -799,26 +801,26 @@ class LiveController extends Controller
 
         $live = LiveInfo::where('id', $input['info_id'])->first();
         if (!$live) {
-            return error(0,'直播不存在');
+            return error(0, '直播不存在');
         }
 
 
         $live_data = Live::where('id', $live['live_pid'])->first();
-        if( $live_data['flag'] > 0 ){   //flag > 0 为限定直播  限定值与flag一致
+        if ($live_data['flag'] > 0) {   //flag > 0 为限定直播  限定值与flag一致
             $flag = LiveCheckPhone::where([
-                'phone' =>  $this->user['phone'],
-                'flag'  =>  $live_data['flag'],
+                'phone' => $this->user['phone'],
+                'flag' => $live_data['flag'],
             ])->first();
 
-            if(empty($flag)){
-                return error(0,'您不可参与该直播，请联系慧宇服务顾问');
+            if (empty($flag)) {
+                return error(0, '您不可参与该直播，请联系慧宇服务顾问');
             }
         }
 
         $list = LiveCountDown::where(['live_id' => $input['info_id'], 'user_id' => $this->user['id']])
             ->first();
         if ($list) {
-            return error(0,'已经预约');
+            return error(0, '已经预约');
         }
 
         $user = User::where('id', $this->user['id'])->first();
@@ -826,15 +828,15 @@ class LiveController extends Controller
                 $user->phone)) {
 
             LiveCountDown::create([
-                'live_id'       => $input['info_id'],
-                'user_id'       => $this->user['id'],
-                'phone'         => $user->phone,
-                'new_vip_uid'   => $input['inviter'] ?? 0,
+                'live_id' => $input['info_id'],
+                'user_id' => $this->user['id'],
+                'phone' => $user->phone,
+                'new_vip_uid' => $input['inviter'] ?? 0,
             ]);
 
             Subscribe::create([
                 'user_id' => $this->user['id'],
-                'type'    => 3,
+                'type' => 3,
                 'relation_id' => $input['info_id'],
                 'status' => 1,
             ]);
@@ -854,7 +856,7 @@ class LiveController extends Controller
             }
 
         } else {
-            return error(0,'手机号不存在或者错误');
+            return error(0, '手机号不存在或者错误');
         }
     }
 
@@ -897,7 +899,7 @@ class LiveController extends Controller
         $tweeter_code = $checked['tweeter_code'];
 
         $from_live_info_id = '';
-        if( isset($input['from_live_info_id']) && $input['from_live_info_id'] > 0 ){   //大于0 时说明在直播间买的
+        if (isset($input['from_live_info_id']) && $input['from_live_info_id'] > 0) {   //大于0 时说明在直播间买的
             $from_live_info_id = $input['from_live_info_id'];
             //查看是否有免费直播间的推荐人
             $liveCountDown = LiveCountDown::select('live_id', 'user_id', 'new_vip_uid')
@@ -909,12 +911,21 @@ class LiveController extends Controller
         }
 
 
-
         $list = Live::select('id', 'title', 'price', 'twitter_money', 'is_free')
             ->where('id', $liveId)
             ->first();
         if (!$list) {
             return error(0, '直播不存在');
+        }
+
+        //创业天下的订单
+        $type_config = ConfigModel::getData(53, 1);
+        if ($type_config == 1 && $activity_tag === 'cytx') {
+            //校验用户本月是否能继续花钱
+            $check_this_money = PayRecord::thisMoneyCanSpendMoney($this->user['id'], 'cytx', $list['price']);
+            if ($check_this_money == 0) {
+                return error(0, '本月已超消费金额', 0);
+            }
         }
 
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
@@ -979,22 +990,19 @@ class LiveController extends Controller
 //    }
 
 
-
-
-
     //nlsg_live_check_phone表关注
-    public function checkPhoneAddSub(){
-
+    public function checkPhoneAddSub()
+    {
 
 
         $flag = true;
-        while ($flag){
+        while ($flag) {
 
-            $checkArr = LiveCheckPhone::select('*')->where(['is_scanning'=>0,'status'=>1])->limit(100)->get()->toArray();
+            $checkArr = LiveCheckPhone::select('*')->where(['is_scanning' => 0, 'status' => 1])->limit(100)->get()->toArray();
 
             //dd($checkArr);
             //先校验是否注册用户
-            if(empty($checkArr)){
+            if (empty($checkArr)) {
                 $flag = false;
                 return $this->getRes([-1]);
             }
@@ -1006,21 +1014,21 @@ class LiveController extends Controller
 //            }
             DB::beginTransaction();
             //所有用户手机号
-            $checkPhoneArr = array_column($checkArr,'phone');
+            $checkPhoneArr = array_column($checkArr, 'phone');
             //已注册用户手机号
-            $user = User::whereIn('phone',$checkPhoneArr)->get()->toArray();
-            $UserPhoneArr = array_column($user,'phone');
-            $resultPhone = array_diff($checkPhoneArr,$UserPhoneArr);
+            $user = User::whereIn('phone', $checkPhoneArr)->get()->toArray();
+            $UserPhoneArr = array_column($user, 'phone');
+            $resultPhone = array_diff($checkPhoneArr, $UserPhoneArr);
             $ures = true;
-            if($resultPhone){
+            if ($resultPhone) {
                 //进行注册操作createMany
                 $addUser = [];
-                foreach ($resultPhone as $k=>$v){
+                foreach ($resultPhone as $k => $v) {
 
 
                     $addUser[] = [
-                        "phone"     =>  $v,
-                        "nickname"  =>  substr_replace($v, '****', 3, 4),
+                        "phone" => $v,
+                        "nickname" => substr_replace($v, '****', 3, 4),
                     ];
                 }
                 $ures = User::insert($addUser);
@@ -1030,27 +1038,26 @@ class LiveController extends Controller
             $LiveCountDownUser = [];
             $subscribeUser = [];
             $up_ids = [];
-            foreach ($checkArr as $k=>$v){
+            foreach ($checkArr as $k => $v) {
                 $up_ids[] = $v['id'];
                 //查询用户信息
-                $user = User::where('phone',$v['phone'])->first();
-                $info_id = LiveInfo::where(['live_pid'=>$v['live_id']])->first();
+                $user = User::where('phone', $v['phone'])->first();
+                $info_id = LiveInfo::where(['live_pid' => $v['live_id']])->first();
 
 
-
-                $liveCountDown = LiveCountDown::where('phone',$v['phone'])->first();
-                if(empty($liveCountDown)){
+                $liveCountDown = LiveCountDown::where('phone', $v['phone'])->first();
+                if (empty($liveCountDown)) {
                     $LiveCountDownUser[] = [
-                        "live_id"   =>  $info_id['id'],  //info表id
-                        "user_id"   =>  $user['id'],
-                        "phone"     =>  $v['phone'],
+                        "live_id" => $info_id['id'],  //info表id
+                        "user_id" => $user['id'],
+                        "phone" => $v['phone'],
                     ];
                 }
 
 
                 $subscribe = Subscribe::where([
-                    'user_id' => $user['id'],'type' => 3,'status' => 1, 'relation_id' => $v['live_id'],])->first();
-                if(empty($subscribe)){
+                    'user_id' => $user['id'], 'type' => 3, 'status' => 1, 'relation_id' => $v['live_id'],])->first();
+                if (empty($subscribe)) {
                     $subscribeUser[] = [
                         'user_id' => $user['id'], //会员id
                         'pay_time' => date("Y-m-d H:i:s", time()), //支付时间
@@ -1062,32 +1069,32 @@ class LiveController extends Controller
 
             }
 
-            $lres=true;
-            $dres=true;
-            if($LiveCountDownUser){
+            $lres = true;
+            $dres = true;
+            if ($LiveCountDownUser) {
                 //直播预约表
                 $dres = LiveCountDown::insert($LiveCountDownUser);
-                $lres = Live::where(['id' => $v['live_id']])->increment('order_num',count($checkArr));
+                $lres = Live::where(['id' => $v['live_id']])->increment('order_num', count($checkArr));
             }
 
             $sres = true;
-            if($subscribeUser){
+            if ($subscribeUser) {
                 //直播关注表
                 $sres = Subscribe::insert($subscribeUser);
             }
 
             //修改标记
             $lupres = true;
-            if($up_ids){
-                $lupres = LiveCheckPhone::whereIn('id',$up_ids)->update([
+            if ($up_ids) {
+                $lupres = LiveCheckPhone::whereIn('id', $up_ids)->update([
                     'is_scanning' => 1,
                 ]);
             }
 
 
-            if($ures && $dres && $lres && $sres && $lupres){
+            if ($ures && $dres && $lres && $sres && $lupres) {
                 DB::commit();
-            }else{
+            } else {
                 $flag = false;
                 DB::rollBack();
             }
@@ -1097,10 +1104,11 @@ class LiveController extends Controller
 
     }
 
-    public function liveTeam(Request $request){
-        $live_team = Live::teamInfo($request->input('id',1),1);
+    public function liveTeam(Request $request)
+    {
+        $live_team = Live::teamInfo($request->input('id', 1), 1);
         return [
-            'live'=>$live_team
+            'live' => $live_team
         ];
     }
 

@@ -20,10 +20,19 @@ class PayRecord extends Base
                 if ($line < 0) {
                     return 0;
                 }
+
+                //是否推送直播预约订单
+                $type_config = ConfigModel::getData(53, 1);
+                if ($type_config == 1) {
+                    $type_list = [9, 15, 10];
+                } else {
+                    $type_list = [9, 15];
+                }
+
                 $money = DB::table('nlsg_order as o')
                     ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
                     ->where('p.user_id', '=', $user_id)
-                    ->whereIn('o.type', [9, 15])
+                    ->whereIn('o.type', $type_list)
                     ->where('o.activity_tag', '=', 'cytx')
                     ->where('o.status', '=', 1)
                     ->where('o.is_shill', '=', 0)
