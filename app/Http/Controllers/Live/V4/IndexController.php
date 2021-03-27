@@ -187,7 +187,7 @@ class IndexController extends ControllerBackend
     }
 
     /**
-     * @api {get} api/live_v4/index/create 直播创建/编辑
+     * @api {post} api/live_v4/index/create 直播创建/编辑
      * @apiVersion 4.0.0
      * @apiName  index/data
      * @apiGroup 直播后台-直播创建/编辑
@@ -196,6 +196,7 @@ class IndexController extends ControllerBackend
      *
      * @apiParam {number} id 直播id
      * @apiParam {string} title 标题
+     * @apiParam {string} cover 封面
      * @apiParam {number} user_id 主播账号
      * @apiParam {number} begin_at 开始时间
      * @apiParam {number} end_at  结束时间
@@ -255,10 +256,10 @@ class IndexController extends ControllerBackend
     }
 
     /**
-     * @api {get} api/live_v4/index/check_helper 创建直播-检验助手
+     * @api {get} api/live_v4/index/check_helper 检验助手
      * @apiVersion 4.0.0
      * @apiName  index/check_helper
-     * @apiGroup 创建直播-检验助手
+     * @apiGroup 直播后台-检验助手
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/check_helper
      * @apiDescription  检验助手
      *
@@ -286,10 +287,10 @@ class IndexController extends ControllerBackend
     }
 
     /**
-     * @api {get} api/live_v4/index/live_users 创建直播-主播账号
+     * @api {get} api/live_v4/index/live_users 主播账号
      * @apiVersion 4.0.0
      * @apiName  index/live_users
-     * @apiGroup 创建直播-主播账号
+     * @apiGroup 直播后台 -主播账号
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/live_users
      * @apiDescription  主播账号
      *
