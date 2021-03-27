@@ -7,6 +7,7 @@ use App\Http\Controllers\ControllerBackend;
 use App\Http\Controllers\Controller;
 use App\Models\Live;
 use App\Models\LiveConsole;
+use App\Models\LiveUserPrivilege;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
@@ -187,7 +188,10 @@ class IndexController extends ControllerBackend
 
     public function create(Request $request)
     {
+        $input = $request->all();
         $cover = ! empty($input['cover']) ? covert_img($input['cover']) : '';
+        $title = $input['title'] ?? '';
+
     }
 
     /**
@@ -219,6 +223,37 @@ class IndexController extends ControllerBackend
 
         return $res;
 
+    }
+
+    /**
+     * @api {get} api/live_v4/index/live_users 创建直播-主播账号
+     * @apiVersion 4.0.0
+     * @apiName  index/live_users
+     * @apiGroup 创建直播-主播账号
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/live_users
+     * @apiDescription  主播账号
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getLiveUsers()
+    {
+        $users = LiveUserPrivilege::with('user:id,nickname')
+            ->select('id', 'user_id')
+            ->where('pri_level', 1)
+            ->where('privilege', 2)
+            ->where('is_del', 0)
+            ->get()
+            ->toArray();
+        return success($users);
     }
 
 }
