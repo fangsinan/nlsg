@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Live\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Live;
 use App\Models\LiveComment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -34,9 +35,29 @@ class CommentController extends Controller
     public function index(Request $request)
     {
         $title = $request->get('title');
+        $nickname = $request->get('nickname');
+        $content = $request->get('content');
+        $start = $request->get('start');
+        $end = $request->get('end');
         $query = LiveComment::with(['user:id,nickname', 'live:id,title'])
+            ->when($content, function ($query) use ($content) {
+                $query->where('content', 'like', '%'.$content.'%');
+            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                });
+            })
             ->when($title, function ($query) use ($title) {
-                $query->where('title', 'like', '%'.$title.'%');
+                $query->whereHas('live', function ($query) use ($title) {
+                    $query->where('title', 'like', '%'.$title.'%');
+                });
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                ]);
             });
         $lists = $query->select('id', 'live_id', 'user_id', 'content', 'created_at')
             ->orderBy('created_at', 'desc')

@@ -86,7 +86,8 @@ class IndexController extends ControllerBackend
             })
             ->when(! is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
-            })->when($start && $end, function ($query) use ($start, $end) {
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($start)->startOfDay()->toDateTimeString(),
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
