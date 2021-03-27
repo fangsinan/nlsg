@@ -12,6 +12,7 @@ use App\Models\LiveCountDown;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -77,7 +78,7 @@ class ChannelServers
 
         $query->where('o.activity_tag', '=', 'cytx')
             ->where('o.status', '=', 1)
-            ->where('p.price','>',0.01)
+            ->where('p.price', '>', 0.01)
             ->whereIn('o.type', [9, 15])
             ->where('cytx_job', '<>', -1);
 
@@ -466,7 +467,7 @@ class ChannelServers
                         break;
                     case 3:
                         //21-03-22 补充的课程
-                        Subscribe::appendSub([$v->user_id],1);
+                        Subscribe::appendSub([$v->user_id], 1);
                         $add_sub_data = [];
                         $add_cd_data = [];
                         DB::beginTransaction();
@@ -512,6 +513,7 @@ class ChannelServers
                             DB::rollBack();
                             break;
                         }
+
                         if (!empty($add_sub_data)) {
                             $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
                             if ($add_res === false) {
@@ -523,6 +525,22 @@ class ChannelServers
                                 DB::rollBack();
                                 break;
                             }
+
+                            //添加关系保护
+                            $check_bind = VipUserBind::getBindParent($v->phone);
+                            if ($check_bind == 0) {
+                                //没有绑定记录,则绑定
+                                $bind_data = [
+                                    'parent' => '18512378959',
+                                    'son' => $v->phone,
+                                    'life' => 2,
+                                    'begin_at' => date('Y-m-d H:i:s'),
+                                    'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                                    'channel' => 3
+                                ];
+                                DB::table('nlsg_vip_user_bind')->insert($bind_data);
+                            }
+
                         }
                         DB::commit();
                         try {

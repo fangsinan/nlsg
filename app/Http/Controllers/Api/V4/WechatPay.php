@@ -23,6 +23,7 @@ use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
+use App\Models\VipUserBind;
 use App\Models\Works;
 use App\Servers\JobServers;
 use EasyWeChat\Factory;
@@ -548,12 +549,6 @@ class WechatPay extends Controller
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
                 $liveData = Live::find($live_id);
 
-                //21-03-22 补充的课程
-                if (in_array($liveData['user_id']??0,[161904,250550,423403])){
-                    Subscribe::appendSub([$user_id],1);
-                }
-
-
                 Live::where('id', $live_id)->increment('order_num');
                 if ($liveData['relation_live'] > 0) {
                     $subscribe = [
@@ -569,6 +564,28 @@ class WechatPay extends Controller
                 }
 
                 $userdata = User::find($user_id);
+
+                //21-03-22 补充的课程
+                if (in_array($liveData['user_id']??0,[161904,250550,423403])){
+                    Subscribe::appendSub([$user_id],1);
+                }
+                //写入关系保护
+                if(!empty($orderInfo['twitter_id'])){
+                    $twitter_data = User::find($orderInfo['twitter_id']);
+                    $check_bind = VipUserBind::getBindParent($userdata['phone']);
+                    if ($check_bind == 0){
+                        //没有绑定记录,则绑定
+                        $bind_data = [
+                            'parent'=>$twitter_data['phone'],
+                            'son'=>$userdata['phone'],
+                            'life'=>2,
+                            'begin_at'=>date('Y-m-d H:i:s'),
+                            'end_at'=>date('Y-m-d 23:59:59',strtotime('+1 years')),
+                            'channel'=>2
+                        ];
+                        DB::table('nlsg_vip_user_bind')->insert($bind_data);
+                    }
+                }
 
                 //添加短信数据
                 $liveCountDown = [
