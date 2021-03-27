@@ -254,7 +254,7 @@ class Order extends Base
 
         //订单编号
         if (!empty($params['ordernum'] ?? 0)) {
-            $query->where('ordernum', 'like', '%'.$params['ordernum'].'%');
+            $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
         //下单时间
         if (!empty($params['created_at'])) {
@@ -337,7 +337,10 @@ class Order extends Base
         ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
             'pay_price', 'pay_type', 'ordernum', 'live_id', 'pay_type', 'os_type']);
 
-        $query->whereHas('live');
+        //$query->whereHas('live');
+        $query->whereHas('live', function ($q) {
+            $q->where('created_at', '>', '2021-01-01');
+        });
 
         $list = $query->paginate($size);
 
