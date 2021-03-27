@@ -35,7 +35,7 @@ class OrderController extends Controller
      *
      * @apiSuccess {string[]} goods 商品信息
      * @apiSuccess {string[]} pay_record 支付信息
-     * @apiSuccess {string[]} pay_record_detail 收益信息
+     * @apiSuccess {string[]} pay_record_detail 收益信息,当指定id时返回
      * @apiSuccess {string[]} live 所属直播信息
      * @apiSuccess {string[]} user 购买者信息
      * @apiSuccess {string} id 订单id
