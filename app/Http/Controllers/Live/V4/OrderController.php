@@ -14,12 +14,12 @@ class OrderController extends Controller
     }
 
     /**
-     * @api {get} api/live_v4/order/list 订单列表
+     * @api {get} api/live_v4/order/list 订单列表和详情
      * @apiVersion 4.0.0
      * @apiName  order/list
-     * @apiGroup 直播后台-订单列表
+     * @apiGroup 直播后台-订单列表和详情
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/order/list
-     * @apiDescription  订单列表
+     * @apiDescription  订单列表和详情
      *
      * @apiParam {number} page 分页
      * @apiParam {number} size 条数
@@ -30,7 +30,7 @@ class OrderController extends Controller
      * @apiParam {strint} [os_type] 客户端(客户端:1安卓 2ios 3微信 )
      * @apiParam {strint} [phone] 账号
      * @apiParam {strint} [title] 直播标题
-     * @apiParam {number=9,10,14,15,16} type 订单类型(9精品课,10直播,14线下产品,15讲座,16新vip)
+     * @apiParam {number=9,10,14,15,16} [type] 订单类型(9精品课,10直播,14线下产品,15讲座,16新vip)
      *
      *
      * @apiSuccess {string[]} goods 商品信息
