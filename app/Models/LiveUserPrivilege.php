@@ -19,4 +19,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class LiveUserPrivilege extends Model{
     protected $table = 'nlsg_live_user_privilege';
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

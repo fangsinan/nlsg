@@ -6,6 +6,8 @@ use App\Http\Controllers\ControllerBackend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Live;
+use App\Models\LiveConsole;
+use App\Models\LiveUserPrivilege;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
@@ -95,7 +97,7 @@ class IndexController extends ControllerBackend
             });
 
         $lists = $query->select('id', 'user_id', 'title', 'price',
-            'order_num', 'status', 'created_at','cover_img')
+            'order_num', 'status', 'created_at', 'cover_img')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -145,7 +147,7 @@ class IndexController extends ControllerBackend
     public function data(Request $request)
     {
         $liveId = $request->get('live_id');
-        $list = Live::select('id','title','begin_at')->where('id', $liveId)->first();
+        $list = Live::select('id', 'title', 'begin_at')->where('id', $liveId)->first();
         if ( ! $list) {
             return error(1000, '直播不存在');
         }
@@ -168,7 +170,7 @@ class IndexController extends ControllerBackend
 
 
         $data = [
-            'live'     => $list,
+            'live'          => $list,
             'subscribe_num' => $subscribeNum > 0 ? float_number($subscribeNum) : 0,
             'watch_num'     => $watchNum > 0 ? float_number($watchNum) : 0,
             'unwatch_num'   => $unwatchNum > 0 ? float_number($unwatchNum) : 0,
@@ -183,5 +185,75 @@ class IndexController extends ControllerBackend
 
     }
 
+
+    public function create(Request $request)
+    {
+        $input = $request->all();
+        $cover = ! empty($input['cover']) ? covert_img($input['cover']) : '';
+        $title = $input['title'] ?? '';
+
+    }
+
+    /**
+     * @api {get} api/live_v4/index/check_helper 创建直播-检验助手
+     * @apiVersion 4.0.0
+     * @apiName  index/check_helper
+     * @apiGroup 创建直播-检验助手
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/check_helper
+     * @apiDescription  检验助手
+     *
+     * @apiParam {number} helper 检验助手
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function checkHelper(Request $request)
+    {
+        $params = $request->input();
+        $model = new LiveConsole();
+        $res = $model->checkHelper($params, 1);
+
+        return $res;
+
+    }
+
+    /**
+     * @api {get} api/live_v4/index/live_users 创建直播-主播账号
+     * @apiVersion 4.0.0
+     * @apiName  index/live_users
+     * @apiGroup 创建直播-主播账号
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/live_users
+     * @apiDescription  主播账号
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getLiveUsers()
+    {
+        $users = LiveUserPrivilege::with('user:id,nickname')
+            ->select('id', 'user_id')
+            ->where('pri_level', 1)
+            ->where('privilege', 2)
+            ->where('is_del', 0)
+            ->get()
+            ->toArray();
+        return success($users);
+    }
 
 }
