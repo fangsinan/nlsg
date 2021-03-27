@@ -66,4 +66,38 @@ class CommentController extends Controller
         return success($lists);
 
     }
+
+    /**
+     * @api {get} api/live_v4/comment/show 评论查看
+     * @apiVersion 4.0.0
+     * @apiName  comment/show
+     * @apiGroup 直播后台-评论查看
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/comment/show
+     * @apiDescription  评论查看
+     *
+     * @apiParam {number} id  评论id
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function show(Request $request)
+    {
+        $id = $request->get('id');
+        $list = LiveComment::with('user:id,nickname')
+            ->select('id', 'user_id', 'content', 'created_at')
+            ->where('id', $id)
+            ->first();
+        if ( ! $list) {
+            return error(1000, '评论不存在');
+        }
+        return success($list);
+    }
 }
