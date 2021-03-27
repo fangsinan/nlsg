@@ -240,12 +240,10 @@ class Order extends Base
 
     public function orderInLive($params)
     {
-        $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
         $now_date = date('Y-m-d H:i:s');
 
         //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
-
         $query = Order::query();
 
         if (!empty($params['id'] ?? 0)) {
@@ -339,6 +337,7 @@ class Order extends Base
 
         //$query->whereHas('live');
         $query->whereHas('live', function ($q) {
+            //老直播和现在直播id有重合,加时间区分
             $q->where('created_at', '>', '2021-01-01');
         });
 
