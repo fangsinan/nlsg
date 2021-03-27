@@ -302,6 +302,13 @@ class Order extends Base
             ->where('status', '=', 1)
             ->where('is_shill', '=', 0);
 
+        if (!empty($params['id'] ?? 0)) {
+            $query->with([
+                'pay_record_detail:id,type,ordernum,user_id',
+                'pay_record_detail.user:id,phone,nickname',
+            ]);
+        }
+
         $query->with([
             'works' => function ($q) {
                 $q->select(['id', 'title', 'type', 'subtitle', 'price',
@@ -321,8 +328,6 @@ class Order extends Base
             'payRecord' => function ($q) {
                 $q->select(['ordernum', 'price', 'type', 'created_at']);
             },
-            'pay_record_detail:id,type,ordernum,user_id',
-            'pay_record_detail.user:id,phone,nickname',
             'live' => function ($q) {
                 $q->select(['id', 'title', 'describe', 'begin_at', 'cover_img']);
             },
