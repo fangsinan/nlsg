@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
 use App\Models\LiveLogin;
+use App\Models\Wiki;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -185,13 +186,72 @@ class IndexController extends ControllerBackend
 
     }
 
-
+    /**
+     * @api {get} api/live_v4/index/create 直播创建/编辑
+     * @apiVersion 4.0.0
+     * @apiName  index/data
+     * @apiGroup 直播后台-直播创建/编辑
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/create
+     * @apiDescription  直播创建/编辑
+     *
+     * @apiParam {number} id 直播id
+     * @apiParam {string} title 标题
+     * @apiParam {number} user_id 主播账号
+     * @apiParam {number} begin_at 开始时间
+     * @apiParam {number} end_at  结束时间
+     * @apiParam {number} price   价格
+     * @apiParam {number} twitter_money 分销金额
+     * @apiParam {number} helper 直播助手
+     * @apiParam {string} content 直播内容
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
     public function create(Request $request)
     {
         $input = $request->all();
         $cover = ! empty($input['cover']) ? covert_img($input['cover']) : '';
         $title = $input['title'] ?? '';
+        $userId = $input['user_id'] ?? 0;
+        $begin_at = $input['begin_at'] ?? date('Y-m-d H:i:s', time());
+        $end_at = $input['end_at'] ?? date('Y-m-d H:i:s', time());
+        $price = $input['price'] ?? 0;
+        $twitter = $input['twitter_money'] ?? 0;
+        $helper = $input['helper'] ?? '';
+        $content = $input['content'] ?? '';
+        if ( ! $title) {
+           return error(1000, '标题不能为空');
+        }
+        if ( ! $begin_at) {
+           return error(1000, '开始时间不能为空');
+        }
 
+        $data = [
+            'user_id'       => $userId,
+            'cover_img'     => $cover,
+            'title'         => $title,
+            'begin_at'      => $begin_at,
+            'end_at'        => $end_at,
+            'price'         => $price,
+            'twitter_money' => $twitter,
+            'helper'        => $helper,
+            'content'       => $content
+        ];
+
+        if ( ! empty($input['id'])) {
+            Live::where('id', $input['id'])->update($data);
+        } else {
+            Live::create($data);
+        }
+        return success();
     }
 
     /**
