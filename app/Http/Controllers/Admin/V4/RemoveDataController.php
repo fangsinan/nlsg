@@ -83,6 +83,10 @@ class RemoveDataController extends ControllerBackend
             $servers->mysqlTest();
         }
 
+        if (0) {
+            $servers->liveOrderAddVipDind();
+        }
+
     }
 
     public function mallOrders()

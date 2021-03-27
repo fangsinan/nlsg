@@ -14,6 +14,7 @@ use App\Models\History;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\MallGoods;
+use App\Models\Order;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -1875,7 +1876,7 @@ and o.status = 1 and o.pay_price > 1";
                 if ($v->works_type != 3) {
                     $temp_data['start_time'] = $now_date;
                     $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
-                }else{
+                } else {
                     $temp_data['start_time'] = $now_date;
                     $temp_data['end_time'] = $now_date;
                 }
@@ -1933,6 +1934,68 @@ and o.status = 1 and o.pay_price > 1";
 
         }
 
+    }
+
+    public function liveOrderAddVipDind()
+    {
+        $sql = "SELECT
+	o.id,
+	o.user_id,
+	u.phone,
+	o.twitter_id,
+	tjr.phone AS tphone,
+	o.pay_time,
+	o.is_ascription,
+	o.ascription_time,
+	ub.parent,
+	ub.son
+FROM
+	nlsg_order AS o
+	LEFT JOIN nlsg_user AS u ON u.id = o.user_id
+	LEFT JOIN nlsg_user AS tjr ON tjr.id = o.twitter_id
+	LEFT JOIN nlsg_vip_user_bind AS ub ON u.phone = ub.son
+WHERE
+	o.pay_time > '2021-02-01 00:00:00'
+	AND o.type = 10
+	AND o.`status` = 1
+	AND o.twitter_id > 0
+	AND o.pay_price > 1
+	AND ISNULL( ub.son )
+GROUP BY
+	o.user_id
+ORDER BY
+	o.id DESC";
+
+        $list = DB::select($sql);
+
+        $begin_date = date('2021-03-27 14:00:00');
+        $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
+
+        foreach ($list as $v) {
+            DB::beginTransaction();
+            $bind_data = [
+                'parent' => $v->tphone,
+                'son' => $v->phone,
+                'life' => 2,
+                'begin_at' => $v->pay_time,
+                'end_at' => date('Y-m-d 23:59:59', strtotime("$v->pay_time +1 years")),
+                'channel' => 2
+            ];
+
+            $b_res = DB::table('nlsg_vip_user_bind')->insert($bind_data);
+            $o_res = Order::where('id', '=', $v->id)->update([
+                'is_ascription' => 1,
+                'ascription_time' => $begin_date
+            ]);
+            if ($b_res && $o_res) {
+                echo '添加:', $v->tphone, '->', $v->phone, PHP_EOL;
+                Db::commit();
+            } else {
+                DB::rollBack();
+            }
+        }
+
+        exit('完毕');
     }
 
     public function mysqlTest()
