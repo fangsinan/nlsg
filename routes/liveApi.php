@@ -8,5 +8,6 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
     Route::get('comment/index', 'CommentController@index');
     Route::get('comment/show', 'CommentController@show');
     Route::get('sub/index', 'SubscribeController@index');
+    Route::get('order/list', 'OrderController@list');
 
 });

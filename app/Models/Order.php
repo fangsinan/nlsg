@@ -25,7 +25,7 @@ class Order extends Base
         'id', 'live_num', 'pay_type', 'activity_tag', 'kun_said', 'refund_no', 'is_live_order_send',
         'ordernum', 'status', 'type', 'user_id', 'relation_id', 'cost_price', 'price', 'twitter_id', 'coupon_id', 'ip',
         'os_type', 'live_id', 'reward_type', 'reward', 'service_id', 'reward_num', 'pay_time', 'start_time', 'end_time',
-        'pay_price', 'city', 'vip_order_type', 'send_type', 'send_user_id', 'remark','sales_id','sales_bind_id',
+        'pay_price', 'city', 'vip_order_type', 'send_type', 'send_user_id', 'remark', 'sales_id', 'sales_bind_id',
 
 
     ];
@@ -45,6 +45,7 @@ class Order extends Base
     {
         return $this->belongsTo(Column::class, 'relation_id', 'id');
     }
+
     public function pay_record_detail()
     {
         return $this->belongsTo(PayRecordDetail::class, 'ordernum', 'ordernum');
@@ -203,10 +204,10 @@ class Order extends Base
 //            ->where('type', '=', 10)
 //            ->where('status', '=', 1)
 //            ->first();
-        $check = Subscribe::where('user_id','=',$user_id)
-            ->where('relation_id','=',$live_id)
-            ->where('type','=',3)
-            ->where('status','=',1)
+        $check = Subscribe::where('user_id', '=', $user_id)
+            ->where('relation_id', '=', $live_id)
+            ->where('type', '=', 3)
+            ->where('status', '=', 1)
             ->first();
         if ($check) {
             return ['code' => true, 'is_sub' => 1, 'p' => $time . $user_id];
@@ -219,7 +220,171 @@ class Order extends Base
     public function payRecord()
     {
         return $this->hasOne(PayRecord::class, 'ordernum', 'ordernum')
-            ->where('status','=',1);
+            ->where('status', '=', 1);
     }
 
+    public function live()
+    {
+        return $this->belongsTo(Live::class, 'live_id', 'id');
+    }
+
+    public function offline()
+    {
+        return $this->belongsTo(OfflineProducts::class, 'relation_id', 'id');
+    }
+
+    public function liveGoods()
+    {
+        return $this->belongsTo(Live::class, 'relation_id', 'id');
+    }
+
+    public function orderInLive($params)
+    {
+        $page = $params['page'] ?? 1;
+        $size = $params['size'] ?? 10;
+        $now_date = date('Y-m-d H:i:s');
+
+        //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
+
+        $query = Order::query();
+
+        if (!empty($params['id'] ?? 0)) {
+            $query->where('id', '=', $params['id']);
+        }
+
+        //订单编号
+        if (!empty($params['ordernum'] ?? 0)) {
+            $query->where('ordernum', 'like', '%'.$params['ordernum'].'%');
+        }
+        //下单时间
+        if (!empty($params['created_at'])) {
+            $created_at = explode(',', $params['created_at']);
+            $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
+            if (empty($created_at[1] ?? '')) {
+                $created_at[1] = $now_date;
+            } else {
+                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[1]));
+            }
+            $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
+        }
+
+        //用户账号
+        if (!empty($params['phone'] ?? '')) {
+            $phone = $params['phone'];
+            $query->whereHas('user', function ($q) use ($phone) {
+                $q->where('phone', 'like', "%$phone%");
+            });
+        }
+
+        //直播标题
+        if (!empty($params['title'] ?? '')) {
+            $title = $params['title'];
+            $query->whereHas('live', function ($q) use ($title) {
+                $q->where('title', 'like', "%$title%");
+            });
+        }
+
+        //支付方式
+        //订单来源
+        if (!empty($params['pay_type'] ?? 0)) {
+            $query->where('pay_type', '=', $params['pay_type']);
+        }
+        if (!empty($params['os_type'] ?? 0)) {
+            $query->where('os_type', '=', $params['os_type']);
+        }
+        //商品类型
+        if (!empty($params['type'] ?? 0)) {
+            $query->where('type', '=', $params['type']);
+        }
+
+        $query->where('live_id', '>', '0')
+            ->whereIn('type', [9, 10, 14, 15, 16])
+            ->where('status', '=', 1)
+            ->where('is_shill', '=', 0);
+
+        $query->with([
+            'works' => function ($q) {
+                $q->select(['id', 'title', 'type', 'subtitle', 'price',
+                    'cover_img', 'detail_img']);
+            },
+            'column' => function ($q) {
+                $q->select(['id', 'name as title', 'type', 'subtitle', 'price',
+                    'cover_pic as cover_img', 'details_pic as detail_img']);
+            },
+            'offline' => function ($q) {
+                $q->select(['id', 'title', 'subtitle', 'price',
+                    'cover_img', 'image']);
+            },
+            'liveGoods' => function ($q) {
+                $q->select(['id', 'title', 'describe', 'cover_img', 'price']);
+            },
+            'payRecord' => function ($q) {
+                $q->select(['ordernum', 'price', 'type', 'created_at']);
+            },
+            'pay_record_detail:id,type,ordernum,user_id',
+            'pay_record_detail.user:id,phone,nickname',
+            'live' => function ($q) {
+                $q->select(['id', 'title', 'describe', 'begin_at', 'cover_img']);
+            },
+            'user' => function ($q) {
+                $q->select(['id', 'phone', 'nickname']);
+            }
+        ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
+            'pay_price', 'pay_type', 'ordernum', 'live_id', 'pay_type', 'os_type']);
+
+        $query->whereHas('live');
+
+        $list = $query->paginate($size);
+
+        foreach ($list as &$v) {
+            $goods = [];
+
+            switch (intval($v->type)) {
+                case 9:
+                    $goods['goods_id'] = $v->works->id ?? 0;
+                    $goods['title'] = $v->works->title ?? '数据错误';
+                    $goods['subtitle'] = $v->works->subtitle ?? '';
+                    $goods['cover_img'] = $v->works->cover_img ?? '';
+                    $goods['detail_img'] = $v->works->detail_img ?? '';
+                    $goods['price'] = $v->works->price ?? '价格数据错误';
+                    break;
+                case 10:
+                    $goods['goods_id'] = $v->liveGoods->id ?? 0;
+                    $goods['title'] = $v->liveGoods->title ?? '数据错误';
+                    $goods['subtitle'] = '';
+                    $goods['cover_img'] = $v->liveGoods->cover_img ?? '';
+                    $goods['detail_img'] = '';
+                    $goods['price'] = $v->liveGoods->price ?? '价格数据错误';
+                    break;
+                case 14:
+                    $goods['goods_id'] = $v->offline->id ?? 0;
+                    $goods['title'] = $v->offline->title ?? '数据错误';
+                    $goods['subtitle'] = $v->offline->subtitle ?? '';
+                    $goods['cover_img'] = $v->offline->cover_img ?? '';
+                    $goods['detail_img'] = $v->offline->image ?? '';
+                    $goods['price'] = $v->offline->price ?? '价格数据错误';
+                    break;
+                case 15:
+                    $goods['goods_id'] = $v->column->id ?? 0;
+                    $goods['title'] = $v->column->title ?? '数据错误';
+                    $goods['subtitle'] = $v->column->subtitle ?? '';
+                    $goods['cover_img'] = $v->column->cover_img ?? '';
+                    $goods['detail_img'] = $v->column->detail_img ?? '';
+                    $goods['price'] = $v->column->price ?? '价格数据错误';
+                    break;
+                case 16:
+                    $goods['goods_id'] = 999999;
+                    $goods['title'] = '幸福360会员';
+                    $goods['subtitle'] = '';
+                    $goods['cover_img'] = '/live/recommend/360_xhc.png';
+                    $goods['detail_img'] = '';
+                    $goods['price'] = 360;
+                    break;
+            }
+            $v->goods = $goods;
+            unset($v->works, $v->column, $v->offline, $v->liveGoods);
+        }
+
+        return $list;
+    }
 }
