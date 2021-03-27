@@ -39,12 +39,13 @@ class IndexController extends ControllerBackend
     {
         $subscribeNum =  Subscribe::where('status', 1)->count();
         $watchNum   = LiveLogin::count();
-
+        $orderNum   = Order::where('type', 10)->where('status', 1)->count();
+        $orderIncome  = Order::where('type', 10)->where('status', 1)->sum('pay_price');
         $data = [
             'subscribe_num' => float_number($subscribeNum),
             'watch_num'     => float_number($watchNum),
-            'order_num'     => float_number(10),
-            'order_income'  => float_number(23456)
+            'order_num'     => float_number($orderNum),
+            'order_income'  => float_number($orderIncome)
         ];
         return success($data);
     }
