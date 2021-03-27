@@ -1955,7 +1955,7 @@ FROM
 	LEFT JOIN nlsg_user AS tjr ON tjr.id = o.twitter_id
 	LEFT JOIN nlsg_vip_user_bind AS ub ON u.phone = ub.son
 WHERE
-	o.pay_time > '2021-02-01 00:00:00'
+	o.pay_time > '2021-01-21 00:00:00'
 	AND o.type = 10
 	AND o.`status` = 1
 	AND o.twitter_id > 0
