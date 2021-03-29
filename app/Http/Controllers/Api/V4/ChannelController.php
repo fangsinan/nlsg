@@ -73,9 +73,9 @@ class ChannelController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/channel/banner
      * @apiDescription 创业天下banner
      */
-    public function cytxBanner(){
+    public function cytxBanner(Request $request){
         $model = new ChannelWorksList();
-        $data = $model->cytxBanner();
+        $data = $model->cytxBanner($request->input(),$this->user);
         return $this->getRes($data);
     }
 
