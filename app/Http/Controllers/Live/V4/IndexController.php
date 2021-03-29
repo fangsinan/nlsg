@@ -328,7 +328,8 @@ class IndexController extends ControllerBackend
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/statistics_img_data
      * @apiDescription  折线图数据
      *
-     * @apiParam {number} date 时间
+     * @apiParam {number} str_time 开始时间
+     * @apiParam {number} end_time 结束时间
      * @apiParam {int} live_id 直播id
      *
      *
@@ -347,7 +348,7 @@ class IndexController extends ControllerBackend
         $live_id = $input['live_id'] ?? 0;
         $str_time = $input['str_time'] ?? 0;
         $end_time = $input['end_time'] ?? 0;
-        
+
         if(empty($live_id)){ // 不指定直播id时  计算时间
             if(empty($str_time) || empty($end_time)){
                 $ageFrom = strtotime(date('Y-m-d ',time()));
