@@ -351,7 +351,7 @@ class IndexController extends ControllerBackend
 
         if(empty($live_id)){ // 不指定直播id时  计算时间
             if(empty($str_time) || empty($end_time)){
-                $ageFrom = strtotime("-3 month");
+                $ageFrom = strtotime("-3 month"); //三月前的时间
                 $ageTo = time();
             }else{
                 $ageFrom = $str_time;
