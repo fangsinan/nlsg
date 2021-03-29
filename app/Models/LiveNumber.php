@@ -2,17 +2,15 @@
 /**
  * Created by PhpStorm.
  * User: nlsg2017
- * Date: 2019/6/27
- * Time: 9:58 AM
+ * Date: 2019/6/25
+ * Time: 2:04 PM
  */
 
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-
-class LiveNumber extends Model
+class LiveNumber extends Base
 {
     protected $table = 'nlsg_live_number';
+
 }

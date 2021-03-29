@@ -3,6 +3,7 @@
 Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
 
     Route::get('index/statistics', 'IndexController@index');
+    Route::get('index/statistics_img_data', 'IndexController@statistics_img_data');
     Route::get('index/data', 'IndexController@data');
     Route::get('index/check_helper', 'IndexController@checkHelper');
     Route::get('index/live_users', 'IndexController@getLiveUsers');

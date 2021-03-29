@@ -7,6 +7,7 @@ use App\Http\Controllers\ControllerBackend;
 use App\Http\Controllers\Controller;
 use App\Models\Live;
 use App\Models\LiveConsole;
+use App\Models\LiveNumber;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
@@ -317,4 +318,71 @@ class IndexController extends ControllerBackend
         return success($users);
     }
 
+
+
+    /**
+     * @api {get} api/live_v4/index/statistics_img_data 折线图数据
+     * @apiVersion 4.0.0
+     * @apiName  index/statistics_img_data
+     * @apiGroup 直播后台
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/index/statistics_img_data
+     * @apiDescription  折线图数据
+     *
+     * @apiParam {number} date 时间
+     * @apiParam {int} live_id 直播id
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function statistics_img_data(Request $request){
+        $input = $request->all();
+        $live_id = $input['live_id'] ?? 0;
+        $str_time = $input['str_time'] ?? 0;
+        $end_time = $input['end_time'] ?? 0;
+        
+        if(empty($live_id)){ // 不指定直播id时  计算时间
+            if(empty($str_time) || empty($end_time)){
+                $ageFrom = strtotime(date('Y-m-d ',time()));
+                $ageTo = time();
+            }else{
+                $ageFrom = $str_time;
+                $ageTo = $end_time;
+            }
+        }
+
+
+        if(!empty($live_id)){
+            //按分钟统计
+            $m = 60;
+        }else{  //按天统计
+            $m = 3600;
+        }
+        $query = LiveNumber::select('live_id',DB::raw('max(count) as 在线人数,from_unixtime(time - time % '.$m.') as 日期'));
+        if(!empty($live_id)){
+            $query->where('live_id', $live_id);
+        }
+
+        if(!empty($ageFrom) && !empty($ageTo)){
+            $query->whereRaw('time BETWEEN ' . $ageFrom . ' AND ' . $ageTo . '');
+
+        }
+        $number = $query->groupBy('日期')
+            ->orderBy('日期','asc')
+            ->get()->toArray();
+
+        $res['columns']=["日期","在线人数"];
+        $res['rows']=$number;
+
+        return success($res);
+
+
+    }
 }
