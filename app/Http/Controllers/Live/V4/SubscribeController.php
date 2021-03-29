@@ -45,7 +45,7 @@ class SubscribeController extends Controller
         $phone = $request->get('phone') ?? '';
         $date = $request->get('date') ?? '';
 
-        $query = Subscribe::with(['user:id,nickname,phone', 'live:id,title', 'order:id,ordernum,pay_time']);
+        $query = Subscribe::with(['user:id,nickname,phone', 'live:id,title,price,twitter_money', 'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at']);
         if(!empty($phone)){
             $query->whereHas('user', function ($q) use($phone){
                 $q->where('phone', $phone);
@@ -75,6 +75,16 @@ class SubscribeController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
+
+        foreach ($lists['data'] as &$val){
+            $val['twitter'] = [];
+            if(!empty($val['order']['twitter_id'])){
+                $twitter = User::find($val['order']['twitter_id']);
+                $val['twitter']['phone'] = $twitter['phone'];
+                $val['twitter']['nickname'] = $twitter['nickname'];
+            }
+        }
+
 
         return success($lists);
 
