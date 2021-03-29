@@ -351,7 +351,7 @@ class IndexController extends ControllerBackend
 
         if(empty($live_id)){ // 不指定直播id时  计算时间
             if(empty($str_time) || empty($end_time)){
-                $ageFrom = strtotime(date('Y-m-d ',time()));
+                $ageFrom = strtotime("-3 month");
                 $ageTo = time();
             }else{
                 $ageFrom = $str_time;
@@ -379,7 +379,8 @@ class IndexController extends ControllerBackend
             ->orderBy('日期','asc')
             ->get()->toArray();
 
-        $res['columns']=["日期","在线人数"];
+
+        $res['columns']=["日期","在线人数"];// 前端折线图插件需要的参数
         $res['rows']=$number;
 
         return success($res);
