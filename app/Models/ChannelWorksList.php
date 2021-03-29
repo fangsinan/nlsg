@@ -247,7 +247,7 @@ class ChannelWorksList extends Base
         if(isset($live_team[0]['id'])) { //直播状态
             $live_info = LiveInfo::query()->where('live_pid', $live_team[0]['id'])->first();
             echo '<pre>';
-            var_dump($live_team[0]['id']);
+            var_dump($live_info);
             exit;
 //            $is_begin = $live_info->is_begin;
             //是否订阅
