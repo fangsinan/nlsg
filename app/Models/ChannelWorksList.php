@@ -248,7 +248,7 @@ class ChannelWorksList extends Base
             $channel = LiveInfo::where('live_pid', $live_team[0]['id'])->first();
             $is_begin = $channel->is_begin;
             //是否订阅
-            $Order=Order::query()->select('id','ordernum','user_id','detailed','status','remarks','created_at')
+            $Order=Order::query()->select('id','live_id')
                 ->where('live_id',$live_team[0]['id'])->where('type',10)->where('status',1)
                 ->where('activity_tag','cytx')->where('pay_price','>','1')
                 ->first();
