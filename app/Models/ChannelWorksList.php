@@ -242,18 +242,17 @@ class ChannelWorksList extends Base
         if(isset($live_team[0]['order_num'])){
             $live_team[0]['order_num']=$live_team[0]['order_num']+5000;
         }
-        $is_begin=0;
-        $is_sub=0;
+
         if(isset($live_team[0]['id'])) { //直播状态
             $live_info = LiveInfo::query()->where('live_pid', $live_team[0]['id'])->first();
-            $is_begin = $live_info->is_begin;
+            $live_team[0]['is_begin'] = $live_info->is_begin;
             //是否订阅
             $Order=Order::query()->select('id','live_id')
                 ->where('live_id',$live_team[0]['id'])->where('type',10)->where('status',1)
                 ->where('activity_tag','cytx')->where('pay_price','>','1')
                 ->first();
             if(!empty($Order)){
-                $is_sub=1;
+                $live_team[0]['is_sub']=1;
             }
         }
         return [
@@ -261,8 +260,6 @@ class ChannelWorksList extends Base
             'home' => array_filter(explode(',', $banner_home)),
             'banner'=>$banner,
             'live'=>$live_team,
-            'is_begin'=>$is_begin,
-            'is_sub'=>$is_sub
         ];
 
     }
