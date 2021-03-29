@@ -230,6 +230,9 @@ class ChannelWorksList extends Base
 
     public function cytxBanner($params, $user)
     {
+
+        $user_id = $user['id'] ?? 0;
+
         $banner_index = ConfigModel::getData(47);
         $banner_home = ConfigModel::getData(51);
 
@@ -248,7 +251,7 @@ class ChannelWorksList extends Base
             $live_team[0]['is_begin'] = $live_info->is_begin;
             //是否订阅
             $Order=Order::query()->select('id','live_id')
-                ->where('user_id',$user)->where('live_id',$live_team[0]['id'])->where('type',10)->where('status',1)
+                ->where('user_id',$user_id)->where('live_id',$live_team[0]['id'])->where('type',10)->where('status',1)
                 ->where('activity_tag','cytx')->where('pay_price','>','1')
                 ->first();
             if(!empty($Order)){
