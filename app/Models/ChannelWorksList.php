@@ -246,18 +246,15 @@ class ChannelWorksList extends Base
         $is_sub=0;
         if(isset($live_team[0]['id'])) { //直播状态
             $live_info = LiveInfo::query()->where('live_pid', $live_team[0]['id'])->first();
-            echo '<pre>';
-            var_dump($live_info);
-            exit;
-//            $is_begin = $live_info->is_begin;
+            $is_begin = $live_info->is_begin;
             //是否订阅
-//            $Order=Order::query()->select('id','live_id')
-//                ->where('live_id',$live_team[0]['id'])->where('type',10)->where('status',1)
-//                ->where('activity_tag','cytx')->where('pay_price','>','1')
-//                ->first();
-//            if(!empty($Order)){
-//                $is_sub=1;
-//            }
+            $Order=Order::query()->select('id','live_id')
+                ->where('live_id',$live_team[0]['id'])->where('type',10)->where('status',1)
+                ->where('activity_tag','cytx')->where('pay_price','>','1')
+                ->first();
+            if(!empty($Order)){
+                $is_sub=1;
+            }
         }
         return [
             'index' => array_filter(explode(',', $banner_index)),
