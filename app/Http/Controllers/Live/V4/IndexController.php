@@ -70,6 +70,15 @@ class IndexController extends ControllerBackend
      * @apiParam {number} page 分页
      * @apiParam {string} title 名称
      * @apiParam {number} status   0 待支付  1已支付
+     * @apiParam {number} start   开始时间
+     * @apiParam {number} end   结束时间
+     *
+     * @apiSuccess {string} title 标题
+     * @apiSuccess {number} price 价格
+     * @apiSuccess {number} order_num 预约人数
+     * @apiSuccess {number} live_status 直播状态 1未开始 2已结束 3正在直播
+     * @apiSuccess {number} live_price_sum 直播收益
+     * @apiSuccess {number} live_twitter_price_sum 推客收益
      *
      *
      * @apiSuccessExample  Success-Response:
