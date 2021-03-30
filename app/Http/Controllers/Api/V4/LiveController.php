@@ -833,12 +833,16 @@ class LiveController extends Controller
                 'phone' => $user->phone,
                 'new_vip_uid' => $input['inviter'] ?? 0,
             ]);
-
+            $is_flag='';
+            if(isset($input['is_flag'])){
+                $is_flag=$input['is_flag'];
+            }
             Subscribe::create([
                 'user_id' => $this->user['id'],
                 'type' => 3,
                 'relation_id' => $input['info_id'],
                 'status' => 1,
+                'is_flag' => $is_flag
             ]);
 
             Live::where(['id' => $input['live_id']])->increment('order_num');
