@@ -179,7 +179,7 @@ class Live extends Base
         $query->with(['liveInfo:id,live_pid','user:id,nickname']);
         $query->orderBy('team_begin_time', 'asc')->orderBy('id', 'asc');
         $query->select([
-            'id', 'title','user_id','order_num','describe',
+            'id', 'title','user_id','order_num','describe','is_free',
             'cover_img','teacher_img','banner_img','price',
             'team_id',DB::raw('FROM_UNIXTIME(UNIX_TIMESTAMP(begin_at),\'%Y-%m-%d %H:%i\') as begin_at'),
             'team_begin_time', 'team_end_time'
