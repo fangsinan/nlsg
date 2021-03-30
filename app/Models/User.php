@@ -250,4 +250,32 @@ class User extends Authenticatable implements JWTSubject
 
         return $res;
     }
+
+    //校验助手是否合法
+    public function checkHelper($params)
+    {
+        if ($params['helper'] ?? false) {
+            $helper = preg_replace('/[^0-9]/i', ',', $params['helper']);
+            $helper = explode(',', $helper);
+
+            $check_user = User::whereIn('phone', $helper)->select(['id', 'phone'])->get();
+            if ($check_user->isEmpty()) {
+                return error(1000, '未查询到该手机号信息');
+            } else {
+                $check_user = $check_user->toArray();
+                $check_user = array_column($check_user, 'phone');
+
+                $diff = array_diff($helper, $check_user);
+                if ($diff) {
+                    return error(1000, '不是注册账号');
+                } else {
+                    return success();
+                }
+            }
+        } else {
+            return error(1000, '没有数据');
+        }
+
+    }
+
 }

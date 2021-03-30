@@ -17,6 +17,7 @@ use App\Models\Subscribe;
 use App\Models\LiveLogin;
 use App\Models\Wiki;
 use App\Models\Works;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -333,8 +334,8 @@ class IndexController extends ControllerBackend
     public function checkHelper(Request $request)
     {
         $params = $request->input();
-        $model = new LiveConsole();
-        $res = $model->checkHelper($params, 1);
+        $model = new User();
+        $res = $model->checkHelper($params);
 
         return $res;
 
@@ -439,5 +440,38 @@ class IndexController extends ControllerBackend
         return success($res);
 
 
+    }
+
+
+    /**
+     * @api {get} api/live_v4/live/info 直播详情
+     * @apiVersion 4.0.0
+     * @apiName  live/info
+     * @apiGroup 直播后台 -直播详情
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live/info
+     * @apiDescription  直播详情
+     *
+     * @apiParam {number} id 直播间id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function  info(Request $request)
+    {
+        $id = $request->get('id');
+        $live  = Live::select('id','title','cover_img','user_id','begin_at','end_at','price','twitter_money','helper','content')
+                    ->where('id', $id)->first();
+        if (!$live){
+            return  error('直播不存在');
+        }
+
+        return success($live);
     }
 }
