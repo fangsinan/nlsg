@@ -255,8 +255,6 @@ class ChannelWorksList extends Base
                 ->where('activity_tag','cytx')->where('pay_price','>','1')
                 ->first();
             $is_sub=0;
-            var_dump($Order);
-            exit;
             if(!empty($Order)){
                 $is_sub=1;
             }
