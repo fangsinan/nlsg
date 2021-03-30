@@ -69,7 +69,7 @@ class IndexController extends ControllerBackend
      *
      * @apiParam {number} page 分页
      * @apiParam {string} title 名称
-     * @apiParam {number} status   0 待支付  1已支付
+     * @apiParam {number} status   1未开始 2已结束 3正在直播
      * @apiParam {number} start   开始时间
      * @apiParam {number} end   结束时间
      *
