@@ -187,13 +187,13 @@ class ChannelWorksList extends Base
             if ($temp_res['view_num'] >= 10000) {
                 $leftNumber = floor($temp_res['view_num'] / 10000);
                 $rightNumber = round(($temp_res['view_num'] % 10000) / 10000, 2);
-                $temp_res['view_num'] = floatval($leftNumber + $rightNumber) . '万';
+                $temp_res['view_num'] = floatval($leftNumber + $rightNumber) . 'W';
             }
 
             if ($temp_res['subscribe_num'] >= 10000) {
                 $leftNumber = floor($temp_res['subscribe_num'] / 10000);
                 $rightNumber = round(($temp_res['subscribe_num'] % 10000) / 10000, 2);
-                $temp_res['subscribe_num'] = floatval($leftNumber + $rightNumber) . '万';
+                $temp_res['subscribe_num'] = floatval($leftNumber + $rightNumber) . 'W';
             }
 
             $temp_res['user_info'] = User::getTeacherInfo($temp_res['user_id']);
@@ -231,7 +231,7 @@ class ChannelWorksList extends Base
     public function cytxBanner($params, $user)
     {
 
-        $user_id = $user['id'] ?? 0;
+        $user_id = $params['user_id'] ?? 0;
 
         $banner_index = ConfigModel::getData(47);
         $banner_home = ConfigModel::getData(51);
