@@ -276,12 +276,12 @@ class IndexController extends ControllerBackend
     }
 
     /**
-     * @api {get} api/live_v4/live/delete 直播删除
+     * @api {post} api/live_v4/live/delete 直播删除
      * @apiVersion 4.0.0
      * @apiName  live/delete
-     * @apiGroup 直播后台-检验助手
+     * @apiGroup 直播后台-直播删除
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live/delete
-     * @apiDescription  检验助手
+     * @apiDescription  直播删除
      *
      * @apiParam {number} id 直播id
      *
