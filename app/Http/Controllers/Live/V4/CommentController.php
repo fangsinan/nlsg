@@ -20,6 +20,10 @@ class CommentController extends Controller
      *
      * @apiParam {number} page 分页
      * @apiParam {string} title 名称
+     * @apiParam {string} nicknake 用户账号
+     * @apiParam {string} content  评论内容
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
      *
      *
      * @apiSuccessExample  Success-Response:
