@@ -42,6 +42,7 @@ class OrderController extends Controller
      * @apiSuccess {string} type 订单类型(9精品课,10直播,14线下产品,15讲座,16新vip)
      * @apiSuccess {string} price 商品价格
      * @apiSuccess {string} pay_price 支付金额
+     * @apiSuccess {string} status 支付状态  0 待支付  1已支付  2取消
      * @apiSuccess {string} pay_type 支付渠道
      * @apiSuccess {string} os_type 客户端
      * @apiSuccessExample  Success-Response:
