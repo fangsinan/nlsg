@@ -834,7 +834,7 @@ class LiveController extends Controller
                 'new_vip_uid' => $input['inviter'] ?? 0,
             ]);
             $is_flag='';
-            if(isset($input['is_flag'])){
+            if(!empty($input['is_flag'])){
                 $is_flag=$input['is_flag'];
             }
             Subscribe::create([
