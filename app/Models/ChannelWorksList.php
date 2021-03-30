@@ -256,7 +256,7 @@ class ChannelWorksList extends Base
                 ->first();
             echo '<pre>';
             echo $user_id;
-            var_dump($Order->toArray());
+            var_dump($Order);
             $is_sub=0;
             if(!empty($Order)){
                 $is_sub=1;
