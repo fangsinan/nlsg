@@ -303,7 +303,7 @@ class Order extends Base
 
         if (!empty($params['id'] ?? 0)) {
             $query->with([
-                'pay_record_detail:id,type,ordernum,user_id',
+                'pay_record_detail:id,type,ordernum,user_id,price',
                 'pay_record_detail.user:id,phone,nickname',
             ]);
         }
