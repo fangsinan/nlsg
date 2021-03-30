@@ -836,7 +836,6 @@ class LiveController extends Controller
             $is_flag='';
             if(!empty($input['is_flag'])){
                 $is_flag=$input['is_flag'];
-                var_dump($is_flag);
             }
             Subscribe::create([
                 'user_id' => $this->user['id'],
