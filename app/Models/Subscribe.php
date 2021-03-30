@@ -14,7 +14,7 @@ class Subscribe extends Base
         return $this->belongsTo('App\Models\User','user_id');
     }
     protected $fillable = ['user_id','pay_time','type','order_id','status',
-        'start_time','end_time', 'relation_id', 'service_id','channel_works_list_id' ];
+        'start_time','end_time', 'relation_id', 'service_id','channel_works_list_id','is_flag' ];
 
 
     public function user()
