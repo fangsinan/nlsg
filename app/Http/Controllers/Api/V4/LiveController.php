@@ -799,8 +799,6 @@ class LiveController extends Controller
     {
         $input = $request->all();
 
-        var_dump($input);
-
         $live = LiveInfo::where('id', $input['info_id'])->first();
         if (!$live) {
             return error(0, '直播不存在');
@@ -839,6 +837,7 @@ class LiveController extends Controller
             if(!empty($input['is_flag'])){
                 $is_flag=$input['is_flag'];
             }
+            var_dump($input['is_flag']);
             Subscribe::create([
                 'user_id' => $this->user['id'],
                 'type' => 3,
