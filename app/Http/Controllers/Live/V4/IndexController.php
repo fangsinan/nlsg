@@ -440,4 +440,37 @@ class IndexController extends ControllerBackend
 
 
     }
+
+
+    /**
+     * @api {get} api/live_v4/live/info 直播详情
+     * @apiVersion 4.0.0
+     * @apiName  live/info
+     * @apiGroup 直播后台 -直播详情
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live/info
+     * @apiDescription  直播详情
+     *
+     * @apiParam {number} id 直播间id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function  info(Request $request)
+    {
+        $id = $request->get('id');
+        $live  = Live::select('id','title','begin_at','end_at','price','twitter_money','helper','content')
+                    ->where('id', $id)->first();
+        if (!$live){
+            return  error('直播不存在');
+        }
+
+        return success($live);
+    }
 }
