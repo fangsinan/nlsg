@@ -245,7 +245,7 @@ class ChannelWorksList extends Base
         if(isset($live_team[0]['order_num'])){
             $live_team[0]['order_num']=$live_team[0]['order_num']+5000;
         }
-var_dump($live_team[0]['live_info']->id);
+var_dump($live_team[0]['live_info']);
         if(isset($live_team[0]['id'])) { //直播状态
             $live_info = LiveInfo::query()->where('live_pid', $live_team[0]['id'])->first();
             $live_team[0]['is_begin'] = $live_info->is_begin;
