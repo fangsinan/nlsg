@@ -9,6 +9,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
     Route::get('index/live_users', 'IndexController@getLiveUsers');
     Route::get('index/lives', 'IndexController@lives');
     Route::post('index/create', 'IndexController@create');
+    Route::post('live/delete', 'IndexController@delete');
     Route::get('comment/index', 'CommentController@index');
     Route::get('comment/show', 'CommentController@show');
     Route::get('sub/index', 'SubscribeController@index');

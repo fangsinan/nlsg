@@ -187,13 +187,13 @@ class ChannelWorksList extends Base
             if ($temp_res['view_num'] >= 10000) {
                 $leftNumber = floor($temp_res['view_num'] / 10000);
                 $rightNumber = round(($temp_res['view_num'] % 10000) / 10000, 2);
-                $temp_res['view_num'] = floatval($leftNumber + $rightNumber) . '万';
+                $temp_res['view_num'] = floatval($leftNumber + $rightNumber) . 'W';
             }
 
             if ($temp_res['subscribe_num'] >= 10000) {
                 $leftNumber = floor($temp_res['subscribe_num'] / 10000);
                 $rightNumber = round(($temp_res['subscribe_num'] % 10000) / 10000, 2);
-                $temp_res['subscribe_num'] = floatval($leftNumber + $rightNumber) . '万';
+                $temp_res['subscribe_num'] = floatval($leftNumber + $rightNumber) . 'W';
             }
 
             $temp_res['user_info'] = User::getTeacherInfo($temp_res['user_id']);
@@ -228,8 +228,11 @@ class ChannelWorksList extends Base
 
     }
 
-    public function cytxBanner()
+    public function cytxBanner($params, $user)
     {
+
+        $user_id = $params['user_id'] ?? 0;
+
         $banner_index = ConfigModel::getData(47);
         $banner_home = ConfigModel::getData(51);
 
@@ -243,11 +246,25 @@ class ChannelWorksList extends Base
             $live_team[0]['order_num']=$live_team[0]['order_num']+5000;
         }
 
+        if(isset($live_team[0]['id'])) { //直播状态
+            $live_info = LiveInfo::query()->where('live_pid', $live_team[0]['id'])->first();
+            $live_team[0]['is_begin'] = $live_info->is_begin;
+            //是否订阅
+            $Order=Order::query()->select('id','live_id')
+                ->where('user_id',$user_id)->where('live_id',$live_team[0]['id'])->where('type',10)->where('status',1)
+                ->where('activity_tag','cytx')->where('pay_price','>','1')
+                ->first();
+            $is_sub=0;
+            if(!empty($Order)){
+                $is_sub=1;
+            }
+            $live_team[0]['is_sub']=$is_sub;
+        }
         return [
             'index' => array_filter(explode(',', $banner_index)),
             'home' => array_filter(explode(',', $banner_home)),
             'banner'=>$banner,
-            'live'=>$live_team
+            'live'=>$live_team,
         ];
 
     }
