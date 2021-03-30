@@ -254,6 +254,9 @@ class ChannelWorksList extends Base
                 ->where('user_id',$user_id)->where('live_id',$live_team[0]['id'])->where('type',10)->where('status',1)
                 ->where('activity_tag','cytx')->where('pay_price','>','1')
                 ->first();
+            echo '<pre>';
+            echo $user_id;
+            var_dump($Order->toArray());
             $is_sub=0;
             if(!empty($Order)){
                 $is_sub=1;
