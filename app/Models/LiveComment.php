@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 class LiveComment extends Base
 {
     protected $table = 'nlsg_live_comment';
+    public $timestamps = false;
 
     public function user()
     {

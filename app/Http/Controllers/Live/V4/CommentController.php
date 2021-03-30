@@ -60,6 +60,7 @@ class CommentController extends Controller
                 ]);
             });
         $lists = $query->select('id', 'live_id', 'user_id', 'content', 'created_at')
+            ->where('status', 1)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -99,5 +100,39 @@ class CommentController extends Controller
             return error(1000, '评论不存在');
         }
         return success($list);
+    }
+
+    /**
+     * @api {post} api/live_v4/comment/delete 直播评论删除
+     * @apiVersion 4.0.0
+     * @apiName  comment/delete
+     * @apiGroup 直播后台
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/comment/delete
+     * @apiDescription  直播评论删除
+     *
+     * @apiParam {number} id 直播评论id
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function delete(Request $request)
+    {
+        $id   = $request->input('id');
+        $list = LiveComment::where('id', $id)->first();
+        if ( !$list) {
+            return error(1000, '直播评论不存在');
+        }
+        $res = LiveComment::where('id', $id)->update(['status' => 0]);
+        if ($res) {
+            return success();
+        }
     }
 }
