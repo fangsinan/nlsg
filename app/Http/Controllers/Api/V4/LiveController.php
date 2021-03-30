@@ -799,6 +799,9 @@ class LiveController extends Controller
     {
         $input = $request->all();
 
+        var_dump($input);
+        exit;
+
         $live = LiveInfo::where('id', $input['info_id'])->first();
         if (!$live) {
             return error(0, '直播不存在');
