@@ -836,13 +836,14 @@ class LiveController extends Controller
             $is_flag='';
             if(!empty($input['is_flag'])){
                 $is_flag=$input['is_flag'];
+                var_dump($is_flag);
             }
             Subscribe::create([
                 'user_id' => $this->user['id'],
                 'type' => 3,
                 'relation_id' => $input['info_id'],
                 'status' => 1,
-                'is_flag' => $is_flag
+                'is_flag' => $is_flag,
             ]);
 
             Live::where(['id' => $input['live_id']])->increment('order_num');
