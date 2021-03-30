@@ -17,6 +17,7 @@ use App\Models\Subscribe;
 use App\Models\LiveLogin;
 use App\Models\Wiki;
 use App\Models\Works;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -333,8 +334,8 @@ class IndexController extends ControllerBackend
     public function checkHelper(Request $request)
     {
         $params = $request->input();
-        $model = new LiveConsole();
-        $res = $model->checkHelper($params, 1);
+        $model = new User();
+        $res = $model->checkHelper($params);
 
         return $res;
 
