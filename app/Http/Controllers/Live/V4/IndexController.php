@@ -92,15 +92,28 @@ class IndexController extends ControllerBackend
             ->when($title, function ($query) use ($title) {
                 $query->where('title', 'like', '%'.$title.'%');
             })
-            ->when(! is_null($status), function ($query) use ($status) {
-                $query->where('status', $status);
-            })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($start)->startOfDay()->toDateTimeString(),
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
+
+        if (!empty($status)){
+            if ($status ==1){
+                $query->whereHas('liveInfo', function ($q) use ($status) {
+                    $q->where('is_begin', 0)->where('is_finish', 0);
+                });
+            } elseif ($status ==2){
+                $query->whereHas('liveInfo', function ($q) use ($status) {
+                    $q->where('is_begin', 0)->where('is_finish', 1);
+                });
+            } elseif($status ==3){
+                $query->whereHas('liveInfo', function ($q) use ($status) {
+                    $q->where('is_begin', 1)->where('is_finish', 0);
+                });
+            }
+        }
 
         $lists = $query->select('id', 'user_id', 'title', 'price',
             'order_num', 'status', 'created_at', 'cover_img')
