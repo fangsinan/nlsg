@@ -245,14 +245,14 @@ class ChannelWorksList extends Base
         if(isset($live_team[0]['order_num'])){
             $live_team[0]['order_num']=$live_team[0]['order_num']+5000;
         }
-        var_dump($live_team[0]['liveInfo']['id']);
         if(isset($live_team[0]['id'])) { //直播状态
             $live_info = LiveInfo::query()->where('live_pid', $live_team[0]['id'])->first();
             $live_team[0]['is_begin'] = $live_info->is_begin;
 
             $is_sub=0;
             if($live_team[0]['is_free']==1){ //免费
-                $Order=Subscribe::query()->select('id')->where('user_id',$user_id)->where('type' ,3)->where('relation_id',$live_team[0]['id'])
+                $Order=Subscribe::query()->select('id')->where('user_id',$user_id)->where('type' ,3)
+                    ->where('relation_id',$live_team[0]['liveInfo']['id']) //live_info表id
                     ->where('status',1)->where('is_flag','cytx')->first();
             }else {
                 //是否订阅
