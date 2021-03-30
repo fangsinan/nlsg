@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Live\V4;
 use App\Http\Controllers\ControllerBackend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
 use App\Models\Live;
 use App\Models\LiveConsole;
+use App\Models\LiveInfo;
 use App\Models\LiveNumber;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
@@ -14,6 +16,7 @@ use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
 use App\Models\LiveLogin;
 use App\Models\Wiki;
+use App\Models\Works;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -100,6 +103,7 @@ class IndexController extends ControllerBackend
 
         $lists = $query->select('id', 'user_id', 'title', 'price',
             'order_num', 'status', 'created_at', 'cover_img')
+            ->where('is_del', 0)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
@@ -107,6 +111,21 @@ class IndexController extends ControllerBackend
 
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
+
+            $channel = LiveInfo::where('live_pid', $val['id'])
+               ->where('status', 1)
+               ->orderBy('id', 'desc')
+               ->first();
+           if ($channel) {
+               if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                   $val['live_status'] = 1;
+               } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                   $val['live_status'] = 3;
+               } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                   $val['live_status'] = 2;
+               }
+           }
+
             //直播收益
             $val['live_price_sum'] = Order::where([
                 'type'    => 10,
@@ -230,10 +249,10 @@ class IndexController extends ControllerBackend
         $helper = $input['helper'] ?? '';
         $content = $input['content'] ?? '';
         if ( ! $title) {
-           return error(1000, '标题不能为空');
+            return error(1000, '标题不能为空');
         }
         if ( ! $begin_at) {
-           return error(1000, '开始时间不能为空');
+            return error(1000, '开始时间不能为空');
         }
 
         $data = [
@@ -254,6 +273,40 @@ class IndexController extends ControllerBackend
             Live::create($data);
         }
         return success();
+    }
+
+    /**
+     * @api {get} api/live_v4/live/delete 直播删除
+     * @apiVersion 4.0.0
+     * @apiName  live/delete
+     * @apiGroup 直播后台-检验助手
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live/delete
+     * @apiDescription  检验助手
+     *
+     * @apiParam {number} id 直播id
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function delete(Request $request)
+    {
+        $liveId = $request->input('id');
+        $live = Live::where('id', $liveId)->first();
+        if ( ! $live) {
+            return error(1000, '直播不存在');
+        }
+        $res = Live::where('id', $liveId)->update(['is_del' => 1]);
+        if ($res) {
+            return success();
+        }
     }
 
     /**

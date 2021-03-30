@@ -334,7 +334,7 @@ class Order extends Base
                 $q->select(['id', 'phone', 'nickname']);
             }
         ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
-            'pay_price', 'pay_type', 'ordernum', 'live_id', 'pay_type', 'os_type']);
+            'pay_price', 'pay_type', 'ordernum', 'live_id', 'pay_type', 'os_type','status']);
 
         $query->whereHas('live');
 //        $query->whereHas('live', function ($q) {
