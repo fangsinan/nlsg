@@ -314,6 +314,7 @@ class IndexController extends ControllerBackend
             Live::where('id', $input['id'])->update($data);
             $live_info_id = LiveInfo::where('live_pid', '=', $input['id'])->value('id');
 
+            $live_info_data['id'] = $input['id'];
             $live_info_data['live_pid'] = $input['id'];
 
             LiveInfo::where('id', '=', $live_info_id)->update($live_info_data);
@@ -322,6 +323,7 @@ class IndexController extends ControllerBackend
             $Live_res = Live::create($data);
 
             $live_info_data['live_pid'] = $Live_res->id;
+            $live_info_data['id'] = $Live_res->id;
             DB::table('nlsg_live_info')->insert($live_info_data);
         }
         return success();
