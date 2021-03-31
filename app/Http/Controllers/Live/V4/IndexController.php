@@ -275,6 +275,9 @@ class IndexController extends ControllerBackend
         $twitter = $input['twitter_money'] ?? 0;
         $helper = $input['helper'] ?? '';
         $content = $input['content'] ?? '';
+        $now = time();
+        $now_date = date('Y-m-s H:i:s');
+
         if ( ! $title) {
             return error(1000, '标题不能为空');
         }
@@ -294,10 +297,40 @@ class IndexController extends ControllerBackend
             'content'       => $content
         ];
 
+        //todo 临时添加
+        $lcModel = new LiveConsole();
+        $temp_push_end_time = date('Y-m-d H:i:s',
+            strtotime($end_at . " +1 days")
+        );
+        $temp_get_url = $lcModel->getPushUrl(
+            rand(100, 999) . $userId . $now, strtotime($temp_push_end_time)
+        );
+
+        $live_info_data = [];
+        $live_info_data['push_live_url'] = $temp_get_url['push_url'];
+        $live_info_data['live_url'] = $temp_get_url['play_url'];
+        $live_info_data['live_url_flv'] = $temp_get_url['play_url_flv'];
+        $live_info_data['push_end_time'] = $temp_push_end_time;
+        $live_info_data['user_id'] = $userId;
+
+        $live_info_data['status'] = 1;
+        $live_info_data['length'] = 5;
+        $live_info_data['created_at'] = $now_date;
+        $live_info_data['updated_at'] = $now_date;
+
         if ( ! empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);
+            $live_info_id = LiveInfo::where('live_pid','=',$input['id'])->value('id');
+
+            $live_info_data['live_pid'] =  $input['id'];
+
+            LiveInfo::where('id','=',$live_info_id)->update($live_info_data);
+
         } else {
-            Live::create($data);
+            $Live_res = Live::create($data);
+
+            $live_info_data['live_pid'] = $Live_res->id;
+            LiveInfo::create($live_info_data);
         }
         return success();
     }
