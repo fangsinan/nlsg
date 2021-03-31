@@ -70,6 +70,7 @@ class AuthController extends ControllerBackend
             $data = [
                 'id' => $check_user->id,
                 'nickname' => $check_user->username,
+                'live_role'=>$check_user->live_role,
                 'token' => $token
             ];
             return $this->getRes($data);

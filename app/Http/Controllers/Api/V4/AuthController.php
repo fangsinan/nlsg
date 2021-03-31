@@ -135,7 +135,6 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'level' => $user->level,
             'sex' => $user->sex,
-            'role'=>$user->role,
             'children_age' => 10,//$user->children_age,
         ];
         return success($data);
