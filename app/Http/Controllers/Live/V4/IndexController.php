@@ -289,7 +289,7 @@ class IndexController extends ControllerBackend
             'twitter_money' => $twitter,
             'helper' => $helper,
             'content' => $content,
-            'is_free' => empty($price) ? 1 : 0,
+            'is_free' => $price < '0.01' ? 1 : 0,
         ];
 
         //todo 临时添加
