@@ -23,6 +23,7 @@ class LiveNotice extends Base
         $live_info_id = $params['live_info_id'] ?? 0;
         $type = $params['type'] ?? 0;
         $content = $params['content'] ?? '';
+        $content_type = $params['content_type'] ?? 1;
         $length = $params['length'] ?? 0;
 
         if (empty($params['send_at'] ?? '')) {
@@ -137,6 +138,7 @@ WHERE
         $model->live_id = $live_id;
         $model->live_info_id = $live_info_id;
         $model->content = $content;
+        $model->content_type = $content_type;
         $model->length = $length;
         $model->is_send = 1;
         $model->send_at = date('Y-m-d H:i:s',strtotime($send_at) + 13);
