@@ -227,9 +227,9 @@ class MallController extends Controller
 //                MallRefundJob::shillJob(1);
 //                VipRedeemUser::subWorksOrGetRedeemCode(726128);
 //                VipRedeemUser::subWorksOrGetRedeemCode(731016);
-//                VipRedeemUser::subWorksOrGetRedeemCode(734775);
-//                VipRedeemUser::subWorksOrGetRedeemCode(735034);
-//                VipRedeemUser::subWorksOrGetRedeemCode(738235);
+//                VipRedeemUser::subWorksOrGetRedeemCode(270277);
+//                VipRedeemUser::subWorksOrGetRedeemCode(740418);
+//                VipRedeemUser::subWorksOrGetRedeemCode(740420);
 
 
 //                $c = new ChannelServers();
