@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
 
 class ControllerBackend extends BaseController
 {
@@ -26,7 +27,7 @@ class ControllerBackend extends BaseController
         $this->user = auth('backendApi')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
-            $this->user['user_id'] = User::where('phone','=',$this->user['username'])->first()->value('id');
+            $this->user['user_id'] = User::where('phone','=',$this->user['username'])->value('id');
         }
     }
 
