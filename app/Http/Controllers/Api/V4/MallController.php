@@ -225,7 +225,12 @@ class MallController extends Controller
 //            $res = Live::teamInfo(1,1);
 //            return $this->getRes($res);
 //                MallRefundJob::shillJob(1);
-//                VipRedeemUser::subWorksOrGetRedeemCode(694258);
+//                VipRedeemUser::subWorksOrGetRedeemCode(726128);
+//                VipRedeemUser::subWorksOrGetRedeemCode(731016);
+//                VipRedeemUser::subWorksOrGetRedeemCode(734775);
+//                VipRedeemUser::subWorksOrGetRedeemCode(735034);
+//                VipRedeemUser::subWorksOrGetRedeemCode(738235);
+
 
 //                $c = new ChannelServers();
 //                $c->getDouyinOrder();//获取抖音订单
