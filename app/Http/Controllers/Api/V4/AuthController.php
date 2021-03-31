@@ -135,6 +135,7 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'level' => $user->level,
             'sex' => $user->sex,
+            'role'=>$user->role,
             'children_age' => 10,//$user->children_age,
         ];
         return success($data);
@@ -577,7 +578,7 @@ class AuthController extends Controller
             $g = "/^1[34578]\d{9}$/";
             $g2 = "/^19[0126789]\d{8}$/";
             $g3 = "/^166\d{8}$/";
-            
+
             if (preg_match($g, $phone)) {
                 return $this->getRes(['code' => true, 'msg' => '正确']);
             } else if (preg_match($g2, $phone)) {
@@ -618,7 +619,7 @@ class AuthController extends Controller
             ],
 
         ];
-        
+
         $res_switchAll = $switchAll[$version] ?? $switchAll['default'];
 
         return success($res_switchAll);
