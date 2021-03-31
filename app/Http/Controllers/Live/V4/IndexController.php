@@ -312,11 +312,8 @@ class IndexController extends ControllerBackend
         $live_info_data['live_url_flv'] = $temp_get_url['play_url_flv'];
         $live_info_data['push_end_time'] = $temp_push_end_time;
         $live_info_data['user_id'] = $userId;
-
         $live_info_data['status'] = 1;
         $live_info_data['length'] = 5;
-        $live_info_data['created_at'] = $now_date;
-        $live_info_data['updated_at'] = $now_date;
 
         if ( ! empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);
@@ -330,7 +327,7 @@ class IndexController extends ControllerBackend
             $Live_res = Live::create($data);
 
             $live_info_data['live_pid'] = $Live_res->id;
-            LiveInfo::create($live_info_data);
+            DB::table('nlsg_live_info')->insert($live_info_data);
         }
         return success();
     }
