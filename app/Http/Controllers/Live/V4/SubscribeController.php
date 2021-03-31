@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Models\Live;
 use App\Models\Order;
 use App\Models\Subscribe;
@@ -10,7 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class SubscribeController extends Controller
+class SubscribeController extends ControllerBackend
 {
 
     /**
@@ -60,7 +61,7 @@ class SubscribeController extends Controller
             'order.pay_record_detail:id,type,ordernum,user_id,price',
             'order.pay_record_detail.user:id,phone,nickname',
         ]);
-        
+
         if (!empty($twitter_phone)){
             $query->whereHas('order.pay_record_detail.user',function($q)use($twitter_phone){
                 $q->where('phone','like',"%$twitter_phone%");

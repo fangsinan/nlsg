@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Models\Live;
 use App\Models\LiveComment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class CommentController extends Controller
+class CommentController extends ControllerBackend
 {
     /**
      * @api {get} api/live_v4/comment/index 评论列表

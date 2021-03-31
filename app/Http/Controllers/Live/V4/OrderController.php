@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class OrderController extends ControllerBackend
 {
     public function index()
     {
