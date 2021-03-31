@@ -3,20 +3,14 @@
 namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\ControllerBackend;
-
-use App\Http\Controllers\Controller;
-use App\Models\Column;
 use App\Models\Live;
 use App\Models\LiveConsole;
 use App\Models\LiveInfo;
+use App\Models\LiveLogin;
 use App\Models\LiveNumber;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
-use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
-use App\Models\LiveLogin;
-use App\Models\Wiki;
-use App\Models\Works;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -52,9 +46,9 @@ class IndexController extends ControllerBackend
         $orderIncome = Order::where('type', 10)->where('status', 1)->sum('pay_price');
         $data = [
             'subscribe_num' => float_number($subscribeNum),
-            'watch_num'     => float_number($watchNum),
-            'order_num'     => float_number($orderNum),
-            'order_income'  => float_number($orderIncome)
+            'watch_num' => float_number($watchNum),
+            'order_num' => float_number($orderNum),
+            'order_income' => float_number($orderIncome)
         ];
         return success($data);
     }
@@ -99,7 +93,7 @@ class IndexController extends ControllerBackend
         $end = $request->get('end');
         $query = Live::with('user:id,nickname')
             ->when($title, function ($query) use ($title) {
-                $query->where('title', 'like', '%'.$title.'%');
+                $query->where('title', 'like', '%' . $title . '%');
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
@@ -108,20 +102,20 @@ class IndexController extends ControllerBackend
                 ]);
             });
 
-        if($this->user['live_role'] == 21){
-            $query->where('user_id','=',$this->user['user_id']);
+        if ($this->user['live_role'] == 21) {
+            $query->where('user_id', '=', $this->user['user_id']);
         }
 
-        if (!empty($status)){
-            if ($status ==1){
+        if (!empty($status)) {
+            if ($status == 1) {
                 $query->whereHas('liveInfo', function ($q) use ($status) {
                     $q->where('is_begin', 0)->where('is_finish', 0);
                 });
-            } elseif ($status ==2){
+            } elseif ($status == 2) {
                 $query->whereHas('liveInfo', function ($q) use ($status) {
                     $q->where('is_begin', 0)->where('is_finish', 1);
                 });
-            } elseif($status ==3){
+            } elseif ($status == 3) {
                 $query->whereHas('liveInfo', function ($q) use ($status) {
                     $q->where('is_begin', 1)->where('is_finish', 0);
                 });
@@ -140,32 +134,32 @@ class IndexController extends ControllerBackend
         foreach ($lists['data'] as &$val) {
 
             $channel = LiveInfo::where('live_pid', $val['id'])
-               ->where('status', 1)
-               ->orderBy('id', 'desc')
-               ->first();
-           if ($channel) {
-               if ($channel->is_begin == 0 && $channel->is_finish == 0) {
-                   $val['live_status'] = 1;
-               } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
-                   $val['live_status'] = 3;
-               } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
-                   $val['live_status'] = 2;
-               }
-           }
+                ->where('status', 1)
+                ->orderBy('id', 'desc')
+                ->first();
+            if ($channel) {
+                if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                    $val['live_status'] = 1;
+                } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                    $val['live_status'] = 3;
+                } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                    $val['live_status'] = 2;
+                }
+            }
 
             //直播收益
             $val['live_price_sum'] = Order::where([
-                'type'    => 10,
+                'type' => 10,
                 'live_id' => $val['id'],
-                'status'  => 1,
+                'status' => 1,
             ])->sum('pay_price');
 
             $val['live_twitter_price_sum'] = Order::join('nlsg_pay_record_detail as d', 'd.ordernum', '=',
                 'nlsg_order.ordernum')
                 ->where([
-                    'nlsg_order.type'    => 10,
+                    'nlsg_order.type' => 10,
                     'nlsg_order.live_id' => $val['id'],
-                    'nlsg_order.status'  => 1,
+                    'nlsg_order.status' => 1,
                 ])->where('nlsg_order.twitter_id', '>', 0)->sum('d.price');
         }
         return success($lists);
@@ -196,7 +190,7 @@ class IndexController extends ControllerBackend
     {
         $liveId = $request->get('live_id');
         $list = Live::select('id', 'title', 'begin_at')->where('id', $liveId)->first();
-        if ( ! $list) {
+        if (!$list) {
             return error(1000, '直播不存在');
         }
 
@@ -218,12 +212,12 @@ class IndexController extends ControllerBackend
 
 
         $data = [
-            'live'          => $list,
+            'live' => $list,
             'subscribe_num' => $subscribeNum > 0 ? float_number($subscribeNum) : 0,
-            'watch_num'     => $watchNum > 0 ? float_number($watchNum) : 0,
-            'unwatch_num'   => $unwatchNum > 0 ? float_number($unwatchNum) : 0,
-            'order_num'     => $orderNum > 0 ? float_number($orderNum) : 0,
-            'order_income'  => $orderIncome > 0 ? float_number($orderIncome) : 0
+            'watch_num' => $watchNum > 0 ? float_number($watchNum) : 0,
+            'unwatch_num' => $unwatchNum > 0 ? float_number($unwatchNum) : 0,
+            'order_num' => $orderNum > 0 ? float_number($orderNum) : 0,
+            'order_income' => $orderIncome > 0 ? float_number($orderIncome) : 0
         ];
 
         //折线图数据
@@ -266,7 +260,7 @@ class IndexController extends ControllerBackend
     public function create(Request $request)
     {
         $input = $request->all();
-        $cover = ! empty($input['cover']) ? covert_img($input['cover']) : '';
+        $cover = !empty($input['cover']) ? covert_img($input['cover']) : '';
         $title = $input['title'] ?? '';
         $userId = $input['user_id'] ?? 0;
         $begin_at = $input['begin_at'] ?? date('Y-m-d H:i:s', time());
@@ -278,23 +272,24 @@ class IndexController extends ControllerBackend
         $now = time();
         $now_date = date('Y-m-s H:i:s');
 
-        if ( ! $title) {
+        if (!$title) {
             return error(1000, '标题不能为空');
         }
-        if ( ! $begin_at) {
+        if (!$begin_at) {
             return error(1000, '开始时间不能为空');
         }
 
         $data = [
-            'user_id'       => $userId,
-            'cover_img'     => $cover,
-            'title'         => $title,
-            'begin_at'      => $begin_at,
-            'end_at'        => $end_at,
-            'price'         => $price,
+            'user_id' => $userId,
+            'cover_img' => $cover,
+            'title' => $title,
+            'begin_at' => $begin_at,
+            'end_at' => $end_at,
+            'price' => $price,
             'twitter_money' => $twitter,
-            'helper'        => $helper,
-            'content'       => $content
+            'helper' => $helper,
+            'content' => $content,
+            'is_free' => empty($price) ? 1 : 0,
         ];
 
         //todo 临时添加
@@ -315,13 +310,13 @@ class IndexController extends ControllerBackend
         $live_info_data['status'] = 1;
         $live_info_data['length'] = 5;
 
-        if ( ! empty($input['id'])) {
+        if (!empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);
-            $live_info_id = LiveInfo::where('live_pid','=',$input['id'])->value('id');
+            $live_info_id = LiveInfo::where('live_pid', '=', $input['id'])->value('id');
 
-            $live_info_data['live_pid'] =  $input['id'];
+            $live_info_data['live_pid'] = $input['id'];
 
-            LiveInfo::where('id','=',$live_info_id)->update($live_info_data);
+            LiveInfo::where('id', '=', $live_info_id)->update($live_info_data);
 
         } else {
             $Live_res = Live::create($data);
@@ -357,7 +352,7 @@ class IndexController extends ControllerBackend
     {
         $liveId = $request->input('id');
         $live = Live::where('id', $liveId)->first();
-        if ( ! $live) {
+        if (!$live) {
             return error(1000, '直播不存在');
         }
         $res = Live::where('id', $liveId)->update(['is_del' => 1]);
@@ -429,7 +424,6 @@ class IndexController extends ControllerBackend
     }
 
 
-
     /**
      * @api {get} api/live_v4/index/statistics_img_data 折线图数据
      * @apiVersion 4.0.0
@@ -453,45 +447,46 @@ class IndexController extends ControllerBackend
      *    }
      * }
      */
-    public function statistics_img_data(Request $request){
+    public function statistics_img_data(Request $request)
+    {
         $input = $request->all();
         $live_id = $input['live_id'] ?? 0;
         $str_time = $input['str_time'] ?? 0;
         $end_time = $input['end_time'] ?? 0;
 
-        if(empty($live_id)){ // 不指定直播id时  计算时间
-            if(empty($str_time) || empty($end_time)){
+        if (empty($live_id)) { // 不指定直播id时  计算时间
+            if (empty($str_time) || empty($end_time)) {
                 $ageFrom = strtotime("-3 month"); //三月前的时间
                 $ageTo = time();
-            }else{
+            } else {
                 $ageFrom = $str_time;
                 $ageTo = $end_time;
             }
         }
 
 
-        if(!empty($live_id)){
+        if (!empty($live_id)) {
             //按分钟统计
             $m = 60;
-        }else{  //按天统计
+        } else {  //按天统计
             $m = 3600;
         }
-        $query = LiveNumber::select('live_id',DB::raw('max(count) as 在线人数,from_unixtime(time - time % '.$m.') as 日期'));
-        if(!empty($live_id)){
+        $query = LiveNumber::select('live_id', DB::raw('max(count) as 在线人数,from_unixtime(time - time % ' . $m . ') as 日期'));
+        if (!empty($live_id)) {
             $query->where('live_id', $live_id);
         }
 
-        if(!empty($ageFrom) && !empty($ageTo)){
+        if (!empty($ageFrom) && !empty($ageTo)) {
             $query->whereRaw('time BETWEEN ' . $ageFrom . ' AND ' . $ageTo . '');
 
         }
         $number = $query->groupBy('日期')
-            ->orderBy('日期','asc')
+            ->orderBy('日期', 'asc')
             ->get()->toArray();
 
 
-        $res['columns']=["日期","在线人数"];// 前端折线图插件需要的参数
-        $res['rows']=$number;
+        $res['columns'] = ["日期", "在线人数"];// 前端折线图插件需要的参数
+        $res['rows'] = $number;
 
         return success($res);
 
@@ -519,13 +514,13 @@ class IndexController extends ControllerBackend
      *    }
      * }
      */
-    public function  info(Request $request)
+    public function info(Request $request)
     {
         $id = $request->get('id');
-        $live  = Live::select('id','title','cover_img','user_id','begin_at','end_at','price','twitter_money','helper','content')
-                    ->where('id', $id)->first();
-        if (!$live){
-            return  error('直播不存在');
+        $live = Live::select('id', 'title', 'cover_img', 'user_id', 'begin_at', 'end_at', 'price', 'twitter_money', 'helper', 'content')
+            ->where('id', $id)->first();
+        if (!$live) {
+            return error('直播不存在');
         }
 
         return success($live);
