@@ -349,7 +349,7 @@ class Order extends Base
 //            $q->where('created_at', '>', '2021-01-01 00:00:00');
 //        });
 
-        $list = $query->paginate($size);
+        $list = $query->orderBy('id','desc')->paginate($size);
 
         foreach ($list as &$v) {
             $goods = [];
