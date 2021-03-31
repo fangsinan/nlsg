@@ -25,7 +25,9 @@ class SubscribeController extends Controller
      * @apiParam {string} ordernum  订单号
      * @apiParam {string} title     直播标题
      * @apiParam {string} phone     用户账号
-     * @apiParam {string} date      格式化时间
+     * @apiParam {string} twitter_phone     推客账号
+     * @apiParam {string} date      支付时间
+     * @apiParam {string} created_at    下单时间
      *
      *
      * @apiSuccessExample  Success-Response:
@@ -44,8 +46,28 @@ class SubscribeController extends Controller
         $ordernum = $request->get('ordernum') ?? '';
         $phone = $request->get('phone') ?? '';
         $date = $request->get('date') ?? '';
+        $created_at = $request->get('created_at') ?? '';
+        $now_date = date('Y-m-d H:i:s');
+        $twitter_phone = $request->input('twitter_phone','');
 
-        $query = Subscribe::with(['user:id,nickname,phone', 'live:id,title,price,twitter_money', 'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at']);
+        $query = Subscribe::with([
+            'user:id,nickname,phone',
+            'live:id,title,price,twitter_money',
+            'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at'
+        ]);
+
+        $query->with([
+            'order.pay_record_detail:id,type,ordernum,user_id,price',
+            'order.pay_record_detail.user:id,phone,nickname',
+        ]);
+        
+        if (!empty($twitter_phone)){
+            $query->whereHas('order.pay_record_detail.user',function($q)use($twitter_phone){
+                $q->where('phone','like',"%$twitter_phone%");
+            });
+        }
+
+
         if(!empty($phone)){
             $query->whereHas('user', function ($q) use($phone){
                 $q->where('phone', $phone);
@@ -62,9 +84,23 @@ class SubscribeController extends Controller
             });
         }
         if(!empty($date)){
-            $query->whereHas('order', function ($q) use($date){
+            $query->whereHas('order', function ($q) use($date,$now_date){
+                $date = explode(',', $date);
                 $q->where('pay_time','>=', $date[0]);
+                if (empty($date[1] ?? '')) {
+                    $date[1] = $now_date;
+                }
                 $q->where('pay_time','<', $date[1]);
+            });
+        }
+        if(!empty($created_at)){
+            $query->whereHas('order', function ($q) use($created_at,$now_date){
+                $created_at = explode(',', $created_at);
+                $q->where('pay_time','>=', $created_at[0]);
+                if (empty($created_at[1] ?? '')) {
+                    $created_at[1] = $now_date;
+                }
+                $q->where('pay_time','<', $created_at[1]);
             });
         }
 
