@@ -108,6 +108,10 @@ class IndexController extends ControllerBackend
                 ]);
             });
 
+        if($this->user['live_role'] == 21){
+            $query->where('user_id','=',$this->user['user_id']);
+        }
+
         if (!empty($status)){
             if ($status ==1){
                 $query->whereHas('liveInfo', function ($q) use ($status) {

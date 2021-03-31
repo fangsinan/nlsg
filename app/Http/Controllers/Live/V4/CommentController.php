@@ -64,6 +64,14 @@ class CommentController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
+
+        if($this->user['live_role'] == 21){
+            $live_user_id = $this->user['user_id'];
+            $query->whereHas('live',function($q)use($live_user_id){
+                $q->where('user_id','=',$live_user_id);
+            });
+        }
+
         $lists = $query->select('id', 'live_id', 'user_id', 'content', 'created_at')
             ->where('status', 1)
             ->orderBy('created_at', 'desc')

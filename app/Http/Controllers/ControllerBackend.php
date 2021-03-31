@@ -26,6 +26,7 @@ class ControllerBackend extends BaseController
         $this->user = auth('backendApi')->user();
         if ($this->user) {
             $this->user = $this->user->toArray();
+            $this->user['user_id'] = User::where('phone','=',$this->user['username'])->first()->value('id');
         }
     }
 

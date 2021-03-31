@@ -68,6 +68,12 @@ class SubscribeController extends ControllerBackend
             });
         }
 
+        if($this->user['live_role'] == 21){
+            $live_user_id = $this->user['user_id'];
+            $query->whereHas('live',function($q)use($live_user_id){
+                $q->where('user_id','=',$live_user_id);
+            });
+        }
 
         if(!empty($phone)){
             $query->whereHas('user', function ($q) use($phone){

@@ -103,7 +103,7 @@ class OrderController extends ControllerBackend
     public function list(Request $request)
     {
         $model = new Order();
-        $data = $model->orderInLive($request->input());
+        $data = $model->orderInLive($request->input(),$this->user);
         return $this->getRes($data);
     }
 }

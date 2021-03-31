@@ -238,7 +238,7 @@ class Order extends Base
         return $this->belongsTo(Live::class, 'relation_id', 'id');
     }
 
-    public function orderInLive($params)
+    public function orderInLive($params,$this_user = [])
     {
         $size = $params['size'] ?? 10;
         $now_date = date('Y-m-d H:i:s');
@@ -280,6 +280,13 @@ class Order extends Base
             $title = $params['title'];
             $query->whereHas('live', function ($q) use ($title) {
                 $q->where('title', 'like', "%$title%");
+            });
+        }
+
+        if($this_user['live_role'] == 21){
+            $live_user_id = $this_user['user_id'];
+            $query->whereHas('live',function($q)use($live_user_id){
+                $q->where('user_id','=',$live_user_id);
             });
         }
 
