@@ -85,10 +85,10 @@ class IndexController extends ControllerBackend
         }
 
         $data = [
-            'subscribe_num' => float_number($subscribeNum),
-            'watch_num' => float_number($watchNum),
-            'order_num' => float_number($orderNum),
-            'order_income' => float_number($orderIncome)
+            'subscribe_num' => $subscribeNum,
+            'watch_num' =>  $watchNum,
+            'order_num' =>  $orderNum,
+            'order_income' => $orderIncome
         ];
         return success($data);
     }
