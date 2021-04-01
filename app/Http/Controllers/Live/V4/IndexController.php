@@ -88,7 +88,7 @@ class IndexController extends ControllerBackend
             'subscribe_num' => $subscribeNum,
             'watch_num' =>  $watchNum,
             'order_num' =>  $orderNum,
-            'order_income' => $orderIncome
+            'order_income' => round($orderIncome, 2)
         ];
         return success($data);
     }
@@ -262,7 +262,7 @@ class IndexController extends ControllerBackend
             'watch_num' => $watchNum > 0 ? $watchNum : 0,
             'unwatch_num' => $unwatchNum > 0 ? $unwatchNum : 0,
             'order_num' => $orderNum > 0 ? $orderNum : 0,
-            'order_income' => $orderIncome > 0 ? $orderIncome : 0
+            'order_income' => $orderIncome > 0 ? round($orderIncome,2) : 0
         ];
 
         //折线图数据
