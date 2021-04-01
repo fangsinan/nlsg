@@ -85,10 +85,10 @@ class IndexController extends ControllerBackend
         }
 
         $data = [
-            'subscribe_num' => float_number($subscribeNum),
-            'watch_num' => float_number($watchNum),
-            'order_num' => float_number($orderNum),
-            'order_income' => float_number($orderIncome)
+            'subscribe_num' => $subscribeNum,
+            'watch_num' =>  $watchNum,
+            'order_num' =>  $orderNum,
+            'order_income' => round($orderIncome, 2)
         ];
         return success($data);
     }
@@ -258,11 +258,11 @@ class IndexController extends ControllerBackend
 
         $data = [
             'live' => $list,
-            'subscribe_num' => $subscribeNum > 0 ? float_number($subscribeNum) : 0,
-            'watch_num' => $watchNum > 0 ? float_number($watchNum) : 0,
-            'unwatch_num' => $unwatchNum > 0 ? float_number($unwatchNum) : 0,
-            'order_num' => $orderNum > 0 ? float_number($orderNum) : 0,
-            'order_income' => $orderIncome > 0 ? float_number($orderIncome) : 0
+            'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
+            'watch_num' => $watchNum > 0 ? $watchNum : 0,
+            'unwatch_num' => $unwatchNum > 0 ? $unwatchNum : 0,
+            'order_num' => $orderNum > 0 ? $orderNum : 0,
+            'order_income' => $orderIncome > 0 ? round($orderIncome,2) : 0
         ];
 
         //折线图数据
