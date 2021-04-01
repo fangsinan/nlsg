@@ -191,21 +191,21 @@ class IndexController extends ControllerBackend
                     $val['live_status'] = 2;
                 }
             }
-            
-            //直播收益
-            $val['live_price_sum'] = Order::where([
-                'type' => 10,
-                'live_id' => $val['id'],
-                'status' => 1,
-            ])->sum('pay_price');
 
-            $val['live_twitter_price_sum'] = Order::join('nlsg_pay_record_detail as d', 'd.ordernum', '=',
-                'nlsg_order.ordernum')
-                ->where([
-                    'nlsg_order.type' => 10,
-                    'nlsg_order.live_id' => $val['id'],
-                    'nlsg_order.status' => 1,
-                ])->where('nlsg_order.twitter_id', '>', 0)->sum('d.price');
+//            //直播收益
+//            $val['live_price_sum'] = Order::where([
+//                'type' => 10,
+//                'live_id' => $val['id'],
+//                'status' => 1,
+//            ])->sum('pay_price');
+//
+//            $val['live_twitter_price_sum'] = Order::join('nlsg_pay_record_detail as d', 'd.ordernum', '=',
+//                'nlsg_order.ordernum')
+//                ->where([
+//                    'nlsg_order.type' => 10,
+//                    'nlsg_order.live_id' => $val['id'],
+//                    'nlsg_order.status' => 1,
+//                ])->where('nlsg_order.twitter_id', '>', 0)->sum('d.price');
         }
         return success($lists);
     }
