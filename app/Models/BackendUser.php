@@ -27,13 +27,19 @@ class BackendUser extends Authenticatable implements JWTSubject
     }
 
     public function changePwd($user,$params){
-        $password = $params['pwd']??'';
-        $re_password = $params['re_pwd']??'';
+        $password = strval($params['pwd']??'');
+        $re_password = strval($params['re_pwd']??'');
 
         if (!empty($password) && $password === $re_password){
-
+            $n_pwd =  bcrypt($password);
+            $res = self::whereId($user['id'])->update(['password'=>$n_pwd]);
+            if ($res === false){
+                return ['code'=>false,'msg'=>'失败'];
+            }else{
+                return ['code'=>true,'msg'=>'成功'];
+            }
         }else{
-            return ['code'=>false,'msg'=>'验证码'];
+            return ['code'=>false,'msg'=>'密码不一致'];
         }
     }
 }
