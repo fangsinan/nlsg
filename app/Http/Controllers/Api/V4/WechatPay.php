@@ -458,7 +458,7 @@ class WechatPay extends Controller
                     $res = $nickname . ':您已支付'.$live_num.'单演说能量定金';
                     break;
                 case 4: //幸福套餐
-                    $res = $nickname . ':您已支付'.$live_num.'张成功幸福套餐';
+                    $res = $nickname . ':您已支付'.$live_num.'张幸福套餐';
                     break;
                 case 5: //幸福套餐
                     $res = $nickname . ':您已支付'.$live_num.'张30天智慧父母(亲子)训练营';
