@@ -41,10 +41,49 @@ class IndexController extends ControllerBackend
      */
     public function index()
     {
-        $subscribeNum = Subscribe::where('type', 3)->where('status', 1)->count();
-        $watchNum = LiveLogin::count();
-        $orderNum = Order::where('type', 10)->where('status', 1)->count();
-        $orderIncome = Order::where('type', 10)->where('status', 1)->sum('pay_price');
+        if ($this->user['live_role'] == 21) {
+            $subscribeNum = Subscribe::where('type', 3)
+                            ->where('status', 1)
+                            ->where('user_id', $this->user['user_id'])
+                            ->count();
+            $watchNum = LiveLogin::where('user_id', $this->user['user_id'])->count();
+            $orderNum = Order::where('type', 10)
+                        ->where('status', 1)
+                        ->where('user_id', $this->user['user_id'])
+                        ->count();
+            $orderIncome = Order::where('type', 10)
+                                ->where('status', 1)
+                                ->where('user_id', $this->user['user_id'])
+                                ->sum('pay_price');
+        }elseif ($this->user['live_role'] == 23) {
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+            $subscribeNum = Subscribe::where('type', 3)
+                            ->where('status', 1)
+                            ->whereIn('user_id', $son_user_id)
+                            ->count();
+            $watchNum = LiveLogin::whereIn('user_id', $son_user_id)->count();
+            $orderNum = Order::where('type', 10)
+                        ->where('status', 1)
+                        ->whereIn('user_id', $son_user_id)
+                        ->count();
+            $orderIncome = Order::where('type', 10)
+                                ->where('status', 1)
+                                ->whereIn('user_id', $son_user_id)
+                                ->sum('pay_price');
+        } else {
+            $subscribeNum = Subscribe::where('type', 3)
+                           ->where('status', 1)
+                           ->count();
+            $watchNum = LiveLogin::count();
+            $orderNum = Order::where('type', 10)
+                       ->where('status', 1)
+                       ->count();
+            $orderIncome = Order::where('type', 10)
+                               ->where('status', 1)
+                               ->sum('pay_price');
+        }
+
         $data = [
             'subscribe_num' => float_number($subscribeNum),
             'watch_num' => float_number($watchNum),
