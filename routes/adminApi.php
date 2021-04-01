@@ -7,6 +7,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('auth/login', 'AuthController@login');
 
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
+        Route::post('auth/change_pwd', 'AuthController@changePassword');
+
         //活动管理
         Route::post('active/add', 'ActiveCont3` roller@add');
         Route::get('active/list', 'ActiveController@list');

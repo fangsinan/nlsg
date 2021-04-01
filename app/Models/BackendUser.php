@@ -25,4 +25,15 @@ class BackendUser extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function changePwd($user,$params){
+        $password = $params['pwd']??'';
+        $re_password = $params['re_pwd']??'';
+
+        if (!empty($password) && $password === $re_password){
+
+        }else{
+            return ['code'=>false,'msg'=>'验证码'];
+        }
+    }
 }

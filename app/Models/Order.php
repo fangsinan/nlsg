@@ -238,14 +238,14 @@ class Order extends Base
         return $this->belongsTo(Live::class, 'relation_id', 'id');
     }
 
-    public function orderInLive($params,$this_user = [])
+    public function orderInLive($params, $this_user = [])
     {
         $size = $params['size'] ?? 10;
         $now_date = date('Y-m-d H:i:s');
 
         //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
         $query = Order::query();
-        $query->where('created_at','>','2021-01-01 00:00:00');
+        $query->where('created_at', '>', '2021-01-01 00:00:00');
 
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
@@ -283,10 +283,19 @@ class Order extends Base
             });
         }
 
-        if($this_user['live_role'] == 21){
+        //21是老师,只看自己
+        //22是管理员,全都能看
+        //23是校长,看名下老师
+        if ($this_user['live_role'] == 21) {
             $live_user_id = $this_user['user_id'];
-            $query->whereHas('live',function($q)use($live_user_id){
-                $q->where('user_id','=',$live_user_id);
+            $query->whereHas('live', function ($q) use ($live_user_id) {
+                $q->where('user_id', '=', $live_user_id);
+            });
+        } elseif ($this_user['live_role'] == 23) {
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this_user['username']);
+            $query->whereHas('live', function ($q) use ($son_user_id) {
+                $q->whereIn('user_id', $son_user_id);
             });
         }
 
@@ -341,7 +350,7 @@ class Order extends Base
                 $q->select(['id', 'phone', 'nickname']);
             }
         ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
-            'pay_price', 'pay_type', 'ordernum', 'live_id', 'pay_type', 'os_type','status']);
+            'pay_price', 'pay_type', 'ordernum', 'live_id', 'pay_type', 'os_type', 'status']);
 
         $query->whereHas('live');
 //        $query->whereHas('live', function ($q) {
@@ -349,7 +358,7 @@ class Order extends Base
 //            $q->where('created_at', '>', '2021-01-01 00:00:00');
 //        });
 
-        $list = $query->orderBy('id','desc')->paginate($size);
+        $list = $query->orderBy('id', 'desc')->paginate($size);
 
         foreach ($list as &$v) {
             $goods = [];

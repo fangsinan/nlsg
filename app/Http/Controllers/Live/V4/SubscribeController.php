@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ControllerBackend;
+use App\Models\BackendLiveRole;
 use App\Models\Live;
 use App\Models\Order;
 use App\Models\Subscribe;
@@ -72,6 +73,12 @@ class SubscribeController extends ControllerBackend
             $live_user_id = $this->user['user_id'];
             $query->whereHas('live',function($q)use($live_user_id){
                 $q->where('user_id','=',$live_user_id);
+            });
+        }elseif ($this->user['live_role'] == 23) {
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+            $query->whereHas('live', function ($q) use ($son_user_id) {
+                $q->whereIn('user_id', $son_user_id);
             });
         }
 

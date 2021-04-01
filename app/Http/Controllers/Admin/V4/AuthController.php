@@ -80,5 +80,11 @@ class AuthController extends ControllerBackend
 
     }
 
+    public function changePassword(Request $request){
+        exit(date('Y-m-d'));
+        $model = new BackendUser();
+        $data = $model->changePwd($this->user,$request->input());
+        return $this->getRes($data);
+    }
 
 }
