@@ -469,9 +469,7 @@ class IndexController extends ControllerBackend
         }elseif ($this->user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $live_ids = Live::select("*")->whereIn([
-                'user_id' => $son_user_id
-            ])->get()->toArray();
+            $live_ids = Live::select("*")->whereIn('user_id', $son_user_id)->get()->toArray();
             $live_ids = array_column($live_ids,'id');
         }
 
