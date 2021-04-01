@@ -426,17 +426,13 @@ class IndexController extends ControllerBackend
 
         if ($this->user['live_role'] == 21) {
             $son_user_id = $this->user['user_id'];
-            $query->whereHas('user', function ($q) use ($son_user_id) {
-                $q->where('id', '=', $son_user_id);
-            });
+            $query->where('user_id', '=', $son_user_id);
         }elseif ($this->user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $query->whereHas('user', function ($q) use ($son_user_id) {
-                $q->whereIn('id', '=', $son_user_id);
-            });
+            $query->whereIn('user_id', $son_user_id);
         }
-        
+
         $users = $query
             ->where('pri_level', 1)
             ->where('privilege', 2)
