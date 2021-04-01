@@ -181,7 +181,7 @@ WHERE
             ->where('is_del', '=', 0)
             ->select([
                 'id', 'live_id', 'live_info_id', 'content', 'length', 'send_at',
-                'is_send', 'is_done', 'done_at', 'user_id', 'type',
+                'is_send', 'is_done', 'done_at', 'user_id', 'type','content_type',
                 DB::raw("if(user_id=$user_id,1,0) as is_self")
             ])
             ->with(['userInfo']);
