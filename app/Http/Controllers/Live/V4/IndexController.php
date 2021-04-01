@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\BackendLiveRole;
 use App\Models\Live;
 use App\Models\LiveConsole;
 use App\Models\LiveInfo;
@@ -456,9 +457,28 @@ class IndexController extends ControllerBackend
         $str_time = $input['str_time'] ?? 0;
         $end_time = $input['end_time'] ?? 0;
 
+        $live_ids = [];
+        if($this->user['live_role'] == 21){
+            $live_user_id = $this->user['user_id'];
+            $live_ids = Live::select("*")->where([
+                'user_id' => $live_user_id
+            ])->get()->toArray();
+            $live_ids = array_column($live_ids,'id');
+
+        }elseif ($this->user['live_role'] == 23) {
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+            $live_ids = Live::select("*")->whereIn([
+                'user_id' => $son_user_id
+            ])->get()->toArray();
+            $live_ids = array_column($live_ids,'id');
+        }
+
+
+
         if (empty($live_id)) { // 不指定直播id时  计算时间
             if (empty($str_time) || empty($end_time)) {
-                $ageFrom = strtotime("-3 month"); //三月前的时间
+                $ageFrom = strtotime("-1 month"); //1月前的时间
                 $ageTo = time();
             } else {
                 $ageFrom = $str_time;
@@ -476,6 +496,10 @@ class IndexController extends ControllerBackend
         $query = LiveNumber::select('live_id', DB::raw('max(count) as 在线人数,from_unixtime(time - time % ' . $m . ') as 日期'));
         if (!empty($live_id)) {
             $query->where('live_id', $live_id);
+        }
+
+        if(!empty($live_ids)){  // 校长和老师  只能看指定的直播数据
+            $query->whereIn('live_id', $live_ids);
         }
 
         if (!empty($ageFrom) && !empty($ageTo)) {
