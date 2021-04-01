@@ -191,6 +191,11 @@ class IndexController extends ControllerBackend
                     $val['live_status'] = 2;
                 }
             }
+            $val['order_num'] = Order::where([
+                                    'type' => 10,
+                                    'live_id' => $val['id'],
+                                    'status' => 1,
+                                ])->count();
 
             //直播收益
             $val['live_price_sum'] = Order::where([
