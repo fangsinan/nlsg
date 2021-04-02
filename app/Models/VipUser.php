@@ -193,6 +193,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
         $user_info = User::whereId($user_id)->select(['id', 'phone'])->first();
 
         $user_vip_info = VipUser::where('username', '=', $user_info->phone)
+            ->where('user_id','=',$user_info->id)
             ->where('status', '=', 1)
             ->where('is_default', '=', 1)
             ->where('expire_time', '>=', $now_date)
