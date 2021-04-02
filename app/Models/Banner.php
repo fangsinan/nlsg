@@ -153,34 +153,51 @@ class Banner extends Base
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
             ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
-            ->first();
+            ->get();
 
         $res['home'] = Banner::where('type', '=', 72)
             ->where('status', '=', 1)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
             ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
-            ->first();
+            ->get();
 
-        if (empty($res['index'])) {
-            $res['index'] = [];
-        } else {
-            $res['index'] = $res['index']->toArray();
-        }
 
-        if (empty($res['home'])) {
-            $res['home'] = [];
-        } else {
-            $res['home'] = $res['home']->toArray();
-        }
-
-        foreach ($res as &$v) {
+        foreach ( $res['index'] as &$v) {
             if ( $v['jump_type'] == 10) {
                 $v['live'] = Live::teamInfo($v['obj_id'], 1);
             } else {
                 $v['live'] = [];
             }
         }
+
+        foreach ($res['home'] as &$v) {
+            if ( $v['jump_type'] == 10) {
+                $v['live'] = Live::teamInfo($v['obj_id'], 1);
+            } else {
+                $v['live'] = [];
+            }
+        }
+
+//        if (empty($res['index'])) {
+//            $res['index'] = [];
+//        } else {
+//            $res['index'] = $res['index']->toArray();
+//        }
+//
+//        if (empty($res['home'])) {
+//            $res['home'] = [];
+//        } else {
+//            $res['home'] = $res['home']->toArray();
+//        }
+//
+//        foreach ($res as &$v) {
+//            if ( $v['jump_type'] == 10) {
+//                $v['live'] = Live::teamInfo($v['obj_id'], 1);
+//            } else {
+//                $v['live'] = [];
+//            }
+//        }
 
         return $res;
 
