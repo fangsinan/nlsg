@@ -142,6 +142,7 @@ WHERE
         $model->length = $length;
         $model->is_send = 1;
         $model->send_at = date('Y-m-d H:i:s',strtotime($send_at) + 13);
+        $model->is_done = 0;
 
         $res = $model->save();
 
