@@ -385,8 +385,9 @@ class Order extends Base
 //            $q->where('created_at', '>', '2021-01-01 00:00:00');
 //        });
 
+        $money_query = clone $query;
         $list = $query->orderBy('id', 'desc')->paginate($size);
-        $list_money = $query->sum('pay_price');
+        $list_money = $money_query->sum('pay_price');
 
         foreach ($list as &$v) {
             $goods = [];
