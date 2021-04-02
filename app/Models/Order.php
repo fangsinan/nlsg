@@ -359,10 +359,10 @@ class Order extends Base
 //        });
 
         $list = $query->orderBy('id', 'desc')->paginate($size);
+        $list_money = $query->sum('pay_price');
 
         foreach ($list as &$v) {
             $goods = [];
-
             switch (intval($v->type)) {
                 case 9:
                     $goods['goods_id'] = $v->works->id ?? 0;
@@ -409,6 +409,7 @@ class Order extends Base
             unset($v->works, $v->column, $v->offline, $v->liveGoods);
         }
 
-        return $list;
+        $total_money = collect(['total_money'=>$list_money]);
+        return $total_money->merge($list);
     }
 }
