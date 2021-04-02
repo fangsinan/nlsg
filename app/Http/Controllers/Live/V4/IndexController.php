@@ -48,7 +48,9 @@ class IndexController extends ControllerBackend
                             ->where('status', 1)
                             ->where('user_id', $this->user['user_id'])
                             ->count();
-            $watchNum = LiveLogin::where('user_id', $this->user['user_id'])->count();
+            $watchNum = LiveLogin::where('user_id', $this->user['user_id'])
+                        ->distinct('user_id')
+                        ->count();
             $orderNum = Order::whereIn('type', $type)
                         ->where('status', 1)
                         ->where('user_id', $this->user['user_id'])
@@ -64,7 +66,9 @@ class IndexController extends ControllerBackend
                             ->where('status', 1)
                             ->whereIn('user_id', $son_user_id)
                             ->count();
-            $watchNum = LiveLogin::whereIn('user_id', $son_user_id)->count();
+            $watchNum = LiveLogin::whereIn('user_id', $son_user_id)
+                        ->distinct('user_id')
+                        ->count();
             $orderNum = Order::whereIn('type', $type)
                         ->where('status', 1)
                         ->whereIn('user_id', $son_user_id)
@@ -77,7 +81,7 @@ class IndexController extends ControllerBackend
             $subscribeNum = Subscribe::where('type', 3)
                            ->where('status', 1)
                            ->count();
-            $watchNum = LiveLogin::count();
+            $watchNum = LiveLogin::distinct('user_id')->count();
             $orderNum = Order::whereIn('type', $type)
                        ->where('status', 1)
                        ->count();
@@ -236,7 +240,7 @@ class IndexController extends ControllerBackend
     public function data(Request $request)
     {
         $liveId = $request->get('live_id');
-        $list = Live::select('id', 'title', 'begin_at')->where('id', $liveId)->first();
+        $list = Live::select('id', 'title', 'begin_at', 'end_at')->where('id', $liveId)->first();
         if (!$list) {
             return error(1000, '直播不存在');
         }
@@ -246,24 +250,34 @@ class IndexController extends ControllerBackend
             ->where('relation_id', $liveId)
             ->where('status', 1)
             ->count();
-        $watchNum = LiveLogin::where('live_id', $liveId)->distinct('user_id')->count();
+        if (!empty($list->begin_at)){
+            $watchNum = LiveLogin::where('live_id', $liveId)
+                          ->whereBetween('ctime', [strtotime($list->begin_at), strtotime($list->end_at)])
+                          ->distinct('user_id')
+                          ->count();
 
-        $unwatchNum = $subscribeNum - $watchNum > 0 ? intval($subscribeNum - $watchNum) : 0;
+             $unwatchNum = $subscribeNum - $watchNum > 0 ? intval($subscribeNum - $watchNum) : 0;
+        } else {
+            $watchNum   = 0;
+            $unwatchNum = 0;
+        }
+        $popurlarNum =  LiveLogin::where('live_id', $liveId)->count();
         $orderNum = Order::whereIn('type', $type)
             ->where('live_id', $liveId)
             ->where('status', 1)
             ->count();
+
         $orderIncome = Order::whereIn('type', $type)
             ->where('live_id', $liveId)
             ->where('status', 1)
             ->sum('pay_price');
-
 
         $data = [
             'live' => $list,
             'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
             'watch_num' => $watchNum > 0 ? $watchNum : 0,
             'unwatch_num' => $unwatchNum > 0 ? $unwatchNum : 0,
+            'popurlar_num' => $popurlarNum > 0 ? $popurlarNum : 0,
             'order_num' => $orderNum > 0 ? $orderNum : 0,
             'order_income' => $orderIncome > 0 ? round($orderIncome,2) : 0
         ];
