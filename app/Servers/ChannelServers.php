@@ -603,9 +603,104 @@ class ChannelServers
                         }
 
                         break;
+                    case 5:
+                        $live_id_list = [];
+                        foreach ($v->skuInfo->to_id as $tv) {
+                            $temp_live_id = Live::teamInfo($tv,1,1);
+                            if (!empty($temp_live_id)){
+                                foreach ($temp_live_id as $tli){
+                                    $live_id_list[] = $tli->id;
+                                }
+                            }
+                        }
+                        $live_id_list = array_unique($live_id_list);
+
+                        $add_sub_data = [];
+                        $add_cd_data = [];
+                        DB::beginTransaction();
+                        foreach ($live_id_list as $tv) {
+                            Live::where('id', $tv)->increment('order_num');
+                            $check = Subscribe::where('user_id', '=', $v->user_id)
+                                ->where('created_at', '>', '2021-01-05')
+                                ->where('relation_id', '=', $tv)
+                                ->where('type', '=', 3)
+                                ->where('status', '=', 1)
+                                ->first();
+                            if (empty($check)) {
+                                $temp_data = [];
+                                $temp_data['type'] = 3;
+                                $temp_data['user_id'] = $v->user_id;
+                                $temp_data['relation_id'] = $tv;
+                                $temp_data['pay_time'] = $now_date;
+                                $temp_data['status'] = 1;
+                                $temp_data['give'] = 15;
+                                $temp_data['channel_order_id'] = $v->order_id;
+                                $temp_data['channel_order_sku'] = $v->sku;
+                                $add_sub_data[] = $temp_data;
+                            }
+                            $check_cd = LiveCountDown::where('user_id', '=', $v->user_id)
+                                ->where('phone', '=', $v->phone)
+                                ->where('live_id', '=', $tv)
+                                ->first();
+                            if (empty($check_cd)) {
+                                $temp_cd_data = [];
+                                $temp_cd_data['live_id'] = 8;
+                                $temp_cd_data['user_id'] = $v->user_id;
+                                $temp_cd_data['phone'] = $v->phone;
+                                $add_cd_data[] = $temp_cd_data;
+                            }
+                        }
+
+                        $edit_res = DB::table('nlsg_channel_order')
+                            ->where('id', '=', $v->id)
+                            ->update([
+                                'status' => 1,
+                                'success_at' => $now_date
+                            ]);
+                        if ($edit_res === false) {
+                            DB::rollBack();
+                            break;
+                        }
+
+                        if (!empty($add_sub_data)) {
+                            $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                            if ($add_res === false) {
+                                DB::rollBack();
+                                break;
+                            }
+                            $add_cd_res = DB::table('nlsg_live_count_down')->insert($add_cd_data);
+                            if ($add_cd_res === false) {
+                                DB::rollBack();
+                                break;
+                            }
+
+                            //添加关系保护
+                            $check_bind = VipUserBind::getBindParent($v->phone);
+                            if ($check_bind == 0) {
+                                //没有绑定记录,则绑定
+                                $bind_data = [
+                                    'parent' => '18512378959',
+                                    'son' => $v->phone,
+                                    'life' => 2,
+                                    'begin_at' => date('Y-m-d H:i:s'),
+                                    'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                                    'channel' => 3
+                                ];
+                                DB::table('nlsg_vip_user_bind')->insert($bind_data);
+                            }
+                        }
+                        DB::commit();
+                        try {
+                            $easySms = app('easysms');
+                            $easySms->send($v->phone, [
+                                'template' => 'SMS_210996538',
+                            ], ['aliyun']);
+                        } catch (\Exception $e) {
+
+                        }
+                        break;
                 }
             }
-
 
         }
 
