@@ -310,6 +310,33 @@ class Order extends Base
         //商品类型
         if (!empty($params['type'] ?? 0)) {
             $query->where('type', '=', $params['type']);
+
+            if (!empty($params['goods_title']??'')){
+                $goods_title = trim($params['goods_title']);
+                switch (intval($params['type'])){
+                    case 9:
+                        $query->whereHas('works', function ($q) use ($goods_title) {
+                            $q->where('title', 'like', "%$goods_title%");
+                        });
+                        break;
+                    case 10:
+                        $query->whereHas('liveGoods', function ($q) use ($goods_title) {
+                            $q->where('title', 'like', "%$goods_title%");
+                        });
+                        break;
+                    case 14:
+                        $query->whereHas('offline', function ($q) use ($goods_title) {
+                            $q->where('title', 'like', "%$goods_title%");
+                        });
+                        break;
+                    case 15:
+                        $query->whereHas('column', function ($q) use ($goods_title) {
+                            $q->where('title', 'like', "%$goods_title%");
+                        });
+                        break;
+                }
+            }
+
         }
 
         $query->where('live_id', '>', '0')
@@ -398,7 +425,7 @@ class Order extends Base
                     break;
                 case 16:
                     $goods['goods_id'] = 999999;
-                    $goods['title'] = '幸福360会员';
+                    $goods['title'] = '幸福360';
                     $goods['subtitle'] = '';
                     $goods['cover_img'] = '/live/recommend/360_xhc.png';
                     $goods['detail_img'] = '';
