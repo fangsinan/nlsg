@@ -41,17 +41,19 @@ class IndexController extends ControllerBackend
      */
     public function index()
     {
+        //5打赏 9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
+        $type = [9, 10, 14, 15, 16];
         if ($this->user['live_role'] == 21) {
             $subscribeNum = Subscribe::where('type', 3)
                             ->where('status', 1)
                             ->where('user_id', $this->user['user_id'])
                             ->count();
             $watchNum = LiveLogin::where('user_id', $this->user['user_id'])->count();
-            $orderNum = Order::where('type', 10)
+            $orderNum = Order::whereIn('type', $type)
                         ->where('status', 1)
                         ->where('user_id', $this->user['user_id'])
                         ->count();
-            $orderIncome = Order::where('type', 10)
+            $orderIncome = Order::whereIn('type', $type)
                                 ->where('status', 1)
                                 ->where('user_id', $this->user['user_id'])
                                 ->sum('pay_price');
@@ -63,11 +65,11 @@ class IndexController extends ControllerBackend
                             ->whereIn('user_id', $son_user_id)
                             ->count();
             $watchNum = LiveLogin::whereIn('user_id', $son_user_id)->count();
-            $orderNum = Order::where('type', 10)
+            $orderNum = Order::whereIn('type', $type)
                         ->where('status', 1)
                         ->whereIn('user_id', $son_user_id)
                         ->count();
-            $orderIncome = Order::where('type', 10)
+            $orderIncome = Order::whereIn('type', $type)
                                 ->where('status', 1)
                                 ->whereIn('user_id', $son_user_id)
                                 ->sum('pay_price');
@@ -76,19 +78,19 @@ class IndexController extends ControllerBackend
                            ->where('status', 1)
                            ->count();
             $watchNum = LiveLogin::count();
-            $orderNum = Order::where('type', 10)
+            $orderNum = Order::whereIn('type', $type)
                        ->where('status', 1)
                        ->count();
-            $orderIncome = Order::where('type', 10)
+            $orderIncome = Order::whereIn('type', $type)
                                ->where('status', 1)
                                ->sum('pay_price');
         }
 
         $data = [
-            'subscribe_num' => $subscribeNum,
-            'watch_num' =>  $watchNum,
-            'order_num' =>  $orderNum,
-            'order_income' => round($orderIncome, 2)
+            'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
+            'watch_num'     => $watchNum > 0 ? $watchNum : 0,
+            'order_num'     => $orderNum > 0 ? $orderNum : 0,
+            'order_income'  => $orderIncome > 0 ? round($orderIncome, 2) : 0
         ];
         return success($data);
     }
@@ -239,6 +241,7 @@ class IndexController extends ControllerBackend
             return error(1000, '直播不存在');
         }
 
+        $type = [9, 10, 14, 15, 16];
         $subscribeNum = Subscribe::where('type', 3)
             ->where('relation_id', $liveId)
             ->where('status', 1)
@@ -246,11 +249,11 @@ class IndexController extends ControllerBackend
         $watchNum = LiveLogin::where('live_id', $liveId)->distinct('user_id')->count();
 
         $unwatchNum = $subscribeNum - $watchNum > 0 ? intval($subscribeNum - $watchNum) : 0;
-        $orderNum = Order::where('type', 10)
+        $orderNum = Order::whereIn('type', $type)
             ->where('live_id', $liveId)
             ->where('status', 1)
             ->count();
-        $orderIncome = Order::where('type', 10)
+        $orderIncome = Order::whereIn('type', $type)
             ->where('live_id', $liveId)
             ->where('status', 1)
             ->sum('pay_price');
