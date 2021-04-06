@@ -23,7 +23,7 @@ class FreightServers
         $size = $params['size'] ?? 10;
         $with = [];
 
-        $field = ['id', 'type', 'name'];
+        $field = ['id', 'type', 'name','status'];
 
         if ($type != 1) {
             $field = array_merge($field, ['admin_name', 'admin_phone', 'admin_phone as phone',
