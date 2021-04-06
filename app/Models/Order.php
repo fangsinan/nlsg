@@ -339,7 +339,7 @@ class Order extends Base
 
         }
 
-        $query->where('live_id', '>', '0')
+        $query->where('live_id', '<>', 0)
             ->whereIn('type', [9, 10, 14, 15, 16])
             ->where('status', '=', 1)
             ->where('is_shill', '=', 0);
@@ -379,11 +379,11 @@ class Order extends Base
         ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
             'pay_price', 'pay_type', 'ordernum', 'live_id', 'pay_type', 'os_type', 'status']);
 
-        $query->whereHas('live');
-//        $query->whereHas('live', function ($q) {
-//            //老直播和现在直播id有重合,加时间区分
-//            $q->where('created_at', '>', '2021-01-01 00:00:00');
-//        });
+//        $query->whereHas('live');
+        $query->whereHas('live', function ($q) {
+            //老直播和现在直播id有重合,加时间区分
+            $q->where('created_at', '>', '2021-01-01 00:00:00');
+        });
 
         $money_query = clone $query;
         $list = $query->orderBy('id', 'desc')->paginate($size);
