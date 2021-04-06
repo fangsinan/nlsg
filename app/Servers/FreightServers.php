@@ -19,6 +19,7 @@ class FreightServers
             return ['code' => false, 'msg' => 'type参数错误'];
         }
 
+        $id = $params['id'] ?? 0;
         $size = $params['size'] ?? 10;
         $with = [];
 
@@ -33,9 +34,11 @@ class FreightServers
             $with[] = 'f_details.d_list';
         }
 
-        $query = FreightTemplate::from('nlsg_freight_template')
-            ->where('type', '=', $type)
-            ->where('status', '<>', 3);
+        $query = FreightTemplate::from('nlsg_freight_template');
+        if (!empty($id)) {
+            $query->where('id', '=', $id);
+        }
+        $query->where('type', '=', $type)->where('status', '<>', 3);
 
         $query->orderBy('id', 'desc');
 
