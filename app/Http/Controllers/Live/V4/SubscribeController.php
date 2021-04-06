@@ -99,7 +99,7 @@ class SubscribeController extends ControllerBackend
         }
         if(!empty($date)){
             $query->whereHas('order', function ($q) use($date,$now_date){
-                $date = explode(',', $date);
+//                $date = explode(',', $date);
                 $q->where('pay_time','>=', $date[0]);
                 if (empty($date[1] ?? '')) {
                     $date[1] = $now_date;
@@ -126,7 +126,7 @@ class SubscribeController extends ControllerBackend
 
         //sub创建时间
         if(!empty($created_at)){
-            $created_at = explode(',', $created_at);
+//            $created_at = explode(',', $created_at);
             $query->where('created_at','>=', $created_at[0]);
             if (empty($created_at[1] ?? '')) {
                 $created_at[1] = $now_date;
