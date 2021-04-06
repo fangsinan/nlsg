@@ -107,22 +107,33 @@ class SubscribeController extends ControllerBackend
                 $q->where('pay_time','<', $date[1]);
             });
         }
-        if(!empty($created_at)){
-            $query->whereHas('order', function ($q) use($created_at,$now_date){
-                $created_at = explode(',', $created_at);
-                $q->where('pay_time','>=', $created_at[0]);
-                if (empty($created_at[1] ?? '')) {
-                    $created_at[1] = $now_date;
-                }
-                $q->where('pay_time','<', $created_at[1]);
-            });
-        }
+//        if(!empty($created_at)){
+//            $query->whereHas('order', function ($q) use($created_at,$now_date){
+//                $created_at = explode(',', $created_at);
+//                $q->where('pay_time','>=', $created_at[0]);
+//                if (empty($created_at[1] ?? '')) {
+//                    $created_at[1] = $now_date;
+//                }
+//                $q->where('pay_time','<', $created_at[1]);
+//            });
+//        }
 
-        $lists = $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time','order_id')
+        $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time','order_id')
             ->where('is_del',0)
             ->where('status',1)
-            ->where('type',3)
-            ->orderBy('created_at', 'desc')
+            ->where('type',3);
+
+
+        //sub创建时间
+        if(!empty($created_at)){
+            $created_at = explode(',', $created_at);
+            $query->where('created_at','>=', $created_at[0]);
+            if (empty($created_at[1] ?? '')) {
+                $created_at[1] = $now_date;
+            }
+            $query->where('created_at','<', $created_at[1]);
+        }
+        $lists = $query->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
 
