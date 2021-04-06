@@ -55,12 +55,9 @@ class SubscribeController extends ControllerBackend
         $query = Subscribe::with([
             'user:id,nickname,phone',
             'live:id,title,price,twitter_money',
-            'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at'
-        ]);
-
-        $query->with([
             'order.pay_record_detail:id,type,ordernum,user_id,price',
             'order.pay_record_detail.user:id,phone,nickname',
+            'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at'
         ]);
 
         if (!empty($twitter_phone)){
