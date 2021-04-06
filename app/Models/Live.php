@@ -166,6 +166,11 @@ class Live extends Base
         return $this->hasOne(LiveInfo::class, 'live_pid', 'id');
     }
 
+    public function livePoster()
+    {
+        return $this->hasMany(LivePoster::class, 'live_id', 'id');
+    }
+
     public static function teamInfo($team_id = 0, $only_not_start = 1,$first=1)
     {
         $now_date = date('Y-m-d H:i:s');
