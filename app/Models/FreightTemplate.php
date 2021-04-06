@@ -27,7 +27,7 @@ class FreightTemplate extends Base
                 ->where('status', '=', 1)
                 ->select(['id', 'type', 'name',
                     'admin_name', 'admin_phone', 'admin_phone as phone',
-                    'province', 'city', 'area', 'details',
+                    'province', 'city', 'area', 'details','status',
                     'start_time', 'end_time'])
                 ->get();
             Cache::put($cache_key_name, $res, $expire_num);
