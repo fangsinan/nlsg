@@ -5,7 +5,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     Route::get('auth/captcha', 'AuthController@captcha');
     Route::post('auth/login', 'AuthController@login');
-
+    Route::get('mall_order/list_new', 'MallOrderController@listNew');
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
         Route::post('auth/change_pwd', 'AuthController@changePassword');
 
@@ -84,7 +84,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::post('mall_order/send', 'MallOrderController@send');
         Route::post('mall_order/make_group_success', 'MallOrderController@makeGroupSuccess');
         Route::get('mall_order/tos', 'MallOrderController@tos');
-        Route::get('mall_order/list_new', 'MallOrderController@listNew');
+
         Route::get('mall_order/list', 'MallOrderController@list');
 
         //售后

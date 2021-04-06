@@ -84,9 +84,9 @@ class MallOrderServers
 
 
         $query->with([
-//            'orderDetails', 'orderDetails.goodsInfo',
-//            'userInfo',
-//            'orderChild', 'orderChild.expressInfo',
+            'orderDetails', 'orderDetails.goodsInfo',
+            'userInfo',
+            'orderChild', 'orderChild.expressInfo',
             'groupBuy'
         ]);
 
@@ -94,9 +94,9 @@ class MallOrderServers
 //        $query->where('order_type','<>',3);
 //        $query->where('ordernum', '=', '21012200008157523257401');
 
-        DB::connection()->enableQueryLog();
+//        DB::connection()->enableQueryLog();
         $list = $query->select()->orderBy('id', 'desc')->limit(10)->get();
-        dd(DB::getQueryLog());
+//        dd(DB::getQueryLog());
 
 
         return $list;
