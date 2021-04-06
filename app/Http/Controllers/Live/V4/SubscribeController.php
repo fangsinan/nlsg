@@ -118,7 +118,7 @@ class SubscribeController extends ControllerBackend
 //            });
 //        }
 
-        $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time','order_id')
+        $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time','order_id','created_at')
             ->where('is_del',0)
             ->where('status',1)
             ->where('type',3);
