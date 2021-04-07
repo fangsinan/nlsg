@@ -246,7 +246,8 @@ class Order extends Base
 
         //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
         $query = Order::query();
-        $query->where('created_at', '>', '2021-01-01 00:00:00');
+//        $query->where('created_at', '>', '2021-01-01 00:00:00');
+        $query->where('id', '>', 341864);
 
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
@@ -383,7 +384,8 @@ class Order extends Base
 //        $query->whereHas('live');
         $query->whereHas('live', function ($q) {
             //老直播和现在直播id有重合,加时间区分
-            $q->where('created_at', '>', '2021-01-01 00:00:00');
+//            $q->where('created_at', '>', '2021-01-01 00:00:00');
+            $q->where('id', '>', 341864);
         });
 
         $cache_key_name = 'list_money_'.$this_user['id'];
