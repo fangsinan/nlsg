@@ -82,7 +82,7 @@ class CommentController extends ControllerBackend
         $lists = $query->select('id', 'live_id', 'user_id', 'content', 'created_at')
             ->where('status', 1)
             ->where('type', 0)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
         return success($lists);
