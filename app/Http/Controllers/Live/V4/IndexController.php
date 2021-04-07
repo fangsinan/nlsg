@@ -175,7 +175,6 @@ class IndexController extends ControllerBackend
         $lists = $query->select('id', 'user_id', 'title', 'price',
             'order_num', 'status', 'created_at', 'cover_img')
             ->where('is_del', 0)
-            ->where('status', 4)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
