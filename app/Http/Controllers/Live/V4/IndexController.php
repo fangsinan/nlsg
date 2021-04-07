@@ -614,6 +614,7 @@ class IndexController extends ControllerBackend
     {
         $id = $request->get('id');
         $live = Live::select('id', 'title', 'cover_img', 'user_id', 'begin_at', 'end_at', 'price', 'twitter_money', 'helper', 'content')
+            ->with(['livePoster'])
             ->where('id', $id)->first();
         if (!$live) {
             return error('直播不存在');

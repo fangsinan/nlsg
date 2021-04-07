@@ -1264,6 +1264,11 @@ class MallOrder extends Base
         return $this->hasOne(MallGroupBuyList::class, 'order_id','id');
     }
 
+    //后台商品列表使用的关联售后查询
+    public function refundRecord(){
+        return $this->hasMany(MallRefundRecord::class,'order_id','id');
+    }
+
     public function orderChild()
     {
         return $this->hasMany('App\Models\MallOrderChild', 'order_id', 'id')

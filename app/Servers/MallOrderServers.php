@@ -81,13 +81,16 @@ class MallOrderServers
         }
 
 
-
-
         $query->with([
             'orderDetails', 'orderDetails.goodsInfo',
             'userInfo',
             'orderChild', 'orderChild.expressInfo',
-            'groupBuy'
+            'groupBuy',
+            'refundRecord'=>function($q){
+                $q->select([
+                    'id','service_num','order_id','order_detail_id','type'
+                ]);
+            }
         ]);
 
 
