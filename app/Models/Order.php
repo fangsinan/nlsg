@@ -9,6 +9,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -385,9 +386,16 @@ class Order extends Base
             $q->where('created_at', '>', '2021-01-01 00:00:00');
         });
 
-        $money_query = clone $query;
+        $cache_key_name = 'list_money_'.$this_user['id'];
+        $expire_num = 30;
+        $list_money = Cache::get($cache_key_name);
+        if (empty($list_money)) {
+            $money_query = clone $query;
+            $list_money = $money_query->sum('pay_price');
+            Cache::put($cache_key_name, $list_money, $expire_num);
+        }
+
         $list = $query->orderBy('id', 'desc')->paginate($size);
-        $list_money = $money_query->sum('pay_price');
 
         foreach ($list as &$v) {
             $goods = [];
