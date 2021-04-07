@@ -73,6 +73,19 @@ class SubscribeController extends ControllerBackend
             'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at'
         ]);
 
+        if($this->user['live_role'] == 21){
+            $live_user_id = $this->user['user_id'];
+            $query->whereHas('live',function($q)use($live_user_id){
+                $q->where('user_id','=',$live_user_id);
+            });
+        }elseif ($this->user['live_role'] == 23) {
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+            $query->whereHas('live', function ($q) use ($son_user_id) {
+                $q->whereIn('user_id', $son_user_id);
+            });
+        }
+
         if(!empty($title)){
             $query->whereHas('live', function ($q) use($title){
                 $q->where('title', 'like', '%'.$title.'%');
