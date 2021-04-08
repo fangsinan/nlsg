@@ -241,7 +241,7 @@ WHERE
                         return ['code' => false, 'msg' => '取消之后删除'];
                     }
                 }
-
+                $check->is_done = 0;
                 $check->is_del = 1;
                 break;
             default:
