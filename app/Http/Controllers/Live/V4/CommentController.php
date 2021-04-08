@@ -157,7 +157,7 @@ class CommentController extends ControllerBackend
 //        $lists = $lists_query->orderBy('id', 'desc')
 //            ->paginate(10)
 //            ->toArray();
-        $total = $query->count();
+        $total = $lists_query->count();
         $list = $lists_query->orderBy('id', 'desc')
             ->limit($size)
             ->offset(($page - 1) * $size)
