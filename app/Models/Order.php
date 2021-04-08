@@ -486,7 +486,7 @@ class Order extends Base
 
         if ($this_user['live_role'] == 21) {
             $live_user_id = $this_user['user_id'];
-            $lu_list_query->whereIn('l.user_id',$live_user_id);
+            $lu_list_query->where('l.user_id','=',$live_user_id);
         } elseif ($this_user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this_user['username']);
