@@ -416,6 +416,7 @@ class IndexController extends ControllerBackend
         $input = $request->all();
         $cover = !empty($input['cover']) ? covert_img($input['cover']) : '';
         $title = $input['title'] ?? '';
+        $describe = $input['describe'] ?? '';
         $userId = $input['user_id'] ?? 0;
         $begin_at = $input['begin_at'] ?? date('Y-m-d H:i:s', time());
         $end_at = $input['end_at'] ?? date('Y-m-d H:i:s', time());
@@ -437,6 +438,7 @@ class IndexController extends ControllerBackend
             'user_id' => $userId,
             'cover_img' => $cover,
             'title' => $title,
+            'describe' => $describe,
             'begin_at' => $begin_at,
             'end_at' => $end_at,
             'price' => $price,
@@ -463,6 +465,8 @@ class IndexController extends ControllerBackend
         $live_info_data['user_id'] = $userId;
         $live_info_data['status'] = 1;
         $live_info_data['length'] = 5;
+        $live_info_data['begin_at'] = $begin_at;
+        $live_info_data['end_at']   = $end_at;
 
         if (!empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);
@@ -470,7 +474,6 @@ class IndexController extends ControllerBackend
 
             $live_info_data['id'] = $input['id'];
             $live_info_data['live_pid'] = $input['id'];
-
             LiveInfo::where('id', '=', $live_info_id)->update($live_info_data);
 
         } else {
