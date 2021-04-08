@@ -505,13 +505,15 @@ class Order extends Base
             $sign_list = array_column($lu_list,'sign');
         }
 
+//        return [$lu_list,$sign_list];
+
         $size = $params['size'] ?? 10;
         $now_date = date('Y-m-d H:i:s');
 
         $query = Order::query();
         $query->where('id', '>', 341864)
             ->where('status', '=', 1)
-            ->whereIn('type', [14,16])
+            ->whereIn('type', [10,14,16])
             ->where('live_id', '>', 0)
             ->where('is_shill', '=', 0);
 
