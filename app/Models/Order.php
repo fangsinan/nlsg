@@ -511,7 +511,7 @@ class Order extends Base
         $query = Order::query();
         $query->where('id', '>', 341864)
             ->where('status', '=', 1)
-            ->whereIn('type', [10,14,16])
+            ->whereIn('type', [14,16])
             ->where('live_id', '>', 0)
             ->where('is_shill', '=', 0);
 
