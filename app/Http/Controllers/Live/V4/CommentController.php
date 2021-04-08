@@ -40,7 +40,7 @@ class CommentController extends ControllerBackend
      *    }
      * }
      */
-    public function index(Request $request)
+    public function index2(Request $request)
     {
         $title = $request->get('title');
         $nickname = $request->get('nickname');
@@ -100,7 +100,113 @@ class CommentController extends ControllerBackend
 
     }
 
-    /**
+
+    public function index(Request $request)
+    {
+
+
+        $title = $request->get('title');
+        $nickname = $request->get('nickname');
+        $content = $request->get('content');
+        $start = $request->get('start');
+        $end = $request->get('end');
+
+        $page = $request->get('page') ?? 1;
+        $size = $request->get('size') ?? 10;
+        //筛查user
+        if (!empty($nickname)) {
+            $userData = User::select('id')->where('nickname', 'like', '%' . $nickname . '%')->get()->toArray();
+            $user_ids = array_column($userData, 'id');
+        }
+
+        //筛查live
+        $query = Live::select('id');
+        if ($this->user['live_role'] == 21) {
+            $query->where('user_id', '=', $this->user['user_id']);
+        } elseif ($this->user['live_role'] == 23) {
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+            $query->whereIn('user_id', $son_user_id);
+        }
+        if (!empty($title)) {
+            $query->where('title', 'like', '%' . $title . '%');
+        }
+        $liveData = $query->get()->toArray();
+        $live_ids = array_column($liveData, 'id');
+
+        $lists_query = LiveComment::select('id', 'live_id', 'user_id', 'content', 'created_at')
+            ->when($content, function ($query) use ($content) {
+                $query->where('content', 'like', '%' . $content . '%');
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                ]);
+            })
+            ->where('status', 1)
+            ->where('type', 0);
+        if (!empty($live_ids)) {
+            $lists_query->whereIn('live_id', $live_ids);
+        }
+
+        if (!empty($user_ids)) {
+            $lists_query->whereIn('user_id', $user_ids);
+        }
+
+//        $lists = $lists_query->orderBy('id', 'desc')
+//            ->paginate(10)
+//            ->toArray();
+        $total = $query->count();
+        $list = $lists_query->orderBy('id', 'desc')
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get();
+        $lists = [
+            'total' => $total,
+            'data'  => $list ?? []
+        ];
+
+        foreach ($lists['data'] as $key => $val) {
+            $val['user'] = [];  //初值
+            $val['live'] = [];
+
+            $lists_user_ids[] = $val['user_id'];
+            $lists_live_ids[] = $val['live_id'];
+        }
+        $new_userData = [];
+        if (!empty($lists_user_ids)) {
+            $list_userData = User::select('id', 'nickname')->whereIn('id', $lists_user_ids)->get()->toArray();
+            foreach ($list_userData as $key => $val) {
+                $new_userData[$val['id']] = $val;
+            }
+        }
+        $new_list_liveData = [];
+        if (!empty($lists_live_ids)) {
+            $list_liveData = Live::select('id', 'title')->whereIn('id', $lists_live_ids)->get()->toArray();
+            foreach ($list_liveData as $key => $val) {
+                $new_list_liveData[$val['id']] = $val;
+            }
+        }
+
+        foreach ($lists['data'] as $key => &$val) {
+
+            if (!empty($new_userData[$val['user_id']])) {
+                $val['user'] = $new_userData[$val['user_id']];
+            }
+
+            if (!empty($new_list_liveData)) {
+                $val['live'] = $new_list_liveData[$val['live_id']];
+            }
+
+        }
+
+
+        return success($lists);
+    }
+
+
+        /**
      * @api {get} api/live_v4/comment/show 评论查看
      * @apiVersion 4.0.0
      * @apiName  comment/show
