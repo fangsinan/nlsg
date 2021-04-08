@@ -44,20 +44,25 @@ class IndexController extends ControllerBackend
         //5打赏 9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
         $type = [9, 10, 14, 15, 16];
         if ($this->user['live_role'] == 21) {
+            $liveIds = Live::where('user_id', $this->user['user_id'])->pluck('id')->toArray();
             $subscribeNum = Subscribe::where('type', 3)
                             ->where('status', 1)
                             ->where('user_id', $this->user['user_id'])
+                            ->whereIn('relation_id', $liveIds)
                             ->count();
             $watchNum = LiveLogin::where('user_id', $this->user['user_id'])
+                        ->whereIn('live_id', $liveIds)
                         ->distinct('user_id')
                         ->count();
             $orderNum = Order::whereIn('type', $type)
-                        ->where('status', 1)
                         ->where('user_id', $this->user['user_id'])
+                        ->whereIn('live_id', $liveIds)
+                        ->where('status', 1)
                         ->count();
             $orderIncome = Order::whereIn('type', $type)
                                 ->where('status', 1)
                                 ->where('user_id', $this->user['user_id'])
+                                ->whereIn('live_id', $liveIds)
                                 ->sum('pay_price');
         }elseif ($this->user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
