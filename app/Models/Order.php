@@ -246,8 +246,12 @@ class Order extends Base
 
         //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
         $query = Order::query();
-//        $query->where('created_at', '>', '2021-01-01 00:00:00');
-        $query->where('id', '>', 341864);
+
+        $query->where('id', '>', 341864)
+            ->where('status', '=', 1)
+            ->whereIn('type', [9, 10, 14, 15, 16])
+            ->where('live_id', '>', 0)
+            ->where('is_shill', '=', 0);
 
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
@@ -272,17 +276,18 @@ class Order extends Base
         //用户账号
         if (!empty($params['phone'] ?? '')) {
             $phone = $params['phone'];
-            $query->whereHas('user', function ($q) use ($phone) {
-                $q->where('phone', 'like', "%$phone%");
-            });
+            $temp_id_list = User::where('phone','like',"%$phone%")->pluck('id')->toArray();
+            $query->whereIn('user_id',$temp_id_list);
         }
 
         //直播标题
         if (!empty($params['title'] ?? '')) {
             $title = $params['title'];
-            $query->whereHas('live', function ($q) use ($title) {
-                $q->where('title', 'like', "%$title%");
-            });
+            $temp_id_list = Live::where('title','like',"%$title%")->pluck('id')->toArray();
+            $query->whereIn('live_id',$temp_id_list);
+//            $query->whereHas('live', function ($q) use ($title) {
+//                $q->where('title', 'like', "%$title%");
+//            });
         }
 
         //21是老师,只看自己
@@ -341,17 +346,23 @@ class Order extends Base
 
         }
 
-        $query->where('live_id', '<>', 0)
-            ->whereIn('type', [9, 10, 14, 15, 16])
-            ->where('status', '=', 1)
-            ->where('is_shill', '=', 0);
-
-        if (!empty($params['id'] ?? 0)) {
+//        if (!empty($params['id'] ?? 0)) {
             $query->with([
                 'pay_record_detail:id,type,ordernum,user_id,price',
                 'pay_record_detail.user:id,phone,nickname',
             ]);
+//        }
+
+        //推荐用户账号
+        if (!empty($params['t_phone'] ?? '')) {
+            $phone = $params['t_phone'];
+            $temp_id_list = User::where('phone','like',"%$phone%")->pluck('id')->toArray();
+            $query->whereHas('pay_record_detail',function($q) use($temp_id_list){
+                $q->whereIn('user_id',$temp_id_list);
+            });
+            //$query->whereIn('user_id',$temp_id_list);
         }
+
 
         $query->with([
             'works' => function ($q) {
