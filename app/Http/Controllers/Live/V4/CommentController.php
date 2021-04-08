@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendLiveRole;
 use App\Models\Live;
+use App\Models\User;
 use App\Models\LiveComment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CommentController extends ControllerBackend
 {
@@ -45,6 +47,10 @@ class CommentController extends ControllerBackend
         $content = $request->get('content');
         $start = $request->get('start');
         $end = $request->get('end');
+
+        $page = $request->get('page') ?? 1;
+        $size = $request->get('size') ?? 10;
+
         $query = LiveComment::with(['user:id,nickname', 'live:id,title'])
             ->when($content, function ($query) use ($content) {
                 $query->where('content', 'like', '%'.$content.'%');
@@ -78,14 +84,17 @@ class CommentController extends ControllerBackend
                 $q->whereIn('user_id', $son_user_id);
             });
         }
-
+        $total = $query->count();
         $lists = $query->select('id', 'live_id', 'user_id', 'content', 'created_at')
-            ->where('status', 1)
-            ->where('type', 0)
             ->orderBy('id', 'desc')
-            ->paginate(10)
-            ->toArray();
-        return success($lists);
+            ->limit($size)
+            ->offset(($page - 1) * $size)
+            ->get();
+        $res = [
+            'total' => $total,
+            'data'  => $lists ?? []
+        ];
+        return success($res);
 
     }
 
