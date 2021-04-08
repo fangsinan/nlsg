@@ -381,11 +381,11 @@ class Order extends Base
         ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
             'pay_price', 'pay_type', 'ordernum', 'live_id', 'pay_type', 'os_type', 'status']);
 
-//        $query->whereHas('live');
-        $query->whereHas('live', function ($q) {
+        $query->whereHas('live');
+//        $query->whereHas('live', function ($q) {
             //老直播和现在直播id有重合,加时间区分
-            $q->where('created_at', '>', '2021-01-01 00:00:00');
-        });
+//            $q->where('created_at', '>', '2021-01-01 00:00:00');
+//        });
 
         $cache_key_name = 'list_money_'.$this_user['id'];
         $expire_num = 30;
