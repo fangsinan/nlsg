@@ -44,16 +44,32 @@ class IndexController extends ControllerBackend
         //5打赏 9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
         $type = [9, 10, 14, 15, 16];
         if ($this->user['live_role'] == 21) {
-            $liveIds = Live::where('user_id', $this->user['user_id'])->pluck('id')->toArray();
-            $subscribeNum = Subscribe::where('type', 3)
-                            ->where('status', 1)
-                            ->where('user_id', $this->user['user_id'])
-                            ->whereIn('relation_id', $liveIds)
-                            ->count();
-            $watchNum = LiveLogin::where('user_id', $this->user['user_id'])
-                        ->whereIn('live_id', $liveIds)
-                        ->distinct('user_id')
+            $lives = Live::where('user_id', $this->user['user_id'])
+                        ->where('status', 4)
+                        ->get()
+                        ->toArray();
+
+            $liveIds = array_column($lives, 'id');
+            $subscribeNum =0;
+            $watchNum =0;
+            if (!empty($lives)){
+                foreach ($lives as $v){
+                    $num = Subscribe::where('type', 3)
+                        ->where('status', 1)
+                        ->where('relation_id', $v['id'])
                         ->count();
+
+                    $wnum = LiveLogin::where('live_id', $v['id'])
+                                        ->whereBetween('ctime', [strtotime($v['begin_at']), strtotime($v['end_at'])])
+                                        ->distinct('user_id')
+                                        ->count();
+
+                    $subscribeNum += $num;
+                    $watchNum += $wnum;
+
+                }
+            }
+
             $orderNum = Order::whereIn('type', $type)
                         ->where('user_id', $this->user['user_id'])
                         ->whereIn('live_id', $liveIds)
@@ -139,12 +155,16 @@ class IndexController extends ControllerBackend
     public function lives(Request $request)
     {
         $title = $request->get('title');
+        $live_status = $request->get('live_status');
         $status = $request->get('status');
         $start = $request->get('start');
         $end = $request->get('end');
         $query = Live::with('user:id,nickname')
             ->when($title, function ($query) use ($title) {
                 $query->where('title', 'like', '%' . $title . '%');
+            })
+            ->when(!is_null($status), function ($query) use ($status) {
+                $query->where('status', $status);
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
@@ -161,16 +181,16 @@ class IndexController extends ControllerBackend
             $query->whereIn('user_id',$son_user_id);
         }
 
-        if (!empty($status)) {
-            if ($status == 1) {
+        if (!empty($live_status)) {
+            if ($live_status == 1) {
                 $query->whereHas('liveInfo', function ($q) use ($status) {
                     $q->where('is_begin', 0)->where('is_finish', 0);
                 });
-            } elseif ($status == 2) {
+            } elseif ($live_status == 2) {
                 $query->whereHas('liveInfo', function ($q) use ($status) {
                     $q->where('is_begin', 0)->where('is_finish', 1);
                 });
-            } elseif ($status == 3) {
+            } elseif ($live_status == 3) {
                 $query->whereHas('liveInfo', function ($q) use ($status) {
                     $q->where('is_begin', 1)->where('is_finish', 0);
                 });
@@ -178,7 +198,7 @@ class IndexController extends ControllerBackend
         }
 
         $lists = $query->select('id', 'user_id', 'title', 'price',
-            'order_num', 'status', 'created_at', 'cover_img')
+            'order_num', 'status', 'begin_at', 'cover_img')
             ->where('is_del', 0)
             //->where('status', 4)
             ->orderBy('created_at', 'desc')
