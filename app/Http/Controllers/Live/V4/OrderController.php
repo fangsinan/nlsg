@@ -106,4 +106,11 @@ class OrderController extends ControllerBackend
         $data = $model->orderInLive($request->input(),$this->user);
         return $this->getRes($data);
     }
+
+    public function inviterLiveList(Request $request){
+        $model = new Order();
+        $data = $model->inviterLiveList($request->input(),$this->user);
+        return $this->getRes($data);
+
+    }
 }

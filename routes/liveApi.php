@@ -18,5 +18,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::post('comment/delete', 'CommentController@delete');
         Route::get('sub/index', 'SubscribeController@index');
         Route::get('order/list', 'OrderController@list');
+        Route::get('order/inviter_list', 'OrderController@inviterLiveList');
     });
+
 });

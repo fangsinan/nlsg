@@ -462,4 +462,186 @@ class Order extends Base
         $total_money = collect(['total_money'=>$list_money]);
         return $total_money->merge($list);
     }
+
+    public function inviterLiveList($params,$this_user = []){
+
+        $lu_list_query = DB::table('nlsg_order as o')
+            ->join('nlsg_live as l','o.remark','=','l.id')
+            ->join('nlsg_user as u','u.id','=','l.user_id')
+            ->where('o.id','>',341864)
+            ->where('o.status','=',1)
+            ->where('o.type','=',10);
+
+        //推荐用户账号
+        if (!empty($params['t_phone'] ?? '')) {
+            $t_phone = $params['t_phone'];
+            $temp_id_list = User::where('phone','like',"%$t_phone%")->pluck('id')->toArray();
+            $lu_list_query->whereIn('l.user_id',$temp_id_list);
+        }
+
+        if (!empty($params['t_title'] ?? '')) {
+            $t_title = $params['t_title'];
+            $lu_list_query->where('l.title','like',"%$t_title%");
+        }
+
+        if ($this_user['live_role'] == 21) {
+            $live_user_id = $this_user['user_id'];
+            $lu_list_query->whereIn('l.user_id',$live_user_id);
+        } elseif ($this_user['live_role'] == 23) {
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this_user['username']);
+            $lu_list_query->whereIn('l.user_id',$son_user_id);
+        }
+
+        $lu_list = $lu_list_query->select([
+            'o.id','o.live_id','o.remark','o.user_id','u.phone','u.nickname','l.title',
+            DB::raw("CONCAT(live_id,'-',o.user_id) as sign")
+        ])->get();
+
+        if ($lu_list->isEmpty()){
+            $sign_list = [];
+        }else{
+            $lu_list = $lu_list->toArray();
+            $sign_list = array_column($lu_list,'sign');
+        }
+
+        $size = $params['size'] ?? 10;
+        $now_date = date('Y-m-d H:i:s');
+
+        $query = Order::query();
+        $query->where('id', '>', 341864)
+            ->where('status', '=', 1)
+            ->whereIn('type', [10,14,16])
+            ->where('live_id', '>', 0)
+            ->where('is_shill', '=', 0);
+
+        if (!empty($params['id'] ?? 0)) {
+            $query->where('id', '=', $params['id']);
+        }
+
+        //订单编号
+        if (!empty($params['ordernum'] ?? 0)) {
+            $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
+        }
+        //下单时间
+        if (!empty($params['created_at'])) {
+            $created_at = explode(',', $params['created_at']);
+            $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
+            if (empty($created_at[1] ?? '')) {
+                $created_at[1] = $now_date;
+            } else {
+                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[1]));
+            }
+            $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
+        }
+
+        //用户账号
+        if (!empty($params['phone'] ?? '')) {
+            $phone = $params['phone'];
+            $temp_id_list = User::where('phone','like',"%$phone%")->pluck('id')->toArray();
+            $query->whereIn('user_id',$temp_id_list);
+        }
+
+        //直播标题
+        if (!empty($params['title'] ?? '')) {
+            $title = $params['title'];
+            $temp_id_list = Live::where('title','like',"%$title%")->pluck('id')->toArray();
+            $query->whereIn('live_id',$temp_id_list);
+        }
+
+        if (!empty($params['pay_type'] ?? 0)) {
+            $query->where('pay_type', '=', $params['pay_type']);
+        }
+        if (!empty($params['os_type'] ?? 0)) {
+            $query->where('os_type', '=', $params['os_type']);
+        }
+        //商品类型
+        if (!empty($params['type'] ?? 0)) {
+            $query->where('type', '=', $params['type']);
+
+            if (!empty($params['goods_title']??'')){
+                $goods_title = trim($params['goods_title']);
+                switch (intval($params['type'])){
+                    case 14:
+                        $query->whereHas('offline', function ($q) use ($goods_title) {
+                            $q->where('title', 'like', "%$goods_title%");
+                        });
+                        break;
+                }
+            }
+        }
+
+        $query->whereIn(DB::raw("CONCAT(live_id,'-',user_id)"),$sign_list);
+
+        $query->with([
+            'offline' => function ($q) {
+                $q->select(['id', 'title', 'subtitle', 'price',
+                    'cover_img', 'image']);
+            },
+            'liveGoods' => function ($q) {
+                $q->select(['id', 'title', 'describe', 'cover_img', 'price']);
+            },
+            'payRecord' => function ($q) {
+                $q->select(['ordernum', 'price', 'type', 'created_at']);
+            },
+            'live' => function ($q) {
+                $q->select(['id', 'title', 'describe', 'begin_at', 'cover_img']);
+            },
+            'user' => function ($q) {
+                $q->select(['id', 'phone', 'nickname']);
+            },
+            'pay_record_detail:id,type,ordernum,user_id,price',
+            'pay_record_detail.user:id,phone,nickname',
+        ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
+            'pay_price', 'pay_type', 'ordernum', 'live_id', 'os_type', 'status',
+            DB::raw("CONCAT(live_id,'-',user_id) as sign")]);
+
+        $list = $query->orderBy('id', 'desc')->paginate($size);
+
+        foreach ($list as &$v) {
+            foreach ($lu_list as $ll_v){
+                if ($ll_v->sign == $v->sign){
+                    $temp_inviter = [];
+                    $temp_inviter['user_id'] = $ll_v->user_id;
+                    $temp_inviter['username'] = $ll_v->phone;
+                    $temp_inviter['nickname'] = $ll_v->nickname;
+                    $temp_inviter['live_id'] = $ll_v->live_id;
+                    $temp_inviter['title'] = $ll_v->title;
+                    $v->inviter_info = $temp_inviter;
+                }
+            }
+
+            $goods = [];
+            switch (intval($v->type)) {
+                case 10:
+                    $goods['goods_id'] = $v->liveGoods->id ?? 0;
+                    $goods['title'] = $v->liveGoods->title ?? '数据错误';
+                    $goods['subtitle'] = '';
+                    $goods['cover_img'] = $v->liveGoods->cover_img ?? '';
+                    $goods['detail_img'] = '';
+                    $goods['price'] = $v->liveGoods->price ?? '价格数据错误';
+                    break;
+                case 14:
+                    $goods['goods_id'] = $v->offline->id ?? 0;
+                    $goods['title'] = $v->offline->title ?? '数据错误';
+                    $goods['subtitle'] = $v->offline->subtitle ?? '';
+                    $goods['cover_img'] = $v->offline->cover_img ?? '';
+                    $goods['detail_img'] = $v->offline->image ?? '';
+                    $goods['price'] = $v->offline->price ?? '价格数据错误';
+                    break;
+                case 16:
+                    $goods['goods_id'] = 999999;
+                    $goods['title'] = '幸福360';
+                    $goods['subtitle'] = '';
+                    $goods['cover_img'] = '/live/recommend/360_xhc.png';
+                    $goods['detail_img'] = '';
+                    $goods['price'] = 360;
+                    break;
+            }
+            $v->goods = $goods;
+            unset($v->offline);
+        }
+
+        return $list;
+    }
 }
