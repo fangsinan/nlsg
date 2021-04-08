@@ -86,6 +86,8 @@ class CommentController extends ControllerBackend
         }
         $total = $query->count();
         $lists = $query->select('id', 'live_id', 'user_id', 'content', 'created_at')
+            ->where('type', 0)
+            ->where('status', 1)
             ->orderBy('id', 'desc')
             ->limit($size)
             ->offset(($page - 1) * $size)
