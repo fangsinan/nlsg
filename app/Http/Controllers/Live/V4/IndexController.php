@@ -163,7 +163,7 @@ class IndexController extends ControllerBackend
             ->when($title, function ($query) use ($title) {
                 $query->where('title', 'like', '%' . $title . '%');
             })
-            ->when(!is_null($status), function ($query) use ($title) {
+            ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
             })
             ->when($start && $end, function ($query) use ($start, $end) {
