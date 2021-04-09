@@ -399,6 +399,16 @@ WHERE
                     }
                     $res->type = 9;
                     $res = $res->toArray();
+                } elseif ($v['push_type'] == 10) {
+                    $res = LiveUrl::select('id', 'name', 'describe', 'url', 'image', 'img', 'user_id')
+                        ->where('id', $v['push_gid'])
+                        ->first();
+                    if ($res){
+                        $infoid =LiveInfo::where('live_pid', $res->id)->value('id');
+                        $res->live_info_id = $infoid ??  0;
+                    }
+                    $res->type = 10;
+                    $res = $res->toArray();
                 }
                 $data[] = $res ?? [];
             }
