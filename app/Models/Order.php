@@ -602,9 +602,9 @@ class Order extends Base
             'payRecord' => function ($q) {
                 $q->select(['ordernum', 'price', 'type', 'created_at']);
             },
-//            'live' => function ($q) {
-//                $q->select(['id', 'title', 'describe', 'begin_at', 'cover_img']);
-//            },
+            'live' => function ($q) {
+                $q->select(['id', 'title', 'describe', 'begin_at', 'cover_img']);
+            },
             'liveRemark' => function ($q) {
                 $q->select(['id', 'title', 'describe', 'begin_at', 'cover_img']);
             },
@@ -634,7 +634,7 @@ class Order extends Base
                     $v->t_live_phone = $ll_v->t_live_phone;
                 }
             }
-            $v->live = $v->liveRemark;
+//            $v->live = $v->liveRemark;
             $goods = [];
             switch (intval($v->type)) {
                 case 10:
