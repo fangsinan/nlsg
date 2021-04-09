@@ -634,7 +634,7 @@ class Order extends Base
                     $v->t_live_phone = $ll_v->t_live_phone;
                 }
             }
-//            $v->live = $v->liveRemark;
+
             $goods = [];
             switch (intval($v->type)) {
                 case 10:
@@ -644,6 +644,7 @@ class Order extends Base
                     $goods['cover_img'] = $v->liveGoods->cover_img ?? '';
                     $goods['detail_img'] = '';
                     $goods['price'] = $v->liveGoods->price ?? '价格数据错误';
+                    $v->live = $v->liveRemark;
                     break;
                 case 14:
                     $goods['goods_id'] = $v->offline->id ?? 0;
