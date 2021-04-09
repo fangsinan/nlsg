@@ -518,8 +518,6 @@ class Order extends Base
             $sign_list = array_column($lu_list,'sign');
         }
 
-        return [$lu_list,$sign_list];
-
         $size = $params['size'] ?? 10;
         $now_date = date('Y-m-d H:i:s');
 
