@@ -468,6 +468,11 @@ class Order extends Base
         $lu_list_query = DB::table('nlsg_order as o')
             ->join('nlsg_live as l','o.remark','=','l.id')
             ->join('nlsg_user as u','u.id','=','l.user_id')
+            ->join('nlsg_live_info as li','li.live_pid','=','l.id')
+            ->leftJoin('nlsg_live_count_down as cd',function($q){
+                $q->on('cd.user_id','=','o.user_id')->on('cd.live_id','=','li.id');
+            })
+            ->leftJoin('nlsg_user as u2','cd.new_vip_uid','=','u2.id')
             ->where('o.id','>',341864)
             ->where('o.status','=',1)
             ->where('o.type','=',10);
@@ -477,6 +482,13 @@ class Order extends Base
             $t_phone = $params['t_phone'];
             $temp_id_list = User::where('phone','like',"%$t_phone%")->pluck('id')->toArray();
             $lu_list_query->whereIn('l.user_id',$temp_id_list);
+        }
+
+        //源直播间推荐用户账号
+        if (!empty($params['t_live_phone'] ?? '')) {
+            $t_live_phone = $params['t_live_phone'];
+            $temp_id_list = User::where('phone','like',"%$t_live_phone%")->pluck('id')->toArray();
+            $lu_list_query->whereIn('u2.id',$temp_id_list);
         }
 
         if (!empty($params['t_title'] ?? '')) {
@@ -494,8 +506,9 @@ class Order extends Base
         }
 
         $lu_list = $lu_list_query->select([
-            'o.id','o.live_id','o.remark','o.user_id','u.phone','u.nickname','l.title',
-            DB::raw("CONCAT(live_id,'-',o.user_id) as sign")
+            'o.id','o.live_id','o.remark','o.user_id','u.phone','u.nickname','l.title','li.id as info_id',
+            'cd.new_vip_uid as t_live_user_id','u2.phone as t_live_phone',
+            DB::raw("CONCAT(o.live_id,'-',o.user_id) as sign")
         ])->get();
 
         if ($lu_list->isEmpty()){
@@ -505,7 +518,7 @@ class Order extends Base
             $sign_list = array_column($lu_list,'sign');
         }
 
-//        return [$lu_list,$sign_list];
+        return [$lu_list,$sign_list];
 
         $size = $params['size'] ?? 10;
         $now_date = date('Y-m-d H:i:s');
@@ -610,6 +623,9 @@ class Order extends Base
                     $temp_inviter['live_id'] = $ll_v->live_id;
                     $temp_inviter['title'] = $ll_v->title;
                     $v->inviter_info = $temp_inviter;
+
+                    $v->t_live_user_id = $ll_v->t_live_user_id;
+                    $v->t_live_phone = $ll_v->t_live_phone;
                 }
             }
 
