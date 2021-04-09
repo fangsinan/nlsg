@@ -242,7 +242,7 @@ class WechatPay extends Controller
                 $PayRDObj = new PayRecordDetail();
                 // 开通续费为360   并且  推客id有 或者  销讲老师id有[推客可能为空]
                 $sales_id = $orderInfo['sales_id']; //销讲老师
-                if ($supremacy_vip == 1 && (!empty($twitter_id) || !empty($sales_id)) ) { //推客是自己不算 服务商赠送不返利
+                if ($supremacy_vip == 1 && (!empty($twitter_id) || !empty($sales_id))) { //推客是自己不算 服务商赠送不返利
                     $tk_vip = VipUser::IsNewVip($twitter_id);
 
                     if ($tk_vip && $supremacy_vip == 1) {   //目前只有360会员有收益
@@ -257,16 +257,16 @@ class WechatPay extends Controller
 
                     /*****************     开通360   有销讲老师的划分收益【】  ****************/
 
-                    if( !empty($map)  && ( empty($sales_id) || $vip_order_type == 2) ){  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程
+                    if (!empty($map) && (empty($sales_id) || $vip_order_type == 2)) {  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程
                         //防止重复添加收入
                         $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
                         $PrdInfo = PayRecordDetail::where($where)->first('id');
                         if (empty($PrdInfo)) {
                             $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                         }
-                    }else if( !empty($sales_id) && $vip_order_type == 1 ) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
+                    } else if (!empty($sales_id) && $vip_order_type == 1) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
                         //老师收益
-                        $salesData = MeetingSales::where(['id'=>$sales_id,'status'=>1])->first();
+                        $salesData = MeetingSales::where(['id' => $sales_id, 'status' => 1])->first();
                         $sales_map = array('user_id' => $salesData['user_id'], "type" => 11, "ordernum" => $out_trade_no, 'price' => 100, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
                         $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
 
@@ -274,7 +274,7 @@ class WechatPay extends Controller
                         $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
                         //if( $salesData['type'] == 2 ){  } //需要查绑定关系   钻石合伙人是126   360是54  没有则只有老师有收益
                         $is_vip = VipUser::IsNewVip($twitter_id);
-                        switch ($is_vip){
+                        switch ($is_vip) {
                             case 1:
                                 $map['price'] = 54;
                                 break;
@@ -287,7 +287,7 @@ class WechatPay extends Controller
                         }
 
                         //代理商收益
-                        if($map){
+                        if ($map) {
                             $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                         }
                     }
@@ -318,7 +318,7 @@ class WechatPay extends Controller
                     self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 
                     //短信
-                    if($AdminInfo['phone']){
+                    if ($AdminInfo['phone']) {
                         $easySms = app('easysms');
                         $result = $easySms->send($AdminInfo['phone'], [
                             'template' => 'SMS_211001614',
@@ -434,7 +434,7 @@ class WechatPay extends Controller
     }
 
 
-    static function LiveRedis($type, $relation_id, $nickname, $live_id = 0, $orderid = 0, $live_num=1)
+    static function LiveRedis($type, $relation_id, $nickname, $live_id = 0, $orderid = 0, $live_num = 1)
     {
 
         if ($live_id == 0) {
@@ -445,23 +445,23 @@ class WechatPay extends Controller
         Redis::select(0);
 
         if ($type == 16) {
-            $res = $nickname . ':您已成功购买'.$live_num.'个幸福360会员';
+            $res = $nickname . ':您已成功购买' . $live_num . '个幸福360会员';
         } else {
             switch ($relation_id) {
                 case 1: //经营能量
-                    $res = $nickname . ':您已成功购买'.$live_num.'张经营能量门票';
+                    $res = $nickname . ':您已成功购买' . $live_num . '张经营能量门票';
                     break;
                 case 2: //一代天骄
-                    $res = $nickname . ':您已支付'.$live_num.'单一代天骄定金';
+                    $res = $nickname . ':您已支付' . $live_num . '单一代天骄定金';
                     break;
                 case 3: //演说能量
-                    $res = $nickname . ':您已支付'.$live_num.'单演说能量定金';
+                    $res = $nickname . ':您已支付' . $live_num . '单演说能量定金';
                     break;
                 case 4: //幸福套餐
-                    $res = $nickname . ':您已支付'.$live_num.'张幸福套餐';
+                    $res = $nickname . ':您已支付' . $live_num . '张幸福套餐';
                     break;
                 case 5: //幸福套餐
-                    $res = $nickname . ':您已支付'.$live_num.'张30天智慧父母(亲子)训练营';
+                    $res = $nickname . ':您已支付' . $live_num . '张30天智慧父母(亲子)训练营';
                     break;
             }
         }
@@ -566,22 +566,22 @@ class WechatPay extends Controller
                 $userdata = User::find($user_id);
 
                 //21-03-22 补充的课程
-                if (in_array($liveData['user_id']??0,[161904,250550,423403])){
-                    Subscribe::appendSub([$user_id],1);
+                if (in_array($liveData['user_id'] ?? 0, [161904, 250550, 423403])) {
+                    Subscribe::appendSub([$user_id], 1);
                 }
                 //写入关系保护
-                if(!empty($orderInfo['twitter_id'])){
+                if (!empty($orderInfo['twitter_id'])) {
                     $twitter_data = User::find($orderInfo['twitter_id']);
                     $check_bind = VipUserBind::getBindParent($userdata['phone']);
-                    if ($check_bind == 0){
+                    if ($check_bind == 0) {
                         //没有绑定记录,则绑定
                         $bind_data = [
-                            'parent'=>$twitter_data['phone'],
-                            'son'=>$userdata['phone'],
-                            'life'=>2,
-                            'begin_at'=>date('Y-m-d H:i:s'),
-                            'end_at'=>date('Y-m-d 23:59:59',strtotime('+1 years')),
-                            'channel'=>2
+                            'parent' => $twitter_data['phone'],
+                            'son' => $userdata['phone'],
+                            'life' => 2,
+                            'begin_at' => date('Y-m-d H:i:s'),
+                            'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                            'channel' => 2
                         ];
                         DB::table('nlsg_vip_user_bind')->insert($bind_data);
                     }
@@ -597,7 +597,7 @@ class WechatPay extends Controller
                 $twitter_id = $orderInfo['twitter_id'];
                 $Profit_Rst = true;
 
-                if (!empty($twitter_id) && $twitter_id != $user_id && $liveData['twitter_money'] > 0 && $total_fee>$liveData['twitter_money']) {
+                if (!empty($twitter_id) && $twitter_id != $user_id && $liveData['twitter_money'] > 0 && $total_fee > $liveData['twitter_money']) {
 //                if (!empty($twitter_id) && $twitter_id != $user_id && $liveData['twitter_money'] > 0 ) {
                     $liveCountDown['new_vip_uid'] = $twitter_id;
                     //固定收益50
@@ -621,7 +621,7 @@ class WechatPay extends Controller
                     DB::commit();
                     //SMS_211275363
                     //短信
-                    if($userdata['phone'] && $live_id == 12 ){
+                    if ($userdata['phone'] && $live_id == 12) {
                         $easySms = app('easysms');
                         $easySms->send($userdata['phone'], [
                             'template' => 'SMS_211275363',
@@ -753,6 +753,7 @@ class WechatPay extends Controller
         $order_obj->pay_type = $data['pay_type'];
         $order_obj->pay_time = $now_date;
         $order_obj->pay_price = $pay_price;
+        $order_obj->gp_status = 1;
 
         $order_res = $order_obj->save();
         if (!$order_res) {
@@ -827,6 +828,7 @@ class WechatPay extends Controller
                 ->count();
 
             if ($now_num >= $need_num) {
+                //拼团成功
                 $gb_res = MallGroupBuyList::where(
                     'group_key', '=', $temp_data->group_key
                 )->update(
@@ -835,6 +837,11 @@ class WechatPay extends Controller
                         'success_at' => $now_date
                     ]
                 );
+
+                MallOrder::where('id', '=', $order_obj->id)->update([
+                    'gp_status' => 2
+                ]);
+
                 if (!$gb_res) {
                     DB::rollBack();
                     return false;
@@ -1082,12 +1089,12 @@ class WechatPay extends Controller
                 if ($orderInfo['type'] == 15) {
                     $sub_type = 6;  //讲座
                 }
-                $check_channel_works_list = ChannelWorksList::where('works_id','=',$teacher_id)
-                    ->where('type','=',1)
+                $check_channel_works_list = ChannelWorksList::where('works_id', '=', $teacher_id)
+                    ->where('type', '=', 1)
                     ->first();
-                if (empty($check_channel_works_list)){
+                if (empty($check_channel_works_list)) {
                     $channel_works_list_id = 0;
-                }else{
+                } else {
                     $channel_works_list_id = $check_channel_works_list->id;
                 }
                 $subscribe = [
@@ -1100,13 +1107,13 @@ class WechatPay extends Controller
                     'end_time' => date("Y-m-d H:i:s", $endtime),
                     'relation_id' => $teacher_id,
                     'service_id' => $orderInfo['service_id'],
-                    'channel_works_list_id'=>$channel_works_list_id,
+                    'channel_works_list_id' => $channel_works_list_id,
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
                 //订阅量处理
                 Column::where(['id' => $teacher_id])->increment('real_subscribe_num');
-                Works::edit_view_num($teacher_id,2,2); //虚拟数 3000以下1：50   以上1：5
+                Works::edit_view_num($teacher_id, 2, 2); //虚拟数 3000以下1：50   以上1：5
 //                $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
 //                $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
@@ -1308,12 +1315,12 @@ class WechatPay extends Controller
                 }
 
                 //添加订阅记录
-                $check_channel_works_list = ChannelWorksList::where('works_id','=',$works_id)
-                    ->where('type','=',2)
+                $check_channel_works_list = ChannelWorksList::where('works_id', '=', $works_id)
+                    ->where('type', '=', 2)
                     ->first();
-                if (empty($check_channel_works_list)){
+                if (empty($check_channel_works_list)) {
                     $channel_works_list_id = 0;
-                }else{
+                } else {
                     $channel_works_list_id = $check_channel_works_list->id;
                 }
                 $subscribe = [
@@ -1326,7 +1333,7 @@ class WechatPay extends Controller
                     'service_id' => $orderInfo['service_id'],
                     'start_time' => date("Y-m-d H:i:s", $starttime),
                     'end_time' => date("Y-m-d H:i:s", $endtime),
-                    'channel_works_list_id' =>$channel_works_list_id,
+                    'channel_works_list_id' => $channel_works_list_id,
                 ];
 
 
@@ -1334,7 +1341,7 @@ class WechatPay extends Controller
 
                 //精品课购买数量 自增1
                 $class_Rst = Works::where(['id' => $works_id])->increment('real_subscribe_num', 1);
-                Works::edit_view_num($works_id,1,2); //虚拟数 3000以下1：50   以上1：5
+                Works::edit_view_num($works_id, 1, 2); //虚拟数 3000以下1：50   以上1：5
 
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);

@@ -64,8 +64,7 @@ class MallOrderServers
         switch (intval($params['status'] ?? 0)) {
             case 1:
                 $query->where(function ($q) {
-                    $q->where('status', '=', 1)
-                        ->orWhere('status', '=', 11);
+                    $q->where('status', '=', 1)->orWhere('status', '=', 11);
                 });
                 break;
             case 10:

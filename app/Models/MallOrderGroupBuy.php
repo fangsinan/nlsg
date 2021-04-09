@@ -1204,6 +1204,7 @@ class MallOrderGroupBuy extends Base
             $order_info->is_stop = 1;
             $order_info->stop_by = 0;
             $order_info->stop_at = $now_date;
+            $order_info->gp_status = 3;
             $order_res = $order_info->save();
             if ($order_res === false) {
                 DB::rollBack();
