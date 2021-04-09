@@ -229,6 +229,11 @@ class Order extends Base
         return $this->belongsTo(Live::class, 'live_id', 'id');
     }
 
+    public function liveRemark()
+    {
+        return $this->belongsTo(Live::class, 'remark', 'id');
+    }
+
     public function offline()
     {
         return $this->belongsTo(OfflineProducts::class, 'relation_id', 'id');
@@ -236,7 +241,7 @@ class Order extends Base
 
     public function liveGoods()
     {
-        return $this->belongsTo(Live::class, 'relation_id', 'id');
+        return $this->belongsTo(Live::class, 'live_id', 'id');
     }
 
     public function orderInLive($params, $this_user = [])
@@ -597,7 +602,10 @@ class Order extends Base
             'payRecord' => function ($q) {
                 $q->select(['ordernum', 'price', 'type', 'created_at']);
             },
-            'live' => function ($q) {
+//            'live' => function ($q) {
+//                $q->select(['id', 'title', 'describe', 'begin_at', 'cover_img']);
+//            },
+            'liveRemark' => function ($q) {
                 $q->select(['id', 'title', 'describe', 'begin_at', 'cover_img']);
             },
             'user' => function ($q) {
@@ -606,7 +614,7 @@ class Order extends Base
             'pay_record_detail:id,type,ordernum,user_id,price',
             'pay_record_detail.user:id,phone,nickname',
         ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
-            'pay_price', 'pay_type', 'ordernum', 'live_id', 'os_type', 'status',
+            'pay_price', 'pay_type', 'ordernum', 'live_id', 'os_type', 'status','remark',
             DB::raw("CONCAT(live_id,'-',user_id) as sign")]);
 
         $list = $query->orderBy('id', 'desc')->paginate($size);
@@ -626,7 +634,7 @@ class Order extends Base
                     $v->t_live_phone = $ll_v->t_live_phone;
                 }
             }
-
+            $v->live = $v->liveRemark;
             $goods = [];
             switch (intval($v->type)) {
                 case 10:
@@ -655,7 +663,7 @@ class Order extends Base
                     break;
             }
             $v->goods = $goods;
-            unset($v->offline);
+            unset($v->offline,$v->liveGoods);
         }
 
         return $list;
