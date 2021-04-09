@@ -908,16 +908,16 @@ class LiveController extends Controller
 
         $from_live_info_id = '';
         if (isset($input['from_live_info_id']) && $input['from_live_info_id'] > 0) {   //大于0 时说明在直播间买的
-            $from_live_info_id = $input['from_live_info_id'];
             //查看是否有免费直播间的推荐人
             $liveCountDown = LiveCountDown::select('live_id', 'user_id', 'new_vip_uid')
-                ->where('live_id', $from_live_info_id)
+                ->where('live_id', $input['from_live_info_id'])
                 ->where('user_id', $this->user['id'])
                 ->first();
 
             $tweeter_code = $liveCountDown['new_vip_uid'];
+            $live_pid = LiveInfo::Find($input['from_live_info_id']);  //推荐 remark
+            $from_live_info_id = $live_pid['live_pid'];
         }
-
 
         $list = Live::select('id', 'title', 'price', 'twitter_money', 'is_free')
             ->where('id', $liveId)
