@@ -173,6 +173,7 @@ class MallOrderServers
             $oModel->user_id = $v['id'];
             $oModel->order_type = 3;
             $oModel->status = 30;
+            $oModel->gp_status = 2;
             $oModel->cost_price = $price_info->group_price;
             $oModel->price = $price_info->group_price;
             $oModel->pay_price = $price_info->group_price;
@@ -205,6 +206,16 @@ class MallOrderServers
             ->update([
                 'is_success' => 1,
                 'success_at' => $now_date
+            ]);
+
+        $order_id_list = MallGroupBuyList::where('group_key', '=', $group_key)
+            ->where('is_success', '=', 1)
+            ->pluck('order_id')
+            ->toArray();
+
+        MallOrder::whereIn('id', $order_id_list)
+            ->update([
+                'gp_status' => 2
             ]);
 
         if ($update_res === false) {
