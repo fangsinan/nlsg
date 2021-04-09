@@ -235,7 +235,7 @@ class MallController extends Controller
 
             if (0) {
                 $data = [
-                    'out_trade_no' => '21040900168934636025001', //获取订单号
+                    'out_trade_no' => '21040900168934727026601', //获取订单号
                     'total_fee' => 0.01, //价格
                     'transaction_id' => 88888888888, //交易单号
                     'attach' => 8,

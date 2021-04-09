@@ -59,42 +59,62 @@ class MallOrderServers
             $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
 
-        //todo 修改拼团下单流程后继续
+
         //订单状态 1待付款  10待发货 20待收货 30已完成 95拼团中 99已取消
+
+        // status : 订单状态 1待付款  10待发货 20待收货 30已完成
+        // gp_status : 补充状态,用于简化拼团订单状态筛选  1拼团中  2拼团成功 3拼团失败
+
         switch (intval($params['status'] ?? 0)) {
             case 1:
-                $query->where(function ($q) {
-                    $q->where('status', '=', 1)->orWhere('status', '=', 11);
-                });
+                $query->where('status', '=', 1)
+                    ->where('is_stop', '=', 0);
                 break;
             case 10:
+                $query->where('status', '=', 10)
+                    ->where('is_stop', '=', 0)
+                    ->where(function ($q) {
+                        $q->whereRaw('order_type = 3 and gp_status = 2')
+                            ->orWhereRaw('order_type <> 3');
+                    });
                 break;
             case 20:
+                $query->where('status', '=', 20)
+                    ->where('is_stop', '=', 0);
                 break;
             case 30:
+                $query->where('status', '=', 30)
+                    ->where('is_stop', '=', 0);
                 break;
             case 95:
+                $query->where('gp_status', '=', 1)
+                    ->where('status', '=', 10)
+                    ->where('is_stop', '=', 0);
                 break;
             case 99:
+                $query->where('is_stop', '=', 1);
                 break;
         }
 
+        $query->where('is_del', '=', 0)
+            ->with([
+                'orderDetails', 'orderDetails.goodsInfo',
+                'userInfo',
+                'orderChild', 'orderChild.expressInfo',
+                'refundRecord' => function ($q) {
+                    $q->select([
+                        'id', 'service_num', 'order_id', 'order_detail_id', 'type'
+                    ]);
+                }
+            ]);
 
-        $query->with([
-            'orderDetails', 'orderDetails.goodsInfo',
-            'userInfo',
-            'orderChild', 'orderChild.expressInfo',
-            'groupBuy',
-            'refundRecord' => function ($q) {
-                $q->select([
-                    'id', 'service_num', 'order_id', 'order_detail_id', 'type'
-                ]);
-            }
-        ]);
 
 
-//        $query->where('order_type','<>',3);
-//        $query->where('ordernum', '=', '21012200008157523257401');
+        $field = [
+            'id', 'ordernum', 'price', 'dead_time',
+            'created_at', 'pay_price', 'price', 'post_type', 'pay_type',
+            'normal_cut'
+        ];
 
 //        DB::connection()->enableQueryLog();
         $list = $query->select()->orderBy('id', 'desc')->limit(10)->get();
