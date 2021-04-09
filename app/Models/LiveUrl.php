@@ -12,7 +12,7 @@ class LiveUrl extends Model
 
     static function search($keywords)
     {
-        $res = Live::select('id', 'name', 'content', 'url', 'image', 'img', 'user_id')
+        $res = LiveUrl::select('id', '`name`', 'content', 'url', 'image', 'img', 'user_id')
             ->where('is_del', 0)
 //            ->where(function ($query) use ($keywords) {
 //                $query->orWhere('name', 'LIKE', "%$keywords%");
