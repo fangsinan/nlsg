@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Live;
+use App\Models\LiveUrl;
 use App\Models\MallGoods;
 use App\Models\OfflineProducts;
 use App\Models\Search;
@@ -444,6 +445,7 @@ class SearchController extends Controller
             $res['products'] = OfflineProducts::search($keywords);
             $res['vip']['res'][] = ['id'=>1,'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/works/20210105102849884378.png','price'=>360.00];
             $res['live'] = Live::search($keywords);
+            $res['live_urls'] = LiveUrl::search($keywords);
         }
 
 
