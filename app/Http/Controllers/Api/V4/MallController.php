@@ -6,17 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\CouponRule;
 use App\Models\CouponRuleList;
-use App\Models\Live;
 use App\Models\MallCategory;
 use App\Models\MallComment;
 use App\Models\MallGoods;
 use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
-use App\Models\VipRedeemUser;
 use App\Models\VipUser;
-use App\Servers\ChannelServers;
-use App\Servers\MallRefundJob;
 use Illuminate\Http\Request;
 
 class MallController extends Controller
@@ -239,11 +235,11 @@ class MallController extends Controller
 
             if (0) {
                 $data = [
-                    'out_trade_no' => '21012700257326612678303', //获取订单号
+                    'out_trade_no' => '21040900168934636025001', //获取订单号
                     'total_fee' => 0.01, //价格
-                    'transaction_id' => 8888, //交易单号
-                    'attach' => 14,
-                    'pay_type' => 4,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
+                    'transaction_id' => 88888888888, //交易单号
+                    'attach' => 8,
+                    'pay_type' => 1,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
                 ];
                 $res = WechatPay::PayStatusUp($data);
                 dd($res);

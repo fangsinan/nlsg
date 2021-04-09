@@ -105,7 +105,6 @@ class ChannelController extends Controller
             case 'cytx':
                 $data['phone'] = $request->input('telephone', '');
                 $data['nickname'] = $request->input('user_name', '');
-                $data['headimg'] = $request->input('avatar', '');
                 $data['ref'] = 1;
                 $sign = $request->input('sign', '');
                 $check_sign = md5($data['phone'] . 'cytxnlsg_v4');
