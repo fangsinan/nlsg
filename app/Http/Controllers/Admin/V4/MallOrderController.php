@@ -31,15 +31,15 @@ class MallOrderController extends ControllerBackend
      * @apiParam {number=0,1} flag 0列表,1详情
      * @apiParam {number} [page] 页数,默认1
      * @apiParam {number} [size] 条数,默认10
-     * @apiParam {strint} [ordernum] 订单编号
-     * @apiParam {strint} [created_at] 订单时间范围(2020-01-01,2022-02-02)
-     * @apiParam {strint} [pay_time] 支付时间范围
-     * @apiParam {strint} [pay_type] 支付渠道(1微信端 2app微信 3app支付宝 4ios)
-     * @apiParam {strint} [os_type] 客户端(客户端:1安卓 2ios 3微信 )
-     * @apiParam {strint} [phone] 账号
-     * @apiParam {strint} [nickname] 昵称
-     * @apiParam {strint} [goods_name] 品名
-     * @apiParam {strint} [status] 状态(参考前端订单接口文档)
+     * @apiParam {string} [ordernum] 订单编号
+     * @apiParam {string} [created_at] 订单时间范围(2020-01-01,2022-02-02)
+     * @apiParam {string} [pay_time] 支付时间范围
+     * @apiParam {string} [pay_type] 支付渠道(1微信端 2app微信 3app支付宝 4ios)
+     * @apiParam {string} [os_type] 客户端(客户端:1安卓 2ios 3微信 )
+     * @apiParam {string} [phone] 账号
+     * @apiParam {string} [nickname] 昵称
+     * @apiParam {string} [goods_name] 品名
+     * @apiParam {string} [status] 状态(参考前端订单接口文档)
      * @apiParam {string='normal','flash_sale','group_buy'} order_type 订单类型:普通,秒杀,团购
      *
      * @apiSuccessExample {json} Request-Example:

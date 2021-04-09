@@ -61,11 +61,11 @@ class MallOrderServers
 
         //todo 修改拼团下单流程后继续
         //订单状态 1待付款  10待发货 20待收货 30已完成 95拼团中 99已取消
-        switch (intval($params['status']??0)){
+        switch (intval($params['status'] ?? 0)) {
             case 1:
-                $query->where(function($q){
-                    $q->where('status','=',1)
-                        ->orWhere('status','=',11);
+                $query->where(function ($q) {
+                    $q->where('status', '=', 1)
+                        ->orWhere('status', '=', 11);
                 });
                 break;
             case 10:
@@ -86,9 +86,9 @@ class MallOrderServers
             'userInfo',
             'orderChild', 'orderChild.expressInfo',
             'groupBuy',
-            'refundRecord'=>function($q){
+            'refundRecord' => function ($q) {
                 $q->select([
-                    'id','service_num','order_id','order_detail_id','type'
+                    'id', 'service_num', 'order_id', 'order_detail_id', 'type'
                 ]);
             }
         ]);
