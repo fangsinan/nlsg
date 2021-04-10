@@ -256,7 +256,8 @@ class Order extends Base
             ->where('status', '=', 1)
             ->whereIn('type', [9, 10, 14, 15, 16])
             ->where('live_id', '>', 0)
-            ->where('is_shill', '=', 0);
+            ->where('is_shill', '=', 0)
+            ->where('pay_price','>',1);
 
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
@@ -480,7 +481,8 @@ class Order extends Base
             ->leftJoin('nlsg_user as u2','cd.new_vip_uid','=','u2.id')
             ->where('o.id','>',341864)
             ->where('o.status','=',1)
-            ->where('o.type','=',10);
+            ->where('o.type','=',10)
+            ->where('o.pay_price','>',1);
 
         //推荐用户账号
         if (!empty($params['t_phone'] ?? '')) {
