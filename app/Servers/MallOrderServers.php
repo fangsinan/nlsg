@@ -351,7 +351,7 @@ class MallOrderServers
             'id', 'ordernum', 'price', 'dead_time', 'user_id', 'order_type', 'pay_price', 'messages', 'created_at',
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'address_history'
         ];
-        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo'];
+        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo','refundRecord'];
 
 //        if (($params['flag'] ?? 0) == 1) {
         $field[] = 'cost_price';
@@ -523,7 +523,7 @@ class MallOrderServers
 				END ) status')
         ];
 
-        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo'];
+        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo','refundRecord'];
 
         if (($params['flag'] ?? 0) == 1) {
             $field[] = 'address_history';
