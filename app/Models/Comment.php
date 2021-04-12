@@ -179,19 +179,19 @@ class Comment extends Base
         if ($lists) {
             foreach ($lists['data'] as $k => &$v) {
                 if ($v['type'] == 1) {
-                    $lists['data'][$k]['title'] = Column::where(['id'   => $v['relation_id'], 'type' => 1
+                    $lists['data'][$k]['title'] = Column::where(['id'=> $v['relation_id'], 'type' => 1
                     ])->value('name');
                 } elseif ($v['type'] == 2) {
-                    $lists['data'][$k]['title'] = Column::where(['id'   => $v['relation_id'], 'type' => 2
+                    $lists['data'][$k]['title'] = Column::where(['id'=> $v['relation_id'], 'type' => 2
                     ])->value('name');
                 } elseif ($v['type'] == 3) {
-                    $lists['data'][$k]['title'] = Works::where(['id'            => $v['relation_id'],
-                                                                'is_audio_book' => 1
+                    $lists['data'][$k]['title'] = Works::where(['id' => $v['relation_id'], 'is_audio_book' => 1
                     ])->value('title');
                 } elseif ($v['type'] == 4) {
-                    $lists['data'][$k]['title'] = Works::where(['id' => $v['relation_id']])->value('title');
+                    $lists['data'][$k]['title'] = Works::where(['id'=>$v['relation_id']])->value('title');
+                    $lists['data'][$k]['chapter'] = WorksInfo::where(['id'=>$v['info_id']])->value('title');
                 } elseif ($v['type'] == 5) {
-                    $lists['data'][$k]['title'] = Wiki::where(['id' => $v['relation_id']])->value('name');
+                    $lists['data'][$k]['title'] = Wiki::where(['id'=> $v['relation_id']])->value('name');
                 }
             }
         }

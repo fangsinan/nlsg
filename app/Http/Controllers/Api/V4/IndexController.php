@@ -58,7 +58,7 @@ class IndexController extends Controller
      * @apiSuccess {string} url  链接地址
      *
      * @apiSuccessExample  Success-Response:
-     *     HTTP/1.1 200 OK
+     *     HTTP/1.1 200 OKr
      *     {
      *       "code": 200,
      *       "msg" : '成功',
