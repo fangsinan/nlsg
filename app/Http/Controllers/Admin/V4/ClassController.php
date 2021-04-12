@@ -877,6 +877,7 @@ class ClassController extends ControllerBackend
         $data = [
             'rank' => $input['rank'] ?? 99,
             'type' => $input['type'] ?? 0,
+            'view_num' => $input['view_num'] ?? 0,
             'title' => $input['title'] ?? '',
             'section' => $input['section'] ?? '',
             'introduce' => $input['introduce'] ?? '',
