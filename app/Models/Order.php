@@ -246,6 +246,8 @@ class Order extends Base
 
     public function orderInLive($params, $this_user = [])
     {
+        $params = array_filter($params);
+        krsort($params);
         $size = $params['size'] ?? 10;
         $now_date = date('Y-m-d H:i:s');
 
@@ -404,7 +406,7 @@ class Order extends Base
 //            $q->where('created_at', '>', '2021-01-01 00:00:00');
 //        });
 
-        $cache_key_name = 'list_money_'.$this_user['id'];
+        $cache_key_name = 'list_money_'.$this_user['id'].'_'.md5(serialize($params));
         $expire_num = 30;
         $list_money = Cache::get($cache_key_name);
         if (empty($list_money)) {
@@ -413,9 +415,7 @@ class Order extends Base
             Cache::put($cache_key_name, $list_money, $expire_num);
         }
 
-//        $this->getSqlBegin();
         $list = $query->orderBy('id', 'desc')->paginate($size);
-//        $this->getSql();
 
         foreach ($list as &$v) {
             $goods = [];
