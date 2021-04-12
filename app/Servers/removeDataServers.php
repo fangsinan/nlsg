@@ -1841,6 +1841,8 @@ and o.status = 1 and o.pay_price > 1";
             if (!empty($v->phone)) {
                 $temp_user = User::firstOrCreate([
                     'phone' => $v->phone
+                ],[
+                    'nickname' => substr_replace($v->phone, '****', 3, 4),
                 ]);
             } else {
                 $temp_user = User::firstOrCreate([

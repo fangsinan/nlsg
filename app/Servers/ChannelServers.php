@@ -257,6 +257,7 @@ class ChannelServers
             return true;
         }
 
+        
         foreach ($list as $v) {
             if (empty($v->skuInfo) || $v->order_status == 4) {
                 $v->status = 9;
