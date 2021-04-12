@@ -63,6 +63,11 @@ class CommentController extends Controller
         if ($comments['data']) {
             $comments['data'] = Comment::convert($comments);
             return success($comments);
+        } else {
+            $data = [
+                'data' => []
+            ];
+            return success($data);
         }
     }
 
