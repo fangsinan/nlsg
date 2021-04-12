@@ -45,7 +45,7 @@ class Comment extends Base
             $query->where('info_id', $info_id);
         }
 
-        $query->whereHas('user', function ($q){
+        $query->whereHas('user', function ($q) {
             $q->where('id', '>', 0);
         });
 
@@ -177,17 +177,21 @@ class Comment extends Base
             return false;
         }
         if ($lists) {
-            foreach ($lists['data'] as $k=>&$v) {
+            foreach ($lists['data'] as $k => &$v) {
                 if ($v['type'] == 1) {
-                    $lists['data'][$k]['title'] = Column::where(['id' => $v['relation_id'], 'type' => 1])->value('name');
+                    $lists['data'][$k]['title'] = Column::where(['id'   => $v['relation_id'], 'type' => 1
+                    ])->value('name');
                 } elseif ($v['type'] == 2) {
-                    $lists['data'][$k]['title']  = Column::where(['id' => $v['relation_id'], 'type' => 2])->value('name');
+                    $lists['data'][$k]['title'] = Column::where(['id'   => $v['relation_id'], 'type' => 2
+                    ])->value('name');
                 } elseif ($v['type'] == 3) {
-                    $lists['data'][$k]['title']  = Works::where(['id' => $v['relation_id'], 'is_audio_book' => 1])->value('title');
+                    $lists['data'][$k]['title'] = Works::where(['id'            => $v['relation_id'],
+                                                                'is_audio_book' => 1
+                    ])->value('title');
                 } elseif ($v['type'] == 4) {
-                    $lists['data'][$k]['title']  = Works::where(['id' => $v['relation_id']])->value('title');
+                    $lists['data'][$k]['title'] = Works::where(['id' => $v['relation_id']])->value('title');
                 } elseif ($v['type'] == 5) {
-                    $lists['data'][$k]['title']  = Wiki::where(['id' => $v['relation_id']])->value('name');
+                    $lists['data'][$k]['title'] = Wiki::where(['id' => $v['relation_id']])->value('name');
                 }
             }
         }
@@ -204,9 +208,15 @@ class Comment extends Base
     {
         return $this->belongsTo(Works::class, 'relation_id', 'id');
     }
+
     public function wiki()
     {
         return $this->belongsTo(Wiki::class, 'relation_id', 'id');
+    }
+
+    public function info()
+    {
+        return $this->belongsTo(WorksInfo::class, 'info_id', 'id');
     }
 
 

@@ -20,6 +20,7 @@ class CommentController extends Controller
         $type = $request->get('type');
         $content = $request->get('content');
         $title = $request->get('title');
+        $chapter = $request->get('chapter');
 
         $query = Comment::with('user:id,nickname')
             ->when($type, function ($query) use ($type) {
@@ -34,6 +35,11 @@ class CommentController extends Controller
                 $query->whereHas('work', function ($query) use ($title) {
                     $query->where('title', 'like', '%'.$title.'%');
                 });
+            })
+            ->when($chapter, function ($query) use ($chapter) {
+               $query->whereHas('info', function ($query) use ($chapter) {
+                   $query->where('title', 'like', '%'.$chapter.'%');
+               });
             })
             ->when($title && $type == 5, function ($query) use ($title) {
                 $query->whereHas('wiki', function ($query) use ($title) {
