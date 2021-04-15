@@ -236,14 +236,17 @@ class LiveConsole extends Base
                 if (empty($v['id'] ?? 0)) {
                     unset($params['list'][$k]['id']);
                 }
-                $temp_push_end_time = date('Y-m-d H:i:s',
+                $temp_push_end_time = date('Y-m-d 23:59:59',
                     strtotime($v['end_at'] . " +1 days")
                 );
 
                 $params['list'][$k]['push_end_time'] = $temp_push_end_time;
 
+//                $temp_get_url = $this->getPushUrl(
+//                    rand(100, 999) . $user_id . $now, strtotime($temp_push_end_time)
+//                );
                 $temp_get_url = $this->getPushUrl(
-                    rand(100, 999) . $user_id . $now, strtotime($temp_push_end_time)
+                    md5($user_id . $temp_push_end_time), strtotime($temp_push_end_time)
                 );
                 $params['list'][$k]['push_live_url'] = $temp_get_url['push_url'];
                 $params['list'][$k]['live_url'] = $temp_get_url['play_url'];
