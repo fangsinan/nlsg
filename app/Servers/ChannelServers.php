@@ -5,6 +5,7 @@ namespace App\Servers;
 
 
 use App\Models\ChannelOrder;
+use App\Models\ChannelWorksList;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
@@ -257,7 +258,7 @@ class ChannelServers
             return true;
         }
 
-        
+
         foreach ($list as $v) {
             if (empty($v->skuInfo) || $v->order_status == 4) {
                 $v->status = 9;
@@ -607,9 +608,9 @@ class ChannelServers
                     case 5:
                         $live_id_list = [];
                         foreach ($v->skuInfo->to_id as $tv) {
-                            $temp_live_id = Live::teamInfo($tv,1,1);
-                            if (!empty($temp_live_id)){
-                                foreach ($temp_live_id as $tli){
+                            $temp_live_id = Live::teamInfo($tv, 1, 1);
+                            if (!empty($temp_live_id)) {
+                                foreach ($temp_live_id as $tli) {
                                     $live_id_list[] = $tli->id;
                                 }
                             }
@@ -714,5 +715,111 @@ class ChannelServers
         }
     }
 
+    //抖音课程列表
+    public function getList($params)
+    {
+        $size = $params['size'] ?? 10;
+
+        $query = ChannelWorksList::where('status', '=', 1)
+            ->where('channel_type', '=', 1)
+            ->with([
+                'column',
+                'works',
+                'categoryBind',
+                'categoryBind.categoryName',
+            ]);
+
+        //视频,音频过滤
+        if (!empty($works_type)) {
+            $query->where('type', '=', $works_type);
+        }
+
+        //筛选 分类,视频/音频
+        if (!empty($category_id)) {
+            $query->whereHas('categoryBind', function ($q) use ($category_id) {
+                $q->where('category_id', '=', $category_id);
+            });
+        }
+
+        //最多学习,最新上架,价格
+//        switch (strtolower($params['ob']??'')) {
+//            case 'view_num_asc':
+//                $query->orderBy('subscribe_num', 'asc');
+//                break;
+//            case 'view_num_desc':
+//                $query->orderBy('subscribe_num', 'desc');
+//                break;
+//            case 'created_asc':
+//                $query->orderBy('created_at', 'asc');
+//                break;
+//            case 'created_desc':
+//                $query->orderBy('created_at', 'desc');
+//                break;
+//            case 'price_asc':
+//                $query->orderBy('price', 'asc');
+//                break;
+//            case 'price_desc':
+//                $query->orderBy('price', 'desc');
+//                break;
+//        }
+
+        $list = $query->orderBy('rank', 'asc')
+            ->orderBy('id', 'asc')
+            ->paginate($size);
+
+        foreach ($list as $k => $v) {
+            $temp_res = [];
+            $temp_res['id'] = $v['works_id'];
+            $temp_res['rank'] = $v['rank'];
+            $temp_res['works_id'] = $v['works_id'];
+            $temp_res['works_type'] = $v['type'];
+            $temp_res['price'] = $v['price'];
+            $temp_res['view_num'] = $v['view_num'];
+            $temp_res['created_at'] = $v['created_at'];
+            $temp_res['is_buy'] = ($v['check_sub_count'] > 0) ? 1 : 0;
+
+            $temp_res['category_info'] = [];
+            foreach ($v['categoryBind'] as $cbv) {
+                if (!empty($cbv['categoryName'] ?? '')) {
+                    $temp_res['category_info'][] = $cbv['categoryName'];
+                }
+            }
+
+            if ($v['type'] == 1) {
+                if (empty($v['column'])) {
+                    continue;
+                }
+                $temp_res['title'] = $v['column']['title'];
+                $temp_res['subtitle'] = $v['column']['subtitle'];
+                $temp_res['cover_img'] = $v['column']['cover_img'];
+                $temp_res['detail_img'] = $v['column']['cover_img'];
+                $temp_res['type'] = 1;
+                $temp_res['column_type'] = $v['column']['column_type'];
+                $temp_res['user_id'] = $v['column']['user_id'];
+                $temp_res['subscribe_num'] = $v['column']['subscribe_num'];
+                $temp_res['info_num'] = $v['column']['info_num'];
+            } else if ($v['type'] == 2) {
+                if (empty($v['works'])) {
+                    continue;
+                }
+                $temp_res['title'] = $v['works']['title'];
+                $temp_res['subtitle'] = $v['works']['subtitle'];
+                $temp_res['cover_img'] = $v['works']['cover_img'];
+                $temp_res['detail_img'] = $v['works']['cover_img'];
+                $temp_res['type'] = $v['works']['type'];
+                $temp_res['column_type'] = 1;
+                $temp_res['user_id'] = $v['works']['user_id'];
+                $temp_res['subscribe_num'] = $v['works']['subscribe_num'];
+                $temp_res['info_num'] = $v['works']['info_num'];
+            } else {
+                continue;
+            }
+
+            $temp_res['user_info'] = User::getTeacherInfo($temp_res['user_id']);
+            $list[$k] = $temp_res;
+        }
+
+        return $list;
+    }
 
 }
