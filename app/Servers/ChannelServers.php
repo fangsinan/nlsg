@@ -745,15 +745,15 @@ class ChannelServers
         //标题搜索
         if (!empty($params['title'] ?? '')) {
             $title = $params['title'];
-            $w_id_list = Works::where('title','like',"%$title%")
-                ->where('status','=',4)->where('type','=',2)
+            $w_id_list = Works::where('title', 'like', "%$title%")
+                ->where('status', '=', 4)->where('type', '=', 2)
                 ->pluck('id')->toArray();
-            $c_id_list = Column::where('title','like',"%$title%")
-                ->where('status','=',1)->where('type','=',2)
+            $c_id_list = Column::where('title', 'like', "%$title%")
+                ->where('status', '=', 1)->where('type', '=', 2)
                 ->pluck('id')->toArray();
-            $temp_id_list = array_unique(array_merge($w_id_list,$c_id_list));
+            $temp_id_list = array_unique(array_merge($w_id_list, $c_id_list));
 
-            $query->whereIn('works_id',$temp_id_list);
+            $query->whereIn('works_id', $temp_id_list);
 
         }
 
@@ -838,22 +838,81 @@ class ChannelServers
         return $list;
     }
 
-    public function rank($params){
+    public function rank($params)
+    {
         $id = $params['id'] ?? 0;
         $rank = $params['rank'] ?? 0;
-        if (empty($id) || empty($rank)){
-            return ['code'=>false,'msg'=>'参数错误'];
+        if (empty($id) || empty($rank)) {
+            return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $check = ChannelWorksList::where('id','=',$id)->first();
+        $check = ChannelWorksList::where('id', '=', $id)->first();
 
-        if (empty($check)){
-            return ['code'=>false,'msg'=>'id错误'];
+        if (empty($check)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        $before_arr = ChannelWorksList::where('id', '<>', $id)
+            ->where('rank', '<=', $rank)
+            ->where('rank', '<>', 99)
+            ->limit($rank - 1)
+            ->orderBy('rank', 'asc')
+            ->orderBy('id', 'asc')
+            ->pluck('id')
+            ->toArray();
+
+        $rank = $rank > (count($before_arr) + 1) ? (count($before_arr) + 1)  : $rank;
+
+        $after_arr = ChannelWorksList::where('id', '<>', $id)
+            ->where('rank', '<>', 99)
+            ->whereNotIn('id', $before_arr)
+            ->orderBy('rank', 'asc')
+            ->orderBy('id', 'asc')
+            ->pluck('id')
+            ->toArray();
+
+        DB::beginTransaction();
+        $r1 = ChannelWorksList::where('id', '=', $id)->update([
+            'rank' => $rank
+        ]);
+        if ($r1 === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
         }
 
 
+        $r2 = true;
+        foreach ($before_arr as $k => $v) {
+            $temp_r2 = ChannelWorksList::where('id', '=', $v)
+                ->update([
+                    'rank' => $k + 1
+                ]);
+            if ($temp_r2 === false) {
+                $r2 = false;
+            }
+        }
+        if ($r2 === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
 
+        $r3 = true;
+        foreach ($after_arr as $k => $v) {
+            $temp_r3 = ChannelWorksList::where('id', '=', $v)
+                ->update([
+                    'rank' => $k + 1 + $rank
+                ]);
+            if ($temp_r3 === false) {
+                $r3 = false;
+            }
+        }
+        if ($r3 === false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
 
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
 
     }
 

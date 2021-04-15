@@ -6,11 +6,14 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('auth/captcha', 'AuthController@captcha');
     Route::post('auth/login', 'AuthController@login');
     Route::get('mall_order/list_new', 'MallOrderController@listNew');
-    Route::get('channel_works/list', 'ChannelController@list');
-    Route::get('channel_works/rank', 'ChannelController@rank');
+
 
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
         Route::post('auth/change_pwd', 'AuthController@changePassword');
+
+        //创业天下后台列表和排序
+        Route::get('channel_works/list', 'ChannelController@list');
+        Route::post('channel_works/rank', 'ChannelController@rank');
 
         //活动管理
         Route::post('active/add', 'ActiveCont3` roller@add');
