@@ -450,11 +450,11 @@ class IndexController extends ControllerBackend
 
         //todo 临时添加
         $lcModel = new LiveConsole();
-        $temp_push_end_time = date('Y-m-d H:i:s',
+        $temp_push_end_time = date('Y-m-d 23:59:59',
             strtotime($end_at . " +1 days")
         );
         $temp_get_url = $lcModel->getPushUrl(
-            rand(100, 999) . $userId . $now, strtotime($temp_push_end_time)
+            md5($user_id . $temp_push_end_time), strtotime($temp_push_end_time)
         );
 
         $live_info_data = [];
