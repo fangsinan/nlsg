@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Live;
+use App\Models\LiveConsole;
 use App\Models\LivePush;
 use App\Models\Wiki;
 use Carbon\Carbon;
@@ -119,5 +120,11 @@ class LiveController extends Controller
         }
 
         return error(1000,'删除失败');
+    }
+
+    public function begin(Request $request){
+        $model = new LiveConsole();
+        $res = $model->begin($request->input());
+        return $this->getRes($res);
     }
 }

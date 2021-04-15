@@ -670,4 +670,57 @@ class LiveConsole extends Base
         return ['code' => true, 'msg' => '成功'];
     }
 
+    public function begin($params){
+        $live_id = $params['live_id'] ?? 0;
+        $job_type = $params['job_type']??0;
+        if (empty($live_id) || empty($job_type)){
+            return ['code'=>false,'msg'=>'参数错误'];
+        }
+
+        $check = LiveConsole::where('id','=',$live_id)->first();
+        if (empty($check)){
+            return ['code'=>false,'msg'=>'id error'];
+        }
+
+        //1开始  2恢复未开始  3结束
+        switch (intval($job_type)){
+            case 1:
+                $res = LiveInfo::where('live_pid','=',$live_id)
+                    ->update([
+                        'is_begin'=>1,
+                        'is_finish'=>0
+                    ]);
+                break;
+            case 2:
+                $res = LiveInfo::where('live_pid','=',$live_id)
+                    ->update([
+                        'is_begin'=>0,
+                        'is_finish'=>0
+                    ]);
+                break;
+            case 3:
+                $res = LiveInfo::where('live_pid','=',$live_id)
+                    ->update([
+                        'is_begin'=>0,
+                        'is_finish'=>1,
+                        'finished_at'=>date('Y-m-d H:i:s'),
+                    ]);
+
+                Live::where('id','=',$live_id)
+                    ->update([
+                        'is_finish'=>1
+                    ]);
+                break;
+            default:
+                return ['code'=>false,'msg'=>'job_type error'];
+        }
+
+        if ($res === false){
+            return ['code'=>false,'msg'=>'error'];
+        }else{
+            return ['code'=>true,'msg'=>'ok'];
+        }
+
+    }
+
 }
