@@ -61,6 +61,16 @@ class AfterSalesServers
             $query->where('service_num', 'like', '%' . $params['service_num'] . '%');
         }
 
+        if ($params['ordernum'] ?? 0) {
+//            $query->where('service_num', 'like', '%' . $params['service_num'] . '%');
+            $ordernum = $params['ordernum'];
+            $query->whereHas('infoOrder',function ($q)use($ordernum){
+                $q->where('ordernum','like',"%$ordernum%");
+            });
+        }
+
+
+
         if (in_array($params['type'] ?? 0, [1, 2])) {
             $query->where('type', '=', $params['type']);
         }
