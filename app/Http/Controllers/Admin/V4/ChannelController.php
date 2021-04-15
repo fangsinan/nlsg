@@ -17,4 +17,10 @@ class ChannelController extends ControllerBackend
         $data = $servers->getList($request->input());
         return $this->getRes($data);
     }
+
+    public function rank(Request $request){
+        $servers = new ChannelServers();
+        $data = $servers->rank($request->input());
+        return $this->getRes($data);
+    }
 }

@@ -730,15 +730,31 @@ class ChannelServers
             ]);
 
         //视频,音频过滤
-        if (!empty($works_type)) {
-            $query->where('type', '=', $works_type);
+        if (!empty($params['works_type'] ?? '')) {
+            $query->where('type', '=', $params['works_type']);
         }
 
         //筛选 分类,视频/音频
-        if (!empty($category_id)) {
+        if (!empty($params['category_id'] ?? '')) {
+            $category_id = $params['category_id'];
             $query->whereHas('categoryBind', function ($q) use ($category_id) {
                 $q->where('category_id', '=', $category_id);
             });
+        }
+
+        //标题搜索
+        if (!empty($params['title'] ?? '')) {
+            $title = $params['title'];
+            $w_id_list = Works::where('title','like',"%$title%")
+                ->where('status','=',4)->where('type','=',2)
+                ->pluck('id')->toArray();
+            $c_id_list = Column::where('title','like',"%$title%")
+                ->where('status','=',1)->where('type','=',2)
+                ->pluck('id')->toArray();
+            $temp_id_list = array_unique(array_merge($w_id_list,$c_id_list));
+
+            $query->whereIn('works_id',$temp_id_list);
+
         }
 
         //最多学习,最新上架,价格
@@ -769,7 +785,7 @@ class ChannelServers
 
         foreach ($list as $k => $v) {
             $temp_res = [];
-            $temp_res['id'] = $v['works_id'];
+            $temp_res['id'] = $v['id'];
             $temp_res['rank'] = $v['rank'];
             $temp_res['works_id'] = $v['works_id'];
             $temp_res['works_type'] = $v['type'];
@@ -820,6 +836,25 @@ class ChannelServers
         }
 
         return $list;
+    }
+
+    public function rank($params){
+        $id = $params['id'] ?? 0;
+        $rank = $params['rank'] ?? 0;
+        if (empty($id) || empty($rank)){
+            return ['code'=>false,'msg'=>'参数错误'];
+        }
+
+        $check = ChannelWorksList::where('id','=',$id)->first();
+
+        if (empty($check)){
+            return ['code'=>false,'msg'=>'id错误'];
+        }
+
+
+
+
+
     }
 
 }

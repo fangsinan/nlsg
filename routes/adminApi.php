@@ -7,6 +7,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::post('auth/login', 'AuthController@login');
     Route::get('mall_order/list_new', 'MallOrderController@listNew');
     Route::get('channel_works/list', 'ChannelController@list');
+    Route::get('channel_works/rank', 'ChannelController@rank');
 
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
         Route::post('auth/change_pwd', 'AuthController@changePassword');
