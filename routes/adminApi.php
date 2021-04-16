@@ -6,7 +6,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('auth/captcha', 'AuthController@captcha');
     Route::post('auth/login', 'AuthController@login');
     Route::get('mall_order/list_new', 'MallOrderController@listNew');
-    Route::get('live/begin', 'LiveController@begin');
+
 
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
         Route::post('auth/change_pwd', 'AuthController@changePassword');
@@ -149,6 +149,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('live/push', 'LiveController@push');
         Route::get('live/push', 'LiveController@push');
         Route::post('live/create', 'LiveController@create');
+        Route::post('live/begin', 'LiveController@begin');
 
         //用户
         Route::get('user/index', 'UserController@index');
