@@ -361,6 +361,8 @@ class WechatPay extends Controller
             try {
                 $orderId = $orderInfo['id'];
                 $live_id = $orderInfo['live_id'];
+                $twitter_id = $orderInfo['twitter_id'];
+
                 //更新订单状态
 
                 $user_id = $orderInfo['user_id']; //用户
@@ -402,13 +404,22 @@ class WechatPay extends Controller
                 } else {
                     $total_fee_line = 1;
                 }
+
+                $vip_res = true;
                 //1360
                 if ($orderInfo['relation_id'] == 4 && $total_fee > $total_fee_line && $orderInfo['type'] == 14) {
                     $vipModel = new VipUser();
                     $vip_res = $vipModel->jobOf1360($orderInfo['user_id'], $orderInfo['id'], $orderInfo['live_id']);
                     $vip_res = $vip_res['code'];
-                } else {
-                    $vip_res = true;
+                }else if ($orderInfo['relation_id'] == 5 && $total_fee > $total_fee_line && $orderInfo['type'] == 14 && !empty($twitter_id) && $twitter_id != $user_id ) {
+                    $tk_vip = VipUser::IsNewVip($twitter_id);
+                    if ( $tk_vip ) {   //目前只有360会员有收益
+                        $ProfitPrice = GetPriceTools::Income(0, $tk_vip, 0, 6);
+                        if ($ProfitPrice > 0) {
+                            $map = array('user_id' => $twitter_id, "type" => 12, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, );
+                            $vip_res = PayRecordDetail::firstOrCreate($map);
+                        }
+                    }
                 }
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);

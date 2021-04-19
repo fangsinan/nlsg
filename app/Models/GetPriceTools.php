@@ -499,6 +499,15 @@ class GetPriceTools extends Base
                 }
                 $price = $price - 0; //没有促销成本
                 break;
+            case 6:   //1980产品
+                $vip_price = 1980;
+                if ($level == 2) {
+                    $price = self::PriceCalc('*', $vip_price, 0.30);
+                } else {
+                    $price = 0;
+                }
+                $price = $price - 0; //没有促销成本
+                break;
         }
         if ($price < 0) {
             $price = 0; //防止负数
