@@ -84,7 +84,7 @@ class IndexController extends Controller
     {
         $os_type = $request->get('os_type') ?? 0; // 1 安卓 2ios 3微信
         //临时解决  安卓未传 os_type参数
-        if (preg_match('Android', $_SERVER['HTTP_USER_AGENT'])) {
+        if (preg_match('/Android/', $_SERVER['HTTP_USER_AGENT'])) {
             $os_type = 1;
         }
         //show_type  0:全部    1 :客户端   3:h5端
