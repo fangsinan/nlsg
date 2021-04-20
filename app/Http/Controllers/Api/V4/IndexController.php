@@ -80,10 +80,20 @@ class IndexController extends Controller
      *
      */
 
-    public function banner()
+    public function banner(Request $request)
     {
+        $os_type = $request->get('os_type') ?? 0; // 1 安卓 2ios 3微信
+
+        //show_type  0:全部    1 :客户端   3:h5端
+        $show_type = 0;
+        if( in_array($os_type,[1,2]) ){
+            $show_type = 1;
+        }else if( $os_type == 3 ) {
+            $show_type = 2;
+        }
+
         $bannerModel = new Banner();
-        $lists = $bannerModel->getIndexBanner();
+        $lists = $bannerModel->getIndexBanner($show_type);
         return $this->success($lists);
     }
 

@@ -18,7 +18,7 @@ class Banner extends Base
      * 首页Banner
      * @return mixed
      */
-    public function getIndexBanner()
+    public function getIndexBanner($show_type=0)
     {
 //        $cache_key_name = 'index_banner_list';
 //        $expire_num = CacheTools::getExpire('mall_banner_list');
@@ -30,6 +30,7 @@ class Banner extends Base
             ->where('type', 1)
             ->where('start_time', '<=', $today)
             ->where('end_time', '>=', $today)
+            ->whereIn('show_type', [0,$show_type])
             ->orderBy('rank')
             ->orderBy('created_at', 'desc')
             ->take(5)
