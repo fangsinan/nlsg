@@ -4,7 +4,6 @@
 namespace App\Models;
 
 use App\Servers\JobServers;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class LiveConsole extends Base
@@ -183,8 +182,8 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '直播时间信息错误'];
         }
 
-        if (!is_string($params['list'])){
-            return ['code'=>false,'msg'=>'直播时间格式错误'];
+        if (!is_string($params['list'])) {
+            return ['code' => false, 'msg' => '直播时间格式错误'];
         }
         $params['list'] = json_decode($params['list'], true);
         if (!is_array($params['list'] ?? '')) {
@@ -194,10 +193,10 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '直播时间信息过多'];
         }
         //编辑时判断info_id
-        foreach ($params['list'] as $v){
-            if(!empty($params['id'])){
-                if (empty($v['id'])){
-                    return ['code'=>false,'msg'=>'编辑数据格式错误'];
+        foreach ($params['list'] as $v) {
+            if (!empty($params['id'])) {
+                if (empty($v['id'])) {
+                    return ['code' => false, 'msg' => '编辑数据格式错误'];
                 }
             }
         }
@@ -383,18 +382,18 @@ class LiveConsole extends Base
     //todo 直播的相关统计
     public function liveStatistisc($live_id, $user_id)
     {
-        $live_info = LiveInfo::where('live_pid','=',$live_id)->select(['id'])->get()->toArray();
-        $live_info_id = array_column($live_info,'id');
+        $live_info = LiveInfo::where('live_pid', '=', $live_id)->select(['id'])->get()->toArray();
+        $live_info_id = array_column($live_info, 'id');
 
         return [
-            ['key' => '预约人数', 'value' => LiveCountDown::whereIn('live_id',$live_info_id)->count()],
-            ['key' => '观看人数', 'value' => LiveWatchRecord::where('live_id','=',$live_id)->count()],
-            ['key' => '打赏人数', 'value' => Order::where('type','=',5)->where('relation_id','=',$live_id)->where('status','=',1)->count()],
-            ['key' => '打赏金额', 'value' => Order::where('type','=',5)->where('relation_id','=',$live_id)->where('status','=',1)->sum('price')],
+            ['key' => '预约人数', 'value' => LiveCountDown::whereIn('live_id', $live_info_id)->count()],
+            ['key' => '观看人数', 'value' => LiveWatchRecord::where('live_id', '=', $live_id)->count()],
+            ['key' => '打赏人数', 'value' => Order::where('type', '=', 5)->where('relation_id', '=', $live_id)->where('status', '=', 1)->count()],
+            ['key' => '打赏金额', 'value' => Order::where('type', '=', 5)->where('relation_id', '=', $live_id)->where('status', '=', 1)->sum('price')],
 //            ['key' => '分销收入', 'value' => '100元'],
 //            ['key' => '报名收入', 'value' => '100元'],
 //            ['key' => '回放收入', 'value' => '100元'],
-            ['key' => '报名流水', 'value' => Order::where('type','=',10)->where('relation_id','=',$live_id)->where('status','=',1)->sum('price')],
+            ['key' => '报名流水', 'value' => Order::where('type', '=', 10)->where('relation_id', '=', $live_id)->where('status', '=', 1)->sum('price')],
 //            ['key' => '回放流水', 'value' => '100元'],
         ];
     }
@@ -670,56 +669,65 @@ class LiveConsole extends Base
         return ['code' => true, 'msg' => '成功'];
     }
 
-    public function begin($params){
+    public function begin($params)
+    {
         $live_id = $params['live_id'] ?? 0;
-        $job_type = $params['job_type']??0;
-        if (empty($live_id) || empty($job_type)){
-            return ['code'=>false,'msg'=>'参数错误'];
+        $job_type = $params['job_type'] ?? 0;
+        if (empty($live_id) || empty($job_type)) {
+            return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $check = LiveConsole::where('id','=',$live_id)->first();
-        if (empty($check)){
-            return ['code'=>false,'msg'=>'id error'];
+        $check = LiveConsole::where('id', '=', $live_id)->first();
+        if (empty($check)) {
+            return ['code' => false, 'msg' => 'id error'];
         }
+
+        $now_date = date('Y-m-d H:i:s');
 
         //1开始  2恢复未开始  3结束
-        switch (intval($job_type)){
+        switch (intval($job_type)) {
             case 1:
-                $res = LiveInfo::where('live_pid','=',$live_id)
+                $res = LiveInfo::where('live_pid', '=', $live_id)
                     ->update([
-                        'is_begin'=>1,
-                        'is_finish'=>0
+                        'is_begin' => 1,
+                        'is_finish' => 0
                     ]);
                 break;
             case 2:
-                $res = LiveInfo::where('live_pid','=',$live_id)
+                $res = LiveInfo::where('live_pid', '=', $live_id)
                     ->update([
-                        'is_begin'=>0,
-                        'is_finish'=>0,
-                        'finished_at'=>null
+                        'is_begin' => 0,
+                        'is_finish' => 0,
+                        'finished_at' => null
+                    ]);
+                Live::where('id', '=', $live_id)
+                    ->update([
+                        'is_finish' => 0,
+                        'finished_at' => null,
                     ]);
                 break;
             case 3:
-                $res = LiveInfo::where('live_pid','=',$live_id)
+                $res = LiveInfo::where('live_pid', '=', $live_id)
                     ->update([
-                        'is_begin'=>0,
-                        'is_finish'=>1,
-                        'finished_at'=>date('Y-m-d H:i:s'),
+                        'is_begin' => 0,
+                        'is_finish' => 1,
+                        'finished_at' => $now_date,
                     ]);
 
-                Live::where('id','=',$live_id)
+                Live::where('id', '=', $live_id)
                     ->update([
-                        'is_finish'=>1
+                        'is_finish' => 1,
+                        'finished_at' => $now_date,
                     ]);
                 break;
             default:
-                return ['code'=>false,'msg'=>'job_type error'];
+                return ['code' => false, 'msg' => 'job_type error'];
         }
 
-        if ($res === false){
-            return ['code'=>false,'msg'=>'error'];
-        }else{
-            return ['code'=>true,'msg'=>'ok'];
+        if ($res === false) {
+            return ['code' => false, 'msg' => 'error'];
+        } else {
+            return ['code' => true, 'msg' => 'ok'];
         }
 
     }
