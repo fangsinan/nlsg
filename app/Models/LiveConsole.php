@@ -695,7 +695,8 @@ class LiveConsole extends Base
                 $res = LiveInfo::where('live_pid','=',$live_id)
                     ->update([
                         'is_begin'=>0,
-                        'is_finish'=>0
+                        'is_finish'=>0,
+                        'finished_at'=>null
                     ]);
                 break;
             case 3:
