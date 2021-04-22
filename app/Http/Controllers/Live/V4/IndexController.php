@@ -454,7 +454,7 @@ class IndexController extends ControllerBackend
             strtotime($end_at . " +1 days")
         );
         $temp_get_url = $lcModel->getPushUrl(
-            md5($this->user['id'] . $temp_push_end_time), strtotime($temp_push_end_time)
+            md5($userId . $temp_push_end_time), strtotime($temp_push_end_time)
         );
 
         $live_info_data = [];
