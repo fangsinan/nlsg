@@ -521,7 +521,11 @@ class WorksController extends Controller
         if($column){
             $column = $column->toArray();
         }else{
-            $column = [];
+            $userInfo = User::find($works_data['user_id']);
+
+            $column = [
+                'title' => $userInfo['honor']
+            ];
         }
 
         //$works_data['info_num'] = count($info);
