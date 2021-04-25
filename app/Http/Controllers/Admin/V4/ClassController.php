@@ -632,6 +632,7 @@ class ClassController extends ControllerBackend
         $user_id = $input['user_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
+        $subscribe_num = $input['subscribe_num'] ?? 0;
         $status = $input['status'] ?? 2;
         $timing_online = $input['online_type'] ?? 1;
 
@@ -642,6 +643,7 @@ class ClassController extends ControllerBackend
             'subtitle' => $subtitle,
             'message' => $message,
             'user_id' => $user_id,
+            'subscribe_num'=>$subscribe_num,
             'price' => $price,
             'timing_online'  => $timing_online,
             'original_price' => $original_price,
@@ -718,6 +720,7 @@ class ClassController extends ControllerBackend
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
         $content = $input['content'] ?? '';
         $is_pay = $input['is_pay'] ?? 0;
+        $subscribe_num = $input['subscribe_num'] ?? 0;
         $type   = $input['type'] ?? 1;
         $subtitle   = $input['subtitle'] ?? '';
         $des      = $input['des'] ?? '';
@@ -732,6 +735,7 @@ class ClassController extends ControllerBackend
             'user_id' => $user_id,
             'original_price' => $original_price,
             'timing_online'  => $timing_online,
+            'subscribe_num' => $subscribe_num,
             'price' => $price,
             'is_end' => $is_end,
             'status' => $status,
