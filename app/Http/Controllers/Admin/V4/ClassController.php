@@ -824,7 +824,7 @@ class ClassController extends ControllerBackend
     {
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
-            ->select('id', 'title', 'subtitle', 'des','cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num',
+            ->select('id', 'title', 'subtitle', 'des','cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num', 'subscribe_num',
                 'price', 'original_price', 'is_pay', 'message', 'timing_online','timing_time')
             ->where('id', $id)
             ->first();
@@ -1111,7 +1111,7 @@ class ClassController extends ControllerBackend
     public function getColumnWorkList(Request $request)
     {
         $id = $request->get('id');
-        $lists = WorksInfo::select('id', 'title', 'view_num', 'size', 'status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
+        $lists = WorksInfo::select('id', 'title', 'view_num','subscribe_num','size', 'status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
             ->where('column_id', $id)
             ->where('status', '>', 0)
             ->paginate(10)
