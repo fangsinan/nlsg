@@ -356,7 +356,7 @@ class AuthController extends Controller
             if (!$user) {
                 $num=date('ymd',time()); //6位
                 $list = User::create([
-                    'phone'=>'1'.$num.rand(10000,99999), //1+6+5
+                    'phone'=>'1'.$num.rand(100000,999999), //1+6+6
                     'wxopenid' => $res->openid,
                     'openid' => $res->openid,
                     'nickname' => '',
