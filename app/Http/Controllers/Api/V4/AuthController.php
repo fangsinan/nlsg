@@ -354,7 +354,9 @@ class AuthController extends Controller
             //判断用户是否注册
             $user = User::where('openid', $res->openid)->first();
             if (!$user) {
+                $num=date('ymd',time()); //6位
                 $list = User::create([
+                    'phone'=>'1'.$num.rand(10000,99999), //1+6+5
                     'wxopenid' => $res->openid,
                     'openid' => $res->openid,
                     'nickname' => '',
