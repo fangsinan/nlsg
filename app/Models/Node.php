@@ -26,7 +26,7 @@ class Node extends Base
                 ->orderBy('id')
                 ->get();
         }else{
-            
+
         }
 
 
