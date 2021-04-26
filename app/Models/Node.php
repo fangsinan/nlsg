@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Support\Facades\DB;
 
 class Node extends Base
 {
@@ -20,7 +21,7 @@ class Node extends Base
             ->where('pid', '=', $pid)
             ->where('status', '=', 1)
             ->where('is_menu', '=', $is_menu)
-            ->select(['id', 'pid', 'name', 'path', 'is_menu', 'status','rank'])
+            ->select(['id', 'pid', 'name', 'path', 'is_menu', 'status', 'rank',DB::raw('0 as checked')])
             ->orderBy('rank')
             ->orderBy('id')
             ->get();
@@ -38,20 +39,4 @@ class Node extends Base
         }
     }
 
-//    public function menuList()
-//    {
-//        return $this->hasMany(Node::class, 'pid', 'id')
-//            ->where('is_menu', '=', 2)
-//            ->where('status', '=', 1)
-//            ->select(['id', 'pid', 'name', 'path', 'is_menu', 'status']);
-//    }
-//
-//
-//    public function apiList()
-//    {
-//        return $this->hasMany(Node::class, 'pid', 'id')
-//            ->where('is_menu', '=', 1)
-//            ->where('status', '=', 1)
-//            ->select(['id', 'pid', 'name', 'path', 'is_menu', 'status']);
-//    }
 }

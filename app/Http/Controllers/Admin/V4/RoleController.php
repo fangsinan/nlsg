@@ -13,8 +13,14 @@ use Illuminate\Http\Request;
 class RoleController extends ControllerBackend
 {
 
+    //后台账号  --列表 修改   (后台用户 列表 修改密码和角色)
+    //角色管理  --列表 修改   (角色列表)
+    //权限管理  --列表 修改   (菜单和接口 列表 添加或修改)
+    //角色和权限关系管理 --列表 修改
+
+
     /**
-     * 菜单和接口 列表
+     * 菜单和接口 列表 和查询角色已有权限
      * @api {get} /api/admin_v4/role/node_list 菜单和接口列表
      * @apiVersion 1.0.0
      * @apiName /api/admin_v4/role/node_list
@@ -22,11 +28,14 @@ class RoleController extends ControllerBackend
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/role/node_list
      * @apiDescription 角色权限配置
      *
+     * @apiParam {number} role_id 查看角色绑定了那些,传这个
+     *
      * @apiSuccess {number} id id
      * @apiSuccess {number} pid 父级id
      * @apiSuccess {number} name 目录或接口名称
      * @apiSuccess {number} path 目录或接口地址
      * @apiSuccess {number} is_menu 1是api  2是目录
+     * @apiSuccess {number} checked 当传role_id的时候,该值=1表示已选择该权限
      * @apiSuccess {string[]} menu 该目录的子目录
      * @apiSuccess {string[]} api 该目录下属接口
      * @apiSuccessExample {json} Request-Example:
@@ -183,7 +192,41 @@ class RoleController extends ControllerBackend
         return $this->getRes($data);
     }
 
-    //角色列表
+    /**
+     * 后台用户 修改密码和角色
+     * @api {put} /api/admin_v4/admin_user/list_status 后台用户 修改密码和角色
+     * @apiVersion 1.0.0
+     * @apiName /api/admin_v4/admin_user/list_status
+     * @apiGroup  后台-角色权限配置
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/admin_user/list_status
+     * @apiDescription 角色权限配置
+     *
+     * @apiParam {number} id
+     * @apiParam {string=role,pwd} flag 动作(角色或密码)
+     * @apiParam {number} role_id 角色id(修改角色时候需要)
+     * @apiParam {string} pwd 密码(修改密码是需要)
+     * @apiParam {string} re_pwd 确认密码(修改密码是需要)
+     */
+    public function adminListStatus(Request $request)
+    {
+        $servers = new BackendUser();
+        $data = $servers->adminListStatus($request->input(), $this->user['id'] ?? 0);
+        return $this->getRes($data);
+    }
+
+    /**
+     * 角色 列表
+     * @api {put} /api/admin_v4/role/role_list 角色 列表
+     * @apiVersion 1.0.0
+     * @apiName /api/admin_v4/role/role_list
+     * @apiGroup  后台-角色权限配置
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/role/role_list
+     * @apiDescription 角色权限配置
+     *
+     * @apiSuccess {number} id id
+     * @apiSuccess {string} name 名称
+     * @apiSuccess {string[]} role 下属角色
+     */
     public function roleList(Request $request)
     {
         $servers = new RoleServers();
@@ -192,8 +235,21 @@ class RoleController extends ControllerBackend
     }
 
 
-    //后台用户改变角色
-
-    //后台用户重置密码
-
+    /**
+     * 角色和菜单接口的绑定
+     * @api {put} /api/admin_v4/role/role_node_bind 角色和菜单接口的绑定
+     * @apiVersion 1.0.0
+     * @apiName /api/admin_v4/role/role_node_bind
+     * @apiGroup  后台-角色权限配置
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/role/role_node_bind
+     * @apiDescription 角色权限配置
+     *
+     * @apiParam {number} role_id 角色id
+     * @apiParam {string} node_id 模块的id,数组列表均可 1,2,3,4
+     */
+    public function roleNodeBind(Request $request){
+        $servers = new RoleServers();
+        $data = $servers->roleNodeBind($request->input(), $this->user['id'] ?? 0);
+        return $this->getRes($data);
+    }
 }

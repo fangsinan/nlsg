@@ -6,6 +6,7 @@ namespace App\Servers;
 
 use App\Models\Node;
 use App\Models\Role;
+use App\Models\RoleNode;
 use Illuminate\Support\Facades\DB;
 
 class RoleServers
@@ -13,8 +14,51 @@ class RoleServers
     public function nodeList($params, $admin_id)
     {
         $nodeModel = new Node();
-        return $nodeModel->getList();
+        $list = $nodeModel->getList();
+
+        //如果指定用户id或者角色id
+        $user_id = $params['user_id'] ?? 0;
+        $role_id = $params['role_id'] ?? 0;
+
+
+        //获取用户或者角色下属的所有角色
+        $roleModel = new Role();
+        $role_list = $roleModel->getAllRoleId($user_id, $role_id);
+
+        //获取所有对应权限
+        if (!empty($role_list)) {
+            $rn_list = RoleNode::whereIn('role_id', $role_list)
+                ->pluck('node_id')
+                ->toArray();
+
+            if (!empty($rn_list)) {
+                //有值,则遍历list 修改选择状态
+                $this->nodeListChecked($list, $rn_list);
+            }
+        }
+
+        return $list;
     }
+
+    private function nodeListChecked(&$list, $rn)
+    {
+        foreach ($list as &$v) {
+            if (isset($v['checked']) && $v['checked'] == 0) {
+                if (in_array($v['id'], $rn)) {
+                    $v['checked'] = 1;
+                }
+                if (!empty($v['menu'])) {
+                    $this->nodeListChecked($v['menu'], $rn);
+                }
+                if (!empty($v['api'])) {
+                    $this->nodeListChecked($v['api'], $rn);
+                }
+            } else {
+                return true;
+            }
+        }
+    }
+
 
     public function nodeListCreate($params, $admin_id)
     {
@@ -188,9 +232,64 @@ class RoleServers
         }
     }
 
-    public function roleList($params,$admin_id){
+    public function roleList($params, $admin_id)
+    {
         $roleModel = new Role();
         return $roleModel->getList();
+    }
+
+    public function roleNodeBind($params, $admin_id)
+    {
+        $node_id = $params['node_id'] ?? [];
+        $role_id = $params['role_id'] ?? 0;
+
+        if (empty($role_id)) {
+            return ['code' => false, 'msg' => '角色id不能为空'];
+        }
+
+        if (!is_array($node_id)) {
+            $node_id = explode(',', $node_id);
+        }
+
+        //已有的
+        $already_node = RoleNode::where('role_id', '=', $role_id)->pluck('node_id')->toArray();
+
+        //需要添加的
+        $add_node = array_diff($node_id, $already_node);
+
+        //需要删除的
+        $del_node = array_diff($already_node, $node_id);
+
+
+        DB::beginTransaction();
+        if (!empty($add_node)) {
+            $add_data = [];
+            foreach ($add_node as $v) {
+                $tmp = [];
+                $tmp['role_id'] = $role_id;
+                $tmp['node_id'] = $v;
+                $add_data[] = $tmp;
+            }
+            $res_add = DB::table('nlsg_role_node')->insert($add_data);
+            if (!$res_add) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败'];
+            }
+        }
+
+        if (!empty($del_node)) {
+            $res_del = RoleNode::where('role_id', '=', $role_id)
+                ->whereIn('node_id', $del_node)
+                ->delete();
+            if (!$res_del) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败'];
+            }
+        }
+
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
+
     }
 
 }

@@ -5,14 +5,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     Route::get('auth/captcha', 'AuthController@captcha');
     Route::post('auth/login', 'AuthController@login');
-    Route::get('mall_order/list_new', 'MallOrderController@listNew');
-
-    Route::get('role/node_list', 'RoleController@nodeList');
-    Route::post('role/node_list_create', 'RoleController@nodeListCreate');
-    Route::put('role/node_list_status', 'RoleController@nodeListStatus');
-
-    Route::get('admin_user/list', 'RoleController@adminList');
-    Route::get('role/role_list', 'RoleController@roleList');
+//    Route::get('mall_order/list_new', 'MallOrderController@listNew');
 
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
         Route::post('auth/change_pwd', 'AuthController@changePassword');
@@ -170,6 +163,16 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('comment/index', 'CommentController@index');
         Route::post('comment/reply', 'CommentController@reply');
         Route::post('comment/forbid', 'CommentController@forbid');
+
+        //后台角色和绑定
+        Route::get('role/node_list', 'RoleController@nodeList');
+        Route::post('role/node_list_create', 'RoleController@nodeListCreate');
+        Route::put('role/node_list_status', 'RoleController@nodeListStatus');
+        Route::post('role/role_node_bind', 'RoleController@roleNodeBind');
+        Route::get('admin_user/list', 'RoleController@adminList');
+        Route::put('admin_user/list_status', 'RoleController@adminListStatus');
+        Route::get('role/role_list', 'RoleController@roleList');
+
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');
