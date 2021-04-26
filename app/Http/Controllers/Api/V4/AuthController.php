@@ -354,12 +354,13 @@ class AuthController extends Controller
             //判断用户是否注册
             $user = User::where('openid', $res->openid)->first();
             if (!$user) {
-                $num=date('ymd',time()); //6位
+                $rand=rand(100000,999999);
+                $phone='1'.date('ymd',time()).$rand; //1+6+6
                 $list = User::create([
-                    'phone'=>'1'.$num.rand(100000,999999), //1+6+6
+                    'phone'=>$phone,
                     'wxopenid' => $res->openid,
                     'openid' => $res->openid,
-                    'nickname' => '',
+                    'nickname' => '能量'.$rand,
                 ]);
                 $user = User::find($list->id);
             }
