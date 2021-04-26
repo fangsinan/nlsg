@@ -8,6 +8,11 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('mall_order/list_new', 'MallOrderController@listNew');
 
     Route::get('role/node_list', 'RoleController@nodeList');
+    Route::post('role/node_list_create', 'RoleController@nodeListCreate');
+    Route::put('role/node_list_status', 'RoleController@nodeListStatus');
+
+    Route::get('admin_user/list', 'RoleController@adminList');
+    Route::get('role/role_list', 'RoleController@roleList');
 
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
         Route::post('auth/change_pwd', 'AuthController@changePassword');

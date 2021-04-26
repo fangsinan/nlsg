@@ -5,6 +5,7 @@ namespace App\Models;
 
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class BackendUser extends Authenticatable implements JWTSubject
@@ -41,5 +42,34 @@ class BackendUser extends Authenticatable implements JWTSubject
         }else{
             return ['code'=>false,'msg'=>'密码不一致'];
         }
+    }
+
+
+    public function roleInfo()
+    {
+        return $this->hasOne(Role::class, 'id','role_id')
+            ->where('status','=',1)
+            ->select(['id', 'name', 'pid']);
+    }
+
+    public function list($params, $admin_id){
+        $size = $params['size'] ?? 10;
+
+        $query =  self::query()
+            ->with(['roleInfo'])
+            ->select(['id','username','role_id'])
+            ->orderBy('id');
+
+        if (!empty($params['username'] ??'')){
+            $query->where('username','like','%'.trim($params['username']).'%');
+        }
+
+        if (!empty($params['role_id']??0)){
+            $query->where('role','=',intval($params['role_id']));
+        }
+
+        return $query
+            ->paginate($size);
+
     }
 }
