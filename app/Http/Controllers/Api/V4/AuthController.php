@@ -371,7 +371,7 @@ class AuthController extends Controller
             'city' => $list->city, //朝阳区
             'country' => $list->country, //中国
         ];*/
-        
+
         //判断用户是否注册
         $user = User::where('unionid', $list->unionid)->first();
         if (!$user) {
@@ -405,6 +405,9 @@ class AuthController extends Controller
 
             'unionid' => $list->unionid,
             'openid' => $res->openid,
+            'province' => $list->province, //北京
+            'city' => $list->city, //朝阳区
+            'country' => $list->country, //中国
         ];
 
         return $this->success($data);
