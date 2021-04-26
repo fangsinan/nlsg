@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerBackend;
 use App\Models\CashData;
 use App\Models\Comment;
 use App\Models\User;
@@ -11,7 +12,7 @@ use App\Models\WorksCategoryRelation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class UserController extends ControllerBackend
 {
 
     public function index(Request $request)

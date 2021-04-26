@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auth;
 use App\Models\User;
 use App\Models\VipUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -10,6 +11,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 class ControllerBackend extends BaseController
 {
@@ -26,6 +28,14 @@ class ControllerBackend extends BaseController
     {
         $this->user = auth('backendApi')->user();
         if ($this->user) {
+            $route = Route::current();
+            $url   = substr($route->uri, 12);
+            $authModel = new Auth();
+            $flag = $authModel->authCheck($url, $this->user['role_id']);
+
+            if (!$flag) {
+                return error(1000, '无操作权限');
+            }
             $this->user = $this->user->toArray();
             $this->user['user_id'] = User::where('phone','=',$this->user['username'])->value('id');
         }
