@@ -361,7 +361,7 @@ class AuthController extends Controller
         if (!$list) {
             return $this->error(400, '获取用户信息失败');
         }
-        $data = [
+        /*$data = [
             'unionid' => $list->unionid,
             'nickname' => $list->nickname,
             'openid' => $res->openid,
@@ -370,7 +370,46 @@ class AuthController extends Controller
             'province' => $list->province, //北京
             'city' => $list->city, //朝阳区
             'country' => $list->country, //中国
+        ];*/
+
+        //判断用户是否注册
+        $user = User::where('unionid', $list->unionid)->first();
+        if (!$user) {
+            $list = User::create([
+                'unionid' => $list->unionid,
+                'openid' => $res->openid,
+                'nickname' => $list->nickname,
+                'sex'=>$list->sex,
+            ]);
+            $user = User::find($list->id);
+        }
+
+        $token = auth('api')->login($user);
+
+        //判断是否过期
+        $time = strtotime(date('Y-m-d', time())) + 86400;
+        if (in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
+            $user->level = $user->level;
+        } else {
+            $user->level = 0;
+        }
+        $data = [
+            'id' => $user->id,
+            'token' => $token,
+            'nickname' => $user->nickname,
+            'headimg' => $user->headimg ?? '',
+            'phone' => $user->phone,
+            'level' => $user->level,
+            'sex' => $user->sex,
+            'children_age' => 10,
+
+            'unionid' => $list->unionid,
+            'openid' => $res->openid,
+            'province' => $list->province, //北京
+            'city' => $list->city, //朝阳区
+            'country' => $list->country, //中国
         ];
+
         return $this->success($data);
 //        $unionid = $request->input('unionid');
 //        $user = User::where('unionid', $unionid)->first();
