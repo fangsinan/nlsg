@@ -28,14 +28,14 @@ class ControllerBackend extends BaseController
     {
         $this->user = auth('backendApi')->user();
         if ($this->user) {
-            $route = Route::current();
-            $url   = substr($route->uri, 12);
-            $authModel = new Auth();
-            $flag = $authModel->authCheck($url, $this->user['role_id']);
-
-            if (!$flag) {
-                return error(1000, '无操作权限');
-            }
+//            $route = Route::current();
+//            $url   = substr($route->uri, 12);
+//            $authModel = new Auth();
+//            $flag = $authModel->authCheck($url, $this->user['role_id']);
+//
+//            if (!$flag) {
+//                return error(1000, '无操作权限');
+//            }
             $this->user = $this->user->toArray();
             $this->user['user_id'] = User::where('phone','=',$this->user['username'])->value('id');
         }
