@@ -92,11 +92,9 @@ class Role extends Base
         if ($role_id){
             $check_role = self::where('id','=',$role_id)->first();
             if (!empty($check_role)){
-
                 if (!in_array($role_id,$res)){
                     array_push($res,$role_id);
                 }
-
                 $this->getAllRoleIdRec($res,$role_id);
             }
         }

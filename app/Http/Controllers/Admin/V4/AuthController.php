@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendUser;
+use App\Models\Node;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mews\Captcha\Captcha;
@@ -57,9 +58,9 @@ class AuthController extends ControllerBackend
         }
 
         $captcha_res = captcha_api_check($captcha, $key, 'flat');
-        if ($captcha_res === false) {
-            return $this->getRes(['code' => false, 'msg' => '验证码错误']);
-        }
+//        if ($captcha_res === false) {
+//            return $this->getRes(['code' => false, 'msg' => '验证码错误']);
+//        }
 
         $check_user = BackendUser::where('username', '=', $username)->first();
         if (empty($check_user)) {
@@ -71,7 +72,9 @@ class AuthController extends ControllerBackend
                 'id' => $check_user->id,
                 'nickname' => $check_user->username,
                 'live_role'=>$check_user->live_role,
-                'token' => $token
+                'token' => $token,
+                'role'=>$check_user->role_id,
+                'menu_tree'=>Node::getMenuTree($check_user->role_id),
             ];
             return $this->getRes($data);
         } else {

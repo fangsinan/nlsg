@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Support\Facades\DB;
 
 class Node extends Base
@@ -21,7 +22,7 @@ class Node extends Base
             ->where('pid', '=', $pid)
             ->where('status', '=', 1)
             ->where('is_menu', '=', $is_menu)
-            ->select(['id', 'pid', 'name', 'path', 'is_menu', 'status', 'rank',DB::raw('0 as checked')])
+            ->select(['id', 'pid', 'name', 'path', 'is_menu', 'status', 'rank', DB::raw('0 as checked')])
             ->orderBy('rank')
             ->orderBy('id')
             ->get();
@@ -36,6 +37,53 @@ class Node extends Base
             }
         } else {
             return true;
+        }
+    }
+
+    public static function getMenuTree($role_id)
+    {
+        $roleModel = new Role();
+        $role_list = $roleModel->getAllRoleId(0, $role_id);
+
+        $tmp = DB::table('nlsg_role_node as rn')
+            ->join('nlsg_node as n', 'rn.node_id', '=', 'n.id')
+            ->whereIn('rn.role_id', $role_list)
+            ->where('n.pid', '=', 0)
+            ->where('n.is_menu', '=', 2)
+            ->where('n.status', '=', 1)
+            ->groupBy('n.id')
+            ->orderBy('n.rank')
+            ->orderBy('n.id')
+            ->select(['n.id', 'n.pid', 'n.name', 'n.path'])
+            ->get();
+
+        if ($tmp->isEmpty()) {
+            return [];
+        }
+        $tmp = $tmp->toArray();
+        foreach ($tmp as &$v) {
+            $v->menu = self::getMenuTreeRec($v->id);
+        }
+
+        return $tmp;
+    }
+
+    private static function getMenuTreeRec($pid)
+    {
+        $list = Node::where('pid', '=', $pid)
+            ->where('is_menu', '=', 2)
+            ->where('status', '=', 1)
+            ->orderBy('rank')
+            ->orderBy('id')
+            ->select(['id', 'pid', 'name', 'path'])
+            ->get();
+        if ($list->isNotEmpty()) {
+            foreach ($list as &$v) {
+                $v->menu = self::getMenuTreeRec($v->id);
+            }
+            return $list;
+        } else {
+            return [];
         }
     }
 
