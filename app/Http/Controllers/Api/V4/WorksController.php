@@ -520,13 +520,11 @@ class WorksController extends Controller
                     ->first($field);
         if($column){
             $column = $column->toArray();
-        }else{
-            $userInfo = User::find($works_data['user_id']);
-
-            $column = [
-                'title' => $userInfo['honor']
-            ];
         }
+
+        $userInfo = User::find($works_data['user_id']);
+        $column['title'] = $userInfo['honor'] ?? '';
+
 
         //$works_data['info_num'] = count($info);
         $works_data['info_num'] = WorksInfo::where('pid','=',$works_id)->where('status','=',4)->count();
