@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auth;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\VipUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -28,20 +29,26 @@ class ControllerBackend extends BaseController
     {
         $this->user = auth('backendApi')->user();
         if ($this->user) {
-//            $route = Route::current();
-//            $url   = substr($route->uri, 12);
-//            $authModel = new Auth();
-//            $flag = $authModel->authCheck($url, $this->user['role_id']);
-//
-//            if (!$flag) {
-//                return error(1000, '无操作权限');
-//            }
+            $route = Route::current();
+            $url = substr($route->uri, 13);
+            $roleModel = new Role();
+            $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
+
+            if ( ! in_array($url, $roleAuthNodeMap)) {
+                $class = new \stdClass();
+                $class->code = 1000;
+                $class->msg  = '没有权限';
+                $class->data = '';
+                echo json_encode($class);
+                exit;
+            }
             $this->user = $this->user->toArray();
-            $this->user['user_id'] = User::where('phone','=',$this->user['username'])->value('id');
+            $this->user['user_id'] = User::where('phone', '=', $this->user['username'])->value('id');
         }
     }
 
-    public function getIp(Request $request){
+    public function getIp(Request $request)
+    {
         $request::setTrustedProxies($request->getClientIps(), \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR);
         return $request->getClientIp();
     }
@@ -50,8 +57,8 @@ class ControllerBackend extends BaseController
     {
         $result = [
             'code' => 200,
-            'msg' => $msg,
-            'now' => time(),
+            'msg'  => $msg,
+            'now'  => time(),
             'data' => $data
         ];
         return response()->json($result);
@@ -61,8 +68,8 @@ class ControllerBackend extends BaseController
     {
         $result = [
             'code' => $code,
-            'msg' => $msg,
-            'now' => time(),
+            'msg'  => $msg,
+            'now'  => time(),
             'data' => $data
         ];
         return response()->json($result);
@@ -71,17 +78,17 @@ class ControllerBackend extends BaseController
     protected function getRes($data)
     {
         if (($data['code'] ?? true) === false) {
-            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':' . $data['ps']) : '') : '');
+            $ps = ($this->show_ps ? (($data['ps'] ?? false) ? (':'.$data['ps']) : '') : '');
             $temp = new class {
             };
             $temp->code = false;
             $temp->msg = $data['msg'];
-            return $this->error(0, $data['msg'] . $ps, $temp);
+            return $this->error(0, $data['msg'].$ps, $temp);
         } else {
             $msg = '成功';
-            if (is_array($data) && isset($data['msg']) && !empty($data['msg'])) {
+            if (is_array($data) && isset($data['msg']) && ! empty($data['msg'])) {
                 $msg = $data['msg'];
-            } elseif (is_object($data) && isset($data->msg) && !empty($data->msg)) {
+            } elseif (is_object($data) && isset($data->msg) && ! empty($data->msg)) {
                 $msg = $data->msg;
             }
             return $this->success($data, 0, $msg);
