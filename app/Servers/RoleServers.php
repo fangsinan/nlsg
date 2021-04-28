@@ -101,12 +101,12 @@ class RoleServers
         if (empty($name)) {
             return ['code' => false, 'msg' => '名称不能为空'];
         }
-        if ($path != '#') {
-            $tmp_path = explode('/', $path);
-            if (count($tmp_path) > 2) {
-                return ['code' => false, 'msg' => '路径格式错误'];
-            }
-        }
+//        if ($path != '#') {
+//            $tmp_path = explode('/', $path);
+//            if (count($tmp_path) > 2) {
+//                return ['code' => false, 'msg' => '路径格式错误'];
+//            }
+//        }
 
         if ($id) {
             //编辑只能修改name,path
