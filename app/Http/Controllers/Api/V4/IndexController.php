@@ -927,6 +927,8 @@ class IndexController extends Controller
     {
         $recommendModel = new Recommend();
         $lists = $recommendModel->getIndexRecommend(13, 1);
+        if($lists == false)
+            $lists = [];
         return $this->success($lists);
     }
 
