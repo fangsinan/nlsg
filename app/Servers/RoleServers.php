@@ -59,6 +59,38 @@ class RoleServers
         }
     }
 
+    public function roleSelectList($params,$admin_id){
+        $list = Role::where('status','=',1)
+            ->select(['id','pid','name',DB::raw('name as name_path')])
+            ->orderBy('pid')
+            ->orderBy('id')
+            ->get();
+
+        foreach ($list as &$v){
+            $tmp = [];
+            $this->roleSelectListRec($tmp,$v->pid,$list);
+            $tmp = implode('-',$tmp);
+            if (!empty($tmp)){
+                $v->name_path = $tmp.'-'.$v->name;
+            }
+        }
+
+        return $list;
+    }
+
+    private function roleSelectListRec(&$tmp,$pid,$list){
+        if ($pid > 0){
+            foreach ($list as $v){
+                if ($v->id == $pid){
+                    if ($v->pid > 0){
+                        $this->roleSelectListRec($tmp,$v->pid,$list);
+                    }
+                    array_push($tmp,$v->name);
+                }
+            }
+        }
+    }
+
 
     public function nodeListCreate($params, $admin_id)
     {

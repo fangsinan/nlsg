@@ -172,6 +172,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('admin_user/list', 'RoleController@adminList');
         Route::put('admin_user/list_status', 'RoleController@adminListStatus');
         Route::get('role/role_list', 'RoleController@roleList');
+        Route::get('role/role_select_list', 'RoleController@roleSelectList');
 
     });
 
