@@ -29,10 +29,10 @@ class ControllerBackend extends BaseController
     {
         $this->user = auth('backendApi')->user();
         if ($this->user) {
-            $route = Route::current();
-            $url = substr($route->uri, 13);
-            $roleModel = new Role();
-            $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
+//            $route = Route::current();
+//            $url = substr($route->uri, 13);
+//            $roleModel = new Role();
+//            $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
 //
 //            if ( ! in_array($url, $roleAuthNodeMap)) {
 //                $class = new \stdClass();
