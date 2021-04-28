@@ -71,7 +71,7 @@ class RoleServers
         }
         if ($path != '#') {
             $tmp_path = explode('/', $path);
-            if (count($tmp_path) != 2) {
+            if (count($tmp_path) > 2) {
                 return ['code' => false, 'msg' => '路径格式错误'];
             }
         }
