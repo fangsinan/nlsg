@@ -898,6 +898,41 @@ class IndexController extends Controller
         return $this->success($lists);
     }
 
+
+
+    /**
+     * @api {get} api/v4/index/camp  首页-训练营
+     * @apiVersion 4.0.0
+     * @apiName  camp
+     * @apiGroup Index
+     *
+     * @apiSuccess {string} name     名称
+     * @apiSuccess {string} title    标题
+     * @apiSuccess {string} subtitle 副标题
+     * @apiSuccess {number} price    价格
+     * @apiSuccess {number} is_new   是否新上架 1是 0 否
+     * @apiSuccess {string} cover_pic 封面
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *        ]
+     *     }
+     *
+     */
+    public function camp()
+    {
+        $recommendModel = new Recommend();
+        $lists = $recommendModel->getIndexRecommend(13, 1);
+        return $this->success($lists);
+    }
+
+
+
+
     /**
      * @api {get} api/v4/index/version  版本更新
      * @apiVersion 4.0.0
