@@ -33,15 +33,15 @@ class ControllerBackend extends BaseController
             $url = substr($route->uri, 13);
             $roleModel = new Role();
             $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
-
-            if ( ! in_array($url, $roleAuthNodeMap)) {
-                $class = new \stdClass();
-                $class->code = 1000;
-                $class->msg  = '没有权限';
-                $class->data = '';
-                echo json_encode($class);
-                exit;
-            }
+//
+//            if ( ! in_array($url, $roleAuthNodeMap)) {
+//                $class = new \stdClass();
+//                $class->code = 1000;
+//                $class->msg  = '没有权限';
+//                $class->data = '';
+//                echo json_encode($class);
+//                exit;
+//            }
             $this->user = $this->user->toArray();
             $this->user['user_id'] = User::where('phone', '=', $this->user['username'])->value('id');
         }
