@@ -1099,6 +1099,8 @@ class WechatPay extends Controller
                 $sub_type = 1;
                 if ($orderInfo['type'] == 15) {
                     $sub_type = 6;  //讲座
+                }else  if ($orderInfo['type'] == 18) {
+                    $sub_type = 7;  //训练营
                 }
                 $check_channel_works_list = ChannelWorksList::where('works_id', '=', $teacher_id)
                     ->where('type', '=', 1)

@@ -194,6 +194,8 @@ class OrderController extends Controller
         $type = 1;
         if ($column_data['type'] == 2) {
             $type = 15;
+        }else if ($column_data['type'] == 3) {
+            $type = 18;
         }
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
