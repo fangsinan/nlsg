@@ -48,6 +48,8 @@ class Recommend extends Base
 
         switch ($type) {
             case 1:
+            case 3:
+            case 13:
                 $model = new Column();
                 $result = $model->getIndexColumn($ids);
                 break;
@@ -55,10 +57,10 @@ class Recommend extends Base
                 $model = new Works();
                 $result = $model->getIndexWorks($ids);
                 break;
-            case 3:
-                $model = new Column();
-                $result = $model->getIndexColumn($ids);
-                break;
+//            case 3:
+//                $model = new Column();
+//                $result = $model->getIndexColumn($ids);
+//                break;
             case 4:
                 $model = new Lists();
                 $result = $model->getIndexListWorks($ids, 3);

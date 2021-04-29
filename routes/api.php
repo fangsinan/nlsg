@@ -40,6 +40,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/test', 'IndexController@test');
     Route::get('config', 'IndexController@config');
     Route::get('temp_config', 'IndexController@tempConfig');
+    Route::get('index/camp', 'IndexController@camp');
 
     //统计
     Route::get('index/Kunsaid', 'IndexController@kunSaid');

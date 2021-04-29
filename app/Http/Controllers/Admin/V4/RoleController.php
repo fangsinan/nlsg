@@ -148,6 +148,12 @@ class RoleController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function roleSelectList(Request $request){
+        $servers = new RoleServers();
+        $data = $servers->roleSelectList($request->input(), $this->user['id'] ?? 0);
+        return $this->getRes($data);
+    }
+
     /**
      * 菜单和接口 删除和排序
      * @api {put} /api/admin_v4/role/node_list_status 菜单和接口 删除和排序

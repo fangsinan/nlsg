@@ -58,13 +58,37 @@ class Column extends Base
             $column['user_data'] = User::select('id','nickname','headimg')->whereIn('id',$user_id_arr)->get()->toArray();
             //$column['user_count'] = Subscribe::where(['relation_id'=> $column_id, 'type' => 6, 'is_del' => 0,])->count();
             //是否购买
-            $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,6);
-            $collection = Collection::where(['type'=>7,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
-        }else{
-            //是否购买
-            $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
-            $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
+//            $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,6);
+//            $collection = Collection::where(['type'=>7,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
+//        }else if( $column['type'] == 1 ){
+//            //是否购买
+//            $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,1);
+//            $collection = Collection::where(['type'=>1,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
         }
+
+        switch ( $column['type'] ){
+            case 1:
+                $sub_type = 1;
+                $col_type = 1;
+                break;
+            case 2:
+                $sub_type = 6;
+                $col_type = 7;
+                break;
+            case 3:
+                $sub_type = 7;
+                break;
+            default:
+                $sub_type = 1;
+                $col_type = 1;
+                break;
+
+        }
+        //是否购买
+        $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,$sub_type);
+
+        $collection = Collection::where(['type'=>$col_type,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
+
         //是否收藏
         $column['is_collection'] = $collection ? 1 : 0;
         return $column;

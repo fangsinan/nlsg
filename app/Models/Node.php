@@ -43,12 +43,16 @@ class Node extends Base
     public static function getMenuTree($role_id)
     {
         $roleModel = new Role();
-        $role_list = $roleModel->getAllRoleId(0, $role_id);
 
-        $tmp = DB::table('nlsg_role_node as rn')
-            ->join('nlsg_node as n', 'rn.node_id', '=', 'n.id')
-            ->whereIn('rn.role_id', $role_list)
-            ->where('n.pid', '=', 0)
+        $query = DB::table('nlsg_role_node as rn')
+            ->join('nlsg_node as n', 'rn.node_id', '=', 'n.id');
+
+        if ($role_id > 1) {
+            $role_list = $roleModel->getAllRoleId(0, $role_id);
+            $query->whereIn('rn.role_id', $role_list);
+        }
+
+        $tmp = $query->where('n.pid', '=', 0)
             ->where('n.is_menu', '=', 2)
             ->where('n.status', '=', 1)
             ->groupBy('n.id')

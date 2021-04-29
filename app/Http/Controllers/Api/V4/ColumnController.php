@@ -35,7 +35,7 @@ class ColumnController extends Controller
      *
      * @apiParam {int} page
      * @apiParam {int} order 1默认倒序 2正序
-     * @apiParam {int} type 1专栏  2讲座
+     * @apiParam {int} type 1专栏  2讲座   3训练营
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -95,7 +95,7 @@ class ColumnController extends Controller
 
         //排序
         $order = $request->input('order', 1);
-        //type 1 专栏  2讲座
+        //type 1 专栏  2讲座  3训练营
         $type = $request->input('type', 1);
         $order_str = 'asc';
         if ($order) {
@@ -114,7 +114,10 @@ class ColumnController extends Controller
         $sub_type = 1;  //专栏
         if ($type == 2) {
             $sub_type = 6;   //讲座
+        } elseif ($type == 3) {
+            $sub_type = 7;   //训练营
         }
+
         foreach ($list['data'] as &$v) {
             $user_info = User::find($v['user_id']);
             $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], $sub_type);
@@ -612,9 +615,9 @@ class ColumnController extends Controller
             return $this->error(0, '参数有误：lecture_id ');
         }
         //IOS 通过审核后修改  并删除返回值works_data
-        $column_data = Column::select(['id', 'name', 'name as title', 'title', 'subtitle', 'cover_pic as cover_img', 'details_pic as detail_img', 'message',
+        $column_data = Column::select(['id', 'name', 'name as title','type' , 'title', 'subtitle', 'cover_pic as cover_img', 'details_pic as detail_img', 'message',
             'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num'])
-            ->where(['id' => $lecture_id, 'type' => 2, 'status' => 1])->first();
+            ->where(['id' => $lecture_id, 'status' => 1])->first();
 
 
         if (empty($column_data)) {
@@ -625,7 +628,12 @@ class ColumnController extends Controller
 //        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
 //            'view_num','price','subscribe_num','is_free','is_end',])
 //            ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
-        $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, 6);
+        if($column_data == 2 ){
+            $type = 6;
+        }else if ($column_data == 3 ){
+            $type = 7;
+        }
+        $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
 
         //查询章节、
         $infoObj = new WorksInfo();
