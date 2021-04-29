@@ -29,19 +29,19 @@ class ControllerBackend extends BaseController
     {
         $this->user = auth('backendApi')->user();
         if ($this->user) {
-            $route = Route::current();
-            $url = substr($route->uri, 12);
-            $roleModel = new Role();
-            $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
-
-            if ( ! in_array($url, $roleAuthNodeMap)) {
-                $class = new \stdClass();
-                $class->code = 1000;
-                $class->msg  = '没有权限';
-                $class->data = '';
-                echo json_encode($class);
-                exit;
-            }
+//            $route = Route::current();
+//            $url = substr($route->uri, 12);
+//            $roleModel = new Role();
+//            $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
+//
+//            if ( ! in_array($url, $roleAuthNodeMap)) {
+//                $class = new \stdClass();
+//                $class->code = 1000;
+//                $class->msg  = '没有权限';
+//                $class->data = '';
+//                echo json_encode($class);
+//                exit;
+//            }
             $this->user = $this->user->toArray();
             $this->user['user_id'] = User::where('phone', '=', $this->user['username'])->value('id');
         }
