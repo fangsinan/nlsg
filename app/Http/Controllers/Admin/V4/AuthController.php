@@ -58,9 +58,9 @@ class AuthController extends ControllerBackend
         }
 
         $captcha_res = captcha_api_check($captcha, $key, 'flat');
-//        if ($captcha_res === false) {
-//            return $this->getRes(['code' => false, 'msg' => '验证码错误']);
-//        }
+        if ($captcha_res === false) {
+            return $this->getRes(['code' => false, 'msg' => '验证码错误']);
+        }
 
         $check_user = BackendUser::where('username', '=', $username)->first();
         if (empty($check_user)) {

@@ -47,8 +47,9 @@ class Node extends Base
         $query = DB::table('nlsg_role_node as rn')
             ->join('nlsg_node as n', 'rn.node_id', '=', 'n.id');
 
+        $role_list = $roleModel->getAllRoleId(0, $role_id);
+
         if ($role_id > 1) {
-            $role_list = $roleModel->getAllRoleId(0, $role_id);
             $query->whereIn('rn.role_id', $role_list);
         }
 
@@ -66,16 +67,21 @@ class Node extends Base
         }
         $tmp = $tmp->toArray();
         foreach ($tmp as &$v) {
-            $v->menu = self::getMenuTreeRec($v->id);
+            $v->menu = self::getMenuTreeRec($v->id, $role_list);
         }
 
         return $tmp;
     }
 
-    private static function getMenuTreeRec($pid)
+    private static function getMenuTreeRec($pid, $role_list)
     {
-        $list = Node::where('pid', '=', $pid)
-            ->where('is_menu', '=', 2)
+        $query = Node::where('pid', '=', $pid);
+
+        if (!empty($role_list)) {
+            $query->whereIn('id', $role_list);
+        }
+
+        $list = $query->where('is_menu', '=', 2)
             ->where('status', '=', 1)
             ->orderBy('rank')
             ->orderBy('id')
@@ -83,7 +89,7 @@ class Node extends Base
             ->get();
         if ($list->isNotEmpty()) {
             foreach ($list as &$v) {
-                $v->menu = self::getMenuTreeRec($v->id);
+                $v->menu = self::getMenuTreeRec($v->id, $role_list);
             }
             return $list;
         } else {
