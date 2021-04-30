@@ -168,6 +168,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('auth/check_wx', 'AuthController@checkWx');
     Route::post('auth/bind', 'AuthController@bind');
     Route::post('auth/channel_bind', 'AuthController@channel_bind');
+    Route::post('auth/sub_phone', 'AuthController@sub_phone');
     Route::post('user/check_phone', 'UserController@checkPhone');
 
     //历史记录

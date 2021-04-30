@@ -365,7 +365,7 @@ class AuthController extends Controller
     /**
      * 李总绑定手机手机号
      */
-    public function subphone(Request $request)
+    public function sub_phone(Request $request)
     {
         $input = $request->all();
         $phone = $input['phone'];
@@ -377,6 +377,9 @@ class AuthController extends Controller
         }
         if (!$code) {
             return error(1000, '验证码不能为空');
+        }
+        if (!$user_id) {
+            return error(1000, '用户id不能为空');
         }
 
         $dont_check_phone = ConfigModel::getData(35, 1);
@@ -402,7 +405,7 @@ class AuthController extends Controller
             'id' => $user_id,
         ];
         return success($arra);
-        
+
     }
 
     /**
