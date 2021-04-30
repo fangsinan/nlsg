@@ -311,6 +311,61 @@ class AuthController extends Controller
 
     }
 
+
+
+    /**
+     * 静默授权注册登录
+     *
+     */
+    public function channel_bind(Request $request)
+    {
+        $input = $request->all();
+        $arra = (object)[];
+
+        if(empty($input['unionid'])){
+            return success($arra);
+        }
+
+        $user = User::where('unionid', $input['unionid'])->first();
+        if ($input['unionid'] && empty( $user )) {
+            $data = [
+                'nickname'  => $input['nickname'] ?? '',
+                'sex'       => $input['sex'] == '男' ? 1 : 2,
+                'province'  => $input['province'],
+                'city'      => $input['city'],
+                'unionid'   => $input['unionid'] ?? '',
+                'wxopenid'  => $input['wx_openid'] ?? '',
+                'headimg'   => $input['headimg'] ?? '',
+                'is_wx'     => 1
+            ];
+            $rand=rand(100000,999999);
+            $phone='1'.date('ymd',time()).$rand; //1+6+6
+
+            $data['phone'] = $phone;
+            $res = User::create($data);
+            if ($res) {
+                $user = User::find($res->id);
+
+                $token = auth('api')->login($user);
+                $arra = [
+                    'id' => $user->id,
+                    'token' => $token,
+                    'sex' => $user->sex,
+                    'children_age' => 10,//$user->children_age,
+                ];
+            }
+
+        }
+
+        return success($arra);
+
+
+    }
+
+
+
+
+
     /**
      * @api {get} api/v4/auth/wechat_info 微信授权
      * @apiVersion 4.0.0
