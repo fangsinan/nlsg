@@ -354,13 +354,13 @@ class AuthController extends Controller
             //判断用户是否注册
             $user = User::where('openid', $res->openid)->first();
             if (!$user) {
-                $rand=rand(100000,999999);
-                $phone='1'.date('ymd',time()).$rand; //1+6+6
+                $rand = rand(100000, 999999);
+                $phone = '1' . date('ymd', time()) . $rand; //1+6+6
                 $list = User::create([
-                    'phone'=>$phone,
+                    'phone' => $phone,
                     'wxopenid' => $res->openid,
                     'openid' => $res->openid,
-                    'nickname' => '能量'.$rand,
+                    'nickname' => '能量' . $rand,
                 ]);
                 $user = User::find($list->id);
             }
@@ -385,7 +385,7 @@ class AuthController extends Controller
                 'children_age' => 10,
             ];
 
-            return $this->success(['openid' => $res->openid,'data'=>$data]);
+            return $this->success(['openid' => $res->openid, 'data' => $data]);
         }
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res->access_token,
