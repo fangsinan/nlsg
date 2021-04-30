@@ -320,7 +320,7 @@ class AuthController extends Controller
     public function channel_bind(Request $request)
     {
         $input = $request->all();
-        $arra = (object)[];
+        $arra = [];
 
         if(empty($input['unionid'])){
             return success($arra);
@@ -331,32 +331,32 @@ class AuthController extends Controller
             $data = [
                 'nickname'  => $input['nickname'] ?? '',
                 'sex'       => $input['sex'] == '男' ? 1 : 2,
-                'province'  => $input['province'],
-                'city'      => $input['city'],
+                'province'  => $input['province'] ??'',
+                'city'      => $input['city'] ??'',
                 'unionid'   => $input['unionid'] ?? '',
                 'wxopenid'  => $input['wx_openid'] ?? '',
                 'headimg'   => $input['headimg'] ?? '',
                 'is_wx'     => 1
             ];
-            $rand=rand(100000,999999);
-            $phone='1'.date('ymd',time()).$rand; //1+6+6
+            $rand=rand(1000,9999);
+            $phone='1'.date('ymds',time()).$rand; //1+8+4
 
             $data['phone'] = $phone;
             $res = User::create($data);
             if ($res) {
                 $user = User::find($res->id);
-
-                $token = auth('api')->login($user);
-                $arra = [
-                    'id' => $user->id,
-                    'token' => $token,
-                    'sex' => $user->sex,
-                    'children_age' => 10,//$user->children_age,
-                ];
+                if(empty($user)){
+                    return success($arra);
+                }
             }
-
         }
-
+        $token = auth('api')->login($user);
+        $arra = [
+            'id' => $user->id,
+            'token' => $token,
+            'sex' => $user->sex,
+            'children_age' => 10,//$user->children_age,
+        ];
         return success($arra);
 
 
