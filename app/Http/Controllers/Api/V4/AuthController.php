@@ -398,9 +398,12 @@ class AuthController extends Controller
             }
         }
         Redis::del($phone);
-
-        User::where('id', $user_id)->update(['phone'=>$phone]);
-
+        $user = User::where('phone', $phone)->first();
+        if (!$user) {
+            User::where('id', $user_id)->update(['phone'=>$phone]);
+        } else { //号码已存在
+            return error(1000, '此手机号已存在');
+        }
         $arra = [
             'id' => $user_id,
         ];
