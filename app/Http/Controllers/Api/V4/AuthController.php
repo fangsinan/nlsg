@@ -312,7 +312,6 @@ class AuthController extends Controller
     }
 
 
-
     /**
      * 静默授权注册登录
      *
@@ -363,7 +362,36 @@ class AuthController extends Controller
     }
 
     /**
-     * 李总绑定手机手机号
+     * 李总免登陆判断是否已绑定手机号
+     */
+    public function bind_phone(Request $request)
+    {
+        $input = $request->all();
+        $user_id = $input['user_id']; //用户id
+
+        if (!$user_id) {
+            return error(1000, '用户id不能为空');
+        }
+
+        $user = User::where('id', $user_id)->first();
+        if (!$user) {
+            return error(1000, '账号不存在');
+        } else {
+            if(strlen($user->phone)==13){ //需要重新绑定
+                $flag=0;
+            }else{
+                $flag=1;
+            }
+        }
+        $arra = [
+            'flag' => $flag,
+        ];
+        return success($arra);
+
+    }
+
+    /**
+     * 李总免登陆绑定手机手机号
      */
     public function sub_phone(Request $request)
     {
