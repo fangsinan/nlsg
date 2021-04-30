@@ -320,7 +320,7 @@ class AuthController extends Controller
     public function channel_bind(Request $request)
     {
         $input = $request->all();
-        $arra = (object)[];
+        $arra = [];
 
         if(empty($input['unionid'])){
             return success($arra);
@@ -345,18 +345,18 @@ class AuthController extends Controller
             $res = User::create($data);
             if ($res) {
                 $user = User::find($res->id);
-
-                $token = auth('api')->login($user);
-                $arra = [
-                    'id' => $user->id,
-                    'token' => $token,
-                    'sex' => $user->sex,
-                    'children_age' => 10,//$user->children_age,
-                ];
+                if(empty($user)){
+                    return success($arra);
+                }
             }
-
         }
-
+        $token = auth('api')->login($user);
+        $arra = [
+            'id' => $user->id,
+            'token' => $token,
+            'sex' => $user->sex,
+            'children_age' => 10,//$user->children_age,
+        ];
         return success($arra);
 
 
