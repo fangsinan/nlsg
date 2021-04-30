@@ -331,15 +331,15 @@ class AuthController extends Controller
             $data = [
                 'nickname'  => $input['nickname'] ?? '',
                 'sex'       => $input['sex'] == '男' ? 1 : 2,
-                'province'  => $input['province'],
-                'city'      => $input['city'],
+                'province'  => $input['province'] ??'',
+                'city'      => $input['city'] ??'',
                 'unionid'   => $input['unionid'] ?? '',
                 'wxopenid'  => $input['wx_openid'] ?? '',
                 'headimg'   => $input['headimg'] ?? '',
                 'is_wx'     => 1
             ];
-            $rand=rand(100000,999999);
-            $phone='1'.date('ymd',time()).$rand; //1+6+6
+            $rand=rand(1000,9999);
+            $phone='1'.date('ymds',time()).$rand; //1+8+4
 
             $data['phone'] = $phone;
             $res = User::create($data);
