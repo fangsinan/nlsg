@@ -29,8 +29,16 @@ class ControllerBackend extends BaseController
     {
         $this->user = auth('backendApi')->user();
         if ($this->user) {
+            $this->user = $this->user->toArray();
+            $this->user['user_id'] = User::where('phone', '=', $this->user['username'])->value('id');
+
             $route = Route::current();
             $url = substr($route->uri, 12);
+
+            if (1 == $this->user['role_id']) {
+                return  true;
+            }
+
             $roleModel = new Role();
             $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
 
@@ -42,8 +50,6 @@ class ControllerBackend extends BaseController
                 echo json_encode($class);
                 exit;
             }
-            $this->user = $this->user->toArray();
-            $this->user['user_id'] = User::where('phone', '=', $this->user['username'])->value('id');
         }
     }
 
