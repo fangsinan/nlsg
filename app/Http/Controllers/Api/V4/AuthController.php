@@ -362,9 +362,48 @@ class AuthController extends Controller
 
     }
 
+    /**
+     * 李总绑定手机手机号
+     */
+    public function subphone(Request $request)
+    {
+        $input = $request->all();
+        $phone = $input['phone'];
+        $code = $input['code'];
+        $user_id = $input['user_id']; //用户id
 
+        if (!$phone) {
+            return error(1000, '手机号不能为空');
+        }
+        if (!$code) {
+            return error(1000, '验证码不能为空');
+        }
 
+        $dont_check_phone = ConfigModel::getData(35, 1);
+        $dont_check_phone = explode(',', $dont_check_phone);
+        if (in_array($phone, $dont_check_phone) || $phone =='18600179874' ) {
+            if (intval($code) !== 6666) {
+                return error(1000, '验证码错误');
+            }
+        } else {
+            $res = Redis::get($phone);
+            if (!$res) {
+                return error(1000, '验证码已过期');
+            }
+            if ($code !== $res) {
+                return error(1000, '验证码错误');
+            }
+        }
+        Redis::del($phone);
 
+        User::where('id', $user_id)->update(['phone'=>$phone]);
+
+        $arra = [
+            'id' => $user_id,
+        ];
+        return success($arra);
+        
+    }
 
     /**
      * @api {get} api/v4/auth/wechat_info 微信授权
@@ -405,42 +444,7 @@ class AuthController extends Controller
         }
 
         if ($type == 1) {
-
-            //判断用户是否注册
-            $user = User::where('openid', $res->openid)->first();
-            if (!$user) {
-                $rand = rand(100000, 999999);
-                $phone = '1' . date('ymd', time()) . $rand; //1+6+6
-                $list = User::create([
-                    'phone' => $phone,
-                    'wxopenid' => $res->openid,
-                    'openid' => $res->openid,
-                    'nickname' => '能量' . $rand,
-                ]);
-                $user = User::find($list->id);
-            }
-
-            $token = auth('api')->login($user);
-
-            //判断是否过期
-            $time = strtotime(date('Y-m-d', time())) + 86400;
-            if (in_array($user->level, [3, 4, 5]) && $user->expire_time > $time) {
-                $user->level = $user->level;
-            } else {
-                $user->level = 0;
-            }
-            $data = [
-                'id' => $user->id,
-                'token' => $token,
-                'nickname' => $user->nickname,
-                'headimg' => $user->headimg ?? '',
-                'phone' => $user->phone,
-                'level' => $user->level,
-                'sex' => $user->sex,
-                'children_age' => 10,
-            ];
-
-            return $this->success(['openid' => $res->openid, 'data' => $data]);
+            return $this->success(['openid' => $res->openid]);
         }
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res->access_token,
