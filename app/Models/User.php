@@ -200,6 +200,10 @@ class User extends Authenticatable implements JWTSubject
     public function channelLogin($data){
         $check = self::where('phone','=',$data['phone'])->first();
         if($check){
+            if ($check->nickname != $data['nickname']){
+                $check->nickname = $data['nickname'];
+                $check->save();
+            }
             return $check;
         }else{
             $model = new self();
