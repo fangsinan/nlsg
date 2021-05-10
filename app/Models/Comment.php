@@ -19,7 +19,7 @@ class Comment extends Base
         if ( ! $id) {
             return false;
         }
-        if ($type == 1 || $type == 2) {
+        if ($type == 1 || $type == 2 || $type == 6) {
             $res = Column::where('id', $id)->first();
         } elseif ($type == 3 || $type == 4) {
             //$res = WorksInfo::where('id',$id)->first()->toArray();
@@ -107,7 +107,7 @@ class Comment extends Base
             $comment['is_follow'] = $follow ? 1 : 0;
         }
 
-        if (in_array($comment['type'], [1, 2])) {
+        if (in_array($comment['type'], [1, 2, 6])) {
             $comment['column'] = Column::find($comment['relation_id'], ['title', 'subtitle', 'cover_pic']);
         } elseif (in_array($comment['type'], [3, 4])) {
             $comment['works'] = Works::find($comment['relation_id'], ['title', 'subtitle', 'cover_img']);

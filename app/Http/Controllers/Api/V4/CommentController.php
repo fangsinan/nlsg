@@ -23,7 +23,7 @@ class CommentController extends Controller
      *
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/list?id=1&type=1
      *
-     * @apiParam {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科
+     * @apiParam {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科 6.训练营
      * @apiParam {number} id    模块id
      * @apiParam {number} info_id    次级id
      * @apiParam {number} order  默认1  最新是2
@@ -176,7 +176,7 @@ class CommentController extends Controller
      * @apiParam {number} pid 转发评论id
      * @apiParam {string} content 发布的内容
      * @apiParam {string} img  多个图片  格式 a.png,b.png,c.png
-     * @apiParam {string} type 模块类型  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科
+     * @apiParam {string} type 模块类型  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科 6.训练营
      *
      *
      * @apiSuccessExample  Success-Response:
@@ -299,7 +299,7 @@ class CommentController extends Controller
      * @apiSuccess {number} is_quality    是否精选
      * @apiSuccess {string} attach        图片
      * @apiSuccess {string} attach.img    图片地址
-     * @apiSuccess {string} column|works|wiki   type =1、2 专栏和讲座 返回 title、subtitle、cover_pic， type =3、4 听书和精品课 works 返回title subtitle、cover_img ， type=5 百科 wiki 返回name、cover
+     * @apiSuccess {string} column|works|wiki   type =1、2、6 专栏、讲座和训练营 返回 title、subtitle、cover_pic， type =3、4 听书和精品课 works 返回title subtitle、cover_img ， type=5 百科 wiki 返回name、cover
      * @apiSuccess {string} reply         回复
      * @apiSuccess {string} reply.content   回复内容
      * @apiSuccess {string} reply.from_user 回复者     【 张三 form_user 回复 李四 to_user 】
