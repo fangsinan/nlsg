@@ -528,7 +528,7 @@ class WechatPay extends Controller
                     try {
                         $user_info = User::whereId($user_id)->first();
                         $phone = $user_info->phone ?? '';
-                        if (!empty($phone)) {
+                        if (!empty($phone) && strlen($phone)==11) {
                             $easySms->send($phone, [
                                 'template' => 'SMS_209470584',
                                 'data' => [],
