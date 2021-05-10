@@ -200,7 +200,7 @@ class VipServers
     public function createVip_2($params, $admin_id)
     {
         $phone = $params['phone'] ?? 0;
-        $now_date = date('Y-m-h H:i:s');
+        $now_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d 23:59:59', strtotime("+2 years"));
 
         $check_vip = VipUser::where('username', '=', $phone)
@@ -224,9 +224,7 @@ class VipServers
             $this_vip_data['username'] = $phone;
             $this_vip_data['level'] = 2;
             $this_vip_data['is_default'] = 1;
-            $this_vip_data['created_at'] = $now_date;
             $this_vip_data['start_time'] = $now_date;
-            $this_vip_data['updated_at'] = $now_date;
             $this_vip_data['channel'] = 'backend_open';
             $this_vip_data['expire_time'] = $end_date;
             $success_msg[] = $phone . '开通钻石.有效期' . $now_date . '至' . $this_vip_data['expire_time'];
@@ -253,9 +251,7 @@ class VipServers
                 $this_vip_data['username'] = $phone;
                 $this_vip_data['level'] = 2;
                 $this_vip_data['is_default'] = 1;
-                $this_vip_data['created_at'] = $now_date;
                 $this_vip_data['start_time'] = $now_date;
-                $this_vip_data['updated_at'] = $now_date;
                 $this_vip_data['channel'] = 'backend_open';
                 $this_vip_data['expire_time'] = $end_date;
                 $this_vip_data['is_open_360'] = 1;
@@ -314,7 +310,7 @@ class VipServers
         $parent = $params['parent'] ?? 0;
         $son = $params['phone'] ?? 0;
         $send_money = $params['send_money'] ?? 0;
-        $now_date = date('Y-m-h H:i:s');
+        $now_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d 23:59:59', strtotime("+1 years"));
 
         //新开通会员
@@ -411,9 +407,7 @@ class VipServers
                 $this_vip_data['source'] = $source;
                 $this_vip_data['source_vip_id'] = $source_vip_id;
                 $this_vip_data['is_default'] = 1;
-                $this_vip_data['created_at'] = $now_date;
                 $this_vip_data['start_time'] = $now_date;
-                $this_vip_data['updated_at'] = $now_date;
                 $this_vip_data['channel'] = 'backend_open';
                 $this_vip_data['expire_time'] = $end_date;
 
