@@ -73,6 +73,8 @@ class WechatPay extends Controller
             return self::PayNewVip($data);
         } elseif ($data['attach'] == 17) { //处理赠送
             return self::PaySend($data);
+        } elseif ($data['attach'] == 18) { //处理训练营
+            return self::PayColumn($data);
         }
     }
 
