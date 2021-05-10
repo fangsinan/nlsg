@@ -963,6 +963,8 @@ class WechatPay extends Controller
                 $order_type = 1;
                 if ($orderInfo['type'] == 15) {
                     $order_type = 19;  //讲座
+                }elseif ($orderInfo['type'] == 18) {
+                    $order_type = 22;  //讲座
                 }
                 $record = [
                     'ordernum' => $out_trade_no, //订单编号
@@ -981,6 +983,13 @@ class WechatPay extends Controller
                 $shareSyRst = true;
                 $map = [];
 
+                //添加订阅记录
+                $sub_type = 1;
+                if ($orderInfo['type'] == 15) {
+                    $sub_type = 6;  //讲座
+                }else  if ($orderInfo['type'] == 18) {
+                    $sub_type = 7;  //训练营
+                }
 
                 if (!empty($twitter_id) && $orderInfo['twitter_id'] != $orderInfo['service_id']) {
 
@@ -1068,7 +1077,7 @@ class WechatPay extends Controller
 
 
                         } else {
-                            $is_sub = Subscribe::isSubscribe($twitter_id, $teacher_id, 1);
+                            $is_sub = Subscribe::isSubscribe($twitter_id, $teacher_id, $sub_type);
                             if ($is_sub) { //订阅专栏
                                 $ColumnInfo = Column::find($teacher_id);
                                 $ProfitPrice = $ColumnInfo['twitter_price'];
@@ -1095,13 +1104,7 @@ class WechatPay extends Controller
                     }
                 }
 
-                //添加订阅记录
-                $sub_type = 1;
-                if ($orderInfo['type'] == 15) {
-                    $sub_type = 6;  //讲座
-                }else  if ($orderInfo['type'] == 18) {
-                    $sub_type = 7;  //训练营
-                }
+
                 $check_channel_works_list = ChannelWorksList::where('works_id', '=', $teacher_id)
                     ->where('type', '=', 1)
                     ->first();
