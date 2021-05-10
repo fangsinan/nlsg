@@ -87,6 +87,7 @@ class Order extends Base
         $result = false;
         switch ($type) {
             case 1:
+            case 18:
                 $model = new Column();
                 $result = $model->getIndexColumn([$relation_id]);
                 break;
