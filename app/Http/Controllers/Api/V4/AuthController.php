@@ -348,6 +348,8 @@ class AuthController extends Controller
                     return success($arra);
                 }
             }
+        }else{
+            $phone=$user->phone;
         }
         $token = auth('api')->login($user);
         $arra = [
