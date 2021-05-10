@@ -353,6 +353,7 @@ class AuthController extends Controller
         $arra = [
             'id' => $user->id,
             'token' => $token,
+            'phone'=>$phone,
             'sex' => $user->sex,
             'children_age' => 10,//$user->children_age,
         ];
