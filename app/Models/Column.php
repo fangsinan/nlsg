@@ -77,6 +77,7 @@ class Column extends Base
                 break;
             case 3:
                 $sub_type = 7;
+                $col_type = 8;
                 break;
             default:
                 $sub_type = 1;
