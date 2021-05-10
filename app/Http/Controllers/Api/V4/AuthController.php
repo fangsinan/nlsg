@@ -435,6 +435,7 @@ class AuthController extends Controller
         }
         $arra = [
             'id' => $user_id,
+            'phone' => $phone,
         ];
         return success($arra);
 
