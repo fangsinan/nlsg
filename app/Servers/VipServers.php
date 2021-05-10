@@ -200,8 +200,7 @@ class VipServers
     public function createVip_2($params, $admin_id)
     {
         $phone = $params['phone'] ?? 0;
-        $now = time();
-        $now_date = date('Y-m-h H:i:s', $now);
+        $now_date = date('Y-m-h H:i:s');
         $end_date = date('Y-m-d 23:59:59', strtotime("+2 years"));
 
         $check_vip = VipUser::where('username', '=', $phone)
@@ -315,8 +314,7 @@ class VipServers
         $parent = $params['parent'] ?? 0;
         $son = $params['phone'] ?? 0;
         $send_money = $params['send_money'] ?? 0;
-        $now = time();
-        $now_date = date('Y-m-h H:i:s', $now);
+        $now_date = date('Y-m-h H:i:s');
         $end_date = date('Y-m-d 23:59:59', strtotime("+1 years"));
 
         //新开通会员
