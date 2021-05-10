@@ -34,7 +34,7 @@ class WorksInfo extends Base
         }
         $query = WorksInfo::select([
             'id','pid', 'type', 'title', 'section', 'introduce', 'url', 'callback_url1', 'callback_url1', 'callback_url2',
-            'callback_url3', 'view_num', 'duration', 'free_trial','rank'
+            'callback_url3', 'view_num', 'duration', 'free_trial','rank','share_img'
         ])->where($where)->orderBy('rank',$order)->orderBy('id', $order);
         //->paginate($page_per_page)->toArray();
 
