@@ -539,7 +539,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {get} /api/v4/column/get_lecture_list  讲座目录  针对讲座[讲座与课程一对一]
+     * @api {get} /api/v4/column/get_lecture_list  讲座目录  针对讲座和训练营[讲座与课程一对一]
      * @apiName get_lecture_list
      * @apiVersion 1.0.0
      * @apiGroup Column
@@ -628,9 +628,9 @@ class ColumnController extends Controller
 //        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
 //            'view_num','price','subscribe_num','is_free','is_end',])
 //            ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
-        if($column_data == 2 ){
+        if($column_data['type'] == 2 ){
             $type = 6;
-        }else if ($column_data == 3 ){
+        }else if ($column_data['type'] == 3 ){
             $type = 7;
         }
         $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
