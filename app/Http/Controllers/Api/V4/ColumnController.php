@@ -459,7 +459,7 @@ class ColumnController extends Controller
 
 
     /**
-     * @api {get} /api/v4/column/get_column_detail 讲座-讲座详细信息
+     * @api {get} /api/v4/column/get_column_detail 讲座(训练营)详细信息
      * @apiName get_column_detail
      * @apiVersion 1.0.0
      * @apiGroup Column
