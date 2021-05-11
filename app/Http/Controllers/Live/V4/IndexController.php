@@ -197,7 +197,7 @@ class IndexController extends ControllerBackend
             }
         }
 
-        if ($this->user['live_role'] != 22) {
+        if ($this->user['live_role'] != 0) {
             $query->where('begin_at', '>=','2021-05-12 00:00:00');
         }
         $lists = $query->select('id', 'user_id', 'title', 'price',
