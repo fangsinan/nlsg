@@ -33,6 +33,7 @@ class CreatePosterController extends Controller
      * @apiParam {int} post_type  类型 post_type   5精品课/听书     7优品海报   8 专栏/讲座
      * @apiParam {int} relation_id  对应 课程或专栏id或商品
      * @apiParam {int} is_qrcode   1 生成纯二维码
+     * @apiParam {int} info_id   
      * @apiParam {int} live_id
      * @apiParam {int} live_info_id
      *
@@ -63,6 +64,7 @@ class CreatePosterController extends Controller
         $flag = $request->input('flag', 0);
         $live_id = $request->input('live_id', 0);
         $live_info_id = $request->input('live_info_id', 0);
+        $info_id = $request->input('info_id', 0);
 
         //3:好书  4:会员  5:精品课  7商品   8:专栏  10:直播  23:360分享海报
         $level = User::getLevel($uid);
@@ -87,7 +89,7 @@ class CreatePosterController extends Controller
             $res = Cache::get($cache_key_name);
             $src = '';
             if (empty($res)) {
-                $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id);
+                $QR_url = $this->getGetQRUrl($post_type, $gid, $uid, $flag, $live_id, $live_info_id,$info_id);
                 $temp_9_res = $this->createQRcode($QR_url, true, true, true);
                 $src = '';
                 $res = ConfigModel::base64Upload(100, $temp_9_res);
@@ -1045,10 +1047,10 @@ class CreatePosterController extends Controller
     }
 
     //获取二维码网址
-    protected function getGetQRUrl($type, $gid, $uid, $flag = 0, $live_id = 0, $live_info_id = 0)
+    protected function getGetQRUrl($type, $gid, $uid, $flag = 0, $live_id = 0, $live_info_id = 0,$info_id=0)
     {
 
-        $info_id = 0;
+        //$info_id = 0;
         $u_type = 0;
         switch ($type) {
             case 3://好书
