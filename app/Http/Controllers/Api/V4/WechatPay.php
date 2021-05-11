@@ -320,7 +320,7 @@ class WechatPay extends Controller
                     self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 
                     //短信
-                    if ($AdminInfo['phone']) {
+                    if ($AdminInfo['phone'] && strlen($AdminInfo['phone'])==11) {
                         $easySms = app('easysms');
                         $result = $easySms->send($AdminInfo['phone'], [
                             'template' => 'SMS_211001614',
@@ -528,7 +528,7 @@ class WechatPay extends Controller
                     try {
                         $user_info = User::whereId($user_id)->first();
                         $phone = $user_info->phone ?? '';
-                        if (!empty($phone)) {
+                        if (!empty($phone) && strlen($phone)==11) {
                             $easySms->send($phone, [
                                 'template' => 'SMS_209470584',
                                 'data' => [],
@@ -634,7 +634,7 @@ class WechatPay extends Controller
                     DB::commit();
                     //SMS_211275363
                     //短信
-                    if ($userdata['phone'] && $live_id == 12) {
+                    if ($userdata['phone'] && $live_id == 12 && strlen($userdata['phone'])==11) {
                         $easySms = app('easysms');
                         $easySms->send($userdata['phone'], [
                             'template' => 'SMS_211275363',

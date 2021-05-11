@@ -348,6 +348,8 @@ class AuthController extends Controller
                     return success($arra);
                 }
             }
+        }else{
+            $phone=$user->phone;
         }
         $token = auth('api')->login($user);
         $arra = [
@@ -435,6 +437,7 @@ class AuthController extends Controller
         }
         $arra = [
             'id' => $user_id,
+            'phone' => $phone,
         ];
         return success($arra);
 
