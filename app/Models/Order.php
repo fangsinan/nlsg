@@ -304,12 +304,14 @@ class Order extends Base
         //23是校长,看名下老师
         if ($this_user['live_role'] == 21) {
             $live_user_id = $this_user['user_id'];
+            $query->where('live_id','>',49);
             $query->whereHas('live', function ($q) use ($live_user_id) {
                 $q->where('user_id', '=', $live_user_id);
             });
         } elseif ($this_user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this_user['username']);
+            $query->where('live_id','>',49);
             $query->whereHas('live', function ($q) use ($son_user_id) {
                 $q->whereIn('user_id', $son_user_id);
             });
@@ -506,10 +508,12 @@ class Order extends Base
 
         if ($this_user['live_role'] == 21) {
             $live_user_id = $this_user['user_id'];
+            $lu_list_query->where('o.live_id','>',49);
             $lu_list_query->where('l.user_id','=',$live_user_id);
         } elseif ($this_user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this_user['username']);
+            $lu_list_query->where('o.live_id','>',49);
             $lu_list_query->whereIn('l.user_id',$son_user_id);
         }
 
