@@ -1032,6 +1032,18 @@ class IndexController extends Controller
     public function share(Request $request)
     {
         $input = $request->all();
+
+        if( $input['tag'] == 1 ){  //训练营分享参数
+            $res = [
+                'title' => '训练营',
+                'sub_title' => '训练开营了-副标题',
+                'share_url' => 'https://wechat.nlsgapp.com/trainingCampList',
+                'cove_img' => 'https://image.nlsgapp.com/nlsg/authorpt/20210106142306594001.jpg',
+            ];
+            return success($res);
+
+        }
+
         $url = $input['url'] ?? '';
         $config = [
             'app_id' => 'wxe24a425adb5102f6',
