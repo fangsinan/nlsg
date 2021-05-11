@@ -197,15 +197,15 @@ class IndexController extends ControllerBackend
             }
         }
 
+        if ($this->user['live_role'] != 22) {
+            $query->where('begin_at', '>=','2021-05-12 00:00:00');
+        }
         $lists = $query->select('id', 'user_id', 'title', 'price',
             'order_num', 'status', 'begin_at', 'cover_img')
             ->where('is_del', 0)
-            ->where('begin_at', '>=','2021-05-12 00:00:00')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-
-
 
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
