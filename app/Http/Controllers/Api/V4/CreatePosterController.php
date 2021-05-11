@@ -30,10 +30,10 @@ class CreatePosterController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup create
      *
-     * @apiParam {int} post_type  类型 post_type   5精品课/听书     7优品海报   8 专栏/讲座
+     * @apiParam {int} post_type  类型 post_type   5精品课/听书     7优品海报   8 专栏/讲座/训练营
      * @apiParam {int} relation_id  对应 课程或专栏id或商品
      * @apiParam {int} is_qrcode   1 生成纯二维码
-     * @apiParam {int} info_id   
+     * @apiParam {int} info_id
      * @apiParam {int} live_id
      * @apiParam {int} live_info_id
      *
@@ -1216,7 +1216,7 @@ class CreatePosterController extends Controller
 
 
     /**
-     * @api {post} /api/v4/create/upload_push   制作专属海报
+     * @api {post} /api/v4/create/upload_push   上传
      * @apiName create_poster
      * @apiVersion 1.0.0
      * @apiGroup create
