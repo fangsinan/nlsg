@@ -12,7 +12,7 @@ class Collection extends Base
     static function CollectionData($user_id = 0, $target_id = 0, $type = 0, $info_id = 0)
     {
         //处理专栏的关注信息
-        if (!in_array($type, [1, 2, 3, 4, 5, 6, 7])) {
+        if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 8])) {
             return 0;
         }
         $where = ['type' => $type, 'user_id' => $user_id, 'relation_id' => $target_id,];
@@ -21,7 +21,7 @@ class Collection extends Base
 
         if ($data) {
             //直接物理删除
-            if ($type == 1 || $type == 7) {
+            if ($type == 1 || $type == 7 || $type == 8) {
                 Column::where(['id' => $target_id])->decrement('collection_num');
             } else if ($type == 2 || $type == 6) {
                 Works::where(['id' => $target_id])->decrement('collection_num');
@@ -34,7 +34,7 @@ class Collection extends Base
         } else {
             //创建
             //1专栏  2课程  3商品  4书单 5百科 6听书 7讲座
-            if ($type == 1 || $type == 7) {
+            if ($type == 1 || $type == 7 || $type == 8) {
                 Column::where(['id' => $target_id])->increment('collection_num');
             } else if ($type == 2 || $type == 6) {
                 Works::where(['id' => $target_id])->increment('collection_num');
@@ -53,6 +53,7 @@ class Collection extends Base
     {
         switch ($type) {
             case 1:   //专栏
+            case 8:   //专栏
                 $model = new Column();
                 $result = $model->getIndexColumn($ids);
                 break;
@@ -77,7 +78,7 @@ class Collection extends Base
                 $model = new Works();
                 $result = $model->getIndexWorks($ids, 1, $user_id);
                 break;
-            case 7:   //专栏
+            case 7:   //讲座
                 $model = new Column();
                 $result = $model->getIndexColumn($ids);
                 break;

@@ -961,7 +961,7 @@ class UserController extends Controller
      * @apiGroup user
      *
      * @apiParam {string} user_id 用户id
-     * @apiParam {string} type  默认1  1专栏  2课程  3商品  4书单 5百科 6听书
+     * @apiParam {string} type  默认1  1专栏  2课程  3商品  4书单 5百科 6听书  7讲座  8训练营
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample 成功响应:
