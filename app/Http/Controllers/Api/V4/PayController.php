@@ -152,7 +152,7 @@ class PayController extends Controller
     {
 
         $body = '';
-        if (in_array($attach, [1, 2, 5, 9, 11, 14, 8, 15, 16, 17])) { //1专栏 2会员 5打赏 9精品课 听课
+        if (in_array($attach, [1, 2, 5, 9, 11, 14, 8, 15, 16, 17, 18])) { //1专栏 2会员 5打赏 9精品课 听课
             $device_info = '';
             if ($attach == 8) {
                 $OrderInfo = MallOrder::where('status', '=', 1)
@@ -198,6 +198,9 @@ class PayController extends Controller
                 $body = "能量时光-幸福360购买";
             } else if ($attach == 17) {
                 $body = "能量时光-赠送订单";
+            } else if ($attach == 17) {
+                $ColumnInfo = Column::find($OrderInfo['relation_id']);
+                $body = "能量时光-训练营购买-" . $ColumnInfo['name'];
             }
         } else {
             return false;
