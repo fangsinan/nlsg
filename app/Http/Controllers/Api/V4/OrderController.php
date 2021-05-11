@@ -784,6 +784,7 @@ class OrderController extends Controller
         foreach ($data as $key => $val) {
             switch ($val['type']) {
                 case 1:
+                case 7:
                     $model = new Column();
                     $result = $model->getIndexColumn([$val['relation_id']], 0);
                     break;
@@ -811,6 +812,9 @@ class OrderController extends Controller
                         }
                         break;
                     case 6:
+                        $hist_type = 2;
+                        break;
+                    case 7:
                         $hist_type = 2;
                         break;
 
