@@ -200,7 +200,7 @@ class IndexController extends ControllerBackend
         $lists = $query->select('id', 'user_id', 'title', 'price',
             'order_num', 'status', 'begin_at', 'cover_img')
             ->where('is_del', 0)
-            //->where('status', 4)
+            ->where('begin_at', '>=','2021-05-12 00:00:00')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
