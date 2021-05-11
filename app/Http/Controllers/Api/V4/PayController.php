@@ -198,7 +198,7 @@ class PayController extends Controller
                 $body = "能量时光-幸福360购买";
             } else if ($attach == 17) {
                 $body = "能量时光-赠送订单";
-            } else if ($attach == 17) {
+            } else if ($attach == 18) {
                 $ColumnInfo = Column::find($OrderInfo['relation_id']);
                 $body = "能量时光-训练营购买-" . $ColumnInfo['name'];
             }
