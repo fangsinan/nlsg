@@ -1109,6 +1109,9 @@ class CreatePosterController extends Controller
                 if ($temp_work['type'] == 2) {//讲座
                     $u_type = 12;
                 }
+                if ($temp_work['type'] == 3) {//训练营
+                    $u_type = 13;
+                }
 
                 break;
             case 10:

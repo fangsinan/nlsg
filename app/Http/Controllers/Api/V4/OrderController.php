@@ -134,6 +134,7 @@ class OrderController extends Controller
      * @apiParam {int} inviter 推客id 默认0
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id  直播间购买时传
+     * @apiParam {int} pay_type  1 微信端 2app微信 3app支付宝 4ios
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:

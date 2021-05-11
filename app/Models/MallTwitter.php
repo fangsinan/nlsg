@@ -76,6 +76,11 @@ class MallTwitter extends Base
                 //讲座
                 $url = 'appv4/lecture-introduce?id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
                 break;
+            case 13:
+                //训练营
+//                $url = 'appv4/videoPlay?dId=' . $gid . '&info_id=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                $url = 'appv4/videoPlay?dId='. $gid .'&info_id='.$info_id.'&relationType=5&type=2';
+                break;
             case 22: //三八邀请app注册
                 $url = '';
                 break;
