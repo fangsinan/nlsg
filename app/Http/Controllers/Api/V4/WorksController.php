@@ -641,7 +641,7 @@ class WorksController extends Controller
         if($relation_type == 1 || $relation_type == 2){
             Works::edit_view_num($relation_id,2,1); //虚拟阅读数 3000以下1：50   以上1：5
             Column::where(['id'=>$relation_id])->increment('real_view_num');
-        }else{
+        }elseif($relation_type == 3 || $relation_type == 4){
             Works::edit_view_num($relation_id,1,1); //虚拟阅读数 3000以下1：50   以上1：5
             Works::where(['id'=>$relation_id])->increment('real_view_num');
         }
