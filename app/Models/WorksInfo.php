@@ -143,9 +143,9 @@ class WorksInfo extends Base
             }
         }
 
-        //1 专栏  2作品 3直播  4会员 5线下产品  6讲座
+        //1 专栏  2作品 3直播  4会员 5线下产品  6讲座   7训练营
         $type = $params['type'] ?? 0;
-        if($type == 1 || $type == 6){
+        if($type == 1 || $type == 6 || $type == 7){
             $column_id = $params['column_id'] ?? 0;
             if (empty($column_id)) {
                 return ['code' => false, 'msg' => 'id不存在'];
@@ -162,10 +162,10 @@ class WorksInfo extends Base
         }
 
 
-        if($type == 6){
+        if($type == 6 || $type == 7){
             $query = self::where(['column_id' => $column_id,'type'=>1])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
+                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img']);
             $works_id = $column_id;  // 讲座直接关联info表
         }else{
             $query = self::where('pid', '=', $works_id)
@@ -217,7 +217,7 @@ class WorksInfo extends Base
 
 
 
-        if($type == 1 || $type == 6){
+        if($type == 1 || $type == 6 || $type == 7){
 
             $works_info = DB::table('nlsg_column as w')
                 ->leftJoin('nlsg_subscribe as s', function ($join) use ($user,$now_date,$type) {
@@ -234,6 +234,9 @@ class WorksInfo extends Base
                     DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
             $sub_type = 6;
+            if($type == 7){
+                $sub_type = 7;
+            }
 
         }else{
             $works_info = DB::table('nlsg_works as w')
@@ -278,8 +281,8 @@ class WorksInfo extends Base
             //'info_id' => $works_info_id,
             'relation_id' => $works_id,
         ]);
-        if($type == 1 || $type == 6){
-            $collection = $collectionObj->whereIn('type',[1,7])->get();
+        if($type == 1 || $type == 6 || $type == 7){
+            $collection = $collectionObj->whereIn('type',[1,7,8])->get();
         }else if($type == 2){
             $collection = $collectionObj->whereIn('type',[2,6])->get();
         }else{
