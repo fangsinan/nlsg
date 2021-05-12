@@ -320,6 +320,7 @@ class LiveConsole extends Base
 
         foreach ($params['list'] as &$v) {
             $v['live_pid'] = $live_id;
+            $v['id'] = $live_id;
             $v['user_id'] = $user_id;
             $v['created_at'] = $v['updated_at'] = $now_date;
         }
