@@ -40,85 +40,91 @@ class IndexController extends ControllerBackend
      * }
      */
     public function index()
-    {
-        //5打赏 9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
-        $type = [9, 10, 14, 15, 16];
-        if ($this->user['live_role'] == 21) {
-            $lives = Live::where('user_id', $this->user['user_id'])
-                        ->where('status', 4)
-                        ->get()
-                        ->toArray();
+        {
+            //5打赏 9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
+            $type = [9, 10, 14, 15, 16];
+            if ($this->user['live_role'] == 21) {
+                $lives = Live::where('user_id', $this->user['user_id'])
+                            ->where('status', 4)
+                            ->where('begin_at',  '>=', '2021-05-12 00:00:00')
+                            ->get()
+                            ->toArray();
 
-            $liveIds = array_column($lives, 'id');
-            $subscribeNum =0;
-            $watchNum =0;
-            if (!empty($lives)){
-                foreach ($lives as $v){
-                    $num = Subscribe::where('type', 3)
-                        ->where('status', 1)
-                        ->where('relation_id', $v['id'])
-                        ->count();
-
-                    $wnum = LiveLogin::where('live_id', $v['id'])
-                                        ->whereBetween('ctime', [strtotime($v['begin_at']), strtotime($v['end_at'])])
-                                        ->distinct('user_id')
-                                        ->count();
-
-                    $subscribeNum += $num;
-                    $watchNum += $wnum;
-
-                }
-            }
-
-            $orderNum = Order::whereIn('type', $type)
-                        ->where('user_id', $this->user['user_id'])
-                        ->whereIn('live_id', $liveIds)
-                        ->where('status', 1)
-                        ->count();
-            $orderIncome = Order::whereIn('type', $type)
-                                ->where('status', 1)
-                                ->where('user_id', $this->user['user_id'])
-                                ->whereIn('live_id', $liveIds)
-                                ->sum('pay_price');
-        }elseif ($this->user['live_role'] == 23) {
-            $blrModel = new BackendLiveRole();
-            $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $subscribeNum = Subscribe::where('type', 3)
+                $liveIds = array_column($lives, 'id');
+                $subscribeNum =0;
+                $watchNum =0;
+                if (!empty($lives)){
+                    foreach ($lives as $v){
+                        $num = Subscribe::where('type', 3)
                             ->where('status', 1)
-                            ->whereIn('user_id', $son_user_id)
+                            ->where('relation_id', $v['id'])
                             ->count();
-            $watchNum = LiveLogin::whereIn('user_id', $son_user_id)
-                        ->distinct('user_id')
-                        ->count();
-            $orderNum = Order::whereIn('type', $type)
-                        ->where('status', 1)
-                        ->whereIn('user_id', $son_user_id)
-                        ->count();
-            $orderIncome = Order::whereIn('type', $type)
+
+                        $wnum = LiveLogin::where('live_id', $v['id'])
+                                            ->whereBetween('ctime', [strtotime($v['begin_at']), strtotime($v['end_at'])])
+                                            ->distinct('user_id')
+                                            ->count();
+
+                        $subscribeNum += $num;
+                        $watchNum += $wnum;
+
+                    }
+                }
+
+                $orderNum = Order::whereIn('type', $type)
+                            ->where('user_id', $this->user['user_id'])
+                            ->whereIn('live_id', $liveIds)
+                            ->where('status', 1)
+                            ->count();
+                $orderIncome = Order::whereIn('type', $type)
+                                    ->where('status', 1)
+                                    ->where('user_id', $this->user['user_id'])
+                                    ->whereIn('live_id', $liveIds)
+                                    ->sum('pay_price');
+            }elseif ($this->user['live_role'] == 23) {
+                $ctime = strtotime('2021-05-12 00:00:00');
+                $blrModel = new BackendLiveRole();
+                $son_user_id = $blrModel->getDataUserId($this->user['username']);
+                $subscribeNum = Subscribe::where('type', 3)
                                 ->where('status', 1)
                                 ->whereIn('user_id', $son_user_id)
-                                ->sum('pay_price');
-        } else {
-            $subscribeNum = Subscribe::where('type', 3)
+                                ->where('created_at', '>=','2021-05-12 00:00:00')
+                                ->count();
+                $watchNum = LiveLogin::whereIn('user_id', $son_user_id)
+                            ->distinct('user_id')
+                            ->where('ctime','>=', $ctime)
+                            ->count();
+                $orderNum = Order::whereIn('type', $type)
+                            ->where('status', 1)
+                            ->whereIn('user_id', $son_user_id)
+                            ->where('created_at', '>=','2021-05-12 00:00:00')
+                            ->count();
+                $orderIncome = Order::whereIn('type', $type)
+                                    ->where('status', 1)
+                                    ->whereIn('user_id', $son_user_id)
+                                    ->where('created_at', '>=','2021-05-12 00:00:00')
+                                    ->sum('pay_price');
+            } else {
+                $subscribeNum = Subscribe::where('type', 3)
+                               ->where('status', 1)
+                               ->count();
+                $watchNum = LiveLogin::distinct('user_id')->count();
+                $orderNum = Order::whereIn('type', $type)
                            ->where('status', 1)
                            ->count();
-            $watchNum = LiveLogin::distinct('user_id')->count();
-            $orderNum = Order::whereIn('type', $type)
-                       ->where('status', 1)
-                       ->count();
-            $orderIncome = Order::whereIn('type', $type)
-                               ->where('status', 1)
-                               ->sum('pay_price');
-        }
+                $orderIncome = Order::whereIn('type', $type)
+                                   ->where('status', 1)
+                                   ->sum('pay_price');
+            }
 
-        $data = [
-            'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
-            'watch_num'     => $watchNum > 0 ? $watchNum : 0,
-            'order_num'     => $orderNum > 0 ? $orderNum : 0,
-            'order_income'  => $orderIncome > 0 ? round($orderIncome, 2) : 0
-        ];
-        return success($data);
-    }
+            $data = [
+                'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
+                'watch_num'     => $watchNum > 0 ? $watchNum : 0,
+                'order_num'     => $orderNum > 0 ? $orderNum : 0,
+                'order_income'  => $orderIncome > 0 ? round($orderIncome, 2) : 0
+            ];
+            return success($data);
+        }
 
     /**
      * @api {get} api/live_v4/index/lives 直播列表
