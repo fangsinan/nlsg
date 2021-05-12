@@ -38,7 +38,7 @@ class LivePush extends Base
             return ['code' => false, 'msg' => '时间错误'];
         }
 
-        if ( ! in_array($push_type, [1, 2, 3, 4, 6, 7, 8, 9, 10])) {
+        if ( ! in_array($push_type, [1, 2, 3, 4, 6, 7, 8, 9, 10, 11])) {
             return ['code' => false, 'msg' => '类型错误'];
         }
 
@@ -347,11 +347,11 @@ WHERE
         if ($lists) {
             $data = [];
             foreach ($lists as $v) {
-                if ($v['push_type'] == 7) {
+                if ($v['push_type'] == 7 || $v['push_type'] == 11) {
                     $res = Column::select('id', 'name as title', 'subtitle', 'original_price', 'price',
                         'cover_pic as cover_img')
                         ->where('id', $v['push_gid'])
-                        ->where('type', 2)
+                        //->where('type', 2)
                         ->where('status', 1)
                         ->first();
                     if (!$res){
