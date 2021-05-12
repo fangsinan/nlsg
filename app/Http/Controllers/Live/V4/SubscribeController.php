@@ -76,13 +76,13 @@ class SubscribeController extends ControllerBackend
         if($this->user['live_role'] == 21){
             $live_user_id = $this->user['user_id'];
             $query->whereHas('live',function($q)use($live_user_id){
-                $q->where('user_id','=',$live_user_id);
+                $q->where('user_id','=',$live_user_id)->where('id','>',52);
             });
         }elseif ($this->user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this->user['username']);
             $query->whereHas('live', function ($q) use ($son_user_id) {
-                $q->whereIn('user_id', $son_user_id);
+                $q->whereIn('user_id', $son_user_id)->where('id','>',52);
             });
         }
 
@@ -116,10 +116,6 @@ class SubscribeController extends ControllerBackend
             ->where('is_del',0)
             ->where('status',1)
             ->where('type',3);
-
-        if (in_array($this->user['live_role'],[21,23])){
-            $query->where('relation_id','>',49);
-        }
 
         //sub创建时间
         if(!empty($created_at)){
