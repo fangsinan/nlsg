@@ -122,11 +122,11 @@ class CommentController extends ControllerBackend
         //筛查live
         $query = Live::select('id');
         if ($this->user['live_role'] == 21) {
-            $query->where('user_id', '=', $this->user['user_id'])->where('id','>',49);
+            $query->where('user_id', '=', $this->user['user_id'])->where('id','>',52);
         } elseif ($this->user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $query->whereIn('user_id', $son_user_id)->where('id','>',49);
+            $query->whereIn('user_id', $son_user_id)->where('id','>',52);
         }
         if (!empty($title)) {
             $query->where('title', 'like', '%' . $title . '%');

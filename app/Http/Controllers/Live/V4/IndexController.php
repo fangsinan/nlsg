@@ -635,13 +635,13 @@ class IndexController extends ControllerBackend
             $live_user_id = $this->user['user_id'];
             $live_ids = Live::select("*")->where([
                 'user_id' => $live_user_id
-            ])->where('id','>',49)->get()->toArray();
+            ])->where('id','>',52)->get()->toArray();
             $live_ids = array_column($live_ids,'id');
 
         }elseif ($this->user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $live_ids = Live::select("*")->whereIn('user_id', $son_user_id)->where('id','>',49)->get()->toArray();
+            $live_ids = Live::select("*")->whereIn('user_id', $son_user_id)->where('id','>',52)->get()->toArray();
             $live_ids = array_column($live_ids,'id');
         }
 
