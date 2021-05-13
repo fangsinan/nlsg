@@ -21,7 +21,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'phone', 'nickname', 'openid', 'sex', 'province', 'city', 'headimg','appleid','is_wx','unionid','inviter','login_flag'
+        'phone', 'nickname', 'openid', 'sex', 'province', 'city', 'headimg','appleid','is_wx','unionid','inviter','login_flag','isNoLogin'
     ];
 
     /**
@@ -200,10 +200,10 @@ class User extends Authenticatable implements JWTSubject
     public function channelLogin($data){
         $check = self::where('phone','=',$data['phone'])->first();
         if($check){
-            if ($check->nickname != $data['nickname']){
-                $check->nickname = $data['nickname'];
-                $check->save();
-            }
+			if ($check->nickname != $data['nickname']){
+			    $check->nickname = $data['nickname'];
+			    $check->save();
+			}
             return $check;
         }else{
             $model = new self();
