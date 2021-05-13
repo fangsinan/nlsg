@@ -314,14 +314,46 @@ class AuthController extends Controller
 
     /**
      * 静默授权注册登录
-     *
      */
     public function channel_bind(Request $request)
     {
         $input = $request->all();
         $arra = [];
 
-        if(empty($input['unionid'])){
+        if(empty($input['wx_openid'])){
+            return success($arra);
+        }
+        $user = User::where('wxopenid', $input['wx_openid'])->first();
+        if ($input['wx_openid'] && empty( $user )) {
+
+            $rand=rand(1000,9999);
+            $phone='1'.date('ymds',time()).$rand; //1+8+4
+
+            $data = [
+                'nickname'  => date('ds',time()).$rand,
+                'phone'=>$phone
+            ];
+            $res = User::create($data);
+            if ($res) {
+                $user = User::find($res->id);
+                if(empty($user)){
+                    return success($arra);
+                }
+            }
+        }else{
+            $phone=$user->phone;
+        }
+        $token = auth('api')->login($user);
+        $arra = [
+            'id' => $user->id,
+            'token' => $token,
+            'phone'=>$phone,
+            'sex' => $user->sex,
+            'children_age' => 10,//$user->children_age,
+        ];
+        return success($arra);
+
+        /*if(empty($input['unionid'])){
             return success($arra);
         }
 
@@ -359,7 +391,7 @@ class AuthController extends Controller
             'sex' => $user->sex,
             'children_age' => 10,//$user->children_age,
         ];
-        return success($arra);
+        return success($arra);*/
 
 
     }
