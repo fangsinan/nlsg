@@ -326,11 +326,9 @@ class AuthController extends Controller
         $user = User::where('wxopenid', $input['wx_openid'])->first();
         if ($input['wx_openid'] && empty( $user )) {
 
-            $rand=rand(10000,99999);
-            $phone=date('ymds',time()).$rand; //8+5
-
+            $phone=self::create_phone();
             $data = [
-                'nickname'  => date('ds',time()).$rand,
+                'nickname'  => rand(100000,999999),
                 'phone'=>$phone,
                 'isNoLogin'=>1,
                 'wxopenid'=>$input['wx_openid']
@@ -355,47 +353,19 @@ class AuthController extends Controller
         ];
         return success($arra);
 
-        /*if(empty($input['unionid'])){
-            return success($arra);
-        }
+    }
 
-        $user = User::where('unionid', $input['unionid'])->first();
-        if ($input['unionid'] && empty( $user )) {
-            $data = [
-                'nickname'  => $input['nickname'] ?? '',
-                'sex'       => $input['sex'] == '男' ? 1 : 2,
-                'province'  => $input['province'] ??'',
-                'city'      => $input['city'] ??'',
-                'unionid'   => $input['unionid'] ?? '',
-                'wxopenid'  => $input['wx_openid'] ?? '',
-                'headimg'   => $input['headimg'] ?? '',
-                'is_wx'     => 1
-            ];
-            $rand=rand(1000,9999);
-            $phone='1'.date('ymds',time()).$rand; //1+8+4
-
-            $data['phone'] = $phone;
-            $res = User::create($data);
-            if ($res) {
-                $user = User::find($res->id);
-                if(empty($user)){
-                    return success($arra);
-                }
+    //生成虚拟手机号
+    public function create_phone()
+    {
+        while (1) {
+            $rand=rand(10000,99999);
+            $phone=date('ymds',time()).$rand; //8+5
+            $user = User::where('phone', $phone)->first();
+            if (empty($user)) {
+                return $phone;
             }
-        }else{
-            $phone=$user->phone;
         }
-        $token = auth('api')->login($user);
-        $arra = [
-            'id' => $user->id,
-            'token' => $token,
-            'phone'=>$phone,
-            'sex' => $user->sex,
-            'children_age' => 10,//$user->children_age,
-        ];
-        return success($arra);*/
-
-
     }
 
     /**
