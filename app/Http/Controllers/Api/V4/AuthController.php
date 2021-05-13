@@ -331,7 +331,8 @@ class AuthController extends Controller
 
             $data = [
                 'nickname'  => date('ds',time()).$rand,
-                'phone'=>$phone
+                'phone'=>$phone,
+                'isNoLogin'=>1
             ];
             $res = User::create($data);
             if ($res) {
