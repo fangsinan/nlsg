@@ -326,8 +326,8 @@ class AuthController extends Controller
         $user = User::where('wxopenid', $input['wx_openid'])->first();
         if ($input['wx_openid'] && empty( $user )) {
 
-            $rand=rand(1000,9999);
-            $phone='1'.date('ymds',time()).$rand; //1+8+4
+            $rand=rand(10000,99999);
+            $phone=date('ymds',time()).$rand; //8+5
 
             $data = [
                 'nickname'  => date('ds',time()).$rand,
