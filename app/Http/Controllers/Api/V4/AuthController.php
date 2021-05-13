@@ -332,7 +332,8 @@ class AuthController extends Controller
             $data = [
                 'nickname'  => date('ds',time()).$rand,
                 'phone'=>$phone,
-                'isNoLogin'=>1
+                'isNoLogin'=>1,
+                'wxopenid'=>$input['wx_openid']
             ];
             $res = User::create($data);
             if ($res) {
