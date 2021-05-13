@@ -1033,7 +1033,7 @@ class IndexController extends Controller
     {
         $input = $request->all();
 
-        if( $input['tag'] == 1 ){  //训练营分享参数
+        if( !empty($input['tag']) && $input['tag'] == 1 ){  //训练营分享参数
             $res = [
                 'title' => '训练营',
                 'sub_title' => '训练开营了-副标题',
