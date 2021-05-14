@@ -14,6 +14,7 @@ use GuzzleHttp\Client;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Ecdsa\Sha256;
 use Lcobucci\JWT\Signer\Key;
+use PHPUnit\Util\Exception;
 use function GuzzleHttp\headers_from_lines;
 
 class AuthController extends Controller
@@ -326,9 +327,21 @@ class AuthController extends Controller
         $user = User::where('wxopenid', $input['wx_openid'])->first();
         if ($input['wx_openid'] && empty( $user )) {
 
-            $phone=self::create_phone();
+            $time=time();
+            $redis_phone='phone_'.date('Ymd',$time);
+
+            $key='phone_lock';
+            self::lock($key); //加锁
+            $num = Redis::get($redis_phone);
+            if(empty($num) || $num<=0){ $num=1;}
+            Redis::setex($redis_phone, 86400, $num+1);
+            self::unlock($key); //释放锁
+
+            $str_num=str_pad($num,7,"0",STR_PAD_LEFT);
+            $phone=date('ymd',$time).$str_num; //6+7
+
             $data = [
-                'nickname'  => rand(100000,999999),
+                'nickname'  => 'nlsg'.rand(100000,999999),
                 'phone'=>$phone,
                 'isNoLogin'=>1,
                 'wxopenid'=>$input['wx_openid']
@@ -348,24 +361,11 @@ class AuthController extends Controller
             'id' => $user->id,
             'token' => $token,
             'phone'=>$phone,
-            'sex' => $user->sex,
+            'sex' => 0,
             'children_age' => 10,//$user->children_age,
         ];
         return success($arra);
 
-    }
-
-    //生成虚拟手机号
-    public function create_phone()
-    {
-        while (1) {
-            $rand=rand(10000,99999);
-            $phone=date('ymds',time()).$rand; //8+5
-            $user = User::where('phone', $phone)->first();
-            if (empty($user)) {
-                return $phone;
-            }
-        }
     }
 
     /**
@@ -418,6 +418,46 @@ class AuthController extends Controller
 
     }
 
+    public static function lock(string $key): string
+    {
+        $redis = new Redis();
+        $key .= '_lock';
+        $value = '';
+        $curTime = time();
+        while (true) { // 独占式抢锁
+            $value = microtime(true).mt_rand(1000, 9999);
+            if ($redis::setnx($key, $value)) { // 获取到锁 当key不存在时设置key
+                // 锁过期时间5秒
+                $redis::expire($key, 5);
+                break;
+            } else  {
+                if (time() - $curTime >= 10) { // 超过10秒抛异常
+                    throw new Exception('lock error', 1);
+                    break;
+                }
+                $time = $redis::ttl($key);
+                if(($time / 2) > 0){
+                    sleep($time / 2);
+                }
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * 释放分布式锁
+     * @param string $key
+     * @return bool
+     */
+    public static function unlock(string $key): bool
+    {
+        $redis = new Redis();
+        $key .= '_lock';
+        $redis::del($key);
+
+        return true;
+    }
+
     /**
      * @api {get} api/v4/auth/wechat_info 微信授权
      * @apiVersion 4.0.0
@@ -457,7 +497,7 @@ class AuthController extends Controller
         }
 
         if ($type == 1) {
-            return $this->success(['openid' => $res->openid]);
+            return $this->success(['openid' => $res->openid]); //获取code  再获取openid
         }
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res->access_token,
