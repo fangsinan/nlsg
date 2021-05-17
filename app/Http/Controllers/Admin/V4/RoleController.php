@@ -190,6 +190,7 @@ class RoleController extends ControllerBackend
      * @apiSuccess {string} username 用户账号
      * @apiSuccess {string[]} role_info 用户角色
      * @apiSuccess {string} role_info.name 角色名称
+     * @apiSuccess {string} live_role_bind 绑定的手机号
      */
     public function adminList(Request $request)
     {
@@ -214,10 +215,12 @@ class RoleController extends ControllerBackend
      * @apiDescription 角色权限配置
      *
      * @apiParam {number} id
-     * @apiParam {string=role,pwd} flag 动作(角色或密码)
+     * @apiParam {string=role,pwd,live_role} flag 动作(角色或密码,直播角色)
      * @apiParam {number} role_id 角色id(修改角色时候需要)
+     * @apiParam {number=21,23} live_role_id 直播角色id(修改直播角色时候需要,21老师23校长)
      * @apiParam {string} pwd 密码(修改密码是需要)
      * @apiParam {string} re_pwd 确认密码(修改密码是需要)
+     * @apiParam {string} bind_phone 绑定手机号(修改直播角色时候需要,可以是多条)
      */
     public function adminListStatus(Request $request)
     {

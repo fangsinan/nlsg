@@ -5,6 +5,7 @@ namespace App\Models;
 
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class BackendUser extends Authenticatable implements JWTSubject
@@ -58,7 +59,7 @@ class BackendUser extends Authenticatable implements JWTSubject
 
         $query = self::query()
             ->with(['roleInfo'])
-            ->select(['id', 'username', 'role_id'])
+            ->select(['id', 'username', 'role_id', 'live_role'])
             ->orderBy('id');
 
         if (!empty($params['username'] ?? '')) {
@@ -69,9 +70,25 @@ class BackendUser extends Authenticatable implements JWTSubject
             $query->where('role', '=', intval($params['role_id']));
         }
 
-        return $query
-            ->paginate($size);
+        $list = $query->paginate($size)->toArray();
 
+        foreach ($list['data'] as &$v) {
+            if ($v['live_role'] == 21) {
+                $v['live_role_bind'] = DB::table('nlsg_backend_live_role')
+                    ->where('son', '=', $v['username'])
+                    ->pluck('parent')->toArray();
+                $v['live_role_bind'] = implode(',', $v['live_role_bind']);
+            } elseif ($v['live_role'] = 23) {
+                $v['live_role_bind'] = DB::table('nlsg_backend_live_role')
+                    ->where('parent', '=', $v['username'])
+                    ->pluck('parent')->toArray();
+                $v['live_role_bind'] = implode(',', $v['live_role_bind']);
+            } else {
+                $v['live_role_bind'] = '';
+            }
+        }
+
+        return $list;
     }
 
     public function adminListStatus($params, $admin_id)
@@ -105,6 +122,42 @@ class BackendUser extends Authenticatable implements JWTSubject
                 if (empty($check_role_id)) {
                     return ['code' => false, 'msg' => '角色不存在'];
                 }
+                break;
+            case 'live_role':
+                $live_role_id = $params['live_role_id'] ?? 0;
+                if (!in_array($live_role_id, [21, 23])) {
+                    return ['code' => false, 'msg' => '直播角色错误'];
+                }
+                $lr_data = [];
+                $bind_phone = $params['bind_phone'] ?? '';
+                if (!is_array($bind_phone)) {
+                    $bind_phone = explode(',', $bind_phone);
+                }
+
+                if (!empty($bind_phone)) {
+                    if ($live_role_id == 21) {
+                        //如果是老师,可以指定校长
+                        foreach ($bind_phone as $v) {
+                            $tmp_lr_data = [];
+                            $tmp_lr_data['parent'] = $v;
+                            $tmp_lr_data['son'] = $check->username;
+                            $lr_data[] = $tmp_lr_data;
+                        }
+                    } else {
+                        //如果是校长,可以指定老师
+                        foreach ($bind_phone as $v) {
+                            $tmp_lr_data = [];
+                            $tmp_lr_data['parent'] = $check->username;
+                            $tmp_lr_data['son'] = $v;
+                            $lr_data[] = $tmp_lr_data;
+                        }
+                    }
+                }
+
+                if (!empty($lr_data)) {
+                    DB::table('nlsg_backend_live_role')->insert($lr_data);
+                }
+                $check->live_role = $live_role_id;
                 break;
             default:
                 return ['code' => false, 'msg' => '修改类型错误'];
