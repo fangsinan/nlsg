@@ -42,7 +42,9 @@ class Subscribe extends Base
 
         //会员都免费
         $level = User::getLevel($user_id);
-        if($type!=3 && $level) return 1;
+
+
+        if( !in_array($type,[3,7]) && $level) return 1;  // 直播和训练营不校验等级
 
         if($user_id && $target_id && $type ){
             $where = ['type' => $type, 'user_id' => $user_id,];
