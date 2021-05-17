@@ -125,7 +125,7 @@ class BackendUser extends Authenticatable implements JWTSubject
                 break;
             case 'live_role':
                 $live_role_id = $params['live_role_id'] ?? 0;
-                if (!in_array($live_role_id, [21, 23])) {
+                if (!in_array($live_role_id, [21, 23, 0])) {
                     return ['code' => false, 'msg' => '直播角色错误'];
                 }
                 $lr_data = [];
