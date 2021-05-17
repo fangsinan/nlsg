@@ -113,7 +113,7 @@ class Column extends Base
             ->whereIn('id', $ids)
             ->where($where)
             ->orderBy('created_at', 'desc')
-            ->take(2)
+            ->take(5)
             ->get()
             ->toArray();
         foreach ($lists as &$v){
