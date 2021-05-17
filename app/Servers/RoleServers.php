@@ -59,38 +59,73 @@ class RoleServers
         }
     }
 
-    public function roleSelectList($params,$admin_id){
-        $list = Role::where('status','=',1)
-            ->select(['id','pid','name',DB::raw('name as name_path')])
+    public function roleSelectList($params, $admin_id)
+    {
+        $list = Role::where('status', '=', 1)
+            ->select(['id', 'pid', 'name', DB::raw('name as name_path')])
             ->orderBy('pid')
             ->orderBy('id')
             ->get();
 
-        foreach ($list as &$v){
+        foreach ($list as &$v) {
             $tmp = [];
-            $this->roleSelectListRec($tmp,$v->pid,$list);
-            $tmp = implode('-',$tmp);
-            if (!empty($tmp)){
-                $v->name_path = $tmp.'-'.$v->name;
+            $this->roleSelectListRec($tmp, $v->pid, $list);
+            $tmp = implode('-', $tmp);
+            if (!empty($tmp)) {
+                $v->name_path = $tmp . '-' . $v->name;
             }
         }
 
         return $list;
     }
 
-    private function roleSelectListRec(&$tmp,$pid,$list){
-        if ($pid > 0){
-            foreach ($list as $v){
-                if ($v->id == $pid){
-                    if ($v->pid > 0){
-                        $this->roleSelectListRec($tmp,$v->pid,$list);
+    private function roleSelectListRec(&$tmp, $pid, $list)
+    {
+        if ($pid > 0) {
+            foreach ($list as $v) {
+                if ($v->id == $pid) {
+                    if ($v->pid > 0) {
+                        $this->roleSelectListRec($tmp, $v->pid, $list);
                     }
-                    array_push($tmp,$v->name);
+                    array_push($tmp, $v->name);
                 }
             }
         }
     }
 
+    public function roleCreate($params, $admin_id)
+    {
+        $id = $params['id'] ?? 0;
+        $name = $params['name'] ?? '';
+        $status = $params['status'] ?? 0;
+
+        if (empty($name) || !in_array($status,[1,2])){
+            return ['code'=>false,'msg'=>'参数错误'];
+        }
+
+        if ($id) {
+            $check = Role::where('id','=',$id)->first();
+            if ($check) {
+                $check->name = $name;
+                $check->status = $status;
+
+                $res = $check->save();
+            } else {
+                return ['code' => false, 'msg' => '角色不存在'];
+            }
+        } else {
+            $rm = new Role();
+            $rm->name = $name;
+            $rm->status = $status;
+            $res = $rm->save();
+        }
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败'];
+        }
+    }
 
     public function nodeListCreate($params, $admin_id)
     {

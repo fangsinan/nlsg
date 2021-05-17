@@ -258,4 +258,23 @@ class RoleController extends ControllerBackend
         $data = $servers->roleNodeBind($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
+
+    /**
+     * 角色添加修改
+     * @api {put} /api/admin_v4/role/create 角色添加修改
+     * @apiVersion 1.0.0
+     * @apiName /api/admin_v4/role/create
+     * @apiGroup  后台-角色权限配置
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/role/create
+     * @apiDescription 角色权限配置
+     *
+     * @apiParam {number} [id] 角色id,编辑时候传
+     * @apiParam {string} name 角色名称
+     * @apiParam {number=1,2} status 状态(1生效,2无效)
+     */
+    public function roleCreate(Request $request){
+        $servers = new RoleServers();
+        $data = $servers->roleCreate($request->input(), $this->user['id'] ?? 0);
+        return $this->getRes($data);
+    }
 }
