@@ -96,9 +96,11 @@ class OrderController extends Controller
     {
 
         //校验用户等级
-        $rst = User::getLevel($user_id);
-        if ($rst > 2) {
-            return ['code' => 0, 'msg' => '您已是vip用户,可免费观看'];
+        if($type != 3){
+            $rst = User::getLevel($user_id);
+            if ($rst > 2) {
+                return ['code' => 0, 'msg' => '您已是vip用户,可免费观看'];
+            }
         }
 
         //校验下单用户是否关注
@@ -159,8 +161,18 @@ class OrderController extends Controller
         $activity_tag = $request->input('activity_tag', '');
         $user_id = $this->user['id'] ?? 0;
 
+        //$column_id 专栏信息
+        $column_data = Column::find($column_id);
+        if (empty($column_data)) {
+            return $this->error(0, '专栏不存在');
+        }
+
+        $type = 1;
+        if ($column_data['type'] == 3) {
+            $type = 3;
+        }
         //检测下单参数有效性
-        $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, 1);
+        $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $type);
         if ($checked['code'] == 0) {
             return $this->error(0, $checked['msg']);
         }
@@ -168,11 +180,9 @@ class OrderController extends Controller
         $tweeter_code = $checked['tweeter_code'];
 
 
-        //$column_id 专栏信息
-        $column_data = Column::find($column_id);
-        if (empty($column_data)) {
-            return $this->error(0, '专栏不存在');
-        }
+
+
+
 
         if ($activity_tag === 'cytx') {
             $price = ChannelWorksList::getPrice(1, $column_id);
