@@ -611,7 +611,7 @@ class WorksController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup works
      *
-     * @apiParam {int} relation_type  1专栏   2讲座   3听书  4精品课程
+     * @apiParam {int} relation_type  1专栏   2讲座   3听书  4精品课程 5训练营
      * @apiParam {int} relation_id   对应id(1专栏对应id但课程  2课程id   3讲座使用对应的课程id )
      * @apiParam {int} works_info_id 章节id
      * @apiParam {int} user_id 用户id
@@ -676,7 +676,7 @@ class WorksController extends Controller
      * @apiGroup works
      *
      * @apiParam {int} relation_id  对应id
-     * @apiParam {int} relation_type 1专栏   2讲座   3听书    4精品课程
+     * @apiParam {int} relation_type 1专栏   2讲座   3听书    4精品课程    5训练营
      * @apiParam {int} works_info_id 章节id
      * @apiParam {int} time_leng  百分比
      * @apiParam {int} time_number  章节分钟数
