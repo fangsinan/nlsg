@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Live\V4;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -105,6 +104,17 @@ class OrderController extends ControllerBackend
         $model = new Order();
         $data = $model->orderInLive($request->input(),$this->user);
         return $this->getRes($data);
+    }
+
+    public function listExcel(Request $request)
+    {
+        $model = new Order();
+        $request->offsetSet('excel_flag','1');
+        $list = $model->orderInLive($request->input(),$this->user);
+
+
+
+        return $list;
     }
 
     public function inviterLiveList(Request $request){

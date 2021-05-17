@@ -418,7 +418,12 @@ class Order extends Base
             Cache::put($cache_key_name, $list_money, $expire_num);
         }
 
-        $list = $query->orderBy('id', 'desc')->paginate($size);
+        if (($params['excel_flag'] ?? 0) == 1){
+            $list = $query->orderBy('id', 'desc')->get();
+        }else{
+            $list = $query->orderBy('id', 'desc')->paginate($size);
+        }
+
 
         foreach ($list as &$v) {
             $goods = [];
@@ -468,8 +473,13 @@ class Order extends Base
             unset($v->works, $v->column, $v->offline, $v->liveGoods);
         }
 
-        $total_money = collect(['total_money'=>$list_money]);
-        return $total_money->merge($list);
+        if (($params['excel_flag'] ?? 0) == 1){
+            return $list;
+        }else{
+            $total_money = collect(['total_money'=>$list_money]);
+            return $total_money->merge($list);
+        }
+
     }
 
     public function inviterLiveList($params,$this_user = []){

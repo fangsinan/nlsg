@@ -118,4 +118,44 @@ class BackendUser extends Authenticatable implements JWTSubject
         }
     }
 
+    public function adminCreate($params,$admin_id){
+        $id = $params['id'] ?? 0;
+        $username = $params['username'] ?? 0;
+//        $role_id = $params['role_id'] ?? 0;
+//        $password = strval($params['pwd'] ?? '');
+//        $re_password = strval($params['re_pwd'] ?? '');
+//        if (!empty($password) && $password === $re_password) {
+//            $password = bcrypt($password);
+//        } else {
+//            return ['code' => false, 'msg' => '密码不一致'];
+//        }
+
+        if (empty($id)){
+            $um = new BackendUser();
+        }else{
+            $um = BackendUser::where('id','=',$id)->first();
+            if (empty($um)){
+                return ['code'=>false,'msg'=>'用户不存在'];
+            }else{
+                if ($um->username != $username){
+                    $check_username = BackendUser::where('username','=',$username)
+                        ->where('id','<>',$id)
+                        ->first();
+                    if ($check_username){
+                        return ['code'=>false,'msg'=>'手机号被占用'];
+                    }
+                }
+            }
+        }
+        $um->username = $username;
+        $res = $um->save();
+        if ($res){
+            return ['code'=>true,'msg'=>'成功'];
+        }else{
+            return ['code'=>false,'msg'=>'失败'];
+        }
+
+
+    }
+
 }

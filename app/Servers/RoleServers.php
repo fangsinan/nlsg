@@ -97,7 +97,7 @@ class RoleServers
     {
         $id = $params['id'] ?? 0;
         $name = $params['name'] ?? '';
-        $status = $params['status'] ?? 0;
+        $status = $params['status'] ?? 1;
 
         if (empty($name) || !in_array($status,[1,2])){
             return ['code'=>false,'msg'=>'参数错误'];

@@ -198,6 +198,12 @@ class RoleController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function adminCreate(Request $request){
+        $servers = new BackendUser();
+        $data = $servers->adminCreate($request->input(), $this->user['id'] ?? 0);
+        return $this->getRes($data);
+    }
+
     /**
      * 后台用户 修改密码和角色
      * @api {put} /api/admin_v4/admin_user/list_status 后台用户 修改密码和角色
@@ -270,7 +276,6 @@ class RoleController extends ControllerBackend
      *
      * @apiParam {number} [id] 角色id,编辑时候传
      * @apiParam {string} name 角色名称
-     * @apiParam {number=1,2} status 状态(1生效,2无效)
      */
     public function roleCreate(Request $request){
         $servers = new RoleServers();
