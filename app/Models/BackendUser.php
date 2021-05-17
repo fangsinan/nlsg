@@ -78,7 +78,7 @@ class BackendUser extends Authenticatable implements JWTSubject
                     ->where('son', '=', $v['username'])
                     ->pluck('parent')->toArray();
                 $v['live_role_bind'] = implode(',', $v['live_role_bind']);
-            } elseif ($v['live_role'] = 23) {
+            } elseif ($v['live_role'] == 23) {
                 $v['live_role_bind'] = DB::table('nlsg_backend_live_role')
                     ->where('parent', '=', $v['username'])
                     ->pluck('parent')->toArray();
@@ -134,17 +134,27 @@ class BackendUser extends Authenticatable implements JWTSubject
                     $bind_phone = explode(',', $bind_phone);
                 }
 
-                if (!empty($bind_phone)) {
-                    if ($live_role_id == 21) {
-                        //如果是老师,可以指定校长
+                if ($live_role_id == 21) {
+                    //如果是老师,可以指定校长
+                    if (empty($bind_phone)) {
+                        DB::table('nlsg_backend_live_role')
+                            ->where('son', '=', $check->username)
+                            ->delete();
+                    } else {
                         foreach ($bind_phone as $v) {
                             $tmp_lr_data = [];
                             $tmp_lr_data['parent'] = $v;
                             $tmp_lr_data['son'] = $check->username;
                             $lr_data[] = $tmp_lr_data;
                         }
+                    }
+                } elseif ($live_role_id == 23) {
+                    //如果是校长,可以指定老师
+                    if (empty($bind_phone)) {
+                        DB::table('nlsg_backend_live_role')
+                            ->where('parent', '=', $check->username)
+                            ->delete();
                     } else {
-                        //如果是校长,可以指定老师
                         foreach ($bind_phone as $v) {
                             $tmp_lr_data = [];
                             $tmp_lr_data['parent'] = $check->username;
