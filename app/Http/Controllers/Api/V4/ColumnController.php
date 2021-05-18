@@ -619,7 +619,7 @@ class ColumnController extends Controller
         }
         //IOS 通过审核后修改  并删除返回值works_data
         $column_data = Column::select(['id', 'name', 'name as title','type' , 'title', 'subtitle', 'cover_pic as cover_img', 'details_pic as detail_img', 'message',
-            'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num'])
+            'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num','show_info_num'])
             ->where(['id' => $lecture_id, 'status' => 1])->first();
 
 
@@ -639,11 +639,15 @@ class ColumnController extends Controller
         $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
 
         //1、加字段控制需要查询的章节
-        //2、时间校验
+        $page_per_page = 50;
+        if($column_data['show_info_num'] > 0) {
+            $page_per_page = $column_data['show_info_num'];
+
+        }
 
         //查询章节、
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($lecture_id, $is_sub, $user_id, 3, $order, 50, $page, $size, $column_data['is_free']);
+        $info = $infoObj->getInfo($lecture_id, $is_sub, $user_id, 3, $order, $page_per_page, $page, $size, $column_data['is_free']);
 
 
 //        if ($flag === 'catalog'){
