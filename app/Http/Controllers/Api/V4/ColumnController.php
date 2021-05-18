@@ -635,6 +635,9 @@ class ColumnController extends Controller
         }
         $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
 
+        //1、加字段控制需要查询的章节
+        //2、时间校验
+
         //查询章节、
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($lecture_id, $is_sub, $user_id, 3, $order, 50, $page, $size, $column_data['is_free']);
