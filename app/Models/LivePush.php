@@ -349,7 +349,7 @@ WHERE
             foreach ($lists as $v) {
                 if ($v['push_type'] == 7 || $v['push_type'] == 11) {
                     $res = Column::select('id', 'name as title', 'subtitle', 'original_price', 'price',
-                        'cover_pic as cover_img')
+                        'cover_pic as cover_img','type')
                         ->where('id', $v['push_gid'])
                         //->where('type', 2)
                         ->where('status', 1)
@@ -358,6 +358,9 @@ WHERE
                         continue;
                     }
                     $res->type = 1;
+                    if($v['push_type'] == 11){
+                        $res->type = 11;
+                    }
                     $res = $res->toArray();
                 } elseif ($v['push_type'] == 2) {
                     $res = Works::select('id', 'title', 'subtitle', 'cover_img', 'original_price', 'price')
