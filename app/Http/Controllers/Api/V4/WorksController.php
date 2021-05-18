@@ -878,7 +878,7 @@ class WorksController extends Controller
      * @apiDescription 相邻章节
      * @apiParam {number} works_id 作品id
      * @apiParam {number} works_info_id 章节id
-     * @apiParam {number} type  1 专栏  2作品  6讲座
+     * @apiParam {number} type  1 专栏  2作品  6讲座  7训练营
      * @apiParam {number} column_id  专栏/讲座 id
      *
      * @apiSuccess {string[]} list 相邻章节列表
