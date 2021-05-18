@@ -167,7 +167,7 @@ class UserController extends Controller
 //                            ->where('type', 1)
 
                     } elseif ($v['relation_type'] == 2) {
-                        $v['lecture'] = Column::select('id', 'name','title', 'cover_pic')
+                        $v['lecture'] = Column::select('id', 'name as title','subtitle', 'cover_pic')
                             ->where('id', $v['relation_id'])
                             ->where('status', 1)
                             ->where('type', 2)
@@ -184,7 +184,7 @@ class UserController extends Controller
                             ->where('status', 4)
                             ->first();
                     } elseif ($v['relation_type'] == 5) {
-                        $v['lecture'] = Column::select('id', 'name','title', 'cover_pic')
+                        $v['lecture'] = Column::select('id', 'name as title','subtitle', 'cover_pic')
                             ->where('id', $v['relation_id'])
                             ->where('status', 1)
                             ->where('type', 3)
