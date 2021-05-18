@@ -854,7 +854,7 @@ class UserController extends Controller
             $val['worksInfo_name'] = '';
 
 
-            if ($val['relation_type'] == 1 or $val['relation_type'] == 2) {
+            if ($val['relation_type'] == 1 or $val['relation_type'] == 2 or $val['relation_type'] == 5) {
 //                $column = Column::find($val['relation_id']);
                 $column = Column::where(['id'=>$val['relation_id'],'status'=>1])->first();
                 $val['column_name'] = $column['name'] ?? '';
