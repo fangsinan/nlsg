@@ -183,6 +183,12 @@ class UserController extends Controller
                             ->where('id', $v['relation_id'])
                             ->where('status', 4)
                             ->first();
+                    } elseif ($v['relation_type'] == 5) {
+                        $v['lecture'] = Column::select('id', 'name','title', 'cover_pic')
+                            ->where('id', $v['relation_id'])
+                            ->where('status', 1)
+                            ->where('type', 3)
+                            ->first();
                     }
                     if(empty($v['columns']) && empty($v['lecture']) && empty( $v['listens']) && empty($v['works'])){
                         unset($user['history'][$k]);
