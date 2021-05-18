@@ -532,6 +532,9 @@ class ColumnController extends Controller
         $column['emperor_price'] = (string)GetPriceTools::Income(1, 4, 0, 1, $column_id);
         $column['service_price'] = (string)GetPriceTools::Income(1, 5, 0, 1, $column_id);
 
+        if($column['type'] == 3){  //训练营  开营时间
+            $column['online_time'] = date('Y-m-d H',strtotime($column['online_time']));
+        }
         return $this->success([
             'column_info' => $column,
         ]);
