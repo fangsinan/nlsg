@@ -631,10 +631,12 @@ class ColumnController extends Controller
 //        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
 //            'view_num','price','subscribe_num','is_free','is_end',])
 //            ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
+        $history_type = 2;
         if($column_data['type'] == 2 ){
             $type = 6;
         }else if ($column_data['type'] == 3 ){
             $type = 7;
+            $history_type = 5; //训练营
         }
         $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
 
@@ -689,7 +691,7 @@ class ColumnController extends Controller
             ];
             return $this->success($res);
         }
-        $historyData = History::getHistoryData($lecture_id, 2, $user_id);
+        $historyData = History::getHistoryData($lecture_id, $history_type, $user_id);
 
         return $this->success([
             'works_data' => $column_data,
