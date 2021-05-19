@@ -168,8 +168,10 @@ class OrderController extends Controller
         }
 
         $type = 1;
+        $coupon_type = 1;
         if ($column_data['type'] == 3) {
             $type = 3;
+            $coupon_type = 8;
         }
         //检测下单参数有效性
         $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $type);
@@ -199,7 +201,7 @@ class OrderController extends Controller
             $column_data->price = $price;
         } else {
             //优惠券
-            $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $column_data->price, 1);
+            $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $column_data->price, $coupon_type);
         }
 
         $type = 1;
