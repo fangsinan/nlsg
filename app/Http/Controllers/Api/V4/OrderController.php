@@ -167,14 +167,20 @@ class OrderController extends Controller
             return $this->error(0, '专栏不存在');
         }
 
-        $type = 1;
+        $sub_type = 1;
         $coupon_type = 1;
-        if ($column_data['type'] == 3) {
-            $type = 3;
+        if ($column_data['type'] == 2) {
+            $sub_type = 6;
+            $coupon_type = 7;
+        }else if ($column_data['type'] == 3) {
+            $sub_type = 7;
             $coupon_type = 8;
         }
+
+
         //检测下单参数有效性
-        $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $type);
+        $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $sub_type);
+
         if ($checked['code'] == 0) {
             return $this->error(0, $checked['msg']);
         }
