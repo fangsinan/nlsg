@@ -78,8 +78,13 @@ class MallTwitter extends Base
                 break;
             case 13:
                 //训练营
-//                $url = 'appv4/videoPlay?dId=' . $gid . '&info_id=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
-                $url = 'appv4/videoPlay?dId='. $gid .'&info_id='.$info_id.'&relationType=5&type=2';
+                if($info_id){
+                    //$url = 'appv4/videoPlay?dId=' . $gid . '&info_id=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                    $url = 'appv4/videoPlay?dId='. $gid .'&info_id='.$info_id.'&relationType=5&type=2';
+                }else{
+                    $url = 'appv4/lecture-introduce?type=2&id='. $gid .'&time=1621217259045';
+                }
+
                 break;
             case 22: //三八邀请app注册
                 $url = '';
