@@ -96,7 +96,7 @@ class OrderController extends Controller
     {
 
         //校验用户等级
-        if($type != 3){
+        if($type != 7){  //训练营不校验vip
             $rst = User::getLevel($user_id);
             if ($rst > 2) {
                 return ['code' => 0, 'msg' => '您已是vip用户,可免费观看'];
