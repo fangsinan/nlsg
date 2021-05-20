@@ -85,7 +85,7 @@ class CreatePosterController extends Controller
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
 
-            $cache_key_name = 'qr_' . $is_qrcode . '_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid . '_' . $flag;
+            $cache_key_name = 'qr_' . $is_qrcode . '_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid . '_' . $flag. '_' . $info_id;
             $res = Cache::get($cache_key_name);
             $src = '';
             if (empty($res)) {
