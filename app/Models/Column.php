@@ -133,6 +133,7 @@ class Column extends Base
             ->leftJoin($userObj->getTable().' as user', 'column.user_id', '=', 'user.id')
             ->where('column.type',$type)
             ->where('column.status',1)
+            ->whereIn('column.is_start',[0,1])
             ->where(function ($query)use($keywords){
                 $query->orWhere('column.title','LIKE',"%$keywords%");
                 $query->orWhere('column.name','LIKE',"%$keywords%");
