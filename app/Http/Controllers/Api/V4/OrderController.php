@@ -169,10 +169,10 @@ class OrderController extends Controller
 
         $sub_type = 1;
         $coupon_type = 1;
-        if ($column_data['type'] == 2) {
+        if ($column_data['type'] == 2) {   //讲座类型
             $sub_type = 6;
             $coupon_type = 7;
-        }else if ($column_data['type'] == 3) {
+        }else if ($column_data['type'] == 3) { // 训练营类型
             $sub_type = 7;
             $coupon_type = 8;
         }
