@@ -328,8 +328,8 @@ class WorksController extends Controller
             $worksData['data'][$key]['username'] = $user['nickname'] ?? '';
 
             //专栏头衔
-            $column = Column::find($val['column_id']);
-            $worksData['data'][$key]['column_title'] = $column['title'] ?? '';
+//            $column = Column::find($val['column_id']);
+            $worksData['data'][$key]['column_title'] = $user['honor'] ?? '';
 
             $newWorks[$key]['id'] = $val['relation_id'];
             $newWorks[$key]['work_id'] = $val['work_id'];
