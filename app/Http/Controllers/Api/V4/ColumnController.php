@@ -128,6 +128,7 @@ class ColumnController extends Controller
             $title = Works::where('column_id', $v['id'])->orderBy('updated_at', 'desc')->first('title');
             $v['work_name'] = $title->title ?? '';
             $v['nickname'] = $user_info['nickname'] ?? '';
+            $v['title'] = $user_info['honor'] ?? '';
 
         }
         return $this->success($list['data']);
@@ -535,6 +536,10 @@ class ColumnController extends Controller
         if($column['type'] == 3){  //训练营  开营时间
             $column['online_time'] = date('Y-m-d',strtotime($column['online_time']));
         }
+
+        $user = User::find($column['user_id']);
+        $column['title'] = $user['honor'] ?? '';
+
         return $this->success([
             'column_info' => $column,
         ]);
