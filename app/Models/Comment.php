@@ -108,7 +108,7 @@ class Comment extends Base
         }
 
         if (in_array($comment['type'], [1, 2, 6])) {
-            $comment['column'] = Column::find($comment['relation_id'], ['title', 'subtitle', 'cover_pic']);
+            $comment['column'] = Column::find($comment['relation_id'], ['name as title', 'subtitle', 'cover_pic']);
         } elseif (in_array($comment['type'], [3, 4])) {
             $comment['works'] = Works::find($comment['relation_id'], ['title', 'subtitle', 'cover_img']);
 //            $workinfo = WorksInfo::select('pid')->where('id', $comment['relation_id'])->first();
