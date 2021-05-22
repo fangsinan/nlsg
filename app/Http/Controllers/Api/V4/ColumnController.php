@@ -101,7 +101,7 @@ class ColumnController extends Controller
         if ($order) {
             $order_str = 'desc';
         }
-        $field = ['id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time','index_pic ', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num', 'is_free'];
+        $field = ['id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time','index_pic', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num', 'is_free'];
         $list = Column::select($field)->where([
             "status" => 1,
             "type" => $type,
@@ -507,7 +507,7 @@ class ColumnController extends Controller
             return $this->error(0, 'column_id 不能为空');
         }
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
-            'original_price', 'price', 'online_time', 'works_update_time', 'index_pic ','cover_pic', 'details_pic',
+            'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
             'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
@@ -623,7 +623,7 @@ class ColumnController extends Controller
             return $this->error(0, '参数有误：lecture_id ');
         }
         //IOS 通过审核后修改  并删除返回值works_data
-        $column_data = Column::select(['id', 'name', 'name as title','type' , 'title', 'subtitle','index_pic ', 'cover_pic as cover_img', 'details_pic as detail_img', 'message','details_pic','cover_pic',
+        $column_data = Column::select(['id', 'name', 'name as title','type' , 'title', 'subtitle','index_pic', 'cover_pic as cover_img', 'details_pic as detail_img', 'message','details_pic','cover_pic',
             'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num','show_info_num'])
             ->where(['id' => $lecture_id, 'status' => 1])->first();
 
