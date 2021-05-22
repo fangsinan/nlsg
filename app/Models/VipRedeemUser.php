@@ -229,6 +229,36 @@ class VipRedeemUser extends Base
             return ['code' => false, 'msg' => '兑换券错误'];
         }
 
+        //查询当前领取用户的vip信息 如果不是钻石,需要校验当前源账户是不是兑换券所有人, 没有源账户就查询关系保护
+        $check_vip = VipUser::where('user_id', '=', $user['id'])
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->first();
+
+        if (empty($check_vip)) {
+            //不是vip,查询关系保护
+            $bind_user_id = VipUserBind::getBindParent($user['phone']);
+            if ($bind_user_id !== 0 && intval($check->user_id) !== $bind_user_id) {
+                return ['code' => false, 'msg' => '您的账号已受保护,无法领取.'];
+            }
+        } else {
+            if ($check_vip['level'] == 1) {
+                //是360,查询当前源账户是否为空
+                if ($check_vip['source_vip_id'] == 0) {
+                    //是0 查询关系保护
+                    $bind_user_id = VipUserBind::getBindParent($user['phone']);
+                    if ($bind_user_id !== 0 && intval($check->user_id) !== $bind_user_id) {
+                        return ['code' => false, 'msg' => '您的账号已受保护,无法领取.'];
+                    }
+                } else {
+                    //不是0 对比是否一直
+                    if ($check_vip != $check_vip['source_vip_id']) {
+                        return ['code' => false, 'msg' => '您的账号已受保护,无法领取.'];
+                    }
+                }
+            }
+        }
+
         $model = new self();
         $model->redeem_code_id = $check->redeem_code_id;
         $model->user_id = $user['id'];
