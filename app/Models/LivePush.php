@@ -349,7 +349,7 @@ WHERE
             foreach ($lists as $v) {
                 if ($v['push_type'] == 7 || $v['push_type'] == 11) {
                     $res = Column::select('id', 'name as title', 'subtitle', 'original_price', 'price',
-                        'cover_pic as cover_img')
+                        'cover_pic as cover_img','index_pic')
                         ->where('id', $v['push_gid'])
                         //->where('type', 2)
                         ->where('status', 1)
