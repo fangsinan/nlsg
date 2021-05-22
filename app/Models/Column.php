@@ -109,7 +109,7 @@ class Column extends Base
         if($is_free !== false ){
             $where['is_free'] = $is_free;
         }
-        $lists= $this->select('id','name', 'column_type', 'title','subtitle', 'message','price','index_pic', 'cover_pic','info_num as chapter_num','is_free','is_start')
+        $lists= $this->select('id','name', 'column_type', 'title','subtitle', 'message','price','index_pic', 'cover_pic','details_pic','info_num as chapter_num','is_free','is_start')
             ->whereIn('id', $ids)
             ->where($where)
             ->orderBy('created_at', 'desc')
