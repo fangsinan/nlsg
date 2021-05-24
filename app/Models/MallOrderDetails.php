@@ -17,7 +17,7 @@ class MallOrderDetails extends Base {
     public function skuInfo()
     {
         return $this->hasOne('App\Models\MallSku', 'sku_number', 'sku_number')
-            ->select(['id','sku_number','picture','stock','status']);
+            ->select(['id','sku_number','picture','stock','status','erp_goods_no','erp_spec_no']);
     }
 
 }
