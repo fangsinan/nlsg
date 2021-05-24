@@ -860,6 +860,7 @@ class ClassController extends ControllerBackend
      * @apiParam {string} free_trial 是否免费 0 否 1 是
      * @apiParam {string} timing_online  是否自动上线 0 否 1是
      * @apiParam {string} timing_time  自动上线时间
+     * @apiParam {string} share_img     章节图片
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -893,6 +894,7 @@ class ClassController extends ControllerBackend
             'url'           => $input['url'] ?? '',
             'status'        => $input['status'] ?? 5,
             'video_id'      => $input['video_id'] ?? '',
+            'share_img'     => $input['share_img'] ?? '',
             'free_trial'    => $input['free_trial'] ?? 0,
             'timing_online' => $timing_online ?? 0
         ];
@@ -1389,7 +1391,7 @@ class ClassController extends ControllerBackend
         $id = $request->get('id');
         $list = WorksInfo::select('id', 'type', 'title', 'view_num', 'section', 'url', 'online_time', 'timing_online',
             'timing_time',
-            'status', 'introduce', 'video_id', 'free_trial', 'rank')
+            'status', 'introduce', 'video_id', 'free_trial', 'rank','share_img')
             ->where('id', $id)
             ->first();
         if ($list) {
@@ -1631,6 +1633,50 @@ class ClassController extends ControllerBackend
         }
         return success();
     }
+
+    /**
+     * @api {post} api/admin_v4/class/get-camp-list 训练营详情
+     * @apiVersion 4.0.0
+     * @apiName  get-camp-list
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/get-camp-list
+     * @apiDescription 训练营详情
+     *
+     * @apiParam   {number} camp_id 训练营id
+     *
+     * @apiParam {string} title 标题
+     * @apiParam {string} subtitle 副标题
+     * @apiParam {string} user  作者相关
+     * @apiParam {string} original_price 定价
+     * @apiParam {string} price 售价
+     * @apiParam {string} status 上架状态
+     * @apiParam {string} message 推荐语
+     * @apiParam {string} index_pic 首页图
+     * @apiParam {string} is_start  是否开营
+     * @apiParam {string} show_info_num 章节数量
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function getCampList(Request $request)
+    {
+        $id = $request->get('camp_id');
+        $list = Column::with('user:id,nickname,headimg')
+            ->select('id', 'user_id', 'name', 'title', 'subtitle', 'subscribe_num', 'message', 'status',
+                'original_price', 'price', 'index_pic','cover_pic',
+                'details_pic', 'created_at', 'timing_online', 'timing_time','is_start','show_info_num')
+            ->where('id', $id)->first();
+        return success($list);
+    }
+
 
 
 }
