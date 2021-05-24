@@ -21,6 +21,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::put('active/status_change', 'ActiveController@statusChange');
 
         Route::get('class/column', 'ClassController@column');
+        Route::get('class/camp', 'ClassController@camp');
         Route::get('class/get-column-list', 'ClassController@getColumnList');
         Route::get('class/get-column-work-list', 'ClassController@getColumnWorkList');
         Route::get('class/get-lecture-work-list', 'ClassController@getLectureWorkList');
@@ -33,6 +34,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
 
         Route::post('class/add-column', 'ClassController@addColumn');
+        Route::post('class/add-camp', 'ClassController@addCamp');
         Route::get('class/get-column-author', 'ClassController@getColumnAuthors');
         Route::post('class/add-lecture', 'ClassController@addLecture');
         Route::post('class/add-works', 'ClassController@addWorks');
