@@ -65,11 +65,11 @@ class ClassController extends ControllerBackend
                 $query->where('status', $status);
             })
             ->when($title, function ($query) use ($title) {
-                $query->where('name', 'like', '%' . $title . '%');
+                $query->where('name', 'like', '%'.$title.'%');
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                    $query->where('nickname', 'like', '%'.$nickname.'%');
                 });
             })
             ->when($start && $end, function ($query) use ($start, $end) {
@@ -79,7 +79,8 @@ class ClassController extends ControllerBackend
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at',
+            'info_num')
             ->where('type', 1)
             ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
@@ -134,11 +135,11 @@ class ClassController extends ControllerBackend
                 $query->where('status', $status);
             })
             ->when($title, function ($query) use ($title) {
-                $query->where('name', 'like', '%' . $title . '%');
+                $query->where('name', 'like', '%'.$title.'%');
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                    $query->where('nickname', 'like', '%'.$nickname.'%');
                 });
             })
             ->when($start && $end, function ($query) use ($start, $end) {
@@ -148,7 +149,8 @@ class ClassController extends ControllerBackend
                 ]);
             });
 
-        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at', 'info_num')
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at',
+            'info_num')
             ->where('type', 2)
             ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
@@ -218,7 +220,7 @@ class ClassController extends ControllerBackend
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when(!is_null($is_pay), function ($query) use ($is_pay) {
+            ->when(! is_null($is_pay), function ($query) use ($is_pay) {
                 $query->where('is_pay', $is_pay);
             })
             ->when($type, function ($query) use ($type) {
@@ -228,11 +230,11 @@ class ClassController extends ControllerBackend
                 $query->where('is_end', $is_end);
             })
             ->when($title, function ($query) use ($title) {
-                $query->where('title', 'like', '%' . $title . '%');
+                $query->where('title', 'like', '%'.$title.'%');
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                    $query->where('nickname', 'like', '%'.$nickname.'%');
                 });
             })
             ->when($category_id, function ($query) use ($category_id) {
@@ -247,7 +249,8 @@ class ClassController extends ControllerBackend
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num', 'is_pay')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price',
+            'is_end', 'chapter_num', 'is_pay')
             ->where('status', '>', 0)
             ->where('is_audio_book', 0)
             ->orderBy('id', 'desc')
@@ -324,11 +327,11 @@ class ClassController extends ControllerBackend
                 $query->where('is_end', $is_end);
             })
             ->when($title, function ($query) use ($title) {
-                $query->where('title', 'like', '%' . $title . '%');
+                $query->where('title', 'like', '%'.$title.'%');
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                    $query->where('nickname', 'like', '%'.$nickname.'%');
                 });
             })
             ->when($category_id, function ($query) use ($category_id) {
@@ -343,7 +346,8 @@ class ClassController extends ControllerBackend
                 ]);
             });
 
-        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price', 'is_end', 'chapter_num')
+        $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price',
+            'is_end', 'chapter_num')
             ->where('is_audio_book', 1)
             ->where('status', '>', 0)
             ->orderBy('id', 'desc')
@@ -398,10 +402,10 @@ class ClassController extends ControllerBackend
         $start = $request->get('start');
         $end = $request->get('end');
         $query = Wiki::when($status, function ($query) use ($status) {
-                $query->where('status', $status);
-            })
+            $query->where('status', $status);
+        })
             ->when($title, function ($query) use ($title) {
-                $query->where('name', 'like', '%' . $title . '%');
+                $query->where('name', 'like', '%'.$title.'%');
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
@@ -410,11 +414,11 @@ class ClassController extends ControllerBackend
                 ]);
             });
 
-        $lists = $query->select('id','category_id','name','cover', 'detail_img', 'status', 'created_at', 'view_num')
+        $lists = $query->select('id', 'category_id', 'name', 'cover', 'detail_img', 'status', 'created_at', 'view_num')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
-        if ($lists['data']){
+        if ($lists['data']) {
             foreach ($lists['data'] as &$v) {
                 $name = WikiCategory::where('id', $v['category_id'])->value('name');
                 $v['category_name'] = $name;
@@ -453,30 +457,30 @@ class ClassController extends ControllerBackend
     public function addWiki(Request $request)
     {
         $input = $request->all();
-        $name  = $input['name'] ?? '';
-        if (!$name) {
+        $name = $input['name'] ?? '';
+        if ( ! $name) {
             return error('名称不能为空');
         }
-        $intro   = $input['intro'] ?? '';
+        $intro = $input['intro'] ?? '';
         $content = $input['content'] ?? '';
-        $status  = $input['status'] ?? 2;
-        $sort    = $input['sort'] ?? 99;
-        $category_id   = $input['category_id'] ?? 0;
-        $cover = !empty($input['cover']) ? covert_img($input['cover']) : '';
-        $detail_img = !empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
+        $status = $input['status'] ?? 2;
+        $sort = $input['sort'] ?? 99;
+        $category_id = $input['category_id'] ?? 0;
+        $cover = ! empty($input['cover']) ? covert_img($input['cover']) : '';
+        $detail_img = ! empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
 
         $data = [
-            'name'    => $name,
-            'intro'   => $intro,
-            'content' => $content,
-            'status'  => $status,
-            'sort'    => $sort,
+            'name'        => $name,
+            'intro'       => $intro,
+            'content'     => $content,
+            'status'      => $status,
+            'sort'        => $sort,
             'category_id' => $category_id,
             'cover'       => $cover,
-            'detail_img' => $detail_img
+            'detail_img'  => $detail_img
         ];
 
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             Wiki::where('id', $input['id'])->update($data);
         } else {
             Wiki::create($data);
@@ -506,14 +510,14 @@ class ClassController extends ControllerBackend
      */
     public function getWikiCategory()
     {
-        $lists = WikiCategory::select('id','name','sort')
-                ->where('status', 1)
-                ->orderBy('sort', 'desc')
-                ->get();
+        $lists = WikiCategory::select('id', 'name', 'sort')
+            ->where('status', 1)
+            ->orderBy('sort', 'desc')
+            ->get();
         return success($lists);
     }
 
-    public  function  editWiki(Request $request)
+    public function editWiki(Request $request)
     {
         $id = $request->get('id');
         $list = Wiki::where('id', $id)->first();
@@ -553,11 +557,11 @@ class ClassController extends ControllerBackend
     {
         $input = $request->all();
         $name = $input['name'] ?? '';
-        if (!$name) {
+        if ( ! $name) {
             return error('名称不能为空');
         }
-        $cover_pic = !empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
-        $details_pic = !empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
+        $cover_pic = ! empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
+        $details_pic = ! empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
         $subtitle = $input['subtitle'] ?? '';
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
@@ -567,19 +571,19 @@ class ClassController extends ControllerBackend
         $online_type = $input['online_type'] ?? 1;
 
         $data = [
-            'cover_pic' => $cover_pic,
-            'details_pic' => $details_pic,
-            'name' => $name ?? '',
-            'subtitle' => $subtitle,
-            'message' => $message,
-            'user_id' => $user_id,
-            'price' => $price,
+            'cover_pic'      => $cover_pic,
+            'details_pic'    => $details_pic,
+            'name'           => $name ?? '',
+            'subtitle'       => $subtitle,
+            'message'        => $message,
+            'user_id'        => $user_id,
+            'price'          => $price,
             'original_price' => $original_price,
-            'type' => 1,
-            'status' => $status
+            'type'           => 1,
+            'status'         => $status
         ];
 
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
         } else {
             Column::create($data);
@@ -622,11 +626,11 @@ class ClassController extends ControllerBackend
     {
         $input = $request->all();
         $name = $input['name'] ?? '';
-        if (!$name) {
+        if ( ! $name) {
             return error('名称不能为空');
         }
-        $cover_pic = !empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
-        $details_pic = !empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
+        $cover_pic = ! empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
+        $details_pic = ! empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
         $subtitle = $input['subtitle'] ?? '';
         $message = $input['message'] ?? '';
         $user_id = $input['user_id'] ?? 0;
@@ -637,34 +641,34 @@ class ClassController extends ControllerBackend
         $timing_online = $input['online_type'] ?? 1;
 
         $data = [
-            'cover_pic' => $cover_pic,
-            'details_pic' => $details_pic,
-            'name' => $name,
-            'subtitle' => $subtitle,
-            'message' => $message,
-            'user_id' => $user_id,
-            'subscribe_num'=>$subscribe_num,
-            'price' => $price,
+            'cover_pic'      => $cover_pic,
+            'details_pic'    => $details_pic,
+            'name'           => $name,
+            'subtitle'       => $subtitle,
+            'message'        => $message,
+            'user_id'        => $user_id,
+            'subscribe_num'  => $subscribe_num,
+            'price'          => $price,
             'timing_online'  => $timing_online,
             'original_price' => $original_price,
-            'type' => 2,
-            'status' => $status
+            'type'           => 2,
+            'status'         => $status
         ];
         //是否自动上架
-       if ($timing_online==1){
-           $data['online_time'] = $input['timing_time'];
-           $data['timing_time'] = $input['timing_time'];
-       } else {
-           if ($status==4){
-               $data['online_time'] =  date('Y-m-d H:i:s', time());
-           }
-       }
-        if (!empty($input['id'])) {
+        if ($timing_online == 1) {
+            $data['online_time'] = $input['timing_time'];
+            $data['timing_time'] = $input['timing_time'];
+        } else {
+            if ($status == 4) {
+                $data['online_time'] = date('Y-m-d H:i:s', time());
+            }
+        }
+        if ( ! empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
         } else {
             $lecture = Column::where('name', $name)->first();
-            if ($lecture){
-               return error(1000,'不能添加重复数据');
+            if ($lecture) {
+                return error(1000, '不能添加重复数据');
             }
             Column::create($data);
         }
@@ -706,11 +710,11 @@ class ClassController extends ControllerBackend
     {
         $input = $request->all();
         $title = $input['title'] ?? '';
-        if (!$title) {
+        if ( ! $title) {
             return error('标题不能为空');
         }
-        $cover_img = !empty($input['cover_img']) ? covert_img($input['cover_img']) : '';
-        $detail_img = !empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
+        $cover_img = ! empty($input['cover_img']) ? covert_img($input['cover_img']) : '';
+        $detail_img = ! empty($input['detail_img']) ? covert_img($input['detail_img']) : '';
         $user_id = $input['user_id'] ?? 0;
         $category_id = $input['category_id'] ?? 0;
         $original_price = $input['original_price'] ?? 0;
@@ -721,43 +725,43 @@ class ClassController extends ControllerBackend
         $content = $input['content'] ?? '';
         $is_pay = $input['is_pay'] ?? 0;
         $subscribe_num = $input['subscribe_num'] ?? 0;
-        $type   = $input['type'] ?? 1;
-        $subtitle   = $input['subtitle'] ?? '';
-        $des      = $input['des'] ?? '';
+        $type = $input['type'] ?? 1;
+        $subtitle = $input['subtitle'] ?? '';
+        $des = $input['des'] ?? '';
 
 
         $data = [
-            'title' => $title,
-            'subtitle' => $subtitle,
-            'des'      => $des,
-            'cover_img' => $cover_img,
-            'detail_img' => $detail_img,
-            'user_id' => $user_id,
+            'title'          => $title,
+            'subtitle'       => $subtitle,
+            'des'            => $des,
+            'cover_img'      => $cover_img,
+            'detail_img'     => $detail_img,
+            'user_id'        => $user_id,
             'original_price' => $original_price,
             'timing_online'  => $timing_online,
-            'subscribe_num' => $subscribe_num,
-            'price' => $price,
-            'is_end' => $is_end,
-            'status' => $status,
-            'content' => $content,
-            'is_pay' => $is_pay,
-            'is_free' => $price == 0 ? 1 : 0,
-            'type'   => $type
+            'subscribe_num'  => $subscribe_num,
+            'price'          => $price,
+            'is_end'         => $is_end,
+            'status'         => $status,
+            'content'        => $content,
+            'is_pay'         => $is_pay,
+            'is_free'        => $price == 0 ? 1 : 0,
+            'type'           => $type
         ];
         //是否自动上架
-       if ($timing_online==1){
-           $data['online_time'] = $input['timing_time'];
-           $data['timing_time'] = $input['timing_time'];
-       } else {
-           if ($status==4){
-               $data['online_time'] =  date('Y-m-d H:i:s', time());
-           } elseif ($status ==5){
-               $data['timing_online'] = 0;
-               $data['online_time']   = NULL;
-           }
-       }
+        if ($timing_online == 1) {
+            $data['online_time'] = $input['timing_time'];
+            $data['timing_time'] = $input['timing_time'];
+        } else {
+            if ($status == 4) {
+                $data['online_time'] = date('Y-m-d H:i:s', time());
+            } elseif ($status == 5) {
+                $data['timing_online'] = 0;
+                $data['online_time'] = null;
+            }
+        }
 
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             Works::where('id', $input['id'])->update($data);
             //增加分类
             WorksCategoryRelation::where('work_id', $input['id'])
@@ -765,7 +769,7 @@ class ClassController extends ControllerBackend
             $id = $input['id'];
         } else {
             $res = Works::where('title', $title)->first();
-            if ($res){
+            if ($res) {
                 return error(1000, '不能添加重复数据');
             }
             $column = Column::where('user_id', $user_id)->first();
@@ -774,7 +778,7 @@ class ClassController extends ControllerBackend
             $id = $work ? $work->id : 0;
         }
         WorksCategoryRelation::create([
-            'work_id' => $id,
+            'work_id'     => $id,
             'category_id' => $input['category_id'] ?? 0
         ]);
 
@@ -824,8 +828,9 @@ class ClassController extends ControllerBackend
     {
         $id = $request->get('id');
         $work = Works::with('userName:id,nickname')
-            ->select('id', 'title', 'subtitle', 'des','cover_img', 'detail_img', 'content', 'status', 'user_id', 'is_end', 'view_num', 'subscribe_num',
-                'price', 'original_price', 'is_pay', 'message', 'timing_online','timing_time')
+            ->select('id', 'title', 'subtitle', 'des', 'cover_img', 'detail_img', 'content', 'status', 'user_id',
+                'is_end', 'view_num', 'subscribe_num',
+                'price', 'original_price', 'is_pay', 'message', 'timing_online', 'timing_time')
             ->where('id', $id)
             ->first();
         if ($work) {
@@ -871,7 +876,7 @@ class ClassController extends ControllerBackend
         $input = $request->all();
         $work_id = $request->get('pid');
         $work = Works::where('id', $work_id)->first();
-        if (!$work) {
+        if ( ! $work) {
             return error(1000, '作品不存在');
         }
 
@@ -879,38 +884,38 @@ class ClassController extends ControllerBackend
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
 
         $data = [
-            'rank' => $input['rank'] ?? 99,
-            'type' => $input['type'] ?? 0,
-            'view_num' => $input['view_num'] ?? 0,
-            'title' => $input['title'] ?? '',
-            'section' => $input['section'] ?? '',
-            'introduce' => $input['introduce'] ?? '',
-            'url' => $input['url'] ?? '',
-            'status' => $input['status'] ?? 5,
-            'video_id' => $input['video_id'] ?? '',
-            'free_trial' => $input['free_trial'] ?? 0,
+            'rank'          => $input['rank'] ?? 99,
+            'type'          => $input['type'] ?? 0,
+            'view_num'      => $input['view_num'] ?? 0,
+            'title'         => $input['title'] ?? '',
+            'section'       => $input['section'] ?? '',
+            'introduce'     => $input['introduce'] ?? '',
+            'url'           => $input['url'] ?? '',
+            'status'        => $input['status'] ?? 5,
+            'video_id'      => $input['video_id'] ?? '',
+            'free_trial'    => $input['free_trial'] ?? 0,
             'timing_online' => $timing_online ?? 0
         ];
-        if ($input['type'] ==1) {
+        if ($input['type'] == 1) {
             $data['column_id'] = $work_id;
-        } elseif($input['type'] ==2) {
-            $data['pid']  = $work_id;
+        } elseif ($input['type'] == 2) {
+            $data['pid'] = $work_id;
         }
         //是否自动上架
-        if ($timing_online==1){
+        if ($timing_online == 1) {
             $data['online_time'] = $input['timing_time'];
             $data['timing_time'] = $input['timing_time'];
         } else {
-           if ($input['status'] ==4){
-               $data['online_time'] =  date('Y-m-d H:i:s', time());
-           }
+            if ($input['status'] == 4) {
+                $data['online_time'] = date('Y-m-d H:i:s', time());
+            }
         }
 
-        if (!empty($input['id'])) {
+        if ( ! empty($input['id'])) {
             WorksInfo::where('id', $input['id'])->update($data);
 
             //作品章节数量
-            if ($input['status'] !=4){
+            if ($input['status'] != 4) {
                 Works::where('id', $work_id)->decrement('chapter_num');
             } else {
                 Works::where('id', $work_id)->increment('chapter_num');
@@ -923,7 +928,7 @@ class ClassController extends ControllerBackend
             } else {
                 WorksInfoContent::create([
                     'works_info_id' => $input['id'],
-                    'content' => $content
+                    'content'       => $content
                 ]);
             }
         } else {
@@ -934,13 +939,13 @@ class ClassController extends ControllerBackend
 
             $res = WorksInfo::create($data);
             if ($res) {
-                if ($input['status'] ==4){
+                if ($input['status'] == 4) {
                     Works::where('id', $work_id)->increment('chapter_num');
                 }
 
                 WorksInfoContent::create([
                     'works_info_id' => $res->id,
-                    'content' => $content
+                    'content'       => $content
                 ]);
             }
         }
@@ -982,7 +987,7 @@ class ClassController extends ControllerBackend
     {
         $input = $request->all();
         $title = $input['title'] ?? '';
-        if (!$title) {
+        if ( ! $title) {
             return error('标题不能为空');
         }
         $cover_img = covert_img($input['cover_img']) ?? '';
@@ -992,51 +997,51 @@ class ClassController extends ControllerBackend
         $is_end = $input['is_end'] ? 1 : 0;
         $status = $input['status'] ?? 5;  //0 删除 1 待审 2 拒绝  3通过 4上架 5下架
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动
-        $content  = $input['content'] ?? '';
+        $content = $input['content'] ?? '';
         $subtitle = $input['subtitle'] ?? '';
 
         $data = [
-            'title' => $title,
-            'subtitle'  => $subtitle,
-            'cover_img' => $cover_img,
-            'user_id' => $user_id,
+            'title'          => $title,
+            'subtitle'       => $subtitle,
+            'cover_img'      => $cover_img,
+            'user_id'        => $user_id,
             'original_price' => $original_price,
-            'is_end' => $is_end,
-            'status' => $status,
-            'timing_online' => $timing_online,
-            'content' => $content,
-            'is_audio_book' => 1,
-            'type'    => 2
+            'is_end'         => $is_end,
+            'status'         => $status,
+            'timing_online'  => $timing_online,
+            'content'        => $content,
+            'is_audio_book'  => 1,
+            'type'           => 2
         ];
 
         //是否自动上架
-        if ($timing_online==1){
+        if ($timing_online == 1) {
             $data['online_time'] = $input['timing_time'];
             $data['timing_time'] = $input['timing_time'];
         } else {
-           if ($status==4){
-              $data['online_time'] =  date('Y-m-d H:i:s', time());
-           }
+            if ($status == 4) {
+                $data['online_time'] = date('Y-m-d H:i:s', time());
+            }
         }
 
-        if (!empty($input['id'])) {
-             Works::where('id', $input['id'])->update($data);
-             //增加分类
-             WorksCategoryRelation::where('work_id', $input['id'])
-                 ->delete();
-             $id = $input['id'];
-         } else {
-             $res = Works::where('title', $title)->first();
-             if ($res){
-                 return error(1000, '不能添加重复数据');
-             }
-             $work = Works::create($data);
-             $id = $work ? $work->id : 0;
-         }
-         WorksCategoryRelation::create([
-             'work_id' => $id,
-             'category_id' => $input['category_id'] ?? 0
-         ]);
+        if ( ! empty($input['id'])) {
+            Works::where('id', $input['id'])->update($data);
+            //增加分类
+            WorksCategoryRelation::where('work_id', $input['id'])
+                ->delete();
+            $id = $input['id'];
+        } else {
+            $res = Works::where('title', $title)->first();
+            if ($res) {
+                return error(1000, '不能添加重复数据');
+            }
+            $work = Works::create($data);
+            $id = $work ? $work->id : 0;
+        }
+        WorksCategoryRelation::create([
+            'work_id'     => $id,
+            'category_id' => $input['category_id'] ?? 0
+        ]);
 
         return success();
     }
@@ -1072,8 +1077,9 @@ class ClassController extends ControllerBackend
     {
         $id = $request->get('column_id');
         $list = Column::with('user:id,nickname,headimg')
-            ->select('id', 'user_id', 'name', 'title', 'subtitle', 'subscribe_num', 'message', 'status', 'original_price', 'price', 'cover_pic',
-                'details_pic', 'created_at', 'timing_online','timing_time')
+            ->select('id', 'user_id', 'name', 'title', 'subtitle', 'subscribe_num', 'message', 'status',
+                'original_price', 'price', 'cover_pic',
+                'details_pic', 'created_at', 'timing_online', 'timing_time')
             ->where('id', $id)->first();
         return success($list);
     }
@@ -1111,7 +1117,8 @@ class ClassController extends ControllerBackend
     public function getColumnWorkList(Request $request)
     {
         $id = $request->get('id');
-        $lists = WorksInfo::select('id', 'title', 'view_num','size', 'status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
+        $lists = WorksInfo::select('id', 'title', 'view_num', 'size', 'status', 'rank', 'free_trial', 'timing_time',
+            'timing_online', 'created_at')
             ->where('column_id', $id)
             ->where('status', '>', 0)
             ->paginate(10)
@@ -1193,7 +1200,8 @@ class ClassController extends ControllerBackend
     public function getWorkChapterList(Request $request)
     {
         $id = $request->get('work_id');
-        $lists = WorksInfo::select('id', 'title', 'view_num', 'size', 'status', 'rank', 'free_trial', 'timing_time', 'timing_online', 'created_at')
+        $lists = WorksInfo::select('id', 'title', 'view_num', 'size', 'status', 'rank', 'free_trial', 'timing_time',
+            'timing_online', 'created_at')
             ->where('pid', $id)
             ->where('status', '>', 0)
             ->orderBy('rank', 'desc')
@@ -1379,8 +1387,9 @@ class ClassController extends ControllerBackend
     public function getChapterInfo(Request $request)
     {
         $id = $request->get('id');
-        $list = WorksInfo::select('id', 'type', 'title','view_num','section', 'url', 'online_time', 'timing_online', 'timing_time',
-            'status', 'introduce', 'video_id', 'free_trial','rank')
+        $list = WorksInfo::select('id', 'type', 'title', 'view_num', 'section', 'url', 'online_time', 'timing_online',
+            'timing_time',
+            'status', 'introduce', 'video_id', 'free_trial', 'rank')
             ->where('id', $id)
             ->first();
         if ($list) {
@@ -1415,14 +1424,14 @@ class ClassController extends ControllerBackend
     {
         $id = $request->get('id');
         $type = $request->get('type');
-        if (!$type) {
+        if ( ! $type) {
             return error(1000, '类型不能为空');
         }
         if ($type) {
             switch ($type) {
                 case  1:
                     $data = [
-                        'status' => 4,
+                        'status'      => 4,
                         'online_time' => date('Y-m-d H:i:s')
                     ];
                     break;
@@ -1476,5 +1485,152 @@ class ClassController extends ControllerBackend
             ->get();
         return success($lists);
     }
+
+    /**
+     * @api {get} api/admin_v4/class/camp 训练营列表
+     * @apiVersion 4.0.0
+     * @apiName  column
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/camp
+     * @apiDescription 训练营列表
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} title 名称
+     * @apiParam {number} status 上下架
+     * @apiParam {string} author 作者名称
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
+     *
+     * @apiSuccess {string} name  专栏名称
+     * @apiSuccess {string} title  标题
+     * @apiSuccess {string} subtitle  副标题
+     * @apiSuccess {string} user    作者相关
+     * @apiSuccess {string} info_num 作品数量
+     * @apiSuccess {string}  price  价格
+     * @apiSuccess {number}  status  状态
+     * @apiSuccess {string}  created_at  创建时间
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function camp(Request $request)
+    {
+        $title = $request->get('title');
+        $status = $request->get('status');
+        $nickname = $request->get('author');
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $query = Column::with('user:id,nickname,phone')
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when($title, function ($query) use ($title) {
+                $query->where('name', 'like', '%'.$title.'%');
+            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                });
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                ]);
+            });
+
+        $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at',
+            'info_num')
+            ->where('type', 3)
+            ->where('status', '<>', 3)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+        return success($lists);
+    }
+
+    /**
+     * @api {post} api/admin_v4/class/add-camp 创建训练营
+     * @apiVersion 4.0.0
+     * @apiName  add-column
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-camp
+     * @apiDescription 创建训练营
+     *
+     * @apiParam {string} name 训练营名称
+     * @apiParam {string} subtitle 副标题
+     * @apiParam {string} index_pic 训练营首页图
+     * @apiParam {string} cover_pic 封面图片
+     * @apiParam {string} details_pic 详情图片
+     * @apiParam {string} message 推荐语
+     * @apiParam {number} user_id 作者
+     * @apiParam {string} author 作者名称
+     * @apiParam {string} original_price 定价
+     * @apiParam {string} is_start 是否开营
+     * @apiParam {string} show_info_num  章节数量
+     * @apiParam {string} price 售价
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function addCamp(Request $request)
+    {
+        $input = $request->all();
+        $name = $input['name'] ?? '';
+        if ( ! $name) {
+            return error('名称不能为空');
+        }
+        $index_pic = ! empty($input['index_pic']) ? covert_img($input['index_pic']) : '';
+        $cover_pic = ! empty($input['cover_pic']) ? covert_img($input['cover_pic']) : '';
+        $details_pic = ! empty($input['details_pic']) ? covert_img($input['details_pic']) : '';
+        $subtitle = $input['subtitle'] ?? '';
+        $message = $input['message'] ?? '';
+        $user_id = $input['user_id'] ?? 0;
+        $original_price = $input['original_price'] ?? 0;
+        $price = $input['price'] ?? 0;
+        $status = $input['status'] ?? 2;
+        $online_type = $input['online_type'] ?? 1;
+        $is_start = $input['is_start'] ?? 0;
+        $show_info_num = $input['show_info_num'] ?? 0;
+
+        $data = [
+            'index_pic'      => $index_pic,
+            'cover_pic'      => $cover_pic,
+            'details_pic'    => $details_pic,
+            'name'           => $name ?? '',
+            'subtitle'       => $subtitle,
+            'message'        => $message,
+            'user_id'        => $user_id,
+            'price'          => $price,
+            'original_price' => $original_price,
+            'is_start'       => $is_start,
+            'show_info_num'  => $show_info_num,
+            'type'           => 3,
+            'status'         => $status
+        ];
+
+        if ( ! empty($input['id'])) {
+            Column::where('id', $input['id'])->update($data);
+        } else {
+            Column::create($data);
+        }
+        return success();
+    }
+
 
 }
