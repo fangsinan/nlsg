@@ -141,56 +141,56 @@ class Withdrawals extends Base
         }
         if($channel == 'WeChat'){
             //微信提现
-//            $config = Config('wechat.payment.default');
-//            $app    = Factory::payment($config);
-//            $result = $app->transfer->toBalance([
-//                'partner_trade_no' => $orderid, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)
-//                'openid' => $zh_account,
-//                'check_name' => 'FORCE_CHECK', // NO_CHECK：不校验真实姓名, FORCE_CHECK：强校验真实姓名
-//                're_user_name' => $truename, // 如果 check_name 设置为FORCE_CHECK，则必填用户真实姓名
-//                'amount' => ($amount* 100), // 企业付款金额，单位为分
-//                'desc' => $orderid, // 企业付款操作说明信息。必填
-//            ]);
+            $config = Config('wechat.payment.default');
+            $app    = Factory::payment($config);
+            $result = $app->transfer->toBalance([
+                'partner_trade_no' => $orderid, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)
+                'openid' => $zh_account,
+                'check_name' => 'FORCE_CHECK', // NO_CHECK：不校验真实姓名, FORCE_CHECK：强校验真实姓名
+                're_user_name' => $truename, // 如果 check_name 设置为FORCE_CHECK，则必填用户真实姓名
+                'amount' => ($amount* 100), // 企业付款金额，单位为分
+                'desc' => $orderid, // 企业付款操作说明信息。必填
+            ]);
 //    //成功后返回参数
-            $result=[
-              "return_code" => "SUCCESS",
-              "return_msg" => null,
-              "mch_appid" => "wx3296e2b7430df182",
-              "mchid" => "1460495202",
-              "nonce_str" => "5f053dcc9371f",
-              "result_code" => "SUCCESS",
-              "partner_trade_no" => "20200708113020",
-              "payment_no" => "10100244512772007083685544540676",
-              "payment_time" => "2020-07-08 11:30:21",
-            ];
+//            $result=[
+//              "return_code" => "SUCCESS",
+//              "return_msg" => null,
+//              "mch_appid" => "wx3296e2b7430df182",
+//              "mchid" => "1460495202",
+//              "nonce_str" => "5f053dcc9371f",
+//              "result_code" => "SUCCESS",
+//              "partner_trade_no" => "20200708113020",
+//              "payment_no" => "10100244512772007083685544540676",
+//              "payment_time" => "2020-07-08 11:30:21",
+//            ];
 
         }else if($channel == 'ali'){
             //支付宝提现
 
-//            $order = [
-//                'out_biz_no' => $orderid,
-//                'trans_amount' => $amount,  // 企业付款金额，单位为元
-//                'product_code' => 'TRANS_ACCOUNT_NO_PWD',
-//                'biz_scene' => 'DIRECT_TRANSFER',
-//                'payee_info' => [
-//                    'identity' => $zh_account,
-//                    'identity_type' => 'ALIPAY_LOGON_ID',
-//                    'name' => $truename,
-//                ],
-//            ];
-//            $config = Config('pay.alipay');
-//            $result = Pay::alipay($config)->transfer($order);
-
-        //  成功返回参数
-            $result = [
-                "code" => "10000",
-                "msg" => "Success",
-                "order_id" => "20200709110070000006310011153064",
-                "out_biz_no" => "20200709104916",
-                "pay_fund_order_id" => "20200709110070001506310012874792",
-                "status" => "SUCCESS",
-                "trans_date" => "2020-07-09 10:49:17",
+            $order = [
+                'out_biz_no' => $orderid,
+                'trans_amount' => $amount,  // 企业付款金额，单位为元
+                'product_code' => 'TRANS_ACCOUNT_NO_PWD',
+                'biz_scene' => 'DIRECT_TRANSFER',
+                'payee_info' => [
+                    'identity' => $zh_account,
+                    'identity_type' => 'ALIPAY_LOGON_ID',
+                    'name' => $truename,
+                ],
             ];
+            $config = Config('pay.alipay');
+            $result = Pay::alipay($config)->transfer($order);
+//
+////  成功返回参数
+//            $result = [
+//                "code" => "10000",
+//                "msg" => "Success",
+//                "order_id" => "20200709110070000006310011153064",
+//                "out_biz_no" => "20200709104916",
+//                "pay_fund_order_id" => "20200709110070001506310012874792",
+//                "status" => "SUCCESS",
+//                "trans_date" => "2020-07-09 10:49:17",
+//            ];
             $result['return_msg'] = $result['sub_msg'] ??'';
 
         }
