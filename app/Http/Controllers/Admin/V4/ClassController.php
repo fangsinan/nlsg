@@ -1491,7 +1491,7 @@ class ClassController extends ControllerBackend
     /**
      * @api {get} api/admin_v4/class/camp 训练营列表
      * @apiVersion 4.0.0
-     * @apiName  column
+     * @apiName  camp
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/camp
      * @apiDescription 训练营列表
@@ -1561,7 +1561,7 @@ class ClassController extends ControllerBackend
     /**
      * @api {post} api/admin_v4/class/add-camp 创建训练营
      * @apiVersion 4.0.0
-     * @apiName  add-column
+     * @apiName  add-camp
      * @apiGroup 后台-虚拟课程
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/add-camp
      * @apiDescription 创建训练营
