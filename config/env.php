@@ -83,4 +83,6 @@ return [
     'ERP_SID'   => env('ERP_SID'),
     'ERP_APPKEY'   => env('ERP_APPKEY'),
     'ERP_APPSECRET'   => env('ERP_APPSECRET'),
+    'ERP_TRADE_PUSH'   => env('ERP_TRADE_PUSH'),
+    'ERP_SHOP_NO'   => env('ERP_SHOP_NO'),
 ];

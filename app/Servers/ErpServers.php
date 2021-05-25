@@ -4,13 +4,17 @@
 namespace App\Servers;
 
 use App\Models\MallOrder;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use WdtClient;
 
 class ErpServers
 {
+    public $shop_no;
     public $sid;
     public $appkey;
     public $appsecret;
+    public $trade_push;
 
     //推送触发时机:支付,取消订单,确认收货
     public function startPush($id)
@@ -19,137 +23,179 @@ class ErpServers
             $id = explode(',', $id);
         }
 
-
         $list = MallOrder::whereIn('id', $id)
-            ->with(['orderDetails', 'orderDetails.skuInfo', 'userInfo'])
-            ->select(['id', 'ordernum', 'pay_price', 'price', 'user_id', 'order_type', 'status', 'pay_time', 'pay_type', 'messages',
-                'remark', 'post_type', 'address_id', 'address_history', 'created_at', 'updated_at', 'is_stop', 'stop_at'])
+            ->with(['orderDetails', 'orderDetails.skuInfo', 'orderDetails.goodsInfo', 'userInfo'])
+            ->select([
+                'id', 'ordernum', 'pay_price', 'price', 'user_id', 'order_type', 'status',
+                'pay_time', 'pay_type', 'messages', 'remark', 'post_type', 'freight',
+                'address_id', 'address_history', 'created_at', 'updated_at', 'is_stop', 'stop_at'
+            ])
             ->get();
-
 
         $trade_list = [];
 
         foreach ($list as $v) {
+            if (!in_array($v->status, [10, 20, 30])) {
+                continue;
+            }
+
             $temp_trade_list = [];
             $temp_order_list = [];
 
             $temp_trade_list['tid'] = $v->ordernum;
+            $temp_trade_list['trade_time'] = date('Y-m-d H:i:s', strtotime($v->created_at));
+            $temp_trade_list['pay_time'] = date('Y-m-d H:i:s', strtotime($v->pay_time));
+            $temp_trade_list['buyer_nick'] = $this->filterEmoji($v->userInfo->nickname);
 
-            $temp_trade_list['trade_time'] = $v->created_at;
-            $temp_trade_list['pay_time'] = $v->pay_time;
-            $temp_trade_list['buyer_nick'] = $v->userInfo->nickname;
+            /**
+             * trade_status=30    已付款待发货(包含货到付款)，30只可以直接变更为70/ 80这2种状态
+             * trade_status=40    部分发货(拆分发货才会出现)
+             * trade_status=50    已发货(平台销售订单已经发货时推送此状态)，如果已发货在自建商城代表订单完结状态，无后续状态变更，直接推送状态值70。
+             * trade_status=70    已完成（已签收），平台订单完成（客户确认收货）后，推送此状态;
+             * 订单为自动流转模式时，初次推送的平台订单状态直接就是已完成状态70
+             * trade_status=80    已退款(付款后又全部退款推送此状态)
+             */
+            if ($v->is_stop == 1) {
+                $temp_trade_list['trade_status'] = 80;
+            } else {
+                switch (intval($v->status)) {
+                    //订单状态 1待付款  10待发货 20待收货 30已完成
+                    case 10:
+                        $temp_trade_list['trade_status'] = 30;
+                        break;
+                    case 20:
+                        $temp_trade_list['trade_status'] = 50;
+                        break;
+                    case 30:
+                    default:
+                        $temp_trade_list['trade_status'] = 70;
+                }
+            }
 
+            //平台订单付款状态:0:未付款,1:部分付款,2:已付款
+            $temp_trade_list['pay_status'] = 2;
 
-            //todo 判断订单状态
-            $temp_trade_list['trade_status'] = $v->ordernum;
-            $temp_trade_list['pay_status'] = $v->ordernum;
+            //省区市和详细地址
+            $temp_address_history = json_decode($v->address_history);
+            $temp_trade_list['receiver_name'] = $temp_address_history->name;
+            $temp_trade_list['receiver_address'] = trim(
+                $temp_address_history->province_name . ' ' .
+                $temp_address_history->city_name . ' ' .
+                $temp_address_history->area_name . ' ' .
+                $temp_address_history->details
+            );
+
+            $temp_trade_list['buyer_message'] = $v->messages;
+            $temp_trade_list['post_amount'] = $v->freight;
+            $temp_trade_list['paid'] = $v->price;//使用pay_price,如果是测试订单会金额错误.
 
             $temp_trade_list['delivery_term'] = 1;
             $temp_trade_list['cod_amount'] = 0;
             $temp_trade_list['ext_cod_fee'] = 0;
 
+            foreach ($v->orderDetails as $vv) {
+                $temp = [];
+                $temp['oid'] = $v->ordernum . '_' . $vv->order_id;
+                $temp['status'] = $temp_trade_list['trade_status'];//子订单状态
+                if ($v->is_stop == 1) {
+                    $temp['refund_status'] = 5;//0是无退款
+                } else {
+                    $temp['refund_status'] = 0;//0是无退款
+                }
+                $temp['goods_id'] = $vv->goods_id;//平台货品id
+                $temp['spec_id'] = $vv->sku_number;//平台规格id
+                $temp['goods_no'] = $vv->skuInfo->erp_goods_no;//平台货品编码
+                $temp['spec_no'] = $vv->skuInfo->erp_spec_no;//平台货品SKU唯一码，对应ERP商家编码，goods_no和spec_no不能同时为空
+                $temp['goods_name'] = $vv->goodsInfo->name;//商品名称
+                $temp_sku_history = json_decode($vv->sku_history, true);
+                $temp['price'] = $temp_sku_history['actual_price'];
+                $temp['spec_name'] = implode(Arr::pluck($temp_sku_history['sku_value'], 'value_name'), ',');
+                $temp['num'] = $vv->num;
+                $temp['adjust_amount'] = '0'; //手工调整;特别注意:正的表示加价;负的表示减价
+                $temp['discount'] = 0; //子订单折扣
+                $temp['share_discount'] = '0';
+                $temp_order_list[] = $temp;
+            }
+            $temp_trade_list['order_list'] = $temp_order_list;
 
-
-
-            $temp_trade_list['receiver_name'] = $v->ordernum;
-            $temp_trade_list['receiver_address'] = $v->ordernum;//省区市和详细地址
-            $temp_trade_list['buyer_message'] = $v->ordernum;
-            $temp_trade_list['post_amount'] = $v->ordernum;
-            $temp_trade_list['paid'] = $v->ordernum;
-
-
+            $trade_list[] = $temp_trade_list;
         }
 
-        return [
-            $this->sid,
-            $this->appkey,
-            $this->appsecret,
-            $id,
-            $list,
-        ];
+        //true
+        $res = $this->pushOrderJob($trade_list);
+        if ($res['code'] === true) {
+            MallOrder::whereIn('id', $id)->update([
+                'erp_push' => 1,
+                'erp_push_time' => date('Y-m-d H:i:s')
+            ]);
+        } else {
+            $error_message = json_decode($res['msg'], true);
+
+            $error_data = [];
+            foreach ($error_message as $v) {
+                $temp_error_data = [];
+                $temp_error_data['ordernum'] = $v['tid'];
+                $temp_error_data['error'] = $v['error'];
+                $error_data[] = $temp_error_data;
+            }
+            if (!empty($error_data)) {
+                DB::table('nlsg_mall_order_erp_error')->insert($error_data);
+            }
+        }
+        return [$res, $trade_list];
+
+    }
+
+    //订单推送动作
+    private function pushOrderJob($trade_list)
+    {
+        if (empty($trade_list) || !is_array($trade_list)) {
+            return ['code' => false, 'msg' => '数据不正确'];
+        }
+        $c = new WdtClient();
+
+        $c->sid = $this->sid;
+        $c->appkey = $this->appkey;
+        $c->appsecret = $this->appsecret;
+        $c->gatewayUrl = $this->trade_push;
+
+        $c->putApiParam('shop_no', $this->shop_no);
+        $c->putApiParam('switch', 1);
+        $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
+        $json = $c->wdtOpenApi();
+        $json = json_decode($json, true);
+
+        if ($json['code'] == 0) {
+            return ['code' => true, 'msg' => '成功:' . $json['new_count'] . ':' . $json['chg_count']];
+        } else {
+            return ['code' => false, 'msg' => $json['message']];
+        }
+    }
+
+
+
+    public function test()
+    {
+        return $this->startPush([10497]);//订单推送
     }
 
     public function __construct()
     {
         $this->sid = env('ERP_SID');
+        $this->shop_no = env('ERP_SHOP_NO');
         $this->appkey = env('ERP_APPKEY');
         $this->appsecret = env('ERP_APPSECRET');
+        $this->trade_push = env('ERP_TRADE_PUSH');
     }
 
-    public function test()
+    //去掉昵称的emoji
+    function filterEmoji($str)
     {
-        if (1) {
-            return $this->startPush(10500);
-        } else {
-            $c = new WdtClient();
-
-            $c->sid = 'apidevnew2';
-            $c->appkey = 'nlsg2-test';
-            $c->appsecret = '12345';
-            $c->gatewayUrl = 'http://sandbox.wangdian.cn/openapi2/trade_push.php';
-            /*
-                    trade_status=30	已付款待发货(包含货到付款)，30只可以直接变更为70/ 80这2种状态
-                    trade_status=40	部分发货(拆分发货才会出现)
-                    trade_status=50	已发货(平台销售订单已经发货时推送此状态)，如果已发货在自建商城代表订单完结状态，无后续状态变更，直接推送状态值70。
-                    trade_status=70	已完成（已签收），平台订单完成（客户确认收货）后，推送此状态;
-                    订单为自动流转模式时，初次推送的平台订单状态直接就是已完成状态70
-                    trade_status=80	已退款(付款后又全部退款推送此状态)
-            */
-            $trade_list[] = array
-            (
-                'tid' => 'LxTestTid' . time(),//原始单号
-                'trade_status' => 30,
-
-                'delivery_term' => 1,//写死
-                'cod_amount' => '0',//写死
-                'ext_cod_fee' => '0',//写死
-
-                'pay_status' => 2,//2是已付款
-                'trade_time' => '0000-00-00 00:00:00',//创建订单时间
-                'pay_time' => '0000-00-00 00:00:00', // 未付款情况下为0000-00-00 00:00:00
-                'buyer_nick' => '',//昵称
-
-                'receiver_province' => '北京',//不传,直接address解析
-                'receiver_city' => '北京市',//不传,直接address解析
-                'receiver_district' => '海淀区',//不传,直接address解析
-
-                'receiver_name' => '我欸额附件',//收件人姓名
-                'receiver_address' => '海淀',//省区市和详细地址
-
-                'buyer_message' => '测试阿斯顿',//卖家备注
-
-                'post_amount' => 10, //邮费
-                'paid' => 409, //已支付金额
-
-                'order_list' => array(
-                    array
-                    (
-                        'oid' => 'LxTestOid' . time(),//子订单id
-                        'status' => 30,//子订单状态
-                        'refund_status' => 0,//0是无退款
-                        'goods_id' => 'E166D18BAAEA420CB132E105B3B6128A',//平台货品id
-                        'spec_id' => '',//平台规格id
-                        'goods_no' => '',//平台货品编码
-                        'spec_no' => '9787533951092',//规格编码,对应erp的商家编码
-                        'goods_name' => '情商是什么？——关于生活智慧的44个故事',//商品名称
-                        'spec_name' => '',//规格名称
-                        'num' => 1,
-                        'price' => 399,
-                        'adjust_amount' => '0', //手工调整,特别注意:正的表示加价,负的表示减价
-                        'discount' => 0, //子订单折扣
-                        'share_discount' => '0', //分摊优惠
-                    )
-                )
-            );
-
-            $c->putApiParam('shop_no', 'nlsg2-test');
-            $c->putApiParam('switch', 1);
-            $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
-            $json = $c->wdtOpenApi();
-            $json = json_decode($json, true);
-            return $json;
-        }
-
-
+        return preg_replace_callback(
+            '/./u',
+            function (array $match) {
+                return strlen($match[0]) >= 4 ? '' : $match[0];
+            },
+            $str);
     }
 }

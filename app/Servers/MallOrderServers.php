@@ -673,7 +673,6 @@ class MallOrderServers
              * JPush::pushNow('all', '通知', '附加信息');
              */
 
-
             if (!$child_res) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '错误', 'ps' => 'child error'];
