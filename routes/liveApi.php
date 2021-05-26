@@ -25,6 +25,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
 
         //导出
         Route::get('live_order/list_excel', 'OrderController@listExcel');
+        Route::get('live_order/inviter_list_excel', 'OrderController@inviterLiveListExcel');
     });
 
 });

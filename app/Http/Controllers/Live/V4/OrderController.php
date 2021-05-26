@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Order;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class OrderController extends ControllerBackend
@@ -102,25 +103,227 @@ class OrderController extends ControllerBackend
     public function list(Request $request)
     {
         $model = new Order();
-        $data = $model->orderInLive($request->input(),$this->user);
+        $data = $model->orderInLive($request->input(), $this->user);
         return $this->getRes($data);
     }
 
     public function listExcel(Request $request)
     {
         $model = new Order();
-        $request->offsetSet('excel_flag','1');
-        $list = $model->orderInLive($request->input(),$this->user);
+        $request->offsetSet('excel_flag', '1');
+        $list = $model->orderInLive($request->input(), $this->user);
 
+        $columns = ['订单编号', '直播标题', '用户昵称', '用户手机', '商品', '类型',
+            '商品价格', '支付价格', '推荐账户', '支付状态', '支付方式', '下单时间', '订单来源'];
+        $fileName = '直播商品列表' . date('Y-m-d H:i') . '.csv';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        $fp = fopen('php://output', 'a');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
 
+        foreach ($list as $v) {
+            $temp_v = [];
+            $temp_v['ordernum'] = '`'.($v->ordernum ?? '');
+            $temp_v['title'] = $v->live->title ?? '';
+            $temp_v['nickname'] = $v->user->nickname ?? '';
+            $temp_v['phone'] = '`'.($v->user->phone ?? '');
+            $temp_v['goods_name'] = $v->goods['title'] ?? '';
 
-        return $list;
+            switch (intval($v->type)) {
+                case 9:
+                    $temp_v['type'] = '精品课';
+                    break;
+                case 10:
+                    $temp_v['type'] = '直播';
+                    break;
+                case 14:
+                    $temp_v['type'] = '线下产品';
+                    break;
+                case 15:
+                    $temp_v['type'] = '讲座';
+                    break;
+                case 16:
+                    $temp_v['type'] = '会员';
+                    break;
+                default:
+                    $temp_v['type'] = '错误';
+            }
+
+            $temp_v['g_p'] = $v->goods['price'] ?? '';
+            $temp_v['p_p'] = $v->pay_price ?? '';
+            $temp_v['t_p'] = $v->payRecordDetail->user->phone ?? '';
+            switch (intval($v->status)) {
+                case 1:
+                    $temp_v['p_status'] = '已支付';
+                    break;
+                case 2:
+                    $temp_v['p_status'] = '取消';
+                    break;
+                case 0:
+                    $temp_v['p_status'] = '待支付';
+                    break;
+                default:
+                    $temp_v['type'] = '错误';
+            }
+            $temp_v['p_status'] = '已支付' ?? '';
+            switch (intval($v->pay_type)) {
+                case 1:
+                    $temp_v['pay_type'] = '微信';
+                    break;
+                case 2:
+                    $temp_v['pay_type'] = '微信APP';
+                    break;
+                case 3:
+                    $temp_v['pay_type'] = '支付宝';
+                    break;
+                case 4:
+                    $temp_v['pay_type'] = '苹果';
+                    break;
+                default:
+                    $temp_v['type'] = '错误';
+            }
+
+            $temp_v['time'] = $v->pay_time ?? '';
+            switch (intval($v->os_type)) {
+                case 1:
+                    $temp_v['os'] = '安卓';
+                    break;
+                case 2:
+                    $temp_v['os'] = '苹果';
+                    break;
+                case 3:
+                    $temp_v['os'] = '微信';
+                    break;
+                default:
+                    $temp_v['type'] = '错误';
+
+            }
+            mb_convert_variables('GBK', 'UTF-8', $temp_v);
+            fputcsv($fp, $temp_v);
+            ob_flush();     //刷新输出缓冲到浏览器
+            flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+        }
+        fclose($fp);
+        exit();
     }
 
-    public function inviterLiveList(Request $request){
+    public function inviterLiveList(Request $request)
+    {
         $model = new Order();
-        $data = $model->inviterLiveList($request->input(),$this->user);
+        $data = $model->inviterLiveList($request->input(), $this->user);
         return $this->getRes($data);
+    }
 
+    public function inviterLiveListExcel(Request $request)
+    {
+        $model = new Order();
+        $request->offsetSet('excel_flag', '1');
+        $list = $model->inviterLiveList($request->input(), $this->user);
+        $columns = ['订单编号', '直播标题', '用户昵称', '用户手机', '商品', '类型',
+            '商品价格', '支付价格','源账户','源直播', '源推荐账户', '支付状态', '支付方式', '下单时间', '订单来源'];
+        $fileName = '直播销售列表' . date('Y-m-d H:i') . '.csv';
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        $fp = fopen('php://output', 'a');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
+        foreach ($list as $v) {
+            $temp_v = [];
+            $temp_v['ordernum'] = '`'.($v->ordernum ?? '');
+            $temp_v['title'] = $v->live->title ?? '';
+            $temp_v['nickname'] = $v->user->nickname ?? '';
+            $temp_v['phone'] = '`'.($v->user->phone ?? '');
+            $temp_v['goods_name'] = $v->goods['title'] ?? '';
+
+            switch (intval($v->type)) {
+                case 9:
+                    $temp_v['type'] = '精品课';
+                    break;
+                case 10:
+                    $temp_v['type'] = '直播';
+                    break;
+                case 14:
+                    $temp_v['type'] = '线下产品';
+                    break;
+                case 15:
+                    $temp_v['type'] = '讲座';
+                    break;
+                case 16:
+                    $temp_v['type'] = '会员';
+                    break;
+                default:
+                    $temp_v['type'] = '错误';
+            }
+
+            $temp_v['g_p'] = $v->goods['price'] ?? '';
+            $temp_v['p_p'] = $v->pay_price ?? '';
+            $temp_v['t_p'] = $v->t_phone ?? '';
+            $temp_v['t_t'] = $v->t_title ?? '';
+            $temp_v['t_l'] = $v->live_phone ?? '';
+
+            switch (intval($v->status)) {
+                case 1:
+                    $temp_v['p_status'] = '已支付';
+                    break;
+                case 2:
+                    $temp_v['p_status'] = '取消';
+                    break;
+                case 0:
+                    $temp_v['p_status'] = '待支付';
+                    break;
+                default:
+                    $temp_v['type'] = '错误';
+            }
+            $temp_v['p_status'] = '已支付' ?? '';
+            switch (intval($v->pay_type)) {
+                case 1:
+                    $temp_v['pay_type'] = '微信';
+                    break;
+                case 2:
+                    $temp_v['pay_type'] = '微信APP';
+                    break;
+                case 3:
+                    $temp_v['pay_type'] = '支付宝';
+                    break;
+                case 4:
+                    $temp_v['pay_type'] = '苹果';
+                    break;
+                default:
+                    $temp_v['type'] = '错误';
+            }
+
+            $temp_v['time'] = $v->pay_time ?? '';
+            switch (intval($v->os_type)) {
+                case 1:
+                    $temp_v['os'] = '安卓';
+                    break;
+                case 2:
+                    $temp_v['os'] = '苹果';
+                    break;
+                case 3:
+                    $temp_v['os'] = '微信';
+                    break;
+                default:
+                    $temp_v['type'] = '错误';
+
+            }
+            mb_convert_variables('GBK', 'UTF-8', $temp_v);
+            fputcsv($fp, $temp_v);
+            ob_flush();     //刷新输出缓冲到浏览器
+            flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+        }
+        fclose($fp);
+        exit();
     }
 }
