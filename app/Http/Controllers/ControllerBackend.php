@@ -35,6 +35,11 @@ class ControllerBackend extends BaseController
             $route = Route::current();
             $url = substr($route->uri, 12);
 
+            //临时添加,解决直播后台和普通后台域名前缀长度不一致问题
+            $url_2 = explode('/',$route->uri);
+            $url_2 = array_slice($url_2,-2);
+            $url_2 = '/'.trim(implode('/',$url_2),'/');
+
             if (1 == $this->user['role_id']) {
                 return  true;
             }
@@ -42,7 +47,8 @@ class ControllerBackend extends BaseController
             $roleModel = new Role();
             $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
 
-            if ( ! in_array($url, $roleAuthNodeMap)) {
+//            if ( ! in_array($url, $roleAuthNodeMap)) {
+            if ( ! in_array($url_2, $roleAuthNodeMap)) {
                 $class = new \stdClass();
                 $class->code = 1000;
                 $class->msg  = '没有权限';

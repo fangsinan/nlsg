@@ -634,7 +634,12 @@ class Order extends Base
             'pay_price', 'pay_type', 'ordernum', 'live_id', 'os_type', 'status','remark',
             DB::raw("CONCAT(live_id,'-',user_id) as sign")]);
 
-        $list = $query->orderBy('id', 'desc')->paginate($size);
+
+        if (($params['excel_flag'] ?? 0) == 1){
+            $list = $query->orderBy('id', 'desc')->get();
+        }else{
+            $list = $query->orderBy('id', 'desc')->paginate($size);
+        }
 
         foreach ($list as &$v) {
             foreach ($lu_list as $ll_v){

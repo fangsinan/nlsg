@@ -390,6 +390,26 @@ class WechatPay extends Controller
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
 
+
+
+//                if($orderInfo['relation_id'] == 5){
+//                    // 直播间的线下产品   训练营
+//                    $starttime = strtotime(date('Y-m-d', $time));
+//                    $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
+//
+//                    $subscribe = [
+//                        'user_id' => $user_id, //会员id
+//                        'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+//                        'type' => 7,
+//                        'order_id' => $orderId, //订单id
+//                        'status' => 1,
+//                        'start_time' => date("Y-m-d H:i:s", $starttime),
+//                        'end_time' => date("Y-m-d H:i:s", $endtime),
+//                        'relation_id' => 517, //{训练营表id}
+//                    ];
+//
+//                }else{
+//                }
                 $subscribe = [
                     'user_id' => $user_id, //会员id
                     'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
@@ -398,6 +418,8 @@ class WechatPay extends Controller
                     'order_id' => $orderId, //订单id
                     'relation_id' => $orderInfo['relation_id'],
                 ];
+
+
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
                 $total_fee_line = ConfigModel::getData(50, 1);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Live;
+use App\Servers\ErpServers;
 use App\Servers\GoodsServers;
 use Illuminate\Http\Request;
 
@@ -139,8 +140,13 @@ class GoodsController extends ControllerBackend
      */
     public function list(Request $request)
     {
-        $servers = new GoodsServers();
-        $data = $servers->list($request->input());
+        if(0){
+            $servers = new GoodsServers();
+            $data = $servers->list($request->input());
+        }else{
+            $servers = new ErpServers();
+            $data = $servers->test();
+        }
         return $this->getRes($data);
     }
 
