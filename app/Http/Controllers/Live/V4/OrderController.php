@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\BackendUser;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -109,6 +110,12 @@ class OrderController extends ControllerBackend
 
     public function listExcel(Request $request)
     {
+        $user_id = $request->input('user_id',0);
+        if (empty($user_id)){
+            exit();
+        }
+        $this->user = BackendUser::where('id','=',$user_id)->first()->toArray();
+
         $model = new Order();
         $request->offsetSet('excel_flag', '1');
         $list = $model->orderInLive($request->input(), $this->user);
@@ -222,6 +229,12 @@ class OrderController extends ControllerBackend
 
     public function inviterLiveListExcel(Request $request)
     {
+        $user_id = $request->input('user_id',0);
+        if (empty($user_id)){
+            exit();
+        }
+        $this->user = BackendUser::where('id','=',$user_id)->first()->toArray();
+
         $model = new Order();
         $request->offsetSet('excel_flag', '1');
         $list = $model->inviterLiveList($request->input(), $this->user);
