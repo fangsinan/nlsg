@@ -233,8 +233,9 @@ class Withdrawals extends Base
             }
         } else {
             if (strtoupper ($result['err_code']) == 'SYSTEMERROR') { //系统繁忙 原单号触发防止重复支付
+                $time = time ();
                 $str = '系统繁忙,系统自动重试';
-                $map=[ 'product_id'=>$truename.':'.$zh_account.':'.$str,];
+                $map=['created_at'=>$time, 'product_id'=>$truename.':'.$zh_account.':'.$str,];
             } else if (strtoupper ($result['err_code']) == 'NOTENOUGH') { //余额不足 提示信息隐藏弊端
                 $str = '用户异常,请联系能量时光解决';
                 $map=['status'=>5, 'product_id'=>'余额不足|'.$str,];
