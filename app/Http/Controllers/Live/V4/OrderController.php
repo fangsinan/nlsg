@@ -122,6 +122,7 @@ class OrderController extends ControllerBackend
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
         $fp = fopen('php://output', 'a');//打开output流
         mb_convert_variables('GBK', 'UTF-8', $columns);
         fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
@@ -234,6 +235,7 @@ class OrderController extends ControllerBackend
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
         $fp = fopen('php://output', 'a');//打开output流
         mb_convert_variables('GBK', 'UTF-8', $columns);
         fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
