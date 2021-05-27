@@ -430,6 +430,7 @@ class IndexController extends ControllerBackend
         $twitter = $input['twitter_money'] ?? 0;
         $helper = $input['helper'] ?? '';
         $content = $input['content'] ?? '';
+        $playback_url = $input['playback_url'] ?? '';
         $now = time();
         $now_date = date('Y-m-s H:i:s');
 
@@ -473,6 +474,7 @@ class IndexController extends ControllerBackend
         $live_info_data['length'] = 5;
         $live_info_data['begin_at'] = $begin_at;
         $live_info_data['end_at']   = $end_at;
+        $live_info_data['playback_url']   = $playback_url;
 
         if (!empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);
