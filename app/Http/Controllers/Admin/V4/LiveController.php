@@ -142,15 +142,9 @@ class LiveController extends Controller
         $type = $request->input("type") ?? '';
         $live_info_id = $request->input("live_info_id") ?? '';
 
-//        $type = 'show';
         if($type == "" || $live_info_id == '' ){
             return error(0, 'error');
         }
-//        $subject='rtmp://push.live.nlsgapp.com/li ve/2cee7db9150716be0c7facdba225f054?txSecret=cc70daa8a78e988c651808caefaa2b6f&txTime=60B1137F';
-//        $str_time = strtotime("2021-05-26 14:10:41")+5;  //开始时间需要大于当前时间  多加5秒
-//        $end_time = $str_time+5;//  结束时间需要大于当前时间
-
-
         //开始时间   结束时间    pushurl   callbackurl
         $info = LiveInfo::find($live_info_id);
         if($type == 'create' && !empty($info['task_id'])){
@@ -162,11 +156,10 @@ class LiveController extends Controller
         }
 
 
-        $subject = $info['push_live_url'];
-        $playback_url = $info['playback_url'];
-
-        $str_time = strtotime($info['begin_at'])+5;  //开始时间需要大于当前时间  多加5秒
-        $end_time = $str_time+3600*3;//  结束时间需要大于当前时间
+        $subject        = $info['push_live_url'];
+        $playback_url   = $info['playback_url'];
+        $str_time       = strtotime($info['begin_at'])+5;  //开始时间需要大于当前时间  多加5秒
+        $end_time       = $str_time+3600*3;//  结束时间需要大于当前时间
 
         if( $str_time <= time() ){
             return error(0, '直播开始时间必须大于当前时间');
