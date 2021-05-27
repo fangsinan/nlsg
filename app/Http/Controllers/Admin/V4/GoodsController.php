@@ -140,7 +140,7 @@ class GoodsController extends ControllerBackend
      */
     public function list(Request $request)
     {
-        if(1){
+        if(0){
             $servers = new GoodsServers();
             $data = $servers->list($request->input());
         }else{

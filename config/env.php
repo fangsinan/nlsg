@@ -85,4 +85,6 @@ return [
     'ERP_APPSECRET'   => env('ERP_APPSECRET'),
     'ERP_TRADE_PUSH'   => env('ERP_TRADE_PUSH'),
     'ERP_SHOP_NO'   => env('ERP_SHOP_NO'),
+    'ERP_LOGISTICS_SYNC_QUERY'   => env('ERP_LOGISTICS_SYNC_QUERY'),
+    'ERP_LOGISTICS_SYNC_ACK'   => env('ERP_LOGISTICS_SYNC_ACK'),
 ];

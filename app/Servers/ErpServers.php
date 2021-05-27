@@ -3,6 +3,7 @@
 
 namespace App\Servers;
 
+use App\Models\ExpressCompany;
 use App\Models\MallOrder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,9 @@ class ErpServers
     public $sid;
     public $appkey;
     public $appsecret;
-    public $trade_push;
+    public $trade_push;//推送订单
+    public $logistics_sync_query;//物流同步查询
+    public $logistics_sync_ack;//物流同步回写
 
     //推送触发时机:支付,取消订单,确认收货
     public function startPush($id)
@@ -78,6 +81,7 @@ class ErpServers
             //省区市和详细地址
             $temp_address_history = json_decode($v->address_history);
             $temp_trade_list['receiver_name'] = $temp_address_history->name;
+            $temp_trade_list['receiver_mobile'] = $temp_address_history->phone;
             $temp_trade_list['receiver_address'] = trim(
                 $temp_address_history->province_name . ' ' .
                 $temp_address_history->city_name . ' ' .
@@ -95,7 +99,7 @@ class ErpServers
 
             foreach ($v->orderDetails as $vv) {
                 $temp = [];
-                $temp['oid'] = $v->ordernum . '_' . $vv->order_id;
+                $temp['oid'] = $v->id . '_' . $vv->order_id;
                 $temp['status'] = $temp_trade_list['trade_status'];//子订单状态
                 if ($v->is_stop == 1) {
                     $temp['refund_status'] = 5;//0是无退款
@@ -123,6 +127,7 @@ class ErpServers
 
         //true
         $res = $this->pushOrderJob($trade_list);
+
         if ($res['code'] === true) {
             MallOrder::whereIn('id', $id)->update([
                 'erp_push' => 1,
@@ -172,11 +177,93 @@ class ErpServers
         }
     }
 
+    //物流同步
+    public function logisticsSync()
+    {
+        $list = $this->logisticsSyncQuery();
+
+        if (!empty($list)) {
+            $expressCompany = ExpressCompany::where('status', '=', 1)
+                ->select(['id', 'erp_type_id'])
+                ->get()->toArray();
+            $expressCompany = array_column($expressCompany, 'id', 'erp_type_id');
+
+            $orderServers = new MallOrderServers();
+            $ack_data = [];//需要回传的id
+            foreach ($list as $v) {
+                $send_data_temp = [];
+                $oids = explode(',', $v['oids']);
+                foreach ($oids as $vv) {
+                    $send_data = [];
+                    $temp_oids = explode('_', $vv);
+                    $send_data['express_id'] = $expressCompany[$v['logistics_type']] ?? 0;
+                    if (!$send_data['express_id']) {
+                        continue;
+                    }
+                    $send_data['num'] = $v['logistics_no'];
+                    $send_data['order_id'] = $temp_oids[0] ?? 0;
+                    $send_data['order_detail_id'] = $temp_oids[0] ?? 0;
+
+                    $send_data_temp[] = $send_data;
+                }
+
+                $send_res = $orderServers->send($send_data_temp);
+                $temp_ack_data = [];
+                $temp_ack_data['rec_id'] = $v['rec_id'];
+                if ($send_res['code'] == true) {
+                    $temp_ack_data['status'] = 0;
+                    $temp_ack_data['message'] = '成功';
+                } else {
+                    $temp_ack_data['status'] = 1;
+                    $temp_ack_data['message'] = $send_res['msg'] ?? '失败';
+                }
+                $ack_data[] = $temp_ack_data;
+            }
+            $this->logisticsSyncAck($ack_data);
+
+            $this->logisticsSync();
+        } else {
+            return true;
+        }
+
+
+    }
+
+    //物流查询动作
+    private function logisticsSyncQuery()
+    {
+        $c = new WdtClient();
+        $c->sid = $this->sid;
+        $c->appkey = $this->appkey;
+        $c->appsecret = $this->appsecret;
+        $c->gatewayUrl = $this->logistics_sync_query;
+
+        $c->putApiParam('shop_no', $this->shop_no);
+        $c->putApiParam('is_part_sync_able', 1);
+        $c->putApiParam('limit', 100);
+        $json = $c->wdtOpenApi();
+        $json = json_decode($json, true);
+        return $json['trades'] ?? [];
+    }
+
+    //物流回写动作
+    private function logisticsSyncAck($ack_data)
+    {
+        $c = new WdtClient();
+        $c->sid = $this->sid;
+        $c->appkey = $this->appkey;
+        $c->appsecret = $this->appsecret;
+        $c->gatewayUrl = $this->logistics_sync_ack;
+        $c->putApiParam('logistics_list', json_encode($ack_data, JSON_UNESCAPED_UNICODE));
+        $json = $c->wdtOpenApi();
+        $json = json_decode($json, true);
+    }
 
 
     public function test()
     {
-        return $this->startPush([10497]);//订单推送
+        return $this->startPush([10515]);//订单推送
+//        $this->logisticsSync();
     }
 
     public function __construct()
@@ -186,6 +273,8 @@ class ErpServers
         $this->appkey = env('ERP_APPKEY');
         $this->appsecret = env('ERP_APPSECRET');
         $this->trade_push = env('ERP_TRADE_PUSH');
+        $this->logistics_sync_query = env('ERP_LOGISTICS_SYNC_QUERY');
+        $this->logistics_sync_ack = env('ERP_LOGISTICS_SYNC_ACK');
     }
 
     //去掉昵称的emoji
