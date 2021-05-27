@@ -197,8 +197,6 @@ class GoodsServers
                     $sku->status = $v['status'];
                     $sku->weight = $v['weight'];
                     $sku->volume = $v['volume'];
-                    $sku->erp_enterprise_code = $v['erp_enterprise_code'] ?? '';
-                    $sku->erp_goods_code = $v['erp_goods_code'] ?? '';
 
                     DB::table('nlsg_mall_sku_value')
                         ->where('sku_id', '=', $v['id'])
