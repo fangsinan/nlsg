@@ -51,7 +51,7 @@ class ControllerBackend extends BaseController
             $pass_url = [
                 '/freight/list'
             ];
-            $pass_url = ConfigModel::getData(75);
+            $pass_url = ConfigModel::getData(55);
             $pass_url = explode(',',$pass_url);
 
 
