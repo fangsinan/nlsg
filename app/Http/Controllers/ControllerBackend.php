@@ -29,6 +29,7 @@ class ControllerBackend extends BaseController
     public function __construct()
     {
         $this->user = auth('backendApi')->user();
+
         if ($this->user) {
             $this->user = $this->user->toArray();
             $this->user['user_id'] = User::where('phone', '=', $this->user['username'])->value('id');
@@ -48,12 +49,8 @@ class ControllerBackend extends BaseController
             $roleModel = new Role();
             $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
 
-            $pass_url = [
-                '/freight/list'
-            ];
             $pass_url = ConfigModel::getData(55);
             $pass_url = explode(',',$pass_url);
-
 
 //            if ( ! in_array($url, $roleAuthNodeMap)) {
             if (!in_array($url_2,$pass_url) && ! in_array($url_2, $roleAuthNodeMap)) {
