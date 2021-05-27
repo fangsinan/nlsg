@@ -481,7 +481,7 @@ class WechatPay extends Controller
 
         if ($type == 16) {
             $res = $nickname . ':您已成功购买' . $live_num . '个幸福360会员';
-        } else {
+        } else if ($type == 14){
             switch ($relation_id) {
                 case 1: //经营能量
                     $res = $nickname . ':您已成功购买' . $live_num . '张经营能量门票';
@@ -499,6 +499,9 @@ class WechatPay extends Controller
                     $res = $nickname . ':您已支付' . $live_num . '张30天智慧父母(亲子)训练营';
                     break;
             }
+        } else if ($type == 18){
+            $data = Column::first($relation_id);
+            $res = $nickname . ':您已支付' . $live_num . '张'.$data['title'];
         }
         Redis::rpush($key, $res);
 //        Redis::setex($key,600,json_encode($res,true));
@@ -1162,6 +1165,9 @@ class WechatPay extends Controller
 
                 if ($orderRst && $couponRst && $phoneRst && $recordRst && $subscribeRst && $shareSyRst && $Sy_Rst) {
                     DB::commit();
+                    $live_id = $orderInfo['live_id'];
+                    self::LiveRedis(18, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
+
 //                    $content = "订单修改:$orderRst--优惠券:$couponRst--短信发送:$phoneRst--支付记录:$recordRst--分成记录:$shareSyRst--订阅:$subscribeRst--分享收益:$Sy_Rst";
 //                    Io::WriteFile('', '', $content, true);
 //                    self::$user_id = $user_id;
