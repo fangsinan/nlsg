@@ -234,6 +234,7 @@ class IndexController extends ControllerBackend
             $live_price_sum_id[] = $val['id'];
             $val['live_price_sum'] = 0;
             $val['live_twitter_price_sum'] = 0;
+            $val['task_id'] = $channel->task_id??0;
 //            //直播收益
 //            $val['live_price_sum'] = Order::where([
 //                'live_id' => $val['id'],
