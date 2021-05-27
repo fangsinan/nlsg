@@ -153,6 +153,10 @@ class LiveController extends Controller
 
         //开始时间   结束时间    pushurl   callbackurl
         $info = LiveInfo::find($live_info_id);
+        if(!empty($info['task_id'])){
+            return error(0, '已创建拉流任务');
+
+        }
         $subject = $info['push_live_url'];
         $playback_url = $info['playback_url'];
 
