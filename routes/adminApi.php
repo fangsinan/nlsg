@@ -152,6 +152,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('live/push', 'LiveController@push');
         Route::post('live/create', 'LiveController@create');
         Route::post('live/begin', 'LiveController@begin');
+        Route::get('live/live_url_edit', 'LiveController@livePushUrlCreate');
 
         //用户
         Route::get('user/index', 'UserController@index');
