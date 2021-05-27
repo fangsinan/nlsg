@@ -153,10 +153,6 @@ class LiveController extends Controller
 
         //开始时间   结束时间    pushurl   callbackurl
         $info = LiveInfo::find($live_info_id);
-        if($type == 'create' && !empty($info['task_id'])){
-            return error(0, '已创建拉流任务');
-
-        }
         $subject = $info['push_live_url'];
         $playback_url = $info['playback_url'];
 
@@ -185,6 +181,10 @@ class LiveController extends Controller
 
         switch ($type){
             case "create":
+                if(!empty($info['task_id'])){
+                    return error(0, '已创建拉流任务');
+                }
+
                 $pattern_1 = '/rtmp:\/\/push.live.nlsgapp.com\/live\/(.*?)\?txSecret=(.*?)/';
                 $num = preg_match_all($pattern_1, $subject, $matches_1,PREG_PATTERN_ORDER);
                 if( $num <= 0 ){
@@ -210,6 +210,11 @@ class LiveController extends Controller
                 $data_key['Action'] = 'DescribeLivePullStreamTasks';
                 break;
             case "del":
+
+                if(empty($info['task_id'])){
+                    return error(0, '当前拉流任务不存在');
+                }
+
                 if($info['task_id'] == ''){
                     return error(0, 'error');
                 }
