@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auth;
+use App\Models\ConfigModel;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\VipUser;
@@ -47,8 +48,15 @@ class ControllerBackend extends BaseController
             $roleModel = new Role();
             $roleAuthNodeMap = $roleModel->getRoleAuthNodeMap($this->user['role_id']);
 
+            $pass_url = [
+                '/freight/list'
+            ];
+            $pass_url = ConfigModel::getData(75);
+            $pass_url = explode(',',$pass_url);
+
+
 //            if ( ! in_array($url, $roleAuthNodeMap)) {
-            if ( ! in_array($url_2, $roleAuthNodeMap)) {
+            if (!in_array($url_2,$pass_url) && ! in_array($url_2, $roleAuthNodeMap)) {
                 $class = new \stdClass();
                 $class->code = 1000;
                 $class->msg  = '没有权限';
