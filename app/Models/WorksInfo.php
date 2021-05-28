@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 class WorksInfo extends Base
 {
     protected $table = 'nlsg_works_info';
-    public $timestamps = false;
 
     protected $fillable = [
          'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time'
