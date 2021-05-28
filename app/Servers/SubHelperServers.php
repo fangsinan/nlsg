@@ -37,7 +37,7 @@ class SubHelperServers
         ];
     }
 
-    public function addOpenList($params)
+    public function addOpenList($params,$admin_id)
     {
         $id = $params['id'] ?? 0;
         $type = $params['type'] ?? 0;
@@ -64,6 +64,7 @@ class SubHelperServers
             $temp_add_data['works_id'] = $id;
             $temp_add_data['status'] = 1;
             $temp_add_data['is_sendsms'] = 0;
+            $temp_add_data['admin_id'] = $admin_id;
             $add_data[] = $temp_add_data;
         }
 
