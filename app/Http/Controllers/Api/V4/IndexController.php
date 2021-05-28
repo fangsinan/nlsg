@@ -963,7 +963,7 @@ class IndexController extends Controller
         $os_type = $request->get('os_type') ?? 1;
 
 
-        $list = Versions::select('id', 'number', 'content', 'url', 'is_force', 'str_at')
+        $list = Versions::select('id', 'number', 'content', 'url', 'is_force', 'str_at','down_type')
             ->where('status', 1)
             ->where('os_type', $os_type)
             ->orderBy('created_at', 'desc')
