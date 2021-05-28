@@ -20,7 +20,7 @@ class WorksInfo extends Base
     }
 
     // $type  1 单课程  2 多课程  3讲座 4训练营
-    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$is_free = 0,$os_type)
+    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$is_free = 0,$os_type=1)
     {
         $where = ['status' => 4];
         if ($type == 1) {
