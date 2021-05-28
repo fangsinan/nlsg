@@ -1820,7 +1820,7 @@ and o.status = 1 and o.pay_price > 1";
 
         $list = DB::table('works_list_of_sub')
             ->where('status', '=', 1)
-            ->whereIn('works_type', [2, 6, 3])
+            ->whereIn('works_type', [2, 6, 3, 7])
             ->limit(100)
             ->get();
 
@@ -1841,7 +1841,7 @@ and o.status = 1 and o.pay_price > 1";
             if (!empty($v->phone)) {
                 $temp_user = User::firstOrCreate([
                     'phone' => $v->phone
-                ],[
+                ], [
                     'nickname' => substr_replace($v->phone, '****', 3, 4),
                 ]);
             } else {
