@@ -660,7 +660,8 @@ class ColumnController extends Controller
         //H5 不返href_url
         if($os_type == 3){
             array_walk($info, function (&$item) {  //对每个元素进行函数处理
-                $item = array_diff($item, ['href_url']);//返回差集
+                unset($item['href_url']);
+//                $item = array_diff($item, ['href_url'=>'',]);//返回差集
             });
         }
 //        if ($flag === 'catalog'){
