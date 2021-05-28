@@ -656,7 +656,13 @@ class ColumnController extends Controller
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($lecture_id, $is_sub, $user_id, 3, $order, $page_per_page, $page, $size, $column_data['is_free']);
 
-
+        $os_type = $request->input('os_type', 0);
+        //H5 不返href_url
+        if($os_type == 3){
+            array_walk($info, function (&$item) {  //对每个元素进行函数处理
+                $item = array_diff($item, ['href_url']);//返回差集
+            });
+        }
 //        if ($flag === 'catalog'){
 //            $res = [
 //                'info'          => $info,
