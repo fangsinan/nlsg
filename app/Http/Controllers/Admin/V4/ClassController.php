@@ -1526,12 +1526,16 @@ class ClassController extends ControllerBackend
     {
         $title = $request->get('title');
         $status = $request->get('status');
+        $is_start = $request->get('is_start');
         $nickname = $request->get('author');
         $start = $request->get('start');
         $end = $request->get('end');
         $query = Column::with('user:id,nickname,phone')
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
+            })
+            ->when(! is_null($is_start), function ($query) use ($is_start) {
+               $query->where('is_start', $is_start);
             })
             ->when($title, function ($query) use ($title) {
                 $query->where('name', 'like', '%'.$title.'%');
@@ -1549,7 +1553,7 @@ class ClassController extends ControllerBackend
             });
 
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at',
-            'info_num')
+            'info_num','is_start')
             ->where('type', 3)
             ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
