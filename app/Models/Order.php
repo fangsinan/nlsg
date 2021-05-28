@@ -420,12 +420,10 @@ class Order extends Base
         }
 
         if (($params['excel_flag'] ?? 0) == 1){
-            $this->getSqlBegin();
             $list = $query->orderBy('id', 'desc')
                 ->limit($size)
                 ->offset(($page - 1) * $size)
                 ->get();
-            $this->getSql();
         }else{
             $list = $query->orderBy('id', 'desc')->paginate($size);
         }
