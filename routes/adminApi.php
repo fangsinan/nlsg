@@ -180,6 +180,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('role/role_select_list', 'RoleController@roleSelectList');
         Route::post('role/create', 'RoleController@roleCreate');
 
+        //自助开通
+        Route::get('sub_helper/ojb_list', 'SubHelperController@objList');
+        Route::post('sub_helper/open', 'SubHelperController@open');
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');
