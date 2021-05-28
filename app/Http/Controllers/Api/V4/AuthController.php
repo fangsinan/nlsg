@@ -90,8 +90,7 @@ class AuthController extends Controller
                 'inviter' => $inviter,
                 'login_flag' => ($inviter == 0) ? 0 : 1,
                 'nickname' => substr_replace($phone, '****', 3, 4),
-                'ref' => $ref,
-                'push'=> uniqid()
+                'ref' => $ref
             ]);
             $user = User::find($list->id);
 
@@ -112,10 +111,6 @@ class AuthController extends Controller
             if ($user->login_flag == 1) {
                 User::where('id', '=', $user->id)->update(['login_flag' => 2]);
             }
-            if (empty($user->push)){
-                User::where('id', '=', $user->id)->update(['push' =>uniqid()]);
-            }
-            $user = User::where('phone', $phone)->first();
         }
 
         Redis::del($phone);
