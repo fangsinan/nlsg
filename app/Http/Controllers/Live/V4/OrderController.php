@@ -138,7 +138,8 @@ class OrderController extends ControllerBackend
         while ($while_flag) {
             $request->offsetSet('page', $page);
             $list = $model->orderInLive($request->input(), $this->user);
-            if (empty($list)) {
+
+            if ($list->isEmpty()) {
                 $while_flag = false;
             } else {
                 foreach ($list as $v) {
@@ -223,8 +224,8 @@ class OrderController extends ControllerBackend
                     ob_flush();     //刷新输出缓冲到浏览器
                     flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
                 }
-                $page++;
             }
+            $page++;
         }
 
         fclose($fp);
