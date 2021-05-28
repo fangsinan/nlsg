@@ -30,10 +30,16 @@ class SubHelperServers
             ->select('id', DB::raw('3 as type'), 'title')
             ->get();
 
+        $xly_list = Column::where('status', '=', 1)
+            ->where('type', '=', 3)
+            ->select('id', DB::raw('7 as type'), 'name as title')
+            ->get();
+
         return [
             'column_list' => $column_list,
             'works_list' => $works_list,
             'live_list' => $live_list,
+            'xly_list' => $xly_list,
         ];
     }
 
