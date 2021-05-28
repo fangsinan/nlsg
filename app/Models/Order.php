@@ -545,6 +545,7 @@ class Order extends Base
         }
 
         $size = $params['size'] ?? 10;
+        $page = $params['page'] ?? 1;
         $now_date = date('Y-m-d H:i:s');
 
         $query = Order::query();
@@ -640,7 +641,10 @@ class Order extends Base
 
 
         if (($params['excel_flag'] ?? 0) == 1){
-            $list = $query->orderBy('id', 'desc')->get();
+            $list = $query->orderBy('id', 'desc')
+                ->limit($size)
+                ->offset(($page - 1) * $size)
+                ->get();
         }else{
             $list = $query->orderBy('id', 'desc')->paginate($size);
         }
