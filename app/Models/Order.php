@@ -250,6 +250,7 @@ class Order extends Base
         $params = array_filter($params);
         krsort($params);
         $size = $params['size'] ?? 10;
+        $page = $params['page'] ?? 1;
         $now_date = date('Y-m-d H:i:s');
 
         //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
@@ -419,7 +420,10 @@ class Order extends Base
         }
 
         if (($params['excel_flag'] ?? 0) == 1){
-            $list = $query->orderBy('id', 'desc')->get();
+            $list = $query->orderBy('id', 'desc')
+                ->offset($size)
+                ->limit(($page - 1) * $size)
+                ->get();
         }else{
             $list = $query->orderBy('id', 'desc')->paginate($size);
         }
