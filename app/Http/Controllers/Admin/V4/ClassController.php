@@ -1549,7 +1549,7 @@ class ClassController extends ControllerBackend
             });
 
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at',
-            'info_num')
+            'info_num','is_start')
             ->where('type', 3)
             ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
