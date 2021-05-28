@@ -637,11 +637,14 @@ class ColumnController extends Controller
 //            'view_num','price','subscribe_num','is_free','is_end',])
 //            ->where(['column_id'=>$lecture_id,'type'=>1,'status'=>4])->first();
         $history_type = 2;
+        $getInfo_type = 3;
         if($column_data['type'] == 2 ){
             $type = 6;
         }else if ($column_data['type'] == 3 ){
             $type = 7;
             $history_type = 5; //训练营
+            $getInfo_type = 4; //训练营
+
         }
         $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
 
@@ -651,19 +654,13 @@ class ColumnController extends Controller
             $page_per_page = $column_data['show_info_num'];
 
         }
+        $os_type = $request->input('os_type', 0);
 
         //查询章节、
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($lecture_id, $is_sub, $user_id, 3, $order, $page_per_page, $page, $size, $column_data['is_free']);
+        $info = $infoObj->getInfo($lecture_id, $is_sub, $user_id, $getInfo_type, $order, $page_per_page, $page, $size, $column_data['is_free'],$os_type);
 
-        $os_type = $request->input('os_type', 0);
         //H5 不返href_url
-        if($os_type == 3){
-            array_walk($info, function (&$item) {  //对每个元素进行函数处理
-                unset($item['href_url']);
-//                $item = array_diff($item, ['href_url'=>'',]);//返回差集
-            });
-        }
 //        if ($flag === 'catalog'){
 //            $res = [
 //                'info'          => $info,

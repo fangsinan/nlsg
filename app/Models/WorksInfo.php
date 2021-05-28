@@ -19,8 +19,8 @@ class WorksInfo extends Base
         return time();
     }
 
-    // $type  1 单课程  2 多课程  3讲座
-    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$is_free = 0)
+    // $type  1 单课程  2 多课程  3讲座 4训练营
+    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$is_free = 0,$os_type)
     {
         $where = ['status' => 4];
         if ($type == 1) {
@@ -28,6 +28,9 @@ class WorksInfo extends Base
         } else if ($type == 2) {
             $where['outline_id'] = $works_id;
         } else if ($type == 3) {
+            $where['column_id'] = $works_id;
+            $where['type'] = 1; //纯视频类型
+        }else if ($type == 4) { //训练营
             $where['column_id'] = $works_id;
             $where['type'] = 1; //纯视频类型
         }
@@ -45,16 +48,24 @@ class WorksInfo extends Base
 
         //$works_data = $works_data_size['data'];
         foreach ($works_data as $key => $val) {
-            //处理url  关注或试听
-            $works_data[$key]['href_url'] = '';
-            if ($is_sub == 1 || $val['free_trial'] == 1 || $is_free == 1) {
-                $works_data[$key]['href_url'] = $works_data[$key]['url'];
-
-            } else {
+            //训练营H5  不返回视频地址
+            if($type == 4 && $os_type == 3){
                 unset($works_data[$key]['callback_url3']);
                 unset($works_data[$key]['callback_url2']);
                 unset($works_data[$key]['callback_url1']);
+            }else{
+                //处理url  关注或试听
+                $works_data[$key]['href_url'] = '';
+                if ($is_sub == 1 || $val['free_trial'] == 1 || $is_free == 1) {
+                    $works_data[$key]['href_url'] = $works_data[$key]['url'];
+
+                } else {
+                    unset($works_data[$key]['callback_url3']);
+                    unset($works_data[$key]['callback_url2']);
+                    unset($works_data[$key]['callback_url1']);
+                }
             }
+
             unset($works_data[$key]['url']);
 
 
