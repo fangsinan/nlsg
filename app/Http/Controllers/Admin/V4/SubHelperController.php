@@ -19,7 +19,7 @@ class SubHelperController  extends ControllerBackend
 
     public function open(Request $request){
         $servers = new SubHelperServers();
-        $data = $servers->addOpenList($request->input());
+        $data = $servers->addOpenList($request->input(),$this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 

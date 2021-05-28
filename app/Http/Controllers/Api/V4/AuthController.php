@@ -137,6 +137,7 @@ class AuthController extends Controller
             'level' => $user->level,
             'sex' => $user->sex,
             'children_age' => 10,//$user->children_age,
+            'push'  => $user->push
         ];
         return success($data);
     }
