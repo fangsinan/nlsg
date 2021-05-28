@@ -160,6 +160,7 @@ class OrderController extends Controller
         $pay_type = !empty($params['pay_type']) ? intval($params['pay_type']) : 0;
         $activity_tag = $request->input('activity_tag', '');
         $user_id = $this->user['id'] ?? 0;
+        $live_num = $request->input('live_num',1);
 
         //$column_id 专栏信息
         $column_data = Column::find($column_id);
@@ -231,7 +232,7 @@ class OrderController extends Controller
             'live_id' => $live_id,
             'pay_type' => $pay_type,
             'activity_tag' => $activity_tag,
-
+            'live_num'=>$live_num,
         ];
         $order = Order::firstOrCreate($data);
 

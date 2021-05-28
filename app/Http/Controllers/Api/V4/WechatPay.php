@@ -500,8 +500,8 @@ class WechatPay extends Controller
                     break;
             }
         } else if ($type == 18){
-            $data = Column::first($relation_id);
-            $res = $nickname . ':您已支付' . $live_num . '张'.$data['title'];
+            $data = Column::find($relation_id);
+            $res = $nickname . ':您已支付' . $live_num . '张'.$data['name'];
         }
         Redis::rpush($key, $res);
 //        Redis::setex($key,600,json_encode($res,true));
