@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\CommentReply;
 use App\Models\Notify;
 use Illuminate\Http\Request;
+use JPush;
 
 class ReplyController extends Controller
 {
@@ -65,6 +66,8 @@ class ReplyController extends Controller
             $notify->save();
 
             //发送通知
+            JPush::pushNow($comment->user_id, '回复了你的评论');
+
             return success();
         }
     }
