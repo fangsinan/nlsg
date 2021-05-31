@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Like;
 use App\Models\Notify;
 use Mockery\Matcher\Not;
+use JPush;
 
 class LikeController extends Controller
 {
@@ -61,6 +62,10 @@ class LikeController extends Controller
             }
             //增加喜欢
             Comment::where('id', $id)->increment('like_num');
+
+            //发送通知
+            JPush::pushNow(strval($comment->user_id), '喜欢了你的想法');
+
             return success('操作成功');
         }
         return error(1000, '操作失败');
