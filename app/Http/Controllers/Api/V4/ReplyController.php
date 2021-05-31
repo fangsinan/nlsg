@@ -66,7 +66,7 @@ class ReplyController extends Controller
             $notify->save();
 
             //发送通知
-            JPush::pushNow($comment->user_id, '回复了你的评论');
+            JPush::pushNow(strval($comment->user_id), '回复了你的想法');
 
             return success();
         }
