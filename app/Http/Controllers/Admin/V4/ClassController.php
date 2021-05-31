@@ -1613,6 +1613,7 @@ class ClassController extends ControllerBackend
         $online_type = $input['online_type'] ?? 1;
         $is_start = $input['is_start'] ?? 0;
         $show_info_num = $input['show_info_num'] ?? 0;
+        $subscribe_num = $input['subscribe_num'] ?? 0;
 
         $data = [
             'index_pic'      => $index_pic,
@@ -1626,6 +1627,7 @@ class ClassController extends ControllerBackend
             'original_price' => $original_price,
             'is_start'       => $is_start,
             'show_info_num'  => $show_info_num,
+            'subscribe_num'  => $subscribe_num,
             'type'           => 3,
             'status'         => $status
         ];
