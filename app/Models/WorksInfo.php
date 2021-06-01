@@ -8,16 +8,16 @@ use Illuminate\Support\Facades\DB;
 class WorksInfo extends Base
 {
     protected $table = 'nlsg_works_info';
-//    public $timestamps = false;
+    public $timestamps = false;
     protected $fillable = [
-         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time','share_img'
+         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time'
     ];
 
 
-//    public function getDateFormat()
-//    {
-//        return time();
-//    }
+    public function getDateFormat()
+    {
+        return time();
+    }
 
     // $type  1 单课程  2 多课程  3讲座 4训练营
     public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$is_free = 0,$os_type=1)
@@ -173,12 +173,12 @@ class WorksInfo extends Base
 
 
         if($type == 6 || $type == 7){
-            $query = self::where(['column_id' => $column_id,'type'=>1])
+            $query = self::where(['column_id' => $column_id,'type'=>1,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
                     'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img']);
             $works_id = $column_id;  // 讲座直接关联info表
         }else{
-            $query = self::where('pid', '=', $works_id)
+            $query = self::where(['pid'=>$works_id,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
                     'introduce', 'section', 'size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
         }
