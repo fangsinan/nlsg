@@ -155,6 +155,7 @@ class WorksInfo extends Base
             if (empty($column_id)) {
                 return ['code' => false, 'msg' => 'id不存在'];
             }
+            $columnDatta = Column::find($column_id);
 //            $column_data = Works::select('id')->where(['column_id'=>$column_id])->first();
 //            $works_id = $column_data['id'];
 
@@ -192,6 +193,10 @@ class WorksInfo extends Base
         } else {
             $query->orderBy('rank','asc')
                     ->orderBy('id', 'asc');
+        }
+
+        if($type == 7 && $columnDatta['show_info_num'] > 0 ){
+            $query->limit($columnDatta['show_info_num']);
         }
 
         $info_list = $query->get();
