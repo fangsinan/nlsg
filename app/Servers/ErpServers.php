@@ -4,6 +4,7 @@
 namespace App\Servers;
 
 use App\Models\ExpressCompany;
+use App\Models\MallErpError;
 use App\Models\MallErpList;
 use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
@@ -178,9 +179,9 @@ class ErpServers
     //物流同步
     public function logisticsSync()
     {
-        $m = new MallErpList();
-        $m->order_id = rand(1,9999);
-        $m->flag = 2;
+        $m = new MallErpError();
+        $m->ordernum = $this->appkey;
+        $m->error = $this->appsecret.'/'.$this->trade_push;
         $m->save();
         return true;
 
