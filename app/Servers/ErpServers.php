@@ -178,6 +178,12 @@ class ErpServers
     //物流同步
     public function logisticsSync()
     {
+        $m = new MallErpList();
+        $m->order_id = rand(1,9999);
+        $m->flag = 2;
+        $m->save();
+        return true;
+
         $list = $this->logisticsSyncQuery();
 
         if (!empty($list)) {
