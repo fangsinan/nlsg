@@ -181,7 +181,7 @@ class ErpServers
     {
         $m = new MallErpError();
         $m->ordernum = $this->appkey;
-        $m->error = $this->appsecret.'/'.$this->trade_push;
+        $m->error = $this->appsecret . '/' . $this->trade_push;
         $m->save();
         return true;
 
@@ -208,7 +208,7 @@ class ErpServers
                     $oids = MallOrderDetails::where('order_id', '=', $tid->id)
                         ->pluck('id')->toArray();
                     foreach ($oids as &$oidsv) {
-                        $oidsv = $tid->id  . '_' . $oidsv;
+                        $oidsv = $tid->id . '_' . $oidsv;
                     }
                 }
 
@@ -320,11 +320,11 @@ class ErpServers
     {
         //= config('env.ALI_APP_ID');
         $this->sid = config('env.ERP_SID');
-        $this->shop_no =config(' en.ERP_SHOP_NO');
+        $this->shop_no = config('env.ERP_SHOP_NO');
         $this->appkey = config('env.ERP_APPKEY');
-        $this->appsecret =config(' en.ERP_APPSECRET');
+        $this->appsecret = config('env.ERP_APPSECRET');
         $this->trade_push = config('env.ERP_TRADE_PUSH');
-        $this->logistics_sync_query =config(' en.ERP_LOGISTICS_SYNC_QUERY');
+        $this->logistics_sync_query = config('env.ERP_LOGISTICS_SYNC_QUERY');
         $this->logistics_sync_ack = config('env.ERP_LOGISTICS_SYNC_ACK');
     }
 
