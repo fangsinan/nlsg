@@ -8,16 +8,11 @@ use Illuminate\Support\Facades\DB;
 class WorksInfo extends Base
 {
     protected $table = 'nlsg_works_info';
-    public $timestamps = false;
+
     protected $fillable = [
-         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time'
+         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time','share_img'
     ];
 
-
-    public function getDateFormat()
-    {
-        return time();
-    }
 
     // $type  1 单课程  2 多课程  3讲座 4训练营
     public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$is_free = 0,$os_type=1)
@@ -160,6 +155,7 @@ class WorksInfo extends Base
             if (empty($column_id)) {
                 return ['code' => false, 'msg' => 'id不存在'];
             }
+            $columnDatta = Column::find($column_id);
 //            $column_data = Works::select('id')->where(['column_id'=>$column_id])->first();
 //            $works_id = $column_data['id'];
 
@@ -197,6 +193,10 @@ class WorksInfo extends Base
         } else {
             $query->orderBy('rank','asc')
                     ->orderBy('id', 'asc');
+        }
+
+        if($type == 7 && $columnDatta['show_info_num'] > 0 ){
+            $query->limit($columnDatta['show_info_num']);
         }
 
         $info_list = $query->get();
@@ -387,7 +387,7 @@ class WorksInfo extends Base
                                    $map['attribute_url3'] = $v['width']."#".$v['height'];
                                }else{
                                    $map['attribute_url'] = $v['width']."#".$v['height']; //原视频
-                                   $map['url'] = $v['url']; //原视频
+//                                   $map['url'] = $v['url']; //原视频
                                }
                                $type=1;
                            }
