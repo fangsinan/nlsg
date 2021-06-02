@@ -179,11 +179,6 @@ class ErpServers
     //物流同步
     public function logisticsSync()
     {
-        $m = new MallErpError();
-        $m->ordernum = $this->appkey;
-        $m->error = $this->appsecret . '/' . $this->trade_push;
-        $m->save();
-        return true;
 
         $list = $this->logisticsSyncQuery();
 
