@@ -80,7 +80,7 @@ return [
     'toQColudIsTest'   => env('toQColudIsTest'),
     'QSECRET_ID'    => env('QSECRET_ID'),
     'QSECRET_KEY'   => env('QSECRET_KEY'),
-    
+
     'ERP_SID'   => env('ERP_SID'),
     'ERP_APPKEY'   => env('ERP_APPKEY'),
     'ERP_APPSECRET'   => env('ERP_APPSECRET'),

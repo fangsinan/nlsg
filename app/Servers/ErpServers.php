@@ -318,13 +318,14 @@ class ErpServers
 
     public function __construct()
     {
-        $this->sid = env('ERP_SID');
-        $this->shop_no = env('ERP_SHOP_NO');
-        $this->appkey = env('ERP_APPKEY');
-        $this->appsecret = env('ERP_APPSECRET');
-        $this->trade_push = env('ERP_TRADE_PUSH');
-        $this->logistics_sync_query = env('ERP_LOGISTICS_SYNC_QUERY');
-        $this->logistics_sync_ack = env('ERP_LOGISTICS_SYNC_ACK');
+        //= config('env.ALI_APP_ID');
+        $this->sid = config('env.ERP_SID');
+        $this->shop_no =config(' en.ERP_SHOP_NO');
+        $this->appkey = config('env.ERP_APPKEY');
+        $this->appsecret =config(' en.ERP_APPSECRET');
+        $this->trade_push = config('env.ERP_TRADE_PUSH');
+        $this->logistics_sync_query =config(' en.ERP_LOGISTICS_SYNC_QUERY');
+        $this->logistics_sync_ack = config('env.ERP_LOGISTICS_SYNC_ACK');
     }
 
     //去掉昵称的emoji
