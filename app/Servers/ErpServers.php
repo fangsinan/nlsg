@@ -201,7 +201,7 @@ class ErpServers
                     $oids = MallOrderDetails::where('order_id', '=', $tid->id)
                         ->pluck('id')->toArray();
                     foreach ($oids as &$oidsv) {
-                        $oidsv = $v['tid'] . '_' . $oidsv;
+                        $oidsv = $tid->id  . '_' . $oidsv;
                     }
                 }
 
