@@ -288,24 +288,28 @@ class ErpServers
 
     public function pushRun()
     {
-        $list = MallErpList::where('flag', '=', 1)->limit(50)->select(['id', 'order_id'])->get();
+        $while_flag = true;
 
-        if ($list->isEmpty()) {
-            return true;
+        while ($while_flag){
+            $list = MallErpList::where('flag', '=', 1)->limit(30)->select(['id', 'order_id'])->get();
+            if ($list->isEmpty()) {
+                $while_flag = false;
+            }else{
+                $list = $list->toArray();
+                $id_list = array_column($list, 'id');
+                $order_id_list = array_column($list, 'order_id');
+
+                $res = $this->startPush($order_id_list);//订单推送
+
+                if ($res['code']) {
+                    MallErpList::whereIn('id', $id_list)
+                        ->update([
+                            'flag' => 2
+                        ]);
+                }
+            }
         }
 
-        $list = $list->toArray();
-        $id_list = array_column($list, 'id');
-        $order_id_list = array_column($list, 'order_id');
-
-        $res = $this->startPush($order_id_list);//订单推送
-
-        if ($res['code']) {
-            MallErpList::whereIn('id', $id_list)
-                ->update([
-                    'flag' => 2
-                ]);
-        }
         return true;
         //订单推送场景   支付成功,取消订单
 //        return $this->startPush([10523,10524]);//订单推送
