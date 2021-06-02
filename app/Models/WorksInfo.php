@@ -382,7 +382,7 @@ class WorksInfo extends Base
                                    $map['attribute_url3'] = $v['width']."#".$v['height'];
                                }else{
                                    $map['attribute_url'] = $v['width']."#".$v['height']; //原视频
-                                   $map['url'] = $v['url']; //原视频
+//                                   $map['url'] = $v['url']; //原视频
                                }
                                $type=1;
                            }
