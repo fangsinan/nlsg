@@ -4,7 +4,9 @@
 namespace App\Servers;
 
 use App\Models\ExpressCompany;
+use App\Models\MallErpList;
 use App\Models\MallOrder;
+use App\Models\MallOrderDetails;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use WdtClient;
@@ -128,12 +130,7 @@ class ErpServers
         //true
         $res = $this->pushOrderJob($trade_list);
 
-        if ($res['code'] === true) {
-            MallOrder::whereIn('id', $id)->update([
-                'erp_push' => 1,
-                'erp_push_time' => date('Y-m-d H:i:s')
-            ]);
-        } else {
+        if ($res['code'] != true) {
             $error_message = json_decode($res['msg'], true);
 
             $error_data = [];
@@ -141,13 +138,14 @@ class ErpServers
                 $temp_error_data = [];
                 $temp_error_data['ordernum'] = $v['tid'];
                 $temp_error_data['error'] = $v['error'];
+                $temp_error_data['type'] = 1;
                 $error_data[] = $temp_error_data;
             }
             if (!empty($error_data)) {
                 DB::table('nlsg_mall_order_erp_error')->insert($error_data);
             }
         }
-        return [$res, $trade_list];
+        return $res;
 
     }
 
@@ -190,9 +188,23 @@ class ErpServers
 
             $orderServers = new MallOrderServers();
             $ack_data = [];//需要回传的id
+
             foreach ($list as $v) {
                 $send_data_temp = [];
-                $oids = explode(',', $v['oids']);
+                $tid = MallOrder::where('ordernum', '=', $v['tid'])->select(['id'])->first();
+
+                if ($v['is_part_sync'] == 1) {
+                    //1是拆分了,走oids
+                    $oids = explode(',', $v['oids']);
+                } else {
+                    //0是没拆分,走tid
+                    $oids = MallOrderDetails::where('order_id', '=', $tid->id)
+                        ->pluck('id')->toArray();
+                    foreach ($oids as &$oidsv) {
+                        $oidsv = $v['tid'] . '_' . $oidsv;
+                    }
+                }
+
                 foreach ($oids as $vv) {
                     $send_data = [];
                     $temp_oids = explode('_', $vv);
@@ -201,9 +213,8 @@ class ErpServers
                         continue;
                     }
                     $send_data['num'] = $v['logistics_no'];
-                    $send_data['order_id'] = $temp_oids[0] ?? 0;
-                    $send_data['order_detail_id'] = $temp_oids[0] ?? 0;
-
+                    $send_data['order_id'] = $tid->id ?? 0;
+                    $send_data['order_detail_id'] = $temp_oids[1] ?? 0;
                     $send_data_temp[] = $send_data;
                 }
 
@@ -219,13 +230,13 @@ class ErpServers
                 }
                 $ack_data[] = $temp_ack_data;
             }
-            $this->logisticsSyncAck($ack_data);
-
+            if (!empty($ack_data)) {
+                $this->logisticsSyncAck($ack_data);
+            }
             $this->logisticsSync();
         } else {
             return true;
         }
-
 
     }
 
@@ -243,6 +254,14 @@ class ErpServers
         $c->putApiParam('limit', 100);
         $json = $c->wdtOpenApi();
         $json = json_decode($json, true);
+
+        if (!empty($json['code'])) {
+            $temp_error_data['ordernum'] = 'query';
+            $temp_error_data['error'] = $json['code'] . ':' . $json['message'];
+            $temp_error_data['type'] = 2;
+            DB::table('nlsg_mall_order_erp_error')->insert($temp_error_data);
+        }
+
         return $json['trades'] ?? [];
     }
 
@@ -257,13 +276,37 @@ class ErpServers
         $c->putApiParam('logistics_list', json_encode($ack_data, JSON_UNESCAPED_UNICODE));
         $json = $c->wdtOpenApi();
         $json = json_decode($json, true);
+        if (!empty($json['code'])) {
+            $temp_error_data['ordernum'] = 'ack';
+            $temp_error_data['error'] = $json['code'] . ':' . $json['message'];
+            $temp_error_data['type'] = 3;
+            DB::table('nlsg_mall_order_erp_error')->insert($temp_error_data);
+        }
     }
 
-
-    public function test()
+    public function pushRun()
     {
-        return $this->startPush([10515]);//订单推送
-//        $this->logisticsSync();
+        $list = MallErpList::where('flag', '=', 1)->limit(50)->select(['id', 'order_id'])->get();
+
+        if ($list->isEmpty()) {
+            return true;
+        }
+
+        $list = $list->toArray();
+        $id_list = array_column($list, 'id');
+        $order_id_list = array_column($list, 'order_id');
+
+        $res = $this->startPush($order_id_list);//订单推送
+
+        if ($res['code']) {
+            MallErpList::whereIn('id', $id_list)
+                ->update([
+                    'flag' => 2
+                ]);
+        }
+        return true;
+        //订单推送场景   支付成功,取消订单
+//        return $this->startPush([10523,10524]);//订单推送
     }
 
     public function __construct()

@@ -140,13 +140,8 @@ class GoodsController extends ControllerBackend
      */
     public function list(Request $request)
     {
-        if(1){
-            $servers = new GoodsServers();
-            $data = $servers->list($request->input());
-        }else{
-            $servers = new ErpServers();
-            $data = $servers->test();
-        }
+        $servers = new GoodsServers();
+        $data = $servers->list($request->input());
         return $this->getRes($data);
     }
 

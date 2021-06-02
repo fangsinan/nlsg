@@ -1082,6 +1082,9 @@ class MallOrder extends Base
                         }
                     }
 
+                    //erp队列
+                    MallErpList::addList($id);
+
                     DB::commit();
                     return ['code' => true, 'msg' => '成功'];
 
@@ -1134,6 +1137,9 @@ class MallOrder extends Base
                             return ['code' => false, 'msg' => '失败'];
                         }
                     }
+
+                    //erp队列
+                    MallErpList::addList($id);
 
                     DB::commit();
 

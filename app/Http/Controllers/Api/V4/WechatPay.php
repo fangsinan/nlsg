@@ -11,6 +11,7 @@ use App\Models\Coupon;
 use App\Models\GetPriceTools;
 use App\Models\Live;
 use App\Models\LiveCountDown;
+use App\Models\MallErpList;
 use App\Models\MallGroupBuyList;
 use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
@@ -926,6 +927,9 @@ class WechatPay extends Controller
             }
 
         }
+
+        //erp队列
+        MallErpList::addList($order_obj->id);
         DB::commit();
         return true;
     }

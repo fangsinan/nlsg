@@ -11,6 +11,7 @@ use App\Models\PayRecordDetailStay;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use App\Servers\ChannelServers;
+use App\Servers\ErpServers;
 use App\Servers\MallRefundJob;
 use App\Servers\removeDataServers;
 use Illuminate\Console\Scheduling\Schedule;
@@ -59,6 +60,18 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             MallRefundJob::shillJob(1);
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            //erp物流同步与回写
+            $s = new ErpServers();
+            $s->logisticsSync();
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            //erp订单创建与更新
+            $s = new ErpServers();
+            $s->pushRun();
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
