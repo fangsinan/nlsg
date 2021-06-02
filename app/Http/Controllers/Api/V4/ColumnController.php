@@ -652,7 +652,7 @@ class ColumnController extends Controller
         $page_per_page = 50;
         if($column_data['show_info_num'] > 0) {
             $page_per_page = $column_data['show_info_num'];
-
+            $page = $size = 0;
         }
         $os_type = $request->input('os_type', 0);
 
