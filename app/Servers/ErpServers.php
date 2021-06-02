@@ -101,7 +101,7 @@ class ErpServers
 
             foreach ($v->orderDetails as $vv) {
                 $temp = [];
-                $temp['oid'] = $v->id . '_' . $vv->order_id;
+                $temp['oid'] = $v->id . '_' . $vv->details_id;
                 $temp['status'] = $temp_trade_list['trade_status'];//子订单状态
                 if ($v->is_stop == 1) {
                     $temp['refund_status'] = 5;//0是无退款
