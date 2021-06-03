@@ -12,6 +12,7 @@ use App\Models\WorksCategoryRelation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use JPush;
+use App\Models\Task;
 
 class UserController extends ControllerBackend
 {
@@ -90,14 +91,20 @@ class UserController extends ControllerBackend
         $type = $request->get('type') ?? 1;
         $id = $request->get('id');
         $reason = $request->get('reason');
+        $list = CashData::where('id', $id)->first();
+
         if ($type == 1) {
             CashData::where('id', $id)->update(['is_pass' => 1]);
+
+            //审核通过
+            Task::send(9, $list->user_id);
         } elseif ($type == 2) {
             CashData::where('id', $id)->update(['is_pass' => 2, 'reason' => $reason]);
+            //审核没有通过
+            Task::send(10, $list->user_id);
+
         }
-        $list = CashData::where('id', $id)->first();
-        //发送通知
-        JPush::pushNow(strval($list->user_id), '您提交的个人认证已通过审核~');
+
         return success();
     }
 
