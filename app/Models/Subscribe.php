@@ -54,7 +54,7 @@ class Subscribe extends Base
             }
 
             $where['relation_id'] = $target_id;
-            if( in_array($type,[3,5]) ){  //直播永久有效不需 判断end_time
+            if( in_array($type,[3,5,7]) ){  //直播永久有效不需 判断end_time
                 $sub_data = Subscribe::where($where)
                     ->first();
             }else{
