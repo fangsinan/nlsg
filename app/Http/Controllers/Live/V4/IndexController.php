@@ -726,13 +726,14 @@ class IndexController extends ControllerBackend
     public function info(Request $request)
     {
         $id = $request->get('id');
-        $live = Live::select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at', 'price', 'twitter_money', 'helper', 'content','playback_url')
+        $live = Live::select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at', 'price', 'twitter_money', 'helper', 'content')
             ->with(['livePoster'])
             ->where('id', $id)->first();
         if (!$live) {
             return error('直播不存在');
         }
-
+        $live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
+        
         return success($live);
     }
 }
