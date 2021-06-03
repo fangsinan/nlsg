@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Live;
-use App\Servers\ErpServers;
 use App\Servers\GoodsServers;
 use Illuminate\Http\Request;
 
@@ -218,16 +217,16 @@ class GoodsController extends ControllerBackend
 
     public function tempTools(Request $request)
     {
-        $type = $request->input('type',0);
-        $id = $request->input('id',0);
-        if ($type && $id){
-            switch ($type){
+        $type = $request->input('type', 0);
+        $id = $request->input('id', 0);
+        if ($type && $id) {
+            switch ($type) {
                 case 'live_pass':
                     $check = Live::whereId($id)->first();
-                    if($check){
-                      $check->status = 4;
-                      $check->check_time = date('Y-m-d H:i:s');
-                      $check->save();
+                    if ($check) {
+                        $check->status = 4;
+                        $check->check_time = date('Y-m-d H:i:s');
+                        $check->save();
                     }
             }
         }
