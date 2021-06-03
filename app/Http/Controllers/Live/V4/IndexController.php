@@ -479,7 +479,7 @@ class IndexController extends ControllerBackend
 
         if (!empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);
-            $info_first = LiveInfo::where('live_pid', '=', $input['id'])->first('id','task_id','begin_at','end_at','push_end_time');
+            $info_first = LiveInfo::select('id','task_id','begin_at','end_at','push_end_time')->where('live_pid', '=', $input['id'])->first();
             $live_info_id = $info_first['id'];
              // 删除拉流任务
             if($info_first['task_id'] ){
