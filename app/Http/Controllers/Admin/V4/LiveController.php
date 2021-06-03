@@ -161,7 +161,7 @@ class LiveController extends Controller
         $str_time       = strtotime($info['begin_at'])+5;  //开始时间需要大于当前时间  多加5秒
         $end_time       = $str_time+3600*3;//  结束时间需要大于当前时间
 
-        if( $str_time <= time() ){
+        if( $type == 'create' && $str_time <= time() ){
             return error(0, '直播开始时间必须大于当前时间');
         }
 
