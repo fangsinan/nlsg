@@ -21,6 +21,7 @@ use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
+use App\Models\WorksListOfSub;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -1821,7 +1822,7 @@ and o.status = 1 and o.pay_price > 1";
         $list = DB::table('works_list_of_sub')
             ->where('status', '=', 1)
             ->whereIn('works_type', [2, 6, 3, 7])
-            ->limit(100)
+            ->limit(300)
             ->get();
 
         foreach ($list as $v) {
@@ -1936,6 +1937,38 @@ and o.status = 1 and o.pay_price > 1";
 
         }
 
+    }
+
+    public function subListSms()
+    {
+//        $while_flag = true;
+//        while ($while_flag) {
+            //现在只有情商课的sms
+            $list = WorksListOfSub::where('works_type', '=', 2)
+                ->where('works_id', '=', 404)
+                ->where('is_sendsms', '=', 1)
+                ->where('status', '=', 2)
+                ->select(['id', 'phone'])
+                ->limit(300)
+                ->get();
+
+            if ($list->isEmpty()) {
+//                $while_flag = false;
+                return true;
+            } else {
+                $list = $list->toArray();
+                $phone = array_column($list, 'phone');
+                $phone = array_unique($phone);
+                $phone = implode(',', $phone);
+                $id_list = array_column($list, 'id');
+                $easySms = app('easysms');
+                $easySms->send($phone, [
+                    'template' => 'SMS_218033474',
+                ], ['aliyun']);
+                WorksListOfSub::whereIn('id',$id_list)->update(['is_sendsms'=>2]);
+            }
+//        }
+        return true;
     }
 
     public function liveOrderAddVipDind()

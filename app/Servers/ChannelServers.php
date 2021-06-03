@@ -619,9 +619,17 @@ class ChannelServers
 
                         $add_sub_data = [];
                         $add_cd_data = [];
+                        $add_sms_data = [];
                         DB::beginTransaction();
                         foreach ($live_id_list as $tv) {
                             Live::where('id', $tv)->increment('order_num');
+
+                            $live_data = Live::where('id', $tv)->select(['id', 'begin_at'])->first();
+                            $temp_add_sms_data = [];
+                            $temp_add_sms_data['phone'] = $v->phone;
+                            $temp_add_sms_data['time'] = date('m月d日', strtotime($live_data->begin_at));
+                            $add_sms_data[] = $temp_add_sms_data;
+
                             $check = Subscribe::where('user_id', '=', $v->user_id)
                                 ->where('created_at', '>', '2021-01-05')
                                 ->where('relation_id', '=', $tv)
@@ -691,12 +699,24 @@ class ChannelServers
                                 DB::table('nlsg_vip_user_bind')->insert($bind_data);
                             }
                         }
+
                         DB::commit();
                         try {
-                            $easySms = app('easysms');
-                            $easySms->send($v->phone, [
-                                'template' => 'SMS_210996538',
-                            ], ['aliyun']);
+                            if (!empty($add_sms_data)) {
+                                $easySms = app('easysms');
+                                foreach ($add_sms_data as $sms_v) {
+                                    $easySms->send($sms_v['phone'], [
+                                        'template' => 'SMS_218028527',
+                                        'data' => [
+                                            'time' => $sms_v['time'],
+                                        ],
+                                    ], ['aliyun']);
+                                }
+//                                $easySms->send($v->phone, [
+//                                    'template' => 'SMS_210996538',
+//                                ], ['aliyun']);
+                            }
+
                         } catch (\Exception $e) {
 
                         }
@@ -861,7 +881,7 @@ class ChannelServers
             ->pluck('id')
             ->toArray();
 
-        $rank = $rank > (count($before_arr) + 1) ? (count($before_arr) + 1)  : $rank;
+        $rank = $rank > (count($before_arr) + 1) ? (count($before_arr) + 1) : $rank;
 
         $after_arr = ChannelWorksList::where('id', '<>', $id)
             ->where('rank', '<>', 99)
