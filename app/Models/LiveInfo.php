@@ -85,18 +85,18 @@ class LiveInfo extends Model
     public static  function  liveUrlEdit($type,$live_info_id){
 
         if($type == "" || $live_info_id == '' ){
-            return ['code'=>0,',msg'=>'error'];
+            return ['code'=>0,'msg'=>'error'];
 
         }
         //开始时间   结束时间    pushurl   callbackurl
         $info = LiveInfo::find($live_info_id);
         if($type == 'create' && !empty($info['task_id'])){
 
-            return ['code'=>0,',msg'=>'已创建拉流任务','data'=>[]];
+            return ['code'=>0,'msg'=>'已创建拉流任务','data'=>[]];
         }
 
         if($type == 'del' && empty($info['task_id'])){
-            return ['code'=>0,',msg'=>'当前拉流任务不存在','data'=>[]];
+            return ['code'=>0,'msg'=>'当前拉流任务不存在','data'=>[]];
         }
 
 
@@ -106,7 +106,7 @@ class LiveInfo extends Model
         $end_time       = $str_time+3600*3;//  结束时间需要大于当前时间
 
         if( $type == 'create' && $str_time <= time() ){
-            return ['code'=>0,',msg'=>'直播开始时间必须大于当前时间','data'=>[]];
+            return ['code'=>0,'msg'=>'直播开始时间必须大于当前时间','data'=>[]];
         }
 
         $SecretId="AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
@@ -154,7 +154,7 @@ class LiveInfo extends Model
                 break;
             case "del":
                 if($info['task_id'] == ''){
-                    return error(0, 'error');
+                    return ['code'=>0,'msg'=>'当前拉流任务不存在','data'=>[]];
                 }
                 $data_key['Action'] = 'DeleteLivePullStreamTask';
                 $data_key['TaskId'] = $info['task_id'];//任务 Id。  创建时返回的任务id
@@ -210,10 +210,10 @@ class LiveInfo extends Model
                     break;
             }
         }else{
-            return ['code'=>0,',msg'=>'error','data'=>$raw_array['Response']['Error']];
+            return ['code'=>0,'msg'=>'error','data'=>$raw_array['Response']['Error']];
         }
         //$res
-        return ['code'=>200,',msg'=>'error','data'=>$res];
+        return ['code'=>200,'msg'=>'error','data'=>$res];
     }
 
 }
