@@ -142,137 +142,15 @@ class LiveController extends Controller
         $type = $request->input("type") ?? '';
         $live_info_id = $request->input("live_info_id") ?? '';
 
-        if($type == "" || $live_info_id == '' ){
-            return error(0, 'error');
-        }
-        //开始时间   结束时间    pushurl   callbackurl
-        $info = LiveInfo::find($live_info_id);
-        if($type == 'create' && !empty($info['task_id'])){
-            return error(0, '已创建拉流任务');
-        }
 
-        if($type == 'del' && empty($info['task_id'])){
-            return error(0, '当前拉流任务不存在');
-        }
-
-
-        $subject        = $info['push_live_url'];
-        $playback_url   = $info['playback_url'];
-        $str_time       = strtotime($info['begin_at'])+5;  //开始时间需要大于当前时间  多加5秒
-        $end_time       = $str_time+3600*3;//  结束时间需要大于当前时间
-
-        if( $type == 'create' && $str_time <= time() ){
-            return error(0, '直播开始时间必须大于当前时间');
-        }
-
-        $SecretId="AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
-        $SECRET_KEY="MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
-        //加密
-        $rand = rand (100, 10000000); //9031868223070871051
-        $time = time ();
-        $Region = "ap-guangzhou";
-        $data_key = [
-            'Action' => 'DescribeLivePullStreamTasks',
-            'Version' => "2018-08-01",
-            'Region' => $Region,
-            'SecretId' => $SecretId,
-            'Timestamp' => $time,
-            'Nonce' => $rand,
-            'SignatureMethod' => 'HmacSHA256',
-        ];
-
-        switch ($type){
-            case "create":
-
-                $pattern_1 = '/rtmp:\/\/push.live.nlsgapp.com\/live\/(.*?)\?txSecret=(.*?)/';
-                $num = preg_match_all($pattern_1, $subject, $matches_1,PREG_PATTERN_ORDER);
-                if( $num <= 0 ){
-                    break;
-                }
-                $StreamName = $matches_1[1][0];
-                $data_key['Action'] = 'CreateLivePullStreamTask';
-                $data_key['Version'] = '2018-08-01';
-                $data_key['SourceType'] = 'PullVodPushLive'; //点播 类型
-                //$data_key['SourceUrls.0'] = 'http://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/d590feb55285890818716274924/Ja0YTxwJYVIA.mp4';
-                $data_key['SourceUrls.0'] = $playback_url;
-                $data_key['DomainName'] = 'push.live.nlsgapp.com'; //推流域名
-                $data_key['AppName'] = 'live';  //推流路径。
-                $data_key['StreamName'] = $StreamName; //推流名称。。
-                // 北京时间值 = UTC 时间值 + 8 小时
-
-                $data_key['StartTime'] = date('Y-m-d\TH:i:s.0000\Z', $str_time-28800); //开始时间  使用 UTC 格式时间，北京时间值 = UTC 时间值 + 8 小时
-                $data_key['EndTime'] = date('Y-m-d\TH:i:s.0000\Z', $end_time-28800); //结束时间  使用 UTC 格式时间结束时间 和 开始时间 间隔必须小于七天。 使用 UTC 格式时间，
-                $data_key['Operator'] = 'admin'; //任务创建人。
-
-                break;
-            case "show":
-                $data_key['Action'] = 'DescribeLivePullStreamTasks';
-                break;
-            case "del":
-
-
-
-                if($info['task_id'] == ''){
-                    return error(0, 'error');
-                }
-                $data_key['Action'] = 'DeleteLivePullStreamTask';
-                $data_key['TaskId'] = $info['task_id'];//任务 Id。  创建时返回的任务id
-                $data_key['Operator'] = 'admin'; //任务创建人。
-                break;
-            default:
-                $data_key['Action'] = 'DescribeLivePullStreamTasks';
-                break;
-        }
-        ksort ($data_key); //排序
-        // 计算签名
-//        $srcStr = "POSTlive.tencentcloudapi.com/?" . http_build_query ($data_key);
-        //使用这种方式 是为了避免特殊字符转义 导致签名失败
-        $srcStr = "POSTlive.tencentcloudapi.com/?";
-        foreach ( $data_key as $key => $value ) {
-            $srcStr = $srcStr . $key . "=" . $value . "&";
-        }
-        $srcStr = substr($srcStr, 0, -1);
-
-
-        $signature = base64_encode (hash_hmac ('sha256', $srcStr, $SECRET_KEY, true)); //SHA1  sha256
-        $data_key['Signature'] = $signature;
-        ksort ($data_key); //排序
-
-
-
-        //拉取转码成功信息
-        $url = "https://live.tencentcloudapi.com/";
-        $info = WorksInfo::curlPost ($url, $data_key);  //post
-        $raw_array = json_decode($info, true);
-
-        if(empty($raw_array['Response']['Error']) ){
-
-            switch ($type){
-                case "create":
-                    //TaskId 记录数据库
-                    LiveInfo::where('id', $live_info_id)->update([
-                        'task_id' => $raw_array['Response']['TaskId'],
-                    ]);
-                    $res = $raw_array['Response'];
-                    break;
-                case "show":
-                    $res = $raw_array['Response']['TaskInfos'];
-                    break;
-                case "del":
-                    LiveInfo::where('id', $live_info_id)->update([
-                        'task_id' => 0,
-                    ]);
-                    $res = $raw_array['Response'];
-                    break;
-                default:
-                    $res = [];
-                    break;
-            }
+        $res = LiveInfo::liveUrlEdit($type,$live_info_id);
+        if($res['code'] == 0){
+            return error($res['code'], $res['msg'],$res['data']);
         }else{
-            return error(0, 'error',$raw_array['Response']['Error']);
+            return $this->success($res['data']);
         }
-        //$res
-        return $this->success($res);
+
+
 
     }
 }
