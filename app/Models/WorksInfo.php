@@ -131,7 +131,7 @@ class WorksInfo extends Base
     public function infoHistory()
     {
         return $this->hasOne(History::class, 'info_id', 'works_info_id')
-            ->select(['id', 'relation_type', 'relation_id', 'info_id', 'user_id', 'time_leng', 'time_number']);
+            ->select(['id', 'relation_type', 'relation_id', 'info_id', 'user_id', 'time_leng', 'time_number','is_end']);
     }
 
     //用于获取章节上下曲信息
