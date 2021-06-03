@@ -479,7 +479,16 @@ class IndexController extends ControllerBackend
 
         if (!empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);
-            $live_info_id = LiveInfo::where('live_pid', '=', $input['id'])->value('id');
+            $info_first = LiveInfo::select('id','task_id','begin_at','end_at','push_end_time')->where('live_pid', '=', $input['id'])->first();
+            $live_info_id = $info_first['id'];
+             // 删除拉流任务
+            if($info_first['task_id'] ){
+                //当开始时间、结束时间、推流结束时间 变了修改     否则  不变
+                if(($info_first['begin_at'] != $begin_at) || ($info_first['end_at'] != $end_at) || ($info_first['push_end_time'] != $temp_push_end_time) ){
+                    //校验 推拉流
+                    LiveInfo::liveUrlEdit('del',$live_info_id);
+                }
+            }
 
             $live_info_data['id'] = $input['id'];
             $live_info_data['live_pid'] = $input['id'];
