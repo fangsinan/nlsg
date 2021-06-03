@@ -730,16 +730,18 @@ class WorksController extends Controller
             // 学习记录数增一
             User::where(['id'=>$user_id])->increment('history_num');
         }
-        $end = 0;
-        if( $time_leng == 100 ){
-            $end = 1;
-        }
-        //更新学习进度
-        History::where('id',$his->id)->update([
+
+
+        $edit_data = [
             'time_leng'=>$time_leng,
             'time_number'=>$time_number,
-            'is_end'=>$end,
-            ]);
+        ];
+        if( $time_leng == 100 ){
+            $edit_data['is_end'] = 1;
+        }
+
+        //更新学习进度
+        History::where('id',$his->id)->update($edit_data);
         return $this->success();
     }
 
