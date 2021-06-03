@@ -82,8 +82,7 @@ class LiveInfo extends Model
 
 
 
-    public function liveUrlEdit($type,$live_info_id){
-
+    public static  function  liveUrlEdit($type,$live_info_id){
 
         if($type == "" || $live_info_id == '' ){
             return ['code'=>0,',msg'=>'error'];
