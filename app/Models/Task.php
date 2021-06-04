@@ -116,6 +116,22 @@ class Task extends Base
                     'type'    => 11
                 ];
                 break;
+            case 12:
+                 $data = [
+                     'subject' => $nickname.'回复了您的想法',
+                     'user_id'  => $user_id,
+                     'source_id'=> $source_id,
+                     'type'     => 12
+                 ];
+                 break;
+            case 13:
+                 $data = [
+                     'subject'  => $nickname.'喜欢了您的想法',
+                     'user_id'  => $user_id,
+                     'source_id'=> $source_id,
+                     'type'     => 13
+                 ];
+                 break;
         }
 
         Task::create($data);

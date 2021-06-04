@@ -7,7 +7,7 @@ use App\Models\Comment;
 use App\Models\CommentReply;
 use App\Models\Notify;
 use Illuminate\Http\Request;
-use JPush;
+use App\Models\Task;
 
 class ReplyController extends Controller
 {
@@ -65,8 +65,9 @@ class ReplyController extends Controller
             $notify->content = $input['content'] ? serialize($content) : '';
             $notify->save();
 
+            $from_user = User::where('id', $user_id)->value('nickname');
             //发送通知
-            JPush::pushNow(strval($comment->user_id), '回复了你的想法');
+            Task::send(12, $comment->user_id, $result->id, 0, '',false,false, 0, $from_user);
 
             return success();
         }

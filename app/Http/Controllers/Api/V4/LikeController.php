@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Models\Like;
 use App\Models\Notify;
@@ -63,8 +64,9 @@ class LikeController extends Controller
             //增加喜欢
             Comment::where('id', $id)->increment('like_num');
 
+            $from_user = User::where('id', $this->user['id'])->value('nickname');
             //发送通知
-            JPush::pushNow(strval($comment->user_id), '喜欢了你的想法');
+            Task::send(13, $comment->user_id, $id, 0, '',false,false, 0, $from_user);
 
             return success('操作成功');
         }
