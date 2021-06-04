@@ -112,6 +112,10 @@ class Kernel extends ConsoleKernel
             PayRecordDetailStay::remove();//商城待到帐收益划转
         })->dailyAt('03:00');//半夜清理
 
+        $schedule->call(function () {
+            Task::push();
+
+        })->everyMinute()->runInBackground();//每分
 
     }
 

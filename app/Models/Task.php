@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use JPush;
 class Task extends Base
 {
 
@@ -121,5 +121,19 @@ class Task extends Base
         Task::create($data);
 
         return true;
+    }
+
+    public function push()
+    {
+        $lists = Task::select('id','user_id','subject','type','source_id','info_id')
+            ->where('status', 1)
+            ->orderBy('created_at','desc')
+            ->get()
+            ->toArray();
+        if (!empty($lists)){
+            foreach ($lists as $item) {
+                JPush::pushNow(strval($item['user_id']), $item['subject'],['type'=>$item['type'],'id'=>$item['source_id'],'info_id'=>$item['info_id']]);
+            }
+        }
     }
 }
