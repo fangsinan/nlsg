@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -281,5 +282,24 @@ class User extends Authenticatable implements JWTSubject
         }
 
     }
+    public static  function expire()
+    {
+           $start = date('Y-m-d H:i:s', time());
+           $lists = User::whereBetween('expire_time', [
+                                                   Carbon::parse($start)->toDateTimeString(),
+                                                   Carbon::parse('+7 days')->toDateTimeString(),
+                                               ])
+                              ->pluck('id')
+                              ->toArray();
 
+           if ($lists){
+               $uids  = array_chunk(array_unique($lists), 100, true);
+               if ($uids){
+                   foreach ($uids as $item) {
+                       JPush::pushNow(strval($item), '您的会员即将到期');
+                   }
+               }
+           }
+
+    }
 }

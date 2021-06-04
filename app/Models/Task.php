@@ -133,6 +133,8 @@ class Task extends Base
         if (!empty($lists)){
             foreach ($lists as $item) {
                 JPush::pushNow(strval($item['user_id']), $item['subject'],['type'=>$item['type'],'id'=>$item['source_id'],'info_id'=>$item['info_id']]);
+                //任务更新为已发送
+                Task::where('id', $item['id'])->update(['status'=>2]);
             }
         }
     }

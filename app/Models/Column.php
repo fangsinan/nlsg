@@ -4,6 +4,7 @@
 namespace App\Models;
 
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class Column extends Base
@@ -154,5 +155,28 @@ class Column extends Base
                 ->orderBy('created_at','desc')
                 ->get();
         return $users;
+    }
+
+
+    public static  function expire()
+    {
+        $start = date('Y-m-d H:i:s', time());
+        $lists = Subscribe::whereBetween('end_time', [
+                                                Carbon::parse($start)->toDateTimeString(),
+                                                Carbon::parse('+7 days')->toDateTimeString(),
+                                            ])
+                           ->where('status', 1)
+                           ->pluck('user_id')
+                           ->toArray();
+
+        if ($lists){
+            $uids  = array_chunk(array_unique($lists), 100, true);
+            if ($uids){
+                foreach ($uids as $item) {
+                    JPush::pushNow(strval($item), '您的专栏即将到期');
+                }
+            }
+        }
+
     }
 }

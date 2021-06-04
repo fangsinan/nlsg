@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -434,6 +435,29 @@ class Coupon extends Base
             ->update([
                 'status' => 3
             ]);
+    }
+
+    /**
+     * 优惠券即将到期消息通知
+     * @return bool|void
+     */
+    public static  function  expire()
+    {
+        $start = date('Y-m-d H:i:s', time());
+        $lists = Coupon::whereBetween('end_time', [
+                                                Carbon::parse($start)->toDateTimeString(),
+                                                Carbon::parse('+7 days')->toDateTimeString(),
+                                            ])
+                           ->where('status', 1)
+                           ->pluck('user_id')
+                           ->toArray();
+       $uids  = array_chunk(array_unique($lists), 100, true);
+       if ($uids){
+           foreach ($uids as $item) {
+               JPush::pushNow(strval($item), '您的1张优惠券即将到期');
+           }
+       }
+
     }
 
 }
