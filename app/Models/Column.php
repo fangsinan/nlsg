@@ -33,7 +33,7 @@ class Column extends Base
         }else{
             $column = Column::where(['type'=>1,'user_id'=>$teacher_id])->first($field);
         }
-
+        $column_id = $column['id'];
         if( empty($column) )    {
             return [];
         }
