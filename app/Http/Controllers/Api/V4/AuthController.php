@@ -54,7 +54,7 @@ class AuthController extends Controller
         $user_id = $request->input('user_id');
         $inviter = $request->input('inviter', 0);
         $ref = $request->input('ref', 0);
-        $wx_openid = $request->input('wx_openid', 0);//h5公众号
+//        $wx_openid = $request->input('wx_openid', 0);//h5公众号
 
         $sclass = new \StdClass();
         if (!$phone) {
@@ -125,9 +125,9 @@ class AuthController extends Controller
         }
 
         //  采集H5的用户openid
-        if($wx_openid){
-            User::where('id', '=', $user->id)->update(['wxopenid' => $wx_openid]);
-        }
+//        if($wx_openid){
+//            User::where('id', '=', $user->id)->update(['wxopenid' => $wx_openid]);
+//        }
         $data = [
             'id' => $user->id,
             'token' => $token,
@@ -206,11 +206,11 @@ class AuthController extends Controller
             $user->level = 0;
         }
 
-        $wx_openid = $request->input('wx_openid', 0);
-        //  采集H5的用户openid
-        if($wx_openid){
-            User::where('id', '=', $user->id)->update(['wxopenid' => $wx_openid]);
-        }
+//        $wx_openid = $request->input('wx_openid', 0);
+//        //  采集H5的用户openid
+//        if($wx_openid){
+//            User::where('id', '=', $user->id)->update(['wxopenid' => $wx_openid]);
+//        }
         $data = [
             'id' => $user->id,
             'token' => $token,
@@ -287,7 +287,7 @@ class AuthController extends Controller
             'province' => $input['province'],
             'city' => $input['city'],
             'unionid' => $input['unionid'] ?? '',
-            'wxopenid' => $input['wx_openid'] ?? '',
+//            'wxopenid' => $input['wx_openid'] ?? '',
             'headimg' => $input['headimg'] ?? '',
             'is_wx' => $is_wx
         ];
