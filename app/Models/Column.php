@@ -173,8 +173,10 @@ class Column extends Base
             $uids  = array_chunk(array_unique($lists), 100, true);
             if ($uids){
                 foreach ($uids as $item) {
-                    JPush::pushNow(strval($item), '您的专栏即将到期');
-                }
+                     foreach ($item as  $v){
+                         JPush::pushNow(strval($v), '您的专栏即将到期');
+                     }
+                 }
             }
         }
 

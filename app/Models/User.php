@@ -291,12 +291,13 @@ class User extends Authenticatable implements JWTSubject
                                                ])
                               ->pluck('id')
                               ->toArray();
-
            if ($lists){
                $uids  = array_chunk(array_unique($lists), 100, true);
                if ($uids){
                    foreach ($uids as $item) {
-                       JPush::pushNow(strval($item), '您的会员即将到期');
+                       foreach ($item as  $v){
+                           JPush::pushNow(strval($v), '您的会员即将到期');
+                       }
                    }
                }
            }
