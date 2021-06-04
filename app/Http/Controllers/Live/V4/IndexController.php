@@ -475,7 +475,7 @@ class IndexController extends ControllerBackend
         $live_info_data['length'] = 5;
         $live_info_data['begin_at'] = $begin_at;
         $live_info_data['end_at']   = $end_at;
-        $live_info_data['playback_url']   = $playback_url;
+        $live_info_data['back_video_url']   = $playback_url;
 
         if (!empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);

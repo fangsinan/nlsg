@@ -101,7 +101,7 @@ class LiveInfo extends Model
 
 
         $subject        = $info['push_live_url'];
-        $playback_url   = $info['playback_url'];
+        $back_video_url   = $info['back_video_url'];
         $str_time       = strtotime($info['begin_at'])+5;  //开始时间需要大于当前时间  多加5秒
         $end_time       = $str_time+3600*3;//  结束时间需要大于当前时间
 
@@ -109,7 +109,7 @@ class LiveInfo extends Model
             return ['code'=>0,'msg'=>'直播开始时间必须大于当前时间','data'=>[]];
         }
         
-        if( $type == 'create' && empty($playback_url) ){
+        if( $type == 'create' && empty($back_video_url) ){
             return ['code'=>0,'msg'=>'回放地址不存在','data'=>[]];
         }
 
@@ -142,7 +142,7 @@ class LiveInfo extends Model
                 $data_key['Version'] = '2018-08-01';
                 $data_key['SourceType'] = 'PullVodPushLive'; //点播 类型
                 //$data_key['SourceUrls.0'] = 'http://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/d590feb55285890818716274924/Ja0YTxwJYVIA.mp4';
-                $data_key['SourceUrls.0'] = $playback_url;
+                $data_key['SourceUrls.0'] = $back_video_url;
                 $data_key['DomainName'] = 'push.live.nlsgapp.com'; //推流域名
                 $data_key['AppName'] = 'live';  //推流路径。
                 $data_key['StreamName'] = $StreamName; //推流名称。。
