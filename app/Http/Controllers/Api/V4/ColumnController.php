@@ -208,6 +208,8 @@ class ColumnController extends Controller
         if (empty($column)) {
             return $this->error(0, '该信息不存在');
         }
+
+        $column_id = $column['id'];
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, 1);
 
         $works_data = [];
