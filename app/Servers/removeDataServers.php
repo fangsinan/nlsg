@@ -1943,30 +1943,31 @@ and o.status = 1 and o.pay_price > 1";
     {
 //        $while_flag = true;
 //        while ($while_flag) {
-            //现在只有情商课的sms
-            $list = WorksListOfSub::where('works_type', '=', 2)
-                ->where('works_id', '=', 404)
-                ->where('is_sendsms', '=', 1)
-                ->where('status', '=', 2)
-                ->select(['id', 'phone'])
-                ->limit(300)
-                ->get();
+        //现在只有情商课的sms
+        $list = WorksListOfSub::where('works_type', '=', 2)
+            ->where('works_id', '=', 404)
+            ->where('is_sendsms', '=', 1)
+            ->where('status', '=', 2)
+            ->select(['id', 'phone'])
+            ->limit(300)
+            ->get();
 
-            if ($list->isEmpty()) {
+        if ($list->isEmpty()) {
 //                $while_flag = false;
-                return true;
-            } else {
-                $list = $list->toArray();
-                $phone = array_column($list, 'phone');
-                $phone = array_unique($phone);
-                $phone = implode(',', $phone);
-                $id_list = array_column($list, 'id');
-                $easySms = app('easysms');
-                $easySms->send($phone, [
-                    'template' => 'SMS_218033474',
-                ], ['aliyun']);
-                WorksListOfSub::whereIn('id',$id_list)->update(['is_sendsms'=>2]);
-            }
+            return true;
+        } else {
+            $list = $list->toArray();
+            $phone = array_column($list, 'phone');
+            $phone = array_unique($phone);
+            $phone = implode(',', $phone);
+            $id_list = array_column($list, 'id');
+            $easySms = app('easysms');
+            $easySms->send($phone, [
+                'template' => 'SMS_218038670',
+                //'template' => 'SMS_218033474',
+            ], ['aliyun']);
+            WorksListOfSub::whereIn('id', $id_list)->update(['is_sendsms' => 2]);
+        }
 //        }
         return true;
     }
