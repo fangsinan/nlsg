@@ -1964,6 +1964,7 @@ and o.status = 1 and o.pay_price > 1";
             $easySms = app('easysms');
             $easySms->send($phone, [
                 'template' => 'SMS_218130053',
+
                 //'template' => 'SMS_218033474',
             ], ['aliyun']);
             WorksListOfSub::whereIn('id', $id_list)->update(['is_sendsms' => 2]);
