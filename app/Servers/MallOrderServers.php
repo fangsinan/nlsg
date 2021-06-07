@@ -16,6 +16,7 @@ use App\Models\MallOrder;
 use App\Models\MallOrderChild;
 use App\Models\MallOrderDetails;
 use App\Models\SpecialPriceModel;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -667,6 +668,12 @@ class MallOrderServers
             ];
             DB::table('nlsg_notify')->insert($notify_data);
             //todo 极光推送
+            Task::send(
+                8,$order_obj->user_id,0,0,0,
+                $order_obj->ordernum,
+                $express_company_info->name ?? '圆通',
+                0,''
+            );
             /**
              * JPush::pushNow('别名', '通知', '附加信息');
              * JPush::pushNow(['别名数组'], '通知', '附加信息');
