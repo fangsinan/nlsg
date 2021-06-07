@@ -437,6 +437,42 @@ class Coupon extends Base
             ]);
     }
 
+    public static function couponEndTimeMsgTask(){
+        $line = date('Y-m-d',strtotime("+7 days"));
+        $user = Coupon::where('end_time','like',"$line%")
+            ->where('status','=',1)
+            ->groupBy('user_id')
+            ->limit(100)
+            ->pluck('user_id')
+            ->toArray();
+
+        if (empty($user)){
+            return true;
+        }else{
+            $plan_time = date('Y-m-d H:i:s',strtotime(date('Y-m-d 08:00:00')) + rand(1,480)*60);
+
+            $add_data = [];
+            foreach ($user as $v){
+                $temp_add_data = [];
+                $temp_add_data['user_id'] = $v;
+                $temp_add_data['subject'] = '您的优惠券将于'.$line.'过期，请尽快使用。';
+                $temp_add_data['type'] = 14;
+                $temp_add_data['title'] = '您的优惠券即将过期';
+                $temp_add_data['status'] = 0;
+                $temp_add_data['plan_time'] = $plan_time;
+
+                $add_data[] = $temp_add_data;
+            }
+
+            DB::table('nlsg_task')->insert($add_data);
+            //todo 标记,递归
+//            self::couponEndTimeMsgTask();
+        }
+
+
+
+    }
+
     /**
      * 优惠券即将到期消息通知
      * @return bool|void
