@@ -387,7 +387,7 @@ WHERE
                     ];
                 } elseif ($v['push_type'] == 4) {
                     $res = OfflineProducts::select('id', 'title', 'subtitle', 'cover_img',
-                        'image as cover_details', 'total_price as original_price', 'price')
+                        'image as cover_details', 'total_price as original_price', 'price','off_line_pay_type')
                         ->where('id', $v['push_gid'])
                         ->first();
                     $res->type = 5;
