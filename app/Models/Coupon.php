@@ -437,28 +437,34 @@ class Coupon extends Base
             ]);
     }
 
-    public static function couponEndTimeMsgTask(){
-        $line = date('Y-m-d',strtotime("+7 days"));
-        $list = Coupon::where('end_time','like',"$line%")
-            ->where('status','=',1)
-            ->where('end_time_msg_flag','=',0)
-            ->limit(100)
-            ->select(['id','user_id'])
+    public static function couponEndTimeMsgTask()
+    {
+        $line = date('Y-m-d 23:59:59', strtotime("+7 days"));
+        $list = Coupon::where('end_time', '<=', $line)
+            ->where('status', '=', 1)
+            ->where('end_time_msg_flag', '=', 0)
+            ->limit(200)
+            ->select(['id', 'user_id', 'end_time'])
             ->get();
 
-        if ($list->isEmpty()){
+        if ($list->isEmpty()) {
             return true;
-        }else{
+        } else {
             $list = $list->toArray();
-            $user_id_list = array_unique(array_column($list,'user_id'));
-            $id_list = array_column($list,'id');
+            $id_list = array_column($list, 'id');
 
-            $plan_time = date('Y-m-d H:i:s',strtotime(date('Y-m-d 08:00:00')) + rand(1,480)*60);
+            $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 300) * 60);
             $add_data = [];
-            foreach ($user_id_list as $v){
+            $add_user_list = [];
+
+            foreach ($list as $v) {
+                if (in_array($v['user_id'], $add_user_list)) {
+                    continue;
+                }
+                $add_user_list[] = $v['user_id'];
                 $temp_add_data = [];
-                $temp_add_data['user_id'] = $v;
-                $temp_add_data['subject'] = '您的优惠券将于'.$line.'过期，请尽快使用。';
+                $temp_add_data['user_id'] = $v['user_id'];
+                $temp_add_data['subject'] = '您的优惠券将于' . date('Y-m-d', strtotime($v['end_time'])) . '日过期，请尽快使用。';
                 $temp_add_data['type'] = 14;
                 $temp_add_data['title'] = '您的优惠券即将过期。';
                 $temp_add_data['status'] = 1;
@@ -467,26 +473,25 @@ class Coupon extends Base
                 $add_data[] = $temp_add_data;
             }
 
-
             DB::beginTransaction();
 
-            $update_res = Coupon::whereIn('id',$id_list)
+            $update_res = Coupon::whereIn('id', $id_list)
                 ->update([
-                    'end_time_msg_flag'=>1
+                    'end_time_msg_flag' => 1
                 ]);
-            if (!$update_res){
+            if (!$update_res) {
                 DB::rollBack();
                 return false;
             }
 
             $add_res = DB::table('nlsg_task')->insert($add_data);
-            if (!$add_res){
+            if (!$add_res) {
                 DB::rollBack();
                 return false;
             }
 
             DB::commit();
-            self::couponEndTimeMsgTask();
+            //self::couponEndTimeMsgTask();
         }
 
     }
@@ -495,24 +500,24 @@ class Coupon extends Base
      * 优惠券即将到期消息通知
      * @return bool|void
      */
-    public static  function  expire()
+    public static function expire()
     {
         $start = date('Y-m-d H:i:s', time());
         $lists = Coupon::whereBetween('end_time', [
-                                                Carbon::parse($start)->toDateTimeString(),
-                                                Carbon::parse('+7 days')->toDateTimeString(),
-                                            ])
-                           ->where('status', 1)
-                           ->pluck('user_id')
-                           ->toArray();
-       $uids  = array_chunk(array_unique($lists), 100, true);
-       if ($uids){
-           foreach ($uids as $item) {
-                foreach ($item as  $v){
+            Carbon::parse($start)->toDateTimeString(),
+            Carbon::parse('+7 days')->toDateTimeString(),
+        ])
+            ->where('status', 1)
+            ->pluck('user_id')
+            ->toArray();
+        $uids = array_chunk(array_unique($lists), 100, true);
+        if ($uids) {
+            foreach ($uids as $item) {
+                foreach ($item as $v) {
                     JPush::pushNow(strval($v), '您的优惠券即将到期');
                 }
-           }
-       }
+            }
+        }
 
     }
 
