@@ -439,37 +439,55 @@ class Coupon extends Base
 
     public static function couponEndTimeMsgTask(){
         $line = date('Y-m-d',strtotime("+7 days"));
-        $user = Coupon::where('end_time','like',"$line%")
+        $list = Coupon::where('end_time','like',"$line%")
             ->where('status','=',1)
-            ->groupBy('user_id')
+            ->where('end_time_msg_flag','=',0)
             ->limit(100)
-            ->pluck('user_id')
-            ->toArray();
+            ->select(['id','user_id'])
+            ->get();
 
-        if (empty($user)){
+        if ($list->isEmpty()){
             return true;
         }else{
-            $plan_time = date('Y-m-d H:i:s',strtotime(date('Y-m-d 08:00:00')) + rand(1,480)*60);
+            $list = $list->toArray();
+            $user_id_list = array_unique(array_column($list,'user_id'));
+            $id_list = array_column($list,'id');
 
+            $plan_time = date('Y-m-d H:i:s',strtotime(date('Y-m-d 08:00:00')) + rand(1,480)*60);
             $add_data = [];
-            foreach ($user as $v){
+            foreach ($user_id_list as $v){
                 $temp_add_data = [];
                 $temp_add_data['user_id'] = $v;
                 $temp_add_data['subject'] = '您的优惠券将于'.$line.'过期，请尽快使用。';
                 $temp_add_data['type'] = 14;
-                $temp_add_data['title'] = '您的优惠券即将过期';
-                $temp_add_data['status'] = 0;
+                $temp_add_data['title'] = '您的优惠券即将过期。';
+                $temp_add_data['status'] = 1;
                 $temp_add_data['plan_time'] = $plan_time;
 
                 $add_data[] = $temp_add_data;
             }
 
-            DB::table('nlsg_task')->insert($add_data);
-            //todo 标记,递归
-//            self::couponEndTimeMsgTask();
+
+            DB::beginTransaction();
+
+            $update_res = Coupon::whereIn('id',$id_list)
+                ->update([
+                    'end_time_msg_flag'=>1
+                ]);
+            if (!$update_res){
+                DB::rollBack();
+                return false;
+            }
+
+            $add_res = DB::table('nlsg_task')->insert($add_data);
+            if (!$add_res){
+                DB::rollBack();
+                return false;
+            }
+
+            DB::commit();
+            self::couponEndTimeMsgTask();
         }
-
-
 
     }
 

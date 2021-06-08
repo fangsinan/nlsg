@@ -111,6 +111,7 @@ class Kernel extends ConsoleKernel
             Coupon::clear();//失效优惠券清理
             Works::statistic(); //数据统计
             PayRecordDetailStay::remove();//商城待到帐收益划转
+            Coupon::couponEndTimeMsgTask();//将过期优惠券的提醒写入
         })->dailyAt('03:00');//半夜清理
 
         $schedule->call(function () {
