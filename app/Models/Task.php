@@ -165,7 +165,7 @@ class Task extends Base
             ->toArray();
         if (!empty($lists)){
             foreach ($lists as $item) {
-                JPush::pushNow(strval($item['user_id']), $item['subject'],['type'=>$item['type'],'id'=>$item['source_id'],'info_id'=>$item['info_id']]);
+                JPush::pushNow(strval($item['user_id']), $item['subject'],['type'=>$item['type'],'id'=>$item['source_id'],'info_id'=>$item['info_id'],'is_sub'=>$item['is_sub']]);
                 //任务更新为已发送
                 Task::where('id', $item['id'])->update(['status'=>2]);
             }
