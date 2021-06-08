@@ -158,7 +158,7 @@ class Task extends Base
 
     public static function pushTo()
     {
-        $lists = Task::select('id','user_id','subject','type','source_id','info_id')
+        $lists = Task::select('id','user_id','subject','type','source_id','info_id','is_sub')
             ->where('status', 1)
             ->orderBy('created_at','desc')
             ->get()
