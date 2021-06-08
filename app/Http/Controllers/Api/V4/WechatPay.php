@@ -21,6 +21,7 @@ use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
 use App\Models\PayRecordDetailStay;
 use App\Models\Subscribe;
+use App\Models\Task;
 use App\Models\User;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
@@ -184,6 +185,7 @@ class WechatPay extends Controller
                 $vip_id = 0;
                 $newVip_rst = true;
                 $Sales_Rst = true;
+                $pay_record_flag = 0;
 
                 //当有效身份不是钻石合伙人，对vip_user表进行任何处理
 
@@ -265,6 +267,7 @@ class WechatPay extends Controller
                         $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
                         $PrdInfo = PayRecordDetail::where($where)->first('id');
                         if (empty($PrdInfo)) {
+                            $pay_record_flag = 1;
                             $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                         }
                     } else if (!empty($sales_id) && $vip_order_type == 1) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
@@ -291,6 +294,7 @@ class WechatPay extends Controller
 
                         //代理商收益
                         if ($map) {
+                            $pay_record_flag = 1;
                             $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                         }
                     }
@@ -327,7 +331,10 @@ class WechatPay extends Controller
                             'template' => 'SMS_211001614',
                         ], ['aliyun']);
                     }
-
+                    Task::send(3, $user_id, $orderInfo['relation_id']);
+                    if($pay_record_flag == 1){
+                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$WorksInfo['title'],'','','',$AdminInfo['nickname']);
+                    }
                     return true;
                 } else {
                     DB::rollBack();
@@ -452,6 +459,7 @@ class WechatPay extends Controller
                     DB::commit();
                     $AdminInfo = User::find($user_id);
                     self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
+                    Task::send(6, $user_id, $orderInfo['relation_id']);
                     return true;
 
                 } else {
@@ -635,7 +643,7 @@ class WechatPay extends Controller
                 //推客收益
                 $twitter_id = $orderInfo['twitter_id'];
                 $Profit_Rst = true;
-
+                $pay_record_flag = 0;
                 if (!empty($twitter_id) && $twitter_id != $user_id && $liveData['twitter_money'] > 0 && $total_fee > $liveData['twitter_money']) {
 //                if (!empty($twitter_id) && $twitter_id != $user_id && $liveData['twitter_money'] > 0 ) {
                     $liveCountDown['new_vip_uid'] = $twitter_id;
@@ -647,6 +655,7 @@ class WechatPay extends Controller
                         $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
                         $PrdInfo = PayRecordDetail::where($where)->first();
                         if (empty($PrdInfo)) {
+                            $pay_record_flag = 1;
                             $Profit_Rst = PayRecordDetail::create($map);
 
                         }
@@ -674,7 +683,10 @@ class WechatPay extends Controller
 //                            self::OrderProfit($transaction_id,$out_trade_no,$liveData['twitter_money'],$twitter_id);
 //                        }
 //                    }
-
+                    Task::send(5, $user_id, $orderInfo['relation_id']);
+                    if($pay_record_flag == 1){
+                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$WorksInfo['title'],'','','',$AdminInfo['nickname']);
+                    }
                     return true;
 
                 } else {
@@ -1013,6 +1025,7 @@ class WechatPay extends Controller
                 $Sy_Rst = true;
                 $shareSyRst = true;
                 $map = [];
+                $pay_record_flag = 0;  //是否有收益
 
                 //添加订阅记录
                 $sub_type = 1;
@@ -1021,7 +1034,6 @@ class WechatPay extends Controller
                 }else  if ($orderInfo['type'] == 18) {
                     $sub_type = 7;  //训练营
                 }
-
                 if (!empty($twitter_id) && $orderInfo['twitter_id'] != $orderInfo['service_id']) {
 
                     $isFlag = User::getIncomeFlag($twitter_id, $user_id); //获取是否可返利
@@ -1128,6 +1140,7 @@ class WechatPay extends Controller
                     $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
                     $PrdInfo = PayRecordDetail::where($where)->first();
                     if (empty($PrdInfo)) {
+                        $pay_record_flag = 1;
                         PayRecordDetail::create($map);
                         //Profit::ServiceIncome($out_trade_no,6,$ProfitPrice,$twitter_id);
                         GetPriceTools::ServiceIncome($out_trade_no, 6, $ProfitPrice, $twitter_id);
@@ -1178,11 +1191,26 @@ class WechatPay extends Controller
                     DB::commit();
                     $live_id = $orderInfo['live_id'];
                     self::LiveRedis(18, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
+                    //发送通知、
 
+                    $send_type = 2;  //专栏
+                    if ($orderInfo['type'] == 15) {
+                        $send_type = 2;  //讲座
+                    }elseif ($orderInfo['type'] == 18) {
+                        $send_type = 7;  //训练营
+                    }
+
+
+                    Task::send($send_type, $user_id, $orderInfo['relation_id']);
+                    if($pay_record_flag == 1){
+                        $ColumnInfo = Column::find($teacher_id)->toArray();
+                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$ColumnInfo['name'],'','','',$AdminInfo['nickname']);
+                    }
 //                    $content = "订单修改:$orderRst--优惠券:$couponRst--短信发送:$phoneRst--支付记录:$recordRst--分成记录:$shareSyRst--订阅:$subscribeRst--分享收益:$Sy_Rst";
 //                    Io::WriteFile('', '', $content, true);
 //                    self::$user_id = $user_id;
                     return true;
+
                 } else {
 
                     DB::rollBack();
@@ -1273,15 +1301,16 @@ class WechatPay extends Controller
                 }
 
                 $shareSyRst = true;
+                $pay_record_flag = 0;
                 $map = [];
                 //$WorksObj    = new Works();
+                $WorksInfo = Works::find($works_id);
 
                 if (!empty($twitter_id) && $twitter_id != $user_id && $orderInfo['twitter_id'] != $orderInfo['service_id']) { //推客是自己不算 服务商赠送不返利
                     //查看用户权限
                     $is_twitter = User::getLevel($twitter_id);
                     $TwitterInfo = User::find($twitter_id);
                     if ($is_twitter > 0) {//是推客 皇钻 黑钻
-                        $WorksInfo = Works::find($works_id);
                         $ProfitPrice = $WorksInfo['twitter_price'];
 
                         if (in_array($TwitterInfo['level'], [2, 3, 4])) {
@@ -1364,6 +1393,7 @@ class WechatPay extends Controller
                     $PrdInfo = PayRecord::where($where)->first();
 
                     if (empty($PrdInfo)) {
+                        $pay_record_flag = 1;
                         $shareSyRst = PayRecordDetail::create($map);
                         //5%返现
                         //Profit::ServiceIncome($out_trade_no,7,$ProfitPrice,$twitter_id);
@@ -1411,6 +1441,12 @@ class WechatPay extends Controller
                     //创业天下推送队列
                     if (($orderInfo['activity_tag'] ?? '') == 'cytx') {
                         JobServers::pushToCytx($orderInfo['id']);
+                    }
+
+
+                    Task::send(1, $user_id, $orderInfo['relation_id']);
+                    if($pay_record_flag == 1){
+                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$WorksInfo['title'],'','','',$AdminInfo['nickname']);
                     }
                     return true;
                 } else {
