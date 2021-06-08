@@ -614,7 +614,7 @@ class OrderController extends Controller
             $where = ['user_id' => $user_id, 'type' => $type];
         }
 
-        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id')
+        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id','pay_type')
             ->whereIn('type', [1, 9, 10, 13, 14, 15, 16, 17, 18])
             ->where($where);
 
