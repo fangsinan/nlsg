@@ -193,7 +193,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
         $user_info = User::whereId($user_id)->select(['id', 'phone'])->first();
 
         $user_vip_info = VipUser::where('username', '=', $user_info->phone)
-            ->where('user_id','=',$user_info->id)
+            ->where('user_id', '=', $user_info->id)
             ->where('status', '=', 1)
             ->where('is_default', '=', 1)
             ->where('expire_time', '>=', $now_date)
@@ -423,5 +423,110 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             return $check_dealer;
         }
     }
+
+    public static function vipEndTimeMsgTask()
+    {
+        $line = date('Y-m-d 23:59:59', strtotime("+7 days"));
+        $limit = 200;
+        $min = date('i');
+        $job_type = $min % 3;
+        switch ($job_type) {
+            case 0:
+                $sql = 'SELECT id,user_id,level,expire_time,CONCAT(user_id,\' - \',`level`) as group_key
+        from nlsg_vip_user
+        where `level` = 1 and `status`= 1 and is_default = 1 and end_time_msg_flag_1 = 0
+        and expire_time <=';
+                break;
+            case 1:
+                $sql = 'SELECT id,user_id,level,expire_time,CONCAT(user_id,\' - \',`level`) as group_key
+        from nlsg_vip_user
+        where level = 2 and status = 1 and is_default = 1 and end_time_msg_flag_2 = 0
+        and expire_time <=';
+                break;
+            case 2:
+                $sql = 'select id,user_id,1 as level,time_end_360 as expire_time,CONCAT(user_id,\' - \',1) as group_key
+        from nlsg_vip_user
+        where `level` = 2 and is_open_360 = 1 and status = 1 and is_default = 1 and end_time_msg_flag_1 = 0
+        and time_end_360 <=';
+                break;
+            default:
+                return true;
+        }
+
+        $sql .=  " '$line'" . ' limit ' . $limit;
+        $list = DB::select($sql);
+        if (empty($limit)){
+            return true;
+        }
+
+        $id_list_1 = [];
+        $id_list_2 = [];
+        $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 300) * 60);
+        $add_data = [];
+        $add_user_list = [];
+        foreach ($list as $v) {
+            if (in_array($v->group_key, $add_user_list)) {
+                continue;
+            }
+            $add_user_list[] = $v->group_key;
+
+            $temp_add_data = [];
+            $temp_add_data['user_id'] = $v->user_id;
+
+            if ($v->level == 1){
+                $temp_add_data['title'] = '您的幸福大使权益即将过期。';
+                $temp_add_data['subject'] = '您的幸福大使权益将于' .
+                    date('Y-m-d', strtotime($v->expire_time)) .
+                    '日过期。';
+                $id_list_1[] = $v->id;
+                $temp_add_data['type'] = 3;
+            }else{
+                $temp_add_data['title'] = '您的钻石权益即将过期。';
+                $temp_add_data['subject'] = '您的钻石权益将于' .
+                    date('Y-m-d', strtotime($v->expire_time)) .
+                    '日过期。';
+                $id_list_2[] = $v->id;
+                $temp_add_data['type'] = 15;
+            }
+
+            $temp_add_data['status'] = 1;
+            $temp_add_data['plan_time'] = $plan_time;
+
+            $add_data[] = $temp_add_data;
+        }
+
+        DB::beginTransaction();
+
+        if (!empty($id_list_1)){
+            $update_res = VipUser::whereIn('id', $id_list_1)
+                ->update([
+                    'end_time_msg_flag_1' => 1
+                ]);
+            if (!$update_res) {
+                DB::rollBack();
+                return false;
+            }
+        }
+
+        if (!empty($id_list_2)){
+            $update_res = VipUser::whereIn('id', $id_list_2)
+                ->update([
+                    'end_time_msg_flag_2' => 1
+                ]);
+            if (!$update_res) {
+                DB::rollBack();
+                return false;
+            }
+        }
+
+        $add_res = DB::table('nlsg_task')->insert($add_data);
+        if (!$add_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        DB::commit();
+    }
+
 
 }

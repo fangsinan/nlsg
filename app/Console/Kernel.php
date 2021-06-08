@@ -9,6 +9,7 @@ use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
 use App\Models\Order;
 use App\Models\PayRecordDetailStay;
+use App\Models\VipUser;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use App\Models\User;
@@ -84,8 +85,8 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
-            //将过期优惠券的提醒写入
-            Coupon::couponEndTimeMsgTask();
+            Coupon::couponEndTimeMsgTask(); //将即将过期优惠券的提醒写入消息
+            VipUser::vipEndTimeMsgTask();//将即将过期会员的提醒写入消息
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
