@@ -68,7 +68,7 @@ class ReplyController extends Controller
 
             $from_user = User::where('id', $user_id)->value('nickname');
             //发送通知
-            Task::send(12, $comment->user_id, $result->id, 0, '',false,false, 0, $from_user);
+            Task::send(12, $comment->user_id, $result->id, 0, '',false,false, 0, $from_user, $comment->type, $comment->relation_id);
 
             return success();
         }

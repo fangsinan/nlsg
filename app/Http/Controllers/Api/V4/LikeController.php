@@ -64,10 +64,9 @@ class LikeController extends Controller
             }
             //增加喜欢
             Comment::where('id', $id)->increment('like_num');
-
             $from_user = User::where('id', $this->user['id'])->value('nickname');
             //发送通知
-            Task::send(13, $comment->user_id, $id, 0, '',false,false, 0, $from_user);
+            Task::send(13, $comment->user_id, $id, 0, '',false,false, 0, $from_user, $comment->type, $comment->relation_id);
 
             return success('操作成功');
         }

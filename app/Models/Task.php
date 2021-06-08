@@ -10,11 +10,11 @@ class Task extends Base
     protected $table = 'nlsg_task';
 
      protected $fillable = [
-        'id','user_id','subject','source_id','info_id','type',
+        'id','user_id','subject','source_id','info_id','type','source_type','is_sub','plan_time'
     ];
     /**
      * 消息任务
-     * @param integer $type 类型  1. 精品课 2.讲座 3.360会员 4.电商 5.直播课 6.幸福套餐 7.训练营 8.商品发货 9.认证审核通过  10.认证审核没有通过 11.收益返佣提醒 12.回复想法 13.喜欢你的想法
+     * @param integer $type 类型  1. 精品课 2.讲座 3.360会员 4.电商 5.直播课 6.幸福套餐 7.训练营 8.商品发货 9.认证审核通过  10.认证审核没有通过 11.收益返佣提醒 12.回复想法 13.喜欢你的想法 14优惠券到期 15 钻石会员过期
      * @param integer $user_id  用户id
      * @param integer $source_id 来源id
      * @param integer $info_id   章节id
@@ -24,7 +24,7 @@ class Task extends Base
      * @param integer $price  价格
      * @return void
      */
-    public static function send($type=1, $user_id=0, $source_id=0, $info_id=0, $title='',$ordernum=false, $express=false, $price=0,$nickname='')
+    public static function send($type=1, $user_id=0, $source_id=0, $info_id=0, $title='',$ordernum=false, $express=false, $price=0,$nickname='',$source_type=false, $relation_id=false)
     {
         if (!$type){
             return  false;
@@ -118,19 +118,35 @@ class Task extends Base
                 ];
                 break;
             case 12:
+                 if ($source_type== 3 || $source_type ==4){
+                     $source_type = 2;
+                 } else if ($source_type == 2){
+                     $source_type = 6;
+                 }
+                 $is_sub = Subscribe::isSubscribe($user_id, $relation_id, $source_type);
                  $data = [
                      'subject' => $nickname.'回复了您的想法',
                      'user_id'  => $user_id,
-                     'source_id'=> $source_id,
+                     'source_id'  => $source_id,
+                     'source_type'=> $source_type,
+                     'is_sub'     => $is_sub ?? 0,
                      'type'     => 12
                  ];
                  break;
             case 13:
+                if ($source_type== 3 || $source_type ==4){
+                    $source_type = 2;
+                } else if ($source_type == 2){
+                    $source_type = 6;
+                }
+                $is_sub = Subscribe::isSubscribe($user_id, $relation_id, $source_type);
                  $data = [
                      'subject'  => $nickname.'喜欢了您的想法',
                      'user_id'  => $user_id,
                      'source_id'=> $source_id,
-                     'type'     => 13
+                     'source_type'=> $source_type,
+                     'is_sub'     => $is_sub ?? 0,
+                     'type'       => 13
                  ];
                  break;
         }
@@ -140,7 +156,7 @@ class Task extends Base
         return true;
     }
 
-    public function push()
+    public static function pushTo()
     {
         $lists = Task::select('id','user_id','subject','type','source_id','info_id')
             ->where('status', 1)
