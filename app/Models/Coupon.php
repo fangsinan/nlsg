@@ -439,21 +439,46 @@ class Coupon extends Base
 
     public static function couponEndTimeMsgTask()
     {
-        $line = date('Y-m-d 23:59:59', strtotime("+7 days"));
-        $list = Coupon::where('end_time', '<=', $line)
-            ->where('status', '=', 1)
-            ->where('end_time_msg_flag', '=', 0)
-            ->limit(200)
-            ->select(['id', 'user_id', 'end_time'])
-            ->get();
+        $limit = 200;
+        $min = date('i');
+        $job_type = $min % 2;
+        $today_date = date('Y-m-d 00:00:00');
+
+        switch ($job_type) {
+            case 0:
+                $line = date('Y-m-d 23:59:59', strtotime("+7 days"));
+                $list = Coupon::where('end_time', '<=', $line)
+                    ->where('end_time', '>=', $today_date)
+                    ->where('status', '=', 1)
+                    ->where('end_time_msg_flag', '=', 0)
+                    ->limit($limit)
+                    ->select(['id', 'user_id', 'end_time'])
+                    ->get();
+                break;
+            case 1:
+                $line = date('Y-m-d');
+                $list = Coupon::where('end_time', 'like', "$line%")
+                    ->where('status', '=', 1)
+                    ->where('end_time_msg_flag', '<>', 2)
+                    ->limit($limit)
+                    ->select(['id', 'user_id', 'end_time'])
+                    ->get();
+                break;
+            default:
+                return true;
+        }
 
         if ($list->isEmpty()) {
             return true;
         } else {
             $list = $list->toArray();
             $id_list = array_column($list, 'id');
+            if ($job_type == 0) {
+                $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 480) * 60);
+            } else {
+                $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 120) * 60);
+            }
 
-            $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 300) * 60);
             $add_data = [];
             $add_user_list = [];
 
@@ -464,7 +489,12 @@ class Coupon extends Base
                 $add_user_list[] = $v['user_id'];
                 $temp_add_data = [];
                 $temp_add_data['user_id'] = $v['user_id'];
-                $temp_add_data['subject'] = '您的优惠券将于' . date('Y-m-d', strtotime($v['end_time'])) . '日过期，请尽快使用。';
+                if ($job_type == 0) {
+                    $temp_add_data['subject'] = '您的优惠券将于' . date('Y-m-d', strtotime($v['end_time'])) . '日过期，请尽快使用。';
+                } else {
+                    $temp_add_data['subject'] = '您的优惠券将于今天过期，请尽快使用。';
+                }
+
                 $temp_add_data['type'] = 14;
                 $temp_add_data['title'] = '您的优惠券即将过期。';
                 $temp_add_data['status'] = 1;
@@ -477,7 +507,7 @@ class Coupon extends Base
 
             $update_res = Coupon::whereIn('id', $id_list)
                 ->update([
-                    'end_time_msg_flag' => 1
+                    'end_time_msg_flag' => $job_type == 0 ? 1 : 2,
                 ]);
             if (!$update_res) {
                 DB::rollBack();

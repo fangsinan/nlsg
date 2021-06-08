@@ -427,41 +427,66 @@ where a.user_id = ' . $user_id . ' and a.status = 2
     public static function vipEndTimeMsgTask()
     {
         $line = date('Y-m-d 23:59:59', strtotime("+7 days"));
+        $today = date('Y-m-d');
         $limit = 200;
         $min = date('i');
-        $job_type = $min % 3;
+        $end_time_msg_flag_1 = 1;
+        $end_time_msg_flag_2 = 1;
+        $job_type = $min % 5;
         switch ($job_type) {
             case 0:
-                $sql = 'SELECT id,user_id,level,expire_time,CONCAT(user_id,\' - \',`level`) as group_key
+                //即将过期的360
+                $sql = 'SELECT id,user_id,level,expire_time,CONCAT(user_id,\'-\',`level`) as group_key
         from nlsg_vip_user
         where `level` = 1 and `status`= 1 and is_default = 1 and end_time_msg_flag_1 = 0
-        and expire_time <=';
+        and expire_time <=' . " '$line'" . ' limit ' . $limit;
                 break;
             case 1:
-                $sql = 'SELECT id,user_id,level,expire_time,CONCAT(user_id,\' - \',`level`) as group_key
+                //即将过期的钻石
+                $sql = 'SELECT id,user_id,level,expire_time,CONCAT(user_id,\'-\',`level`) as group_key
         from nlsg_vip_user
         where level = 2 and status = 1 and is_default = 1 and end_time_msg_flag_2 = 0
-        and expire_time <=';
+        and expire_time <=' . " '$line'" . ' limit ' . $limit;
                 break;
             case 2:
-                $sql = 'select id,user_id,1 as level,time_end_360 as expire_time,CONCAT(user_id,\' - \',1) as group_key
+                //即将过期的钻石360
+                $sql = 'select id,user_id,1 as level,time_end_360 as expire_time,CONCAT(user_id,\'-\',1) as group_key
         from nlsg_vip_user
         where `level` = 2 and is_open_360 = 1 and status = 1 and is_default = 1 and end_time_msg_flag_1 = 0
-        and time_end_360 <=';
+        and time_end_360 <=' . " '$line'" . ' limit ' . $limit;
+                break;
+            case 3:
+                //当天到期的360
+                $sql = "SELECT id,user_id,1 as level,'$today' as expire_time,concat(user_id,'-',1) as group_key
+        from nlsg_vip_user
+        where status = 1 and is_default = 1 and end_time_msg_flag_1 <> 2
+        and (expire_time like '$today%' or (is_open_360 = 1 and time_end_360 like '$today%')) limit $limit";
+                $end_time_msg_flag_1 = 2;
+                break;
+            case 4:
+                //当天到期钻石
+                $sql = "SELECT id,user_id,2 as level,'$today' as expire_time,concat(user_id,'-',2) as group_key
+        from nlsg_vip_user where status = 1 and is_default = 1 and level = 2
+        and expire_time like '$today%' and end_time_msg_flag_2 <> 2 limit $limit";
+                $end_time_msg_flag_2 = 2;
                 break;
             default:
                 return true;
         }
 
-        $sql .=  " '$line'" . ' limit ' . $limit;
         $list = DB::select($sql);
-        if (empty($limit)){
+        if (empty($limit)) {
             return true;
         }
 
         $id_list_1 = [];
         $id_list_2 = [];
-        $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 300) * 60);
+
+        if (in_array($job_type, [3, 4])) {
+            $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 120) * 60);
+        } else {
+            $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 420) * 60);
+        }
         $add_data = [];
         $add_user_list = [];
         foreach ($list as $v) {
@@ -473,18 +498,26 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             $temp_add_data = [];
             $temp_add_data['user_id'] = $v->user_id;
 
-            if ($v->level == 1){
+            if ($v->level == 1) {
                 $temp_add_data['title'] = '您的幸福大使权益即将过期。';
-                $temp_add_data['subject'] = '您的幸福大使权益将于' .
-                    date('Y-m-d', strtotime($v->expire_time)) .
-                    '日过期。';
+                if (in_array($job_type, [3, 4])) {
+                    $temp_add_data['subject'] = '您的幸福大使权益将于今日过期。';
+                } else {
+                    $temp_add_data['subject'] = '您的幸福大使权益将于' .
+                        date('Y-m-d', strtotime($v->expire_time)) .
+                        '日过期。';
+                }
                 $id_list_1[] = $v->id;
                 $temp_add_data['type'] = 3;
-            }else{
+            } else {
                 $temp_add_data['title'] = '您的钻石权益即将过期。';
-                $temp_add_data['subject'] = '您的钻石权益将于' .
-                    date('Y-m-d', strtotime($v->expire_time)) .
-                    '日过期。';
+                if (in_array($job_type, [3, 4])) {
+                    $temp_add_data['subject'] = '您的钻石权益将于今日过期。';
+                } else {
+                    $temp_add_data['subject'] = '您的钻石权益将于' .
+                        date('Y-m-d', strtotime($v->expire_time)) .
+                        '日过期。';
+                }
                 $id_list_2[] = $v->id;
                 $temp_add_data['type'] = 15;
             }
@@ -497,10 +530,10 @@ where a.user_id = ' . $user_id . ' and a.status = 2
 
         DB::beginTransaction();
 
-        if (!empty($id_list_1)){
+        if (!empty($id_list_1)) {
             $update_res = VipUser::whereIn('id', $id_list_1)
                 ->update([
-                    'end_time_msg_flag_1' => 1
+                    'end_time_msg_flag_1' => $end_time_msg_flag_1,
                 ]);
             if (!$update_res) {
                 DB::rollBack();
@@ -508,10 +541,10 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             }
         }
 
-        if (!empty($id_list_2)){
+        if (!empty($id_list_2)) {
             $update_res = VipUser::whereIn('id', $id_list_2)
                 ->update([
-                    'end_time_msg_flag_2' => 1
+                    'end_time_msg_flag_2' => $end_time_msg_flag_2,
                 ]);
             if (!$update_res) {
                 DB::rollBack();
