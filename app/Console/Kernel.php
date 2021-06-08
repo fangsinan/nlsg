@@ -122,10 +122,9 @@ class Kernel extends ConsoleKernel
         })->dailyAt('03:00');//半夜清理
 
         $schedule->call(function () {
-            User::expire(); //会员过期提醒
-            Column::expire(); //专栏过期提醒
-            Coupon::expire(); //优惠券过期提醒
-            Task::push();  //消息任务
+//            User::expire(); //会员过期提醒
+//            Column::expire(); //专栏过期提醒
+            Task::pushTo();  //消息任务
 
         })->everyMinute()->runInBackground();//每分
 
