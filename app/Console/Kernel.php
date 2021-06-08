@@ -11,6 +11,8 @@ use App\Models\Order;
 use App\Models\PayRecordDetailStay;
 use App\Models\Works;
 use App\Models\WorksInfo;
+use App\Models\User;
+use App\Models\Task;
 use App\Servers\ChannelServers;
 use App\Servers\ErpServers;
 use App\Servers\MallRefundJob;
