@@ -508,7 +508,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
                         '日过期。';
                 }
                 $id_list_1[] = $v->id;
-                $temp_add_data['type'] = 3;
+                $temp_add_data['type'] = 16;
             } else {
                 $temp_add_data['title'] = '您的钻石权益即将过期。';
                 if (in_array($job_type, [3, 4])) {
