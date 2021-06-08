@@ -188,7 +188,27 @@ class PayController extends Controller
 
                 $body = "能量时光-直播购买-" . $OrderInfo['ordernum'];
             } else if ($attach == 14) {
-                $body = "能量时光-线下课购买-" . $OrderInfo['ordernum'];
+                $relation_str='线下课';
+                if(isset($OrderInfo['relation_id']) && !empty($OrderInfo['relation_id'])) {
+                    switch ($OrderInfo['relation_id']) {
+                        case 1:
+                            $relation_str = '经营能量线下门票';
+                            break;
+                        case 2:
+                            $relation_str = '一代天骄线下门票';
+                            break;
+                        case 3:
+                            $relation_str = '演说能量线下门票';
+                            break;
+                        case 4:
+                            $relation_str = '经营能量+360套餐';
+                            break;
+                        case 5:
+                            $relation_str = '30天智慧父母(亲子)训练营';
+                            break;
+                    }
+                }
+                $body = "能量时光-$relation_str-" . $OrderInfo['ordernum'];
             } else if ($attach == 8) {
                 $body = "能量时光-电商订单-" . $OrderInfo['ordernum'];
             } else if ($attach == 15) {
