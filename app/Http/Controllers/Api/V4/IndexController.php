@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Announce;
 use App\Models\Banner;
 use App\Models\CacheTools;
+use App\Models\Column;
 use App\Models\ConfigModel;
+use App\Models\Coupon;
 use App\Models\Lists;
 use App\Models\Recommend;
 use App\Models\User;
@@ -16,6 +18,10 @@ use App\Servers\StatisticsServers;
 use EasyWeChat\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use JPush;
+use Carbon\Carbon;
+use App\Models\Task;
+use JPush\Client as JPushClient;
 
 class IndexController extends Controller
 {
@@ -1059,8 +1065,7 @@ class IndexController extends Controller
 
     public function test()
     {
-
-        Works::deal(); //数据统计
+        Task::pushTo();
     }
 
 
@@ -1089,6 +1094,14 @@ class IndexController extends Controller
         $servers = new StatisticsServers();
         $data = $servers->kunSaid($request->input());
         return $this->getRes($data);
+    }
+
+    public function  jpushAlias(Request $request)
+    {
+        $user_id =  $request->get('user_id');
+        $client   = new JPushClient(config('services.jpush.app_key'), config('services.jpush.master_secret'));
+        $response = $client->device()->deleteAlias(strval($user_id));
+        return success();
     }
 
 }

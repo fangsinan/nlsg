@@ -14,7 +14,7 @@ class Task extends Base
     ];
     /**
      * 消息任务
-     * @param integer $type 类型  1. 精品课 2.讲座 3.360会员 4.电商 5.直播课 6.幸福套餐 7.训练营 8.商品发货 9.认证审核通过  10.认证审核没有通过 11.收益返佣提醒 12.回复想法 13.喜欢你的想法 14优惠券到期 15 钻石会员过期
+     * @param integer $type 类型  1. 精品课 2.讲座 3.360会员 4.电商 5.直播课 6.幸福套餐 7.训练营 8.商品发货 9.认证审核通过  10.认证审核没有通过 11.收益返佣提醒 12.回复想法 13.喜欢你的想法 14优惠券到期 15 钻石会员过期 16 幸福大使权益到期
      * @param integer $user_id  用户id
      * @param integer $source_id 来源id
      * @param integer $info_id   章节id
@@ -147,6 +147,20 @@ class Task extends Base
                      'source_type'=> $source_type,
                      'is_sub'     => $is_sub ?? 0,
                      'type'       => 13
+                 ];
+                 break;
+            case 14:
+                  $data = [
+                      'subject' => '您的优惠券即将过期。',
+                      'user_id' => $user_id,
+                      'type'   => 14
+                  ];
+                  break;
+            case 15:
+                 $data = [
+                     'subject' => '您的钻石权益即将过期。',
+                     'user_id' => $user_id,
+                     'type'    => 15
                  ];
                  break;
         }
