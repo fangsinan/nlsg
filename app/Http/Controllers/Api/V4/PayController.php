@@ -167,8 +167,6 @@ class PayController extends Controller
                 }
             }
 
-            $attach = $OrderInfo['type'];
-            
             if (empty($OrderInfo)) { //订单有误
                 return false;
             }
