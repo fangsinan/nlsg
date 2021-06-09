@@ -119,6 +119,7 @@ class Role extends Base
         }
     }
 
+    
     public function roleNode()
     {
         return $this->hasMany(RoleNode::class, 'role_id', 'id')
