@@ -652,9 +652,19 @@ class ColumnController extends Controller
 
         //1、加字段控制需要查询的章节
         $page_per_page = 50;
-        if($column_data['show_info_num'] > 0) {
-            $page = 1;
-            $size = $column_data['show_info_num'];
+        if($column_data['show_info_num'] > 0) {   //训练营
+            //如果分页到达指定最大数 ，不返回数据
+            $to_page = ceil($column_data['show_info_num']/$size);//应显示的总页数
+
+            if($page == $to_page){
+                //传的页数 = 总页数   则取模  返回数据库指定的剩余数量
+                $size = $column_data['show_info_num']%$size;
+                if($size == 0 ){
+                    $size = 10;  //当前页最大数
+                }
+            }else if($page > $to_page){
+                $page = 100;//传的页数大于总数 不返回数据
+            }
         }
         $os_type = $request->input('os_type', 0);
 
@@ -673,7 +683,7 @@ class ColumnController extends Controller
 
         $column_data['is_sub'] = $is_sub;
         //查询总的历史记录进度`
-        $hisCount = History::getHistoryCount($lecture_id, 2, $user_id);  //讲座
+        $hisCount = History::getHistoryCount($lecture_id, $history_type, $user_id);  //讲座
 //        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
 
