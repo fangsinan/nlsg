@@ -499,7 +499,7 @@ class Order extends Base
             ->where('o.id','>',341864)
             ->where('o.status','=',1)
             ->where('o.type','=',10)
-            ->where('o.pay_price','>',1);
+            ->where('o.pay_price','>',0.01);
 
         //推荐用户账号
         if (!empty($params['t_phone'] ?? '')) {
@@ -638,7 +638,6 @@ class Order extends Base
         ])->select(['id', 'type', 'relation_id', 'pay_time', 'price', 'user_id',
             'pay_price', 'pay_type', 'ordernum', 'live_id', 'os_type', 'status','remark',
             DB::raw("CONCAT(live_id,'-',user_id) as sign")]);
-
 
         if (($params['excel_flag'] ?? 0) == 1){
             $list = $query->orderBy('id', 'desc')
