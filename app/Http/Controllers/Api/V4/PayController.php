@@ -188,6 +188,9 @@ class PayController extends Controller
                 $profit_sharing = $live['profit_sharing'];
 
                 $body = "能量时光-直播购买-" . $OrderInfo['ordernum'];
+                if($is_given_user == 1 ){
+                    $OrderInfo['price'] = 0.1;
+                }
             } else if ($attach == 14) {
                 $relation_str='线下课';
                 if(isset($OrderInfo['relation_id']) && !empty($OrderInfo['relation_id'])) {
@@ -226,9 +229,7 @@ class PayController extends Controller
         } else {
             return false;
         }
-        if($is_given_user == 1 ){
-            $OrderInfo['price'] = 0.1;
-        }
+
 
 
         $userInfo = User::find($OrderInfo['user_id']);
