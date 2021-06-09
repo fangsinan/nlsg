@@ -653,6 +653,7 @@ class ColumnController extends Controller
         //1、加字段控制需要查询的章节
         $page_per_page = 50;
         if($column_data['show_info_num'] > 0) {
+            $page = 1;
             $size = $column_data['show_info_num'];
         }
         $os_type = $request->input('os_type', 0);
