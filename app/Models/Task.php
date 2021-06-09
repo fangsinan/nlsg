@@ -14,7 +14,7 @@ class Task extends Base
     ];
     /**
      * 消息任务
-     * @param integer $type 类型  1. 精品课 2.讲座 3.360会员 4.电商 5.直播课 6.幸福套餐 7.训练营 8.商品发货 9.认证审核通过  10.认证审核没有通过 11.收益返佣提醒 12.回复想法 13.喜欢你的想法 14优惠券到期 15 钻石会员过期 16 幸福大使权益到期
+     * @param integer $type 类型  1. 精品课 2.讲座 3.360会员 4.电商 5.直播课 6.幸福套餐 7.训练营 8.商品发货 9.认证审核通过  10.认证审核没有通过 11.收益返佣提醒 12.回复想法 13.喜欢你的想法 14优惠券到期 15 钻石会员过期 16 幸福大使权益到期 17 专栏到期
      * @param integer $user_id  用户id
      * @param integer $source_id 来源id
      * @param integer $info_id   章节id
@@ -24,7 +24,7 @@ class Task extends Base
      * @param integer $price  价格
      * @return void
      */
-    public static function send($type=1, $user_id=0, $source_id=0, $info_id=0, $title='',$ordernum=false, $express=false, $price=0,$nickname='',$source_type=false, $relation_id=false)
+    public static function send($type=1, $user_id=0, $source_id=0, $info_id=0, $title='',$ordernum=false, $express=false, $price=0,$nickname='',$source_type=false, $relation_id=false, $plan_time=false)
     {
         if (!$type){
             return  false;
@@ -163,6 +163,22 @@ class Task extends Base
                      'type'    => 15
                  ];
                  break;
+
+            case 16:
+                 $data = [
+                     'subject' => '您的幸福大使权益即将过期。',
+                     'user_id' => $user_id,
+                     'type'   => 16
+                 ];
+                 break;
+           case 17:
+                $data = [
+                    'subject' => '您的专栏即将过期。',
+                    'user_id' => $user_id,
+                    'type'    => 17,
+                    'plan_time'=> $plan_time
+                ];
+                break;
         }
 
         Task::create($data);
