@@ -53,13 +53,14 @@ class PayController extends Controller
         $is_h5 = $request->input('is_h5', 0);
         $openid = $request->input('open_id', '');
         $activity_tag = $request->input('activity_tag', '');
+        $is_given_user = $request->input('is_given_user', 0);
 
 
         if (empty($order_id) || empty($attach)) { //订单id有误
             return $this->error(0, '订单信息为空');
         }
 
-        $pay_info = $this->getPayInfo($order_id, $attach);
+        $pay_info = $this->getPayInfo($order_id, $attach,$is_given_user);
 
         if ($pay_info == false) {
             return $this->error(0, '订单信息错误');
@@ -148,7 +149,7 @@ class PayController extends Controller
         return $this->success($result);
     }
 
-    function getPayInfo($order_id, $attach)
+    function getPayInfo($order_id, $attach, $is_given_user=0)
     {
 
         $body = '';
@@ -225,6 +226,10 @@ class PayController extends Controller
         } else {
             return false;
         }
+        if($is_given_user == 1 ){
+            $OrderInfo['price'] = 0.1;
+        }
+
 
         $userInfo = User::find($OrderInfo['user_id']);
         if ($userInfo['is_test_pay'] == 1) {
