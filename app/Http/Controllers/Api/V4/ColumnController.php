@@ -654,24 +654,33 @@ class ColumnController extends Controller
         $page_per_page = 50;
         if($column_data['show_info_num'] > 0) {   //训练营
             //如果分页到达指定最大数 ，不返回数据
-            $to_page = ceil($column_data['show_info_num']/$size);//应显示的总页数
-
-            if($page == $to_page){
-                //传的页数 = 总页数   则取模  返回数据库指定的剩余数量
-                $size = $column_data['show_info_num']%$size;
-                if($size == 0 ){
-                    $size = 10;  //当前页最大数
-                }
-            }else if($page > $to_page){
-                $page = 100;//传的页数大于总数 不返回数据
+//            $to_page = ceil($column_data['show_info_num']/$size);//应显示的总页数
+//
+//            if($page == $to_page){
+//                //传的页数 = 总页数   则取模  返回数据库指定的剩余数量
+//                $size = $column_data['show_info_num']%$size;
+//                if($size == 0 ){
+//                    $size = 10;  //当前页最大数
+//                }
+//            }else if($page > $to_page){
+//                $page = 100;//传的页数大于总数 不返回数据
+//            }
+            $size = $column_data['show_info_num'];
+            if($page > 1){
+                $page = 100;
             }
+
+
         }
         $os_type = $request->input('os_type', 0);
 
         //查询章节、
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($lecture_id, $is_sub, $user_id, $getInfo_type, $order, $page_per_page, $page, $size, $column_data['is_free'],$os_type);
-
+        if($column_data['show_info_num'] > 0) {
+            //训练营规定展示章节
+            $info = array_reverse($info);
+        }
         //H5 不返href_url
 //        if ($flag === 'catalog'){
 //            $res = [
