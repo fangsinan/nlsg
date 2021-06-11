@@ -102,6 +102,7 @@ class JPushService implements PushServiceInterface
     {
         $this->payload
              ->androidNotification($this->notification, [
+                 'title' => 'huawei demo',
                  'uri_activity' => 'com.huiyujiaoyu.powertime.jpush.OpenClickActivity',
                  'uri_action'   => 'com.huiyujiaoyu.powertime.jpush.OpenClickActivity',
                  'extras' => $this->extras,
