@@ -181,4 +181,74 @@ class Subscribe extends Base
         }
     }
 
+    //定时任务   一天一次     7天前到期提醒一次    1天前到期也提醒一次
+    static function expire(){
+
+        //7天的  1天
+        $s_time = date('Y-m-d ',strtotime("+8 day"));
+        $e_time = date('Y-m-d ',strtotime("+7 day"));
+
+        $page = 1;
+        $size = 100;
+
+        $flag = true;
+        while($flag){
+
+            $data = Subscribe::select('*')
+                ->where('end_time','>=',$e_time)
+                ->where('end_time','<',$s_time)
+                ->where('status',1)
+                ->where('type',1)
+                ->limit($size)->offset(($page - 1) * $size)
+                ->get()->toArray();
+
+
+            if(empty($data)){
+                $flag = false;
+            }else{
+                $page++;
+                //处理消息
+                foreach ($data as $key=>$val){
+                    $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 300) * 60);
+                    Task::send(17, $val['user_id'], $val['relation_id'],'','','','','','','','',$plan_time);
+                }
+            }
+        }
+
+
+
+
+        // 1天的
+        $s_time = date('Y-m-d ',strtotime("+2 day"));
+        $e_time = date('Y-m-d ',strtotime("+1 day"));
+
+        $page = 1;
+        $size = 100;
+
+        $flag = true;
+        while($flag){
+
+            $data = Subscribe::select('*')
+                ->where('end_time','>=',$e_time)
+                ->where('end_time','<',$s_time)
+                ->where('status',1)
+                ->where('type',1)
+                ->limit($size)->offset(($page - 1) * $size)
+                ->get()->toArray();
+
+
+            if(empty($data)){
+                $flag = false;
+            }else{
+                $page++;
+                //处理消息
+                foreach ($data as $key=>$val){
+                    $plan_time = date('Y-m-d H:i:s', strtotime(date('Y-m-d 08:00:00')) + rand(1, 300) * 60);
+                    Task::send(17, $val['user_id'], $val['relation_id'],'','','','','','','','',$plan_time);
+                }
+            }
+        }
+
+    }
+
 }

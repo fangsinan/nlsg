@@ -9,6 +9,7 @@ use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
 use App\Models\Order;
 use App\Models\PayRecordDetailStay;
+use App\Models\Subscribe;
 use App\Models\VipUser;
 use App\Models\Works;
 use App\Models\WorksInfo;
@@ -127,6 +128,11 @@ class Kernel extends ConsoleKernel
             Task::pushTo();  //消息任务
 
         })->everyMinute()->runInBackground();//每分
+
+
+        $schedule->call(function () {
+            Subscribe::expire();
+        })->daily();  //每天执行一次
 
     }
 
