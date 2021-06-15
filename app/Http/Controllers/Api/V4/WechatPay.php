@@ -333,7 +333,7 @@ class WechatPay extends Controller
                     }
                     Task::send(3, $user_id, $orderInfo['relation_id']);
                     if($pay_record_flag == 1){
-                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$WorksInfo['title'],'','','',$AdminInfo['nickname']);
+                        Task::send(11, $user_id, $orderInfo['relation_id'],'','360会员','','','',$AdminInfo['nickname']);
                     }
                     return true;
                 } else {
@@ -685,7 +685,7 @@ class WechatPay extends Controller
 //                    }
                     Task::send(5, $user_id, $orderInfo['relation_id']);
                     if($pay_record_flag == 1){
-                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$WorksInfo['title'],'','','',$AdminInfo['nickname']);
+                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$liveData['title'],'','','',$userdata['nickname']);
                     }
                     return true;
 
