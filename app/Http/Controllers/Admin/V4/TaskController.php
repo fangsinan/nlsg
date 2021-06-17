@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\MallGoods;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use JPush;
 
 class TaskController extends ControllerBackend
 {
@@ -84,6 +85,21 @@ class TaskController extends ControllerBackend
                    Task::send(4, $uid, $id,0, $title);
                    break;
             }
+        } elseif($send_type ==2){
+            switch($type){
+               case 1:
+                  JPush::pushNow('all', $title, ['type'=>1, 'id'=>$id]);
+                  break;
+               case 2:
+                   JPush::pushNow('all', $title, ['type'=>2, 'id'=>$id]);
+                  break;
+               case  3:
+                   JPush::pushNow('all',$title, ['type'=>4, 'id'=>$id]);
+                  break;
+               case  4:
+                   JPush::pushNow('all',$title, ['type'=>5, 'id'=>$id]);
+                  break;
+           }
         }
     }
 
