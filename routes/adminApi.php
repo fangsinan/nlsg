@@ -183,6 +183,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //自助开通
         Route::get('sub_helper/ojb_list', 'SubHelperController@objList');
         Route::post('sub_helper/open', 'SubHelperController@open');
+
+        //消息列表
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');
@@ -204,4 +206,10 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 //    Route::get('live/pass', 'GoodsController@tempTools');//商城退款
 
     Route::post('upload/file', 'UploadController@file');//上传视频/音频
+
+    Route::get('task/index','TaskController@index');
+    Route::get('task/goods','TaskController@getGoods');
+    Route::get('task/lives','TaskController@getLives');
+    Route::get('task/lectures','TaskController@getLectures');
+    Route::get('task/users','TaskController@getUsers');
 });
