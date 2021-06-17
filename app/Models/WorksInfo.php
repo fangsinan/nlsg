@@ -151,6 +151,7 @@ class WorksInfo extends Base
         //1 专栏  2作品 3直播  4会员 5线下产品  6讲座   7训练营
         $type = $params['type'] ?? 0;
         if($type == 1 || $type == 6 || $type == 7){
+
             $column_id = $params['column_id'] ?? 0;
             if (empty($column_id)) {
                 return ['code' => false, 'msg' => 'id不存在'];
@@ -158,7 +159,12 @@ class WorksInfo extends Base
             $columnDatta = Column::find($column_id);
 //            $column_data = Works::select('id')->where(['column_id'=>$column_id])->first();
 //            $works_id = $column_data['id'];
-
+            //仅限于训练营  因为多期训练营共用同一章节
+            if( $columnDatta['info_column_id'] > 0){
+                $get_info_id = $columnDatta['info_column_id'];
+            }else{
+                $get_info_id = $column_id;
+            }
 
         }else{
             if (empty($works_id) || empty($works_info_id)) {
@@ -169,7 +175,7 @@ class WorksInfo extends Base
 
 
         if($type == 6 || $type == 7){
-            $query = self::where(['column_id' => $column_id,'type'=>1,'status'=>4])
+            $query = self::where(['column_id' => $get_info_id,'type'=>1,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
                     'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img']);
             $works_id = $column_id;  // 讲座直接关联info表

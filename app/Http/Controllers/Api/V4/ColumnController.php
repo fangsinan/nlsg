@@ -626,7 +626,7 @@ class ColumnController extends Controller
         }
         //IOS 通过审核后修改  并删除返回值works_data
         $column_data = Column::select(['id', 'name', 'name as title','type' , 'title', 'subtitle','index_pic', 'cover_pic as cover_img', 'details_pic as detail_img', 'message','details_pic','cover_pic',
-            'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num','show_info_num'])
+            'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num','show_info_num','info_column_id'])
             ->where(['id' => $lecture_id, 'status' => 1])->first();
 
 
@@ -674,9 +674,14 @@ class ColumnController extends Controller
         }
         $os_type = $request->input('os_type', 0);
 
+        //仅限于训练营  因为多期训练营共用同一章节
+        $getInfo_id = $lecture_id;
+        if($column_data['info_column_id'] > 0 ){
+            $getInfo_id = $column_data['info_column_id'];
+        }
         //查询章节、
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($lecture_id, $is_sub, $user_id, $getInfo_type, $order, $page_per_page, $page, $size, $column_data['is_free'],$os_type);
+        $info = $infoObj->getInfo($getInfo_id, $is_sub, $user_id, $getInfo_type, $order, $page_per_page, $page, $size, $column_data['is_free'],$os_type);
         if($column_data['show_info_num'] > 0) {
             //训练营规定展示章节
             $info = array_reverse($info);
