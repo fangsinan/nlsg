@@ -19,15 +19,15 @@ class UserController extends ControllerBackend
 
     public function index(Request $request)
     {
-        $id = $request->get('id');
+        $phone = $request->get('phone');
         $nickname = $request->get('nickname');
         $sex = $request->get('sex');
         $level = $request->get('level');
         $is_author = $request->get('is_author');
         $start = $request->get('start');
         $end = $request->get('end');
-        $query = User::when($id, function ($query) use ($id) {
-                $query->where('id', $id);
+        $query = User::when($phone, function ($query) use ($phone) {
+                $query->where('phone', 'like', '%' . $phone . '%');
             })
             ->when($nickname, function ($query) use ($nickname) {
                $query->where('nickname', 'like', '%' . $nickname . '%');
