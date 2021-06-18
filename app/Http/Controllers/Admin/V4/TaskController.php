@@ -82,7 +82,7 @@ class TaskController extends ControllerBackend
                       ->orderBy('id', 'desc')
                       ->get()
                       ->toArray();
-        return $lists;
+        return success($lists);
     }
 
     public function  getLectures()
@@ -93,7 +93,7 @@ class TaskController extends ControllerBackend
                    ->orderBy('created_at', 'desc')
                    ->get()
                    ->toArray();
-        return $lists;
+        return success($lists);
     }
 
     public function getLives()
@@ -102,7 +102,7 @@ class TaskController extends ControllerBackend
                    ->orderBy('created_at', 'desc')
                    ->get()
                    ->toArray();
-        return $lists;
+        return success($lists);
     }
 
     public function getGoods()
@@ -112,7 +112,7 @@ class TaskController extends ControllerBackend
                 ->orderBy('id','desc')
                 ->get()
                 ->toArray();
-        return $lists;
+        return success($lists);
     }
 
 
