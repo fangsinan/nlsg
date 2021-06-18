@@ -65,15 +65,11 @@ class TaskController extends ControllerBackend
 
     public function  send(Request $request)
     {
-        $type = $request->get('type');
-        $uid  = $request->get('user_id');
-        $id   = $request->get('id');
-        $title = $request->get('title');
-        $send_type    =  $request->get('send_type');
-        if ($send_type ==1){
-            Task::send($type, $uid, $id,0, $title);
-        } elseif($send_type ==2){
-            JPush::pushNow('all', $title, ['type'=>$type, 'id'=>$id]);
+        $input = $request->all();
+        if ($input['send_type'] ==1){
+            Task::send($input['type'], $input['user_id'], $input['id'],0, $input['title']);
+        } elseif($input['send_type'] ==2){
+            JPush::pushNow('all', $input['title'], ['type'=>$input['type'], 'id'=>$input['id']]);
         }
     }
 
