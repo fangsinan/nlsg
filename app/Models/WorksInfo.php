@@ -35,7 +35,7 @@ class WorksInfo extends Base
         ])->where($where)->orderBy('rank',$order)->orderBy('id', $order);
         //->paginate($page_per_page)->toArray();
 
-        if ($page && $size) {
+        if ($page) {
             $works_data = $query->limit($size)->offset(($page - 1) * $size)->get()->toArray();
         } else {
             $works_data = $query->limit($page_per_page)->get()->toArray();
