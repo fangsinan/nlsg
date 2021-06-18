@@ -97,11 +97,11 @@ class UserController extends ControllerBackend
             CashData::where('id', $id)->update(['is_pass' => 1]);
 
             //审核通过
-            Task::send(9, $list->user_id);
+            //Task::send(9, $list->user_id);
         } elseif ($type == 2) {
             CashData::where('id', $id)->update(['is_pass' => 2, 'reason' => $reason]);
             //审核没有通过
-            Task::send(10, $list->user_id);
+            //Task::send(10, $list->user_id);
 
         }
 
