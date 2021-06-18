@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\Live;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Works;
 use App\Models\MallGoods;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
