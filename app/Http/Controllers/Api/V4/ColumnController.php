@@ -652,7 +652,7 @@ class ColumnController extends Controller
 
         //1、加字段控制需要查询的章节
         $page_per_page = 50;
-        if($column_data['show_info_num'] > 0) {   //训练营
+        if( $column_data['type'] == 3 ) {   //训练营
             //如果分页到达指定最大数 ，不返回数据
 //            $to_page = ceil($column_data['show_info_num']/$size);//应显示的总页数
 //
@@ -682,7 +682,7 @@ class ColumnController extends Controller
         //查询章节、
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($getInfo_id, $is_sub, $user_id, $getInfo_type, $order, $page_per_page, $page, $size, $column_data['is_free'],$os_type);
-        if($column_data['show_info_num'] > 0) {
+        if($column_data['type'] == 3) {
             //训练营规定展示章节
             $info = array_reverse($info);
         }

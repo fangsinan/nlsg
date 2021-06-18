@@ -201,7 +201,8 @@ class WorksInfo extends Base
                     ->orderBy('id', 'asc');
         }
 
-        if($type == 7 && $columnDatta['show_info_num'] > 0 ){
+//        if($type == 7 && $columnDatta['show_info_num'] > 0 ){
+        if( $type == 7 ){
             $query->limit($columnDatta['show_info_num']);
         }
 
