@@ -212,4 +212,5 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('task/lives','TaskController@getLives');
     Route::get('task/lectures','TaskController@getLectures');
     Route::get('task/users','TaskController@getUsers');
+    Route::get('task/works','TaskController@getWorks');
 });
