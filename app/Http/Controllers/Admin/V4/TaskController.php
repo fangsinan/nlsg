@@ -71,6 +71,7 @@ class TaskController extends ControllerBackend
         } elseif($input['send_type'] ==2){
             JPush::pushNow('all', $input['title'], ['type'=>$input['type'], 'id'=>$input['id']]);
         }
+        return success();
     }
 
     public function getWorks()
