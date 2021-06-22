@@ -88,4 +88,9 @@ return [
     'ERP_SHOP_NO'   => env('ERP_SHOP_NO'),
     'ERP_LOGISTICS_SYNC_QUERY'   => env('ERP_LOGISTICS_SYNC_QUERY'),
     'ERP_LOGISTICS_SYNC_ACK'   => env('ERP_LOGISTICS_SYNC_ACK'),
+
+
+
+    'OPENIM_APPID'   => env('OPENIM_APPID'),
+    'OPENIM_SECRETKEY'   => env('OPENIM_SECRETKEY'),
 ];
