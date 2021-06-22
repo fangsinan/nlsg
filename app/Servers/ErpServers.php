@@ -168,6 +168,13 @@ class ErpServers
         $c->putApiParam('switch', 1);
         $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
         $json = $c->wdtOpenApi();
+
+        $error_data = [];
+        $error_data['ordernum'] = '';
+        $error_data['error'] = $json;
+        $error_data['type'] = 4;
+        DB::table('nlsg_mall_order_erp_error')->insert($error_data);
+
         $json = json_decode($json, true);
 
         if ($json['code'] == 0) {
@@ -302,12 +309,12 @@ class ErpServers
 
                 $res = $this->startPush($order_id_list);//订单推送
 
-                if ($res['code']) {
+//                if ($res['code']) {
                     MallErpList::whereIn('id', $id_list)
                         ->update([
                             'flag' => 2
                         ]);
-                }
+//                }
             }
         }
 
