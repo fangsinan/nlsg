@@ -156,30 +156,24 @@ class ErpServers
         if (empty($trade_list) || !is_array($trade_list)) {
             return ['code' => false, 'msg' => '数据不正确'];
         }
-        try {
-            $c = new WdtClient();
 
-            $c->sid = $this->sid;
-            $c->appkey = $this->appkey;
-            $c->appsecret = $this->appsecret;
-            $c->gatewayUrl = $this->trade_push;
+        $c = new WdtClient();
 
-            $c->putApiParam('shop_no', $this->shop_no);
-            $c->putApiParam('switch', 1);
-            $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
-            $json = $c->wdtOpenApi();
-            $json = json_decode($json, true);
+        $c->sid = $this->sid;
+        $c->appkey = $this->appkey;
+        $c->appsecret = $this->appsecret;
+        $c->gatewayUrl = $this->trade_push;
 
-            if ($json['code'] == 0) {
-                return ['code' => true, 'msg' => '成功:' . $json['new_count'] . ':' . $json['chg_count']];
-            } else {
-                return ['code' => false, 'msg' => $json['message']];
-            }
-        } catch (\Exception $e) {
-            $error_data['ordernum'] = '';
-            $error_data['error'] = '错误' . __LINE__;
-            $error_data['type'] = 4;
-            DB::table('nlsg_mall_order_erp_error')->insert($error_data);
+        $c->putApiParam('shop_no', $this->shop_no);
+        $c->putApiParam('switch', 1);
+        $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
+        $json = $c->wdtOpenApi();
+        $json = json_decode($json, true);
+
+        if ($json['code'] == 0) {
+            return ['code' => true, 'msg' => '成功:' . $json['new_count'] . ':' . $json['chg_count']];
+        } else {
+            return ['code' => false, 'msg' => $json['message']];
         }
     }
 
