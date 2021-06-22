@@ -90,7 +90,6 @@ return [
     'ERP_LOGISTICS_SYNC_ACK'   => env('ERP_LOGISTICS_SYNC_ACK'),
 
 
-
     'OPENIM_APPID'   => env('OPENIM_APPID'),
     'OPENIM_SECRETKEY'   => env('OPENIM_SECRETKEY'),
 ];
