@@ -86,8 +86,8 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
-            Coupon::couponEndTimeMsgTask(); //推送的优惠券提醒
-            VipUser::vipEndTimeMsgTask();//推送的会员提醒
+            //Coupon::couponEndTimeMsgTask(); //推送的优惠券提醒
+            //VipUser::vipEndTimeMsgTask();//推送的会员提醒
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
