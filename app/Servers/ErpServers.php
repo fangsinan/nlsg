@@ -111,7 +111,7 @@ class ErpServers
                 }
                 $temp['goods_id'] = $vv->goods_id;//平台货品id
                 $temp['spec_id'] = $vv->sku_number;//平台规格id
-                $temp['goods_no'] = $vv->skuInfo->erp_goods_no;//平台货品编码
+                //$temp['goods_no'] = $vv->skuInfo->erp_goods_no;//平台货品编码
                 $temp['spec_no'] = $vv->skuInfo->erp_spec_no;//平台货品SKU唯一码，对应ERP商家编码，goods_no和spec_no不能同时为空
                 $temp['goods_name'] = $vv->goodsInfo->name;//商品名称
                 $temp_sku_history = json_decode($vv->sku_history, true);
