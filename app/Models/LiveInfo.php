@@ -108,9 +108,8 @@ class LiveInfo extends Model
         if( $type == 'create' && $str_time <= time() ){
             return ['code'=>0,'msg'=>'直播开始时间必须大于当前时间','data'=>[]];
         }
-        
         if( $type == 'create' && empty($back_video_url) ){
-            return ['code'=>0,'msg'=>'回放地址不存在','data'=>[]];
+            return ['code'=>0,'msg'=>'源播放地址不存在','data'=>[]];
         }
 
         $SecretId="AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";

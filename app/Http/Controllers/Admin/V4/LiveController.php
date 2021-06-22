@@ -135,7 +135,7 @@ class LiveController extends Controller
 
 
     /**
-     * 直播自动拉流任务
+     * 直播自动拉流任务  /api/admin_v4/live/live_url_edit?type=show&live_info_id=760
      */
     public function livePushUrlCreate(Request $request){
 

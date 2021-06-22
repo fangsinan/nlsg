@@ -637,6 +637,7 @@ class ClassController extends ControllerBackend
         $original_price = $input['original_price'] ?? 0;
         $price = $input['price'] ?? 0;
         $subscribe_num = $input['subscribe_num'] ?? 0;
+        $info_num      = $input['info_num'] ?? 0;
         $status = $input['status'] ?? 2;
         $timing_online = $input['online_type'] ?? 1;
 
@@ -648,6 +649,7 @@ class ClassController extends ControllerBackend
             'message'        => $message,
             'user_id'        => $user_id,
             'subscribe_num'  => $subscribe_num,
+            'info_num'       => $info_num,
             'price'          => $price,
             'timing_online'  => $timing_online,
             'original_price' => $original_price,
@@ -1080,7 +1082,7 @@ class ClassController extends ControllerBackend
         $id = $request->get('column_id');
         $list = Column::with('user:id,nickname,headimg')
             ->select('id', 'user_id', 'name', 'title', 'subtitle', 'subscribe_num', 'message', 'status',
-                'original_price', 'price', 'cover_pic',
+                'original_price', 'price', 'cover_pic','info_num',
                 'details_pic', 'created_at', 'timing_online', 'timing_time')
             ->where('id', $id)->first();
         return success($list);
