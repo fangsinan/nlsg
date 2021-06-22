@@ -217,8 +217,9 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
-            $s = new ErpServers();
-            $s->pushRun();
+//            $s = new ErpServers();
+//            $s->pushRun();
+//            $s->logisticsSync();
 //            ChannelServers::cytxJob();
 
 //            $res = Live::teamInfo(1,1);

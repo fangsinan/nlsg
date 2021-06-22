@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
-
 class WdtClient
 {
 	public $sid;
@@ -101,12 +99,6 @@ class WdtClient
 		curl_setopt($cl,CURLOPT_POSTFIELDS,$postdata);
 		curl_setopt($cl,CURLOPT_RETURNTRANSFER,true);
 		$content = curl_exec($cl);
-
-        $error_data = [];
-        $error_data['ordernum'] = '';
-        $error_data['error'] = $postdata.' '.$this->apiParas['trade_list'];
-        $error_data['type'] = 5;
-        DB::table('nlsg_mall_order_erp_error')->insert($error_data);
 
 		if (curl_errno($cl))
 		{
