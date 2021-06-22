@@ -166,8 +166,7 @@ class ErpServers
 
         $c->putApiParam('shop_no', $this->shop_no);
         $c->putApiParam('switch', 1);
-//        $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
-        $c->putApiParam('trade_list', json_encode($trade_list));
+        $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
         $json = $c->wdtOpenApi();
 
         $error_data = [];
