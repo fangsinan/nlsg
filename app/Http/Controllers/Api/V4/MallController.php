@@ -13,6 +13,7 @@ use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
+use App\Servers\ErpServers;
 use Illuminate\Http\Request;
 
 class MallController extends Controller
@@ -216,6 +217,8 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
+            $s = new ErpServers();
+            $s->pushRun();
 //            ChannelServers::cytxJob();
 
 //            $res = Live::teamInfo(1,1);

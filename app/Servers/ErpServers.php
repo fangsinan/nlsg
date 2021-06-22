@@ -4,7 +4,6 @@
 namespace App\Servers;
 
 use App\Models\ExpressCompany;
-use App\Models\MallErpError;
 use App\Models\MallErpList;
 use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
@@ -28,6 +27,7 @@ class ErpServers
         if (!is_array($id)) {
             $id = explode(',', $id);
         }
+        $id = array_unique($id);
 
         $list = MallOrder::whereIn('id', $id)
             ->with(['orderDetails', 'orderDetails.skuInfo', 'orderDetails.goodsInfo', 'userInfo'])
@@ -156,23 +156,30 @@ class ErpServers
         if (empty($trade_list) || !is_array($trade_list)) {
             return ['code' => false, 'msg' => '数据不正确'];
         }
-        $c = new WdtClient();
+        try {
+            $c = new WdtClient();
 
-        $c->sid = $this->sid;
-        $c->appkey = $this->appkey;
-        $c->appsecret = $this->appsecret;
-        $c->gatewayUrl = $this->trade_push;
+            $c->sid = $this->sid;
+            $c->appkey = $this->appkey;
+            $c->appsecret = $this->appsecret;
+            $c->gatewayUrl = $this->trade_push;
 
-        $c->putApiParam('shop_no', $this->shop_no);
-        $c->putApiParam('switch', 1);
-        $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
-        $json = $c->wdtOpenApi();
-        $json = json_decode($json, true);
+            $c->putApiParam('shop_no', $this->shop_no);
+            $c->putApiParam('switch', 1);
+            $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
+            $json = $c->wdtOpenApi();
+            $json = json_decode($json, true);
 
-        if ($json['code'] == 0) {
-            return ['code' => true, 'msg' => '成功:' . $json['new_count'] . ':' . $json['chg_count']];
-        } else {
-            return ['code' => false, 'msg' => $json['message']];
+            if ($json['code'] == 0) {
+                return ['code' => true, 'msg' => '成功:' . $json['new_count'] . ':' . $json['chg_count']];
+            } else {
+                return ['code' => false, 'msg' => $json['message']];
+            }
+        } catch (\Exception $e) {
+            $error_data['ordernum'] = '';
+            $error_data['error'] = '错误' . __LINE__;
+            $error_data['type'] = 4;
+            DB::table('nlsg_mall_order_erp_error')->insert($error_data);
         }
     }
 
@@ -290,11 +297,11 @@ class ErpServers
     {
         $while_flag = true;
 
-        while ($while_flag){
+        while ($while_flag) {
             $list = MallErpList::where('flag', '=', 1)->limit(30)->select(['id', 'order_id'])->get();
             if ($list->isEmpty()) {
                 $while_flag = false;
-            }else{
+            } else {
                 $list = $list->toArray();
                 $id_list = array_column($list, 'id');
                 $order_id_list = array_column($list, 'order_id');

@@ -31,6 +31,13 @@ class MallErpList extends Base
                 break;
         }
 
+        $check_list = self::where('order_id','=',$order_id)
+            ->where('flag','=',1)
+            ->first();
+        if (!empty($check_list)){
+            return true;
+        }
+
         $m = new self();
         $m->order_id = $order_id;
         $m->save();
