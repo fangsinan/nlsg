@@ -86,11 +86,6 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
-            //Coupon::couponEndTimeMsgTask(); //推送的优惠券提醒
-            //VipUser::vipEndTimeMsgTask();//推送的会员提醒
-        })->everyMinute()->runInBackground();//每分
-
-        $schedule->call(function () {
             //队列消息发送
             $servers = new removeDataServers();
             $servers->subListSms();
@@ -125,13 +120,17 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
 //            User::expire(); //会员过期提醒
 //            Column::expire(); //专栏过期提醒
-            Task::pushTo();  //消息任务
+//            Task::pushTo();  //消息任务
 
         })->everyMinute()->runInBackground();//每分
 
+        $schedule->call(function () {
+            //Coupon::couponEndTimeMsgTask(); //推送的优惠券提醒
+            //VipUser::vipEndTimeMsgTask();//推送的会员提醒
+        })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
-            Subscribe::expire();
+//            Subscribe::expire();
         })->daily();  //每天执行一次
 
     }
