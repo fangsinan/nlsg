@@ -332,13 +332,13 @@ class MallOrderServers
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
-                $query->where('status', '=', 1);
+                $query->where('status', '=', 1)->where('is_stop', '=', 0);
                 break;
             case 10:
-                $query->where('status', '=', 10);
+                $query->where('status', '=', 10)->where('is_stop', '=', 0);
                 break;
             case 20:
-                $query->where('status', '=', 20);
+                $query->where('status', '=', 20)->where('is_stop', '=', 0);
                 break;
             case 30:
                 $query->where('status', '=', 30);
