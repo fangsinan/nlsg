@@ -113,6 +113,24 @@ class CallbackController extends Controller
     }
 
 
+    //Im 回调  POST请求
+    public function callbackMsg(Request $request){
+        //
+        $params = $request->input();
+
+        $res = [];
+        switch ($params['CallbackCommand']){
+            case 'C2C.CallbackBeforeSendMsg': //消息之前
+            case 'C2C.CallbackAfterSendMsg': //消息之后回调
+
+                $res = ImMsgController::callbackMsg($params);
+
+        }
+        return $res;
+
+    }
+
+
     function test(Request $request){
         $json = $request->input('json');
         $pay_type = $request->input('pay_type') ??1;

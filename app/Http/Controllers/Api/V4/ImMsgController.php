@@ -10,7 +10,6 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Libraries\ImClient;
 
 
 /**
@@ -21,12 +20,11 @@ use Libraries\ImClient;
 class ImMsgController extends Controller
 {
 
-    public function callbackMsg(Request $request){
+    public static function callbackMsg($params=[]){
+        if ($params){
+            return 0;
+        }
         return 1;
-
-        $a = ImClient::getUserSig(1);
-        dd($a);
-
 
     }
 

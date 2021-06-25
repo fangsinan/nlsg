@@ -389,7 +389,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     });
 
     //IM
-    Route::get('callback/callbackMsg', 'ImMsgController@callbackMsg');
+    Route::get('callback/callbackMsg', 'CallbackController@callbackMsg');
 
 
 
