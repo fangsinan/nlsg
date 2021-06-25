@@ -71,7 +71,7 @@ class TaskController extends ControllerBackend
         if ($input['send_type'] ==1){
             $user = User::where('id', $input['user_id'])->first();
             if (!$user){
-                return error(1000,'没有找到用户',);
+                return error(1000,'没有找到用户');
             }
             Task::send($input['type'], $input['user_id'], $input['id'],0, $input['title']);
         } elseif($input['send_type'] ==2){
