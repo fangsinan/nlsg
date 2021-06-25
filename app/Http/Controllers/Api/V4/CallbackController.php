@@ -118,19 +118,24 @@ class CallbackController extends Controller
         //
         $params = $request->input();
 
-        $res = [];
         switch ($params['CallbackCommand']){
             case 'C2C.CallbackBeforeSendMsg': //消息之前
             case 'C2C.CallbackAfterSendMsg': //消息之后回调
 
-                $res = ImMsgController::callbackMsg($params);
+            $result = ImMsgController::callbackMsg($params);
+            default :
+                $result = [
+                    "ActionStatus"=>"OK",
+                    "ErrorInfo"=>"",
+                    "ErrorCode"=> 0 // 0为回调成功，1为回调出错
+                ];
 
         }
-        return $res;
+        return response()->json($result);
 
     }
 
 
- 
+
 
 }
