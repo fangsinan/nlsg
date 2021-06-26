@@ -115,14 +115,24 @@ class CallbackController extends Controller
 
     //Im 回调  POST请求
     public function callbackMsg(Request $request){
-        //
+        //https://www.example.com?SdkAppid=1400510272&CallbackCommand=C2C.CallbackAfterSendMsg
+        //&contenttype=json&ClientIP=127.0.0.1&OptPlatform=$OptPlatform
         $params = $request->input();
 
+        if($params['SdkAppid'] != config('env.OPENIM_APPID')){
+            return '';
+        }
+
         switch ($params['CallbackCommand']){
-            case 'C2C.CallbackBeforeSendMsg': //消息之前
+            case 'C2C.Call backBeforeSendMsg': //消息之前
             case 'C2C.CallbackAfterSendMsg': //消息之后回调
 
-            $result = ImMsgController::callbackMsg($params);
+                $result = ImMsgController::callbackMsg($params);
+                break;
+
+            case 'Group.CallbackAfterCreateGroup':
+                $result = ImGroupController::addGroup($params);
+                break;
             default :
                 $result = [
                     "ActionStatus"=>"OK",
