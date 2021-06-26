@@ -58,8 +58,8 @@ class TaskController extends ControllerBackend
             });
 
         $lists = $query->select('id', 'user_id', 'subject', 'type', 'created_at', 'plan_time', 'status')
-            ->where('status', 1)
             ->orderBy('created_at', 'desc')
+            ->orderBy('status', 'desc')
             ->paginate(10)
             ->toArray();
         return success($lists);
@@ -83,8 +83,7 @@ class TaskController extends ControllerBackend
     public function getWorks()
     {
         $lists = Works::select('id', 'title')
-                      ->where('status', '>', 0)
-                      ->where('is_audio_book', 0)
+                      ->where('status', 4)
                       ->orderBy('id', 'desc')
                       ->get()
                       ->toArray();
@@ -95,7 +94,7 @@ class TaskController extends ControllerBackend
     {
         $lists = Column::select('id', 'name')
                    ->where('type', 2)
-                   ->where('status', '<>', 3)
+                   ->where('status', 1)
                    ->orderBy('created_at', 'desc')
                    ->get()
                    ->toArray();
@@ -105,6 +104,7 @@ class TaskController extends ControllerBackend
     public function getLives()
     {
         $lists = Live::select('id', 'title')
+                   ->where('status', 4)
                    ->orderBy('created_at', 'desc')
                    ->get()
                    ->toArray();
