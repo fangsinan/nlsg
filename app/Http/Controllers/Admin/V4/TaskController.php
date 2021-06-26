@@ -58,8 +58,8 @@ class TaskController extends ControllerBackend
             });
 
         $lists = $query->select('id', 'user_id', 'subject', 'type', 'created_at', 'plan_time', 'status')
+            ->where('status', 1)
             ->orderBy('created_at', 'desc')
-            ->orderBy('status', 'asc')
             ->paginate(10)
             ->toArray();
         return success($lists);
