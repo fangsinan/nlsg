@@ -69,7 +69,7 @@ class TaskController extends ControllerBackend
     {
         $input = $request->all();
         if ($input['send_type'] ==1){
-            $user = User::where('id', $input['phone'])->first();
+            $user = User::where('phone', $input['phone'])->first();
             if (!$user){
                 return error(1000,'没有找到用户');
             }
