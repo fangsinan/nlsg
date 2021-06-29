@@ -10,6 +10,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_index/check_helper', 'IndexController@checkHelper');
         Route::get('live_index/live_users', 'IndexController@getLiveUsers');
         Route::get('live_index/lives', 'IndexController@lives');
+        Route::get('live_index/get_back_videos', 'IndexController@getBackVideos');
         Route::post('live_index/create', 'IndexController@create');
         Route::post('live_live/delete', 'IndexController@delete');
         Route::get('live_live/info', 'IndexController@info');

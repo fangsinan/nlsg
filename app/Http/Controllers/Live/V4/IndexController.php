@@ -738,4 +738,15 @@ class IndexController extends ControllerBackend
         
         return success($live);
     }
+
+
+    public function getBackVideos(Request $request)
+    {
+        $res = [
+            ['title' => "王琨老师第一天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/9cce592f3701925919134293895/v.f100030.mp4',],
+            ['title' => "王琨老师第二天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/bba62eab3701925919196098502/v.f100030.mp4',],
+            ['title' => "李婷老师直播",      'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/86674a033701925920092825176/v.f100030.mp4',],
+        ];
+        return success($res);
+    }
 }
