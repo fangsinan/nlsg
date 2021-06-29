@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendLiveRole;
 use App\Models\Live;
+use App\Models\LiveCountDown;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
@@ -140,8 +141,17 @@ class SubscribeController extends ControllerBackend
         $user_ids = [];
         foreach ($lists['data'] as &$val){
             $val['twitter'] = [];
-            if(!empty($val['order']['twitter_id'])){
-                $twitter = User::find($val['order']['twitter_id']);
+            $twitter_id = $val['order']['twitter_id'] ?? 0;
+            //免费的邀约人是live_count_down
+            if(!empty($val['live']['is_free'])==1){
+                $live_down_data = LiveCountDown::select('new_vip_uid')->where([
+                    'live_id'=>$val['live']['id'],'user_id'=>$val['user_id']
+                ])->first();
+                $twitter_id = $live_down_data['new_vip_uid'];
+            }
+
+            if(!empty($twitter_id)){
+                $twitter = User::find($twitter_id);
                 $val['twitter']['phone'] = $twitter['phone'];
                 $val['twitter']['nickname'] = $twitter['nickname'];
             }
