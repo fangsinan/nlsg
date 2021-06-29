@@ -3,6 +3,7 @@
 //后台
 Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
+    Route::get('deal/get_order_info', 'DealController@getOrderInfo');
     Route::get('auth/captcha', 'AuthController@captcha');
     Route::post('auth/login', 'AuthController@login');
 //    Route::get('mall_order/list_new', 'MallOrderController@listNew');
