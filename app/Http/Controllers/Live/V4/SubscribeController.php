@@ -98,9 +98,14 @@ class SubscribeController extends ControllerBackend
             });
         }
         if(!empty($twitter_phoneUser)){
-            $query->whereHas('order', function ($q) use($twitter_phoneUser){
-                $q->where('twitter_id', $twitter_phoneUser['id']);
-            });
+            if($this->user['phone'] == 13522223779){
+                $query->where('twitter_id',$twitter_phoneUser['id']);
+            }else{
+                $query->whereHas('order', function ($q) use($twitter_phoneUser){
+                    $q->where('twitter_id', $twitter_phoneUser['id']);
+                });
+            }
+
         }
 
         if(!empty($date)){
@@ -113,7 +118,7 @@ class SubscribeController extends ControllerBackend
             });
         }
 
-        $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time','order_id','created_at')
+        $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time','order_id','created_at','twitter_id')
             ->where('is_del',0)
             ->where('status',1)
             ->where('type',3);
@@ -144,10 +149,7 @@ class SubscribeController extends ControllerBackend
             $twitter_id = $val['order']['twitter_id'] ?? 0;
             //免费的邀约人是live_count_down
             if(!empty($val['live']['is_free'])==1){
-                $live_down_data = LiveCountDown::select('new_vip_uid')->where([
-                    'live_id'=>$val['live']['id'],'user_id'=>$val['user_id']
-                ])->first();
-                $twitter_id = $live_down_data['new_vip_uid'];
+                $twitter_id = $val['twitter_id'];
             }
 
             if(!empty($twitter_id)){
