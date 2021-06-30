@@ -98,7 +98,7 @@ class SubscribeController extends ControllerBackend
             });
         }
         if(!empty($twitter_phoneUser)){
-            if($this->user['phone'] == 13522223779){
+            if($this->user['username'] == 13522223779){
                 $query->where('twitter_id',$twitter_phoneUser['id']);
             }else{
                 $query->whereHas('order', function ($q) use($twitter_phoneUser){
@@ -148,7 +148,7 @@ class SubscribeController extends ControllerBackend
             $val['twitter'] = [];
             $twitter_id = $val['order']['twitter_id'] ?? 0;
             //免费的邀约人是live_count_down
-            if(!empty($val['live']['is_free'])==1){
+            if( $val['live']['is_free'] == 1 ){
                 $twitter_id = $val['twitter_id'];
             }
 
