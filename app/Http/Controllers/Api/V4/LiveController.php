@@ -848,7 +848,7 @@ class LiveController extends Controller
                 'relation_id' => $input['info_id'],
                 'status' => 1,
                 'is_flag' => $is_flag,
-                'twitter_id' => $input['inviter'],
+                'twitter_id' => (!empty($input['inviter']))?$input['inviter']:0,
             ]);
 
             Live::where(['id' => $input['live_id']])->increment('order_num');
