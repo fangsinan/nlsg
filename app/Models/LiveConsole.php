@@ -739,8 +739,8 @@ class LiveConsole extends Base
         $date_begin = date('Y-m-d H:i:00');
         $date_end = date('Y-m-d H:i:59');
 
-        $date_begin = '2021-07-01 00:00:00';
-        $date_end = '2021-07-01 00:00:59';
+//        $date_begin = '2021-07-01 00:00:00';
+//        $date_end = '2021-07-01 00:00:59';
 
         //自动开始的
         $begin_list_sql = "select l.id as live_id from nlsg_live as l
