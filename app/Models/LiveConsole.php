@@ -746,8 +746,8 @@ class LiveConsole extends Base
         $begin_list_sql = "select l.id as live_id from nlsg_live as l
 join nlsg_live_info as li on l.id = li.live_pid and li.task_id <> 0 and li.is_begin = 0
 where l.status = 4
-and li.begin_at >= '$date_begin'
 and li.begin_at <= '$date_end'";
+
         $begin_list = DB::select($begin_list_sql);
 
         if (!empty($begin_list)) {
