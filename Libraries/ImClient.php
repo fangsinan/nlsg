@@ -17,7 +17,7 @@ class ImClient
         $sdkappid = config('env.OPENIM_APPID');
 
         $tlsClass = new \TLSSigAPIv2($sdkappid, $key);
-        return $tlsClass->genUserSig($userId);
+        return $tlsClass->genUserSig((int)$userId);
 
     }
 
