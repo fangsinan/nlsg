@@ -433,6 +433,8 @@ class IndexController extends ControllerBackend
         $content = $input['content'] ?? '';
         $playback_url = $input['playback_url'] ?? '';
         $back_video_url = $input['back_video_url'] ?? '';
+        $need_virtual  = $input['need_virtual '] ?? 0;
+        $need_virtual_num = $input['need_virtual_num'] ?? 0;
         $now = time();
         $now_date = date('Y-m-s H:i:s');
 
@@ -454,6 +456,8 @@ class IndexController extends ControllerBackend
             'twitter_money' => $twitter,
             'helper' => $helper,
             'content' => $content,
+            'need_virtual' => $need_virtual,
+            'need_virtual_num' => $need_virtual_num,
             'is_free' => $price < '0.01' ? 1 : 0,
         ];
 

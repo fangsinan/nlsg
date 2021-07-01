@@ -776,10 +776,15 @@ and li.end_at <= '$date_end'";
         }
 
         //虚拟人数
+//        $online_num_sql = "update nlsg_live as l
+//join nlsg_live_info as li on l.id = li.live_pid and li.task_id > 0
+//set l.virtual_online_num = case when (timestampdiff(MINUTE,li.begin_at,li.end_at)*100) > 3000  then 3000 else (timestampdiff(MINUTE,li.begin_at,li.end_at)*100) > 3000 end
+//where li.is_begin = 1 and l.virtual_online_num < 3000";
+
         $online_num_sql = "update nlsg_live as l
 join nlsg_live_info as li on l.id = li.live_pid and li.task_id > 0
-set l.virtual_online_num = case when (timestampdiff(MINUTE,li.begin_at,li.end_at)*100) > 3000  then 3000 else (timestampdiff(MINUTE,li.begin_at,li.end_at)*100) > 3000 end
-where li.is_begin = 1 and l.virtual_online_num < 3000";
+set l.virtual_online_num = case when (timestampdiff(MINUTE,li.begin_at,li.end_at)*100) > need_virtual_num  then need_virtual_num else (timestampdiff(MINUTE,li.begin_at,li.end_at)*100) end
+where li.is_begin = 1 and  l.need_virtual = 1 and l.virtual_online_num < l.need_virtual_num;";
         DB::select($online_num_sql);
     }
 
