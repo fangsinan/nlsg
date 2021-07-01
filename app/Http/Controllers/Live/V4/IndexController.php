@@ -734,8 +734,10 @@ class IndexController extends ControllerBackend
         if (!$live) {
             return error('直播不存在');
         }
-        $live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
-        
+        //$live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
+        $liveInfo= LiveInfo::select('playback_url','back_video_url')->where('live_pid', $id)->first();
+        $live->playback_url = $liveInfo['playback_url'];
+        $live->back_video_url = $liveInfo['back_video_url'];
         return success($live);
     }
 
