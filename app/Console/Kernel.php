@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Models\Column;
 use App\Models\Coupon;
+use App\Models\LiveConsole;
 use App\Models\MallOrder;
 use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
@@ -49,6 +50,11 @@ class Kernel extends ConsoleKernel
             MallRefundJob::refundJob(1);//商城订单退款处理
             WorksInfo::covertVideo(); //转换音频视频
             Works::deal(); //自动上架
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            $m = new LiveConsole();
+            $m->LiveAutoConfig();//直播自动开始结束和人数
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
