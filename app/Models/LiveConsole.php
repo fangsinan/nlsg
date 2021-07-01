@@ -719,6 +719,7 @@ class LiveConsole extends Base
                     ->update([
                         'is_finish' => 1,
                         'finished_at' => $now_date,
+                        'virtual_online_num' => 0,
                     ]);
                 break;
             default:
@@ -731,6 +732,69 @@ class LiveConsole extends Base
             return ['code' => true, 'msg' => 'ok'];
         }
 
+    }
+
+    public function LiveAutoConfig()
+    {
+        $date_begin = date('Y-m-d H:i:00');
+        $date_end = date('Y-m-d H:i:59');
+
+//        $date_begin = '2021-07-01 00:00:00';
+//        $date_end = '2021-07-01 00:00:59';
+
+        //自动开始的
+        $begin_list_sql = "select l.id as live_id from nlsg_live as l
+join nlsg_live_info as li on l.id = li.live_pid and li.task_id <> 0 and li.is_begin = 0
+where l.status = 4
+and li.begin_at >= '$date_begin'
+and li.begin_at <= '$date_end'";
+
+        $begin_list = DB::select($begin_list_sql);
+
+        if (!empty($begin_list)) {
+            foreach ($begin_list as $v) {
+                $temp = [];
+                $temp['live_id'] = $v->live_id;
+                $temp['job_type'] = 1;
+                $this->begin($temp);
+            }
+        }
+
+        //自动结束的
+        $end_list_sql = "select l.id as live_id from nlsg_live as l
+join nlsg_live_info as li on l.id = li.live_pid and li.task_id > 0 and li.is_begin = 1 and li.is_finish = 0
+where l.status = 4
+and li.end_at >= '$date_begin'
+and li.end_at <= '$date_end'";
+        $end_list = DB::select($end_list_sql);
+        if (!empty($end_list)) {
+            foreach ($end_list as $v) {
+                $temp = [];
+                $temp['live_id'] = $v->live_id;
+                $temp['job_type'] = 3;
+                $this->begin($temp);
+            }
+        }
+
+        //虚拟人数
+//        $online_num_sql = "update nlsg_live as l
+//join nlsg_live_info as li on l.id = li.live_pid and li.task_id > 0
+//set l.virtual_online_num = case when (timestampdiff(MINUTE,li.begin_at,li.end_at)*100) > 3000  then 3000 else (timestampdiff(MINUTE,li.begin_at,li.end_at)*100) > 3000 end
+//where li.is_begin = 1 and l.virtual_online_num < 3000";
+
+        $online_num_sql = "UPDATE nlsg_live AS l
+JOIN nlsg_live_info AS li ON l.id = li.live_pid
+AND li.task_id > 0
+SET l.virtual_online_num =
+CASE
+		WHEN ( timestampdiff( MINUTE, li.begin_at,current_timestamp )* 100 ) > need_virtual_num THEN
+		need_virtual_num ELSE ( timestampdiff( MINUTE, li.begin_at,current_timestamp )* 100 )
+	END
+	WHERE
+		li.is_begin = 1
+	AND l.need_virtual = 1
+	AND l.virtual_online_num < l.need_virtual_num;";
+        DB::select($online_num_sql);
     }
 
 }

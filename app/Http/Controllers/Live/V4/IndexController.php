@@ -433,6 +433,8 @@ class IndexController extends ControllerBackend
         $content = $input['content'] ?? '';
         $playback_url = $input['playback_url'] ?? '';
         $back_video_url = $input['back_video_url'] ?? '';
+        $need_virtual  = $input['need_virtual'] ?? 0;
+        $need_virtual_num = $input['need_virtual_num'] ?? 0;
         $now = time();
         $now_date = date('Y-m-s H:i:s');
 
@@ -454,6 +456,8 @@ class IndexController extends ControllerBackend
             'twitter_money' => $twitter,
             'helper' => $helper,
             'content' => $content,
+            'need_virtual' => $need_virtual,
+            'need_virtual_num' => $need_virtual_num,
             'is_free' => $price < '0.01' ? 1 : 0,
         ];
 
@@ -728,14 +732,17 @@ class IndexController extends ControllerBackend
     public function info(Request $request)
     {
         $id = $request->get('id');
-        $live = Live::select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at', 'price', 'twitter_money', 'helper', 'content')
+        $live = Live::select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
+            'price', 'twitter_money', 'helper', 'content','need_virtual','need_virtual_num')
             ->with(['livePoster'])
             ->where('id', $id)->first();
         if (!$live) {
             return error('直播不存在');
         }
-        $live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
-        
+        //$live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
+        $liveInfo= LiveInfo::select('playback_url','back_video_url')->where('live_pid', $id)->first();
+        $live->playback_url = $liveInfo['playback_url'];
+        $live->back_video_url = $liveInfo['back_video_url'];
         return success($live);
     }
 
