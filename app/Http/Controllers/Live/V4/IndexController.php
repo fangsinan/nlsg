@@ -433,7 +433,7 @@ class IndexController extends ControllerBackend
         $content = $input['content'] ?? '';
         $playback_url = $input['playback_url'] ?? '';
         $back_video_url = $input['back_video_url'] ?? '';
-        $need_virtual  = $input['need_virtual '] ?? 0;
+        $need_virtual  = $input['need_virtual'] ?? 0;
         $need_virtual_num = $input['need_virtual_num'] ?? 0;
         $now = time();
         $now_date = date('Y-m-s H:i:s');
