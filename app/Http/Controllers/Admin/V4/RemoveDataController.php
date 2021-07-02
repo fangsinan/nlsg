@@ -72,6 +72,7 @@ class RemoveDataController extends ControllerBackend
         }
 
         if (0) {
+            //360添加课程后补全订阅信息
             $servers->addVipWorksToSub();
         }
 
