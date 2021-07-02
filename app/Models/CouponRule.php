@@ -111,20 +111,23 @@ class CouponRule extends Base
             foreach ($res as $v) {
                 $cr_id[] = $v->id;
             }
-
-            $get_list = Coupon::where('user_id', '=', $user_id)
-                ->whereIn('cr_id', $cr_id)
-                ->select([
-                    'cr_id',
-                    DB::raw('max(created_at) as created_at'),
-                    DB::raw('count(id) as counts')
-                ])->groupBy('cr_id')->get();
-            if ($get_list->isEmpty()) {
+            if (empty($cr_id)){
                 $get_list = [];
-            } else {
-                $get_list = $get_list->toArray();
-            }
+            }else{
+                $get_list = Coupon::where('user_id', '=', $user_id)
+                    ->whereIn('cr_id', $cr_id)
+                    ->select([
+                        'cr_id',
+                        DB::raw('max(created_at) as created_at'),
+                        DB::raw('count(id) as counts')
+                    ])->groupBy('cr_id')->get();
 
+                if ($get_list->isEmpty()) {
+                    $get_list = [];
+                } else {
+                    $get_list = $get_list->toArray();
+                }
+            }
         }
 
         //根据优惠券的restrict判断
