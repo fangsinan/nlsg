@@ -9,7 +9,6 @@ class Subscribe extends Base
 {
     protected $table = 'nlsg_subscribe';
 
-
     public function UserInfo (){
         return $this->belongsTo('App\Models\User','user_id');
     }

@@ -287,7 +287,7 @@ class AuthController extends Controller
             'province' => $input['province'],
             'city' => $input['city'],
             'unionid' => $input['unionid'] ?? '',
-//            'wxopenid' => $input['wx_openid'] ?? '',
+            'wxopenid' => $input['wx_openid'] ?? '',
             'headimg' => $input['headimg'] ?? '',
             'is_wx' => $is_wx
         ];
