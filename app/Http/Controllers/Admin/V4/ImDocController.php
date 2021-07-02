@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\MallCategory;
+use App\Models\WorksCategory;
 use App\Servers\ImDocServers;
 use Illuminate\Http\Request;
 
@@ -104,5 +106,55 @@ class ImDocController extends ControllerBackend
         $servers = new ImDocServers();
         $data = $servers->changeJobStatus($request->input());
         return $this->getRes($data);
+    }
+
+    /**
+     * 选择商品分类
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function  getCategory()
+    {
+        $works_category= WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
+            ->where(['status' => 1,])
+            ->orderBy('sort', 'asc')
+            ->get()
+            ->toArray();
+
+        $mall = new MallCategory();
+        $goods_category  = $mall->getUsedList();
+
+        $data = [
+            'works' => [
+                'name'     =>'精品课',
+                'category' =>$works_category
+            ],
+            'lecture' => [
+                'name'   =>  '讲座'
+            ],
+            'goods'   => [
+                'name'   => '商品',
+                'category' => $goods_category
+            ],
+            'live'  => [
+                'name' =>  '直播训练营',
+                'category' => [
+                    [
+                        'id' => '100001',
+                        'name' => '直播'
+                    ],
+                    [
+                       'id' => '100002',
+                       'name' => '训练营'
+                    ],
+                    [
+                        'id' => '100003',
+                        'name' => '幸福360'
+                    ],
+                ]
+            ]
+
+        ];
+
+        return success($data);
     }
 }

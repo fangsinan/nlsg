@@ -1099,7 +1099,7 @@ class IndexController extends Controller
     public function  jpushAlias(Request $request)
     {
         $user_id =  $request->get('user_id');
-        $client   = new JPushClient(config('services.jpush.app_key'), config('services.jpush.master_secret'));
+        $client   = new JPushClient(config('services.jpush.app_key'), config('services.jpush.master_secret'),config('services.jpush.log_file'));
         $response = $client->device()->deleteAlias(strval($user_id));
         return success();
     }

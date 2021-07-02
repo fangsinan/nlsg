@@ -118,6 +118,8 @@ class CallbackController extends Controller
         //https://www.example.com?SdkAppid=1400510272&CallbackCommand=C2C.CallbackAfterSendMsg
         //&contenttype=json&ClientIP=127.0.0.1&OptPlatform=$OptPlatform
         $params = $request->input();
+        \Log::info('im_log'.json_encode($params));
+
 
         if($params['SdkAppid'] != config('env.OPENIM_APPID')){
             return '';
@@ -133,6 +135,10 @@ class CallbackController extends Controller
             case 'Group.CallbackAfterCreateGroup':
                 $result = ImGroupController::addGroup($params);
                 break;
+            case 'Group.CallbackAfterSendMsg':
+                $result = ImGroupController::groupSend($params);
+                break;
+
             default :
                 $result = [
                     "ActionStatus"=>"OK",
