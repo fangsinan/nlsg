@@ -195,6 +195,10 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::post('im_doc/job_add', 'ImDocController@addSendJob');
         Route::put('im_doc/change_job_status', 'ImDocController@changeJobStatus');
 
+        //im选择商品
+        Route::get('im_doc/category', 'ImDocController@getCategory');
+
+
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');
@@ -224,4 +228,6 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('task/lectures','TaskController@getLectures');
     Route::get('task/users','TaskController@getUsers');
     Route::get('task/works','TaskController@getWorks');
+
+
 });
