@@ -64,6 +64,24 @@ class ImDocController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse{
+    "doc_id": 1,
+    "send_type": 1,
+    "send_at": "",
+    "info": [
+    {
+    "type": 1,
+    "list": [
+    1,
+    2,
+    3
+    ]
+    }
+    ]
+    }
+     */
     //添加发送任务
     public function addSendJob(Request $request)
     {

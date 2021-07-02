@@ -21,6 +21,13 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_order/list', 'OrderController@list');
         Route::get('live_order/inviter_list', 'OrderController@inviterLiveList');
 
+
+        Route::get('live_info/live_sub_order', 'InfoController@liveSubOrder');
+        Route::get('live_info/live_order', 'InfoController@liveOrder');
+        Route::get('live_info/comment', 'InfoController@comment');
+        Route::get('live_info/order_online_num', 'InfoController@orderOnlineNum');
+        Route::get('live_info/online_num', 'InfoController@onlineNum');
+
     });
     //导出
     Route::get('live_order/list_excel', 'OrderController@listExcel');
