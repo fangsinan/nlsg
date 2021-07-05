@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 
 class InfoController extends ControllerBackend
 {
+    //邀约
     public function liveSubOrder(Request $request)
     {
         $s = new LiveInfoServers();
@@ -17,6 +18,7 @@ class InfoController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    //订单
     public function liveOrder(Request $request)
     {
         $s = new LiveInfoServers();
@@ -24,6 +26,7 @@ class InfoController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    //评论
     public function comment(Request $request)
     {
         $s = new LiveInfoServers();
@@ -31,6 +34,7 @@ class InfoController extends ControllerBackend
            return $this->getRes($data);
     }
 
+    //下单时在线人数
     public function orderOnlineNum(Request $request)
     {
         $s = new LiveInfoServers();
@@ -38,6 +42,7 @@ class InfoController extends ControllerBackend
            return $this->getRes($data);
     }
 
+    //在线人数
     public function onlineNum(Request $request)
     {
         $s = new LiveInfoServers();
