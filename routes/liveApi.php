@@ -27,6 +27,9 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_info/comment', 'InfoController@comment');
         Route::get('live_info/order_online_num', 'InfoController@orderOnlineNum');
         Route::get('live_info/online_num', 'InfoController@onlineNum');
+        Route::get('live_info/online_num_info', 'InfoController@onlineNumInfo');
+        Route::get('live_info/user_watch', 'InfoController@userWatch');
+
 
     });
     //导出
