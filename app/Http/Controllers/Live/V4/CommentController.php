@@ -220,8 +220,8 @@ class CommentController extends ControllerBackend
             $list_query = LiveComment::with([ 'user:id,phone,nickname',])
                 ->select('id', 'live_id', 'user_id', 'content', 'created_at')
                 ->where('live_id', $live_id)
-                ->where('status', 1)
-                ->where('type', 0);
+                ->where('type', 0)
+                ->where('status', 1);
             if(empty($live_flag)){
                 $list_query->where('live_son_flag', $live_flag);
             }
