@@ -40,8 +40,8 @@ class LiveInfoServers
         if (!empty($params['nickname'] ?? '')) {
             $query->where('u.nickname', 'like', '%' . $params['nickname'] . '%');
         }
-        if (!empty($params['id'] ?? '')) {
-            $query->where('u.id', '=', $params['id']);
+        if (!empty($params['user_id'] ?? '')) {
+            $query->where('u.id', '=', $params['user_id']);
         }
         if (!empty($params['phone'] ?? '')) {
             $query->where('u.phone', 'like', '%' . $params['phone'] . '%');

@@ -14,9 +14,18 @@ class InfoController extends ControllerBackend
      * @api {get} api/live_v4/live_info/live_sub_order 邀约
      * @apiVersion 4.0.0
      * @apiName  live_info/live_sub_order
-     * @apiGroup 直播后台新增-邀约
+     * @apiGroup 直播后台新增
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/live_sub_order
      * @apiDescription  邀约
+     * @apiParam {number} live_id 直播id
+     *
+     * @apiParam {string} [nickname] 昵称
+     * @apiParam {string} [user_id] 用户id
+     * @apiParam {string} [phone] 用户u账号
+     * @apiParam {string} [t_nickname] 推荐昵称
+     * @apiParam {string} [t_user_id] 推荐用户id
+     * @apiParam {string} [t_phone] 推荐账号
+     * @apiParam {string} [son_flag] 别名
      **/
     public function liveSubOrder(Request $request)
     {
@@ -57,9 +66,16 @@ class InfoController extends ControllerBackend
      * @api {get} api/live_v4/live_info/live_order 预约订单
      * @apiVersion 4.0.0
      * @apiName  live_info/live_order
-     * @apiGroup 直播后台新增-预约订单
+     * @apiGroup 直播后台新增
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/live_order
      * @apiDescription  预约订单
+     * @apiParam {number} live_id 直播id
+     *
+     * @apiParam {string} [nickname] 昵称
+     * @apiParam {string} [phone] 用户u账号
+     * @apiParam {string} [t_nickname] 推荐昵称
+     * @apiParam {string} [t_phone] 推荐账号
+     * @apiParam {string} [son_flag] 别名
      **/
     public function liveOrder(Request $request)
     {
@@ -108,9 +124,10 @@ class InfoController extends ControllerBackend
      * @api {get} api/live_v4/live_info/online_num 在线人数
      * @apiVersion 4.0.0
      * @apiName  live_info/online_num
-     * @apiGroup 直播后台新增-在线人数
+     * @apiGroup 直播后台新增
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/online_num
      * @apiDescription  在线人数
+     * @apiParam {number} live_id 直播id
      **/
     public function onlineNum(Request $request)
     {
@@ -123,9 +140,11 @@ class InfoController extends ControllerBackend
      * @api {get} api/live_v4/live_info/online_num_info 在线人数详情
      * @apiVersion 4.0.0
      * @apiName  live_info/online_num_info
-     * @apiGroup 直播后台新增-在线人数详情
+     * @apiGroup 直播后台新增
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/online_num_info
      * @apiDescription  在线人数详情
+     * @apiParam {number} live_id 直播id
+     * @apiParam {string} date 时间,精确到分钟(2021-01-01 10:00:01)
      **/
     public function onlineNumInfo(Request $request)
     {
@@ -138,11 +157,14 @@ class InfoController extends ControllerBackend
      * @api {get} api/live_v4/live_info/user_watch (未)进入直播间用户列表
      * @apiVersion 4.0.0
      * @apiName  live_info/user_watch
-     * @apiGroup 直播后台新增-(未)进入直播间用户列表
+     * @apiGroup 直播后台新增
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/user_watch
      * @apiDescription  (未)进入直播间用户列表
+     * @apiParam {number} live_id 直播id
+     * @apiParam {number=1,2} flag 标记,1是进入了,2是没进入
      **/
-    public function userWatch(Request $request){
+    public function userWatch(Request $request)
+    {
         $s = new LiveInfoServers();
         $data = $s->userWatch($request->input());
         return $this->getRes($data);
