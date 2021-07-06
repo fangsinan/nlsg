@@ -450,6 +450,7 @@ class LiveController extends Controller
     public function show(Request $request)
     {
         $id = $request->get('live_id');
+        $live_son_flag = $request->get('live_son_flag');
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro,honor',
             'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish',
@@ -509,6 +510,16 @@ class LiveController extends Controller
             } else {
                 $list['is_password'] = $list->live->password ? 1 : 0;
             }
+            $list['live_son_flag_count'] = 0;
+            if(!empty($live_son_flag)){
+                $list['live_son_flag_count'] = Subscribe::where([
+                    "type" => 3,
+                    "relation_id" => $list->live_pid,
+                    "status" => 1,
+                    "twitter_id" => $live_son_flag,
+                ])->count();
+            }
+
 //
         }
         $data = [
