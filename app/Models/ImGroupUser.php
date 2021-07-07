@@ -4,7 +4,7 @@ namespace App\Models;
 
 
 
-class ImGroupUserModel extends Base
+class ImGroupUser extends Base
 {
 
     protected $table = 'nlsg_im_group_user';
