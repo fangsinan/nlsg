@@ -69,7 +69,9 @@ class LiveInfoServers
                 's.id', 's.user_id', 'u.phone', 'u.nickname', 'tu.id as t_user_id', 'tu.phone as t_phone',
                 'tu.nickname as t_nickname', 'lr.son_flag', 's.created_at', 's.relation_id'
             ]);
-            return $query->paginate($size);
+            $res =  $query->paginate($size);
+            $custom = collect(['live_user_id' => $check_live_id->user_id]);
+            return $custom->merge($res);
         } else {
             $query->select([
                 's.user_id', 'u.phone', 'u.nickname', 'tu.id as t_user_id', 'tu.phone as t_phone',
@@ -135,7 +137,9 @@ class LiveInfoServers
 
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
-            return $query->paginate($size);
+            $res =  $query->paginate($size);
+            $custom = collect(['live_user_id' => $check_live_id->user_id]);
+            return $custom->merge($res);
         } else {
             return $query->get();
         }
@@ -288,7 +292,9 @@ class LiveInfoServers
             'u.nickname as t_nickname', DB::raw('left(lou.online_time,16) as online_time')
         ]);
 
-        return $query->paginate($size);
+        $res =  $query->paginate($size);
+        $custom = collect(['live_user_id' => $check_live_id->user_id]);
+        return $custom->merge($res);
     }
 
     public function userWatch($params)
@@ -356,7 +362,7 @@ class LiveInfoServers
 
             $list['data'] = DB::select($sql);
             $list['total'] = DB::select($count_sql)[0]->counts;
-
+            $list['live_user_id'] = $check_live_id->user_id;
             return $list;
         }
 
