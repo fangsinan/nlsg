@@ -95,7 +95,7 @@ class LiveInfoServers
             return ['code' => false, 'msg' => '不是王琨的直播间'];
         }
 
-        $query = DB::table('nlsg_live_deal');
+        $query = DB::table('nlsg_live_deal')->where('live_id','=',$live_id);
 
         if (!empty($params['ordernum'] ?? '')) {
             $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
