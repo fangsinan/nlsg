@@ -4,7 +4,7 @@ namespace App\Models;
 
 
 
-class ImMsgModel extends Base
+class ImMsg extends Base
 {
 
     protected $table = 'nlsg_im_msg';

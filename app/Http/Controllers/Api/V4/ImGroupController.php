@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
-use App\Models\ImGroupModel;
-use App\Models\ImGroupUserModel;
+use App\Models\ImGroup;
+use App\Models\ImGroupUser;
 use App\Models\Live;
 use App\Models\LiveComment;
 use App\Models\LiveInfo;
@@ -31,7 +31,7 @@ class ImGroupController extends Controller
             'name'           => $params['Name'],
 
         ];
-        $group_add_id = ImGroupModel::insert($group_add);
+        $group_add_id = ImGroup::insert($group_add);
 
         $adds = [];
         foreach ($params['MemberList'] as $key=>$val){
@@ -46,7 +46,7 @@ class ImGroupController extends Controller
 
         }
         if(!empty($adds)){
-            ImGroupUserModel::insert($adds);
+            ImGroupUser::insert($adds);
         }
 
 

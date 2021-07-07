@@ -9,9 +9,9 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
-use App\Models\ImMsgContentImgModel;
-use App\Models\ImMsgContentModel;
-use App\Models\ImMsgModel;
+use App\Models\ImMsgContentImg;
+use App\Models\ImMsgContent;
+use App\Models\ImMsg;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,7 +43,7 @@ class ImMsgController extends Controller
             'send_msg_result'   => $params['SendMsgResult'],
             'unread_msg_num'    => $params['UnreadMsgNum'],
         ];
-        $msg_add_id = ImMsgModel::insert($msg_add);
+        $msg_add_id = ImMsg::insert($msg_add);
 
         $img_res= true;
         //消息体
@@ -87,7 +87,7 @@ class ImMsgController extends Controller
 
                     }
                     if(!empty($img_adds)){
-                        $img_res = ImMsgContentImgModel::insert($img_adds);
+                        $img_res = ImMsgContentImg::insert($img_adds);
                     }else{
                         $img_res = false;
                     }
@@ -119,7 +119,7 @@ class ImMsgController extends Controller
             $msg_content_adds[] = $msg_content_add;
         }
         if(!empty($msg_content_adds)){
-            $content_res = ImMsgContentModel::insert($msg_content_adds);
+            $content_res = ImMsgContent::insert($msg_content_adds);
         }else{
             $content_res=false;
         }
