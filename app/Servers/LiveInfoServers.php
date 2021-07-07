@@ -95,7 +95,7 @@ class LiveInfoServers
             return ['code' => false, 'msg' => '不是王琨的直播间'];
         }
 
-        $query = DB::table('nlsg_live_deal')->where('live_id','=',$live_id);
+        $query = DB::table('nlsg_live_deal')->where('live_id', '=', $live_id);
 
         if (!empty($params['ordernum'] ?? '')) {
             $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
@@ -295,6 +295,8 @@ class LiveInfoServers
         $page = $params['page'] ?? 1;
         $offset = ($page - 1) * $size;
 
+        $excel_flag = $params['excel_flag'] ?? 0;
+
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
@@ -330,8 +332,31 @@ class LiveInfoServers
             AND s.relation_id = $live_id
             AND s.type = 3
             AND $where_str ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
-        limit $size offset $offset
         ";
+
+        if (empty($excel_flag)) {
+            $count_sql = "
+        SELECT
+           count(*) as counts
+        FROM
+            nlsg_subscribe AS s
+            JOIN nlsg_user AS u ON s.user_id = u.id
+            LEFT JOIN nlsg_live_count_down as cd on s.user_id = cd.user_id and cd.live_id = $live_id
+            LEFT JOIN nlsg_backend_live_role as lr on cd.new_vip_uid = lr.son_id
+        WHERE
+            ( s.order_id > 9 OR s.channel_order_id > 0 )
+            AND s.relation_id = $live_id
+            AND s.type = 3
+            AND $where_str ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
+        ";
+
+            $sql .= " limit $size offset $offset ";
+
+            $list['data'] = DB::select($sql);
+            $list['total'] = DB::select($count_sql)[0]->counts;
+
+            return $list;
+        }
 
         return DB::select($sql);
 

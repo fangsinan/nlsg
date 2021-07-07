@@ -89,7 +89,7 @@ class InfoController extends ControllerBackend
         } else {
             $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
                 '推客别名', '支付价格', '支付时间', '直播id', '直播标题', '订单id'];
-            $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
+            $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
             header('Content-Description: File Transfer');
             header('Content-Type: application/vnd.ms-excel');
             header('Content-Disposition: attachment; filename="' . $fileName . '"');
@@ -143,7 +143,7 @@ class InfoController extends ControllerBackend
                 '推荐人账号', '推荐人昵称', '关系保护账号', '关系保护昵称', '关系保护身份', '受益人id', '受益人金额',
                 '是否抖音渠道', '抖音订单号', '渠道类型', '渠道名称',
                 '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款'];
-            $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
+            $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
             header('Content-Description: File Transfer');
             header('Content-Type: application/vnd.ms-excel');
             header('Content-Disposition: attachment; filename="' . $fileName . '"');
@@ -218,12 +218,40 @@ class InfoController extends ControllerBackend
      * @apiDescription  (未)进入直播间用户列表
      * @apiParam {number} live_id 直播id
      * @apiParam {number=1,2} flag 标记,1是进入了,2是没进入
+     * @apiParam {string} [excel_flag=1,0] 是否未导出请求(1是)
      **/
     public function userWatch(Request $request)
     {
+        $excel_flag = $request->input('excel_flag', 0);
         $s = new LiveInfoServers();
         $data = $s->userWatch($request->input());
-        return $this->getRes($data);
+        if (empty($excel_flag)) {
+            return $this->getRes($data);
+        } else {
+            $columns = ['编号','用户id','用户账号','时间','邀约人','邀约人别名'];
+            $fileName = '直播间用户观看分析' . date('Y-m-d H:i') . '.csv';
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header("Access-Control-Allow-Origin: *");
+            $fp = fopen('php://output', 'a');//打开output流
+            mb_convert_variables('GBK', 'UTF-8', $columns);
+            fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
+            foreach ($data as $v) {
+                $v = json_decode(json_encode($v), true);
+                mb_convert_variables('GBK', 'UTF-8', $v);
+                fputcsv($fp, $v);
+                ob_flush();     //刷新输出缓冲到浏览器
+                flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+            }
+            fclose($fp);
+            exit();
+        }
+
     }
 
 }
