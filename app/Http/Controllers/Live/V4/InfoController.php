@@ -228,7 +228,7 @@ class InfoController extends ControllerBackend
         if (empty($excel_flag)) {
             return $this->getRes($data);
         } else {
-            $columns = ['编号','用户id','用户账号','时间','邀约人','邀约人别名'];
+            $columns = ['编号', '用户id', '用户账号', '时间', '邀约人', '邀约人别名'];
             $fileName = '直播间用户观看分析' . date('Y-m-d H:i') . '.csv';
             header('Content-Description: File Transfer');
             header('Content-Type: application/vnd.ms-excel');
@@ -252,6 +252,13 @@ class InfoController extends ControllerBackend
             exit();
         }
 
+    }
+
+    public function statistics(Request $request)
+    {
+        $s = new LiveInfoServers();
+        $data = $s->statistics($request->input());
+        return $this->getRes($data);
     }
 
 }

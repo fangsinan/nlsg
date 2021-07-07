@@ -30,6 +30,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_info/online_num', 'InfoController@onlineNum');
         Route::get('live_info/online_num_info', 'InfoController@onlineNumInfo');
         Route::get('live_info/user_watch', 'InfoController@userWatch');
+        Route::get('live_info/statistics', 'InfoController@statistics');
 
 
     });

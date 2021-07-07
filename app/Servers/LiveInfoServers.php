@@ -6,6 +6,9 @@ namespace App\Servers;
 
 use App\Models\BackendLiveRole;
 use App\Models\Live;
+use App\Models\LiveLogin;
+use App\Models\Subscribe;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class LiveInfoServers
@@ -69,7 +72,7 @@ class LiveInfoServers
                 's.id', 's.user_id', 'u.phone', 'u.nickname', 'tu.id as t_user_id', 'tu.phone as t_phone',
                 'tu.nickname as t_nickname', 'lr.son_flag', 's.created_at', 's.relation_id'
             ]);
-            $res =  $query->paginate($size);
+            $res = $query->paginate($size);
             $custom = collect(['live_user_id' => $check_live_id->user_id]);
             return $custom->merge($res);
         } else {
@@ -137,7 +140,7 @@ class LiveInfoServers
 
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
-            $res =  $query->paginate($size);
+            $res = $query->paginate($size);
             $custom = collect(['live_user_id' => $check_live_id->user_id]);
             return $custom->merge($res);
         } else {
@@ -211,7 +214,7 @@ class LiveInfoServers
                 'o.id as order_id', 'o.pay_type', 'os_type',
                 'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id'
             ]);
-            $res =  $query->paginate($size);
+            $res = $query->paginate($size);
             $custom = collect(['live_user_id' => $check_live_id->user_id]);
             return $custom->merge($res);
         } else {
@@ -292,7 +295,7 @@ class LiveInfoServers
             'u.nickname as t_nickname', DB::raw('left(lou.online_time,16) as online_time')
         ]);
 
-        $res =  $query->paginate($size);
+        $res = $query->paginate($size);
         $custom = collect(['live_user_id' => $check_live_id->user_id]);
         return $custom->merge($res);
     }
@@ -367,6 +370,68 @@ class LiveInfoServers
         }
 
         return DB::select($sql);
+
+    }
+
+    public function statistics($params)
+    {
+        $live_id = $params['live_id'] ?? 0;
+        if (empty($live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+        if (empty($check_live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+
+        $user_info = User::where('id', '=', $check_live_id->user_id)->select(['nickname', 'headimg'])->first();
+
+        $res['headimg'] = $user_info->headimg;
+        $res['nickname'] = $user_info->nickname;
+        $res['user_id'] = $check_live_id->user_id;
+        $res['begin_at'] = $check_live_id->begin_at;
+        $res['end_at'] = $check_live_id->end_at;
+        $res['live_login'] = LiveLogin::where('live_id', '=', $live_id)->count();//人气
+        $res['order_num'] = Subscribe::where('relation_id', '=', $live_id)
+            ->where(function ($query) {
+                $query->where('order_id', '>', 0)->orWhere('channel_order_id', '<>', '');
+            })->count();//总预约人数
+
+        $watch_count_sql = "SELECT
+           count(*) as counts
+        FROM
+            nlsg_subscribe AS s
+            JOIN nlsg_user AS u ON s.user_id = u.id
+        WHERE
+            ( s.order_id > 9 OR s.channel_order_id > 0 )
+            AND s.relation_id = $live_id
+            AND s.type = 3
+            AND EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )";
+
+        $not_watch_count_sql = "SELECT
+           count(*) as counts
+        FROM
+            nlsg_subscribe AS s
+            JOIN nlsg_user AS u ON s.user_id = u.id
+        WHERE
+            ( s.order_id > 9 OR s.channel_order_id > 0 )
+            AND s.relation_id = $live_id
+            AND s.type = 3
+            AND NOT EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id ) ";
+
+        $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
+        $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+
+
+        //成交单数 总金额,购买人数,未购买人数
+        if ($check_live_id->user_id == 161904) {
+            //王琨,统计live_deal
+        } else {
+            //李婷,统计order表的9.9
+        }
+
+
+        return $res;
 
     }
 
