@@ -592,6 +592,7 @@ class WechatPay extends Controller
                     'status' => 1,
                     'order_id' => $orderId, //订单id
                     'relation_id' => $live_id,
+                    'twitter_id' => $orderInfo['twitter_id'],
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
                 $liveData = Live::find($live_id);
