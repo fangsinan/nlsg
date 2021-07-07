@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ImCollection;
 use App\Models\ImMsgContentImg;
 use App\Models\ImMsgContent;
 use App\Models\ImMsg;
@@ -23,6 +24,83 @@ use Illuminate\Support\Facades\DB;
  */
 class ImMsgController extends Controller
 {
+
+
+    /**
+     * @api {get} /api/v4/im/msg_collection  消息收藏操作
+     * @apiName msg_collection
+     * @apiVersion 1.0.0
+     * @apiGroup im
+     *
+     * @apiParam {int} msg_seq  消息序列号
+     * @apiParam {int} type  收藏类型   1消息收藏
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {}
+    }
+     */
+    public function MsgCollection(Request $request){
+        $msg_seq = $request->input('msg_seq', 0);  //消息序列号
+        $type = $request->input('type') ?? 1;  //类型
+
+
+        $msg = ImMsg::where('msg_seq',$msg_seq)->first();
+        if(empty($msg)){
+            $this->error('0','msg_seq error');
+        }
+        $uid = $this->user['id']; //uid
+
+        $data = [
+            'user_id' => $uid,
+            'msg_seq' => $msg_seq,
+            'type' => $type,
+        ];
+        ImCollection::firstOrCreate($data);
+        return $this->success();
+    }
+
+
+    /**
+     * @api {get} /api/v4/im/msg_collection_list  消息收藏列表
+     * @apiName msg_collection_list
+     * @apiVersion 1.0.0
+     * @apiGroup im
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {}
+    }
+     */
+    public function MsgCollectionList(Request $request){
+        $request->input('user_id', 0);  //消息序列号
+        $uid = $this->user['id'];
+
+        $collectionList = ImCollection::select("id","user_id","msg_seq")->where([
+            'type'=>1,'user_id'=>$uid
+        ])->orderBy('created_at',"desc")->paginate($this->page_per_page)->toArray();
+
+        $msg_seqs = array_column($collectionList['data'],'msg_seq');
+        $msg_list = ImMsg::getMsgList([],$msg_seqs);
+
+        foreach ($collectionList['data'] as $key=>$val) {
+            $collectionList['data'][$key]['msg_list'] = [];
+            foreach ($msg_list as $item){
+                if($val['msg_seq'] == $item['msg_seq']){
+                    $collectionList['data'][$key]['msg_list'] = $item;
+                    break;
+                }
+            }
+        }
+
+        return $this->success($collectionList);
+    }
 
     public static function callbackMsg($params=[]){
 

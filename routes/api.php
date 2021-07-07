@@ -385,12 +385,15 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('order/create_send_order', 'OrderController@createSendOrder'); //赠送下单
         Route::post('send/send_edit', 'SendController@getSendEdit');
 
+        //Im
+        Route::get('im/msg_collection', 'ImMsgController@MsgCollection');
+        Route::get('im/msg_collection_list', 'ImMsgController@MsgCollectionList');
+
     });
 
     //IM
     Route::get('callback/callbackMsg', 'CallbackController@callbackMsg');
     Route::get('im/get_user_sig', 'ImController@getUserSig');
-
 
 
 });
