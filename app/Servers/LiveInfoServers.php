@@ -79,6 +79,69 @@ class LiveInfoServers
         }
     }
 
+    public function liveOrderKun($params)
+    {
+        $size = $params['size'] ?? 10;
+
+        $live_id = $params['live_id'] ?? 0;
+        if (empty($live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+        if (empty($check_live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        if ($check_live_id->user_id != 161904) {
+            return ['code' => false, 'msg' => '不是王琨的直播间'];
+        }
+
+        $query = DB::table('nlsg_live_deal');
+
+        if (!empty($params['ordernum'] ?? '')) {
+            $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
+        }
+        if (!empty($params['phone'] ?? '')) {
+            $query->where('phone', 'like', '%' . $params['phone'] . '%');
+        }
+        if (!empty($params['invite_phone'] ?? '')) {
+            $query->where('invite_phone', 'like', '%' . $params['invite_phone'] . '%');
+        }
+        if (!empty($params['protect_phone'] ?? '')) {
+            $query->where('protect_phone', 'like', '%' . $params['protect_phone'] . '%');
+        }
+        if (!empty($params['diamond_phone'] ?? '')) {
+            $query->where('diamond_phone', 'like', '%' . $params['diamond_phone'] . '%');
+        }
+        if (!empty($params['qd'] ?? '')) {
+            $query->where('qd', '=', $params['qd']);
+        }
+
+        $query->select([
+            'ordernum', 'pay_price', 'num', 'pay_time',
+            DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
+            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "类型错误" end) as type_name'),
+            'phone', 'nickname',
+            DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as identity_name'),
+            'invite_phone', 'invite_nickname',
+            'protect_phone', 'protect_nickname',
+            DB::raw('(case protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as protect_identity_name'),
+            'profit_user_id', 'profit_price',
+            DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
+            'tiktok_ordernum', 'qd',
+            DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" else "错误" end) as qd_name'),
+            'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
+            DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
+        ]);
+
+        $excel_flag = $params['excel_flag'] ?? 0;
+        if (empty($excel_flag)) {
+            return $query->paginate($size);
+        } else {
+            return $query->get();
+        }
+
+    }
+
     public function liveOrder($params)
     {
         $size = $params['size'] ?? 10;
