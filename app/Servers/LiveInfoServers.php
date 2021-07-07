@@ -87,6 +87,7 @@ class LiveInfoServers
     public function liveOrderKun($params)
     {
         $size = $params['size'] ?? 10;
+        $query_flag = $params['query_flag'] ?? '';
 
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
@@ -121,6 +122,14 @@ class LiveInfoServers
             $query->where('qd', '=', $params['qd']);
         }
 
+        switch ($query_flag) {
+            case 'money_sum':
+                return $query->sum('pay_price');
+            case 'user_sum':
+                return $query->count('user_id');
+        }
+
+
         $query->select([
             'ordernum', 'pay_price', 'num', 'pay_time',
             DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
@@ -152,6 +161,7 @@ class LiveInfoServers
     public function liveOrder($params)
     {
         $size = $params['size'] ?? 10;
+        $query_flag = $params['query_flag'] ?? '';
 
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
@@ -207,6 +217,14 @@ class LiveInfoServers
 
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
+
+            switch ($query_flag) {
+                case 'money_sum':
+                    return $query->sum('pay_price');
+                case 'user_sum':
+                    return $query->count('o.user_id');
+            }
+
             $query->select([
                 'o.user_id', 'u.phone', 'u.nickname', 'o.twitter_id',
                 'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
@@ -422,14 +440,29 @@ class LiveInfoServers
         $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
         $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
 
-
         //成交单数 总金额,购买人数,未购买人数
         if ($check_live_id->user_id == 161904) {
             //王琨,统计live_deal
+            $temp_order = $this->liveOrderKun(['live_id' => $live_id]);
+            $temp_order_money = $this->liveOrderKun(['live_id' => $live_id, 'query_flag' => 'money_sum']);
+            $temp_order_user = $this->liveOrderKun(['live_id' => $live_id, 'query_flag' => 'user_sum']);
         } else {
             //李婷,统计order表的9.9
+            $temp_order = $this->liveOrder(['live_id' => $live_id]);
+            $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum']);
+            $temp_order_user = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum']);
         }
 
+        $res['total_order'] = $temp_order['total'] ?? '错误';
+        $res['total_order_money'] = $temp_order_money;
+        $res['total_order_user'] = $temp_order_user;
+
+        //总预约人数
+        $res['total_sub_count'] = Subscribe::where('relation_id', '=', $live_id)
+            ->where('type', '=', 3)->where('status', '=', 1)
+            ->count();
+        //为购买人数
+        $res['total_not_buy'] = $res['total_sub_count'] - $temp_order_user;
 
         return $res;
 

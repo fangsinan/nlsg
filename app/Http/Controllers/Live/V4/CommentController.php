@@ -210,7 +210,6 @@ class CommentController extends ControllerBackend
         mb_convert_variables('GBK', 'UTF-8', $columns);
         fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
 
-
         $size = 100;
         $page = 1;
         $request->offsetSet('size', $size);

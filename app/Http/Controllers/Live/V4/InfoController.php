@@ -254,6 +254,17 @@ class InfoController extends ControllerBackend
 
     }
 
+    /**
+     * @api {get} api/live_v4/live_info/statistics 统计数据
+     * @apiVersion 4.0.0
+     * @apiName  live_info/statistics
+     * @apiGroup 直播后台新增
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/statistics
+     * @apiDescription  统计数据
+     * @apiParam {number} live_id 直播id
+     * @apiParam {number=1,2} flag 标记,1是进入了,2是没进入
+     * @apiParam {string} [excel_flag=1,0] 是否未导出请求(1是)
+     **/
     public function statistics(Request $request)
     {
         $s = new LiveInfoServers();
