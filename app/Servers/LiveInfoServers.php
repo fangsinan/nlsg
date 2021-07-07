@@ -207,7 +207,9 @@ class LiveInfoServers
                 'o.id as order_id', 'o.pay_type', 'os_type',
                 'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id'
             ]);
-            return $query->paginate($size);
+            $res =  $query->paginate($size);
+            $custom = collect(['live_user_id' => $check_live_id->user_id]);
+            return $custom->merge($res);
         } else {
             $query->select([
                 'o.user_id', 'u.phone', 'u.nickname', 'o.twitter_id',
