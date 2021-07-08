@@ -41,6 +41,9 @@ return [
         'merchant.NLSGApplePay.1398nlb' => 1398,
         'merchant.NLSGApplePay.2998nlb' => 2998,
     ],
+    "Im_config" => [
+        'admin' => "administrator",
 
+    ],
 
 ];
