@@ -122,7 +122,7 @@ class ImMsgController extends Controller
         }
         $uid = $this->user['id']; //uid
 
-        foreach ($msg_seq as $k=>$v){
+        foreach ($msg as $k=>$v){
             $data = [
                 'user_id' => $uid,
                 'msg_seq' => $v['msg_seq'],
