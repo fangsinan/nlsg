@@ -6,6 +6,7 @@ namespace App\Servers;
 
 use App\Models\BackendLiveRole;
 use App\Models\Live;
+use App\Models\LiveCountDown;
 use App\Models\LiveLogin;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -40,18 +41,11 @@ class LiveInfoServers
         //用户昵称 推荐人昵称
         //用户id 推荐人id
         //用户手机 推荐人手机
-        if (!empty($params['nickname'] ?? '')) {
-            $query->where('u.nickname', 'like', '%' . $params['nickname'] . '%');
-        }
         if (!empty($params['user_id'] ?? '')) {
             $query->where('u.id', '=', $params['user_id']);
         }
         if (!empty($params['phone'] ?? '')) {
             $query->where('u.phone', 'like', '%' . $params['phone'] . '%');
-        }
-
-        if (!empty($params['t_nickname'] ?? '')) {
-            $query->where('tu.nickname', 'like', '%' . $params['t_nickname'] . '%');
         }
         if (!empty($params['t_user_id'] ?? '')) {
             $query->where('tu.user_id', '=', $params['tu_user_id']);
@@ -129,7 +123,6 @@ class LiveInfoServers
                 return $query->count('user_id');
         }
 
-
         $query->select([
             'ordernum', 'pay_price', 'num', 'pay_time',
             DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
@@ -137,11 +130,13 @@ class LiveInfoServers
             'phone', 'nickname',
             DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as identity_name'),
             'invite_phone', 'invite_nickname',
-            'protect_phone', 'protect_nickname',
+            'protect_user_id', 'protect_phone', 'protect_nickname',
             DB::raw('(case protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as protect_identity_name'),
             'profit_user_id', 'profit_price',
+            'diamond_user_id', 'diamond_phone', 'diamond_nickname',
+            DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as diamond_identity'),
             DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
-            'tiktok_ordernum', 'qd',
+            'tiktok_ordernum', 'tiktok_time', 'qd',
             DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" else "错误" end) as qd_name'),
             'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
             DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
@@ -267,15 +262,30 @@ class LiveInfoServers
             return ['code' => false, 'msg' => 'live_id错误'];
         }
 
-        return DB::table('nlsg_live_online_user')
-            ->where('live_id', '=', $live_id)
-            ->groupBy(Db::raw('left(online_time,16)'))
+        $res['son_flag'] = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
+            ->select(['son', 'son_id', 'son_flag'])
+            ->get();
+
+        $query = DB::table('nlsg_live_online_user')
+            ->where('live_id', '=', $live_id);
+
+        if (!empty($params['son_id'] ?? 0)) {
+            $temp_user_list = LiveCountDown::where('live_id', '=', $live_id)
+                ->where('new_vip_uid', '=', $params['son_id'])
+                ->pluck('user_id')
+                ->toArray();
+
+            $query->whereIn('user_id', $temp_user_list);
+        }
+
+        $res['list'] = $query->groupBy(Db::raw('left(online_time,16)'))
             ->orderBy('online_time')
             ->select([
                 DB::raw('count(*) as counts'),
                 DB::raw('LEFT(online_time,16) as time')
-            ])
-            ->get();
+            ])->get();
+
+        return $res;
     }
 
     public function onlineNumInfo($params)
@@ -463,6 +473,27 @@ class LiveInfoServers
             ->count();
         //为购买人数
         $res['total_not_buy'] = $res['total_sub_count'] - $temp_order_user;
+
+        //观看时常大于30分钟的
+        $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
+SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
+) as a where counts >= 30";
+        $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
+
+        //观看时常大于60分钟的
+        $more_than_60_min_sql = "SELECT count(user_id) as user_count from (
+SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
+) as a where counts >= 60";
+        $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
+
+        //累计人次login
+        $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
+        //累计人数sub
+        $res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
+            ->where('type', '=', 3)
+//            ->where('status','=',1)
+            ->count();
+
 
         return $res;
 

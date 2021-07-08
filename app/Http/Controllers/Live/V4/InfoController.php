@@ -140,8 +140,10 @@ class InfoController extends ControllerBackend
             return $this->getRes($data);
         } else {
             $columns = ['订单编号', '支付金额', '数量', '支付时间', '类型名称', '购买人账号', '购买人昵称', '购买人身份',
-                '推荐人账号', '推荐人昵称', '关系保护账号', '关系保护昵称', '关系保护身份', '受益人id', '受益人金额',
-                '是否抖音渠道', '抖音订单号', '渠道类型', '渠道名称',
+                '推荐人账号', '推荐人昵称', '关系保护账号', '关系保护id','关系保护昵称', '关系保护身份',
+                '受益人id', '受益人金额',
+                '钻石合伙人id','钻石合伙人账号','钻石合伙人昵称','钻石合伙人身份',
+                '是否抖音渠道', '抖音订单号', '抖音下单时间','渠道类型', '渠道名称',
                 '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款'];
             $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
             header('Content-Description: File Transfer');
@@ -184,6 +186,9 @@ class InfoController extends ControllerBackend
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/online_num
      * @apiDescription  在线人数
      * @apiParam {number} live_id 直播id
+     * @apiParam {number} [son_id] 渠道过滤(son_flag对应的son_id)
+     * @apiSuccess {string[]} son_flag 渠道列表,如果有,则显示过滤选项
+     * @apiSuccess {string[]} list 内容
      **/
     public function onlineNum(Request $request)
     {
