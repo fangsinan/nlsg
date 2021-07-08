@@ -54,7 +54,6 @@ class AuthController extends Controller
         $user_id = $request->input('user_id');
         $inviter = $request->input('inviter', 0);
         $ref = $request->input('ref', 0);
-//        $wx_openid = $request->input('wx_openid', 0);//h5公众号
 
         $sclass = new \StdClass();
         if (!$phone) {
@@ -124,10 +123,6 @@ class AuthController extends Controller
             $user->level = 0;
         }
 
-        //  采集H5的用户openid
-//        if($wx_openid){
-//            User::where('id', '=', $user->id)->update(['wxopenid' => $wx_openid]);
-//        }
         $data = [
             'id' => $user->id,
             'token' => $token,
@@ -206,11 +201,6 @@ class AuthController extends Controller
             $user->level = 0;
         }
 
-//        $wx_openid = $request->input('wx_openid', 0);
-//        //  采集H5的用户openid
-//        if($wx_openid){
-//            User::where('id', '=', $user->id)->update(['wxopenid' => $wx_openid]);
-//        }
         $data = [
             'id' => $user->id,
             'token' => $token,
@@ -269,13 +259,6 @@ class AuthController extends Controller
             }
         }
 
-//        $res = Redis::get($phone);
-//        if (!$res) {
-//            return error(1000, '验证码已过期');
-//        }
-//        if ($code !== $res) {
-//            return error(1000, '验证码错误');
-//        }
         Redis::del($phone);
         $is_wx = 0;
         if($input['unionid']){
@@ -503,8 +486,6 @@ class AuthController extends Controller
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res->access_token,
             'openid' => $res->openid,
-//            'access_token' => '40_tltoeeRVSC3-8r1b3moslhijYvZxBk3XHQYk3RefzZCRlLv90Xz1e3rO4ZlVy2wByT--JJ6URuZSYyXCfs-AnA',
-//            'openid' => 'oVWHQwTytdgrfchdok3rKaxN6I-k',
         ]);
         if (!$list) {
             return $this->error(400, '获取用户信息失败');
@@ -520,26 +501,6 @@ class AuthController extends Controller
             'country' => $list->country, //中国
         ];
         return $this->success($data);
-//        $unionid = $request->input('unionid');
-//        $user = User::where('unionid', $unionid)->first();
-//        if (!$user) {
-//            $user = User::create([
-//                'nickname' => '微信',
-//                'sex' => '1',
-//                'province' => '北京市',
-//                'city' => '海淀区',
-//                'headimg' => '/wechat/works/headimg/3833/2017110823004219451.png'
-//            ]);
-//        }
-//        $token = auth('api')->login($user);;
-//        $data = [
-//            'nickname' => $user->nickname,
-//            'sex' => $user->sex,
-//            'province' => $user->province,
-//            'city' => $user->city,
-//            'token' => $token
-//        ];
-//        return $this->success($data);
 
     }
 
@@ -597,7 +558,6 @@ class AuthController extends Controller
             } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
                 $message = $exception->getResults();
                 return $this->error(400, '验证码发送错误,请一分钟后重试');
-                return $message;
             }
         }
 
