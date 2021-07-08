@@ -193,19 +193,21 @@ class ImMsgController extends Controller
             'send_msg_result'   => $params['SendMsgResult'],
             'unread_msg_num'    => $params['UnreadMsgNum'],
         ];
-        $msg_add_id = ImMsg::insert($msg_add);
 
+        $msg_add_res = ImMsg::create($msg_add);
         $img_res= true;
         //消息体
         foreach ($params['MsgBody'] as $k=>$v){
             $msg_content_add = [
-                'msg_id'        => $msg_add_id,
+                'msg_id'        => $msg_add_res->id,
                 'msg_type'      => $v['MsgType'],
+                'created_at'      => date('Y-m-d H:i:s'),
+                'updated_at'      => date('Y-m-d H:i:s'),
                 ];
 
             switch ($v['MsgType']){
                 case 'TIMTextElem' :  //文本消息元素
-                    $msg_content_add['text']            = $v['MsgContent']->Text;
+                    $msg_content_add['text']            = $v['MsgContent']['Text'];
                     break;
                 case 'TIMFaceElem' : //表情消息元素
                     $msg_content_add['index']           = $v['MsgContent']->Index;
@@ -237,7 +239,7 @@ class ImMsgController extends Controller
 
                     }
                     if(!empty($img_adds)){
-                        $img_res = ImMsgContentImg::insert($img_adds);
+                        $img_res = ImMsgContentImg::create($img_adds);
                     }else{
                         $img_res = false;
                     }
@@ -273,14 +275,14 @@ class ImMsgController extends Controller
         }else{
             $content_res=false;
         }
-
-        if($msg_add_id && $img_res && $content_res){
+        if($msg_add_res && $img_res && $content_res){
             DB::commit();
         }else{
             DB::rollBack();
         }
 
 
+        dd($content_res);
 
 
 

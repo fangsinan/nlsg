@@ -9,6 +9,13 @@ class ImMsg extends Base
 
     protected $table = 'nlsg_im_msg';
 
+    protected $fillable = ['from_account', 'to_account', 'msg_seq','msg_random',
+        'msg_time','msg_time','send_msg_result','unread_msg_num',];
+
+
+
+
+
     public function  content(){
         return  $this->hasMany(ImMsgContent::class, 'msg_id');
     }
