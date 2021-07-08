@@ -26,7 +26,7 @@ class DealServers
     {
 
         $fields=[
-            'O.id','O.ordernum','O.live_id','O.relation_id','O.user_id','O.pay_price','O.pay_time','O.twitter_id','O.live_num',
+            'O.id','O.ordernum','O.live_id','O.relation_id','O.user_id','O.pay_price','O.pay_time','invite.twitter_id as twitter_id','O.live_num',
             'U.phone','U.nickname',
             'TJ.phone as invite_phone','TJ.nickname as invite_nickname',
             'B.parent as protect_phone',
@@ -48,7 +48,10 @@ class DealServers
 
         $query->select($fields)
             ->leftJoin('nlsg_user as U','O.user_id','=','U.id')
-            ->leftJoin('nlsg_user as TJ','TJ.id','=','O.twitter_id')   #这个应该查9.9邀约人--------------
+            ->leftjoin('nlsg_order as invite',function($query)use($live_id){
+                $query->on('O.user_id','=','invite.user_id')->where('invite.live_id','=',$live_id)->where('invite.type','=',10)->where('invite.status','=',1);
+            })
+            ->leftJoin('nlsg_user as TJ','TJ.id','=','invite.twitter_id')
             ->leftJoin('nlsg_vip_user_bind as B','B.son','=','U.phone') //查看用户是否被绑定
             ->leftJoin('nlsg_user as BU','B.parent','=','BU.phone')     //查询绑定人信息
             ->leftJoin('nlsg_pay_record_detail as PRD',function ($join){
@@ -208,7 +211,11 @@ class DealServers
         $subLiveInfo=Subscribe::query()->where(['user_id'=>$user_id,'type'=>3,'status'=>1])->first();
         if(!empty($subLiveInfo)){
             $sub_live_id=$subLiveInfo->relation_id;
-            $sub_live_pay_time=$subLiveInfo->pay_time;
+            if(!empty($subLiveInfo->pay_time)){
+                $sub_live_pay_time=$subLiveInfo->pay_time;
+            }else{
+                $sub_live_pay_time=$subLiveInfo->created_at;
+            }
             if(!empty($subLiveInfo->channel_order_sku)){ //抖音
                 $sub_live_pay_price=9.9; //抖音默认9.9
             }else if(!empty($subLiveInfo->order_id)) { //有订单
@@ -235,7 +242,10 @@ class DealServers
         $tiktok_time=null;
         $qd=0;
 
-        $arr=[365569,730190,739394,756226,756227,756228,756229,756230,756231,756232,211370,324111,769159];
+        $arr=[211370,324111,769159,
+            365569,730190,739394,756226,756227,756228,756229,756230,756231,756232,
+            785339,785340,785341,785342,785343,785344,785345,785346,785347,785348,
+            785349,785350,785351,785352,785353,785354,785355,785356,785357,785358];
 
         //获取当前直播间
         $subLiveInfo=Subscribe::query()->where(['user_id'=>$user_id,'type'=>3,'relation_id'=>$live_id,'status'=>1])->first();
