@@ -34,7 +34,7 @@ class ImMsgController extends Controller
      *
      * @apiParam {int} From_Account  发送方帐号
      * @apiParam {array} To_Account  接收方用户 数组类型
-     * @apiParam {array} Msg_Content  接收方用户 数组类型  根据MsgType  对应im的字段类型
+     * @apiParam {array} Msg_Content 消息体 数组类型  根据MsgType  对应im的字段类型
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
