@@ -60,7 +60,7 @@ class ImMsgController extends Controller
         if (empty($to_accounts) && empty($to_group)){
             return $this->error('0','request error');
         }
-        $to_accounts = explode(',',$to_accounts);
+//        $to_accounts = explode(',',$to_accounts);
 
 
         $msgBody = ImMsg::MsgBody($msg_content);
@@ -98,7 +98,7 @@ class ImMsgController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup im
      *
-     * @apiParam {int} msg_seq  消息序列号
+     * @apiParam {array} msg_seq  消息序列号 array
      * @apiParam {int} type  收藏类型   1消息收藏
      *
      * @apiSuccess {string} result json
@@ -114,18 +114,22 @@ class ImMsgController extends Controller
         $type = $request->input('type') ?? 1;  //类型
 
 
-        $msg = ImMsg::where('msg_seq',$msg_seq)->first();
+        $msg = ImMsg::whereIn('msg_seq',$msg_seq)->get()->toArray();
         if(empty($msg)){
             $this->error('0','msg_seq error');
         }
         $uid = $this->user['id']; //uid
 
-        $data = [
-            'user_id' => $uid,
-            'msg_seq' => $msg_seq,
-            'type' => $type,
-        ];
-        ImCollection::firstOrCreate($data);
+        foreach ($msg as $k=>$v){
+            $data = [
+                'user_id' => $uid,
+                'msg_seq' => $v,
+                'type' => $type,
+            ];
+            ImCollection::firstOrCreate($data);
+        }
+
+
         return $this->success();
     }
 
