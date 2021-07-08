@@ -21,7 +21,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_order/list', 'OrderController@list');
         Route::get('live_order/inviter_list', 'OrderController@inviterLiveList');
 
-        
+
         Route::get('live_info/live_sub_order', 'InfoController@liveSubOrder');
         Route::get('live_info/live_order', 'InfoController@liveOrder');
         Route::get('live_info/live_order_kun', 'InfoController@liveOrderKun');
