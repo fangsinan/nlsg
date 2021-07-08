@@ -15,6 +15,7 @@ use App\Models\ImMsgContent;
 use App\Models\ImMsg;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Libraries\ImClient;
 
 
 /**
@@ -24,6 +25,66 @@ use Illuminate\Support\Facades\DB;
  */
 class ImMsgController extends Controller
 {
+
+    /**
+     * @api {get} /api/v4/im/msg_send_all  消息群发
+     * @apiName msg_send_all
+     * @apiVersion 1.0.0
+     * @apiGroup im
+     *
+     * @apiParam {int} From_Account  发送方帐号
+     * @apiParam {array} To_Account  接收方用户 数组类型
+     * @apiParam {array} Msg_Content  接收方用户 数组类型  根据MsgType  对应im的字段类型
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {}
+    }
+     */
+    public function MsgSendAll(Request $request){
+        $params    = $request->input();
+
+        $from_account   = $params['From_Account']??'';  //发送方帐号
+        $to_accounts   = $params['To_Account']??'';  //消息接收方用户
+        $msg_content   = $params['Msg_Content'];  //消息体
+
+
+        if(empty($from_account) || empty($to_accounts)  || empty($msg_content)){
+            return $this->error('0','request error');
+        }
+        $to_accounts = explode(',',$to_accounts);
+
+
+        $msgBody = ImMsg::MsgBody($msg_content);
+
+        if(empty($msgBody)){
+            return $this->error('0','Msg Body Error');
+        }
+
+        $url = "https://console.tim.qq.com/v4/openim/batchsendmsg?";
+        $url.=http_build_query([
+            'sdkappid' => config('env.OPENIM_APPID'),
+            'identifier' => config('web.Im_config.admin'),
+            'usersig' => ImClient::getUserSig(config('web.Im_config.admin')),
+            'random' => rand(0,4294967295),
+            'contenttype'=>'json',
+        ]);
+
+
+
+        $post_data['From_Account'] = $from_account;
+        $post_data['To_Account'] = $to_accounts;
+        $post_data['MsgRandom'] = rand(10000000,99999999);
+        $post_data['MsgBody'] = $msgBody;
+
+        $res = ImClient::curlPost($url,json_encode($post_data));
+
+        return $this->success($res);
+    }
+
 
 
     /**
