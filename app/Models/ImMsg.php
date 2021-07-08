@@ -81,11 +81,16 @@ class ImMsg extends Base
                     $msg_content_add['VideoSecond']         = $params['VideoSecond'];
                     $msg_content_add['VideoFormat']         = $params['VideoFormat'];
                     $msg_content_add['VideoDownloadFlag']   = $params['VideoDownloadFlag'];
-//                $msg_content_add['ThumbUrl']            = $params['ThumbUrl'];
-//                $msg_content_add['ThumbSize']           = $params['ThumbSize'];
-//                $msg_content_add['ThumbWidth']          = $params['ThumbWidth'];
-//                $msg_content_add['ThumbHeight']         = $params['ThumbHeight'];
-//                $msg_content_add['ThumbFormat']         = $params['ThumbFormat'];
+    //                $msg_content_add['ThumbUrl']            = $params['ThumbUrl'];
+    //                $msg_content_add['ThumbSize']           = $params['ThumbSize'];
+    //                $msg_content_add['ThumbWidth']          = $params['ThumbWidth'];
+    //                $msg_content_add['ThumbHeight']         = $params['ThumbHeight'];
+    //                $msg_content_add['ThumbFormat']         = $params['ThumbFormat'];
+                    break;
+
+                case 'TIMCustomElem' : //自定义消息
+                    $msg_content_add['Desc']    = $params['Desc'];
+                    $msg_content_add['Data']    = $params['Data'];
                     break;
 
                 default :
