@@ -34,6 +34,7 @@ class ImMsgController extends Controller
      *
      * @apiParam {int} From_Account  发送方帐号
      * @apiParam {array} To_Account  接收方用户 数组类型
+     * @apiParam {array} To_Group   接收方群组 数组类型
      * @apiParam {array} Msg_Content 消息体 数组类型  根据MsgType  对应im的字段类型
      *
      * @apiSuccess {string} result json
@@ -49,10 +50,14 @@ class ImMsgController extends Controller
 
         $from_account   = $params['From_Account']??'';  //发送方帐号
         $to_accounts   = $params['To_Account']??'';  //消息接收方用户
+        $to_group   = $params['To_Group']??'';  //消息接收方用户
         $msg_content   = $params['Msg_Content'];  //消息体
 
 
-        if(empty($from_account) || empty($to_accounts)  || empty($msg_content)){
+        if(empty($from_account) || empty($msg_content)){
+            return $this->error('0','request error');
+        }
+        if (empty($to_accounts) && empty($to_group)){
             return $this->error('0','request error');
         }
         $to_accounts = explode(',',$to_accounts);
