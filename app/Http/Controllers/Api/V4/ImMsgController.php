@@ -277,11 +277,12 @@ class ImMsgController extends Controller
         }
         if($msg_add_res && $img_res && $content_res){
             DB::commit();
+            return 1;
         }else{
             DB::rollBack();
         }
 
-        return 1;
+        return 'error';
 
     }
 

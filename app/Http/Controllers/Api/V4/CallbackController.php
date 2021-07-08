@@ -149,7 +149,22 @@ class CallbackController extends Controller
                 ];
 
         }
-        return response()->json($result);
+
+
+        if($result){
+            return response()->json([
+                "ActionStatus"=>"OK",
+                "ErrorInfo"=>"",
+                "ErrorCode"=> 0 // 0为回调成功，1为回调出错
+            ]);
+        }else{
+            return response()->json([
+                "ActionStatus"=>"FAIL",
+                "ErrorInfo"=>'',
+                "ErrorCode"=> 1 // 0为回调成功，1为回调出错
+            ]);
+        }
+
 
     }
 
