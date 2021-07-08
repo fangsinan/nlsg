@@ -114,13 +114,13 @@ class ImMsgController extends Controller
         $type = $request->input('type') ?? 1;  //类型
 
 
-        $msg = ImMsg::whereIn('msg_seq',$msg_seq)->get()->toArray();
-        if(empty($msg)){
-            $this->error('0','msg_seq error');
-        }
+//        $msg = ImMsg::whereIn('msg_seq',$msg_seq)->get()->toArray();
+//        if(empty($msg)){
+//            $this->error('0','msg_seq error');
+//        }
         $uid = $this->user['id']; //uid
 
-        foreach ($msg as $k=>$v){
+        foreach ($msg_seq as $k=>$v){
             $data = [
                 'user_id' => $uid,
                 'msg_seq' => $v,
