@@ -29,6 +29,8 @@ class ImMsg extends Base
     }
 
 
+
+    //返回body消息格式
     public static function MsgBody($msg_type, $params){
 
         $msg_content_add = [];
