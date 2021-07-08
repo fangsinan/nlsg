@@ -120,8 +120,10 @@ class CallbackController extends Controller
         $params = $request->input();
         \Log::info('im_log'.json_encode($params));
 
-
-        if($params['SdkAppid'] != config('env.OPENIM_APPID')){
+        if(empty($params['SdkAppid'])){
+            return '';
+        }
+        if( $params['SdkAppid'] != config('env.OPENIM_APPID')){
             return '';
         }
 
