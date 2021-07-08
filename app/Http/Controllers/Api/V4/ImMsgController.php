@@ -15,6 +15,7 @@ use App\Models\ImMsgContent;
 use App\Models\ImMsg;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Libraries\ImClient;
 
 
 /**
@@ -25,6 +26,71 @@ use Illuminate\Support\Facades\DB;
 class ImMsgController extends Controller
 {
 
+    /**
+     * @api {get} /api/v4/im/msg_send_all  消息群发
+     * @apiName msg_send_all
+     * @apiVersion 1.0.0
+     * @apiGroup im
+     *
+     * @apiParam {int} From_Account  发送方帐号
+     * @apiParam {array} To_Account  接收方用户 数组类型
+     * @apiParam {array} To_Group   接收方群组 数组类型
+     * @apiParam {array} Msg_Content 消息体 数组类型  根据MsgType  对应im的字段类型
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {}
+    }
+     */
+    public function MsgSendAll(Request $request){
+        $params    = $request->input();
+
+        $from_account   = $params['From_Account']??'';  //发送方帐号
+        $to_accounts   = $params['To_Account']??'';  //消息接收方用户
+        $to_group   = $params['To_Group']??'';  //消息接收方用户
+        $msg_content   = $params['Msg_Content'];  //消息体
+
+
+        if(empty($from_account) || empty($msg_content)){
+            return $this->error('0','request error');
+        }
+        if (empty($to_accounts) && empty($to_group)){
+            return $this->error('0','request error');
+        }
+//        $to_accounts = explode(',',$to_accounts);
+
+
+        $msgBody = ImMsg::MsgBody($msg_content);
+
+        if(empty($msgBody)){
+            return $this->error('0','Msg Body Error');
+        }
+
+        $url = "https://console.tim.qq.com/v4/openim/batchsendmsg?";
+        $url.=http_build_query([
+            'sdkappid' => config('env.OPENIM_APPID'),
+            'identifier' => config('web.Im_config.admin'),
+            'usersig' => ImClient::getUserSig(config('web.Im_config.admin')),
+            'random' => rand(0,4294967295),
+            'contenttype'=>'json',
+        ]);
+
+
+
+        $post_data['From_Account'] = $from_account;
+        $post_data['To_Account'] = $to_accounts;
+        $post_data['MsgRandom'] = rand(10000000,99999999);
+        $post_data['MsgBody'] = $msgBody;
+
+        $res = ImClient::curlPost($url,json_encode($post_data));
+
+        return $this->success($res);
+    }
+
+
 
     /**
      * @api {get} /api/v4/im/msg_collection  消息收藏操作
@@ -32,7 +98,7 @@ class ImMsgController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup im
      *
-     * @apiParam {int} msg_seq  消息序列号
+     * @apiParam {array} msg_seq  消息序列号 array
      * @apiParam {int} type  收藏类型   1消息收藏
      *
      * @apiSuccess {string} result json
@@ -48,18 +114,22 @@ class ImMsgController extends Controller
         $type = $request->input('type') ?? 1;  //类型
 
 
-        $msg = ImMsg::where('msg_seq',$msg_seq)->first();
+        $msg = ImMsg::whereIn('msg_seq',$msg_seq)->get()->toArray();
         if(empty($msg)){
             $this->error('0','msg_seq error');
         }
         $uid = $this->user['id']; //uid
 
-        $data = [
-            'user_id' => $uid,
-            'msg_seq' => $msg_seq,
-            'type' => $type,
-        ];
-        ImCollection::firstOrCreate($data);
+        foreach ($msg as $k=>$v){
+            $data = [
+                'user_id' => $uid,
+                'msg_seq' => $v,
+                'type' => $type,
+            ];
+            ImCollection::firstOrCreate($data);
+        }
+
+
         return $this->success();
     }
 

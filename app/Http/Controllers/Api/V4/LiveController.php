@@ -451,6 +451,12 @@ class LiveController extends Controller
     {
         $id = $request->get('live_id');
         $live_son_flag = $request->get('live_son_flag');
+        $os_type = intval($request->input('os_type', 0)); //1 安卓 2ios 3微信
+        if(!empty($os_type) && $os_type==3){
+            $selectArr=['id','live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video'];
+        }else{
+            $selectArr=['id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video'];
+        }
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro,honor',
             'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish',
@@ -458,7 +464,7 @@ class LiveController extends Controller
                 $q->where('status','=',1);
             }
         ])
-            ->select('id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video')
+            ->select($selectArr)
             ->where('id', $id)
             ->first();
 
