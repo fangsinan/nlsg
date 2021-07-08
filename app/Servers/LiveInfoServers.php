@@ -285,6 +285,10 @@ class LiveInfoServers
                 DB::raw('LEFT(online_time,16) as time')
             ])->get();
 
+        if (($params['only_list'] ?? 0) == 1) {
+            return $res['list'];
+        }
+
         return $res;
     }
 
@@ -294,7 +298,25 @@ class LiveInfoServers
         $live_id = $params['live_id'] ?? 0;
         $date = $params['date'] ?? '';
         if (empty($date)) {
-            return ['code' => false, 'msg' => '时间错误'];
+
+            $temp_date_list = $this->onlineNum(['live_id' => $params['live_id'], 'only_list' => 1]);
+
+            if (!empty($temp_date_list)) {
+                $temp_date_str = $temp_date_list[0];
+                foreach ($temp_date_list as $v) {
+                    if ($v->counts >= $temp_date_str->counts) {
+                        $temp_date_str = $v;
+                    }
+                }
+            }
+
+            if (!empty($temp_date_str ?? [])) {
+                $date = $temp_date_str->time;
+            }
+
+            if (empty($date)) {
+                return ['code' => false, 'msg' => '时间错误'];
+            }
         }
 
         $begin_time = date('Y-m-d H:i:00', strtotime($date));
@@ -324,7 +346,7 @@ class LiveInfoServers
         ]);
 
         $res = $query->paginate($size);
-        $custom = collect(['live_user_id' => $check_live_id->user_id]);
+        $custom = collect(['live_user_id' => $check_live_id->user_id, 'date' => $begin_time]);
         return $custom->merge($res);
     }
 
