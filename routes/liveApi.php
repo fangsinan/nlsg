@@ -25,11 +25,12 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_info/live_sub_order', 'InfoController@liveSubOrder');
         Route::get('live_info/live_order', 'InfoController@liveOrder');
         Route::get('live_info/live_order_kun', 'InfoController@liveOrderKun');
+        Route::get('live_info/user_watch', 'InfoController@userWatch');
+
         Route::get('live_info/comment', 'InfoController@comment');
         Route::get('live_info/order_online_num', 'InfoController@orderOnlineNum');
         Route::get('live_info/online_num', 'InfoController@onlineNum');
         Route::get('live_info/online_num_info', 'InfoController@onlineNumInfo');
-        Route::get('live_info/user_watch', 'InfoController@userWatch');
         Route::get('live_info/statistics', 'InfoController@statistics');
         Route::get('live_info/flag_poster_list', 'InfoController@flagPosterList');
         Route::get('live_info/flag_poster_status', 'InfoController@flagPosterStatus');
@@ -40,4 +41,10 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
     Route::get('live_order/list_excel', 'OrderController@listExcel');
     Route::get('live_order/inviter_list_excel', 'OrderController@inviterLiveListExcel');
     Route::get('live_comment/listExcel', 'CommentController@listExcel');
+
+    Route::get('live_info/live_sub_order_excel', 'InfoController@liveSubOrderExcel');
+    Route::get('live_info/live_order_excel', 'InfoController@liveOrderExcel');
+    Route::get('live_info/live_order_kun_excel', 'InfoController@liveOrderKunExcel');
+    Route::get('live_info/user_watch_excel', 'InfoController@userWatchExcel');
+
 });
