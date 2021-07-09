@@ -731,7 +731,7 @@ class AuthController extends Controller
 
         return success($res_switchAll);
     }
-    
+
     //收集用户信息
     public function checkWx(Request $request){
         $uid = $request->input('user_id')??0;//
