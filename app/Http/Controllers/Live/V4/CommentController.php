@@ -61,7 +61,7 @@ class CommentController extends ControllerBackend
         }
 
         $son_id = 0;   //渠道标记
-        if(empty($live_flag)){
+        if(!empty($live_flag)){
             $live_role = BackendLiveRole::select('parent_id', 'son_id')->where('son_flag', $live_flag)->first();
             $son_id = $live_role['son_id'];
         }
@@ -133,7 +133,7 @@ class CommentController extends ControllerBackend
         }
         $new_userData = [];
         if (!empty($lists_user_ids)) {
-            $list_userData = User::select('id', 'nickname')->whereIn('id', $lists_user_ids)->get()->toArray();
+            $list_userData = User::select('id', 'nickname','phone')->whereIn('id', $lists_user_ids)->get()->toArray();
             foreach ($list_userData as $key => $val) {
                 $new_userData[$val['id']] = $val;
             }
