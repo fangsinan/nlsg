@@ -67,6 +67,9 @@ class InfoController extends ControllerBackend
     {
         $s = new LiveInfoServers();
         $data = $s->liveSubOrder($request->input());
+        if (($data['code'] ?? true) === false) {
+            exit($data['msg']);
+        }
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
             '推客别名', '邀约时间', '直播id'];
         $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
@@ -147,6 +150,9 @@ class InfoController extends ControllerBackend
     {
         $s = new LiveInfoServers();
         $data = $s->liveOrder($request->input());
+        if (($data['code'] ?? true) === false) {
+            exit($data['msg']);
+        }
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
             '推客别名', '支付价格', '支付时间', '直播id', '直播标题', '订单id'];
         $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
@@ -160,6 +166,7 @@ class InfoController extends ControllerBackend
         $fp = fopen('php://output', 'a');//打开output流
         mb_convert_variables('GBK', 'UTF-8', $columns);
         fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
         foreach ($data as $v) {
             $v = json_decode(json_encode($v), true);
             mb_convert_variables('GBK', 'UTF-8', $v);
@@ -231,6 +238,9 @@ class InfoController extends ControllerBackend
     {
         $s = new LiveInfoServers();
         $data = $s->liveOrderKun($request->input());
+        if (($data['code'] ?? true) === false) {
+            exit($data['msg']);
+        }
         $columns = ['订单编号', '支付金额', '数量', '支付时间', '类型名称',
             '购买人账号', '购买人昵称', '购买人id', '购买人身份',
             '推荐人账号', '推荐人昵称', '关系保护账号', '关系保护id', '关系保护昵称', '关系保护身份',
@@ -353,6 +363,9 @@ class InfoController extends ControllerBackend
     {
         $s = new LiveInfoServers();
         $data = $s->userWatch($request->input());
+        if (($data['code'] ?? true) === false) {
+            exit($data['msg']);
+        }
         $columns = ['编号', '用户id', '用户账号', '时间', '邀约人', '邀约人别名'];
         $fileName = '直播间用户观看分析' . date('Y-m-d H:i') . '.csv';
         header('Content-Description: File Transfer');
