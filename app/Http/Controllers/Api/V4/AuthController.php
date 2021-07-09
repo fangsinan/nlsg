@@ -179,6 +179,7 @@ class AuthController extends Controller
      *   }
      *
      */
+    //获取微信绑定信息
     public function wechat(Request $request)
     {
         $input = $request->all();
