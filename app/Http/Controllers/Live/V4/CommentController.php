@@ -221,7 +221,7 @@ class CommentController extends ControllerBackend
                 ->where('live_id', $live_id)
                 ->where('type', 0)
                 ->where('status', 1);
-            if(empty($live_flag)){
+            if(!empty($live_flag)){
                 $list_query->where('live_son_flag', $live_flag);
             }
             $list = $list_query->orderBy('id', 'desc')
