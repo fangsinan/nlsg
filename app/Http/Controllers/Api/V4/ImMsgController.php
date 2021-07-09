@@ -199,10 +199,10 @@ class ImMsgController extends Controller
         //消息体
         foreach ($params['MsgBody'] as $k=>$v){
             $msg_content_add = [
-                'msg_id'        => $msg_add_res->id,
-                'msg_type'      => $v['MsgType'],
-                'created_at'      => date('Y-m-d H:i:s'),
-                'updated_at'      => date('Y-m-d H:i:s'),
+                    'msg_id'        => $msg_add_res->id,
+                    'msg_type'      => $v['MsgType'],
+                    'created_at'      => date('Y-m-d H:i:s'),
+                    'updated_at'      => date('Y-m-d H:i:s'),
                 ];
 
             switch ($v['MsgType']){
@@ -220,26 +220,31 @@ class ImMsgController extends Controller
                     $msg_content_add['download_flag']   = $v['MsgContent']['Download_Flag'];
                     break;
                 case 'TIMImageElem' ://图片元素
+
                     $msg_content_add['uuid']            = $v['MsgContent']['UUID'];
                     $msg_content_add['image_format']    = $v['MsgContent']['ImageFormat'];
                     //保留缩略图
-                    foreach ($v['MsgContent']->ImageFormat as $img_k=>$img_v){
+                    foreach ($v['MsgContent']['ImageInfoArray'] as $img_k=>$img_v){
                         if($img_v['Type'] == 3){
                             $msg_content_add['url'] = $img_v['URL'];
                         }
                         //入库图片表
                         $img_add = [
+                            'uuid'      => $v['MsgContent']['UUID'],
                             'type'      => $img_v['Type'],
                             'size'      => $img_v['Size'],
                             'width'     => $img_v['Width'],
                             'height'    => $img_v['Height'],
                             'url'       => $img_v['URL'],
+                            'created_at'=> date("Y-m-d h:i:s"),
+                            'updated_at'=> date("Y-m-d h:i:s"),
                         ];
                         $img_adds[] = $img_add;
 
                     }
+
                     if(!empty($img_adds)){
-                        $img_res = ImMsgContentImg::create($img_adds);
+                        $img_res = ImMsgContentImg::insert($img_adds);
                     }else{
                         $img_res = false;
                     }
