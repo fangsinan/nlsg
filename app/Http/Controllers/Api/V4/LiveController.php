@@ -12,6 +12,7 @@ use App\Models\LiveConsole;
 use App\Models\LiveCountDown;
 use App\Models\LiveForbiddenWords;
 use App\Models\LiveInfo;
+use App\Models\LiveSonFlagPoster;
 use App\Models\LiveWorks;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
@@ -517,6 +518,7 @@ class LiveController extends Controller
                 $list['is_password'] = $list->live->password ? 1 : 0;
             }
             $list['live_son_flag_count'] = 0;
+            $list['live_son_flag_status'] = 0;
             if(!empty($live_son_flag)){
                 $list['live_son_flag_count'] = Subscribe::where([
                     "type" => 3,
@@ -524,6 +526,16 @@ class LiveController extends Controller
                     "status" => 1,
                     "twitter_id" => $live_son_flag,
                 ])->count();
+
+
+
+                //渠道是否开启直播
+                $list['live_son_flag_status'] = LiveSonFlagPoster::where([
+                    'live_id'   =>$list->live_pid,
+                    'son_id'    =>$live_son_flag,
+                    'is_del'    =>0,
+                ])->value('status');
+                $list['live_son_flag_status'] = $list['live_son_flag_status']??0;
             }
 //
         }
@@ -858,13 +870,20 @@ class LiveController extends Controller
             if(!empty($input['is_flag'])){
                 $is_flag=$input['is_flag'];
             }
+
+            $twitter_id = 0;
+            if(!empty($input['inviter'])) {
+                $twitter_id = $input['inviter'];
+            }else if(!empty($input['live_son_flag'])){
+                $twitter_id = $input['live_son_flag'];
+            }
             Subscribe::create([
                 'user_id' => $this->user['id'],
                 'type' => 3,
                 'relation_id' => $input['info_id'],
                 'status' => 1,
                 'is_flag' => $is_flag,
-                'twitter_id' => (!empty($input['inviter']))?$input['inviter']:0,
+                'twitter_id' => $twitter_id,
             ]);
 
             Live::where(['id' => $input['live_id']])->increment('order_num');
