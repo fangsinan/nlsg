@@ -174,10 +174,10 @@ class ImMsgController extends Controller
         return $this->success($collectionList);
     }
 
-    public static function callbackMsg($params=[]){
+    public static function sendMsg($params=[]){
 
         if (empty($params)){
-            return 0;
+            return false;
         }
 
         DB::beginTransaction();
@@ -277,12 +277,12 @@ class ImMsgController extends Controller
         }
         if($msg_add_res && $img_res && $content_res){
             DB::commit();
-            return 1;
+            return true;
         }else{
             DB::rollBack();
         }
 
-        return 'error';
+        return false;
 
     }
 

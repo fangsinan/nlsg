@@ -20,7 +20,7 @@ class ImGroupController extends Controller
     public function addGroup($params){
 
         if (empty($params)){
-            return ["ActionStatus" => "OK","ErrorInfo" => "","ErrorCode" => 0 ];
+            return false;
         }
 
         $group_add = [
@@ -50,7 +50,7 @@ class ImGroupController extends Controller
         }
 
 
-
+        return true;
 
     }
 
@@ -59,7 +59,7 @@ class ImGroupController extends Controller
     public function groupSend($params){
 
         if (empty($params)){
-            return ["ActionStatus" => "OK","ErrorInfo" => "","ErrorCode" => 0 ];
+            return false;
         }
         
         //回调 类型如果是直播群  需要发送至redis
@@ -88,7 +88,7 @@ class ImGroupController extends Controller
         }
 
 
-        return ["ActionStatus" => "OK","ErrorInfo" => "","ErrorCode" => 0 ];
+        return true;
 
     }
 

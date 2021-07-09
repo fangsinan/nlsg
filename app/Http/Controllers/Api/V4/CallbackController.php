@@ -118,20 +118,22 @@ class CallbackController extends Controller
 
         $params = $request->input();
         \Log::info('im_log'.json_encode($params));
-//        $params = json_decode('{"MsgBody":[{"MsgType":"TIMTextElem","MsgContent":{"Text":"\u4f60\u8c01"}}],"CallbackCommand":"C2C.CallbackAfterSendMsg","From_Account":"fangsinan","To_Account":"test","MsgRandom":56155576,"MsgSeq":1805693773,"MsgTime":1625734124,"MsgKey":"1805693773_56155576_1625734124","OnlineOnlyFlag":0,"SendMsgResult":0,"ErrorInfo":"send msg succeed","UnreadMsgNum":6,"ClientIP":"36.112.173.178","OptPlatform":"RESTAPI","RequestId":"14305845-144115261130957368-1625734124-56155576","SdkAppid":"1400510272","contenttype":"json"}  ',true);
+//        $json = '{"CallbackCommand":"Sns.CallbackFriendDelete","PairList":[{"From_Account":"211172","To_Account":"425214"},{"From_Account":"425214","To_Account":"211172"}],"ClientIP":"36.112.173.178","OptPlatform":"iOS","RequestId":"2ea4e023-2859-4512-b629-3089f77dff70","SdkAppid":"1400483163","contenttype":"json"}';
+//        $params = json_decode($json,true);
 
-        if(empty($params['SdkAppid'])){
-            return '';
+        if( empty($params['SdkAppid']) ){
+            return response()->json(["ActionStatus"=>"FAIL", "ErrorInfo"=>'SdkAppid error',  "ErrorCode"=> 1  ]);
         }
+
         if( $params['SdkAppid'] != config('env.OPENIM_APPID')){
-            return '';
+            return response()->json(["ActionStatus"=>"FAIL", "ErrorInfo"=>'SdkAppid error',  "ErrorCode"=> 1  ]);
         }
 
         switch ($params['CallbackCommand']){
             case 'C2C.Call backBeforeSendMsg': //消息之前
             case 'C2C.CallbackAfterSendMsg': //消息之后回调
 
-                $result = ImMsgController::callbackMsg($params);
+                $result = ImMsgController::sendMsg($params);
                 break;
 
             case 'Group.CallbackAfterCreateGroup':
@@ -141,6 +143,13 @@ class CallbackController extends Controller
                 $result = ImGroupController::groupSend($params);
                 break;
 
+            case 'Sns.CallbackFriendAdd':  //添加好友
+                $result = ImFriendController::friendAdd($params);
+                break;
+
+            case 'Sns.CallbackFriendDelete':  //删除好友
+                $result = ImFriendController::friendDel($params);
+                break;
             default :
                 $result = [
                     "ActionStatus"=>"OK",
@@ -149,7 +158,6 @@ class CallbackController extends Controller
                 ];
 
         }
-
 
         if($result){
             return response()->json([
