@@ -533,8 +533,9 @@ class LiveController extends Controller
                 $list['live_son_flag_status'] = LiveSonFlagPoster::where([
                     'live_id'   =>$list->live_pid,
                     'son_id'    =>$live_son_flag,
-                    'is_del'    =>1,
-                ])->velue('status');
+                    'is_del'    =>0,
+                ])->value('status');
+                $list['live_son_flag_status'] = $list['live_son_flag_status']??0;
             }
 //
         }
