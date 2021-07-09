@@ -145,7 +145,6 @@ class InfoController extends ControllerBackend
 
     public function liveOrderExcel(Request $request)
     {
-        dd(__LINE__);
         $s = new LiveInfoServers();
         $data = $s->liveOrder($request->input());
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
