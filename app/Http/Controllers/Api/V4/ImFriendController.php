@@ -7,6 +7,7 @@ use App\Models\ImCollection;
 use App\Models\ImMsgContentImg;
 use App\Models\ImMsgContent;
 use App\Models\ImMsg;
+use App\Models\ImUserBlacklist;
 use App\Models\ImUserFriend;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +29,6 @@ class ImFriendController extends Controller
         if (empty($params)){
             return false;
         }
-
 
         $adds = [];
         foreach ($params['PairList'] as $key=>$val){
@@ -58,7 +58,7 @@ class ImFriendController extends Controller
         $del_ids = [];
         foreach ($params['PairList'] as $key=>$val){
 
-            $del_id = ImUserFriend::select('*')->where([
+            $del_id = ImUserFriend::where([
                 'from_account'  =>$val['From_Account'],
                 'to_account'    =>$val['To_Account'],
                 'status'        =>1,
@@ -72,5 +72,53 @@ class ImFriendController extends Controller
 
         return true;
     }
+
+
+
+    //添加黑名单
+    public static function blackListAdd($params){
+        if (empty($params)){
+            return false;
+        }
+        $adds = [];
+        foreach ($params['PairList'] as $key=>$val){
+            $add['from_account']= $val['From_Account'];
+            $add['to_account']  = $val['To_Account'];
+            $add['created_at']  = date("Y-m-d h:i:s");
+            $add['updated_at']  = date("Y-m-d h:i:s");
+            $adds[] = $add;
+        }
+        if($adds){
+            ImUserBlacklist::insert($adds);
+        }
+
+        return true;
+    }
+
+
+    //删除黑名单
+    public static function blackListDel($params){
+        if (empty($params)){
+            return false;
+        }
+
+        $del_ids = [];
+        foreach ($params['PairList'] as $key=>$val){
+
+            $del_id = ImUserBlacklist::where([
+                'from_account'  =>$val['From_Account'],
+                'to_account'    =>$val['To_Account'],
+                'status'        =>1,
+            ])->value('id');
+
+            $del_ids[] = $del_id;
+        }
+        if($del_ids){
+            ImUserBlacklist::whereIn('id',$del_ids)->update(['status'=>2]);
+        }
+
+        return true;
+    }
+
 
 }
