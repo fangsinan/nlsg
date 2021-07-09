@@ -862,7 +862,7 @@ class LiveController extends Controller
             $twitter_id = 0;
             if(!empty($input['inviter'])) {
                 $twitter_id = $input['inviter'];
-            }else if($input['live_son_flag']){
+            }else if(!empty($input['live_son_flag'])){
                 $twitter_id = $input['live_son_flag'];
             }
             Subscribe::create([
