@@ -61,7 +61,7 @@ class CommentController extends ControllerBackend
         }
 
         $son_id = 0;   //渠道标记
-        if(empty($live_flag)){
+        if(!empty($live_flag)){
             $live_role = BackendLiveRole::select('parent_id', 'son_id')->where('son_flag', $live_flag)->first();
             $son_id = $live_role['son_id'];
         }
