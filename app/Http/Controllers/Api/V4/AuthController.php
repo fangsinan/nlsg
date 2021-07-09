@@ -179,7 +179,7 @@ class AuthController extends Controller
      *   }
      *
      */
-    //获取微信绑定信息
+    //获取微信绑定信息，如已绑定返回登录信息，未绑定跳转绑定手机号
     public function wechat(Request $request)
     {
         $input = $request->all();
@@ -277,7 +277,7 @@ class AuthController extends Controller
         ];
         $user = User::where('phone', $phone)->first();
         if ($user) {
-            User::where('phone', $phone)->update($data);
+            User::where('phone', $phone)->update($data); //如果有手机号，以前有微信覆盖
         } else {
             $data['phone'] = $phone;
             $res = User::create($data);
