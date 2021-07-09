@@ -11,14 +11,16 @@ class LiveSonFlagPoster extends Model
 {
     protected $table = 'nlsg_live_son_flag_poster';
 
-    public function getList($params){
+    public function getList($params)
+    {
         $live_id = $params['live_id'];
         $size = $params['size'];
         $query = DB::table('nlsg_live_son_flag_poster as p')
-            ->join('nlsg_backend_live_role as lr','p.son_id','=','lr.son_id')
-            ->where('p.live_id','=',$live_id)
-            ->where('p.is_del','=',0)
-            ->select(['p.id','p.live_id','p.son_id','p.status','lr.son','lr.son_flag']);
+            ->join('nlsg_backend_live_role as lr', 'p.son_id', '=', 'lr.son_id')
+            ->join('nlsg_live as l', 'p.live_id', '=', 'l.id')
+            ->where('p.live_id', '=', $live_id)
+            ->where('p.is_del', '=', 0)
+            ->select(['p.id', 'p.live_id', 'p.son_id', 'p.status', 'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at']);
 
         return $query->paginate($size);
     }
