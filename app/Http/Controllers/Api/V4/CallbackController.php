@@ -150,6 +150,13 @@ class CallbackController extends Controller
             case 'Sns.CallbackFriendDelete':  //删除好友
                 $result = ImFriendController::friendDel($params);
                 break;
+
+            case 'Sns.CallbackBlackListAdd'://添加黑名单
+                $result = ImFriendController::blackListAdd($params);
+                break;
+            case 'Sns.CallbackBlackListDelete'://删除黑名单
+                $result = ImFriendController::blackListDel($params);
+                break;
             default :
                 $result = [
                     "ActionStatus"=>"OK",
