@@ -12,6 +12,7 @@ use App\Models\LiveConsole;
 use App\Models\LiveCountDown;
 use App\Models\LiveForbiddenWords;
 use App\Models\LiveInfo;
+use App\Models\LiveSonFlagPoster;
 use App\Models\LiveWorks;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
@@ -517,6 +518,7 @@ class LiveController extends Controller
                 $list['is_password'] = $list->live->password ? 1 : 0;
             }
             $list['live_son_flag_count'] = 0;
+            $list['live_son_flag_status'] = 0;
             if(!empty($live_son_flag)){
                 $list['live_son_flag_count'] = Subscribe::where([
                     "type" => 3,
@@ -524,6 +526,15 @@ class LiveController extends Controller
                     "status" => 1,
                     "twitter_id" => $live_son_flag,
                 ])->count();
+
+
+
+                //渠道是否开启直播
+                $list['live_son_flag_status'] = LiveSonFlagPoster::where([
+                    'live_id'   =>$list->live_pid,
+                    'son_id'    =>$live_son_flag,
+                    'is_del'    =>1,
+                ])->velue('status');
             }
 //
         }
