@@ -133,7 +133,7 @@ class CommentController extends ControllerBackend
         }
         $new_userData = [];
         if (!empty($lists_user_ids)) {
-            $list_userData = User::select('id', 'nickname')->whereIn('id', $lists_user_ids)->get()->toArray();
+            $list_userData = User::select('id', 'nickname','phone')->whereIn('id', $lists_user_ids)->get()->toArray();
             foreach ($list_userData as $key => $val) {
                 $new_userData[$val['id']] = $val;
             }
