@@ -267,6 +267,25 @@ class InfoController extends ControllerBackend
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/statistics
      * @apiDescription  统计数据
      * @apiParam {number} live_id 直播id
+     *
+     * @apiSuccess {string} headimg 头像,
+     * @apiSuccess {string} nickname 老师,
+     * @apiSuccess {string} user_id 老师id,
+     * @apiSuccess {string} begin_at 直播开始,
+     * @apiSuccess {string} end_at 直播结束,
+     * @apiSuccess {string} live_login 人气,
+     * @apiSuccess {string} order_num":总预约人数 ,
+     * @apiSuccess {string} watch_counts 观看人数
+     * @apiSuccess {string} not_watch_counts 未观看人数,
+     * @apiSuccess {string} total_order 成交单数
+     * @apiSuccess {string} total_order_money":总金额
+     * @apiSuccess {string} total_order_user 购买人数
+     * @apiSuccess {string} total_sub_count 总预约人数
+     * @apiSuccess {string} total_not_buy 为购买人数
+     * @apiSuccess {string} more_than_30m 大于30分钟
+     * @apiSuccess {string} more_than_60m 小于30分钟
+     * @apiSuccess {string} total_login 累计人次
+     * @apiSuccess {string} total_sub 累计人数
      **/
     public function statistics(Request $request)
     {
@@ -274,5 +293,44 @@ class InfoController extends ControllerBackend
         $data = $s->statistics($request->input());
         return $this->getRes($data);
     }
+
+    /**
+     * @api {get} api/live_v4/live_info/flag_poster_list 海报列表
+     * @apiVersion 4.0.0
+     * @apiName  live_info/flag_poster_list
+     * @apiGroup 直播后台新增
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/flag_poster_list
+     * @apiDescription  海报列表
+     * @apiParam {number} live_id 直播id
+     *
+     * @apiSuccess {string} id id
+     * @apiSuccess {string} live_id 直播id
+     * @apiSuccess {string} son_id 渠道用户id
+     * @apiSuccess {string} status 状态(待开启  2开启  3关闭)
+     * @apiSuccess {string} son 渠道账号
+     **/
+    public function flagPosterList(Request $request){
+        $s = new LiveInfoServers();
+        $data = $s->flagPosterList($request->input());
+        return $this->getRes($data);
+    }
+
+    /**
+     * @api {get} api/live_v4/live_info/flag_poster_status 海报状态修改
+     * @apiVersion 4.0.0
+     * @apiName  live_info/flag_poster_status
+     * @apiGroup 直播后台新增
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/flag_poster_status
+     * @apiDescription  海报状态修改
+     * @apiParam {number} live_id 直播id
+     * @apiParam {string=on,off,del} flag 动作
+     **/
+    public function flagPosterStatus(Request $request){
+        $s = new LiveInfoServers();
+        $data = $s->flagPosterStatus($request->input());
+        return $this->getRes($data);
+    }
+
+
 
 }

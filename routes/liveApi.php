@@ -31,6 +31,8 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_info/online_num_info', 'InfoController@onlineNumInfo');
         Route::get('live_info/user_watch', 'InfoController@userWatch');
         Route::get('live_info/statistics', 'InfoController@statistics');
+        Route::get('live_info/flag_poster_list', 'InfoController@flagPosterList');
+        Route::get('live_info/flag_poster_status', 'InfoController@flagPosterStatus');
 
 
     });

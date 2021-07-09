@@ -8,6 +8,7 @@ use App\Models\BackendLiveRole;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\LiveLogin;
+use App\Models\LiveSonFlagPoster;
 use App\Models\Subscribe;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -528,6 +529,58 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
             $query->where('parent', '=', $phone)
                 ->orWhere('parent_id', '=', $user_id);
         })->pluck('son_id')->toArray();
+    }
+
+    public function flagPosterList($params)
+    {
+        $live_id = $params['live_id'] ?? 0;
+        $page = $params['page'] ?? 1;
+        $size = $params['size'] ?? 10;
+
+        if (empty($live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+        if (empty($check_live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+
+        $model = new LiveSonFlagPoster();
+        $model->createPosterByLiveId($live_id);
+
+        return $model->getList(['live_id' => $live_id, 'page' => $page, 'size' => $size]);
+    }
+
+    public function flagPosterStatus($params)
+    {
+        $id = $params['id'] ?? 0;
+        $flag = $params['flag'] ?? '';
+        if (empty($id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check_id = LiveSonFlagPoster::where('id', '=', $id)->first();
+
+        switch ($flag) {
+            case 'on':
+                $check_id->status = 2;
+                break;
+            case 'off':
+                $check_id->status = 3;
+                break;
+            case 'del':
+                $check_id->is_del = 1;
+                break;
+            default:
+                return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $res = $check_id->save();
+        if ($res === false) {
+            return ['code' => false, 'msg' => '失败'];
+        } else {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
     }
 
 }
