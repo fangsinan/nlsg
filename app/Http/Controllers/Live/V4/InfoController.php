@@ -139,11 +139,12 @@ class InfoController extends ControllerBackend
         if (empty($excel_flag)) {
             return $this->getRes($data);
         } else {
-            $columns = ['订单编号', '支付金额', '数量', '支付时间', '类型名称', '购买人账号', '购买人昵称', '购买人身份',
-                '推荐人账号', '推荐人昵称', '关系保护账号', '关系保护id','关系保护昵称', '关系保护身份',
+            $columns = ['订单编号', '支付金额', '数量', '支付时间', '类型名称',
+                '购买人账号', '购买人昵称', '购买人id', '购买人身份',
+                '推荐人账号', '推荐人昵称', '关系保护账号', '关系保护id', '关系保护昵称', '关系保护身份',
                 '受益人id', '受益人金额',
-                '钻石合伙人id','钻石合伙人账号','钻石合伙人昵称','钻石合伙人身份',
-                '是否抖音渠道', '抖音订单号', '抖音下单时间','渠道类型', '渠道名称',
+                '钻石合伙人id', '钻石合伙人账号', '钻石合伙人昵称', '钻石合伙人身份',
+                '是否抖音渠道', '抖音订单号', '抖音下单时间', '渠道类型', '渠道名称',
                 '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款'];
             $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
             header('Content-Description: File Transfer');
@@ -309,7 +310,8 @@ class InfoController extends ControllerBackend
      * @apiSuccess {string} status 状态(待开启  2开启  3关闭)
      * @apiSuccess {string} son_flag 渠道账号
      **/
-    public function flagPosterList(Request $request){
+    public function flagPosterList(Request $request)
+    {
         $s = new LiveInfoServers();
         $data = $s->flagPosterList($request->input());
         return $this->getRes($data);
@@ -325,12 +327,12 @@ class InfoController extends ControllerBackend
      * @apiParam {number} live_id 直播id
      * @apiParam {string=on,off,del} flag 动作
      **/
-    public function flagPosterStatus(Request $request){
+    public function flagPosterStatus(Request $request)
+    {
         $s = new LiveInfoServers();
         $data = $s->flagPosterStatus($request->input());
         return $this->getRes($data);
     }
-
 
 
 }
