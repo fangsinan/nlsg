@@ -201,6 +201,11 @@ class LiveInfoServers
             $query->where('son_flag', 'like', '%' . $params['son_flag'] . '%');
         }
 
+        if (!empty($params['ordernum'] ?? '')) {
+            $query->where('o.ordernum', 'like', '%' . $params['ordernum'] . '%');
+        }
+
+
 
         $query->whereIn('o.twitter_id', $twitter_id_list);
 
