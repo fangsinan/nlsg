@@ -174,10 +174,10 @@ class ImMsgController extends Controller
         return $this->success($collectionList);
     }
 
-    public static function callbackMsg($params=[]){
+    public static function sendMsg($params=[]){
 
         if (empty($params)){
-            return 0;
+            return false;
         }
 
         DB::beginTransaction();
@@ -193,33 +193,35 @@ class ImMsgController extends Controller
             'send_msg_result'   => $params['SendMsgResult'],
             'unread_msg_num'    => $params['UnreadMsgNum'],
         ];
-        $msg_add_id = ImMsg::insert($msg_add);
 
+        $msg_add_res = ImMsg::create($msg_add);
         $img_res= true;
         //消息体
         foreach ($params['MsgBody'] as $k=>$v){
             $msg_content_add = [
-                'msg_id'        => $msg_add_id,
+                'msg_id'        => $msg_add_res->id,
                 'msg_type'      => $v['MsgType'],
+                'created_at'      => date('Y-m-d H:i:s'),
+                'updated_at'      => date('Y-m-d H:i:s'),
                 ];
 
             switch ($v['MsgType']){
                 case 'TIMTextElem' :  //文本消息元素
-                    $msg_content_add['text']            = $v['MsgContent']->Text;
+                    $msg_content_add['text']            = $v['MsgContent']['Text'];
                     break;
                 case 'TIMFaceElem' : //表情消息元素
-                    $msg_content_add['index']           = $v['MsgContent']->Index;
-                    $msg_content_add['data']            = $v['MsgContent']->Data;
+                    $msg_content_add['index']           = $v['MsgContent']['Index'];
+                    $msg_content_add['data']            = $v['MsgContent']['Data'];
                     break;
                 case 'TIMSoundElem' ://语音消息元素
-                    $msg_content_add['url']             = $v['MsgContent']->Url;
-                    $msg_content_add['size']            = $v['MsgContent']->Size;
-                    $msg_content_add['second']          = $v['MsgContent']->Second;
-                    $msg_content_add['download_flag']   = $v['MsgContent']->Download_Flag;
+                    $msg_content_add['url']             = $v['MsgContent']['Url'];
+                    $msg_content_add['size']            = $v['MsgContent']['Size'];
+                    $msg_content_add['second']          = $v['MsgContent']['Second'];
+                    $msg_content_add['download_flag']   = $v['MsgContent']['Download_Flag'];
                     break;
                 case 'TIMImageElem' ://图片元素
-                    $msg_content_add['uuid']            = $v['MsgContent']->UUID;
-                    $msg_content_add['image_format']    = $v['MsgContent']->ImageFormat;
+                    $msg_content_add['uuid']            = $v['MsgContent']['UUID'];
+                    $msg_content_add['image_format']    = $v['MsgContent']['ImageFormat'];
                     //保留缩略图
                     foreach ($v['MsgContent']->ImageFormat as $img_k=>$img_v){
                         if($img_v['Type'] == 3){
@@ -237,32 +239,32 @@ class ImMsgController extends Controller
 
                     }
                     if(!empty($img_adds)){
-                        $img_res = ImMsgContentImg::insert($img_adds);
+                        $img_res = ImMsgContentImg::create($img_adds);
                     }else{
                         $img_res = false;
                     }
 
                     break;
                 case 'TIMFileElem' ://文件类型元素
-                    $msg_content_add['url']            = $v['MsgContent']->Url;
-                    $msg_content_add['file_size']      = $v['MsgContent']->FileSize;
-                    $msg_content_add['file_name']      = $v['MsgContent']->FileName;
-                    $msg_content_add['download_flag']  = $v['MsgContent']->Download_Flag;
+                    $msg_content_add['url']            = $v['MsgContent']['Url'];
+                    $msg_content_add['file_size']      = $v['MsgContent']['FileSize'];
+                    $msg_content_add['file_name']      = $v['MsgContent']['FileName'];
+                    $msg_content_add['download_flag']  = $v['MsgContent']['Download_Flag'];
                     break;
 
 
 
                 case 'TIMVideoFileElem' : //视频类型元素
-                    $msg_content_add['video_url']           = $v['MsgContent']->VideoUrl;
-                    $msg_content_add['size']                = $v['MsgContent']->VideoSize;
-                    $msg_content_add['second']              = $v['MsgContent']->VideoSecond;
-                    $msg_content_add['video_format']        = $v['MsgContent']->VideoFormat;
-                    $msg_content_add['video_download_flag'] = $v['MsgContent']->VideoDownloadFlag;
-                    $msg_content_add['video_thumb_url']     = $v['MsgContent']->ThumbUrl;
-                    $msg_content_add['thumb_size']          = $v['MsgContent']->ThumbUrl;
-                    $msg_content_add['thumb_width']         = $v['MsgContent']->ThumbWidth;
-                    $msg_content_add['thumb_height']        = $v['MsgContent']->ThumbHeight;
-                    $msg_content_add['thumb_format']        = $v['MsgContent']->ThumbFormat;
+                    $msg_content_add['video_url']           = $v['MsgContent']['VideoUrl'];
+                    $msg_content_add['size']                = $v['MsgContent']['VideoSize'];
+                    $msg_content_add['second']              = $v['MsgContent']['VideoSecond'];
+                    $msg_content_add['video_format']        = $v['MsgContent']['VideoFormat'];
+                    $msg_content_add['video_download_flag'] = $v['MsgContent']['VideoDownloadFlag'];
+                    $msg_content_add['video_thumb_url']     = $v['MsgContent']['ThumbUrl'];
+                    $msg_content_add['thumb_size']          = $v['MsgContent']['ThumbSize'];
+                    $msg_content_add['thumb_width']         = $v['MsgContent']['ThumbWidth'];
+                    $msg_content_add['thumb_height']        = $v['MsgContent']['ThumbHeight'];
+                    $msg_content_add['thumb_format']        = $v['MsgContent']['ThumbFormat'];
                     break;
             }
 
@@ -273,18 +275,14 @@ class ImMsgController extends Controller
         }else{
             $content_res=false;
         }
-
-        if($msg_add_id && $img_res && $content_res){
+        if($msg_add_res && $img_res && $content_res){
             DB::commit();
+            return true;
         }else{
             DB::rollBack();
         }
 
-
-
-
-
-        return 1;
+        return false;
 
     }
 

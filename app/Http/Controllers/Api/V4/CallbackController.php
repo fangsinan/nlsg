@@ -115,23 +115,25 @@ class CallbackController extends Controller
 
     //Im 回调  POST请求
     public function callbackMsg(Request $request){
-        //https://www.example.com?SdkAppid=1400510272&CallbackCommand=C2C.CallbackAfterSendMsg
-        //&contenttype=json&ClientIP=127.0.0.1&OptPlatform=$OptPlatform
+
         $params = $request->input();
         \Log::info('im_log'.json_encode($params));
+//        $json = '{"CallbackCommand":"Sns.CallbackFriendDelete","PairList":[{"From_Account":"211172","To_Account":"425214"},{"From_Account":"425214","To_Account":"211172"}],"ClientIP":"36.112.173.178","OptPlatform":"iOS","RequestId":"2ea4e023-2859-4512-b629-3089f77dff70","SdkAppid":"1400483163","contenttype":"json"}';
+//        $params = json_decode($json,true);
 
-        if(empty($params['SdkAppid'])){
-            return '';
+        if( empty($params['SdkAppid']) ){
+            return response()->json(["ActionStatus"=>"FAIL", "ErrorInfo"=>'SdkAppid error',  "ErrorCode"=> 1  ]);
         }
+
         if( $params['SdkAppid'] != config('env.OPENIM_APPID')){
-            return '';
+            return response()->json(["ActionStatus"=>"FAIL", "ErrorInfo"=>'SdkAppid error',  "ErrorCode"=> 1  ]);
         }
 
         switch ($params['CallbackCommand']){
             case 'C2C.Call backBeforeSendMsg': //消息之前
             case 'C2C.CallbackAfterSendMsg': //消息之后回调
 
-                $result = ImMsgController::callbackMsg($params);
+                $result = ImMsgController::sendMsg($params);
                 break;
 
             case 'Group.CallbackAfterCreateGroup':
@@ -141,6 +143,13 @@ class CallbackController extends Controller
                 $result = ImGroupController::groupSend($params);
                 break;
 
+            case 'Sns.CallbackFriendAdd':  //添加好友
+                $result = ImFriendController::friendAdd($params);
+                break;
+
+            case 'Sns.CallbackFriendDelete':  //删除好友
+                $result = ImFriendController::friendDel($params);
+                break;
             default :
                 $result = [
                     "ActionStatus"=>"OK",
@@ -149,7 +158,21 @@ class CallbackController extends Controller
                 ];
 
         }
-        return response()->json($result);
+
+        if($result){
+            return response()->json([
+                "ActionStatus"=>"OK",
+                "ErrorInfo"=>"",
+                "ErrorCode"=> 0 // 0为回调成功，1为回调出错
+            ]);
+        }else{
+            return response()->json([
+                "ActionStatus"=>"FAIL",
+                "ErrorInfo"=>'',
+                "ErrorCode"=> 1 // 0为回调成功，1为回调出错
+            ]);
+        }
+
 
     }
 
