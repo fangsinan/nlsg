@@ -115,10 +115,10 @@ class CallbackController extends Controller
 
     //Im 回调  POST请求
     public function callbackMsg(Request $request){
-        //https://www.example.com?SdkAppid=1400510272&CallbackCommand=C2C.CallbackAfterSendMsg
-        //&contenttype=json&ClientIP=127.0.0.1&OptPlatform=$OptPlatform
+
         $params = $request->input();
         \Log::info('im_log'.json_encode($params));
+//        $params = json_decode('{"MsgBody":[{"MsgType":"TIMTextElem","MsgContent":{"Text":"\u4f60\u8c01"}}],"CallbackCommand":"C2C.CallbackAfterSendMsg","From_Account":"fangsinan","To_Account":"test","MsgRandom":56155576,"MsgSeq":1805693773,"MsgTime":1625734124,"MsgKey":"1805693773_56155576_1625734124","OnlineOnlyFlag":0,"SendMsgResult":0,"ErrorInfo":"send msg succeed","UnreadMsgNum":6,"ClientIP":"36.112.173.178","OptPlatform":"RESTAPI","RequestId":"14305845-144115261130957368-1625734124-56155576","SdkAppid":"1400510272","contenttype":"json"}  ',true);
 
         if(empty($params['SdkAppid'])){
             return '';
