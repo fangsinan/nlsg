@@ -858,13 +858,20 @@ class LiveController extends Controller
             if(!empty($input['is_flag'])){
                 $is_flag=$input['is_flag'];
             }
+
+            $twitter_id = 0;
+            if(!empty($input['inviter'])) {
+                $twitter_id = $input['inviter'];
+            }else if($input['live_son_flag']){
+                $twitter_id = $input['live_son_flag'];
+            }
             Subscribe::create([
                 'user_id' => $this->user['id'],
                 'type' => 3,
                 'relation_id' => $input['info_id'],
                 'status' => 1,
                 'is_flag' => $is_flag,
-                'twitter_id' => (!empty($input['inviter']))?$input['inviter']:0,
+                'twitter_id' => $twitter_id,
             ]);
 
             Live::where(['id' => $input['live_id']])->increment('order_num');
