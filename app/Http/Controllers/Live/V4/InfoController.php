@@ -307,7 +307,7 @@ class InfoController extends ControllerBackend
      * @apiSuccess {string} live_id 直播id
      * @apiSuccess {string} son_id 渠道用户id
      * @apiSuccess {string} status 状态(待开启  2开启  3关闭)
-     * @apiSuccess {string} son 渠道账号
+     * @apiSuccess {string} son_flag 渠道账号
      **/
     public function flagPosterList(Request $request){
         $s = new LiveInfoServers();
