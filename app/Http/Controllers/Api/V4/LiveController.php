@@ -525,7 +525,6 @@ class LiveController extends Controller
                     "twitter_id" => $live_son_flag,
                 ])->count();
             }
-
 //
         }
         $data = [
