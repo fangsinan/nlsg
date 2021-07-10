@@ -513,7 +513,9 @@ class IndexController extends ControllerBackend
             LivePoster::firstOrCreate([
                 'live_id' =>$live_info_data['live_pid'] ,
                 'status' =>1
-            ],[                'image'  =>'http://image.nlsgapp.com/nlsg/works/20210710105652627976.jpg',]);
+            ],[
+                'image'  =>'http://image.nlsgapp.com/nlsg/works/20210710105652627976.jpg'
+            ]);
         }
 
 

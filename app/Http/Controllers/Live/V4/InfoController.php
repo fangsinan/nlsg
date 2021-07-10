@@ -453,7 +453,7 @@ class InfoController extends ControllerBackend
      * @apiGroup 直播后台新增
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/live_v4/live_info/flag_poster_status
      * @apiDescription  海报状态修改
-     * @apiParam {number} live_id 直播id
+     * @apiParam {number} id id
      * @apiParam {string=on,off,del} flag 动作
      **/
     public function flagPosterStatus(Request $request)
