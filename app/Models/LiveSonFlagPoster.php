@@ -22,7 +22,11 @@ class LiveSonFlagPoster extends Model
             ->where('p.is_del', '=', 0)
             ->select(['p.id', 'p.live_id', 'p.son_id', 'p.status', 'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at']);
 
-        $bg_img = LivePoster::where('live_id','=',$live_id)->where('status','=',1)
+        if (!empty($params['status'] ?? 0)) {
+            $query->where('p.status', '=', $params['status']);
+        }
+
+        $bg_img = LivePoster::where('live_id', '=', $live_id)->where('status', '=', 1)
             ->select(['image'])
             ->get();
 

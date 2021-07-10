@@ -206,7 +206,6 @@ class LiveInfoServers
         }
 
 
-
         $query->whereIn('o.twitter_id', $twitter_id_list);
 
 //        $query->where('o.live_id', '=', $live_id);
@@ -608,6 +607,7 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
         $live_id = $params['live_id'] ?? 0;
         $page = $params['page'] ?? 1;
         $size = $params['size'] ?? 10;
+        $status = $params['status'] ?? 0;
 
         if (empty($live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
@@ -620,7 +620,7 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
         $model = new LiveSonFlagPoster();
         $model->createPosterByLiveId($live_id);
 
-        return $model->getList(['live_id' => $live_id, 'page' => $page, 'size' => $size]);
+        return $model->getList(['live_id' => $live_id, 'page' => $page, 'size' => $size, 'status' => $status]);
     }
 
     public function flagPosterStatus($params)
