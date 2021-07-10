@@ -49,7 +49,7 @@ class LiveInfoServers
             $query->where('u.phone', 'like', '%' . $params['phone'] . '%');
         }
         if (!empty($params['t_user_id'] ?? '')) {
-            $query->where('tu.user_id', '=', $params['tu_user_id']);
+            $query->where('tu.user_id', '=', $params['t_user_id']);
         }
         if (!empty($params['t_phone'] ?? '')) {
             $query->where('tu.phone', 'like', '%' . $params['t_phone'] . '%');
@@ -182,11 +182,11 @@ class LiveInfoServers
         //搜索
         //用户昵称,手机 推荐人手机,昵称,flag
         if (!empty($params['nickname'] ?? '')) {
-            $query->where('u.nickname', 'like', '%' . $params['t_nickname'] . '%');
+            $query->where('u.nickname', 'like', '%' . $params['nickname'] . '%');
         }
 
         if (!empty($params['phone'] ?? '')) {
-            $query->where('u.phone', 'like', '%' . $params['t_phone'] . '%');
+            $query->where('u.phone', 'like', '%' . $params['phone'] . '%');
         }
 
         if (!empty($params['t_nickname'] ?? '')) {
