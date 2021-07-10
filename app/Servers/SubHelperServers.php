@@ -43,6 +43,10 @@ class SubHelperServers
         ];
     }
 
+    public function comObjList(){
+
+    }
+
     public function addOpenList($params, $admin_id)
     {
         $id = $params['id'] ?? 0;

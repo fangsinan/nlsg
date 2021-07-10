@@ -185,6 +185,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('sub_helper/ojb_list', 'SubHelperController@objList');
         Route::post('sub_helper/open', 'SubHelperController@open');
 
+        Route::get('sub_helper/com_ojb_list', 'SubHelperController@comObjList');
+
         //消息列表
 
         //im文案部分

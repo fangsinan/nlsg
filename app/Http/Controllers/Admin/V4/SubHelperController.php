@@ -16,6 +16,12 @@ class SubHelperController  extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function comObjList(){
+        $servers = new SubHelperServers();
+        $data = $servers->comObjList();
+        return $this->getRes($data);
+    }
+
 
     public function open(Request $request){
         $servers = new SubHelperServers();
