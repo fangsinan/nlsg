@@ -822,7 +822,7 @@ class IncomeController extends Controller
 
         }else{
             //earn_type==2时 type[ 2：用户专栏分享提成 5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画 10直播分享收益]
-            $order_type_val = [2,5,6,7,8,9,10,11,12];//默认全部查询
+            $order_type_val = [2,5,6,7,8,9,10,11,12,13];//默认全部查询
             if( !empty($type) &&  in_array($type,[1,2,3,4]) ){
                 // 改需求后的 type类型  1 电商收益   2内容收益 3会员收益  4直播收益
                 switch ($type){
