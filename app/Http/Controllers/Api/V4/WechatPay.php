@@ -449,7 +449,8 @@ class WechatPay extends Controller
                         $ProfitPrice = GetPriceTools::Income(0, $tk_vip, 0, 6);
                         if ($ProfitPrice > 0) {
                             $map = array('user_id' => $twitter_id, "type" => 12, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, );
-                            $vip_res = PayRecordDetail::firstOrCreate($map);
+                            //防止用户退款   暂时走线下 名单返款
+                            //$vip_res = PayRecordDetail::firstOrCreate($map);
                         }
                     }
                 }
