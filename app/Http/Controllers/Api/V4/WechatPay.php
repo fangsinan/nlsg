@@ -168,6 +168,7 @@ class WechatPay extends Controller
                 $Userdata['expire_time'] = $endtime;
                 $Userdata['start_time'] = $starttime;
                 $Userdata['status'] = 1;
+                $Userdata['order_id'] = $orderId;
                 if ($supremacy_vip == 2) { // 支付一千元定金   状态为待审核
                     $Userdata['status'] = 0;
                 }
