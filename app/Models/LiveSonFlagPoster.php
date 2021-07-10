@@ -22,7 +22,13 @@ class LiveSonFlagPoster extends Model
             ->where('p.is_del', '=', 0)
             ->select(['p.id', 'p.live_id', 'p.son_id', 'p.status', 'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at']);
 
-        return $query->paginate($size);
+        $bg_img = LivePoster::where('live_id','=',$live_id)->where('status','=',1)
+            ->select(['image'])
+            ->get();
+
+        $res = $query->paginate($size);
+        $custom = collect(['bg_img' => $bg_img]);
+        return $custom->merge($res);
     }
 
     public function createPosterByLiveId($live_id = 0)
