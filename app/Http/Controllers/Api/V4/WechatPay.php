@@ -331,10 +331,10 @@ class WechatPay extends Controller
                             'template' => 'SMS_211001614',
                         ], ['aliyun']);
                     }
-                    Task::send(3, $user_id, $orderInfo['relation_id']);
-                    if($pay_record_flag == 1){
-                        Task::send(11, $user_id, $orderInfo['relation_id'],'','360会员','','','',$AdminInfo['nickname']);
-                    }
+//                    Task::send(3, $user_id, $orderInfo['relation_id']);
+//                    if($pay_record_flag == 1){
+//                        Task::send(11, $user_id, $orderInfo['relation_id'],'','360会员','','','',$AdminInfo['nickname']);
+//                    }
                     return true;
                 } else {
                     DB::rollBack();
@@ -459,7 +459,7 @@ class WechatPay extends Controller
                     DB::commit();
                     $AdminInfo = User::find($user_id);
                     self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
-                    Task::send(6, $user_id, $orderInfo['relation_id']);
+//                    Task::send(6, $user_id, $orderInfo['relation_id']);
                     return true;
 
                 } else {
@@ -684,10 +684,10 @@ class WechatPay extends Controller
 //                            self::OrderProfit($transaction_id,$out_trade_no,$liveData['twitter_money'],$twitter_id);
 //                        }
 //                    }
-                    Task::send(5, $user_id, $orderInfo['relation_id']);
-                    if($pay_record_flag == 1){
-                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$liveData['title'],'','','',$userdata['nickname']);
-                    }
+//                    Task::send(5, $user_id, $orderInfo['relation_id']);
+//                    if($pay_record_flag == 1){
+//                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$liveData['title'],'','','',$userdata['nickname']);
+//                    }
                     return true;
 
                 } else {
@@ -1202,11 +1202,11 @@ class WechatPay extends Controller
                     }
 
 
-                    Task::send($send_type, $user_id, $orderInfo['relation_id']);
-                    if($pay_record_flag == 1){
-                        $ColumnInfo = Column::find($teacher_id)->toArray();
-                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$ColumnInfo['name'],'','','',$AdminInfo['nickname']);
-                    }
+//                    Task::send($send_type, $user_id, $orderInfo['relation_id']);
+//                    if($pay_record_flag == 1){
+//                        $ColumnInfo = Column::find($teacher_id)->toArray();
+//                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$ColumnInfo['name'],'','','',$AdminInfo['nickname']);
+//                    }
 //                    $content = "订单修改:$orderRst--优惠券:$couponRst--短信发送:$phoneRst--支付记录:$recordRst--分成记录:$shareSyRst--订阅:$subscribeRst--分享收益:$Sy_Rst";
 //                    Io::WriteFile('', '', $content, true);
 //                    self::$user_id = $user_id;
@@ -1445,10 +1445,10 @@ class WechatPay extends Controller
                     }
 
 
-                    Task::send(1, $user_id, $orderInfo['relation_id']);
-                    if($pay_record_flag == 1){
-                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$WorksInfo['title'],'','','',$AdminInfo['nickname']);
-                    }
+//                    Task::send(1, $user_id, $orderInfo['relation_id']);
+//                    if($pay_record_flag == 1){
+//                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$WorksInfo['title'],'','','',$AdminInfo['nickname']);
+//                    }
                     return true;
                 } else {
                     DB::rollBack();
