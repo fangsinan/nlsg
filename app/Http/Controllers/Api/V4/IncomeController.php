@@ -9,6 +9,7 @@ use App\Models\CashData;
 use App\Models\Column;
 use App\Models\MallGoods;
 use App\Models\MallOrderDetails;
+use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
@@ -821,7 +822,7 @@ class IncomeController extends Controller
 
         }else{
             //earn_type==2时 type[ 2：用户专栏分享提成 5电商推客收益  6专栏推客收益  7精品课收益 8会员收益 9菩提沙画 10直播分享收益]
-            $order_type_val = [2,5,6,7,8,9,10,11];//默认全部查询
+            $order_type_val = [2,5,6,7,8,9,10,11,12];//默认全部查询
             if( !empty($type) &&  in_array($type,[1,2,3,4]) ){
                 // 改需求后的 type类型  1 电商收益   2内容收益 3会员收益  4直播收益
                 switch ($type){
@@ -980,7 +981,7 @@ class IncomeController extends Controller
                     if($OrderInfo){
                         $works_id=$OrderInfo['relation_id'];
 
-                        $workName = Works::find($works_id);;
+                        $workName = Works::find($works_id);
                         //$val['name']=Tool::SubStr($workName,8); //截取名称13
                         $res['name']=$workName['title']; //截取名称13
                     }
@@ -1017,6 +1018,20 @@ class IncomeController extends Controller
                     if($teacherInfo){
                         $userInfo = User::find($teacherInfo['user_id']);
                         $res['o_nick_name']=$userInfo['phone'];
+                    }
+                    break;
+                case 12:
+                    $res['content'] = '线下门票收益';
+                    $res['name']='线下门票';
+                    $res['o_nick_name']='';
+
+                    $teacherInfo = Order::select('user_id','relation_id')->where(['ordernum'=>$ordernum])->first();
+                    if($teacherInfo){
+                        $userInfo = User::find($teacherInfo['user_id']);
+                        $res['o_nick_name']=$userInfo['phone'];
+
+                        $offline = OfflineProducts::find($teacherInfo['relation_id']);
+                        $res['name'] =$offline['title'];
                     }
                     break;
 
