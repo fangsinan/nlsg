@@ -11,57 +11,73 @@ use App\Models\Live;
 use App\Models\LiveComment;
 use App\Models\LiveInfo;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
 class ImGroupController extends Controller
 {
 
     //创建群回调
-    public function addGroup($params){
+    public static function addGroup($params){
 
         if (empty($params)){
             return false;
         }
 
+        DB::beginTransaction();
         $group_add = [
-            'group_id'      => $params['GroupId'],
-            'operator_account'        => $params['Operator_Account'],
-            'owner_account'           => $params['Owner_Account'],
-            'type'           => $params['Type'],
-            'name'           => $params['Name'],
-
+            'group_id'          => $params['GroupId'],
+            'operator_account'  => $params['Operator_Account'],
+            'owner_account'     => $params['Owner_Account'],
+            'type'              => $params['Type'],
+            'name'              => $params['Name'],
+            'created_at'        => date('Y-m-d H:i:s'),
+            'updated_at'        => date('Y-m-d H:i:s'),
         ];
         $group_add_id = ImGroup::insert($group_add);
+        $id = ImGroup::insertGetId($group_add);
 
         $adds = [];
         foreach ($params['MemberList'] as $key=>$val){
 
             $add = [
-                'group_id' => $group_add_id,
+                'group_id'      => $id,
                 'group_account' => $val['Member_Account'],
-                'group_role' => 0,
+                'group_role'    => 0,
+                'created_at'    => date('Y-m-d H:i:s'),
+                'updated_at'    => date('Y-m-d H:i:s'),
             ];
+            if($val['Member_Account'] == $params['Owner_Account']){
+                $add['group_role'] = 1;
+            }
 
             $adds[] = $add;
 
         }
+        $gu_res = true;
         if(!empty($adds)){
-            ImGroupUser::insert($adds);
+            $gu_res = ImGroupUser::insert($adds);
         }
 
+        if($group_add_id && $gu_res){
+            DB::commit();
+            return true;
+        }else{
+            DB::rollBack();
+        }
 
-        return true;
+        return false;
 
     }
 
 
     //群聊消息回调
-    public function groupSend($params){
+    public static function groupSend($params){
 
         if (empty($params)){
             return false;
         }
-        
+        dd($params);
         //回调 类型如果是直播群  需要发送至redis
         if($params['Type'] == "AVChatRoom"){
             //直播群

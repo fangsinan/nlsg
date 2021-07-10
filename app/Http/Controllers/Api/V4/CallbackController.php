@@ -130,17 +130,14 @@ class CallbackController extends Controller
         }
 
         switch ($params['CallbackCommand']){
-            case 'C2C.Call backBeforeSendMsg': //消息之前
+            case 'C2C.CallbackBeforeSendMsg': //消息之前
             case 'C2C.CallbackAfterSendMsg': //消息之后回调
-
+            case 'Group.CallbackAfterSendMsg': //群聊消息
                 $result = ImMsgController::sendMsg($params);
                 break;
 
-            case 'Group.CallbackAfterCreateGroup':
+            case 'Group.CallbackAfterCreateGroup': //创建群聊天
                 $result = ImGroupController::addGroup($params);
-                break;
-            case 'Group.CallbackAfterSendMsg':
-                $result = ImGroupController::groupSend($params);
                 break;
 
             case 'Sns.CallbackFriendAdd':  //添加好友
