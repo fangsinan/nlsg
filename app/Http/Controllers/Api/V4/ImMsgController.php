@@ -185,14 +185,25 @@ class ImMsgController extends Controller
         //消息主库
         $msg_add = [
             'from_account'      => $params['From_Account'],
-            'to_account'        => $params['To_Account'],
             'msg_seq'           => $params['MsgSeq'],
-            'msg_random'        => $params['MsgRandom'],
             'msg_time'          => $params['MsgTime'],
-            'msg_key'           => $params['MsgKey'],
-            'send_msg_result'   => $params['SendMsgResult'],
-            'unread_msg_num'    => $params['UnreadMsgNum'],
         ];
+
+        //单聊消息
+        if($params['CallbackCommand'] == 'C2C.CallbackAfterSendMsg'){
+            $msg_add['to_account']          = $params['To_Account'];
+            $msg_add['msg_random']          = $params['MsgRandom'];
+            $msg_add['msg_key']             = $params['MsgKey'];
+            $msg_add['send_msg_result']     = $params['SendMsgResult'];
+            $msg_add['unread_msg_num']      = $params['UnreadMsgNum'];
+        }
+        //群聊消息
+        if($params['CallbackCommand'] == 'Group.CallbackAfterSendMsg'){
+            $msg_add['group_id']            = $params['GroupId'];
+            $msg_add['online_only_flag']    = $params['OnlineOnlyFlag'];
+            $msg_add['type']                = 1;
+            $msg_add['msg_random']          = $params['Random'];
+        }
 
         $msg_add_res = ImMsg::create($msg_add);
         $img_res= true;
@@ -264,12 +275,19 @@ class ImMsgController extends Controller
                     $msg_content_add['size']                = $v['MsgContent']['VideoSize'];
                     $msg_content_add['second']              = $v['MsgContent']['VideoSecond'];
                     $msg_content_add['video_format']        = $v['MsgContent']['VideoFormat'];
-                    $msg_content_add['video_download_flag'] = $v['MsgContent']['VideoDownloadFlag'];
-                    $msg_content_add['video_thumb_url']     = $v['MsgContent']['ThumbUrl'];
+                    $msg_content_add['download_flag']       = $v['MsgContent']['VideoDownloadFlag'];
+                    $msg_content_add['thumb_url']           = $v['MsgContent']['ThumbUrl'];
                     $msg_content_add['thumb_size']          = $v['MsgContent']['ThumbSize'];
                     $msg_content_add['thumb_width']         = $v['MsgContent']['ThumbWidth'];
                     $msg_content_add['thumb_height']        = $v['MsgContent']['ThumbHeight'];
                     $msg_content_add['thumb_format']        = $v['MsgContent']['ThumbFormat'];
+                    break;
+                case 'TIMCustomElem' : //自定义类型
+                    $msg_content_add['data']    = $v['MsgContent']['Data'];
+                    $msg_content_add['desc']    = $v['MsgContent']['Desc'];
+                    $msg_content_add['ext']     = $v['MsgContent']['Ext'];
+                    $msg_content_add['sound']   = $v['MsgContent']['Sound'];
+
                     break;
             }
 
