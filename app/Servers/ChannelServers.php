@@ -567,7 +567,7 @@ class ChannelServers
                         break;
                     case 4:
                         $servers = new VipServers();
-                        $servers->openVip($v->user_id, $v->phone);
+                        $servers->openVip($v->user_id, $v->phone,'douyin');
                         DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([

@@ -150,7 +150,7 @@ class VipServers
 
     }
 
-    public function openVip($user_id, $phone)
+    public function openVip($user_id, $phone,$channel='')
     {
         $now_date = date('Y-m-d H:i:s');
         $user_info = User::where('id', '=', $user_id)->first();
@@ -191,6 +191,7 @@ class VipServers
             $check_vip->expire_time = date('Y-m-d 23:59:59', strtotime('+1 years'));
             $check_vip->status = 1;
             $check_vip->is_default = 1;
+            $check_vip->channel = $channel;
         }
         $check_vip->save();
         VipRedeemUser::subWorksOrGetRedeemCode($user_id);
