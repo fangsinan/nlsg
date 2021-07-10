@@ -1031,6 +1031,22 @@ class IncomeController extends Controller
                         $res['o_nick_name']=$userInfo['phone'];
 
                         $offline = OfflineProducts::find($teacherInfo['relation_id']);
+                        $res['content'] =$offline['title'];
+                        $res['name'] =$offline['title'];
+                    }
+                    break;
+                case 13:
+                    $res['content'] = '训练营收益';
+                    $res['name']='训练营';
+                    $res['o_nick_name']='';
+
+                    $teacherInfo = Order::select('user_id','relation_id')->where(['ordernum'=>$ordernum])->first();
+                    if($teacherInfo){
+                        $userInfo = User::find($teacherInfo['user_id']);
+                        $res['o_nick_name']=$userInfo['phone'];
+
+                        $offline = OfflineProducts::find($teacherInfo['relation_id']);
+                        $res['content'] =$offline['title'];
                         $res['name'] =$offline['title'];
                     }
                     break;
