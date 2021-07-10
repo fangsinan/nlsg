@@ -637,7 +637,7 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
                 $check_id->status = 2;
                 break;
             case 'off':
-                $check_id->status = 3;
+                $check_id->status = 1;
                 break;
             case 'del':
                 $check_id->is_del = 1;
