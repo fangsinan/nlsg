@@ -1136,7 +1136,7 @@ class WechatPay extends Controller
                     }
                 }
 
-                if (!empty($map)) {
+                if (!empty($map) && $orderInfo['type'] != 18 ) {
                     //$PayRDObj = new PayRecordDetail();
                     //防止重复添加收入
                     $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
