@@ -1025,7 +1025,7 @@ class IncomeController extends Controller
                     $res['name']='线下门票';
                     $res['o_nick_name']='';
 
-                    $teacherInfo = Order::select('user_id')->where(['ordernum'=>$ordernum])->first();
+                    $teacherInfo = Order::select('user_id','relation_id')->where(['ordernum'=>$ordernum])->first();
                     if($teacherInfo){
                         $userInfo = User::find($teacherInfo['user_id']);
                         $res['o_nick_name']=$userInfo['phone'];
