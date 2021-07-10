@@ -9,6 +9,7 @@ use App\Models\LiveConsole;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveNumber;
+use App\Models\LivePoster;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
 use App\Models\Subscribe;
@@ -507,6 +508,17 @@ class IndexController extends ControllerBackend
             $live_info_data['id'] = $Live_res->id;
             DB::table('nlsg_live_info')->insert($live_info_data);
         }
+
+        if ($userId == 169209){
+            LivePoster::firstOrCreate([
+                'live_id' =>$live_info_data['live_pid'] ,
+                'status' =>1
+            ],[
+                'image'  =>'http://image.nlsgapp.com/nlsg/works/20210710105652627976.jpg'
+            ]);
+        }
+
+
         return success();
     }
 
@@ -753,7 +765,6 @@ class IndexController extends ControllerBackend
             ['title' => "王琨老师第一天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/9cce592f3701925919134293895/v.f100030.mp4',],
             ['title' => "王琨老师第二天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/bba62eab3701925919196098502/v.f100030.mp4',],
             ['title' => "李婷老师直播",      'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/86674a033701925920092825176/v.f100030.mp4',],
-            ['title' => "李婷老师直播新版",      'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/24c43b093701925920528809905/v.f100030.mp4',],
         ];
         return success($res);
     }
