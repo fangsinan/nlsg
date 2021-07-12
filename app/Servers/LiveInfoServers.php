@@ -206,7 +206,7 @@ class LiveInfoServers
             $query->where('o.ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
 
-        $query->where('o.remark','=',$live_id);
+        $query->where('o.remark', '=', $live_id);
         $query->whereIn('o.twitter_id', $twitter_id_list);
 
 //        $query->where('o.live_id', '=', $live_id);
@@ -279,10 +279,11 @@ class LiveInfoServers
         $query = DB::table('nlsg_live_online_user')
             ->where('live_id', '=', $live_id);
 
+        $son_id = intval($params['son_id'] ?? 0);
 
-        if (!empty($params['son_id'] ?? 0)) {
+        if (!empty($son_id ?? 0)) {
             $temp_user_list = LiveCountDown::where('live_id', '=', $live_id)
-                ->where('new_vip_uid', '=', $params['son_id'])
+                ->where('new_vip_uid', '=', $son_id)
                 ->pluck('user_id')
                 ->toArray();
 
@@ -340,13 +341,40 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
 //            ->where('status','=',1)
                 ->count();
         }
+        DB::connection()->enableQueryLog();
+        //       $res['list'] = $query->groupBy(Db::raw('left(online_time,16)'))
+        //    ->orderBy('online_time')
+        //   ->select([
+        //       DB::raw('count(*) as counts'),
+        //        DB::raw('LEFT(online_time,16) as time')
+        //   ])->get();
 
-        $res['list'] = $query->groupBy(Db::raw('left(online_time,16)'))
-            ->orderBy('online_time')
-            ->select([
-                DB::raw('count(*) as counts'),
-                DB::raw('LEFT(online_time,16) as time')
-            ])->get();
+        $list_sql = "
+SELECT
+	count(*) AS counts,
+	time
+FROM
+	(
+	SELECT
+		*
+	FROM
+		(
+		SELECT
+			user_id,
+			LEFT ( online_time, 16 ) AS time
+		FROM
+			`nlsg_live_online_user`
+		WHERE
+			`live_id` = $live_id
+		) AS a
+	GROUP BY
+		user_id,
+		time
+	) AS b
+GROUP BY
+	time";
+
+        $res['list'] = DB::select($list_sql);
 
         if (($params['only_list'] ?? 0) == 1) {
             return $res['list'];
@@ -408,7 +436,7 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
         }
 
         $query = DB::table('nlsg_live_online_user as lou')
-            ->join('nlsg_live_count_down as cd', function ($query) use ($live_id) {
+            ->leftJoin('nlsg_live_count_down as cd', function ($query) use ($live_id) {
                 $query->on('cd.user_id', '=', 'lou.user_id')->where('cd.live_id', '=', $live_id);
             })
             ->leftJoin('nlsg_user as u', 'u.id', '=', 'cd.new_vip_uid');
