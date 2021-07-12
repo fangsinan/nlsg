@@ -67,22 +67,34 @@ class ImDocController extends ControllerBackend
     }
 
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse{
-    "doc_id": 1,
-    "send_type": 1,
-    "send_at": "",
-    "info": [
-    {
-    "type": 1,
-    "list": [
-    1,
-    2,
-    3
-    ]
-    }
-    ]
-    }
+     * @api {put} api/admin_v4/im_doc/job_add 添加发送任务
+     * @apiVersion 4.0.0
+     * @apiName  list
+     * @apiGroup 后台-社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/job_add
+     * @apiParam {number} doc_id 文案id
+     * @apiParam {number=1,2} send_type 发送时间类型(1立刻 2定时)
+     * @apiParam {string} [send_at] 定时时间
+     * @apiParam {string[]} info 对象列表
+     * @apiParam {string=1,2,3} info.send_obj_type 目标对象类型(1群组 2个人 3标签)
+     * @apiParam {string} info.send_obj_id 目标id
+     * @apiDescription 添加发送任务
+     * @apiParamExample {json} Request-Example:
+     * {
+     * "doc_id": 1,
+     * "send_type": 1,
+     * "send_at": "",
+     * "info": [
+     * {
+     * "type": 1,
+     * "list": [
+     * 1,
+     * 2,
+     * 3
+     * ]
+     * }
+     * ]
+     * }
      */
     //添加发送任务
     public function addSendJob(Request $request)
@@ -112,39 +124,39 @@ class ImDocController extends ControllerBackend
      * 选择商品分类
      * @return \Illuminate\Http\JsonResponse
      */
-    public function  getCategory()
+    public function getCategory()
     {
-        $works_category= WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
+        $works_category = WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
             ->where(['status' => 1,])
             ->orderBy('sort', 'asc')
             ->get()
             ->toArray();
 
         $mall = new MallCategory();
-        $goods_category  = $mall->getUsedList();
+        $goods_category = $mall->getUsedList();
 
         $data = [
             'works' => [
-                'name'     =>'精品课',
-                'category' =>$works_category
+                'name' => '精品课',
+                'category' => $works_category
             ],
             'lecture' => [
-                'name'   =>  '讲座'
+                'name' => '讲座'
             ],
-            'goods'   => [
-                'name'   => '商品',
+            'goods' => [
+                'name' => '商品',
                 'category' => $goods_category
             ],
-            'live'  => [
-                'name' =>  '直播训练营',
+            'live' => [
+                'name' => '直播训练营',
                 'category' => [
                     [
                         'id' => '100001',
                         'name' => '直播'
                     ],
                     [
-                       'id' => '100002',
-                       'name' => '训练营'
+                        'id' => '100002',
+                        'name' => '训练营'
                     ],
                     [
                         'id' => '100003',
