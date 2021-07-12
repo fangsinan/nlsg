@@ -287,7 +287,7 @@ class LiveInfoServers
                 ->pluck('user_id')
                 ->toArray();
 
-            $temp_user_list_str = implode('', $temp_user_list);
+            $temp_user_list_str = implode(',', $temp_user_list);
 
             $query->whereIn('user_id', $temp_user_list);
 
@@ -314,10 +314,30 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
                     ->whereIn('user_id', $temp_user_list)
                     ->count();
                 //累计人数sub
-                $res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
-                    ->where('type', '=', 3)
-                    ->whereIn('user_id', $temp_user_list)
-                    ->count();
+                //$res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
+                //    ->where('type', '=', 3)
+                //    ->whereIn('user_id', $temp_user_list)
+                 //   ->count();
+
+                $order_num_sql = "
+SELECT
+	count(*) AS counts
+FROM
+	(
+	SELECT
+		*
+	FROM
+		nlsg_subscribe
+	WHERE
+		relation_id = $live_id
+		AND STATUS = 1
+	AND user_id in ($temp_user_list_str)
+	GROUP BY
+	user_id
+	) AS a";
+
+                $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
+
             }
 
         } else {
@@ -336,10 +356,30 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
             //累计人次login
             $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
             //累计人数sub
-            $res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
-                ->where('type', '=', 3)
+            //$res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
+            //    ->where('type', '=', 3)
 //            ->where('status','=',1)
-                ->count();
+             //   ->count();
+
+
+            $order_num_sql = "
+SELECT
+	count(*) AS counts
+FROM
+	(
+	SELECT
+		*
+	FROM
+		nlsg_subscribe
+	WHERE
+		relation_id = $live_id
+		AND STATUS = 1
+	GROUP BY
+	user_id
+	) AS a";
+
+            $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
+
         }
         DB::connection()->enableQueryLog();
         //       $res['list'] = $query->groupBy(Db::raw('left(online_time,16)'))
@@ -547,11 +587,29 @@ GROUP BY
         $res['begin_at'] = $check_live_id->begin_at;
         $res['end_at'] = $check_live_id->end_at;
         $res['live_login'] = LiveLogin::where('live_id', '=', $live_id)->count();//人气
-        $res['order_num'] = Subscribe::where('relation_id', '=', $live_id)
-            ->where(function ($query) {
-                $query->where('order_id', '>', 0)->orWhere('channel_order_id', '<>', '');
-            })->count();//总预约人数
+        //$res['order_num'] = Subscribe::where('relation_id', '=', $live_id)
+            //->where(function ($query) {
+            //    $query->where('order_id', '>', 0)->orWhere('channel_order_id', '<>', '');
+            //})
+            //->count();//总预约人数
 
+        $order_num_sql = "
+SELECT
+	count(*) AS counts
+FROM
+	(
+	SELECT
+		*
+	FROM
+		nlsg_subscribe
+	WHERE
+		relation_id = $live_id
+		AND STATUS = 1
+	GROUP BY
+	user_id
+	) AS a";
+
+        $res['order_num'] = DB::select($order_num_sql)[0]->counts;
 
         if ($check_live_id->user_id == 161904) {
             //王琨,统计live_deal
