@@ -15,8 +15,8 @@ class ImDocController extends ControllerBackend
     /**
      * @api {post} api/admin_v4/im_doc/add 添加文案
      * @apiVersion 4.0.0
-     * @apiName  list
-     * @apiGroup 后台-社群文案
+     * @apiName  api/admin_v4/im_doc/add
+     * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/add
      * @apiDescription 社群文案
      *
@@ -37,8 +37,8 @@ class ImDocController extends ControllerBackend
     /**
      * @api {get} api/admin_v4/im_doc/list 文案列表
      * @apiVersion 4.0.0
-     * @apiName  list
-     * @apiGroup 后台-社群文案
+     * @apiName  api/admin_v4/im_doc/list
+     * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/list
      * @apiDescription 社群文案
      */
@@ -52,8 +52,8 @@ class ImDocController extends ControllerBackend
     /**
      * @api {put} api/admin_v4/im_doc/change_status 文案状态修改
      * @apiVersion 4.0.0
-     * @apiName  list
-     * @apiGroup 后台-社群文案
+     * @apiName  api/admin_v4/im_doc/change_status
+     * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/change_status
      * @apiParam {number} id id
      * @apiParam {string=del} flag 动作(del:删除)
@@ -69,8 +69,8 @@ class ImDocController extends ControllerBackend
     /**
      * @api {put} api/admin_v4/im_doc/job_add 添加发送任务
      * @apiVersion 4.0.0
-     * @apiName  list
-     * @apiGroup 后台-社群文案
+     * @apiName  api/admin_v4/im_doc/job_add
+     * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/job_add
      * @apiParam {number} doc_id 文案id
      * @apiParam {number=1,2} send_type 发送时间类型(1立刻 2定时)
