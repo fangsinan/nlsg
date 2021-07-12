@@ -520,7 +520,10 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
                 $query->where('order_id', '>', 0)->orWhere('channel_order_id', '<>', '');
             })->count();//总预约人数
 
-        $watch_count_sql = "SELECT
+
+        if ($check_live_id->user_id == 161904) {
+            //王琨,统计live_deal
+            $watch_count_sql = "SELECT
            count(*) as counts
         FROM
             nlsg_subscribe AS s
@@ -531,7 +534,7 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
             AND s.type = 3
             AND EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )";
 
-        $not_watch_count_sql = "SELECT
+            $not_watch_count_sql = "SELECT
            count(*) as counts
         FROM
             nlsg_subscribe AS s
@@ -542,8 +545,36 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
             AND s.type = 3
             AND NOT EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id ) ";
 
-        $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
-        $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+            $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
+            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+        } else {
+            //李婷,统计order表的9.9
+            $watch_count_sql = "SELECT
+           count(*) as counts
+        FROM
+            nlsg_subscribe AS s
+            JOIN nlsg_user AS u ON s.user_id = u.id
+        WHERE
+            s.relation_id = $live_id
+            AND s.type = 3
+            AND EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )";
+
+            $not_watch_count_sql = "SELECT
+           count(*) as counts
+        FROM
+            nlsg_subscribe AS s
+            JOIN nlsg_user AS u ON s.user_id = u.id
+        WHERE
+            s.relation_id = $live_id
+            AND s.type = 3
+            AND NOT EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id ) ";
+
+            $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
+            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+        }
+
+
+
 
         //成交单数 总金额,购买人数,未购买人数
         if ($check_live_id->user_id == 161904) {
