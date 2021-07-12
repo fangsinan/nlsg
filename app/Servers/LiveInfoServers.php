@@ -211,9 +211,7 @@ class LiveInfoServers
 
 //        $query->where('o.live_id', '=', $live_id);
         $query->whereRaw('o.type=10 and o.`status`=1 and u.is_test_pay=0
-            and o.pay_price>=0.1 and o.is_shill=0 and o.activity_tag <>\'cytx\'')
-            ->groupBy('o.id')
-            ->orderBy('o.id', 'desc');
+            and o.pay_price>=0.1 and o.is_shill=0 and o.activity_tag <>\'cytx\'');
 
 
         $excel_flag = $params['excel_flag'] ?? 0;
@@ -226,22 +224,28 @@ class LiveInfoServers
                     return $query->count('o.user_id');
             }
 
-            $query->select([
-                'o.user_id', 'u.phone', 'u.nickname', 'o.twitter_id',
-                'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
-                'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
-                'o.id as order_id', 'o.pay_type', 'os_type',
-                'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id'
-            ]);
+            $query
+                ->groupBy('o.id')
+                ->orderBy('o.id', 'desc')
+                ->select([
+                    'o.user_id', 'u.phone', 'u.nickname', 'o.twitter_id',
+                    'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
+                    'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
+                    'o.id as order_id', 'o.pay_type', 'os_type',
+                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id'
+                ]);
             $res = $query->paginate($size);
             $custom = collect(['live_user_id' => $check_live_id->user_id]);
             return $custom->merge($res);
         } else {
-            $query->select([
-                'o.user_id', 'u.phone', 'u.nickname', 'o.twitter_id',
-                'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
-                'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
-            ]);
+            $query
+                ->groupBy('o.id')
+                ->orderBy('o.id', 'desc')
+                ->select([
+                    'o.user_id', 'u.phone', 'u.nickname', 'o.twitter_id',
+                    'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
+                    'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
+                ]);
             return $query->get();
         }
 
@@ -572,8 +576,6 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
             $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
             $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
         }
-
-
 
 
         //成交单数 总金额,购买人数,未购买人数
