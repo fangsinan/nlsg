@@ -596,9 +596,16 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
         $res['total_order_user'] = $temp_order_user;
 
         //总预约人数
-        $res['total_sub_count'] = Subscribe::where('relation_id', '=', $live_id)
-            ->where('type', '=', 3)->where('status', '=', 1)
-            ->count();
+//        $res['total_sub_count'] = Subscribe::where('relation_id', '=', $live_id)
+//            ->where('type', '=', 3)->where('status', '=', 1)
+//            ->groupBy('user_id')
+//            ->count();
+
+        $total_sub_count_sql = "select count(*) counts from (
+SELECT id from nlsg_subscribe where relation_id = $live_id and type = 3 and status = 1 GROUP BY user_id
+) as a ";
+        $res['total_sub_count'] = DB::select($total_sub_count_sql)[0]->counts;
+
         //为购买人数
         $res['total_not_buy'] = $res['total_sub_count'] - $temp_order_user;
 
