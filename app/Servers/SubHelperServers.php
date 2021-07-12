@@ -44,7 +44,20 @@ class SubHelperServers
     }
 
     public function comObjList(){
+        $column_list = Column::where('status', '=', 1)
+            ->where('type', '=', 2)
+            ->select('id', DB::raw('2 as type'), 'name as title')
+            ->get();
 
+        $works_list = Works::where('status', '=', 4)
+            ->where('type', '=', 2)
+            ->select('id', DB::raw('4 as type'), 'title')
+            ->get();
+
+        return [
+            'column_list' => $column_list,
+            'works_list' => $works_list,
+        ];
     }
 
     public function addOpenList($params, $admin_id)

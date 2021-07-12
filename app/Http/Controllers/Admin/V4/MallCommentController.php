@@ -97,4 +97,36 @@ class MallCommentController extends ControllerBackend
         $data = $servers->addRobotComment($request->input());
         return $this->getRes($data);
     }
+
+    /**
+     * 添加课程讲座虚拟评论
+     * @api {post} /api/admin_v4/goods/add_robot_comment_for_works 添加课程讲座虚拟评论
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/goods/add_robot_comment_for_works
+     * @apiGroup  后台-商品评论
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/add_robot_comment_for_works
+     * @apiDescription 添加课程讲座虚拟评论
+     * @apiParamExample {json} Request-Example:
+     * {
+     * "id":474,
+     * "type":2,
+     * "list":[
+     * {
+     * "content":"好啊"
+     * },
+     * {
+     * "content":"好啊11"
+     * },
+     * {
+     * "content":"好啊11"
+     * }
+     * ]
+     * }
+     */
+    public function addRobotCommentForWorks(Request $request)
+    {
+        $servers = new MallCommentServers();
+        $data = $servers->addRobotCommentForWorks($request->input());
+        return $this->getRes($data);
+    }
 }

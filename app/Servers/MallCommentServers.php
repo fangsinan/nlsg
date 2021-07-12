@@ -4,10 +4,12 @@
 namespace App\Servers;
 
 
+use App\Models\Column;
 use App\Models\MallComment;
 use App\Models\MallGoods;
 use App\Models\MallSku;
 use App\Models\User;
+use App\Models\Works;
 use Illuminate\Support\Facades\DB;
 
 class MallCommentServers
@@ -163,5 +165,59 @@ class MallCommentServers
         } else {
             return ['code' => false, 'msg' => '失败'];
         }
+    }
+
+    public function addRobotCommentForWorks($params){
+        $id = $params['id'] ?? 0;
+        $type = $params['type'] ?? 0;
+        $list = $params['list'] ?? [];
+        if (empty($id) || empty($type) || empty($list)) {
+            return [
+                'code' => false,
+                'msg' => '参数错误',
+            ];
+        }
+
+        if (!in_array($type,[2,4])){
+            return ['code'=>false,'msg'=>'参数错误'];
+        }
+
+        $count = count($list);
+        $robot = User::where('is_robot', '=', 1)
+            ->select(['id'])
+            ->orderByRaw('rand()')
+            ->limit($count)
+            ->get()->toArray();
+        $robot = array_column($robot, 'id');
+
+        $add_data = [];
+        foreach ($list as $key => $v) {
+            if (empty($v['content'])) {
+                continue;
+            }
+            $temp_data = [];
+            $temp_data['user_id'] = $robot[$key] ?? 0;
+            $temp_data['content'] = $v['content'] ?? '';
+            $temp_data['relation_id'] = $id;
+            $temp_data['type'] = $type;
+            $add_data[] = $temp_data;
+        }
+
+        $res = DB::table('nlsg_comment')->insert($add_data);
+
+        if ($type == 2){
+            Column::where('id', '=', $id)->increment('comment_num', $count);
+            Column::where('id', '=', $id)->increment('subscribe_num', $count);
+        }else{
+            Works::where('id', '=', $id)->increment('subscribe_num', $count);
+            Works::where('id', '=', $id)->increment('comment_num', $count);
+        }
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => '失败'];
+        }
+
     }
 }

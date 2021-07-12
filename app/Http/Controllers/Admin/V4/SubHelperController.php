@@ -16,7 +16,33 @@ class SubHelperController  extends ControllerBackend
         return $this->getRes($data);
     }
 
-    public function comObjList(){
+
+    /**
+     * 课程讲座列表
+     * @api {post} /api/admin_v4/sub_helper/works_ojb_list 课程讲座列表
+     * @apiVersion 4.0.0
+     * @apiName /api/admin_v4/sub_helper/works_ojb_list
+     * @apiGroup  后台-商品评论
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/sub_helper/works_ojb_list
+     * @apiDescription 课程讲座列表
+     * @apiParamExample {json} Request-Example:
+     * {
+     * "id":474,
+     * "type":2,
+     * "list":[
+     * {
+     * "content":"好啊"
+     * },
+     * {
+     * "content":"好啊11"
+     * },
+     * {
+     * "content":"好啊11"
+     * }
+     * ]
+     * }
+     */
+    public function worksObjList(){
         $servers = new SubHelperServers();
         $data = $servers->comObjList();
         return $this->getRes($data);

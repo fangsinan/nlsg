@@ -110,6 +110,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
         //商品评论
         Route::post('goods/add_robot_comment', 'MallCommentController@addRobotComment');
+        Route::post('goods/add_robot_comment_for_works', 'MallCommentController@addRobotCommentForWorks');
+        Route::get('sub_helper/works_ojb_list', 'SubHelperController@worksObjList');
         Route::get('goods/comment_list', 'MallCommentController@commentList');
         Route::post('goods/comment_reply', 'MallCommentController@replyComment');
         Route::put('goods/comment_status', 'MallCommentController@changeStatus');
