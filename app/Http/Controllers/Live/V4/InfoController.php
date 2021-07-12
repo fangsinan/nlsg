@@ -404,7 +404,7 @@ class InfoController extends ControllerBackend
      * @apiSuccess {string} begin_at 直播开始,
      * @apiSuccess {string} end_at 直播结束,
      * @apiSuccess {string} live_login 人气,
-     * @apiSuccess {string} order_num":总预约人数 ,
+     * @apiSuccess {string} order_num 总预约人数
      * @apiSuccess {string} watch_counts 观看人数
      * @apiSuccess {string} not_watch_counts 未观看人数,
      * @apiSuccess {string} total_order 成交单数
