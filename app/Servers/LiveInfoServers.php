@@ -7,6 +7,7 @@ namespace App\Servers;
 use App\Models\BackendLiveRole;
 use App\Models\Live;
 use App\Models\LiveCountDown;
+use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveSonFlagPoster;
 use App\Models\Subscribe;
@@ -587,6 +588,22 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
             ->where('type', '=', 3)
 //            ->where('status','=',1)
             ->count();
+
+
+        $res['live_status'] = 1;  //默认值
+        $channel = LiveInfo::where('live_pid', $live_id)
+            ->where('status', 1)
+            ->orderBy('id', 'desc')
+            ->first();
+        if ($channel) {
+            if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                $res['live_status'] = 1;
+            } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                $res['live_status'] = 3;
+            } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                $res['live_status'] = 2;
+            }
+        }
 
 
         return $res;
