@@ -206,7 +206,7 @@ class LiveInfoServers
             $query->where('o.ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
 
-
+        $query->where('o.remark','=',$live_id);
         $query->whereIn('o.twitter_id', $twitter_id_list);
 
 //        $query->where('o.live_id', '=', $live_id);
