@@ -554,24 +554,38 @@ SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_
         } else {
             //李婷,统计order表的9.9
             $watch_count_sql = "SELECT
-           count(*) as counts
-        FROM
-            nlsg_subscribe AS s
-            JOIN nlsg_user AS u ON s.user_id = u.id
-        WHERE
-            s.relation_id = $live_id
-            AND s.type = 3
-            AND EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )";
+	count(*) AS counts
+FROM
+	(
+	SELECT
+		s.id AS sid
+	FROM
+		nlsg_subscribe AS s
+		JOIN nlsg_user AS u ON s.user_id = u.id
+	WHERE
+		s.relation_id = $live_id
+		AND s.type = 3
+		AND EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
+	GROUP BY
+	s.user_id
+	) AS a";
 
             $not_watch_count_sql = "SELECT
-           count(*) as counts
-        FROM
-            nlsg_subscribe AS s
-            JOIN nlsg_user AS u ON s.user_id = u.id
-        WHERE
-            s.relation_id = $live_id
-            AND s.type = 3
-            AND NOT EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id ) ";
+	count(*) AS counts
+FROM
+	(
+	SELECT
+		s.id AS sid
+	FROM
+		nlsg_subscribe AS s
+		JOIN nlsg_user AS u ON s.user_id = u.id
+	WHERE
+		s.relation_id = $live_id
+		AND s.type = 3
+		AND NOT EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
+	GROUP BY
+	s.user_id
+	) AS a";
 
             $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
             $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
