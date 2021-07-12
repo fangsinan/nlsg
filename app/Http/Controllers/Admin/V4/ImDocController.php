@@ -96,7 +96,6 @@ class ImDocController extends ControllerBackend
      * ]
      * }
      */
-    //添加发送任务
     public function addSendJob(Request $request)
     {
         $servers = new ImDocServers();
