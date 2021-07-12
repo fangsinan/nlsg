@@ -61,6 +61,7 @@ class LiveInfoServers
         }
 
         $query->orderBy('s.created_at', 'desc');
+        $query->groupBy('s.user_id');
 
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
