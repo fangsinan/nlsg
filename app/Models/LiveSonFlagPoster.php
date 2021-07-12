@@ -15,20 +15,32 @@ class LiveSonFlagPoster extends Model
     {
         $live_id = $params['live_id'];
         $size = $params['size'];
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+
+
         $query = DB::table('nlsg_live_son_flag_poster as p')
             ->join('nlsg_backend_live_role as lr', 'p.son_id', '=', 'lr.son_id')
             ->join('nlsg_live as l', 'p.live_id', '=', 'l.id')
             ->where('p.live_id', '=', $live_id)
             ->where('p.is_del', '=', 0)
+            ->where('lr.parent_id', '=', $check_live_id->user_id)
             ->select(['p.id', 'p.live_id', 'p.son_id', 'p.status', 'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at']);
 
         if (!empty($params['status'] ?? 0)) {
             $query->where('p.status', '=', $params['status']);
         }
 
-        $bg_img = LivePoster::where('live_id', '=', $live_id)->where('status', '=', 1)
-            ->select(['image'])
-            ->get();
+//        $bg_img = LivePoster::where('live_id', '=', $live_id)->where('status', '=', 1)
+//            ->select(['image'])
+//            ->get();
+
+        $temp_bg_img = ConfigModel::getData(57);
+        $temp_bg_img = explode(',', $temp_bg_img);
+        $bg_img = [];
+        foreach ($temp_bg_img as $v) {
+            $temp_data['image'] = $v;
+            $bg_img[] = $temp_data;
+        }
 
         $res = $query->paginate($size);
         $custom = collect(['bg_img' => $bg_img]);
@@ -46,12 +58,12 @@ class LiveSonFlagPoster extends Model
             ->select(['son', 'son_id', 'son_flag'])
             ->get();
 
+
         if ($son_flag->isEmpty()) {
             return ['code' => true, 'msg' => '没有渠道'];
         }
 
         $son_flag = $son_flag->toArray();
-
         //已经添加的
         $old = LiveSonFlagPoster::where('live_id', '=', $live_id)
             ->where('is_del', '=', 0)
