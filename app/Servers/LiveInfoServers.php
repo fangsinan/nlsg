@@ -272,77 +272,65 @@ class LiveInfoServers
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
-
+        //获取所有渠道
         $res['son_flag'] = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
             ->select(['son', 'son_id', 'son_flag'])
-            ->orderBy('sort','asc')
+            ->orderBy('sort','asc')   //按标记排序
             ->get();
 
-        $query = DB::table('nlsg_live_online_user')
-            ->where('live_id', '=', $live_id);
 
         $son_id = intval($params['son_id'] ?? 0);
-
-        if (!empty($son_id ?? 0)) {
-            $temp_user_list = LiveCountDown::where('live_id', '=', $live_id)
-                ->where('new_vip_uid', '=', $son_id)
-                ->pluck('user_id')
-                ->toArray();
-
-            $temp_user_list_str = implode(',', $temp_user_list);
-
-            $query->whereIn('user_id', $temp_user_list);
-
-            if (empty($temp_user_list)) {
-                $res['more_than_30m'] = 0;
-                $res['more_than_60m'] = 0;
-                $res['total_login'] = 0;
-                $res['total_sub'] = 0;
-            } else {
+        //特定渠道
+        if (!empty($son_id)) {
             //观看时常大于30分钟的
 //                $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
 //SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and user_id in ($temp_user_list_str) GROUP BY user_id
 //) as a where counts >= 30";
 //                $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
 
-                //观看时常大于60分钟的
+            //观看时常大于60分钟的
 //                $more_than_60_min_sql = "SELECT count(user_id) as user_count from (
 //SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and user_id in ($temp_user_list_str)  GROUP BY user_id
 //) as a where counts >= 60";
 //                $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
 
-                //累计人次login
-                $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)
-                    ->whereIn('user_id', $temp_user_list)
-                    ->count();
-                //累计人数sub
-                //$res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
-                //    ->where('type', '=', 3)
-                //    ->whereIn('user_id', $temp_user_list)
-                 //   ->count();
+            //累计人次login
+            $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)
+                ->where('live_son_flag', $son_id)
+                ->count();
+            //累计人数sub
+            $order_num_sql = "
+            SELECT
+                count(*) AS counts
+            FROM
+                (
+                    SELECT
+                        *
+                    FROM  nlsg_subscribe
+                    WHERE  relation_id = $live_id and type=3  AND STATUS = 1 AND twitter_id =$son_id
+                    GROUP BY user_id
+                ) AS a";
 
-                $order_num_sql = "
-SELECT
-	count(*) AS counts
-FROM
-	(
-	SELECT
-		*
-	FROM
-		nlsg_subscribe
-	WHERE
-		relation_id = $live_id
-		AND STATUS = 1
-	AND user_id in ($temp_user_list_str)
-	GROUP BY
-	user_id
-	) AS a";
+            $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
 
-                $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
+            //在线人数
+            $list_sql = "
+            SELECT
+                count(*) AS counts,time
+            FROM
+                (
+                    SELECT	* FROM
+                        (
+                            SELECT
+                                user_id,LEFT ( online_time, 16 ) AS time,live_son_flag
+                            FROM `nlsg_live_online_user`
+                            WHERE `live_id` = $live_id and live_son_flag=$son_id
+                        ) AS a
+                    GROUP BY user_id,time
+                ) AS b
+            GROUP BY time";
 
-            }
-
-        } else {
+        }else { //总数据
             //观看时常大于30分钟的
 //            $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
 //SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
@@ -358,31 +346,42 @@ FROM
             //累计人次login
             $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
             //累计人数sub
-            //$res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
-            //    ->where('type', '=', 3)
-//            ->where('status','=',1)
-             //   ->count();
-
-
             $order_num_sql = "
-SELECT
-	count(*) AS counts
-FROM
-	(
-	SELECT
-		*
-	FROM
-		nlsg_subscribe
-	WHERE
-		relation_id = $live_id
-		AND STATUS = 1
-	GROUP BY
-	user_id
-	) AS a";
+            SELECT
+                count(*) AS counts
+            FROM
+                (
+                SELECT
+                    *
+                FROM nlsg_subscribe
+                WHERE relation_id = $live_id and type=3 AND STATUS = 1
+                GROUP BY user_id
+                ) AS a";
 
             $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
-
+            //在线人数
+            $list_sql = "
+            SELECT
+                count(*) AS counts,
+                time
+            FROM
+                (
+                SELECT
+                    *
+                FROM
+                    (
+                    SELECT
+                        user_id,LEFT ( online_time, 16 ) AS time
+                    FROM  `nlsg_live_online_user`
+                    WHERE `live_id` = $live_id
+                    ) AS a
+                 GROUP BY  user_id, time
+                ) AS b
+            GROUP BY
+                time";
         }
+
+
         DB::connection()->enableQueryLog();
         //       $res['list'] = $query->groupBy(Db::raw('left(online_time,16)'))
         //    ->orderBy('online_time')
@@ -391,30 +390,6 @@ FROM
         //        DB::raw('LEFT(online_time,16) as time')
         //   ])->get();
 
-        $list_sql = "
-SELECT
-	count(*) AS counts,
-	time
-FROM
-	(
-	SELECT
-		*
-	FROM
-		(
-		SELECT
-			user_id,
-			LEFT ( online_time, 16 ) AS time
-		FROM
-			`nlsg_live_online_user`
-		WHERE
-			`live_id` = $live_id
-		) AS a
-	GROUP BY
-		user_id,
-		time
-	) AS b
-GROUP BY
-	time";
         //在线人数折线图
         $res['list'] = DB::select($list_sql);
 

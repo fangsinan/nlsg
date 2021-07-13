@@ -29,7 +29,7 @@ class LiveSonFlagPoster extends Model
         if (!empty($params['status'] ?? 0)) {
             $query->where('p.status', '=', $params['status']);
         }
-        $query->orderBy('lr.sort','asc');
+        $query->orderBy('lr.sort','asc'); //海报排序
 
 //        $bg_img = LivePoster::where('live_id', '=', $live_id)->where('status', '=', 1)
 //            ->select(['image'])
