@@ -139,6 +139,17 @@ class CallbackController extends Controller
             case 'Group.CallbackAfterCreateGroup': //创建群聊天
                 $result = ImGroupController::addGroup($params);
                 break;
+            case 'Group.CallbackAfterGroupDestroyed': //解散群聊天
+            case 'Group.CallbackAfterGroupInfoChanged': //群组资料修改之后回调
+                $result = ImGroupController::editGroup($params);
+                break;
+
+            case 'Group.CallbackAfterNewMemberJoin': //新成员入群之后回调
+                $result = ImGroupController::joinGroup($params);
+                break;
+            case 'Group.CallbackAfterMemberExit': //群成员离开之后回调
+                $result = ImGroupController::exitGroup($params);
+                break;
 
             case 'Sns.CallbackFriendAdd':  //添加好友
                 $result = ImFriendController::friendAdd($params);
@@ -155,11 +166,7 @@ class CallbackController extends Controller
                 $result = ImFriendController::blackListDel($params);
                 break;
             default :
-                $result = [
-                    "ActionStatus"=>"OK",
-                    "ErrorInfo"=>"",
-                    "ErrorCode"=> 0 // 0为回调成功，1为回调出错
-                ];
+                $result = true;
 
         }
 

@@ -69,16 +69,7 @@ class ImMsgController extends Controller
             return $this->error('0','Msg Body Error');
         }
 
-        $url = "https://console.tim.qq.com/v4/openim/batchsendmsg?";
-        $url.=http_build_query([
-            'sdkappid' => config('env.OPENIM_APPID'),
-            'identifier' => config('web.Im_config.admin'),
-            'usersig' => ImClient::getUserSig(config('web.Im_config.admin')),
-            'random' => rand(0,4294967295),
-            'contenttype'=>'json',
-        ]);
-
-
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
 
         $post_data['From_Account'] = $from_account;
         $post_data['To_Account'] = $to_accounts;

@@ -8,6 +8,23 @@ class ImClient
         return ;
     }
 
+    //拼接im 所需参数
+    public static function get_im_url($url){
+
+        if(empty($url)){
+            return '';
+        }
+
+        $url.='?'.http_build_query([
+                'sdkappid' => config('env.OPENIM_APPID'),
+                'identifier' => config('web.Im_config.admin'),
+                'usersig' => ImClient::getUserSig(config('web.Im_config.admin')),
+                'random' => rand(0,4294967295),
+                'contenttype'=>'json',
+            ]);
+        return $url;
+    }
+
 
     public static function getUserSig($userId){
         if(empty($userId)){

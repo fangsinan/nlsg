@@ -11,19 +11,71 @@ use App\Models\Live;
 use App\Models\LiveComment;
 use App\Models\LiveInfo;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use Libraries\ImClient;
 
 class ImGroupController extends Controller
 {
+    /**
+     * @api {post} /api/v4/im_group/add_join_group 添加成员入群
+     * @apiName add_join_group
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *
+     * @apiParam {int} group_id   腾讯云的groupId
+     * @apiParam {array} user_id  user_id  数组类型
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function addJoinGroup(Request $request){
+        $params    = $request->input();
 
+        if( empty($params['group_id']) || empty($params['user_id'])  ){
+            return $this->error('0','request error');
+        }
+
+        $imGroup = ImGroup::select('type')->where(['group_id'=>$params['group_id']])->first();
+        if(empty($imGroup)){
+            return $this->error('0','该群不存在');
+        }
+        if( !empty($imGroup['type']) && $imGroup['type'] == "AVChatRoom" ){
+            return $this->error('0','AVChatRoom 不支持该操作');
+        }
+
+
+
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/add_group_member");
+        $post_data['GroupId'] = $params['group_id'];
+        foreach ($params['user_id'] as $v){
+            $post_data['MemberList'][] = [
+                'Member_Account'=>$v,
+            ];
+        }
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+
+        if ($res['ActionStatus'] == 'OK'){
+            return $this->success();
+        }else{
+            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+        }
+
+    }
     //创建群回调
     public static function addGroup($params){
 
         if (empty($params)){
             return false;
         }
-
         DB::beginTransaction();
         $group_add = [
             'group_id'          => $params['GroupId'],
@@ -41,12 +93,16 @@ class ImGroupController extends Controller
         foreach ($params['MemberList'] as $key=>$val){
 
             $add = [
-                'group_id'      => $id,
+                'group_id'      => $params['GroupId'],
                 'group_account' => $val['Member_Account'],
+                'operator_account'  => $params['Operator_Account'],
+                'join_type'         => 'Invited',  //Invited 邀请入群
                 'group_role'    => 0,
                 'created_at'    => date('Y-m-d H:i:s'),
                 'updated_at'    => date('Y-m-d H:i:s'),
             ];
+
+
             if($val['Member_Account'] == $params['Owner_Account']){
                 $add['group_role'] = 1;
             }
@@ -68,6 +124,34 @@ class ImGroupController extends Controller
 
         return false;
 
+    }
+
+    //修改/解散  群
+    public static function editGroup($params){
+
+        if (empty($params)){
+            return false;
+        }
+        if($params['CallbackCommand'] == 'Group.CallbackAfterGroupDestroyed'){
+            $ed_data = ['status'=>2];
+        }elseif($params['CallbackCommand'] == 'Group.CallbackAfterGroupInfoChanged'){
+            $ed_data = [
+                'Type'              => $params['Type'],
+                'operator_account'  => $params['Operator_Account'],
+                'name'              => $params['Name'],
+                'introduction'      => $params['Introduction'],
+                'notification'      => $params['Notification'],
+                'face_url'          => $params['FaceUrl'],
+            ];
+        }else{
+            return false;
+        }
+
+        $group_res = ImGroup::where([
+            'group_id' =>$params['GroupId'],
+        ])->update($ed_data);
+
+        return true;
     }
 
 
@@ -107,5 +191,70 @@ class ImGroupController extends Controller
         return true;
 
     }
+
+
+    //新成员入群之后回调
+    public static function joinGroup($params){
+
+        if (empty($params)){
+            return false;
+        }
+
+        $group = ImGroup::where(['group_id'=>$params['GroupId']])->first();
+        if(empty($group)){
+            return false;
+        }
+        $adds = [];
+        foreach ($params['NewMemberList'] as $key=>$item) {
+            $add = [
+                'group_id'          => $params['GroupId'],
+                'group_account'     => $item['Member_Account'],
+                'operator_account'  => $params['Operator_Account'],
+                'join_type'         => $params['JoinType'],
+                'group_role'        => 0,
+                'created_at'    => date('Y-m-d H:i:s'),
+                'updated_at'    => date('Y-m-d H:i:s'),
+            ];
+
+
+            $adds[] = $add;
+        }
+        if(!empty($adds)){
+            $gu_res = ImGroupUser::insert($adds);
+        }
+
+
+        return true;
+
+    }
+
+    //群成员离开之后回调
+    public static function exitGroup($params){
+
+        if (empty($params)){
+            return false;
+        }
+        //  未解散群
+        $group = ImGroup::where(['group_id'=>$params['GroupId'], 'status'=>1,])->first();
+        if(empty($group)){
+            return false;
+        }
+        $exit_type = ['Kicked'=>1,'Quit'=>2];   // 成员离开方式：Kicked-被踢；Quit-主动退群
+        foreach ($params['NewMemberList'] as $key=>$item) {
+            $ed_data = [
+                'operator_account'  => $params['Operator_Account'],
+                'exit_type'         => empty($exit_type[$params['ExitType']])?0:$exit_type[$params['ExitType']],
+            ];
+            ImGroup::where([
+                'group_id'      =>$params['GroupId'],
+                'group_account' => $item['Member_Account'],
+            ])->update($ed_data);
+        }
+
+        return true;
+
+    }
+
+
 
 }
