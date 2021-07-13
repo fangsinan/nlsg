@@ -32,11 +32,11 @@ class ImGroupController extends Controller
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
      *  {
-    "code": 200,
-    "msg": "成功",
-    "data": [
-    ]
-    }
+            "code": 200,
+            "msg": "成功",
+            "data": [
+            ]
+        }
      */
     public function editJoinGroup(Request $request){
         $params    = $request->input();
@@ -87,6 +87,51 @@ class ImGroupController extends Controller
     }
 
 
+
+    /**
+     * @api {post} /api/v4/im_group/forbid_send_msg 群成员禁言/解禁
+     * @apiName forbid_send_msg
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *e
+     * @apiParam {int} group_id   腾讯云的groupId
+     * @apiParam {array} user_id  user_id  数组类型
+     * @apiParam {array} shut_up_time  禁言时长  0解禁 其他表示禁言
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function forbidSendMsg(Request $request){
+        $params    = $request->input();
+
+        if( empty($params['group_id']) || empty($params['user_id'])  ){
+            return $this->error('0','request error');
+        }
+        $shut_up_time = empty($params['shut_up_time']) ?0 : $params['shut_up_time'];
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/forbid_send_msg");
+        $post_data = [
+            'GroupId' => $params['group_id'],
+            'Members_Account' => $params['user_id'],
+            'ShutUpTime' => $shut_up_time,
+        ];
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+
+        if ($res['ActionStatus'] == 'OK'){
+            return $this->success();
+        }else{
+            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+        }
+
+    }
+
+
     /********************************  回调接口 start ********************************/
     //创建群回调
     public static function addGroup($params){
@@ -105,7 +150,6 @@ class ImGroupController extends Controller
             'updated_at'        => date('Y-m-d H:i:s'),
         ];
         $group_add_id = ImGroup::insert($group_add);
-        $id = ImGroup::insertGetId($group_add);
 
         $adds = [];
         foreach ($params['MemberList'] as $key=>$val){
@@ -153,14 +197,25 @@ class ImGroupController extends Controller
         if($params['CallbackCommand'] == 'Group.CallbackAfterGroupDestroyed'){
             $ed_data = ['status'=>2];
         }elseif($params['CallbackCommand'] == 'Group.CallbackAfterGroupInfoChanged'){
+
             $ed_data = [
                 'Type'              => $params['Type'],
                 'operator_account'  => $params['Operator_Account'],
-                'name'              => $params['Name'],
-                'introduction'      => $params['Introduction'],
-                'notification'      => $params['Notification'],
-                'face_url'          => $params['FaceUrl'],
             ];
+
+            if(!empty($params['Name'])){
+                $ed_data['name'] =$params['Name'];
+            }
+            if(!empty($params['Introduction'])){
+                $ed_data['introduction'] =$params['Introduction'];
+            }
+            if(!empty($params['Notification'])){
+                $ed_data['notification'] =$params['Notification'];
+            }
+            if(!empty($params['FaceUrl'])){
+                $ed_data['face_url'] =$params['FaceUrl'];
+            }
+
         }else{
             return false;
         }
