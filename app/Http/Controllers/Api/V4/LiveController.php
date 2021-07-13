@@ -860,23 +860,24 @@ class LiveController extends Controller
         if ($user->phone && (preg_match("/^1((34[0-8]\d{7})|((3[0-3|5-9])|(4[5-7|9])|(5[0-3|5-9])|(66)|(7[2-3|5-8])|(8[0-9])|(9[1|8|9]))\d{8})$/",
                 $user->phone) || strlen($user->phone)==13)) {
 
-            LiveCountDown::create([
-                'live_id' => $input['info_id'],
-                'user_id' => $this->user['id'],
-                'phone' => $user->phone,
-                'new_vip_uid' => $input['inviter'] ?? 0,
-            ]);
-            $is_flag='';
-            if(!empty($input['is_flag'])){
-                $is_flag=$input['is_flag'];
-            }
-
             $twitter_id = 0;
             if(!empty($input['inviter'])) {
                 $twitter_id = $input['inviter'];
             }else if(!empty($input['live_son_flag'])){
                 $twitter_id = $input['live_son_flag'];
             }
+
+            LiveCountDown::create([
+                'live_id' => $input['info_id'],
+                'user_id' => $this->user['id'],
+                'phone' => $user->phone,
+                'new_vip_uid' => $twitter_id,
+            ]);
+            $is_flag='';
+            if(!empty($input['is_flag'])){
+                $is_flag=$input['is_flag'];
+            }
+
             Subscribe::create([
                 'user_id' => $this->user['id'],
                 'type' => 3,
