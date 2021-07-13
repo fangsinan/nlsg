@@ -850,7 +850,9 @@ class LiveController extends Controller
             }
         }
 
-        $list = LiveCountDown::where(['live_id' => $input['info_id'], 'user_id' => $this->user['id']])
+//        $list = LiveCountDown::where(['live_id' => $input['info_id'], 'user_id' => $this->user['id']])
+//            ->first();
+        $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
             ->first();
         if ($list) {
             return error(0, '已经预约');
