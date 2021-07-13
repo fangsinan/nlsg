@@ -29,6 +29,7 @@ class LiveSonFlagPoster extends Model
         if (!empty($params['status'] ?? 0)) {
             $query->where('p.status', '=', $params['status']);
         }
+        $query->orderBy('lr.sort','asc');
 
 //        $bg_img = LivePoster::where('live_id', '=', $live_id)->where('status', '=', 1)
 //            ->select(['image'])
@@ -71,9 +72,9 @@ class LiveSonFlagPoster extends Model
             ->toArray();
 
         $son_id_list = array_column($son_flag, 'son_id');
-
+        //返回交集
         $intersect = array_intersect($son_id_list, $old);
-
+        //返回差集
         $add_son_list = array_diff($son_id_list, $intersect);
         $del_son_list = array_diff($old, $intersect);
 
