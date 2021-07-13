@@ -14,7 +14,7 @@ class ImController extends Controller
     * @apiName  get_user_sig
     * @apiGroup im
     *
-    * @apiSuccess {string} data 内容
+    * @apiSuccess {string} user_id user_Id
     *
     * @apiSuccessExample  Success-Response:
     * HTTP/1.1 200 OK
