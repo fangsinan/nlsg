@@ -285,15 +285,15 @@ class ImGroupController extends Controller
                 'operator_account'  => $params['Operator_Account'],
                 'join_type'         => $params['JoinType'],
                 'group_role'        => 0,
-                'created_at'    => date('Y-m-d H:i:s'),
-                'updated_at'    => date('Y-m-d H:i:s'),
+//                'created_at'    => date('Y-m-d H:i:s'),
+//                'updated_at'    => date('Y-m-d H:i:s'),
             ];
 
 
             $adds[] = $add;
         }
         if(!empty($adds)){
-            $gu_res = ImGroupUser::insert($adds);
+            $gu_res = ImGroupUser::firstOrCreate($adds);
         }
 
 
