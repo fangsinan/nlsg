@@ -388,7 +388,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         //Im
         Route::get('im/msg_collection', 'ImMsgController@MsgCollection');
         Route::get('im/msg_collection_list', 'ImMsgController@MsgCollectionList');
-        Route::post('im_group/add_join_group', 'ImGroupController@addJoinGroup');
+        Route::post('im_group/edit_join_group', 'ImGroupController@editJoinGroup');
 
     });
 

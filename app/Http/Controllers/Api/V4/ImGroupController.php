@@ -19,13 +19,15 @@ use Libraries\ImClient;
 class ImGroupController extends Controller
 {
     /**
-     * @api {post} /api/v4/im_group/add_join_group 添加成员入群
-     * @apiName add_join_group
+     * @api {post} /api/v4/im_group/edit_join_group 添加/删除成员入群
+     * @apiName edit_join_group
      * @apiVersion 1.0.0
      * @apiGroup im_group
-     *
+     *e
      * @apiParam {int} group_id   腾讯云的groupId
      * @apiParam {array} user_id  user_id  数组类型
+     * @apiParam {array} silence  type==del删除时Silence是否静默删人。0表示非静默删人，1表示静默删人
+     * @apiParam {array} reason  type==del删除时踢出用户原因
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -36,10 +38,10 @@ class ImGroupController extends Controller
     ]
     }
      */
-    public function addJoinGroup(Request $request){
+    public function editJoinGroup(Request $request){
         $params    = $request->input();
 
-        if( empty($params['group_id']) || empty($params['user_id'])  ){
+        if(empty($params['type']) || empty($params['group_id']) || empty($params['user_id'])  ){
             return $this->error('0','request error');
         }
 
@@ -53,13 +55,26 @@ class ImGroupController extends Controller
 
 
 
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/add_group_member");
-        $post_data['GroupId'] = $params['group_id'];
-        foreach ($params['user_id'] as $v){
-            $post_data['MemberList'][] = [
-                'Member_Account'=>$v,
+        if($params['type'] == 'add'){
+            $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/add_group_member");
+            $post_data['GroupId'] = $params['group_id'];
+            foreach ($params['user_id'] as $v){
+                $post_data['MemberList'][] = [
+                    'Member_Account'=>$v,
+                ];
+            }
+        }elseif($params['type'] == 'del'){
+            $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/delete_group_member");
+            $post_data = [
+                'GroupId' => $params['group_id'],
+                'Silence' => $params['silence'] ?? '',
+                'Reason' => $params['reason'] ?? '',
+                'MemberToDel_Account' => $params['user_id'],
             ];
+        }else{
+            return $this->error(0,'type error');
         }
+
         $res = ImClient::curlPost($url,json_encode($post_data));
         $res = json_decode($res,true);
 
@@ -70,6 +85,9 @@ class ImGroupController extends Controller
         }
 
     }
+
+
+    /********************************  回调接口 start ********************************/
     //创建群回调
     public static function addGroup($params){
 
@@ -240,12 +258,13 @@ class ImGroupController extends Controller
             return false;
         }
         $exit_type = ['Kicked'=>1,'Quit'=>2];   // 成员离开方式：Kicked-被踢；Quit-主动退群
-        foreach ($params['NewMemberList'] as $key=>$item) {
+        foreach ($params['ExitMemberList'] as $key=>$item) {
             $ed_data = [
                 'operator_account'  => $params['Operator_Account'],
                 'exit_type'         => empty($exit_type[$params['ExitType']])?0:$exit_type[$params['ExitType']],
             ];
-            ImGroup::where([
+
+            ImGroupUser::where([
                 'group_id'      =>$params['GroupId'],
                 'group_account' => $item['Member_Account'],
             ])->update($ed_data);
