@@ -13,8 +13,9 @@ class ImController extends Controller
     * @apiVersion 4.0.0
     * @apiName  get_user_sig
     * @apiGroup im
-    *
-    * @apiSuccess {string} user_id user_Id
+    * @apiParam {int} user_id  user_id  数组类型
+
+    * @apiSuccess {string} data 内容
     *
     * @apiSuccessExample  Success-Response:
     * HTTP/1.1 200 OK
