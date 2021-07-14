@@ -283,16 +283,20 @@ class LiveInfoServers
         //特定渠道
         if (!empty($son_id)) {
             //观看时常大于30分钟的
-//                $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
-//SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and user_id in ($temp_user_list_str) GROUP BY user_id
-//) as a where counts >= 30";
-//                $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
+            $more_than_30_min_sql = "
+                SELECT count(user_id) as user_count
+                from (
+                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id GROUP BY user_id
+                ) as a where counts >= 30";
+            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
 
             //观看时常大于60分钟的
-//                $more_than_60_min_sql = "SELECT count(user_id) as user_count from (
-//SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and user_id in ($temp_user_list_str)  GROUP BY user_id
-//) as a where counts >= 60";
-//                $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
+            $more_than_60_min_sql = "
+                SELECT count(user_id) as user_count
+                from (
+                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id  GROUP BY user_id
+                ) as a where counts >= 60";
+            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
 
             //累计人次login
             $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)
@@ -331,17 +335,20 @@ class LiveInfoServers
             GROUP BY time";
 
         }else { //总数据
-            //观看时常大于30分钟的
-//            $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
-//SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
-//) as a where counts >= 30";
-//            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
+            $more_than_30_min_sql = "
+                SELECT count(user_id) as user_count
+                from (
+                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id
+                ) as a where counts >= 30";
+            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
 
             //观看时常大于60分钟的
-//            $more_than_60_min_sql = "SELECT count(user_id) as user_count from (
-//SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
-//) as a where counts >= 60";
-//            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
+            $more_than_60_min_sql = "
+                SELECT count(user_id) as user_count
+                from (
+                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id
+                ) as a where counts >= 60";
+            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
 
             //累计人次login
             $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
