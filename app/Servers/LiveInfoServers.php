@@ -286,7 +286,7 @@ class LiveInfoServers
             $more_than_30_min_sql = "
                 SELECT count(user_id) as user_count
                 from (
-                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id GROUP BY user_id
+                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id GROUP BY user_id,online_time
                 ) as a where counts >= 30";
             $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
 
@@ -294,7 +294,7 @@ class LiveInfoServers
             $more_than_60_min_sql = "
                 SELECT count(user_id) as user_count
                 from (
-                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id  GROUP BY user_id
+                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id  GROUP BY user_id,online_time
                 ) as a where counts >= 60";
             $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
 
@@ -335,10 +335,11 @@ class LiveInfoServers
             GROUP BY time";
 
         }else { //总数据
+            //nlsg_live_online_user 表记录可能重复，同一用户多次刷新，socket fd未能及时回收，存在一个用户同一时段多条记录
             $more_than_30_min_sql = "
                 SELECT count(user_id) as user_count
                 from (
-                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id
+                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id,online_time
                 ) as a where counts >= 30";
             $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
 
@@ -346,7 +347,7 @@ class LiveInfoServers
             $more_than_60_min_sql = "
                 SELECT count(user_id) as user_count
                 from (
-                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id
+                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id,online_time
                 ) as a where counts >= 60";
             $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
 
