@@ -212,7 +212,7 @@ class ImMsgController extends Controller
         //消息主库
         $msg_add = [
             'from_account'      => $params['From_Account'],
-            'msg_seq'           => $params['MsgSeq'],
+            'msg_seq'           => $params['MsgSeq'],       //群消息的唯一标识
             'msg_time'          => $params['MsgTime'],
         ];
 
@@ -230,7 +230,7 @@ class ImMsgController extends Controller
             $msg_add['online_only_flag']    = $params['OnlineOnlyFlag'];
             $msg_add['type']                = 1;
             $msg_add['msg_random']          = $params['Random'];
-            $msg_add['msg_key']             = $params['MsgSeq'];
+            $msg_add['msg_key']             = $params['GroupId'].'_'.$params['MsgSeq'];
         }
 
         $msg_add_res = ImMsg::create($msg_add);
