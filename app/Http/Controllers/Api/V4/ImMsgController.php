@@ -131,7 +131,7 @@ class ImMsgController extends Controller
     }
      */
     public function MsgCollection(Request $request){
-        $msg_key = $request->input('msg_key', 0);  //消息序列号
+        $msg_key = $request->input('msg_key');  //消息
         $type = $request->input('type') ?? 1;  //类型
         $collection_id = $request->input('collection_id');  //id
 
