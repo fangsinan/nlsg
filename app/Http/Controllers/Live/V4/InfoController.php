@@ -314,6 +314,36 @@ class InfoController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function onlineNumInfoExcel(Request $request)
+    {
+        $s = new LiveInfoServers();
+        $data = $s->onlineNumInfo($request->input());
+        if (($data['code'] ?? true) === false) {
+            exit($data['msg']);
+        }
+        $columns = ['用户id', '用户账号', '推荐人id', '推荐人手机号', '推荐人昵称','预约时间'];
+        $fileName = '在线人数分析' . date('Y-m-d H:i') . '.csv';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
+        $fp = fopen('php://output', 'a');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+        foreach ($data as $v) {
+            $v = json_decode(json_encode($v), true);
+            mb_convert_variables('GBK', 'UTF-8', $v);
+            fputcsv($fp, $v);
+            ob_flush();     //刷新输出缓冲到浏览器
+            flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+        }
+        fclose($fp);
+        exit();
+    }
+
     /**
      * @api {get} api/live_v4/live_info/user_watch (未)进入直播间用户列表
      * @apiVersion 4.0.0
