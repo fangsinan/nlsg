@@ -76,7 +76,8 @@ class LiveInfoServers
             return $custom->merge($res);
         } else {
             $query->select([
-                's.user_id', DB::raw("CONCAT('`','-',u.phone) as phone"),'u.nickname', 'tu.id as t_user_id', 'tu.phone as t_phone',
+                's.user_id', DB::raw("CONCAT('`','-',u.phone) as phone"), 'u.nickname', 'tu.id as t_user_id',
+                DB::raw("CONCAT('`','-',tu.phone) as t_phone"),
                 'tu.nickname as t_nickname', 'lr.son_flag', 's.created_at', 's.relation_id'
             ]);
             return $query->get();
@@ -128,31 +129,49 @@ class LiveInfoServers
                 return $query->count('user_id');
         }
 
-        $query->select([
-            'ordernum', 'pay_price', 'num', 'pay_time',
-            DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
-            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "类型错误" end) as type_name'),
-            'phone', 'nickname', 'user_id',
-            DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as identity_name'),
-            'invite_phone', 'invite_nickname',
-            'protect_user_id', 'protect_phone', 'protect_nickname',
-            DB::raw('(case protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as protect_identity_name'),
-            'profit_user_id', 'profit_price',
-            'diamond_user_id', 'diamond_phone', 'diamond_nickname',
-            DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as diamond_identity'),
-            DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
-            'tiktok_ordernum', 'tiktok_time', 'qd',
-            DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" else "错误" end) as qd_name'),
-            'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
-            DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
-        ]);
-
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
+            $query->select([
+                'ordernum', 'pay_price', 'num', 'pay_time',
+                DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
+            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "类型错误" end) as type_name'),
+                'phone', 'nickname', 'user_id',
+                DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as identity_name'),
+                'invite_phone', 'invite_nickname',
+                'protect_user_id', 'protect_phone', 'protect_nickname',
+                DB::raw('(case protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as protect_identity_name'),
+                'profit_user_id', 'profit_price',
+                'diamond_user_id', 'diamond_phone', 'diamond_nickname',
+                DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as diamond_identity'),
+                DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
+                'tiktok_ordernum', 'tiktok_time', 'qd',
+                DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" else "错误" end) as qd_name'),
+                'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
+                DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
+            ]);
             $res = $query->paginate($size);
             $custom = collect(['live_user_id' => $check_live_id->user_id]);
             return $custom->merge($res);
         } else {
+            $query->select([
+                'ordernum', 'pay_price', 'num', 'pay_time',
+                DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
+            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "类型错误" end) as type_name'),
+                DB::raw("CONCAT('`','-',phone) as phone"), 'nickname', 'user_id',
+                DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as identity_name'),
+                DB::raw("CONCAT('`','-',invite_phone) as invite_phone"), 'invite_nickname',
+                'protect_user_id', 'protect_phone', 'protect_nickname',
+                DB::raw('(case protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as protect_identity_name'),
+                'profit_user_id', 'profit_price',
+                'diamond_user_id',
+                DB::raw("CONCAT('`','-',diamond_phone) as diamond_phone"), 'diamond_nickname',
+                DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as diamond_identity'),
+                DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
+                'tiktok_ordernum', 'tiktok_time', 'qd',
+                DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" else "错误" end) as qd_name'),
+                'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
+                DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
+            ]);
             return $query->get();
         }
 
@@ -245,8 +264,9 @@ class LiveInfoServers
                 ->groupBy('o.id')
                 ->orderBy('o.id', 'desc')
                 ->select([
-                    'o.user_id',DB::raw("CONCAT('`','-',u.phone) as phone"), 'u.nickname', 'o.twitter_id',
-                    'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
+                    'o.user_id', DB::raw("CONCAT('`','-',u.phone) as phone"), 'u.nickname', 'o.twitter_id',
+                    DB::raw("CONCAT('`','-',lt.phone) as t_phone"),
+                    'lt.nickname as t_nickname', 'lr.son_flag',
                     'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
                 ]);
             return $query->get();
@@ -446,7 +466,7 @@ GROUP BY
         $live_id = $params['live_id'] ?? 0;
         $date = $params['date'] ?? '';
         if (empty($date)) {
-            $temp_data = LiveOnlineUser::where('live_id','=',$live_id)->first();
+            $temp_data = LiveOnlineUser::where('live_id', '=', $live_id)->orderBy('id', 'desc')->first();
             $date = $temp_data->online_time_str ?? date('Y-m-d 00:00:00');
 //            $temp_date_list = $this->onlineNum(['live_id' => $params['live_id'], 'only_list' => 1]);
 //
@@ -490,20 +510,27 @@ GROUP BY
             ->whereBetween('lou.online_time', [$begin_time, $end_time])
             ->groupBy('lou.user_id');
 
-        $query->select([
-            'lou.user_id', 'lu.phone', 'cd.new_vip_uid as t_user_id', 'u.phone as t_phone',
-            'u.nickname as t_nickname', DB::raw('left(lou.online_time,16) as online_time')
-        ]);
 
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
+            $query->select([
+                'lou.user_id', 'lu.phone', 'cd.new_vip_uid as t_user_id', 'u.phone as t_phone',
+                'u.nickname as t_nickname', 'online_time_str as online_time'
+            ]);
             $res = $query->paginate($size);
             $custom = collect(['live_user_id' => $check_live_id->user_id, 'date' => $begin_time]);
             return $custom->merge($res);
         } else {
+            $query->select([
+                'lou.user_id',
+                DB::raw("CONCAT('`','-',lu.phone) as phone"),
+                'cd.new_vip_uid as t_user_id',
+                DB::raw("CONCAT('`','-',u.phone) as t_phone"),
+                'u.nickname as t_nickname',
+                'online_time_str as online_time'
+            ]);
             return $query->get();
         }
-
 
     }
 
