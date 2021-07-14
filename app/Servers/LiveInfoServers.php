@@ -9,6 +9,7 @@ use App\Models\CacheTools;
 use App\Models\Live;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
+use App\Models\LiveOnlineUser;
 use App\Models\LiveSonFlagPoster;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -75,7 +76,7 @@ class LiveInfoServers
             return $custom->merge($res);
         } else {
             $query->select([
-                's.user_id', 'u.phone', 'u.nickname', 'tu.id as t_user_id', 'tu.phone as t_phone',
+                's.user_id', DB::raw("CONCAT('`','-',u.phone) as phone"),'u.nickname', 'tu.id as t_user_id', 'tu.phone as t_phone',
                 'tu.nickname as t_nickname', 'lr.son_flag', 's.created_at', 's.relation_id'
             ]);
             return $query->get();
@@ -244,7 +245,7 @@ class LiveInfoServers
                 ->groupBy('o.id')
                 ->orderBy('o.id', 'desc')
                 ->select([
-                    'o.user_id', 'u.phone', 'u.nickname', 'o.twitter_id',
+                    'o.user_id',DB::raw("CONCAT('`','-',u.phone) as phone"), 'u.nickname', 'o.twitter_id',
                     'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
                     'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
                 ]);
@@ -445,25 +446,26 @@ GROUP BY
         $live_id = $params['live_id'] ?? 0;
         $date = $params['date'] ?? '';
         if (empty($date)) {
-
-            $temp_date_list = $this->onlineNum(['live_id' => $params['live_id'], 'only_list' => 1]);
-
-            if (!empty($temp_date_list)) {
-                $temp_date_str = $temp_date_list[0];
-                foreach ($temp_date_list as $v) {
-                    if ($v->counts >= $temp_date_str->counts) {
-                        $temp_date_str = $v;
-                    }
-                }
-            }
-
-            if (!empty($temp_date_str ?? [])) {
-                $date = $temp_date_str->time;
-            }
-
-            if (empty($date)) {
-                return ['code' => false, 'msg' => '时间错误'];
-            }
+            $temp_data = LiveOnlineUser::where('live_id','=',$live_id)->first();
+            $date = $temp_data->online_time_str ?? date('Y-m-d 00:00:00');
+//            $temp_date_list = $this->onlineNum(['live_id' => $params['live_id'], 'only_list' => 1]);
+//
+//            if (!empty($temp_date_list)) {
+//                $temp_date_str = $temp_date_list[0];
+//                foreach ($temp_date_list as $v) {
+//                    if ($v->counts >= $temp_date_str->counts) {
+//                        $temp_date_str = $v;
+//                    }
+//                }
+//            }
+//
+//            if (!empty($temp_date_str ?? [])) {
+//                $date = $temp_date_str->time;
+//            }
+//
+//            if (empty($date)) {
+//                return ['code' => false, 'msg' => '时间错误'];
+//            }
         }
 
         $begin_time = date('Y-m-d H:i:00', strtotime($date));
