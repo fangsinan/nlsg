@@ -91,6 +91,7 @@ class ImMsgController extends Controller
      *
      * @apiParam {array} msg_seq  消息序列号 array
      * @apiParam {int} type  收藏类型   1消息收藏
+     * @apiParam {int} collection_id  收藏列表id (取消收藏只传该字段)
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -103,6 +104,12 @@ class ImMsgController extends Controller
     public function MsgCollection(Request $request){
         $msg_seq = $request->input('msg_seq', 0);  //消息序列号
         $type = $request->input('type') ?? 1;  //类型
+        $collection_id = $request->input('collection_id');  //id
+
+        if(!empty($collection_id)){
+            ImCollection::where('id',$collection_id)->update(['state' => 2,]);
+            return $this->success();
+        }
 
         if(!is_array($msg_seq)){
             return $this->error('0','msg_seq error');
@@ -117,7 +124,7 @@ class ImMsgController extends Controller
             $data = [
                 'user_id' => $uid,
                 'msg_seq' => $v['msg_seq'],
-                'type' => $type,
+                'type'    => $type,
             ];
             ImCollection::firstOrCreate($data);
         }
