@@ -76,8 +76,8 @@ class LiveInfoServers
             return $custom->merge($res);
         } else {
             $query->select([
-                's.user_id', DB::raw("CONCAT('`','-',u.phone) as phone"), 'u.nickname', 'tu.id as t_user_id',
-                DB::raw("CONCAT('`','-',tu.phone) as t_phone"),
+                's.user_id', DB::raw("CONCAT('`',u.phone) as phone"), 'u.nickname', 'tu.id as t_user_id',
+                DB::raw("CONCAT('`',tu.phone) as t_phone"),
                 'tu.nickname as t_nickname', 'lr.son_flag', 's.created_at', 's.relation_id'
             ]);
             return $query->get();
@@ -157,14 +157,14 @@ class LiveInfoServers
                 'ordernum', 'pay_price', 'num', 'pay_time',
                 DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
             when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "类型错误" end) as type_name'),
-                DB::raw("CONCAT('`','-',phone) as phone"), 'nickname', 'user_id',
+                DB::raw("CONCAT('`',phone) as phone"), 'nickname', 'user_id',
                 DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as identity_name'),
-                DB::raw("CONCAT('`','-',invite_phone) as invite_phone"), 'invite_nickname',
+                DB::raw("CONCAT('`',invite_phone) as invite_phone"), 'invite_nickname',
                 'protect_user_id', 'protect_phone', 'protect_nickname',
                 DB::raw('(case protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as protect_identity_name'),
                 'profit_user_id', 'profit_price',
                 'diamond_user_id',
-                DB::raw("CONCAT('`','-',diamond_phone) as diamond_phone"), 'diamond_nickname',
+                DB::raw("CONCAT('`',diamond_phone) as diamond_phone"), 'diamond_nickname',
                 DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "错误" end) as diamond_identity'),
                 DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
                 'tiktok_ordernum', 'tiktok_time', 'qd',
@@ -264,8 +264,8 @@ class LiveInfoServers
                 ->groupBy('o.id')
                 ->orderBy('o.id', 'desc')
                 ->select([
-                    'o.user_id', DB::raw("CONCAT('`','-',u.phone) as phone"), 'u.nickname', 'o.twitter_id',
-                    DB::raw("CONCAT('`','-',lt.phone) as t_phone"),
+                    'o.user_id', DB::raw("CONCAT('`',u.phone) as phone"), 'u.nickname', 'o.twitter_id',
+                    DB::raw("CONCAT('`',lt.phone) as t_phone"),
                     'lt.nickname as t_nickname', 'lr.son_flag',
                     'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
                 ]);
@@ -523,9 +523,9 @@ GROUP BY
         } else {
             $query->select([
                 'lou.user_id',
-                DB::raw("CONCAT('`','-',lu.phone) as phone"),
+                DB::raw("CONCAT('`',lu.phone) as phone"),
                 'cd.new_vip_uid as t_user_id',
-                DB::raw("CONCAT('`','-',u.phone) as t_phone"),
+                DB::raw("CONCAT('`',u.phone) as t_phone"),
                 'u.nickname as t_nickname',
                 'online_time_str as online_time'
             ]);
