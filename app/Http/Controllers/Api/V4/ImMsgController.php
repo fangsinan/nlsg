@@ -223,6 +223,7 @@ class ImMsgController extends Controller
             $msg_add['msg_key']             = $params['MsgKey'];
             $msg_add['send_msg_result']     = $params['SendMsgResult'];
             $msg_add['unread_msg_num']      = $params['UnreadMsgNum'];
+            $msg_add['os_msg_id']           = $params['From_Account'].'_'.$params['To_Account'].'_'.$params['MsgRandom'].'_'.$params['MsgSeq'];
         }
         //群聊消息
         if($params['CallbackCommand'] == 'Group.CallbackAfterSendMsg'){
@@ -230,7 +231,7 @@ class ImMsgController extends Controller
             $msg_add['online_only_flag']    = $params['OnlineOnlyFlag'];
             $msg_add['type']                = 1;
             $msg_add['msg_random']          = $params['Random'];
-            $msg_add['msg_key']             = $params['GroupId'].'_'.$params['MsgSeq'];
+            $msg_add['os_msg_id']           = $params['GroupId'].'_'.$params['MsgSeq'];
         }
 
         $msg_add_res = ImMsg::create($msg_add);
