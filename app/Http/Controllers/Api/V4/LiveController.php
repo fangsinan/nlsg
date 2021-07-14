@@ -837,7 +837,6 @@ class LiveController extends Controller
             return error(0, '直播不存在');
         }
 
-
         $live_data = Live::where('id', $live['live_pid'])->first();
         if ($live_data['flag'] > 0) {   //flag > 0 为限定直播  限定值与flag一致
             $flag = LiveCheckPhone::where([
@@ -850,8 +849,6 @@ class LiveController extends Controller
             }
         }
 
-//        $list = LiveCountDown::where(['live_id' => $input['info_id'], 'user_id' => $this->user['id']])
-//            ->first();
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
             ->first();
         if ($list) {
@@ -869,17 +866,10 @@ class LiveController extends Controller
                 $twitter_id = $input['live_son_flag'];
             }
 
-            LiveCountDown::create([
-                'live_id' => $input['info_id'],
-                'user_id' => $this->user['id'],
-                'phone' => $user->phone,
-                'new_vip_uid' => $twitter_id,
-            ]);
             $is_flag='';
             if(!empty($input['is_flag'])){
                 $is_flag=$input['is_flag'];
             }
-
             Subscribe::create([
                 'user_id' => $this->user['id'],
                 'type' => 3,
@@ -887,6 +877,12 @@ class LiveController extends Controller
                 'status' => 1,
                 'is_flag' => $is_flag,
                 'twitter_id' => $twitter_id,
+            ]);
+            LiveCountDown::create([
+                'live_id' => $input['info_id'],
+                'user_id' => $this->user['id'],
+                'phone' => $user->phone,
+                'new_vip_uid' => $twitter_id,
             ]);
 
             Live::where(['id' => $input['live_id']])->increment('order_num');
