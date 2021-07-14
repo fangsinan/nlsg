@@ -355,7 +355,7 @@ class WorksController extends Controller
      * @apiName get_works_category
      * @apiVersion 1.0.0
      * @apiGroup works
-     *
+     *get_works_index
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
     {
