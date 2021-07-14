@@ -40,6 +40,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_info/live_order_excel', 'InfoController@liveOrderExcel');
         Route::get('live_info/live_order_kun_excel', 'InfoController@liveOrderKunExcel');
         Route::get('live_info/user_watch_excel', 'InfoController@userWatchExcel');
+        Route::get('live_info/online_num_info_excel', 'InfoController@onlineNumInfoExcel');
 
     });
     //导出

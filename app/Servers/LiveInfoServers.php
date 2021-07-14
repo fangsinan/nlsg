@@ -453,6 +453,7 @@ class LiveInfoServers
         }
 
         $query = DB::table('nlsg_live_online_user as lou')
+            ->join('nlsg_user as lu','lou.user_id','=','lu.id')
             ->leftJoin('nlsg_live_count_down as cd', function ($query) use ($live_id) {
                 $query->on('cd.user_id', '=', 'lou.user_id')->where('cd.live_id', '=', $live_id);
             })
@@ -463,13 +464,20 @@ class LiveInfoServers
             ->groupBy('lou.user_id');
 
         $query->select([
-            'lou.user_id', 'cd.phone', 'cd.new_vip_uid as t_user_id', 'u.phone as t_phone',
+            'lou.user_id', 'lu.phone', 'cd.new_vip_uid as t_user_id', 'u.phone as t_phone',
             'u.nickname as t_nickname', DB::raw('left(lou.online_time,16) as online_time')
         ]);
 
-        $res = $query->paginate($size);
-        $custom = collect(['live_user_id' => $check_live_id->user_id, 'date' => $begin_time]);
-        return $custom->merge($res);
+        $excel_flag = $params['excel_flag'] ?? 0;
+        if (empty($excel_flag)) {
+            $res = $query->paginate($size);
+            $custom = collect(['live_user_id' => $check_live_id->user_id, 'date' => $begin_time]);
+            return $custom->merge($res);
+        } else {
+            return $query->get();
+        }
+
+
     }
 
     public function userWatch($params)
