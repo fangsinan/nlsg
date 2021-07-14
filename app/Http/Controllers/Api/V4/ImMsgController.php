@@ -327,7 +327,6 @@ class ImMsgController extends Controller
         }else{
             $content_res=false;
         }
-        dd($content_res);
         if($msg_add_res && $img_res && $content_res){
             DB::commit();
             return true;
