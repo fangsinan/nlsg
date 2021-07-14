@@ -35,7 +35,8 @@ class ImMsgController extends Controller
      * @apiParam {int} From_Account  发送方帐号
      * @apiParam {array} To_Account  接收方用户 数组类型
      * @apiParam {array} To_Group   接收方群组 数组类型
-     * @apiParam {array} Msg_Content 消息体 数组类型  根据MsgType  对应im的字段类型
+     * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"}] 数组类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
+     * @apiParam {array} collection_id 收藏id  数组格式
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -49,36 +50,64 @@ class ImMsgController extends Controller
         $params    = $request->input();
 
         $from_account   = $params['From_Account']??'';  //发送方帐号
-        $to_accounts   = $params['To_Account']??'';  //消息接收方用户
-        $to_group   = $params['To_Group']??'';  //消息接收方用户
-        $msg_content   = $params['Msg_Content'];  //消息体
+        $to_accounts    = $params['To_Account']??'';  //消息接收方用户
+        $to_group       = $params['To_Group']??'';  //消息接收方群
+        $msg_content    = $params['Msg_Content'] ??[];  //消息体
+        $collection_id  = $params['collection_id'] ??0;  //消息收藏id
 
 
-        if(empty($from_account) || empty($msg_content)){
-            return $this->error('0','request error');
+        if( empty($from_account) ){
+            return $this->error('0','request from_account error');
         }
+        if(empty($collection_id) && empty($msg_content)){
+            return $this->error('0','request msg error');
+        }
+        //接收方用户或者群
         if (empty($to_accounts) && empty($to_group)){
-            return $this->error('0','request error');
+            return $this->error('0','request to users error');
         }
-//        $to_accounts = explode(',',$to_accounts);
 
-
+        //发送收藏的消息
+        if( !empty($collection_id) ){
+            $msg_seq = ImCollection::where(['id'=>$collection_id])->value('msg_seq');
+            $contents = ImMsg::getMsgList([],['30879','30913']);
+            $msg_content = [];  //初始化消息体
+            foreach ($contents as $key=>$value) {
+                $msg_content = array_merge($msg_content,$value['content']);
+            }
+        }
+//        dd($msg_content);
         $msgBody = ImMsg::MsgBody($msg_content);
 
         if(empty($msgBody)){
             return $this->error('0','Msg Body Error');
         }
 
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
-
         $post_data['From_Account'] = $from_account;
-        $post_data['To_Account'] = $to_accounts;
-        $post_data['MsgRandom'] = rand(10000000,99999999);
         $post_data['MsgBody'] = $msgBody;
+        //用户体 群发
+        if(!empty($to_accounts)){
+            $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
+            $post_data['To_Account'] = $to_accounts;
+            $post_data['MsgRandom'] = rand(10000000,99999999);
+            ImClient::curlPost($url,json_encode($post_data));
 
-        $res = ImClient::curlPost($url,json_encode($post_data));
+        }
 
-        return $this->success($res);
+        //群组体 群发
+        if(!empty($to_group)) {
+            $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+            foreach ($to_group as $item) {
+                $post_data['GroupId'] = $item;
+                $post_data['Random'] = rand(10000000,99999999);
+                //dd($post_data);
+                $res = ImClient::curlPost($url,json_encode($post_data));
+                //dd($res);
+            }
+        }
+
+
+        return $this->success();
     }
 
 
@@ -207,6 +236,7 @@ class ImMsgController extends Controller
         $img_res= true;
         //消息体
         foreach ($params['MsgBody'] as $k=>$v){
+
             $msg_content_add = [
                     'msg_id'        => $msg_add_res->id,
                     'msg_type'      => $v['MsgType'],
@@ -274,11 +304,11 @@ class ImMsgController extends Controller
                     $msg_content_add['second']              = $v['MsgContent']['VideoSecond'];
                     $msg_content_add['video_format']        = $v['MsgContent']['VideoFormat'];
                     $msg_content_add['download_flag']       = $v['MsgContent']['VideoDownloadFlag'];
-                    $msg_content_add['thumb_url']           = $v['MsgContent']['ThumbUrl'];
-                    $msg_content_add['thumb_size']          = $v['MsgContent']['ThumbSize'];
-                    $msg_content_add['thumb_width']         = $v['MsgContent']['ThumbWidth'];
-                    $msg_content_add['thumb_height']        = $v['MsgContent']['ThumbHeight'];
-                    $msg_content_add['thumb_format']        = $v['MsgContent']['ThumbFormat'];
+                    $msg_content_add['thumb_url']           = $v['MsgContent']['ThumbUrl']??'';
+                    $msg_content_add['thumb_size']          = $v['MsgContent']['ThumbSize']??0;
+                    $msg_content_add['thumb_width']         = $v['MsgContent']['ThumbWidth']??0;
+                    $msg_content_add['thumb_height']        = $v['MsgContent']['ThumbHeight']??0;
+                    $msg_content_add['thumb_format']        = $v['MsgContent']['ThumbFormat']??'';
                     break;
                 case 'TIMCustomElem' : //自定义类型
                     $msg_content_add['data']    = $v['MsgContent']['Data'];
