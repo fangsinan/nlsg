@@ -131,7 +131,7 @@ class ImMsgController extends Controller
     }
      */
     public function MsgCollection(Request $request){
-        $msg_key = $request->input('msg_key', 0);  //消息序列号
+        $msg_key = $request->input('msg_key');  //消息
         $type = $request->input('type') ?? 1;  //类型
         $collection_id = $request->input('collection_id');  //id
 
@@ -230,6 +230,7 @@ class ImMsgController extends Controller
             $msg_add['online_only_flag']    = $params['OnlineOnlyFlag'];
             $msg_add['type']                = 1;
             $msg_add['msg_random']          = $params['Random'];
+            $msg_add['msg_key']             = $params['MsgSeq'];
         }
 
         $msg_add_res = ImMsg::create($msg_add);
@@ -326,7 +327,6 @@ class ImMsgController extends Controller
         }else{
             $content_res=false;
         }
-        dd($content_res);
         if($msg_add_res && $img_res && $content_res){
             DB::commit();
             return true;
