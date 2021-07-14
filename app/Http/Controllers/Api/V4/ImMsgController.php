@@ -27,7 +27,7 @@ class ImMsgController extends Controller
 {
 
     /**
-     * @api {get} /api/v4/im/msg_send_all  消息群发
+     * @api {post} /api/v4/im/msg_send_all  消息群发
      * @apiName msg_send_all
      * @apiVersion 1.0.0
      * @apiGroup im
@@ -113,7 +113,7 @@ class ImMsgController extends Controller
 
 
     /**
-     * @api {get} /api/v4/im/msg_collection  消息收藏操作
+     * @api {post} /api/v4/im/msg_collection  消息收藏操作
      * @apiName msg_collection
      * @apiVersion 1.0.0
      * @apiGroup im
