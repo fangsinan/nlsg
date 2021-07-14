@@ -278,25 +278,25 @@ class LiveInfoServers
             ->orderBy('sort','asc')   //按标记排序
             ->get();
 
-
         $son_id = intval($params['son_id'] ?? 0);
+
         //特定渠道
         if (!empty($son_id)) {
             //观看时常大于30分钟的
-            $more_than_30_min_sql = "
-                SELECT count(user_id) as user_count
-                from (
-                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id GROUP BY user_id,online_time
-                ) as a where counts >= 30";
-            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
+//            $more_than_30_min_sql = "
+//                SELECT count(user_id) as user_count
+//                from (
+//                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id GROUP BY user_id,online_time
+//                ) as a where counts >= 30";
+//            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
 
             //观看时常大于60分钟的
-            $more_than_60_min_sql = "
-                SELECT count(user_id) as user_count
-                from (
-                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id  GROUP BY user_id,online_time
-                ) as a where counts >= 60";
-            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
+//            $more_than_60_min_sql = "
+//                SELECT count(user_id) as user_count
+//                from (
+//                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id  GROUP BY user_id,online_time
+//                ) as a where counts >= 60";
+//            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
 
             //累计人次login
             $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)
@@ -316,6 +316,7 @@ class LiveInfoServers
                 ) AS a";
 
             $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
+            return $res;
 
             //在线人数
             $list_sql = "
@@ -336,20 +337,20 @@ class LiveInfoServers
 
         }else { //总数据
             //nlsg_live_online_user 表记录可能重复，同一用户多次刷新，socket fd未能及时回收，存在一个用户同一时段多条记录
-            $more_than_30_min_sql = "
-                SELECT count(user_id) as user_count
-                from (
-                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id,online_time
-                ) as a where counts >= 30";
-            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
+//            $more_than_30_min_sql = "
+//                SELECT count(user_id) as user_count
+//                from (
+//                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id,online_time
+//                ) as a where counts >= 30";
+//            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
 
             //观看时常大于60分钟的
-            $more_than_60_min_sql = "
-                SELECT count(user_id) as user_count
-                from (
-                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id,online_time
-                ) as a where counts >= 60";
-            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
+//            $more_than_60_min_sql = "
+//                SELECT count(user_id) as user_count
+//                from (
+//                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id,online_time
+//                ) as a where counts >= 60";
+//            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
 
             //累计人次login
             $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
@@ -390,7 +391,7 @@ class LiveInfoServers
         }
 
 
-        DB::connection()->enableQueryLog();
+//        DB::connection()->enableQueryLog();
         //       $res['list'] = $query->groupBy(Db::raw('left(online_time,16)'))
         //    ->orderBy('online_time')
         //   ->select([
