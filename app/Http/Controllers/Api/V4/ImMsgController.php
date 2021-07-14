@@ -230,6 +230,7 @@ class ImMsgController extends Controller
             $msg_add['online_only_flag']    = $params['OnlineOnlyFlag'];
             $msg_add['type']                = 1;
             $msg_add['msg_random']          = $params['Random'];
+            $msg_add['msg_key']             = $params['MsgSeq'];
         }
 
         $msg_add_res = ImMsg::create($msg_add);
