@@ -130,7 +130,7 @@ class CallbackController extends Controller
         }
 
         switch ($params['CallbackCommand']){
-            case 'C2C.CallbackBeforeSendMsg': //消息之前
+            //case 'C2C.CallbackBeforeSendMsg': //消息之前x
             case 'C2C.CallbackAfterSendMsg': //消息之后回调
             case 'Group.CallbackAfterSendMsg': //群聊消息
                 $result = ImMsgController::sendMsg($params);
