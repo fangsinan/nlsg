@@ -27,7 +27,7 @@ class ImMsgController extends Controller
 {
 
     /**
-     * @api {get} /api/v4/im/msg_send_all  消息群发
+     * @api {post} /api/v4/im/msg_send_all  消息群发
      * @apiName msg_send_all
      * @apiVersion 1.0.0
      * @apiGroup im
@@ -113,7 +113,7 @@ class ImMsgController extends Controller
 
 
     /**
-     * @api {get} /api/v4/im/msg_collection  消息收藏操作
+     * @api {post} /api/v4/im/msg_collection  消息收藏操作
      * @apiName msg_collection
      * @apiVersion 1.0.0
      * @apiGroup im
@@ -152,7 +152,7 @@ class ImMsgController extends Controller
         foreach ($msg as $k=>$v){
             $data = [
                 'user_id' => $uid,
-                'msg_key' => $v['msg_key'],
+                'msg_id' => $v['id'],
                 'type'    => $type,
             ];
             ImCollection::firstOrCreate($data);
@@ -181,17 +181,17 @@ class ImMsgController extends Controller
         $request->input('user_id', 0);  //消息序列号
         $uid = $this->user['id'];
 
-        $collectionList = ImCollection::select("id","user_id","msg_key")->where([
+        $collectionList = ImCollection::select("id","user_id","msg_id")->where([
             'type'=>1,'user_id'=>$uid
         ])->orderBy('created_at',"desc")->paginate($this->page_per_page)->toArray();
 
-        $msg_keys = array_column($collectionList['data'],'msg_key');
-        $msg_list = ImMsg::getMsgList([],$msg_keys);
+        $msg_ids = array_column($collectionList['data'],'msg_id');
+        $msg_list = ImMsg::getMsgList($msg_ids);
 
         foreach ($collectionList['data'] as $key=>$val) {
             $collectionList['data'][$key]['msg_list'] = [];
             foreach ($msg_list as $item){
-                if($val['msg_key'] == $item['msg_key']){
+                if($val['msg_id'] == $item['id']){
                     $collectionList['data'][$key]['msg_list'] = $item;
                     break;
                 }
@@ -212,7 +212,7 @@ class ImMsgController extends Controller
         //消息主库
         $msg_add = [
             'from_account'      => $params['From_Account'],
-            'msg_seq'           => $params['MsgSeq'],
+            'msg_seq'           => $params['MsgSeq'],       //群消息的唯一标识
             'msg_time'          => $params['MsgTime'],
         ];
 
@@ -230,7 +230,7 @@ class ImMsgController extends Controller
             $msg_add['online_only_flag']    = $params['OnlineOnlyFlag'];
             $msg_add['type']                = 1;
             $msg_add['msg_random']          = $params['Random'];
-            $msg_add['msg_key']             = $params['MsgSeq'];
+            $msg_add['msg_key']             = $params['GroupId'].'_'.$params['MsgSeq'];
         }
 
         $msg_add_res = ImMsg::create($msg_add);
