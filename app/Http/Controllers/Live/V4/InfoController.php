@@ -39,9 +39,10 @@ class InfoController extends ControllerBackend
         } else {
             $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
                 '推客别名', '邀约时间', '直播id'];
-            $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
+//            $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
+            $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
             header('Content-Description: File Transfer');
-            header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+            header('Content-Type: application/vnd.ms-excel');
             header('Content-Disposition: attachment; filename="' . $fileName . '"');
             header('Expires: 0');
             header('Cache-Control: must-revalidate');
@@ -72,9 +73,10 @@ class InfoController extends ControllerBackend
         }
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
             '推客别名', '邀约时间', '直播id'];
-        $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
+//        $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
+        $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
-        header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+        header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
@@ -121,9 +123,10 @@ class InfoController extends ControllerBackend
         } else {
             $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
                 '推客别名', '支付价格', '支付时间', '直播id', '直播标题', '订单id'];
-            $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
+//            $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
+            $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
             header('Content-Description: File Transfer');
-            header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+            header('Content-Type: application/vnd.ms-excel');
             header('Content-Disposition: attachment; filename="' . $fileName . '"');
             header('Expires: 0');
             header('Cache-Control: must-revalidate');
@@ -155,9 +158,10 @@ class InfoController extends ControllerBackend
         }
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
             '推客别名', '支付价格', '支付时间', '直播id', '直播标题', '订单id'];
-        $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
+//        $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
+        $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
-        header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+        header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
@@ -210,9 +214,10 @@ class InfoController extends ControllerBackend
                 '钻石合伙人id', '钻石合伙人账号', '钻石合伙人昵称', '钻石合伙人身份',
                 '是否抖音渠道', '抖音订单号', '抖音下单时间', '渠道类型', '渠道名称',
                 '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款'];
-            $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
+//            $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
+            $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
             header('Content-Description: File Transfer');
-            header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+            header('Content-Type: application/vnd.ms-excel');
             header('Content-Disposition: attachment; filename="' . $fileName . '"');
             header('Expires: 0');
             header('Cache-Control: must-revalidate');
@@ -248,9 +253,10 @@ class InfoController extends ControllerBackend
             '钻石合伙人id', '钻石合伙人账号', '钻石合伙人昵称', '钻石合伙人身份',
             '是否抖音渠道', '抖音订单号', '抖音下单时间', '渠道类型', '渠道名称',
             '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款'];
-        $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
+//        $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
+        $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
-        header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+        header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
@@ -321,12 +327,13 @@ class InfoController extends ControllerBackend
         if (($data['code'] ?? true) === false) {
             exit($data['msg']);
         }
-        $columns = ['用户id', '用户账号', '推荐人id', '推荐人手机号', '推荐人昵称','预约时间'];
-        $fileName = '在线人数分析' . date('Y-m-d H:i') . '.csv';
-        
+        $columns = ['用户id', '用户账号', '推荐人id', '推荐人手机号', '推荐人昵称', '预约时间'];
+//        $fileName = '在线人数分析' . date('Y-m-d H:i') . '.csv';
+        $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
+
         header('Content-Description: File Transfer');
         header('Cache-Control: max-age=0');
-        header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+        header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
@@ -367,9 +374,10 @@ class InfoController extends ControllerBackend
             return $this->getRes($data);
         } else {
             $columns = ['编号', '用户id', '用户账号', '时间', '邀约人', '邀约人别名'];
-            $fileName = '直播间用户观看分析' . date('Y-m-d H:i') . '.csv';
+//            $fileName = '直播间用户观看分析' . date('Y-m-d H:i') . '.csv';
+            $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
             header('Content-Description: File Transfer');
-            header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+            header('Content-Type: application/vnd.ms-excel');
             header('Content-Disposition: attachment; filename="' . $fileName . '"');
             header('Expires: 0');
             header('Cache-Control: must-revalidate');
@@ -400,9 +408,10 @@ class InfoController extends ControllerBackend
             exit($data['msg']);
         }
         $columns = ['编号', '用户id', '用户账号', '时间', '邀约人', '邀约人别名'];
-        $fileName = '直播间用户观看分析' . date('Y-m-d H:i') . '.csv';
+//        $fileName = '直播间用户观看分析' . date('Y-m-d H:i') . '.csv';
+        $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
-        header('Content-Type: application/vnd.ms-excel; charset=gb18030');
+        header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
