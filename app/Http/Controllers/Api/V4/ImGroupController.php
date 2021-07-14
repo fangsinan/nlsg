@@ -95,7 +95,7 @@ class ImGroupController extends Controller
      * @apiGroup im_group
      *e
      * @apiParam {int} group_id   腾讯云的groupId
-     * @apiParam {array} user_id  user_id  数组类型
+     * @apiParam {int} user_id  user_id
      * @apiParam {array} shut_up_time  禁言时长  0解禁 其他表示禁言
      *
      * @apiSuccess {string} result json
