@@ -386,8 +386,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('send/send_edit', 'SendController@getSendEdit');
 
         //Im
-        Route::get('im/msg_collection', 'ImMsgController@MsgCollection');
-        Route::get('im/msg_collection_list', 'ImMsgController@MsgCollectionList');
+        Route::post('im/msg_collection', 'ImMsgController@MsgCollection');
+        Route::post('im/msg_collection_list', 'ImMsgController@MsgCollectionList');
         Route::post('im_group/edit_join_group', 'ImGroupController@editJoinGroup');
         Route::post('im_group/forbid_send_msg', 'ImGroupController@forbidSendMsg');
 
@@ -396,7 +396,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     //IM
     Route::any('callback/callbackMsg', 'CallbackController@callbackMsg');
     Route::get('im/get_user_sig', 'ImController@getUserSig');
-    Route::get('im/msg_send_all', 'ImMsgController@MsgSendAll');
+    Route::post('im/msg_send_all', 'ImMsgController@MsgSendAll');
 
 
 });

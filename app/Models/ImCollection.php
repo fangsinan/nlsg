@@ -9,5 +9,5 @@ class ImCollection extends Base
 
     protected $table = 'nlsg_im_collection';
 
-    protected $fillable = ['user_id', 'msg_key', 'type','state'];
+    protected $fillable = ['user_id','msg_id',  'type','state'];
 }
