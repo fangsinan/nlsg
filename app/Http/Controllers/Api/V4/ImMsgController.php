@@ -69,8 +69,8 @@ class ImMsgController extends Controller
 
         //发送收藏的消息
         if( !empty($collection_id) ){
-            $msg_seq = ImCollection::where(['id'=>$collection_id])->value('msg_seq');
-            $contents = ImMsg::getMsgList([],['30879','30913']);
+            $msg_keys = ImCollection::where(['id'=>$collection_id])->value('msg_key');
+            $contents = ImMsg::getMsgList([],[$msg_keys]);
             $msg_content = [];  //初始化消息体
             foreach ($contents as $key=>$value) {
                 $msg_content = array_merge($msg_content,$value['content']);
@@ -118,7 +118,7 @@ class ImMsgController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup im
      *
-     * @apiParam {array} msg_seq  消息序列号 array
+     * @apiParam {array} msg_key  消息序列号 array
      * @apiParam {int} type  收藏类型   1消息收藏
      * @apiParam {int} collection_id  收藏列表id (取消收藏只传该字段)
      *
@@ -131,7 +131,7 @@ class ImMsgController extends Controller
     }
      */
     public function MsgCollection(Request $request){
-        $msg_seq = $request->input('msg_seq', 0);  //消息序列号
+        $msg_key = $request->input('msg_key', 0);  //消息序列号
         $type = $request->input('type') ?? 1;  //类型
         $collection_id = $request->input('collection_id');  //id
 
@@ -140,19 +140,19 @@ class ImMsgController extends Controller
             return $this->success();
         }
 
-        if(!is_array($msg_seq)){
-            return $this->error('0','msg_seq error');
+        if(!is_array($msg_key)){
+            return $this->error('0','msg_key error');
         }
-        $msg = ImMsg::whereIn('msg_seq',$msg_seq)->get()->toArray();
+        $msg = ImMsg::whereIn('msg_key',$msg_key)->get()->toArray();
         if(empty($msg)){
-            return $this->error('0','msg_seq error');
+            return $this->error('0','msg_key error');
         }
         $uid = $this->user['id']; //uid
 
         foreach ($msg as $k=>$v){
             $data = [
                 'user_id' => $uid,
-                'msg_seq' => $v['msg_seq'],
+                'msg_key' => $v['msg_key'],
                 'type'    => $type,
             ];
             ImCollection::firstOrCreate($data);
@@ -181,17 +181,17 @@ class ImMsgController extends Controller
         $request->input('user_id', 0);  //消息序列号
         $uid = $this->user['id'];
 
-        $collectionList = ImCollection::select("id","user_id","msg_seq")->where([
+        $collectionList = ImCollection::select("id","user_id","msg_key")->where([
             'type'=>1,'user_id'=>$uid
         ])->orderBy('created_at',"desc")->paginate($this->page_per_page)->toArray();
 
-        $msg_seqs = array_column($collectionList['data'],'msg_seq');
-        $msg_list = ImMsg::getMsgList([],$msg_seqs);
+        $msg_keys = array_column($collectionList['data'],'msg_key');
+        $msg_list = ImMsg::getMsgList([],$msg_keys);
 
         foreach ($collectionList['data'] as $key=>$val) {
             $collectionList['data'][$key]['msg_list'] = [];
             foreach ($msg_list as $item){
-                if($val['msg_seq'] == $item['msg_seq']){
+                if($val['msg_key'] == $item['msg_key']){
                     $collectionList['data'][$key]['msg_list'] = $item;
                     break;
                 }
@@ -326,6 +326,7 @@ class ImMsgController extends Controller
         }else{
             $content_res=false;
         }
+        dd($content_res);
         if($msg_add_res && $img_res && $content_res){
             DB::commit();
             return true;

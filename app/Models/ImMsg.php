@@ -20,8 +20,8 @@ class ImMsg extends Base
         return  $this->hasMany(ImMsgContent::class, 'msg_id');
     }
 
-    public static function getMsgList($ids=[],$msg_seqs=[]){
-        if(empty($ids) && empty($msg_seqs)){
+    public static function getMsgList($ids=[],$msg_keys=[]){
+        if(empty($ids) && empty($msg_keys)){
             return [];
         }
 
@@ -32,8 +32,8 @@ class ImMsg extends Base
         if(!empty($ids) ){
             return $query->whereIn('id',$ids)->get()->toArray();
         }
-        if(!empty($msg_seqs) ){
-            return $query->whereIn('msg_seq',$msg_seqs)->get()->toArray();
+        if(!empty($msg_keys) ){
+            return $query->whereIn('msg_key',$msg_keys)->get()->toArray();
         }
     }
 
