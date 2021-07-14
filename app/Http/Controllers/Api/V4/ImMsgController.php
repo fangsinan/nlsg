@@ -118,7 +118,7 @@ class ImMsgController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup im
      *
-     * @apiParam {array} msg_key  消息序列号 array
+     * @apiParam {array} os_msg_id  消息序列号 array
      * @apiParam {int} type  收藏类型   1消息收藏
      * @apiParam {int} collection_id  收藏列表id (取消收藏只传该字段)
      *
@@ -131,7 +131,7 @@ class ImMsgController extends Controller
     }
      */
     public function MsgCollection(Request $request){
-        $msg_key = $request->input('msg_key');  //消息
+        $os_msg_id = $request->input('os_msg_id');  //消息
         $type = $request->input('type') ?? 1;  //类型
         $collection_id = $request->input('collection_id');  //id
 
@@ -140,12 +140,12 @@ class ImMsgController extends Controller
             return $this->success();
         }
 
-        if(!is_array($msg_key)){
+        if(!is_array($os_msg_id)){
             return $this->error('0','msg_key error');
         }
-        $msg = ImMsg::whereIn('msg_key',$msg_key)->get()->toArray();
+        $msg = ImMsg::whereIn('os_msg_id',$os_msg_id)->get()->toArray();
         if(empty($msg)){
-            return $this->error('0','msg_key error');
+            return $this->error('0','os_msg_id error');
         }
         $uid = $this->user['id']; //uid
 
