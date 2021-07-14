@@ -5,13 +5,14 @@ namespace App\Servers;
 
 
 use App\Models\BackendLiveRole;
+use App\Models\CacheTools;
 use App\Models\Live;
-use App\Models\LiveCountDown;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveSonFlagPoster;
 use App\Models\Subscribe;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class LiveInfoServers
@@ -273,10 +274,23 @@ class LiveInfoServers
             return ['code' => false, 'msg' => 'live_id错误'];
         }
         //获取所有渠道
-        $res['son_flag'] = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
-            ->select(['son', 'son_id', 'son_flag'])
-            ->orderBy('sort','asc')   //按标记排序
-            ->get();
+//        $res['son_flag'] = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
+//            ->select(['son', 'son_id', 'son_flag'])
+//            ->orderBy('sort','asc')   //按标记排序
+//            ->get();
+
+        $cache_key_name = 'son_flag_' . $check_live_id->user_id;
+        $expire_num = CacheTools::getExpire('son_flag');
+        $son_flag = Cache::get($cache_key_name);
+
+        if (empty($son_flag)) {
+            $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
+                ->select(['son', 'son_id', 'son_flag'])
+                ->orderBy('sort', 'asc')   //按标记排序
+                ->get();
+            Cache::put($cache_key_name, $son_flag, $expire_num);
+        }
+        $res['son_flag'] = $son_flag;
 
         $son_id = intval($params['son_id'] ?? 0);
 
@@ -309,33 +323,35 @@ class LiveInfoServers
             FROM
                 (
                     SELECT
-                        *
+                        id
                     FROM  nlsg_subscribe
                     WHERE  relation_id = $live_id and type=3  AND STATUS = 1 AND twitter_id =$son_id
                     GROUP BY user_id
                 ) AS a";
 
             $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
-            return $res;
 
             //在线人数
             $list_sql = "
             SELECT
-                count(*) AS counts,time
-            FROM
-                (
-                    SELECT	* FROM
-                        (
-                            SELECT
-                                user_id,LEFT ( online_time, 16 ) AS time,live_son_flag
-                            FROM `nlsg_live_online_user`
-                            WHERE `live_id` = $live_id and live_son_flag=$son_id
-                        ) AS a
-                    GROUP BY user_id,time
-                ) AS b
-            GROUP BY time";
+	count(*) AS counts,
+	time
+FROM
+	(
+	SELECT
+		*
+	FROM
+		( SELECT user_id, online_time_str AS time, live_son_flag FROM `nlsg_live_online_user` WHERE `live_id` = $live_id AND live_son_flag = $son_id ) AS a
+	GROUP BY
+		user_id,
+		time ORDER BY null
+	) AS b
+GROUP BY
+	time
+	ORDER BY time asc
+            ";
 
-        }else { //总数据
+        } else { //总数据
             //nlsg_live_online_user 表记录可能重复，同一用户多次刷新，socket fd未能及时回收，存在一个用户同一时段多条记录
 //            $more_than_30_min_sql = "
 //                SELECT count(user_id) as user_count
@@ -361,7 +377,7 @@ class LiveInfoServers
             FROM
                 (
                 SELECT
-                    *
+                    id
                 FROM nlsg_subscribe
                 WHERE relation_id = $live_id and type=3 AND STATUS = 1
                 GROUP BY user_id
@@ -380,14 +396,14 @@ class LiveInfoServers
                 FROM
                     (
                     SELECT
-                        user_id,LEFT ( online_time, 16 ) AS time
+                        user_id,online_time_str AS time
                     FROM  `nlsg_live_online_user`
                     WHERE `live_id` = $live_id
                     ) AS a
-                 GROUP BY  user_id, time
+                 GROUP BY  user_id, time ORDER BY null
                 ) AS b
             GROUP BY
-                time";
+                time ORDER BY time asc";
         }
 
 
@@ -462,7 +478,7 @@ class LiveInfoServers
         }
 
         $query = DB::table('nlsg_live_online_user as lou')
-            ->join('nlsg_user as lu','lou.user_id','=','lu.id')
+            ->join('nlsg_user as lu', 'lou.user_id', '=', 'lu.id')
             ->leftJoin('nlsg_live_count_down as cd', function ($query) use ($live_id) {
                 $query->on('cd.user_id', '=', 'lou.user_id')->where('cd.live_id', '=', $live_id);
             })
@@ -582,10 +598,10 @@ class LiveInfoServers
         $res['end_at'] = $check_live_id->end_at;
         $res['live_login'] = LiveLogin::where('live_id', '=', $live_id)->count();//人气
         //$res['order_num'] = Subscribe::where('relation_id', '=', $live_id)
-            //->where(function ($query) {
-            //    $query->where('order_id', '>', 0)->orWhere('channel_order_id', '<>', '');
-            //})
-            //->count();//总预约人数
+        //->where(function ($query) {
+        //    $query->where('order_id', '>', 0)->orWhere('channel_order_id', '<>', '');
+        //})
+        //->count();//总预约人数
 
         $order_num_sql = "
 SELECT
