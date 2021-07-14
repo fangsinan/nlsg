@@ -182,7 +182,7 @@ class ImMsgController extends Controller
         $uid = $this->user['id'];
 
         $collectionList = ImCollection::select("id","user_id","msg_id")->where([
-            'type'=>1,'user_id'=>$uid
+            'type'=>1,'user_id'=>$uid,'state'=>1
         ])->orderBy('created_at',"desc")->paginate($this->page_per_page)->toArray();
 
         $msg_ids = array_column($collectionList['data'],'msg_id');
