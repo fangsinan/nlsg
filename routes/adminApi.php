@@ -201,6 +201,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
         //im选择商品
         Route::get('im_doc/category', 'ImDocController@getCategory');
+        Route::get('im_doc/category/product', 'ImDocController@getCategoryProduct');
 
 
     });
