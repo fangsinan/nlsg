@@ -1683,7 +1683,7 @@ class ClassController extends ControllerBackend
         $list = Column::with('user:id,nickname,headimg')
             ->select('id', 'user_id', 'name', 'title', 'subtitle', 'subscribe_num', 'message', 'status',
                 'original_price', 'price', 'index_pic','cover_pic',
-                'details_pic', 'created_at', 'timing_online', 'timing_time','is_start','show_info_num')
+                'details_pic', 'created_at', 'timing_online', 'timing_time','is_start','show_info_num','online_time','info_column_id')
             ->where('id', $id)->first();
         return success($list);
     }
