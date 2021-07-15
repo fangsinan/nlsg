@@ -98,7 +98,7 @@ class ImGroupController extends Controller
      * @apiParam {int} group_id   腾讯云的groupId
      * @apiParam {array} user_id  user_id
      * @apiParam {int} shut_up_time  禁言时长  0解禁 其他表示禁言
-     * @apiParam {int} type  是否全员 1是
+     * @apiParam {int} is_all  是否全员 1是
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -117,7 +117,7 @@ class ImGroupController extends Controller
         }
         $shut_up_time = empty($params['shut_up_time']) ?0 : $params['shut_up_time'];
 
-        if( $params['type'] == 1 ){
+        if( $params['is_all'] == 1 ){
             //全员禁言/解禁
             ImGroup::where([
                 'group_id' =>$params['GroupId'],
