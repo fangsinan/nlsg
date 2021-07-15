@@ -117,10 +117,10 @@ class ImGroupController extends Controller
         }
         $shut_up_time = empty($params['shut_up_time']) ?0 : $params['shut_up_time'];
 
-        if( $params['is_all'] == 1 ){
+        if( !empty($params['is_all']) && $params['is_all'] == 1 ){
             //全员禁言/解禁
             ImGroup::where([
-                'group_id' =>$params['GroupId'],
+                'group_id' =>$params['group_id'],
             ])->update(['shut_up_time'=>$shut_up_time]);
         }
 
