@@ -192,7 +192,8 @@ class LiveInfoServers
             return $custom->merge($res);
         } else {
             $query->select([
-                'ordernum', 'pay_price', 'num', 'pay_time',
+                DB::raw("CONCAT('`',ordernum) as ordernum"),
+                'pay_price', 'num', 'pay_time',
                 DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
             when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "类型错误" end) as type_name'),
                 DB::raw("CONCAT('`',phone) as phone"), 'nickname', 'user_id',
