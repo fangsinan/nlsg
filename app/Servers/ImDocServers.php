@@ -4,9 +4,19 @@
 namespace App\Servers;
 
 
+use App\Models\CacheTools;
+use App\Models\Column;
 use App\Models\ImDoc;
 use App\Models\ImDocSendJob;
 use App\Models\ImDocSendJobInfo;
+use App\Models\Live;
+use App\Models\MallCategory;
+use App\Models\MallGoods;
+use App\Models\Works;
+use App\Models\WorksCategory;
+use App\Models\WorksCategoryRelation;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ImDocServers
@@ -238,5 +248,140 @@ class ImDocServers
     {
 
         return $params;
+    }
+
+    public function getCategoryProduct($params){
+        $category_id = $params['category_id'] ?? 0;//0 为全部
+        $type = $params['type'] ?? 0;
+        switch ($type) {
+            case 1:
+                $cate_id_arr = [];
+                $cate_data = WorksCategory::find($category_id);
+                if ($cate_data['level'] == 1) {
+                    $cate_arr = WorksCategory::select('id')->where(['pid' => $cate_data['id'], 'status' => 1
+                    ])->get()->toArray();
+                    $cate_id_arr = array_column($cate_arr, 'id');
+                }
+                $where = [
+                    'works.status' => 4,
+                    'works.type' => 2,
+                    'works.is_audio_book' => 0
+                ];
+                $relationObj = new WorksCategoryRelation();
+                $worksObj = new Works();
+                $query = DB::table($relationObj->getTable(), ' relation')
+                    ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
+                    ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price',
+                        'works.original_price', 'works.subtitle',
+                        'works.works_update_time', 'works.detail_img', 'works.content', 'relation.id as relation_id',
+                        'relation.category_id', 'relation.work_id', 'works.column_id',
+                        'works.comment_num', 'works.chapter_num', 'works.subscribe_num', 'works.collection_num',
+                        'works.is_free');
+                if ($cate_id_arr && $category_id != 0) {
+                    $query->whereIn('relation.category_id', $cate_id_arr);
+                }
+
+                $lists = $query->where($where)
+                    ->orderBy('works.created_at', 'desc')
+                    ->groupBy('works.id')
+                    ->paginate(10)
+                    ->toArray();
+
+                break;
+            case 2:
+                $lists = Column::select('id', 'user_id', 'name', 'title', 'subtitle', 'cover_img', 'price', 'status',
+                    'created_at',
+                    'info_num')
+                    ->where('type', 2)
+                    ->where('status', '<>', 3)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+                break;
+            case  3:
+                $query = MallGoods::query();
+                if ($category_id != 0) {
+                    $query->where('category_id', $category_id);
+                }
+                $lists = $query->select('id', 'name', 'subtitle', 'picture', 'status')
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+                break;
+            case 4:
+                $lists = Live::select('id', 'user_id', 'title', 'price', 'order_num', 'status', 'begin_at', 'cover_img')
+                    ->where('is_del', 0)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+                break;
+            case 5:
+                $lists = Column::select('id', 'user_id', 'name', 'title', 'subtitle', 'cover_img', 'price', 'status',
+                    'created_at',
+                    'info_num')
+                    ->where('type', 3)
+                    ->where('status', '<>', 3)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+                break;
+
+        }
+        return $lists ?? [];
+    }
+
+    public function getCategory(){
+        $cache_key_name = 'works_category_list';
+        $expire_num = CacheTools::getExpire('goods_category_list');
+        $works_category = Cache::get($cache_key_name);
+        if (empty($res)) {
+            $works_category = WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
+                ->where(['status' => 1,])
+                ->orderBy('sort', 'asc')
+                ->get()
+                ->toArray();
+            Cache::put($cache_key_name, $works_category, $expire_num);
+        }
+
+        $mall = new MallCategory();
+        $goods_category = $mall->getUsedList();
+
+        return [
+            'works' => [
+                'type' => 1,
+                'name' => '精品课',
+                'category' => $works_category
+            ],
+            'lecture' => [
+                'type' => 2,
+                'name' => '讲座'
+            ],
+            'goods' => [
+                'type' => 3,
+                'name' => '商品',
+                'category' => $goods_category
+            ],
+            'live' => [
+                'name' => '直播训练营',
+                'category' => [
+                    [
+                        'id' => '100001',
+                        'type' => 4,
+                        'name' => '直播'
+                    ],
+                    [
+                        'id' => '100002',
+                        'type' => 5,
+                        'name' => '训练营'
+                    ],
+                    [
+                        'id' => '100003',
+                        'type' => 6,
+                        'name' => '幸福360'
+                    ],
+                ]
+            ]
+        ];
+
     }
 }

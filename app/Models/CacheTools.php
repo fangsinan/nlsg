@@ -65,6 +65,7 @@ class CacheTools
             case 'freight_template_list':
             case 'freight_template':
             case 'index_works_category':
+            case 'works_category_list':
                 $expire = $long_expire;
                 break;
 

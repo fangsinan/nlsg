@@ -63,4 +63,101 @@ class ImDocController extends Controller
         $data = $servers->changeStatus($request->input(),$this->user['user_id']);
         return $this->getRes($data);
     }
+
+
+
+    /**
+     * @api {put} api/v4/im_doc/job_add 添加发送任务
+     * @apiVersion 4.0.0
+     * @apiName  api/v4/im_doc/job_add
+     * @apiGroup 社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/job_add
+     * @apiParam {number} doc_id 文案id
+     * @apiParam {number=1,2} send_type 发送时间类型(1立刻 2定时)
+     * @apiParam {string} [send_at] 定时时间
+     * @apiParam {string[]} info 对象列表
+     * @apiParam {string=1,2,3} info.send_obj_type 目标对象类型(1群组 2个人 3标签)
+     * @apiParam {string} info.send_obj_id 目标id
+     * @apiDescription 添加发送任务
+     * @apiParamExample {json} Request-Example:
+     * {
+     * "doc_id": 1,
+     * "send_type": 1,
+     * "send_at": "",
+     * "info": [
+     * {
+     * "type": 1,
+     * "list": [
+     * 1,
+     * 2,
+     * 3
+     * ]
+     * }
+     * ]
+     * }
+     */
+    //添加发送任务
+    public function addSendJob(Request $request)
+    {
+        $servers = new ImDocServers();
+        $data = $servers->addSendJob($request->input());
+        return $this->getRes($data);
+    }
+
+
+    /**
+     * @api {get} api/v4/im_doc/category 分类
+     * @apiVersion 4.0.0
+     * @apiName  im_doc
+     * @apiGroup 社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/category
+     * @apiDescription 分类的列表
+     *
+     * @apiParam {number} category_id 分类id 0为全部
+     * @apiParam {number} type   类型  1.精品课 2 讲座 3 商品 4 直播 5训练营 6幸福360
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getCategory()
+    {
+        $servers = new ImDocServers();
+        $data = $servers->getCategory();
+        return $this->getRes($data);
+    }
+
+    /**
+     * @api {get} api/v4/im_doc/category/product 分类筛选的商品列表
+     * @apiVersion 4.0.0
+     * @apiName  im_doc
+     * @apiGroup 社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/category/product
+     * @apiDescription 分类筛选的商品列表
+     *
+     * @apiParam {number} category_id 分类id 0为全部
+     * @apiParam {number} type   类型  1.精品课 2 讲座 3 商品 4 直播 5训练营 6幸福360
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function getCategoryProduct(Request $request)
+    {
+        $servers = new ImDocServers();
+        $data = $servers->getCategoryProduct($request->input());
+        return $this->getRes($data);
+    }
 }
