@@ -135,8 +135,8 @@ class LiveInfoServers
         }
 
         $params['type'] = 0;
-        if (!empty($params['qd_name'] ?? '')) {
-            switch ($params['qd_name']) {
+        if (!empty($params['type_name'] ?? '')) {
+            switch ($params['type_name']) {
                 case '经营能量门票':
                     $params['type'] = 1;
                     break;
@@ -146,16 +146,20 @@ class LiveInfoServers
                 case '演说能量门票':
                     $params['type'] = 3;
                     break;
-                case '经营能量+360套餐':
+                case '经营能量 360套餐':
                     $params['type'] = 4;
                     break;
                 case '30天智慧父母(亲子)训练营':
                     $params['type'] = 5;
                     break;
-                default:
+                case '':
                     $params['type'] = 0;
+                    break;
+                default:
+                    $params['type'] = 999;
             }
         }
+
         if (!empty($params['type'])) {
             $query->where('type', '=', $params['type']);
         }
