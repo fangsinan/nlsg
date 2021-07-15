@@ -17,6 +17,7 @@ use App\Models\WorksInfo;
 use App\Models\User;
 use App\Models\Task;
 use App\Servers\ChannelServers;
+use App\Servers\DealServers;
 use App\Servers\ErpServers;
 use App\Servers\MallRefundJob;
 use App\Servers\removeDataServers;
@@ -138,6 +139,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
 //            Subscribe::expire();
         })->daily();  //每天执行一次
+
+        $schedule->call(function () {
+            //抓取直播间成交订单
+            DealServers::getOrderInfo([],0,1);
+        })->everyFiveMinutes()->runInBackground();//每5分钟执行一次
 
     }
 

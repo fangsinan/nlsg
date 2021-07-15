@@ -22,8 +22,20 @@ class DealServers
     }
 
     //获取成交订单
-    public function getOrderInfo($data,$live_id)
+    public static function getOrderInfo($data,$live_id,$crontab=0)
     {
+
+        if(!empty($crontab)){ //定时任务执行
+            $now=date('Y-m-d',time());
+            //获取当天未抓取的订单
+            $LiveOrderObj=Order::query()->where('pay_time', '>', $now.' 00:00:00')
+                ->where(['type'=>14,'status'=>1,'is_deal'=>0])->select(['live_id'])->first();
+            if(!empty($LiveOrderObj)) {
+                $live_id = $LiveOrderObj->live_id;
+            }else{
+                return ['status' => 1, 'data' => [],'msg'=>'没有直播间开播'];
+            }
+        }
 
         $fields=[
             'O.id','O.ordernum','O.live_id','O.relation_id','O.user_id','O.pay_price','O.pay_time','invite.twitter_id as twitter_id','O.live_num',
@@ -35,9 +47,9 @@ class DealServers
         ];
 
         $query=DB::table(LiveDeal::DB_ORDER_TABLE.' as O');
-        $query->where('O.pay_time', '>', $data['start_time'].' 00:00:00')->where('O.pay_time', '<', $data['end_time'].' 23:59:59');
-        $query->where('O.type',14);
+//        $query->where('O.pay_time', '>', $data['start_time'].' 00:00:00')->where('O.pay_time', '<', $data['end_time'].' 23:59:59'); //取消时间为了抓取第一天遗漏订单
         $query->where('O.live_id',$live_id); //有没在直播间购买此条件非必须
+        $query->where('O.type',14);
         $query->where('O.status',1);
         $query->whereIn('O.relation_id', [1,2,3,4,5]);
         $query->where('O.pay_price','>', 1);
@@ -68,21 +80,21 @@ class DealServers
 
             $user_arr = array_column($list, 'user_id'); //用户
             //顶级钻石合伙人
-            $DiamondArr=$this->DiamondInfo($user_arr);
+            $DiamondArr=self::DiamondInfo($user_arr);
 
             //处理用户等级  邀约人等级
             $invite_user_arr = array_column($list, 'twitter_id');  //邀约人       邀约人关系不清
             $protect_user_arr = array_column($list, 'protect_user_id'); //保护人
-            $UserArr=$this->InviteInfo($user_arr,$invite_user_arr,$protect_user_arr);
+            $UserArr=self::InviteInfo($user_arr,$invite_user_arr,$protect_user_arr);
 
             $OrderIdArr = array_column($list, 'id'); //用于更新订单状态
             $map=[];
             foreach ($list as $key=>$val){
 
                 //查询第一次预约时间
-                $SubInfo=$this->getFirstSub($val->user_id);
+                $SubInfo=self::getFirstSub($val->user_id);
                 //处理渠道
-                $QdInfo=$this->getQd($val->user_id,$val->live_id);
+                $QdInfo=self::getQd($val->user_id,$val->live_id);
 
                 $map[]=[
                     'ordernum'=>$val->ordernum,
@@ -150,7 +162,7 @@ class DealServers
     }
 
     //处理顶级合伙人信息
-    public function DiamondInfo($user_arr){
+    public static function DiamondInfo($user_arr){
         //顶级钻石合伙人
         $query=DB::table('nlsg_vip_user as VIP');
         $query->whereIn('VIP.user_id', $user_arr);
@@ -180,7 +192,7 @@ class DealServers
     }
 
     //处理邀约人信息
-    public function InviteInfo($user_arr,$invite_user_arr,$protect_user_arr){
+    public static function InviteInfo($user_arr,$invite_user_arr,$protect_user_arr){
 
         $arr=array_merge($user_arr,$invite_user_arr,$protect_user_arr);
         $User_list = VipUser::query()->whereIn('user_id', $arr)
@@ -200,7 +212,7 @@ class DealServers
     }
 
     //获取第一次预约时间
-    public function getFirstSub($user_id){
+    public static function getFirstSub($user_id){
 
         //预约信息
         $sub_live_id=0;
@@ -233,7 +245,7 @@ class DealServers
     }
 
     //处理渠道
-    public function getQd($user_id,$live_id)
+    public static function getQd($user_id,$live_id)
     {
 
         //抖音信息
