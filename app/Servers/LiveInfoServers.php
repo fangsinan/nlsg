@@ -616,16 +616,16 @@ GROUP BY
             ( s.order_id > 9 OR s.channel_order_id > 0 )
             AND s.relation_id = $live_id";
 
-        if (!empty($phone)){
+        if (!empty($phone)) {
             $sql .= " AND u.phone like '%$phone%' ";
         }
 
-        if (!empty($son)){
+        if (!empty($son)) {
             $sql .= " AND lr.son like '%$son%' ";
         }
 
         $son_flag = $params['son_flag'] ?? '';
-        if (!empty($son_flag)){
+        if (!empty($son_flag)) {
             $sql .= " AND lr.son_flag like '%$son_flag%' ";
         }
 
@@ -645,7 +645,22 @@ GROUP BY
             LEFT JOIN nlsg_backend_live_role as lr on cd.new_vip_uid = lr.son_id
         WHERE
             ( s.order_id > 9 OR s.channel_order_id > 0 )
-            AND s.relation_id = $live_id
+            AND s.relation_id = $live_id ";
+
+            if (!empty($phone)) {
+                $count_sql .= " AND u.phone like '%$phone%' ";
+            }
+
+            if (!empty($son)) {
+                $count_sql .= " AND lr.son like '%$son%' ";
+            }
+
+            $son_flag = $params['son_flag'] ?? '';
+            if (!empty($son_flag)) {
+                $count_sql .= " AND lr.son_flag like '%$son_flag%' ";
+            }
+
+            $count_sql .= "
             AND s.type = 3
             AND $where_str ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
         ";
