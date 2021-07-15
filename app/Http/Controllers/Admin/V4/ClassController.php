@@ -1555,7 +1555,7 @@ class ClassController extends ControllerBackend
             });
 
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at',
-            'info_num','is_start')
+            'info_num','is_start','show_info_num','online_time','info_column_id')
             ->where('type', 3)
             ->where('status', '<>', 3)
             ->orderBy('created_at', 'desc')
@@ -1615,7 +1615,8 @@ class ClassController extends ControllerBackend
         $online_type = $input['online_type'] ?? 1;
         $is_start = $input['is_start'] ?? 0;
         $show_info_num = $input['show_info_num'] ?? 0;
-        $subscribe_num = $input['subscribe_num'] ?? 0;
+        $online_time   = $input['online_time'] ?? 0;
+        $info_column_id= $input['info_column_id'] ?? 0;
 
         $data = [
             'index_pic'      => $index_pic,
@@ -1629,6 +1630,8 @@ class ClassController extends ControllerBackend
             'original_price' => $original_price,
             'is_start'       => $is_start,
             'show_info_num'  => $show_info_num,
+            'online_time'    => $online_time,
+            'info_column_id' => $info_column_id,
             'subscribe_num'  => $subscribe_num,
             'type'           => 3,
             'status'         => $status
