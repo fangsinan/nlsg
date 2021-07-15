@@ -668,6 +668,7 @@ class AuthController extends Controller
     //登录返回字段
     function get_data($user,$token){
 
+        $is_community_admin = $user->is_staff == 2 ? 1:0;  // im管理员
         return  [
             'id' => $user->id,
             'token' => $token,
@@ -676,7 +677,7 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'level' => $user->level,
             'sex' => $user->sex,
-            'is_community_admin' => $user->is_staff,
+            'is_community_admin' => $is_community_admin,
             'children_age' => 10,//$user->children_age,
         ];
     }
