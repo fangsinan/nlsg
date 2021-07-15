@@ -133,6 +133,52 @@ class ImGroupController extends Controller
     }
 
 
+
+    /**
+     * @api {post} /api/v4/im_group/forbid_msg_list 群成员禁言list
+     * @apiName forbid_msg_list
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *e
+     * @apiParam {int} group_id   腾讯云的groupId
+     * @apiParam {array} user_id  user_id
+     * @apiParam {int} shut_up_time  禁言时长  0解禁 其他表示禁言
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function forbidMsgList(Request $request){
+        $params    = $request->input();
+
+        if( empty($params['group_id']) ){
+            return $this->error('0','request error');
+        }
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/get_group_shutted_uin");
+        $post_data = [
+            'GroupId' => $params['group_id'],
+        ];
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+
+        if ($res['ActionStatus'] == 'OK'){
+            return $this->success($res['ShuttedUinList']);
+        }else{
+            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+        }
+
+    }
+
+
+
+
+
+
     /********************************  回调接口 start ********************************/
     //创建群回调
     public static function addGroup($params){

@@ -392,12 +392,14 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('im_group/forbid_send_msg', 'ImGroupController@forbidSendMsg');
 
     });
+    Route::post('im_group/forbid_msg_list', 'ImGroupController@forbidMsgList');
 
     //IM
     Route::any('callback/callbackMsg', 'CallbackController@callbackMsg');
     Route::get('im/get_user_sig', 'ImController@getUserSig');
     Route::post('im/msg_send_all', 'ImMsgController@MsgSendAll');
 
+    Route::get('ToTwitter', 'IncomeController@ToTwitter');
 
 });
 
