@@ -134,6 +134,31 @@ class LiveInfoServers
             $query->where('qd', '=', $params['qd']);
         }
 
+        $params['type'] = 0;
+        if (!empty($params['qd_name'] ?? '')) {
+            switch ($params['qd_name']) {
+                case '经营能量门票':
+                    $params['type'] = 1;
+                    break;
+                case '一代天骄门票':
+                    $params['type'] = 2;
+                    break;
+                case '演说能量门票':
+                    $params['type'] = 3;
+                    break;
+                case '经营能量+360套餐':
+                    $params['type'] = 4;
+                    break;
+                case '30天智慧父母(亲子)训练营':
+                    $params['type'] = 5;
+                    break;
+                default:
+                    $params['type'] = 0;
+            }
+        }
+        if (!empty($params['type'])) {
+            $query->where('type', '=', $params['type']);
+        }
 
         switch ($query_flag) {
             case 'money_sum':
@@ -147,7 +172,7 @@ class LiveInfoServers
             $query->select([
                 'ordernum', 'pay_price', 'num', 'pay_time',
                 DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
-            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "类型错误" end) as type_name'),
+            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "--" end) as type_name'),
                 'phone', 'nickname', 'user_id',
                 DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
                 'invite_phone', 'invite_nickname',
@@ -241,6 +266,10 @@ class LiveInfoServers
             $query->where('o.ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
 
+        if (!empty($params['pay_price'] ?? '')) {
+            $query->where('pay_price', '=', $params['pay_price']);
+        }
+
         $query->where('o.remark', '=', $live_id);
         $query->whereIn('o.twitter_id', $twitter_id_list);
 
@@ -284,16 +313,6 @@ class LiveInfoServers
                 ]);
             return $query->get();
         }
-
-    }
-
-    public function comment($params)
-    {
-
-    }
-
-    public function orderOnlineNum($params)
-    {
 
     }
 
@@ -587,7 +606,14 @@ GROUP BY
             LEFT JOIN nlsg_backend_live_role as lr on cd.new_vip_uid = lr.son_id
         WHERE
             ( s.order_id > 9 OR s.channel_order_id > 0 )
-            AND s.relation_id = $live_id
+            AND s.relation_id = $live_id";
+
+        $son_flag = $params['son_flag'] ?? '';
+        if (!empty($son_flag)){
+            $sql .= " AND lr.son_flag like '%$son_flag%' ";
+        }
+
+        $sql .= "
             AND s.type = 3
             AND $where_str ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
         ";

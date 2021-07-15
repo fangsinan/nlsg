@@ -50,6 +50,7 @@ class CommentController extends ControllerBackend
         $end = $request->get('end');
         $live_id = $request->get('live_id');
         $live_flag = $request->get('live_flag');
+        $phone = $request->get('phone','');
 
 
         $page = $request->get('page') ?? 1;
@@ -58,6 +59,12 @@ class CommentController extends ControllerBackend
         if (!empty($nickname)) {
             $userData = User::select('id')->where('nickname', 'like', '%' . $nickname . '%')->get()->toArray();
             $user_ids = array_column($userData, 'id');
+        }
+        if (!empty($phone)){
+            $check_phone = User::where('phone','like',"%$phone%")->pluck('id')->toArray();
+            if (!empty($check_phone)){
+                $user_ids = $check_phone;
+            }
         }
 
         $son_id = 0;   //渠道标记
