@@ -95,8 +95,8 @@ class ImGroupController extends Controller
      * @apiGroup im_group
      *e
      * @apiParam {int} group_id   腾讯云的groupId
-     * @apiParam {int} user_id  user_id
-     * @apiParam {array} shut_up_time  禁言时长  0解禁 其他表示禁言
+     * @apiParam {array} user_id  user_id
+     * @apiParam {int} shut_up_time  禁言时长  0解禁 其他表示禁言
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -117,7 +117,7 @@ class ImGroupController extends Controller
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/forbid_send_msg");
         $post_data = [
             'GroupId' => $params['group_id'],
-            'Members_Account' => $params['user_id'],
+            'Members_Account' => $params['user_id'],  //数组类型
             'ShutUpTime' => $shut_up_time,
         ];
         $res = ImClient::curlPost($url,json_encode($post_data));
