@@ -1225,4 +1225,41 @@ class IncomeController extends Controller
     }
 
 
+
+    public function  ToTwitter(){
+
+        $to_twitters = DB::table('nlsg_pay_to_twitter')->where([
+            //'type'      => 1,
+            'status'    => 0,
+        ])->get()->toArray();
+
+        foreach ($to_twitters as $key=>$twitter) {
+            $user_data = User::where(['phone'=>$twitter->user_phone,])->first();
+            if(!empty($user_data)){
+                $add_data = [
+                    'type'      =>$twitter->type,
+                    'user_id'   =>$user_data['id'],
+                    'price'     => $twitter->price,
+                    'ctime'     => time(),
+                ];
+                $order = Order::where(['ordernum'=>$twitter->ordernum,'status'=>1])->first();
+                if(empty($order)){ //微信线下返款
+                    $add_data['ordernum']='';
+                    $add_data['remark']  =$twitter->ordernum.'_线下交易';
+                }else{
+                    $add_data['ordernum']=$twitter->ordernum;
+                }
+                $recordRst = PayRecordDetail::firstOrCreate($add_data);
+                if($recordRst->wasRecentlyCreated){ //新增
+                    DB::table('nlsg_pay_to_twitter')->where([
+                        'id'=>$twitter->id,
+                    ])->update(['status'=>1]);
+                }
+            }
+
+        }
+        return $this->success();
+
+    }
+
 }
