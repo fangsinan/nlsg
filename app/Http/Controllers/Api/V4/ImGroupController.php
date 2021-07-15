@@ -26,6 +26,7 @@ class ImGroupController extends Controller
      *e
      * @apiParam {int} group_id   腾讯云的groupId
      * @apiParam {array} user_id  user_id  数组类型
+     * @apiParam {array} type  type==del删除  add添加
      * @apiParam {array} silence  type==del删除时Silence是否静默删人。0表示非静默删人，1表示静默删人
      * @apiParam {array} reason  type==del删除时踢出用户原因
      *
