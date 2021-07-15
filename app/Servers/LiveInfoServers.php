@@ -588,6 +588,9 @@ GROUP BY
             return ['code' => false, 'msg' => 'flag参数错误'];
         }
 
+        $phone = $params['phone'] ?? '';
+        $son = $params['son'] ?? '';
+
         if ($flag == 1) {
             $where_str = 'EXISTS';
         } else {
@@ -607,6 +610,14 @@ GROUP BY
         WHERE
             ( s.order_id > 9 OR s.channel_order_id > 0 )
             AND s.relation_id = $live_id";
+
+        if (!empty($phone)){
+            $sql .= " AND u.phone like '%$phone%' ";
+        }
+
+        if (!empty($son)){
+            $sql .= " AND lr.son like '%$son%' ";
+        }
 
         $son_flag = $params['son_flag'] ?? '';
         if (!empty($son_flag)){
