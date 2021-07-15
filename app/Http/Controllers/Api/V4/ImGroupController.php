@@ -98,6 +98,7 @@ class ImGroupController extends Controller
      * @apiParam {int} group_id   腾讯云的groupId
      * @apiParam {array} user_id  user_id
      * @apiParam {int} shut_up_time  禁言时长  0解禁 其他表示禁言
+     * @apiParam {int} type  是否全员 1是
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -115,6 +116,14 @@ class ImGroupController extends Controller
             return $this->error('0','request error');
         }
         $shut_up_time = empty($params['shut_up_time']) ?0 : $params['shut_up_time'];
+
+        if( $params['type'] == 1 ){
+            //全员禁言/解禁
+            ImGroup::where([
+                'group_id' =>$params['GroupId'],
+            ])->update(['shut_up_time'=>$shut_up_time]);
+        }
+
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/forbid_send_msg");
         $post_data = [
             'GroupId' => $params['group_id'],
@@ -164,8 +173,13 @@ class ImGroupController extends Controller
         $res = ImClient::curlPost($url,json_encode($post_data));
         $res = json_decode($res,true);
 
+
+        $group_shut_up_time = ImGroup::where([
+            'group_id' =>$params['group_id'],
+        ])->value('shut_up_time');
+
         if ($res['ActionStatus'] == 'OK'){
-            return $this->success($res['ShuttedUinList']);
+            return $this->success(['ShuttedUinList'=>$res['ShuttedUinList'],'all_shut_up_time'=>$group_shut_up_time ]);
         }else{
             return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
         }
