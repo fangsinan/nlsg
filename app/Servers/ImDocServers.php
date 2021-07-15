@@ -157,6 +157,10 @@ class ImDocServers
                 if (in_array($jobModel->is_done, [2, 3])) {
                     return ['code' => false, 'msg' => '发送中和已完成的任务无法编辑'];
                 }
+
+                if ($jobModel->user_id != $user_id) {
+                    return ['code' => false, 'msg' => '任务只有创建人自己能编辑'];
+                }
             }
             $job_str .= '修改:';
         } else {
@@ -212,6 +216,7 @@ class ImDocServers
         $jobModel->send_type = $send_type;
         $jobModel->send_at = $send_at;
         $jobModel->is_done = 1;
+        $jobModel->user_id = $user_id;
 
         $job_str .= "id($doc_id),send_type($send_type),info(" . json_encode($info) . ")";
 
@@ -260,7 +265,37 @@ class ImDocServers
     {
         $size = $params['size'] ?? 10;
 
-        $query = ImDocSendJob::query()->with(['docInfo', 'jobInfo']);
+        $query = ImDocSendJob::query()->with(['docInfo', 'jobInfo'])->where('status', '<>', 3);
+
+        $send_obj_type = $params['send_obj_type'] ?? 0;
+        $send_obj_id = $params['send_obj_id'] ?? 0;
+        $doc_type = $params['doc_type'] ?? 0;
+        $doc_type_info = $params['doc_type_info'] ?? 0;
+        $is_done = $params['is_done'] ?? 0;
+
+        if (!empty($send_obj_type)) {
+            $query->whereHas('jobInfo', function ($q) use ($send_obj_type) {
+                $q->where('send_obj_type', '=', $send_obj_type);
+            });
+        }
+        if (!empty($send_obj_id)) {
+            $query->whereHas('jobInfo', function ($q) use ($send_obj_id) {
+                $q->where('send_obj_id', '=', $send_obj_id);
+            });
+        }
+        if (!empty($doc_type)) {
+            $query->whereHas('docInfo', function ($q) use ($doc_type) {
+                $q->where('type', '=', $doc_type);
+            });
+        }
+        if (!empty($doc_type_info)) {
+            $query->whereHas('docInfo', function ($q) use ($doc_type_info) {
+                $q->where('type_info', '=', $doc_type_info);
+            });
+        }
+        if (!empty($is_done)) {
+            $query->where('is_done', '=', $is_done);
+        }
 
 
         $query->select([
@@ -270,9 +305,67 @@ class ImDocServers
         return $query->paginate($size);
     }
 
-    public function changeJobStatus($params)
+    public function changeJobStatus($params, $user_id)
     {
+        if (!empty($params['id'] ?? 0)) {
+            $jobModel = ImDocSendJob::where('id', '=', $params['id'])
+                ->whereIn('status', [1, 2])
+                ->select(['id'])->first();
+            if (empty($jobModel)) {
+                return ['code' => false, 'msg' => 'id错误'];
+            } else {
+                if (in_array($jobModel->is_done, [2, 3])) {
+                    return ['code' => false, 'msg' => '发送中和已完成的任务无法编辑'];
+                }
 
+                if ($jobModel->user_id != $user_id) {
+                    return ['code' => false, 'msg' => '任务只有创建人自己能编辑'];
+                }
+            }
+
+            $job_str = '修改:id($jobModel->id)';
+
+            $flag = $params['flag'] ?? '';
+            switch ($flag) {
+                case 'on':
+                    $jobModel->status = 1;
+                    break;
+                case 'off':
+                    $jobModel->status = 2;
+                    break;
+                case 'del':
+                    $jobModel->status = 3;
+                    break;
+                default:
+                    return ['code' => false, 'msg' => '参数错误'];
+            }
+
+            $job_str .= "flag($flag)";
+
+            DB::beginTransaction();
+
+            $res = $jobModel->save();
+            if ($res == false) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败' . __LINE__];
+            }
+
+            $logModel = new imDocSendJobLog();
+            $logModel->job_id = $jobModel->id;
+            $logModel->user_id = $user_id;
+            $logModel->record = $job_str;
+            $log_res = $logModel->save();
+            if ($log_res == false) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败' . __LINE__];
+            }
+
+            DB::commit();
+            return ['code' => true, 'msg' => '成功'];
+
+        } else {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
         return $params;
     }
 
