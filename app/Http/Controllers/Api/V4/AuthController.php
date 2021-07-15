@@ -122,21 +122,21 @@ class AuthController extends Controller
         } else {
             $user->level = 0;
         }
+        $data = $this->get_data($user,$token);
 
-        $data = [
-            'id' => $user->id,
-            'token' => $token,
-            'nickname' => $user->nickname,
-            'headimg' => $user->headimg ?? '',
-            'phone' => $user->phone,
-            'level' => $user->level,
-            'sex' => $user->sex,
-            'children_age' => 10,//$user->children_age,
-            'push'  => $user->push
-        ];
+//        $data = [
+//            'id' => $user->id,
+//            'token' => $token,
+//            'nickname' => $user->nickname,
+//            'headimg' => $user->headimg ?? '',
+//            'phone' => $user->phone,
+//            'level' => $user->level,
+//            'sex' => $user->sex,
+//            'children_age' => 10,//$user->children_age,
+//            'push'  => $user->push
+//        ];
         return success($data);
     }
-
 
     /**
      * @api {get} api/v4/auth/logout 退出
@@ -201,17 +201,17 @@ class AuthController extends Controller
         } else {
             $user->level = 0;
         }
-
-        $data = [
-            'id' => $user->id,
-            'token' => $token,
-            'nickname' => $user->nickname,
-            'headimg' => $user->headimg ?? '',
-            'phone' => $user->phone,
-            'level' => $user->level,
-            'sex' => $user->sex,
-            'children_age' => 10,//$user->children_age,
-        ];
+        $data = $this->get_data($user,$token);
+//        $data = [
+//            'id' => $user->id,
+//            'token' => $token,
+//            'nickname' => $user->nickname,
+//            'headimg' => $user->headimg ?? '',
+//            'phone' => $user->phone,
+//            'level' => $user->level,
+//            'sex' => $user->sex,
+//            'children_age' => 10,//$user->children_age,
+//        ];
         return success($data);
     }
 
@@ -286,16 +286,20 @@ class AuthController extends Controller
             }
         }
         $token = auth('api')->login($user);
-        $arra = [
-            'id' => $user->id,
-            'token' => $token,
-            'sex' => $user->sex,
-            'children_age' => 10,//$user->children_age,
-        ];
+        $arra = $this->get_data($user,$token);
+//        $arra = [
+//            'id' => $user->id,
+//            'token' => $token,
+//            'sex' => $user->sex,
+//            'children_age' => 10,//$user->children_age,
+//        ];
         return success($arra);
 
 
     }
+
+
+
 
 
     /**
@@ -546,6 +550,7 @@ class AuthController extends Controller
 
     }
 
+
     /**
      * @api {get} api/v4/auth/sms 发送验证码
      * @apiVersion 4.0.0
@@ -647,7 +652,23 @@ class AuthController extends Controller
         } else {
             $user->level = 0;
         }
-        $data = [
+        $data = $this->get_data($user,$token);
+//        $data = [
+//            'id' => $user->id,
+//            'token' => $token,
+//            'nickname' => $user->nickname,
+//            'headimg' => $user->headimg ?? '',
+//            'phone' => $user->phone,
+//            'level' => $user->level,
+//            'sex' => $user->sex,
+//            'children_age' => 10,//$user->children_age,
+//        ];
+        return success($data);
+    }
+    //登录返回字段
+    function get_data($user,$token){
+
+        return  [
             'id' => $user->id,
             'token' => $token,
             'nickname' => $user->nickname,
@@ -655,9 +676,9 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'level' => $user->level,
             'sex' => $user->sex,
+            'is_staff' => $user->is_staff,
             'children_age' => 10,//$user->children_age,
         ];
-        return success($data);
     }
 
     // JWT 验证
