@@ -6,10 +6,10 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Column;
+use App\Models\Live;
 use App\Models\MallCategory;
 use App\Models\MallGoods;
 use App\Models\Works;
-use App\Models\Live;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use App\Servers\ImDocServers;
@@ -24,7 +24,7 @@ class ImDocController extends ControllerBackend
      * @apiName  list
      * @apiGroup 后台-社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/add
-     * @apiDescription 社群文案
+     * @apiDescription 添加文案
      *
      * @apiParam {number=1,2,3} type 类型(1商品 2附件 3文本)
      * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 21音频 22视频 23图片 31文本)
@@ -36,7 +36,7 @@ class ImDocController extends ControllerBackend
     public function add(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->add($request->input(),$this->user['user_id']);
+        $data = $servers->add($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
 
@@ -46,7 +46,7 @@ class ImDocController extends ControllerBackend
      * @apiName  list
      * @apiGroup 后台-社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/list
-     * @apiDescription 社群文案
+     * @apiDescription 文案列表
      */
     public function list(Request $request)
     {
@@ -63,18 +63,30 @@ class ImDocController extends ControllerBackend
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/change_status
      * @apiParam {number} id id
      * @apiParam {string=del} flag 动作(del:删除)
-     * @apiDescription 社群文案
+     * @apiDescription 文案状态修改
      */
     public function changeStatus(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->changeStatus($request->input(),$this->user['user_id']);
+        $data = $servers->changeStatus($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
 
     /**
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse{
+     * @api {put} api/admin_v4/im_doc/job_add 添加发送任务
+     * @apiVersion 4.0.0
+     * @apiName  api/admin_v4/im_doc/job_add
+     * @apiGroup 后台-社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/job_add
+     * @apiParam {number} doc_id 文案id
+     * @apiParam {number=1,2} send_type 发送时间类型(1立刻 2定时)
+     * @apiParam {string} [send_at] 定时时间
+     * @apiParam {string[]} info 对象列表
+     * @apiParam {string=1,2,3} info.send_obj_type 目标对象类型(1群组 2个人 3标签)
+     * @apiParam {string} info.send_obj_id 目标id
+     * @apiDescription 添加发送任务
+     * @apiParamExample {json} Request-Example:
+     * {
      * "doc_id": 1,
      * "send_type": 1,
      * "send_at": "",
@@ -115,8 +127,25 @@ class ImDocController extends ControllerBackend
     }
 
     /**
-     * 选择商品分类
-     * @return \Illuminate\Http\JsonResponse
+     * @api {get} api/admin_v4/im_doc/category 分类
+     * @apiVersion 4.0.0
+     * @apiName  im_doc
+     * @apiGroup 后台-分类筛选
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/category
+     * @apiDescription 分类的列表
+     *
+     * @apiParam {number} category_id 分类id 0为全部
+     * @apiParam {number} type   类型  1.精品课 2 讲座 3 商品 4 直播 5训练营 6幸福360
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
      */
     public function getCategory()
     {
@@ -130,35 +159,35 @@ class ImDocController extends ControllerBackend
         $goods_category = $mall->getUsedList();
 
         $data = [
-            'works'   => [
-                'type'     => 1,
-                'name'     => '精品课',
+            'works' => [
+                'type' => 1,
+                'name' => '精品课',
                 'category' => $works_category
             ],
             'lecture' => [
                 'type' => 2,
                 'name' => '讲座'
             ],
-            'goods'   => [
-                'type'     => 3,
-                'name'     => '商品',
+            'goods' => [
+                'type' => 3,
+                'name' => '商品',
                 'category' => $goods_category
             ],
-            'live'    => [
-                'name'     => '直播训练营',
+            'live' => [
+                'name' => '直播训练营',
                 'category' => [
                     [
-                        'id'   => '100001',
+                        'id' => '100001',
                         'type' => 4,
                         'name' => '直播'
                     ],
                     [
-                        'id'   => '100002',
+                        'id' => '100002',
                         'type' => 5,
                         'name' => '训练营'
                     ],
                     [
-                        'id'   => '100003',
+                        'id' => '100003',
                         'type' => 6,
                         'name' => '幸福360'
                     ],
@@ -175,7 +204,7 @@ class ImDocController extends ControllerBackend
      * @api {get} api/admin_v4/im_doc/category/product 分类筛选的列表
      * @apiVersion 4.0.0
      * @apiName  im_doc
-     * @apiGroup 后台-分类筛选的列表
+     * @apiGroup 后台-分类筛选
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/category/product
      * @apiDescription 分类筛选的列表
      *
@@ -203,20 +232,20 @@ class ImDocController extends ControllerBackend
                 $cate_id_arr = [];
                 $cate_data = WorksCategory::find($category_id);
                 if ($cate_data['level'] == 1) {
-                    $cate_arr = WorksCategory::select('id')->where(['pid'    => $cate_data['id'], 'status' => 1
+                    $cate_arr = WorksCategory::select('id')->where(['pid' => $cate_data['id'], 'status' => 1
                     ])->get()->toArray();
                     $cate_id_arr = array_column($cate_arr, 'id');
                 }
 
                 $where = [
-                    'works.status'        => 4,
-                    'works.type'          => 2,
+                    'works.status' => 4,
+                    'works.type' => 2,
                     'works.is_audio_book' => 0
                 ];
                 $relationObj = new WorksCategoryRelation();
                 $worksObj = new Works();
                 $query = DB::table($relationObj->getTable(), ' relation')
-                    ->leftJoin($worksObj->getTable().' as works', 'works.id', '=', 'relation.work_id')
+                    ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
                     ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price',
                         'works.original_price', 'works.subtitle',
                         'works.works_update_time', 'works.detail_img', 'works.content', 'relation.id as relation_id',
