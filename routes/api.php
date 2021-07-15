@@ -391,6 +391,15 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('im_group/edit_join_group', 'ImGroupController@editJoinGroup');
         Route::post('im_group/forbid_send_msg', 'ImGroupController@forbidSendMsg');
 
+
+        //im文案部分
+        Route::get('im_doc/list', 'ImDocController@list');
+        Route::post('im_doc/add', 'ImDocController@add');
+        Route::put('im_doc/change_status', 'ImDocController@changeStatus');
+        Route::get('im_doc/job_list', 'ImDocController@sendJobList');
+        Route::post('im_doc/job_add', 'ImDocController@addSendJob');
+        Route::put('im_doc/change_job_status', 'ImDocController@changeJobStatus');
+
     });
 
     //IM

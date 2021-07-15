@@ -36,7 +36,7 @@ class ImDocController extends ControllerBackend
     public function add(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->add($request->input());
+        $data = $servers->add($request->input(),$this->user['user_id']);
         return $this->getRes($data);
     }
 
@@ -68,7 +68,7 @@ class ImDocController extends ControllerBackend
     public function changeStatus(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->changeStatus($request->input());
+        $data = $servers->changeStatus($request->input(),$this->user['user_id']);
         return $this->getRes($data);
     }
 

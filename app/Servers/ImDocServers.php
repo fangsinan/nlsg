@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class ImDocServers
 {
-    public function add($params)
+    public function add($params,$user_id)
     {
         if (!empty($params['id'] ?? 0)) {
             $docModel = ImDoc::where('id', '=', $params['id'])
@@ -79,6 +79,7 @@ class ImDocServers
         $docModel->content = $content;
         $docModel->file_url = $file_url;
         $docModel->status = $status;
+        $docModel->user_id = $user_id;
 
         $res = $docModel->save();
 
@@ -108,7 +109,7 @@ class ImDocServers
         return $query->paginate($size);
     }
 
-    public function changeStatus($params)
+    public function changeStatus($params,$user_id)
     {
         $id = $params['id'] ?? 0;
         $flag = $params['flag'] ?? '';
