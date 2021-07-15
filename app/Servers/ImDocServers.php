@@ -9,19 +9,19 @@ use App\Models\Column;
 use App\Models\ImDoc;
 use App\Models\ImDocSendJob;
 use App\Models\ImDocSendJobInfo;
+use App\Models\imDocSendJobLog;
 use App\Models\Live;
 use App\Models\MallCategory;
 use App\Models\MallGoods;
 use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ImDocServers
 {
-    public function add($params,$user_id)
+    public function add($params, $user_id)
     {
         if (!empty($params['id'] ?? 0)) {
             $docModel = ImDoc::where('id', '=', $params['id'])
@@ -119,7 +119,7 @@ class ImDocServers
         return $query->paginate($size);
     }
 
-    public function changeStatus($params,$user_id)
+    public function changeStatus($params, $user_id)
     {
         $id = $params['id'] ?? 0;
         $flag = $params['flag'] ?? '';
@@ -143,8 +143,10 @@ class ImDocServers
         }
     }
 
-    public function addSendJob($params)
+    public function addSendJob($params, $user_id)
     {
+        $job_str = '';
+
         if (!empty($params['id'] ?? 0)) {
             $jobModel = ImDocSendJob::where('id', '=', $params['id'])
                 ->whereIn('status', [1, 2])
@@ -156,8 +158,10 @@ class ImDocServers
                     return ['code' => false, 'msg' => '发送中和已完成的任务无法编辑'];
                 }
             }
+            $job_str .= '修改:';
         } else {
             $jobModel = new ImDocSendJob();
+            $job_str .= '添加:';
         }
 
         $doc_id = $params['doc_id'] ?? 0;
@@ -181,7 +185,7 @@ class ImDocServers
                     return ['code' => false, 'msg' => '发送时间错误' . $temp_line];
                 }
             }
-        }else{
+        } else {
             $send_at = date('Y-m-d H:i:s');
         }
 
@@ -209,6 +213,9 @@ class ImDocServers
         $jobModel->send_at = $send_at;
         $jobModel->is_done = 1;
 
+        $job_str .= "id($doc_id),send_type($send_type),info(" . json_encode($info) . ")";
+
+
         DB::beginTransaction();
 
         $job_ers = $jobModel->save();
@@ -235,13 +242,32 @@ class ImDocServers
             return ['code' => false, 'msg' => '失败' . __LINE__];
         }
 
+        $logModel = new imDocSendJobLog();
+        $logModel->job_id = $jobModel->id;
+        $logModel->user_id = $user_id;
+        $logModel->record = $job_str;
+        $log_res = $logModel->save();
+        if ($log_res == false) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败' . __LINE__];
+        }
+
         DB::commit();
         return ['code' => true, 'msg' => '成功'];
     }
 
     public function sendJobList($params)
     {
-        return $params;
+        $size = $params['size'] ?? 10;
+
+        $query = ImDocSendJob::query()->with(['docInfo', 'jobInfo']);
+
+
+        $query->select([
+            'id', 'doc_id', 'created_at', 'status', 'send_type', 'is_done', 'success_at'
+        ]);
+
+        return $query->paginate($size);
     }
 
     public function changeJobStatus($params)
@@ -250,7 +276,8 @@ class ImDocServers
         return $params;
     }
 
-    public function getCategoryProduct($params){
+    public function getCategoryProduct($params)
+    {
         $category_id = $params['category_id'] ?? 0;//0 为全部
         $type = $params['type'] ?? 0;
         switch ($type) {
@@ -330,7 +357,8 @@ class ImDocServers
         return $lists ?? [];
     }
 
-    public function getCategory(){
+    public function getCategory()
+    {
         $cache_key_name = 'works_category_list';
         $expire_num = CacheTools::getExpire('goods_category_list');
         $works_category = Cache::get($cache_key_name);

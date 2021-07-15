@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class ImDocController extends Controller
 {
     /**
-     * @api {post} api/v4/im_doc/add 添加文案
+     * @api {post} api/v4/im_doc/add 废弃(添加文案)
      * @apiVersion 4.0.0
      * @apiName  list
      * @apiGroup 社群文案
@@ -33,7 +33,7 @@ class ImDocController extends Controller
     }
 
     /**
-     * @api {get} api/v4/im_doc/list 文案列表
+     * @api {get} api/v4/im_doc/list 废弃(文案列表)
      * @apiVersion 4.0.0
      * @apiName  list
      * @apiGroup 社群文案
@@ -48,7 +48,7 @@ class ImDocController extends Controller
     }
 
     /**
-     * @api {put} api/v4/im_doc/change_status 文案状态修改
+     * @api {put} api/v4/im_doc/change_status 废弃(文案状态修改)
      * @apiVersion 4.0.0
      * @apiName  list
      * @apiGroup 社群文案
@@ -67,7 +67,7 @@ class ImDocController extends Controller
 
 
     /**
-     * @api {put} api/v4/im_doc/job_add 添加发送任务
+     * @api {put} api/v4/im_doc/job_add 废弃(添加发送任务)
      * @apiVersion 4.0.0
      * @apiName  api/v4/im_doc/job_add
      * @apiGroup 社群文案

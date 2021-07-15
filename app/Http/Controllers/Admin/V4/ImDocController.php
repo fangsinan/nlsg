@@ -98,7 +98,7 @@ class ImDocController extends ControllerBackend
     public function addSendJob(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->addSendJob($request->input());
+        $data = $servers->addSendJob($request->input(),$this->user['id']);
         return $this->getRes($data);
     }
 
