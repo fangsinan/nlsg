@@ -1617,6 +1617,7 @@ class ClassController extends ControllerBackend
         $show_info_num = $input['show_info_num'] ?? 0;
         $online_time   = $input['online_time'] ?? 0;
         $info_column_id= $input['info_column_id'] ?? 0;
+        $subscribe_num = $input['subscribe_num'] ?? 0;
 
         $data = [
             'index_pic'      => $index_pic,
