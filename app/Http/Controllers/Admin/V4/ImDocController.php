@@ -113,7 +113,6 @@ class ImDocController extends ControllerBackend
      * @apiParam {number=0,1,2,3,4} is_done 发送结果(1待发送  2发送中 3已完成 4无任务)
      * @apiParam {number=1,2,3} send_obj_type 发送目标类型(1群组 2个人 3标签)
      * @apiParam {number} send_obj_id 发送目标id
-     * @apiParamExample {json} Request-Example:
      */
     public function sendJobList(Request $request)
     {
@@ -131,7 +130,6 @@ class ImDocController extends ControllerBackend
      * @apiParam {number} id 任务id
      * @apiParam {string=on,off,del} flag 动作
      * @apiDescription 发送任务状态修改
-     * @apiParamExample {json} Request-Example:
      */
     public function changeJobStatus(Request $request)
     {
