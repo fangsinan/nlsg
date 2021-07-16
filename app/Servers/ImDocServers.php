@@ -45,6 +45,8 @@ class ImDocServers
         $cover_img = $params['cover_img'] ?? '';
         $status = $params['status'] ?? 1;
         $file_url = $params['file_url'] ?? '';
+        $for_app = $params['for_app'] ?? 0;
+
         if (!in_array($status, [1, 2])) {
             return ['code' => false, 'msg' => '状态错误'];
         }
@@ -91,13 +93,32 @@ class ImDocServers
         $docModel->status = $status;
         $docModel->user_id = $user_id;
 
-        $res = $docModel->save();
+        DB::beginTransaction();
 
-        if ($res) {
-            return ['code' => true, 'msg' => '成功'];
-        } else {
+        $res = $docModel->save();
+        if ($res === false) {
+            DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
+
+        if ($for_app == 1) {
+            $jobModel = new ImDocSendJob();
+            $jobModel->doc_id = $docModel->id;
+            $jobModel->status = 2;
+            $jobModel->send_type = 3;
+            $jobModel->is_done = 4;
+            $jobModel->month = date('Y-m');
+            $jobModel->day = date('Y-m-d');
+            $job_res = $jobModel->save();
+            if ($job_res === false) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败'];
+            }
+        }
+
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
+
     }
 
     public function list($params)
@@ -173,8 +194,8 @@ class ImDocServers
         $send_at = $params['send_at'] ?? '';
         $info = $params['info'] ?? [];
         $now = time();
-        $month = date('Y-m',$now);
-        $day = date('Y-m-d',$now);
+        $month = date('Y-m', $now);
+        $day = date('Y-m-d', $now);
 
         $check_doc = ImDoc::where('id', '=', $doc_id)->where('status', '=', 1)->first();
         if (empty($check_doc)) {
@@ -192,8 +213,8 @@ class ImDocServers
                     return ['code' => false, 'msg' => '发送时间错误' . $temp_line];
                 }
             }
-            $month = date('Y-m',strtotime($send_at));
-            $day = date('Y-m-d',strtotime($send_at));
+            $month = date('Y-m', strtotime($send_at));
+            $day = date('Y-m-d', strtotime($send_at));
         } else {
             $send_at = date('Y-m-d H:i:s');
         }
@@ -284,15 +305,15 @@ class ImDocServers
             $query->whereHas('jobInfo', function ($q) use ($send_obj_type) {
                 $q->where('send_obj_type', '=', $send_obj_type);
             });
-        }else{
-            return ['code'=>false,'msg'=>'目标类型参数无效'];
+        } else {
+            return ['code' => false, 'msg' => '目标类型参数无效'];
         }
         if (!empty($send_obj_id)) {
             $query->whereHas('jobInfo', function ($q) use ($send_obj_id) {
                 $q->where('send_obj_id', '=', $send_obj_id);
             });
-        }else{
-            return ['code'=>false,'msg'=>'目标id参数无效'];
+        } else {
+            return ['code' => false, 'msg' => '目标id参数无效'];
         }
         if (!empty($doc_type)) {
             $query->whereHas('docInfo', function ($q) use ($doc_type) {
@@ -314,6 +335,68 @@ class ImDocServers
         ]);
 
         return $query->paginate($size);
+    }
+
+    //app的文案列表
+    public function sendJobListForApp($params)
+    {
+        $send_obj_type = $params['send_obj_type'] ?? 0;
+        $send_obj_id = $params['send_obj_id'] ?? 0;
+        $size = $params['size'] ?? 10;
+        $page = $params['page'] ?? 1;
+        $offset = ($page - 1) * $size;
+
+        if (empty($send_obj_type) || empty($send_obj_id)) {
+            return ['code' => false, 'msg' => '目标id参数无效'];
+        }
+
+        $job_id_list = ImDocSendJobInfo::query()
+            ->where('send_obj_type', '=', $send_obj_type)
+            ->where('send_obj_id', '=', $send_obj_id)
+            ->pluck('job_id')
+            ->toArray();
+
+        $month_list = ImDocSendJob::query()
+            ->where(function ($q) use ($job_id_list) {
+                $q->whereIn('id', $job_id_list)
+                    ->orWhere('send_type', '=', 3);
+            })
+            ->whereIn('status', [1, 2])
+            ->groupBy('month')
+            ->orderBy('month', 'desc')
+            ->limit($size)
+            ->offset($offset)
+            ->pluck('month')
+            ->toArray();
+
+        if (empty($month_list)) {
+            return [];
+        }
+
+        $list = [];
+        foreach ($month_list as $v) {
+            $temp_list = [];
+            $temp_list['month'] = $v;
+            $temp_list['list'] = ImDocSendJob::query()
+                ->with(['docInfo', 'jobInfo'])
+                ->where(function ($q) use ($job_id_list) {
+                    $q->whereIn('id', $job_id_list)
+                        ->orWhere('send_type', '=', 3);
+                })
+                ->where('month','=',$v)
+                ->where('status', '<>', 3)
+                ->select([
+                    'id', 'doc_id', 'created_at', 'status', 'send_type', 'is_done', 'success_at'
+                ])->get();
+            $list[] = $temp_list;
+        }
+
+
+        return $list;
+
+        return $job_id_list;
+
+
     }
 
     public function changeJobStatus($params, $user_id)

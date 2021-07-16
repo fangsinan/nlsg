@@ -10,12 +10,12 @@ use Illuminate\Http\Request;
 class ImDocController extends Controller
 {
     /**
-     * @api {post} api/admin_v4/im_doc/add 添加文案
+     * @api {post} api/admin_v4/im_doc/add (废弃)添加文案
      * @apiVersion 4.0.0
      * @apiName  api/v4/im_doc/add
      * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/add
-     * @apiDescription 添加文案
+     * @apiDescription (废弃)添加文案
      *
      * @apiParam {number=1,2,3} type 类型(1商品 2附件 3文本)
      * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 21音频 22视频 23图片 31文本)
@@ -32,7 +32,30 @@ class ImDocController extends Controller
     }
 
     /**
-     * @api {get} api/v4/im_doc/list 文案列表
+     * @api {post} api/admin_v4/im_doc/add_for_app 添加文案
+     * @apiVersion 4.0.0
+     * @apiName  api/v4/im_doc/add_for_app
+     * @apiGroup 社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/add_for_app
+     * @apiDescription 添加文案
+     *
+     * @apiParam {number=1,2,3} type 类型(1商品 2附件 3文本)
+     * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 21音频 22视频 23图片 31文本)
+     * @apiParam {number} [obj_id]  目标id(当type=1时需要传)
+     * @apiParam {string} content   内容或名称
+     * @apiParam {string} [file_url]  附件地址,当type=2时需要传
+     *
+     */
+    public function addForApp(Request $request){
+        $servers = new ImDocServers();
+        $params = $request->input();
+        $params['for_app'] = 1;
+        $data = $servers->add($params, $this->user['id']);
+        return $this->getRes($data);
+    }
+
+    /**
+     * @api {get} api/v4/im_doc/list (废弃)文案列表
      * @apiVersion 4.0.0
      * @apiName  api/v4/im_doc/list
      * @apiGroup 社群文案
@@ -101,7 +124,7 @@ class ImDocController extends Controller
     }
 
     /**
-     * @api {post} api/v4/im_doc/job_list 发送任务列表
+     * @api {post} api/v4/im_doc/job_list (废弃)发送任务列表
      * @apiVersion 4.0.0
      * @apiName  api/v4/im_doc/job_list
      * @apiGroup 社群文案
@@ -116,6 +139,13 @@ class ImDocController extends Controller
     {
         $servers = new ImDocServers();
         $data = $servers->sendJobList($request->input());
+        return $this->getRes($data);
+    }
+
+    public function sendJobListForApp(Request $request)
+    {
+        $servers = new ImDocServers();
+        $data = $servers->sendJobListForApp($request->input());
         return $this->getRes($data);
     }
 
