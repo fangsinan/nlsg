@@ -27,7 +27,7 @@ class ImMsg extends Base
 
 
         $query = ImMsg::with([
-            'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data Data',
+            'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data',
             ])->select('id','msg_seq','msg_time');
         if(!empty($ids) ){
             return $query->whereIn('id',$ids)->get()->toArray();

@@ -178,7 +178,7 @@ class ImMsgController extends Controller
     }
      */
     public function MsgCollectionList(Request $request){
-        $request->input('user_id', 0);  //消息序列号
+        //$request->input('user_id', 0);  //消息序列号
         $uid = $this->user['id'];
 
         $collectionList = ImCollection::select("id","user_id","msg_id")->where([
