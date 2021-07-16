@@ -13,7 +13,7 @@ class ImDocController extends ControllerBackend
     /**
      * @api {post} api/admin_v4/im_doc/add 添加文案
      * @apiVersion 4.0.0
-     * @apiName  list
+     * @apiName  api/admin_v4/im_doc/add
      * @apiGroup 后台-社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/add
      * @apiDescription 添加文案
@@ -35,7 +35,7 @@ class ImDocController extends ControllerBackend
     /**
      * @api {get} api/admin_v4/im_doc/list 文案列表
      * @apiVersion 4.0.0
-     * @apiName  list
+     * @apiName  api/admin_v4/im_doc/list
      * @apiGroup 后台-社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/list
      * @apiDescription 文案列表
@@ -50,7 +50,7 @@ class ImDocController extends ControllerBackend
     /**
      * @api {put} api/admin_v4/im_doc/change_status 文案状态修改
      * @apiVersion 4.0.0
-     * @apiName  list
+     * @apiName  api/admin_v4/im_doc/change_status
      * @apiGroup 后台-社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/change_status
      * @apiParam {number} id id
@@ -122,11 +122,11 @@ class ImDocController extends ControllerBackend
     }
 
     /**
-     * @api {post} api/admin_v4/im_doc/job_list 发送任务状态修改
+     * @api {post} api/admin_v4/im_doc/change_job_status 发送任务状态修改
      * @apiVersion 4.0.0
-     * @apiName  api/admin_v4/im_doc/job_list
+     * @apiName  api/admin_v4/im_doc/change_job_status
      * @apiGroup 后台-社群文案
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/job_list
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/change_job_status
      * @apiParam {number} id 任务id
      * @apiParam {string=on,off,del} flag 动作
      * @apiDescription 发送任务状态修改
@@ -141,7 +141,7 @@ class ImDocController extends ControllerBackend
     /**
      * @api {get} api/admin_v4/im_doc/category 分类
      * @apiVersion 4.0.0
-     * @apiName  im_doc
+     * @apiName  api/admin_v4/im_doc/category
      * @apiGroup 后台-社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/category
      * @apiDescription 分类的列表
@@ -169,7 +169,7 @@ class ImDocController extends ControllerBackend
     /**
      * @api {get} api/admin_v4/im_doc/category/product 分类筛选的商品列表
      * @apiVersion 4.0.0
-     * @apiName  im_doc
+     * @apiName  api/admin_v4/im_doc/category/product
      * @apiGroup 后台-社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/category/product
      * @apiDescription 分类筛选的商品列表
