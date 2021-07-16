@@ -400,6 +400,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('im_doc/job_add', 'ImDocController@addSendJob');
         Route::put('im_doc/change_job_status', 'ImDocController@changeJobStatus');
 
+        //im选择商品
+        Route::get('im_doc/category', 'ImDocController@getCategory');
+        Route::get('im_doc/category/product', 'ImDocController@getCategoryProduct');
+
     });
     Route::post('im_group/forbid_msg_list', 'ImGroupController@forbidMsgList');
 

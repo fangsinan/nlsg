@@ -3,7 +3,6 @@
 
 namespace App\Http\Controllers\Api\V4;
 
-
 use App\Http\Controllers\Controller;
 use App\Servers\ImDocServers;
 use Illuminate\Http\Request;
@@ -11,12 +10,12 @@ use Illuminate\Http\Request;
 class ImDocController extends Controller
 {
     /**
-     * @api {post} api/v4/im_doc/add 废弃(添加文案)
+     * @api {post} api/admin_v4/im_doc/add 添加文案
      * @apiVersion 4.0.0
-     * @apiName  list
+     * @apiName  api/v4/im_doc/add
      * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/add
-     * @apiDescription 社群文案
+     * @apiDescription 添加文案
      *
      * @apiParam {number=1,2,3} type 类型(1商品 2附件 3文本)
      * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 21音频 22视频 23图片 31文本)
@@ -28,17 +27,17 @@ class ImDocController extends Controller
     public function add(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->add($request->input(),$this->user['user_id']);
+        $data = $servers->add($request->input(), $this->user['id']);
         return $this->getRes($data);
     }
 
     /**
-     * @api {get} api/v4/im_doc/list 废弃(文案列表)
+     * @api {get} api/v4/im_doc/list 文案列表
      * @apiVersion 4.0.0
-     * @apiName  list
+     * @apiName  api/v4/im_doc/list
      * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/list
-     * @apiDescription 社群文案
+     * @apiDescription 文案列表
      */
     public function list(Request $request)
     {
@@ -48,26 +47,24 @@ class ImDocController extends Controller
     }
 
     /**
-     * @api {put} api/v4/im_doc/change_status 废弃(文案状态修改)
+     * @api {put} api/v4/im_doc/change_status 文案状态修改
      * @apiVersion 4.0.0
-     * @apiName  list
+     * @apiName  api/v4/im_doc/change_status
      * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/change_status
      * @apiParam {number} id id
      * @apiParam {string=del} flag 动作(del:删除)
-     * @apiDescription 社群文案
+     * @apiDescription 文案状态修改
      */
     public function changeStatus(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->changeStatus($request->input(),$this->user['user_id']);
+        $data = $servers->changeStatus($request->input(), $this->user['id']);
         return $this->getRes($data);
     }
 
-
-
     /**
-     * @api {put} api/v4/im_doc/job_add 废弃(添加发送任务)
+     * @api {post} api/v4/im_doc/job_add 添加发送任务
      * @apiVersion 4.0.0
      * @apiName  api/v4/im_doc/job_add
      * @apiGroup 社群文案
@@ -96,19 +93,53 @@ class ImDocController extends Controller
      * ]
      * }
      */
-    //添加发送任务
     public function addSendJob(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->addSendJob($request->input());
+        $data = $servers->addSendJob($request->input(), $this->user['id']);
         return $this->getRes($data);
     }
 
+    /**
+     * @api {post} api/v4/im_doc/job_list 发送任务列表
+     * @apiVersion 4.0.0
+     * @apiName  api/v4/im_doc/job_list
+     * @apiGroup 社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/job_list
+     * @apiParam {number=1,2,3} doc_type 文案类型(1商品 2附件 3文本)
+     * @apiParam {number} doc_type_info 文案类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营21音频 22视频 23图片 31文本)
+     * @apiParam {number=0,1,2,3,4} is_done 发送结果(1待发送  2发送中 3已完成 4无任务)
+     * @apiParam {number=1,2,3} send_obj_type 发送目标类型(1群组 2个人 3标签)
+     * @apiParam {number} send_obj_id 发送目标id
+     */
+    public function sendJobList(Request $request)
+    {
+        $servers = new ImDocServers();
+        $data = $servers->sendJobList($request->input());
+        return $this->getRes($data);
+    }
+
+    /**
+     * @api {put} api/v4/im_doc/change_job_status 发送任务状态修改
+     * @apiVersion 4.0.0
+     * @apiName  api/v4/im_doc/change_job_status
+     * @apiGroup 社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/change_job_status
+     * @apiParam {number} id 任务id
+     * @apiParam {string=on,off,del} flag 动作
+     * @apiDescription 发送任务状态修改
+     */
+    public function changeJobStatus(Request $request)
+    {
+        $servers = new ImDocServers();
+        $data = $servers->changeJobStatus($request->input(), $this->user['id']);
+        return $this->getRes($data);
+    }
 
     /**
      * @api {get} api/v4/im_doc/category 分类
      * @apiVersion 4.0.0
-     * @apiName  im_doc
+     * @apiName  api/v4/im_doc/category
      * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/category
      * @apiDescription 分类的列表
@@ -136,7 +167,7 @@ class ImDocController extends Controller
     /**
      * @api {get} api/v4/im_doc/category/product 分类筛选的商品列表
      * @apiVersion 4.0.0
-     * @apiName  im_doc
+     * @apiName  api/v4/im_doc/category/product
      * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/category/product
      * @apiDescription 分类筛选的商品列表

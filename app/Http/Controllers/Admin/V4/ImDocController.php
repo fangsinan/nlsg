@@ -94,7 +94,6 @@ class ImDocController extends ControllerBackend
      * ]
      * }
      */
-    //添加发送任务
     public function addSendJob(Request $request)
     {
         $servers = new ImDocServers();
@@ -122,7 +121,7 @@ class ImDocController extends ControllerBackend
     }
 
     /**
-     * @api {post} api/admin_v4/im_doc/change_job_status 发送任务状态修改
+     * @api {put} api/admin_v4/im_doc/change_job_status 发送任务状态修改
      * @apiVersion 4.0.0
      * @apiName  api/admin_v4/im_doc/change_job_status
      * @apiGroup 后台-社群文案
