@@ -27,7 +27,7 @@ class ImMsg extends Base
 
 
         $query = ImMsg::with([
-            'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data,file_name as FileName',
+            'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data,file_name as FileName,file_size as FileSize',
             ])->select('id','msg_seq','msg_time','from_account');
         if(!empty($ids) ){
             return $query->whereIn('id',$ids)->get()->toArray();
@@ -79,9 +79,9 @@ class ImMsg extends Base
                     break;
                 case 'TIMFileElem' ://文件类型元素
                     $msg_content_add['Url']             = $val['Url'];
-                    $msg_content_add['FileSize']        = $val['FileSize'];
+//                    $msg_content_add['FileSize']        = $val['FileSize'];
                     $msg_content_add['FileName']        = $val['FileName'];
-                    $msg_content_add['Download_Flag']   = $val['Download_Flag'];
+//                    $msg_content_add['Download_Flag']   = $val['Download_Flag'];
                     break;
 
                 case 'TIMVideoFileElem' : //视频类型元素
