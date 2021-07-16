@@ -178,27 +178,60 @@ class ImMsgController extends Controller
     }
      */
     public function MsgCollectionList(Request $request){
-        //$request->input('user_id', 0);  //消息序列号
         $uid = $this->user['id'];
 
         $collectionList = ImCollection::select("id","user_id","msg_id")->where([
             'type'=>1,'user_id'=>$uid,'state'=>1
         ])->orderBy('created_at',"desc")->paginate($this->page_per_page)->toArray();
 
+        //获取消息
         $msg_ids = array_column($collectionList['data'],'msg_id');
         $msg_list = ImMsg::getMsgList($msg_ids);
+
+        //获取用户信息
+        $uids = array_column($msg_list,'from_account');
+        $userProfileItem = self::getImUser($uids);
 
         foreach ($collectionList['data'] as $key=>$val) {
             $collectionList['data'][$key]['msg_list'] = [];
             foreach ($msg_list as $item){
+                //消息昵称
+                $item['nick_name'] = $userProfileItem[$item['from_account']]['Tag_Profile_IM_Nick']??'';
                 if($val['msg_id'] == $item['id']){
                     $collectionList['data'][$key]['msg_list'] = $item;
                     break;
                 }
             }
+
         }
 
         return $this->success($collectionList);
+    }
+
+
+
+    public static function getImUser($ids=[]){
+        if(empty($ids)){
+            return [];
+        }
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/profile/portrait_get");
+        $post_data['To_Account'] = $ids;
+        $post_data['TagList'] = ['Tag_Profile_IM_Nick','Tag_Profile_IM_Gender'];
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+
+        $return_data = [];
+        foreach ($res['UserProfileItem'] as $userProfile_key=>$userProfileItem_item) {
+            $return_data[$userProfileItem_item['To_Account']] = [];
+            foreach ($userProfileItem_item['ProfileItem'] as $key=>$value) {
+                $return_data[$userProfileItem_item['To_Account']][$value['Tag']] = $value['Value'];
+            }
+        }
+
+
+        return $return_data;
+
+
     }
 
     public static function sendMsg($params=[]){
