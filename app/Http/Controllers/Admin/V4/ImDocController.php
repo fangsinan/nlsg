@@ -97,7 +97,7 @@ class ImDocController extends ControllerBackend
     public function addSendJob(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->addSendJob($request->input(),$this->user['user_id']);
+        $data = $servers->addSendJob($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
 
@@ -107,11 +107,11 @@ class ImDocController extends ControllerBackend
      * @apiName  api/admin_v4/im_doc/job_list
      * @apiGroup 后台-社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc/job_list
-     * @apiParam {number=1,2,3} doc_type 文案类型(1商品 2附件 3文本)
-     * @apiParam {number} doc_type_info 文案类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营21音频 22视频 23图片 31文本)
-     * @apiParam {number=0,1,2,3,4} is_done 发送结果(1待发送  2发送中 3已完成 4无任务)
      * @apiParam {number=1,2,3} send_obj_type 发送目标类型(1群组 2个人 3标签)
      * @apiParam {number} send_obj_id 发送目标id
+     * @apiParam {number=1,2,3} [doc_type] 文案类型(1商品 2附件 3文本)
+     * @apiParam {number} [doc_type_info] 文案类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营21音频 22视频 23图片 31文本)
+     * @apiParam {number=0,1,2,3,4} [is_done] 发送结果(1待发送  2发送中 3已完成 4无任务)
      */
     public function sendJobList(Request $request)
     {
@@ -133,7 +133,7 @@ class ImDocController extends ControllerBackend
     public function changeJobStatus(Request $request)
     {
         $servers = new ImDocServers();
-        $data = $servers->changeJobStatus($request->input(),$this->user['user_id']);
+        $data = $servers->changeJobStatus($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
 

@@ -172,6 +172,9 @@ class ImDocServers
         $send_type = $params['send_type'] ?? 0;
         $send_at = $params['send_at'] ?? '';
         $info = $params['info'] ?? [];
+        $now = time();
+        $month = date('Y-m',$now);
+        $day = date('Y-m-d',$now);
 
         $check_doc = ImDoc::where('id', '=', $doc_id)->where('status', '=', 1)->first();
         if (empty($check_doc)) {
@@ -189,6 +192,8 @@ class ImDocServers
                     return ['code' => false, 'msg' => '发送时间错误' . $temp_line];
                 }
             }
+            $month = date('Y-m',strtotime($send_at));
+            $day = date('Y-m-d',strtotime($send_at));
         } else {
             $send_at = date('Y-m-d H:i:s');
         }
@@ -217,6 +222,8 @@ class ImDocServers
         $jobModel->send_at = $send_at;
         $jobModel->is_done = 1;
         $jobModel->user_id = $user_id;
+        $jobModel->month = $month;
+        $jobModel->day = $day;
 
         $job_str .= "id($doc_id),send_type($send_type),info(" . json_encode($info) . ")";
 
@@ -277,11 +284,15 @@ class ImDocServers
             $query->whereHas('jobInfo', function ($q) use ($send_obj_type) {
                 $q->where('send_obj_type', '=', $send_obj_type);
             });
+        }else{
+            return ['code'=>false,'msg'=>'目标类型参数无效'];
         }
         if (!empty($send_obj_id)) {
             $query->whereHas('jobInfo', function ($q) use ($send_obj_id) {
                 $q->where('send_obj_id', '=', $send_obj_id);
             });
+        }else{
+            return ['code'=>false,'msg'=>'目标id参数无效'];
         }
         if (!empty($doc_type)) {
             $query->whereHas('docInfo', function ($q) use ($doc_type) {
