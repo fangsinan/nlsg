@@ -509,14 +509,14 @@ class IndexController extends ControllerBackend
             DB::table('nlsg_live_info')->insert($live_info_data);
         }
 
-        if ($userId == 169209){
-            LivePoster::firstOrCreate([
-                'live_id' =>$live_info_data['live_pid'] ,
-                'status' =>1
-            ],[
-                'image'  =>'http://image.nlsgapp.com/nlsg/works/20210710105652627976.jpg'
-            ]);
-        }
+//        if ($userId == 169209){
+//            LivePoster::firstOrCreate([
+//                'live_id' =>$live_info_data['live_pid'] ,
+//                'status' =>1
+//            ],[
+//                'image'  =>'http://image.nlsgapp.com/nlsg/works/20210710105652627976.jpg'
+//            ]);
+//        }
 
 
         return success();
