@@ -153,6 +153,7 @@ class ImMsgController extends Controller
                 'user_id' => $uid,
                 'msg_id' => $v['id'],
                 'type'    => $type,
+                'state'    => 1,
             ];
             ImCollection::firstOrCreate($data);
         }
