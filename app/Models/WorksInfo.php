@@ -52,7 +52,8 @@ class WorksInfo extends Base
                 //处理url  关注或试听
                 $works_data[$key]['href_url'] = '';
                 if ($is_sub == 1 || $val['free_trial'] == 1 || $is_free == 1) {
-                    $works_data[$key]['href_url'] = $works_data[$key]['url'];
+                    //$works_data[$key]['href_url'] = $works_data[$key]['url'];
+                    $works_data[$key]['href_url'] = self::GetWorksUrl($val);
 
                 } else {
                     unset($works_data[$key]['callback_url3']);
