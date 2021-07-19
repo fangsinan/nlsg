@@ -14,7 +14,7 @@ class ImDocSendJob extends Base
     public function docInfo()
     {
         return $this->hasOne(ImDoc::class, 'id', 'doc_id')
-            ->select(['id','type','type_info','obj_id','cover_img','content','file_url','status']);
+            ->select(['id','type','type_info','obj_id','cover_img','content','subtitle','file_url','status']);
     }
 
     public function jobInfo()

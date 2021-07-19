@@ -613,13 +613,14 @@ class ImDocServers
     {
         $job_info = ImDocSendJob::query()
             ->where('is_done', '=', 1)
+            ->where('status', '=', 1)
             ->where(function ($q) {
                 $q->where('send_type', '=', 1)
                     ->orWhere(function ($q) {
                         $q->where('send_type', '=', 2)->where('send_at', '<=', date('Y-m-d H:i:59'));
                     });
             })
-            ->with(['jobInfo', 'jobInfo.groupInfo:id,group_id','docInfo'])
+            ->with(['jobInfo', 'jobInfo.groupInfo:id,group_id', 'docInfo'])
             ->get();
 
 
@@ -637,23 +638,116 @@ class ImDocServers
                 if (!isset($post_data_array[$key])) {
                     $post_data_array[$key]['user_id'] = $v->user_id;
                     $post_data_array[$key]['group_id'] = $vv->groupInfo->group_id;
-                    $post_data_array[$key]['doc_info'] = $v->docInfo;
-                    $post_data_array[$key]['job_id'] = $v->id;
-                    $post_data_array[$key]['list'] = [];
+                    $post_data_array[$key]['doc_list'] = [];
                 }
-
-                $list_key = $vv->send_obj_type . '_' . $vv->send_obj_id;
-                if (!isset($post_data_array[$key]['list'][$list_key])) {
-                    $post_data_array[$key]['list'][$list_key] = [
-                        'send_obj_type' => $vv->send_obj_type,
-                        'send_obj_id' => $vv->send_obj_id
-                    ];
+                $list_key = $v->doc_id;
+                if (!isset($post_data_array[$key]['doc_list'][$list_key])) {
+                    $post_data_array[$key]['doc_list'][$list_key] = $v->docInfo;
                 }
             }
         }
 
 
-
+        foreach ($post_data_array as $v) {
+            $post_data = [
+                "GroupId" => $v->group_id,
+                "From_Account" => $v->user_id,
+                "Random" => $this->getMsgRandom(),
+                "MsgBody" => []
+            ];
+            foreach ($v['doc_list'] as $vv) {
+                switch ($vv['obj_id']) {
+                    case 11:
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                    case 16:
+                        $temp_body = [
+                            "MsgType"=> "TIMCustomElem",
+                            "MsgContent"=> [
+                                "Data"=> "message",
+                                "Desc"=> "notification",
+                                "Ext"=> "url",
+                                "Sound"=> "dingdong.aiff"
+                            ]
+                        ];
+                        break;
+                    case 21://音频
+                        $temp_body = [
+                            "MsgType" => "TIMSoundElem",
+                            "MsgContent" => [
+                                "Url" => "https://1234-5678187359-1253735226.cos.ap-shanghai.myqcloud.com/abc123/c9be9d32c05bfb77b3edafa4312c6c7d",
+                                "Size" => 62351,
+                                "Second" => 1,
+                                "Download_Flag" => 2
+                            ]
+                        ];
+                        break;
+                    case 22:
+                        //视频
+                        $temp_body = [
+                            "MsgType" => "TIMVideoFileElem",
+                            "MsgContent" => [
+                                "VideoUrl" => "https://0345-1400187352-1256635546.cos.ap-shanghai.myqcloud.com/abcd/f7c6ad3c50af7d83e23efe0a208b90c9",
+                                "VideoSize" => 1194603,
+                                "VideoSecond" => 5,
+                                "VideoFormat" => "mp4",
+                                "VideoDownloadFlag" => 2,
+                                "ThumbUrl" => "https://0345-1400187352-1256635546.cos.ap-shanghai.myqcloud.com/abcd/a6c170c9c599280cb06e0523d7a1f37b",
+                                "ThumbSize" => 13907,
+                                "ThumbWidth" => 720,
+                                "ThumbHeight" => 1280,
+                                "ThumbFormat" => "JPG",
+                                "ThumbDownloadFlag" => 2
+                            ]
+                        ];
+                        break;
+                    case 23:
+                        //图片
+                        $temp_body = [
+                            "MsgType" => "TIMImageElem",
+                            "MsgContent" => [
+                                "UUID" => "1853095_D61040894AC3DE44CDFFFB3EC7EB720F",
+                                "ImageFormat" => 1,
+                                "ImageInfoArray" => [
+                                    [
+                                        "Type" => 1,           //原图
+                                        "Size" => 1853095,
+                                        "Width" => 2448,
+                                        "Height" => 3264,
+                                        "URL" => "http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"
+                                    ],
+                                    [
+                                        "Type" => 2,      //大图
+                                        "Size" => 2565240,
+                                        "Width" => 0,
+                                        "Height" => 0,
+                                        "URL" => "http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/720"
+                                    ],
+                                    [
+                                        "Type" => 3,   //缩量图
+                                        "Size" => 12535,
+                                        "Width" => 0,
+                                        "Height" => 0,
+                                        "URL" => "http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/198"
+                                    ]
+                                ]
+                            ]
+                        ];
+                        break;
+                    case 31:
+                        //文本
+                        $temp_body = [
+                            "MsgType" => "TIMTextElem",
+                            "MsgContent" => [
+                                "Text" => "hello world"
+                            ]
+                        ];
+                        break;
+                }
+            }
+        }
 
 
 //        return [$post_data_array, $job_info];
@@ -677,7 +771,7 @@ class ImDocServers
 //@property (nonatomic , strong) NSString  *titleName;
 //@property (nonatomic , strong) NSString  *subtitle;
 //@property (nonatomic , strong) NSString  *price;
-//@property (nonatomic , strong) NSString  *type;//类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书 9:直播)
+//@property (nonatomic , strong) NSString  *type;//类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书 9:直播 10:外链 11:训练营)
 
 
         //10自定类型

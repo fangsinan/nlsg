@@ -143,7 +143,7 @@ class ImDocController extends Controller
     }
 
     /**
-     * @api {post} api/v4/im_doc/job_list_for_app 发送任务列表
+     * @api {get} api/v4/im_doc/job_list_for_app 发送任务列表
      * @apiVersion 4.0.0
      * @apiName  api/v4/im_doc/job_list_for_app
      * @apiGroup 社群文案
