@@ -64,6 +64,8 @@ class ImDocServers
         $status = $params['status'] ?? 1;
         $file_url = $params['file_url'] ?? '';
         $for_app = $params['for_app'] ?? 0;
+        $second = $params['second'] ?? 0;
+        $format = $params['format'] ?? '';
 
         if (!in_array($status, [1, 2])) {
             return ['code' => false, 'msg' => '状态错误'];
@@ -91,6 +93,9 @@ class ImDocServers
                 if (empty($file_url)) {
                     return ['code' => false, 'msg' => '附件地址不能为空'];
                 }
+                if (empty($format)) {
+                    return ['code' => false, 'msg' => '格式后缀名不能为空'];
+                }
 
                 break;
             case 3:
@@ -102,6 +107,12 @@ class ImDocServers
                 break;
         }
 
+        if (in_array($params['type_info'],[21,22])){
+            if (empty($second)){
+                return ['code' => false, 'msg' => '时常不能为空'];
+            }
+        }
+
         $docModel->type = $type;
         $docModel->type_info = $type_info;
         $docModel->obj_id = $obj_id;
@@ -111,6 +122,8 @@ class ImDocServers
         $docModel->file_url = $file_url;
         $docModel->status = $status;
         $docModel->user_id = $user_id;
+        $docModel->second = $second;
+        $docModel->format = $format;
 
         DB::beginTransaction();
 
@@ -325,14 +338,14 @@ class ImDocServers
                 $q->where('send_obj_type', '=', $send_obj_type);
             });
         } else {
-            return ['code' => false, 'msg' => '目标类型参数无效'];
+//            return ['code' => false, 'msg' => '目标类型参数无效'];
         }
         if (!empty($send_obj_id)) {
             $query->whereHas('jobInfo', function ($q) use ($send_obj_id) {
                 $q->where('send_obj_id', '=', $send_obj_id);
             });
         } else {
-            return ['code' => false, 'msg' => '目标id参数无效'];
+//            return ['code' => false, 'msg' => '目标id参数无效'];
         }
         if (!empty($doc_type)) {
             $query->whereHas('docInfo', function ($q) use ($doc_type) {
