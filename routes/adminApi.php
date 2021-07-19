@@ -224,6 +224,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     //测试临时用,之后要删除
 //    Route::get('live/pass', 'GoodsController@tempTools');//商城退款
 
+    Route::get('im_doc/test', 'ImDocController@test');
+
     Route::post('upload/file', 'UploadController@file');//上传视频/音频
 
     Route::get('task/index','TaskController@index');

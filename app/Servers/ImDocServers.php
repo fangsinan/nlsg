@@ -18,6 +18,7 @@ use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Libraries\ImClient;
 
 class ImDocServers
 {
@@ -43,6 +44,7 @@ class ImDocServers
         $obj_id = $params['obj_id'] ?? 0;
         $content = $params['content'] ?? '';
         $cover_img = $params['cover_img'] ?? '';
+        $subtitle = $params['subtitle'] ?? '';
         $status = $params['status'] ?? 1;
         $file_url = $params['file_url'] ?? '';
         $for_app = $params['for_app'] ?? 0;
@@ -89,6 +91,7 @@ class ImDocServers
         $docModel->obj_id = $obj_id;
         $docModel->cover_img = $cover_img;
         $docModel->content = $content;
+        $docModel->subtitle = $subtitle;
         $docModel->file_url = $file_url;
         $docModel->status = $status;
         $docModel->user_id = $user_id;
@@ -383,20 +386,14 @@ class ImDocServers
                     $q->whereIn('id', $job_id_list)
                         ->orWhere('send_type', '=', 3);
                 })
-                ->where('month','=',$v)
+                ->where('month', '=', $v)
                 ->where('status', '<>', 3)
                 ->select([
                     'id', 'doc_id', 'created_at', 'status', 'send_type', 'is_done', 'success_at'
                 ])->get();
             $list[] = $temp_list;
         }
-
-
         return $list;
-
-        return $job_id_list;
-
-
     }
 
     public function changeJobStatus($params, $user_id)
@@ -460,7 +457,6 @@ class ImDocServers
         } else {
             return ['code' => false, 'msg' => 'id错误'];
         }
-        return $params;
     }
 
     public function getCategoryProduct($params)
@@ -598,5 +594,122 @@ class ImDocServers
             ]
         ];
 
+    }
+
+    public function getMsgRandom()
+    {
+        $date = date('YmdHi');
+        $cache_key_name = 'msg_counter_' . $date;
+        $expire_num = 60;
+        $counter = Cache::get($cache_key_name);
+        if ($counter < 1) {
+            Cache::put($cache_key_name, 1, $expire_num);
+        }
+        $counter = Cache::increment($cache_key_name);
+        return $date . sprintf("%010d", $counter);
+    }
+
+    public function sendGroupDocMsgJob()
+    {
+        $job_info = ImDocSendJob::query()
+            ->where('is_done', '=', 1)
+            ->where(function ($q) {
+                $q->where('send_type', '=', 1)
+                    ->orWhere(function ($q) {
+                        $q->where('send_type', '=', 2)->where('send_at', '<=', date('Y-m-d H:i:59'));
+                    });
+            })
+            ->with(['jobInfo', 'jobInfo.groupInfo:id,group_id','docInfo'])
+            ->get();
+
+
+        if ($job_info->isEmpty()) {
+            return ['code' => true, 'msg' => '没有任务'];
+        }
+
+        $job_id_list = [];
+        $post_data_array = [];
+
+        foreach ($job_info as $v) {
+            $job_id_list[] = $v->id;
+            foreach ($v->jobInfo as $vv) {
+                $key = $vv->groupInfo->group_id . '_' . $v->user_id;
+                if (!isset($post_data_array[$key])) {
+                    $post_data_array[$key]['user_id'] = $v->user_id;
+                    $post_data_array[$key]['group_id'] = $vv->groupInfo->group_id;
+                    $post_data_array[$key]['doc_info'] = $v->docInfo;
+                    $post_data_array[$key]['job_id'] = $v->id;
+                    $post_data_array[$key]['list'] = [];
+                }
+
+                $list_key = $vv->send_obj_type . '_' . $vv->send_obj_id;
+                if (!isset($post_data_array[$key]['list'][$list_key])) {
+                    $post_data_array[$key]['list'][$list_key] = [
+                        'send_obj_type' => $vv->send_obj_type,
+                        'send_obj_id' => $vv->send_obj_id
+                    ];
+                }
+            }
+        }
+
+
+
+
+
+//        return [$post_data_array, $job_info];
+        return $post_data_array;
+        return $job_info;
+
+
+        $random = $this->getMsgRandom();
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+
+        //文案类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 21音频 22视频 23图片 31文本)
+
+        //发送类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书 9:直播)
+        $post_data = [
+            'GroupId' => '@TGS#2OOSYXIHU',
+            'Random' => $random,
+        ];
+
+//@property (nonatomic , strong) NSString  *goodsID;
+//@property (nonatomic , strong) NSString  *cover_pic;
+//@property (nonatomic , strong) NSString  *titleName;
+//@property (nonatomic , strong) NSString  *subtitle;
+//@property (nonatomic , strong) NSString  *price;
+//@property (nonatomic , strong) NSString  *type;//类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书 9:直播)
+
+
+        //10自定类型
+        //20文件
+        //30 文本
+
+//        $post_data = [
+//            "GroupId" => "@TGS#2OOSYXIHU",
+//            "From_Account" => "168934", // 指定消息发送者（选填）
+//            "Random" => time().rand(1000000,9999999), // 随机数字，五分钟数字相同认为是重复消息
+//            "MsgBody" => [ // 消息体，由一个element数组组成，详见字段说明
+//                [
+//                    "MsgType" => "TIMTextElem", // 文本
+//                    "MsgContent" =>[
+//                        "Text" => "red packet".__LINE__
+//                    ]
+//                ],
+//                [
+//                    "MsgType" => "TIMFaceElem", // 表情
+//                    "MsgContent" => [
+//                        "Index" => 6,
+//                        "Data" => "abc\u0000\u0001"
+//                    ]
+//                ]
+//            ]
+//        ];
+
+        dd($post_data);
+
+        $res = ImClient::curlPost($url, json_encode($post_data));
+        $res = json_decode($res, true);
+
+        dd($res);
     }
 }

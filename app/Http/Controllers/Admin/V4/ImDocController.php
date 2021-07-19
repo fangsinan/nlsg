@@ -22,6 +22,8 @@ class ImDocController extends ControllerBackend
      * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 21音频 22视频 23图片 31文本)
      * @apiParam {number} [obj_id]  目标id(当type=1时需要传)
      * @apiParam {string} content   内容或名称
+     * @apiParam {string} subtitle   副标题
+     * @apiParam {string} cover_img   封面图片
      * @apiParam {string} [file_url]  附件地址,当type=2时需要传
      *
      */
@@ -190,6 +192,12 @@ class ImDocController extends ControllerBackend
     {
         $servers = new ImDocServers();
         $data = $servers->getCategoryProduct($request->input());
+        return $this->getRes($data);
+    }
+
+    public function test(){
+        $servers = new ImDocServers();
+        $data = $servers->sendGroupDocMsgJob();
         return $this->getRes($data);
     }
 }
