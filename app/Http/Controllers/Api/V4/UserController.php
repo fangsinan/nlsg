@@ -1091,7 +1091,7 @@ class UserController extends Controller
             $res['history_num'] = $this->user['history_num'] ?? 0;
             $res['is_vip'] = $this->user['new_vip']['level'] ?? 0;
             $res['sex'] = $this->user['sex'];
-            $res['is_community_admin'] = $this->user['is_staff'] == 2 ? 1:0;  // im管理员
+            $res['is_community_admin'] = $this->user['is_community_admin'];  // im管理员
 
             if ($res['id']) {
                 $is_live = LiveUserPrivilege::where('user_id', $this->user['id'])
