@@ -10,6 +10,8 @@ use App\Models\ImDoc;
 use App\Models\ImDocSendJob;
 use App\Models\ImDocSendJobInfo;
 use App\Models\imDocSendJobLog;
+use App\Models\ImGroup;
+use App\Models\ImGroupUser;
 use App\Models\Live;
 use App\Models\MallCategory;
 use App\Models\MallGoods;
@@ -22,6 +24,20 @@ use Libraries\ImClient;
 
 class ImDocServers
 {
+    public function groupList($params,$user_id){
+        $group_id_list = ImGroupUser::where('group_account','=',$user_id)
+            ->where('exit_type','=',0)->pluck('group_id')->toArray();
+        if (empty($group_id_list)){
+            return [];
+        }
+
+
+        return ImGroup::whereIn('group_id',$group_id_list)
+            ->where('status','=',1)
+            ->select(['id','name'])
+            ->get();
+    }
+
     public function add($params, $user_id)
     {
         if (!empty($params['id'] ?? 0)) {

@@ -9,8 +9,24 @@ use Illuminate\Http\Request;
 
 class ImDocController extends Controller
 {
+
     /**
-     * @api {post} api/admin_v4/im_doc/add (废弃)添加文案
+     * @api {post} api/v4/im_doc/group_list 群列表
+     * @apiVersion 4.0.0
+     * @apiName  api/v4/im_doc/group_list
+     * @apiGroup 社群文案
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/group_list
+     * @apiDescription 群列表
+     */
+    public function groupList(Request $request){
+        $servers = new ImDocServers();
+        $data = $servers->groupList($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
+    }
+
+
+    /**
+     * @api {post} api/v4/im_doc/add (废弃)添加文案
      * @apiVersion 4.0.0
      * @apiName  api/v4/im_doc/add
      * @apiGroup 社群文案
@@ -32,7 +48,7 @@ class ImDocController extends Controller
     }
 
     /**
-     * @api {post} api/admin_v4/im_doc/add_for_app 添加文案
+     * @api {post} api/v4/im_doc/add_for_app 添加文案
      * @apiVersion 4.0.0
      * @apiName  api/v4/im_doc/add_for_app
      * @apiGroup 社群文案

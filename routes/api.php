@@ -401,6 +401,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('im_doc/job_list_for_app', 'ImDocController@sendJobListForApp');
         Route::post('im_doc/job_add', 'ImDocController@addSendJob');
         Route::put('im_doc/change_job_status', 'ImDocController@changeJobStatus');
+        Route::get('im_doc/group_list', 'ImDocController@groupList');
 
         //im选择商品
         Route::get('im_doc/category', 'ImDocController@getCategory');
