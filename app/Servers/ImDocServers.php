@@ -24,17 +24,18 @@ use Libraries\ImClient;
 
 class ImDocServers
 {
-    public function groupList($params,$user_id){
-        $group_id_list = ImGroupUser::where('group_account','=',$user_id)
-            ->where('exit_type','=',0)->pluck('group_id')->toArray();
-        if (empty($group_id_list)){
+    public function groupList($params, $user_id)
+    {
+        $group_id_list = ImGroupUser::where('group_account', '=', $user_id)
+            ->where('exit_type', '=', 0)->pluck('group_id')->toArray();
+        if (empty($group_id_list)) {
             return [];
         }
 
 
-        return ImGroup::whereIn('group_id',$group_id_list)
-            ->where('status','=',1)
-            ->select(['id','name'])
+        return ImGroup::whereIn('group_id', $group_id_list)
+            ->where('status', '=', 1)
+            ->select(['id', 'name'])
             ->get();
     }
 
@@ -107,8 +108,8 @@ class ImDocServers
                 break;
         }
 
-        if (in_array($params['type_info'],[21,22])){
-            if (empty($second)){
+        if (in_array($params['type_info'], [21, 22])) {
+            if (empty($second)) {
                 return ['code' => false, 'msg' => '时常不能为空'];
             }
         }
@@ -326,7 +327,7 @@ class ImDocServers
         $size = $params['size'] ?? 10;
 
         $query = ImDocSendJob::query()
-            ->with(['docInfo', 'jobInfo','jobInfo.groupInfo:id,name'])
+            ->with(['docInfo', 'jobInfo', 'jobInfo.groupInfo:id,name'])
             ->where('status', '<>', 3);
 
         $send_obj_type = $params['send_obj_type'] ?? 0;
@@ -640,12 +641,111 @@ class ImDocServers
         return $date . sprintf("%010d", $counter);
     }
 
-    public function imgUrl($url){
-        $url = ltrim($url,'/');
-        if (substr($url,0,4) != 'http'){
-            $url = 'http://image.nlsgapp.com/'.$url;
+    public function imgUrl($url)
+    {
+        $url = ltrim($url, '/');
+        if (substr($url, 0, 4) != 'http') {
+            $url = 'http://image.nlsgapp.com/' . $url;
         }
         return $url;
+    }
+
+    public function test()
+    {
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+        $post_data = [
+            "GroupId" => "@TGS#2GZCYDJHT",
+            "From_Account" => "168934", // 指定消息发送者（选填）
+            "Random" => $this->getMsgRandom(), // 随机数字，五分钟数字相同认为是重复消息
+            "MsgBody" => [ // 消息体，由一个element数组组成，详见字段说明
+//                [
+//                    "MsgType" => "TIMFaceElem", // 表情
+//                    "MsgContent" => [
+//                        "Index" => 6,
+//                        "Data" => "abc\u0000\u0001"
+//                    ]
+//                ],
+                [
+                    "MsgType" => "TIMTextElem", // 文本
+                    "MsgContent" =>[
+                        "Text" => "red packet".__LINE__
+                    ]
+                ],
+//                [
+//                    "MsgType" => "TIMCustomElem", // 自定义,不成功
+//                    "MsgContent" => [
+//                        "Data" => [
+//                            "goodsID" => 394,
+//                            "cover_pic" => "nlsg/works/20201212162527485745.png",
+//                            "titleName" => "自定标题",
+//                            "subtitle" => "自定副标题",
+//                            "type" => 2,
+//                        ]
+//                    ]
+//                ],
+//                [
+//                    "MsgType" => "TIMSoundElem",//音频
+//                    "MsgContent" => [
+//                        "Url" => "https://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/f63da4f95285890780889058541/aaodecBf5FAA.mp3",
+//                        "Size" => 4426079,
+//                        "Second" => 275,
+//                        "Download_Flag" => 2
+//                    ]
+//                ],
+//                [
+//                    "MsgType" => "TIMVideoFileElem",//视频 未成功
+//                    "MsgContent" => [
+////                        "VideoUrl" => 'https://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/70085c833701925921203766717/zR8GaCZiBnUA.mp4',
+//                        "VideoUrl" => 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/4f17-168934/c70fd2d8040becafdde743d6010c3ac1.mp4',
+//                        "VideoSize" => 407499,
+//                        "VideoSecond" => 4,
+//                        "VideoFormat" => 'mp4',
+//                        "VideoDownloadFlag" => 2,
+////                        "ThumbUrl" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png",
+//                        "ThumbUrl" => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/4f17-168934/b99e0d7fc33f37ab59cdac1e369ca017?imageMogr2/",
+//                        "ThumbSize" => 56920,
+////                        "ThumbWidth" => 960,
+//                        "ThumbWidth" => 192,
+////                        "ThumbHeight" => 540,
+//                        "ThumbHeight" => 108,
+//                        "ThumbFormat" => "PNG",
+//                        "ThumbDownloadFlag" => 2
+//                    ]
+//                ],
+//                [
+//                    "MsgType" => "TIMImageElem", //图片
+//                    "MsgContent" => [
+//                        "UUID" => "8912484a9e64fa8fa89f84c1e6371edc1231",
+//                        "ImageFormat" => 255,
+//                        "ImageInfoArray" => [
+//                            [
+//                                "Type" => 1,
+//                                "Size" => 4534,
+//                                "Width" => 200,
+//                                "Height" => 200,
+//                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"
+//                            ],
+//                            [
+//                                "Type" => 2,
+//                                "Size" => 4534,
+//                                "Width" => 0,
+//                                "Height" => 0,
+//                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"],
+//                            [
+//                                "Type" => 3,
+//                                "Size" => 4534,
+//                                "Width" => 0,
+//                                "Height" => 0,
+//                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"],
+//                        ]
+//                    ]
+//                ],
+            ]
+        ];
+
+        $res = ImClient::curlPost($url, json_encode($post_data));
+        $res = json_decode($res, true);
+        dd([$res, $post_data]);
     }
 
     public function sendGroupDocMsgJob()
@@ -702,27 +802,27 @@ class ImDocServers
             foreach ($v['doc_list'] as $vv) {
                 switch ($vv['type_info']) {
                     case 11:
-                        if (empty($temp_msg_type)){
+                        if (empty($temp_msg_type)) {
                             $temp_msg_type = 7;
                         }
                     case 12:
-                        if (empty($temp_msg_type)){
+                        if (empty($temp_msg_type)) {
                             $temp_msg_type = 2;
                         }
                     case 13:
-                        if (empty($temp_msg_type)){
+                        if (empty($temp_msg_type)) {
                             $temp_msg_type = 3;
                         }
                     case 14:
-                        if (empty($temp_msg_type)){
+                        if (empty($temp_msg_type)) {
                             $temp_msg_type = 6;
                         }
                     case 15:
-                        if (empty($temp_msg_type)){
+                        if (empty($temp_msg_type)) {
                             $temp_msg_type = 9;
                         }
                     case 16:
-                        if (empty($temp_msg_type)){
+                        if (empty($temp_msg_type)) {
                             $temp_msg_type = 11;
                         }
                         break;
@@ -773,8 +873,8 @@ class ImDocServers
                         break;
                     case 23:
                         //图片
-                        $file_url = explode(',',$vv->file_url);
-                        foreach ($file_url as $vvv){
+                        $file_url = explode(',', $vv->file_url);
+                        foreach ($file_url as $vvv) {
                             $post_data['MsgBody'][] = [
                                 "MsgType" => "TIMImageElem",
                                 "MsgContent" => [

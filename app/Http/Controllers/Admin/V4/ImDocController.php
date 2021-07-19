@@ -214,7 +214,8 @@ class ImDocController extends ControllerBackend
 
     public function test(){
         $servers = new ImDocServers();
-        $data = $servers->sendGroupDocMsgJob();
+//        $data = $servers->sendGroupDocMsgJob();
+        $data = $servers->test();
         return $this->getRes($data);
     }
 }
