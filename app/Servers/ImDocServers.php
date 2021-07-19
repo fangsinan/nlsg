@@ -325,7 +325,9 @@ class ImDocServers
     {
         $size = $params['size'] ?? 10;
 
-        $query = ImDocSendJob::query()->with(['docInfo', 'jobInfo'])->where('status', '<>', 3);
+        $query = ImDocSendJob::query()
+            ->with(['docInfo', 'jobInfo','jobInfo.groupInfo:id,name'])
+            ->where('status', '<>', 3);
 
         $send_obj_type = $params['send_obj_type'] ?? 0;
         $send_obj_id = $params['send_obj_id'] ?? 0;
