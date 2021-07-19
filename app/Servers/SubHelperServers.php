@@ -26,7 +26,7 @@ class SubHelperServers
         $live_list = Live::whereIn('status', [1,4])
             ->where('is_finish', '=', 0)
             ->where('is_del', '=', 0)
-            ->where('is_test', '=', 0)
+//            ->where('is_test', '=', 0)
             ->select('id', DB::raw('3 as type'), 'title')
             ->get();
 
