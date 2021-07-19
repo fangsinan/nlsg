@@ -55,8 +55,8 @@ class ImFriendController extends Controller
         ];
 
 
-        $is_staff = User::where('id',$params['user_id'])->value('is_staff');
-        $res_data['is_community_admin'] = $is_staff == 2 ? 1:0;  // im管理员
+        $is_community_admin = User::where('id',$params['user_id'])->value('is_community_admin');
+        $res_data['is_community_admin'] = $is_community_admin;  // im管理员
 
 
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/im_open_login_svc/account_check");

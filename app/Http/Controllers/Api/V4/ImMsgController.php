@@ -36,7 +36,7 @@ class ImMsgController extends Controller
      * @apiParam {array} To_Account  接收方用户 数组类型
      * @apiParam {array} To_Group   接收方群组 数组类型
      * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"}] 数组类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
-     * @apiParam {array} collection_id 收藏id  数组格式
+     * @apiParam {int}  collection_id 收藏id  数组格式
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -69,8 +69,8 @@ class ImMsgController extends Controller
 
         //发送收藏的消息
         if( !empty($collection_id) ){
-            $msg_keys = ImCollection::where(['id'=>$collection_id])->value('msg_key');
-            $contents = ImMsg::getMsgList([],[$msg_keys]);
+            $msg_ids = ImCollection::where(['id'=>$collection_id])->value('msg_id');
+            $contents = ImMsg::getMsgList($msg_ids);
             $msg_content = [];  //初始化消息体
             foreach ($contents as $key=>$value) {
                 $msg_content = array_merge($msg_content,$value['content']);
@@ -102,7 +102,6 @@ class ImMsgController extends Controller
                 $post_data['Random'] = rand(10000000,99999999);
                 //dd($post_data);
                 $res = ImClient::curlPost($url,json_encode($post_data));
-                //dd($res);
             }
         }
 
