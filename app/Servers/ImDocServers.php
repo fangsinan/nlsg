@@ -638,8 +638,18 @@ class ImDocServers
         return $date . sprintf("%010d", $counter);
     }
 
+    public function imgUrl($url){
+        $url = ltrim($url,'/');
+        if (substr($url,0,4) != 'http'){
+            $url = 'http://image.nlsgapp.com/'.$url;
+        }
+        return $url;
+    }
+
     public function sendGroupDocMsgJob()
     {
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+
         $job_info = ImDocSendJob::query()
             ->where('is_done', '=', 1)
             ->where('status', '=', 1)
@@ -676,106 +686,137 @@ class ImDocServers
             }
         }
 
-
         foreach ($post_data_array as $v) {
             $post_data = [
-                "GroupId" => $v->group_id,
-                "From_Account" => $v->user_id,
+                "GroupId" => $v['group_id'],
+                "From_Account" => (string)$v['user_id'],
                 "Random" => $this->getMsgRandom(),
                 "MsgBody" => []
             ];
+
+
+            $temp_msg_type = 0;
+
             foreach ($v['doc_list'] as $vv) {
-                switch ($vv['obj_id']) {
+                switch ($vv['type_info']) {
                     case 11:
+                        if (empty($temp_msg_type)){
+                            $temp_msg_type = 7;
+                        }
                     case 12:
+                        if (empty($temp_msg_type)){
+                            $temp_msg_type = 2;
+                        }
                     case 13:
+                        if (empty($temp_msg_type)){
+                            $temp_msg_type = 3;
+                        }
                     case 14:
+                        if (empty($temp_msg_type)){
+                            $temp_msg_type = 6;
+                        }
                     case 15:
+                        if (empty($temp_msg_type)){
+                            $temp_msg_type = 9;
+                        }
                     case 16:
-                        $temp_body = [
-                            "MsgType"=> "TIMCustomElem",
-                            "MsgContent"=> [
-                                "Data"=> "message",
-                                "Desc"=> "notification",
-                                "Ext"=> "url",
-                                "Sound"=> "dingdong.aiff"
-                            ]
-                        ];
+                        if (empty($temp_msg_type)){
+                            $temp_msg_type = 11;
+                        }
                         break;
+//                        $post_data['MsgBody'][] = [
+//                            "MsgType"=> "TIMCustomElem",
+//                            "MsgContent"=> [
+//                                "Data"=> "message",
+//                                "Desc"=> [
+//                                    "goodsID"=>450,
+//                                    "cover_pic"=>$this->imgUrl($vv->cover_img),
+//                                    "titleName"=>$vv->content,
+//                                    "subtitle"=>$vv->subtitle,
+//                                    "type"=>$temp_msg_type,
+//                                ],
+//                                "Ext"=> "url",
+//                            ]
+//                        ];
+//                        break;
                     case 21://音频
-                        $temp_body = [
+                        $post_data['MsgBody'][] = [
                             "MsgType" => "TIMSoundElem",
                             "MsgContent" => [
-                                "Url" => "https://1234-5678187359-1253735226.cos.ap-shanghai.myqcloud.com/abc123/c9be9d32c05bfb77b3edafa4312c6c7d",
-                                "Size" => 62351,
-                                "Second" => 1,
+                                "Url" => $vv->file_url,
+                                "Size" => $vv->file_size,
+                                "Second" => $vv->second,
                                 "Download_Flag" => 2
                             ]
                         ];
                         break;
                     case 22:
                         //视频
-                        $temp_body = [
+                        $post_data['MsgBody'][] = [
                             "MsgType" => "TIMVideoFileElem",
                             "MsgContent" => [
-                                "VideoUrl" => "https://0345-1400187352-1256635546.cos.ap-shanghai.myqcloud.com/abcd/f7c6ad3c50af7d83e23efe0a208b90c9",
-                                "VideoSize" => 1194603,
-                                "VideoSecond" => 5,
-                                "VideoFormat" => "mp4",
+                                "VideoUrl" => $vv->file_url,
+                                "VideoSize" => $vv->file_size,
+                                "VideoSecond" => $vv->second,
+                                "VideoFormat" => $vv->format,
                                 "VideoDownloadFlag" => 2,
-                                "ThumbUrl" => "https://0345-1400187352-1256635546.cos.ap-shanghai.myqcloud.com/abcd/a6c170c9c599280cb06e0523d7a1f37b",
-                                "ThumbSize" => 13907,
-                                "ThumbWidth" => 720,
-                                "ThumbHeight" => 1280,
-                                "ThumbFormat" => "JPG",
-                                "ThumbDownloadFlag" => 2
+//                                "ThumbUrl" => "https://0345-1400187352-1256635546.cos.ap-shanghai.myqcloud.com/abcd/a6c170c9c599280cb06e0523d7a1f37b",
+//                                "ThumbSize" => 13907,
+//                                "ThumbWidth" => 720,
+//                                "ThumbHeight" => 1280,
+//                                "ThumbFormat" => "JPG",
+//                                "ThumbDownloadFlag" => 2
                             ]
                         ];
                         break;
                     case 23:
                         //图片
-                        $temp_body = [
-                            "MsgType" => "TIMImageElem",
-                            "MsgContent" => [
-                                "UUID" => "1853095_D61040894AC3DE44CDFFFB3EC7EB720F",
-                                "ImageFormat" => 1,
-                                "ImageInfoArray" => [
-                                    [
-                                        "Type" => 1,           //原图
-                                        "Size" => 1853095,
-                                        "Width" => 2448,
-                                        "Height" => 3264,
-                                        "URL" => "http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"
-                                    ],
-                                    [
-                                        "Type" => 2,      //大图
-                                        "Size" => 2565240,
-                                        "Width" => 0,
-                                        "Height" => 0,
-                                        "URL" => "http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/720"
-                                    ],
-                                    [
-                                        "Type" => 3,   //缩量图
-                                        "Size" => 12535,
-                                        "Width" => 0,
-                                        "Height" => 0,
-                                        "URL" => "http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/198"
+                        $file_url = explode(',',$vv->file_url);
+                        foreach ($file_url as $vvv){
+                            $post_data['MsgBody'][] = [
+                                "MsgType" => "TIMImageElem",
+                                "MsgContent" => [
+//                                    "UUID" => "1853095_D61040894AC3DE44CDFFFB3EC7EB720F",
+                                    "UUID" => $this->getMsgRandom(),
+                                    "ImageFormat" => 1,
+                                    "ImageInfoArray" => [
+                                        [
+                                            "Type" => 1,           //原图
+//                                            "Size" => 1853095,
+//                                            "Width" => 2448,
+//                                            "Height" => 3264,
+                                            "URL" => $this->imgUrl($vvv),
+                                        ]
                                     ]
                                 ]
-                            ]
-                        ];
+                            ];
+                        }
+
                         break;
                     case 31:
                         //文本
-                        $temp_body = [
+                        $post_data['MsgBody'][] = [
                             "MsgType" => "TIMTextElem",
                             "MsgContent" => [
-                                "Text" => "hello world"
+                                "Text" => $vv->content,
                             ]
                         ];
                         break;
                 }
+
+//                if (empty($post_data['MsgBody'])){
+//                    continue;
+//                }
+//                $res = ImClient::curlPost($url, json_encode($post_data));
+//                $res = json_decode($res, true);
+//                dd([$res,$post_data]);
+//                dd($post_data);
             }
+//            dd(json_encode($post_data));
+            dd($post_data);
+            $res = ImClient::curlPost($url, json_encode($post_data));
+            $res = json_decode($res, true);
+            dd($res);
         }
 
 

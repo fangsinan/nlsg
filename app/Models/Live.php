@@ -207,11 +207,38 @@ class Live extends Base
             ->where('status', 4)
             ->where('is_del', 0)
             ->where('is_test', 0)
+            ->with(['user:id,nickname'])
 //            ->where(function ($query) use ($keywords) {
 //                $query->orWhere('title', 'LIKE', "%$keywords%");
 //                $query->orWhere('describe', 'LIKE', "%$keywords%");
 //            })
             ->get();
+
+
+        foreach ($res as &$v) {
+            $channel = LiveInfo::where('live_pid', $v['id'])
+                ->where('status', 1)
+                ->orderBy('id', 'desc')
+                ->first();
+            if ($channel) {
+                if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                    $v['live_status'] = 1;
+                } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                    $v['live_status'] = 3;
+                } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                    $v['live_status'] = 2;
+                }
+                $v['info_id'] = $channel->id;
+            }
+//            $isSub = Subscribe::isSubscribe($uid, $v['id'], 3);
+//            $v['is_sub'] = $isSub ?? 0;
+
+//            $isAdmin = LiveConsole::isAdmininLive($uid, $v['id']);
+//            $v['is_admin'] = $isAdmin ? 1 : 0;
+
+//            $v['is_password'] = $v['password'] ? 1 : 0;
+//            $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+        }
 
         return ['res' => $res, 'count' => $res->count()];
     }
