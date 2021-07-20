@@ -54,58 +54,58 @@ class ImDocController extends ControllerBackend
      *
      * @apiParamExample {json} Request-Example:
      *[
-    {
-    "type": 1,
-    "type_info": 11,
-    "obj_id": 448,
-    "content": "44节科学探索课，开启孩子自然科学之门",
-    "cover_img": "nlsg/authorpt/20201229114832542932.png",
-    "subtitle": "浩瀚宇宙、海洋世界、恐龙时代、昆虫家族，精美视频动画展现前沿的科学知识，让孩子爱上自然科学",
-    "status": 1
-    },
-    {
-    "type": 1,
-    "type_info": 16,
-    "obj_id": 517,
-    "content": "30天亲子训练营",
-    "cover_img": "wechat/works/video/184528/8105_1527070171.png",
-    "subtitle": "",
-    "status": 1
-    },
-    {
-    "type": 2,
-    "type_info": 21,
-    "content": "文件ing.mp3",
-    "file_url": "https://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/f63da4f95285890780889058541/aaodecBf5FAA.mp3",
-    "file_size": 4426079,
-    "format": "mp3",
-    "second": 275,
-    "file_md5": "34131545324543",
-    "status": 1
-    },
-    {
-    "type": 2,
-    "type_info": 22,
-    "content": "视频.mp4",
-    "file_url": "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a4d8-425232/345e2a389fe32d62fedad3d6d2150110.mp4",
-    "file_size": 1247117,
-    "format": "mp4",
-    "second": 7,
-    "file_md5": "3413154532454311",
-    "cover_img": "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a4d8-425232/643665ba437cf198a9961f85795d8474.jpg?imageMogr2/",
-    "img_size": 277431,
-    "img_width": 720,
-    "img_height": 1600,
-    "img_format": "jpg",
-    "img_md5": "14436454",
-    "status": 1
-    },
-    {
-    "type": 3,
-    "type_info": 31,
-    "content": "nihao"
-    }
-    ]
+     * {
+     * "type": 1,
+     * "type_info": 11,
+     * "obj_id": 448,
+     * "content": "44节科学探索课，开启孩子自然科学之门",
+     * "cover_img": "nlsg/authorpt/20201229114832542932.png",
+     * "subtitle": "浩瀚宇宙、海洋世界、恐龙时代、昆虫家族，精美视频动画展现前沿的科学知识，让孩子爱上自然科学",
+     * "status": 1
+     * },
+     * {
+     * "type": 1,
+     * "type_info": 16,
+     * "obj_id": 517,
+     * "content": "30天亲子训练营",
+     * "cover_img": "wechat/works/video/184528/8105_1527070171.png",
+     * "subtitle": "",
+     * "status": 1
+     * },
+     * {
+     * "type": 2,
+     * "type_info": 21,
+     * "content": "文件ing.mp3",
+     * "file_url": "https://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/f63da4f95285890780889058541/aaodecBf5FAA.mp3",
+     * "file_size": 4426079,
+     * "format": "mp3",
+     * "second": 275,
+     * "file_md5": "34131545324543",
+     * "status": 1
+     * },
+     * {
+     * "type": 2,
+     * "type_info": 22,
+     * "content": "视频.mp4",
+     * "file_url": "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a4d8-425232/345e2a389fe32d62fedad3d6d2150110.mp4",
+     * "file_size": 1247117,
+     * "format": "mp4",
+     * "second": 7,
+     * "file_md5": "3413154532454311",
+     * "cover_img": "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a4d8-425232/643665ba437cf198a9961f85795d8474.jpg?imageMogr2/",
+     * "img_size": 277431,
+     * "img_width": 720,
+     * "img_height": 1600,
+     * "img_format": "jpg",
+     * "img_md5": "14436454",
+     * "status": 1
+     * },
+     * {
+     * "type": 3,
+     * "type_info": 31,
+     * "content": "nihao"
+     * }
+     * ]
      */
     public function add(Request $request)
     {

@@ -18,7 +18,8 @@ class ImDocController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/group_list
      * @apiDescription 群列表
      */
-    public function groupList(Request $request){
+    public function groupList(Request $request)
+    {
         $servers = new ImDocServers();
         $data = $servers->groupList($request->input(), $this->user['user_id']);
         return $this->getRes($data);
@@ -59,13 +60,80 @@ class ImDocController extends Controller
      * @apiDescription 添加文案
      *
      * @apiParam {number=1,2,3} type 类型(1商品 2附件 3文本)
-     * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 21音频 22视频 23图片 31文本)
+     * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链 21音频 22视频 23图片 24文件 31文本)
      * @apiParam {number} [obj_id]  目标id(当type=1时需要传)
-     * @apiParam {string} content   内容或名称
-     * @apiParam {string} [file_url]  附件地址,当type=2时需要传
+     * @apiParam {string} content   内容或名称(如果是商品类型传商品的标题,外链类型传网址)
+     * @apiParam {string} [subtitle]   副标题(外链类型传网址说明名称)
+     * @apiParam {string} cover_img   封面图片(type_info等于22,11-16必穿)
+     * @apiParam {string} [second]   视频音频的时长(秒)
+     * @apiParam {string} [format]   格式后缀名
+     * @apiParam {string} [file_url]  附件地址,当type=2时需要传(如果是图片,格式url,size,width,height,md5;多个图片用分号隔开)
+     * @apiParam {string} [file_md5]  文件md5(type_info=22)
+     * @apiParam {string} [file_size]  文件大小(type_info=21,22,24)
+     * @apiParam {string} [img_size]  图片大小(type=22时必穿)
+     * @apiParam {string} [img_width]  图片宽度(type=22时必穿)
+     * @apiParam {string} [img_height]  图片高度(type=22时必穿)
+     * @apiParam {string} [img_format]  图片格式类型(type=22时必穿)
+     * @apiParam {string} [img_md5]  图片md5(type=22时必穿)
+     *
+     * @apiParamExample {json} Request-Example:
+     *[
+     * {
+     * "type": 1,
+     * "type_info": 11,
+     * "obj_id": 448,
+     * "content": "44节科学探索课，开启孩子自然科学之门",
+     * "cover_img": "nlsg/authorpt/20201229114832542932.png",
+     * "subtitle": "浩瀚宇宙、海洋世界、恐龙时代、昆虫家族，精美视频动画展现前沿的科学知识，让孩子爱上自然科学",
+     * "status": 1
+     * },
+     * {
+     * "type": 1,
+     * "type_info": 16,
+     * "obj_id": 517,
+     * "content": "30天亲子训练营",
+     * "cover_img": "wechat/works/video/184528/8105_1527070171.png",
+     * "subtitle": "",
+     * "status": 1
+     * },
+     * {
+     * "type": 2,
+     * "type_info": 21,
+     * "content": "文件ing.mp3",
+     * "file_url": "https://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/f63da4f95285890780889058541/aaodecBf5FAA.mp3",
+     * "file_size": 4426079,
+     * "format": "mp3",
+     * "second": 275,
+     * "file_md5": "34131545324543",
+     * "status": 1
+     * },
+     * {
+     * "type": 2,
+     * "type_info": 22,
+     * "content": "视频.mp4",
+     * "file_url": "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a4d8-425232/345e2a389fe32d62fedad3d6d2150110.mp4",
+     * "file_size": 1247117,
+     * "format": "mp4",
+     * "second": 7,
+     * "file_md5": "3413154532454311",
+     * "cover_img": "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a4d8-425232/643665ba437cf198a9961f85795d8474.jpg?imageMogr2/",
+     * "img_size": 277431,
+     * "img_width": 720,
+     * "img_height": 1600,
+     * "img_format": "jpg",
+     * "img_md5": "14436454",
+     * "status": 1
+     * },
+     * {
+     * "type": 3,
+     * "type_info": 31,
+     * "content": "nihao"
+     * }
+     * ]
      *
      */
-    public function addForApp(Request $request){
+    public function addForApp(Request $request)
+    {
         $servers = new ImDocServers();
         $params = $request->input();
         $params['for_app'] = 1;
