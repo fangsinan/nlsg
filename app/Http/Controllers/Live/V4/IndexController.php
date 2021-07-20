@@ -468,14 +468,14 @@ class IndexController extends ControllerBackend
         $temp_push_end_time = date('Y-m-d 23:59:59',
             strtotime($end_at . " +1 days")
         );
-        $temp_get_url = $lcModel->getPushUrl(
-            md5($userId . $temp_push_end_time), strtotime($temp_push_end_time)
-        );
+//        $temp_get_url = $lcModel->getPushUrl(
+//            md5($userId . $temp_push_end_time), strtotime($temp_push_end_time)
+//        );
 
         $live_info_data = [];
-        $live_info_data['push_live_url'] = $temp_get_url['push_url'];
-        $live_info_data['live_url'] = $temp_get_url['play_url'];
-        $live_info_data['live_url_flv'] = $temp_get_url['play_url_flv'];
+//        $live_info_data['push_live_url'] = $temp_get_url['push_url'];
+//        $live_info_data['live_url'] = $temp_get_url['play_url'];
+//        $live_info_data['live_url_flv'] = $temp_get_url['play_url_flv'];
         $live_info_data['push_end_time'] = $temp_push_end_time;
         $live_info_data['user_id'] = $userId;
         $live_info_data['status'] = 1;
@@ -501,7 +501,6 @@ class IndexController extends ControllerBackend
             $live_info_data['id'] = $input['id'];
             $live_info_data['live_pid'] = $input['id'];
             LiveInfo::where('id', '=', $live_info_id)->update($live_info_data);
-
         } else {
             $Live_res = Live::create($data);
 
@@ -509,6 +508,16 @@ class IndexController extends ControllerBackend
             $live_info_data['id'] = $Live_res->id;
             DB::table('nlsg_live_info')->insert($live_info_data);
         }
+
+
+        $temp_get_url = $lcModel->getPushUrl(
+            md5($userId . $temp_push_end_time.$live_info_data['live_pid']), strtotime($temp_push_end_time)
+        );
+        $update_live_info_data['push_live_url'] = $temp_get_url['push_url'];
+        $update_live_info_data['live_url'] = $temp_get_url['play_url'];
+        $update_live_info_data['live_url_flv'] = $temp_get_url['play_url_flv'];
+        LiveInfo::where('live_pid','=',$live_info_data['live_pid'])->update($update_live_info_data);
+
 
 //        if ($userId == 169209){
 //            LivePoster::firstOrCreate([
