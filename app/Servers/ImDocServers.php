@@ -71,6 +71,8 @@ class ImDocServers
         $img_width = $params['img_width'] ?? 0;
         $img_height = $params['img_height'] ?? 0;
         $img_format = $params['img_format'] ?? 0;
+        $file_md5 = $params['file_md5'] ?? 0;
+        $img_md5 = $params['img_md5'] ?? 0;
 
         if (!in_array($status, [1, 2])) {
             return ['code' => false, 'msg' => '状态错误'];
@@ -107,13 +109,26 @@ class ImDocServers
                         return ['code' => false, 'msg' => 'second不能为空'];
                     }
                 }
-                if ($params['type_info'] == 22){
+                if ($params['type_info'] == 22) {
                     //如果是视频,必须有封面
-                    if (empty($cover_img) || empty($img_size) || empty($img_width) || empty($img_height) || empty($img_format)){
-                        return ['code'=>false,'msg'=>'必须有封面和尺寸长宽后缀名参数'];
+                    if (empty($cover_img) || empty($img_size) || empty($img_width)
+                        || empty($img_height) || empty($img_format) || empty($img_md5)) {
+                        return ['code' => false, 'msg' => '必须有封面和尺寸长宽后缀名参数'];
+                    }
+                    if (empty($file_md5)) {
+                        return ['code' => false, 'msg' => '文件md5不能为空'];
                     }
                 }
-
+                if ($params['type_info'] == 23) {
+                    //url,size,width,height,md5
+                    $file_url = explode(';', $file_url);
+                    foreach ($file_url as $fuv) {
+                        $fuv = explode(',', $fuv);
+                        if (count($fuv) != 5) {
+                            return ['code' => false, 'msg' => '图片参数格式错误'];
+                        }
+                    }
+                }
                 break;
             case 3:
                 //31文本
@@ -123,7 +138,6 @@ class ImDocServers
 
                 break;
         }
-
 
 
         $docModel->type = $type;
@@ -141,6 +155,8 @@ class ImDocServers
         $docModel->img_width = $img_width;
         $docModel->img_height = $img_height;
         $docModel->img_format = $img_format;
+        $docModel->img_format = $file_md5;
+        $docModel->img_format = $img_md5;
 
         DB::beginTransaction();
 
@@ -911,13 +927,13 @@ class ImDocServers
                             "MsgType" => "TIMVideoFileElem",//视频
                             "MsgContent" => [
                                 "VideoUrl" => $v->docInfo->file_url,
-                                "VideoUUID" => $this->getMsgRandom(),
+                                "VideoUUID" => $v->docInfo->file_md5,
                                 "VideoSize" => $v->docInfo->file_size,
                                 "VideoSecond" => $v->docInfo->second,
                                 "VideoFormat" => $v->docInfo->format,
                                 "VideoDownloadFlag" => 2,
                                 "ThumbUrl" => $v->docInfo->cover_img,
-                                "ThumbUUID" => $this->getMsgRandom(),
+                                "ThumbUUID" => $v->docInfo->img_md5,
                                 "ThumbSize" => $v->docInfo->img_size,
                                 "ThumbWidth" => $v->docInfo->img_width,
                                 "ThumbHeight" => $v->docInfo->img_height,
@@ -929,39 +945,42 @@ class ImDocServers
                         break;
                     case 23:
                         //图片
-                        $file_url = explode(',', $vv->file_url);
+                        $file_url = explode(';', $vv->file_url);
                         foreach ($file_url as $fuv) {
-                            $temp_post_data['MsgBody'][] = [
-                                "MsgType" => "TIMImageElem",
-                                "MsgContent" => [
-                                    "UUID" => $this->getMsgRandom(),
-                                    "ImageFormat" => 255,
-                                    "ImageInfoArray" => [
-                                        [
-                                            "Type" => 1,
-                                            "Size" => $v->docInfo->img_size,
-                                            "Width" => $v->docInfo->img_width,
-                                            "Height" => $v->docInfo->img_height,
-                                            "URL" => $v->docInfo->cover_img,
-                                        ],
-                                        [
-                                            "Type" => 2,
-                                            "Size" => $v->docInfo->img_size,
-                                            "Width" => 0,
-                                            "Height" => 0,
-                                            "URL" => $v->docInfo->cover_img,
-                                        ],
-                                        [
-                                            "Type" => 3,
-                                            "Size" => $v->docInfo->img_size,
-                                            "Width" => 0,
-                                            "Height" => 0,
-                                            "URL" => $v->docInfo->cover_img,
-                                        ],
+                            $fuv = explode(',', $fuv);
+                            foreach ($fuv as $fuvv) {
+                                $temp_post_data['MsgBody'][] = [
+                                    "MsgType" => "TIMImageElem",
+                                    "MsgContent" => [
+                                        "UUID" => $fuvv[4],
+                                        "ImageFormat" => 255,
+                                        "ImageInfoArray" => [
+                                            [
+                                                "Type" => 1,
+                                                "Size" => $fuvv[1],
+                                                "Width" => $fuvv[2],
+                                                "Height" => $fuvv[3],
+                                                "URL" => $fuvv[0],
+                                            ],
+                                            [
+                                                "Type" => 2,
+                                                "Size" => $fuvv[1],
+                                                "Width" => 0,
+                                                "Height" => 0,
+                                                "URL" => $fuvv[0],
+                                            ],
+                                            [
+                                                "Type" => 3,
+                                                "Size" => $fuvv[1],
+                                                "Width" => 0,
+                                                "Height" => 0,
+                                                "URL" => $fuvv[0],
+                                            ],
+                                        ]
                                     ]
-                                ]
-                            ];
-                            $post_data_array[] = $temp_post_data;
+                                ];
+                                $post_data_array[] = $temp_post_data;
+                            }
                         }
                         break;
                     case 31:
