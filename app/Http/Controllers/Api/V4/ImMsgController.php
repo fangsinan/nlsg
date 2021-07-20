@@ -13,6 +13,7 @@ use App\Models\ImCollection;
 use App\Models\ImMsgContentImg;
 use App\Models\ImMsgContent;
 use App\Models\ImMsg;
+use App\Models\ImSendAll;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Libraries\ImClient;
@@ -36,7 +37,7 @@ class ImMsgController extends Controller
      * @apiParam {array} To_Account  接收方用户 数组类型
      * @apiParam {array} To_Group   接收方群组 数组类型
      * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"}] 数组类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
-     * @apiParam {int}  collection_id 收藏id  数组格式
+     * @apiParam {int}  collection_id 收藏id  
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -50,8 +51,8 @@ class ImMsgController extends Controller
         $params    = $request->input();
 
         $from_account   = $params['From_Account']??'';  //发送方帐号
-        $to_accounts    = $params['To_Account']??'';  //消息接收方用户
-        $to_group       = $params['To_Group']??'';  //消息接收方群
+        $to_accounts    = $params['To_Account']??[];  //消息接收方用户
+        $to_group       = $params['To_Group']??[];  //消息接收方群
         $msg_content    = $params['Msg_Content'] ??[];  //消息体
         $collection_id  = $params['collection_id'] ??0;  //消息收藏id
 
@@ -70,28 +71,61 @@ class ImMsgController extends Controller
         //发送收藏的消息
         if( !empty($collection_id) ){
             $msg_ids = ImCollection::where(['id'=>$collection_id])->value('msg_id');
-            $contents = ImMsg::getMsgList($msg_ids);
+            $contents = ImMsg::getMsgList([$msg_ids]);
+
             $msg_content = [];  //初始化消息体
             foreach ($contents as $key=>$value) {
                 $msg_content = array_merge($msg_content,$value['content']);
             }
         }
-//        dd($msg_content);
+
         $msgBody = ImMsg::MsgBody($msg_content);
 
         if(empty($msgBody)){
             return $this->error('0','Msg Body Error');
         }
+        //群发列表
+        //查询当前消息的
+        //因为群发给多个群无法确定唯一key  所以保留消息体'
+        $add_data = [
+            'from_account'  => $from_account,
+            'to_account'    => implode(",", $to_accounts),
+            'to_group'      => implode(",", $to_group),
+            'collection_id' => $collection_id,
+            'msg_body'      => json_encode($msgBody),
+            'created_at'    => date("Y-m-d h:i:s"),
+            'updated_at'    => date("Y-m-d h:i:s"),
+        ];
+
+        $id = ImSendAll::insertGetId($add_data);
 
         $post_data['From_Account'] = $from_account;
         $post_data['MsgBody'] = $msgBody;
+        $post_data['CloudCustomData'] = json_encode(['ImSendAllId'=>$id]);
+
         //用户体 群发
         if(!empty($to_accounts)){
+            //本接口不会触发回调  所以需要储存消息体
             $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
             $post_data['To_Account'] = $to_accounts;
+            $post_data['MsgSeq']    = rand(10000000,99999999);
             $post_data['MsgRandom'] = rand(10000000,99999999);
-            ImClient::curlPost($url,json_encode($post_data));
+            $res = ImClient::curlPost($url,json_encode($post_data));
+            $res = json_decode($res,true);
+            if($res['ActionStatus'] == "OK"){
+                $post_data['CallbackCommand']   = 'C2C.CallbackAfterSendMsg';
+                $post_data['SendMsgResult']     = 0;
+                $post_data['UnreadMsgNum']      = 0;
+                //$post_data['type']              = 3; //群发
+                $post_data['MsgTime']           = time();
+                $post_data['MsgKey']            = $res['MsgKey'];
+                $to_accounts = array_unique($to_accounts);
+                foreach ($to_accounts as $key=>$val){
+                    $post_data['To_Account'] = $val;
+                    self::sendMsg($post_data);
+                }
 
+            }
         }
 
         //群组体 群发
@@ -100,12 +134,9 @@ class ImMsgController extends Controller
             foreach ($to_group as $item) {
                 $post_data['GroupId'] = $item;
                 $post_data['Random'] = rand(10000000,99999999);
-                //dd($post_data);
-                $res = ImClient::curlPost($url,json_encode($post_data));
+                ImClient::curlPost($url,json_encode($post_data));
             }
         }
-
-
         return $this->success();
     }
 
@@ -248,6 +279,10 @@ class ImMsgController extends Controller
             'msg_seq'           => $params['MsgSeq'],       //群消息的唯一标识
             'msg_time'          => $params['MsgTime'],
         ];
+        if( !empty($params['CloudCustomData']) ){
+            $cloudCustomData = json_decode($params['CloudCustomData'],true);
+            $msg_add['send_all_id'] = $cloudCustomData['ImSendAllId']??0;
+        }
 
         //单聊消息
         if($params['CallbackCommand'] == 'C2C.CallbackAfterSendMsg'){
@@ -289,56 +324,60 @@ class ImMsgController extends Controller
                     break;
                 case 'TIMSoundElem' ://语音消息元素
                     $msg_content_add['url']             = $v['MsgContent']['Url'];
-                    $msg_content_add['size']            = $v['MsgContent']['Size'];
-                    $msg_content_add['second']          = $v['MsgContent']['Second'];
-                    $msg_content_add['download_flag']   = $v['MsgContent']['Download_Flag'];
+                    $msg_content_add['size']            = $v['MsgContent']['Size']??0;
+                    $msg_content_add['second']          = $v['MsgContent']['Second']??0;
+                    $msg_content_add['download_flag']   = $v['MsgContent']['Download_Flag']??2;
                     break;
                 case 'TIMImageElem' ://图片元素
 
                     $msg_content_add['uuid']            = $v['MsgContent']['UUID'];
                     $msg_content_add['image_format']    = $v['MsgContent']['ImageFormat'];
                     //保留缩略图
-                    foreach ($v['MsgContent']['ImageInfoArray'] as $img_k=>$img_v){
-                        if($img_v['Type'] == 3){
-                            $msg_content_add['url'] = $img_v['URL'];
+                    $img_res = true;
+                    if(!empty($v['MsgContent']['ImageInfoArray'])){
+                        foreach ($v['MsgContent']['ImageInfoArray'] as $img_k=>$img_v){
+                            if($img_v['Type'] == 3){
+                                $msg_content_add['url'] = $img_v['URL'];
+                            }
+                            //入库图片表
+                            $img_add = [
+                                'uuid'      => $v['MsgContent']['UUID'],
+                                'type'      => $img_v['Type'],
+                                'size'      => $img_v['Size'],
+                                'width'     => $img_v['Width'],
+                                'height'    => $img_v['Height'],
+                                'url'       => $img_v['URL'],
+                                'created_at'=> date("Y-m-d h:i:s"),
+                                'updated_at'=> date("Y-m-d h:i:s"),
+                            ];
+                            $img_adds[] = $img_add;
+
                         }
-                        //入库图片表
-                        $img_add = [
-                            'uuid'      => $v['MsgContent']['UUID'],
-                            'type'      => $img_v['Type'],
-                            'size'      => $img_v['Size'],
-                            'width'     => $img_v['Width'],
-                            'height'    => $img_v['Height'],
-                            'url'       => $img_v['URL'],
-                            'created_at'=> date("Y-m-d h:i:s"),
-                            'updated_at'=> date("Y-m-d h:i:s"),
-                        ];
-                        $img_adds[] = $img_add;
 
+                        if(!empty($img_adds)){
+                            $img_res = ImMsgContentImg::insert($img_adds);
+                        }else{
+                            $img_res = false;
+                        }
                     }
 
-                    if(!empty($img_adds)){
-                        $img_res = ImMsgContentImg::insert($img_adds);
-                    }else{
-                        $img_res = false;
-                    }
 
                     break;
                 case 'TIMFileElem' ://文件类型元素
                     $msg_content_add['url']            = $v['MsgContent']['Url'];
-                    $msg_content_add['file_size']      = $v['MsgContent']['FileSize'];
+                    $msg_content_add['file_size']      = $v['MsgContent']['FileSize']??0;
                     $msg_content_add['file_name']      = $v['MsgContent']['FileName'];
-                    $msg_content_add['download_flag']  = $v['MsgContent']['Download_Flag'];
+                    $msg_content_add['download_flag']  = $v['MsgContent']['Download_Flag']??2;
                     break;
 
 
 
                 case 'TIMVideoFileElem' : //视频类型元素
                     $msg_content_add['video_url']           = $v['MsgContent']['VideoUrl'];
-                    $msg_content_add['size']                = $v['MsgContent']['VideoSize'];
-                    $msg_content_add['second']              = $v['MsgContent']['VideoSecond'];
-                    $msg_content_add['video_format']        = $v['MsgContent']['VideoFormat'];
-                    $msg_content_add['download_flag']       = $v['MsgContent']['VideoDownloadFlag'];
+                    $msg_content_add['size']                = $v['MsgContent']['VideoSize']??0;
+                    $msg_content_add['second']              = $v['MsgContent']['VideoSecond']??0;
+                    $msg_content_add['video_format']        = $v['MsgContent']['VideoFormat']??'';
+                    $msg_content_add['download_flag']       = $v['MsgContent']['VideoDownloadFlag']??2;
                     $msg_content_add['thumb_url']           = $v['MsgContent']['ThumbUrl']??'';
                     $msg_content_add['thumb_size']          = $v['MsgContent']['ThumbSize']??0;
                     $msg_content_add['thumb_width']         = $v['MsgContent']['ThumbWidth']??0;
@@ -346,10 +385,10 @@ class ImMsgController extends Controller
                     $msg_content_add['thumb_format']        = $v['MsgContent']['ThumbFormat']??'';
                     break;
                 case 'TIMCustomElem' : //自定义类型
-                    $msg_content_add['data']    = $v['MsgContent']['Data'];
-                    $msg_content_add['desc']    = $v['MsgContent']['Desc'];
-                    $msg_content_add['ext']     = $v['MsgContent']['Ext'];
-                    $msg_content_add['sound']   = $v['MsgContent']['Sound'];
+                    $msg_content_add['data']    = $v['MsgContent']['Data']??'';
+                    $msg_content_add['desc']    = $v['MsgContent']['Desc']??'';
+                    $msg_content_add['ext']     = $v['MsgContent']['Ext']??'';
+                    $msg_content_add['sound']   = $v['MsgContent']['Sound']??'';
 
                     break;
             }

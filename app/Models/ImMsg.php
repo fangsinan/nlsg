@@ -10,7 +10,7 @@ class ImMsg extends Base
     protected $table = 'nlsg_im_msg';
 
     protected $fillable = ['from_account', 'to_account', 'msg_seq','msg_random','msg_key',
-        'msg_time','msg_time','send_msg_result','unread_msg_num','group_id','type','online_only_flag','os_msg_id'];
+        'msg_time','msg_time','send_msg_result','unread_msg_num','group_id','type','online_only_flag','os_msg_id','send_all_id'];
 
 
 
@@ -90,7 +90,7 @@ class ImMsg extends Base
 //                    $msg_content_add['VideoSecond']         = $val['VideoSecond'];
 //                    $msg_content_add['VideoFormat']         = $val['VideoFormat'];
 //                    $msg_content_add['VideoDownloadFlag']   = $val['VideoDownloadFlag'];
-                    $msg_content_add['ThumbUrl']            = $params['ThumbUrl'];
+                    $msg_content_add['ThumbUrl']            = $params['ThumbUrl']??'';
     //                $msg_content_add['ThumbSize']           = $params['ThumbSize'];
     //                $msg_content_add['ThumbWidth']          = $params['ThumbWidth'];
     //                $msg_content_add['ThumbHeight']         = $params['ThumbHeight'];
@@ -98,7 +98,7 @@ class ImMsg extends Base
                     break;
 
                 case 'TIMCustomElem' : //自定义消息
-                    $msg_content_add['Desc']    = $val['Desc'];
+                    $msg_content_add['Desc']    = $val['Desc']??'';
                     $msg_content_add['Data']    = $val['Data'];
                     break;
 
