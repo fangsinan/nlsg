@@ -37,7 +37,7 @@ class ImMsgController extends Controller
      * @apiParam {array} To_Account  接收方用户 数组类型
      * @apiParam {array} To_Group   接收方群组 数组类型
      * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"}] 数组类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
-     * @apiParam {int}  collection_id 收藏id  
+     * @apiParam {int}  collection_id 收藏id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -169,7 +169,7 @@ class ImMsgController extends Controller
             ImCollection::where('id',$collection_id)->update(['state' => 2,]);
             return $this->success();
         }
-
+        \Log::info('im_param_log'.json_encode($request->input()));
         if(!is_array($os_msg_id)){
             return $this->error('0','msg_key error');
         }
