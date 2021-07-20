@@ -898,17 +898,23 @@ class ImDocServers
                         if (empty($temp_msg_type)) {
                             $temp_msg_type = 9;
                         }
+                    case 17:
+                        if (empty($temp_msg_type)) {
+                            $temp_msg_type = 10;
+                        }
                     case 16:
                         if (empty($temp_msg_type)) {
                             $temp_msg_type = 11;
                         }
+
                         $custom_elem_body = [
-                            "goodsID" => $v->docInfo->obj_id,
+                            "goodsID" => $temp_msg_type == 10 ? $v->docInfo->content : (string)$v->docInfo->obj_id,
                             "cover_pic" => $v->docInfo->cover_img,
                             "titleName" => $v->docInfo->content,
                             "subtitle" => $v->docInfo->subtitle,
                             "type" => (string)$temp_msg_type,
                         ];
+
                         $custom_elem_body = json_encode($custom_elem_body);
                         $temp_post_data['MsgBody'][] = [
                             "MsgType" => "TIMCustomElem", // 自定义,不成功
@@ -1025,17 +1031,17 @@ class ImDocServers
             }
         }
 
-        if (empty($post_data_array)){
-            return ['code'=>true,'msg'=>'没有任务'];
+        if (empty($post_data_array)) {
+            return ['code' => true, 'msg' => '没有任务'];
         }
 
         $res_list = [];
-        foreach ($post_data_array as $v){
+        foreach ($post_data_array as $v) {
             $res = ImClient::curlPost($url, json_encode($v));
             $res_list[] = json_decode($res, true);
             sleep(1);
         }
 
-        return [$res_list,$post_data_array];
+        return [$res_list, $post_data_array];
     }
 }
