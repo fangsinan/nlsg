@@ -64,6 +64,7 @@ class ImDocServers
         $subtitle = $params['subtitle'] ?? '';
         $status = $params['status'] ?? 1;
         $file_url = $params['file_url'] ?? '';
+        $file_size = $params['file_size'] ?? '';
         $for_app = $params['for_app'] ?? 0;
         $second = $params['second'] ?? 0;
         $format = $params['format'] ?? '';
@@ -93,7 +94,7 @@ class ImDocServers
 
                 break;
             case 2:
-                //21音频 22视频 23图片
+                //21音频 22视频 23图片 24文件
                 if (empty($content)) {
                     return ['code' => false, 'msg' => '内容不能为空'];
                 }
@@ -103,6 +104,14 @@ class ImDocServers
                 if (empty($format)) {
                     return ['code' => false, 'msg' => '格式后缀名不能为空format'];
                 }
+
+
+                if (in_array($params['type_info'], [21, 22,24])) {
+                    if (empty($file_size)) {
+                        return ['code' => false, 'msg' => 'file_size不能为空'];
+                    }
+                }
+
 
                 if (in_array($params['type_info'], [21, 22])) {
                     if (empty($second)) {
@@ -147,6 +156,7 @@ class ImDocServers
         $docModel->content = $content;
         $docModel->subtitle = $subtitle;
         $docModel->file_url = $file_url;
+        $docModel->file_size = $file_size;
         $docModel->status = $status;
         $docModel->user_id = $user_id;
         $docModel->second = $second;
