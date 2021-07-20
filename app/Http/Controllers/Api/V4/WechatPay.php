@@ -681,7 +681,9 @@ class WechatPay extends Controller
                         ], ['aliyun']);
                     }
                     //9.9刷单推送
-                    self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $live_id, $orderId, 1);
+                    if(!empty($orderInfo['remark']) && $orderInfo['remark']>0) {
+                        self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
+                    }
 
                     //暂时先不启用直接分账
 //                    //调用直播分账
