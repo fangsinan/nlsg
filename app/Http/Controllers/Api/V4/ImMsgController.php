@@ -37,7 +37,7 @@ class ImMsgController extends Controller
      * @apiParam {array} To_Account  接收方用户 数组类型
      * @apiParam {array} To_Group   接收方群组 数组类型
      * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"}] 数组类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
-     * @apiParam {int}  collection_id 收藏id  数组格式
+     * @apiParam {int}  collection_id 收藏id  
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
