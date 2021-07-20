@@ -12,6 +12,7 @@ use App\Models\LiveConsole;
 use App\Models\LiveCountDown;
 use App\Models\LiveForbiddenWords;
 use App\Models\LiveInfo;
+use App\Models\LiveLogin;
 use App\Models\LiveSonFlagPoster;
 use App\Models\LiveWorks;
 use App\Models\MallOrder;
@@ -451,7 +452,7 @@ class LiveController extends Controller
     public function show(Request $request)
     {
         $id = $request->get('live_id');
-        $live_son_flag = $request->get('live_son_flag');
+        $live_son_flag = intval($request->get('live_son_flag',0));
         $os_type = intval($request->input('os_type', 0)); //1 安卓 2ios 3微信
         if(!empty($os_type) && $os_type==3){
             $selectArr=['id','live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video'];
@@ -539,8 +540,15 @@ class LiveController extends Controller
             }
 //
         }
+        //初始化人气值
+        if(empty($live_son_flag)){
+            $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
+        }else{
+            $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->where('live_son_flag', $live_son_flag)->count();
+        }
         $data = [
             'info' => $list,
+            'live_son_flag_num' => $live_son_flag_num,
         ];
         return success($data);
 
