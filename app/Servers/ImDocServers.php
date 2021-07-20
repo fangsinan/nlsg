@@ -64,7 +64,7 @@ class ImDocServers
         $subtitle = $params['subtitle'] ?? '';
         $status = $params['status'] ?? 1;
         $file_url = $params['file_url'] ?? '';
-        $file_size = $params['file_size'] ?? '';
+        $file_size = $params['file_size'] ?? 0;
         $for_app = $params['for_app'] ?? 0;
         $second = $params['second'] ?? 0;
         $format = $params['format'] ?? '';
@@ -87,11 +87,21 @@ class ImDocServers
         //1商品 2附件 3文本
         switch (intval($params['type'])) {
             case 1:
-                // 11:讲座 12课程 13商品 14会员 15直播 16训练营
-                if (empty($obj_id)) {
-                    return ['code' => false, 'msg' => '目标id错误'];
-                }
+                // 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链
+                if ($type_info = 17){
+                    //判断网址
+                }else{
+                    if (empty($obj_id)) {
+                        return ['code' => false, 'msg' => '目标id错误'];
+                    }
 
+                    if (empty($cover_img)){
+                        return ['code'=>false,'msg'=>'cover_img错误','ps'=>'封面图'];
+                    }
+                    if (empty($cover_img)){
+                        return ['code'=>false,'msg'=>'content错误','ps'=>'标题'];
+                    }
+                }
                 break;
             case 2:
                 //21音频 22视频 23图片 24文件
@@ -118,14 +128,16 @@ class ImDocServers
                         return ['code' => false, 'msg' => 'second不能为空'];
                     }
                 }
+                if ($params['type_info'] == 22 || $params['type_info'] == 21) {
+                    if (empty($file_md5)) {
+                        return ['code' => false, 'msg' => '文件md5不能为空'];
+                    }
+                }
                 if ($params['type_info'] == 22) {
                     //如果是视频,必须有封面
                     if (empty($cover_img) || empty($img_size) || empty($img_width)
                         || empty($img_height) || empty($img_format) || empty($img_md5)) {
                         return ['code' => false, 'msg' => '必须有封面和尺寸长宽后缀名参数'];
-                    }
-                    if (empty($file_md5)) {
-                        return ['code' => false, 'msg' => '文件md5不能为空'];
                     }
                 }
                 if ($params['type_info'] == 23) {
