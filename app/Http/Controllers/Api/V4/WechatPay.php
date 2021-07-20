@@ -513,6 +513,8 @@ class WechatPay extends Controller
         } else if ($type == 18){
             $data = Column::find($relation_id);
             $res = $nickname . ':您已购买'.$data['name'];
+        }else if($type==11){ //购买9.9直播间
+            $res = $nickname . ':您已订阅'.$relation_id;
         }
         Redis::rpush($key, $res);
 //        Redis::setex($key,600,json_encode($res,true));
@@ -678,6 +680,8 @@ class WechatPay extends Controller
                             'template' => 'SMS_211275363',
                         ], ['aliyun']);
                     }
+                    //9.9刷单推送
+                    self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $live_id, $orderId, 1);
 
                     //暂时先不启用直接分账
 //                    //调用直播分账
