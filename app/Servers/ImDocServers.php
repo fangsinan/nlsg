@@ -1039,9 +1039,14 @@ class ImDocServers
         foreach ($post_data_array as $v) {
             $res = ImClient::curlPost($url, json_encode($v));
             $res_list[] = json_decode($res, true);
-            sleep(1);
+//            sleep(1);
         }
 
-        return [$res_list, $post_data_array];
+        ImDocSendJob::whereIn('id',$job_id_list)->update([
+            'is_done'=>3,
+            'success_at'=>date('Y-m-d H:i:s')
+        ]);
+
+        return ['code'=>true,'msg'=>'成功'];
     }
 }
