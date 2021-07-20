@@ -106,7 +106,7 @@ class ImDocServers
                 }
 
 
-                if (in_array($params['type_info'], [21, 22,24])) {
+                if (in_array($params['type_info'], [21, 22, 24])) {
                     if (empty($file_size)) {
                         return ['code' => false, 'msg' => 'file_size不能为空'];
                     }
@@ -992,6 +992,19 @@ class ImDocServers
                                 $post_data_array[] = $temp_post_data;
                             }
                         }
+                        break;
+                    case 24:
+                        //文件
+                        $temp_post_data['MsgBody'][] = [
+                            "MsgType" => "TIMFileElem",
+                            "MsgContent" => [
+                                "Url" => $v->docInfo->file_url,
+                                "FileSize" => $v->docInfo->file_size,
+                                "FileName" => $v->docInfo->content,
+                                "Download_Flag" => 2,
+                            ]
+                        ];
+                        $post_data_array[] = $temp_post_data;
                         break;
                     case 31:
                         //文本
