@@ -10,7 +10,7 @@ class ImMsg extends Base
     protected $table = 'nlsg_im_msg';
 
     protected $fillable = ['from_account', 'to_account', 'msg_seq','msg_random','msg_key',
-        'msg_time','msg_time','send_msg_result','unread_msg_num','group_id','type','online_only_flag','os_msg_id'];
+        'msg_time','msg_time','send_msg_result','unread_msg_num','group_id','type','online_only_flag','os_msg_id','send_all_id'];
 
 
 

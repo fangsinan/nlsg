@@ -51,8 +51,8 @@ class ImMsgController extends Controller
         $params    = $request->input();
 
         $from_account   = $params['From_Account']??'';  //发送方帐号
-        $to_accounts    = $params['To_Account']??'';  //消息接收方用户
-        $to_group       = $params['To_Group']??'';  //消息接收方群
+        $to_accounts    = $params['To_Account']??[];  //消息接收方用户
+        $to_group       = $params['To_Group']??[];  //消息接收方群
         $msg_content    = $params['Msg_Content'] ??[];  //消息体
         $collection_id  = $params['collection_id'] ??0;  //消息收藏id
 
@@ -84,16 +84,48 @@ class ImMsgController extends Controller
         if(empty($msgBody)){
             return $this->error('0','Msg Body Error');
         }
+        //群发列表
+        //查询当前消息的
+        //因为群发给多个群无法确定唯一key  所以保留消息体'
+        $add_data = [
+            'from_account'  => $from_account,
+            'to_account'    => implode(",", $to_accounts),
+            'to_group'      => implode(",", $to_group),
+            'collection_id' => $collection_id,
+            'msg_body'      => json_encode($msgBody),
+            'created_at'    => date("Y-m-d h:i:s"),
+            'updated_at'    => date("Y-m-d h:i:s"),
+        ];
+
+        $id = ImSendAll::insertGetId($add_data);
 
         $post_data['From_Account'] = $from_account;
         $post_data['MsgBody'] = $msgBody;
+        $post_data['CloudCustomData'] = json_encode(['ImSendAllId'=>$id]);
+
         //用户体 群发
         if(!empty($to_accounts)){
+            //本接口不会触发回调  所以需要储存消息体
             $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
             $post_data['To_Account'] = $to_accounts;
+            $post_data['MsgSeq']    = rand(10000000,99999999);
             $post_data['MsgRandom'] = rand(10000000,99999999);
-            ImClient::curlPost($url,json_encode($post_data));
+            $res = ImClient::curlPost($url,json_encode($post_data));
+            $res = json_decode($res,true);
+            if($res['ActionStatus'] == "OK"){
+                $post_data['CallbackCommand']   = 'C2C.CallbackAfterSendMsg';
+                $post_data['SendMsgResult']     = 0;
+                $post_data['UnreadMsgNum']      = 0;
+                //$post_data['type']              = 3; //群发
+                $post_data['MsgTime']           = time();
+                $post_data['MsgKey']            = $res['MsgKey'];
+                $to_accounts = array_unique($to_accounts);
+                foreach ($to_accounts as $key=>$val){
+                    $post_data['To_Account'] = $val;
+                    self::sendMsg($post_data);
+                }
 
+            }
         }
 
         //群组体 群发
@@ -102,12 +134,9 @@ class ImMsgController extends Controller
             foreach ($to_group as $item) {
                 $post_data['GroupId'] = $item;
                 $post_data['Random'] = rand(10000000,99999999);
-                //dd($post_data);
-                $res = ImClient::curlPost($url,json_encode($post_data));
+                ImClient::curlPost($url,json_encode($post_data));
             }
         }
-
-
         return $this->success();
     }
 
@@ -250,6 +279,10 @@ class ImMsgController extends Controller
             'msg_seq'           => $params['MsgSeq'],       //群消息的唯一标识
             'msg_time'          => $params['MsgTime'],
         ];
+        if( !empty($params['CloudCustomData']) ){
+            $cloudCustomData = json_decode($params['CloudCustomData'],true);
+            $msg_add['send_all_id'] = $cloudCustomData['ImSendAllId']??0;
+        }
 
         //单聊消息
         if($params['CallbackCommand'] == 'C2C.CallbackAfterSendMsg'){
