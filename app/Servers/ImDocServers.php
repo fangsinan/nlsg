@@ -699,7 +699,7 @@ class ImDocServers
             $url = ImClient::get_im_url('https://console.tim.qq.com/v4/group_open_http_svc/group_msg_get_simple');
             $body = [
                 "GroupId" => "@TGS#2GZCYDJHT",    //拉取消息的群 ID
-                "ReqMsgNumber" => 4    //需要拉取的消息条数
+                "ReqMsgNumber" => 2    //需要拉取的消息条数
             ];
             $res = ImClient::curlPost($url, json_encode($body));
             $res = json_decode($res, true);
@@ -754,15 +754,15 @@ class ImDocServers
 //                        "Text" => "red packet".__LINE__
 //                    ]
 //                ],
-                [
-                    "MsgType" => "TIMCustomElem", // 自定义,不成功
-                    "MsgContent" => [
-                        "Data" => $custom_elem_body,
-                        "Desc" => '',
-                        'Ext' => '',
-                        'Sound' => '',
-                    ]
-                ],
+//                [
+//                    "MsgType" => "TIMCustomElem", // 自定义,不成功
+//                    "MsgContent" => [
+//                        "Data" => $custom_elem_body,
+//                        "Desc" => '',
+//                        'Ext' => '',
+//                        'Sound' => '',
+//                    ]
+//                ],
 //                [
 //                    "MsgType" => "TIMSoundElem",//音频
 //                    "MsgContent" => [
@@ -790,34 +790,34 @@ class ImDocServers
 //                        "ThumbDownloadFlag" => 2
 //                    ]
 //                ],
-//                [
-//                    "MsgType" => "TIMImageElem", //图片
-//                    "MsgContent" => [
-//                        "UUID" => "8912484a9e64fa8fa89f84c1e6371edc1231",
-//                        "ImageFormat" => 255,
-//                        "ImageInfoArray" => [
-//                            [
-//                                "Type" => 1,
-//                                "Size" => 4534,
-//                                "Width" => 200,
-//                                "Height" => 200,
-//                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"
-//                            ],
-//                            [
-//                                "Type" => 2,
-//                                "Size" => 4534,
-//                                "Width" => 0,
-//                                "Height" => 0,
-//                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"],
-//                            [
-//                                "Type" => 3,
-//                                "Size" => 4534,
-//                                "Width" => 0,
-//                                "Height" => 0,
-//                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"],
-//                        ]
-//                    ]
-//                ],
+                [
+                    "MsgType" => "TIMImageElem", //图片
+                    "MsgContent" => [
+                        "UUID" => "8912484a9e64fa8fa89f84c1e6371edc1231",
+                        "ImageFormat" => 255,
+                        "ImageInfoArray" => [
+                            [
+                                "Type" => 1,
+                                "Size" => 4534,
+                                "Width" => 200,
+                                "Height" => 200,
+                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"
+                            ],
+                            [
+                                "Type" => 2,
+                                "Size" => 4534,
+                                "Width" => 0,
+                                "Height" => 0,
+                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"],
+                            [
+                                "Type" => 3,
+                                "Size" => 4534,
+                                "Width" => 0,
+                                "Height" => 0,
+                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"],
+                        ]
+                    ]
+                ],
 //                [
 //                    "MsgType" => "TIMFileElem",//文件音频
 //                    "MsgContent" => [
@@ -873,7 +873,7 @@ class ImDocServers
             foreach ($v->jobInfo as $vv) {
                 $temp_post_data = [];
                 $temp_post_data['GroupId'] = $vv->groupInfo->group_id;
-                $temp_post_data['From_Account'] = $v->user_id;
+                $temp_post_data['From_Account'] = (string)$v->user_id;
                 $temp_post_data['Random'] = $this->getMsgRandom();
                 $temp_post_data['MsgBody'] = [];
                 $temp_msg_type = 0;
@@ -907,8 +907,9 @@ class ImDocServers
                             "cover_pic" => $v->docInfo->cover_img,
                             "titleName" => $v->docInfo->content,
                             "subtitle" => $v->docInfo->subtitle,
-                            "type" => $temp_msg_type,
+                            "type" => (string)$temp_msg_type,
                         ];
+                        $custom_elem_body = json_encode($custom_elem_body);
                         $temp_post_data['MsgBody'][] = [
                             "MsgType" => "TIMCustomElem", // 自定义,不成功
                             "MsgContent" => [
@@ -937,13 +938,15 @@ class ImDocServers
                             "MsgType" => "TIMVideoFileElem",//视频
                             "MsgContent" => [
                                 "VideoUrl" => $v->docInfo->file_url,
-                                "VideoUUID" => $v->docInfo->file_md5,
+//                                "VideoUUID" => $v->docInfo->file_md5,
+                                "VideoUUID" => $this->getMsgRandom(),
                                 "VideoSize" => $v->docInfo->file_size,
                                 "VideoSecond" => $v->docInfo->second,
                                 "VideoFormat" => $v->docInfo->format,
                                 "VideoDownloadFlag" => 2,
                                 "ThumbUrl" => $v->docInfo->cover_img,
-                                "ThumbUUID" => $v->docInfo->img_md5,
+//                                "ThumbUUID" => $v->docInfo->img_md5,
+                                "ThumbUUID" => $this->getMsgRandom(),
                                 "ThumbSize" => $v->docInfo->img_size,
                                 "ThumbWidth" => $v->docInfo->img_width,
                                 "ThumbHeight" => $v->docInfo->img_height,
@@ -955,42 +958,43 @@ class ImDocServers
                         break;
                     case 23:
                         //图片
-                        $file_url = explode(';', $vv->file_url);
+                        $file_url = explode(';', $v->docInfo->file_url);
+                        $file_url = array_filter($file_url);
                         foreach ($file_url as $fuv) {
+                            $temp_post_data['MsgBody'] = [];
                             $fuv = explode(',', $fuv);
-                            foreach ($fuv as $fuvv) {
-                                $temp_post_data['MsgBody'][] = [
-                                    "MsgType" => "TIMImageElem",
-                                    "MsgContent" => [
-                                        "UUID" => $fuvv[4],
-                                        "ImageFormat" => 255,
-                                        "ImageInfoArray" => [
-                                            [
-                                                "Type" => 1,
-                                                "Size" => $fuvv[1],
-                                                "Width" => $fuvv[2],
-                                                "Height" => $fuvv[3],
-                                                "URL" => $fuvv[0],
-                                            ],
-                                            [
-                                                "Type" => 2,
-                                                "Size" => $fuvv[1],
-                                                "Width" => 0,
-                                                "Height" => 0,
-                                                "URL" => $fuvv[0],
-                                            ],
-                                            [
-                                                "Type" => 3,
-                                                "Size" => $fuvv[1],
-                                                "Width" => 0,
-                                                "Height" => 0,
-                                                "URL" => $fuvv[0],
-                                            ],
-                                        ]
+                            $temp_post_data['MsgBody'][] = [
+                                "MsgType" => "TIMImageElem",
+                                "MsgContent" => [
+//                                    "UUID" => $fuv[4],
+                                    "UUID" => $this->getMsgRandom(),
+                                    "ImageFormat" => 1,
+                                    "ImageInfoArray" => [
+                                        [
+                                            "Type" => 1,
+                                            "Size" => (int)$fuv[1],
+                                            "Width" => (int)$fuv[2],
+                                            "Height" => (int)$fuv[3],
+                                            "URL" => $fuv[0],
+                                        ],
+                                        [
+                                            "Type" => 2,
+                                            "Size" => (int)$fuv[1],
+                                            "Width" => 0,
+                                            "Height" => 0,
+                                            "URL" => $fuv[0],
+                                        ],
+                                        [
+                                            "Type" => 3,
+                                            "Size" => $fuv[1],
+                                            "Width" => 0,
+                                            "Height" => 0,
+                                            "URL" => $fuv[0],
+                                        ],
                                     ]
-                                ];
-                                $post_data_array[] = $temp_post_data;
-                            }
+                                ]
+                            ];
+                            $post_data_array[] = $temp_post_data;
                         }
                         break;
                     case 24:
@@ -1021,6 +1025,17 @@ class ImDocServers
             }
         }
 
-        return [$post_data_array, $job_id_list, $job_info];
+        if (empty($post_data_array)){
+            return ['code'=>true,'msg'=>'没有任务'];
+        }
+
+        $res_list = [];
+        foreach ($post_data_array as $v){
+            $res = ImClient::curlPost($url, json_encode($v));
+            $res_list[] = json_decode($res, true);
+            sleep(1);
+        }
+
+        return [$res_list,$post_data_array];
     }
 }
