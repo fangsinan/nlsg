@@ -14,7 +14,8 @@ class ImDocSendJob extends Base
         return $this->hasOne(ImDoc::class, 'id', 'doc_id')
             ->select([
                 'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content',
-                'subtitle', 'file_url', 'status', 'second', 'format','file_size'
+                'subtitle', 'file_url', 'status', 'second', 'format','file_size',
+                'img_size','img_width','img_height','img_format'
             ]);
     }
 

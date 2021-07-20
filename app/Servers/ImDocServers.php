@@ -67,6 +67,10 @@ class ImDocServers
         $for_app = $params['for_app'] ?? 0;
         $second = $params['second'] ?? 0;
         $format = $params['format'] ?? '';
+        $img_size = $params['img_size'] ?? 0;
+        $img_width = $params['img_width'] ?? 0;
+        $img_height = $params['img_height'] ?? 0;
+        $img_format = $params['img_format'] ?? 0;
 
         if (!in_array($status, [1, 2])) {
             return ['code' => false, 'msg' => '状态错误'];
@@ -95,7 +99,19 @@ class ImDocServers
                     return ['code' => false, 'msg' => '附件地址不能为空'];
                 }
                 if (empty($format)) {
-                    return ['code' => false, 'msg' => '格式后缀名不能为空'];
+                    return ['code' => false, 'msg' => '格式后缀名不能为空format'];
+                }
+
+                if (in_array($params['type_info'], [21, 22])) {
+                    if (empty($second)) {
+                        return ['code' => false, 'msg' => 'second不能为空'];
+                    }
+                }
+                if ($params['type_info'] == 22){
+                    //如果是视频,必须有封面
+                    if (empty($cover_img) || empty($img_size) || empty($img_width) || empty($img_height) || empty($img_format)){
+                        return ['code'=>false,'msg'=>'必须有封面和尺寸长宽后缀名参数'];
+                    }
                 }
 
                 break;
@@ -108,11 +124,7 @@ class ImDocServers
                 break;
         }
 
-        if (in_array($params['type_info'], [21, 22])) {
-            if (empty($second)) {
-                return ['code' => false, 'msg' => '时常不能为空'];
-            }
-        }
+
 
         $docModel->type = $type;
         $docModel->type_info = $type_info;
@@ -125,6 +137,10 @@ class ImDocServers
         $docModel->user_id = $user_id;
         $docModel->second = $second;
         $docModel->format = $format;
+        $docModel->img_size = $img_size;
+        $docModel->img_width = $img_width;
+        $docModel->img_height = $img_height;
+        $docModel->img_format = $img_format;
 
         DB::beginTransaction();
 
@@ -652,7 +668,48 @@ class ImDocServers
 
     public function test()
     {
+        if (0) {
+            //拉去群消息记录
+            $url = ImClient::get_im_url('https://console.tim.qq.com/v4/group_open_http_svc/group_msg_get_simple');
+            $body = [
+                "GroupId" => "@TGS#2GZCYDJHT",    //拉取消息的群 ID
+                "ReqMsgNumber" => 4    //需要拉取的消息条数
+            ];
+            $res = ImClient::curlPost($url, json_encode($body));
+            $res = json_decode($res, true);
+            dd([$res, $body]);
+        }
+
+        if (0) {
+            $url = ImClient::get_im_url('https://console.tim.qq.com/v4/group_open_http_svc/add_group_member');
+            //加人
+            $body = [
+                "GroupId" => "@TGS#2GZCYDJHT", // 要操作的群组（必填）
+                "Silence" => 1, // 是否静默加人（选填）
+                "MemberList" => [ // 一次最多添加300个成员
+                    [
+                        "Member_Account" => "425232" // 要添加的群成员 ID（必填）
+                    ],
+                ]
+            ];
+            $res = ImClient::curlPost($url, json_encode($body));
+            $res = json_decode($res, true);
+            dd([$res, $body]);
+        }
+
+
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+
+        $custom_elem_body = [
+            "goodsID" => "81",
+//            "cover_pic" => "https://image.nlsgapp.com/nlsg/goods/20201218171703214387.jpg",
+            "cover_pic" => "nlsg/goods/20201218171703214387.jpg",
+            "titleName" => "自定标题sdfsdf" . rand(1, 999),
+            "subtitle" => "自定副标题fdfaas" . rand(1, 999),
+            "type" => "3",
+        ];
+        $custom_elem_body = json_encode($custom_elem_body);
+
         $post_data = [
             "GroupId" => "@TGS#2GZCYDJHT",
             "From_Account" => "168934", // 指定消息发送者（选填）
@@ -665,24 +722,21 @@ class ImDocServers
 //                        "Data" => "abc\u0000\u0001"
 //                    ]
 //                ],
-                [
-                    "MsgType" => "TIMTextElem", // 文本
-                    "MsgContent" =>[
-                        "Text" => "red packet".__LINE__
-                    ]
-                ],
 //                [
-//                    "MsgType" => "TIMCustomElem", // 自定义,不成功
-//                    "MsgContent" => [
-//                        "Data" => [
-//                            "goodsID" => 394,
-//                            "cover_pic" => "nlsg/works/20201212162527485745.png",
-//                            "titleName" => "自定标题",
-//                            "subtitle" => "自定副标题",
-//                            "type" => 2,
-//                        ]
+//                    "MsgType" => "TIMTextElem", // 文本
+//                    "MsgContent" =>[
+//                        "Text" => "red packet".__LINE__
 //                    ]
 //                ],
+                [
+                    "MsgType" => "TIMCustomElem", // 自定义,不成功
+                    "MsgContent" => [
+                        "Data" => $custom_elem_body,
+                        "Desc" => '',
+                        'Ext' => '',
+                        'Sound' => '',
+                    ]
+                ],
 //                [
 //                    "MsgType" => "TIMSoundElem",//音频
 //                    "MsgContent" => [
@@ -693,22 +747,20 @@ class ImDocServers
 //                    ]
 //                ],
 //                [
-//                    "MsgType" => "TIMVideoFileElem",//视频 未成功
+//                    "MsgType" => "TIMVideoFileElem",//视频
 //                    "MsgContent" => [
-////                        "VideoUrl" => 'https://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/70085c833701925921203766717/zR8GaCZiBnUA.mp4',
-//                        "VideoUrl" => 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/4f17-168934/c70fd2d8040becafdde743d6010c3ac1.mp4',
-//                        "VideoSize" => 407499,
-//                        "VideoSecond" => 4,
+//                        "VideoUrl" => 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a4d8-425232/345e2a389fe32d62fedad3d6d2150110.mp4',
+//                        "VideoUUID" => 'sdfafafasfafamp4',
+//                        "VideoSize" => 1247117,
+//                        "VideoSecond" => 7,
 //                        "VideoFormat" => 'mp4',
 //                        "VideoDownloadFlag" => 2,
-////                        "ThumbUrl" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png",
-//                        "ThumbUrl" => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/4f17-168934/b99e0d7fc33f37ab59cdac1e369ca017?imageMogr2/",
-//                        "ThumbSize" => 56920,
-////                        "ThumbWidth" => 960,
-//                        "ThumbWidth" => 192,
-////                        "ThumbHeight" => 540,
-//                        "ThumbHeight" => 108,
-//                        "ThumbFormat" => "PNG",
+//                        "ThumbUrl" => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a4d8-425232/643665ba437cf198a9961f85795d8474.jpg?imageMogr2/",
+//                        "ThumbUUID" => '131231313jpg',
+//                        "ThumbSize" => 277431,
+//                        "ThumbWidth" => 720,
+//                        "ThumbHeight" => 1600,
+//                        "ThumbFormat" => "jpg",
 //                        "ThumbDownloadFlag" => 2
 //                    ]
 //                ],
@@ -738,6 +790,24 @@ class ImDocServers
 //                                "Height" => 0,
 //                                "URL" => "http://image.nlsgapp.com/nlsg/works/20210526154253564773.png"],
 //                        ]
+//                    ]
+//                ],
+//                [
+//                    "MsgType" => "TIMFileElem",//文件音频
+//                    "MsgContent" => [
+//                        "Url" => "https://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/f63da4f95285890780889058541/aaodecBf5FAA.mp3",
+//                        "FileSize" => 4426079,
+//                        "FileName" => "fdldaslf.mp3",
+//                        "Download_Flag" => 2
+//                    ]
+//                ],
+//                [
+//                    "MsgType" => "TIMFileElem",//文件视频
+//                    "MsgContent" => [
+//                        "Url" => "https://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/70085c833701925921203766717/zR8GaCZiBnUA.mp4",
+//                        "FileSize" => 407499,
+//                        "FileName" => "fdffa.mp4",
+//                        "Download_Flag" => 2
 //                    ]
 //                ],
             ]
@@ -775,32 +845,13 @@ class ImDocServers
         foreach ($job_info as $v) {
             $job_id_list[] = $v->id;
             foreach ($v->jobInfo as $vv) {
-                $key = $vv->groupInfo->group_id . '_' . $v->user_id;
-                if (!isset($post_data_array[$key])) {
-                    $post_data_array[$key]['user_id'] = $v->user_id;
-                    $post_data_array[$key]['group_id'] = $vv->groupInfo->group_id;
-                    $post_data_array[$key]['doc_list'] = [];
-                }
-                $list_key = $v->doc_id;
-                if (!isset($post_data_array[$key]['doc_list'][$list_key])) {
-                    $post_data_array[$key]['doc_list'][$list_key] = $v->docInfo;
-                }
-            }
-        }
-
-        foreach ($post_data_array as $v) {
-            $post_data = [
-                "GroupId" => $v['group_id'],
-                "From_Account" => (string)$v['user_id'],
-                "Random" => $this->getMsgRandom(),
-                "MsgBody" => []
-            ];
-
-
-            $temp_msg_type = 0;
-
-            foreach ($v['doc_list'] as $vv) {
-                switch ($vv['type_info']) {
+                $temp_post_data = [];
+                $temp_post_data['GroupId'] = $vv->groupInfo->group_id;
+                $temp_post_data['From_Account'] = $v->user_id;
+                $temp_post_data['Random'] = $this->getMsgRandom();
+                $temp_post_data['MsgBody'] = [];
+                $temp_msg_type = 0;
+                switch (intval($v->docInfo->type_info)) {
                     case 11:
                         if (empty($temp_msg_type)) {
                             $temp_msg_type = 7;
@@ -825,157 +876,109 @@ class ImDocServers
                         if (empty($temp_msg_type)) {
                             $temp_msg_type = 11;
                         }
-                        break;
-//                        $post_data['MsgBody'][] = [
-//                            "MsgType"=> "TIMCustomElem",
-//                            "MsgContent"=> [
-//                                "Data"=> "message",
-//                                "Desc"=> [
-//                                    "goodsID"=>450,
-//                                    "cover_pic"=>$this->imgUrl($vv->cover_img),
-//                                    "titleName"=>$vv->content,
-//                                    "subtitle"=>$vv->subtitle,
-//                                    "type"=>$temp_msg_type,
-//                                ],
-//                                "Ext"=> "url",
-//                            ]
-//                        ];
-//                        break;
-                    case 21://音频
-                        $post_data['MsgBody'][] = [
-                            "MsgType" => "TIMSoundElem",
+                        $custom_elem_body = [
+                            "goodsID" => $v->docInfo->obj_id,
+                            "cover_pic" => $v->docInfo->cover_img,
+                            "titleName" => $v->docInfo->content,
+                            "subtitle" => $v->docInfo->subtitle,
+                            "type" => $temp_msg_type,
+                        ];
+                        $temp_post_data['MsgBody'][] = [
+                            "MsgType" => "TIMCustomElem", // 自定义,不成功
                             "MsgContent" => [
-                                "Url" => $vv->file_url,
-                                "Size" => $vv->file_size,
-                                "Second" => $vv->second,
+                                "Data" => $custom_elem_body,
+                                "Desc" => '',
+                                'Ext' => '',
+                                'Sound' => '',
+                            ]
+                        ];
+                        $post_data_array[] = $temp_post_data;
+                        break;
+                    case 21://音频
+                        $temp_post_data['MsgBody'][] = [
+                            "MsgType" => "TIMSoundElem",//音频
+                            "MsgContent" => [
+                                "Url" => $v->docInfo->file_url,
+                                "Size" => $v->docInfo->file_size,
+                                "Second" => $v->docInfo->second,
                                 "Download_Flag" => 2
                             ]
                         ];
+                        $post_data_array[] = $temp_post_data;
                         break;
-                    case 22:
-                        //视频
-                        $post_data['MsgBody'][] = [
-                            "MsgType" => "TIMVideoFileElem",
+                    case 22://视频
+                        $temp_post_data['MsgBody'][] = [
+                            "MsgType" => "TIMVideoFileElem",//视频
                             "MsgContent" => [
-                                "VideoUrl" => $vv->file_url,
-                                "VideoSize" => $vv->file_size,
-                                "VideoSecond" => $vv->second,
-                                "VideoFormat" => $vv->format,
+                                "VideoUrl" => $v->docInfo->file_url,
+                                "VideoUUID" => $this->getMsgRandom(),
+                                "VideoSize" => $v->docInfo->file_size,
+                                "VideoSecond" => $v->docInfo->second,
+                                "VideoFormat" => $v->docInfo->format,
                                 "VideoDownloadFlag" => 2,
-//                                "ThumbUrl" => "https://0345-1400187352-1256635546.cos.ap-shanghai.myqcloud.com/abcd/a6c170c9c599280cb06e0523d7a1f37b",
-//                                "ThumbSize" => 13907,
-//                                "ThumbWidth" => 720,
-//                                "ThumbHeight" => 1280,
-//                                "ThumbFormat" => "JPG",
-//                                "ThumbDownloadFlag" => 2
+                                "ThumbUrl" => $v->docInfo->cover_img,
+                                "ThumbUUID" => $this->getMsgRandom(),
+                                "ThumbSize" => $v->docInfo->img_size,
+                                "ThumbWidth" => $v->docInfo->img_width,
+                                "ThumbHeight" => $v->docInfo->img_height,
+                                "ThumbFormat" => $v->docInfo->img_format,
+                                "ThumbDownloadFlag" => 2
                             ]
                         ];
+                        $post_data_array[] = $temp_post_data;
                         break;
                     case 23:
                         //图片
                         $file_url = explode(',', $vv->file_url);
-                        foreach ($file_url as $vvv) {
-                            $post_data['MsgBody'][] = [
+                        foreach ($file_url as $fuv) {
+                            $temp_post_data['MsgBody'][] = [
                                 "MsgType" => "TIMImageElem",
                                 "MsgContent" => [
-//                                    "UUID" => "1853095_D61040894AC3DE44CDFFFB3EC7EB720F",
                                     "UUID" => $this->getMsgRandom(),
-                                    "ImageFormat" => 1,
+                                    "ImageFormat" => 255,
                                     "ImageInfoArray" => [
                                         [
-                                            "Type" => 1,           //原图
-//                                            "Size" => 1853095,
-//                                            "Width" => 2448,
-//                                            "Height" => 3264,
-                                            "URL" => $this->imgUrl($vvv),
-                                        ]
+                                            "Type" => 1,
+                                            "Size" => $v->docInfo->img_size,
+                                            "Width" => $v->docInfo->img_width,
+                                            "Height" => $v->docInfo->img_height,
+                                            "URL" => $v->docInfo->cover_img,
+                                        ],
+                                        [
+                                            "Type" => 2,
+                                            "Size" => $v->docInfo->img_size,
+                                            "Width" => 0,
+                                            "Height" => 0,
+                                            "URL" => $v->docInfo->cover_img,
+                                        ],
+                                        [
+                                            "Type" => 3,
+                                            "Size" => $v->docInfo->img_size,
+                                            "Width" => 0,
+                                            "Height" => 0,
+                                            "URL" => $v->docInfo->cover_img,
+                                        ],
                                     ]
                                 ]
                             ];
+                            $post_data_array[] = $temp_post_data;
                         }
-
                         break;
                     case 31:
                         //文本
-                        $post_data['MsgBody'][] = [
+                        $temp_post_data['MsgBody'][] = [
                             "MsgType" => "TIMTextElem",
                             "MsgContent" => [
-                                "Text" => $vv->content,
+                                "Text" => $v->docInfo->content,
                             ]
                         ];
+                        $post_data_array[] = $temp_post_data;
                         break;
                 }
 
-//                if (empty($post_data['MsgBody'])){
-//                    continue;
-//                }
-//                $res = ImClient::curlPost($url, json_encode($post_data));
-//                $res = json_decode($res, true);
-//                dd([$res,$post_data]);
-//                dd($post_data);
             }
-//            dd(json_encode($post_data));
-            dd($post_data);
-            $res = ImClient::curlPost($url, json_encode($post_data));
-            $res = json_decode($res, true);
-            dd($res);
         }
 
-
-//        return [$post_data_array, $job_info];
-        return $post_data_array;
-        return $job_info;
-
-
-        $random = $this->getMsgRandom();
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
-
-        //文案类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 21音频 22视频 23图片 31文本)
-
-        //发送类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书 9:直播)
-        $post_data = [
-            'GroupId' => '@TGS#2OOSYXIHU',
-            'Random' => $random,
-        ];
-
-//@property (nonatomic , strong) NSString  *goodsID;
-//@property (nonatomic , strong) NSString  *cover_pic;
-//@property (nonatomic , strong) NSString  *titleName;
-//@property (nonatomic , strong) NSString  *subtitle;
-//@property (nonatomic , strong) NSString  *price;
-//@property (nonatomic , strong) NSString  *type;//类型( 1专栏 2精品课 3商品 4 线下产品门票类 6新会员 7:讲座 8:听书 9:直播 10:外链 11:训练营)
-
-
-        //10自定类型
-        //20文件
-        //30 文本
-
-//        $post_data = [
-//            "GroupId" => "@TGS#2OOSYXIHU",
-//            "From_Account" => "168934", // 指定消息发送者（选填）
-//            "Random" => time().rand(1000000,9999999), // 随机数字，五分钟数字相同认为是重复消息
-//            "MsgBody" => [ // 消息体，由一个element数组组成，详见字段说明
-//                [
-//                    "MsgType" => "TIMTextElem", // 文本
-//                    "MsgContent" =>[
-//                        "Text" => "red packet".__LINE__
-//                    ]
-//                ],
-//                [
-//                    "MsgType" => "TIMFaceElem", // 表情
-//                    "MsgContent" => [
-//                        "Index" => 6,
-//                        "Data" => "abc\u0000\u0001"
-//                    ]
-//                ]
-//            ]
-//        ];
-
-        dd($post_data);
-
-        $res = ImClient::curlPost($url, json_encode($post_data));
-        $res = json_decode($res, true);
-
-        dd($res);
+        return [$post_data_array, $job_id_list, $job_info];
     }
 }

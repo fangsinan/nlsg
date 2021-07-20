@@ -38,10 +38,14 @@ class ImDocController extends ControllerBackend
      * @apiParam {number} [obj_id]  目标id(当type=1时需要传)
      * @apiParam {string} content   内容或名称
      * @apiParam {string} [subtitle]   副标题
-     * @apiParam {string} cover_img   封面图片
+     * @apiParam {string} cover_img   封面图片(type_info等于21,11-16必穿)
      * @apiParam {string} [second]   视频音频的时长(秒)
      * @apiParam {string} [format]   格式后缀名
      * @apiParam {string} [file_url]  附件地址,当type=2时需要传
+     * @apiParam {string} [img_size]  图片大小(type=22,23时必穿)
+     * @apiParam {string} [img_width]  图片宽度(type=22,23时必穿)
+     * @apiParam {string} [img_height]  图片高度(type=22,23时必穿)
+     * @apiParam {string} [img_format]  图片格式类型(type=22,23时必穿)
      *
      */
     public function add(Request $request)
@@ -214,8 +218,8 @@ class ImDocController extends ControllerBackend
 
     public function test(){
         $servers = new ImDocServers();
-//        $data = $servers->sendGroupDocMsgJob();
-        $data = $servers->test();
+        $data = $servers->sendGroupDocMsgJob();
+//        $data = $servers->test();
         return $this->getRes($data);
     }
 }
