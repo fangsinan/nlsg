@@ -121,8 +121,9 @@ class ImGroupController extends Controller
             ImGroup::where([
                 'group_id' =>$params['group_id'],
             ])->update(['shut_up_time'=>$shut_up_time]);
-            //获取群资料
-            //MemberRoleFilter
+
+
+            //获取群成员
             $userList_post_data['GroupId'] = $params['group_id'];
             $userList_post_data['MemberInfoFilter'] = ['Member_Account'];
             $userList_post_data['MemberRoleFilter'] = ['Member'];
@@ -137,7 +138,7 @@ class ImGroupController extends Controller
             return $this->error('0','user_id empty');
         }
 
-        
+
         $user_ids = array_chunk($params['user_id'], 500);  //该接口最大支持500人
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/forbid_send_msg");
         $res=[];
