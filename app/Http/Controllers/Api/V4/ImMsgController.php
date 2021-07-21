@@ -70,7 +70,8 @@ class ImMsgController extends Controller
 
         //发送收藏的消息
         if( !empty($collection_id) ){
-            $msg_ids = ImCollection::whereIn(['id'=>$collection_id])->pluck('msg_id')->toArray();
+            $msg_ids = ImCollection::whereIn('id',$collection_id)->pluck('msg_id')->toArray();
+
             $contents = ImMsg::getMsgList($msg_ids);
 
             $msg_content = [];  //初始化消息体
@@ -89,9 +90,9 @@ class ImMsgController extends Controller
         //因为群发给多个群无法确定唯一key  所以保留消息体'
         $add_data = [
             'from_account'  => $from_account,
-            'to_account'    => implode(",", $to_accounts),
-            'to_group'      => implode(",", $to_group),
-            'collection_id' => $collection_id,
+            'to_account'    => implode(",", $to_accounts) ??'',
+            'to_group'      => implode(",", $to_group)??'',
+            'collection_id' => implode(",", $collection_id)??'',
             'msg_body'      => json_encode($msgBody),
             'created_at'    => date("Y-m-d h:i:s"),
             'updated_at'    => date("Y-m-d h:i:s"),
