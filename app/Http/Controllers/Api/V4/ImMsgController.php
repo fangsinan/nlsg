@@ -305,6 +305,7 @@ class ImMsgController extends Controller
 
         $msg_add_res = ImMsg::create($msg_add);
         $img_res= true;
+        $content_res = true;
         //消息体
         foreach ($params['MsgBody'] as $k=>$v){
 
@@ -393,14 +394,20 @@ class ImMsgController extends Controller
 
                     break;
             }
-
-            $msg_content_adds[] = $msg_content_add;
+            $content_res = ImMsgContent::insert($msg_content_add);
+            if($content_res){
+                $content_res = true;
+            }else{
+                $content_res=false;
+                continue;
+            }
+            //$msg_content_adds[] = $msg_content_add;
         }
-        if(!empty($msg_content_adds)){
-            $content_res = ImMsgContent::insert($msg_content_adds);
-        }else{
-            $content_res=false;
-        }
+//        if(!empty($msg_content_adds)){
+//            $content_res = ImMsgContent::insert($msg_content_adds);
+//        }else{
+//            $content_res=false;
+//        }
         if($msg_add_res && $img_res && $content_res){
             DB::commit();
             return true;
