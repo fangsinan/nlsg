@@ -25,6 +25,7 @@ use App\Models\LivePush;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
 
 class LiveController extends Controller
 {
@@ -543,12 +544,21 @@ class LiveController extends Controller
         //初始化人气值
         if(empty($live_son_flag)){
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
+            $num=0;
         }else{
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->where('live_son_flag', $live_son_flag)->count();
+            //判断key是否存在，否则初始化最新值，防止重启直播框架时删除key
+            $key='live_son_flag_'.$id.'_'.$live_son_flag;
+            Redis::select(0);
+            $num=Redis::get('live_son_flag_92_785339');
+//            if($num<$live_son_flag_num){
+//                Redis::setex($key,86400*10,$live_son_flag_num);
+//            }
         }
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
+            'live_son_flag_num1' => $num,
         ];
         return success($data);
 
