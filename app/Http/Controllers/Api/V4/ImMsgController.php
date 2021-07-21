@@ -227,6 +227,7 @@ class ImMsgController extends Controller
         foreach ($collectionList['data'] as $key=>$val) {
             $collectionList['data'][$key]['msg_list'] = [];
             foreach ($msg_list as $item){
+                $item['collection_time'] = $val['created_at'];
                 //消息昵称
                 $item['nick_name'] = $userProfileItem[$item['from_account']]['Tag_Profile_IM_Nick']??'';
                 if($val['msg_id'] == $item['id']){
