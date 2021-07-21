@@ -462,7 +462,7 @@ class LiveController extends Controller
         }
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro,honor',
-            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish',
+            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num',
             'live.livePoster'=>function($q){
                 $q->where('status','=',1);
             }
@@ -528,9 +528,7 @@ class LiveController extends Controller
                     "status" => 1,
                     "twitter_id" => $live_son_flag,
                 ])->count();
-
-
-
+                
                 //渠道是否开启直播
                 $list['live_son_flag_status'] = LiveSonFlagPoster::where([
                     'live_id'   =>$list->live_pid,
@@ -542,19 +540,23 @@ class LiveController extends Controller
 //
         }
         //初始化人气值
+        Redis::select(0);
         if(empty($live_son_flag)){
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
+            $key="live_number_$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
             $num=0;
+//            $LiveObj=Live::find($id);
+//            $num=Redis::get($key);
+//            $num=$num+$LiveObj->virtual_online_num;
         }else{
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->where('live_son_flag', $live_son_flag)->count();
             //判断key是否存在，否则初始化最新值，防止重启直播框架时删除key
             $key='live_son_flag_'.$id.'_'.$live_son_flag;
-            Redis::select(0);
-            $num=Redis::get('live_son_flag_92_785339');
-//            if($num<$live_son_flag_num){
-//                Redis::setex($key,86400*10,$live_son_flag_num);
-//            }
+            $num=Redis::get('laravel_database_laravel_cache:live_son_flag_92_785339');
         }
+//        if(empty($num) || $num<$live_son_flag_num){
+//            Redis::setex($key,86400*10,$live_son_flag_num);
+//        }
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
