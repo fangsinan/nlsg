@@ -151,7 +151,7 @@ class ImMsgController extends Controller
      *
      * @apiParam {array} os_msg_id  消息序列号 array
      * @apiParam {int} type  收藏类型   1消息收藏
-     * @apiParam {int} collection_id  收藏列表id (取消收藏只传该字段)
+     * @apiParam {array} collection_id  收藏列表id (取消收藏只传该字段)
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -167,7 +167,7 @@ class ImMsgController extends Controller
         $collection_id = $request->input('collection_id');  //id
 
         if(!empty($collection_id)){
-            ImCollection::where('id',$collection_id)->update(['state' => 2,]);
+            ImCollection::whereIn('id',$collection_id)->update(['state' => 2,]);
             return $this->success();
         }
         \Log::info('im_param_log'.json_encode($request->input()));
@@ -212,7 +212,7 @@ class ImMsgController extends Controller
     public function MsgCollectionList(Request $request){
         $uid = $this->user['id'];
 
-        $collectionList = ImCollection::select("id","user_id","msg_id")->where([
+        $collectionList = ImCollection::select("id","user_id","msg_id","created_at")->where([
             'type'=>1,'user_id'=>$uid,'state'=>1
         ])->orderBy('created_at',"desc")->paginate($this->page_per_page)->toArray();
 

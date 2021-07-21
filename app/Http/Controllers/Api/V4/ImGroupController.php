@@ -115,7 +115,7 @@ class ImGroupController extends Controller
             return $this->error('0','request error');
         }
         $shut_up_time = empty($params['shut_up_time']) ?0 : $params['shut_up_time'];
-
+        $params_user = $params['user_id'];
         if( !empty($params['is_all']) && $params['is_all'] == 1 ){
             //全员禁言/解禁
             ImGroup::where([
@@ -131,15 +131,15 @@ class ImGroupController extends Controller
             $getUserRes = ImClient::curlPost($getUserUrl,json_encode($userList_post_data));
             $getUserRes = json_decode($getUserRes,true);
             if($getUserRes){
-                $params['user_id'] = array_column($getUserRes['MemberList'],'Member_Account');
+                $params_user = array_column($getUserRes['MemberList'],'Member_Account');
             }
         }
-        if(empty($params['user_id'])){
+        if(empty($params_user)){
             return $this->error('0','user_id empty');
         }
 
 
-        $user_ids = array_chunk($params['user_id'], 500);  //该接口最大支持500人
+        $user_ids = array_chunk($params_user, 500);  //该接口最大支持500人
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/forbid_send_msg");
         $res=[];
         foreach ($user_ids as $val){
