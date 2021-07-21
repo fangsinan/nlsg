@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
+use Predis\Client;
 
 class LiveController extends Controller
 {
@@ -540,28 +541,28 @@ class LiveController extends Controller
 //
         }
         //初始化人气值
-        Redis::select(0);
+        $redisConfig = config('database.redis.default');
+        $redis = new Client($redisConfig);
+        $redis->select(0);
         if(empty($live_son_flag)){
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
             $key="live_number_$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
-            $num=0;
-//            $num=Redis::get($key);
-//            if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
-//                $num=$num+$list['live']['virtual_online_num']; //虚拟值
-//            }
+            $num=$redis->get($key);
+            if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
+                $num=$num+$list['live']['virtual_online_num']; //虚拟值
+            }
         }else{
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->where('live_son_flag', $live_son_flag)->count();
             //判断key是否存在，否则初始化最新值，防止重启直播框架时删除key
             $key='live_son_flag_'.$id.'_'.$live_son_flag;
-            $num=Redis::get('laravel_database_laravel_cache:live_son_flag_92_785339');
+            $num=$redis->get($key);
         }
-//        if(empty($num) || $num<$live_son_flag_num){
-//            Redis::setex($key,86400*10,$live_son_flag_num);
-//        }
+        if(empty($num) || $num<$live_son_flag_num){
+            $redis->setex($key,86400*10,$live_son_flag_num);
+        }
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
-            'live_son_flag_num1' => $num,
         ];
         return success($data);
 
