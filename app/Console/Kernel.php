@@ -2,7 +2,6 @@
 
 namespace App\Console;
 
-use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\LiveConsole;
 use App\Models\MallOrder;
@@ -10,15 +9,13 @@ use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
 use App\Models\Order;
 use App\Models\PayRecordDetailStay;
-use App\Models\Subscribe;
-use App\Models\VipUser;
+use App\Models\Task;
 use App\Models\Works;
 use App\Models\WorksInfo;
-use App\Models\User;
-use App\Models\Task;
 use App\Servers\ChannelServers;
 use App\Servers\DealServers;
 use App\Servers\ErpServers;
+use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
 use App\Servers\removeDataServers;
 use Illuminate\Console\Scheduling\Schedule;
@@ -52,6 +49,12 @@ class Kernel extends ConsoleKernel
             WorksInfo::covertVideo(); //转换音频视频
             Works::deal(); //自动上架
         })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            //im doc
+            $servers = new ImDocServers();
+            $servers->sendGroupDocMsgJob();
+        })->everyMinute()->runInBackground()->withoutOverlapping(5);//每分
 
         $schedule->call(function () {
             $m = new LiveConsole();
@@ -142,7 +145,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             //抓取直播间成交订单
-            DealServers::getOrderInfo([],0,1);
+            DealServers::getOrderInfo([], 0, 1);
         })->everyFiveMinutes()->runInBackground();//每5分钟执行一次
 
     }

@@ -879,8 +879,6 @@ class ImDocServers
 
     public function sendGroupDocMsgJob()
     {
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
-
         $job_info = ImDocSendJob::query()
             ->where('is_done', '=', 1)
             ->where('status', '=', 1)
@@ -1067,6 +1065,12 @@ class ImDocServers
         if (empty($post_data_array)) {
             return ['code' => true, 'msg' => '没有任务'];
         }
+
+        ImDocSendJob::whereIn('id', $job_id_list)->update([
+            'is_done' =>2
+        ]);
+
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
 
         $res_list = [];
         foreach ($post_data_array as $v) {
