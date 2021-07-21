@@ -54,7 +54,7 @@ class Kernel extends ConsoleKernel
             //im doc
             $servers = new ImDocServers();
             $servers->sendGroupDocMsgJob();
-        })->everyMinute()->runInBackground()->withoutOverlapping(5);//每分
+        })->everyMinute()->runInBackground()->withoutOverlapping();//每分
 
         $schedule->call(function () {
             $m = new LiveConsole();

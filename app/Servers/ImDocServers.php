@@ -1084,6 +1084,7 @@ class ImDocServers
             'success_at' => date('Y-m-d H:i:s')
         ]);
 
-        return ['code' => true, 'msg' => '成功'];
+        return true;
+//        return ['code' => true, 'msg' => '成功'];
     }
 }
