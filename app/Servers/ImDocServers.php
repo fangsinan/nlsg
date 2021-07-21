@@ -6,6 +6,7 @@ namespace App\Servers;
 
 use App\Models\CacheTools;
 use App\Models\Column;
+use App\Models\ConfigModel;
 use App\Models\ImDoc;
 use App\Models\ImDocSendJob;
 use App\Models\ImDocSendJobInfo;
@@ -88,18 +89,18 @@ class ImDocServers
         switch (intval($params['type'])) {
             case 1:
                 // 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链
-                if ($type_info = 17){
+                if ($type_info = 17) {
                     //判断网址
-                }else{
+                } else {
                     if (empty($obj_id)) {
                         return ['code' => false, 'msg' => '目标id错误'];
                     }
 
-                    if (empty($cover_img)){
-                        return ['code'=>false,'msg'=>'cover_img错误','ps'=>'封面图'];
+                    if (empty($cover_img)) {
+                        return ['code' => false, 'msg' => 'cover_img错误', 'ps' => '封面图'];
                     }
-                    if (empty($cover_img)){
-                        return ['code'=>false,'msg'=>'content错误','ps'=>'标题'];
+                    if (empty($cover_img)) {
+                        return ['code' => false, 'msg' => 'content错误', 'ps' => '标题'];
                     }
                 }
                 break;
@@ -567,12 +568,9 @@ class ImDocServers
                 $worksObj = new Works();
                 $query = DB::table($relationObj->getTable(), ' relation')
                     ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
-                    ->select('works.id', 'works.type', 'works.title', 'works.user_id', 'works.cover_img', 'works.price',
-                        'works.original_price', 'works.subtitle',
-                        'works.works_update_time', 'works.detail_img', 'works.content', 'relation.id as relation_id',
-                        'relation.category_id', 'relation.work_id', 'works.column_id',
-                        'works.comment_num', 'works.chapter_num', 'works.subscribe_num', 'works.collection_num',
-                        'works.is_free');
+                    ->select(['works.id', 'works.type', 'works.title', 'works.cover_img', 'works.price', 'works.subtitle',
+                        'works.title as doc_content', DB::raw('1 as doc_type'), DB::raw('12 as doc_type_info'),
+                        'relation.category_id']);
                 if ($cate_id_arr && $category_id != 0) {
                     $query->whereIn('relation.category_id', $cate_id_arr);
                 }
@@ -585,9 +583,12 @@ class ImDocServers
 
                 break;
             case 2:
-                $lists = Column::select('id', 'user_id', 'name', 'title', 'subtitle', 'cover_img', 'price', 'status',
-                    'created_at',
-                    'info_num')
+                $lists = Column::select([
+                    'id', 'user_id', 'name', 'title', 'subtitle',
+                    DB::raw('name as doc_content'),
+                    DB::raw('1 as doc_type'), DB::raw('11 as doc_type_info'),
+                    'cover_pic as cover_img', 'price', 'status',
+                    'info_num'])
                     ->where('type', 2)
                     ->where('status', '<>', 3)
                     ->orderBy('created_at', 'desc')
@@ -599,27 +600,47 @@ class ImDocServers
                 if ($category_id != 0) {
                     $query->where('category_id', $category_id);
                 }
-                $lists = $query->select('id', 'name', 'subtitle', 'picture', 'status')
+                $lists = $query->select(['id', 'name', 'subtitle', 'picture', 'status', 'picture as cover_img',
+                    DB::raw('name as doc_content'),
+                    DB::raw('1 as doc_type'), DB::raw('13 as doc_type_info'),])
                     ->orderBy('created_at', 'desc')
                     ->paginate(10)
                     ->toArray();
                 break;
             case 4:
-                $lists = Live::select('id', 'user_id', 'title', 'price', 'order_num', 'status', 'begin_at', 'cover_img')
+                $lists = Live::select(['id', 'user_id', 'title', 'price', 'order_num',
+                    DB::raw('title as doc_content'),
+                    DB::raw('1 as doc_type'), DB::raw('15 as doc_type_info'),
+                    'status', 'begin_at', 'cover_img'])
                     ->where('is_del', 0)
                     ->orderBy('created_at', 'desc')
                     ->paginate(10)
                     ->toArray();
                 break;
             case 5:
-                $lists = Column::select('id', 'user_id', 'name', 'title', 'subtitle', 'cover_img', 'price', 'status',
+                $lists = Column::select(['id', 'user_id', 'name', 'title', 'subtitle', 'cover_pic as cover_img',
+                    'price', 'status',
+                    DB::raw('title as doc_content'),
+                    DB::raw('1 as doc_type'), DB::raw('16 as doc_type_info'),
                     'created_at',
-                    'info_num')
+                    'info_num'])
                     ->where('type', 3)
                     ->where('status', '<>', 3)
                     ->orderBy('created_at', 'desc')
                     ->paginate(10)
                     ->toArray();
+                break;
+            case 6:
+                $lists = [
+                    'id' => 1,
+                    'name' => '360幸福大使',
+                    'title' => '360幸福大使',
+                    'subtitle' => '360幸福大使',
+                    'cover_img' => ConfigModel::getData(22),
+                    'doc_content' => '360幸福大使',
+                    'doc_type' => 1,
+                    'doc_type_info' => 14,
+                ];
                 break;
 
         }
@@ -1054,11 +1075,11 @@ class ImDocServers
 //            sleep(1);
         }
 
-        ImDocSendJob::whereIn('id',$job_id_list)->update([
-            'is_done'=>3,
-            'success_at'=>date('Y-m-d H:i:s')
+        ImDocSendJob::whereIn('id', $job_id_list)->update([
+            'is_done' => 3,
+            'success_at' => date('Y-m-d H:i:s')
         ]);
 
-        return ['code'=>true,'msg'=>'成功'];
+        return ['code' => true, 'msg' => '成功'];
     }
 }
