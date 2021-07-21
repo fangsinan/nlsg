@@ -115,7 +115,8 @@ class ImGroupController extends Controller
             return $this->error('0','request error');
         }
         $shut_up_time = empty($params['shut_up_time']) ?0 : $params['shut_up_time'];
-        $params_user = $params['user_id'];
+
+        $params_user = $params['user_id'] ??[];
         if( !empty($params['is_all']) && $params['is_all'] == 1 ){
             //全员禁言/解禁
             ImGroup::where([
