@@ -545,19 +545,21 @@ class LiveController extends Controller
         $redis = new Client($redisConfig);
         $redis->select(0);
         if(empty($live_son_flag)){
+            //数据库实时数据
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
             $key="live_number_$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
-            $num=$redis->get($key);
+            $key_num=$redis->get($key);
             if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
-                $num=$num+$list['live']['virtual_online_num']; //虚拟值
+                $live_son_flag_num=$live_son_flag_num+$list['live']['virtual_online_num']; //虚拟值
             }
         }else{
+            //数据库实时数据
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->where('live_son_flag', $live_son_flag)->count();
             //判断key是否存在，否则初始化最新值，防止重启直播框架时删除key
             $key='live_son_flag_'.$id.'_'.$live_son_flag;
-            $num=$redis->get($key);
+            $key_num=$redis->get($key);
         }
-        if(empty($num) || $num<$live_son_flag_num){
+        if(empty($key_num) || $key_num<$live_son_flag_num){
             $redis->setex($key,86400*10,$live_son_flag_num);
         }
         $data = [
