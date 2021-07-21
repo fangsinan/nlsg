@@ -88,7 +88,6 @@ class ImGroupController extends Controller
     }
 
 
-
     /**
      * @api {post} /api/v4/im_group/forbid_send_msg 群成员禁言/解禁
      * @apiName forbid_send_msg
@@ -112,7 +111,7 @@ class ImGroupController extends Controller
     public function forbidSendMsg(Request $request){
         $params    = $request->input();
 
-        if( empty($params['group_id']) || empty($params['user_id'])  ){
+        if( empty($params['group_id']) ){
             return $this->error('0','request error');
         }
         $shut_up_time = empty($params['shut_up_time']) ?0 : $params['shut_up_time'];
@@ -122,16 +121,35 @@ class ImGroupController extends Controller
             ImGroup::where([
                 'group_id' =>$params['group_id'],
             ])->update(['shut_up_time'=>$shut_up_time]);
+            //获取群资料
+            //MemberRoleFilter
+            $userList_post_data['GroupId'] = $params['group_id'];
+            $userList_post_data['MemberInfoFilter'] = ['Member_Account'];
+            $userList_post_data['MemberRoleFilter'] = ['Member'];
+            $getUserUrl = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/get_group_member_info");
+            $getUserRes = ImClient::curlPost($getUserUrl,json_encode($userList_post_data));
+            $getUserRes = json_decode($getUserRes,true);
+            if($getUserRes){
+                $params['user_id'] = array_column($getUserRes['MemberList'],'Member_Account');
+            }
+        }
+        if(empty($params['user_id'])){
+            return $this->error('0','user_id empty');
         }
 
+        
+        $user_ids = array_chunk($params['user_id'], 500);  //该接口最大支持500人
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/forbid_send_msg");
-        $post_data = [
-            'GroupId' => $params['group_id'],
-            'Members_Account' => $params['user_id'],  //数组类型
-            'ShutUpTime' => $shut_up_time,
-        ];
-        $res = ImClient::curlPost($url,json_encode($post_data));
-        $res = json_decode($res,true);
+        $res=[];
+        foreach ($user_ids as $val){
+            $post_data = [
+                'GroupId' => $params['group_id'],
+                'Members_Account' => $val,  //数组类型
+                'ShutUpTime' => $shut_up_time,
+            ];
+            $res = ImClient::curlPost($url,json_encode($post_data));
+            $res = json_decode($res,true);
+        }
 
         if ($res['ActionStatus'] == 'OK'){
             return $this->success();
