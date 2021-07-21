@@ -528,7 +528,7 @@ class LiveController extends Controller
                     "status" => 1,
                     "twitter_id" => $live_son_flag,
                 ])->count();
-                
+
                 //渠道是否开启直播
                 $list['live_son_flag_status'] = LiveSonFlagPoster::where([
                     'live_id'   =>$list->live_pid,
@@ -545,9 +545,10 @@ class LiveController extends Controller
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
             $key="live_number_$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
             $num=0;
-//            $LiveObj=Live::find($id);
 //            $num=Redis::get($key);
-//            $num=$num+$LiveObj->virtual_online_num;
+//            if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
+//                $num=$num+$list['live']['virtual_online_num']; //虚拟值
+//            }
         }else{
             $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->where('live_son_flag', $live_son_flag)->count();
             //判断key是否存在，否则初始化最新值，防止重启直播框架时删除key
