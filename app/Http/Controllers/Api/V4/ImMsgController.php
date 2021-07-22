@@ -211,6 +211,7 @@ class ImMsgController extends Controller
      */
     public function MsgCollectionList(Request $request){
         $uid = $this->user['id'];
+        $keywords = $request->input('keywords');  //消息关键字
 
         $collectionList = ImCollection::select("id","user_id","msg_id","created_at")->where([
             'type'=>1,'user_id'=>$uid,'state'=>1
@@ -218,7 +219,23 @@ class ImMsgController extends Controller
 
         //获取消息
         $msg_ids = array_column($collectionList['data'],'msg_id');
-        $msg_list = ImMsg::getMsgList($msg_ids);
+        //$msg_list = ImMsg::getMsgList($msg_ids);
+        $query = ImMsg::with([
+            'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data,file_name as FileName,file_size as FileSize',
+        ]);
+
+        if(!empty($keywords)){
+            $query->whereHas('content', function ($query) use ($keywords){
+                $query->where(function ($query)use($keywords){
+                    $query->orWhere('nlsg_im_msg_content.text','LIKE',"%$keywords%");
+                    $query->orWhere('nlsg_im_msg_content.data','LIKE',"%$keywords%");
+                    $query->orWhere('nlsg_im_msg_content.file_name','LIKE',"%$keywords%");
+                });
+            });
+        }
+
+        $msg_list = $query->select('id','msg_seq','msg_time','from_account')
+            ->whereIn('id',$msg_ids)->get()->toArray();
 
         //获取用户信息
         $uids = array_column($msg_list,'from_account');
@@ -236,7 +253,13 @@ class ImMsgController extends Controller
                 }
             }
 
+            //如果搜索keyword后 没有匹配到 则删除该key值
+            if(empty($collectionList['data'][$key]['msg_list'])){
+                unset($collectionList['data'][$key]);
+            }
+
         }
+        $collectionList['data'] = array_values($collectionList['data']);
 
         return $this->success($collectionList);
     }
