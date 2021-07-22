@@ -334,7 +334,12 @@ class ImMsgController extends Controller
                 case 'TIMImageElem' ://图片元素
 
                     $msg_content_add['uuid']            = $v['MsgContent']['UUID']??'';
-                    $msg_content_add['image_format']    = $v['MsgContent']['ImageFormat'];
+                    $msg_content_add['image_format']    = $v['MsgContent']['ImageFormat']??0;
+                    //群发时  同步图片url
+                    if(!empty($v['MsgContent']['URL'])){
+                        $msg_content_add['url'] = $v['MsgContent']['URL'];
+                    }
+                    
                     //保留缩略图
                     $img_res = true;
                     if(!empty($v['MsgContent']['ImageInfoArray'])){
