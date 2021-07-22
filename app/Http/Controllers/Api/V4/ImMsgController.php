@@ -330,6 +330,7 @@ class ImMsgController extends Controller
         $msg_add_res = ImMsg::create($msg_add);
         $img_res= true;
         $content_res = true;
+        $img_up_res = true;
         //消息体
         foreach ($params['MsgBody'] as $k=>$v){
 
@@ -386,10 +387,15 @@ class ImMsgController extends Controller
                         }
 
                         if(!empty($img_adds)){
-                            $img_res = ImMsgContentImg::insert($img_adds);
-                        }else{
+                            foreach($img_adds as $key=>$img_adds_data){
+                                $ids[] = ImMsgContentImg::insertGetId($img_adds_data);
+                            }
+
+                        }
+                        if(empty($ids)){
                             $img_res = false;
                         }
+
                     }
 
 
@@ -423,7 +429,11 @@ class ImMsgController extends Controller
 
                     break;
             }
-            $content_res = ImMsgContent::insert($msg_content_add);
+            $content_res = ImMsgContent::insertGetId($msg_content_add);
+
+            if(!empty($ids)){
+                $img_up_res = ImMsgContentImg::whereIn('id',$ids)->update(['content_id'=>$content_res]);
+            }
             if($content_res){
                 $content_res = true;
             }else{
@@ -437,7 +447,7 @@ class ImMsgController extends Controller
 //        }else{
 //            $content_res=false;
 //        }
-        if($msg_add_res && $img_res && $content_res){
+        if($msg_add_res && $img_res && $content_res && $img_up_res){
             DB::commit();
             return true;
         }else{
