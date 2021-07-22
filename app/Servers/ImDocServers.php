@@ -204,8 +204,6 @@ class ImDocServers
             }
 
 
-
-
         }
 
         DB::commit();
@@ -672,15 +670,17 @@ class ImDocServers
                     "total" => 1,
                     'data' => [
                         ['id' => 1,
-                        'name' => '360幸福大使',
-                        'title' => '360幸福大使',
-                        'subtitle' => '360幸福大使',
-                        'cover_img' => ConfigModel::getData(22),
-                        'doc_content' => '360幸福大使',
-                        'doc_type' => 1,
-                        'doc_type_info' => 14,
-                        'price' => 360]
-                    ]];
+                            'name' => '360幸福大使',
+                            'title' => '360幸福大使',
+                            'subtitle' => '360幸福大使',
+                            'cover_img' => ConfigModel::getData(22),
+                            'doc_content' => '360幸福大使',
+                            'doc_type' => 1,
+                            'doc_type_info' => 14,
+                            'price' => 360
+                        ]
+                    ]
+                ];
                 break;
 
         }
