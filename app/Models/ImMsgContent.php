@@ -14,6 +14,12 @@ class ImMsgContent extends Base
 'video_url','video_format','thumb_url','thumb_size','thumb_width','thumb_height','thumb_format',
 'desc','ext','sound'
         ];
+
+
+    public function  imginfo(){
+        return  $this->hasMany(ImMsgContentImg::class, 'uuid','uuid');
+    }
+
 }
 
 
