@@ -17,7 +17,7 @@ class ImMsgContent extends Base
 
 
     public function  imginfo(){
-        return  $this->hasMany(ImMsgContentImg::class, 'uuid','uuid');
+        return  $this->hasMany(ImMsgContentImg::class, 'content_id');
     }
 
 }
