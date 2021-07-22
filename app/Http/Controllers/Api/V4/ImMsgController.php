@@ -333,7 +333,7 @@ class ImMsgController extends Controller
                     break;
                 case 'TIMImageElem' ://图片元素
 
-                    $msg_content_add['uuid']            = $v['MsgContent']['UUID'];
+                    $msg_content_add['uuid']            = $v['MsgContent']['UUID']??'';
                     $msg_content_add['image_format']    = $v['MsgContent']['ImageFormat'];
                     //保留缩略图
                     $img_res = true;
