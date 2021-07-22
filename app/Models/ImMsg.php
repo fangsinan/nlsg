@@ -96,11 +96,14 @@ class ImMsg extends Base
                     $msg_content_add['VideoSecond']         = $val['VideoSecond'];
                     $msg_content_add['VideoFormat']         = $val['VideoFormat'];
                     $msg_content_add['VideoDownloadFlag']   = 2;
+                    $msg_content_add['VideoUUID']           = $params['video_uuid']??'';
+                    $msg_content_add['ThumbUUID']           = $params['uuid']??'';
                     $msg_content_add['ThumbUrl']            = $params['ThumbUrl']??'';
                     $msg_content_add['ThumbSize']           = $params['ThumbSize'];
                     $msg_content_add['ThumbWidth']          = $params['ThumbWidth'];
                     $msg_content_add['ThumbHeight']         = $params['ThumbHeight'];
                     $msg_content_add['ThumbFormat']         = $params['ThumbFormat'] ?? 'mp4';
+                    $msg_content_add['ThumbDownloadFlag']         = 2;
                     break;
 
                 case 'TIMCustomElem' : //自定义消息
