@@ -25,9 +25,10 @@ class ImMsg extends Base
             return [];
         }
 
-
         $query = ImMsg::with([
-            'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data,file_name as FileName,file_size as FileSize',
+            'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data,file_name as FileName,file_size as FileSize
+            ,uuid,image_format as ImageFormat,file_name as FileName,size as VideoSize,video_format as VideoFormat,thumb_url as ThumbUrl,thumb_size as ThumbSize,thumb_width as ThumbWidth,thumb_height as ThumbHeight,thumb_format as ThumbFormat,second as VideoSecond',
+            'content.imginfo:content_id,type,size,width,height,url',
             ])->select('id','msg_seq','msg_time','from_account');
         if(!empty($ids) ){
             return $query->whereIn('id',$ids)->get()->toArray();
@@ -45,9 +46,7 @@ class ImMsg extends Base
         if(empty($msg_content)){
             return [];
         }
-
         $res = [];
-
         foreach ($msg_content as $key=>$val) {
             $msg_type = $val['MsgType'];
             $params = $val;
@@ -68,33 +67,40 @@ class ImMsg extends Base
                     $msg_content_add['Download_Flag']   = 2;
                     break;
                 case 'TIMImageElem' ://图片元素
-//                    $msg_content_add['Type']        = $val['Type'];
-//                    $msg_content_add['Size']        = $val['Size'];
-//                    $msg_content_add['Width']       = $val['Width'];
-//                    $msg_content_add['Height']      = $val['Height'];
-                    $msg_content_add['URL']         = $val['Url'];
-//                    $msg_content_add['UUID']        = $val['UUID'];
-//                    $msg_content_add['ImageFormat'] = $val['ImageFormat'];
+
+                    foreach ($val['imginfo'] as $item) {
+                        if( in_array($item['type'],[1,2,3])){
+                            $msg_content_add['ImageInfoArray'][] = [
+                                "Type" => $item['type'],
+                                "Size" => (int)$item['size'],
+                                "Width" => (int)$item['width'],
+                                "Height" => (int)$item['height'],
+                                "URL" => $item['url'],
+                            ];
+                        }
+                    }
+                    $msg_content_add['UUID']         = ($val['uuid']);
+                    $msg_content_add['ImageFormat']         = $val['ImageFormat'];
 
                     break;
                 case 'TIMFileElem' ://文件类型元素
                     $msg_content_add['Url']             = $val['Url'];
-//                    $msg_content_add['FileSize']        = $val['FileSize'];
+                    $msg_content_add['FileSize']        = $val['FileSize'];
                     $msg_content_add['FileName']        = $val['FileName'];
-//                    $msg_content_add['Download_Flag']   = $val['Download_Flag'];
+                    $msg_content_add['Download_Flag']   = 2;
                     break;
 
                 case 'TIMVideoFileElem' : //视频类型元素
                     $msg_content_add['VideoUrl']            = $val['VideoUrl'];
-//                    $msg_content_add['VideoSize']           = $val['VideoSize'];
-//                    $msg_content_add['VideoSecond']         = $val['VideoSecond'];
-//                    $msg_content_add['VideoFormat']         = $val['VideoFormat'];
-//                    $msg_content_add['VideoDownloadFlag']   = $val['VideoDownloadFlag'];
+                    $msg_content_add['VideoSize']           = $val['VideoSize'];
+                    $msg_content_add['VideoSecond']         = $val['VideoSecond'];
+                    $msg_content_add['VideoFormat']         = $val['VideoFormat'];
+                    $msg_content_add['VideoDownloadFlag']   = 2;
                     $msg_content_add['ThumbUrl']            = $params['ThumbUrl']??'';
-    //                $msg_content_add['ThumbSize']           = $params['ThumbSize'];
-    //                $msg_content_add['ThumbWidth']          = $params['ThumbWidth'];
-    //                $msg_content_add['ThumbHeight']         = $params['ThumbHeight'];
-    //                $msg_content_add['ThumbFormat']         = $params['ThumbFormat'];
+                    $msg_content_add['ThumbSize']           = $params['ThumbSize'];
+                    $msg_content_add['ThumbWidth']          = $params['ThumbWidth'];
+                    $msg_content_add['ThumbHeight']         = $params['ThumbHeight'];
+                    $msg_content_add['ThumbFormat']         = $params['ThumbFormat'] ?? 'mp4';
                     break;
 
                 case 'TIMCustomElem' : //自定义消息
@@ -106,6 +112,7 @@ class ImMsg extends Base
                     $msg_content_add = [];
                     break;
             }
+            //dd($msg_content_add);
             if($msg_content_add){
                 $res[] = [ 'MsgType' => $msg_type,  'MsgContent' => $msg_content_add, ];
             }
