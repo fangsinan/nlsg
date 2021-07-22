@@ -5,7 +5,6 @@ namespace App\Servers;
 
 
 use App\Models\CacheTools;
-use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\ImDoc;
 use App\Models\ImDocSendJob;
@@ -14,6 +13,7 @@ use App\Models\imDocSendJobLog;
 use App\Models\ImGroup;
 use App\Models\ImGroupUser;
 use App\Models\Live;
+use App\Models\LiveInfo;
 use App\Models\MallCategory;
 use App\Models\MallGoods;
 use App\Models\Works;
@@ -550,6 +550,7 @@ class ImDocServers
     {
         $category_id = $params['category_id'] ?? 0;//0 为全部
         $type = $params['type'] ?? 0;
+        $size = $params['size'] ?? 10;
         switch ($type) {
             case 1:
                 $cate_id_arr = [];
@@ -568,9 +569,10 @@ class ImDocServers
                 $worksObj = new Works();
                 $query = DB::table($relationObj->getTable(), ' relation')
                     ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
+                    ->leftJoin('nlsg_user as u', 'works.user_id', '=', 'u.id')
                     ->select(['works.id', 'works.type', 'works.title', 'works.cover_img', 'works.price', 'works.subtitle',
                         'works.title as doc_content', DB::raw('1 as doc_type'), DB::raw('12 as doc_type_info'),
-                        'relation.category_id']);
+                        'relation.category_id', 'works.is_end', 'u.nickname']);
                 if ($cate_id_arr && $category_id != 0) {
                     $query->whereIn('relation.category_id', $cate_id_arr);
                 }
@@ -578,34 +580,39 @@ class ImDocServers
                 $lists = $query->where($where)
                     ->orderBy('works.created_at', 'desc')
                     ->groupBy('works.id')
-                    ->paginate(10)
-                    ->toArray();
-
+                    ->paginate($size);
                 break;
             case 2:
-                $lists = Column::select([
-                    'id', 'user_id', 'name', 'title', 'subtitle',
-                    DB::raw('name as doc_content'),
-                    DB::raw('1 as doc_type'), DB::raw('11 as doc_type_info'),
-                    'cover_pic as cover_img', 'price', 'status',
-                    'info_num'])
-                    ->where('type', 2)
-                    ->where('status', '<>', 3)
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(10)
-                    ->toArray();
+                $lists = DB::table('nlsg_column as col')
+                    ->join('nlsg_user as u', 'col.user_id', '=', 'u.id')
+                    ->where('col.type', '=', 2)
+                    ->where('col.status', '<>', 3)
+                    ->orderBy('col.id', 'desc')
+                    ->select([
+                        'col.id', 'col.user_id', 'col.name', 'col.title', 'col.subtitle',
+                        DB::raw('col.name as doc_content'),
+                        DB::raw('1 as doc_type'), DB::raw('11 as doc_type_info'),
+                        'col.cover_pic as cover_img', 'col.price', 'col.status', 'col.is_end',
+                        'col.info_num', 'u.nickname'])
+                    ->paginate($size);
+
                 break;
-            case  3:
+            case 3:
                 $query = MallGoods::query();
                 if ($category_id != 0) {
                     $query->where('category_id', $category_id);
                 }
                 $lists = $query->select(['id', 'name', 'subtitle', 'picture', 'status', 'picture as cover_img',
-                    DB::raw('name as doc_content'),
+                    DB::raw('name as doc_content'), 'price',
                     DB::raw('1 as doc_type'), DB::raw('13 as doc_type_info'),])
                     ->orderBy('created_at', 'desc')
-                    ->paginate(10)
-                    ->toArray();
+                    ->paginate($size);
+
+                $gModel = new MallGoods();
+                foreach ($lists as &$v) {
+                    $v->stock = $gModel->getGoodsAllStock($v->id);
+                }
+
                 break;
             case 4:
                 $lists = Live::select(['id', 'user_id', 'title', 'price', 'order_num',
@@ -614,33 +621,62 @@ class ImDocServers
                     'status', 'begin_at', 'cover_img'])
                     ->where('is_del', 0)
                     ->orderBy('created_at', 'desc')
-                    ->paginate(10)
-                    ->toArray();
+                    ->paginate($size);
+                foreach ($lists as &$val) {
+                    $val['live_status'] = 1;  //默认值
+                    $channel = LiveInfo::where('live_pid', $val['id'])
+                        ->where('status', 1)
+                        ->orderBy('id', 'desc')
+                        ->first();
+                    if ($channel) {
+                        if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                            $val['live_status'] = 1;
+                        } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                            $val['live_status'] = 3;
+                        } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                            $val['live_status'] = 2;
+                        }
+                    }
+                }
                 break;
             case 5:
-                $lists = Column::select(['id', 'user_id', 'name', 'title', 'subtitle', 'cover_pic as cover_img',
-                    'price', 'status',
-                    DB::raw('title as doc_content'),
-                    DB::raw('1 as doc_type'), DB::raw('16 as doc_type_info'),
-                    'created_at',
-                    'info_num'])
-                    ->where('type', 3)
-                    ->where('status', '<>', 3)
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(10)
-                    ->toArray();
+                $lists = DB::table('nlsg_column as col')
+                    ->join('nlsg_user as u', 'col.user_id', '=', 'u.id')
+                    ->where('col.type', '=', 3)
+                    ->where('col.status', '<>', 3)
+                    ->orderBy('col.id', 'desc')
+                    ->select([
+                        'col.id', 'col.user_id', 'col.name', 'col.title', 'col.subtitle',
+                        DB::raw('col.name as doc_content'),
+                        DB::raw('1 as doc_type'), DB::raw('16 as doc_type_info'),
+                        'col.cover_pic as cover_img', 'col.price', 'col.status', 'col.is_end',
+                        'col.info_num', 'u.nickname'])
+                    ->paginate($size);
                 break;
             case 6:
                 $lists = [
-                    'id' => 1,
-                    'name' => '360幸福大使',
-                    'title' => '360幸福大使',
-                    'subtitle' => '360幸福大使',
-                    'cover_img' => ConfigModel::getData(22),
-                    'doc_content' => '360幸福大使',
-                    'doc_type' => 1,
-                    'doc_type_info' => 14,
-                ];
+                    'current_page' => 1,
+                    "first_page_url" => "http://127.0.0.1:8000/api/admin_v4/im_doc/category/product?page=1",
+                    "from" => 1,
+                    "last_page" => 1,
+                    "last_page_url" => "",
+                    "next_page_url" => "",
+                    "path" => "",
+                    "per_page" => 1,
+                    "prev_page_url" => null,
+                    "to" => 1,
+                    "total" => 1,
+                    'data' => [
+                        'id' => 1,
+                        'name' => '360幸福大使',
+                        'title' => '360幸福大使',
+                        'subtitle' => '360幸福大使',
+                        'cover_img' => ConfigModel::getData(22),
+                        'doc_content' => '360幸福大使',
+                        'doc_type' => 1,
+                        'doc_type_info' => 14,
+                        'price' => 360
+                    ]];
                 break;
 
         }
@@ -1067,7 +1103,7 @@ class ImDocServers
         }
 
         ImDocSendJob::whereIn('id', $job_id_list)->update([
-            'is_done' =>2
+            'is_done' => 2
         ]);
 
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
