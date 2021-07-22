@@ -415,6 +415,8 @@ class ImMsgController extends Controller
                     $msg_content_add['second']              = $v['MsgContent']['VideoSecond']??0;
                     $msg_content_add['video_format']        = $v['MsgContent']['VideoFormat']??'';
                     $msg_content_add['download_flag']       = $v['MsgContent']['VideoDownloadFlag']??2;
+                    $msg_content_add['video_uuid']          = $v['MsgContent']['VideoUUID']??'';
+                    $msg_content_add['uuid']                = $v['MsgContent']['ThumbUUID']??'';
                     $msg_content_add['thumb_url']           = $v['MsgContent']['ThumbUrl']??'';
                     $msg_content_add['thumb_size']          = $v['MsgContent']['ThumbSize']??0;
                     $msg_content_add['thumb_width']         = $v['MsgContent']['ThumbWidth']??0;

@@ -27,7 +27,7 @@ class ImMsg extends Base
 
         $query = ImMsg::with([
             'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data,file_name as FileName,file_size as FileSize
-            ,uuid,image_format as ImageFormat,file_name as FileName,size as VideoSize,video_format as VideoFormat,thumb_url as ThumbUrl,thumb_size as ThumbSize,thumb_width as ThumbWidth,thumb_height as ThumbHeight,thumb_format as ThumbFormat,second as VideoSecond',
+            ,uuid,image_format as ImageFormat,file_name as FileName,size as VideoSize,video_format as VideoFormat,thumb_url as ThumbUrl,thumb_size as ThumbSize,thumb_width as ThumbWidth,thumb_height as ThumbHeight,thumb_format as ThumbFormat,second as VideoSecond,video_uuid',
             'content.imginfo:content_id,type,size,width,height,url',
             ])->select('id','msg_seq','msg_time','from_account');
         if(!empty($ids) ){
@@ -96,11 +96,14 @@ class ImMsg extends Base
                     $msg_content_add['VideoSecond']         = $val['VideoSecond'];
                     $msg_content_add['VideoFormat']         = $val['VideoFormat'];
                     $msg_content_add['VideoDownloadFlag']   = 2;
+                    $msg_content_add['VideoUUID']           = $params['video_uuid']??'';
+                    $msg_content_add['ThumbUUID']           = $params['uuid']??'';
                     $msg_content_add['ThumbUrl']            = $params['ThumbUrl']??'';
                     $msg_content_add['ThumbSize']           = $params['ThumbSize'];
                     $msg_content_add['ThumbWidth']          = $params['ThumbWidth'];
                     $msg_content_add['ThumbHeight']         = $params['ThumbHeight'];
                     $msg_content_add['ThumbFormat']         = $params['ThumbFormat'] ?? 'mp4';
+                    $msg_content_add['ThumbDownloadFlag']         = 2;
                     break;
 
                 case 'TIMCustomElem' : //自定义消息
