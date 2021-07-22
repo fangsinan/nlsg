@@ -142,10 +142,11 @@ class ImDocController extends Controller
      */
     public function addForApp(Request $request)
     {
-        $servers = new ImDocServers();
-        $params = $request->input();
-        $params['for_app'] = 1;
-        $data = $servers->add($params, $this->user['id']);
+//        $servers = new ImDocServers();
+//        $params = $request->input();
+//        $params['for_app'] = 1;
+//        $data = $servers->add($params, $this->user['id']);
+        $data = ['code'=>false,'msg'=>'弃用'];
         return $this->getRes($data);
     }
 
