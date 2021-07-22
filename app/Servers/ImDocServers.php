@@ -671,7 +671,7 @@ class ImDocServers
                     "to" => 1,
                     "total" => 1,
                     'data' => [
-                        'id' => 1,
+                        ['id' => 1,
                         'name' => '360幸福大使',
                         'title' => '360幸福大使',
                         'subtitle' => '360幸福大使',
@@ -679,7 +679,7 @@ class ImDocServers
                         'doc_content' => '360幸福大使',
                         'doc_type' => 1,
                         'doc_type_info' => 14,
-                        'price' => 360
+                        'price' => 360]
                     ]];
                 break;
 
