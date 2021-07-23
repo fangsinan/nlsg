@@ -190,6 +190,10 @@ class MallCommentServers
             ->get()->toArray();
         $robot = array_column($robot, 'id');
 
+        $begin_timestamp = strtotime('-1 hours');
+        $end_timestamp = time();
+        $now_date = date('Y-m-d H:i:s');
+
         $add_data = [];
         foreach ($list as $key => $v) {
             if (empty($v['content'])) {
@@ -200,6 +204,8 @@ class MallCommentServers
             $temp_data['content'] = $v['content'] ?? '';
             $temp_data['relation_id'] = $id;
             $temp_data['type'] = $type;
+            $temp_data['created_at'] = date('Y-m-d H:i:s',rand($begin_timestamp,$end_timestamp));
+            $temp_data['updated_at'] = $now_date;
             $add_data[] = $temp_data;
         }
 
