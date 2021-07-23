@@ -106,6 +106,7 @@ class MallCommentController extends ControllerBackend
      * @apiGroup  后台-商品评论
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/goods/add_robot_comment_for_works
      * @apiDescription 添加课程讲座虚拟评论
+     * @apiParam {number=2,4} type 类型(4是作品 2是讲座)
      * @apiParamExample {json} Request-Example:
      * {
      * "id":474,
