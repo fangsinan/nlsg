@@ -96,6 +96,12 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     //生成海报
     Route::get('create/create_poster', 'CreatePosterController@CreatePoster');
     Route::post('create/upload_push', 'CreatePosterController@uploadPush');
+    //上传阿里点播、OSS
+    Route::post('upload/push_ali_auth', 'AliUploadController@PushAliAuth');
+    Route::post('upload/del_ali_ydb', 'AliUploadController@DelAliYdb');
+    Route::post('upload/get_play', 'AliUploadController@GetPlay');
+    Route::post('upload/file_ali_oss', 'AliUploadController@FileAliOss');
+    Route::post('upload/del_ali_oss', 'AliUploadController@DelAliOss');
 
 
     //*******************************商城部分开始*******************************
