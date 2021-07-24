@@ -11,6 +11,8 @@ use AlibabaCloud\Client\Exception\ServerException;
 use OSS\OssClient;
 use OSS\Core\OssException;
 
+use Illuminate\Support\Facades\Log;
+
 //https://next.api.aliyun.com/api-tools/sdk/vod?version=2017-03-21&language=php
 //https://help.aliyun.com/document_detail/123461.html?spm=a2c4g.11186623.6.1074.525958a4xbtMvZ
 //php -d memory_limit=-1 composer.phar require alibabacloud/sdk
@@ -476,6 +478,14 @@ class AliUploadController extends Controller
             'AuthInfoTimeout' => $TimeOut,
         ];
         return self::AlibabaCloudRpcRequest('GetVideoPlayAuth',$query);
+
+    }
+
+    //上传完成回调
+    public function Callback(Request $request){
+        $params =$request->input();
+
+        Log::channel('aliOnDemandLog')->info(json_encode($params,true));
 
     }
 
