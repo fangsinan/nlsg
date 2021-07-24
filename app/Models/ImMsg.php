@@ -57,13 +57,13 @@ class ImMsg extends Base
                     $msg_content_add['Text']            = $val['Text'];
                     break;
                 case 'TIMFaceElem' : //表情消息元素
-                    $msg_content_add['Index']           = $val['Index'];
+                    $msg_content_add['Index']           = $val['Index']??'';
                     $msg_content_add['Data']            = $val['Data'];
                     break;
                 case 'TIMSoundElem' ://语音消息元素
                     $msg_content_add['Url']             = $val['Url'];
-                    $msg_content_add['Size']            = $val['Size'];
-                    $msg_content_add['Second']          = $val['Second'];
+                    $msg_content_add['Size']            = $val['Size']??0;
+                    $msg_content_add['Second']          = $val['Second']??0;
                     $msg_content_add['Download_Flag']   = 2;
                     break;
                 case 'TIMImageElem' ://图片元素
@@ -85,23 +85,23 @@ class ImMsg extends Base
                     break;
                 case 'TIMFileElem' ://文件类型元素
                     $msg_content_add['Url']             = $val['Url'];
-                    $msg_content_add['FileSize']        = $val['FileSize'];
+                    $msg_content_add['FileSize']        = $val['FileSize']??0;
                     $msg_content_add['FileName']        = $val['FileName'];
                     $msg_content_add['Download_Flag']   = 2;
                     break;
 
                 case 'TIMVideoFileElem' : //视频类型元素
                     $msg_content_add['VideoUrl']            = $val['VideoUrl'];
-                    $msg_content_add['VideoSize']           = $val['VideoSize'];
-                    $msg_content_add['VideoSecond']         = $val['VideoSecond'];
-                    $msg_content_add['VideoFormat']         = $val['VideoFormat'];
+                    $msg_content_add['VideoSize']           = $val['VideoSize']??0;
+                    $msg_content_add['VideoSecond']         = $val['VideoSecond']??0;
+                    $msg_content_add['VideoFormat']         = $val['VideoFormat']??0;
                     $msg_content_add['VideoDownloadFlag']   = 2;
                     $msg_content_add['VideoUUID']           = $params['video_uuid']??'';
                     $msg_content_add['ThumbUUID']           = $params['uuid']??'';
                     $msg_content_add['ThumbUrl']            = $params['ThumbUrl']??'';
-                    $msg_content_add['ThumbSize']           = $params['ThumbSize'];
-                    $msg_content_add['ThumbWidth']          = $params['ThumbWidth'];
-                    $msg_content_add['ThumbHeight']         = $params['ThumbHeight'];
+                    $msg_content_add['ThumbSize']           = $params['ThumbSize']??0;
+                    $msg_content_add['ThumbWidth']          = $params['ThumbWidth']??0;
+                    $msg_content_add['ThumbHeight']         = $params['ThumbHeight']??0;
                     $msg_content_add['ThumbFormat']         = $params['ThumbFormat'] ?? 'mp4';
                     $msg_content_add['ThumbDownloadFlag']         = 2;
                     break;
