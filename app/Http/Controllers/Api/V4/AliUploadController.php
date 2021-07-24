@@ -36,11 +36,34 @@ class AliUploadController extends Controller
     public static $IMAGES_URL = 'https://audiovideo.ali.nlsgapp.com/';
 
     //初始化
-    function initVodClient($accessKeyId, $accessKeySecret) {
+    public function initVodClient($accessKeyId, $accessKeySecret) {
         $regionId = 'cn-beijing';
         AlibabaCloud::accessKeyClient($accessKeyId, $accessKeySecret)
             ->regionId($regionId)
             ->asDefaultClient();
+    }
+
+    //参数请求提取
+    public function AlibabaCloudRpcRequest($action,$query){
+        try {
+            $result= AlibabaCloud::rpc()
+                ->product('vod')
+                ->scheme('https') // https | http
+                ->version('2017-03-21')
+                ->action($action)
+                ->method('POST')
+                ->host('vod.cn-beijing.aliyuncs.com')
+                ->options([
+                    'query' => $query,
+                ])
+                ->request();
+            return ['status'=>1,'data'=>$result->toArray()];
+        } catch (ClientException $e) {
+            return ['status'=>0,'msg'=>$e->getErrorMessage()];
+        } catch (ServerException $e) {
+            return ['status'=>0,'msg'=>$e->getErrorMessage()];
+        }
+
     }
 
     /**
@@ -386,25 +409,8 @@ class AliUploadController extends Controller
 //            $queryArr['TemplateGroupId']=self::TemplateGroupId; //转码模板组ID  只限视频
             $queryArr['WorkflowId']=self::WorkflowId; //工作流ID  只限视频 可截封面图
         }
-        try {
-            $result = AlibabaCloud::rpc()
-                ->product('vod')
-                ->scheme('https') // https | http
-                ->version('2017-03-21')
-                ->action('CreateUploadVideo')
-                ->method('POST')
-                ->host('vod.cn-beijing.aliyuncs.com')
-                ->options([
-                    'query' =>$queryArr,
-                ])
-                ->request();
-            return ['status'=>1,'data'=>$result->toArray()];
-        } catch (ClientException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        } catch (ServerException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        }
 
+        return self::AlibabaCloudRpcRequest('CreateUploadVideo',$queryArr);
 
     }
 
@@ -417,116 +423,59 @@ class AliUploadController extends Controller
             'CateId'=>self::TypeArr[$type], //分类ID  type 1 视频 2音频 3 图片 4文件
             'StorageLocation'=>self::StorageLocation, //存储地址
         ];
-        try {
-            $result = AlibabaCloud::rpc()
-                ->product('vod')
-                ->scheme('https') // https | http
-                ->version('2017-03-21')
-                ->action('CreateUploadImage')
-                ->method('POST')
-                ->host('vod.cn-beijing.aliyuncs.com')
-                ->options([
-                    'query' =>$queryArr,
-                ])
-                ->request();
-            return ['status'=>1,'data'=>$result->toArray()];
-        } catch (ClientException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        } catch (ServerException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        }
+
+        return self::AlibabaCloudRpcRequest('CreateUploadImage',$queryArr);
+
     }
 
     //删除音视频时更改类型到待删除
     public function updateVideoInfo($VideoId,$CateId=5){
-        try {
-            $result = AlibabaCloud::rpc()
-                ->product('vod')
-                ->scheme('https') // https | http
-                ->version('2017-03-21')
-                ->action('UpdateVideoInfo')
-                ->method('POST')
-                ->host('vod.cn-beijing.aliyuncs.com')
-                ->options([
-                    'query' => [
-                        'VideoId' => $VideoId,
-                        'CateId' => self::TypeArr[$CateId],
-                    ],
-                ])
-                ->request();
-            return ['status'=>1,'data'=>$result->toArray()];
-        } catch (ClientException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        } catch (ServerException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        }
+
+        $query=[
+            'VideoId' => $VideoId,
+            'CateId' => self::TypeArr[$CateId],
+        ];
+
+        return self::AlibabaCloudRpcRequest('UpdateVideoInfo',$query);
+
     }
 
     //删除点播图片
     public function DeleteImage($ImageIds){
-        try {
-            $result = AlibabaCloud::rpc()
-                ->product('vod')
-                ->scheme('https') // https | http
-                ->version('2017-03-21')
-                ->action('DeleteImage')
-                ->method('POST')
-                ->host('vod.cn-beijing.aliyuncs.com')
-                ->options([
-                    'query' => [
-                        'ImageIds' => $ImageIds,
-                        'DeleteImageType' => "ImageId",
-                    ],
-                ])
-                ->request();
-            return ['status'=>1,'data'=>$result->toArray()];
-        } catch (ClientException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        } catch (ServerException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        }
+
+        $query = [
+            'ImageIds' => $ImageIds,
+            'DeleteImageType' => "ImageId",
+        ];
+
+        return self::AlibabaCloudRpcRequest('DeleteImage',$query);
+
     }
 
     //获取播放地址接口
     public function getPlayInfo($VideoId) {
 
-        $result = AlibabaCloud::rpc()
-            ->product('vod')
-            ->scheme('https') // https | http
-            ->version('2017-03-21')
-            ->action('GetPlayInfo')
-            ->method('POST')
-            ->host('vod.cn-beijing.aliyuncs.com')
-            ->options([
-                'query' => [
-                    'VideoId' => $VideoId,
-                ],
-            ])
-            ->request();
+        $query=[
+            'VideoId' => $VideoId,
+        ];
 
-        $InfoArr=$result->toArray();
-        return ['status'=>1,'data'=>['url'=>$InfoArr['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
+        $result=self::AlibabaCloudRpcRequest('GetPlayInfo',$query);
+        if($result['status']==1){
+            return ['status'=>1,'data'=>['url'=>$result['data']['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
+        }else{
+            return $result;
+        }
 
     }
 
     //获取视频播放凭证
     public function getVideoPlayAuth($VideoId,$TimeOut) {
-        $result = AlibabaCloud::rpc()
-            ->product('vod')
-            ->scheme('https') // https | http
-            ->version('2017-03-21')
-            ->action('GetVideoPlayAuth')
-            ->method('POST')
-            ->host('vod.cn-beijing.aliyuncs.com')
-            ->options([
-                'query' => [
-                    'VideoId' => $VideoId,
-                    'AuthInfoTimeout' => $TimeOut,
-                ],
-            ])
-            ->request();
 
-        return ['status'=>1,'data'=>$result->toArray()];
+        $query=[
+            'VideoId' => $VideoId,
+            'AuthInfoTimeout' => $TimeOut,
+        ];
+        return self::AlibabaCloudRpcRequest('GetVideoPlayAuth',$query);
 
     }
 
