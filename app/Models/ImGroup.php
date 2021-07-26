@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Libraries\ImClient;
+
 class ImGroup extends Base
 {
 
@@ -52,4 +54,32 @@ class ImGroup extends Base
 
     }
 
+
+
+
+    //$group_id  array类型
+    public static function setGroupInfo($group_id){
+        if(empty($group_id) || !is_array($group_id)){
+            return '0';
+        }
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/get_group_info");
+        //目前只修改群人数
+        $post_data = [
+            'GroupIdList' => $group_id,
+            'GroupBaseInfoFilter' => [
+                'GroupId','Type','Name','MemberNum'
+            ],
+        ];
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+        if($res['ActionStatus'] == "OK" && empty(!$res['GroupInfo'])){
+            foreach ($res['GroupInfo'] as $item) {
+                if($item['ErrorCode'] == 0){
+                    ImGroup::where('group_id',$item['GroupId'])->update(['member_num'=>$item['MemberNum']]);
+                }
+            }
+        }
+
+        return ;
+    }
 }
