@@ -5,6 +5,7 @@ namespace App\Servers;
 
 
 use App\Models\ImGroup;
+use App\Models\ImGroupTop;
 use Illuminate\Support\Facades\DB;
 
 class ImGroupServers
@@ -21,7 +22,7 @@ class ImGroupServers
             ->select([
                 'g.id', 'g.group_id', 'g.operator_account', 'g.owner_account', 'g.type', 'g.name',
                 'g.status', 'g.created_at', 'owner.phone as owner_phone', 'owner.id as owner_id',
-                'owner.nickname as owner_nickname','g.member_num',
+                'owner.nickname as owner_nickname', 'g.member_num',
                 DB::raw('(case gt.id when gt.id > 0 then 1 else 0 end) as is_top'),
                 DB::raw('2000 as max_num')
             ])->orderBy('gt.id', 'desc');
@@ -39,8 +40,8 @@ class ImGroupServers
             $query->where('g.name', 'like', '%' . $params['name'] . '%');
         }
 
-        if (!empty($params['status'] ?? 0)){
-            $query->where('g.status','=',$params['status']);
+        if (!empty($params['status'] ?? 0)) {
+            $query->where('g.status', '=', $params['status']);
         }
 
         $query->orderBy('g.id', 'desc');
@@ -97,10 +98,47 @@ class ImGroupServers
         return $res;
     }
 
-    public function changeStatus($params, $user_id)
+    public function changeTop($params, $user_id)
     {
+        $group_id = $params['group_id'] ?? '';
+        if (empty($group_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $group_id = ImGroup::getId($group_id);
+        $group_id = $group_id['id'];
+        if (empty($group_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check = ImGroupTop::query()
+            ->where('group_id', '=', $group_id)
+            ->where('user_id', '=', $user_id)
+            ->first();
 
-        //退出 Topping置顶 取消指定 转让 解散
-
+        //退出 置顶 取消置顶 转让 解散
+        $flag = $params['flag'] ?? '';
+        switch ($flag) {
+            case 'top':
+                $res = ImGroupTop::firstOrCreate([
+                    'user_id' => $user_id,
+                    'group_id' => $group_id
+                ]);
+                break;
+            case 'cancel_top':
+                if ($check) {
+                    $res = ImGroupTop::where('user_id', '=', $user_id)
+                        ->where('group_id', '=', $group_id)
+                        ->delete();
+                } else {
+                    $res = true;
+                }
+                break;
+            default:
+                return ['code' => false, 'msg' => '参数错误'];
+        }
+        if ($res == false) {
+            return ['code' => false, 'msg' => '失败'];
+        } else {
+            return ['code' => true, 'msg' => '成功'];
+        }
     }
 }

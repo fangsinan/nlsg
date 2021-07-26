@@ -54,6 +54,19 @@ class ImGroup extends Base
 
     }
 
+    public static function getId($id){
+        if (is_numeric($id)){
+            $res = ImGroup::where('id','=',$id)->select('id','group_id')->first();
+        }else{
+            $res = ImGroup::where('group_id','=',$id)->select('id','group_id')->first();
+        }
+        if (empty($res)){
+            return ['id'=>0,'group_id'=>0];
+        }else{
+            return $res->toArray();
+        }
+    }
+
 
 
 

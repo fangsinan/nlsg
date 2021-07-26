@@ -206,6 +206,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //im群
         Route::get('im_group/list', 'ImGroupController@list');
         Route::get('im_group/statistics', 'ImGroupController@statistics');
+        Route::put('im_group/change_top', 'ImGroupController@changeTop');
 
         //im选择商品
         Route::get('im_doc/category', 'ImDocController@getCategory');

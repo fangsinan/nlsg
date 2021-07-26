@@ -72,9 +72,19 @@ class ImGroupController extends ControllerBackend
         return $this->getRes($data);
     }
 
-    public function changeStatus(Request $request){
+    /**
+     * @api {put} api/admin_v4/im_group/change_top 设置或取消置顶
+     * @apiVersion 4.0.0
+     * @apiName  api/admin_v4/im_group/change_top
+     * @apiGroup 后台-社群
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_group/change_top
+     * @apiDescription 群列表
+     * @apiParam {string} group_id 群组id
+     * @apiParam {string=top,cancel_top} flag 操作
+     */
+    public function changeTop(Request $request){
         $servers = new ImGroupServers();
-        $data = $servers->changeStatus($request->input(), $this->user['user_id']);
+        $data = $servers->changeTop($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
 
