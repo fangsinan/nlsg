@@ -78,6 +78,9 @@ class ImGroupController extends Controller
 
         $res = ImClient::curlPost($url,json_encode($post_data));
         $res = json_decode($res,true);
+        //修改群人数
+        ImGroup::setGroupInfo([$params['group_id']]);
+
 
         if ($res['ActionStatus'] == 'OK'){
             return $this->success();
@@ -375,6 +378,8 @@ class ImGroupController extends Controller
             $gu_res = ImGroupUser::firstOrCreate($adds);
         }
 
+        ImGroup::setGroupInfo([$params['GroupId']]);
+
 
         return true;
 
@@ -403,6 +408,9 @@ class ImGroupController extends Controller
                 'group_account' => $item['Member_Account'],
             ])->update($ed_data);
         }
+
+
+        ImGroup::setGroupInfo([$params['GroupId']]);
 
         return true;
 
