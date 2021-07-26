@@ -531,6 +531,7 @@ class AliUploadController extends Controller
                 $query=[
                     'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4",
                     'WorkflowId' => $WorkflowId, //视频工作流id
+                    'userData'=>'{"MessageCallback": {"CallbackType":"http","CallbackURL": "http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback"},	"Extend": {"localId": "xxx","test": "www"}}'
                 ];
                 break;
             case 2:
