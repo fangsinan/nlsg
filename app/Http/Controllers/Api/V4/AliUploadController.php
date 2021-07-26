@@ -495,8 +495,8 @@ class AliUploadController extends Controller
         $params = $request->input();
         $type = (empty($params['type']))?0:$params['type'];
 
-        //type 1 视频 2音频 3 图片
-        if (!in_array($type, [1, 2,3])) {
+        //type 1 视频 2音频 3 图片 4文件
+        if (!in_array($type, [1, 2,3,4])) {
             return $this->error(0, '抓取类型有误');
         }
         try {
@@ -506,9 +506,11 @@ class AliUploadController extends Controller
             if(in_array($type,[2,3])) {
                 //抓取音频和图片
                 $result = $this->UploadMediaByURL($type);
-            }else {
+            }else if($type==1){
                 //抓取视频
                 $result = $this->UploadMediaByURL($type, self::WorkflowId);
+            }else if($type==4){
+                $result = $this->UploadMediaByURL($type);
             }
 
             if($result['status']==1){
@@ -547,10 +549,10 @@ class AliUploadController extends Controller
                     'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198",
                 ];
                 break;
+            case 4:
+                //拉取文件 oss
+                return self::GetUrlOSS('https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a438a563cd83fcafe9dbc0c76fb19c8f.docx');
         }
-
-        //拉取文件 oss
-        //https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a438a563cd83fcafe9dbc0c76fb19c8f.docx
 
         return self::AlibabaCloudRpcRequest('UploadMediaByURL',$query);
 
@@ -559,19 +561,37 @@ class AliUploadController extends Controller
     //腾讯下载文件上传OSS
     public function GetUrlOSS($url){
 
-        $filePath = EASYSWOOLE_ROOT . "/Temp/".md5($url).'.jpg';
-        //下载图片
-        $ch = curl_init ();
-        curl_setopt ($ch, CURLOPT_URL, $url);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 30);
-        $file = curl_exec ($ch);
-        curl_close ($ch);
-        $resource = fopen ($filePath, 'a');
-        fwrite ($resource, $file);
-        fclose ($resource);
+        $arr=explode('.',$url);
+        $filename=md5($arr[0]); //文件名
+        $ext=arr[1]; //扩展名
+        $filePath=storage_path('logs/img/'.$filename.'.'.$ext);
+        file_put_contents($filePath, file_get_contents($url));
 
-        file_put_contents("Tmpfile.zip", file_get_contents("http://someurl/file.zip"));
+        // Endpoint以杭州为例
+        $endpoint = self::EndPoint;
+        // 存储空间名称
+        $bucket = Config('web.Ali.BUCKET_ALI');
+        // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
+        $filePath = $filePath;
+
+        try{
+
+            //上传阿里
+            $ossClient = new OssClient(self::AccessKeyId, self::AccessKeySecret, $endpoint);
+            // 设置文件名称
+            $object = '1111group/' . date('Ymd') . $filename . '.' . $ext;
+            // 文件内容
+            $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
+            if ($doesres) {
+                return [ 'status' => 0,'data'=>[],'msg'=>'文件名已存在'];
+            }
+            $ossClient->uploadFile($bucket, $object, $filePath);
+
+            return [ 'status' => 1,'data'=>['name' => $object]];
+
+        } catch(OssException $e) {
+            return [ 'status' => 0,'data'=>[],'msg'=>$e->getMessage()];
+        }
 
     }
 
