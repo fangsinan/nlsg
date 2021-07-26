@@ -310,10 +310,15 @@ class ImDocServers
             if (!in_array($temp_type, [1, 2, 3])) {
                 return ['code' => false, 'msg' => '发送对象类型错误'];
             }
+            if (!is_array($v['list'])){
+                $v['list'] = explode(',',$v['list']);
+            }
             foreach ($v['list'] as $vv) {
                 $temp_info_data = [];
                 $temp_info_data['send_obj_type'] = $temp_type;
-                $temp_info_data['send_obj_id'] = $vv;
+                $temp_obj_id = ImGroup::getId($vv);
+                $temp_obj_id = $temp_obj_id['id'];
+                $temp_info_data['send_obj_id'] = $temp_obj_id;
                 $add_info_data[] = $temp_info_data;
             }
         }
