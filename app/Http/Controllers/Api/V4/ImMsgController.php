@@ -37,7 +37,7 @@ class ImMsgController extends Controller
      * @apiParam {int} From_Account  发送方帐号
      * @apiParam {array} To_Account  接收方用户 数组类型
      * @apiParam {array} To_Group   接收方群组 数组类型
-     * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"},{"MsgType":"TIMImageElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0","FileName":"file"},{"MsgType":"TIMVideoFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMCustomElem","Data":"eqweqeqe"}]  消息类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
+     * @apiParam {json} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"},{"MsgType":"TIMImageElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0","FileName":"file"},{"MsgType":"TIMVideoFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMCustomElem","Data":"eqweqeqe"}]  消息类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
      * @apiParam {array}  collection_id 收藏id
      *
      * @apiSuccess {string} result json
@@ -79,9 +79,10 @@ class ImMsgController extends Controller
             foreach ($contents as $key=>$value) {
                 $msg_body = array_merge($msg_body,$value['content']);
             }
+            $collection_id = implode(",", $collection_id)??'';
         }else{
             //群发的聊天消息
-            //$msg_content = json_decode($msg_content,true);
+            $msg_content = json_decode($msg_content,true);
             $msg_body = ImMsg::setMsgContent($msg_content);
         }
         //dd($msg_body);
@@ -97,7 +98,7 @@ class ImMsgController extends Controller
             'from_account'  => $from_account,
             'to_account'    => implode(",", $to_accounts) ??'',
             'to_group'      => implode(",", $to_group)??'',
-            'collection_id' => implode(",", $collection_id)??'',
+            'collection_id' => $collection_id,
             'msg_body'      => json_encode($msgBody),
             'created_at'    => date("Y-m-d h:i:s"),
             'updated_at'    => date("Y-m-d h:i:s"),
@@ -125,6 +126,7 @@ class ImMsgController extends Controller
                 //$post_data['type']              = 3; //群发
                 $post_data['MsgTime']           = time();
                 $post_data['MsgKey']            = $res['MsgKey'];
+                $post_data['OptPlatform']       = 'RESTAPI' ;
                 $to_accounts = array_unique($to_accounts);
                 foreach ($to_accounts as $key=>$val){
                     $post_data['To_Account'] = $val;
@@ -279,7 +281,11 @@ class ImMsgController extends Controller
         }
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/profile/portrait_get");
         $post_data['To_Account'] = $ids;
-        $post_data['TagList'] = ['Tag_Profile_IM_Nick','Tag_Profile_IM_Gender'];
+        $post_data['TagList'] = ['Tag_Profile_IM_Nick','Tag_Profile_IM_Gender',
+            'Tag_Profile_IM_BirthDay','Tag_Profile_IM_Location','Tag_Profile_IM_SelfSignature',
+            'Tag_Profile_IM_AllowType','Tag_Profile_IM_Language','Tag_Profile_IM_Image',
+            'Tag_Profile_IM_MsgSettings','Tag_Profile_IM_AdminForbidType','Tag_Profile_IM_Level','Tag_Profile_IM_Role'
+        ];
         $res = ImClient::curlPost($url,json_encode($post_data));
         $res = json_decode($res,true);
 
