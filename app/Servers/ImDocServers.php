@@ -33,7 +33,6 @@ class ImDocServers
             return [];
         }
 
-
         return ImGroup::whereIn('group_id', $group_id_list)
             ->where('status', '=', 1)
             ->select(['id', 'name'])
@@ -83,7 +82,6 @@ class ImDocServers
         if ($type_info < ($type * 10) || $type_info > ($type * 10 + 9)) {
             return ['code' => false, 'msg' => '详细类型错误'];
         }
-
 
         //1商品 2附件 3文本
         switch (intval($params['type'])) {
@@ -161,7 +159,6 @@ class ImDocServers
                 break;
         }
 
-
         $docModel->type = $type;
         $docModel->type_info = $type_info;
         $docModel->obj_id = $obj_id;
@@ -202,8 +199,6 @@ class ImDocServers
                 DB::rollBack();
                 return ['code' => false, 'msg' => '失败'];
             }
-
-
         }
 
         DB::commit();

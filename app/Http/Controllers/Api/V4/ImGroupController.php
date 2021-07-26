@@ -78,6 +78,9 @@ class ImGroupController extends Controller
 
         $res = ImClient::curlPost($url,json_encode($post_data));
         $res = json_decode($res,true);
+        //修改群人数
+        ImGroup::setGroupInfo([$params['group_id']]);
+
 
         if ($res['ActionStatus'] == 'OK'){
             return $this->success();
@@ -206,6 +209,53 @@ class ImGroupController extends Controller
 
     }
 
+
+    /**
+     * @api {post} /api/v4/im_group/set_group_user 设置群管理员
+     * @apiName set_group_user
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *e
+     * @apiParam {int} group_id 腾讯云的groupId
+     * @apiParam {int} user_id  user_id
+     * @apiParam {int} type  0取消管理员 1设置管理员
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function setGroupUser(Request $request){
+        $params    = $request->input();
+
+        if( empty($params['group_id']) || empty($params['user_id']) ){
+            return $this->error('0','request error');
+        }
+
+        $get_where = $where = [
+            'group_id'      =>$params['group_id'],
+            'group_account' =>$params['user_id'],
+        ];
+
+        $get_where['group_role'] = 1;
+        $res = ImGroupUser::where($get_where)->first();
+        if(!empty($res)){
+            return $this->success();
+        }
+
+        $type = 0;
+        if(!empty($params['type'])){
+            $type = 2;
+        }
+        ImGroupUser::where($where)->update(['group_role'=>$type]);
+
+        return $this->success();
+
+    }
 
 
 
@@ -375,6 +425,8 @@ class ImGroupController extends Controller
             $gu_res = ImGroupUser::firstOrCreate($adds);
         }
 
+        ImGroup::setGroupInfo([$params['GroupId']]);
+
 
         return true;
 
@@ -403,6 +455,9 @@ class ImGroupController extends Controller
                 'group_account' => $item['Member_Account'],
             ])->update($ed_data);
         }
+
+
+        ImGroup::setGroupInfo([$params['GroupId']]);
 
         return true;
 
