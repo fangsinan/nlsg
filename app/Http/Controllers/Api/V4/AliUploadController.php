@@ -303,10 +303,10 @@ class AliUploadController extends Controller
     {
 
         $file=$request->file('file');
-        if(!$file->isValid()){
-            return $this->error(0, '文件不合法');
-        }
         try {
+            if(!$file->isValid()){
+                return $this->error(0, '文件不合法');
+            }
             $fileextension = $file->getClientOriginalExtension();//获取上传文件的后缀（如abc.png，获取到的为png）
             $realpath = $file->getRealPath();//获取上传的文件缓存在tmp文件夹下的绝对路径
             $filename = $file->getClientOriginalName(); //获取上传文件的文件名（带后缀，如abc.png）
