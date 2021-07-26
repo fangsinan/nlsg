@@ -29,7 +29,7 @@ class ImFriendController extends Controller
 
 
     /**
-     * @api {get} /api/v4/im_friend/portrait_get  拉取im 用户
+     * @api {get} /api/v4/im_friend/portrait_get  拉取im 用户资料
      * @apiName portrait_get
      * @apiVersion 1.0.0
      * @apiGroup im_friend
