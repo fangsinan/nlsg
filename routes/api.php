@@ -424,6 +424,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('im/get_user_sig', 'ImController@getUserSig');
     Route::post('im/msg_send_all', 'ImMsgController@MsgSendAll');
     Route::get('im_friend/get_im_user', 'ImFriendController@getImUser');
+    Route::get('im_friend/portrait_get', 'ImFriendController@getPortrait');
 
 
     Route::get('ToTwitter', 'IncomeController@ToTwitter');

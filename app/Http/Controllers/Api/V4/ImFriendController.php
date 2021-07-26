@@ -7,6 +7,7 @@ use App\Models\ImCollection;
 use App\Models\ImMsgContentImg;
 use App\Models\ImMsgContent;
 use App\Models\ImMsg;
+use App\Models\ImUser;
 use App\Models\ImUserBlacklist;
 use App\Models\ImUserFriend;
 use App\Models\User;
@@ -22,6 +23,75 @@ use Libraries\ImClient;
  */
 class ImFriendController extends Controller
 {
+
+
+
+
+
+    /**
+     * @api {get} /api/v4/im_friend/portrait_get  拉取im 用户
+     * @apiName portrait_get
+     * @apiVersion 1.0.0
+     * @apiGroup im_friend
+     *e
+     * @apiParam {int} user_id   user_id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function getPortrait(Request $request){
+        $params    = $request->input();
+
+        if( empty($params['user_id']) ){
+            return $this->error('0','request user_id error');
+        }
+        $user = ImMsgController::getImUser([$params['user_id']]);
+
+        if(!empty($user)){
+            foreach ($user as $key=>$value) {
+                $is_user = ImUser::where(['tag_im_to_account'=>$key ])->first();
+
+                $data = [
+                    'tag_im_to_account'     => $params['user_id'],
+                    'tag_im_nick'           => $value['Tag_Profile_IM_Nick']??'',
+                    'tag_im_gender'         => $value['Tag_Profile_IM_Gender']??'',
+                    'tag_im_birth_day'      => $value['Tag_Profile_IM_BirthDay']??'',
+                    'tag_im_location'       => $value['Tag_Profile_IM_Location']??'',
+                    'tag_im_self_signature' => $value['Tag_Profile_IM_SelfSignature']??'',
+                    'tag_im_allow_type'     => $value['Tag_Profile_IM_AllowType']??'',
+                    'tag_im_language'       => $value['Tag_Profile_IM_Language']??'',
+                    'tag_im_image'          => $value['Tag_Profile_IM_Image']??'',
+                    'tag_im_msg_settings'   => $value['Tag_Profile_IM_MsgSettings']??'',
+                    'tag_im_admin_forbid_type'  => $value['Tag_Profile_IM_AdminForbidType']??'',
+                    'tag_im_level'          => $value['Tag_Profile_IM_Level']??0,
+                    'tag_im_role'           => $value['Tag_Profile_IM_Role']??0,
+                    'created_at'            => date("y-m-d H:i:s"),
+                    'updated_at'            => date("y-m-d H:i:s"),
+                ];
+
+                if(empty($is_user)){
+                    //add
+                    ImUser::insert($data);
+                }else{
+                    //edit
+                    ImUser::where(['tag_im_to_account'=>$params['user_id']])->update($data);
+                }
+            }
+        }
+
+        return $this->success();
+
+    }
+
+
+
+
 
 
 
