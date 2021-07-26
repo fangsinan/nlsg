@@ -565,7 +565,7 @@ class AliUploadController extends Controller
         $filename=md5($url); //文件名
         $ext=$arr[count($arr)-1]; //扩展名
 
-        $filePath=storage_path('logs/img/'.$filename.'.'.$ext);
+        $filePath=storage_path('logs/'.$filename.'.'.$ext);
         file_put_contents($filePath, file_get_contents($url));
 
         // Endpoint以杭州为例
