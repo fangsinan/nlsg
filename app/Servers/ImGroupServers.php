@@ -21,8 +21,7 @@ class ImGroupServers
             ->select([
                 'g.id', 'g.group_id', 'g.operator_account', 'g.owner_account', 'g.type', 'g.name',
                 'g.status', 'g.created_at', 'owner.phone as owner_phone', 'owner.id as owner_id',
-                'owner.nickname as owner_nickname',
-                DB::raw('0 as group_count'),
+                'owner.nickname as owner_nickname','g.member_num',
                 DB::raw('(case gt.id when gt.id > 0 then 1 else 0 end) as is_top')
             ])->orderBy('gt.id', 'desc');
 
@@ -37,6 +36,10 @@ class ImGroupServers
 
         if (!empty($params['name'] ?? '')) {
             $query->where('g.name', 'like', '%' . $params['name'] . '%');
+        }
+
+        if (!empty($params['status'] ?? 0)){
+            $query->where('g.status','=',$params['status']);
         }
 
         $query->orderBy('g.id', 'desc');
