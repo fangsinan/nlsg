@@ -13,9 +13,8 @@ use OSS\Core\OssException;
 
 use Illuminate\Support\Facades\Log;
 
-//https://next.api.aliyun.com/api-tools/sdk/vod?version=2017-03-21&language=php
-//https://help.aliyun.com/document_detail/123461.html?spm=a2c4g.11186623.6.1074.525958a4xbtMvZ
-//php -d memory_limit=-1 composer.phar require alibabacloud/sdk
+//https://help.aliyun.com/document_detail/123461.html?spm=a2c4g.11186623.6.1074.525958a4xbtMvZ      安装php -d memory_limit=-1 composer.phar require alibabacloud/sdk
+//https://next.api.aliyun.com/api/vod/2017-03-21/GetPlayInfo?params={%22VideoId%22:%2213a3ba6d4f1b4c7ba1b585cad344562e%22}&sdkStyle=old
 class AliUploadController extends Controller
 {
 
@@ -304,16 +303,19 @@ class AliUploadController extends Controller
     {
 
         $file=$request->file('file');
-        if(!$file->isValid()){
-            return $this->error(0, '文件不合法');
+        try {
+            if(!$file->isValid()){
+                return $this->error(0, '文件不合法');
+            }
+            $fileextension = $file->getClientOriginalExtension();//获取上传文件的后缀（如abc.png，获取到的为png）
+            $realpath = $file->getRealPath();//获取上传的文件缓存在tmp文件夹下的绝对路径
+            $filename = $file->getClientOriginalName(); //获取上传文件的文件名（带后缀，如abc.png）
+//            $filesize=$file->getSize();
+//            $filaname=$file->getFilename();//获取缓存在tmp目录下的文件名（带后缀，如php8933.tmp）
+//            $path=$file->move(path,newname);//将缓存在tmp目录下的文件移动，返回文件移动过后的路径 第一个参数是文件移到哪个文件夹下的路径，第二个参数是将上传的文件重新命名的文件名
+        }catch (\Exception $e){
+            return $this->error(0, $e->getMessage());
         }
-        $fileextension=$file->getClientOriginalExtension();//获取上传文件的后缀（如abc.png，获取到的为png）
-        $realpath=$file->getRealPath();//获取上传的文件缓存在tmp文件夹下的绝对路径
-        $filename=$file->getClientOriginalName(); //获取上传文件的文件名（带后缀，如abc.png）
-//        $filesize=$file->getSize();
-//        $filaname=$file->getFilename();//获取缓存在tmp目录下的文件名（带后缀，如php8933.tmp）
-//        $path=$file->move(path,newname);//将缓存在tmp目录下的文件移动，返回文件移动过后的路径 第一个参数是文件移到哪个文件夹下的路径，第二个参数是将上传的文件重新命名的文件名
-
         // Endpoint以杭州为例
         $endpoint = self::EndPoint;
         // 存储空间名称
@@ -397,7 +399,6 @@ class AliUploadController extends Controller
     /**
      * 获取视频上传地址和凭证
      */
-    //https://next.api.aliyun.com/api/vod/2017-03-21/GetPlayInfo?params={%22VideoId%22:%2213a3ba6d4f1b4c7ba1b585cad344562e%22}&sdkStyle=old
     public function createUploadVideo($type,$fileName,$title) {
 
         $queryArr=[
@@ -486,6 +487,27 @@ class AliUploadController extends Controller
         $params =$request->input();
 
         Log::channel('aliOnDemandLog')->info(json_encode($params,true));
+
+    }
+
+    //音视频拉取文件
+    public function UploadMediaByURL(){
+        //拉取音频
+        $query=[
+            'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/9d746c3a68617aaf1a2ceeb5de6a3080.m4a",
+        ];
+        //拉取视频
+        $query=[
+            'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4",
+            'WorkflowId' => "04d6477bd874095952201ff69be42f4e", //视频工作流id
+        ];
+        //拉取图片 点播
+        //https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png
+
+        //拉取文件 oss
+        //https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a438a563cd83fcafe9dbc0c76fb19c8f.docx
+
+        return self::AlibabaCloudRpcRequest('UploadMediaByURL',$query);
 
     }
 
