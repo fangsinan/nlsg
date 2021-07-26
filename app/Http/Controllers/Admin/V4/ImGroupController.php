@@ -48,6 +48,7 @@ class ImGroupController extends ControllerBackend
      * @apiSuccess {string} owner_nickname 群组昵称
      * @apiSuccess {string} member_num 群人数
      * @apiSuccess {string} is_top 是否置顶(1是 0否)
+     * @apiSuccess {string} max_num 最高人数
      * @apiSuccessExample {json} Request-Example:
      * {
      * "id": 56,

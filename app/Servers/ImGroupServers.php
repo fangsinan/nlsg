@@ -22,7 +22,8 @@ class ImGroupServers
                 'g.id', 'g.group_id', 'g.operator_account', 'g.owner_account', 'g.type', 'g.name',
                 'g.status', 'g.created_at', 'owner.phone as owner_phone', 'owner.id as owner_id',
                 'owner.nickname as owner_nickname','g.member_num',
-                DB::raw('(case gt.id when gt.id > 0 then 1 else 0 end) as is_top')
+                DB::raw('(case gt.id when gt.id > 0 then 1 else 0 end) as is_top'),
+                DB::raw('2000 as max_num')
             ])->orderBy('gt.id', 'desc');
 
         switch ($params['ob'] ?? '') {
