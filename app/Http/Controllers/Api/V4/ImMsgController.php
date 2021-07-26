@@ -305,6 +305,7 @@ class ImMsgController extends Controller
             'from_account'      => $params['From_Account'],
             'msg_seq'           => $params['MsgSeq'],       //群消息的唯一标识
             'msg_time'          => $params['MsgTime'],
+            'platform'          => $params['OptPlatform'],
         ];
         if( !empty($params['CloudCustomData']) ){
             $cloudCustomData = json_decode($params['CloudCustomData'],true);
