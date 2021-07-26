@@ -556,5 +556,24 @@ class AliUploadController extends Controller
 
     }
 
+    //腾讯下载文件上传OSS
+    public function GetUrlOSS($url){
+
+        $filePath = EASYSWOOLE_ROOT . "/Temp/".md5($url).'.jpg';
+        //下载图片
+        $ch = curl_init ();
+        curl_setopt ($ch, CURLOPT_URL, $url);
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 30);
+        $file = curl_exec ($ch);
+        curl_close ($ch);
+        $resource = fopen ($filePath, 'a');
+        fwrite ($resource, $file);
+        fclose ($resource);
+
+        file_put_contents("Tmpfile.zip", file_get_contents("http://someurl/file.zip"));
+
+    }
+
 
 }
