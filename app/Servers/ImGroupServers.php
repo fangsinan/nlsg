@@ -46,7 +46,20 @@ class ImGroupServers
 
         $query->orderBy('g.id', 'desc');
 
-        return $query->paginate($size);
+
+        $list =  $query->paginate($size);
+
+        foreach ($list as $v){
+            $v->admin = DB::table('nlsg_im_group_user as gu')
+                ->join('nlsg_user as u','gu.group_account','=','u.id')
+                ->where('group_id','=',$v->group_id)
+                ->where('group_role','<>',0)
+                ->orderBy('group_role')
+                ->select(['group_account','u.phone','u.nickname','group_role'])
+                ->get();
+        }
+
+        return $list;
     }
 
 

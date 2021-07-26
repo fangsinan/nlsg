@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\ControllerBackend;
-use App\Servers\ImDocServers;
 use App\Servers\ImGroupServers;
 use Illuminate\Http\Request;
 
@@ -19,7 +18,8 @@ class ImGroupController extends ControllerBackend
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_group/statistics
      * @apiDescription 群列表统计信息
      */
-    public function statistics(Request $request){
+    public function statistics(Request $request)
+    {
         $servers = new ImGroupServers();
         $data = $servers->statistics($request->input(), $this->user['user_id']);
         return $this->getRes($data);
@@ -49,6 +49,10 @@ class ImGroupController extends ControllerBackend
      * @apiSuccess {string} member_num 群人数
      * @apiSuccess {string} is_top 是否置顶(1是 0否)
      * @apiSuccess {string} max_num 最高人数
+     * @apiSuccess {string[]} admin 管理员列表
+     * @apiSuccess {string} admin.phone 管理员账号
+     * @apiSuccess {string} admin.group_account 管理员id
+     * @apiSuccess {string} admin.group_role  级别(1群组2管理员)
      * @apiSuccessExample {json} Request-Example:
      * {
      * "id": 56,
@@ -62,11 +66,21 @@ class ImGroupController extends ControllerBackend
      * "owner_phone": "15650701817",
      * "owner_id": 211172,
      * "owner_nickname": "房思楠",
-     * "group_count": 0,
-     * "is_top": 1
+     * "member_num": 5,
+     * "is_top": 1,
+     * "max_num": 2000,
+     * "admin": [
+     * {
+     * "group_account": "211172",
+     * "phone": "15650701817",
+     * "nickname": "房思楠",
+     * "group_role": 1
+     * }
+     * ]
      * }
      */
-    public function list(Request $request){
+    public function list(Request $request)
+    {
         $servers = new ImGroupServers();
         $data = $servers->groupList($request->input(), $this->user['user_id']);
         return $this->getRes($data);
@@ -82,7 +96,8 @@ class ImGroupController extends ControllerBackend
      * @apiParam {string} group_id 群组id
      * @apiParam {string=top,cancel_top} flag 操作
      */
-    public function changeTop(Request $request){
+    public function changeTop(Request $request)
+    {
         $servers = new ImGroupServers();
         $data = $servers->changeTop($request->input(), $this->user['user_id']);
         return $this->getRes($data);
