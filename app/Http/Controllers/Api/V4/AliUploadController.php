@@ -562,8 +562,9 @@ class AliUploadController extends Controller
     public function GetUrlOSS($url){
 
         $arr=explode('.',$url);
-        $filename=md5($arr[0]); //文件名
-        $ext=arr[1]; //扩展名
+        $filename=md5($url); //文件名
+        $ext=$arr[count($arr)-1]; //扩展名
+
         $filePath=storage_path('logs/img/'.$filename.'.'.$ext);
         file_put_contents($filePath, file_get_contents($url));
 
