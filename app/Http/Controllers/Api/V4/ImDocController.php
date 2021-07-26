@@ -32,7 +32,7 @@ class ImDocController extends Controller
      * @apiName  api/v4/im_doc/add
      * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/add
-     * @apiDescription (废弃)添加文案
+     * @apiDescription 添加文案
      *
      * @apiParam {number=1,2,3} type 类型(1商品 2附件 3文本)
      * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链 21音频 22视频 23图片 24文件 31文本)
