@@ -37,7 +37,7 @@ class ImMsgController extends Controller
      * @apiParam {int} From_Account  发送方帐号
      * @apiParam {array} To_Account  接收方用户 数组类型
      * @apiParam {array} To_Group   接收方群组 数组类型
-     * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"},{"MsgType":"TIMImageElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0","FileName":"file"},{"MsgType":"TIMVideoFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMCustomElem","Data":"eqweqeqe"}]  消息类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
+     * @apiParam {json} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"},{"MsgType":"TIMImageElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0","FileName":"file"},{"MsgType":"TIMVideoFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMCustomElem","Data":"eqweqeqe"}]  消息类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
      * @apiParam {array}  collection_id 收藏id
      *
      * @apiSuccess {string} result json
@@ -82,7 +82,7 @@ class ImMsgController extends Controller
             $collection_id = implode(",", $collection_id)??'';
         }else{
             //群发的聊天消息
-            //$msg_content = json_decode($msg_content,true);
+            $msg_content = json_decode($msg_content,true);
             $msg_body = ImMsg::setMsgContent($msg_content);
         }
         //dd($msg_body);
