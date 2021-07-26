@@ -236,15 +236,22 @@ class ImGroupController extends Controller
             return $this->error('0','request error');
         }
 
+        $get_where = $where = [
+            'group_id'      =>$params['group_id'],
+            'group_account' =>$params['user_id'],
+        ];
+
+        $get_where['group_role'] = 1;
+        $res = ImGroupUser::where($get_where)->first();
+        if(!empty($res)){
+            return $this->success();
+        }
+
         $type = 0;
         if(!empty($params['type'])){
             $type = 2;
         }
-
-        ImGroupUser::where([
-            'group_id'      =>$params['group_id'],
-            'group_account' =>$params['user_id'],
-        ])->update(['type'=>$type]);
+        ImGroupUser::where($where)->update(['group_role'=>$type]);
 
         return $this->success();
 
