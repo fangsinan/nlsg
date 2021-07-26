@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\ImCollection;
+use App\Models\ImGroup;
 use App\Models\ImMsgContentImg;
 use App\Models\ImMsgContent;
 use App\Models\ImMsg;
@@ -36,7 +37,7 @@ class ImMsgController extends Controller
      * @apiParam {int} From_Account  发送方帐号
      * @apiParam {array} To_Account  接收方用户 数组类型
      * @apiParam {array} To_Group   接收方群组 数组类型
-     * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"}] 数组类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
+     * @apiParam {array} Msg_Content 消息体:[{"MsgType":"TIMTextElem","Text":"文本消息"},{"MsgType":"TIMSoundElem","Url":"语音url"},{"MsgType":"TIMImageElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0","FileName":"file"},{"MsgType":"TIMVideoFileElem","Url":"http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0"},{"MsgType":"TIMCustomElem","Data":"eqweqeqe"}]  消息类型  根据MsgType  对应im的字段类型 参考：https://cloud.tencent.com/document/product/269/2720
      * @apiParam {array}  collection_id 收藏id
      *
      * @apiSuccess {string} result json
@@ -74,13 +75,17 @@ class ImMsgController extends Controller
 
             $contents = ImMsg::getMsgList($msg_ids);
 
-            $msg_content = [];  //初始化消息体
+            $msg_body = [];  //初始化消息体
             foreach ($contents as $key=>$value) {
-                $msg_content = array_merge($msg_content,$value['content']);
+                $msg_body = array_merge($msg_body,$value['content']);
             }
+        }else{
+            //群发的聊天消息
+            $msg_content = json_decode($msg_content,true);
+            $msg_body = ImMsg::setMsgContent($msg_content);
         }
-
-        $msgBody = ImMsg::MsgBody($msg_content);
+        //dd($msg_body);
+        $msgBody = ImMsg::MsgBody($msg_body);
 
         if(empty($msgBody)){
             return $this->error('0','Msg Body Error');
