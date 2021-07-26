@@ -587,7 +587,7 @@ class AliUploadController extends Controller
                 return [ 'status' => 0,'data'=>[],'msg'=>'文件名已存在'];
             }
             $ossClient->uploadFile($bucket, $object, $filePath);
-            unset($filePath);
+            unlink($filePath);
             return [ 'status' => 1,'data'=>['name' => $object]];
 
         } catch(OssException $e) {
