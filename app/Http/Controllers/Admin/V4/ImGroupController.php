@@ -36,9 +36,14 @@ class ImGroupController extends ControllerBackend
      * @apiParam {string} [name] 群名
      */
     public function list(Request $request){
-
         $servers = new ImGroupServers();
         $data = $servers->groupList($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
+    }
+
+    public function changeStatus(Request $request){
+        $servers = new ImGroupServers();
+        $data = $servers->changeStatus($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
 
