@@ -4,6 +4,7 @@
 namespace App\Servers;
 
 
+use App\Models\Column;
 use App\Models\ImGroup;
 use App\Models\ImGroupTop;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ class ImGroupServers
             ->select([
                 'g.id', 'g.group_id', 'g.operator_account', 'g.owner_account', 'g.type', 'g.name',
                 'g.status', 'g.created_at', 'owner.phone as owner_phone', 'owner.id as owner_id',
-                'owner.nickname as owner_nickname', 'g.member_num',
+                'owner.nickname as owner_nickname', 'g.member_num','works_id',
                 DB::raw('(case gt.id when gt.id > 0 then 1 else 0 end) as is_top'),
                 DB::raw('2000 as max_num')
             ])->orderBy('gt.id', 'desc');
@@ -57,6 +58,10 @@ class ImGroupServers
                 ->orderBy('group_role')
                 ->select(['group_account','u.phone','u.nickname','group_role'])
                 ->get();
+            $v->worksInfo = Column::query()
+                ->where('id','=',$v->works_id??0)
+                ->select(['id','name','subtitle'])
+                ->first();
         }
 
         return $list;
