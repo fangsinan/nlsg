@@ -40,6 +40,115 @@ class ImMsg extends Base
 
 
 
+    public static function setMsgContent($params_msg){
+        if(empty($params_msg)){
+            return [];
+        }
+
+
+        $res = [];
+        foreach ($params_msg as $key=>$val) {
+            $res[$key]['MsgType'] = $val['MsgType'];
+
+            //查询媒体表详情
+            $media = [
+                'size'          => 130, //大小
+                'second'        => 20, //时长
+                'uuid'          => 'ywuiabaguw', //uuid
+                'format'        => 255, //格式
+                'width'        => 102,
+                'height'        => 202,
+
+                //封面图
+                'thumb_uuid'        => '1231231',
+                'thumb_url'        => 'http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0',
+                'thumb_size'        => 130,
+                'thumb_width'        => 102,
+                'thumb_height'        => 202,
+                'thumb_format'        => 255,
+            ];
+
+            switch ($val['MsgType']){
+                case 'TIMTextElem' :  //文本消息元素
+                case 'TIMFaceElem' : //表情消息元素
+                    $res[$key] = $val;
+                    break;
+                case 'TIMSoundElem' ://语音消息元素
+                    $res[$key]['Size']  = $media['size'];
+                    $res[$key]['Second']  = $media['second'];
+                    $res[$key]['Url']  = $val['Url'];
+                    break;
+                case 'TIMImageElem' ://图片元素
+
+                    $res[$key]['uuid']          = $media['uuid'];
+                    $res[$key]['ImageFormat']   = $media['format'];
+                    $res[$key]['imginfo'] = [
+                        [
+                            'type' => 1,
+                            'size' => $media['size'],
+                            'width' => $media['width'],
+                            'height' => $media['height'],
+                            'url' => $val['Url'],
+                        ],[
+                            'type' => 2,
+                            'size' => $media['size'],
+                            'width' => $media['width'],
+                            'height' => $media['height'],
+                            'url' => $val['Url'],
+                        ],[
+                            'type' => 3,
+                            'size' => $media['size'],
+                            'width' => $media['width'],
+                            'height' => $media['height'],
+                            'url' => $val['Url'],
+                        ],
+                    ];
+
+
+
+                    break;
+                case 'TIMFileElem' ://文件类型元素
+                    $res[$key]['FileSize']  = $media['size'];
+                    $res[$key]['FileName']  = $val['FileName'];
+                    $res[$key]['Url']       = $val['Url'];
+                    break;
+
+                case 'TIMVideoFileElem' : //视频类型元素
+                    $res[$key]['VideoUrl']      = $val['Url'];
+                    $res[$key]['VideoSize']     = $media['size'];
+                    $res[$key]['VideoSecond']   = $media['second'];
+                    $res[$key]['VideoFormat']   = $media['format'];
+                    $res[$key]['video_uuid']    = $media['uuid']; //视频uuid
+
+                    $res[$key]['uuid']          = $media['thumb_uuid'];//封面图uuid
+                    $res[$key]['ThumbUrl']      = $media['thumb_url'];//封面图uuid
+                    $res[$key]['ThumbSize']     = $media['thumb_size'];//封面图uuid
+                    $res[$key]['ThumbWidth']    = $media['thumb_width'];//封面图uuid
+                    $res[$key]['ThumbHeight']   = $media['thumb_height'];//封面图uuid
+                    $res[$key]['ThumbFormat']   = $media['thumb_format'];//封面图uuid
+
+                    break;
+
+                case 'TIMCustomElem' : //自定义消息
+                    $res[$key]['Desc']    = $val['Desc']??'msg';
+                    $res[$key]['Data']    = $val['Data'];
+                    break;
+
+                default :
+                    break;
+            }
+
+        }
+
+
+
+
+        return $res;
+
+    }
+
+
+
     //返回body消息格式
     public static function MsgBody($msg_content){
 
@@ -49,7 +158,6 @@ class ImMsg extends Base
         $res = [];
         foreach ($msg_content as $key=>$val) {
             $msg_type = $val['MsgType'];
-            $params = $val;
 
             $msg_content_add = [];
             switch ($msg_type){
@@ -96,13 +204,13 @@ class ImMsg extends Base
                     $msg_content_add['VideoSecond']         = $val['VideoSecond']??0;
                     $msg_content_add['VideoFormat']         = $val['VideoFormat']??0;
                     $msg_content_add['VideoDownloadFlag']   = 2;
-                    $msg_content_add['VideoUUID']           = $params['video_uuid']??'';
-                    $msg_content_add['ThumbUUID']           = $params['uuid']??'';
-                    $msg_content_add['ThumbUrl']            = $params['ThumbUrl']??'';
-                    $msg_content_add['ThumbSize']           = $params['ThumbSize']??0;
-                    $msg_content_add['ThumbWidth']          = $params['ThumbWidth']??0;
-                    $msg_content_add['ThumbHeight']         = $params['ThumbHeight']??0;
-                    $msg_content_add['ThumbFormat']         = $params['ThumbFormat'] ?? 'mp4';
+                    $msg_content_add['VideoUUID']           = $val['video_uuid']??'';
+                    $msg_content_add['ThumbUUID']           = $val['uuid']??'';
+                    $msg_content_add['ThumbUrl']            = $val['ThumbUrl']??'';
+                    $msg_content_add['ThumbSize']           = $val['ThumbSize']??0;
+                    $msg_content_add['ThumbWidth']          = $val['ThumbWidth']??0;
+                    $msg_content_add['ThumbHeight']         = $val['ThumbHeight']??0;
+                    $msg_content_add['ThumbFormat']         = $val['ThumbFormat'] ?? 'mp4';
                     $msg_content_add['ThumbDownloadFlag']         = 2;
                     break;
 
