@@ -79,6 +79,7 @@ class ImMsgController extends Controller
             foreach ($contents as $key=>$value) {
                 $msg_body = array_merge($msg_body,$value['content']);
             }
+            $collection_id = implode(",", $collection_id)??'';
         }else{
             //群发的聊天消息
             //$msg_content = json_decode($msg_content,true);
@@ -97,7 +98,7 @@ class ImMsgController extends Controller
             'from_account'  => $from_account,
             'to_account'    => implode(",", $to_accounts) ??'',
             'to_group'      => implode(",", $to_group)??'',
-            'collection_id' => implode(",", $collection_id)??'',
+            'collection_id' => $collection_id,
             'msg_body'      => json_encode($msgBody),
             'created_at'    => date("Y-m-d h:i:s"),
             'updated_at'    => date("Y-m-d h:i:s"),
@@ -125,6 +126,7 @@ class ImMsgController extends Controller
                 //$post_data['type']              = 3; //群发
                 $post_data['MsgTime']           = time();
                 $post_data['MsgKey']            = $res['MsgKey'];
+                $post_data['OptPlatform']       = 'RESTAPI' ;
                 $to_accounts = array_unique($to_accounts);
                 foreach ($to_accounts as $key=>$val){
                     $post_data['To_Account'] = $val;
