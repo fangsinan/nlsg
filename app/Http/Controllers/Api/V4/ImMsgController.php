@@ -281,7 +281,11 @@ class ImMsgController extends Controller
         }
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/profile/portrait_get");
         $post_data['To_Account'] = $ids;
-        $post_data['TagList'] = ['Tag_Profile_IM_Nick','Tag_Profile_IM_Gender'];
+        $post_data['TagList'] = ['Tag_Profile_IM_Nick','Tag_Profile_IM_Gender',
+            'Tag_Profile_IM_BirthDay','Tag_Profile_IM_Location','Tag_Profile_IM_SelfSignature',
+            'Tag_Profile_IM_AllowType','Tag_Profile_IM_Language','Tag_Profile_IM_Image',
+            'Tag_Profile_IM_MsgSettings','Tag_Profile_IM_AdminForbidType','Tag_Profile_IM_Level','Tag_Profile_IM_Role'
+        ];
         $res = ImClient::curlPost($url,json_encode($post_data));
         $res = json_decode($res,true);
 
