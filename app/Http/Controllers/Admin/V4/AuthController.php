@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendUser;
 use App\Models\Node;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mews\Captcha\Captcha;
@@ -75,6 +76,7 @@ class AuthController extends ControllerBackend
                 'token' => $token,
                 'role'=>$check_user->role_id,
                 'menu_tree'=>Node::getMenuTree($check_user->role_id),
+                'app_uid'=>User::where('phone','=',$username)->value('id'),
             ];
             return $this->getRes($data);
         } else {
