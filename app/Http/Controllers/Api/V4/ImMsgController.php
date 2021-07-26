@@ -81,7 +81,7 @@ class ImMsgController extends Controller
             }
         }else{
             //群发的聊天消息
-            $msg_content = json_decode($msg_content,true);
+            //$msg_content = json_decode($msg_content,true);
             $msg_body = ImMsg::setMsgContent($msg_content);
         }
         //dd($msg_body);

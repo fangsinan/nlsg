@@ -14,7 +14,7 @@ use OSS\Core\OssException;
 use Illuminate\Support\Facades\Log;
 
 //https://help.aliyun.com/document_detail/123461.html?spm=a2c4g.11186623.6.1074.525958a4xbtMvZ      安装php -d memory_limit=-1 composer.phar require alibabacloud/sdk
-//https://next.api.aliyun.com/api/vod/2017-03-21/GetPlayInfo?params={%22VideoId%22:%2213a3ba6d4f1b4c7ba1b585cad344562e%22}&sdkStyle=old
+//https://next.api.aliyun.com/api/vod/2017-03-21/GetPlayInfo?params={%22VideoId%22:%2213a3ba6d4f1b4c7ba1b585cad344562e%22}&sdkStyle=old    接口调试
 class AliUploadController extends Controller
 {
 
@@ -490,19 +490,63 @@ class AliUploadController extends Controller
 
     }
 
+    //定时抓取腾讯IM音视频、图片、文件到阿里云平台
+    public  function TimingGrab(Request $request){
+        $params = $request->input();
+        $type = (empty($params['type']))?0:$params['type'];
+
+        //type 1 视频 2音频 3 图片
+        if (!in_array($type, [1, 2,3])) {
+            return $this->error(0, '抓取类型有误');
+        }
+        try {
+
+            self::initVodClient(self::AccessKeyId, self::AccessKeySecret);
+
+            if(in_array($type,[2,3])) {
+                //抓取音频和图片
+                $result = $this->UploadMediaByURL($type);
+            }else {
+                //抓取视频
+                $result = $this->UploadMediaByURL($type, self::WorkflowId);
+            }
+
+            if($result['status']==1){
+                return $this->success($result['data']);
+            }else{
+                return $this->error(0, $result['msg']);
+            }
+
+        } catch (\Exception $e) {
+            return $this->error(0, $e->getMessage());
+        }
+
+    }
+
     //音视频拉取文件
-    public function UploadMediaByURL(){
-        //拉取音频
-        $query=[
-            'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/9d746c3a68617aaf1a2ceeb5de6a3080.m4a",
-        ];
-        //拉取视频
-        $query=[
-            'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4",
-            'WorkflowId' => "04d6477bd874095952201ff69be42f4e", //视频工作流id
-        ];
-        //拉取图片 点播
-        //https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png
+    public function UploadMediaByURL($type,$WorkflowId=''){
+
+        switch ($type){
+            case 1://拉取视频
+                $query=[
+                    'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4",
+                    'WorkflowId' => $WorkflowId, //视频工作流id
+                ];
+                break;
+            case 2:
+                //拉取音频
+                $query=[
+                    'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/9d746c3a68617aaf1a2ceeb5de6a3080.m4a",
+                ];
+                break;
+            case 3:
+                //拉取图片 点播
+                //https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png
+                $query=[
+                    'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198",
+                ];
+                break;
+        }
 
         //拉取文件 oss
         //https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a438a563cd83fcafe9dbc0c76fb19c8f.docx

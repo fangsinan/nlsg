@@ -103,6 +103,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('upload/file_ali_oss', 'AliUploadController@FileAliOss');
     Route::post('upload/del_ali_oss', 'AliUploadController@DelAliOss');
     Route::post('upload/callback', 'AliUploadController@Callback');
+    Route::post('upload/TimingGrab', 'AliUploadController@TimingGrab'); //抓取腾讯资源
 
 
     //*******************************商城部分开始*******************************
@@ -397,6 +398,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('im/msg_collection_list', 'ImMsgController@MsgCollectionList');
         Route::post('im_group/edit_join_group', 'ImGroupController@editJoinGroup');
         Route::post('im_group/forbid_send_msg', 'ImGroupController@forbidSendMsg');
+        Route::post('im_group/set_group_user', 'ImGroupController@setGroupUser');
 
 
         //im文案部分
