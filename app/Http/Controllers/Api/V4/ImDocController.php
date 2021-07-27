@@ -251,7 +251,7 @@ class ImDocController extends Controller
      * @apiSuccess {number=1,2,3} list.doc_type 文案类型(1商品 2附件 3文本)
      * @apiSuccess {number} list.doc_type_info 文案类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营21音频 22视频 23图片 31文本)
      * @apiSuccess {number=0,1,2,3,4} list.is_done 发送结果(1待发送  2发送中 3已完成 4无任务)
-     * @apiSuccess {number=0,1,2,3,4} list.status 任务状态(1有效 2无效 3删除)
+     * @apiSuccess {number} list.status 任务状态(1有效 2无效 3删除)
      * @apiSuccess {number=1,2,3} list.send_obj_type 发送目标类型(1群组 2个人 3标签)
      * @apiSuccess {number} list.send_obj_id 发送目标id
      */
