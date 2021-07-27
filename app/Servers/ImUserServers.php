@@ -4,8 +4,8 @@
 namespace App\Servers;
 
 use App\Models\MallOrder;
+use App\Models\Order;
 use App\Models\User;
-use App\Models\VipUser;
 
 class ImUserServers
 {
@@ -16,12 +16,13 @@ class ImUserServers
         $query = User::query();
 
         //详情
-        if (!empty($params['id']??0)){
-            $query->where('id','=',$params['id']);
+        if (!empty($params['id'] ?? 0)) {
+            $query->where('id', '=', $params['id']);
         }
 
         //性别
-        if (!empty($params['sex']??'')) {
+        $sex = $params['sex'] ?? -1;
+        if ($sex >= 0) {
             $query->where('sex', '=', intval($params['sex']));
         }
         //会员
@@ -108,25 +109,25 @@ class ImUserServers
         $query->with([
             'imUser:id,tag_im_nick,tag_im_gender,tag_im_image,tag_im_to_account',
             'vipUser:id,user_id,level,is_open_360,created_at,expire_time,time_begin_360,time_end_360',
-            'vipUser.orderInfo',
         ]);
 
 
         //序号,昵称,账号,头像,性别,会员,注册时间
         $query->select([
-            'id', 'phone', 'nickname', 'headimg', 'sex', 'created_at','birthday',
-            'intro','is_staff','status','ios_balance','is_author','income_num',
-            'reply_num','income_num','fan_num','follow_num','fans_num','ref','is_test_pay'
+            'id', 'phone', 'nickname', 'headimg', 'sex', 'created_at', 'birthday',
+            'intro', 'is_staff', 'status', 'ios_balance', 'is_author', 'income_num',
+            'reply_num', 'income_num', 'fan_num', 'follow_num', 'fans_num', 'ref', 'is_test_pay'
         ]);
 
-        $res['list'] = $query->where('is_robot','=',0)->paginate($size);
+        $res['list'] = $query->where('is_robot', '=', 0)->paginate($size);
 
-//        $vuModel = new VipUser();
-//        if (!empty($params['id']??0)){
-//            foreach ($res['list'] as &$v){
-//                $v->openHistory = $vuModel->openHistory($v->id);
-//            }
-//        }
+        foreach ($res['list'] as &$v) {
+            $v->open_count = Order::query()
+                ->where('user_id', '=', $v->id)
+                ->where('type', '=', 16)
+                ->where('status', '=', 1)
+                ->count();
+        }
 
         $res['statistics'] = $this->userStatistics();
         return $res;
