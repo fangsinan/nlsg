@@ -467,7 +467,8 @@ class AliUploadController extends Controller
 
         $result=self::AlibabaCloudRpcRequest('GetPlayInfo',$query);
         if($result['status']==1){
-            return ['status'=>1,'data'=>['url'=>$result['data']['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
+//            return ['status'=>1,'data'=>['url'=>$result['data']['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
+            return ['status'=>1,'data'=>['url'=>$result['data']]];
         }else{
             return $result;
         }
@@ -500,9 +501,9 @@ class AliUploadController extends Controller
      * @apiGroup upload
      *
      * @apiParam {int} type   类型  1 视频 2音频 3图片 4文件
-     * @apiParam {string} videoid   点播id
-     * @apiParam {string} url   媒体地址
-     * @apiParam {string} name  当type为4时上传
+     * @apiParam {string} videoid   点播id    ||type为4不传
+     * @apiParam {string} url   媒体地址  ||全链接
+     * @apiParam {string} name   type为4时上传
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -529,8 +530,10 @@ class AliUploadController extends Controller
         if (!in_array($type, [1, 2, 3,4])) {
             return $this->error(0, '类型有误');
         }
-        if(empty($videoid)){
-            return $this->error(0, '媒体id不能为空');
+        if(in_array($type, [1, 2, 3])) { //文件没有id
+            if (empty($videoid)) {
+                return $this->error(0, '媒体id不能为空');
+            }
         }
         if(empty($url)){
             return $this->error(0, '媒体地址不能为空');
@@ -542,24 +545,41 @@ class AliUploadController extends Controller
         }
 
         try {
-
-            $data=[
-                'type'=>$type,
-                'media_id'=>$videoid,
-                'url'=>$url,
-                'created_at'=>date('Y-m-d H:i:s')
+            $now_date=date('Y-m-d H:i:s');
+            $data = [
+                'type' => $type,
+                'url' => $url,
+                'created_at' => $now_date
             ];
-            if($type==4){
-                $data['file_name']=$name;
-            }
-            $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
-            if ($rst === false) {
-                return $this->error(0, '保存失败');
+            if(in_array($type, [1, 2, 3])) {
+                $data['media_id'] = $videoid;
+                $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
+                if ($rst === false) {
+                    return $this->error(0, '保存失败');
+                }
+            }else{ //文件
+                DB::beginTransaction();
+                $data['file_name'] = $name;
+                $rstId = DB::table(ImMedia::DB_TABLE)->insertGetId($data);
+                if ($rstId === false) {
+                    DB::rollBack();
+                    return $this->error(0, '保存失败');
+                }
+                //初始化媒体id
+                $UpRst=DB::table(ImMedia::DB_TABLE)->where('id', $rstId)->update(['media_id' => $rstId,'updated_at' => $now_date]);
+                if($UpRst===false){
+                    DB::rollBack();
+                    return $this->error(0, '保存失败');
+                }
+                DB::commit();
             }
 
             return $this->success([]);
 
         } catch (\Exception $e) {
+            if($type==4){
+                DB::rollBack();
+            }
             return $this->error(0, $e->getMessage());
         }
 
@@ -603,32 +623,33 @@ class AliUploadController extends Controller
     public function UploadMediaByURL($type,$WorkflowId=''){
 
         switch ($type){
-            case 1://拉取视频
-                $query=[
-                    'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4",
-                    'WorkflowId' => $WorkflowId, //视频工作流id
-                    'userData'=>'{"MessageCallback": {"CallbackType":"http","CallbackURL": "http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback"},	"Extend": {"localId": "xxx","test": "www"}}'
-                ];
+            case 1://拉取视频 https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4
+
+                try {
+                    $uploader = new AliyunVodUploader($accessKeyId, $accessKeySecret);
+                    $uploadVideoRequest = new UploadVideoRequest($fileURL, 'testUploadWebVideo via PHP-SDK');
+                    $res = $uploader->uploadWebVideo($uploadVideoRequest);
+                    print_r($res);
+                } catch (Exception $e) {
+                    printf("testUploadWebVideo Failed, ErrorMessage: %s\n Location: %s %s\n Trace: %s\n",
+                        $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
+                }
+
                 break;
             case 2:
-                //拉取音频
-                $query=[
-                    'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/9d746c3a68617aaf1a2ceeb5de6a3080.m4a",
-                ];
+                //拉取音频 https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/9d746c3a68617aaf1a2ceeb5de6a3080.m4a
+
                 break;
             case 3:
-                //拉取图片 点播
+                //拉取图片 https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198
                 //https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png
-                $query=[
-                    'UploadURLs' => "https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198",
-                ];
+
                 break;
             case 4:
                 //拉取文件 oss
                 return self::GetUrlOSS('https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a438a563cd83fcafe9dbc0c76fb19c8f.docx');
         }
 
-        return self::AlibabaCloudRpcRequest('UploadMediaByURL',$query);
 
     }
 
