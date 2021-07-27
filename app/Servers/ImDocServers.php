@@ -433,7 +433,7 @@ class ImDocServers
     public function sendJobListForApp($params)
     {
         $group_id = $params['group_id'] ?? 0;
-        $send_obj_type = 2;
+        $send_obj_type = $params['send_obj_type'] ?? 0;
         $send_obj_id = ImGroup::getId($group_id);
         $send_obj_id = $send_obj_id['id'];
 
