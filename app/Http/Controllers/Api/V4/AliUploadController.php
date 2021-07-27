@@ -619,6 +619,7 @@ class AliUploadController extends Controller
                     return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
                 }
             }
+            echo $filePath.PHP_EOL;
 
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret);
             $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
