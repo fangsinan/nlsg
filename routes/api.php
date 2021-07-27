@@ -401,6 +401,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('im_group/forbid_send_msg', 'ImGroupController@forbidSendMsg');
         Route::post('im_group/set_group_user', 'ImGroupController@setGroupUser');
 
+        Route::post('im_friend/add_friend', 'ImFriendController@addFriend');
+        Route::post('im_friend/del_friend', 'ImFriendController@delFriend');
+        Route::get('im_friend/get_im_user', 'ImFriendController@getImUser');
+        Route::get('im_friend/portrait_get', 'ImFriendController@getPortrait');
 
         //im文案部分
         Route::get('im_doc/list', 'ImDocController@list');
@@ -424,8 +428,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::any('callback/callbackMsg', 'CallbackController@callbackMsg');
     Route::get('im/get_user_sig', 'ImController@getUserSig');
     Route::post('im/msg_send_all', 'ImMsgController@MsgSendAll');
-    Route::get('im_friend/get_im_user', 'ImFriendController@getImUser');
-    Route::get('im_friend/portrait_get', 'ImFriendController@getPortrait');
 
 
     Route::get('ToTwitter', 'IncomeController@ToTwitter');

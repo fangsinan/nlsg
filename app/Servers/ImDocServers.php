@@ -252,7 +252,6 @@ class ImDocServers
     public function addSendJob($params, $user_id)
     {
         $job_str = '';
-
         if (!empty($params['id'] ?? 0)) {
             $jobModel = ImDocSendJob::where('id', '=', $params['id'])
                 ->whereIn('status', [1, 2])
@@ -281,6 +280,9 @@ class ImDocServers
         $now = time();
         $month = date('Y-m', $now);
         $day = date('Y-m-d', $now);
+        if (!is_array($info)){
+            $info = json_decode($info,true);
+        }
 
         $check_doc = ImDoc::where('id', '=', $doc_id)->where('status', '=', 1)->first();
         if (empty($check_doc)) {
@@ -432,8 +434,11 @@ class ImDocServers
     //app的文案列表
     public function sendJobListForApp($params)
     {
+        $group_id = $params['group_id'] ?? 0;
         $send_obj_type = $params['send_obj_type'] ?? 0;
-        $send_obj_id = $params['send_obj_id'] ?? 0;
+        $send_obj_id = ImGroup::getId($group_id);
+        $send_obj_id = $send_obj_id['id'];
+
         $size = $params['size'] ?? 10;
         $page = $params['page'] ?? 1;
         $offset = ($page - 1) * $size;
