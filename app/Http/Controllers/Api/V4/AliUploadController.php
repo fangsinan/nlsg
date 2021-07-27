@@ -525,6 +525,7 @@ class AliUploadController extends Controller
         $videoid = (empty($params['videoid']))?'':$params['videoid'];
         $url = (empty($params['url']))?'':$params['url'];
         $name = (empty($params['name']))?'':$params['name'];
+        $size = (empty($params['size']))?'':$params['size'];
 
         //type 1 视频 2音频 3 图片 4文件
         if (!in_array($type, [1, 2, 3,4])) {
@@ -541,6 +542,9 @@ class AliUploadController extends Controller
         if($type==4){
             if(empty($name)){
                 return $this->error(0, '文件名不能为空');
+            }
+            if(empty($size)){
+                return $this->error(0, '文件大小不能为空');
             }
         }
 
@@ -560,6 +564,7 @@ class AliUploadController extends Controller
             }else{ //文件
                 DB::beginTransaction();
                 $data['file_name'] = $name;
+                $data['size'] = $size;
                 $rstId = DB::table(ImMedia::DB_TABLE)->insertGetId($data);
                 if ($rstId === false) {
                     DB::rollBack();
