@@ -273,7 +273,7 @@ class ImDocServers
             $jobModel = new ImDocSendJob();
             $job_str .= '添加:';
         }
-
+return $params;
         $doc_id = $params['doc_id'] ?? 0;
         $send_type = $params['send_type'] ?? 0;
         $send_at = $params['send_at'] ?? '';
@@ -281,6 +281,9 @@ class ImDocServers
         $now = time();
         $month = date('Y-m', $now);
         $day = date('Y-m-d', $now);
+        if (!is_array($info)){
+            $info = json_decode($info,true);
+        }
 
         $check_doc = ImDoc::where('id', '=', $doc_id)->where('status', '=', 1)->first();
         if (empty($check_doc)) {
