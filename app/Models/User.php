@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Medz\Laravel\Notifications\JPush\Sender as JPushSender;
 use Illuminate\Support\Facades\DB;
+use DateTimeInterface;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -172,6 +173,21 @@ class User extends Authenticatable implements JWTSubject
     public function history()
     {
         return $this->hasMany(History::class, 'user_id', 'id');
+    }
+
+    public function imUser()
+    {
+        return $this->hasOne(ImUser::class, 'tag_im_to_account', 'id');
+    }
+
+    public function vipUser(){
+        return $this->hasOne(VipUser::class,'user_id','id')
+            ->where('status','=',1)
+            ->where('is_default','=',1);
+    }
+
+    protected function serializeDate(DateTimeInterface $date) {
+        return $date->format('Y-m-d H:i:s');
     }
 
     public function getInvitationRecord($uid){

@@ -131,6 +131,12 @@ class VipUser extends Base
             ->orderBy('id', 'desc');
     }
 
+    public function orderInfo(){
+        return $this->hasMany(Order::class,'user_id','user_id')
+            ->where('type', '=', 16)
+            ->where('status', '=', 1);
+    }
+
     public function codeHistory()
     {
         return $this->hasOne(VipRedeemUser::class, 'user_id', 'user_id')
