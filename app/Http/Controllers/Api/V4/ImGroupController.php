@@ -218,7 +218,7 @@ class ImGroupController extends Controller
      *e
      * @apiParam {int} group_id 腾讯云的groupId
      * @apiParam {array} user_id  user_id 数组
-     * @apiParam {int} type  0取消管理员 1设置管理员
+     * @apiParam {int} type  2取消管理员 1设置管理员
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -232,7 +232,7 @@ class ImGroupController extends Controller
     public function setGroupUser(Request $request){
         $params    = $request->input();
 
-        if( empty($params['group_id']) || empty($params['user_id']) ){
+        if( empty($params['group_id']) || empty($params['user_id']) || empty($params['type']) ){
             return $this->error('0','request error');
         }
 
@@ -248,7 +248,7 @@ class ImGroupController extends Controller
         }
 
         $type = 0;
-        if(!empty($params['type'])){
+        if( $params['type']==1 ){
             $type = 2;
         }
         ImGroupUser::where($where)->whereIn('group_account',$params['user_id'])->update(['group_role'=>$type]);
