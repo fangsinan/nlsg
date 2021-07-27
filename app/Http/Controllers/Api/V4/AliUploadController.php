@@ -624,7 +624,7 @@ class AliUploadController extends Controller
             $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
             $uploadVideoRequest->setCateId(self::TypeArr[1]);
             $uploadVideoRequest->setStorageLocation(self::StorageLocation);
-            $uploadVideoRequest->setWorkflowId(self::WorkflowId);
+//            $uploadVideoRequest->setWorkflowId(self::WorkflowId);
 //            $userData = array(
 //                "MessageCallback"=>array("CallbackURL"=>"http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback"),
 //                "Extend"=>array("localId"=>"xxx", "test"=>"www")
