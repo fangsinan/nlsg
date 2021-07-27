@@ -251,9 +251,7 @@ class ImDocServers
 
     public function addSendJob($params, $user_id)
     {
-        return $params;
         $job_str = '';
-
         if (!empty($params['id'] ?? 0)) {
             $jobModel = ImDocSendJob::where('id', '=', $params['id'])
                 ->whereIn('status', [1, 2])
