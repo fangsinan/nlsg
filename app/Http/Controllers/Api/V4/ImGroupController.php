@@ -217,7 +217,7 @@ class ImGroupController extends Controller
      * @apiGroup im_group
      *e
      * @apiParam {int} group_id 腾讯云的groupId
-     * @apiParam {int} user_id  user_id
+     * @apiParam {array} user_id  user_id 数组
      * @apiParam {int} type  0取消管理员 1设置管理员
      *
      * @apiSuccess {string} result json
@@ -238,20 +238,20 @@ class ImGroupController extends Controller
 
         $get_where = $where = [
             'group_id'      =>$params['group_id'],
-            'group_account' =>$params['user_id'],
         ];
 
+        //群主
         $get_where['group_role'] = 1;
-        $res = ImGroupUser::where($get_where)->first();
+        $res = ImGroupUser::where($get_where)->whereIn('group_account',$params['user_id'])->first();
         if(!empty($res)){
-            return $this->success();
+            $params['user_id'] = array_diff($params['user_id'],[$res['group_account']]);
         }
 
         $type = 0;
         if(!empty($params['type'])){
             $type = 2;
         }
-        ImGroupUser::where($where)->update(['group_role'=>$type]);
+        ImGroupUser::where($where)->whereIn('group_account',$params['user_id'])->update(['group_role'=>$type]);
 
         return $this->success();
 
