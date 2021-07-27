@@ -622,7 +622,7 @@ class AliUploadController extends Controller
 
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret);
             $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
-            $uploadVideoRequest->setCateId(self::TypeArr[1]);
+//            $uploadVideoRequest->setCateId(self::TypeArr[1]);
 //            $uploadVideoRequest->setStorageLocation(self::StorageLocation);
 //            $uploadVideoRequest->setWorkflowId(self::WorkflowId);
 //            $userData = array(
