@@ -163,6 +163,117 @@ class ImFriendController extends Controller
 
 
 
+
+    /**
+     * @api {get} /api/v4/im_friend/add_friend  Im添加好友
+     * @apiName add_friend
+     * @apiVersion 1.0.0
+     * @apiGroup im_friend
+     *e
+     * @apiParam {int} From_Account 为该 用户 添加好友
+     * @apiParam {int} To_Account   需要添加好友的id
+     * @apiParam {int} AddWording   添加的备注
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function addFriend(Request $request){
+        $params    = $request->input();
+
+        if( empty($params['From_Account']) || empty($params['To_Account']) ){
+            return $this->error('0','request From_Account or To_Account error');
+        }
+        $user = ImUserFriend::where(['from_account'=>$params['From_Account'], 'to_account'=>$params['To_Account'],'status'=>1])->first();
+        if(!empty($user)){
+            return $this->success([],0,'已经是好友');
+        }
+        $os_type = empty($params['os_type']) ?3:$params['os_type'];
+
+        switch ($os_type){
+            case 1:
+                $AddSource = 'Android'; break;
+            case 2:
+                $AddSource = 'Ios';     break;
+            case 3:
+                $AddSource = 'Web';     break;
+            default:
+                $AddSource = 'web';     break;
+        }
+
+
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_add");
+        $post_data = [
+            'From_Account'  =>  $params['From_Account'],
+            'AddFriendItem'     =>  [
+                [   'To_Account' => $params['To_Account'],
+                    'AddSource'=>'AddSource_Type_'.$AddSource,
+                    'AddWording'=>$params['AddWording'] ??'',
+                ]
+            ]
+        ];
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+
+        if ($res['ActionStatus'] == 'OK'){
+            return $this->success();
+        }else{
+            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+        }
+    }
+
+    /**
+     * @api {get} /api/v4/im_friend/del_friend  Im删除好友
+     * @apiName del_friend
+     * @apiVersion 1.0.0
+     * @apiGroup im_friend
+     *e
+     * @apiParam {int} From_Account 需要删除该 用户 的好友
+     * @apiParam {array} To_Account   需要删除好友的id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function delFriend(Request $request){
+        $params    = $request->input();
+
+        if( empty($params['From_Account']) || empty($params['To_Account']) || !is_array($params['To_Account']) ){
+            return $this->error('0','request From_Account or To_Account error');
+        }
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_delete");
+        $post_data = [
+            'From_Account'  =>  $params['From_Account'],
+            'To_Account'    =>  $params['To_Account'],
+            'DeleteType'    => "Delete_Type_Both",
+        ];
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+
+        if ($res['ActionStatus'] == 'OK'){
+            return $this->success();
+        }else{
+            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+        }
+    }
+
+
+
+
+
+
+
+
     /********************************  回调接口 start ********************************/
 
     //添加好友
