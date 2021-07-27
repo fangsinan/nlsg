@@ -103,6 +103,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('upload/file_ali_oss', 'AliUploadController@FileAliOss');
     Route::post('upload/del_ali_oss', 'AliUploadController@DelAliOss');
     Route::post('upload/callback', 'AliUploadController@Callback');
+    Route::post('upload/addmedia', 'AliUploadController@AddMedia'); //上传成功入库
     Route::post('upload/TimingGrab', 'AliUploadController@TimingGrab'); //抓取腾讯资源
 
 
