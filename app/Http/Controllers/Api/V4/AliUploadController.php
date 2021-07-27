@@ -547,6 +547,7 @@ class AliUploadController extends Controller
                 'type'=>$type,
                 'media_id'=>$videoid,
                 'url'=>$url,
+                'created_at'=>date('Y-m-d H:i:s')
             ];
             if($type==4){
                 $data['file_name']=$name;
