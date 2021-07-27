@@ -631,10 +631,9 @@ class AliUploadController extends Controller
 //            );
 //            $uploadVideoRequest->setUserData(json_encode($userData));
             $res = $uploader->uploadLocalVideo($uploadVideoRequest);
-            var_dump($res);
+            return $this->success($res);
         } catch (\Exception $e) {
-            printf("ErrorMessage: %s\n Location: %s %s\n Trace: %s\n",
-                $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
+            return $this->error(0, $e->getMessage());
         }
         return ;
         try {
