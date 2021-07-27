@@ -612,10 +612,12 @@ class AliUploadController extends Controller
             $filename=md5($url); //文件名
             $ext=$arr[count($arr)-1]; //扩展名
             $filePath=storage_path('logs/'.$filename.'.'.$ext);
-            try {
-                file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
-            }catch (\Exception $e){
-                return [ 'status' => 0,'data'=>[],'msg'=>$url.'下载异常：'.$e->getMessage()];
+            if(!file_exists($filePath)) {
+                try {
+                    file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
+                } catch (\Exception $e) {
+                    return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
+                }
             }
 
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret);
@@ -690,10 +692,12 @@ class AliUploadController extends Controller
 
         // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
         $filePath=storage_path('logs/'.$filename.'.'.$ext);
-        try {
-            file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
-        }catch (\Exception $e){
-            return [ 'status' => 0,'data'=>[],'msg'=>$url.'下载异常：'.$e->getMessage()];
+        if(!file_exists($filePath)) {
+            try {
+                file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
+            } catch (\Exception $e) {
+                return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
+            }
         }
 
         // Endpoint以杭州为例
