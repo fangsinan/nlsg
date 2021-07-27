@@ -560,7 +560,7 @@ class AliUploadController extends Controller
             }else{ //文件
                 DB::beginTransaction();
                 $data['file_name'] = $name;
-                $rstId = DB::table(ImMedia::DB_TABLE)->insert($data);
+                $rstId = DB::table(ImMedia::DB_TABLE)->insertGetId($data);
                 if ($rstId === false) {
                     DB::rollBack();
                     return $this->error(0, '保存失败');
@@ -577,6 +577,9 @@ class AliUploadController extends Controller
             return $this->success([]);
 
         } catch (\Exception $e) {
+            if($type==4){
+                DB::rollBack();
+            }
             return $this->error(0, $e->getMessage());
         }
 
@@ -631,7 +634,7 @@ class AliUploadController extends Controller
                     printf("testUploadWebVideo Failed, ErrorMessage: %s\n Location: %s %s\n Trace: %s\n",
                         $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
                 }
-                
+
                 break;
             case 2:
                 //拉取音频 https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/9d746c3a68617aaf1a2ceeb5de6a3080.m4a
