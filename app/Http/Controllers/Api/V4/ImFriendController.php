@@ -223,7 +223,7 @@ class ImFriendController extends Controller
         if ($res['ActionStatus'] == 'OK'){
             return $this->success();
         }else{
-            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+            return $this->error(0,$res['ErrorCode'],$res['ErrorInfo']);
         }
     }
 
@@ -263,7 +263,7 @@ class ImFriendController extends Controller
         if ($res['ActionStatus'] == 'OK'){
             return $this->success();
         }else{
-            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+            return $this->error(0,$res['ErrorCode'],$res['ErrorInfo']);
         }
     }
 
