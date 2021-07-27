@@ -495,7 +495,7 @@ class ImDocServers
         if (!empty($params['id'] ?? 0)) {
             $jobModel = ImDocSendJob::where('id', '=', $params['id'])
                 ->whereIn('status', [1, 2])
-                ->select(['id'])->first();
+                ->first();
             if (empty($jobModel)) {
                 return ['code' => false, 'msg' => 'id错误'];
             } else {
