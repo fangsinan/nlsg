@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ImMedia;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 use AlibabaCloud\Client\AlibabaCloud;
@@ -310,7 +312,7 @@ class AliUploadController extends Controller
             $fileextension = $file->getClientOriginalExtension();//获取上传文件的后缀（如abc.png，获取到的为png）
             $realpath = $file->getRealPath();//获取上传的文件缓存在tmp文件夹下的绝对路径
             $filename = $file->getClientOriginalName(); //获取上传文件的文件名（带后缀，如abc.png）
-//            $filesize=$file->getSize();
+            $filesize=$file->getSize();
 //            $filaname=$file->getFilename();//获取缓存在tmp目录下的文件名（带后缀，如php8933.tmp）
 //            $path=$file->move(path,newname);//将缓存在tmp目录下的文件移动，返回文件移动过后的路径 第一个参数是文件移到哪个文件夹下的路径，第二个参数是将上传的文件重新命名的文件名
         }catch (\Exception $e){
@@ -338,7 +340,8 @@ class AliUploadController extends Controller
 
             return $this->success([
                 'url' => Config('web.Ali.IMAGES_URL'),
-                'name' => $object
+                'name' => $object,
+                'size'=>$filesize
             ]);
 
         } catch(OssException $e) {
@@ -490,6 +493,78 @@ class AliUploadController extends Controller
 
     }
 
+    /**
+     * @api {post} /api/v4/upload/addmedia   上传成功入库
+     * @apiName addmedia
+     * @apiVersion 1.0.0
+     * @apiGroup upload
+     *
+     * @apiParam {int} type   类型  1 视频 2音频 3图片 4文件
+     * @apiParam {string} videoid   点播id
+     * @apiParam {string} url   媒体地址
+     * @apiParam {string} name  当type为4时上传
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *
+     * {
+     *   "code": 200,
+     *   "msg": "成功",
+     *   "now": 1627033302,
+     *   "data": {
+     *
+     *   }
+     *}
+     */
+    public function AddMedia(Request $request)
+    {
+
+        $params = $request->input();
+        $type = (empty($params['type']))?0:$params['type'];
+        $videoid = (empty($params['videoid']))?'':$params['videoid'];
+        $url = (empty($params['url']))?'':$params['url'];
+        $name = (empty($params['name']))?'':$params['name'];
+
+        //type 1 视频 2音频 3 图片 4文件
+        if (!in_array($type, [1, 2, 3,4])) {
+            return $this->error(0, '类型有误');
+        }
+        if(empty($videoid)){
+            return $this->error(0, '媒体id不能为空');
+        }
+        if(empty($url)){
+            return $this->error(0, '媒体地址不能为空');
+        }
+        if($type==4){
+            if(empty($name)){
+                return $this->error(0, '文件名不能为空');
+            }
+        }
+
+        try {
+
+            $data=[
+                'type'=>$type,
+                'media_id'=>$videoid,
+                'url'=>$url,
+            ];
+            if($type==4){
+                $data['file_name']=$name;
+            }
+            $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
+            if ($rst === false) {
+                return $this->error(0, '保存失败');
+            }
+
+            return $this->success([]);
+
+        } catch (\Exception $e) {
+            return $this->error(0, $e->getMessage());
+        }
+
+    }
+
+
     //定时抓取腾讯IM音视频、图片、文件到阿里云平台
     public  function TimingGrab(Request $request){
         $params = $request->input();
@@ -503,14 +578,12 @@ class AliUploadController extends Controller
 
             self::initVodClient(self::AccessKeyId, self::AccessKeySecret);
 
-            if(in_array($type,[2,3])) {
+            if(in_array($type,[2,3,4])) {
                 //抓取音频和图片
                 $result = $this->UploadMediaByURL($type);
             }else if($type==1){
                 //抓取视频
                 $result = $this->UploadMediaByURL($type, self::WorkflowId);
-            }else if($type==4){
-                $result = $this->UploadMediaByURL($type);
             }
 
             if($result['status']==1){
@@ -565,15 +638,18 @@ class AliUploadController extends Controller
         $filename=md5($url); //文件名
         $ext=$arr[count($arr)-1]; //扩展名
 
+        // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
         $filePath=storage_path('logs/'.$filename.'.'.$ext);
-        file_put_contents($filePath, file_get_contents($url));
+        try {
+            file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
+        }catch (\Exception $e){
+            return [ 'status' => 0,'data'=>[],'msg'=>$url.'下载异常：'.$e->getMessage()];
+        }
 
         // Endpoint以杭州为例
         $endpoint = self::EndPoint;
         // 存储空间名称
         $bucket = Config('web.Ali.BUCKET_ALI');
-        // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
-        $filePath = $filePath;
 
         try{
 
@@ -587,7 +663,7 @@ class AliUploadController extends Controller
                 return [ 'status' => 0,'data'=>[],'msg'=>'文件名已存在'];
             }
             $ossClient->uploadFile($bucket, $object, $filePath);
-            unlink($filePath);
+            unlink($filePath); //删除本地文件
             return [ 'status' => 1,'data'=>['name' => $object]];
 
         } catch(OssException $e) {
