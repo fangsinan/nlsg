@@ -7,6 +7,7 @@ namespace App\Servers;
 use App\Models\Column;
 use App\Models\ImGroup;
 use App\Models\ImGroupTop;
+use App\Models\ImGroupUser;
 use Illuminate\Support\Facades\DB;
 
 class ImGroupServers
@@ -14,6 +15,7 @@ class ImGroupServers
     public function groupList($params, $user_id)
     {
         $size = $params['size'] ?? 10;
+        $owner= $params['owner'] ?? 0;
 
         $query = DB::table('nlsg_im_group as g')
             ->leftJoin('nlsg_im_group_top as gt', function ($q) use ($user_id) {
@@ -28,6 +30,22 @@ class ImGroupServers
                 DB::raw('if(gt.id>0,1,0) AS is_top'),
                 DB::raw('2000 as max_num')
             ])->orderBy('gt.id', 'desc');
+
+        switch (intval($owner)){
+            case 1:
+                //我创建的
+                $query->where('g.owner_account', '=', $user_id);
+                break;
+            case 2:
+                //我加入的
+                $join_group_id_list = ImGroupUser::query()
+                    ->where('group_account', '=', $user_id)
+                    ->where('exit_type', '=', 0)
+                    ->pluck('group_id')
+                    ->toArray();
+                $query->whereIn('g.group_id',$join_group_id_list);
+                break;
+        }
 
         switch ($params['ob'] ?? '') {
             case 'time_asc':
