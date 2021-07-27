@@ -606,6 +606,18 @@ class AliUploadController extends Controller
 
         //测试上传网络视频
         try {
+            $filePath='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/d4b9-425233/c010100d30b026df9fa52e8afaaab927.png?imageMogr2/';
+
+            //上传图片
+            $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
+            $uploadImageRequest = new \UploadImageRequest($filePath, 'testUploadLocalImage via PHP-SDK');
+            $uploadImageRequest->setCateId(self::TypeArr[3]);
+            $res = $uploader->uploadLocalImage($uploadImageRequest);
+            print_r($res);
+            return ;
+
+
+
 //            $fileURL='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
             $url='https://audiovideo.ali.nlsgapp.com/original/workflow/6017b70b-17ae70d4644-0004-7621-b40-81766.mp4';
             $arr=explode('.',$url);
