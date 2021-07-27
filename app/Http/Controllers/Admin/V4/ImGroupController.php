@@ -103,6 +103,17 @@ class ImGroupController extends ControllerBackend
         return $this->getRes($data);
     }
 
+
+     /**
+      * @api {post} api/admin_v4/im_group/bind_works 群绑定课程
+      * @apiVersion 4.0.0
+      * @apiName  api/admin_v4/im_group/bind_works
+      * @apiGroup 后台-社群
+      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_group/bind_works
+      * @apiDescription 群绑定课程
+      * @apiParam {number} group_id 群id
+      * @apiParam {number} works_id 课程id
+      */
     public function bindWorks(Request $request)
     {
         $servers = new ImGroupServers();
