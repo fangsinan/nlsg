@@ -530,8 +530,10 @@ class AliUploadController extends Controller
         if (!in_array($type, [1, 2, 3,4])) {
             return $this->error(0, '类型有误');
         }
-        if(empty($videoid)){
-            return $this->error(0, '媒体id不能为空');
+        if(in_array($type, [1, 2, 3])) { //文件没有id
+            if (empty($videoid)) {
+                return $this->error(0, '媒体id不能为空');
+            }
         }
         if(empty($url)){
             return $this->error(0, '媒体地址不能为空');
@@ -543,19 +545,35 @@ class AliUploadController extends Controller
         }
 
         try {
-
-            $data=[
-                'type'=>$type,
-                'media_id'=>$videoid,
-                'url'=>$url,
-                'created_at'=>date('Y-m-d H:i:s')
+            $now_date=date('Y-m-d H:i:s');
+            $data = [
+                'type' => $type,
+                'url' => $url,
+                'created_at' => $now_date
             ];
-            if($type==4){
-                $data['file_name']=$name;
-            }
-            $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
-            if ($rst === false) {
-                return $this->error(0, '保存失败');
+            if(in_array($type, [1, 2, 3])) {
+                $data['media_id'] = $videoid;
+                $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
+                if ($rst === false) {
+                    return $this->error(0, '保存失败');
+                }
+            }else{ //文件
+                DB::beginTransaction();
+                $data['file_name'] = $name;
+                $rstId = DB::table(ImMedia::DB_TABLE)->insert($data);
+                if ($rstId === false) {
+                    DB::rollBack();
+                    return $this->error(0, '保存失败');
+                }
+                //初始化媒体id
+                $UpRst=DB::table(ImMedia::DB_TABLE)
+                    ->where('id', $rstId)
+                    ->update(['media_id' => $rstId,'updated_at' => $now_date]);
+                if($UpRst===false){
+                    DB::rollBack();
+                    return $this->error(0, '保存失败');
+                }
+                DB::commit();
             }
 
             return $this->success([]);
