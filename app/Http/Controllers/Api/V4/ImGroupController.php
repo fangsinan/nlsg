@@ -85,7 +85,7 @@ class ImGroupController extends Controller
         if ($res['ActionStatus'] == 'OK'){
             return $this->success();
         }else{
-            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+            return $this->error(0,$res['ErrorCode'],$res['ErrorInfo']);
         }
 
     }
@@ -159,7 +159,7 @@ class ImGroupController extends Controller
         if ($res['ActionStatus'] == 'OK'){
             return $this->success();
         }else{
-            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+            return $this->error(0,$res['ErrorCode'],$res['ErrorInfo']);
         }
 
     }
@@ -204,7 +204,7 @@ class ImGroupController extends Controller
         if ($res['ActionStatus'] == 'OK'){
             return $this->success(['ShuttedUinList'=>$res['ShuttedUinList'],'all_shut_up_time'=>$group_shut_up_time ]);
         }else{
-            return $this->error(0,$res['ActionStatus'],$res['ErrorInfo']);
+            return $this->error(0,$res['ErrorCode'],$res['ErrorInfo']);
         }
 
     }
