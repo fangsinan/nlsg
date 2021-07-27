@@ -501,9 +501,9 @@ class AliUploadController extends Controller
      * @apiGroup upload
      *
      * @apiParam {int} type   类型  1 视频 2音频 3图片 4文件
-     * @apiParam {string} videoid   点播id
-     * @apiParam {string} url   媒体地址
-     * @apiParam {string} name  当type为4时上传
+     * @apiParam {string} videoid   点播id    type为4不传
+     * @apiParam {string} url   媒体地址  全链接
+     * @apiParam {string} name   type为4时上传
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
