@@ -273,7 +273,7 @@ class ImDocServers
             $jobModel = new ImDocSendJob();
             $job_str .= '添加:';
         }
-return $params;
+
         $doc_id = $params['doc_id'] ?? 0;
         $send_type = $params['send_type'] ?? 0;
         $send_at = $params['send_at'] ?? '';
