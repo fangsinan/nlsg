@@ -606,11 +606,20 @@ class AliUploadController extends Controller
 
         //测试上传网络视频
         try {
-            $filePath='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/d4b9-425233/c010100d30b026df9fa52e8afaaab927.png?imageMogr2/';
-
+            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/d4b9-425233/c010100d30b026df9fa52e8afaaab927.png?imageMogr2/';
+            $filename=md5($url); //文件名
+            $ext='png'; //扩展名
+            $filePath=storage_path('logs/'.$filename.'.'.$ext);
+            if(!file_exists($filePath)) {
+                try {
+                    file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
+                } catch (\Exception $e) {
+                    return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
+                }
+            }
             //上传图片
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
-            $uploadImageRequest = new \UploadImageRequest($filePath, 'testUploadLocalImage via PHP-SDK');
+            $uploadImageRequest = new \UploadImageRequest($filePath, '测试图片上传');
             $uploadImageRequest->setCateId(self::TypeArr[3]);
             $res = $uploader->uploadLocalImage($uploadImageRequest);
             print_r($res);
