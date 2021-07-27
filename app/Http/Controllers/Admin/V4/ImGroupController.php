@@ -103,4 +103,11 @@ class ImGroupController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function bindWorks(Request $request)
+    {
+        $servers = new ImGroupServers();
+        $data = $servers->bindWorks($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
+    }
+
 }

@@ -246,13 +246,13 @@ class ImDocController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/job_list_for_app
      * @apiParam {number} size  条数
      * @apiParam {number} page 页数
-     * @apiParam {string} month 月份分组
-     * @apiParam {string[]} list 列表
-     * @apiParam {number=1,2,3} list.doc_type 文案类型(1商品 2附件 3文本)
-     * @apiParam {number} list.doc_type_info 文案类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营21音频 22视频 23图片 31文本)
-     * @apiParam {number=0,1,2,3,4} list.is_done 发送结果(1待发送  2发送中 3已完成 4无任务)
-     * @apiParam {number=1,2,3} list.send_obj_type 发送目标类型(1群组 2个人 3标签)
-     * @apiParam {number} list.send_obj_id 发送目标id
+     * @apiSuccess {string} month 月份分组
+     * @apiSuccess {string[]} list 列表
+     * @apiSuccess {number=1,2,3} list.doc_type 文案类型(1商品 2附件 3文本)
+     * @apiSuccess {number} list.doc_type_info 文案类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营21音频 22视频 23图片 31文本)
+     * @apiSuccess {number=0,1,2,3,4} list.is_done 发送结果(1待发送  2发送中 3已完成 4无任务)
+     * @apiSuccess {number=1,2,3} list.send_obj_type 发送目标类型(1群组 2个人 3标签)
+     * @apiSuccess {number} list.send_obj_id 发送目标id
      */
     public function sendJobListForApp(Request $request)
     {

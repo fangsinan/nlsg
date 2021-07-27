@@ -432,8 +432,11 @@ class ImDocServers
     //app的文案列表
     public function sendJobListForApp($params)
     {
-        $send_obj_type = $params['send_obj_type'] ?? 0;
-        $send_obj_id = $params['send_obj_id'] ?? 0;
+        $group_id = $params['group_id'] ?? 0;
+        $send_obj_type = 2;
+        $send_obj_id = ImGroup::getId($group_id);
+        $send_obj_id = $send_obj_id['id'];
+
         $size = $params['size'] ?? 10;
         $page = $params['page'] ?? 1;
         $offset = ($page - 1) * $size;

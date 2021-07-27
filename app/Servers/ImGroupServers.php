@@ -159,4 +159,8 @@ class ImGroupServers
             return ['code' => true, 'msg' => '成功'];
         }
     }
+
+    public function bindWorks($params, $user_id){
+
+    }
 }
