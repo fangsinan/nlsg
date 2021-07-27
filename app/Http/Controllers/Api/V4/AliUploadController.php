@@ -467,7 +467,8 @@ class AliUploadController extends Controller
 
         $result=self::AlibabaCloudRpcRequest('GetPlayInfo',$query);
         if($result['status']==1){
-            return ['status'=>1,'data'=>['url'=>$result['data']['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
+//            return ['status'=>1,'data'=>['url'=>$result['data']['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
+            return ['status'=>1,'data'=>['url'=>$result['data']]];
         }else{
             return $result;
         }
@@ -584,11 +585,20 @@ class AliUploadController extends Controller
                 $result = $this->UploadMediaByURL($type);
             }else if($type==1){
                 //抓取视频
-                $result = $this->UploadMediaByURL($type, self::WorkflowId);
+//                $result = $this->UploadMediaByURL($type, self::WorkflowId);
+                $result['status']=1;
             }
 
             if($result['status']==1){
-                return $this->success($result['data']);
+//                return $this->success($result['data']);
+                //获取到视频ID
+//                $rst=self::GetURLUploadInfos($result['data']['UploadJobs'][0]['JobId'],$result['data']['UploadJobs'][0]['SourceURL']);
+                $rst=self::GetURLUploadInfos('18f252cca75ca906','https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4');
+                if($rst['status']==1){
+                    return $this->success($rst['data']);
+                }else {
+                    return $this->error(0, $result['msg']);
+                }
             }else{
                 return $this->error(0, $result['msg']);
             }
@@ -597,6 +607,16 @@ class AliUploadController extends Controller
             return $this->error(0, $e->getMessage());
         }
 
+    }
+
+    //获取上传id
+    public function GetURLUploadInfos($JobIds,$UploadURLs){
+
+        $query=[
+            'JobIds' => $JobIds,
+            'UploadURLs' => $UploadURLs,
+        ];
+        return self::AlibabaCloudRpcRequest('GetURLUploadInfos',$query);
     }
 
     //音视频拉取文件
