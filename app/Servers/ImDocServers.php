@@ -251,6 +251,7 @@ class ImDocServers
 
     public function addSendJob($params, $user_id)
     {
+        return $params;
         $job_str = '';
 
         if (!empty($params['id'] ?? 0)) {

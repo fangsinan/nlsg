@@ -191,7 +191,7 @@ class ImDocController extends Controller
      * @apiParam {number} doc_id 文案id
      * @apiParam {number=1,2} send_type 发送时间类型(1立刻 2定时)
      * @apiParam {string} [send_at] 定时时间
-     * @apiParam {string[]} info 对象列表
+     * @apiParam {string[]} info 对象列表的json
      * @apiParam {string=1,2,3} info.type 目标对象类型(1群组 2个人 3标签)
      * @apiParam {string} info.list 目标id
      * @apiDescription 添加发送任务
