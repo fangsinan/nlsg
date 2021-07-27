@@ -531,7 +531,7 @@ class AliUploadController extends Controller
         if (!in_array($type, [1, 2, 3,4])) {
             return $this->error(0, '类型有误');
         }
-        if(in_array($type, [1, 2, 3])) { //文件没有id
+        if(in_array($type, [1, 2, 3])) { //类型4 文件没有资源id
             if (empty($videoid)) {
                 return $this->error(0, '媒体id不能为空');
             }
@@ -600,9 +600,42 @@ class AliUploadController extends Controller
         if (!in_array($type, [1, 2,3,4])) {
             return $this->error(0, '抓取类型有误');
         }
-        try {
 
-            self::initVodClient(self::AccessKeyId, self::AccessKeySecret);
+        require base_path('vendor').DIRECTORY_SEPARATOR . 'voduploadsdk' . DIRECTORY_SEPARATOR . 'Autoloader.php';
+        date_default_timezone_set('PRC');
+
+        //测试上传网络视频
+        try {
+//            $fileURL='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
+            $url='https://audiovideo.ali.nlsgapp.com/original/workflow/6017b70b-17ae70d4644-0004-7621-b40-81766.mp4';
+            $arr=explode('.',$url);
+            $filename=md5($url); //文件名
+            $ext=$arr[count($arr)-1]; //扩展名
+            $filePath=storage_path('logs/'.$filename.'.'.$ext);
+            try {
+                file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
+            }catch (\Exception $e){
+                return [ 'status' => 0,'data'=>[],'msg'=>$url.'下载异常：'.$e->getMessage()];
+            }
+
+            $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret);
+            $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
+            $uploadVideoRequest->setCateId(self::TypeArr[1]);
+            $uploadVideoRequest->setStorageLocation(self::StorageLocation);
+            $uploadVideoRequest->setWorkflowId(self::WorkflowId);
+//            $userData = array(
+//                "MessageCallback"=>array("CallbackURL"=>"http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback"),
+//                "Extend"=>array("localId"=>"xxx", "test"=>"www")
+//            );
+//            $uploadVideoRequest->setUserData(json_encode($userData));
+            $res = $uploader->uploadLocalVideo($uploadVideoRequest);
+            var_dump($res);
+        } catch (\Exception $e) {
+            printf("testUploadWebVideo Failed, ErrorMessage: %s\n Location: %s %s\n Trace: %s\n",
+                $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
+        }
+        return ;
+        try {
 
             if(in_array($type,[2,3,4])) {
                 //抓取音频和图片
@@ -624,21 +657,11 @@ class AliUploadController extends Controller
 
     }
 
-    //音视频拉取文件
+    //音视频拉取文件 https://help.aliyun.com/document_detail/100976.html?spm=a2c4g.11186623.6.1031.30f6d418f1Hpzw
     public function UploadMediaByURL($type,$WorkflowId=''){
 
         switch ($type){
             case 1://拉取视频 https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4
-
-                try {
-                    $uploader = new AliyunVodUploader($accessKeyId, $accessKeySecret);
-                    $uploadVideoRequest = new UploadVideoRequest($fileURL, 'testUploadWebVideo via PHP-SDK');
-                    $res = $uploader->uploadWebVideo($uploadVideoRequest);
-                    print_r($res);
-                } catch (Exception $e) {
-                    printf("testUploadWebVideo Failed, ErrorMessage: %s\n Location: %s %s\n Trace: %s\n",
-                        $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
-                }
 
                 break;
             case 2:
