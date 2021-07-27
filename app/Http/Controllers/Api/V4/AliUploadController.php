@@ -619,13 +619,12 @@ class AliUploadController extends Controller
                     return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
                 }
             }
-            echo $filePath.PHP_EOL;
 
-            $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret);
+            $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
             $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
-//            $uploadVideoRequest->setCateId(self::TypeArr[1]);
-//            $uploadVideoRequest->setStorageLocation(self::StorageLocation);
-//            $uploadVideoRequest->setWorkflowId(self::WorkflowId);
+            $uploadVideoRequest->setCateId(self::TypeArr[1]);
+            $uploadVideoRequest->setStorageLocation(self::StorageLocation);
+            $uploadVideoRequest->setWorkflowId(self::WorkflowId);
 //            $userData = array(
 //                "MessageCallback"=>array("CallbackURL"=>"http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback"),
 //                "Extend"=>array("localId"=>"xxx", "test"=>"www")
@@ -634,7 +633,7 @@ class AliUploadController extends Controller
             $res = $uploader->uploadLocalVideo($uploadVideoRequest);
             var_dump($res);
         } catch (\Exception $e) {
-            printf("testUploadWebVideo Failed, ErrorMessage: %s\n Location: %s %s\n Trace: %s\n",
+            printf("ErrorMessage: %s\n Location: %s %s\n Trace: %s\n",
                 $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
         }
         return ;
