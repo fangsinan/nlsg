@@ -601,12 +601,70 @@ class AliUploadController extends Controller
             return $this->error(0, '抓取类型有误');
         }
 
-        require base_path('vendor').DIRECTORY_SEPARATOR . 'voduploadsdk' . DIRECTORY_SEPARATOR . 'Autoloader.php';
-        date_default_timezone_set('PRC');
-
-        //测试上传网络视频
         try {
-            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/d4b9-425233/c010100d30b026df9fa52e8afaaab927.png?imageMogr2/';
+
+            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
+            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/46d7b74f9a396ce76539c1c8f8295b44.png?imageMogr2/';
+            $url= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png';
+            //抓取音视频和图片
+            $url= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198';
+            $result = $this->UploadMediaByURL(3,$url);
+            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
+            $result = $this->UploadMediaByURL(1,$url);
+            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/29845510b9fe73f1ea290b7c2466277d.m4a';
+            $result = $this->UploadMediaByURL(2,$url);
+            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/f866-316743/7eca6acb927a86ba8580c8e0ce83ac84.txt';
+            $result = $this->UploadMediaByURL(4,$url);
+
+            if($result['status']==1){
+                return $this->success($result['data']);
+            }else{
+                return $this->error(0, $result['msg']);
+            }
+
+        } catch (\Exception $e) {
+            return $this->error(0, $e->getMessage());
+        }
+
+    }
+
+    //音视频拉取文件 https://help.aliyun.com/document_detail/100976.html?spm=a2c4g.11186623.6.1031.30f6d418f1Hpzw
+    public function UploadMediaByURL($type,$url){
+
+        if(in_array($type,[1,2,3])){
+            require_once base_path('vendor').DIRECTORY_SEPARATOR . 'voduploadsdk' . DIRECTORY_SEPARATOR . 'Autoloader.php';
+            date_default_timezone_set('PRC');
+        }
+        $now_date=date('Y-m-d H:i:s');
+        if (in_array($type,[1,2])) { //拉取音视频
+            $arr=explode('.',$url);
+            $filename=md5($url); //文件名
+            $ext=$arr[count($arr)-1]; //扩展名
+            $filePath=storage_path('logs/'.$filename.'.'.$ext);
+            if(!file_exists($filePath)) {
+                try {
+                    file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
+                } catch (\Exception $e) {
+                    return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
+                }
+            }
+
+            $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
+            $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
+            $uploadVideoRequest->setCateId(self::TypeArr[$type]);
+            $uploadVideoRequest->setStorageLocation(self::StorageLocation);
+            if($type==1) { //视频
+                $uploadVideoRequest->setWorkflowId(self::WorkflowId);
+            }
+//            $userData = array(
+//                "MessageCallback"=>array("CallbackURL"=>"http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback"),
+//                "Extend"=>array("localId"=>"xxx", "test"=>"www")
+//            );
+//            $uploadVideoRequest->setUserData(json_encode($userData));
+            $videoid = $uploader->uploadLocalVideo($uploadVideoRequest);
+            $new_url='';
+        }else if($type==3){//拉取图片
+
             $filename=md5($url); //文件名
             $ext='png'; //扩展名
             $filePath=storage_path('logs/'.$filename.'.'.$ext);
@@ -622,84 +680,28 @@ class AliUploadController extends Controller
             $uploadImageRequest = new \UploadImageRequest($filePath, '测试图片上传');
             $uploadImageRequest->setCateId(self::TypeArr[3]);
             $res = $uploader->uploadLocalImage($uploadImageRequest);
-            print_r($res);
-            return ;
+            $new_url=$res['ImageURL'];
+            $videoid=$res['ImageId']; //媒体id
 
-
-
-//            $fileURL='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
-            $url='https://audiovideo.ali.nlsgapp.com/original/workflow/6017b70b-17ae70d4644-0004-7621-b40-81766.mp4';
-            $arr=explode('.',$url);
-            $filename=md5($url); //文件名
-            $ext=$arr[count($arr)-1]; //扩展名
-            $filePath=storage_path('logs/'.$filename.'.'.$ext);
-            if(!file_exists($filePath)) {
-                try {
-                    file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
-                } catch (\Exception $e) {
-                    return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
-                }
-            }
-
-            $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
-            $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
-            $uploadVideoRequest->setCateId(self::TypeArr[1]);
-            $uploadVideoRequest->setStorageLocation(self::StorageLocation);
-            $uploadVideoRequest->setWorkflowId(self::WorkflowId);
-//            $userData = array(
-//                "MessageCallback"=>array("CallbackURL"=>"http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback"),
-//                "Extend"=>array("localId"=>"xxx", "test"=>"www")
-//            );
-//            $uploadVideoRequest->setUserData(json_encode($userData));
-            $res = $uploader->uploadLocalVideo($uploadVideoRequest);
-            return $this->success($res);
-        } catch (\Exception $e) {
-            return $this->error(0, $e->getMessage());
         }
-        return ;
-        try {
-
-            if(in_array($type,[2,3,4])) {
-                //抓取音频和图片
-                $result = $this->UploadMediaByURL($type);
-            }else if($type==1){
-                //抓取视频
-                $result = $this->UploadMediaByURL($type, self::WorkflowId);
-            }
-
-            if($result['status']==1){
-                return $this->success($result['data']);
+        if(in_array($type,[1,2,3])){
+            $data = [
+                'type' => $type,
+                'url' => $new_url,
+                'created_at' => $now_date
+            ];
+            $data['media_id'] = $videoid;
+            $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
+            if ($rst === false) {
+                return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
             }else{
-                return $this->error(0, $result['msg']);
+                unlink($filePath);
+                return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
             }
-
-        } catch (\Exception $e) {
-            return $this->error(0, $e->getMessage());
         }
-
-    }
-
-    //音视频拉取文件 https://help.aliyun.com/document_detail/100976.html?spm=a2c4g.11186623.6.1031.30f6d418f1Hpzw
-    public function UploadMediaByURL($type,$WorkflowId=''){
-
-        switch ($type){
-            case 1://拉取视频 https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4
-
-                break;
-            case 2:
-                //拉取音频 https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/9d746c3a68617aaf1a2ceeb5de6a3080.m4a
-
-                break;
-            case 3:
-                //拉取图片 https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198
-                //https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png
-
-                break;
-            case 4:
-                //拉取文件 oss
-                return self::GetUrlOSS('https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a438a563cd83fcafe9dbc0c76fb19c8f.docx');
+        if($type==4) {//拉取文件上传oss
+            return self::GetUrlOSS($url);
         }
-
 
     }
 
@@ -725,6 +727,7 @@ class AliUploadController extends Controller
         // 存储空间名称
         $bucket = Config('web.Ali.BUCKET_ALI');
 
+        $now_date=date('Y-m-d H:i:s');
         try{
 
             //上传阿里
@@ -737,8 +740,28 @@ class AliUploadController extends Controller
                 return [ 'status' => 0,'data'=>[],'msg'=>'文件名已存在'];
             }
             $ossClient->uploadFile($bucket, $object, $filePath);
-            unlink($filePath); //删除本地文件
-            return [ 'status' => 1,'data'=>['name' => $object]];
+
+            DB::beginTransaction();
+            $data = [
+                'type' => 4,
+                'url' => self::$IMAGES_URL.$object,
+                'file_name' => $object,
+                'created_at' => $now_date
+            ];
+            $rstId = DB::table(ImMedia::DB_TABLE)->insertGetId($data);
+            if ($rstId === false) {
+                DB::rollBack();
+                return ['status' => 0, 'data' => [], 'msg' => '抓取失败111'];
+            }
+            //初始化媒体id
+            $UpRst=DB::table(ImMedia::DB_TABLE)->where('id', $rstId)->update(['media_id' => $rstId,'updated_at' => $now_date]);
+            if($UpRst===false){
+                DB::rollBack();
+                return ['status' => 0, 'data' => [], 'msg' => '抓取失败222'];
+            }
+            DB::commit();
+            unlink($filePath);
+            return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
 
         } catch(OssException $e) {
             return [ 'status' => 0,'data'=>[],'msg'=>$e->getMessage()];
