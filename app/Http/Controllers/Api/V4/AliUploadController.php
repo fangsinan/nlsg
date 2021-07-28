@@ -430,6 +430,10 @@ class AliUploadController extends Controller
                     $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
 
                     // 测试的图片链接
+
+                    $result=getimagesize('https://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg');
+                    var_dump($result);
+                    return ;
                     echo '<pre>';
                     $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'curl');
                     var_dump($result);
