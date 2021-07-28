@@ -431,26 +431,6 @@ class AliUploadController extends Controller
                     $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
                     $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
                     $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
-
-                    // 测试的图片链接
-
-//                    $result=getimagesize('https://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg');
-//                    var_dump($result);
-//                    return ;
-                    echo '<pre>';
-                    $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'curl');
-                    var_dump($result);
-                    return ;
-                    echo '<hr />';
-                    $result =$AliUploadServer-> myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'fread');
-                    var_dump($result);
-                    echo '<hr />';
-                    $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'fread', true);
-                    var_dump($result);
-                    echo '<hr />';
-                    $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'curl', true);
-                    var_dump($result);
-                    return ;
                 }
 
                 $data['media_id'] = $videoid;
@@ -458,7 +438,8 @@ class AliUploadController extends Controller
                 if ($rst === false) {
                     return $this->error(0, '保存失败');
                 }
-            }else{ //文件
+                return $this->success(['media_id'=>$videoid]);
+             }else{ //文件
                 DB::beginTransaction();
                 $data['file_name'] = $name;
                 $data['size'] = $size;
@@ -474,9 +455,8 @@ class AliUploadController extends Controller
                     return $this->error(0, '保存失败');
                 }
                 DB::commit();
+                return $this->success(['media_id'=>$rstId]);
             }
-
-            return $this->success([]);
 
         } catch (\Exception $e) {
             if($type==4){
