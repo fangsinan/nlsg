@@ -576,12 +576,12 @@ class AliUploadController extends Controller
                 if($ruselt['status']!=1){
                     return $this->error(0, '获取保存失败');
                 }
+                $arr=explode('.',$url);
+                $ext=$arr[count($arr)-1]; //扩展名
+                $data['format']=$ext;
                 if($type==1){ //视频
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
-                    $arr=explode('.',$url);
-                    $ext=$arr[count($arr)-1]; //扩展名
-                    $data['format']=$ext;
                     $data['thumb_url']=(empty($ruselt['data']['Video']['CoverURL']))?'':$ruselt['data']['Video']['CoverURL'];
 //                    $data['thumb_size']=;
 //                    $data['thumb_width']=;
@@ -594,16 +594,10 @@ class AliUploadController extends Controller
                 }else if($type==2){ //音频
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
-                    $arr=explode('.',$url);
-                    $ext=$arr[count($arr)-1]; //扩展名
-                    $data['format']=$ext;
                 }else{ //图片
                     $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
                     $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
                     $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
-                    $arr=explode('.',$url);
-                    $ext=$arr[count($arr)-1]; //扩展名
-                    $data['format']=$ext;
                 }
 
                 $data['media_id'] = $videoid;
@@ -706,11 +700,6 @@ class AliUploadController extends Controller
             if($type==1) { //视频
                 $uploadVideoRequest->setWorkflowId(self::WorkflowId);
             }
-//            $userData = array(
-//                "MessageCallback"=>array("CallbackURL"=>"http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback"),
-//                "Extend"=>array("localId"=>"xxx", "test"=>"www")
-//            );
-//            $uploadVideoRequest->setUserData(json_encode($userData));
             $videoid = $uploader->uploadLocalVideo($uploadVideoRequest);
             $new_url='';
         }else if($type==3){//拉取图片
