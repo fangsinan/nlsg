@@ -164,8 +164,6 @@ class AliUploadServers
             ->get();
         if($Imglist->isNotEmpty()){
             $ImgData=$Imglist->toArray();
-            var_dump($ImgData);
-            return ;
             foreach ($ImgData as $key=>$val){
                 self::UploadMediaByURL(3,$val['url'],$val);
             }
@@ -238,6 +236,8 @@ class AliUploadServers
             $uploadImageRequest = new \UploadImageRequest($filePath, $filename.'.'.$ext);
             $uploadImageRequest->setCateId(self::TypeArr[3]);
             $res = $uploader->uploadLocalImage($uploadImageRequest);
+            var_dump($res);
+            return ;
             $new_url=$res['ImageURL'];
             $videoid=$res['ImageId']; //媒体id
             $file_name=$res['FileName']; //名称
