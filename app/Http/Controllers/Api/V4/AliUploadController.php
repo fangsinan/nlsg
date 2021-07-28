@@ -409,11 +409,14 @@ class AliUploadController extends Controller
                 if($type==1){ //视频
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
-                    $data['thumb_url']=(empty($ruselt['data']['Video']['CoverURL']))?'':$ruselt['data']['Video']['CoverURL'];
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
+                    $data['thumb_url']=(empty($ruselt['data']['Video']['CoverURL']))?'':$ruselt['data']['Video']['CoverURL'];
+                    if(!empty($data['thumb_url'])){
+                        $CoverSize=getimagesize($data['thumb_url']);
+                        $data['thumb_width']=$CoverSize[0];
+                        $data['thumb_height']=$CoverSize[1];
+                    }
 //                    $data['thumb_size']=;
-//                    $data['thumb_width']=;
-//                    $data['thumb_height']=;
                     if(!empty($data['thumb_url'])){
                         $thumb_arr=explode('.',$data['thumb_url']);
                         $thumb_ext=$thumb_arr[count($thumb_arr)-1]; //扩展名
@@ -431,12 +434,13 @@ class AliUploadController extends Controller
 
                     // 测试的图片链接
 
-                    $result=getimagesize('https://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg');
-                    var_dump($result);
-                    return ;
+//                    $result=getimagesize('https://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg');
+//                    var_dump($result);
+//                    return ;
                     echo '<pre>';
                     $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'curl');
                     var_dump($result);
+                    return ;
                     echo '<hr />';
                     $result =$AliUploadServer-> myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'fread');
                     var_dump($result);
