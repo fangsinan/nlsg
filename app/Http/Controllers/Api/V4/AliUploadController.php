@@ -459,7 +459,7 @@ class AliUploadController extends Controller
     }
 
     //获取播放地址接口
-    public function getPlayInfo($VideoId) {
+    public function getPlayInfo($VideoId,$ReturnData=false) {
 
         $query=[
             'VideoId' => $VideoId,
@@ -467,8 +467,11 @@ class AliUploadController extends Controller
 
         $result=self::AlibabaCloudRpcRequest('GetPlayInfo',$query);
         if($result['status']==1){
-//            return ['status'=>1,'data'=>['url'=>$result['data']['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
-            return ['status'=>1,'data'=>['url'=>$result['data']]];
+            if($ReturnData===false) {
+                return ['status' => 1, 'data' => ['url' => $result['data']['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
+            }else {
+                return ['status' => 1, 'data' => ['url' => $result['data']]];
+            }
         }else{
             return $result;
         }
@@ -556,6 +559,53 @@ class AliUploadController extends Controller
                 'created_at' => $now_date
             ];
             if(in_array($type, [1, 2, 3])) {
+
+                self::initVodClient(self::AccessKeyId, self::AccessKeySecret);
+                if($type==3) {
+                    $query = [
+                        'ImageId' => $videoid,
+                    ];
+                    $action='GetImageInfo';
+                }else{
+                    $query=[
+                        'VideoId' => $videoid,
+                    ];
+                    $action="GetVideoInfo";
+                }
+                $ruselt=self::AlibabaCloudRpcRequest($action,$query);
+                if($ruselt['status']!=1){
+                    return $this->error(0, '获取保存失败');
+                }
+                if($type==1){ //视频
+                    $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
+                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
+                    $arr=explode('.',$url);
+                    $ext=$arr[count($arr)-1]; //扩展名
+                    $data['format']=$ext;
+                    $data['thumb_url']=(empty($ruselt['data']['Video']['CoverURL']))?'':$ruselt['data']['Video']['CoverURL'];
+//                    $data['thumb_size']=;
+//                    $data['thumb_width']=;
+//                    $data['thumb_height']=;
+                    if(!empty($data['thumb_url'])){
+                        $thumb_arr=explode('.',$data['thumb_url']);
+                        $thumb_ext=$thumb_arr[count($thumb_arr)-1]; //扩展名
+                        $data['thumb_format']=$thumb_ext;
+                    }
+                }else if($type==2){ //音频
+                    $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
+                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
+                    $arr=explode('.',$url);
+                    $ext=$arr[count($arr)-1]; //扩展名
+                    $data['format']=$ext;
+                }else{ //图片
+                    $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
+                    $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
+                    $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
+                    $arr=explode('.',$url);
+                    $ext=$arr[count($arr)-1]; //扩展名
+                    $data['format']=$ext;
+                }
+
                 $data['media_id'] = $videoid;
                 $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
                 if ($rst === false) {
