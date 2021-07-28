@@ -3,15 +3,9 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\ImMedia;
+use App\Servers\AliUploadServers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
-use AlibabaCloud\Client\AlibabaCloud;
-use AlibabaCloud\Client\Exception\ClientException;
-use AlibabaCloud\Client\Exception\ServerException;
-
-use OSS\OssClient;
-use OSS\Core\OssException;
 
 use Illuminate\Support\Facades\Log;
 
@@ -19,55 +13,6 @@ use Illuminate\Support\Facades\Log;
 //https://next.api.aliyun.com/api/vod/2017-03-21/GetPlayInfo?params={%22VideoId%22:%2213a3ba6d4f1b4c7ba1b585cad344562e%22}&sdkStyle=old    接口调试
 class AliUploadController extends Controller
 {
-
-    const AccessKeyId='LTAI5tL6ecVBmEVkQgjJgwrQ';
-    const AccessKeySecret='vpuz7JdR4oklMLbLqsoeMUZlq2y6T5';
-    const StorageLocation='outin-676a8a43e83811eb8be600163e108a8f.oss-cn-beijing.aliyuncs.com'; //存储地址
-
-    const TemplateGroupId='296dad2655536aac8ef30199d528579b'; //视频转码ID
-    const WorkflowId='04d6477bd874095952201ff69be42f4e'; //视频工作流ID
-
-    const EndPoint='oss-cn-beijing.aliyuncs.com';//阿里oss上传
-
-    const TypeArr=[
-        '1'=>2870, //视频
-        '2'=>2869, //音频
-        '3'=>2872, //图片
-        '4'=>2871, //文件
-        '5'=>2899, //待删除
-    ];
-    public static $IMAGES_URL = 'https://audiovideo.ali.nlsgapp.com/';
-
-    //初始化
-    public function initVodClient($accessKeyId, $accessKeySecret) {
-        $regionId = 'cn-beijing';
-        AlibabaCloud::accessKeyClient($accessKeyId, $accessKeySecret)
-            ->regionId($regionId)
-            ->asDefaultClient();
-    }
-
-    //参数请求提取
-    public function AlibabaCloudRpcRequest($action,$query){
-        try {
-            $result= AlibabaCloud::rpc()
-                ->product('vod')
-                ->scheme('https') // https | http
-                ->version('2017-03-21')
-                ->action($action)
-                ->method('POST')
-                ->host('vod.cn-beijing.aliyuncs.com')
-                ->options([
-                    'query' => $query,
-                ])
-                ->request();
-            return ['status'=>1,'data'=>$result->toArray()];
-        } catch (ClientException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        } catch (ServerException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
-        }
-
-    }
 
     /**
      * @api {post} /api/v4/upload/push_ali_auth   上传音视频点播和图片
@@ -130,14 +75,15 @@ class AliUploadController extends Controller
         }
         try {
 
-            self::initVodClient(self::AccessKeyId, self::AccessKeySecret);
+            $AliUploadServer=new AliUploadServers();
+            $AliUploadServer->initVodClient();
 
             if(in_array($type,[1,2])) {
                 //获取视频上传地址和凭证
-                $result = $this->createUploadVideo($type, $filename, $title);
+                $result = $AliUploadServer->createUploadVideo($type, $filename, $title);
             }else {
                 //图片上传凭证
-                $result = $this->createUploadImage($type, $title, $imageext);
+                $result = $AliUploadServer->createUploadImage($type, $title, $imageext);
             }
 
             if($result['status']==1){
@@ -189,13 +135,14 @@ class AliUploadController extends Controller
 
         try {
 
-            self::initVodClient(self::AccessKeyId, self::AccessKeySecret);
+            $AliUploadServer=new AliUploadServers();
+            $AliUploadServer->initVodClient();
             if(in_array($type,[1,2])) {
                 //删除时修改类型
-                $result = $this->updateVideoInfo($videoid);
+                $result = $AliUploadServer->updateVideoInfo($videoid);
             }else{
                 //删除图片
-                $result=$this->DeleteImage($videoid);
+                $result=$AliUploadServer->DeleteImage($videoid);
             }
 
             if($result['status']==1){
@@ -259,13 +206,14 @@ class AliUploadController extends Controller
 
         try {
 
-            self::initVodClient(self::AccessKeyId, self::AccessKeySecret);
+            $AliUploadServer=new AliUploadServers();
+            $AliUploadServer->initVodClient();
             if($flag==1){
                 //获取播放地址
-                $result=$this->getPlayInfo($videoid);
+                $result=$AliUploadServer->getPlayInfo($videoid);
             }else{
                 //获取视频播放凭证
-                $result=$this->getVideoPlayAuth($videoid,$timeout);
+                $result=$AliUploadServer->getVideoPlayAuth($videoid,$timeout);
             }
 
             if($result['status']==1){
@@ -310,7 +258,7 @@ class AliUploadController extends Controller
                 return $this->error(0, '文件不合法');
             }
             $fileextension = $file->getClientOriginalExtension();//获取上传文件的后缀（如abc.png，获取到的为png）
-            $realpath = $file->getRealPath();//获取上传的文件缓存在tmp文件夹下的绝对路径
+            $filePath = $file->getRealPath();//获取上传的文件缓存在tmp文件夹下的绝对路径
             $filename = $file->getClientOriginalName(); //获取上传文件的文件名（带后缀，如abc.png）
             $filesize=$file->getSize();
 //            $filaname=$file->getFilename();//获取缓存在tmp目录下的文件名（带后缀，如php8933.tmp）
@@ -318,34 +266,14 @@ class AliUploadController extends Controller
         }catch (\Exception $e){
             return $this->error(0, $e->getMessage());
         }
-        // Endpoint以杭州为例
-        $endpoint = self::EndPoint;
-        // 存储空间名称
-        $bucket = Config('web.Ali.BUCKET_ALI');
-        // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
-        $filePath = $realpath;
 
-        try{
-
-            //上传阿里
-            $ossClient = new OssClient(self::AccessKeyId, self::AccessKeySecret, $endpoint);
-            // 设置文件名称
-            $object = '1111group/' . date('Ymd') . md5($filename) . '.' . $fileextension;
-            // 文件内容
-            $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
-            if ($doesres) {
-                return $this->error(0, '文件名已存在');
-            }
-            $ossClient->uploadFile($bucket, $object, $filePath);
-
-            return $this->success([
-                'url' => Config('web.Ali.IMAGES_URL'),
-                'name' => $object,
-                'size'=>$filesize
-            ]);
-
-        } catch(OssException $e) {
-            return $this->error(0, $e->getMessage());
+        $AliUploadServer=new AliUploadServers();
+        $RstData=$AliUploadServer->PushOSS($filename,$fileextension,$filePath);
+        if($RstData['status']==1){
+            $RstData['data']['size']=$filesize; //返回大小
+            return $this->success($RstData['data']);
+        }else{
+            return $this->error(0, $RstData['msg']);
         }
 
     }
@@ -377,116 +305,13 @@ class AliUploadController extends Controller
             return $this->error(0, '文件名不能为空');
         }
 
-        try {
-            $ossClient = new OssClient(self::AccessKeyId, self::AccessKeySecret, self::EndPoint);
-
-            // 存储空间名称
-            $bucket= Config('web.Ali.BUCKET_ALI');
-            // 文件名称
-            $object=$name;
-
-            $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
-            if($doesres){
-                // 文件内容
-                $ossClient->deleteObject($bucket, $object);
-                return $this->success([]);
-            }else{
-                return $this->error(0, '文件不存在');
-            }
-
-        } catch (OssException $e) {
-            return $this->error(0, $e->getMessage());
-        }
-    }
-
-    /**
-     * 获取视频上传地址和凭证
-     */
-    public function createUploadVideo($type,$fileName,$title) {
-
-        $queryArr=[
-            'FileName'=>$fileName, //视频源文件名 必须带扩展名   https://help.aliyun.com/document_detail/55396.htm?spm=a2c4g.11186623.2.11.65b95d4aPwYn08s
-            'Title'=>$title,
-            'CateId'=>self::TypeArr[$type], //分类ID  type 1 视频 2音频 3 图片 4文件
-            'StorageLocation'=>self::StorageLocation, //存储地址
-        ];
-        //选择“不转码即分发”的方式上传视频文件后，点播播放服务仅支持MP4、FLV、MP3和M3U8格式的视频
-        if($type==1) { //视频处理
-//            $queryArr['TemplateGroupId']=self::TemplateGroupId; //转码模板组ID  只限视频
-            $queryArr['WorkflowId']=self::WorkflowId; //工作流ID  只限视频 可截封面图
-        }
-
-        return self::AlibabaCloudRpcRequest('CreateUploadVideo',$queryArr);
-
-    }
-
-    //获取图片上传地址和凭证
-    public function createUploadImage($type,$title,$ImageExt){
-        $queryArr=[
-            'ImageType'=>'default',
-            'Title'=>$title,
-            'ImageExt'=>$ImageExt, //扩展名 png jpg jpeg gif
-            'CateId'=>self::TypeArr[$type], //分类ID  type 1 视频 2音频 3 图片 4文件
-            'StorageLocation'=>self::StorageLocation, //存储地址
-        ];
-
-        return self::AlibabaCloudRpcRequest('CreateUploadImage',$queryArr);
-
-    }
-
-    //删除音视频时更改类型到待删除
-    public function updateVideoInfo($VideoId,$CateId=5){
-
-        $query=[
-            'VideoId' => $VideoId,
-            'CateId' => self::TypeArr[$CateId],
-        ];
-
-        return self::AlibabaCloudRpcRequest('UpdateVideoInfo',$query);
-
-    }
-
-    //删除点播图片
-    public function DeleteImage($ImageIds){
-
-        $query = [
-            'ImageIds' => $ImageIds,
-            'DeleteImageType' => "ImageId",
-        ];
-
-        return self::AlibabaCloudRpcRequest('DeleteImage',$query);
-
-    }
-
-    //获取播放地址接口
-    public function getPlayInfo($VideoId,$ReturnData=false) {
-
-        $query=[
-            'VideoId' => $VideoId,
-        ];
-
-        $result=self::AlibabaCloudRpcRequest('GetPlayInfo',$query);
-        if($result['status']==1){
-            if($ReturnData===false) {
-                return ['status' => 1, 'data' => ['url' => $result['data']['PlayInfoList']['PlayInfo'][0]['PlayURL']]];
-            }else {
-                return ['status' => 1, 'data' => ['url' => $result['data']]];
-            }
+        $AliUploadServer=new AliUploadServers();
+        $Rst=$AliUploadServer->DelOss($name);
+        if($Rst['status']==1){
+            return $this->success([]);
         }else{
-            return $result;
+            return $this->error(0, $Rst['msg']);
         }
-
-    }
-
-    //获取视频播放凭证
-    public function getVideoPlayAuth($VideoId,$TimeOut) {
-
-        $query=[
-            'VideoId' => $VideoId,
-            'AuthInfoTimeout' => $TimeOut,
-        ];
-        return self::AlibabaCloudRpcRequest('GetVideoPlayAuth',$query);
-
     }
 
     //上传完成回调
@@ -560,7 +385,8 @@ class AliUploadController extends Controller
             ];
             if(in_array($type, [1, 2, 3])) {
 
-                self::initVodClient(self::AccessKeyId, self::AccessKeySecret);
+                $AliUploadServer=new AliUploadServers();
+                $AliUploadServer->initVodClient();
                 if($type==3) {
                     $query = [
                         'ImageId' => $videoid,
@@ -572,7 +398,7 @@ class AliUploadController extends Controller
                     ];
                     $action="GetVideoInfo";
                 }
-                $ruselt=self::AlibabaCloudRpcRequest($action,$query);
+                $ruselt=$AliUploadServer->AlibabaCloudRpcRequest($action,$query);
                 if($ruselt['status']!=1){
                     return $this->error(0, '获取保存失败');
                 }
@@ -583,6 +409,7 @@ class AliUploadController extends Controller
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
                     $data['thumb_url']=(empty($ruselt['data']['Video']['CoverURL']))?'':$ruselt['data']['Video']['CoverURL'];
+                    $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
 //                    $data['thumb_size']=;
 //                    $data['thumb_width']=;
 //                    $data['thumb_height']=;
@@ -594,7 +421,9 @@ class AliUploadController extends Controller
                 }else if($type==2){ //音频
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
+                    $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
                 }else{ //图片
+                    $data['file_name']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['OriginalFileName']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['OriginalFileName'];
                     $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
                     $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
                     $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
@@ -646,19 +475,19 @@ class AliUploadController extends Controller
         }
 
         try {
-
+            $AliUploadServer=new AliUploadServers();
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/46d7b74f9a396ce76539c1c8f8295b44.png?imageMogr2/';
             $url= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png';
             //抓取音视频和图片
             $url= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198';
-            $result = $this->UploadMediaByURL(3,$url);
+            $result = $AliUploadServer->UploadMediaByURL(3,$url);
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
-            $result = $this->UploadMediaByURL(1,$url);
+            $result = $AliUploadServer->UploadMediaByURL(1,$url);
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/29845510b9fe73f1ea290b7c2466277d.m4a';
-            $result = $this->UploadMediaByURL(2,$url);
+            $result = $AliUploadServer->UploadMediaByURL(2,$url);
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/f866-316743/7eca6acb927a86ba8580c8e0ce83ac84.txt';
-            $result = $this->UploadMediaByURL(4,$url);
+            $result = $AliUploadServer->UploadMediaByURL(4,$url);
 
             if($result['status']==1){
                 return $this->success($result['data']);
@@ -671,142 +500,5 @@ class AliUploadController extends Controller
         }
 
     }
-
-    //音视频拉取文件 https://help.aliyun.com/document_detail/100976.html?spm=a2c4g.11186623.6.1031.30f6d418f1Hpzw
-    public function UploadMediaByURL($type,$url){
-
-        if(in_array($type,[1,2,3])){
-            require_once base_path('vendor').DIRECTORY_SEPARATOR . 'voduploadsdk' . DIRECTORY_SEPARATOR . 'Autoloader.php';
-            date_default_timezone_set('PRC');
-        }
-        $now_date=date('Y-m-d H:i:s');
-        if (in_array($type,[1,2])) { //拉取音视频
-            $arr=explode('.',$url);
-            $filename=md5($url); //文件名
-            $ext=$arr[count($arr)-1]; //扩展名
-            $filePath=storage_path('logs/'.$filename.'.'.$ext);
-            if(!file_exists($filePath)) {
-                try {
-                    file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
-                } catch (\Exception $e) {
-                    return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
-                }
-            }
-
-            $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
-            $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
-            $uploadVideoRequest->setCateId(self::TypeArr[$type]);
-            $uploadVideoRequest->setStorageLocation(self::StorageLocation);
-            if($type==1) { //视频
-                $uploadVideoRequest->setWorkflowId(self::WorkflowId);
-            }
-            $videoid = $uploader->uploadLocalVideo($uploadVideoRequest);
-            $new_url='';
-        }else if($type==3){//拉取图片
-
-            $filename=md5($url); //文件名
-            $ext='png'; //扩展名
-            $filePath=storage_path('logs/'.$filename.'.'.$ext);
-            if(!file_exists($filePath)) {
-                try {
-                    file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
-                } catch (\Exception $e) {
-                    return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
-                }
-            }
-            //上传图片
-            $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
-            $uploadImageRequest = new \UploadImageRequest($filePath, '测试图片上传');
-            $uploadImageRequest->setCateId(self::TypeArr[3]);
-            $res = $uploader->uploadLocalImage($uploadImageRequest);
-            $new_url=$res['ImageURL'];
-            $videoid=$res['ImageId']; //媒体id
-
-        }
-        if(in_array($type,[1,2,3])){
-            $data = [
-                'type' => $type,
-                'url' => $new_url,
-                'created_at' => $now_date
-            ];
-            $data['media_id'] = $videoid;
-            $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
-            if ($rst === false) {
-                return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
-            }else{
-                unlink($filePath);
-                return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
-            }
-        }
-        if($type==4) {//拉取文件上传oss
-            return self::GetUrlOSS($url);
-        }
-
-    }
-
-    //腾讯下载文件上传OSS
-    public function GetUrlOSS($url){
-
-        $arr=explode('.',$url);
-        $filename=md5($url); //文件名
-        $ext=$arr[count($arr)-1]; //扩展名
-
-        // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
-        $filePath=storage_path('logs/'.$filename.'.'.$ext);
-        if(!file_exists($filePath)) {
-            try {
-                file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
-            } catch (\Exception $e) {
-                return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
-            }
-        }
-
-        // Endpoint以杭州为例
-        $endpoint = self::EndPoint;
-        // 存储空间名称
-        $bucket = Config('web.Ali.BUCKET_ALI');
-
-        $now_date=date('Y-m-d H:i:s');
-        try{
-
-            //上传阿里
-            $ossClient = new OssClient(self::AccessKeyId, self::AccessKeySecret, $endpoint);
-            // 设置文件名称
-            $object = '1111group/' . date('Ymd') . $filename . '.' . $ext;
-            // 文件内容
-            $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
-            if ($doesres) {
-                return [ 'status' => 0,'data'=>[],'msg'=>'文件名已存在'];
-            }
-            $ossClient->uploadFile($bucket, $object, $filePath);
-
-            DB::beginTransaction();
-            $data = [
-                'type' => 4,
-                'url' => self::$IMAGES_URL.$object,
-                'file_name' => $object,
-                'created_at' => $now_date
-            ];
-            $rstId = DB::table(ImMedia::DB_TABLE)->insertGetId($data);
-            if ($rstId === false) {
-                DB::rollBack();
-                return ['status' => 0, 'data' => [], 'msg' => '抓取失败111'];
-            }
-            //初始化媒体id
-            $UpRst=DB::table(ImMedia::DB_TABLE)->where('id', $rstId)->update(['media_id' => $rstId,'updated_at' => $now_date]);
-            if($UpRst===false){
-                DB::rollBack();
-                return ['status' => 0, 'data' => [], 'msg' => '抓取失败222'];
-            }
-            DB::commit();
-            unlink($filePath);
-            return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
-
-        } catch(OssException $e) {
-            return [ 'status' => 0,'data'=>[],'msg'=>$e->getMessage()];
-        }
-
-    }
-
 
 }
