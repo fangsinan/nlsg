@@ -12,6 +12,7 @@ use App\Models\PayRecordDetailStay;
 use App\Models\Task;
 use App\Models\Works;
 use App\Models\WorksInfo;
+use App\Servers\AliUploadServers;
 use App\Servers\ChannelServers;
 use App\Servers\DealServers;
 use App\Servers\ErpServers;
@@ -147,6 +148,12 @@ class Kernel extends ConsoleKernel
             //抓取直播间成交订单
             DealServers::getOrderInfo([], 0, 1);
         })->everyFiveMinutes()->runInBackground();//每5分钟执行一次
+        //https://laravelacademy.org/post/8484.html
+        $schedule->call(function () {
+            //抓取腾讯IM音视频、图片、文件到阿里云
+            AliUploadServers::UploadMediaPull();
+//        })->daily()->runInBackground();//每天凌晨执行
+        })->everyFiveMinutes()->runInBackground();//5分钟执行一次
 
     }
 
