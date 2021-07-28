@@ -124,9 +124,10 @@ class ImDocServers
 
                 $media_info = ImMedia::where('media_id', '=', $media_id)->first();
                 $media_info_type = 20 + $media_info->type;
-                if ($type_info != $media_info_type) {
-                    return ['code' => false, 'msg' => '媒体类型不匹配'];
-                }
+
+//                if (intval($type_info) != intval($media_info_type)) {
+//                    return ['code' => false, 'msg' => '媒体类型不匹配'];
+//                }
 
                 if (empty($media_info)) {
                     return ['code' => false, 'msg' => '媒体信息为空,请重试.'];
