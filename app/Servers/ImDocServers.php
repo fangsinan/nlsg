@@ -280,8 +280,8 @@ class ImDocServers
         $now = time();
         $month = date('Y-m', $now);
         $day = date('Y-m-d', $now);
-        if (!is_array($info)){
-            $info = json_decode($info,true);
+        if (!is_array($info)) {
+            $info = json_decode($info, true);
         }
 
         $check_doc = ImDoc::where('id', '=', $doc_id)->where('status', '=', 1)->first();
@@ -312,8 +312,8 @@ class ImDocServers
             if (!in_array($temp_type, [1, 2, 3])) {
                 return ['code' => false, 'msg' => '发送对象类型错误'];
             }
-            if (!is_array($v['list'])){
-                $v['list'] = explode(',',$v['list']);
+            if (!is_array($v['list'])) {
+                $v['list'] = explode(',', $v['list']);
             }
             foreach ($v['list'] as $vv) {
                 $temp_info_data = [];
@@ -424,9 +424,11 @@ class ImDocServers
         }
 
 
-        $query->select([
-            'id', 'doc_id', 'created_at', 'status', 'send_type', 'is_done', 'success_at'
-        ]);
+        $query->orderBy('success_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->select([
+                'id', 'doc_id', 'created_at', 'status', 'send_type', 'is_done', 'success_at'
+            ]);
 
         return $query->paginate($size);
     }
@@ -482,6 +484,8 @@ class ImDocServers
                 })
                 ->where('month', '=', $v)
                 ->where('status', '<>', 3)
+                ->orderBy('success_at', 'desc')
+                ->orderBy('id', 'desc')
                 ->select([
                     'id', 'doc_id', 'created_at', 'status', 'send_type', 'is_done', 'success_at'
                 ])->get();
