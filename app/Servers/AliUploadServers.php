@@ -154,11 +154,31 @@ class AliUploadServers
 
     }
 
-    //定时抓取
+    //定时抓取图片
     public function UploadMediaPull(){
         //获取图片
         $urlkey='https://cos.ap-shanghai.myqcloud.com/';
-        $Imglist = ImMsgContentImg::query()->where(['media_id'=>0])->where('url', 'like', $urlkey . '%')
+        $Imglist = ImMsgContentImg::query()->where('media_id','=','')->where('url', 'like', $urlkey . '%')
+            ->select(['id', 'size', 'width','height','url'])
+            ->limit(10)
+            ->get();
+        if($Imglist->isNotEmpty()){
+            $ImgData=$Imglist->toArray();
+            var_dump($ImgData);
+            return ;
+            foreach ($ImgData as $key=>$val){
+                self::UploadMediaByURL(3,$val['url'],$val);
+            }
+        }
+        return 'OK';
+
+    }
+
+    //定时抓取音视频 文件
+    public function UploadMediaVideoAudio(){
+        //获取图片
+        $urlkey='https://cos.ap-shanghai.myqcloud.com/';
+        $Imglist = ImMsgContentImg::query()->where('media_id','=','')->where('url', 'like', $urlkey . '%')
             ->select(['id', 'size', 'width','height','url'])
             ->limit(10)
             ->get();
@@ -168,8 +188,10 @@ class AliUploadServers
                 self::UploadMediaByURL(3,$val['url'],$val);
             }
         }
+        return 'OK';
 
     }
+
 
     //音视频拉取文件 https://help.aliyun.com/document_detail/100976.html?spm=a2c4g.11186623.6.1031.30f6d418f1Hpzw
     public function UploadMediaByURL($type='',$url='',$info=[]){
@@ -230,23 +252,27 @@ class AliUploadServers
                 'created_at' => $now_date
             ];
             $data['media_id'] = $videoid;
-            if($type==3){
+            if($type==3){ //图片
                 $data['file_name']=$file_name;
                 $data['size']=$info['size'];
                 $data['width']=$info['width'];
                 $data['height']=$info['height'];
+
+                //更新数据
+                $upRst=ImMsgContentImg::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
+                if ($upRst === false) {
+                    DB::rollBack();
+                    return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
+                }
+            }else{
+
             }
             $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
             if ($rst === false) {
                 DB::rollBack();
                 return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
             }
-            //更新数据
-            $upRst=ImMsgContentImg::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
-            if ($upRst === false) {
-                DB::rollBack();
-                return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
-            }
+
             DB::commit();
             unlink($filePath);
             return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];

@@ -493,6 +493,9 @@ class AliUploadController extends Controller
             $result = $AliUploadServer->UploadMediaByURL(3,$url3);
             $result = $AliUploadServer->UploadMediaByURL(3,$url4);*/
 
+            $rst=$AliUploadServer->UploadMediaPull();
+            var_dump($rst);
+            return ;
 
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
             $result = $AliUploadServer->UploadMediaByURL(1,$url);
