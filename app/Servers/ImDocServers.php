@@ -265,7 +265,7 @@ class ImDocServers
         $query->where('status', '=', 1)
             ->orderBy('id', 'desc')
             ->select([
-                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url'
+                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url','subtitle'
             ]);
 
         return $query->paginate($size);
