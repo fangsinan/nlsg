@@ -277,7 +277,7 @@ class AliUploadServers
             }
         }
         $data=[
-            'filename'=>$filename.'.'.$ext,
+            'filename'=>$filename,
             'ext'=>$ext,
             'filepath'=>$filePath
         ];
@@ -298,7 +298,7 @@ class AliUploadServers
             //上传阿里
             $ossClient = new OssClient(self::AccessKeyId, self::AccessKeySecret, $endpoint);
             // 设置文件名称
-            $object = '1111group/' . date('Ymd') . $filename ;//. '.' . $ext;
+            $object = '1111group/' . date('Ymd') . $filename . '.' . $ext;
             // 文件内容
             $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
             if ($doesres) {

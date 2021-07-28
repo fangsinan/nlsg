@@ -267,6 +267,9 @@ class AliUploadController extends Controller
             return $this->error(0, $e->getMessage());
         }
 
+        $len= strlen($fileextension)+1;
+        $filename= substr($filename,0,-$len); //去掉扩展名
+
         $AliUploadServer=new AliUploadServers();
         $RstData=$AliUploadServer->PushOSS($filename,$fileextension,$filePath);
         if($RstData['status']==1){
