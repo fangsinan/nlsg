@@ -1057,8 +1057,8 @@ class ImDocServers
                         }
 
                         $custom_elem_body = [
-//                            "goodsID" => $temp_msg_type == 10 ? $v->docInfo->content : (string)$v->docInfo->obj_id,
-                            "goodsID" => (string)$v->docInfo->obj_id,
+                            "goodsID" => $temp_msg_type == 10 ? $v->docInfo->subtitle : (string)$v->docInfo->obj_id,
+//                            "goodsID" => (string)$v->docInfo->obj_id,
                             "cover_pic" => $v->docInfo->cover_img,
                             "titleName" => $v->docInfo->content,
                             "subtitle" => $v->docInfo->subtitle,
