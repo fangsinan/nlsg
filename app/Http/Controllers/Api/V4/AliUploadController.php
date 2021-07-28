@@ -410,8 +410,8 @@ class AliUploadController extends Controller
                 $ext=$arr[count($arr)-1]; //扩展名
                 $data['format']=$ext;
                 if($type==1){ //视频
-                    $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
-                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
+                    $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
+                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
                     $data['thumb_url']=(empty($ruselt['data']['Video']['CoverURL']))?'':$ruselt['data']['Video']['CoverURL'];
                     if(!empty($data['thumb_url'])){
@@ -426,14 +426,14 @@ class AliUploadController extends Controller
                         $data['thumb_format']=$thumb_ext;
                     }
                 }else if($type==2){ //音频
-                    $data['size']=(empty($ruselt['data']['Video']['Size']))?'':$ruselt['data']['Video']['Size'];
-                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?'':$ruselt['data']['Video']['Duration'];
+                    $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
+                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
                 }else{ //图片
                     $data['file_name']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['OriginalFileName']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['OriginalFileName'];
-                    $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
-                    $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
-                    $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
+                    $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
+                    $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
+                    $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
                 }
 
                 $data['media_id'] = $videoid;
@@ -483,18 +483,23 @@ class AliUploadController extends Controller
 
         try {
             $AliUploadServer=new AliUploadServers();
-            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
-            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/46d7b74f9a396ce76539c1c8f8295b44.png?imageMogr2/';
-            $url= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png';
+            $url1='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
+            $url2='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/46d7b74f9a396ce76539c1c8f8295b44.png?imageMogr2/';
+            $url3= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png';
             //抓取音视频和图片
-            $url= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198';
-            $result = $AliUploadServer->UploadMediaByURL(3,$url);
-            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
-            $result = $AliUploadServer->UploadMediaByURL(1,$url);
-            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/29845510b9fe73f1ea290b7c2466277d.m4a';
-            $result = $AliUploadServer->UploadMediaByURL(2,$url);
-            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/f866-316743/7eca6acb927a86ba8580c8e0ce83ac84.txt';
-            $result = $AliUploadServer->UploadMediaByURL(4,$url);
+            $url4= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/cca8979fd71055639f493a914979c361?imageView2/3/w/198/h/198';
+            $result = $AliUploadServer->UploadMediaByURL(3,$url1);
+            $result = $AliUploadServer->UploadMediaByURL(3,$url2);
+            $result = $AliUploadServer->UploadMediaByURL(3,$url3);
+            $result = $AliUploadServer->UploadMediaByURL(3,$url4);
+
+
+//            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
+//            $result = $AliUploadServer->UploadMediaByURL(1,$url);
+//            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/29845510b9fe73f1ea290b7c2466277d.m4a';
+//            $result = $AliUploadServer->UploadMediaByURL(2,$url);
+//            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/f866-316743/7eca6acb927a86ba8580c8e0ce83ac84.txt';
+//            $result = $AliUploadServer->UploadMediaByURL(4,$url);
 
             if($result['status']==1){
                 return $this->success($result['data']);
