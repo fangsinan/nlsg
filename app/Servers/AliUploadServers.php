@@ -160,7 +160,7 @@ class AliUploadServers
         $urlkey='https://cos.ap-shanghai.myqcloud.com/';
         $Imglist = ImMsgContentImg::query()->where('media_id','=','')->where('url', 'like', $urlkey . '%')
             ->select(['id', 'size', 'width','height','url'])
-            ->limit(5)
+            ->limit(10)
             ->get();
         if($Imglist->isNotEmpty()){
             $ImgData=$Imglist->toArray();
