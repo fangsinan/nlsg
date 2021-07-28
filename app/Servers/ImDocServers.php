@@ -12,6 +12,7 @@ use App\Models\ImDocSendJobInfo;
 use App\Models\imDocSendJobLog;
 use App\Models\ImGroup;
 use App\Models\ImGroupUser;
+use App\Models\ImMedia;
 use App\Models\Live;
 use App\Models\LiveInfo;
 use App\Models\MallCategory;
@@ -65,15 +66,16 @@ class ImDocServers
         $status = $params['status'] ?? 1;
         $file_url = $params['file_url'] ?? '';
         $file_size = $params['file_size'] ?? 0;
-        $for_app = $params['for_app'] ?? 0;
+//        $for_app = $params['for_app'] ?? 0;
         $second = $params['second'] ?? 0;
         $format = $params['format'] ?? '';
         $img_size = $params['img_size'] ?? 0;
         $img_width = $params['img_width'] ?? 0;
         $img_height = $params['img_height'] ?? 0;
         $img_format = $params['img_format'] ?? 0;
-        $file_md5 = $params['file_md5'] ?? 0;
-        $img_md5 = $params['img_md5'] ?? 0;
+        $file_md5 = $params['file_md5'] ?? '';
+        $img_md5 = $params['img_md5'] ?? '';
+        $media_id = $params['media_id'] ?? '';
 
         if (!in_array($status, [1, 2])) {
             return ['code' => false, 'msg' => '状态错误'];
@@ -104,6 +106,46 @@ class ImDocServers
                 break;
             case 2:
                 //21音频 22视频 23图片 24文件
+                if (empty($media_id)) {
+                    return ['code' => false, 'msg' => '媒体id不能为空'];
+                }
+
+                $media_id_list = explode(',', $media_id);
+                $media_id_list = array_unique($media_id_list);
+                if ($params['type_info'] == 23) {
+                    $media_id = $media_id_list[0];
+                } else {
+                    if (count($media_id_list) > 1) {
+                        return ['code' => false, 'msg' => '媒体id错误'];
+                    }
+                }
+
+                $media_info = ImMedia::where('media_id', '=', $media_id)->first();
+                $media_info_type = 20 + $media_info->type;
+                if ($type_info != $media_info_type) {
+                    return ['code' => false, 'msg' => '媒体类型不匹配'];
+                }
+
+                if (empty($media_info)) {
+                    return ['code' => false, 'msg' => '媒体信息为空,请重试.'];
+                } else {
+                    $content = $media_info->file_name ?: $media_info->id;
+                    $file_url = $media_info->url;
+                    $format = $media_info->format;
+                    $file_size = $media_info->size;
+                    $second = $media_info->second;
+
+                    if ($params['type_info'] != 23) {
+                        $file_md5 = $media_id;
+                        $cover_img = $media_info->thumb_url;
+                        $img_size = $media_info->thumb_size ?: 200;
+                        $img_width = $media_info->thumb_width ?: 200;
+                        $img_height = $media_info->thumb_height ?: 200;
+                        $img_format = $media_info->thumb_format;
+                        $img_md5 = $media_id . '_' . 'c';
+                    }
+                }
+
                 if (empty($content)) {
                     return ['code' => false, 'msg' => '内容不能为空'];
                 }
@@ -113,15 +155,9 @@ class ImDocServers
                 if (empty($format)) {
                     return ['code' => false, 'msg' => '格式后缀名不能为空format'];
                 }
-
-
-                if (in_array($params['type_info'], [21, 22, 24])) {
-                    if (empty($file_size)) {
-                        return ['code' => false, 'msg' => 'file_size不能为空'];
-                    }
+                if (empty($file_size)) {
+                    return ['code' => false, 'msg' => 'file_size不能为空'];
                 }
-
-
                 if (in_array($params['type_info'], [21, 22])) {
                     if (empty($second)) {
                         return ['code' => false, 'msg' => 'second不能为空'];
@@ -140,14 +176,23 @@ class ImDocServers
                     }
                 }
                 if ($params['type_info'] == 23) {
-                    //url,size,width,height,md5
-                    $file_url = explode(';', $file_url);
-                    foreach ($file_url as $fuv) {
-                        $fuv = explode(',', $fuv);
-                        if (count($fuv) != 5) {
-                            return ['code' => false, 'msg' => '图片参数格式错误'];
-                        }
+//                    $media_id_list = explode(',', $media_id);
+                    $file_url = '';
+                    foreach ($media_id_list as $milv) {
+                        $temp_media_info = ImMedia::where('media_id', '=', $milv)->first();
+                        $temp_file_url = $temp_media_info->url . ',' . $temp_media_info->size . ',' .
+                            $temp_media_info->width . ',' . $temp_media_info->height . ',' . $milv . ';';
+                        $file_url .= $temp_file_url;
                     }
+
+                    //url,size,width,height,md5
+//                    $file_url = explode(';', $file_url);
+//                    foreach ($file_url as $fuv) {
+//                        $fuv = explode(',', $fuv);
+//                        if (count($fuv) != 5) {
+//                            return ['code' => false, 'msg' => '图片参数格式错误'];
+//                        }
+//                    }
                 }
                 break;
             case 3:
@@ -175,33 +220,34 @@ class ImDocServers
         $docModel->img_width = $img_width;
         $docModel->img_height = $img_height;
         $docModel->img_format = $img_format;
-        $docModel->img_format = $file_md5;
-        $docModel->img_format = $img_md5;
+        $docModel->file_md5 = $file_md5;
+        $docModel->img_md5 = $img_md5;
 
-        DB::beginTransaction();
+        return $docModel;
+//        DB::beginTransaction();
 
         $res = $docModel->save();
         if ($res === false) {
-            DB::rollBack();
+//            DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
 
-        if ($for_app == 1) {
-            $jobModel = new ImDocSendJob();
-            $jobModel->doc_id = $docModel->id;
-            $jobModel->status = 2;
-            $jobModel->send_type = 3;
-            $jobModel->is_done = 4;
-            $jobModel->month = date('Y-m');
-            $jobModel->day = date('Y-m-d');
-            $job_res = $jobModel->save();
-            if ($job_res === false) {
-                DB::rollBack();
-                return ['code' => false, 'msg' => '失败'];
-            }
-        }
+//        if ($for_app == 1) {
+//            $jobModel = new ImDocSendJob();
+//            $jobModel->doc_id = $docModel->id;
+//            $jobModel->status = 2;
+//            $jobModel->send_type = 3;
+//            $jobModel->is_done = 4;
+//            $jobModel->month = date('Y-m');
+//            $jobModel->day = date('Y-m-d');
+//            $job_res = $jobModel->save();
+//            if ($job_res === false) {
+//                DB::rollBack();
+//                return ['code' => false, 'msg' => '失败'];
+//            }
+//        }
 
-        DB::commit();
+//        DB::commit();
         return ['code' => true, 'msg' => '成功'];
 
     }

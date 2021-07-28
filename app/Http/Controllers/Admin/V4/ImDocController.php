@@ -37,19 +37,10 @@ class ImDocController extends ControllerBackend
      * @apiParam {number=1,2,3} type 类型(1商品 2附件 3文本)
      * @apiParam {number} type_info 详细类型(类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链 21音频 22视频 23图片 24文件 31文本)
      * @apiParam {number} [obj_id]  目标id(当type=1时需要传)
-     * @apiParam {string} content   内容或名称(如果是商品类型传商品的标题,外链类型传网址)
+     * @apiParam {string} content   内容或名称(type=1如果是商品类型传商品的标题,外链类型传网址)
      * @apiParam {string} [subtitle]   副标题(外链类型传网址说明名称)
-     * @apiParam {string} cover_img   封面图片(type_info等于22,11-16必穿)
-     * @apiParam {string} [second]   视频音频的时长(秒)
-     * @apiParam {string} [format]   格式后缀名
-     * @apiParam {string} [file_url]  附件地址,当type=2时需要传(如果是图片,格式url,size,width,height,md5;多个图片用分号隔开)
-     * @apiParam {string} [file_md5]  文件md5(type_info=22)
-     * @apiParam {string} [file_size]  文件大小(type_info=21,22,24)
-     * @apiParam {string} [img_size]  图片大小(type=22时必穿)
-     * @apiParam {string} [img_width]  图片宽度(type=22时必穿)
-     * @apiParam {string} [img_height]  图片高度(type=22时必穿)
-     * @apiParam {string} [img_format]  图片格式类型(type=22时必穿)
-     * @apiParam {string} [img_md5]  图片md5(type=22时必穿)
+     * @apiParam {string} cover_img   封面图片(type=1必穿)
+     * @apiParam {string} [media_id]  媒体id(type=2时必传,如果是图片,可逗号拼接多个)
      *
      *
      * @apiParamExample {json} Request-Example:
