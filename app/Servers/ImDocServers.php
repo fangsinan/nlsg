@@ -224,7 +224,6 @@ class ImDocServers
         $docModel->file_md5 = $file_md5;
         $docModel->img_md5 = $img_md5;
 
-        return $docModel;
 //        DB::beginTransaction();
 
         $res = $docModel->save();
