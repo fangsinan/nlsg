@@ -184,7 +184,6 @@ class AliUploadServers
             $ImgData=$Imglist->toArray();
             foreach ($ImgData as $key=>$val){
                 self::UploadMediaByURL(3,$val['url'],$val);
-                return ;
             }
         }
         return 'OK';
