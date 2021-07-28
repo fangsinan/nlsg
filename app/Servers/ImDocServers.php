@@ -224,7 +224,6 @@ class ImDocServers
         $docModel->img_format = $img_format;
         $docModel->file_md5 = $file_md5;
         $docModel->img_md5 = $img_md5;
-        $docModel->url = $url;
 
 //        DB::beginTransaction();
 
@@ -267,7 +266,7 @@ class ImDocServers
         $query->where('status', '=', 1)
             ->orderBy('id', 'desc')
             ->select([
-                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url', 'subtitle', 'url'
+                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url', 'subtitle'
             ]);
 
         return $query->paginate($size);
@@ -1064,7 +1063,6 @@ class ImDocServers
                             "titleName" => $v->docInfo->content,
                             "subtitle" => $v->docInfo->subtitle,
                             "type" => (string)$temp_msg_type,
-                            "url" => $v->docInfo->url,
                         ];
 
                         $custom_elem_body = json_encode($custom_elem_body);
