@@ -25,7 +25,49 @@ class ImFriendController extends Controller
 {
 
 
+    /**
+     * @api {post} /api/v4/im_friend/friend_check  校验用户关系
+     * @apiName friend_check
+     * @apiVersion 1.0.0
+     * @apiGroup im_friend
+     *e
+     * @apiParam {int} From_Account  需要校验该 UserID 的好友
+     * @apiParam {array} To_Account  请求校验的好友的 UserID 列表
+     *
+     * @apiSuccess {string} Relation  CheckResult_Type_BothWay	From_Account 的好友表中有 To_Account，To_Account 的好友表中也有 From_Account
+                            CheckResult_Type_AWithB	From_Account 的好友表中有 To_Account，但 To_Account 的好友表中没有 From_Account
+                            CheckResult_Type_BWithA	From_Account 的好友表中没有 To_Account，但 To_Account 的好友表中有 From_Account
+                            CheckResult_Type_NoRelation	From_Account 的好友表中没有 To_Account，To_Account 的好友表中也没有 From_Account
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function friendCheck(Request $request){
+        $params    = $request->input();
 
+        if( empty($params['From_Account']) || empty($params['To_Account']) || !is_array($params['To_Account']) ){
+            return $this->error('0','request From_Account or To_Account error');
+        }
+
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_check");
+        $post_data = [
+            'From_Account'  => $params['From_Account'],
+            'To_Account'    => $params['To_Account'],
+            'CheckType'     => 'CheckResult_Type_Both',
+        ];
+
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+
+        return $this->success($res['InfoItem'] ?? []);
+
+    }
 
 
     /**
