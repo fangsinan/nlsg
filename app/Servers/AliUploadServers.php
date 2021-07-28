@@ -6,6 +6,7 @@ use AlibabaCloud\Client\Exception\ClientException;
 use AlibabaCloud\Client\Exception\ServerException;
 
 use App\Models\ImMedia;
+use App\Models\ImMsgContentImg;
 use Illuminate\Support\Facades\DB;
 
 use OSS\OssClient;
@@ -153,8 +154,25 @@ class AliUploadServers
 
     }
 
+    //定时抓取
+    public function UploadMediaPull(){
+        //获取图片
+        $urlkey='https://cos.ap-shanghai.myqcloud.com/';
+        $Imglist = ImMsgContentImg::query()->where(['media_id'=>0])->where('url', 'like', $urlkey . '%')
+            ->select(['id', 'size', 'width','height','url'])
+            ->limit(10)
+            ->get();
+        if($Imglist->isNotEmpty()){
+            $ImgData=$Imglist->toArray();
+            foreach ($ImgData as $key=>$val){
+                self::UploadMediaByURL(3,$val['url'],$val);
+            }
+        }
+
+    }
+
     //音视频拉取文件 https://help.aliyun.com/document_detail/100976.html?spm=a2c4g.11186623.6.1031.30f6d418f1Hpzw
-    public function UploadMediaByURL($type,$url){
+    public function UploadMediaByURL($type='',$url='',$info=[]){
 
         if(in_array($type,[1,2,3])){
             require_once base_path('vendor').DIRECTORY_SEPARATOR . 'voduploadsdk' . DIRECTORY_SEPARATOR . 'Autoloader.php';
@@ -162,20 +180,15 @@ class AliUploadServers
         }
         $now_date=date('Y-m-d H:i:s');
         if (in_array($type,[1,2])) { //拉取音视频
-            $arr=explode('.',$url);
-            $filename=md5($url); //文件名
-            $ext=$arr[count($arr)-1]; //扩展名
-            $filePath=storage_path('logs/'.$filename.'.'.$ext);
-            if(!file_exists($filePath)) {
-                try {
-                    file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
-                } catch (\Exception $e) {
-                    return ['status' => 0, 'data' => [], 'msg' => $url . '下载异常：' . $e->getMessage()];
-                }
+
+            //下载文件
+            $DownRst=self::GetUrlDownload($url);
+            if($DownRst['status']!=1){
+                return $DownRst;
             }
 
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
-            $uploadVideoRequest = new \UploadVideoRequest($filePath, '测试上传视频');
+            $uploadVideoRequest = new \UploadVideoRequest($DownRst['data']['filepath'], $DownRst['data']['filename'].'.'.$DownRst['data']['ext']);
             $uploadVideoRequest->setCateId(self::TypeArr[$type]);
             $uploadVideoRequest->setStorageLocation(self::StorageLocation);
             if($type==1) { //视频
@@ -186,7 +199,9 @@ class AliUploadServers
         }else if($type==3){//拉取图片
 
             $filename=md5($url); //文件名
-            $ext='png'; //扩展名
+            $ImgType=getimagesize($url);
+            $arr=explode('/',$ImgType['mime']);
+            $ext=$arr[1]; //获取扩展名
             $filePath=storage_path('logs/'.$filename.'.'.$ext);
             if(!file_exists($filePath)) {
                 try {
@@ -197,7 +212,7 @@ class AliUploadServers
             }
             //上传图片
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
-            $uploadImageRequest = new \UploadImageRequest($filePath, '测试图片上传');
+            $uploadImageRequest = new \UploadImageRequest($filePath, $filename.'.'.$ext);
             $uploadImageRequest->setCateId(self::TypeArr[3]);
             $res = $uploader->uploadLocalImage($uploadImageRequest);
             $new_url=$res['ImageURL'];
