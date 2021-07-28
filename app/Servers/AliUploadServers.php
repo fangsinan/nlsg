@@ -384,7 +384,7 @@ class AliUploadServers
 
             if (! $dataBlock) return false;
         }
-
+        return $dataBlock;
         // 将读取的图片信息转化为图片路径并获取图片信息,经测试,这里的转化设置 jpeg 对获取png,gif的信息没有影响,无须分别设置
         // 有些图片虽然可以在浏览器查看但实际已被损坏可能无法解析信息
         $size = getimagesize('data://image/jpeg;base64,'. base64_encode($dataBlock));
