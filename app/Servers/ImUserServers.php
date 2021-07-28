@@ -3,6 +3,7 @@
 
 namespace App\Servers;
 
+use App\Models\ImUserFriend;
 use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\User;
@@ -151,4 +152,21 @@ class ImUserServers
 
         return $res;
     }
+
+    public function friendsList($params, $user_id)
+    {
+        $size = $params['size'] ?? 10;
+
+        $query = ImUserFriend::query()
+            ->where('from_account', '=', $user_id)
+            ->where('status', '=', 1);
+
+        $query->with(['UserInfo:id,phone,nickname'])->has('UserInfo');
+        $query->select([
+            'id', 'from_account', 'from_name', 'to_account', 'to_name', 'created_at'
+        ]);
+
+        return $query->paginate($size);
+    }
+
 }

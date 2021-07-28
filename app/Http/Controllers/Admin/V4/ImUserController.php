@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class ImUserController extends ControllerBackend
 {
     /**
-     * @api {post} api/admin_v4/im_user/list 用户列表
+     * @api {get} api/admin_v4/im_user/list 用户列表
      * @apiVersion 4.0.0
      * @apiName  api/admin_v4/im_user/list
      * @apiGroup 后台-用户列表与信息
@@ -114,4 +114,21 @@ class ImUserController extends ControllerBackend
         $data = $servers->list($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
+
+
+    /**
+     * @api {get} api/admin_v4/im_user/friends_list 好友列表
+     * @apiVersion 4.0.0
+     * @apiName  api/admin_v4/im_user/friends_list
+     * @apiGroup 后台-用户列表与信息
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_user/friends_list
+     * @apiDescription 好友列表
+     */
+    public function friendsList(Request $request)
+    {
+        $servers = new ImUserServers();
+        $data = $servers->friendsList($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
+    }
+
 }
