@@ -399,6 +399,7 @@ class AliUploadController extends Controller
                     $action="GetVideoInfo";
                 }
                 $ruselt=$AliUploadServer->AlibabaCloudRpcRequest($action,$query);
+
                 if($ruselt['status']!=1){
                     return $this->error(0, '获取保存失败');
                 }
@@ -427,6 +428,21 @@ class AliUploadController extends Controller
                     $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
                     $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
                     $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
+
+                    // 测试的图片链接
+                    echo '<pre>';
+                    $result = $AliUploadServer->myGetImageSize('http://s6.mogujie.cn/b7/bao/120630/2kpa6_kqywusdel5bfqrlwgfjeg5sckzsew_345x483.jpg_225x999.jpg', 'curl');
+                    print_r($result);
+                    echo '<hr />';
+                    $result =$AliUploadServer-> myGetImageSize('http://s5.mogujie.cn/b7/bao/120629/6d3or_kqytasdel5bgevsugfjeg5sckzsew_801x1193.jpg', 'fread');
+                    print_r($result);
+                    echo '<hr />';
+                    $result = $AliUploadServer->myGetImageSize('http://hiphotos.baidu.com/zhengmingjiang/pic/item/1c5f338c6d22d797503d92f9.jpg', 'fread', true);
+                    print_r($result);
+                    echo '<hr />';
+                    $result = $AliUploadServer->myGetImageSize('http://www.vegandocumentary.com/wp-content/uploads/2009/01/imveganlogotransparentbackground.png', 'curl', true);
+                    print_r($result);
+                    print_r($result);
                 }
 
                 $data['media_id'] = $videoid;
