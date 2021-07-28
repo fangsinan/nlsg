@@ -438,7 +438,7 @@ class AliUploadController extends Controller
                 if ($rst === false) {
                     return $this->error(0, '保存失败');
                 }
-                return $this->success(['media_id'=>$videoid]);
+                return $this->success(['videoid'=>$videoid]);
              }else{ //文件
                 DB::beginTransaction();
                 $data['file_name'] = $name;
@@ -455,7 +455,7 @@ class AliUploadController extends Controller
                     return $this->error(0, '保存失败');
                 }
                 DB::commit();
-                return $this->success(['media_id'=>$rstId]);
+                return $this->success(['videoid'=>$rstId]);
             }
 
         } catch (\Exception $e) {
