@@ -77,6 +77,7 @@ class ImDocServers
         $file_md5 = $params['file_md5'] ?? '';
         $img_md5 = $params['img_md5'] ?? '';
         $media_id = $params['media_id'] ?? '';
+        $url = $params['url'] ?? '';
 
         if (!in_array($status, [1, 2])) {
             return ['code' => false, 'msg' => '状态错误'];
@@ -223,6 +224,7 @@ class ImDocServers
         $docModel->img_format = $img_format;
         $docModel->file_md5 = $file_md5;
         $docModel->img_md5 = $img_md5;
+        $docModel->url = $url;
 
 //        DB::beginTransaction();
 
@@ -265,7 +267,7 @@ class ImDocServers
         $query->where('status', '=', 1)
             ->orderBy('id', 'desc')
             ->select([
-                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url','subtitle'
+                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url', 'subtitle', 'url'
             ]);
 
         return $query->paginate($size);
@@ -744,10 +746,10 @@ class ImDocServers
                 break;
             case 7:
                 $lists = OfflineProducts::query()
-                    ->where('is_show','=',1)
-                    ->where('is_del','=',0)
+                    ->where('is_show', '=', 1)
+                    ->where('is_del', '=', 0)
                     ->select([
-                        'id','title','subtitle','cover_img',
+                        'id', 'title', 'subtitle', 'cover_img',
                         DB::raw('title as doc_content'),
                         DB::raw('1 as doc_type'),
                         DB::raw('18 as doc_type_info'),
@@ -1056,11 +1058,13 @@ class ImDocServers
                         }
 
                         $custom_elem_body = [
-                            "goodsID" => $temp_msg_type == 10 ? $v->docInfo->content : (string)$v->docInfo->obj_id,
+//                            "goodsID" => $temp_msg_type == 10 ? $v->docInfo->content : (string)$v->docInfo->obj_id,
+                            "goodsID" => (string)$v->docInfo->obj_id,
                             "cover_pic" => $v->docInfo->cover_img,
                             "titleName" => $v->docInfo->content,
                             "subtitle" => $v->docInfo->subtitle,
                             "type" => (string)$temp_msg_type,
+                            "url" => $v->docInfo->url,
                         ];
 
                         $custom_elem_body = json_encode($custom_elem_body);
