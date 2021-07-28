@@ -263,8 +263,8 @@ class AliUploadServers
     //从第三方源地址下载文件
     public function GetUrlDownload($url){
 
-        $arr = explode('.', $url);
         $filename = md5($url); //文件名
+        $arr = explode('.', $url);
         $ext = $arr[count($arr) - 1]; //扩展名
 
         // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
@@ -277,7 +277,7 @@ class AliUploadServers
             }
         }
         $data=[
-            'filename'=>$filename,
+            'filename'=>$filename.'.'.$ext,
             'ext'=>$ext,
             'filepath'=>$filePath
         ];
@@ -298,7 +298,7 @@ class AliUploadServers
             //上传阿里
             $ossClient = new OssClient(self::AccessKeyId, self::AccessKeySecret, $endpoint);
             // 设置文件名称
-            $object = '1111group/' . date('Ymd') . $filename . '.' . $ext;
+            $object = '1111group/' . date('Ymd') . $filename ;//. '.' . $ext;
             // 文件内容
             $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
             if ($doesres) {
