@@ -251,9 +251,9 @@ class ImFriendController extends Controller
 
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_add");
         $post_data = [
-            'From_Account'  =>  $params['From_Account'],
+            'From_Account'  =>  (string)$params['From_Account'],
             'AddFriendItem'     =>  [
-                [   'To_Account' => $params['To_Account'],
+                [   'To_Account' => (string)$params['To_Account'],
                     'AddSource'=>'AddSource_Type_'.$AddSource,
                     'AddWording'=>$params['AddWording'] ??'',
                 ]
