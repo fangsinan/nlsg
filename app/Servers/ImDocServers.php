@@ -17,6 +17,7 @@ use App\Models\Live;
 use App\Models\LiveInfo;
 use App\Models\MallCategory;
 use App\Models\MallGoods;
+use App\Models\OfflineProducts;
 use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
@@ -620,16 +621,21 @@ class ImDocServers
                 $where = [
                     'works.status' => 4,
                     'works.type' => 2,
-                    'works.is_audio_book' => 0
+//                    'works.is_audio_book' => 0
                 ];
                 $relationObj = new WorksCategoryRelation();
                 $worksObj = new Works();
                 $query = DB::table($relationObj->getTable(), ' relation')
-                    ->leftJoin($worksObj->getTable() . ' as works', 'works.id', '=', 'relation.work_id')
-                    ->leftJoin('nlsg_user as u', 'works.user_id', '=', 'u.id')
-                    ->select(['works.id', 'works.type', 'works.title', 'works.cover_img', 'works.price', 'works.subtitle',
-                        'works.title as doc_content', DB::raw('1 as doc_type'), DB::raw('12 as doc_type_info'),
+                    ->leftJoin($worksObj->getTable() . ' as works',
+                        'works.id', '=', 'relation.work_id')
+                    ->leftJoin('nlsg_user as u',
+                        'works.user_id', '=', 'u.id')
+                    ->select(['works.id', 'works.type', 'works.title', 'works.cover_img',
+                        'works.price', 'works.subtitle', 'works.title as doc_content', 'is_audio_book',
+                        DB::raw('if(is_audio_book=1,19,12) as doc_type_info'),
+                        DB::raw('1 as doc_type'),
                         'relation.category_id', 'works.is_end', 'u.nickname']);
+
                 if ($cate_id_arr && $category_id != 0) {
                     $query->whereIn('relation.category_id', $cate_id_arr);
                 }
@@ -737,6 +743,18 @@ class ImDocServers
                     ]
                 ];
                 break;
+            case 7:
+                $lists = OfflineProducts::query()
+                    ->where('is_show','=',1)
+                    ->where('is_del','=',0)
+                    ->select([
+                        'id','title','subtitle','cover_img',
+                        DB::raw('title as doc_content'),
+                        DB::raw('1 as doc_type'),
+                        DB::raw('18 as doc_type_info'),
+                        'price',
+                    ])
+                    ->paginate($size);
 
         }
         return $lists ?? [];
@@ -791,6 +809,11 @@ class ImDocServers
                         'id' => '100003',
                         'type' => 6,
                         'name' => '幸福360'
+                    ],
+                    [
+                        'id' => '100004',
+                        'type' => 7,
+                        'name' => '线下课'
                     ],
                 ]
             ]
