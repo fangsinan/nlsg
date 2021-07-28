@@ -236,14 +236,14 @@ class AliUploadServers
             $uploadImageRequest = new \UploadImageRequest($filePath, $filename.'.'.$ext);
             $uploadImageRequest->setCateId(self::TypeArr[3]);
             $res = $uploader->uploadLocalImage($uploadImageRequest);
-            var_dump($res);
-            return ;
             $new_url=$res['ImageURL'];
             $videoid=$res['ImageId']; //媒体id
             $file_name=$res['FileName']; //名称
 
         }
         if(in_array($type,[1,2,3])){
+            var_dump($info);
+            return ;
             DB::beginTransaction();
             $data = [
                 'type' => $type,
