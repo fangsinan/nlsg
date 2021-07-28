@@ -431,18 +431,19 @@ class AliUploadController extends Controller
 
                     // 测试的图片链接
                     echo '<pre>';
-                    $result = $AliUploadServer->myGetImageSize('http://s6.mogujie.cn/b7/bao/120630/2kpa6_kqywusdel5bfqrlwgfjeg5sckzsew_345x483.jpg_225x999.jpg', 'curl');
+                    $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'curl');
                     print_r($result);
                     echo '<hr />';
-                    $result =$AliUploadServer-> myGetImageSize('http://s5.mogujie.cn/b7/bao/120629/6d3or_kqytasdel5bgevsugfjeg5sckzsew_801x1193.jpg', 'fread');
+                    $result =$AliUploadServer-> myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'fread');
                     print_r($result);
                     echo '<hr />';
-                    $result = $AliUploadServer->myGetImageSize('http://hiphotos.baidu.com/zhengmingjiang/pic/item/1c5f338c6d22d797503d92f9.jpg', 'fread', true);
+                    $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'fread', true);
                     print_r($result);
                     echo '<hr />';
-                    $result = $AliUploadServer->myGetImageSize('http://www.vegandocumentary.com/wp-content/uploads/2009/01/imveganlogotransparentbackground.png', 'curl', true);
+                    $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'curl', true);
                     print_r($result);
                     print_r($result);
+                    return ;
                 }
 
                 $data['media_id'] = $videoid;
