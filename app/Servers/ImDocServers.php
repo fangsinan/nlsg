@@ -90,7 +90,7 @@ class ImDocServers
         switch (intval($params['type'])) {
             case 1:
                 // 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链
-                if ($type_info = 17) {
+                if ($type_info == 17) {
                     //判断网址
                 } else {
                     if (empty($obj_id)) {
