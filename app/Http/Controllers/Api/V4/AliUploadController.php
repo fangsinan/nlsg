@@ -432,17 +432,16 @@ class AliUploadController extends Controller
                     // 测试的图片链接
                     echo '<pre>';
                     $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'curl');
-                    print_r($result);
+                    var_dump($result);
                     echo '<hr />';
                     $result =$AliUploadServer-> myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'fread');
-                    print_r($result);
+                    var_dump($result);
                     echo '<hr />';
                     $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'fread', true);
-                    print_r($result);
+                    var_dump($result);
                     echo '<hr />';
                     $result = $AliUploadServer->myGetImageSize('http://audiovideo.ali.nlsgapp.com/13a3ba6d4f1b4c7ba1b585cad344562e/snapshots/8fa02b01e7c54e35ae666a7d353ed4fb-00005.jpg', 'curl', true);
-                    print_r($result);
-                    print_r($result);
+                    var_dump($result);
                     return ;
                 }
 
