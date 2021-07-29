@@ -60,9 +60,9 @@ class AliUploadServers
                 ->request();
             return ['status'=>1,'data'=>$result->toArray()];
         } catch (ClientException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
+            return ['status'=>0,'msg'=>$e->getErrorMessage().' '.$e->getLine().' '.$e->getFile()];
         } catch (ServerException $e) {
-            return ['status'=>0,'msg'=>$e->getErrorMessage()];
+            return ['status'=>0,'msg'=>$e->getErrorMessage().' '.$e->getLine().' '.$e->getFile()];
         }
 
     }

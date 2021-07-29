@@ -483,6 +483,19 @@ class AliUploadController extends Controller
 
         try {
             $AliUploadServer=new AliUploadServers();
+
+            //处理客户端上传拿不到宽高截图
+            $videoid='13a3ba6d4f1b4c7ba1b585cad344562e';
+            //查询信息
+            $rst=$AliUploadServer->getPlayInfo($videoid,true);
+            var_dump($rst);
+            $query=[
+                'VideoId' => $videoid,
+            ];
+            $action="GetVideoInfo";
+            $rst=$AliUploadServer->AlibabaCloudRpcRequest($action,$query);
+            var_dump($rst);
+            return ;
             /*$url1='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
             $url2='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/46d7b74f9a396ce76539c1c8f8295b44.png?imageMogr2/';
             $url3= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png';
@@ -493,12 +506,12 @@ class AliUploadController extends Controller
             $result = $AliUploadServer->UploadMediaByURL(3,$url3);
             $result = $AliUploadServer->UploadMediaByURL(3,$url4);*/
 
-//            $rst=$AliUploadServer->UploadMediaPull();
-//            var_dump($rst);
-//            return ;
-              $rst=$AliUploadServer->UploadMediaVideoAudio();
-              var_dump($rst);
-              return ;
+            /*$rst=$AliUploadServer->UploadMediaPull();
+            var_dump($rst);
+            return ;
+            $rst=$AliUploadServer->UploadMediaVideoAudio();
+            var_dump($rst);
+            return ;*/
 
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
             $result = $AliUploadServer->UploadMediaByURL(1,$url);
