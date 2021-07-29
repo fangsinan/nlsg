@@ -86,10 +86,11 @@ class ImMsg extends Base
                     $res[$key]['Size']  = $media['size'];
                     $res[$key]['Second']  = $media['second'];
                     $res[$key]['Url']  = $val['Url'];
+                    $res[$key]['UUID']  = md5($val['Url']);
                     break;
                 case 'TIMImageElem' ://图片元素
 
-                    $res[$key]['uuid']          = $media['uuid'];
+                    $res[$key]['UUID']          = md5($val['Url']);
                     $res[$key]['ImageFormat']   = $media['format'];
                     $res[$key]['imginfo'] = [
                         [
@@ -120,6 +121,7 @@ class ImMsg extends Base
                     $res[$key]['FileSize']  = $media['size'];
                     $res[$key]['FileName']  = $val['FileName'];
                     $res[$key]['Url']       = $val['Url'];
+                    $res[$key]['UUID']       = md5($val['Url']);
                     break;
 
                 case 'TIMVideoFileElem' : //视频类型元素
@@ -129,7 +131,7 @@ class ImMsg extends Base
                     $res[$key]['VideoFormat']   = $media['format'];
                     $res[$key]['video_uuid']    = $media['uuid']; //视频uuid
 
-                    $res[$key]['uuid']          = $media['thumb_uuid'];//封面图uuid
+                    $res[$key]['UUID']          = $media['thumb_uuid'];//封面图uuid
                     $res[$key]['ThumbUrl']      = $media['thumb_url'];
                     $res[$key]['ThumbSize']     = $media['thumb_size'];
                     $res[$key]['ThumbWidth']    = $media['thumb_width'];
@@ -181,6 +183,7 @@ class ImMsg extends Base
                     $msg_content_add['Url']             = $val['Url'];
                     $msg_content_add['Size']            = $val['Size']??0;
                     $msg_content_add['Second']          = $val['Second']??0;
+                    $msg_content_add['UUID']            = $val['UUID']??'';
                     $msg_content_add['Download_Flag']   = 2;
                     break;
                 case 'TIMImageElem' ://图片元素
@@ -196,7 +199,7 @@ class ImMsg extends Base
                             ];
                         }
                     }
-                    $msg_content_add['UUID']         = ($val['uuid']);
+                    $msg_content_add['UUID']         = ($val['UUID']);
                     $msg_content_add['ImageFormat']         = $val['ImageFormat'];
 
                     break;
@@ -205,6 +208,7 @@ class ImMsg extends Base
                     $msg_content_add['FileSize']        = $val['FileSize']??0;
                     $msg_content_add['FileName']        = $val['FileName'];
                     $msg_content_add['Download_Flag']   = 2;
+                    $msg_content_add['UUID']            = ($val['UUID']);
                     break;
 
                 case 'TIMVideoFileElem' : //视频类型元素
@@ -214,7 +218,7 @@ class ImMsg extends Base
                     $msg_content_add['VideoFormat']         = $val['VideoFormat']??0;
                     $msg_content_add['VideoDownloadFlag']   = 2;
                     $msg_content_add['VideoUUID']           = $val['video_uuid']??'';
-                    $msg_content_add['ThumbUUID']           = $val['uuid']??'';
+                    $msg_content_add['ThumbUUID']           = $val['UUID']??'';
                     $msg_content_add['ThumbUrl']            = $val['ThumbUrl']??'';
                     $msg_content_add['ThumbSize']           = $val['ThumbSize']??0;
                     $msg_content_add['ThumbWidth']          = $val['ThumbWidth']??0;
