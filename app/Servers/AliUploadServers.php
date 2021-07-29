@@ -157,7 +157,7 @@ class AliUploadServers
 
     //定时抓取图片
     public  function UploadMediaPull(){
-        Log::channel('aliOnDemandLog')->info('-----------定时抓取图片----------');
+        Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片开始----------');
         try {
             //获取图片
             $urlkey = 'https://cos.ap-shanghai.myqcloud.com/';
@@ -168,13 +168,13 @@ class AliUploadServers
             if ($Imglist->isNotEmpty()) {
                 $ImgData = $Imglist->toArray();
                 foreach ($ImgData as $key => $val) {
-                    Log::channel('aliOnDemandLog')->info(json_encode($val, true));
                     self::UploadMediaByURL(3, $val['url'], $val);
                 }
             }
         }catch (\Exception $e){
-            Log::channel('aliOnDemandLog')->info('定时抓取图片异常：'.$e->getMessage());
+            Log::channel('aliCrontabPullLog')->info('定时抓取图片异常：'.$e->getMessage());
         }
+        Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片结束----------');
         return 'OK';
 
     }
