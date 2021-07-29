@@ -21,6 +21,10 @@ class ImUserServers
             $query->where('id', '=', $params['id']);
         }
 
+        if (!empty($params['phone']) ?? ''){
+            $query->where('phone','like','%'.$params['phone'].'%');
+        }
+
         //性别
         $sex = $params['sex'] ?? -1;
         if ($sex >= 0) {
