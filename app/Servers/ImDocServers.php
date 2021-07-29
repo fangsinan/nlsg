@@ -225,6 +225,7 @@ class ImDocServers
         $docModel->img_format = $img_format;
         $docModel->file_md5 = $file_md5;
         $docModel->img_md5 = $img_md5;
+        $docModel->media_id = $media_id;
 
 //        DB::beginTransaction();
 
@@ -257,7 +258,7 @@ class ImDocServers
     public function list($params)
     {
         $size = $params['size'] ?? 10;
-        $query = ImDoc::query();
+        $query = ImDoc::query()->with(['mediaInfo']);
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
         }
@@ -267,7 +268,7 @@ class ImDocServers
         $query->where('status', '=', 1)
             ->orderBy('id', 'desc')
             ->select([
-                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url', 'subtitle'
+                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url', 'subtitle','media_id'
             ]);
 
         return $query->paginate($size);
