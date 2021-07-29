@@ -50,23 +50,28 @@ class ImMsg extends Base
         foreach ($params_msg as $key=>$val) {
             $res[$key]['MsgType'] = $val['MsgType'];
 
+            $media_data = ImMedia::where(['media_id'=>$val['videoid']])->first();
+            if(empty($media_data)) {
+                return [];
+            }
             //查询媒体表详情
             $media = [
-                'size'          => 130, //大小
-                'second'        => 20, //时长
-                'uuid'          => 'ywuiabaguw', //uuid
+                'size'          => $media_data['size']??0, //大小
+                'second'        => $media_data['second'], //时长
+                'uuid'          => md5($val['Url']), //uuid
                 'format'        => 255, //格式
-                'width'        => 102,
-                'height'        => 202,
+                'width'         => $media_data['width'],
+                'height'        => $media_data['height'],
 
                 //封面图
-                'thumb_uuid'        => '1231231',
-                'thumb_url'        => 'http://xxx/3200490432214177468_144115198371610486_D61040894AC3DE44CDFFFB3EC7EB720F/0',
-                'thumb_size'        => 130,
-                'thumb_width'        => 102,
-                'thumb_height'        => 202,
-                'thumb_format'        => 255,
+                'thumb_uuid'    => md5($val['thumb_url']),
+                'thumb_url'     => $media_data['thumb_url'],
+                'thumb_size'    => $media_data['thumb_size'],
+                'thumb_width'   => $media_data['thumb_width'],
+                'thumb_height'  => $media_data['thumb_height'],
+                'thumb_format'  => 255,
             ];
+
 
             switch ($val['MsgType']){
                 case 'TIMTextElem' :  //文本消息元素
@@ -121,11 +126,11 @@ class ImMsg extends Base
                     $res[$key]['video_uuid']    = $media['uuid']; //视频uuid
 
                     $res[$key]['uuid']          = $media['thumb_uuid'];//封面图uuid
-                    $res[$key]['ThumbUrl']      = $media['thumb_url'];//封面图uuid
-                    $res[$key]['ThumbSize']     = $media['thumb_size'];//封面图uuid
-                    $res[$key]['ThumbWidth']    = $media['thumb_width'];//封面图uuid
-                    $res[$key]['ThumbHeight']   = $media['thumb_height'];//封面图uuid
-                    $res[$key]['ThumbFormat']   = $media['thumb_format'];//封面图uuid
+                    $res[$key]['ThumbUrl']      = $media['thumb_url'];
+                    $res[$key]['ThumbSize']     = $media['thumb_size'];
+                    $res[$key]['ThumbWidth']    = $media['thumb_width'];
+                    $res[$key]['ThumbHeight']   = $media['thumb_height'];
+                    $res[$key]['ThumbFormat']   = $media['thumb_format'];
 
                     break;
 
