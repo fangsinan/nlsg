@@ -297,12 +297,6 @@ class AliUploadServers
                 $data['size']=$info['size'];
                 $data['width']=$info['width'];
                 $data['height']=$info['height'];
-                //更新数据
-                $upRst=ImMsgContentImg::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
-                if ($upRst === false) {
-                    DB::rollBack();
-                    return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
-                }
             }else{
                 $data['content_id']= $info['id'];
                 $data['file_name']=$filename;
@@ -322,6 +316,20 @@ class AliUploadServers
                     $data['size']=$info['size'];
                     $data['second']=$info['second'];
                 }
+            }
+            $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
+            if ($rst === false) {
+                DB::rollBack();
+                return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
+            }
+            if($type==3){ //图片
+                //更新数据
+                $upRst=ImMsgContentImg::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
+                if ($upRst === false) {
+                    DB::rollBack();
+                    return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
+                }
+            }else{
                 //更新数据
                 $upRst=ImMsgContent::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
                 if ($upRst === false) {
@@ -329,12 +337,6 @@ class AliUploadServers
                     return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
                 }
             }
-            $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
-            if ($rst === false) {
-                DB::rollBack();
-                return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
-            }
-
             DB::commit();
             unlink($filePath);
             return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
