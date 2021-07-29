@@ -50,7 +50,7 @@ class ImMsg extends Base
         foreach ($params_msg as $key=>$val) {
             $res[$key]['MsgType'] = $val['MsgType'];
 
-            $media_data = ImMedia::where(['media_id'=>$val['videoid']])->first();
+            $media_data = ImMedia::where(['media_id'=>$val['videoId']])->first();
             if(empty($media_data)) {
                 return [];
             }
@@ -64,7 +64,7 @@ class ImMsg extends Base
                 'height'        => $media_data['height'],
 
                 //封面图
-                'thumb_uuid'    => md5($val['thumb_url']),
+                'thumb_uuid'    => md5($media_data['thumb_url']),
                 'thumb_url'     => $media_data['thumb_url'],
                 'thumb_size'    => $media_data['thumb_size'],
                 'thumb_width'   => $media_data['thumb_width'],
