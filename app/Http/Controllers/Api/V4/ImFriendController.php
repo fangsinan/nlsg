@@ -11,6 +11,7 @@ use App\Models\ImUser;
 use App\Models\ImUserBlacklist;
 use App\Models\ImUserFriend;
 use App\Models\User;
+use App\Servers\ImFriendServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Libraries\ImClient;
@@ -49,24 +50,10 @@ class ImFriendController extends Controller
     }
      */
     public function friendCheck(Request $request){
-        $params    = $request->input();
 
-        if( empty($params['From_Account']) || empty($params['To_Account']) || !is_array($params['To_Account']) ){
-            return $this->error('0','request From_Account or To_Account error');
-        }
-
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_check");
-        $post_data = [
-            'From_Account'  => (string)$params['From_Account'],
-            'To_Account'    => $params['To_Account'],
-            'CheckType'     => 'CheckResult_Type_Both',
-        ];
-
-        $res = ImClient::curlPost($url,json_encode($post_data));
-        $res = json_decode($res,true);
-
-        return $this->success($res['InfoItem'] ?? []);
-
+        $imObj = new ImFriendServers();
+        $data = $imObj->friendCheck($request->input());
+        return $this->getRes($data);
     }
 
 
@@ -88,47 +75,10 @@ class ImFriendController extends Controller
     }
      */
     public function getPortrait(Request $request){
-        $params    = $request->input();
 
-        if( empty($params['user_id']) ){
-            return $this->error('0','request user_id error');
-        }
-        $user = ImMsgController::getImUser([$params['user_id']]);
-
-        if(!empty($user)){
-            foreach ($user as $key=>$value) {
-                $is_user = ImUser::where(['tag_im_to_account'=>$key ])->first();
-
-                $data = [
-                    'tag_im_to_account'     => $params['user_id'],
-                    'tag_im_nick'           => $value['Tag_Profile_IM_Nick']??'',
-                    'tag_im_gender'         => $value['Tag_Profile_IM_Gender']??'',
-                    'tag_im_birth_day'      => $value['Tag_Profile_IM_BirthDay']??'',
-                    'tag_im_location'       => $value['Tag_Profile_IM_Location']??'',
-                    'tag_im_self_signature' => $value['Tag_Profile_IM_SelfSignature']??'',
-                    'tag_im_allow_type'     => $value['Tag_Profile_IM_AllowType']??'',
-                    'tag_im_language'       => $value['Tag_Profile_IM_Language']??'',
-                    'tag_im_image'          => $value['Tag_Profile_IM_Image']??'',
-                    'tag_im_msg_settings'   => $value['Tag_Profile_IM_MsgSettings']??'',
-                    'tag_im_admin_forbid_type'  => $value['Tag_Profile_IM_AdminForbidType']??'',
-                    'tag_im_level'          => $value['Tag_Profile_IM_Level']??0,
-                    'tag_im_role'           => $value['Tag_Profile_IM_Role']??0,
-                    'created_at'            => date("y-m-d H:i:s"),
-                    'updated_at'            => date("y-m-d H:i:s"),
-                ];
-
-                if(empty($is_user)){
-                    //add
-                    ImUser::insert($data);
-                }else{
-                    //edit
-                    ImUser::where(['tag_im_to_account'=>$params['user_id']])->update($data);
-                }
-            }
-        }
-
-        return $this->success();
-
+        $imObj = new ImFriendServers();
+        $data = $imObj->getPortrait($request->input());
+        return $this->getRes($data);
     }
 
 
@@ -226,47 +176,10 @@ class ImFriendController extends Controller
     }
      */
     public function addFriend(Request $request){
-        $params    = $request->input();
 
-        if( empty($params['From_Account']) || empty($params['To_Account']) ){
-            return $this->error('0','request From_Account or To_Account error');
-        }
-        $user = ImUserFriend::where(['from_account'=>$params['From_Account'], 'to_account'=>$params['To_Account'],'status'=>1])->first();
-        if(!empty($user)){
-            return $this->success([],0,'已经是好友');
-        }
-        $os_type = empty($params['os_type']) ?3:$params['os_type'];
-
-        switch ($os_type){
-            case 1:
-                $AddSource = 'Android'; break;
-            case 2:
-                $AddSource = 'Ios';     break;
-            case 3:
-                $AddSource = 'Web';     break;
-            default:
-                $AddSource = 'web';     break;
-        }
-
-
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_add");
-        $post_data = [
-            'From_Account'  =>  (string)$params['From_Account'],
-            'AddFriendItem'     =>  [
-                [   'To_Account' => (string)$params['To_Account'],
-                    'AddSource'=>'AddSource_Type_'.$AddSource,
-                    'AddWording'=>$params['AddWording'] ??'',
-                ]
-            ]
-        ];
-        $res = ImClient::curlPost($url,json_encode($post_data));
-        $res = json_decode($res,true);
-
-        if ($res['ActionStatus'] == 'OK'){
-            return $this->success();
-        }else{
-            return $this->error(0,$res['ErrorCode'],$res['ErrorInfo']);
-        }
+        $imObj = new ImFriendServers();
+        $data = $imObj->addFriend($request->input());
+        return $this->getRes($data);
     }
 
     /**
@@ -288,25 +201,10 @@ class ImFriendController extends Controller
     }
      */
     public function delFriend(Request $request){
-        $params    = $request->input();
 
-        if( empty($params['From_Account']) || empty($params['To_Account']) || !is_array($params['To_Account']) ){
-            return $this->error('0','request From_Account or To_Account error');
-        }
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_delete");
-        $post_data = [
-            'From_Account'  =>  $params['From_Account'],
-            'To_Account'    =>  $params['To_Account'],
-            'DeleteType'    => "Delete_Type_Both",
-        ];
-        $res = ImClient::curlPost($url,json_encode($post_data));
-        $res = json_decode($res,true);
-
-        if ($res['ActionStatus'] == 'OK'){
-            return $this->success();
-        }else{
-            return $this->error(0,$res['ErrorCode'],$res['ErrorInfo']);
-        }
+        $imObj = new ImFriendServers();
+        $data = $imObj->delFriend($request->input());
+        return $this->getRes($data);
     }
 
 
