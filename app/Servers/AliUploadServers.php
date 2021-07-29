@@ -6,6 +6,7 @@ use AlibabaCloud\Client\Exception\ClientException;
 use AlibabaCloud\Client\Exception\ServerException;
 
 use App\Models\ImMedia;
+use App\Models\ImMsgContent;
 use App\Models\ImMsgContentImg;
 use Illuminate\Support\Facades\DB;
 
@@ -33,6 +34,7 @@ class AliUploadServers
         '5'=>2899, //待删除
     ];
     public static $IMAGES_URL = 'https://audiovideo.ali.nlsgapp.com/';
+    public static $ImUrlKey = 'https://cos.ap-shanghai.myqcloud.com/';
 
     //初始化
     public function initVodClient($accessKeyId=self::AccessKeyId, $accessKeySecret=self::AccessKeySecret) {
@@ -157,42 +159,72 @@ class AliUploadServers
 
     //定时抓取图片
     public  function UploadMediaPull(){
-        Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片开始----------');
+
         try {
             //获取图片
-            $urlkey = 'https://cos.ap-shanghai.myqcloud.com/';
-            $Imglist = ImMsgContentImg::query()->where('media_id', '=', '')->where('url', 'like', $urlkey . '%')
+            $Imglist = ImMsgContentImg::query()->where('media_id', '=', '')->where('url', 'like', self::$ImUrlKey . '%')
                 ->select(['id', 'size', 'width', 'height', 'url'])
                 ->limit(10)
                 ->get();
             if ($Imglist->isNotEmpty()) {
                 $ImgData = $Imglist->toArray();
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片开始----------');
                 foreach ($ImgData as $key => $val) {
                     self::UploadMediaByURL(3, $val['url'], $val);
                 }
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片结束----------');
             }
         }catch (\Exception $e){
             Log::channel('aliCrontabPullLog')->info('定时抓取图片异常：'.$e->getMessage());
         }
-        Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片结束----------');
+
         return 'OK';
 
     }
 
     //定时抓取音视频 文件
     public function UploadMediaVideoAudio(){
-        //获取图片
-        $urlkey='https://cos.ap-shanghai.myqcloud.com/';
-        $Imglist = ImMsgContentImg::query()->where('media_id','=','')->where('url', 'like', $urlkey . '%')
-            ->select(['id', 'size', 'width','height','url'])
-            ->limit(10)
-            ->get();
-        if($Imglist->isNotEmpty()){
-            $ImgData=$Imglist->toArray();
-            foreach ($ImgData as $key=>$val){
-                self::UploadMediaByURL(3,$val['url'],$val);
+
+        try {
+            //获取文件
+            $query= ImMsgContent::query()->whereIn('msg_type', ['TIMSoundElem', 'TIMFileElem', 'TIMVideoFileElem'])->where('media_id', '=', '');
+            $query->where(function ($query) {
+                    $query->where('url', 'like',self::$ImUrlKey. '%')->orWhere('video_url', 'like',self::$ImUrlKey. '%');
+                })
+                ->select(['id', 'msg_id', 'msg_type', 'data', 'url', 'size', 'second', 'download_flag', 'uuid', 'image_format', 'file_size', 'file_name', 'video_url', 'video_format', 'thumb_url',
+                    'thumb_size', 'thumb_height', 'thumb_width', 'thumb_format','created_at'])
+                ->orderBy('id','desc')
+                ->limit(10);
+//            echo $query->toSql().PHP_EOL;
+//            $query->dd(); //dd 阻断流程
+            $Filelist=$query->get();
+            if ($Filelist->isNotEmpty()) {
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取文件开始----------');
+                $FileData = $Filelist->toArray();
+                foreach ($FileData as $key => $val) {
+                    switch ($val['msg_type']) {
+                        case 'TIMSoundElem':
+                            $type = 2;
+                            $url = $val['url'];
+                            break;
+                        case 'TIMFileElem':
+                            $type = 4;
+                            $url = $val['url'];
+                            break;
+                        case 'TIMVideoFileElem':
+                            $type = 1;
+                            $url = $val['video_url'];
+                            break;
+                    }
+
+                    self::UploadMediaByURL($type, $url, $val);
+                }
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取文件结束----------');
             }
+        }catch (\Exception $e){
+            Log::channel('aliCrontabPullLog')->info('定时抓取文件异常：'.$e->getMessage());
         }
+
         return 'OK';
 
     }
@@ -224,6 +256,8 @@ class AliUploadServers
             $res = $uploader->uploadLocalVideo($uploadVideoRequest);
             $new_url=self::$IMAGES_URL.$res['UploadAddress'];
             $videoid=$res['VideoId']; //媒体id
+            $filename=$res['UploadAddress']; //名称
+
         }else if($type==3){//拉取图片
 
             $filename=md5($url); //文件名
@@ -253,16 +287,15 @@ class AliUploadServers
             $data = [
                 'type' => $type,
                 'url' => $new_url,
-                'content_img_id' => $info['id'],
+                'media_id'=>$videoid,
                 'created_at' => $now_date
             ];
-            $data['media_id'] = $videoid;
             if($type==3){ //图片
+                $data['content_img_id']= $info['id'];
                 $data['file_name']=$file_name;
                 $data['size']=$info['size'];
                 $data['width']=$info['width'];
                 $data['height']=$info['height'];
-
                 //更新数据
                 $upRst=ImMsgContentImg::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
                 if ($upRst === false) {
@@ -270,7 +303,30 @@ class AliUploadServers
                     return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
                 }
             }else{
-
+                $data['content_id']= $info['id'];
+                $data['file_name']=$filename;
+                if($type==1){ //视频
+                    $data['format']= $info['video_format'];
+                    $data['size']=$info['size'];
+                    $data['second']=$info['second'];
+                    $data['thumb_url']=$info['thumb_url'];
+                    $data['thumb_width']=$info['thumb_width'];
+                    $data['thumb_height']=$info['thumb_height'];
+                    $data['thumb_size']=$info['thumb_size'];
+                    $data['thumb_format']=$info['thumb_format'];
+                }else{ //音频
+                    $arr=explode('.',$url);
+                    $ext=$arr[count($arr)-1]; //扩展名
+                    $data['format']=$ext;
+                    $data['size']=$info['size'];
+                    $data['second']=$info['second'];
+                }
+                //更新数据
+                $upRst=ImMsgContent::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
+                if ($upRst === false) {
+                    DB::rollBack();
+                    return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
+                }
             }
             $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
             if ($rst === false) {
@@ -281,7 +337,6 @@ class AliUploadServers
             DB::commit();
             unlink($filePath);
             return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
-
 
         }
         if($type==4) {//拉取文件上传oss
@@ -305,6 +360,7 @@ class AliUploadServers
                 'type' => 4,
                 'url' => self::$IMAGES_URL.$PushRst['data']['name'],
                 'file_name' => $PushRst['data']['name'],
+                'size'=>$info['size'],
                 'created_at' => $now_date
             ];
             $rstId = DB::table(ImMedia::DB_TABLE)->insertGetId($data);
@@ -318,6 +374,13 @@ class AliUploadServers
                 DB::rollBack();
                 return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
             }
+            //更新数据
+            $ImRst=ImMsgContent::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
+            if ($ImRst === false) {
+                DB::rollBack();
+                return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
+            }
+
             DB::commit();
             unlink($filePath);
             return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
