@@ -134,17 +134,17 @@ class ImDocServers
                 } else {
                     $content = $media_info->file_name ?: $media_info->id;
                     $file_url = $media_info->url;
-                    $format = $media_info->format;
-                    $file_size = $media_info->size;
-                    $second = $media_info->second;
+                    $format = $media_info->format ?: 'mp4';
+                    $file_size = $media_info->size ?: 1119442;
+                    $second = $media_info->second ?: 60;
 
                     if ($params['type_info'] != 23) {
                         $file_md5 = $media_id;
-                        $cover_img = $media_info->thumb_url;
-                        $img_size = $media_info->thumb_size ?: 200;
-                        $img_width = $media_info->thumb_width ?: 200;
-                        $img_height = $media_info->thumb_height ?: 200;
-                        $img_format = $media_info->thumb_format;
+                        $cover_img = $media_info->thumb_url ?: 'https://image.nlsgapp.com/nlsg/works/20210729141614776327.png';
+                        $img_size = $media_info->thumb_size ?: 61440;
+                        $img_width = $media_info->thumb_width ?: 953;
+                        $img_height = $media_info->thumb_height ?: 535;
+                        $img_format = $media_info->thumb_format ?: 'png';
                         $img_md5 = $media_id . '_' . 'c';
                     }
                 }
@@ -268,7 +268,7 @@ class ImDocServers
         $query->where('status', '=', 1)
             ->orderBy('id', 'desc')
             ->select([
-                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url', 'subtitle','media_id'
+                'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url', 'subtitle', 'media_id'
             ]);
 
         return $query->paginate($size);
