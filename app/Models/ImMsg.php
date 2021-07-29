@@ -50,27 +50,31 @@ class ImMsg extends Base
         foreach ($params_msg as $key=>$val) {
             $res[$key]['MsgType'] = $val['MsgType'];
 
-            $media_data = ImMedia::where(['media_id'=>$val['videoid']])->first();
-            if(empty($media_data)) {
-                return [];
-            }
-            //查询媒体表详情
-            $media = [
-                'size'          => $media_data['size']??0, //大小
-                'second'        => $media_data['second'], //时长
-                'uuid'          => md5($val['Url']), //uuid
-                'format'        => 255, //格式
-                'width'         => $media_data['width'],
-                'height'        => $media_data['height'],
+            $media = [];
+            if(!empty($val['videoId'])){
+                $media_data = ImMedia::where(['media_id'=>$val['videoId']])->first();
+                if(empty($media_data)) {
+                    return [];
+                }
+                //查询媒体表详情
+                $media = [
+                    'size'          => $media_data['size']??0, //大小
+                    'second'        => $media_data['second'], //时长
+                    'uuid'          => md5($val['Url']), //uuid
+                    'format'        => 255, //格式
+                    'width'         => $media_data['width'],
+                    'height'        => $media_data['height'],
 
-                //封面图
-                'thumb_uuid'    => md5($val['thumb_url']),
-                'thumb_url'     => $media_data['thumb_url'],
-                'thumb_size'    => $media_data['thumb_size'],
-                'thumb_width'   => $media_data['thumb_width'],
-                'thumb_height'  => $media_data['thumb_height'],
-                'thumb_format'  => 255,
-            ];
+                    //封面图
+                    'thumb_uuid'    => md5($media_data['thumb_url']),
+                    'thumb_url'     => $media_data['thumb_url'],
+                    'thumb_size'    => $media_data['thumb_size'],
+                    'thumb_width'   => $media_data['thumb_width'],
+                    'thumb_height'  => $media_data['thumb_height'],
+                    'thumb_format'  => 255,
+                ];
+            }
+
 
 
             switch ($val['MsgType']){

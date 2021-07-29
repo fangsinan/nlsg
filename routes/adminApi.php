@@ -218,6 +218,12 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('im_doc/category', 'ImDocController@getCategory');
         Route::get('im_doc/category/product', 'ImDocController@getCategoryProduct');
 
+        //im 好友关系
+        Route::post('im_friend/friend_check', 'ImFriendController@friendCheck');
+        Route::get('im_friend/portrait_get', 'ImFriendController@getPortrait');
+        Route::post('im_friend/add_friend', 'ImFriendController@addFriend');
+        Route::post('im_friend/del_friend', 'ImFriendController@delFriend');
+
 
     });
 
