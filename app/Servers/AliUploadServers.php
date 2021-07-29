@@ -257,7 +257,7 @@ class AliUploadServers
             $res = $uploader->uploadLocalVideo($uploadVideoRequest);
             $new_url=self::$IMAGES_URL.$res['UploadAddress'];
             $videoid=$res['VideoId']; //媒体id
-            $filename=$res['UploadAddress']; //名称
+            $filename=$info['file_name'];//$res['UploadAddress']; //名称
 
         }else if($type==3){//拉取图片
 
@@ -362,7 +362,7 @@ class AliUploadServers
                 'content_id'=>$info['id'],
                 'type' => 4,
                 'url' => self::$IMAGES_URL.$PushRst['data']['name'],
-                'file_name' => $PushRst['data']['name'],
+                'file_name' => $info['file_name'],//$PushRst['data']['name'],
                 'size'=>$info['size'],
                 'created_at' => $now_date
             ];
