@@ -429,10 +429,10 @@ class AliUploadServers
             // 设置文件名称
             $object = '1111group/' . date('Ymd') . $filename . '.' . $ext;
             // 文件内容
-            $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
-            if ($doesres) {
-                return [ 'status' => 0,'data'=>[],'msg'=>'文件名已存在'];
-            }
+//            $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
+//            if ($doesres) {
+//                return [ 'status' => 0,'data'=>[],'msg'=>'文件名已存在'];
+//            }
             $ossClient->uploadFile($bucket, $object, $filePath);
 
             $data=[
