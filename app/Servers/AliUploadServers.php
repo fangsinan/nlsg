@@ -157,19 +157,23 @@ class AliUploadServers
 
     //定时抓取图片
     public function UploadMediaPull(){
-        //获取图片
-        $urlkey='https://cos.ap-shanghai.myqcloud.com/';
-        $Imglist = ImMsgContentImg::query()->where('media_id','=','')->where('url', 'like', $urlkey . '%')
-            ->select(['id', 'size', 'width','height','url'])
-            ->limit(10)
-            ->get();
-        Log::channel('aliOnDemandLog')->info('-----------定时抓取----------');
-        if($Imglist->isNotEmpty()){
-            $ImgData=$Imglist->toArray();
-            foreach ($ImgData as $key=>$val){
-                Log::channel('aliOnDemandLog')->info(json_encode($val,true));
-                self::UploadMediaByURL(3,$val['url'],$val);
+        Log::channel('aliOnDemandLog')->info('-----------定时抓取图片----------');
+        try {
+            //获取图片
+            $urlkey = 'https://cos.ap-shanghai.myqcloud.com/';
+            $Imglist = ImMsgContentImg::query()->where('media_id', '=', '')->where('url', 'like', $urlkey . '%')
+                ->select(['id', 'size', 'width', 'height', 'url'])
+                ->limit(10)
+                ->get();
+            if ($Imglist->isNotEmpty()) {
+                $ImgData = $Imglist->toArray();
+                foreach ($ImgData as $key => $val) {
+                    Log::channel('aliOnDemandLog')->info(json_encode($val, true));
+                    self::UploadMediaByURL(3, $val['url'], $val);
+                }
             }
+        }catch (\Exception $e){
+            Log::channel('aliOnDemandLog')->info('定时抓取图片异常：'.$e->getMessage());
         }
         return 'OK';
 
