@@ -156,7 +156,7 @@ class AliUploadServers
     }
 
     //定时抓取图片
-    public static function UploadMediaPull(){
+    public  function UploadMediaPull(){
         Log::channel('aliOnDemandLog')->info('-----------定时抓取图片----------');
         try {
             //获取图片
@@ -199,7 +199,7 @@ class AliUploadServers
 
 
     //音视频拉取文件 https://help.aliyun.com/document_detail/100976.html?spm=a2c4g.11186623.6.1031.30f6d418f1Hpzw
-    public function UploadMediaByURL($type='',$url='',$info=[]){
+    public  function UploadMediaByURL($type='',$url='',$info=[]){
 
         if(in_array($type,[1,2,3])){
             require_once base_path('vendor').DIRECTORY_SEPARATOR . 'voduploadsdk' . DIRECTORY_SEPARATOR . 'Autoloader.php';

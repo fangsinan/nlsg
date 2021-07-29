@@ -152,8 +152,8 @@ class Kernel extends ConsoleKernel
         //https://laravelacademy.org/post/8484.html
         $schedule->call(function () {
             //抓取腾讯IM音视频、图片、文件到阿里云
-
-            AliUploadServers::UploadMediaPull();
+            $AliUploadServer=new AliUploadServers();
+            $AliUploadServer->UploadMediaPull();
 //        })->daily()->runInBackground();//每天凌晨执行
 //        })->everyFiveMinutes()->runInBackground();//5分钟执行一次
         })->everyMinute()->runInBackground();//每分钟执行一次
