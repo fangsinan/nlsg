@@ -376,7 +376,7 @@ class AliUploadServers
                 return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
             }
             //更新数据
-            $ImRst=ImMsgContent::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
+            $ImRst=ImMsgContent::query()->where(['id'=>$info['id']])->update(['media_id'=>$rstId,'ali_url'=>$data['url']]);
             if ($ImRst === false) {
                 DB::rollBack();
                 return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
