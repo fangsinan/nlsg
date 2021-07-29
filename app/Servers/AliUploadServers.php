@@ -222,7 +222,7 @@ class AliUploadServers
                 Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取文件结束----------');
             }
         }catch (\Exception $e){
-            Log::channel('aliCrontabPullLog')->info('定时抓取文件异常：'.$e->getMessage());
+            Log::channel('aliCrontabPullLog')->info('定时抓取文件异常：'.$e->getMessage().$e->getLine());
         }
 
         return 'OK';
@@ -245,6 +245,7 @@ class AliUploadServers
             if($DownRst['status']!=1){
                 return $DownRst;
             }
+            $filePath=$DownRst['data']['filepath'];
 
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
             $uploadVideoRequest = new \UploadVideoRequest($DownRst['data']['filepath'], $DownRst['data']['filename'].'.'.$DownRst['data']['ext']);
