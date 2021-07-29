@@ -36,8 +36,8 @@ class Controller extends BaseController
             $this->user['level'] = $this->user['true_level'];
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
         }else{
-            exit(json_encode(['msg'=>'没有登陆','code'=>401]));
-            //return response()->json(['msg' => '没有登录','code'=> 401]);
+//            exit(json_encode(['msg'=>'没有登陆','code'=>401]));
+            return response()->json(['msg' => '没有登录','code'=> 401]);
         }
     }
 
