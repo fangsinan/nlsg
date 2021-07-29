@@ -284,7 +284,6 @@ class AliUploadServers
 
         }
         if(in_array($type,[1,2,3])){
-            DB::beginTransaction();
             $data = [
                 'type' => $type,
                 'url' => $new_url,
@@ -317,6 +316,7 @@ class AliUploadServers
                     $data['second']=$info['second'];
                 }
             }
+            DB::beginTransaction();
             $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
             if ($rst === false) {
                 DB::rollBack();
@@ -357,7 +357,6 @@ class AliUploadServers
             if($PushRst['status']==0){
                 return ['status' => 0, 'data' => [], 'msg' => '拉取失败'];
             }
-            DB::beginTransaction();
             $now_date=date('Y-m-d H:i:s');
             $data = [
                 'type' => 4,
@@ -366,6 +365,7 @@ class AliUploadServers
                 'size'=>$info['size'],
                 'created_at' => $now_date
             ];
+            DB::beginTransaction();
             $rstId = DB::table(ImMedia::DB_TABLE)->insertGetId($data);
             if ($rstId === false) {
                 DB::rollBack();
@@ -383,7 +383,6 @@ class AliUploadServers
                 DB::rollBack();
                 return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
             }
-
             DB::commit();
             unlink($filePath);
             return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
