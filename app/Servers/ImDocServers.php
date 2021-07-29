@@ -452,6 +452,10 @@ class ImDocServers
 //            return ['code' => false, 'msg' => '目标类型参数无效'];
         }
         if (!empty($send_obj_id)) {
+
+            $send_obj_id = ImGroup::getId($send_obj_id);
+            $send_obj_id = $send_obj_id['id'];
+
             $query->whereHas('jobInfo', function ($q) use ($send_obj_id) {
                 $q->where('send_obj_id', '=', $send_obj_id);
             });

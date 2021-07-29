@@ -195,7 +195,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('im_doc/list', 'ImDocController@list');
         Route::post('im_doc/add', 'ImDocController@add');
         Route::put('im_doc/change_status', 'ImDocController@changeStatus');
-        Route::get('im_doc/job_list', 'ImDocController@sendJobList');
+        Route::any('im_doc/job_list', 'ImDocController@sendJobList');
         Route::post('im_doc/job_add', 'ImDocController@addSendJob');
         Route::put('im_doc/change_job_status', 'ImDocController@changeJobStatus');
         Route::get('im_doc/group_list', 'ImDocController@groupList');
