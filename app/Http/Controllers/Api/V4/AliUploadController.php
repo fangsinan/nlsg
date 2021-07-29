@@ -493,7 +493,7 @@ class AliUploadController extends Controller
             $result = $AliUploadServer->UploadMediaByURL(3,$url3);
             $result = $AliUploadServer->UploadMediaByURL(3,$url4);*/
 
-            $rst=$AliUploadServer->UploadMediaPull();
+            $rst=$AliUploadServer::UploadMediaPull();
             var_dump($rst);
             return ;
 

@@ -156,7 +156,7 @@ class AliUploadServers
     }
 
     //定时抓取图片
-    public function UploadMediaPull(){
+    public static function UploadMediaPull(){
         Log::channel('aliOnDemandLog')->info('-----------定时抓取图片----------');
         try {
             //获取图片
