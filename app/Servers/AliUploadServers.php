@@ -9,6 +9,7 @@ use App\Models\ImMedia;
 use App\Models\ImMsgContentImg;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Log;
 use OSS\OssClient;
 use OSS\Core\OssException;
 
@@ -162,9 +163,11 @@ class AliUploadServers
             ->select(['id', 'size', 'width','height','url'])
             ->limit(10)
             ->get();
+        Log::channel('aliOnDemandLog')->info('-----------定时抓取----------');
         if($Imglist->isNotEmpty()){
             $ImgData=$Imglist->toArray();
             foreach ($ImgData as $key=>$val){
+                Log::channel('aliOnDemandLog')->info(json_encode($val,true));
                 self::UploadMediaByURL(3,$val['url'],$val);
             }
         }
