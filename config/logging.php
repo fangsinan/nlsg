@@ -44,7 +44,7 @@ return [
         'aliCrontabPullLog' => [  //腾讯云资源抓取
             'driver' => 'single',
             'name' => 'ali_crontab_pull',
-            'path' => storage_path('logs/aliondemand/ali_pull_error.log'),
+            'path' => storage_path('logs/aliondemand/ali_crontab_pull.log'),
             'level' => 'info',
         ],
         'stack' => [
