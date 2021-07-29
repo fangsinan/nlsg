@@ -483,7 +483,7 @@ class AliUploadController extends Controller
 
         try {
             $AliUploadServer=new AliUploadServers();
-            $url1='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
+            /*$url1='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
             $url2='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/46d7b74f9a396ce76539c1c8f8295b44.png?imageMogr2/';
             $url3= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png';
             //抓取音视频和图片
@@ -491,11 +491,14 @@ class AliUploadController extends Controller
             $result = $AliUploadServer->UploadMediaByURL(3,$url1);
             $result = $AliUploadServer->UploadMediaByURL(3,$url2);
             $result = $AliUploadServer->UploadMediaByURL(3,$url3);
-            $result = $AliUploadServer->UploadMediaByURL(3,$url4);
+            $result = $AliUploadServer->UploadMediaByURL(3,$url4);*/
 
+            $rst=$AliUploadServer->UploadMediaPull();
+            var_dump($rst);
+            return ;
 
-//            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
-//            $result = $AliUploadServer->UploadMediaByURL(1,$url);
+            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
+            $result = $AliUploadServer->UploadMediaByURL(1,$url);
 //            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/29845510b9fe73f1ea290b7c2466277d.m4a';
 //            $result = $AliUploadServer->UploadMediaByURL(2,$url);
 //            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/f866-316743/7eca6acb927a86ba8580c8e0ce83ac84.txt';

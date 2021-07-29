@@ -74,7 +74,8 @@ class AliyunVodUploader
         $uploadInfo = $this->createUploadVideo($uploadVideoRequest);
         $headers = $this->getUploadHeaders($uploadVideoRequest);
         $this->uploadOssObject($uploadVideoRequest->getFilePath(), $uploadInfo->UploadAddress->FileName, $uploadInfo, $headers);
-        return $uploadInfo->VideoId;
+        return ['VideoId'=>$uploadInfo->VideoId,'UploadAddress'=>$uploadInfo->UploadAddress->FileName];
+//        return $uploadInfo->VideoId;
     }
 
     /**
@@ -109,7 +110,7 @@ class AliyunVodUploader
     {
         $uploadInfo = $this->createUploadImage($uploadImageRequest);
         $this->uploadOssObject($uploadImageRequest->getFilePath(), $uploadInfo->UploadAddress->FileName, $uploadInfo);
-        return array('ImageId'=>$uploadInfo->ImageId, 'ImageURL'=>$uploadInfo->ImageURL);
+        return array('ImageId'=>$uploadInfo->ImageId, 'ImageURL'=>$uploadInfo->ImageURL,'FileName'=>$uploadInfo->UploadAddress->FileName);
     }
 
     /**

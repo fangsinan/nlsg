@@ -38,7 +38,7 @@ return [
         'aliOnDemandLog' => [  //阿里云点播上传回调
             'driver' => 'single',
             'name' => 'ali_ondemand',
-            'path' => storage_path('logs/aliondemand/'.date('Y-m-d').'.log'),
+            'path' => storage_path('logs/aliondemand/ali_video.log'),
             'level' => 'info',
         ],
         'stack' => [

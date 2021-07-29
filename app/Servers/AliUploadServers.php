@@ -9,6 +9,7 @@ use App\Models\ImMedia;
 use App\Models\ImMsgContentImg;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Log;
 use OSS\OssClient;
 use OSS\Core\OssException;
 
@@ -154,11 +155,35 @@ class AliUploadServers
 
     }
 
-    //定时抓取
-    public function UploadMediaPull(){
+    //定时抓取图片
+    public  function UploadMediaPull(){
+        Log::channel('aliOnDemandLog')->info('-----------定时抓取图片----------');
+        try {
+            //获取图片
+            $urlkey = 'https://cos.ap-shanghai.myqcloud.com/';
+            $Imglist = ImMsgContentImg::query()->where('media_id', '=', '')->where('url', 'like', $urlkey . '%')
+                ->select(['id', 'size', 'width', 'height', 'url'])
+                ->limit(10)
+                ->get();
+            if ($Imglist->isNotEmpty()) {
+                $ImgData = $Imglist->toArray();
+                foreach ($ImgData as $key => $val) {
+                    Log::channel('aliOnDemandLog')->info(json_encode($val, true));
+                    self::UploadMediaByURL(3, $val['url'], $val);
+                }
+            }
+        }catch (\Exception $e){
+            Log::channel('aliOnDemandLog')->info('定时抓取图片异常：'.$e->getMessage());
+        }
+        return 'OK';
+
+    }
+
+    //定时抓取音视频 文件
+    public function UploadMediaVideoAudio(){
         //获取图片
         $urlkey='https://cos.ap-shanghai.myqcloud.com/';
-        $Imglist = ImMsgContentImg::query()->where(['media_id'=>0])->where('url', 'like', $urlkey . '%')
+        $Imglist = ImMsgContentImg::query()->where('media_id','=','')->where('url', 'like', $urlkey . '%')
             ->select(['id', 'size', 'width','height','url'])
             ->limit(10)
             ->get();
@@ -168,11 +193,13 @@ class AliUploadServers
                 self::UploadMediaByURL(3,$val['url'],$val);
             }
         }
+        return 'OK';
 
     }
 
+
     //音视频拉取文件 https://help.aliyun.com/document_detail/100976.html?spm=a2c4g.11186623.6.1031.30f6d418f1Hpzw
-    public function UploadMediaByURL($type='',$url='',$info=[]){
+    public  function UploadMediaByURL($type='',$url='',$info=[]){
 
         if(in_array($type,[1,2,3])){
             require_once base_path('vendor').DIRECTORY_SEPARATOR . 'voduploadsdk' . DIRECTORY_SEPARATOR . 'Autoloader.php';
@@ -194,8 +221,9 @@ class AliUploadServers
             if($type==1) { //视频
                 $uploadVideoRequest->setWorkflowId(self::WorkflowId);
             }
-            $videoid = $uploader->uploadLocalVideo($uploadVideoRequest);
-            $new_url='';
+            $res = $uploader->uploadLocalVideo($uploadVideoRequest);
+            $new_url=self::$IMAGES_URL.$res['UploadAddress'];
+            $videoid=$res['VideoId']; //媒体id
         }else if($type==3){//拉取图片
 
             $filename=md5($url); //文件名
@@ -217,22 +245,44 @@ class AliUploadServers
             $res = $uploader->uploadLocalImage($uploadImageRequest);
             $new_url=$res['ImageURL'];
             $videoid=$res['ImageId']; //媒体id
+            $file_name=$res['FileName']; //名称
 
         }
         if(in_array($type,[1,2,3])){
+            DB::beginTransaction();
             $data = [
                 'type' => $type,
                 'url' => $new_url,
+                'content_img_id' => $info['id'],
                 'created_at' => $now_date
             ];
             $data['media_id'] = $videoid;
+            if($type==3){ //图片
+                $data['file_name']=$file_name;
+                $data['size']=$info['size'];
+                $data['width']=$info['width'];
+                $data['height']=$info['height'];
+
+                //更新数据
+                $upRst=ImMsgContentImg::query()->where(['id'=>$info['id']])->update(['media_id'=>$videoid,'ali_url'=>$new_url]);
+                if ($upRst === false) {
+                    DB::rollBack();
+                    return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
+                }
+            }else{
+
+            }
             $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
             if ($rst === false) {
+                DB::rollBack();
                 return ['status' => 0, 'data' => [], 'msg' => '抓取失败'];
-            }else{
-                unlink($filePath);
-                return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
             }
+
+            DB::commit();
+            unlink($filePath);
+            return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
+
+
         }
         if($type==4) {//拉取文件上传oss
 
@@ -356,47 +406,6 @@ class AliUploadServers
         } catch (OssException $e) {
             return ['status' => 0,  'msg' =>  $e->getMessage()];
         }
-    }
-
-    //获取视频封面图信息
-    /**
-     * 获取远程图片的宽高和体积大小
-     *
-     * @param string $url 远程图片的链接
-     * @param string $type 获取远程图片资源的方式, 默认为 curl 可选 fread
-     * @param boolean $isGetFilesize 是否获取远程图片的体积大小, 默认false不获取, 设置为 true 时 $type 将强制为 fread
-     * @return false|array
-     */
-    function myGetImageSize($url, $type = 'curl', $isGetFilesize = false)
-    {
-        // 若需要获取图片体积大小则默认使用 fread 方式
-        $type = $isGetFilesize ? 'fread' : $type;
-
-        // 或者使用 socket 二进制方式读取, 需要获取图片体积大小最好使用此方法
-        $handle = fopen($url, 'rb');
-
-        if (! $handle) return false;
-
-        $result=[];
-        // 是否获取图片体积大小
-        if ($isGetFilesize) {
-            // 获取文件数据流信息
-            $meta = stream_get_meta_data($handle);
-            // nginx 的信息保存在 headers 里，apache 则直接在 wrapper_data
-            $dataInfo = isset($meta['wrapper_data']['headers']) ? $meta['wrapper_data']['headers'] : $meta['wrapper_data'];
-
-            foreach ($dataInfo as $va) {
-                if ( preg_match('/length/iU', $va)) {
-                    $ts = explode(':', $va);
-                    $result['size'] = trim(array_pop($ts));
-                    break;
-                }
-            }
-        }
-
-        if ($type == 'fread') fclose($handle);
-
-        return $result;
     }
 
 
