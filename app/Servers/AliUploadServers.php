@@ -359,6 +359,7 @@ class AliUploadServers
             }
             $now_date=date('Y-m-d H:i:s');
             $data = [
+                'content_id'=>$info['id'],
                 'type' => 4,
                 'url' => self::$IMAGES_URL.$PushRst['data']['name'],
                 'file_name' => $PushRst['data']['name'],
