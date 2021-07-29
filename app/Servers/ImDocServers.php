@@ -556,13 +556,13 @@ class ImDocServers
             if (empty($jobModel)) {
                 return ['code' => false, 'msg' => 'id错误'];
             } else {
-                if (in_array($jobModel->is_done, [2, 3])) {
-                    return ['code' => false, 'msg' => '发送中和已完成的任务无法编辑'];
-                }
+//                if (in_array($jobModel->is_done, [2, 3])) {
+//                    return ['code' => false, 'msg' => '发送中和已完成的任务无法编辑'];
+//                }
 
-                if ($jobModel->user_id != $user_id) {
-                    return ['code' => false, 'msg' => '任务只有创建人自己能编辑'];
-                }
+//                if ($jobModel->user_id != $user_id) {
+//                    return ['code' => false, 'msg' => '任务只有创建人自己能编辑'];
+//                }
             }
 
             $job_str = '修改:id($jobModel->id)';
