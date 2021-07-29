@@ -276,7 +276,7 @@ class AliUploadController extends Controller
             $RstData['data']['size']=$filesize; //返回大小
             return $this->success($RstData['data']);
         }else{
-            return $this->error(0, $RstData['msg'],'{}');
+            return $this->error(0, $RstData['msg'], (object)[]);
         }
 
     }
