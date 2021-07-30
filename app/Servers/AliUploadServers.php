@@ -245,9 +245,13 @@ class AliUploadServers
                 return $DownRst;
             }
             $filePath=$DownRst['data']['filepath'];
+            $file_ext='';
+            if(!empty($DownRst['data']['ext'])){ //有没有扩展名的地址
+                $file_ext='.'.$DownRst['data']['ext'];
+            }
 
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
-            $uploadVideoRequest = new \UploadVideoRequest($DownRst['data']['filepath'], $DownRst['data']['filename'].'.'.$DownRst['data']['ext']);
+            $uploadVideoRequest = new \UploadVideoRequest($DownRst['data']['filepath'], $DownRst['data']['filename'].$file_ext);
             $uploadVideoRequest->setCateId(self::TypeArr[$type]);
             $uploadVideoRequest->setStorageLocation(self::StorageLocation);
             if($type==1) { //视频
