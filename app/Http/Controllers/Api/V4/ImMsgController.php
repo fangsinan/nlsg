@@ -174,7 +174,7 @@ class ImMsgController extends Controller
     }
 
     /**
-     * @api {post} /api/v4/im/del_send_all_list  群发列表
+     * @api {post} /api/v4/im/del_send_all_list  清空群发列表
      * @apiName del_send_all_list
      * @apiVersion 1.0.0
      * @apiGroup im
