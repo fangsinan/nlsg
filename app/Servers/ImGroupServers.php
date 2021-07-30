@@ -15,7 +15,7 @@ class ImGroupServers
     public function groupList($params, $user_id)
     {
         $size = $params['size'] ?? 10;
-        $owner= $params['owner'] ?? 0;
+        $owner_type= $params['owner_type'] ?? 0;
 
         $query = DB::table('nlsg_im_group as g')
             ->leftJoin('nlsg_im_group_top as gt', function ($q) use ($user_id) {
@@ -31,7 +31,7 @@ class ImGroupServers
                 DB::raw('2000 as max_num')
             ])->orderBy('gt.id', 'desc');
 
-        switch (intval($owner)){
+        switch (intval($owner_type)){
             case 1:
                 //我创建的
                 $query->where('g.owner_account', '=', $user_id);
