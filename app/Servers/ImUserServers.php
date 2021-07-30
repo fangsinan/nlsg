@@ -21,8 +21,8 @@ class ImUserServers
             $query->where('id', '=', $params['id']);
         }
 
-        if (!empty($params['phone']) ?? ''){
-            $query->where('phone','like','%'.$params['phone'].'%');
+        if (!empty($params['phone']) ?? '') {
+            $query->where('phone', 'like', '%' . $params['phone'] . '%');
         }
 
         //性别
@@ -171,6 +171,89 @@ class ImUserServers
         ]);
 
         return $query->paginate($size);
+    }
+
+    public function orderList($params, $user_id)
+    {
+        $size = $params['size'] ?? 10;
+        $query = Order::query()->where('status', '=', 1);
+        $query->where('user_id','=',$user_id);
+        $query->where('is_shill', '=', 0);
+        //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip  18训练营
+        $query->whereIn('type', [9, 10, 14, 15, 16, 18]);
+        $query->with([
+            'works:id,type,title,cover_img',
+            'works.categoryRelation',
+            'works.categoryRelation.categoryName',
+            'column:id,type,name,cover_pic',
+            'live:id,title,cover_img',
+            'offline:id,title,cover_img'
+        ]);
+
+        $query->select(['id', 'type', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time',
+            'ordernum', 'pay_price']);
+
+        $list = $query->paginate($size);
+
+        foreach ($list as $v) {
+            $v->category_name = [];
+            switch (intval($v->type)) {
+                case 9:
+                    $v->type_name = '课程';
+                    $v->cover_img = $v->works->cover_img ?? '';
+                    $v->title = $v->works->title ?? '-';
+                    $temp_category_name = [];
+                    foreach ($v->works->categoryRelation as $vv) {
+                        $temp_category_name[] = $vv->categoryName['name'];
+                    }
+                    $v->category_name = $temp_category_name;
+                    break;
+                case 10:
+                    $v->type_name = '直播';
+                    $v->cover_img = $v->live->cover_img ?? '';
+                    $v->title = $v->live->title ?? '-';
+                    break;
+                case 14:
+                    $v->type_name = '线下课';
+                    $v->cover_img = $v->offline->cover_img ?? '';
+                    $v->title = $v->offline->title ?? '-';
+                    break;
+                case 15:
+                    $v->type_name = '讲座';
+                    $v->cover_img = $v->column->cover_img ?? '';
+                    $v->title = $v->column->name ?? '-';
+                    break;
+                case 16:
+                    $v->type_name = 'vip';
+                    $v->cover_img = '/nlsg/works/20210105102849884378.png';
+                    $v->title = 'vip';
+                    break;
+                case 18:
+                    $v->type_name = '训练营';
+                    $v->cover_img = $v->column->cover_img ?? '';
+                    $v->title = $v->column->name ?? '-';
+                    break;
+                default:
+                    $v->type_name = '-';
+                    $v->cover_img = '';
+                    $v->title = '';
+            }
+            unset(
+                $v->works,
+                $v->column,
+                $v->live,
+                $v->offline
+            );
+        }
+
+
+        return $list;
+
+    }
+
+    public function mallOrderList($params, $user_id)
+    {
+        $size = $params['size'] ?? 10;
     }
 
 }

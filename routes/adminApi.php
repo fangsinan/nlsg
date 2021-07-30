@@ -212,6 +212,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //im用户
         Route::get('im_user/list', 'ImUserController@list');
         Route::get('im_user/friends_list', 'ImUserController@friendsList');
+        Route::get('im_user/order_list', 'ImUserController@orderList');
+        Route::get('im_user/mall_order_list', 'ImUserController@mallOrderList');
 
 
         //im选择商品
