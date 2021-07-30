@@ -77,6 +77,7 @@ class AuthController extends ControllerBackend
                 'role'=>$check_user->role_id,
                 'menu_tree'=>Node::getMenuTree($check_user->role_id),
                 'app_uid'=>User::where('phone','=',$username)->value('id'),
+                'live_role_button' => $check_user->live_role_button,
             ];
             return $this->getRes($data);
         } else {
