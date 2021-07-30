@@ -194,7 +194,7 @@ class AliUploadServers
                 ->select(['id', 'msg_id', 'msg_type', 'data', 'url', 'size', 'second', 'download_flag', 'uuid', 'image_format', 'file_size', 'file_name', 'video_url', 'video_format', 'thumb_url',
                     'thumb_size', 'thumb_height', 'thumb_width', 'thumb_format','created_at'])
                 ->orderBy('id','desc')
-                ->limit(10);
+                ->limit(1);
 //            echo $query->toSql().PHP_EOL;
 //            $query->dd(); //dd 阻断流程
             $Filelist=$query->get();
@@ -240,7 +240,7 @@ class AliUploadServers
         if (in_array($type,[1,2])) { //拉取音视频
 
             //下载文件
-            $DownRst=self::GetUrlDownload($url);
+            $DownRst=self::GetUrlDownload($url,$type,$info);
             if($DownRst['status']!=1){
                 return $DownRst;
             }
@@ -258,6 +258,7 @@ class AliUploadServers
                 $uploadVideoRequest->setWorkflowId(self::WorkflowId);
             }
             $res = $uploader->uploadLocalVideo($uploadVideoRequest);
+
             $new_url=self::$IMAGES_URL.$res['UploadAddress'];
             $videoid=$res['VideoId']; //媒体id
             $filename=$info['file_name'];//$res['UploadAddress']; //名称
@@ -348,7 +349,7 @@ class AliUploadServers
         if($type==4) {//拉取文件上传oss
 
             //下载文件
-            $RstData=self::GetUrlDownload($url);
+            $RstData=self::GetUrlDownload($url,$type,$info);
             if($RstData['status']==0){
                 return $RstData;
             }
@@ -395,14 +396,19 @@ class AliUploadServers
     }
 
     //从第三方源地址下载文件
-    public function GetUrlDownload($url){
+    public function GetUrlDownload($url,$type=0,$info=[]){
 
         $filename = md5($url); //文件名
         $arr = explode('.', $url);
         $ext = $arr[count($arr) - 1]; //扩展名
-        if(strlen($ext)>10){ //处理没扩展情况
-            $ext='';
-            $filePath=storage_path('logs/' . $filename);
+        if(strlen($ext)>10){ //处理没扩展名情况
+            $ext=''; //文件可没扩展名
+            if($type==1 && !empty($info)){ //视频必须要有扩展名
+                $ext=$info['video_format'];
+                $filePath=storage_path('logs/' . $filename. '.' . $ext);
+            }else{
+                $filePath=storage_path('logs/' . $filename);
+            }
         }else {
             // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
             $filePath = storage_path('logs/' . $filename . '.' . $ext);
