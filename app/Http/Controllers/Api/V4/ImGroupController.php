@@ -23,7 +23,7 @@ class ImGroupController extends Controller
      * @apiName edit_join_group
      * @apiVersion 1.0.0
      * @apiGroup im_group
-     *e
+     *
      * @apiParam {int} group_id   腾讯云的groupId
      * @apiParam {array} user_id  user_id  数组类型
      * @apiParam {array} type  type==del删除  add添加
@@ -96,7 +96,7 @@ class ImGroupController extends Controller
      * @apiName forbid_send_msg
      * @apiVersion 1.0.0
      * @apiGroup im_group
-     *e
+     *
      * @apiParam {int} group_id   腾讯云的groupId
      * @apiParam {array} user_id  user_id
      * @apiParam {int} shut_up_time  禁言时长  0解禁 其他表示禁言
@@ -171,7 +171,7 @@ class ImGroupController extends Controller
      * @apiName forbid_msg_list
      * @apiVersion 1.0.0
      * @apiGroup im_group
-     *e
+     *
      * @apiParam {int} group_id   腾讯云的groupId
      *
      * @apiSuccess {string} result json
@@ -215,7 +215,7 @@ class ImGroupController extends Controller
      * @apiName set_group_user
      * @apiVersion 1.0.0
      * @apiGroup im_group
-     *e
+     *
      * @apiParam {int} group_id 腾讯云的groupId
      * @apiParam {array} user_id  user_id 数组
      * @apiParam {int} type  2取消管理员 1设置管理员
@@ -357,7 +357,7 @@ class ImGroupController extends Controller
     }
 
 
-    //群聊消息回调
+    //群聊消息回调 - （废弃)
     public static function groupSend($params){
 
         if (empty($params)){
