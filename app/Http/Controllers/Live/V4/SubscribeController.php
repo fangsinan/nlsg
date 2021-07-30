@@ -74,7 +74,7 @@ class SubscribeController extends ControllerBackend
             'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at'
         ]);
 
-        if ($this->user['live_role'] == 23 && $this->user['live_role_button'] == 2){
+        if ($this->user['role_id'] == 13 && $this->user['live_role_button'] == 2){
             $query->has('order');
         }
 
