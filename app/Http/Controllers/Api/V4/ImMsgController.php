@@ -171,10 +171,32 @@ class ImMsgController extends Controller
         //$this->user['id'] = 211172;
         $data = $imObj->sendAllList($request->input(),$this->user['id']);
         return $this->getRes($data);
+    }
+
+    /**
+     * @api {post} /api/v4/im/del_send_all_list  群发列表
+     * @apiName del_send_all_list
+     * @apiVersion 1.0.0
+     * @apiGroup im
+     *
+     * @apiParam {array} id  需要清空的列表id  不传则全部清空
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {}
+    }
+     */
+    function delSendAllList(Request $request){
+        $imObj = new ImMsgServers();
+        $this->user['id'] = 211172;
+        $data = $imObj->delSendAllList($request->input(),$this->user['id']);
+        return $this->getRes($data);
 
 
     }
-
 
 
     /**
