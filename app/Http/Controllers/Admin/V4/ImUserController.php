@@ -138,9 +138,9 @@ class ImUserController extends ControllerBackend
     }
 
     public function mallOrderList(Request $request){
-//        $servers = new ImUserServers();
-//        $data = $servers->mallOrderList($request->input(), $this->user['user_id']);
-//        return $this->getRes($data);
+        $servers = new ImUserServers();
+        $data = $servers->mallOrderList($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
     }
 
 }

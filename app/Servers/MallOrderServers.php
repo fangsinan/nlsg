@@ -63,7 +63,7 @@ class MallOrderServers
         $field = [
             'id', 'ordernum', 'price', 'dead_time',
             'created_at', 'pay_price', 'price', 'post_type', 'pay_type',
-            'normal_cut'
+            'normal_cut','user_id',
         ];
 
         //订单状态 1待付款  10待发货 20待收货 30已完成 95拼团中 99已取消
