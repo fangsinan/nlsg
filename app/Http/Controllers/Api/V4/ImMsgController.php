@@ -210,6 +210,7 @@ class ImMsgController extends Controller
      * @apiGroup im
      *
      * @apiParam {string} keywords  收藏消息关键字
+     * @apiParam {string} page
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -244,11 +245,14 @@ class ImMsgController extends Controller
 
         $return_data = [];
         foreach ($res['UserProfileItem'] as $userProfile_key=>$userProfileItem_item) {
-            $return_data[$userProfileItem_item['To_Account']] = [];
-            $return_data[$userProfileItem_item['To_Account']]["Tag_Profile_IM_UID"] = $userProfileItem_item['To_Account'];
-            foreach ($userProfileItem_item['ProfileItem'] as $key=>$value) {
-                $return_data[$userProfileItem_item['To_Account']][$value['Tag']] = $value['Value'];
+            if($userProfileItem_item['ResultCode'] == 0){
+                $return_data[$userProfileItem_item['To_Account']] = [];
+                $return_data[$userProfileItem_item['To_Account']]["Tag_Profile_IM_UID"] = $userProfileItem_item['To_Account'];
+                foreach ($userProfileItem_item['ProfileItem'] as $key=>$value) {
+                    $return_data[$userProfileItem_item['To_Account']][$value['Tag']] = $value['Value'];
+                }
             }
+
         }
 
 

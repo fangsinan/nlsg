@@ -88,11 +88,15 @@ class ImMsgServers
         $uids = [];
         $group_id = [];
         foreach ($list as $key=>$value){
-            $uids = array_merge($uids, explode(',',$value['to_account']));
-            $group_id = array_merge($group_id, explode(',',$value['to_group']));
+            if(!empty($value['to_account'])){
+                $uids = array_merge($uids, explode(',',$value['to_account']));
+            }
+            if(!empty($value['to_group'])){
+                $group_id = array_merge($group_id, explode(',',$value['to_group']));
+            }
+
         }
         $userProfileItem = ImMsgController::getImUser($uids);
-        dd($userProfileItem);
         $nikenames = array_column($userProfileItem,"Tag_Profile_IM_Nick");
 
         $groups = ImGroup::select('name','group_id')->whereIn('group_id',$group_id)->get()->toArray();
@@ -113,7 +117,7 @@ class ImMsgServers
 
         $collectionList = ImCollection::select("id","user_id","msg_id","created_at")->where([
             'type'=>1,'user_id'=>$uid,'state'=>1
-        ])->orderBy('created_at',"desc")->paginate($this->page_per_page)->toArray();
+        ])->orderBy('created_at',"desc")->paginate(20)->toArray();
 
         //获取消息
         $msg_ids = array_column($collectionList['data'],'msg_id');
