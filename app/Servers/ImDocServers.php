@@ -278,7 +278,9 @@ class ImDocServers
     {
         $id = $params['id'] ?? 0;
         $flag = $params['flag'] ?? '';
-        $check = ImDoc::where('id', '=', $id)->first();
+        $check = ImDoc::query()
+            ->where('id', '=', $id)
+            ->first();
         if (empty($check)) {
             return ['code' => false, 'msg' => 'id错误'];
         }

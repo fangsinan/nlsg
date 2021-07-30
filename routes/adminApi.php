@@ -215,6 +215,10 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('im_user/order_list', 'ImUserController@orderList');
         Route::get('im_user/mall_order_list', 'ImUserController@mallOrderList');
 
+        //im快捷恢复
+        Route::get('im_quick_reply/list', 'ImQuickReply@list');
+        Route::post('im_quick_reply/add', 'ImQuickReply@add');
+        Route::put('im_quick_reply/change_status', 'ImQuickReply@changeStatus');
 
         //im选择商品
         Route::get('im_doc/category', 'ImDocController@getCategory');

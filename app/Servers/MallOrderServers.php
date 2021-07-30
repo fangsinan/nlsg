@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\DB;
 class MallOrderServers
 {
 
-    public function listNew($params)
+    public function listNew($params,$user_id = 0)
     {
         $query = MallOrder::query();
 
@@ -112,14 +112,15 @@ class MallOrderServers
                         'id', 'service_num', 'order_id', 'order_detail_id', 'type'
                     ]);
                 }
-            ]);
+            ])
+            ->has('userInfo');
 
 
 
 
-        DB::connection()->enableQueryLog();
+//        DB::connection()->enableQueryLog();
         $list = $query->select($field)->orderBy('id', 'desc')->limit(10)->get();
-        dd(DB::getQueryLog());
+//        dd(DB::getQueryLog());
 
 
         return $list;

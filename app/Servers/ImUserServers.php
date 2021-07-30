@@ -246,14 +246,14 @@ class ImUserServers
             );
         }
 
-
         return $list;
-
     }
 
     public function mallOrderList($params, $user_id)
     {
-        $size = $params['size'] ?? 10;
+        $servers = new MallOrderServers();
+        $data = $servers->listNew($params,$user_id);
+        return $data;
     }
 
 }
