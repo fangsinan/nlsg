@@ -12,7 +12,7 @@ class ImFriendController extends ControllerBackend
 {
     /**
      * @api {post} api/admin_v4/im_friend/friend_check  管理后台-校验用户关系
-     * @apiName friend_check
+     * @apiName admin  friend_check
      * @apiVersion 1.0.0
      * @apiGroup im_friend
      *e
@@ -43,7 +43,7 @@ class ImFriendController extends ControllerBackend
 
     /**
      * @api {get} api/admin_v4/im_friend/portrait_get  管理后台-拉取im 用户资料
-     * @apiName portrait_get
+     * @apiName admin portrait_get
      * @apiVersion 1.0.0
      * @apiGroup im_friend
      *e
@@ -68,7 +68,7 @@ class ImFriendController extends ControllerBackend
 
     /**
      * @api {post} api/admin_v4/im_friend/add_friend  管理后台-Im添加好友
-     * @apiName add_friend
+     * @apiName admin add_friend
      * @apiVersion 1.0.0
      * @apiGroup im_friend
      *e
@@ -94,7 +94,7 @@ class ImFriendController extends ControllerBackend
 
     /**
      * @api {post} api/admin_v4/im_friend/del_friend  管理后台-Im删除好友
-     * @apiName del_friend
+     * @apiName admin del_friend
      * @apiVersion 1.0.0
      * @apiGroup im_friend
      *e

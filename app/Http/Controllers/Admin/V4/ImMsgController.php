@@ -22,7 +22,7 @@ class ImMsgController extends ControllerBackend
 
     /**
      * @api {post} api/admin_v4/im/msg_collection  后台管理-消息收藏操作
-     * @apiName msg_collection
+     * @apiName admin msg_collection
      * @apiVersion 1.0.0
      * @apiGroup im
      *
@@ -48,7 +48,7 @@ class ImMsgController extends ControllerBackend
 
     /**
      * @api {post} api/admin_v4/im/msg_collection_list  后台管理-消息收藏列表
-     * @apiName msg_collection_list
+     * @apiName admin msg_collection_list
      * @apiVersion 1.0.0
      * @apiGroup im
      *
