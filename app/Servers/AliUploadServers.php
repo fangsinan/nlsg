@@ -168,11 +168,11 @@ class AliUploadServers
                 ->get();
             if ($Imglist->isNotEmpty()) {
                 $ImgData = $Imglist->toArray();
-                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片开始----------');
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取图片start----------');
                 foreach ($ImgData as $key => $val) {
                     self::UploadMediaByURL(3, $val['url'], $val);
                 }
-                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片结束----------');
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取图片end----------');
             }
         }catch (\Exception $e){
             Log::channel('aliCrontabPullLog')->info('定时抓取图片异常：'.$e->getMessage());
@@ -199,7 +199,7 @@ class AliUploadServers
 //            $query->dd(); //dd 阻断流程
             $Filelist=$query->get();
             if ($Filelist->isNotEmpty()) {
-                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取文件开始----------');
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取文件start----------');
                 $FileData = $Filelist->toArray();
                 foreach ($FileData as $key => $val) {
                     switch ($val['msg_type']) {
@@ -219,7 +219,7 @@ class AliUploadServers
 
                     self::UploadMediaByURL($type, $url, $val);
                 }
-                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取文件结束----------');
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取文件end----------');
             }
         }catch (\Exception $e){
             Log::channel('aliCrontabPullLog')->info('定时抓取文件异常：'.$e->getMessage().$e->getLine());
