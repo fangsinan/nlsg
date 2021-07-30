@@ -194,7 +194,7 @@ class AliUploadServers
                 ->select(['id', 'msg_id', 'msg_type', 'data', 'url', 'size', 'second', 'download_flag', 'uuid', 'image_format', 'file_size', 'file_name', 'video_url', 'video_format', 'thumb_url',
                     'thumb_size', 'thumb_height', 'thumb_width', 'thumb_format','created_at'])
                 ->orderBy('id','desc')
-                ->limit(1);
+                ->limit(10);
 //            echo $query->toSql().PHP_EOL;
 //            $query->dd(); //dd 阻断流程
             $Filelist=$query->get();
