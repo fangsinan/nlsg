@@ -2,7 +2,10 @@
 
 namespace App\Servers;
 
+use App\Http\Controllers\Api\V4\ImMsgController;
+use App\Models\ImGroup;
 use App\Models\ImMsg;
+use App\Models\ImSendAll;
 
 class ImMsgServers
 {
@@ -69,4 +72,35 @@ class ImMsgServers
             ->paginate($size);
 
     }
+
+
+
+
+    public     function sendAllList($params,$uid){
+        if(empty($uid)){
+            return [];
+        }
+        //群发列表
+        $list = ImSendAll::where(['from_account' => $uid])->get()->toArray();
+
+        $uids = [];
+        $group_id = [];
+        foreach ($list as $key=>$value){
+            $uids = array_merge($uids, explode(',',$value['to_account']));
+            $group_id = array_merge($group_id, explode(',',$value['to_group']));
+        }
+        $userProfileItem = ImMsgController::getImUser($uids);
+        $nikenames = array_column($userProfileItem,"Tag_Profile_IM_Nick");
+
+        $groups = ImGroup::select('name','group_id')->whereIn('group_id',$group_id)->get()->toArray();
+        $groupnames = array_column($groups,"name");
+
+        foreach ($list as $key=>$value){
+            $list[$key]['to_account_name'] = $nikenames;
+            $list[$key]['to_group_name'][] = $groupnames;
+        }
+
+        return $list;
+    }
+
 }

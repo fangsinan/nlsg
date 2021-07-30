@@ -15,6 +15,7 @@ use App\Models\ImMsgContentImg;
 use App\Models\ImMsgContent;
 use App\Models\ImMsg;
 use App\Models\ImSendAll;
+use App\Servers\ImMsgServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Libraries\ImClient;
@@ -146,6 +147,32 @@ class ImMsgController extends Controller
             }
         }
         return $this->success();
+    }
+
+
+
+    /**
+     * @api {get} /api/v4/im/send_all_list  群发列表
+     * @apiName send_all_list
+     * @apiVersion 1.0.0
+     * @apiGroup im
+     *
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+    "code": 200,
+    "msg": "成功",
+    "data": {}
+    }
+     */
+    function sendAllList(Request $request){
+        $imObj = new ImMsgServers();
+        //$this->user['id'] = 211172;
+        $data = $imObj->sendAllList($request->input(),$this->user['id']);
+        return $this->getRes($data);
+
+
     }
 
 
@@ -292,6 +319,7 @@ class ImMsgController extends Controller
         $return_data = [];
         foreach ($res['UserProfileItem'] as $userProfile_key=>$userProfileItem_item) {
             $return_data[$userProfileItem_item['To_Account']] = [];
+            $return_data[$userProfileItem_item['To_Account']]["Tag_Profile_IM_UID"] = $userProfileItem_item['To_Account'];
             foreach ($userProfileItem_item['ProfileItem'] as $key=>$value) {
                 $return_data[$userProfileItem_item['To_Account']][$value['Tag']] = $value['Value'];
             }

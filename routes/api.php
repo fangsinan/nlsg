@@ -397,6 +397,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         //Im
         Route::post('im/msg_collection', 'ImMsgController@MsgCollection');
         Route::post('im/msg_collection_list', 'ImMsgController@MsgCollectionList');
+        Route::post('im/send_all_list', 'ImMsgController@sendAllList');
+
         Route::post('im_group/edit_join_group', 'ImGroupController@editJoinGroup');
         Route::post('im_group/forbid_send_msg', 'ImGroupController@forbidSendMsg');
         Route::post('im_group/set_group_user', 'ImGroupController@setGroupUser');
@@ -430,8 +432,11 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('im/get_user_sig', 'ImController@getUserSig');
     Route::post('im/msg_send_all', 'ImMsgController@MsgSendAll');
 
+    Route::post('im_friend/friend_check', 'ImFriendController@friendCheck');
 
     Route::get('ToTwitter', 'IncomeController@ToTwitter');
+
+
 
 });
 
