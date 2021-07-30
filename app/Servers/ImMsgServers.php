@@ -83,7 +83,7 @@ class ImMsgServers
             return [];
         }
         //群发列表
-        $list = ImSendAll::where(['from_account' => $uid])->get()->toArray();
+        $list = ImSendAll::where(['from_account' => $uid,'status'=>0])->get()->toArray();
 
         $uids = [];
         $group_id = [];
@@ -110,6 +110,23 @@ class ImMsgServers
         return $list;
     }
 
+    //清空群发记录 delSendAllList
+    public function delSendAllList($params,$uid){
+        if(empty($uid)){
+            return [];
+        }
+//dd($params);
+        //清空群发列表
+        $query = ImSendAll::where(['from_account' => $uid]);
+
+        if(!empty($params['id']) && is_array($params['id'])){
+            $query->whereIn('id',$params['id']);
+        }
+
+        $query->update(['status'=>1]);
+
+        return [];
+    }
 
     //收藏列表
     public function MsgCollectionList($params,$uid){

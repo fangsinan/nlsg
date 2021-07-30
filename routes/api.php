@@ -398,6 +398,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('im/msg_collection', 'ImMsgController@MsgCollection');
         Route::post('im/msg_collection_list', 'ImMsgController@MsgCollectionList');
         Route::post('im/send_all_list', 'ImMsgController@sendAllList');
+        Route::post('im/del_send_all_list', 'ImMsgController@delSendAllList');
 
         Route::post('im_group/edit_join_group', 'ImGroupController@editJoinGroup');
         Route::post('im_group/forbid_send_msg', 'ImGroupController@forbidSendMsg');
