@@ -210,6 +210,7 @@ class ImMsgController extends Controller
      * @apiGroup im
      *
      * @apiParam {string} keywords  收藏消息关键字
+     * @apiParam {string} page
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
