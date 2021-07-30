@@ -216,7 +216,6 @@ class AliUploadServers
                             $url = $val['video_url'];
                             break;
                     }
-
                     self::UploadMediaByURL($type, $url, $val);
                 }
                 Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取文件end----------');
@@ -397,9 +396,13 @@ class AliUploadServers
         $filename = md5($url); //文件名
         $arr = explode('.', $url);
         $ext = $arr[count($arr) - 1]; //扩展名
-
-        // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
-        $filePath = storage_path('logs/' . $filename . '.' . $ext);
+        if(strlen($ext)>10){ //处理没扩展情况
+            $ext='';
+            $filePath=storage_path('logs/' . $filename);
+        }else {
+            // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
+            $filePath = storage_path('logs/' . $filename . '.' . $ext);
+        }
         if (!file_exists($filePath)) {
             try {
                 file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地
