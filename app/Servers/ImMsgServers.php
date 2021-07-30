@@ -3,9 +3,11 @@
 namespace App\Servers;
 
 use App\Http\Controllers\Api\V4\ImMsgController;
+use App\Models\ImCollection;
 use App\Models\ImGroup;
 use App\Models\ImMsg;
 use App\Models\ImSendAll;
+use Illuminate\Http\Request;
 
 class ImMsgServers
 {
@@ -75,8 +77,8 @@ class ImMsgServers
 
 
 
-
-    public     function sendAllList($params,$uid){
+    //群发list
+    public function sendAllList($params,$uid){
         if(empty($uid)){
             return [];
         }
@@ -90,6 +92,7 @@ class ImMsgServers
             $group_id = array_merge($group_id, explode(',',$value['to_group']));
         }
         $userProfileItem = ImMsgController::getImUser($uids);
+        dd($userProfileItem);
         $nikenames = array_column($userProfileItem,"Tag_Profile_IM_Nick");
 
         $groups = ImGroup::select('name','group_id')->whereIn('group_id',$group_id)->get()->toArray();
@@ -102,5 +105,96 @@ class ImMsgServers
 
         return $list;
     }
+
+
+    //收藏列表
+    public function MsgCollectionList($params,$uid){
+        $keywords = $params['keywords'] ?? '';  //消息关键字
+
+        $collectionList = ImCollection::select("id","user_id","msg_id","created_at")->where([
+            'type'=>1,'user_id'=>$uid,'state'=>1
+        ])->orderBy('created_at',"desc")->paginate($this->page_per_page)->toArray();
+
+        //获取消息
+        $msg_ids = array_column($collectionList['data'],'msg_id');
+        //$msg_list = ImMsg::getMsgList($msg_ids);
+        $query = ImMsg::with([
+            'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data,file_name as FileName,file_size as FileSize',
+        ]);
+
+        if(!empty($keywords)){
+            $query->whereHas('content', function ($query) use ($keywords){
+                $query->where(function ($query)use($keywords){
+                    $query->orWhere('nlsg_im_msg_content.text','LIKE',"%$keywords%");
+                    $query->orWhere('nlsg_im_msg_content.data','LIKE',"%$keywords%");
+                    $query->orWhere('nlsg_im_msg_content.file_name','LIKE',"%$keywords%");
+                });
+            });
+        }
+
+        $msg_list = $query->select('id','msg_seq','msg_time','from_account')
+            ->whereIn('id',$msg_ids)->get()->toArray();
+
+        //获取用户信息
+        $uids = array_column($msg_list,'from_account');
+        $userProfileItem = ImMsgController::getImUser($uids);
+
+        foreach ($collectionList['data'] as $key=>$val) {
+            $collectionList['data'][$key]['msg_list'] = [];
+            foreach ($msg_list as $item){
+                $item['collection_time'] = $val['created_at'];
+                //消息昵称
+                $item['nick_name'] = $userProfileItem[$item['from_account']]['Tag_Profile_IM_Nick']??'';
+                if($val['msg_id'] == $item['id']){
+                    $collectionList['data'][$key]['msg_list'] = $item;
+                    break;
+                }
+            }
+
+            //如果搜索keyword后 没有匹配到 则删除该key值
+            if(empty($collectionList['data'][$key]['msg_list'])){
+                unset($collectionList['data'][$key]);
+            }
+
+        }
+        $collectionList['data'] = array_values($collectionList['data']);
+
+        return $collectionList;
+    }
+
+
+    //收藏操作
+    public function MsgCollection($params,$uid){
+
+        $os_msg_id = $params['os_msg_id'];  //消息
+        $type = $params['type'] ?? 1;  //类型
+        $collection_id = $params['collection_id'];  //id
+
+        if(!empty($collection_id)){
+            ImCollection::whereIn('id',$collection_id)->update(['state' => 2,]);
+            return $this->success();
+        }
+        if(!is_array($os_msg_id)){
+            return ['code'=>false,'msg' => 'msg_key error'];//$this->error('0','msg_key error');
+        }
+        $msg = ImMsg::whereIn('os_msg_id',$os_msg_id)->get()->toArray();
+        if(empty($msg)){
+            return ['code'=>false,'msg' => 'os_msg_id error'];
+        }
+
+        foreach ($msg as $k=>$v){
+            $data = [
+                'user_id' => $uid,
+                'msg_id' => $v['id'],
+                'type'    => $type,
+                'state'    => 1,
+            ];
+            ImCollection::firstOrCreate($data);
+        }
+
+
+        return [];
+    }
+
 
 }
