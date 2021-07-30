@@ -168,11 +168,11 @@ class AliUploadServers
                 ->get();
             if ($Imglist->isNotEmpty()) {
                 $ImgData = $Imglist->toArray();
-                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片开始----------');
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取图片start----------');
                 foreach ($ImgData as $key => $val) {
                     self::UploadMediaByURL(3, $val['url'], $val);
                 }
-                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取图片结束----------');
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取图片end----------');
             }
         }catch (\Exception $e){
             Log::channel('aliCrontabPullLog')->info('定时抓取图片异常：'.$e->getMessage());
@@ -199,7 +199,7 @@ class AliUploadServers
 //            $query->dd(); //dd 阻断流程
             $Filelist=$query->get();
             if ($Filelist->isNotEmpty()) {
-                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取文件开始----------');
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取文件start----------');
                 $FileData = $Filelist->toArray();
                 foreach ($FileData as $key => $val) {
                     switch ($val['msg_type']) {
@@ -216,10 +216,9 @@ class AliUploadServers
                             $url = $val['video_url'];
                             break;
                     }
-
                     self::UploadMediaByURL($type, $url, $val);
                 }
-                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------定时抓取文件结束----------');
+                Log::channel('aliCrontabPullLog')->info(date('Y-m-d H:i:s').'-----------抓取文件end----------');
             }
         }catch (\Exception $e){
             Log::channel('aliCrontabPullLog')->info('定时抓取文件异常：'.$e->getMessage().$e->getLine());
@@ -246,9 +245,13 @@ class AliUploadServers
                 return $DownRst;
             }
             $filePath=$DownRst['data']['filepath'];
+            $file_ext='';
+            if(!empty($DownRst['data']['ext'])){ //有没有扩展名的地址
+                $file_ext='.'.$DownRst['data']['ext'];
+            }
 
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
-            $uploadVideoRequest = new \UploadVideoRequest($DownRst['data']['filepath'], $DownRst['data']['filename'].'.'.$DownRst['data']['ext']);
+            $uploadVideoRequest = new \UploadVideoRequest($DownRst['data']['filepath'], $DownRst['data']['filename'].$file_ext);
             $uploadVideoRequest->setCateId(self::TypeArr[$type]);
             $uploadVideoRequest->setStorageLocation(self::StorageLocation);
             if($type==1) { //视频
@@ -397,9 +400,13 @@ class AliUploadServers
         $filename = md5($url); //文件名
         $arr = explode('.', $url);
         $ext = $arr[count($arr) - 1]; //扩展名
-
-        // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
-        $filePath = storage_path('logs/' . $filename . '.' . $ext);
+        if(strlen($ext)>10){ //处理没扩展情况
+            $ext='';
+            $filePath=storage_path('logs/' . $filename);
+        }else {
+            // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
+            $filePath = storage_path('logs/' . $filename . '.' . $ext);
+        }
         if (!file_exists($filePath)) {
             try {
                 file_put_contents($filePath, file_get_contents($url)); //远程下载文件到本地

@@ -152,7 +152,7 @@ class ImMsgController extends Controller
 
 
     /**
-     * @api {get} /api/v4/im/send_all_list  群发列表
+     * @api {post} /api/v4/im/send_all_list  群发列表
      * @apiName send_all_list
      * @apiVersion 1.0.0
      * @apiGroup im

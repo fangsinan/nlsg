@@ -410,6 +410,11 @@ class AliUploadController extends Controller
                 $ext=$arr[count($arr)-1]; //扩展名
                 $data['format']=$ext;
                 if($type==1){ //视频
+                    $arrLog='视频默认';
+                    if(isset($ruselt['data']['Video'])){
+                        $arrLog=json_encode($ruselt['data']['Video'],true);
+                    }
+                    Log::channel('aliOnDemandLog')->info($arrLog);
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
@@ -426,6 +431,11 @@ class AliUploadController extends Controller
                         $data['thumb_format']=$thumb_ext;
                     }
                 }else if($type==2){ //音频
+                    $arrLog='音频默认';
+                    if(isset($ruselt['data']['Video'])){
+                        $arrLog=json_encode($ruselt['data']['Video'],true);
+                    }
+                    Log::channel('aliOnDemandLog')->info($arrLog);
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
@@ -483,18 +493,30 @@ class AliUploadController extends Controller
 
         try {
             $AliUploadServer=new AliUploadServers();
-
+            $AliUploadServer->initVodClient();
             //处理客户端上传拿不到宽高截图
-            $videoid='13a3ba6d4f1b4c7ba1b585cad344562e';
+            $videoid='d7485a804e3c4c82952ce06a85614af5'; //控制台传mp3
+//            $videoid='b8f021293bc744718532f6d94da12909'; //控制台传mp4   状态完成 有转码
+
+            $videoid='adf41759727f47469565631aedc1fdc6';//客户端m4a
+            $videoid='2ecb28e5d65e46d294bad2b28231d07e';//客户端mp4  状态 上传完成  未转码
             //查询信息
-            $rst=$AliUploadServer->getPlayInfo($videoid,true);
-            var_dump($rst);
+            //https://help.aliyun.com/document_detail/56124.htm?spm=a2c4g.11186623.2.6.386e7d44cGAnIu#doc-api-vod-GetPlayInfo
             $query=[
                 'VideoId' => $videoid,
             ];
-            $action="GetVideoInfo";
-            $rst=$AliUploadServer->AlibabaCloudRpcRequest($action,$query);
-            var_dump($rst);
+//            $result=$AliUploadServer->AlibabaCloudRpcRequest('GetPlayInfo',$query); //获取播放地址 只支持mp4  m3u8  mp3  mpd    但是如果状态不是正常状态只是上传完成状态也不能获取
+//            echo '播放地址：'.PHP_EOL;
+//            var_dump($result);
+//            $result=$AliUploadServer->AlibabaCloudRpcRequest('GetVideoPlayAuth',$query);//获取播放凭证
+//            echo '播放凭证：'.PHP_EOL;
+//            var_dump($result);
+            $result=$AliUploadServer->AlibabaCloudRpcRequest('GetVideoInfo',$query);
+//            echo '媒体信息：'.PHP_EOL;
+            var_dump($result);
+//            $result=$AliUploadServer->AlibabaCloudRpcRequest('GetMezzanineInfo',$query);
+//            echo '原始文件：'.PHP_EOL;
+//            var_dump($result);
             return ;
             /*$url1='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
             $url2='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/46d7b74f9a396ce76539c1c8f8295b44.png?imageMogr2/';
@@ -527,7 +549,7 @@ class AliUploadController extends Controller
             }
 
         } catch (\Exception $e) {
-            return $this->error(0, $e->getMessage());
+            return $this->error(0, $e->getMessage().' '.$e->getLine());
         }
 
     }
