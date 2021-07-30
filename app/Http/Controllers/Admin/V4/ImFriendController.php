@@ -15,7 +15,7 @@ class ImFriendController extends ControllerBackend
      * @apiName admin  friend_check
      * @apiVersion 1.0.0
      * @apiGroup im_friend
-     *e
+     *
      * @apiParam {int} From_Account  需要校验该 UserID 的好友
      * @apiParam {array} To_Account  请求校验的好友的 UserID 列表
      *
@@ -46,7 +46,7 @@ class ImFriendController extends ControllerBackend
      * @apiName admin portrait_get
      * @apiVersion 1.0.0
      * @apiGroup im_friend
-     *e
+     *
      * @apiParam {int} user_id   user_id
      *
      * @apiSuccess {string} result json
@@ -71,7 +71,7 @@ class ImFriendController extends ControllerBackend
      * @apiName admin add_friend
      * @apiVersion 1.0.0
      * @apiGroup im_friend
-     *e
+     *
      * @apiParam {int} From_Account 为该 用户 添加好友
      * @apiParam {int} To_Account   需要添加好友的id
      * @apiParam {int} AddWording   添加的备注
@@ -97,7 +97,7 @@ class ImFriendController extends ControllerBackend
      * @apiName admin del_friend
      * @apiVersion 1.0.0
      * @apiGroup im_friend
-     *e
+     *
      * @apiParam {int} From_Account 需要删除该 用户 的好友
      * @apiParam {array} To_Account   需要删除好友的id
      *
