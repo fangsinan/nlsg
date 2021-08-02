@@ -183,7 +183,7 @@ class ImDocServers
                     foreach ($media_id_list as $milv) {
                         $temp_media_info = ImMedia::where('media_id', '=', $milv)->first();
 
-                        if (empty($cover_img)){
+                        if (empty($cover_img)) {
                             $cover_img = $temp_media_info->url;
                         }
 
@@ -256,10 +256,12 @@ class ImDocServers
 
 //        DB::commit();
 
-        $doc_id = $docModel->id;
-        ImMedia::whereIn('media_id',$media_id_list)->update([
-            'doc_id'=>$doc_id
-        ]);
+        if (!empty($media_id_list)) {
+            $doc_id = $docModel->id;
+            ImMedia::whereIn('media_id', $media_id_list)->update([
+                'doc_id' => $doc_id
+            ]);
+        }
 
         return ['code' => true, 'msg' => '成功'];
 
