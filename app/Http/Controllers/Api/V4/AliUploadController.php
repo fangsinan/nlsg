@@ -390,12 +390,7 @@ class AliUploadController extends Controller
 
                 $AliUploadServer=new AliUploadServers();
                 $AliUploadServer->initVodClient();
-                if($type==3) {
-                    $query = [
-                        'ImageId' => $videoid,
-                    ];
-                    $action='GetImageInfo';
-                }else if($type==1){ //视频
+                if($type==1){ //视频
                     $query=[
                         'VideoId' => $videoid,
                     ];
@@ -405,6 +400,11 @@ class AliUploadController extends Controller
                         'VideoId' => $videoid,
                     ];
                     $action="GetMezzanineInfo"; //查询源文件信息
+                }else if($type==3) {
+                    $query = [
+                        'ImageId' => $videoid,
+                    ];
+                    $action='GetImageInfo';
                 }
                 $ruselt=$AliUploadServer->AlibabaCloudRpcRequest($action,$query);
 
@@ -415,11 +415,9 @@ class AliUploadController extends Controller
                 $ext=$arr[count($arr)-1]; //扩展名
                 $data['format']=$ext;
                 if($type==1){ //视频
-                    $arrLog='video-default';
-                    if(isset($ruselt['data']['Video'])){
-                        $arrLog=json_encode($ruselt['data']['Video'],true);
-                    }
-                    Log::channel('aliOnDemandLog')->info("--AddMedia---".$arrLog);
+
+                    $arrLog=json_encode($ruselt['data']['Video'],true);
+                    Log::channel('aliOnDemandLog')->info("--video AddMedia---".$arrLog);
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration']; //没有
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
@@ -436,11 +434,9 @@ class AliUploadController extends Controller
                         $data['thumb_format']=$thumb_ext;
                     }
                 }else if($type==2){ //音频
-                    $arrLog='audio-default';
-                    if(isset($ruselt['data']['Mezzanine'])){
-                        $arrLog=json_encode($ruselt['data']['Mezzanine'],true);
-                    }
-                    Log::channel('aliOnDemandLog')->info("--AddMedia---".$arrLog);
+
+                    $arrLog=json_encode($ruselt['data']['Mezzanine'],true);
+                    Log::channel('aliOnDemandLog')->info("--audio AddMedia---".$arrLog);
 
                     $data['size']=(empty($ruselt['data']['Mezzanine']['Size']))?0:$ruselt['data']['Mezzanine']['Size'];
                     $data['second']=(empty($ruselt['data']['Mezzanine']['Duration']))?0:$ruselt['data']['Mezzanine']['Duration'];
