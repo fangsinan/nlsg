@@ -52,7 +52,17 @@ class ImMsg extends Base
 
             $media = [];
             if(!empty($val['videoId'])){
-                $media_data = ImMedia::where(['media_id'=>$val['videoId']])->first();
+
+                // 由于视频音频转码 延迟  需设置一个延时超时操作
+                for ($i=0;$i<4;$i++){
+//                    $media_data = ImMedia::where(['media_id'=>$val['videoId'],'is_finish'=>1])->first();
+                    $media_data = ImMedia::where(['media_id'=>$val['videoId'],])->first();
+                    if(!empty($media_data)){
+                        continue;
+                    }
+                    sleep(2);
+                }
+
                 if(empty($media_data)) {
                     return [];
                 }

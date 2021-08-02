@@ -191,7 +191,7 @@ class ImMsgController extends Controller
      */
     function delSendAllList(Request $request){
         $imObj = new ImMsgServers();
-        $this->user['id'] = 211172;
+        //$this->user['id'] = 211172;
         $data = $imObj->delSendAllList($request->input(),$this->user['id']);
         return $this->getRes($data);
 
@@ -310,6 +310,7 @@ class ImMsgController extends Controller
             $msg_add['msg_key']             = $params['MsgKey'];
             $msg_add['send_msg_result']     = $params['SendMsgResult'];
             $msg_add['unread_msg_num']      = $params['UnreadMsgNum'];
+            //单聊    From_Account_To_Account_MsgRandom_MsgSeq
             $msg_add['os_msg_id']           = $params['From_Account'].'_'.$params['To_Account'].'_'.$params['MsgRandom'].'_'.$params['MsgSeq'];
         }
         //群聊消息
@@ -318,6 +319,7 @@ class ImMsgController extends Controller
             $msg_add['online_only_flag']    = $params['OnlineOnlyFlag'];
             $msg_add['type']                = 1;
             $msg_add['msg_random']          = $params['Random'];
+            //群聊   GroupId_MsgSeq
             $msg_add['os_msg_id']           = $params['GroupId'].'_'.$params['MsgSeq'];
         }
 
