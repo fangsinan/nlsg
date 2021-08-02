@@ -191,7 +191,7 @@ class ImMsgController extends Controller
      */
     function delSendAllList(Request $request){
         $imObj = new ImMsgServers();
-        $this->user['id'] = 211172;
+        //$this->user['id'] = 211172;
         $data = $imObj->delSendAllList($request->input(),$this->user['id']);
         return $this->getRes($data);
 
