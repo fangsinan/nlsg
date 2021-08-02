@@ -322,6 +322,37 @@ class AliUploadController extends Controller
         $params =$request->input();
 
         Log::channel('aliOnDemandLog')->info(json_encode($params,true));
+        if(!empty($params)){
+            $data=json_decode($params,true);
+            if(!empty($data['Status']) && $data['Status']=='success' && !empty($data['CoverUrl'])){ //处理视频封面
+                $map=[];
+                $map['thumb_url']=$data['CoverUrl'];
+                $CoverSize=getimagesize($data['thumb_url']);
+                $map['thumb_width']=$CoverSize[0];
+                $map['thumb_height']=$CoverSize[1];
+//                    $data['thumb_size']=;
+                $thumb_arr=explode('.',$map['thumb_url']);
+                $thumb_ext=$thumb_arr[count($thumb_arr)-1]; //扩展名
+                $map['thumb_format']=$thumb_ext;
+
+                $map['media_id'] = $data['VideoId'];//媒体id
+
+                $ImMediaInfo = ImMedia::query()->where('media_id', $data['VideoId'])->first();
+                if (empty($ImMediaInfo)) {
+                    $rst = DB::table(ImMedia::DB_TABLE)->insert($map);
+                } else {
+                    $rst = DB::table(ImMedia::DB_TABLE)->where('id', $ImMediaInfo->id)->update($map);
+                }
+
+                if($rst===false){
+                    DB::rollBack();
+                    return $this->error(0, '保存失败');
+                }
+
+
+
+            }
+        }
 
     }
 
@@ -441,6 +472,7 @@ class AliUploadController extends Controller
                     $data['size']=(empty($ruselt['data']['Mezzanine']['Size']))?0:$ruselt['data']['Mezzanine']['Size'];
                     $data['second']=(empty($ruselt['data']['Mezzanine']['Duration']))?0:$ruselt['data']['Mezzanine']['Duration'];
                     $data['file_name']=(empty($ruselt['data']['Mezzanine']['FileName']))?'':$ruselt['data']['Mezzanine']['FileName'];
+                    $data['is_finish']=1;
 
 //                    $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
 //                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];  //这个值没有
@@ -454,8 +486,24 @@ class AliUploadController extends Controller
                 }
 
                 $data['media_id'] = $videoid;
-                $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
-                if ($rst === false) {
+                if($type==3 && $type==2){//图片
+                    $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
+                }else {//视频
+                    $ImMediaInfo = ImMedia::query()->where('media_id', $videoid)->first();
+                    if (empty($ImMediaInfo)) {
+                        $rst = DB::table(ImMedia::DB_TABLE)->insert($data);
+                    } else {
+                        if(empty($data['thumb_url'])){
+                            unset($data['thumb_url']);
+                        }
+//                        $data['size']=(empty($ruselt['data']['Mezzanine']['Size']))?0:$ruselt['data']['Mezzanine']['Size'];
+//                        $data['second']=(empty($ruselt['data']['Mezzanine']['Duration']))?0:$ruselt['data']['Mezzanine']['Duration'];
+//                        $data['file_name']=(empty($ruselt['data']['Mezzanine']['FileName']))?'':$ruselt['data']['Mezzanine']['FileName'];
+                        $rst = DB::table(ImMedia::DB_TABLE)->where('id', $ImMediaInfo->id)->update($data);
+                    }
+                }
+                if($rst===false){
+                    DB::rollBack();
                     return $this->error(0, '保存失败');
                 }
                 return $this->success(['videoid'=>$videoid]);
