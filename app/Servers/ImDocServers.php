@@ -271,9 +271,7 @@ class ImDocServers
     {
         $size = $params['size'] ?? 10;
         $query = ImDoc::query()
-            ->with([
-                'mediaInfo:id,type,media_id,url,doc_id'
-            ]);
+            ->with(['mediaInfo:id,type,media_id,url,doc_id,file_name,size,width,height,second,format,thumb_url,thumb_size,thumb_width,thumb_height,thumb_format']);
 
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
