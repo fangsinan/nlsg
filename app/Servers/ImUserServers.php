@@ -252,6 +252,7 @@ class ImUserServers
     public function mallOrderList($params, $user_id)
     {
         $servers = new MallOrderServers();
+//        $data = $servers->allMallOrder($params,$user_id);
         $data = $servers->listNew($params,$user_id);
         return $data;
     }

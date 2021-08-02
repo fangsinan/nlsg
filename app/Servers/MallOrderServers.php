@@ -16,7 +16,6 @@ use App\Models\MallOrder;
 use App\Models\MallOrderChild;
 use App\Models\MallOrderDetails;
 use App\Models\SpecialPriceModel;
-use App\Models\Task;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +28,7 @@ use Illuminate\Support\Facades\DB;
 class MallOrderServers
 {
 
-    public function listNew($params,$user_id = 0)
+    public function listNew($params, $user_id = 0)
     {
         $query = MallOrder::query();
 
@@ -63,9 +62,10 @@ class MallOrderServers
         $field = [
             'id', 'ordernum', 'price', 'dead_time',
             'created_at', 'pay_price', 'price', 'post_type', 'pay_type',
-            'normal_cut','user_id',
+            'normal_cut', 'user_id', 'order_type',
+            DB::raw('(case order_type when 1 then "普通"
+             when  2 then "秒杀" when  3 then "拼团" else "数据错误" end) as order_type_name')
         ];
-
         //订单状态 1待付款  10待发货 20待收货 30已完成 95拼团中 99已取消
 
         // status : 订单状态 1待付款  10待发货 20待收货 30已完成
@@ -75,6 +75,8 @@ class MallOrderServers
             case 1:
                 $query->where('status', '=', 1)
                     ->where('is_stop', '=', 0);
+                $field[] = DB::raw('1 as search_status');
+                $field[] = DB::raw('"待付款" as search_status_name');
                 break;
             case 10:
                 $query->where('status', '=', 10)
@@ -83,22 +85,33 @@ class MallOrderServers
                         $q->whereRaw('order_type = 3 and gp_status = 2')
                             ->orWhereRaw('order_type <> 3');
                     });
+                $field[] = DB::raw('10 as search_status');
+                $field[] = DB::raw('"待发货" as search_status_name');
                 break;
             case 20:
                 $query->where('status', '=', 20)
                     ->where('is_stop', '=', 0);
+                $field[] = DB::raw('20 as search_status');
+                $field[] = DB::raw('"待收货" as search_status_name');
                 break;
             case 30:
                 $query->where('status', '=', 30)
                     ->where('is_stop', '=', 0);
+                $field[] = DB::raw('30 as search_status');
+                $field[] = DB::raw('"已完成" as search_status_name');
                 break;
             case 95:
-                $query->where('gp_status', '=', 1)
+                $query->where('order_type','=',3)
+                    ->where('gp_status', '=', 1)
                     ->where('status', '=', 10)
                     ->where('is_stop', '=', 0);
+                $field[] = DB::raw('95 as search_status');
+                $field[] = DB::raw('"拼团中" as search_status_name');
                 break;
             case 99:
                 $query->where('is_stop', '=', 1);
+                $field[] = DB::raw('99 as search_status');
+                $field[] = DB::raw('"已取消" as search_status_name');
                 break;
         }
 
@@ -113,13 +126,15 @@ class MallOrderServers
                     ]);
                 }
             ])
-            ->has('userInfo');
-
-
+            ->has('userInfo')
+            ->has('orderDetails');
 
 
 //        DB::connection()->enableQueryLog();
-        $list = $query->select($field)->orderBy('id', 'desc')->limit(10)->get();
+        $query->select($field);
+
+
+        $list = $query->orderBy('id', 'desc')->limit(10)->get();
 //        dd(DB::getQueryLog());
 
 
@@ -353,7 +368,7 @@ class MallOrderServers
             'id', 'ordernum', 'price', 'dead_time', 'user_id', 'order_type', 'pay_price', 'messages', 'created_at',
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'address_history'
         ];
-        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo','refundRecord'];
+        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo', 'refundRecord'];
 
 //        if (($params['flag'] ?? 0) == 1) {
         $field[] = 'cost_price';
@@ -525,7 +540,7 @@ class MallOrderServers
 				END ) status')
         ];
 
-        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo','refundRecord'];
+        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo', 'refundRecord'];
 
         if (($params['flag'] ?? 0) == 1) {
             $field[] = 'address_history';
@@ -688,6 +703,26 @@ class MallOrderServers
         }
         DB::commit();
         return ['code' => true, 'msg' => '成功'];
+    }
+
+
+    //群组
+    public function allMallOrder($params,$user_id){
+        $size = $params['size'] ?? 10;
+        $query = MallOrder::query();
+        $query->with([
+            'userInfo',
+            'groupBuy',
+            'orderDetails',
+            'orderDetails.goodsInfo',
+        ])->has('userInfo')
+            ->has('orderDetails');
+
+        $field = ['id','ordernum','user_id','order_type','status','gp_status'];
+
+        $query->select($field);
+
+        return $query->paginate($size);
     }
 
 }

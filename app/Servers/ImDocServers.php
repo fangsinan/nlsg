@@ -179,10 +179,14 @@ class ImDocServers
                     }
                 }
                 if ($params['type_info'] == 23) {
-//                    $media_id_list = explode(',', $media_id);
                     $file_url = '';
                     foreach ($media_id_list as $milv) {
                         $temp_media_info = ImMedia::where('media_id', '=', $milv)->first();
+
+                        if (empty($cover_img)){
+                            $cover_img = $temp_media_info->url;
+                        }
+
                         $temp_file_url = $temp_media_info->url . ',' . $temp_media_info->size . ',' .
                             $temp_media_info->width . ',' . $temp_media_info->height . ',' . $milv . ';';
                         $file_url .= $temp_file_url;
@@ -251,6 +255,12 @@ class ImDocServers
 //        }
 
 //        DB::commit();
+
+        $doc_id = $docModel->id;
+        ImMedia::whereIn('media_id',$media_id_list)->update([
+            'doc_id'=>$doc_id
+        ]);
+
         return ['code' => true, 'msg' => '成功'];
 
     }
@@ -258,7 +268,11 @@ class ImDocServers
     public function list($params)
     {
         $size = $params['size'] ?? 10;
-        $query = ImDoc::query()->with(['mediaInfo']);
+        $query = ImDoc::query()
+            ->with([
+                'mediaInfo:id,type,media_id,url,doc_id'
+            ]);
+
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
         }

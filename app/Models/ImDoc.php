@@ -11,6 +11,6 @@ class ImDoc extends Base
     protected $table = 'nlsg_im_doc';
 
     public function mediaInfo(){
-        return $this->hasOne(ImMedia::class,'id','media_id');
+        return $this->hasMany(ImMedia::class,'doc_id','id');
     }
 }
