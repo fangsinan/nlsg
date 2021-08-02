@@ -27,8 +27,8 @@ class ImMsg extends Base
 
         $query = ImMsg::with([
             'content:id,msg_id,msg_type as MsgType,text as Text,url as Url,video_url as VideoUrl,thumb_url as ThumbUrl,data as Data,file_name as FileName,file_size as FileSize
-            ,uuid,image_format as ImageFormat,file_name as FileName,size as VideoSize,video_format as VideoFormat,thumb_url as ThumbUrl,thumb_size as ThumbSize,thumb_width as ThumbWidth,thumb_height as ThumbHeight,thumb_format as ThumbFormat,second as VideoSecond,video_uuid',
-            'content.imginfo:content_id,type,size,width,height,url',
+            ,uuid,image_format as ImageFormat,file_name as FileName,size as VideoSize,video_format as VideoFormat,thumb_url as ThumbUrl,thumb_size as ThumbSize,thumb_width as ThumbWidth,thumb_height as ThumbHeight,thumb_format as ThumbFormat,second as VideoSecond,video_uuid,uuid as UUID',
+            'content.imginfo:content_id,type,size,width,height,url,uuid as UUID',
             ])->select('id','msg_seq','msg_time','from_account');
         if(!empty($ids) ){
             return $query->whereIn('id',$ids)->get()->toArray();
