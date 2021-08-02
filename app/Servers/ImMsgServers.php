@@ -187,9 +187,9 @@ class ImMsgServers
     //收藏操作
     public function MsgCollection($params,$uid){
 
-        $os_msg_id = $params['os_msg_id'];  //消息
+        $os_msg_id = $params['os_msg_id']??[];  //消息
         $type = $params['type'] ?? 1;  //类型
-        $collection_id = $params['collection_id'];  //id
+        $collection_id = $params['collection_id']??[];  //id
 
         if(!empty($collection_id)){
             ImCollection::whereIn('id',$collection_id)->update(['state' => 2,]);
