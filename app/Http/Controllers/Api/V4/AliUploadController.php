@@ -437,8 +437,8 @@ class AliUploadController extends Controller
                     }
                 }else if($type==2){ //音频
                     $arrLog='audio-default';
-                    if(isset($ruselt['data']['Video'])){
-                        $arrLog=json_encode($ruselt['data']['Video'],true);
+                    if(isset($ruselt['data']['Mezzanine'])){
+                        $arrLog=json_encode($ruselt['data']['Mezzanine'],true);
                     }
                     Log::channel('aliOnDemandLog')->info("--AddMedia---".$arrLog);
 
@@ -454,6 +454,7 @@ class AliUploadController extends Controller
                     $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
                     $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
                     $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
+                    $data['is_finish']=1;
                 }
 
                 $data['media_id'] = $videoid;
