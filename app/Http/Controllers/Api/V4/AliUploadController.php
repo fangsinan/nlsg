@@ -410,11 +410,11 @@ class AliUploadController extends Controller
                 $ext=$arr[count($arr)-1]; //扩展名
                 $data['format']=$ext;
                 if($type==1){ //视频
-                    $arrLog='视频默认';
+                    $arrLog='video-default';
                     if(isset($ruselt['data']['Video'])){
                         $arrLog=json_encode($ruselt['data']['Video'],true);
                     }
-                    Log::channel('aliOnDemandLog')->info($arrLog);
+                    Log::channel('aliOnDemandLog')->info("--AddMedia---".$arrLog);
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
@@ -431,11 +431,11 @@ class AliUploadController extends Controller
                         $data['thumb_format']=$thumb_ext;
                     }
                 }else if($type==2){ //音频
-                    $arrLog='音频默认';
+                    $arrLog='audio-default';
                     if(isset($ruselt['data']['Video'])){
                         $arrLog=json_encode($ruselt['data']['Video'],true);
                     }
-                    Log::channel('aliOnDemandLog')->info($arrLog);
+                    Log::channel('aliOnDemandLog')->info("--AddMedia---".$arrLog);
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
@@ -493,6 +493,17 @@ class AliUploadController extends Controller
 
         try {
             $AliUploadServer=new AliUploadServers();
+
+//            $rst=$AliUploadServer->UploadMediaPull();
+//           var_dump($rst);
+//           return ;
+           $rst=$AliUploadServer->UploadMediaVideoAudio();
+           var_dump($rst);
+           return ;
+
+            //回调问题
+
+
             $AliUploadServer->initVodClient();
             //处理客户端上传拿不到宽高截图
             $videoid='d7485a804e3c4c82952ce06a85614af5'; //控制台传mp3
@@ -528,12 +539,6 @@ class AliUploadController extends Controller
             $result = $AliUploadServer->UploadMediaByURL(3,$url3);
             $result = $AliUploadServer->UploadMediaByURL(3,$url4);*/
 
-            /*$rst=$AliUploadServer->UploadMediaPull();
-            var_dump($rst);
-            return ;
-            $rst=$AliUploadServer->UploadMediaVideoAudio();
-            var_dump($rst);
-            return ;*/
 
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
             $result = $AliUploadServer->UploadMediaByURL(1,$url);
