@@ -330,12 +330,13 @@ class AliUploadController extends Controller
                 $CoverSize=getimagesize($data['thumb_url']);
                 $map['thumb_width']=$CoverSize[0];
                 $map['thumb_height']=$CoverSize[1];
-//                    $data['thumb_size']=;
+//                $data['thumb_size']=;
                 $thumb_arr=explode('.',$map['thumb_url']);
                 $thumb_ext=$thumb_arr[count($thumb_arr)-1]; //扩展名
                 $map['thumb_format']=$thumb_ext;
 
                 $map['media_id'] = $data['VideoId'];//媒体id
+                $map['is_finish']=1;
 
                 $ImMediaInfo = ImMedia::query()->where('media_id', $data['VideoId'])->first();
                 if (empty($ImMediaInfo)) {
@@ -452,25 +453,13 @@ class AliUploadController extends Controller
                     $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
                     $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration']; //没有
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
-                    $data['thumb_url']=(empty($ruselt['data']['Video']['CoverURL']))?'':$ruselt['data']['Video']['CoverURL']; //没有
-                    if(!empty($data['thumb_url'])){ //没有
-                        $CoverSize=getimagesize($data['thumb_url']);
-                        $data['thumb_width']=$CoverSize[0];
-                        $data['thumb_height']=$CoverSize[1];
-                    }
-//                    $data['thumb_size']=;
-                    if(!empty($data['thumb_url'])){
-                        $thumb_arr=explode('.',$data['thumb_url']);
-                        $thumb_ext=$thumb_arr[count($thumb_arr)-1]; //扩展名
-                        $data['thumb_format']=$thumb_ext;
-                    }
                 }else if($type==2){ //音频
 
                     $arrLog=json_encode($ruselt['data']['Mezzanine'],true);
                     Log::channel('aliOnDemandLog')->info("--audio-AddMedia---".$arrLog);
 
                     $data['size']=(empty($ruselt['data']['Mezzanine']['Size']))?0:$ruselt['data']['Mezzanine']['Size'];
-                    $data['second']=(empty($ruselt['data']['Mezzanine']['Duration']))?0:$ruselt['data']['Mezzanine']['Duration'];
+                    $data['second']=(empty($ruselt['data']['Mezzanine']['Duration']))?0:$ruselt['data']['Mezzanine']['Duration']; //没有
                     $data['file_name']=(empty($ruselt['data']['Mezzanine']['FileName']))?'':$ruselt['data']['Mezzanine']['FileName'];
                     $data['is_finish']=1;
 
