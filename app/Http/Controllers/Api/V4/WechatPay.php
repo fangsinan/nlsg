@@ -21,7 +21,6 @@ use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
 use App\Models\PayRecordDetailStay;
 use App\Models\Subscribe;
-use App\Models\Task;
 use App\Models\User;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
@@ -326,7 +325,7 @@ class WechatPay extends Controller
                     self::LiveRedis(16, 1, $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 
                     //短信
-                    if ($AdminInfo['phone'] && strlen($AdminInfo['phone'])==11) {
+                    if ($AdminInfo['phone'] && strlen($AdminInfo['phone']) == 11) {
                         $easySms = app('easysms');
                         $result = $easySms->send($AdminInfo['phone'], [
                             'template' => 'SMS_211001614',
@@ -400,7 +399,6 @@ class WechatPay extends Controller
                 $recordRst = PayRecord::firstOrCreate($record);
 
 
-
 //                if($orderInfo['relation_id'] == 5){
 //                    // 直播间的线下产品   训练营
 //                    $starttime = strtotime(date('Y-m-d', $time));
@@ -444,12 +442,12 @@ class WechatPay extends Controller
                     $vipModel = new VipUser();
                     $vip_res = $vipModel->jobOf1360($orderInfo['user_id'], $orderInfo['id'], $orderInfo['live_id']);
                     $vip_res = $vip_res['code'];
-                }else if ($orderInfo['relation_id'] == 5 && $total_fee > $total_fee_line && $orderInfo['type'] == 14 && !empty($twitter_id) && $twitter_id != $user_id ) {
+                } else if ($orderInfo['relation_id'] == 5 && $total_fee > $total_fee_line && $orderInfo['type'] == 14 && !empty($twitter_id) && $twitter_id != $user_id) {
                     $tk_vip = VipUser::IsNewVip($twitter_id);
-                    if ( $tk_vip ) {   //目前只有360会员有收益
+                    if ($tk_vip) {   //目前只有360会员有收益
                         $ProfitPrice = GetPriceTools::Income(0, $tk_vip, 0, 6);
                         if ($ProfitPrice > 0) {
-                            $map = array('user_id' => $twitter_id, "type" => 12, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, );
+                            $map = array('user_id' => $twitter_id, "type" => 12, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time,);
                             //防止用户退款   暂时走线下 名单返款
                             //$vip_res = PayRecordDetail::firstOrCreate($map);
                         }
@@ -492,7 +490,7 @@ class WechatPay extends Controller
 
         if ($type == 16) {
             $res = $nickname . ':您已成功购买' . $live_num . '个幸福360会员';
-        } else if ($type == 14){
+        } else if ($type == 14) {
             switch ($relation_id) {
                 case 1: //经营能量
                     $res = $nickname . ':您已成功购买' . $live_num . '张经营能量门票';
@@ -510,11 +508,11 @@ class WechatPay extends Controller
                     $res = $nickname . ':您已支付' . $live_num . '张30天智慧父母(亲子)训练营';
                     break;
             }
-        } else if ($type == 18){
+        } else if ($type == 18) {
             $data = Column::find($relation_id);
-            $res = $nickname . ':您已购买'.$data['name'];
-        }else if($type==11){ //购买9.9直播间
-            $res = $nickname . ':您已订阅'.$relation_id;
+            $res = $nickname . ':您已购买' . $data['name'];
+        } else if ($type == 11) { //购买9.9直播间
+            $res = $nickname . ':您已订阅' . $relation_id;
         }
         Redis::rpush($key, $res);
 //        Redis::setex($key,600,json_encode($res,true));
@@ -566,7 +564,7 @@ class WechatPay extends Controller
                     try {
                         $user_info = User::whereId($user_id)->first();
                         $phone = $user_info->phone ?? '';
-                        if (!empty($phone) && strlen($phone)==11) {
+                        if (!empty($phone) && strlen($phone) == 11) {
                             $easySms->send($phone, [
                                 'template' => 'SMS_209470584',
                                 'data' => [],
@@ -674,14 +672,14 @@ class WechatPay extends Controller
                     DB::commit();
                     //SMS_211275363
                     //短信
-                    if ($userdata['phone'] && $live_id == 12 && strlen($userdata['phone'])==11) {
+                    if ($userdata['phone'] && $live_id == 12 && strlen($userdata['phone']) == 11) {
                         $easySms = app('easysms');
                         $easySms->send($userdata['phone'], [
                             'template' => 'SMS_211275363',
                         ], ['aliyun']);
                     }
                     //9.9刷单推送
-                    if(!empty($orderInfo['remark']) && $orderInfo['remark']>0) {
+                    if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
                         self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
                     }
 
@@ -813,7 +811,6 @@ class WechatPay extends Controller
         $order_obj->pay_type = $data['pay_type'];
         $order_obj->pay_time = $now_date;
         $order_obj->pay_price = $pay_price;
-        $order_obj->gp_status = 1;
 
         $order_res = $order_obj->save();
         if (!$order_res) {
@@ -898,9 +895,14 @@ class WechatPay extends Controller
                     ]
                 );
 
-                MallOrder::where('id', '=', $order_obj->id)->update([
-                    'gp_status' => 2
-                ]);
+                $change_gp_status_order_ids = MallGroupBuyList::where(
+                    'group_key', '=', $temp_data->group_key
+                )->pluck('order_id')->toArray();
+
+                MallOrder::whereIn('id', $change_gp_status_order_ids)
+                    ->update([
+                        'gp_status' => 2
+                    ]);
 
                 if (!$gb_res) {
                     DB::rollBack();
@@ -1015,7 +1017,7 @@ class WechatPay extends Controller
                 $order_type = 1;
                 if ($orderInfo['type'] == 15) {
                     $order_type = 19;  //讲座
-                }elseif ($orderInfo['type'] == 18) {
+                } elseif ($orderInfo['type'] == 18) {
                     $order_type = 22;  //讲座
                 }
                 $record = [
@@ -1040,7 +1042,7 @@ class WechatPay extends Controller
                 $sub_type = 1;
                 if ($orderInfo['type'] == 15) {
                     $sub_type = 6;  //讲座
-                }else  if ($orderInfo['type'] == 18) {
+                } else if ($orderInfo['type'] == 18) {
                     $sub_type = 7;  //训练营
                 }
                 if (!empty($twitter_id) && $orderInfo['twitter_id'] != $orderInfo['service_id']) {
@@ -1143,7 +1145,7 @@ class WechatPay extends Controller
                     }
                 }
 
-                if (!empty($map) && $orderInfo['type'] != 18 ) {
+                if (!empty($map) && $orderInfo['type'] != 18) {
                     //$PayRDObj = new PayRecordDetail();
                     //防止重复添加收入
                     $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
@@ -1182,12 +1184,11 @@ class WechatPay extends Controller
 
                 //订阅量处理
                 Column::where(['id' => $teacher_id])->increment('real_subscribe_num');
-                if($orderInfo['type'] == 18){   //训练营不需要虚拟订阅数据
+                if ($orderInfo['type'] == 18) {   //训练营不需要虚拟订阅数据
                     Column::where(['id' => $teacher_id])->increment('subscribe_num');
-                }else{
+                } else {
                     Works::edit_view_num($teacher_id, 2, 2); //虚拟数 3000以下1：50   以上1：5
                 }
-
 
 
 //                $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
@@ -1205,7 +1206,7 @@ class WechatPay extends Controller
                     $send_type = 2;  //专栏
                     if ($orderInfo['type'] == 15) {
                         $send_type = 2;  //讲座
-                    }elseif ($orderInfo['type'] == 18) {
+                    } elseif ($orderInfo['type'] == 18) {
                         $send_type = 7;  //训练营
                     }
 

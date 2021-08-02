@@ -71,6 +71,7 @@ class MallOrderGroupBuy extends Base
         $order_data['pay_type'] = $params['pay_type'];
         $order_data['live_id'] = $params['live_id'];
         $order_data['live_info_id'] = $params['live_info_id'];
+        $order_data['gp_status'] = 1;
 
         DB::beginTransaction();
 
