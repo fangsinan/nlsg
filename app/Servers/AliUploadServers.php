@@ -399,19 +399,19 @@ class AliUploadServers
     public function GetUrlDownload($url,$type=0,$info=[]){
 
         $filename = md5($url); //文件名
+        $filePath=storage_path('logs/' . $filename);
+
         $arr = explode('.', $url);
         $ext = $arr[count($arr) - 1]; //扩展名
         if(strlen($ext)>10){ //处理没扩展名情况
             $ext=''; //文件可没扩展名
             if($type==1 && !empty($info)){ //视频必须要有扩展名
                 $ext=$info['video_format'];
-                $filePath=storage_path('logs/' . $filename. '.' . $ext);
-            }else{
-                $filePath=storage_path('logs/' . $filename);
+                $filePath.='.' . $ext;
             }
         }else {
             // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
-            $filePath = storage_path('logs/' . $filename . '.' . $ext);
+            $filePath .=  '.' . $ext;
         }
         if (!file_exists($filePath)) {
             try {
