@@ -193,7 +193,7 @@ class ImMsgServers
 
         if(!empty($collection_id)){
             ImCollection::whereIn('id',$collection_id)->update(['state' => 2,]);
-            return $this->success();
+            return [];
         }
         if(!is_array($os_msg_id)){
             return ['code'=>false,'msg' => 'msg_key error'];//$this->error('0','msg_key error');
