@@ -11,6 +11,7 @@ use App\Models\Live;
 use App\Models\LiveComment;
 use App\Models\LiveInfo;
 use App\Models\User;
+use App\Servers\ImGroupServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -40,54 +41,11 @@ class ImGroupController extends Controller
     }
      */
     public function editJoinGroup(Request $request){
-        $params    = $request->input();
-
-        if(empty($params['type']) || empty($params['group_id']) || empty($params['user_id'])  ){
-            return $this->error('0','request error');
-        }
-
-        $imGroup = ImGroup::select('type')->where(['group_id'=>$params['group_id']])->first();
-        if(empty($imGroup)){
-            return $this->error('0','该群不存在');
-        }
-        if( !empty($imGroup['type']) && $imGroup['type'] == "AVChatRoom" ){
-            return $this->error('0','AVChatRoom 不支持该操作');
-        }
 
 
-
-        if($params['type'] == 'add'){
-            $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/add_group_member");
-            $post_data['GroupId'] = $params['group_id'];
-            foreach ($params['user_id'] as $v){
-                $post_data['MemberList'][] = [
-                    'Member_Account'=>$v,
-                ];
-            }
-        }elseif($params['type'] == 'del'){
-            $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/delete_group_member");
-            $post_data = [
-                'GroupId' => $params['group_id'],
-                'Silence' => $params['silence'] ?? '',
-                'Reason' => $params['reason'] ?? '',
-                'MemberToDel_Account' => $params['user_id'],
-            ];
-        }else{
-            return $this->error(0,'type error');
-        }
-
-        $res = ImClient::curlPost($url,json_encode($post_data));
-        $res = json_decode($res,true);
-        //修改群人数
-        ImGroup::setGroupInfo([$params['group_id']]);
-
-
-        if ($res['ActionStatus'] == 'OK'){
-            return $this->success();
-        }else{
-            return $this->error(0,$res['ErrorCode'],$res['ErrorInfo']);
-        }
-
+        $servers = new ImGroupServers();
+        $data = $servers->editJoinGroup($request->input());
+        return $this->getRes($data);
     }
 
 
