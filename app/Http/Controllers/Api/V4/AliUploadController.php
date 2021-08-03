@@ -329,6 +329,7 @@ class AliUploadController extends Controller
                     $returnArr = json_decode($data['Extend'], true);
                     if (!empty($returnArr['type']) && $returnArr['type'] == 2) { //音频
                         $map['second'] = $data['Duration']; //时长
+                        $map['size'] = $data['Size']; //大小
                         $map['is_finish']=1;
                     } else if (!empty($returnArr['type']) && $returnArr['type'] == 1) { //处理视频
                         if(!empty($data['EventType']) && $data['EventType']=='VideoAnalysisComplete'){ //视频分析完成
