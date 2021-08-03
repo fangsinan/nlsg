@@ -330,6 +330,7 @@ class AliUploadController extends Controller
                     $returnArr = json_encode($data['Extend'], true);
                     if (!empty($returnArr['type']) && $returnArr['type'] == 2) { //音频
                         $map['second'] = $data['Duration']; //时长
+                        $map['is_finish']=1;
                     } else if (!empty($returnArr['type']) && $returnArr['type'] == 1) { //视频
                         //获取视频时长
                         $AliUploadServer = new AliUploadServers();
@@ -354,17 +355,15 @@ class AliUploadController extends Controller
                         $map['media_id'] = $data['VideoId'];//媒体id
                         $map['is_finish'] = 1;
                     }
-                    
+
                     $ImMediaInfo = ImMedia::query()->where('media_id', $data['VideoId'])->first();
                     if (empty($ImMediaInfo)) {
                         $rst = DB::table(ImMedia::DB_TABLE)->insert($map);
                     } else {
                         $rst = DB::table(ImMedia::DB_TABLE)->where('id', $ImMediaInfo->id)->update($map);
                     }
-
                     if ($rst === false) {
-                        DB::rollBack();
-                        return $this->error(0, '保存失败');
+                        Log::channel('aliOnDemandLog')->info($data['VideoId'].' Callback fail');
                     }
                 }
 
@@ -477,7 +476,6 @@ class AliUploadController extends Controller
                     $data['size']=(empty($ruselt['data']['Mezzanine']['Size']))?0:$ruselt['data']['Mezzanine']['Size'];
                     $data['second']=(empty($ruselt['data']['Mezzanine']['Duration']))?0:$ruselt['data']['Mezzanine']['Duration']; //没有
                     $data['file_name']=(empty($ruselt['data']['Mezzanine']['FileName']))?'':$ruselt['data']['Mezzanine']['FileName'];
-                    $data['is_finish']=1;
 
 //                    $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
 //                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];  //这个值没有
