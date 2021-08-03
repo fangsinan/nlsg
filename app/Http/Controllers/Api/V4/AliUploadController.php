@@ -327,7 +327,7 @@ class AliUploadController extends Controller
             if(!empty($data['Status']) && $data['Status']=='success'){ //处理视频封面  && !empty($data['CoverUrl'])
                 $map=[];
                 if(!empty($data['Extend'])) { //有返回值
-                    $returnArr = json_encode($data['Extend'], true);
+                    $returnArr = json_decode($data['Extend'], true);
                     if (!empty($returnArr['type']) && $returnArr['type'] == 2) { //音频
                         $map['second'] = $data['Duration']; //时长
                         $map['is_finish']=1;
