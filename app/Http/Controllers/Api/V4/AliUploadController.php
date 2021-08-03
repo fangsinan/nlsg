@@ -331,6 +331,7 @@ class AliUploadController extends Controller
                         $map['second'] = $data['Duration']; //时长
                         $map['is_finish']=1;
                     } else if (!empty($returnArr['type']) && $returnArr['type'] == 1) { //处理视频封面  && !empty($data['CoverUrl'])
+                        return ;
                         //获取视频时长
                         $AliUploadServer = new AliUploadServers();
                         $AliUploadServer->initVodClient();
