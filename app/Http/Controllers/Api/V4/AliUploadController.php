@@ -319,11 +319,10 @@ class AliUploadController extends Controller
 
     //上传完成回调
     public function Callback(Request $request){
-        $params =$request->input();
+        $data =$request->input();
 
-        Log::channel('aliOnDemandLog')->info(json_encode($params,true));
-        if(!empty($params)){
-            $data=json_decode($params,true);
+        if(!empty($data)){
+            Log::channel('aliOnDemandLog')->info(json_encode($data,true));
             if(!empty($data['Status']) && $data['Status']=='success'){
 
                 $map=[];
@@ -363,7 +362,6 @@ class AliUploadController extends Controller
                     } else {
                         $rst = DB::table(ImMedia::DB_TABLE)->where('id', $ImMediaInfo->id)->update($map);
                     }
-                    Log::channel('aliOnDemandLog')->info($data['VideoId'].'   -----    '.json_encode($map));
                     if ($rst === false) {
                         Log::channel('aliOnDemandLog')->info($data['VideoId'].' Callback fail');
                     }
