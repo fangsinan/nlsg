@@ -327,15 +327,14 @@ class AliUploadController extends Controller
                 $map=[];
                 if(!empty($data['Extend'])) { //有返回值
                     $returnArr = json_decode($data['Extend'], true);
-                    if (!empty($returnArr['type']) && $returnArr['type'] == 2) { //音频
+                    if (!empty($returnArr['type']) && $returnArr['type'] == 2) { //音频 1s
                         $map['second'] = $data['Duration']; //时长
                         $map['size'] = $data['Size']; //大小
                         $map['is_finish']=1;
                     } else if (!empty($returnArr['type']) && $returnArr['type'] == 1) { //处理视频
-                        if(!empty($data['EventType']) && $data['EventType']=='VideoAnalysisComplete'){ //视频分析完成
+                        if(!empty($data['EventType']) && $data['EventType']=='VideoAnalysisComplete'){ //视频分析完成 1s
                             $map['second'] = $data['Duration']; //时长
-                        }else if(!empty($data['EventType']) && $data['EventType']=='SnapshotComplete' && !empty($data['CoverUrl'])) { //封面图
-
+                        }else if(!empty($data['EventType']) && $data['EventType']=='SnapshotComplete' && !empty($data['CoverUrl'])) { //封面图  此回调相对较长3-4s
                             $map['thumb_url'] = $data['CoverUrl'];
                             $CoverSize = getimagesize($map['thumb_url']);
                             $map['thumb_width'] = $CoverSize[0];
@@ -534,69 +533,12 @@ class AliUploadController extends Controller
         try {
             $AliUploadServer=new AliUploadServers();
 
-            $data='{"Status":"success","VideoId":"780f352ff17c4c45ba83221ed09f6811","EventType":"VideoAnalysisComplete","Extend":"{\"type\":\"2\"}","Size":33722,"EventTime":"2021-08-03T03:48:48Z","Duration":8.448,"Bitrate":"31.933"} ';
-            $data=json_decode($data,true);
-
-            if(!empty($data['Status']) && $data['Status']=='success'){ //处理视频封面  && !empty($data['CoverUrl'])
-                $map=[];
-                if(!empty($data['Extend'])) { //有返回值
-                    $returnArr = json_decode($data['Extend'], true);
-
-                    if (!empty($returnArr['type']) && $returnArr['type'] == 2) { //音频
-
-                        $map['second'] = $data['Duration']; //时长
-                        $map['is_finish']=1;
-
-                    } else if (!empty($returnArr['type']) && $returnArr['type'] == 1) { //视频
-                        //获取视频时长
-                        $AliUploadServer = new AliUploadServers();
-                        $AliUploadServer->initVodClient();
-                        $query = [
-                            'VideoId' => $data['VideoId'],
-                        ];
-                        $action = "GetVideoInfo";
-                        $ruselt = $AliUploadServer->AlibabaCloudRpcRequest($action, $query);
-                        if (!empty($ruselt['data']['Video']['Duration'])) {
-                            $map['second'] = $ruselt['data']['Video']['Duration'];
-                        }
-                        $map['thumb_url'] = $data['CoverUrl'];
-                        $CoverSize = getimagesize($data['thumb_url']);
-                        $map['thumb_width'] = $CoverSize[0];
-                        $map['thumb_height'] = $CoverSize[1];
-//                        $data['thumb_size']=;
-                        $thumb_arr = explode('.', $map['thumb_url']);
-                        $thumb_ext = $thumb_arr[count($thumb_arr) - 1]; //扩展名
-                        $map['thumb_format'] = $thumb_ext;
-
-                        $map['media_id'] = $data['VideoId'];//媒体id
-                        $map['is_finish'] = 1;
-                    }
-
-                    $ImMediaInfo = ImMedia::query()->where('media_id', $data['VideoId'])->first();
-                    if (empty($ImMediaInfo)) {
-                        $rst = DB::table(ImMedia::DB_TABLE)->insert($map);
-                    } else {
-                        $rst = DB::table(ImMedia::DB_TABLE)->where('id', $ImMediaInfo->id)->update($map);
-                        var_dump($rst);
-                    }
-                    if ($rst === false) {
-                        Log::channel('aliOnDemandLog')->info($data['VideoId'].' Callback fail');
-                    }
-                }
-
-            }
-
-            return ;
-
 //            $rst=$AliUploadServer->UploadMediaPull();
 //           var_dump($rst);
 //           return ;
 //           $rst=$AliUploadServer->UploadMediaVideoAudio();
 //           var_dump($rst);
 //           return ;
-
-            //回调问题
-
 
             $AliUploadServer->initVodClient();
             //处理客户端上传拿不到宽高截图
