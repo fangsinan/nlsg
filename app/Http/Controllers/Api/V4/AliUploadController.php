@@ -324,45 +324,49 @@ class AliUploadController extends Controller
         Log::channel('aliOnDemandLog')->info(json_encode($params,true));
         if(!empty($params)){
             $data=json_decode($params,true);
-            if(!empty($data['Status']) && $data['Status']=='success' && !empty($data['CoverUrl'])){ //处理视频封面
-
+            if(!empty($data['Status']) && $data['Status']=='success'){ //处理视频封面  && !empty($data['CoverUrl'])
                 $map=[];
-                //获取视频时长
-                $AliUploadServer=new AliUploadServers();
-                $AliUploadServer->initVodClient();
-                $query=[
-                    'VideoId' => $data['VideoId'],
-                ];
-                $action="GetVideoInfo";
-                $ruselt=$AliUploadServer->AlibabaCloudRpcRequest($action,$query);
-                if(!empty($ruselt['data']['Video']['Duration'])){
-                    $map['second']=$ruselt['data']['Video']['Duration'];
+                if(!empty($data['Extend'])) { //有返回值
+                    $returnArr = json_encode($data['Extend'], true);
+                    if (!empty($returnArr['type']) && $returnArr['type'] == 2) { //音频
+                        $map['second'] = $data['Duration']; //时长
+                    } else if (!empty($returnArr['type']) && $returnArr['type'] == 1) { //视频
+                        //获取视频时长
+                        $AliUploadServer = new AliUploadServers();
+                        $AliUploadServer->initVodClient();
+                        $query = [
+                            'VideoId' => $data['VideoId'],
+                        ];
+                        $action = "GetVideoInfo";
+                        $ruselt = $AliUploadServer->AlibabaCloudRpcRequest($action, $query);
+                        if (!empty($ruselt['data']['Video']['Duration'])) {
+                            $map['second'] = $ruselt['data']['Video']['Duration'];
+                        }
+                        $map['thumb_url'] = $data['CoverUrl'];
+                        $CoverSize = getimagesize($data['thumb_url']);
+                        $map['thumb_width'] = $CoverSize[0];
+                        $map['thumb_height'] = $CoverSize[1];
+//                        $data['thumb_size']=;
+                        $thumb_arr = explode('.', $map['thumb_url']);
+                        $thumb_ext = $thumb_arr[count($thumb_arr) - 1]; //扩展名
+                        $map['thumb_format'] = $thumb_ext;
+
+                        $map['media_id'] = $data['VideoId'];//媒体id
+                        $map['is_finish'] = 1;
+                    }
+                    
+                    $ImMediaInfo = ImMedia::query()->where('media_id', $data['VideoId'])->first();
+                    if (empty($ImMediaInfo)) {
+                        $rst = DB::table(ImMedia::DB_TABLE)->insert($map);
+                    } else {
+                        $rst = DB::table(ImMedia::DB_TABLE)->where('id', $ImMediaInfo->id)->update($map);
+                    }
+
+                    if ($rst === false) {
+                        DB::rollBack();
+                        return $this->error(0, '保存失败');
+                    }
                 }
-                $map['thumb_url']=$data['CoverUrl'];
-                $CoverSize=getimagesize($data['thumb_url']);
-                $map['thumb_width']=$CoverSize[0];
-                $map['thumb_height']=$CoverSize[1];
-//                $data['thumb_size']=;
-                $thumb_arr=explode('.',$map['thumb_url']);
-                $thumb_ext=$thumb_arr[count($thumb_arr)-1]; //扩展名
-                $map['thumb_format']=$thumb_ext;
-
-                $map['media_id'] = $data['VideoId'];//媒体id
-                $map['is_finish']=1;
-
-                $ImMediaInfo = ImMedia::query()->where('media_id', $data['VideoId'])->first();
-                if (empty($ImMediaInfo)) {
-                    $rst = DB::table(ImMedia::DB_TABLE)->insert($map);
-                } else {
-                    $rst = DB::table(ImMedia::DB_TABLE)->where('id', $ImMediaInfo->id)->update($map);
-                }
-
-                if($rst===false){
-                    DB::rollBack();
-                    return $this->error(0, '保存失败');
-                }
-
-
 
             }
         }
