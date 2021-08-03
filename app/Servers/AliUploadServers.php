@@ -35,6 +35,7 @@ class AliUploadServers
     ];
     public static $IMAGES_URL = 'https://audiovideo.ali.nlsgapp.com/';
     public static $ImUrlKey = 'https://cos.ap-shanghai.myqcloud.com/';
+    public static $ReturnUrl = 'http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback';
 
     //初始化
     public function initVodClient($accessKeyId=self::AccessKeyId, $accessKeySecret=self::AccessKeySecret) {
@@ -82,10 +83,17 @@ class AliUploadServers
         if($type==1) { //视频处理
 //            $queryArr['TemplateGroupId']=self::TemplateGroupId; //转码模板组ID  只限视频
             $queryArr['WorkflowId']=self::WorkflowId; //工作流ID  只限视频 可截封面图
-            $queryArr['UserData']=json_encode(['type'=>1]);
-        }else{
-            $queryArr['UserData']=json_encode(['type'=>2]);
         }
+        $returnArr=[
+            'MessageCallback'=>[
+                'CallbackURL'=>self::$ReturnUrl
+            ],
+            'Extend'=>[
+                'type'=>$type
+            ]
+        ];
+        $queryArr['UserData']=json_encode($returnArr);
+
 
         return self::AlibabaCloudRpcRequest('CreateUploadVideo',$queryArr);
 
