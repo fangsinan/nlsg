@@ -324,7 +324,6 @@ class AliUploadController extends Controller
         if(!empty($data)){
             Log::channel('aliOnDemandLog')->info(json_encode($data,true));
             if(!empty($data['Status']) && $data['Status']=='success'){
-
                 $map=[];
                 if(!empty($data['Extend'])) { //有返回值
                     $returnArr = json_decode($data['Extend'], true);
@@ -470,16 +469,10 @@ class AliUploadController extends Controller
                     $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
                 }else if($type==2){ //音频
 
-                    $arrLog=json_encode($ruselt['data']['Mezzanine'],true);
-                    Log::channel('aliOnDemandLog')->info("--audio-AddMedia---".$arrLog);
-
                     $data['size']=(empty($ruselt['data']['Mezzanine']['Size']))?0:$ruselt['data']['Mezzanine']['Size'];
                     $data['second']=(empty($ruselt['data']['Mezzanine']['Duration']))?0:$ruselt['data']['Mezzanine']['Duration']; //没有
                     $data['file_name']=(empty($ruselt['data']['Mezzanine']['FileName']))?'':$ruselt['data']['Mezzanine']['FileName'];
 
-//                    $data['size']=(empty($ruselt['data']['Video']['Size']))?0:$ruselt['data']['Video']['Size'];
-//                    $data['second']=(empty($ruselt['data']['Video']['Duration']))?0:$ruselt['data']['Video']['Duration'];  //这个值没有
-//                    $data['file_name']=(empty($ruselt['data']['Video']['Title']))?'':$ruselt['data']['Video']['Title'];
                 }else{ //图片
                     $data['file_name']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['OriginalFileName']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['OriginalFileName'];
                     $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
@@ -499,9 +492,6 @@ class AliUploadController extends Controller
                         if(empty($data['thumb_url'])){
                             unset($data['thumb_url']);
                         }
-//                        $data['size']=(empty($ruselt['data']['Mezzanine']['Size']))?0:$ruselt['data']['Mezzanine']['Size'];
-//                        $data['second']=(empty($ruselt['data']['Mezzanine']['Duration']))?0:$ruselt['data']['Mezzanine']['Duration'];
-//                        $data['file_name']=(empty($ruselt['data']['Mezzanine']['FileName']))?'':$ruselt['data']['Mezzanine']['FileName'];
                         $rst = DB::table(ImMedia::DB_TABLE)->where('id', $ImMediaInfo->id)->update($data);
                     }
                 }
