@@ -325,7 +325,19 @@ class AliUploadController extends Controller
         if(!empty($params)){
             $data=json_decode($params,true);
             if(!empty($data['Status']) && $data['Status']=='success' && !empty($data['CoverUrl'])){ //处理视频封面
+
                 $map=[];
+                //获取视频时长
+                $AliUploadServer=new AliUploadServers();
+                $AliUploadServer->initVodClient();
+                $query=[
+                    'VideoId' => $data['VideoId'],
+                ];
+                $action="GetVideoInfo";
+                $ruselt=$AliUploadServer->AlibabaCloudRpcRequest($action,$query);
+                if(!empty($ruselt['data']['Video']['Duration'])){
+                    $map['second']=$ruselt['data']['Video']['Duration'];
+                }
                 $map['thumb_url']=$data['CoverUrl'];
                 $CoverSize=getimagesize($data['thumb_url']);
                 $map['thumb_width']=$CoverSize[0];
