@@ -82,6 +82,9 @@ class AliUploadServers
         if($type==1) { //视频处理
 //            $queryArr['TemplateGroupId']=self::TemplateGroupId; //转码模板组ID  只限视频
             $queryArr['WorkflowId']=self::WorkflowId; //工作流ID  只限视频 可截封面图
+            $queryArr['UserData']=json_encode(['type'=>1]);
+        }else{
+            $queryArr['UserData']=json_encode(['type'=>2]);
         }
 
         return self::AlibabaCloudRpcRequest('CreateUploadVideo',$queryArr);
