@@ -207,7 +207,7 @@ class Live extends Base
             ->where('status', 4)
             ->where('is_del', 0)
             ->where('is_test', 0)
-            ->where('created_at', '>=',date('Y-m-d ', time()))
+            ->where('begin_at', '>=',date('Y-m-d ', time()))
             ->with(['user:id,nickname'])
 //            ->where(function ($query) use ($keywords) {
 //                $query->orWhere('title', 'LIKE', "%$keywords%");
