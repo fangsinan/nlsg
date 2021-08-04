@@ -154,14 +154,14 @@ class Kernel extends ConsoleKernel
             //抓取腾讯IM图片到阿里云
             $AliUploadServer=new AliUploadServers();
             $AliUploadServer->UploadMediaPull();
-        })->everyMinute()->runInBackground();//每分钟执行一次
+        })->everyMinute()->between('0:00', '3:00')->runInBackground();//每分钟执行一次
 
         $schedule->call(function () {
             //抓取腾讯IM音视频、文件到阿里云
             $AliUploadServer=new AliUploadServers();
             $AliUploadServer->UploadMediaVideoAudio();
 //        })->daily()->runInBackground();//每天凌晨执行
-        })->everyFiveMinutes()->runInBackground();//5分钟执行一次
+        })->everyFiveMinutes()->between('2:00', '6:00')->runInBackground();//5分钟执行一次
 
     }
 
