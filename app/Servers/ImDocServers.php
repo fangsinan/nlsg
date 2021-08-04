@@ -556,7 +556,8 @@ class ImDocServers
                 ->orderBy('success_at', 'desc')
                 ->orderBy('id', 'desc')
                 ->select([
-                    'id', 'doc_id', 'created_at', 'status', 'send_type', 'is_done', 'success_at'
+                    'id', 'doc_id', 'created_at', 'status', 'send_type',
+                    'is_done', 'success_at','send_at',
                 ])->get();
             $list[] = $temp_list;
         }
@@ -593,6 +594,10 @@ class ImDocServers
                     break;
                 case 'del':
                     $jobModel->status = 3;
+                    break;
+                case 'send':
+                    $jobModel->status = 1;
+                    $jobModel->send_type = 1;
                     break;
                 default:
                     return ['code' => false, 'msg' => '参数错误'];

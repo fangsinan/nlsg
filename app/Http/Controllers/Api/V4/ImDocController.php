@@ -261,7 +261,7 @@ class ImDocController extends Controller
      * @apiGroup 社群文案
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/im_doc/change_job_status
      * @apiParam {number} id 任务id
-     * @apiParam {string=on,off,del} flag 动作
+     * @apiParam {string=on,off,del,send} flag 动作
      * @apiDescription 发送任务状态修改
      */
     public function changeJobStatus(Request $request)
