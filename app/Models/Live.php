@@ -203,10 +203,11 @@ class Live extends Base
 
     static function search($keywords)
     {
-        $res = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'user_id', 'price')
+        $res = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'user_id', 'price', 'created_at')
             ->where('status', 4)
             ->where('is_del', 0)
             ->where('is_test', 0)
+            ->where('created_at', '>=',date('Y-m-d ', time()))
             ->with(['user:id,nickname'])
 //            ->where(function ($query) use ($keywords) {
 //                $query->orWhere('title', 'LIKE', "%$keywords%");
