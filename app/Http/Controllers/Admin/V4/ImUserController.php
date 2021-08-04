@@ -154,6 +154,7 @@ class ImUserController extends ControllerBackend
     {
         $user_id = $request->input('user_id', 0);
         $order = $request->input('order', 'desc');
+        $size = $request->input('size',10);
 
         if (empty($user_id)){
             return $this->getRes([
@@ -163,13 +164,16 @@ class ImUserController extends ControllerBackend
         }
 
         $lists = History::where(['user_id' => $user_id, 'is_del' => 0,])
-            ->groupBy('relation_id', 'relation_type')->orderBy('updated_at', $order)->paginate($this->page_per_page)->toArray();
+            ->groupBy('relation_id', 'relation_type')
+            ->orderBy('updated_at', $order)
+            ->paginate($size)
+            ->toArray();
 
         if (empty($lists['data'])) {
             return $this->success();
         }
         $new_list = [];
-        foreach ($lists['data'] as $key => $val) {
+        foreach ($lists['data'] as $key => &$val) {
             //查询所属专栏 课程 以及章节
             $val['column_name'] = '';
             $val['column_cover_img'] = '';
@@ -197,13 +201,13 @@ class ImUserController extends ControllerBackend
             }
 //            $new_list[History::DateTime($val['created_at'])][] = $val;
 
-            if($val['column_name'] || $val['works_name'] ){
-                $list[History::DateTime($val['created_at'])][] = $val;
-                $new_list[History::DateTime($val['created_at'])][] = $val;
-            }
+//            if($val['column_name'] || $val['works_name'] ){
+//                $list[History::DateTime($val['created_at'])][] = $val;
+//                $new_list[History::DateTime($val['created_at'])][] = $val;
+//            }
         }
 
-        return $this->getRes($new_list);
+        return $this->getRes($lists);
     }
 
 }

@@ -6,7 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class History extends Model
+class History extends Base
 {
     protected $table = 'nlsg_history';
 
