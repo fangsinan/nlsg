@@ -51,7 +51,7 @@ class ControllerBackend extends BaseController
 
             $pass_url = ConfigModel::getData(55);
             $pass_url = explode(',',$pass_url);
-
+//dd([$this->user,$url,$url_2,$pass_url,$roleAuthNodeMap]);
 //            if ( ! in_array($url, $roleAuthNodeMap)) {
             if (!in_array($url_2,$pass_url) && ! in_array($url_2, $roleAuthNodeMap)) {
                 $class = new \stdClass();
