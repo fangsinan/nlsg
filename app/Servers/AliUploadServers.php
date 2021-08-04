@@ -264,6 +264,17 @@ class AliUploadServers
             $uploader = new \AliyunVodUploader(self::AccessKeyId, self::AccessKeySecret,'cn-beijing');
             $uploadVideoRequest = new \UploadVideoRequest($DownRst['data']['filepath'], $DownRst['data']['filename'].$file_ext);
             $uploadVideoRequest->setCateId(self::TypeArr[$type]);
+            if($type==1) { //视频
+                $returnArr = [
+                    'MessageCallback' => [
+                        'CallbackURL' => self::$ReturnUrl
+                    ],
+                    'Extend' => [
+                        'type' => $type
+                    ]
+                ];
+                $uploadVideoRequest->setUserData(json_encode($returnArr)); //返回值
+            }
             $uploadVideoRequest->setStorageLocation(self::StorageLocation);
             if($type==1) { //视频
                 $uploadVideoRequest->setWorkflowId(self::WorkflowId);
