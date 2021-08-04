@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\Column;
+use App\Models\History;
+use App\Models\Works;
+use App\Models\WorksInfo;
 use App\Servers\ImUserServers;
 use Illuminate\Http\Request;
 
@@ -143,6 +147,63 @@ class ImUserController extends ControllerBackend
         $servers = new ImUserServers();
         $data = $servers->mallOrderList($request->input(), $this->user['user_id']);
         return $this->getRes($data);
+    }
+
+
+    public function history(Request $request)
+    {
+        $user_id = $request->input('user_id', 0);
+        $order = $request->input('order', 'desc');
+
+        if (empty($user_id)){
+            return $this->getRes([
+                'code'=>false,
+                'msg'=>'用户错误',
+            ]);
+        }
+
+        $lists = History::where(['user_id' => $user_id, 'is_del' => 0,])
+            ->groupBy('relation_id', 'relation_type')->orderBy('updated_at', $order)->paginate($this->page_per_page)->toArray();
+
+        if (empty($lists['data'])) {
+            return $this->success();
+        }
+        $new_list = [];
+        foreach ($lists['data'] as $key => $val) {
+            //查询所属专栏 课程 以及章节
+            $val['column_name'] = '';
+            $val['column_cover_img'] = '';
+            $val['works_name'] = '';
+            $val['works_cover_img'] = '';
+            $val['worksInfo_name'] = '';
+
+
+            if ($val['relation_type'] == 1 or $val['relation_type'] == 2 or $val['relation_type'] == 5) {
+//                $column = Column::find($val['relation_id']);
+                $column = Column::where(['id'=>$val['relation_id'],'status'=>1])->first();
+                $val['column_name'] = $column['name'] ?? '';
+                $val['column_cover_img'] = $column['cover_pic'] ?? '';
+            }
+            if ($val['relation_type'] == 3 or $val['relation_type'] == 4) {
+//                $works = Works::find($val['relation_id']);
+                $works = Works::where(['id'=>$val['relation_id'],'status'=>4])->first();
+                $val['works_name'] = $works['title'] ?? '';
+                $val['works_cover_img'] = $works['cover_img'] ?? '';
+            }
+            if ($val['info_id']) {
+                $worksInfo = WorksInfo::find($val['info_id']);
+                $val['worksInfo_name'] = $worksInfo['title'] ?? '';
+                $val['worksInfo_type'] = $worksInfo['type'] ?? "";
+            }
+//            $new_list[History::DateTime($val['created_at'])][] = $val;
+
+            if($val['column_name'] || $val['works_name'] ){
+                $list[History::DateTime($val['created_at'])][] = $val;
+                $new_list[History::DateTime($val['created_at'])][] = $val;
+            }
+        }
+
+        return $this->getRes($new_list);
     }
 
 }

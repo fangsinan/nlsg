@@ -177,7 +177,7 @@ class ImUserServers
     {
         $size = $params['size'] ?? 10;
         $query = Order::query()->where('status', '=', 1);
-        $query->where('user_id','=',$user_id);
+        $query->where('user_id', '=', $user_id);
         $query->where('is_shill', '=', 0);
         //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip  18训练营
         $query->whereIn('type', [9, 10, 14, 15, 16, 18]);
@@ -206,7 +206,7 @@ class ImUserServers
                     foreach ($v->works->categoryRelation as $vv) {
                         $temp_category_name[] = $vv->categoryName['name'];
                     }
-                    $v->category_name = implode(',',$temp_category_name);
+                    $v->category_name = implode(',', $temp_category_name);
                     break;
                 case 10:
                     $v->type_name = '直播';
@@ -253,8 +253,9 @@ class ImUserServers
     {
         $servers = new MallOrderServers();
 //        $data = $servers->allMallOrder($params,$user_id);
-        $data = $servers->listNew($params,$user_id);
+        $data = $servers->listNew($params, $user_id);
         return $data;
     }
+
 
 }

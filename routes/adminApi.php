@@ -214,6 +214,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('im_user/friends_list', 'ImUserController@friendsList');
         Route::get('im_user/order_list', 'ImUserController@orderList');
         Route::get('im_user/mall_order_list', 'ImUserController@mallOrderList');
+        Route::get('im_user/history', 'ImUserController@history');
 
         //im快捷恢复
         Route::get('im_quick_reply/list', 'ImQuickReply@list');
