@@ -14,8 +14,14 @@ class JwtBackendMiddleware
 {
     public function handle($request, Closure $next)
     {
-        if (auth('backendApi')->check()){
 
+        $token = $request->header('authorization');
+        $url_token = $request->input('token','');
+        if (empty($token) && !empty($url_token)){
+            $request->headers->set('Authorization', 'Bearer ' .$url_token);
+        }
+
+        if (auth('backendApi')->check()){
             //$route= Route::current();
             //$route->uri; 当前路由
             //$route->controller->user; 当前用户信息
