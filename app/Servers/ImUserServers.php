@@ -196,7 +196,7 @@ class ImUserServers
         $list = $query->paginate($size);
 
         foreach ($list as $v) {
-            $v->category_name = [];
+            $v->category_name = '';
             switch (intval($v->type)) {
                 case 9:
                     $v->type_name = '课程';
@@ -206,7 +206,7 @@ class ImUserServers
                     foreach ($v->works->categoryRelation as $vv) {
                         $temp_category_name[] = $vv->categoryName['name'];
                     }
-                    $v->category_name = $temp_category_name;
+                    $v->category_name = implode(',',$temp_category_name);
                     break;
                 case 10:
                     $v->type_name = '直播';
