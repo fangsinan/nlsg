@@ -252,9 +252,11 @@ class ImUserServers
     public function mallOrderList($params, $user_id)
     {
         $servers = new MallOrderServers();
+        if (empty($params['user_id'] ?? 0)){
+            return ['code'=>false,'msg'=>'用户错误'];
+        }
 //        $data = $servers->allMallOrder($params,$user_id);
-        $data = $servers->listNew($params, $user_id);
-        return $data;
+        return $servers->listNew($params, $user_id);
     }
 
 
