@@ -149,6 +149,11 @@ class ImUserController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function rechargeOrder(Request $request){
+        $servers = new ImUserServers();
+        $data = $servers->rechargeOrder($request->input(),$this->user['user_id']);
+        return $this->getRes($data);
+    }
 
     public function history(Request $request)
     {

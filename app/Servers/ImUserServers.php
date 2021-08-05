@@ -255,9 +255,24 @@ class ImUserServers
         if (empty($params['user_id'] ?? 0)){
             return ['code'=>false,'msg'=>'用户错误'];
         }
-//        $data = $servers->allMallOrder($params,$user_id);
         return $servers->listNew($params, $user_id);
     }
+
+    public function rechargeOrder($params,$user_id){
+        if (empty($params['user_id'] ?? 0)){
+            return ['code'=>false,'msg'=>'用户错误'];
+        }
+        $size = $params['size'] ?? 10;
+
+        $query = Order::query()
+            ->where('user_id','=',$params['user_id'])
+            ->where('type','=',3)
+            ->where('status','=',1);
+        $query->select(['id','user_id','pay_time','pay_price','status']);
+
+        return $query->paginate($size);
+    }
+
 
 
 }
