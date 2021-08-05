@@ -122,4 +122,37 @@ class ImGroupController extends ControllerBackend
         return $this->getRes($data);
     }
 
+
+
+
+
+
+    /**
+     * @api {post} api/admin_v4/im_group/edit_join_group 管理后台-添加/删除成员入群
+     * @apiName admin edit_join_group
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *
+     * @apiParam {int} group_id   腾讯云的groupId
+     * @apiParam {array} user_id  user_id  数组类型
+     * @apiParam {array} type  type==del删除  add添加
+     * @apiParam {int} silence  type==del删除时Silence是否静默删人。0表示非静默删人，1表示静默删人
+     * @apiParam {string} reason  type==del删除时踢出用户原因
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function editJoinGroup(Request $request){
+
+        $servers = new ImGroupServers();
+        $data = $servers->editJoinGroup($request->input());
+        return $this->getRes($data);
+    }
+
 }
