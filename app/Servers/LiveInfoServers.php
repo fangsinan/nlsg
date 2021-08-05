@@ -602,16 +602,33 @@ GROUP BY
             $where_str = 'NOT EXISTS';
         }
 
+//        $sql = "
+//        SELECT
+//            s.id,
+//            s.user_id,
+//            u.phone ,s.created_at,lr.son,lr.son_flag
+//        FROM
+//            nlsg_subscribe AS s
+//            JOIN nlsg_user AS u ON s.user_id = u.id
+//            LEFT JOIN nlsg_live_count_down as cd on s.user_id = cd.user_id and cd.live_id = $live_id
+//            LEFT JOIN nlsg_backend_live_role as lr on cd.new_vip_uid = lr.son_id
+//        WHERE
+//            ( s.order_id > 9 OR s.channel_order_id > 0 )
+//            AND s.relation_id = $live_id";
+
         $sql = "
         SELECT
             s.id,
             s.user_id,
-            u.phone ,s.created_at,lr.son,lr.son_flag
+            u.phone,
+            s.created_at,
+            t.phone as son,
+            lr.son_flag
         FROM
             nlsg_subscribe AS s
             JOIN nlsg_user AS u ON s.user_id = u.id
-            LEFT JOIN nlsg_live_count_down as cd on s.user_id = cd.user_id and cd.live_id = $live_id
-            LEFT JOIN nlsg_backend_live_role as lr on cd.new_vip_uid = lr.son_id
+            LEFT JOIN nlsg_user as t on s.twitter_id = t.id
+            LEFT JOIN nlsg_backend_live_role AS lr ON t.id = lr.son_id
         WHERE
             ( s.order_id > 9 OR s.channel_order_id > 0 )
             AND s.relation_id = $live_id";
@@ -641,8 +658,8 @@ GROUP BY
         FROM
             nlsg_subscribe AS s
             JOIN nlsg_user AS u ON s.user_id = u.id
-            LEFT JOIN nlsg_live_count_down as cd on s.user_id = cd.user_id and cd.live_id = $live_id
-            LEFT JOIN nlsg_backend_live_role as lr on cd.new_vip_uid = lr.son_id
+            LEFT JOIN nlsg_user as t on s.twitter_id = t.id
+            LEFT JOIN nlsg_backend_live_role AS lr ON t.id = lr.son_id
         WHERE
             ( s.order_id > 9 OR s.channel_order_id > 0 )
             AND s.relation_id = $live_id ";
