@@ -322,6 +322,7 @@ class AliUploadServers
                 $data['size']=$info['size'];
                 $data['width']=$info['width'];
                 $data['height']=$info['height'];
+                $data['is_finish']=1;
             }else{
                 $data['content_id']= $info['id'];
                 $data['file_name']=$filename;
@@ -340,6 +341,7 @@ class AliUploadServers
                     $data['format']=$ext;
                     $data['size']=$info['size'];
                     $data['second']=$info['second'];
+                    $data['is_finish']=1;
                 }
             }
             DB::beginTransaction();

@@ -94,21 +94,27 @@ class ImMsgServers
             if(!empty($value['to_group'])){
                 $group_id = array_merge($group_id, explode(',',$value['to_group']));
             }
-
         }
         $userProfileItem = ImMsgController::getImUser($uids);
-        $nikenames = array_column($userProfileItem,"Tag_Profile_IM_Nick");
-
         $groups = ImGroup::select('name','group_id')->whereIn('group_id',$group_id)->get()->toArray();
-        $groupnames = array_column($groups,"name");
 
         foreach ($list as $key=>$value){
-            $list[$key]['to_account_name'] = $nikenames;
-            $list[$key]['to_group_name'][] = $groupnames;
+            $list[$key]['to_account_name'] = [];
+            $list[$key]['to_group_name'] = [];
+            foreach ($userProfileItem as $user_v) {
+                if(!empty($value['to_account']) && strpos($value['to_account'],$user_v['Tag_Profile_IM_UID']) !== false ){
+                    $list[$key]['to_account_name'][] = $user_v['Tag_Profile_IM_Nick'];
+                }
+            }
+            foreach ($groups as $group_v) {
+                if(!empty($value['to_group']) && strpos($value['to_group'],$group_v['group_id']) !== false ){
+                    $list[$key]['to_group_name'][] = $group_v['name'];
+                }
+            }
         }
-
         return $list;
     }
+
 
     //清空群发记录 delSendAllList
     public function delSendAllList($params,$uid){
