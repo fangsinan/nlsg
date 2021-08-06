@@ -9,6 +9,7 @@ use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Coupon;
 use App\Models\GetPriceTools;
+use App\Models\ImGroup;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\MallErpList;
@@ -26,6 +27,7 @@ use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Models\VipUserBind;
 use App\Models\Works;
+use App\Servers\ImGroupServers;
 use App\Servers\JobServers;
 use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
@@ -1018,7 +1020,7 @@ class WechatPay extends Controller
                 if ($orderInfo['type'] == 15) {
                     $order_type = 19;  //讲座
                 } elseif ($orderInfo['type'] == 18) {
-                    $order_type = 22;  //讲座
+                    $order_type = 22;  //训练营
                 }
                 $record = [
                     'ordernum' => $out_trade_no, //订单编号
@@ -1208,6 +1210,8 @@ class WechatPay extends Controller
                         $send_type = 2;  //讲座
                     } elseif ($orderInfo['type'] == 18) {
                         $send_type = 7;  //训练营
+                        //  加入社群
+                        self::joinImGroup($orderInfo['relation_id'],$user_id);
                     }
 
 
@@ -1235,6 +1239,23 @@ class WechatPay extends Controller
             //订单状态已更新，直接返回true
             return true;
         }
+    }
+    public static function joinImGroup($relation_id,$uid){
+        $groups = ImGroup::where(['status'=>1,'works_id'=>$relation_id])
+                    ->where('member_num','<',2000)  //群满员两千人
+                    ->first();
+        if(empty($groups)){
+            return ;
+        }
+        $params=[
+            'type'      => 'add',
+            'group_id'  => $groups['group_id'],
+            'user_id'   => [$uid],
+        ];
+
+        $servers = new ImGroupServers();
+        $res = $servers->editJoinGroup($params);
+        return ;
     }
 
     //微信购买精品课
