@@ -64,6 +64,7 @@ class AuthController extends ControllerBackend
         }
 
         $check_user = BackendUser::where('username', '=', $username)->first();
+        $userInfo = User::where('phone', '=', $username)->first();
         if (empty($check_user)) {
             return $this->getRes(['code' => false, 'msg' => '账号或密码错误']);
         }
@@ -72,13 +73,14 @@ class AuthController extends ControllerBackend
             $data = [
                 'id' => $check_user->id,
                 'nickname' => $check_user->username,
-                'live_role'=>$check_user->live_role,
+                'live_role' => $check_user->live_role,
                 'token' => $token,
-                'role'=>$check_user->role_id,
-                'role_id'=>$check_user->role_id,
-                'menu_tree'=>Node::getMenuTree($check_user->role_id),
-                'app_uid'=>User::where('phone','=',$username)->value('id'),
+                'role' => $check_user->role_id,
+                'role_id' => $check_user->role_id,
+                'menu_tree' => Node::getMenuTree($check_user->role_id),
+                'app_uid' => User::where('phone', '=', $username)->value('id'),
                 'live_role_button' => $check_user->live_role_button,
+                'app_user_id' => $userInfo->id,
             ];
             return $this->getRes($data);
         } else {
@@ -87,9 +89,10 @@ class AuthController extends ControllerBackend
 
     }
 
-    public function changePassword(Request $request){
+    public function changePassword(Request $request)
+    {
         $model = new BackendUser();
-        $data = $model->changePwd($this->user,$request->input());
+        $data = $model->changePwd($this->user, $request->input());
         return $this->getRes($data);
     }
 
