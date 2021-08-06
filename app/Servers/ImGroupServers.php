@@ -235,7 +235,7 @@ class ImGroupServers
             $post_data['GroupId'] = $params['group_id'];
             foreach ($params['user_id'] as $v) {
                 $post_data['MemberList'][] = [
-                    'Member_Account' => $v,
+                    'Member_Account' => (string)$v,
                 ];
             }
         } elseif ($params['type'] == 'del') {

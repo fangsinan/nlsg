@@ -376,12 +376,16 @@ class ImGroupController extends Controller
 //                'updated_at'    => date('Y-m-d H:i:s'),
             ];
 
+            if(!empty($add)){
+                $gu_res = ImGroupUser::firstOrCreate($add);
+            }
+            //$adds[] = $add;
+        }
 
-            $adds[] = $add;
-        }
-        if(!empty($adds)){
-            $gu_res = ImGroupUser::firstOrCreate($adds);
-        }
+        //批量时有问题
+//        if(!empty($adds)){
+//            $gu_res = ImGroupUser::firstOrCreate($adds);
+//        }
 
         ImGroup::setGroupInfo([$params['GroupId']]);
 
