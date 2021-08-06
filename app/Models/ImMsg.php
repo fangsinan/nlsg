@@ -67,6 +67,14 @@ class ImMsg extends Base
                     return [];
                 }
                 //查询媒体表详情
+
+                if(empty($media_data['thumb_url'])){
+                    //默认封面
+                    $media_data['thumb_url'] = 'https://image.nlsgapp.com/nlsg/works/20210729141614776327.png';
+                    $media_data['thumb_size'] = 61440;
+                    $media_data['thumb_width'] = 953;
+                    $media_data['thumb_height'] =535;
+                }
                 $media = [
                     'size'          => $media_data['size']??0, //大小
                     'second'        => $media_data['second'], //时长
