@@ -105,8 +105,8 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $cs = new ChannelServers();
             $cs->getDouyinOrder();
-            $cs->supplementDouYinOrder();
-            $cs->douYinJob();
+//            $cs->supplementDouYinOrder();
+//            $cs->douYinJob();
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
