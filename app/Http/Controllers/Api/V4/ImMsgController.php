@@ -51,7 +51,7 @@ class ImMsgController extends Controller
      */
     public function MsgSendAll(Request $request){
         $params    = $request->input();
-
+        \Log::info('im_log:MsgSendAll-'.json_encode($params));
         $from_account   = $params['From_Account']??'';  //发送方帐号
         $to_accounts    = $params['To_Account']??[];  //消息接收方用户
         $to_group       = $params['To_Group']??[];  //消息接收方群
