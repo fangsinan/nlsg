@@ -159,19 +159,37 @@ class ImMsgServers
             });
         }
 
-        $msg_list = $query->select('id','msg_seq','msg_time','from_account')
+        $msg_list = $query->select('id', 'type', 'msg_seq','msg_time','from_account', 'to_account', 'group_id')
             ->whereIn('id',$msg_ids)->get()->toArray();
 
         //获取用户信息
         $uids = array_column($msg_list,'from_account');
+        $uids = array_merge($uids, array_column($msg_list,'to_account'));
         $userProfileItem = ImMsgController::getImUser($uids);
 
+        // 群名称
+        $group_ids = array_column($msg_list,'group_id');
+        $new_group = [];
+        if(!empty($group_ids)){
+            $group = ImGroup::whereIn('group_id',$group_ids)->get()->toArray();
+            foreach ($group as $val){
+                $new_group[$val['group_id']] = $val['name'];
+            }
+        }
         foreach ($collectionList['data'] as $key=>$val) {
             $collectionList['data'][$key]['msg_list'] = [];
             foreach ($msg_list as $item){
                 $item['collection_time'] = $val['created_at'];
                 //消息昵称
                 $item['nick_name'] = $userProfileItem[$item['from_account']]['Tag_Profile_IM_Nick']??'';
+                //收藏来源
+                $item['to_coll_name'] = '';
+                if(!empty($userProfileItem[$item['to_account']]['Tag_Profile_IM_Nick'])){
+                    $item['to_coll_name'] = $userProfileItem[$item['to_account']]['Tag_Profile_IM_Nick'];
+                }else if(!empty($new_group[$item['group_id']])){
+                    $item['to_coll_name'] = $new_group[$item['group_id']];
+                }
+
                 if($val['msg_id'] == $item['id']){
                     $collectionList['data'][$key]['msg_list'] = $item;
                     break;

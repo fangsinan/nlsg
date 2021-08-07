@@ -66,7 +66,6 @@ class ImMsgController extends ControllerBackend
     public function MsgCollectionList(Request $request){
 
         $imObj = new ImMsgServers();
-        $this->user['id'] = 211172;
         $data = $imObj->MsgCollectionList($request->input(),$this->user['id']);
         return $this->getRes($data);
     }
