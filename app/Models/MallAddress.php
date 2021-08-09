@@ -9,7 +9,6 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Description of MallAddress
@@ -36,8 +35,8 @@ class MallAddress extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        if (strlen($phone) > 11){
-            return ['code'=>false,'msg'=>'手机号格式错误'];
+        if (strlen($phone) > 11) {
+            return ['code' => false, 'msg' => '手机号格式错误'];
         }
 
         if (!empty(($params['id'] ?? 0))) {
@@ -53,12 +52,12 @@ class MallAddress extends Base
         DB::beginTransaction();
 
         if (($params['is_default'] ?? 0) == 1) {
-            if (!empty($params['id']??0)){
+            if (!empty($params['id'] ?? 0)) {
                 $update_res = self::where('user_id', '=', $user_id)
-                    ->where('id','<>',$params['id'])
+                    ->where('id', '<>', $params['id'])
                     ->where('is_default', '=', 1)
                     ->update(['is_default' => 0]);
-            }else{
+            } else {
                 $update_res = self::where('user_id', '=', $user_id)
                     ->where('is_default', '=', 1)
                     ->update(['is_default' => 0]);
@@ -96,13 +95,17 @@ class MallAddress extends Base
         return $res->name ?? '';
     }
 
-    public function getList($user_id, $id = 0)
+    public function getList($user_id, $id = 0, $limit = 0)
     {
 
         $query = self::where('user_id', '=', $user_id);
 
         if ($id) {
             $query->where('id', '=', $id);
+        }
+
+        if ($limit) {
+            $query->limit($limit);
         }
 
         $query->where('is_del', '=', 0)

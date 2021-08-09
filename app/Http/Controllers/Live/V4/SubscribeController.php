@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendLiveRole;
+use App\Models\MallAddress;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -19,7 +20,7 @@ class SubscribeController extends ControllerBackend
         $page = 1;
         $size = 50;
 
-        $columns = ['订单编号', '直播标题', '用户昵称', '用户账号', '直播定价', '分销金额', '分销昵称',
+        $columns = ['订单编号', '直播标题', '用户昵称', '用户账号','收件人','收件人电话','地址', '直播定价', '分销金额', '分销昵称',
             '分销账号', '订单来源', '支付时间', '支付金额', '支付方式', '创建时间'];
         $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -50,6 +51,20 @@ class SubscribeController extends ControllerBackend
                 } else {
                     $temp_v['phone'] = '`' . $v['user']['phone'];
                 }
+
+                if (empty($v['user']['address'])){
+                    $temp_v['address_name'] = '';
+                    $temp_v['address_phone'] = '';
+                    $temp_v['address'] = '';
+                }else{
+                    $temp_v['address_name'] = $v['user']['address']['name'];
+                    $temp_v['address_phone'] = '`'.$v['user']['address']['phone'];
+                    $temp_v['address'] = $v['user']['address']['province_name'].' '.
+                        $v['user']['address']['city_name'].' '.
+                        $v['user']['address']['area_name'].' '.
+                        $v['user']['address']['details'];
+                }
+
                 $temp_v['live_price'] = $v['live']['price'] ?? '-';
                 $temp_v['t_price'] = $v['live']['twitter_money'] ?? '-';
                 $temp_v['t_nickname'] = $v['twitter']['nickname'] ?? '-';
@@ -283,10 +298,12 @@ class SubscribeController extends ControllerBackend
         }
         $new_users = [];
         $users = User::select('id', 'nickname', 'phone')->whereIn('id', $user_ids)->get()->toArray();
+
+        $maModel = new MallAddress();
         foreach ($users as $dk => $dv) {
             $new_users[$dv['id']] = $dv;
+            $new_users[$dv['id']]['address'] = ($maModel->getList($dv['id'], 0, 1))[0] ?? '';
         }
-
 
         foreach ($lists['data'] as &$val) {
 
