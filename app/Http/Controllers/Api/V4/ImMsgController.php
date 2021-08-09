@@ -157,6 +157,7 @@ class ImMsgController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup im
      *
+     * @apiParam {int} page page
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:

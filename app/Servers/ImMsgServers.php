@@ -83,8 +83,10 @@ class ImMsgServers
             return [];
         }
         //群发列表
-        $list = ImSendAll::where(['from_account' => $uid,'status'=>0])->get()->toArray();
+        //$list = ImSendAll::where(['from_account' => $uid,'status'=>0])->get()->toArray();
+        $lists = ImSendAll::where(['from_account' => $uid,'status'=>0])->paginate(20)->toArray();
 
+        $list = $lists['data'];
         $uids = [];
         $group_id = [];
         foreach ($list as $key=>$value){
