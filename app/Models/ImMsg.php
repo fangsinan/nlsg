@@ -236,7 +236,7 @@ class ImMsg extends Base
 
                 case 'TIMVideoFileElem' : //视频类型元素
                     $msg_content_add['VideoUrl']            = $val['VideoUrl'];
-                    $msg_content_add['VideoSize']           = $val['VideoSize']??0;
+                    $msg_content_add['VideoSize']           = $val['VideoSize']??10;
                     $msg_content_add['VideoSecond']         = $val['VideoSecond']??0;
                     $msg_content_add['VideoFormat']         = $val['VideoFormat']??0;
                     $msg_content_add['VideoDownloadFlag']   = 2;
