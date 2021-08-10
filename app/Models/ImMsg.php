@@ -74,12 +74,18 @@ class ImMsg extends Base
                     $media_data['thumb_size'] = 61440;
                     $media_data['thumb_width'] = 953;
                     $media_data['thumb_height'] =535;
+                    $media_data['thumb_format'] ='png';
                 }
+                $format=255; //图片显示255
+                if($media_data['type'] == 1){//视频显示后缀
+                    $format = $media_data['format'];
+                }
+
                 $media = [
                     'size'          => $media_data['size']??0, //大小
                     'second'        => $media_data['second'], //时长
                     'uuid'          => md5($val['Url']), //uuid
-                    'format'        => 255, //格式
+                    'format'        => $format, //格式
                     'width'         => $media_data['width'],
                     'height'        => $media_data['height'],
 
@@ -89,10 +95,9 @@ class ImMsg extends Base
                     'thumb_size'    => $media_data['thumb_size'],
                     'thumb_width'   => $media_data['thumb_width'],
                     'thumb_height'  => $media_data['thumb_height'],
-                    'thumb_format'  => 255,
+                    'thumb_format'  => $media_data['thumb_format'],
                 ];
             }
-
 
 
             switch ($val['MsgType']){
