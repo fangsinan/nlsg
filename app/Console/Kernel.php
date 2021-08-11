@@ -54,7 +54,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             //im doc
             $s = new ImDocServers();
-            $s->sendGroupDocMsgJob();
+            //秒级执行 立即发送任务
+            for ($i=1;$i<=30;$i++){
+                $s->sendGroupDocMsgJob();
+                sleep(2);
+            }
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
