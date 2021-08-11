@@ -84,7 +84,7 @@ class ImMsgServers
         }
         //群发列表
         //$list = ImSendAll::where(['from_account' => $uid,'status'=>0])->get()->toArray();
-        $lists = ImSendAll::where(['from_account' => $uid,'status'=>0])->paginate(20)->toArray();
+        $lists = ImSendAll::where(['from_account' => $uid,'status'=>0])->orderBy('created_at',"desc")->paginate(20)->toArray();
 
         $list = $lists['data'];
         $uids = [];
