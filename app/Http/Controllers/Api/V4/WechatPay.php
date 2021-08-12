@@ -393,7 +393,7 @@ class WechatPay extends Controller
                     'price' => $total_fee, //支付金额
                     'transaction_id' => $transaction_id, //流水号
                     'user_id' => $user_id, //会员id
-                    'type' => 1, //1：微信  2：支付宝
+                    'type' => $pay_type, //1：微信  2：支付宝
                     'client' => 1, //微信
                     'order_type' => 21, //
                     'status' => 1,
