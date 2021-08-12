@@ -493,10 +493,11 @@ class ImDocServers
         }
 
 
-        $query->orderBy('success_at', 'desc')
+        $query->orderBy('send_at', 'desc')
+            ->orderBy('success_at', 'desc')
             ->orderBy('id', 'desc')
             ->select([
-                'id', 'doc_id', 'created_at', 'status', 'send_type', 'is_done', 'success_at'
+                'id', 'doc_id', 'created_at', 'send_at','status', 'send_type', 'is_done', 'success_at'
             ]);
 
         return $query->paginate($size);
