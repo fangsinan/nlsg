@@ -1151,6 +1151,7 @@ class ImDocServers
                         $file_url = explode(';', $v->docInfo->file_url);
                         $file_url = array_filter($file_url);
                         foreach ($file_url as $fuv) {
+                            $temp_post_data['Random'] = $this->getMsgRandom();
                             $temp_post_data['MsgBody'] = [];
                             $fuv = explode(',', $fuv);
                             $temp_post_data['MsgBody'][] = [
