@@ -5,81 +5,64 @@ namespace AlibabaCloud\CS\V20151215;
 use AlibabaCloud\Client\Resolver\ApiResolver;
 
 /**
- * @method DownloadClusterNodeCerts downloadClusterNodeCerts(array $options = [])
- * @method CreateClusterToken createClusterToken(array $options = [])
- * @method DescribeClusterHosts describeClusterHosts(array $options = [])
- * @method DescribeClusterResources describeClusterResources(array $options = [])
- * @method DescribeApiVersion describeApiVersion(array $options = [])
- * @method AddAgilityCluster addAgilityCluster(array $options = [])
- * @method ScaleCluster scaleCluster(array $options = [])
- * @method DeleteClusterNode deleteClusterNode(array $options = [])
- * @method DescribeMonitorToken describeMonitorToken(array $options = [])
- * @method ScaleOutCluster scaleOutCluster(array $options = [])
- * @method ScaleInCluster scaleInCluster(array $options = [])
- * @method DescribeServiceContainers describeServiceContainers(array $options = [])
- * @method CheckAliyunCSServiceRole checkAliyunCSServiceRole(array $options = [])
- * @method DescribeKubernetesTemplates describeKubernetesTemplates(array $options = [])
- * @method UpgradeClusterAddons upgradeClusterAddons(array $options = [])
- * @method DeleteCluster deleteCluster(array $options = [])
- * @method CallbackClusterToken callbackClusterToken(array $options = [])
- * @method CreateCluster createCluster(array $options = [])
- * @method GetProjectEvents getProjectEvents(array $options = [])
- * @method DescribeKubernetesClusterScaleMeta describeKubernetesClusterScaleMeta(array $options = [])
- * @method DescribeClusterEndpoints describeClusterEndpoints(array $options = [])
- * @method GetTriggerHook getTriggerHook(array $options = [])
- * @method DescribeClusterNodes describeClusterNodes(array $options = [])
- * @method RenewK8sClusterCert renewK8sClusterCert(array $options = [])
- * @method CreateTemplate createTemplate(array $options = [])
- * @method ReBindSecurityGroup reBindSecurityGroup(array $options = [])
- * @method ModifyClusterName modifyClusterName(array $options = [])
- * @method DescribeKubernetesVersionMetadata describeKubernetesVersionMetadata(array $options = [])
- * @method PreCheckForCreateCluster preCheckForCreateCluster(array $options = [])
- * @method DescribeK8sResourceGroup describeK8sResourceGroup(array $options = [])
- * @method RenewClusterNodeCerts renewClusterNodeCerts(array $options = [])
- * @method DescribeEdasClusterToken describeEdasClusterToken(array $options = [])
  * @method AttachInstances attachInstances(array $options = [])
- * @method DescribeClusterLogs describeClusterLogs(array $options = [])
- * @method DescribeTaskInfo describeTaskInfo(array $options = [])
- * @method DescribeClusterAttachScripts describeClusterAttachScripts(array $options = [])
- * @method DescribeImages describeImages(array $options = [])
- * @method DescribeKubernetesTemplate describeKubernetesTemplate(array $options = [])
- * @method DescribeClusterNodeInfo describeClusterNodeInfo(array $options = [])
- * @method CreateClusterByResourcesGroup createClusterByResourcesGroup(array $options = [])
- * @method GetCidrsForVpc getCidrsForVpc(array $options = [])
- * @method UpdateEdasClusterRole updateEdasClusterRole(array $options = [])
- * @method ResetClusterNode resetClusterNode(array $options = [])
- * @method DescribeAgilityTunnelCerts describeAgilityTunnelCerts(array $options = [])
- * @method DescribeClusterAddonUpgradeStatus describeClusterAddonUpgradeStatus(array $options = [])
- * @method GatherLogsToken gatherLogsToken(array $options = [])
- * @method DescribeTemplateAttribute describeTemplateAttribute(array $options = [])
- * @method DescribeClusterDetail describeClusterDetail(array $options = [])
- * @method UpgradeClusterComponents upgradeClusterComponents(array $options = [])
- * @method DescribeClusters describeClusters(array $options = [])
- * @method DescribeClusterServices describeClusterServices(array $options = [])
- * @method UpdateTemplate updateTemplate(array $options = [])
- * @method DescribeClusterUserKubeconfig describeClusterUserKubeconfig(array $options = [])
- * @method DescribeClusterCerts describeClusterCerts(array $options = [])
- * @method DescribeUserContainers describeUserContainers(array $options = [])
- * @method CallBackAgilityCluster callBackAgilityCluster(array $options = [])
- * @method DeleteTemplate deleteTemplate(array $options = [])
- * @method UpdateSubUserResouces updateSubUserResouces(array $options = [])
- * @method GetClusterCertInfo getClusterCertInfo(array $options = [])
- * @method DescribeClusterNodeInfoWithInstance describeClusterNodeInfoWithInstance(array $options = [])
- * @method UpdateEdasClusterRoleBinding updateEdasClusterRoleBinding(array $options = [])
- * @method DescribeClusterScaledNode describeClusterScaledNode(array $options = [])
- * @method CreateTriggerHook createTriggerHook(array $options = [])
- * @method CreateEdasClusterRoleBinding createEdasClusterRoleBinding(array $options = [])
- * @method DescribeTemplates describeTemplates(array $options = [])
- * @method CreateEdasClusterRole createEdasClusterRole(array $options = [])
- * @method DescribeAgilityTunnelAgentInfo describeAgilityTunnelAgentInfo(array $options = [])
- * @method DescribeEdgeClusterAttachScripts describeEdgeClusterAttachScripts(array $options = [])
- * @method DescribeClusterAddonsVersion describeClusterAddonsVersion(array $options = [])
- * @method RevokeClusterToken revokeClusterToken(array $options = [])
- * @method AbandonCluster abandonCluster(array $options = [])
- * @method GetClusterProjects getClusterProjects(array $options = [])
- * @method DescribeKubernetesClusterHookTrigger describeKubernetesClusterHookTrigger(array $options = [])
- * @method DescribeClusterTokens describeClusterTokens(array $options = [])
+ * @method CancelClusterUpgrade cancelClusterUpgrade(array $options = [])
+ * @method CancelComponentUpgrade cancelComponentUpgrade(array $options = [])
+ * @method CancelWorkflow cancelWorkflow(array $options = [])
+ * @method CreateCluster createCluster(array $options = [])
+ * @method CreateClusterNodePool createClusterNodePool(array $options = [])
+ * @method CreateKubernetesTrigger createKubernetesTrigger(array $options = [])
+ * @method CreateTemplate createTemplate(array $options = [])
+ * @method DeleteCluster deleteCluster(array $options = [])
+ * @method DeleteClusterNodepool deleteClusterNodepool(array $options = [])
  * @method DeleteClusterNodes deleteClusterNodes(array $options = [])
+ * @method DeleteKubernetesTrigger deleteKubernetesTrigger(array $options = [])
+ * @method DeleteTemplate deleteTemplate(array $options = [])
+ * @method DescirbeWorkflow descirbeWorkflow(array $options = [])
+ * @method DescribeAddons describeAddons(array $options = [])
+ * @method DescribeClusterAddonsUpgradeStatus describeClusterAddonsUpgradeStatus(array $options = [])
+ * @method DescribeClusterAddonsVersion describeClusterAddonsVersion(array $options = [])
+ * @method DescribeClusterAddonUpgradeStatus describeClusterAddonUpgradeStatus(array $options = [])
+ * @method DescribeClusterAttachScripts describeClusterAttachScripts(array $options = [])
+ * @method DescribeClusterDetail describeClusterDetail(array $options = [])
+ * @method DescribeClusterLogs describeClusterLogs(array $options = [])
+ * @method DescribeClusterNodePoolDetail describeClusterNodePoolDetail(array $options = [])
+ * @method DescribeClusterNodePools describeClusterNodePools(array $options = [])
+ * @method DescribeClusterNodes describeClusterNodes(array $options = [])
+ * @method DescribeClusterResources describeClusterResources(array $options = [])
+ * @method DescribeClusters describeClusters(array $options = [])
+ * @method DescribeClustersV1 describeClustersV1(array $options = [])
+ * @method DescribeClusterUserKubeconfig describeClusterUserKubeconfig(array $options = [])
+ * @method DescribeClusterV2UserKubeconfig describeClusterV2UserKubeconfig(array $options = [])
+ * @method DescribeExternalAgent describeExternalAgent(array $options = [])
+ * @method DescribeKubernetesVersionMetadata describeKubernetesVersionMetadata(array $options = [])
+ * @method DescribeTemplateAttribute describeTemplateAttribute(array $options = [])
+ * @method DescribeTemplates describeTemplates(array $options = [])
+ * @method DescribeUserQuota describeUserQuota(array $options = [])
+ * @method DescribeWorkflows describeWorkflows(array $options = [])
+ * @method GetKubernetesTrigger getKubernetesTrigger(array $options = [])
+ * @method GetUpgradeStatus getUpgradeStatus(array $options = [])
+ * @method InstallClusterAddons installClusterAddons(array $options = [])
+ * @method ListTagResources listTagResources(array $options = [])
+ * @method ModifyCluster modifyCluster(array $options = [])
+ * @method ModifyClusterConfiguration modifyClusterConfiguration(array $options = [])
+ * @method ModifyClusterNodePool modifyClusterNodePool(array $options = [])
+ * @method ModifyClusterTags modifyClusterTags(array $options = [])
+ * @method PauseClusterUpgrade pauseClusterUpgrade(array $options = [])
+ * @method PauseComponentUpgrade pauseComponentUpgrade(array $options = [])
+ * @method RemoveClusterNodes removeClusterNodes(array $options = [])
+ * @method RemoveWorkflow removeWorkflow(array $options = [])
+ * @method ResumeComponentUpgrade resumeComponentUpgrade(array $options = [])
+ * @method ResumeUpgradeCluster resumeUpgradeCluster(array $options = [])
+ * @method ScaleCluster scaleCluster(array $options = [])
+ * @method ScaleClusterNodePool scaleClusterNodePool(array $options = [])
+ * @method ScaleOutCluster scaleOutCluster(array $options = [])
+ * @method StartWorkflow startWorkflow(array $options = [])
+ * @method UnInstallClusterAddons unInstallClusterAddons(array $options = [])
+ * @method UpdateK8sClusterUserConfigExpire updateK8sClusterUserConfigExpire(array $options = [])
+ * @method UpdateTemplate updateTemplate(array $options = [])
+ * @method UpgradeCluster upgradeCluster(array $options = [])
+ * @method UpgradeClusterAddons upgradeClusterAddons(array $options = [])
  */
 class CSApiResolver extends ApiResolver
 {
@@ -92,31 +75,16 @@ class Roa extends \AlibabaCloud\Client\Resolver\Roa
 
     /** @var string */
     public $version = '2015-12-15';
-
-    /** @var string */
-    public $serviceCode = 'cs';
-}
-
-/**
- * @method string getNodeId()
- * @method $this withNodeId($value)
- * @method string getToken()
- * @method $this withToken($value)
- */
-class DownloadClusterNodeCerts extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/token/[Token]/nodes/[NodeId]/certs';
 }
 
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class CreateClusterToken extends Roa
+class AttachInstances extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/token';
+    public $pathPattern = '/clusters/[ClusterId]/attach';
 
     /** @var string */
     public $method = 'POST';
@@ -126,111 +94,83 @@ class CreateClusterToken extends Roa
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class DescribeClusterHosts extends Roa
+class CancelClusterUpgrade extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/hosts';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterResources extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/resources';
-}
-
-class DescribeApiVersion extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/version';
-}
-
-class AddAgilityCluster extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/add_agility_cluster';
+    public $pathPattern = '/api/v2/clusters/[ClusterId]/upgrade/cancel';
 
     /** @var string */
     public $method = 'POST';
 }
 
 /**
- * @method string getClusterId()
- * @method $this withClusterId($value)
+ * @method string getComponentid()
+ * @method string getClusterid()
  */
-class ScaleCluster extends Roa
+class CancelComponentUpgrade extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]';
+    public $pathPattern = '/clusters/[clusterid]/components/[componentid]/cancel';
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withComponentid($value)
+    {
+        $this->data['Componentid'] = $value;
+        $this->pathParameters['componentid'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withClusterid($value)
+    {
+        $this->data['Clusterid'] = $value;
+        $this->pathParameters['clusterid'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getWorkflowName()
+ */
+class CancelWorkflow extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/gs/workflow/[workflowName]';
 
     /** @var string */
     public $method = 'PUT';
-}
-
-/**
- * @method string getReleaseInstance()
- * @method string getIp()
- * @method $this withIp($value)
- * @method string getForce()
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DeleteClusterNode extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/ip/[Ip]';
-
-    /** @var string */
-    public $method = 'DELETE';
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function withReleaseInstance($value)
+    public function withWorkflowName($value)
     {
-        $this->data['ReleaseInstance'] = $value;
-        $this->options['query']['releaseInstance'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withForce($value)
-    {
-        $this->data['Force'] = $value;
-        $this->options['query']['force'] = $value;
+        $this->data['WorkflowName'] = $value;
+        $this->pathParameters['workflowName'] = $value;
 
         return $this;
     }
 }
 
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeMonitorToken extends Roa
+class CreateCluster extends Roa
 {
     /** @var string */
-    public $pathPattern = '/k8s/[ClusterId]/monitor/token';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class ScaleOutCluster extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/api/v2/clusters/[ClusterId]';
+    public $pathPattern = '/clusters';
 
     /** @var string */
     public $method = 'POST';
@@ -240,51 +180,47 @@ class ScaleOutCluster extends Roa
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class ScaleInCluster extends Roa
+class CreateClusterNodePool extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/scalein';
+    public $pathPattern = '/clusters/[ClusterId]/nodepools';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+class CreateKubernetesTrigger extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/triggers';
 
     /** @var string */
     public $method = 'POST';
 }
 
 /**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- * @method string getServiceId()
- * @method $this withServiceId($value)
+ * @method string getTemplate()
+ * @method string getName()
+ * @method string getTemplateType()
+ * @method string getTags()
  */
-class DescribeServiceContainers extends Roa
+class CreateTemplate extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/services/[ServiceId]/containers';
-}
+    public $pathPattern = '/templates';
 
-class CheckAliyunCSServiceRole extends Roa
-{
     /** @var string */
-    public $pathPattern = '/aliyuncsrole/status';
-}
-
-/**
- * @method string getKubernetesVersion()
- * @method string getRegion()
- */
-class DescribeKubernetesTemplates extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/k8s/templates';
+    public $method = 'POST';
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function withKubernetesVersion($value)
+    public function withTemplate($value)
     {
-        $this->data['KubernetesVersion'] = $value;
-        $this->options['query']['KubernetesVersion'] = $value;
+        $this->data['Template'] = $value;
+        $this->options['form_params']['template'] = $value;
 
         return $this;
     }
@@ -294,26 +230,39 @@ class DescribeKubernetesTemplates extends Roa
      *
      * @return $this
      */
-    public function withRegion($value)
+    public function withName($value)
     {
-        $this->data['Region'] = $value;
-        $this->options['query']['Region'] = $value;
+        $this->data['Name'] = $value;
+        $this->options['form_params']['name'] = $value;
 
         return $this;
     }
-}
 
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class UpgradeClusterAddons extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/components/upgrade';
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withTemplateType($value)
+    {
+        $this->data['TemplateType'] = $value;
+        $this->options['form_params']['template_type'] = $value;
 
-    /** @var string */
-    public $method = 'POST';
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withTags($value)
+    {
+        $this->data['Tags'] = $value;
+        $this->options['form_params']['tags'] = $value;
+
+        return $this;
+    }
 }
 
 /**
@@ -330,77 +279,224 @@ class DeleteCluster extends Roa
 }
 
 /**
- * @method string getReqOnce()
- * @method $this withReqOnce($value)
- * @method string getToken()
- * @method $this withToken($value)
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ * @method string getNodepoolId()
+ * @method $this withNodepoolId($value)
  */
-class CallbackClusterToken extends Roa
+class DeleteClusterNodepool extends Roa
 {
     /** @var string */
-    public $pathPattern = '/token/[Token]/req_once/[ReqOnce]/callback';
+    public $pathPattern = '/clusters/[ClusterId]/nodepools/[NodepoolId]';
+
+    /** @var string */
+    public $method = 'DELETE';
+}
+
+/**
+ * @method string getReleaseNode()
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class DeleteClusterNodes extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/nodes';
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withReleaseNode($value)
+    {
+        $this->data['ReleaseNode'] = $value;
+        $this->options['form_params']['release_node'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getId()
+ * @method $this withId($value)
+ */
+class DeleteKubernetesTrigger extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/triggers/revoke/[Id]';
+
+    /** @var string */
+    public $method = 'DELETE';
+}
+
+/**
+ * @method string getTemplateId()
+ * @method $this withTemplateId($value)
+ */
+class DeleteTemplate extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/templates/[TemplateId]';
+
+    /** @var string */
+    public $method = 'DELETE';
+}
+
+/**
+ * @method string getWorkflowName()
+ */
+class DescirbeWorkflow extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/gs/workflow/[workflowName]';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withWorkflowName($value)
+    {
+        $this->data['WorkflowName'] = $value;
+        $this->pathParameters['workflowName'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getClusterType()
+ * @method string getRegion()
+ */
+class DescribeAddons extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/components/metadata';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withClusterType($value)
+    {
+        $this->data['ClusterType'] = $value;
+        $this->options['query']['cluster_type'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withRegion($value)
+    {
+        $this->data['Region'] = $value;
+        $this->options['query']['region'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class DescribeClusterAddonsUpgradeStatus extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/components/upgradestatus';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class DescribeClusterAddonsVersion extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/components/version';
+}
+
+/**
+ * @method string getComponentId()
+ * @method $this withComponentId($value)
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class DescribeClusterAddonUpgradeStatus extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/components/[ComponentId]/upgradestatus';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class DescribeClusterAttachScripts extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/attachscript';
 
     /** @var string */
     public $method = 'POST';
 }
 
-class CreateCluster extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
- * @method string getProjectId()
- * @method $this withProjectId($value)
  */
-class GetProjectEvents extends Roa
+class DescribeClusterDetail extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/projects/[ProjectId]/events';
+    public $pathPattern = '/clusters/[ClusterId]';
 }
 
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class DescribeKubernetesClusterScaleMeta extends Roa
+class DescribeClusterLogs extends Roa
 {
     /** @var string */
-    public $pathPattern = '/api/v1/clusters/[ClusterId]/scale_metadata';
+    public $pathPattern = '/clusters/[ClusterId]/logs';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ * @method string getNodepoolId()
+ * @method $this withNodepoolId($value)
+ */
+class DescribeClusterNodePoolDetail extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/nodepools/[NodepoolId]';
 }
 
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class DescribeClusterEndpoints extends Roa
+class DescribeClusterNodePools extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/endpoints';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- * @method string getProjectId()
- * @method $this withProjectId($value)
- */
-class GetTriggerHook extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/hook/trigger/[ClusterId]/[ProjectId]';
+    public $pathPattern = '/clusters/[ClusterId]/nodepools';
 }
 
 /**
  * @method string getPageSize()
  * @method string getClusterId()
  * @method $this withClusterId($value)
+ * @method string getState()
+ * @method string getNodepoolId()
  * @method string getPageNumber()
  */
 class DescribeClusterNodes extends Roa
@@ -426,6 +522,32 @@ class DescribeClusterNodes extends Roa
      *
      * @return $this
      */
+    public function withState($value)
+    {
+        $this->data['State'] = $value;
+        $this->options['query']['state'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withNodepoolId($value)
+    {
+        $this->data['NodepoolId'] = $value;
+        $this->options['query']['nodepool_id'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
     public function withPageNumber($value)
     {
         $this->data['PageNumber'] = $value;
@@ -439,50 +561,175 @@ class DescribeClusterNodes extends Roa
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class RenewK8sClusterCert extends Roa
+class DescribeClusterResources extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/cert_renew';
-
-    /** @var string */
-    public $method = 'POST';
+    public $pathPattern = '/clusters/[ClusterId]/resources';
 }
 
-class CreateTemplate extends Roa
+/**
+ * @method string getClusterType()
+ * @method string getName()
+ */
+class DescribeClusters extends Roa
 {
     /** @var string */
-    public $pathPattern = '/templates';
+    public $pathPattern = '/clusters';
 
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withClusterType($value)
+    {
+        $this->data['ClusterType'] = $value;
+        $this->options['query']['clusterType'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withName($value)
+    {
+        $this->data['Name'] = $value;
+        $this->options['query']['name'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getClusterType()
+ * @method string getPageNumber()
+ * @method string getName()
+ * @method string getPageSize()
+ */
+class DescribeClustersV1 extends Roa
+{
     /** @var string */
-    public $method = 'POST';
+    public $pathPattern = '/api/v1/clusters';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withClusterType($value)
+    {
+        $this->data['ClusterType'] = $value;
+        $this->options['query']['ClusterType'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withPageNumber($value)
+    {
+        $this->data['PageNumber'] = $value;
+        $this->options['query']['page_number'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withName($value)
+    {
+        $this->data['Name'] = $value;
+        $this->options['query']['Name'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withPageSize($value)
+    {
+        $this->data['PageSize'] = $value;
+        $this->options['query']['page_size'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getPrivateIpAddress()
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class DescribeClusterUserKubeconfig extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/k8s/[ClusterId]/user_config';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withPrivateIpAddress($value)
+    {
+        $this->data['PrivateIpAddress'] = $value;
+        $this->options['query']['PrivateIpAddress'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getPrivateIpAddress()
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class DescribeClusterV2UserKubeconfig extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/api/v2/k8s/[ClusterId]/user_config';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withPrivateIpAddress($value)
+    {
+        $this->data['PrivateIpAddress'] = $value;
+        $this->options['query']['PrivateIpAddress'] = $value;
+
+        return $this;
+    }
 }
 
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class ReBindSecurityGroup extends Roa
+class DescribeExternalAgent extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/rebind_sg';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-class ModifyClusterName extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/name/[ClusterName]';
-
-    /** @var string */
-    public $method = 'POST';
+    public $pathPattern = '/k8s/[ClusterId]/external/agent/deployment';
 }
 
 /**
  * @method string getClusterType()
  * @method string getMultiAZ()
  * @method string getKubernetesVersion()
+ * @method string getProfile()
  * @method string getRegion()
  */
 class DescribeKubernetesVersionMetadata extends Roa
@@ -534,6 +781,19 @@ class DescribeKubernetesVersionMetadata extends Roa
      *
      * @return $this
      */
+    public function withProfile($value)
+    {
+        $this->data['Profile'] = $value;
+        $this->options['query']['Profile'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
     public function withRegion($value)
     {
         $this->data['Region'] = $value;
@@ -541,250 +801,6 @@ class DescribeKubernetesVersionMetadata extends Roa
 
         return $this;
     }
-}
-
-class PreCheckForCreateCluster extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/api/v1/ess/precheck';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeK8sResourceGroup extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/k8s/[ClusterId]/monitor/resource_group';
-}
-
-/**
- * @method string getHostId()
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class RenewClusterNodeCerts extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/hosts/[hostId]/renew';
-
-    /** @var string */
-    public $method = 'POST';
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withHostId($value)
-    {
-        $this->data['HostId'] = $value;
-        $this->pathParameters['hostId'] = $value;
-
-        return $this;
-    }
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeEdasClusterToken extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/k8s/[ClusterId]/token';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class AttachInstances extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/attach';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterLogs extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/logs';
-}
-
-/**
- * @method string getTaskId()
- * @method $this withTaskId($value)
- */
-class DescribeTaskInfo extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/tasks/[TaskId]';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterAttachScripts extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/attachscript';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-/**
- * @method string getImageName()
- * @method string getDockerVersion()
- */
-class DescribeImages extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/images';
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withImageName($value)
-    {
-        $this->data['ImageName'] = $value;
-        $this->options['query']['ImageName'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withDockerVersion($value)
-    {
-        $this->data['DockerVersion'] = $value;
-        $this->options['query']['DockerVersion'] = $value;
-
-        return $this;
-    }
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeKubernetesTemplate extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/k8s/templates/[ClusterId]';
-}
-
-/**
- * @method string getToken()
- * @method $this withToken($value)
- */
-class DescribeClusterNodeInfo extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/token/[Token]/node_info';
-}
-
-/**
- * @method string getResourceGroupId()
- * @method $this withResourceGroupId($value)
- */
-class CreateClusterByResourcesGroup extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/resource_groups/[ResourceGroupId]/clusters';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-/**
- * @method string getVpcId()
- * @method $this withVpcId($value)
- */
-class GetCidrsForVpc extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/api/v1/vpc/[VpcId]/cidrs';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class UpdateEdasClusterRole extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/clusterroles';
-
-    /** @var string */
-    public $method = 'PUT';
-}
-
-/**
- * @method string getInstanceId()
- * @method $this withInstanceId($value)
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class ResetClusterNode extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/instances/[InstanceId]/reset';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-/**
- * @method string getToken()
- * @method $this withToken($value)
- */
-class DescribeAgilityTunnelCerts extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/agility/[Token]/agent_certs';
-}
-
-/**
- * @method string getComponentId()
- * @method $this withComponentId($value)
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterAddonUpgradeStatus extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/components/[ComponentId]/upgradestatus';
-}
-
-/**
- * @method string getToken()
- * @method $this withToken($value)
- */
-class GatherLogsToken extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/token/[Token]/gather_logs';
-
-    /** @var string */
-    public $method = 'POST';
 }
 
 /**
@@ -795,250 +811,6 @@ class DescribeTemplateAttribute extends Roa
 {
     /** @var string */
     public $pathPattern = '/templates/[TemplateId]';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterDetail extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]';
-}
-
-/**
- * @method string getComponentId()
- * @method $this withComponentId($value)
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class UpgradeClusterComponents extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/components/[ComponentId]/upgrade';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-/**
- * @method string getClusterType()
- * @method string getName()
- */
-class DescribeClusters extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters';
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withClusterType($value)
-    {
-        $this->data['ClusterType'] = $value;
-        $this->options['query']['clusterType'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withName($value)
-    {
-        $this->data['Name'] = $value;
-        $this->options['query']['Name'] = $value;
-
-        return $this;
-    }
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterServices extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/services';
-}
-
-/**
- * @method string getTemplateId()
- * @method $this withTemplateId($value)
- */
-class UpdateTemplate extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/templates/[TemplateId]';
-
-    /** @var string */
-    public $method = 'PUT';
-}
-
-/**
- * @method string getPrivateIpAddress()
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterUserKubeconfig extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/k8s/[ClusterId]/user_config';
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withPrivateIpAddress($value)
-    {
-        $this->data['PrivateIpAddress'] = $value;
-        $this->options['query']['PrivateIpAddress'] = $value;
-
-        return $this;
-    }
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterCerts extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/certs';
-}
-
-/**
- * @method string getServiceId()
- */
-class DescribeUserContainers extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/region/[RegionId]/containers';
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withServiceId($value)
-    {
-        $this->data['ServiceId'] = $value;
-        $this->options['query']['ServiceId'] = $value;
-
-        return $this;
-    }
-}
-
-/**
- * @method string getReqOnce()
- * @method $this withReqOnce($value)
- * @method string getToken()
- * @method $this withToken($value)
- */
-class CallBackAgilityCluster extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/agility/token/[Token]/req_once/[ReqOnce]/callback';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-/**
- * @method string getTemplateId()
- * @method $this withTemplateId($value)
- */
-class DeleteTemplate extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/templates/[TemplateId]';
-
-    /** @var string */
-    public $method = 'DELETE';
-}
-
-class UpdateSubUserResouces extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/ram/resources';
-
-    /** @var string */
-    public $method = 'POST';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class GetClusterCertInfo extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/hosts/certs';
-}
-
-/**
- * @method string getInstanceId()
- * @method $this withInstanceId($value)
- * @method string getToken()
- * @method $this withToken($value)
- */
-class DescribeClusterNodeInfoWithInstance extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/token/[Token]/instance/[InstanceId]/node_info';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class UpdateEdasClusterRoleBinding extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/clusterrolebindings';
-
-    /** @var string */
-    public $method = 'PUT';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeClusterScaledNode extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/scaled_nodes/';
-}
-
-class CreateTriggerHook extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/hook/trigger';
-
-    /** @var string */
-    public $method = 'PUT';
-}
-
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class CreateEdasClusterRoleBinding extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/clusterrolebindings';
-
-    /** @var string */
-    public $method = 'POST';
 }
 
 /**
@@ -1063,48 +835,65 @@ class DescribeTemplates extends Roa
     }
 }
 
-/**
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class CreateEdasClusterRole extends Roa
+class DescribeUserQuota extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/clusterroles';
+    public $pathPattern = '/quota';
+}
 
+class DescribeWorkflows extends Roa
+{
     /** @var string */
-    public $method = 'POST';
+    public $pathPattern = '/gs/workflows';
 }
 
 /**
- * @method string getToken()
- * @method $this withToken($value)
- */
-class DescribeAgilityTunnelAgentInfo extends Roa
-{
-    /** @var string */
-    public $pathPattern = '/agility/[Token]/agent_info';
-}
-
-/**
+ * @method string getNamespace()
+ * @method string getName()
  * @method string getClusterId()
  * @method $this withClusterId($value)
- * @method string getNamePrefix()
+ * @method string getType()
  */
-class DescribeEdgeClusterAttachScripts extends Roa
+class GetKubernetesTrigger extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/attachscript';
+    public $pathPattern = '/triggers/[ClusterId]';
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function withNamePrefix($value)
+    public function withNamespace($value)
     {
-        $this->data['NamePrefix'] = $value;
-        $this->options['query']['NamePrefix'] = $value;
+        $this->data['Namespace'] = $value;
+        $this->options['query']['Namespace'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withName($value)
+    {
+        $this->data['Name'] = $value;
+        $this->options['query']['Name'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withType($value)
+    {
+        $this->data['Type'] = $value;
+        $this->options['query']['Type'] = $value;
 
         return $this;
     }
@@ -1114,80 +903,395 @@ class DescribeEdgeClusterAttachScripts extends Roa
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class DescribeClusterAddonsVersion extends Roa
+class GetUpgradeStatus extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/components/version';
+    public $pathPattern = '/api/v2/clusters/[ClusterId]/upgrade/status';
 }
 
 /**
- * @method string getToken()
- * @method $this withToken($value)
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
  */
-class RevokeClusterToken extends Roa
+class InstallClusterAddons extends Roa
 {
     /** @var string */
-    public $pathPattern = '/token/[Token]/revoke';
+    public $pathPattern = '/clusters/[ClusterId]/components/install';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getResourceType()
+ * @method string getNextToken()
+ * @method string getResourceIds()
+ * @method string getTags()
+ */
+class ListTagResources extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/tags';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withResourceType($value)
+    {
+        $this->data['ResourceType'] = $value;
+        $this->options['query']['resource_type'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withNextToken($value)
+    {
+        $this->data['NextToken'] = $value;
+        $this->options['query']['next_token'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withResourceIds($value)
+    {
+        $this->data['ResourceIds'] = $value;
+        $this->options['query']['resource_ids'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withTags($value)
+    {
+        $this->data['Tags'] = $value;
+        $this->options['query']['tags'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class ModifyCluster extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/api/v2/clusters/[ClusterId]';
+
+    /** @var string */
+    public $method = 'PUT';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class ModifyClusterConfiguration extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/configuration';
+
+    /** @var string */
+    public $method = 'PUT';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ * @method string getNodepoolId()
+ * @method $this withNodepoolId($value)
+ */
+class ModifyClusterNodePool extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/nodepools/[NodepoolId]';
+
+    /** @var string */
+    public $method = 'PUT';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class ModifyClusterTags extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/tags';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class PauseClusterUpgrade extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/api/v2/clusters/[ClusterId]/upgrade/pause';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getComponentid()
+ * @method string getClusterid()
+ */
+class PauseComponentUpgrade extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[clusterid]/components/[componentid]/pause';
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withComponentid($value)
+    {
+        $this->data['Componentid'] = $value;
+        $this->pathParameters['componentid'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withClusterid($value)
+    {
+        $this->data['Clusterid'] = $value;
+        $this->pathParameters['clusterid'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class RemoveClusterNodes extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/api/v2/clusters/[ClusterId]/nodes/remove';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getWorkflowName()
+ */
+class RemoveWorkflow extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/gs/workflow/[workflowName]';
 
     /** @var string */
     public $method = 'DELETE';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withWorkflowName($value)
+    {
+        $this->data['WorkflowName'] = $value;
+        $this->pathParameters['workflowName'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getComponentid()
+ * @method string getClusterid()
+ */
+class ResumeComponentUpgrade extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[clusterid]/components/[componentid]/resume';
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withComponentid($value)
+    {
+        $this->data['Componentid'] = $value;
+        $this->pathParameters['componentid'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withClusterid($value)
+    {
+        $this->data['Clusterid'] = $value;
+        $this->pathParameters['clusterid'] = $value;
+
+        return $this;
+    }
 }
 
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class AbandonCluster extends Roa
+class ResumeUpgradeCluster extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/abandon';
+    public $pathPattern = '/api/v2/clusters/[ClusterId]/upgrade/resume';
 
     /** @var string */
-    public $method = 'DELETE';
+    public $method = 'POST';
 }
 
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class GetClusterProjects extends Roa
+class ScaleCluster extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/projects';
-}
+    public $pathPattern = '/clusters/[ClusterId]';
 
-/**
- * @method string getNamespace()
- * @method $this withNamespace($value)
- * @method string getDdeployment()
- * @method $this withDdeployment($value)
- * @method string getClusterId()
- * @method $this withClusterId($value)
- */
-class DescribeKubernetesClusterHookTrigger extends Roa
-{
     /** @var string */
-    public $pathPattern = '/hook/trigger/[ClusterId]/[Namespace]/[Ddeployment]';
+    public $method = 'PUT';
 }
 
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
+ * @method string getNodepoolId()
+ * @method $this withNodepoolId($value)
  */
-class DescribeClusterTokens extends Roa
+class ScaleClusterNodePool extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/tokens';
+    public $pathPattern = '/clusters/[ClusterId]/nodepools/[NodepoolId]';
+
+    /** @var string */
+    public $method = 'POST';
 }
 
 /**
  * @method string getClusterId()
  * @method $this withClusterId($value)
  */
-class DeleteClusterNodes extends Roa
+class ScaleOutCluster extends Roa
 {
     /** @var string */
-    public $pathPattern = '/clusters/[ClusterId]/nodes';
+    public $pathPattern = '/api/v2/clusters/[ClusterId]';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+class StartWorkflow extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/gs/workflow';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class UnInstallClusterAddons extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/components/uninstall';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class UpdateK8sClusterUserConfigExpire extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/k8s/[ClusterId]/user_config/expire';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getTemplateId()
+ * @method $this withTemplateId($value)
+ */
+class UpdateTemplate extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/templates/[TemplateId]';
+
+    /** @var string */
+    public $method = 'PUT';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class UpgradeCluster extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/api/v2/clusters/[ClusterId]/upgrade';
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getClusterId()
+ * @method $this withClusterId($value)
+ */
+class UpgradeClusterAddons extends Roa
+{
+    /** @var string */
+    public $pathPattern = '/clusters/[ClusterId]/components/upgrade';
 
     /** @var string */
     public $method = 'POST';

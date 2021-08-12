@@ -5,10 +5,12 @@ namespace AlibabaCloud\BssOpenApi\V20171214;
 use AlibabaCloud\Client\Resolver\ApiResolver;
 
 /**
+ * @method AddAccountRelation addAccountRelation(array $options = [])
  * @method AllocateCostUnitResource allocateCostUnitResource(array $options = [])
  * @method ApplyInvoice applyInvoice(array $options = [])
  * @method CancelOrder cancelOrder(array $options = [])
  * @method ChangeResellerConsumeAmount changeResellerConsumeAmount(array $options = [])
+ * @method ConfirmRelation confirmRelation(array $options = [])
  * @method ConvertChargeType convertChargeType(array $options = [])
  * @method CreateAgAccount createAgAccount(array $options = [])
  * @method CreateCostUnit createCostUnit(array $options = [])
@@ -16,8 +18,14 @@ use AlibabaCloud\Client\Resolver\ApiResolver;
  * @method CreateResellerUserQuota createResellerUserQuota(array $options = [])
  * @method CreateResourcePackage createResourcePackage(array $options = [])
  * @method DeleteCostUnit deleteCostUnit(array $options = [])
+ * @method DescribeInstanceBill describeInstanceBill(array $options = [])
  * @method DescribePricingModule describePricingModule(array $options = [])
+ * @method DescribeResourceCoverageDetail describeResourceCoverageDetail(array $options = [])
+ * @method DescribeResourceCoverageTotal describeResourceCoverageTotal(array $options = [])
  * @method DescribeResourcePackageProduct describeResourcePackageProduct(array $options = [])
+ * @method DescribeResourceUsageDetail describeResourceUsageDetail(array $options = [])
+ * @method DescribeResourceUsageTotal describeResourceUsageTotal(array $options = [])
+ * @method DescribeSplitItemBill describeSplitItemBill(array $options = [])
  * @method EnableBillGeneration enableBillGeneration(array $options = [])
  * @method GetCustomerAccountInfo getCustomerAccountInfo(array $options = [])
  * @method GetCustomerList getCustomerList(array $options = [])
@@ -25,10 +33,12 @@ use AlibabaCloud\Client\Resolver\ApiResolver;
  * @method GetPayAsYouGoPrice getPayAsYouGoPrice(array $options = [])
  * @method GetResourcePackagePrice getResourcePackagePrice(array $options = [])
  * @method GetSubscriptionPrice getSubscriptionPrice(array $options = [])
+ * @method ModifyAccountRelation modifyAccountRelation(array $options = [])
  * @method ModifyCostUnit modifyCostUnit(array $options = [])
  * @method ModifyInstance modifyInstance(array $options = [])
  * @method QueryAccountBalance queryAccountBalance(array $options = [])
  * @method QueryAccountBill queryAccountBill(array $options = [])
+ * @method QueryAccountTransactionDetails queryAccountTransactionDetails(array $options = [])
  * @method QueryAccountTransactions queryAccountTransactions(array $options = [])
  * @method QueryAvailableInstances queryAvailableInstances(array $options = [])
  * @method QueryBill queryBill(array $options = [])
@@ -38,29 +48,44 @@ use AlibabaCloud\Client\Resolver\ApiResolver;
  * @method QueryCostUnit queryCostUnit(array $options = [])
  * @method QueryCostUnitResource queryCostUnitResource(array $options = [])
  * @method QueryCustomerAddressList queryCustomerAddressList(array $options = [])
+ * @method QueryDPUtilizationDetail queryDPUtilizationDetail(array $options = [])
  * @method QueryEvaluateList queryEvaluateList(array $options = [])
+ * @method QueryFinancialAccountInfo queryFinancialAccountInfo(array $options = [])
  * @method QueryInstanceBill queryInstanceBill(array $options = [])
+ * @method QueryInstanceByTag queryInstanceByTag(array $options = [])
  * @method QueryInstanceGaapCost queryInstanceGaapCost(array $options = [])
  * @method QueryInvoicingCustomerList queryInvoicingCustomerList(array $options = [])
  * @method QueryMonthlyBill queryMonthlyBill(array $options = [])
  * @method QueryMonthlyInstanceConsumption queryMonthlyInstanceConsumption(array $options = [])
  * @method QueryOrders queryOrders(array $options = [])
+ * @method QueryPermissionList queryPermissionList(array $options = [])
  * @method QueryPrepaidCards queryPrepaidCards(array $options = [])
  * @method QueryProductList queryProductList(array $options = [])
  * @method QueryRedeem queryRedeem(array $options = [])
+ * @method QueryRelationList queryRelationList(array $options = [])
  * @method QueryResellerAvailableQuota queryResellerAvailableQuota(array $options = [])
  * @method QueryResourcePackageInstances queryResourcePackageInstances(array $options = [])
  * @method QueryRIUtilizationDetail queryRIUtilizationDetail(array $options = [])
+ * @method QuerySavingsPlansDeductLog querySavingsPlansDeductLog(array $options = [])
+ * @method QuerySavingsPlansInstance querySavingsPlansInstance(array $options = [])
+ * @method QuerySettleBill querySettleBill(array $options = [])
  * @method QuerySettlementBill querySettlementBill(array $options = [])
+ * @method QuerySplitItemBill querySplitItemBill(array $options = [])
  * @method QueryUserOmsData queryUserOmsData(array $options = [])
+ * @method RelieveAccountRelation relieveAccountRelation(array $options = [])
  * @method RenewInstance renewInstance(array $options = [])
  * @method RenewResourcePackage renewResourcePackage(array $options = [])
+ * @method SaveUserCredit saveUserCredit(array $options = [])
+ * @method SetAllExpirationDay setAllExpirationDay(array $options = [])
+ * @method SetCreditLabelAction setCreditLabelAction(array $options = [])
  * @method SetRenewal setRenewal(array $options = [])
  * @method SetResellerUserAlarmThreshold setResellerUserAlarmThreshold(array $options = [])
  * @method SetResellerUserQuota setResellerUserQuota(array $options = [])
  * @method SetResellerUserStatus setResellerUserStatus(array $options = [])
  * @method SubscribeBillToOSS subscribeBillToOSS(array $options = [])
+ * @method TagResources tagResources(array $options = [])
  * @method UnsubscribeBillToOSS unsubscribeBillToOSS(array $options = [])
+ * @method UntagResources untagResources(array $options = [])
  * @method UpgradeResourcePackage upgradeResourcePackage(array $options = [])
  */
 class BssOpenApiApiResolver extends ApiResolver
@@ -77,6 +102,54 @@ class Rpc extends \AlibabaCloud\Client\Resolver\Rpc
 
     /** @var string */
     public $method = 'POST';
+}
+
+/**
+ * @method string getChildNick()
+ * @method $this withChildNick($value)
+ * @method string getRelationType()
+ * @method $this withRelationType($value)
+ * @method string getParentUserId()
+ * @method $this withParentUserId($value)
+ * @method string getChildUserId()
+ * @method $this withChildUserId($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method array getPermissionCodes()
+ * @method array getRoleCodes()
+ */
+class AddAccountRelation extends Rpc
+{
+
+    /**
+     * @param array $permissionCodes
+     *
+     * @return $this
+     */
+	public function withPermissionCodes(array $permissionCodes)
+	{
+	    $this->data['PermissionCodes'] = $permissionCodes;
+		foreach ($permissionCodes as $i => $iValue) {
+			$this->options['query']['PermissionCodes.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
+
+    /**
+     * @param array $roleCodes
+     *
+     * @return $this
+     */
+	public function withRoleCodes(array $roleCodes)
+	{
+	    $this->data['RoleCodes'] = $roleCodes;
+		foreach ($roleCodes as $i => $iValue) {
+			$this->options['query']['RoleCodes.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
 }
 
 /**
@@ -102,9 +175,18 @@ class AllocateCostUnitResource extends Rpc
 	{
 	    $this->data['ResourceInstanceList'] = $resourceInstanceList;
 		foreach ($resourceInstanceList as $depth1 => $depth1Value) {
-			$this->options['query']['ResourceInstanceList.' . ($depth1 + 1) . '.ResourceId'] = $depth1Value['ResourceId'];
-			$this->options['query']['ResourceInstanceList.' . ($depth1 + 1) . '.CommodityCode'] = $depth1Value['CommodityCode'];
-			$this->options['query']['ResourceInstanceList.' . ($depth1 + 1) . '.ResourceUserId'] = $depth1Value['ResourceUserId'];
+			if(isset($depth1Value['ResourceId'])){
+				$this->options['query']['ResourceInstanceList.' . ($depth1 + 1) . '.ResourceId'] = $depth1Value['ResourceId'];
+			}
+			if(isset($depth1Value['CommodityCode'])){
+				$this->options['query']['ResourceInstanceList.' . ($depth1 + 1) . '.CommodityCode'] = $depth1Value['CommodityCode'];
+			}
+			if(isset($depth1Value['ApportionCode'])){
+				$this->options['query']['ResourceInstanceList.' . ($depth1 + 1) . '.ApportionCode'] = $depth1Value['ApportionCode'];
+			}
+			if(isset($depth1Value['ResourceUserId'])){
+				$this->options['query']['ResourceInstanceList.' . ($depth1 + 1) . '.ResourceUserId'] = $depth1Value['ResourceUserId'];
+			}
 		}
 
 		return $this;
@@ -116,7 +198,6 @@ class AllocateCostUnitResource extends Rpc
  * @method $this withInvoicingType($value)
  * @method string getProcessWay()
  * @method $this withProcessWay($value)
- * @method string getCallerBid()
  * @method string getOwnerId()
  * @method $this withOwnerId($value)
  * @method string getInvoiceAmount()
@@ -130,23 +211,11 @@ class AllocateCostUnitResource extends Rpc
  * @method string getCustomerId()
  * @method $this withCustomerId($value)
  * @method array getSelectedIds()
- * @method string getCallerUid()
+ * @method string getUserRemark()
+ * @method $this withUserRemark($value)
  */
 class ApplyInvoice extends Rpc
 {
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withCallerBid($value)
-    {
-        $this->data['CallerBid'] = $value;
-        $this->options['query']['callerBid'] = $value;
-
-        return $this;
-    }
 
     /**
      * @param array $selectedIds
@@ -161,19 +230,6 @@ class ApplyInvoice extends Rpc
 		}
 
 		return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withCallerUid($value)
-    {
-        $this->data['CallerUid'] = $value;
-        $this->options['query']['callerUid'] = $value;
-
-        return $this;
     }
 }
 
@@ -207,6 +263,38 @@ class CancelOrder extends Rpc
  */
 class ChangeResellerConsumeAmount extends Rpc
 {
+}
+
+/**
+ * @method string getRelationType()
+ * @method $this withRelationType($value)
+ * @method string getParentUserId()
+ * @method $this withParentUserId($value)
+ * @method string getConfirmCode()
+ * @method $this withConfirmCode($value)
+ * @method string getChildUserId()
+ * @method $this withChildUserId($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method array getPermissionCodes()
+ */
+class ConfirmRelation extends Rpc
+{
+
+    /**
+     * @param array $permissionCodes
+     *
+     * @return $this
+     */
+	public function withPermissionCodes(array $permissionCodes)
+	{
+	    $this->data['PermissionCodes'] = $permissionCodes;
+		foreach ($permissionCodes as $i => $iValue) {
+			$this->options['query']['PermissionCodes.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
 }
 
 /**
@@ -269,9 +357,15 @@ class CreateCostUnit extends Rpc
 	{
 	    $this->data['UnitEntityList'] = $unitEntityList;
 		foreach ($unitEntityList as $depth1 => $depth1Value) {
-			$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.UnitName'] = $depth1Value['UnitName'];
-			$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.ParentUnitId'] = $depth1Value['ParentUnitId'];
-			$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.OwnerUid'] = $depth1Value['OwnerUid'];
+			if(isset($depth1Value['UnitName'])){
+				$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.UnitName'] = $depth1Value['UnitName'];
+			}
+			if(isset($depth1Value['ParentUnitId'])){
+				$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.ParentUnitId'] = $depth1Value['ParentUnitId'];
+			}
+			if(isset($depth1Value['OwnerUid'])){
+				$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.OwnerUid'] = $depth1Value['OwnerUid'];
+			}
 		}
 
 		return $this;
@@ -287,6 +381,8 @@ class CreateCostUnit extends Rpc
  * @method $this withClientToken($value)
  * @method string getSubscriptionType()
  * @method $this withSubscriptionType($value)
+ * @method string getLogistics()
+ * @method $this withLogistics($value)
  * @method string getOwnerId()
  * @method $this withOwnerId($value)
  * @method string getProductType()
@@ -309,8 +405,12 @@ class CreateInstance extends Rpc
 	{
 	    $this->data['Parameter'] = $parameter;
 		foreach ($parameter as $depth1 => $depth1Value) {
-			$this->options['query']['Parameter.' . ($depth1 + 1) . '.Code'] = $depth1Value['Code'];
-			$this->options['query']['Parameter.' . ($depth1 + 1) . '.Value'] = $depth1Value['Value'];
+			if(isset($depth1Value['Code'])){
+				$this->options['query']['Parameter.' . ($depth1 + 1) . '.Code'] = $depth1Value['Code'];
+			}
+			if(isset($depth1Value['Value'])){
+				$this->options['query']['Parameter.' . ($depth1 + 1) . '.Value'] = $depth1Value['Value'];
+			}
 		}
 
 		return $this;
@@ -364,6 +464,38 @@ class DeleteCostUnit extends Rpc
 /**
  * @method string getProductCode()
  * @method $this withProductCode($value)
+ * @method string getIsHideZeroCharge()
+ * @method $this withIsHideZeroCharge($value)
+ * @method string getSubscriptionType()
+ * @method $this withSubscriptionType($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getProductType()
+ * @method $this withProductType($value)
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getBillingCycle()
+ * @method $this withBillingCycle($value)
+ * @method string getOwnerId()
+ * @method $this withOwnerId($value)
+ * @method string getBillingDate()
+ * @method $this withBillingDate($value)
+ * @method string getIsBillingItem()
+ * @method $this withIsBillingItem($value)
+ * @method string getInstanceID()
+ * @method $this withInstanceID($value)
+ * @method string getGranularity()
+ * @method $this withGranularity($value)
+ * @method string getMaxResults()
+ * @method $this withMaxResults($value)
+ */
+class DescribeInstanceBill extends Rpc
+{
+}
+
+/**
+ * @method string getProductCode()
+ * @method $this withProductCode($value)
  * @method string getSubscriptionType()
  * @method $this withSubscriptionType($value)
  * @method string getOwnerId()
@@ -376,11 +508,134 @@ class DescribePricingModule extends Rpc
 }
 
 /**
+ * @method string getPeriodType()
+ * @method $this withPeriodType($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getResourceType()
+ * @method $this withResourceType($value)
+ * @method string getStartPeriod()
+ * @method $this withStartPeriod($value)
+ * @method string getEndPeriod()
+ * @method $this withEndPeriod($value)
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getMaxResults()
+ * @method $this withMaxResults($value)
+ */
+class DescribeResourceCoverageDetail extends Rpc
+{
+}
+
+/**
+ * @method string getPeriodType()
+ * @method $this withPeriodType($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getResourceType()
+ * @method $this withResourceType($value)
+ * @method string getStartPeriod()
+ * @method $this withStartPeriod($value)
+ * @method string getEndPeriod()
+ * @method $this withEndPeriod($value)
+ */
+class DescribeResourceCoverageTotal extends Rpc
+{
+}
+
+/**
  * @method string getProductCode()
  * @method $this withProductCode($value)
  */
 class DescribeResourcePackageProduct extends Rpc
 {
+}
+
+/**
+ * @method string getPeriodType()
+ * @method $this withPeriodType($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getResourceType()
+ * @method $this withResourceType($value)
+ * @method string getStartPeriod()
+ * @method $this withStartPeriod($value)
+ * @method string getEndPeriod()
+ * @method $this withEndPeriod($value)
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getMaxResults()
+ * @method $this withMaxResults($value)
+ */
+class DescribeResourceUsageDetail extends Rpc
+{
+}
+
+/**
+ * @method string getPeriodType()
+ * @method $this withPeriodType($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getResourceType()
+ * @method $this withResourceType($value)
+ * @method string getStartPeriod()
+ * @method $this withStartPeriod($value)
+ * @method string getEndPeriod()
+ * @method $this withEndPeriod($value)
+ */
+class DescribeResourceUsageTotal extends Rpc
+{
+}
+
+/**
+ * @method string getProductCode()
+ * @method $this withProductCode($value)
+ * @method string getSubscriptionType()
+ * @method $this withSubscriptionType($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getProductType()
+ * @method $this withProductType($value)
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getSplitItemID()
+ * @method $this withSplitItemID($value)
+ * @method string getBillingCycle()
+ * @method $this withBillingCycle($value)
+ * @method string getOwnerId()
+ * @method $this withOwnerId($value)
+ * @method array getTagFilter()
+ * @method string getBillingDate()
+ * @method $this withBillingDate($value)
+ * @method string getInstanceID()
+ * @method $this withInstanceID($value)
+ * @method string getGranularity()
+ * @method $this withGranularity($value)
+ * @method string getMaxResults()
+ * @method $this withMaxResults($value)
+ */
+class DescribeSplitItemBill extends Rpc
+{
+
+    /**
+     * @param array $tagFilter
+     *
+     * @return $this
+     */
+	public function withTagFilter(array $tagFilter)
+	{
+	    $this->data['TagFilter'] = $tagFilter;
+		foreach ($tagFilter as $depth1 => $depth1Value) {
+			foreach ($depth1Value['TagValues'] as $i => $iValue) {
+				$this->options['query']['TagFilter.' . ($depth1 + 1) . '.TagValues.' . ($i + 1)] = $iValue;
+			}
+			if(isset($depth1Value['TagKey'])){
+				$this->options['query']['TagFilter.' . ($depth1 + 1) . '.TagKey'] = $depth1Value['TagKey'];
+			}
+		}
+
+		return $this;
+    }
 }
 
 /**
@@ -391,9 +646,6 @@ class DescribeResourcePackageProduct extends Rpc
  */
 class EnableBillGeneration extends Rpc
 {
-
-    /** @var string */
-    public $method = 'PUT';
 }
 
 /**
@@ -443,9 +695,15 @@ class GetPayAsYouGoPrice extends Rpc
 	{
 	    $this->data['ModuleList'] = $moduleList;
 		foreach ($moduleList as $depth1 => $depth1Value) {
-			$this->options['query']['ModuleList.' . ($depth1 + 1) . '.ModuleCode'] = $depth1Value['ModuleCode'];
-			$this->options['query']['ModuleList.' . ($depth1 + 1) . '.PriceType'] = $depth1Value['PriceType'];
-			$this->options['query']['ModuleList.' . ($depth1 + 1) . '.Config'] = $depth1Value['Config'];
+			if(isset($depth1Value['ModuleCode'])){
+				$this->options['query']['ModuleList.' . ($depth1 + 1) . '.ModuleCode'] = $depth1Value['ModuleCode'];
+			}
+			if(isset($depth1Value['PriceType'])){
+				$this->options['query']['ModuleList.' . ($depth1 + 1) . '.PriceType'] = $depth1Value['PriceType'];
+			}
+			if(isset($depth1Value['Config'])){
+				$this->options['query']['ModuleList.' . ($depth1 + 1) . '.Config'] = $depth1Value['Config'];
+			}
 		}
 
 		return $this;
@@ -511,10 +769,68 @@ class GetSubscriptionPrice extends Rpc
 	{
 	    $this->data['ModuleList'] = $moduleList;
 		foreach ($moduleList as $depth1 => $depth1Value) {
-			$this->options['query']['ModuleList.' . ($depth1 + 1) . '.ModuleCode'] = $depth1Value['ModuleCode'];
-			$this->options['query']['ModuleList.' . ($depth1 + 1) . '.ModuleStatus'] = $depth1Value['ModuleStatus'];
-			$this->options['query']['ModuleList.' . ($depth1 + 1) . '.Tag'] = $depth1Value['Tag'];
-			$this->options['query']['ModuleList.' . ($depth1 + 1) . '.Config'] = $depth1Value['Config'];
+			if(isset($depth1Value['ModuleCode'])){
+				$this->options['query']['ModuleList.' . ($depth1 + 1) . '.ModuleCode'] = $depth1Value['ModuleCode'];
+			}
+			if(isset($depth1Value['ModuleStatus'])){
+				$this->options['query']['ModuleList.' . ($depth1 + 1) . '.ModuleStatus'] = $depth1Value['ModuleStatus'];
+			}
+			if(isset($depth1Value['Tag'])){
+				$this->options['query']['ModuleList.' . ($depth1 + 1) . '.Tag'] = $depth1Value['Tag'];
+			}
+			if(isset($depth1Value['Config'])){
+				$this->options['query']['ModuleList.' . ($depth1 + 1) . '.Config'] = $depth1Value['Config'];
+			}
+		}
+
+		return $this;
+    }
+}
+
+/**
+ * @method string getChildNick()
+ * @method $this withChildNick($value)
+ * @method string getRelationOperation()
+ * @method $this withRelationOperation($value)
+ * @method string getRelationType()
+ * @method $this withRelationType($value)
+ * @method string getParentUserId()
+ * @method $this withParentUserId($value)
+ * @method string getChildUserId()
+ * @method $this withChildUserId($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method array getPermissionCodes()
+ * @method array getRoleCodes()
+ */
+class ModifyAccountRelation extends Rpc
+{
+
+    /**
+     * @param array $permissionCodes
+     *
+     * @return $this
+     */
+	public function withPermissionCodes(array $permissionCodes)
+	{
+	    $this->data['PermissionCodes'] = $permissionCodes;
+		foreach ($permissionCodes as $i => $iValue) {
+			$this->options['query']['PermissionCodes.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
+
+    /**
+     * @param array $roleCodes
+     *
+     * @return $this
+     */
+	public function withRoleCodes(array $roleCodes)
+	{
+	    $this->data['RoleCodes'] = $roleCodes;
+		foreach ($roleCodes as $i => $iValue) {
+			$this->options['query']['RoleCodes.' . ($i + 1)] = $iValue;
 		}
 
 		return $this;
@@ -536,9 +852,15 @@ class ModifyCostUnit extends Rpc
 	{
 	    $this->data['UnitEntityList'] = $unitEntityList;
 		foreach ($unitEntityList as $depth1 => $depth1Value) {
-			$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.NewUnitName'] = $depth1Value['NewUnitName'];
-			$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.UnitId'] = $depth1Value['UnitId'];
-			$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.OwnerUid'] = $depth1Value['OwnerUid'];
+			if(isset($depth1Value['NewUnitName'])){
+				$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.NewUnitName'] = $depth1Value['NewUnitName'];
+			}
+			if(isset($depth1Value['UnitId'])){
+				$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.UnitId'] = $depth1Value['UnitId'];
+			}
+			if(isset($depth1Value['OwnerUid'])){
+				$this->options['query']['UnitEntityList.' . ($depth1 + 1) . '.OwnerUid'] = $depth1Value['OwnerUid'];
+			}
 		}
 
 		return $this;
@@ -574,8 +896,12 @@ class ModifyInstance extends Rpc
 	{
 	    $this->data['Parameter'] = $parameter;
 		foreach ($parameter as $depth1 => $depth1Value) {
-			$this->options['query']['Parameter.' . ($depth1 + 1) . '.Code'] = $depth1Value['Code'];
-			$this->options['query']['Parameter.' . ($depth1 + 1) . '.Value'] = $depth1Value['Value'];
+			if(isset($depth1Value['Code'])){
+				$this->options['query']['Parameter.' . ($depth1 + 1) . '.Code'] = $depth1Value['Code'];
+			}
+			if(isset($depth1Value['Value'])){
+				$this->options['query']['Parameter.' . ($depth1 + 1) . '.Value'] = $depth1Value['Value'];
+			}
 		}
 
 		return $this;
@@ -595,12 +921,42 @@ class QueryAccountBalance extends Rpc
  * @method $this withPageNum($value)
  * @method string getOwnerID()
  * @method $this withOwnerID($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getBillingDate()
+ * @method $this withBillingDate($value)
  * @method string getIsGroupByProduct()
  * @method $this withIsGroupByProduct($value)
+ * @method string getGranularity()
+ * @method $this withGranularity($value)
  * @method string getPageSize()
  * @method $this withPageSize($value)
  */
 class QueryAccountBill extends Rpc
+{
+}
+
+/**
+ * @method string getTransactionType()
+ * @method $this withTransactionType($value)
+ * @method string getCreateTimeEnd()
+ * @method $this withCreateTimeEnd($value)
+ * @method string getRecordID()
+ * @method $this withRecordID($value)
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getMaxResults()
+ * @method $this withMaxResults($value)
+ * @method string getTransactionChannel()
+ * @method $this withTransactionChannel($value)
+ * @method string getTransactionChannelSN()
+ * @method $this withTransactionChannelSN($value)
+ * @method string getCreateTimeStart()
+ * @method $this withCreateTimeStart($value)
+ * @method string getTransactionNumber()
+ * @method $this withTransactionNumber($value)
+ */
+class QueryAccountTransactionDetails extends Rpc
 {
 }
 
@@ -673,6 +1029,8 @@ class QueryAvailableInstances extends Rpc
  * @method $this withOwnerId($value)
  * @method string getPageNum()
  * @method $this withPageNum($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
  * @method string getProductType()
  * @method $this withProductType($value)
  * @method string getPageSize()
@@ -689,6 +1047,8 @@ class QueryBill extends Rpc
  * @method $this withSubscriptionType($value)
  * @method string getBillingCycle()
  * @method $this withBillingCycle($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
  * @method string getProductType()
  * @method $this withProductType($value)
  */
@@ -741,39 +1101,35 @@ class QueryCostUnitResource extends Rpc
 }
 
 /**
- * @method string getCallerBid()
  * @method string getOwnerId()
  * @method $this withOwnerId($value)
- * @method string getCallerUid()
  */
 class QueryCustomerAddressList extends Rpc
 {
+}
 
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withCallerBid($value)
-    {
-        $this->data['CallerBid'] = $value;
-        $this->options['query']['callerBid'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withCallerUid($value)
-    {
-        $this->data['CallerUid'] = $value;
-        $this->options['query']['callerUid'] = $value;
-
-        return $this;
-    }
+/**
+ * @method string getDeductedInstanceId()
+ * @method $this withDeductedInstanceId($value)
+ * @method string getLastToken()
+ * @method $this withLastToken($value)
+ * @method string getInstanceSpec()
+ * @method $this withInstanceSpec($value)
+ * @method string getEndTime()
+ * @method $this withEndTime($value)
+ * @method string getIncludeShare()
+ * @method $this withIncludeShare($value)
+ * @method string getCommodityCode()
+ * @method $this withCommodityCode($value)
+ * @method string getStartTime()
+ * @method $this withStartTime($value)
+ * @method string getInstanceId()
+ * @method $this withInstanceId($value)
+ * @method string getLimit()
+ * @method $this withLimit($value)
+ */
+class QueryDPUtilizationDetail extends Rpc
+{
 }
 
 /**
@@ -825,6 +1181,14 @@ class QueryEvaluateList extends Rpc
 }
 
 /**
+ * @method string getUserId()
+ * @method $this withUserId($value)
+ */
+class QueryFinancialAccountInfo extends Rpc
+{
+}
+
+/**
  * @method string getProductCode()
  * @method $this withProductCode($value)
  * @method string getIsHideZeroCharge()
@@ -837,15 +1201,66 @@ class QueryEvaluateList extends Rpc
  * @method $this withOwnerId($value)
  * @method string getPageNum()
  * @method $this withPageNum($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getBillingDate()
+ * @method $this withBillingDate($value)
  * @method string getProductType()
  * @method $this withProductType($value)
  * @method string getIsBillingItem()
  * @method $this withIsBillingItem($value)
+ * @method string getGranularity()
+ * @method $this withGranularity($value)
  * @method string getPageSize()
  * @method $this withPageSize($value)
  */
 class QueryInstanceBill extends Rpc
 {
+}
+
+/**
+ * @method array getResourceId()
+ * @method array getTag()
+ * @method string getResourceType()
+ * @method $this withResourceType($value)
+ */
+class QueryInstanceByTag extends Rpc
+{
+
+    /**
+     * @param array $resourceId
+     *
+     * @return $this
+     */
+	public function withResourceId(array $resourceId)
+	{
+	    $this->data['ResourceId'] = $resourceId;
+		foreach ($resourceId as $i => $iValue) {
+			$this->options['query']['ResourceId.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
+
+    /**
+     * @param array $tag
+     *
+     * @return $this
+     */
+	public function withTag(array $tag)
+	{
+	    $this->data['Tag'] = $tag;
+		foreach ($tag as $depth1 => $depth1Value) {
+			if(isset($depth1Value['Value'])){
+				$this->options['query']['Tag.' . ($depth1 + 1) . '.Value'] = $depth1Value['Value'];
+			}
+			if(isset($depth1Value['Key'])){
+				$this->options['query']['Tag.' . ($depth1 + 1) . '.Key'] = $depth1Value['Key'];
+			}
+		}
+
+		return $this;
+    }
 }
 
 /**
@@ -929,6 +1344,14 @@ class QueryOrders extends Rpc
 }
 
 /**
+ * @method string getRelationId()
+ * @method $this withRelationId($value)
+ */
+class QueryPermissionList extends Rpc
+{
+}
+
+/**
  * @method string getExpiryTimeEnd()
  * @method $this withExpiryTimeEnd($value)
  * @method string getExpiryTimeStart()
@@ -969,6 +1392,34 @@ class QueryRedeem extends Rpc
 
     /** @var string */
     public $method = 'GET';
+}
+
+/**
+ * @method array getStatusList()
+ * @method string getPageNum()
+ * @method $this withPageNum($value)
+ * @method string getUserId()
+ * @method $this withUserId($value)
+ * @method string getPageSize()
+ * @method $this withPageSize($value)
+ */
+class QueryRelationList extends Rpc
+{
+
+    /**
+     * @param array $statusList
+     *
+     * @return $this
+     */
+	public function withStatusList(array $statusList)
+	{
+	    $this->data['StatusList'] = $statusList;
+		foreach ($statusList as $i => $iValue) {
+			$this->options['query']['StatusList.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
 }
 
 /**
@@ -1022,6 +1473,95 @@ class QueryRIUtilizationDetail extends Rpc
 }
 
 /**
+ * @method string getEndTime()
+ * @method $this withEndTime($value)
+ * @method string getStartTime()
+ * @method $this withStartTime($value)
+ * @method string getLocale()
+ * @method $this withLocale($value)
+ * @method string getPageNum()
+ * @method $this withPageNum($value)
+ * @method string getInstanceId()
+ * @method $this withInstanceId($value)
+ * @method string getPageSize()
+ * @method $this withPageSize($value)
+ * @method string getInstanceType()
+ * @method $this withInstanceType($value)
+ */
+class QuerySavingsPlansDeductLog extends Rpc
+{
+}
+
+/**
+ * @method string getEndTime()
+ * @method $this withEndTime($value)
+ * @method string getStartTime()
+ * @method $this withStartTime($value)
+ * @method string getLocale()
+ * @method $this withLocale($value)
+ * @method string getPageNum()
+ * @method $this withPageNum($value)
+ * @method string getInstanceId()
+ * @method $this withInstanceId($value)
+ * @method string getPageSize()
+ * @method $this withPageSize($value)
+ * @method array getTag()
+ */
+class QuerySavingsPlansInstance extends Rpc
+{
+
+    /**
+     * @param array $tag
+     *
+     * @return $this
+     */
+	public function withTag(array $tag)
+	{
+	    $this->data['Tag'] = $tag;
+		foreach ($tag as $depth1 => $depth1Value) {
+			if(isset($depth1Value['Value'])){
+				$this->options['query']['Tag.' . ($depth1 + 1) . '.Value'] = $depth1Value['Value'];
+			}
+			if(isset($depth1Value['Key'])){
+				$this->options['query']['Tag.' . ($depth1 + 1) . '.Key'] = $depth1Value['Key'];
+			}
+		}
+
+		return $this;
+    }
+}
+
+/**
+ * @method string getProductCode()
+ * @method $this withProductCode($value)
+ * @method string getIsHideZeroCharge()
+ * @method $this withIsHideZeroCharge($value)
+ * @method string getIsDisplayLocalCurrency()
+ * @method $this withIsDisplayLocalCurrency($value)
+ * @method string getSubscriptionType()
+ * @method $this withSubscriptionType($value)
+ * @method string getBillingCycle()
+ * @method $this withBillingCycle($value)
+ * @method string getType()
+ * @method $this withType($value)
+ * @method string getOwnerId()
+ * @method $this withOwnerId($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getProductType()
+ * @method $this withProductType($value)
+ * @method string getRecordID()
+ * @method $this withRecordID($value)
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getMaxResults()
+ * @method $this withMaxResults($value)
+ */
+class QuerySettleBill extends Rpc
+{
+}
+
+/**
  * @method string getProductCode()
  * @method $this withProductCode($value)
  * @method string getIsHideZeroCharge()
@@ -1050,6 +1590,28 @@ class QuerySettlementBill extends Rpc
 }
 
 /**
+ * @method string getProductCode()
+ * @method $this withProductCode($value)
+ * @method string getSubscriptionType()
+ * @method $this withSubscriptionType($value)
+ * @method string getBillingCycle()
+ * @method $this withBillingCycle($value)
+ * @method string getOwnerId()
+ * @method $this withOwnerId($value)
+ * @method string getPageNum()
+ * @method $this withPageNum($value)
+ * @method string getBillOwnerId()
+ * @method $this withBillOwnerId($value)
+ * @method string getProductType()
+ * @method $this withProductType($value)
+ * @method string getPageSize()
+ * @method $this withPageSize($value)
+ */
+class QuerySplitItemBill extends Rpc
+{
+}
+
+/**
  * @method string getEndTime()
  * @method $this withEndTime($value)
  * @method string getStartTime()
@@ -1067,9 +1629,20 @@ class QuerySettlementBill extends Rpc
  */
 class QueryUserOmsData extends Rpc
 {
+}
 
-    /** @var string */
-    public $method = 'GET';
+/**
+ * @method string getRelationType()
+ * @method $this withRelationType($value)
+ * @method string getParentUserId()
+ * @method $this withParentUserId($value)
+ * @method string getChildUserId()
+ * @method $this withChildUserId($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ */
+class RelieveAccountRelation extends Rpc
+{
 }
 
 /**
@@ -1104,6 +1677,84 @@ class RenewInstance extends Rpc
  */
 class RenewResourcePackage extends Rpc
 {
+}
+
+/**
+ * @method string getAvoidExpiration()
+ * @method $this withAvoidExpiration($value)
+ * @method string getDescription()
+ * @method $this withDescription($value)
+ * @method string getAvoidPrepaidNotification()
+ * @method $this withAvoidPrepaidNotification($value)
+ * @method string getAvoidPrepaidExpiration()
+ * @method $this withAvoidPrepaidExpiration($value)
+ * @method string getAvoidNotification()
+ * @method $this withAvoidNotification($value)
+ * @method string getOperator()
+ * @method $this withOperator($value)
+ * @method string getCreditValue()
+ * @method $this withCreditValue($value)
+ * @method string getCreditType()
+ * @method $this withCreditType($value)
+ */
+class SaveUserCredit extends Rpc
+{
+
+    /** @var string */
+    public $scheme = 'https';
+}
+
+/**
+ * @method string getOwnerId()
+ * @method $this withOwnerId($value)
+ * @method string getUnifyExpireDay()
+ * @method $this withUnifyExpireDay($value)
+ */
+class SetAllExpirationDay extends Rpc
+{
+}
+
+/**
+ * @method string getActionType()
+ * @method $this withActionType($value)
+ * @method string getIsNeedSaveNotifyRule()
+ * @method $this withIsNeedSaveNotifyRule($value)
+ * @method string getIsNeedAdjustCreditAccount()
+ * @method $this withIsNeedAdjustCreditAccount($value)
+ * @method string getNewCreateMode()
+ * @method $this withNewCreateMode($value)
+ * @method string getDescription()
+ * @method $this withDescription($value)
+ * @method string getSource()
+ * @method $this withSource($value)
+ * @method string getCurrencyCode()
+ * @method $this withCurrencyCode($value)
+ * @method string getDailyCycle()
+ * @method $this withDailyCycle($value)
+ * @method string getOperator()
+ * @method $this withOperator($value)
+ * @method string getUid()
+ * @method $this withUid($value)
+ * @method string getSiteCode()
+ * @method $this withSiteCode($value)
+ * @method string getClearCycle()
+ * @method $this withClearCycle($value)
+ * @method string getNeedNotice()
+ * @method $this withNeedNotice($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getIsNeedSetCreditAmount()
+ * @method $this withIsNeedSetCreditAmount($value)
+ * @method string getCreditAmount()
+ * @method $this withCreditAmount($value)
+ * @method string getIsNeedAddSettleLabel()
+ * @method $this withIsNeedAddSettleLabel($value)
+ */
+class SetCreditLabelAction extends Rpc
+{
+
+    /** @var string */
+    public $scheme = 'https';
 }
 
 /**
@@ -1173,11 +1824,58 @@ class SetResellerUserStatus extends Rpc
  * @method $this withSubscribeType($value)
  * @method string getSubscribeBucket()
  * @method $this withSubscribeBucket($value)
+ * @method string getBeginBillingCycle()
+ * @method $this withBeginBillingCycle($value)
  * @method string getMultAccountRelSubscribe()
  * @method $this withMultAccountRelSubscribe($value)
  */
 class SubscribeBillToOSS extends Rpc
 {
+}
+
+/**
+ * @method array getResourceId()
+ * @method array getTag()
+ * @method string getResourceType()
+ * @method $this withResourceType($value)
+ */
+class TagResources extends Rpc
+{
+
+    /**
+     * @param array $resourceId
+     *
+     * @return $this
+     */
+	public function withResourceId(array $resourceId)
+	{
+	    $this->data['ResourceId'] = $resourceId;
+		foreach ($resourceId as $i => $iValue) {
+			$this->options['query']['ResourceId.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
+
+    /**
+     * @param array $tag
+     *
+     * @return $this
+     */
+	public function withTag(array $tag)
+	{
+	    $this->data['Tag'] = $tag;
+		foreach ($tag as $depth1 => $depth1Value) {
+			if(isset($depth1Value['Value'])){
+				$this->options['query']['Tag.' . ($depth1 + 1) . '.Value'] = $depth1Value['Value'];
+			}
+			if(isset($depth1Value['Key'])){
+				$this->options['query']['Tag.' . ($depth1 + 1) . '.Key'] = $depth1Value['Key'];
+			}
+		}
+
+		return $this;
+    }
 }
 
 /**
@@ -1188,6 +1886,48 @@ class SubscribeBillToOSS extends Rpc
  */
 class UnsubscribeBillToOSS extends Rpc
 {
+}
+
+/**
+ * @method string getAll()
+ * @method $this withAll($value)
+ * @method array getResourceId()
+ * @method array getTagKey()
+ * @method string getResourceType()
+ * @method $this withResourceType($value)
+ */
+class UntagResources extends Rpc
+{
+
+    /**
+     * @param array $resourceId
+     *
+     * @return $this
+     */
+	public function withResourceId(array $resourceId)
+	{
+	    $this->data['ResourceId'] = $resourceId;
+		foreach ($resourceId as $i => $iValue) {
+			$this->options['query']['ResourceId.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
+
+    /**
+     * @param array $tagKey
+     *
+     * @return $this
+     */
+	public function withTagKey(array $tagKey)
+	{
+	    $this->data['TagKey'] = $tagKey;
+		foreach ($tagKey as $i => $iValue) {
+			$this->options['query']['TagKey.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
 }
 
 /**
