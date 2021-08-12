@@ -531,6 +531,28 @@ class AliUploadController extends Controller
         }
 
         try {
+
+            /*$map=[];
+            for($n=1;$n<=100;$n++){
+
+//                $str=18522222;
+                $str=18512342;
+//                $code = str_pad($n,3,0,STR_PAD_LEFT);
+                $code=300+$n;
+                $code=260+$n;
+                $phone=$str.$code;
+                $map[]=[
+                    'phone' => $phone,
+//                    'is_qd_push' => 1,#地推
+                    'is_qd_push' => 2,#李婷
+                    'nickname' => substr_replace($phone, '****', 3, 4),
+                    'created_at'=>date('Y-m-d H:i:s')
+                ];
+            }
+            $rst = DB::table('nlsg_user')->insert($map);
+            var_dump($rst);
+            return ;*/
+
             $AliUploadServer=new AliUploadServers();
 
 //            $rst=$AliUploadServer->UploadMediaPull();

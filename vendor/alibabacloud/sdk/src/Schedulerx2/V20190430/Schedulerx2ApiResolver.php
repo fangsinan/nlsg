@@ -5,10 +5,14 @@ namespace AlibabaCloud\Schedulerx2\V20190430;
 use AlibabaCloud\Client\Resolver\ApiResolver;
 
 /**
+ * @method BatchDeleteJobs batchDeleteJobs(array $options = [])
+ * @method BatchDisableJobs batchDisableJobs(array $options = [])
+ * @method BatchEnableJobs batchEnableJobs(array $options = [])
  * @method CreateAppGroup createAppGroup(array $options = [])
  * @method CreateJob createJob(array $options = [])
  * @method DeleteJob deleteJob(array $options = [])
  * @method DeleteWorkflow deleteWorkflow(array $options = [])
+ * @method DescribeRegions describeRegions(array $options = [])
  * @method DisableJob disableJob(array $options = [])
  * @method DisableWorkflow disableWorkflow(array $options = [])
  * @method EnableJob enableJob(array $options = [])
@@ -18,6 +22,11 @@ use AlibabaCloud\Client\Resolver\ApiResolver;
  * @method GetJobInfo getJobInfo(array $options = [])
  * @method GetJobInstance getJobInstance(array $options = [])
  * @method GetJobInstanceList getJobInstanceList(array $options = [])
+ * @method GrantPermission grantPermission(array $options = [])
+ * @method ListGroups listGroups(array $options = [])
+ * @method ListJobs listJobs(array $options = [])
+ * @method ListNamespaces listNamespaces(array $options = [])
+ * @method RevokePermission revokePermission(array $options = [])
  * @method StopInstance stopInstance(array $options = [])
  * @method UpdateJob updateJob(array $options = [])
  */
@@ -32,12 +41,99 @@ class Rpc extends \AlibabaCloud\Client\Resolver\Rpc
 
     /** @var string */
     public $version = '2019-04-30';
+}
+
+/**
+ * @method string getNamespaceSource()
+ * @method $this withNamespaceSource($value)
+ * @method string getGroupId()
+ * @method $this withGroupId($value)
+ * @method array getJobIdList()
+ * @method string getNamespace()
+ * @method $this withNamespace($value)
+ */
+class BatchDeleteJobs extends Rpc
+{
 
     /** @var string */
-    protected $scheme = 'https';
+    public $method = 'POST';
+
+    /**
+     * @param array $jobIdList
+     *
+     * @return $this
+     */
+	public function withJobIdList(array $jobIdList)
+	{
+	    $this->data['JobIdList'] = $jobIdList;
+		foreach ($jobIdList as $i => $iValue) {
+			$this->options['form_params']['JobIdList.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
+}
+
+/**
+ * @method string getNamespaceSource()
+ * @method $this withNamespaceSource($value)
+ * @method string getGroupId()
+ * @method $this withGroupId($value)
+ * @method string getNamespace()
+ * @method $this withNamespace($value)
+ * @method array getJobIdList()
+ */
+class BatchDisableJobs extends Rpc
+{
 
     /** @var string */
-    public $serviceCode = 'schedulerx2';
+    public $method = 'POST';
+
+    /**
+     * @param array $jobIdList
+     *
+     * @return $this
+     */
+	public function withJobIdList(array $jobIdList)
+	{
+	    $this->data['JobIdList'] = $jobIdList;
+		foreach ($jobIdList as $i => $iValue) {
+			$this->options['form_params']['JobIdList.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
+}
+
+/**
+ * @method string getNamespaceSource()
+ * @method $this withNamespaceSource($value)
+ * @method string getGroupId()
+ * @method $this withGroupId($value)
+ * @method string getNamespace()
+ * @method $this withNamespace($value)
+ * @method array getJobIdList()
+ */
+class BatchEnableJobs extends Rpc
+{
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param array $jobIdList
+     *
+     * @return $this
+     */
+	public function withJobIdList(array $jobIdList)
+	{
+	    $this->data['JobIdList'] = $jobIdList;
+		foreach ($jobIdList as $i => $iValue) {
+			$this->options['form_params']['JobIdList.' . ($i + 1)] = $iValue;
+		}
+
+		return $this;
+    }
 }
 
 /**
@@ -62,6 +158,9 @@ class Rpc extends \AlibabaCloud\Client\Resolver\Rpc
  */
 class CreateAppGroup extends Rpc
 {
+
+    /** @var string */
+    public $scheme = 'https';
 }
 
 /**
@@ -423,8 +522,12 @@ class CreateJob extends Rpc
 	{
 	    $this->data['ContactInfo'] = $contactInfo;
 		foreach ($contactInfo as $depth1 => $depth1Value) {
-			$this->options['form_params']['ContactInfo.' . ($depth1 + 1) . '.UserPhone'] = $depth1Value['UserPhone'];
-			$this->options['form_params']['ContactInfo.' . ($depth1 + 1) . '.UserName'] = $depth1Value['UserName'];
+			if(isset($depth1Value['UserPhone'])){
+				$this->options['form_params']['ContactInfo.' . ($depth1 + 1) . '.UserPhone'] = $depth1Value['UserPhone'];
+			}
+			if(isset($depth1Value['UserName'])){
+				$this->options['form_params']['ContactInfo.' . ($depth1 + 1) . '.UserName'] = $depth1Value['UserName'];
+			}
 		}
 
 		return $this;
@@ -522,6 +625,16 @@ class DeleteJob extends Rpc
  */
 class DeleteWorkflow extends Rpc
 {
+
+    /** @var string */
+    public $scheme = 'https';
+}
+
+class DescribeRegions extends Rpc
+{
+
+    /** @var string */
+    public $method = 'POST';
 }
 
 /**
@@ -550,6 +663,9 @@ class DisableJob extends Rpc
  */
 class DisableWorkflow extends Rpc
 {
+
+    /** @var string */
+    public $scheme = 'https';
 }
 
 /**
@@ -578,6 +694,9 @@ class EnableJob extends Rpc
  */
 class EnableWorkflow extends Rpc
 {
+
+    /** @var string */
+    public $scheme = 'https';
 }
 
 /**
@@ -610,6 +729,9 @@ class ExecuteJob extends Rpc
  */
 class ExecuteWorkflow extends Rpc
 {
+
+    /** @var string */
+    public $scheme = 'https';
 }
 
 /**
@@ -640,6 +762,9 @@ class GetJobInfo extends Rpc
  */
 class GetJobInstance extends Rpc
 {
+
+    /** @var string */
+    public $scheme = 'https';
 }
 
 /**
@@ -657,6 +782,74 @@ class GetJobInstanceList extends Rpc
 }
 
 /**
+ * @method string getNamespaceSource()
+ * @method $this withNamespaceSource($value)
+ * @method string getGroupId()
+ * @method $this withGroupId($value)
+ * @method string getUserId()
+ * @method $this withUserId($value)
+ * @method string getGrantOption()
+ * @method $this withGrantOption($value)
+ * @method string getNamespace()
+ * @method $this withNamespace($value)
+ * @method string getUserName()
+ * @method $this withUserName($value)
+ */
+class GrantPermission extends Rpc
+{
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
+ * @method string getNamespaceSource()
+ * @method $this withNamespaceSource($value)
+ * @method string getNamespace()
+ * @method $this withNamespace($value)
+ */
+class ListGroups extends Rpc
+{
+}
+
+/**
+ * @method string getNamespaceSource()
+ * @method $this withNamespaceSource($value)
+ * @method string getGroupId()
+ * @method $this withGroupId($value)
+ * @method string getNamespace()
+ * @method $this withNamespace($value)
+ * @method string getJobName()
+ * @method $this withJobName($value)
+ * @method string getStatus()
+ * @method $this withStatus($value)
+ */
+class ListJobs extends Rpc
+{
+}
+
+class ListNamespaces extends Rpc
+{
+}
+
+/**
+ * @method string getNamespaceSource()
+ * @method $this withNamespaceSource($value)
+ * @method string getGroupId()
+ * @method $this withGroupId($value)
+ * @method string getNamespace()
+ * @method $this withNamespace($value)
+ * @method string getUserId()
+ * @method $this withUserId($value)
+ */
+class RevokePermission extends Rpc
+{
+
+    /** @var string */
+    public $method = 'POST';
+}
+
+/**
  * @method string getJobId()
  * @method $this withJobId($value)
  * @method string getNamespaceSource()
@@ -670,6 +863,9 @@ class GetJobInstanceList extends Rpc
  */
 class StopInstance extends Rpc
 {
+
+    /** @var string */
+    public $scheme = 'https';
 }
 
 /**
@@ -1031,8 +1227,12 @@ class UpdateJob extends Rpc
 	{
 	    $this->data['ContactInfo'] = $contactInfo;
 		foreach ($contactInfo as $depth1 => $depth1Value) {
-			$this->options['form_params']['ContactInfo.' . ($depth1 + 1) . '.UserPhone'] = $depth1Value['UserPhone'];
-			$this->options['form_params']['ContactInfo.' . ($depth1 + 1) . '.UserName'] = $depth1Value['UserName'];
+			if(isset($depth1Value['UserPhone'])){
+				$this->options['form_params']['ContactInfo.' . ($depth1 + 1) . '.UserPhone'] = $depth1Value['UserPhone'];
+			}
+			if(isset($depth1Value['UserName'])){
+				$this->options['form_params']['ContactInfo.' . ($depth1 + 1) . '.UserName'] = $depth1Value['UserName'];
+			}
 		}
 
 		return $this;

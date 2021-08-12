@@ -4,6 +4,7 @@ namespace App\Servers;
 use App\Models\LiveDeal;
 use App\Models\Order;
 use App\Models\Subscribe;
+use App\Models\User;
 use App\Models\VipUser;
 use Illuminate\Support\Facades\DB;
 
@@ -253,11 +254,12 @@ class DealServers
         $tiktok_ordernum='';
         $tiktok_time=null;
         $qd=0;
+        //李婷老师账号  测试推广0.1有1052单（211370  324111  769159朋勇）
+        $user_arr=User::query()->where(['is_qd_push'=>2])->get(['id','phone'])->toArray();
+        $arr = array_column($user_arr, 'id'); //用户
+        //地推账号
 
-        $arr=[211370,324111,769159,
-            365569,730190,739394,756226,756227,756228,756229,756230,756231,756232,
-            785339,785340,785341,785342,785343,785344,785345,785346,785347,785348,
-            785349,785350,785351,785352,785353,785354,785355,785356,785357,785358];
+        //抖音
 
         //获取当前直播间
         $subLiveInfo=Subscribe::query()->where(['user_id'=>$user_id,'type'=>3,'relation_id'=>$live_id,'status'=>1])->first();

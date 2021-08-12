@@ -5,18 +5,23 @@ namespace AlibabaCloud\Fnf\V20190315;
 use AlibabaCloud\Client\Resolver\ApiResolver;
 
 /**
- * @method ReportTaskSucceeded reportTaskSucceeded(array $options = [])
- * @method ReportTaskFailed reportTaskFailed(array $options = [])
- * @method UpdateFlow updateFlow(array $options = [])
- * @method StopExecution stopExecution(array $options = [])
- * @method StartExecution startExecution(array $options = [])
- * @method ListFlows listFlows(array $options = [])
- * @method ListExecutions listExecutions(array $options = [])
- * @method GetExecutionHistory getExecutionHistory(array $options = [])
- * @method DescribeFlow describeFlow(array $options = [])
- * @method DescribeExecution describeExecution(array $options = [])
- * @method DeleteFlow deleteFlow(array $options = [])
  * @method CreateFlow createFlow(array $options = [])
+ * @method CreateSchedule createSchedule(array $options = [])
+ * @method DeleteFlow deleteFlow(array $options = [])
+ * @method DeleteSchedule deleteSchedule(array $options = [])
+ * @method DescribeExecution describeExecution(array $options = [])
+ * @method DescribeFlow describeFlow(array $options = [])
+ * @method DescribeSchedule describeSchedule(array $options = [])
+ * @method GetExecutionHistory getExecutionHistory(array $options = [])
+ * @method ListExecutions listExecutions(array $options = [])
+ * @method ListFlows listFlows(array $options = [])
+ * @method ListSchedules listSchedules(array $options = [])
+ * @method ReportTaskFailed reportTaskFailed(array $options = [])
+ * @method ReportTaskSucceeded reportTaskSucceeded(array $options = [])
+ * @method StartExecution startExecution(array $options = [])
+ * @method StopExecution stopExecution(array $options = [])
+ * @method UpdateFlow updateFlow(array $options = [])
+ * @method UpdateSchedule updateSchedule(array $options = [])
  */
 class FnfApiResolver extends ApiResolver
 {
@@ -31,85 +36,50 @@ class Rpc extends \AlibabaCloud\Client\Resolver\Rpc
     public $version = '2019-03-15';
 
     /** @var string */
-    public $method = 'POST';
-
-    /** @var string */
     public $serviceCode = 'fnf';
 }
 
 /**
- * @method string getOutput()
- * @method string getRequestId()
- * @method $this withRequestId($value)
- * @method string getTaskToken()
- * @method $this withTaskToken($value)
- */
-class ReportTaskSucceeded extends Rpc
-{
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withOutput($value)
-    {
-        $this->data['Output'] = $value;
-        $this->options['form_params']['Output'] = $value;
-
-        return $this;
-    }
-}
-
-/**
- * @method string getRequestId()
- * @method $this withRequestId($value)
- * @method string getCause()
- * @method string getTaskToken()
- * @method $this withTaskToken($value)
- * @method string getError()
- */
-class ReportTaskFailed extends Rpc
-{
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withCause($value)
-    {
-        $this->data['Cause'] = $value;
-        $this->options['form_params']['Cause'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function withError($value)
-    {
-        $this->data['Error'] = $value;
-        $this->options['form_params']['Error'] = $value;
-
-        return $this;
-    }
-}
-
-/**
+ * @method string getDescription()
+ * @method string getType()
  * @method string getRequestId()
  * @method $this withRequestId($value)
  * @method string getRoleArn()
  * @method string getName()
- * @method string getDescription()
  * @method string getDefinition()
- * @method string getType()
+ * @method string getExternalStorageLocation()
  */
-class UpdateFlow extends Rpc
+class CreateFlow extends Rpc
 {
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withDescription($value)
+    {
+        $this->data['Description'] = $value;
+        $this->options['form_params']['Description'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withType($value)
+    {
+        $this->data['Type'] = $value;
+        $this->options['form_params']['Type'] = $value;
+
+        return $this;
+    }
 
     /**
      * @param string $value
@@ -142,19 +112,6 @@ class UpdateFlow extends Rpc
      *
      * @return $this
      */
-    public function withDescription($value)
-    {
-        $this->data['Description'] = $value;
-        $this->options['form_params']['Description'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
     public function withDefinition($value)
     {
         $this->data['Definition'] = $value;
@@ -168,38 +125,245 @@ class UpdateFlow extends Rpc
      *
      * @return $this
      */
-    public function withType($value)
+    public function withExternalStorageLocation($value)
     {
-        $this->data['Type'] = $value;
-        $this->options['form_params']['Type'] = $value;
+        $this->data['ExternalStorageLocation'] = $value;
+        $this->options['form_params']['ExternalStorageLocation'] = $value;
 
         return $this;
     }
 }
 
 /**
- * @method string getExecutionName()
+ * @method string getScheduleName()
+ * @method string getCronExpression()
+ * @method string getPayload()
  * @method string getRequestId()
  * @method $this withRequestId($value)
- * @method string getCause()
+ * @method string getEnable()
+ * @method string getDescription()
  * @method string getFlowName()
- * @method string getError()
  */
-class StopExecution extends Rpc
+class CreateSchedule extends Rpc
 {
+
+    /** @var string */
+    public $method = 'POST';
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function withExecutionName($value)
+    public function withScheduleName($value)
     {
-        $this->data['ExecutionName'] = $value;
-        $this->options['form_params']['ExecutionName'] = $value;
+        $this->data['ScheduleName'] = $value;
+        $this->options['form_params']['ScheduleName'] = $value;
 
         return $this;
     }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withCronExpression($value)
+    {
+        $this->data['CronExpression'] = $value;
+        $this->options['form_params']['CronExpression'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withPayload($value)
+    {
+        $this->data['Payload'] = $value;
+        $this->options['form_params']['Payload'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withEnable($value)
+    {
+        $this->data['Enable'] = $value;
+        $this->options['form_params']['Enable'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withDescription($value)
+    {
+        $this->data['Description'] = $value;
+        $this->options['form_params']['Description'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withFlowName($value)
+    {
+        $this->data['FlowName'] = $value;
+        $this->options['form_params']['FlowName'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getName()
+ * @method $this withName($value)
+ */
+class DeleteFlow extends Rpc
+{
+}
+
+/**
+ * @method string getScheduleName()
+ * @method $this withScheduleName($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getFlowName()
+ * @method $this withFlowName($value)
+ */
+class DeleteSchedule extends Rpc
+{
+}
+
+/**
+ * @method string getExecutionName()
+ * @method $this withExecutionName($value)
+ * @method string getWaitTimeSeconds()
+ * @method $this withWaitTimeSeconds($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getFlowName()
+ * @method $this withFlowName($value)
+ */
+class DescribeExecution extends Rpc
+{
+}
+
+/**
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getName()
+ * @method $this withName($value)
+ */
+class DescribeFlow extends Rpc
+{
+}
+
+/**
+ * @method string getScheduleName()
+ * @method $this withScheduleName($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getFlowName()
+ * @method $this withFlowName($value)
+ */
+class DescribeSchedule extends Rpc
+{
+}
+
+/**
+ * @method string getExecutionName()
+ * @method $this withExecutionName($value)
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getLimit()
+ * @method $this withLimit($value)
+ * @method string getFlowName()
+ * @method $this withFlowName($value)
+ */
+class GetExecutionHistory extends Rpc
+{
+}
+
+/**
+ * @method string getStartedTimeBegin()
+ * @method $this withStartedTimeBegin($value)
+ * @method string getExecutionNamePrefix()
+ * @method $this withExecutionNamePrefix($value)
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getLimit()
+ * @method $this withLimit($value)
+ * @method string getFlowName()
+ * @method $this withFlowName($value)
+ * @method string getStartedTimeEnd()
+ * @method $this withStartedTimeEnd($value)
+ * @method string getStatus()
+ * @method $this withStatus($value)
+ */
+class ListExecutions extends Rpc
+{
+}
+
+/**
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getLimit()
+ * @method $this withLimit($value)
+ */
+class ListFlows extends Rpc
+{
+}
+
+/**
+ * @method string getNextToken()
+ * @method $this withNextToken($value)
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getLimit()
+ * @method $this withLimit($value)
+ * @method string getFlowName()
+ * @method $this withFlowName($value)
+ */
+class ListSchedules extends Rpc
+{
+}
+
+/**
+ * @method string getCause()
+ * @method string getError()
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getTaskToken()
+ * @method $this withTaskToken($value)
+ */
+class ReportTaskFailed extends Rpc
+{
+
+    /** @var string */
+    public $method = 'POST';
 
     /**
      * @param string $value
@@ -219,19 +383,6 @@ class StopExecution extends Rpc
      *
      * @return $this
      */
-    public function withFlowName($value)
-    {
-        $this->data['FlowName'] = $value;
-        $this->options['form_params']['FlowName'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
     public function withError($value)
     {
         $this->data['Error'] = $value;
@@ -242,14 +393,71 @@ class StopExecution extends Rpc
 }
 
 /**
- * @method string getInput()
+ * @method string getOutput()
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getTaskToken()
+ * @method $this withTaskToken($value)
+ */
+class ReportTaskSucceeded extends Rpc
+{
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withOutput($value)
+    {
+        $this->data['Output'] = $value;
+        $this->options['form_params']['Output'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getCallbackFnFTaskToken()
  * @method string getExecutionName()
+ * @method string getInput()
  * @method string getRequestId()
  * @method $this withRequestId($value)
  * @method string getFlowName()
  */
 class StartExecution extends Rpc
 {
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withCallbackFnFTaskToken($value)
+    {
+        $this->data['CallbackFnFTaskToken'] = $value;
+        $this->options['form_params']['CallbackFnFTaskToken'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withExecutionName($value)
+    {
+        $this->data['ExecutionName'] = $value;
+        $this->options['form_params']['ExecutionName'] = $value;
+
+        return $this;
+    }
 
     /**
      * @param string $value
@@ -269,10 +477,64 @@ class StartExecution extends Rpc
      *
      * @return $this
      */
+    public function withFlowName($value)
+    {
+        $this->data['FlowName'] = $value;
+        $this->options['form_params']['FlowName'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getExecutionName()
+ * @method string getCause()
+ * @method string getError()
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getFlowName()
+ */
+class StopExecution extends Rpc
+{
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
     public function withExecutionName($value)
     {
         $this->data['ExecutionName'] = $value;
         $this->options['form_params']['ExecutionName'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withCause($value)
+    {
+        $this->data['Cause'] = $value;
+        $this->options['form_params']['Cause'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withError($value)
+    {
+        $this->data['Error'] = $value;
+        $this->options['form_params']['Error'] = $value;
 
         return $this;
     }
@@ -292,108 +554,46 @@ class StartExecution extends Rpc
 }
 
 /**
- * @method string getNextToken()
- * @method $this withNextToken($value)
- * @method string getRequestId()
- * @method $this withRequestId($value)
- * @method string getLimit()
- * @method $this withLimit($value)
- */
-class ListFlows extends Rpc
-{
-
-    /** @var string */
-    public $method = 'GET';
-}
-
-/**
- * @method string getNextToken()
- * @method $this withNextToken($value)
- * @method string getRequestId()
- * @method $this withRequestId($value)
- * @method string getLimit()
- * @method $this withLimit($value)
- * @method string getFlowName()
- * @method $this withFlowName($value)
- */
-class ListExecutions extends Rpc
-{
-
-    /** @var string */
-    public $method = 'GET';
-}
-
-/**
- * @method string getExecutionName()
- * @method $this withExecutionName($value)
- * @method string getNextToken()
- * @method $this withNextToken($value)
- * @method string getRequestId()
- * @method $this withRequestId($value)
- * @method string getLimit()
- * @method $this withLimit($value)
- * @method string getFlowName()
- * @method $this withFlowName($value)
- */
-class GetExecutionHistory extends Rpc
-{
-
-    /** @var string */
-    public $method = 'GET';
-}
-
-/**
- * @method string getRequestId()
- * @method $this withRequestId($value)
- * @method string getName()
- * @method $this withName($value)
- */
-class DescribeFlow extends Rpc
-{
-
-    /** @var string */
-    public $method = 'GET';
-}
-
-/**
- * @method string getExecutionName()
- * @method $this withExecutionName($value)
- * @method string getRequestId()
- * @method $this withRequestId($value)
- * @method string getFlowName()
- * @method $this withFlowName($value)
- */
-class DescribeExecution extends Rpc
-{
-
-    /** @var string */
-    public $method = 'GET';
-}
-
-/**
- * @method string getRequestId()
- * @method $this withRequestId($value)
- * @method string getName()
- * @method $this withName($value)
- */
-class DeleteFlow extends Rpc
-{
-
-    /** @var string */
-    public $method = 'GET';
-}
-
-/**
+ * @method string getDescription()
+ * @method string getType()
  * @method string getRequestId()
  * @method $this withRequestId($value)
  * @method string getRoleArn()
  * @method string getName()
- * @method string getDescription()
  * @method string getDefinition()
- * @method string getType()
+ * @method string getExternalStorageLocation()
  */
-class CreateFlow extends Rpc
+class UpdateFlow extends Rpc
 {
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withDescription($value)
+    {
+        $this->data['Description'] = $value;
+        $this->options['form_params']['Description'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withType($value)
+    {
+        $this->data['Type'] = $value;
+        $this->options['form_params']['Type'] = $value;
+
+        return $this;
+    }
 
     /**
      * @param string $value
@@ -426,19 +626,6 @@ class CreateFlow extends Rpc
      *
      * @return $this
      */
-    public function withDescription($value)
-    {
-        $this->data['Description'] = $value;
-        $this->options['form_params']['Description'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
     public function withDefinition($value)
     {
         $this->data['Definition'] = $value;
@@ -452,10 +639,105 @@ class CreateFlow extends Rpc
      *
      * @return $this
      */
-    public function withType($value)
+    public function withExternalStorageLocation($value)
     {
-        $this->data['Type'] = $value;
-        $this->options['form_params']['Type'] = $value;
+        $this->data['ExternalStorageLocation'] = $value;
+        $this->options['form_params']['ExternalStorageLocation'] = $value;
+
+        return $this;
+    }
+}
+
+/**
+ * @method string getScheduleName()
+ * @method string getCronExpression()
+ * @method string getPayload()
+ * @method string getRequestId()
+ * @method $this withRequestId($value)
+ * @method string getEnable()
+ * @method string getDescription()
+ * @method string getFlowName()
+ */
+class UpdateSchedule extends Rpc
+{
+
+    /** @var string */
+    public $method = 'POST';
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withScheduleName($value)
+    {
+        $this->data['ScheduleName'] = $value;
+        $this->options['form_params']['ScheduleName'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withCronExpression($value)
+    {
+        $this->data['CronExpression'] = $value;
+        $this->options['form_params']['CronExpression'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withPayload($value)
+    {
+        $this->data['Payload'] = $value;
+        $this->options['form_params']['Payload'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withEnable($value)
+    {
+        $this->data['Enable'] = $value;
+        $this->options['form_params']['Enable'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withDescription($value)
+    {
+        $this->data['Description'] = $value;
+        $this->options['form_params']['Description'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function withFlowName($value)
+    {
+        $this->data['FlowName'] = $value;
+        $this->options['form_params']['FlowName'] = $value;
 
         return $this;
     }
