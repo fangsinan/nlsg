@@ -47,9 +47,9 @@ class Wiki extends Base
 
     public static  function  search($keywords)
     {
-        if (!$keywords){
-            return false;
-        }
+//        if (!$keywords){
+//            return ['res' => [], 'count'=> 0 ];
+//        }
         $res= Wiki::select('id','name','intro','content','cover','view_num','like_num', 'comment_num')
             ->where('name','LIKE',"%$keywords%")
             ->where('status',1)
