@@ -443,6 +443,7 @@ class ImDocServers
         }
 
         DB::commit();
+        $this->sendGroupDocMsgJob($jobModel->id);
         return ['code' => true, 'msg' => '成功'];
     }
 
@@ -497,7 +498,7 @@ class ImDocServers
             ->orderBy('success_at', 'desc')
             ->orderBy('id', 'desc')
             ->select([
-                'id', 'doc_id', 'created_at', 'send_at','status', 'send_type', 'is_done', 'success_at'
+                'id', 'doc_id', 'created_at', 'send_at', 'status', 'send_type', 'is_done', 'success_at'
             ]);
 
         return $query->paginate($size);
@@ -558,7 +559,7 @@ class ImDocServers
                 ->orderBy('id', 'desc')
                 ->select([
                     'id', 'doc_id', 'created_at', 'status', 'send_type',
-                    'is_done', 'success_at','send_at',
+                    'is_done', 'success_at', 'send_at',
                 ])->get();
             $list[] = $temp_list;
         }
@@ -1023,10 +1024,15 @@ class ImDocServers
         dd([$res, $post_data]);
     }
 
-    public function sendGroupDocMsgJob()
+    public function sendGroupDocMsgJob($id = 0)
     {
-        $job_info = ImDocSendJob::query()
-            ->where('is_done', '=', 1)
+        $query = ImDocSendJob::query();
+
+        if (!empty($id)) {
+            $query->where('id', '=', $id);
+        }
+
+        $job_info = $query->where('is_done', '=', 1)
             ->where('status', '=', 1)
             ->where(function ($q) {
                 $q->where('send_type', '=', 1)
