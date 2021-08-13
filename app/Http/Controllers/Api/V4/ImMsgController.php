@@ -104,8 +104,13 @@ class ImMsgController extends Controller
             'created_at'    => date("Y-m-d h:i:s"),
             'updated_at'    => date("Y-m-d h:i:s"),
         ];
+        if(empty($collection_id)){
+            //收藏的转发 不进入群发list
+            $id = ImSendAll::insertGetId($add_data);
+        }else{
+            $id = 0;
+        }
 
-        $id = ImSendAll::insertGetId($add_data);
 
         $post_data['From_Account'] = $from_account;
         $post_data['MsgBody'] = $msgBody;
