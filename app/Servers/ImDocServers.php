@@ -1232,7 +1232,8 @@ class ImDocServers
             $temp_res_list = [];
             $temp_res_list['id'] = substr($v['Random'],22);
             $res_list[] = array_merge(json_decode($res, true),$temp_res_list);
-            sleep(1);
+            //sleep(1);
+            usleep(100000);
         }
 
 
