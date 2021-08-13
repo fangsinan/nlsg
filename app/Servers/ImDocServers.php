@@ -1057,7 +1057,7 @@ class ImDocServers
                 $temp_post_data = [];
                 $temp_post_data['GroupId'] = $vv->groupInfo->group_id;
                 $temp_post_data['From_Account'] = (string)$v->user_id;
-                $temp_post_data['Random'] = $this->getMsgRandom();
+                $temp_post_data['Random'] = $this->getMsgRandom().$v->id;
                 $temp_post_data['MsgBody'] = [];
                 $temp_msg_type = 0;
                 switch (intval($v->docInfo->type_info)) {
@@ -1151,7 +1151,7 @@ class ImDocServers
                         $file_url = explode(';', $v->docInfo->file_url);
                         $file_url = array_filter($file_url);
                         foreach ($file_url as $fuv) {
-                            $temp_post_data['Random'] = $this->getMsgRandom();
+                            $temp_post_data['Random'] = $this->getMsgRandom().$v->id;
                             $temp_post_data['MsgBody'] = [];
                             $fuv = explode(',', $fuv);
                             $temp_post_data['MsgBody'][] = [
@@ -1159,7 +1159,7 @@ class ImDocServers
                                 "MsgContent" => [
 //                                    "UUID" => $fuv[4],
                                     "UUID" => $this->getMsgRandom(),
-                                    "ImageFormat" => 1,
+                                    "ImageFormat" => 255,
                                     "ImageInfoArray" => [
                                         [
                                             "Type" => 1,
@@ -1229,14 +1229,30 @@ class ImDocServers
         $res_list = [];
         foreach ($post_data_array as $v) {
             $res = ImClient::curlPost($url, json_encode($v));
-            $res_list[] = json_decode($res, true);
+            $temp_res_list = [];
+            $temp_res_list['id'] = substr($v['Random'],22);
+            $res_list[] = array_merge(json_decode($res, true),$temp_res_list);
 //            sleep(1);
         }
+
+
 
         ImDocSendJob::whereIn('id', $job_id_list)->update([
             'is_done' => 3,
             'success_at' => date('Y-m-d H:i:s')
         ]);
+
+        $res_list_data = [];
+        foreach ($res_list as $rlv){
+            $temp_res_list_data = [];
+            $temp_res_list_data['job_id'] = $rlv['id'];
+            $temp_res_list_data['user_id'] = 0;
+            $temp_res_list_data['record'] = $rlv['ActionStatus'].':'.$rlv['ErrorCode'].':'.$rlv['ErrorInfo'];
+            $res_list_data[] = $temp_res_list_data;
+        }
+
+        $logModel = new imDocSendJobLog();
+        $logModel->insert($res_list_data);
 
         return true;
 //        return ['code' => true, 'msg' => '成功'];
