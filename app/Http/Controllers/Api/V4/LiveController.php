@@ -18,6 +18,7 @@ use App\Models\LiveWorks;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
+use App\Models\OrderTwitterLog;
 use App\Models\PayRecord;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -1020,6 +1021,18 @@ class LiveController extends Controller
             $data = [
                 'order_id' => $order['id']
             ];
+            if(!empty($tweeterCode) && empty($tweeter_code)){ //推荐人不为空，但是没有订阅
+                $map=[
+                    'user_id' => $this->user['id'],
+                    'order_id' => $order['id'],
+                    'ordernum' => $ordernum,
+                    'live_id' => $liveId,
+                    'twitter_id'=>$tweeterCode,//邀请人记录
+                    'created_at'=>date('Y-m-d H:i:s'),
+                ];
+                //记录推荐下单历史
+                OrderTwitterLog::Add($map, true);
+            }
             return success($data);
         }
         return error(1004, '下单失败');
