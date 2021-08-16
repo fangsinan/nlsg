@@ -13,5 +13,8 @@ class ImUserFriend extends Base
         return $this->hasOne(User::class,'id','to_account');
     }
 
+    public function ImUser(){
+        return $this->hasOne(ImUser::class,'tag_im_to_account','to_account');
+    }
 
 }

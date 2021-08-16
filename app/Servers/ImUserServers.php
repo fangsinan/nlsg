@@ -166,6 +166,7 @@ class ImUserServers
             ->where('status', '=', 1);
 
         $query->with(['UserInfo:id,phone,nickname'])->has('UserInfo');
+        $query->with(['ImUser:tag_im_to_account,tag_im_image,tag_im_nick'])->has('UserInfo');
         $query->select([
             'id', 'from_account', 'from_name', 'to_account', 'to_name', 'created_at'
         ]);
