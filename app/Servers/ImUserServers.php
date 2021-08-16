@@ -170,7 +170,8 @@ class ImUserServers
             'id', 'from_account', 'from_name', 'to_account', 'to_name', 'created_at'
         ]);
 
-        return $query->paginate($size);
+        return ['list'=>$query->paginate($size),'count'=>$query->count(),];
+
     }
 
     public function orderList($params, $user_id)
