@@ -118,4 +118,10 @@ class ImFriendController extends ControllerBackend
     }
 
 
+    public function imFriendList(Request $request){
+        $imObj = new ImFriendServers();
+        $data = $imObj->imFriendList($request->input());
+        return $this->getRes($data);
+    }
+
 }

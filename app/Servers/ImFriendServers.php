@@ -146,5 +146,24 @@ class ImFriendServers
         }
     }
 
+    //获取好友列表
+    public function imFriendList($params){
+        dd($params);
+
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_get");
+        $post_data = [
+            'From_Account'          =>  (string)$params['From_Account'],
+            'StartIndex'            =>  $params['StartIndex'] ?? 0,
+            'StandardSequence'      =>  $params['StandardSequence'] ?? 0,
+            'CustomSequence'        =>  $params['CustomSequence'] ?? 0,
+        ];
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        $res = json_decode($res,true);
+
+        dd($res);
+
+
+
+    }
 
 }

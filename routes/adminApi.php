@@ -232,6 +232,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('im_friend/portrait_get', 'ImFriendController@getPortrait');
         Route::post('im_friend/add_friend', 'ImFriendController@addFriend');
         Route::post('im_friend/del_friend', 'ImFriendController@delFriend');
+        Route::post('im_friend/im_friend_list', 'ImFriendController@imFriendList');
 
         //im收藏
         Route::post('im/msg_collection', 'ImMsgController@MsgCollection');
