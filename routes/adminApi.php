@@ -209,6 +209,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::put('im_group/change_top', 'ImGroupController@changeTop');
         Route::post('im_group/bind_works', 'ImGroupController@bindWorks');
         Route::post('im_group/edit_join_group', 'ImGroupController@editJoinGroup');
+        Route::post('im_group/create_group', 'ImGroupController@createGroup');
 
         //im用户
         Route::get('im_user/list', 'ImUserController@list');

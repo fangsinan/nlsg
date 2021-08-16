@@ -264,5 +264,31 @@ class ImGroupServers
 
     }
 
+    public function createGroup($params,$user_id){
+
+        if(count($params['user_id']) < 2){
+            return ['code' => false, 'msg' => '初始群最少添加两个用户'];
+
+        }
+        $post_data= [
+            'Owner_Account' => (string)$user_id,
+            'Type' => "Public",
+            'Name' => "w我的群",
+            'MemberList' => [
+//                [
+//                    "Member_Account"=> "211172", // 成员（必填）
+//                    "Role" => "Admin" // 赋予该成员的身份，目前备选项只有 Admin（选填）
+//                ],
+            ]
+        ];
+
+        foreach ($params['user_id'] as $k=>$v){
+            $post_data['MemberList'][]=['Member_Account'=>(string)$v];
+        }
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/create_group");
+        $res = ImClient::curlPost($url, json_encode($post_data));
+        $res = json_decode($res, true);
+        return $res;
+    }
 
 }

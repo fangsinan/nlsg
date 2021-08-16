@@ -155,4 +155,34 @@ class ImGroupController extends ControllerBackend
         return $this->getRes($data);
     }
 
+
+    /**
+     * @api {post} api/admin_v4/im_group/create_group 管理后台-创建群
+     * @apiName admin create_group
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *
+     * @apiParam {array} user_id  user_id  数组类型 群初始人员
+
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function createGroup(Request $request){
+
+        $servers = new ImGroupServers();
+        $data = $servers->createGroup($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
+    }
+
+
+
+
+
 }
