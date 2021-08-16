@@ -266,14 +266,18 @@ class ImGroupServers
 
     public function createGroup($params,$user_id){
 
-        if(count($params['user_id']) < 2){
-            return ['code' => false, 'msg' => '初始群最少添加两个用户'];
-
+        if( empty($params['Name']) ){
+            return ['code' => false, 'msg' => '群名称错误'];
         }
+
+        if(count($params['user_id']) < 2 ){
+            return ['code' => false, 'msg' => '初始群最少添加两个用户'];
+        }
+
         $post_data= [
             'Owner_Account' => (string)$user_id,
             'Type' => "Public",
-            'Name' => "w我的群",
+            'Name' => $params['Name'],
             'MemberList' => [
 //                [
 //                    "Member_Account"=> "211172", // 成员（必填）
