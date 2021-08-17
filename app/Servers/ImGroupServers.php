@@ -308,7 +308,7 @@ class ImGroupServers
         }
 
         $post_data= [
-            'GroupId' => (string)$user_id,
+            'GroupId' => (string)$params['GroupId'],
         ];
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/destroy_group");
         $res = ImClient::curlPost($url, json_encode($post_data));
@@ -331,7 +331,7 @@ class ImGroupServers
         }
 
         $post_data= [
-            'GroupId' => (string)$user_id,
+            'GroupId' => (string)$params['GroupId'],
             'NewOwner_Account' => (string)$params['NewOwner_Account'],
         ];
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/change_group_owner");
@@ -340,6 +340,13 @@ class ImGroupServers
         if($res['ActionStatus'] == "OK"){
             ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])
                 ->update(['owner_account'=>$params['NewOwner_Account']]);
+
+            //变更普通成员
+            ImGroupUser::where(['group_id'=>$params['GroupId'],'group_account'=>$user_id,])
+                ->update(['group_role'=>0]);
+            //变更新群主
+            ImGroupUser::where(['group_id'=>$params['GroupId'],'group_account'=>$params['NewOwner_Account'],])
+                ->update(['group_role'=>1]);
         }
 
         return $res;
