@@ -443,8 +443,8 @@ class ImDocServers
         }
 
         DB::commit();
-        $this->sendGroupDocMsgJob($jobModel->id);
-        return ['code' => true, 'msg' => '成功'];
+        return $this->sendGroupDocMsgJob($jobModel->id);
+        //return ['code' => true, 'msg' => '成功'];
     }
 
     public function sendJobList($params)
@@ -1057,7 +1057,7 @@ class ImDocServers
                 $temp_post_data = [];
                 $temp_post_data['GroupId'] = $vv->groupInfo->group_id;
                 $temp_post_data['From_Account'] = (string)$v->user_id;
-                $temp_post_data['Random'] = $this->getMsgRandom().$v->id;
+                $temp_post_data['Random'] = $this->getMsgRandom() . $v->id;
                 $temp_post_data['MsgBody'] = [];
                 $temp_msg_type = 0;
                 switch (intval($v->docInfo->type_info)) {
@@ -1151,7 +1151,7 @@ class ImDocServers
                         $file_url = explode(';', $v->docInfo->file_url);
                         $file_url = array_filter($file_url);
                         foreach ($file_url as $fuv) {
-                            $temp_post_data['Random'] = $this->getMsgRandom().$v->id;
+                            $temp_post_data['Random'] = $this->getMsgRandom() . $v->id;
                             $temp_post_data['MsgBody'] = [];
                             $fuv = explode(',', $fuv);
                             $temp_post_data['MsgBody'][] = [
@@ -1230,13 +1230,13 @@ class ImDocServers
         foreach ($post_data_array as $v) {
             $res = ImClient::curlPost($url, json_encode($v));
             $temp_res_list = [];
-            $temp_res_list['id'] = substr($v['Random'],22);
-            $res_list[] = array_merge(json_decode($res, true),$temp_res_list);
+            $temp_res_list['id'] = substr($v['Random'], 22);
+            $res_list[] = array_merge(json_decode($res, true), $temp_res_list);
             //sleep(1);
-            usleep(500000);
+            if (empty($id)) {
+                usleep(500000);
+            }
         }
-
-
 
         ImDocSendJob::whereIn('id', $job_id_list)->update([
             'is_done' => 3,
@@ -1244,18 +1244,36 @@ class ImDocServers
         ]);
 
         $res_list_data = [];
-        foreach ($res_list as $rlv){
+
+        $id_res_data = [];
+        $id_res_data['res'] = true;
+        $id_res_data['msg'] = 'ok';
+        $id_res_data['num'] = 0;
+        foreach ($res_list as $rlv) {
             $temp_res_list_data = [];
             $temp_res_list_data['job_id'] = $rlv['id'];
             $temp_res_list_data['user_id'] = 0;
-            $temp_res_list_data['record'] = $rlv['ActionStatus'].':'.$rlv['ErrorCode'].':'.$rlv['ErrorInfo'];
+            if ($rlv['ErrorCode'] <> 0){
+                $id_res_data['res'] = false;
+                $id_res_data['msg'] = $rlv['ErrorInfo'];
+                $id_res_data['num'] = $rlv['ErrorCode'];
+            }
+            $temp_res_list_data['record'] = $rlv['ActionStatus'] . ':' . $rlv['ErrorCode'] . ':' . $rlv['ErrorInfo'];
             $res_list_data[] = $temp_res_list_data;
         }
 
         $logModel = new imDocSendJobLog();
         $logModel->insert($res_list_data);
 
-        return true;
+        if (empty($id)){
+            return true;
+        }else{
+            if ($id_res_data['res']){
+                return ['code'=>true,'msg'=>'成功'];
+            }else{
+                return ['code'=>false,'msg'=>$id_res_data['num'].':'.$id_res_data['msg']];
+            }
+        }
 //        return ['code' => true, 'msg' => '成功'];
     }
 }
