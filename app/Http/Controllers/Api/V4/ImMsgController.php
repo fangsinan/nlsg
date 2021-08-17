@@ -101,8 +101,8 @@ class ImMsgController extends Controller
             'to_group'      => implode(",", $to_group)??'',
             'collection_id' => $collection_id,
             'msg_body'      => json_encode($msgBody),
-            'created_at'    => date("Y-m-d h:i:s"),
-            'updated_at'    => date("Y-m-d h:i:s"),
+            'created_at'    => date("Y-m-d H:i:s"),
+            'updated_at'    => date("Y-m-d H:i:s"),
         ];
         if(empty($collection_id)){
             //收藏的转发 不进入群发list
@@ -381,8 +381,8 @@ class ImMsgController extends Controller
                                 'width'     => $img_v['Width'],
                                 'height'    => $img_v['Height'],
                                 'url'       => $img_v['URL'],
-                                'created_at'=> date("Y-m-d h:i:s"),
-                                'updated_at'=> date("Y-m-d h:i:s"),
+                                'created_at'=> date("Y-m-d H:i:s"),
+                                'updated_at'=> date("Y-m-d H:i:s"),
                             ];
                             $img_adds[] = $img_add;
 
