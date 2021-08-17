@@ -146,7 +146,7 @@ class ImFriendServers
         }
     }
 
-    //获取好友列表
+    //获取好友列表 从im  （废弃中)
     public function imFriendList($params){
 
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/sns/friend_get");

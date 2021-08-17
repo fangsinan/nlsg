@@ -184,6 +184,61 @@ class ImGroupController extends ControllerBackend
 
 
 
+    /**
+     * @api {post} api/admin_v4/im_group/destroy_group 管理后台-解散群
+     * @apiName admin destroy_group
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *
+     * @apiParam {string} GroupId  GroupId
+
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function destroyGroup(Request $request){
+
+        $servers = new ImGroupServers();
+        $data = $servers->destroyGroup($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
+    }
+
+
+
+
+    /**
+     * @api {post} api/admin_v4/im_group/change_group_owner 管理后台-转让群
+     * @apiName admin change_group_owner
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *
+     * @apiParam {string} GroupId  GroupId
+     * @apiParam {string} NewOwner_Account  新群主id
+
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function changeGroupOwner(Request $request){
+        $servers = new ImGroupServers();
+        $data = $servers->changeGroupOwner($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
+    }
+
+
+
 
 
 }

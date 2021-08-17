@@ -117,7 +117,7 @@ class ImFriendController extends ControllerBackend
         return $this->getRes($data);
     }
 
-
+    //从im获取好友列表  （废弃中)
     public function imFriendList(Request $request){
 
         $imObj = new ImFriendServers();

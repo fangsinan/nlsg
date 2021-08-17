@@ -264,6 +264,7 @@ class ImGroupServers
 
     }
 
+    //创建群
     public function createGroup($params,$user_id){
 
         if( empty($params['Name']) ){
@@ -292,6 +293,55 @@ class ImGroupServers
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/create_group");
         $res = ImClient::curlPost($url, json_encode($post_data));
         $res = json_decode($res, true);
+        return $res;
+    }
+
+    //删除群
+    public function destroyGroup($params,$user_id){
+
+        if( empty($params['GroupId']) ){
+            return ['code' => false, 'msg' => 'GroupId错误'];
+        }
+        $group = ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])->first();
+        if(empty($group)){
+            return ['code' => false, 'msg' => 'Group error'];
+        }
+
+        $post_data= [
+            'GroupId' => (string)$user_id,
+        ];
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/destroy_group");
+        $res = ImClient::curlPost($url, json_encode($post_data));
+        $res = json_decode($res, true);
+        return $res;
+    }
+
+
+
+    //转让群
+    public function changeGroupOwner($params,$user_id){
+
+        if( empty($params['GroupId']) || empty($params['NewOwner_Account']) ){
+            return ['code' => false, 'msg' => 'GroupId or new_user_id error'];
+        }
+
+        $group = ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])->first();
+        if(empty($group)){
+            return ['code' => false, 'msg' => 'Group error'];
+        }
+
+        $post_data= [
+            'GroupId' => (string)$user_id,
+            'NewOwner_Account' => (string)$params['NewOwner_Account'],
+        ];
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/change_group_owner");
+        $res = ImClient::curlPost($url, json_encode($post_data));
+        $res = json_decode($res, true);
+        if($res['ActionStatus'] == "OK"){
+            ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])
+                ->update(['owner_account'=>$params['NewOwner_Account']]);
+        }
+
         return $res;
     }
 
