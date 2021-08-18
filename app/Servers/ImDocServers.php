@@ -361,10 +361,10 @@ class ImDocServers
                 return ['code' => false, 'msg' => '定时时间不能为空'];
             } else {
                 //$temp_line = date('Y-m-d H:i:00', strtotime('+1 minute'));
-                $temp_line = date('Y-m-d H:i:00');
-                if ($send_at <= $temp_line) {
-                    return ['code' => false, 'msg' => '发送时间错误' . $temp_line];
-                }
+//                $temp_line = date('Y-m-d H:i:00');
+//                if ($send_at <= $temp_line) {
+//                    return ['code' => false, 'msg' => '发送时间错误' . $temp_line];
+//                }
             }
             $month = date('Y-m', strtotime($send_at));
             $day = date('Y-m-d', strtotime($send_at));
