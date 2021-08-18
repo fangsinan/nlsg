@@ -132,7 +132,7 @@ class ImDocServers
                 if (empty($media_info)) {
                     return ['code' => false, 'msg' => '媒体信息为空,请重试.'];
                 } else {
-                    $content = $media_info->file_name ?: $media_info->id;
+//                    $content = $media_info->file_name ?: $media_info->id;
                     $file_url = $media_info->url;
                     $format = $media_info->format ?: 'mp4';
                     $file_size = $media_info->size ?: 1119442;
