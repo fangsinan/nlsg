@@ -874,7 +874,7 @@ class LiveController extends Controller
             }
         }
 
-        $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
+        $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();
         if ($list) {
             return error(0, '已经预约');
@@ -959,8 +959,14 @@ class LiveController extends Controller
         $osType = $input['os_type'] ?? 1;
         $payType = $input['pay_type'] ?? 0;
         $activity_tag = $input['activity_tag'] ?? '';
-        $model = new Order();
 
+
+        $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
+            ->first();
+        if ($list) {
+            return error(0, '已经预约');
+        }
+        $model = new Order();
         $checked = $model->addOrderLiveCheck($this->user['id'], $tweeterCode, $liveId, 3);
         if ($checked['code'] == 0) {
             return error(0, $checked['msg']);
