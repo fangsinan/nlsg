@@ -360,7 +360,8 @@ class ImDocServers
             if (empty($send_at)) {
                 return ['code' => false, 'msg' => '定时时间不能为空'];
             } else {
-                $temp_line = date('Y-m-d H:i:00', strtotime('+1 minute'));
+                //$temp_line = date('Y-m-d H:i:00', strtotime('+1 minute'));
+                $temp_line = date('Y-m-d H:i:00');
                 if ($send_at <= $temp_line) {
                     return ['code' => false, 'msg' => '发送时间错误' . $temp_line];
                 }
