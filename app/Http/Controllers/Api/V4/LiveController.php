@@ -876,7 +876,7 @@ class LiveController extends Controller
 
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();
-        if ($list) {
+        if (!empty($list)) {
             return error(0, '已经预约');
         }
 
@@ -963,7 +963,7 @@ class LiveController extends Controller
 
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();
-        if ($list) {
+        if (!empty($list)) {
             return error(0, '已经预约');
         }
         $model = new Order();
