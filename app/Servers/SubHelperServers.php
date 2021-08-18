@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\Live;
 use App\Models\Works;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class SubHelperServers
 {
@@ -64,45 +65,64 @@ class SubHelperServers
     {
         $id = $params['id'] ?? 0;
         $type = $params['type'] ?? 0;
+        $is_file = $params['is_file'] ?? 0;
+        $file_name = $params['file_name'] ?? '';
+
+
         if (empty($id) || empty($type)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
-        $phone = $params['phone'] ?? '';
-        $phone = preg_replace('/[^0-9]/i', ',', $phone);
-        $phone = explode(',', $phone);
-        if (empty($phone)) {
-            return ['code' => false, 'msg' => '手机号信息错误'];
-        }
 
-        $error_phone = [];
-        $add_data = [];
-        foreach ($phone as $v) {
-            if (strlen($v) !== 11) {
-                $error_phone[] = $v;
-                continue;
+        if ($is_file == 1){
+            if ($type != 3){
+                return ['code'=>false,'msg'=>'文件必须是直播类型'];
             }
-            $temp_add_data = [];
-            $temp_add_data['phone'] = $v;
-            $temp_add_data['works_type'] = $type;
-            $temp_add_data['works_id'] = $id;
-            $temp_add_data['status'] = 1;
+            if (empty($file_name)){
+                return ['code'=>false,'msg'=>'文件名错误'];
+            }
 
-            if ($type == 2 && $id == 404) {
-                $temp_add_data['is_sendsms'] = 1;
+            $aa = Storage::url('https://audiovideo.ali.nlsgapp.com/image/default/2795D5A2D69B415C87F6A7258F02699F-6-2.jpeg');
+
+            dd([$aa,time()]);
+        }else{
+            $phone = $params['phone'] ?? '';
+            $phone = preg_replace('/[^0-9]/i', ',', $phone);
+            $phone = explode(',', $phone);
+            if (empty($phone)) {
+                return ['code' => false, 'msg' => '手机号信息错误'];
+            }
+
+            $error_phone = [];
+            $add_data = [];
+            foreach ($phone as $v) {
+                if (strlen($v) !== 11) {
+                    $error_phone[] = $v;
+                    continue;
+                }
+                $temp_add_data = [];
+                $temp_add_data['phone'] = $v;
+                $temp_add_data['works_type'] = $type;
+                $temp_add_data['works_id'] = $id;
+                $temp_add_data['status'] = 1;
+
+                if ($type == 2 && $id == 404) {
+                    $temp_add_data['is_sendsms'] = 1;
+                } else {
+                    $temp_add_data['is_sendsms'] = 0;
+                }
+
+                $temp_add_data['admin_id'] = $admin_id;
+                $add_data[] = $temp_add_data;
+            }
+
+            if (!empty($add_data)) {
+                $res = DB::table('works_list_of_sub')
+                    ->insert($add_data);
             } else {
-                $temp_add_data['is_sendsms'] = 0;
+                $res = true;
             }
-
-            $temp_add_data['admin_id'] = $admin_id;
-            $add_data[] = $temp_add_data;
         }
 
-        if (!empty($add_data)) {
-            $res = DB::table('works_list_of_sub')
-                ->insert($add_data);
-        } else {
-            $res = true;
-        }
 
         $error_phone = implode(',', $error_phone);
         $msg = '';
