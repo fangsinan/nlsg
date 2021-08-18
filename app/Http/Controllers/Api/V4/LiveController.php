@@ -857,6 +857,9 @@ class LiveController extends Controller
     {
         $input = $request->all();
 
+        if( in_array($this->user['id'], [878644, 882057, 882861]) ){
+            return error(0, '用户异常');
+        }
         $live = LiveInfo::where('id', $input['info_id'])->first();
         if (!$live) {
             return error(0, '直播不存在');
@@ -960,10 +963,14 @@ class LiveController extends Controller
         $payType = $input['pay_type'] ?? 0;
         $activity_tag = $input['activity_tag'] ?? '';
 
+        if( in_array($this->user['id'], [878644, 882057, 882861]) ){
+            return error(0, '用户异常');
+        }
+
 
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();
-        if (!empty($list)) {
+        if ( !empty($list) ) {
             return error(0, '已经预约');
         }
         $model = new Order();
