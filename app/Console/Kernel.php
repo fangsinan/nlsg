@@ -97,8 +97,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             //开通订阅队列
-//            $servers = new removeDataServers();
-//            $servers->worksListOfSub();
+            $servers = new removeDataServers();
+            $servers->worksListOfSub();
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
