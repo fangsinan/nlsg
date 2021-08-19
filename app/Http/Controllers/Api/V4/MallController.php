@@ -15,6 +15,7 @@ use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
 use App\Servers\ErpServers;
 use App\Servers\ImDocServers;
+use App\Servers\removeDataServers;
 use Illuminate\Http\Request;
 
 class MallController extends Controller
@@ -218,8 +219,10 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
-            $s = new ImDocServers();
-            $s->sendGroupDocMsgJob();
+//            $s = new ImDocServers();
+//            $s->sendGroupDocMsgJob();
+            $servers = new removeDataServers();
+            $servers->worksListOfSub();
 //            $s = new ErpServers();
 //            $s->pushRun();
 //            $s->logisticsSync();

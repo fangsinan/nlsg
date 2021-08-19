@@ -1862,7 +1862,7 @@ and o.status = 1 and o.pay_price > 1";
                     $temp_t_user_id = $temp_t_u->id;
                 }
             }
-
+dd($temp_t_user_id);
             $temp_user_id = $temp_user->id;
             $temp_user_phone = $temp_user->phone;
 
