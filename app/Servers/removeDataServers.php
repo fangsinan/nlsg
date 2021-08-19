@@ -21,6 +21,7 @@ use App\Models\User;
 use App\Models\UserFollow;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
+use App\Models\VipUserBind;
 use App\Models\WorksListOfSub;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -1851,6 +1852,17 @@ and o.status = 1 and o.pay_price > 1";
                 ]);
             }
 
+            if (empty($v->twitter_phone)) {
+                $temp_t_user_id = 0;
+            } else {
+                $temp_t_u = User::query()->where('phone', '=', $v->twitter_phone)->first();
+                if (empty($temp_t_u)) {
+                    $temp_t_user_id = 0;
+                } else {
+                    $temp_t_user_id = $temp_t_u->id;
+                }
+            }
+
             $temp_user_id = $temp_user->id;
             $temp_user_phone = $temp_user->phone;
 
@@ -1876,6 +1888,8 @@ and o.status = 1 and o.pay_price > 1";
                 $temp_data['pay_time'] = $now_date;
                 $temp_data['status'] = 1;
                 $temp_data['give'] = 3;
+                $temp_data['twitter_id'] = $temp_t_user_id;
+                $temp_data['is_flag'] = $v->flag_name;
                 if ($v->works_type != 3) {
                     $temp_data['start_time'] = $now_date;
                     $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
@@ -1913,6 +1927,21 @@ and o.status = 1 and o.pay_price > 1";
                     }
                 }
                 Live::where('id', '=', $v->works_id)->increment('order_num');
+
+                //添加关系保护
+                $check_bind = VipUserBind::getBindParent($v->phone);
+                if ($check_bind == 0 && $v->flag_name == '抖音') {
+                    //没有绑定记录,则绑定
+                    $bind_data = [
+                        'parent' => '18512378959',
+                        'son' => $v->phone,
+                        'life' => 2,
+                        'begin_at' => date('Y-m-d H:i:s'),
+                        'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                        'channel' => 3
+                    ];
+                    DB::table('nlsg_vip_user_bind')->insert($bind_data);
+                }
             }
 
             $edit_res = DB::table('works_list_of_sub')

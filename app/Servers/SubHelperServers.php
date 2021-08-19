@@ -175,7 +175,7 @@ class SubHelperServers
                 $temp_add_data = [];
                 $temp_add_data['phone'] = $phone;
                 $temp_add_data['twitter_phone'] = $t_phone;
-                $temp_add_data['flag_name'] = $v[2] ?? '';
+                $temp_add_data['flag_name'] = trim($v[2] ?? '');
                 $temp_add_data['works_type'] = $type;
                 $temp_add_data['works_id'] = $id;
                 $temp_add_data['status'] = 1;
