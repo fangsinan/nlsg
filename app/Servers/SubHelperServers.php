@@ -136,6 +136,9 @@ class SubHelperServers
             readfile($url);
             $content = ob_get_contents();
             ob_end_clean();
+            if (empty($content)) {
+                return ['code' => false, 'msg' => '文件数据错误'];
+            }
 
             Storage::put($file, $content);
 
