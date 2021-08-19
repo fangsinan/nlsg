@@ -112,6 +112,7 @@ class SubHelperServers
         $type = $params['type'] ?? 0;
         $is_file = $params['is_file'] ?? 0;
         $file_name = $params['file_name'] ?? '';
+        $url = $params['url'] ?? '';
 
 
         if (empty($id) || empty($type)) {
@@ -125,10 +126,11 @@ class SubHelperServers
             if (empty($file_name)) {
                 return ['code' => false, 'msg' => '文件名错误'];
             }
-
+            if (empty($url)) {
+                return ['code' => false, 'msg' => '文件地址错误'];
+            }
             //$url = 'https://image.nlsgapp.com/1111group/20210818测试开通.xlsx';
 
-            $url = $file_name;
             $file = 'shs' . time() . rand(1, 999) . '.xlsx';
             ob_start();
             readfile($url);
@@ -146,6 +148,8 @@ class SubHelperServers
             $excel_data = Excel::toArray(new UsersImport, base_path() . '/storage/app/' . $file);
 
             Storage::delete($file);
+            $AliUploadServer = new AliUploadServers();
+            $AliUploadServer->DelOss($file_name);
 
             $excel_data = $excel_data[0] ?? [];
             if (empty($excel_data)) {
