@@ -96,6 +96,12 @@ class ImGroupController extends Controller
                 $params_user = array_column($getUserRes['MemberList'],'Member_Account');
             }
         }
+        // 过滤群管理和群主
+        //当前禁言user里过滤掉该群的群主与管理
+        $params_user = ImGroupUser::where(['group_id'=>$params['group_id'],'group_role'=>0,'exit_type'=>0])
+            ->whereIn("group_account", $params_user)
+            ->pluck('group_account')->toArray();
+
         if(empty($params_user)){
             return $this->error('0','user_id empty');
         }
