@@ -372,19 +372,25 @@ class ImGroupController extends Controller
         }
         $adds = [];
         foreach ($params['NewMemberList'] as $key=>$item) {
-            $add = [
+
+            $group_user = ImGroupUser::where([
                 'group_id'          => $params['GroupId'],
                 'group_account'     => $item['Member_Account'],
-                'operator_account'  => $params['Operator_Account'],
-                'join_type'         => $params['JoinType'],
-                'group_role'        => 0,
-//                'created_at'    => date('Y-m-d H:i:s'),
-//                'updated_at'    => date('Y-m-d H:i:s'),
-            ];
-
-            if(!empty($add)){
+            ])->first();
+            if(!empty($group_user)){
+                ImGroupUser::where(['id'=>$group_user['id']])->update(['exit_type'=>0]);
+            }else{
+                $add = [
+                    'group_id'          => $params['GroupId'],
+                    'group_account'     => $item['Member_Account'],
+                    'operator_account'  => $params['Operator_Account'],
+                    'join_type'         => $params['JoinType'],
+                    'group_role'        => 0,
+                ];
                 $gu_res = ImGroupUser::firstOrCreate($add);
+
             }
+
             //$adds[] = $add;
         }
 
