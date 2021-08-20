@@ -113,7 +113,9 @@ class SubHelperServers
         $is_file = $params['is_file'] ?? 0;
         $file_name = $params['file_name'] ?? '';
         $url = $params['url'] ?? '';
-
+//        if (!empty($url)){
+//            $url = str_replace('https://','http://',$url);
+//        }
 
         if (empty($id) || empty($type)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -132,10 +134,23 @@ class SubHelperServers
             //$url = 'https://image.nlsgapp.com/1111group/20210818测试开通.xlsx';
 
             $file = 'shs' . time() . rand(1, 999) . '.xlsx';
-            ob_start();
-            readfile($url);
-            $content = ob_get_contents();
-            ob_end_clean();
+
+            if (1) {
+                $ch = curl_init();
+                $timeout = 10;
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);//在需要用户检测的网页里需要增加下面两行
+                //curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+                //curl_setopt($ch, CURLOPT_USERPWD, US_NAME.”:”.US_PWD);
+                $content = curl_exec($ch);
+            } else {
+                ob_start();
+                readfile($url);
+                $content = ob_get_contents();
+                ob_end_clean();
+            }
+
             if (empty($content)) {
                 return ['code' => false, 'msg' => '文件数据错误'];
             }
