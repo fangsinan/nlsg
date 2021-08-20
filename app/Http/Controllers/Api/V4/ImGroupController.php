@@ -382,6 +382,7 @@ class ImGroupController extends Controller
                     'exit_type'=>0,
                     'operator_account'  => $params['Operator_Account']??'',
                     'join_type'         => $params['JoinType']??'',
+                    'group_role'        => 0,
                 ]);
             }else{
                 $add = [
