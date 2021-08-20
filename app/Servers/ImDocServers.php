@@ -9,7 +9,7 @@ use App\Models\ConfigModel;
 use App\Models\ImDoc;
 use App\Models\ImDocSendJob;
 use App\Models\ImDocSendJobInfo;
-use App\Models\imDocSendJobLog;
+use App\Models\ImDocSendJobLog;
 use App\Models\ImGroup;
 use App\Models\ImGroupUser;
 use App\Models\ImMedia;
@@ -433,7 +433,7 @@ class ImDocServers
             return ['code' => false, 'msg' => '失败' . __LINE__];
         }
 
-        $logModel = new imDocSendJobLog();
+        $logModel = new ImDocSendJobLog();
         $logModel->job_id = $jobModel->id;
         $logModel->user_id = $user_id;
         $logModel->record = $job_str;
@@ -616,7 +616,7 @@ class ImDocServers
                 return ['code' => false, 'msg' => '失败' . __LINE__];
             }
 
-            $logModel = new imDocSendJobLog();
+            $logModel = new ImDocSendJobLog();
             $logModel->job_id = $jobModel->id;
             $logModel->user_id = $user_id;
             $logModel->record = $job_str;
@@ -1263,7 +1263,7 @@ class ImDocServers
             $res_list_data[] = $temp_res_list_data;
         }
 
-        $logModel = new imDocSendJobLog();
+        $logModel = new ImDocSendJobLog();
         $logModel->insert($res_list_data);
 
         if (empty($id)){
