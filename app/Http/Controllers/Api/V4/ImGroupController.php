@@ -378,7 +378,11 @@ class ImGroupController extends Controller
                 'group_account'     => $item['Member_Account'],
             ])->first();
             if(!empty($group_user)){
-                ImGroupUser::where(['id'=>$group_user['id']])->update(['exit_type'=>0]);
+                ImGroupUser::where(['id'=>$group_user['id']])->update([
+                    'exit_type'=>0,
+                    'operator_account'  => $params['Operator_Account']??'',
+                    'join_type'         => $params['JoinType']??'',
+                ]);
             }else{
                 $add = [
                     'group_id'          => $params['GroupId'],
