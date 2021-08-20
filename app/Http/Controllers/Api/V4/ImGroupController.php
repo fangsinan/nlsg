@@ -96,10 +96,16 @@ class ImGroupController extends Controller
                 $params_user = array_column($getUserRes['MemberList'],'Member_Account');
             }
         }
+
         // 过滤群管理和群主
         //当前禁言user里过滤掉该群的群主与管理
-        $params_user = ImGroupUser::where(['group_id'=>$params['group_id'],'group_role'=>0,'exit_type'=>0])
-            ->whereIn("group_account", $params_user)
+        $group_role_arr=[0];
+        if($shut_up_time == 0){
+            $group_role_arr=[0, 2];
+        }
+        $query = ImGroupUser::where(['group_id'=>$params['group_id'],'exit_type'=>0]);
+        $query->whereIn('group_role',$group_role_arr);
+        $params_user = $query->whereIn("group_account", $params_user)
             ->pluck('group_account')->toArray();
 
         if(empty($params_user)){
@@ -372,19 +378,30 @@ class ImGroupController extends Controller
         }
         $adds = [];
         foreach ($params['NewMemberList'] as $key=>$item) {
-            $add = [
+
+            $group_user = ImGroupUser::where([
                 'group_id'          => $params['GroupId'],
                 'group_account'     => $item['Member_Account'],
-                'operator_account'  => $params['Operator_Account'],
-                'join_type'         => $params['JoinType'],
-                'group_role'        => 0,
-//                'created_at'    => date('Y-m-d H:i:s'),
-//                'updated_at'    => date('Y-m-d H:i:s'),
-            ];
-
-            if(!empty($add)){
+            ])->first();
+            if(!empty($group_user)){
+                ImGroupUser::where(['id'=>$group_user['id']])->update([
+                    'exit_type'=>0,
+                    'operator_account'  => $params['Operator_Account']??'',
+                    'join_type'         => $params['JoinType']??'',
+                    'group_role'        => 0,
+                ]);
+            }else{
+                $add = [
+                    'group_id'          => $params['GroupId'],
+                    'group_account'     => $item['Member_Account'],
+                    'operator_account'  => $params['Operator_Account'],
+                    'join_type'         => $params['JoinType'],
+                    'group_role'        => 0,
+                ];
                 $gu_res = ImGroupUser::firstOrCreate($add);
+
             }
+
             //$adds[] = $add;
         }
 
