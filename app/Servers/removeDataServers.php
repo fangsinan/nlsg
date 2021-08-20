@@ -1862,7 +1862,7 @@ and o.status = 1 and o.pay_price > 1";
                     $temp_t_user_id = $temp_t_u->id;
                 }
             }
-dd($temp_t_user_id);
+
             $temp_user_id = $temp_user->id;
             $temp_user_phone = $temp_user->phone;
 
@@ -1890,6 +1890,12 @@ dd($temp_t_user_id);
                 $temp_data['give'] = 3;
                 $temp_data['twitter_id'] = $temp_t_user_id;
                 $temp_data['is_flag'] = $v->flag_name;
+                if ($v->flag_name = '抖音') {
+                    $temp_data['channel_order_sku'] = '3460976881036350000';
+                }else{
+                    $temp_data['channel_order_sku'] = '';
+                }
+
                 if ($v->works_type != 3) {
                     $temp_data['start_time'] = $now_date;
                     $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
@@ -1930,17 +1936,34 @@ dd($temp_t_user_id);
 
                 //添加关系保护
                 $check_bind = VipUserBind::getBindParent($v->phone);
-                if ($check_bind == 0 && $v->flag_name == '抖音') {
+                if ($check_bind == 0) {
                     //没有绑定记录,则绑定
-                    $bind_data = [
-                        'parent' => '18512378959',
-                        'son' => $v->phone,
-                        'life' => 2,
-                        'begin_at' => date('Y-m-d H:i:s'),
-                        'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                        'channel' => 3
-                    ];
-                    DB::table('nlsg_vip_user_bind')->insert($bind_data);
+                    $bind_data = [];
+                    if (!empty($v->twitter_phone)) {
+                        $bind_data = [
+                            'parent' => $v->twitter_phone,
+                            'son' => $v->phone,
+                            'life' => 2,
+                            'begin_at' => date('Y-m-d H:i:s'),
+                            'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                            'channel' => 1
+                        ];
+                    } else {
+                        if ($v->flag_name = '抖音') {
+                            $bind_data = [
+                                'parent' => '18512378959',
+                                'son' => $v->phone,
+                                'life' => 2,
+                                'begin_at' => date('Y-m-d H:i:s'),
+                                'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                                'channel' => 3
+                            ];
+                        }
+                    }
+
+                    if (!empty($bind_data)) {
+                        DB::table('nlsg_vip_user_bind')->insert($bind_data);
+                    }
                 }
             }
 
@@ -1951,7 +1974,7 @@ dd($temp_t_user_id);
                     'phone' => $temp_user_phone,
                     'status' => 2,
                 ]);
-            if ($edit_res === false) {
+            if ($edit_res == false) {
                 DB::rollBack();
                 continue;
             }
