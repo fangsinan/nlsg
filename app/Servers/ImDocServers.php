@@ -133,12 +133,16 @@ class ImDocServers
                     return ['code' => false, 'msg' => '媒体信息为空,请重试.'];
                 } else {
 //                    $content = $media_info->file_name ?: $media_info->id;
+
                     $file_url = $media_info->url;
                     $format = $media_info->format ?: 'mp4';
                     $file_size = $media_info->size ?: 1119442;
                     $second = $media_info->second ?: 60;
 
                     if ($params['type_info'] != 23) {
+                        if (empty($content)) {
+                            $content = $media_info->file_name ?: $media_info->id;
+                        }
                         $file_md5 = $media_id;
                         $cover_img = $media_info->thumb_url ?: 'https://image.nlsgapp.com/nlsg/works/20210729141614776327.png';
                         $img_size = $media_info->thumb_size ?: 61440;
@@ -1254,7 +1258,7 @@ class ImDocServers
             $temp_res_list_data = [];
             $temp_res_list_data['job_id'] = $rlv['id'];
             $temp_res_list_data['user_id'] = 0;
-            if ($rlv['ErrorCode'] <> 0){
+            if ($rlv['ErrorCode'] <> 0) {
                 $id_res_data['res'] = false;
                 $id_res_data['msg'] = $rlv['ErrorInfo'];
                 $id_res_data['num'] = $rlv['ErrorCode'];
@@ -1266,13 +1270,13 @@ class ImDocServers
         $logModel = new ImDocSendJobLog();
         $logModel->insert($res_list_data);
 
-        if (empty($id)){
+        if (empty($id)) {
             return true;
-        }else{
-            if ($id_res_data['res']){
-                return ['code'=>true,'msg'=>'成功'];
-            }else{
-                return ['code'=>false,'msg'=>$id_res_data['num'].':'.$id_res_data['msg']];
+        } else {
+            if ($id_res_data['res']) {
+                return ['code' => true, 'msg' => '成功'];
+            } else {
+                return ['code' => false, 'msg' => $id_res_data['num'] . ':' . $id_res_data['msg']];
             }
         }
 //        return ['code' => true, 'msg' => '成功'];
