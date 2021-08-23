@@ -843,7 +843,8 @@ class AuthController extends Controller
             return error(0, 'unionid error');
         }
         //如果密串错误  直接返回
-        if( !(MD5($unionid.'_'.$timestamp."_"."NLSG") == $sig) ){
+
+        if( !( strtoupper(MD5($unionid.'_'.$timestamp."_"."NLSG")) == strtoupper($sig)) ){
             return error(0, 'sig error');
         }
         $rand =  uniqid();
