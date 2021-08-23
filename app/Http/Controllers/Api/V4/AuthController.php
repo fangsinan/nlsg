@@ -834,6 +834,8 @@ class AuthController extends Controller
         $timestamp = $request->input('timestamp');
         $sig = $request->input('sig');
         $version = $request->input('version');
+        $nicke = substr($unionid, 0, 5);
+
 
         //如果开关关闭  直接返回
         $version_config = ConfigModel::getData(52);
@@ -848,15 +850,14 @@ class AuthController extends Controller
         if( !( strtoupper(MD5($unionid.'_'.$timestamp."_"."NLSG")) == strtoupper($sig)) ){
             return error(0, 'sig error');
         }
-
-        $nicke = substr($unionid, 0, 8);
-        $user = User::where("phone",'like','游客'. $nicke.'%')
-                    ->where(['phone'=>$unionid,'unionid'=>$unionid])->first();
+        $rand = substr(uniqid(), -5);
+        $user = User::where("phones",'like',"游客$nicke"."_%")
+                    ->where(['unionid'=>$unionid])->first();
         if(empty($user)){
             $list = User::create([
-                'phone' => '游客'. $nicke,
+                'phone' => '游客'. $nicke."_".$rand,
                 'unionid' => $unionid,
-                'nickname' => '游客'. $nicke,
+                'nickname' => '游客'. $nicke."_".$rand,
             ]);
             $user = User::find($list->id);
 
