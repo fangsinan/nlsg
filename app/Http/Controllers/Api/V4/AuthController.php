@@ -814,7 +814,7 @@ class AuthController extends Controller
      * @apiVersion 4.0.0
      * @apiName  visitorLogin
      * @apiGroup Auth
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/sendsms
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/visitorLogin
      *
      * @apiParam {number} unionid  设备号
      * @apiSuccessExample  Success-Response:
