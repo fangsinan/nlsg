@@ -834,6 +834,7 @@ class AuthController extends Controller
         $timestamp = $request->input('timestamp');
         $sig = $request->input('sig');
         $version = $request->input('version');
+
         //如果开关关闭  直接返回
         $version_config = ConfigModel::getData(52);
         if($version_config == $version){
@@ -847,17 +848,21 @@ class AuthController extends Controller
         if( !( strtoupper(MD5($unionid.'_'.$timestamp."_"."NLSG")) == strtoupper($sig)) ){
             return error(0, 'sig error');
         }
-        $rand =  uniqid();
-        $user = User::where(['phone'=>$unionid,'unionid'=>$unionid])->first();
+
+        $nicke = substr($unionid, 0, 8);
+        $user = User::where("phone",'like','游客'. $nicke.'%')
+                    ->where(['phone'=>$unionid,'unionid'=>$unionid])->first();
         if(empty($user)){
             $list = User::create([
-                'phone' => '游客'. $rand,
+                'phone' => '游客'. $nicke,
                 'unionid' => $unionid,
-                'nickname' => '游客'. $rand,
+                'nickname' => '游客'. $nicke,
             ]);
             $user = User::find($list->id);
 
         }
+
+
         $token = auth('api')->login($user);
         $res = $this->get_data($user,$token);
         return  success($res);
