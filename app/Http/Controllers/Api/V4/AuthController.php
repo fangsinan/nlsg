@@ -851,9 +851,9 @@ class AuthController extends Controller
         $user = User::where(['phone'=>$unionid,'unionid'=>$unionid])->first();
         if(empty($user)){
             $list = User::create([
-                'phone' => $unionid,
+                'phone' => '游客'. $rand,
                 'unionid' => $unionid,
-                'nickname' => '苹果用户'. $rand,
+                'nickname' => '游客'. $rand,
             ]);
             $user = User::find($list->id);
 
