@@ -283,6 +283,10 @@ class ImDocServers
         if (!empty($params['type_info'] ?? 0)) {
             $query->where('type_info', '=', $params['type_info']);
         }
+        if (!empty($params['content'] ?? '')) {
+            $query->where('content', 'like', '%' . $params['content'] . '%');
+        }
+
         $query->where('status', '=', 1)
             ->orderBy('id', 'desc')
             ->select([
