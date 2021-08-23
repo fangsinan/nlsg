@@ -851,7 +851,7 @@ class AuthController extends Controller
             return error(0, 'sig error');
         }
         $rand = substr(uniqid(), -5);
-        $user = User::where("phones",'like',"游客$nicke"."_%")
+        $user = User::where("phone",'like',"游客$nicke"."_%")
                     ->where(['unionid'=>$unionid])->first();
         if(empty($user)){
             $list = User::create([
