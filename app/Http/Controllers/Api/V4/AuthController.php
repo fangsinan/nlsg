@@ -806,4 +806,47 @@ class AuthController extends Controller
         return success();
     }
 
+
+
+
+    /**
+     * @api {post} api/v4/auth/visitorLogin  游客登录
+     * @apiVersion 4.0.0
+     * @apiName  visitorLogin
+     * @apiGroup Auth
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/sendsms
+     *
+     * @apiParam {number} unionid  设备号
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function visitorUser(Request $request){
+        $unionid = $request->input('unionid');
+        if(empty($unionid)){
+            return success();
+        }
+        $rand =  uniqid();
+        $user = User::where(['phone'=>$unionid,'unionid'=>$unionid])->first();
+        if(empty($user)){
+            $list = User::create([
+                'phone' => $unionid,
+                'unionid' => $unionid,
+                'nickname' => '苹果用户'. $rand,
+            ]);
+            $user = User::find($list->id);
+
+        }
+        $token = auth('api')->login($user);
+        $res = $this->get_data($user,$token);
+        return  success($res);
+    }
+
 }

@@ -191,6 +191,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::post('auth/sms', 'AuthController@sendSms');
     Route::post('auth/login', 'AuthController@login');
+    Route::post('auth/visitorLogin', 'AuthController@visitorUser');
 
     Route::post('auth/wechat', 'AuthController@wechat');
     Route::post('auth/wechat_info', 'AuthController@wechatInfo');
