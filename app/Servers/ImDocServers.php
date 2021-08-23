@@ -469,6 +469,7 @@ class ImDocServers
         $doc_type = $params['doc_type'] ?? 0;
         $doc_type_info = $params['doc_type_info'] ?? 0;
         $is_done = $params['is_done'] ?? 0;
+        $content = $params['content'] ?? '';
 
         if (!empty($send_obj_type)) {
             $query->whereHas('jobInfo', function ($q) use ($send_obj_type) {
@@ -496,6 +497,11 @@ class ImDocServers
         if (!empty($doc_type_info)) {
             $query->whereHas('docInfo', function ($q) use ($doc_type_info) {
                 $q->where('type_info', '=', $doc_type_info);
+            });
+        }
+        if (!empty($content)) {
+            $query->whereHas('docInfo', function ($q) use ($content) {
+                $q->where('content', 'like', '%' . $content . '%');
             });
         }
         if (!empty($is_done)) {
