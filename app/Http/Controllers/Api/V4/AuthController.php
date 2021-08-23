@@ -817,6 +817,7 @@ class AuthController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/visitorLogin
      *
      * @apiParam {number} unionid  设备号
+     * @apiParam {number} sig  sig
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -830,8 +831,20 @@ class AuthController extends Controller
 
     public function visitorUser(Request $request){
         $unionid = $request->input('unionid');
+        $timestamp = $request->input('timestamp');
+        $sig = $request->input('sig');
+        $version = $request->input('version');
+        //如果开关关闭  直接返回
+        $version_config = ConfigModel::getData(52);
+        if($version_config == $version){
+            return error(0, 'version error');
+        }
         if(empty($unionid)){
-            return success();
+            return error(0, 'unionid error');
+        }
+        //如果密串错误  直接返回
+        if( !(MD5($unionid.'_'.$timestamp."_"."NLSG") == $sig) ){
+            return error(0, 'sig error');
         }
         $rand =  uniqid();
         $user = User::where(['phone'=>$unionid,'unionid'=>$unionid])->first();
