@@ -7,6 +7,7 @@ use App\Models\ImCollection;
 use App\Models\ImGroup;
 use App\Models\ImMsg;
 use App\Models\ImSendAll;
+use App\Models\ImUser;
 use Illuminate\Http\Request;
 
 class ImMsgServers
@@ -97,7 +98,10 @@ class ImMsgServers
                 $group_id = array_merge($group_id, explode(',',$value['to_group']));
             }
         }
-        $userProfileItem = ImMsgController::getImUser($uids);
+        //由于=腾讯的限制(100)   多个获取时 慢
+        //$userProfileItem = ImMsgController::getImUser($uids);
+        $userProfileItem=ImUser::select("tag_im_to_account as Tag_Profile_IM_UID","tag_im_nick as Tag_Profile_IM_Nick")->whereIn('tag_im_to_account',$uids)->get->toArray();
+
         $groups = ImGroup::select('name','group_id')->whereIn('group_id',$group_id)->get()->toArray();
 
         foreach ($list as $key=>$value){
