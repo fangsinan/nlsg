@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Models\Coupon;
+use App\Models\ImMsg;
 use App\Models\LiveConsole;
 use App\Models\MallOrder;
 use App\Models\MallOrderFlashSale;
@@ -60,6 +61,9 @@ class Kernel extends ConsoleKernel
 //                $s->sendGroupDocMsgJob();
 //                sleep(1);
 //            }
+            //IM 群发后入库
+            $msg = new ImMsg();
+            $msg->RedisSendAllMsgCallback();
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {

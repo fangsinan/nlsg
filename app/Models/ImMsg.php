@@ -4,6 +4,9 @@ namespace App\Models;
 
 
 
+use App\Http\Controllers\Api\V4\ImMsgController;
+use Illuminate\Support\Facades\Redis;
+
 class ImMsg extends Base
 {
 
@@ -273,5 +276,17 @@ class ImMsg extends Base
         return $res;
     }
 
+
+
+    //redis list 群发回调入库调用
+    public function RedisSendAllMsgCallback(){
+        $res=Redis::lrange('send_all_msg_callback',0,-1);// 获取所有数据
+        Redis::ltrim('send_all_msg_callback',count($res),-1);//删除已取出数据
+
+        foreach ($res as $post_data) {
+            self::sendMsg($post_data);
+        }
+
+    }
 
 }

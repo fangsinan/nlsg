@@ -18,6 +18,7 @@ use App\Models\ImSendAll;
 use App\Servers\ImMsgServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Libraries\ImClient;
 
 
@@ -143,7 +144,8 @@ class ImMsgController extends Controller
                     $to_accounts = array_unique($to_accounts);
                     foreach ($to_accounts as $key=>$val){
                         $post_data['To_Account'] = $val;
-                        self::sendMsg($post_data);
+                        Redis::rpush("send_all_msg_callback", $post_data);
+                        //self::sendMsg($post_data);
                     }
 
                 }
@@ -299,6 +301,8 @@ class ImMsgController extends Controller
 
     }
 
+
+    //回调入库
     public static function sendMsg($params=[]){
 
         if (empty($params)){
