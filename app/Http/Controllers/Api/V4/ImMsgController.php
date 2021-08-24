@@ -96,14 +96,33 @@ class ImMsgController extends Controller
         if(empty($msgBody)){
             return $this->error('0','Msg Body Error');
         }
+        $add_data = [
+            'from_account'  => $from_account,
+            'to_account'    => implode(",", $to_accounts) ??'',
+            'to_group'      => implode(",", $to_group)??'',
+            'collection_id' => $collection_id,
+            'msg_body'      => json_encode($msgBody),
+            'created_at'    => date("Y-m-d H:i:s"),
+            'updated_at'    => date("Y-m-d H:i:s"),
+        ];
+
+
+        if(empty($collection_id)){
+            //收藏的转发 不进入群发list
+            $id = ImSendAll::insertGetId($add_data);
+        }else{
+            $id = 0;
+        }
+
+
+
         //群发请求较多 list处理
         Redis::rpush("send_all_msg_callback", json_encode([
             "from_account"  =>$from_account,
             "msgBody"       =>$msgBody,
             "to_accounts"   =>$to_accounts,
             "to_group"      =>$to_group,
-            "collection_id" =>$collection_id,
-            "time"          =>date("Y-m-d H:i:s"),
+            "add_id"        =>$id,
         ]));
 
         return $this->success();
@@ -118,29 +137,28 @@ class ImMsgController extends Controller
             $from_account = $data['from_account'];
             $msgBody = $data['msgBody'];
             $to_group = $data['to_group'];
-            $collection_id = $data['collection_id'];
-            $time = $data['time'];
             $to_accounts = $data['to_accounts'];
+            $id = $data['add_id'];
 
 
             //群发列表
             //查询当前消息的
             //因为群发给多个群无法确定唯一key  所以保留消息体'
-            $add_data = [
-                'from_account'  => $from_account,
-                'to_account'    => implode(",", $to_accounts) ??'',
-                'to_group'      => implode(",", $to_group)??'',
-                'collection_id' => $collection_id,
-                'msg_body'      => json_encode($msgBody),
-                'created_at'    => $time,
-                'updated_at'    => $time,
-            ];
-            if(empty($collection_id)){
-                //收藏的转发 不进入群发list
-                $id = ImSendAll::insertGetId($add_data);
-            }else{
-                $id = 0;
-            }
+//            $add_data = [
+//                'from_account'  => $from_account,
+//                'to_account'    => implode(",", $to_accounts) ??'',
+//                'to_group'      => implode(",", $to_group)??'',
+//                'collection_id' => $collection_id,
+//                'msg_body'      => json_encode($msgBody),
+//                'created_at'    => $time,
+//                'updated_at'    => $time,
+//            ];
+//            if(empty($collection_id)){
+//                //收藏的转发 不进入群发list
+//                $id = ImSendAll::insertGetId($add_data);
+//            }else{
+//                $id = 0;
+//            }
 
 
             $post_data['From_Account'] = $from_account;
