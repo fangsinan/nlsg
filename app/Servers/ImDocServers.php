@@ -1185,6 +1185,20 @@ class ImDocServers
                             $temp_post_data['Random'] = $this->getMsgRandom() . $v->id;
                             $temp_post_data['MsgBody'] = [];
                             $fuv = explode(',', $fuv);
+                            $temp_fuv_width = (int)$fuv[2];
+                            $temp_fuv_height = (int)$fuv[3];
+                            $temp_wh_str = '';
+
+                            if ($temp_fuv_height > 396 && $temp_fuv_width > 396){
+                                $temp_w_c = floor($temp_fuv_width/198);
+                                $temp_h_c = floor($temp_fuv_height/198);
+
+                                $temp_wh = $temp_h_c > $temp_w_c ? $temp_w_c : $temp_h_c;
+                                $temp_wh = floor(100/$temp_wh);
+                                $temp_wh = $temp_wh > 50 ? 50 : $temp_wh;
+                                $temp_wh_str = '?x-oss-process=image/resize,p_'.$temp_wh;
+                            }
+
                             $temp_post_data['MsgBody'][] = [
                                 "MsgType" => "TIMImageElem",
                                 "MsgContent" => [
@@ -1208,10 +1222,10 @@ class ImDocServers
                                         ],
                                         [
                                             "Type" => 3,
-                                            "Size" => $fuv[1],
+                                            "Size" => (int)$fuv[1],
                                             "Width" => 0,
                                             "Height" => 0,
-                                            "URL" => $fuv[0],
+                                            "URL" => $fuv[0].$temp_wh_str,
                                         ],
                                     ]
                                 ]
@@ -1250,7 +1264,7 @@ class ImDocServers
         if (empty($post_data_array)) {
             return ['code' => true, 'msg' => '没有任务'];
         }
-
+//dd($post_data_array);
         ImDocSendJob::whereIn('id', $job_id_list)->update([
             'is_done' => 2
         ]);
@@ -1259,6 +1273,7 @@ class ImDocServers
 
         $res_list = [];
         foreach ($post_data_array as $v) {
+//            dd([$v,json_encode($v)]);
             $res = ImClient::curlPost($url, json_encode($v));
             $temp_res_list = [];
             $temp_res_list['id'] = substr($v['Random'], 22);
