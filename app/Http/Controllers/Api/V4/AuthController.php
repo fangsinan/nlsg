@@ -839,7 +839,7 @@ class AuthController extends Controller
 
         //如果开关关闭  直接返回
         $version_config = ConfigModel::getData(52);
-        if($version_config == $version){
+        if($version_config != $version){
             return error(0, 'version error');
         }
         if(empty($unionid)){
