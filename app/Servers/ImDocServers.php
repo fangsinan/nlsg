@@ -1166,6 +1166,22 @@ class ImDocServers
                         $file_url = explode(';', $v->docInfo->file_url);
                         $file_url = array_filter($file_url);
                         foreach ($file_url as $fuv) {
+                            $temp_format = pathinfo($fuv[0])['extension'] ?? 'jpg';
+                            $temp_format_num = 255;
+                            switch (strtolower($temp_format)) {
+                                case 'jpg':
+                                    $temp_format_num = 1;
+                                    break;
+                                case 'gif':
+                                    $temp_format_num = 2;
+                                    break;
+                                case 'png':
+                                    $temp_format_num = 3;
+                                    break;
+                                case 'bmp':
+                                    $temp_format_num = 4;
+                                    break;
+                            }
                             $temp_post_data['Random'] = $this->getMsgRandom() . $v->id;
                             $temp_post_data['MsgBody'] = [];
                             $fuv = explode(',', $fuv);
@@ -1173,8 +1189,8 @@ class ImDocServers
                                 "MsgType" => "TIMImageElem",
                                 "MsgContent" => [
 //                                    "UUID" => $fuv[4],
-                                    "UUID" => $this->getMsgRandom(),
-                                    "ImageFormat" => 255,
+                                    "UUID" => $this->getMsgRandom() . '.' . $temp_format,
+                                    "ImageFormat" => $temp_format_num,
                                     "ImageInfoArray" => [
                                         [
                                             "Type" => 1,
@@ -1249,7 +1265,8 @@ class ImDocServers
             $res_list[] = array_merge(json_decode($res, true), $temp_res_list);
             //sleep(1);
             if (empty($id)) {
-                usleep(500000);
+                //usleep(500000);
+                sleep(1);
             }
         }
 
