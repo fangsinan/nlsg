@@ -100,10 +100,11 @@ class ImMsgServers
                 $group_id = array_merge($group_id, explode(',',$value['to_group']));
             }
         }
+
         //由于=腾讯的限制(100)   多个获取时 慢
         //$userProfileItem = ImMsgController::getImUser($uids);
         $userProfileItem=ImUser::select("tag_im_to_account as Tag_Profile_IM_UID","tag_im_nick as Tag_Profile_IM_Nick")
-            ->whereIn('tag_im_to_account',array_slice($uids, 10))->get()->toArray();
+            ->whereIn('tag_im_to_account',array_slice($uids, 0,20))->get()->toArray();
 
         $groups = ImGroup::select('name','group_id')->whereIn('group_id',$group_id)->get()->toArray();
 
