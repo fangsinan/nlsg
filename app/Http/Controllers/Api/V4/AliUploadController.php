@@ -261,6 +261,10 @@ class AliUploadController extends Controller
             $filePath = $file->getRealPath();//获取上传的文件缓存在tmp文件夹下的绝对路径
             $filename = $file->getClientOriginalName(); //获取上传文件的文件名（带后缀，如abc.png）
             $filesize=$file->getSize();
+            $maxSize=1024*1024*50;
+            if($filesize>$maxSize){
+                return $this->error(0, '上传文件超过50M', (object)[]);
+            }
 //            $filaname=$file->getFilename();//获取缓存在tmp目录下的文件名（带后缀，如php8933.tmp）
 //            $path=$file->move(path,newname);//将缓存在tmp目录下的文件移动，返回文件移动过后的路径 第一个参数是文件移到哪个文件夹下的路径，第二个参数是将上传的文件重新命名的文件名
         }catch (\Exception $e){
