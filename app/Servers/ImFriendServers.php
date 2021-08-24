@@ -44,7 +44,7 @@ class ImFriendServers
 
 
 
-        $user = ImMsgController::getImUser($params['user_id']);
+        $user = ImMsgController::getImUser([$params['user_id']]);
 
         if(!empty($user)){
             foreach ($user as $key=>$value) {
