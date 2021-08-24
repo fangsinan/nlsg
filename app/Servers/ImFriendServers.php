@@ -41,6 +41,9 @@ class ImFriendServers
         if( empty($params['user_id']) ){
             return ['code'=>false,   'msg'=>'request user_id error'];
         }
+
+
+
         $user = ImMsgController::getImUser([$params['user_id']]);
 
         if(!empty($user)){
@@ -48,7 +51,7 @@ class ImFriendServers
                 $is_user = ImUser::where(['tag_im_to_account'=>$key ])->first();
 
                 $data = [
-                    'tag_im_to_account'     => $params['user_id'],
+                    'tag_im_to_account'     => $key,
                     'tag_im_nick'           => $value['Tag_Profile_IM_Nick']??'',
                     'tag_im_gender'         => $value['Tag_Profile_IM_Gender']??'',
                     'tag_im_birth_day'      => $value['Tag_Profile_IM_BirthDay']??'',
@@ -68,6 +71,7 @@ class ImFriendServers
                 if(empty($is_user)){
                     //add
                     ImUser::insert($data);
+                    //dd(ImUser::insert($data));
                 }else{
                     //edit
                     ImUser::where(['tag_im_to_account'=>$params['user_id']])->update($data);

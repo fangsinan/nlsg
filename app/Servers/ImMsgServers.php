@@ -7,6 +7,7 @@ use App\Models\ImCollection;
 use App\Models\ImGroup;
 use App\Models\ImMsg;
 use App\Models\ImSendAll;
+use App\Models\ImUser;
 use Illuminate\Http\Request;
 
 class ImMsgServers
@@ -85,7 +86,9 @@ class ImMsgServers
         //群发列表
         //$list = ImSendAll::where(['from_account' => $uid,'status'=>0])->get()->toArray();
         $lists = ImSendAll::where(['from_account' => $uid,'status'=>0])->orderBy('created_at',"desc")->paginate(20)->toArray();
-
+        if(empty($lists['data'])){
+            return [];
+        }
         $list = $lists['data'];
         $uids = [];
         $group_id = [];
@@ -97,14 +100,19 @@ class ImMsgServers
                 $group_id = array_merge($group_id, explode(',',$value['to_group']));
             }
         }
-        $userProfileItem = ImMsgController::getImUser($uids);
+
+        //由于=腾讯的限制(100)   多个获取时 慢
+        //$userProfileItem = ImMsgController::getImUser($uids);
+        $userProfileItem=ImUser::select("tag_im_to_account as Tag_Profile_IM_UID","tag_im_nick as Tag_Profile_IM_Nick")
+            ->whereIn('tag_im_to_account',array_slice($uids, 0,20))->get()->toArray();
+
         $groups = ImGroup::select('name','group_id')->whereIn('group_id',$group_id)->get()->toArray();
 
         foreach ($list as $key=>$value){
             $list[$key]['to_account_name'] = [];
             $list[$key]['to_group_name'] = [];
             foreach ($userProfileItem as $user_v) {
-                if(!empty($value['to_account']) && strpos($value['to_account'],$user_v['Tag_Profile_IM_UID']) !== false ){
+                if(!empty($value['to_account']) && strpos((string)$value['to_account'],(string)$user_v['Tag_Profile_IM_UID']) !== false ){
                     $list[$key]['to_account_name'][] = $user_v['Tag_Profile_IM_Nick'];
                 }
             }

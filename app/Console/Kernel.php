@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Http\Controllers\Api\V4\ImMsgController;
 use App\Models\Coupon;
 use App\Models\LiveConsole;
 use App\Models\MallOrder;
@@ -56,10 +57,14 @@ class Kernel extends ConsoleKernel
             $s = new ImDocServers();
             $s->sendGroupDocMsgJob();
             //秒级执行 立即发送任务
-//            for ($i=1;$i<=60;$i++){
-//                $s->sendGroupDocMsgJob();
-//                sleep(1);
-//            }
+
+            //IM 群发后入库
+            $msg = new ImMsgController();
+            for ($i=1;$i<=30;$i++){
+                $msg->RedisSendAllMsgCallback();
+                sleep(2);
+            }
+
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {

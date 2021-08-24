@@ -817,6 +817,7 @@ class AuthController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/visitorLogin
      *
      * @apiParam {number} unionid  设备号
+     * @apiParam {number} sig  sig
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -830,20 +831,39 @@ class AuthController extends Controller
 
     public function visitorUser(Request $request){
         $unionid = $request->input('unionid');
-        if(empty($unionid)){
-            return success();
+        $timestamp = $request->input('timestamp');
+        $sig = $request->input('sig');
+        $version = $request->input('version');
+        $nicke = substr($unionid, 0, 5);
+
+
+        //如果开关关闭  直接返回
+        $version_config = ConfigModel::getData(52);
+        if($version_config != $version){
+            return error(0, 'version error');
         }
-        $rand =  uniqid();
-        $user = User::where(['phone'=>$unionid,'unionid'=>$unionid])->first();
+        if(empty($unionid)){
+            return error(0, 'unionid error');
+        }
+        //如果密串错误  直接返回
+
+        if( !( strtoupper(MD5($unionid.'_'.$timestamp."_"."NLSG")) == strtoupper($sig)) ){
+            return error(0, 'sig error');
+        }
+        $rand = substr(uniqid(), -5);
+        $user = User::where(["is_staff"=>2, 'unionid'=>$unionid])->first();
         if(empty($user)){
             $list = User::create([
-                'phone' => $unionid,
+                'phone' => '游客'. $nicke."_".$rand,
                 'unionid' => $unionid,
-                'nickname' => '苹果用户'. $rand,
+                'nickname' => '游客'. $nicke."_".$rand,
+                'is_staff' => 2,
             ]);
             $user = User::find($list->id);
 
         }
+
+
         $token = auth('api')->login($user);
         $res = $this->get_data($user,$token);
         return  success($res);

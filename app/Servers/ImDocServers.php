@@ -1166,15 +1166,45 @@ class ImDocServers
                         $file_url = explode(';', $v->docInfo->file_url);
                         $file_url = array_filter($file_url);
                         foreach ($file_url as $fuv) {
+                            $temp_format = pathinfo($fuv[0])['extension'] ?? 'jpg';
+                            $temp_format_num = 255;
+                            switch (strtolower($temp_format)) {
+                                case 'jpg':
+                                    $temp_format_num = 1;
+                                    break;
+                                case 'gif':
+                                    $temp_format_num = 2;
+                                    break;
+                                case 'png':
+                                    $temp_format_num = 3;
+                                    break;
+                                case 'bmp':
+                                    $temp_format_num = 4;
+                                    break;
+                            }
                             $temp_post_data['Random'] = $this->getMsgRandom() . $v->id;
                             $temp_post_data['MsgBody'] = [];
                             $fuv = explode(',', $fuv);
+                            $temp_fuv_width = (int)$fuv[2];
+                            $temp_fuv_height = (int)$fuv[3];
+                            $temp_wh_str = '';
+
+                            if ($temp_fuv_height > 396 && $temp_fuv_width > 396){
+                                $temp_w_c = floor($temp_fuv_width/198);
+                                $temp_h_c = floor($temp_fuv_height/198);
+
+                                $temp_wh = $temp_h_c > $temp_w_c ? $temp_w_c : $temp_h_c;
+                                $temp_wh = floor(100/$temp_wh);
+                                $temp_wh = $temp_wh > 50 ? 50 : $temp_wh;
+                                $temp_wh_str = '?x-oss-process=image/resize,p_'.$temp_wh;
+                            }
+
                             $temp_post_data['MsgBody'][] = [
                                 "MsgType" => "TIMImageElem",
                                 "MsgContent" => [
 //                                    "UUID" => $fuv[4],
-                                    "UUID" => $this->getMsgRandom(),
-                                    "ImageFormat" => 255,
+                                    "UUID" => $this->getMsgRandom() . '.' . $temp_format,
+                                    "ImageFormat" => $temp_format_num,
                                     "ImageInfoArray" => [
                                         [
                                             "Type" => 1,
@@ -1192,10 +1222,10 @@ class ImDocServers
                                         ],
                                         [
                                             "Type" => 3,
-                                            "Size" => $fuv[1],
+                                            "Size" => (int)$fuv[1],
                                             "Width" => 0,
                                             "Height" => 0,
-                                            "URL" => $fuv[0],
+                                            "URL" => $fuv[0].$temp_wh_str,
                                         ],
                                     ]
                                 ]
@@ -1234,7 +1264,7 @@ class ImDocServers
         if (empty($post_data_array)) {
             return ['code' => true, 'msg' => '没有任务'];
         }
-
+//dd($post_data_array);
         ImDocSendJob::whereIn('id', $job_id_list)->update([
             'is_done' => 2
         ]);
@@ -1243,13 +1273,15 @@ class ImDocServers
 
         $res_list = [];
         foreach ($post_data_array as $v) {
+//            dd([$v,json_encode($v)]);
             $res = ImClient::curlPost($url, json_encode($v));
             $temp_res_list = [];
             $temp_res_list['id'] = substr($v['Random'], 22);
             $res_list[] = array_merge(json_decode($res, true), $temp_res_list);
             //sleep(1);
             if (empty($id)) {
-                usleep(500000);
+                //usleep(500000);
+                sleep(1);
             }
         }
 

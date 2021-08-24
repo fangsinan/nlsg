@@ -4,6 +4,9 @@ namespace App\Models;
 
 
 
+use App\Http\Controllers\Api\V4\ImMsgController;
+use Illuminate\Support\Facades\Redis;
+
 class ImMsg extends Base
 {
 
@@ -272,6 +275,9 @@ class ImMsg extends Base
 
         return $res;
     }
+
+
+
 
 
 }
