@@ -96,76 +96,103 @@ class ImMsgController extends Controller
         if(empty($msgBody)){
             return $this->error('0','Msg Body Error');
         }
-        //群发列表
-        //查询当前消息的
-        //因为群发给多个群无法确定唯一key  所以保留消息体'
-        $add_data = [
-            'from_account'  => $from_account,
-            'to_account'    => implode(",", $to_accounts) ??'',
-            'to_group'      => implode(",", $to_group)??'',
-            'collection_id' => $collection_id,
-            'msg_body'      => json_encode($msgBody),
-            'created_at'    => date("Y-m-d H:i:s"),
-            'updated_at'    => date("Y-m-d H:i:s"),
-        ];
-        if(empty($collection_id)){
-            //收藏的转发 不进入群发list
-            $id = ImSendAll::insertGetId($add_data);
-        }else{
-            $id = 0;
-        }
+        //群发请求较多 list处理
+        Redis::rpush("send_all_msg_callback", [
+            "from_account"  =>$from_account,
+            "msgBody"       =>$msgBody,
+            "to_accounts"   =>$to_accounts,
+            "to_group"      =>$to_group,
+            "collection_id" =>$collection_id,
+            "time"          =>date("Y-m-d H:i:s"),
+        ]);
 
-
-        $post_data['From_Account'] = $from_account;
-        $post_data['MsgBody'] = $msgBody;
-        $post_data['CloudCustomData'] = json_encode(['ImSendAllId'=>$id]);
-
-        //用户体 群发
-        if(!empty($to_accounts)){
-            //本接口不会触发回调  所以需要储存消息体
-            $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
-            //去重后 拆分二维数组 每个500数据
-            $to_accounts_arr = array_chunk(array_unique($to_accounts), 500);
-            //该接口最大支持500人
-            foreach ($to_accounts_arr as $to_accounts) {
-                $post_data['To_Account'] = $to_accounts;
-                $post_data['MsgSeq']    = rand(10000000,99999999);
-                $post_data['MsgRandom'] = rand(10000000,99999999);
-                $res = ImClient::curlPost($url,json_encode($post_data));
-                $res = json_decode($res,true);
-                if($res['ActionStatus'] == "OK"){
-                    $post_data['CallbackCommand']   = 'C2C.CallbackAfterSendMsg';
-                    $post_data['SendMsgResult']     = 0;
-                    $post_data['UnreadMsgNum']      = 0;
-                    //$post_data['type']              = 3; //群发
-                    $post_data['MsgTime']           = time();
-                    $post_data['MsgKey']            = $res['MsgKey'];
-                    $post_data['OptPlatform']       = 'RESTAPI' ;
-                    $to_accounts = array_unique($to_accounts);
-                    foreach ($to_accounts as $key=>$val){
-                        $post_data['To_Account'] = $val;
-                        Redis::rpush("send_all_msg_callback", $post_data);
-                        //self::sendMsg($post_data);
-                    }
-
-                }
-            }
-
-
-        }
-
-        //群组体 群发
-        if(!empty($to_group)) {
-            $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
-            foreach ($to_group as $item) {
-                $post_data['GroupId'] = $item;
-                $post_data['Random'] = rand(10000000,99999999);
-                ImClient::curlPost($url,json_encode($post_data));
-            }
-        }
         return $this->success();
     }
+    //redis list 群发回调入库调用
+    function RedisSendAllMsgCallback(){
+        $redis_key = 'send_all_msg_callback';
+        $redis_data=Redis::lrange($redis_key,0,-1);// 获取所有数据
 
+        foreach ($redis_data as $data) {
+
+            $from_account = $data['from_account'];
+            $msgBody = $data['msgBody'];
+            $to_group = $data['to_group'];
+            $collection_id = $data['collection_id'];
+            $time = $data['time'];
+            $to_accounts = $data['to_accounts'];
+
+
+            //群发列表
+            //查询当前消息的
+            //因为群发给多个群无法确定唯一key  所以保留消息体'
+            $add_data = [
+                'from_account'  => $from_account,
+                'to_account'    => implode(",", $to_accounts) ??'',
+                'to_group'      => implode(",", $to_group)??'',
+                'collection_id' => $collection_id,
+                'msg_body'      => json_encode($msgBody),
+                'created_at'    => $time,
+                'updated_at'    => $time,
+            ];
+            if(empty($collection_id)){
+                //收藏的转发 不进入群发list
+                $id = ImSendAll::insertGetId($add_data);
+            }else{
+                $id = 0;
+            }
+
+
+            $post_data['From_Account'] = $from_account;
+            $post_data['MsgBody'] = $msgBody;
+            $post_data['CloudCustomData'] = json_encode(['ImSendAllId'=>$id]);
+
+            //用户体 群发
+            if(!empty($to_accounts)){
+                //本接口不会触发回调  所以需要储存消息体
+                $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
+                //去重后 拆分二维数组 每个500数据
+                $to_accounts_arr = array_chunk(array_unique($to_accounts), 500);
+                //该接口最大支持500人
+                foreach ($to_accounts_arr as $to_accounts) {
+                    $post_data['To_Account'] = $to_accounts;
+                    $post_data['MsgSeq']    = rand(10000000,99999999);
+                    $post_data['MsgRandom'] = rand(10000000,99999999);
+                    $res = ImClient::curlPost($url,json_encode($post_data));
+                    $res = json_decode($res,true);
+                    if($res['ActionStatus'] == "OK"){
+                        $post_data['CallbackCommand']   = 'C2C.CallbackAfterSendMsg';
+                        $post_data['SendMsgResult']     = 0;
+                        $post_data['UnreadMsgNum']      = 0;
+                        //$post_data['type']              = 3; //群发
+                        $post_data['MsgTime']           = time();
+                        $post_data['MsgKey']            = $res['MsgKey'];
+                        $post_data['OptPlatform']       = 'RESTAPI' ;
+                        $to_accounts = array_unique($to_accounts);
+                        foreach ($to_accounts as $key=>$val){
+                            $post_data['To_Account'] = $val;
+                            self::sendMsg($post_data);
+                        }
+
+                    }
+                }
+
+
+            }
+
+            //群组体 群发
+            if(!empty($to_group)) {
+                $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+                foreach ($to_group as $item) {
+                    $post_data['GroupId'] = $item;
+                    $post_data['Random'] = rand(10000000,99999999);
+                    ImClient::curlPost($url,json_encode($post_data));
+                }
+            }
+        }
+
+        Redis::ltrim($redis_key,count($redis_data),-1);//删除已取出数据
+    }
 
 
     /**

@@ -278,15 +278,6 @@ class ImMsg extends Base
 
 
 
-    //redis list 群发回调入库调用
-    public function RedisSendAllMsgCallback(){
-        $res=Redis::lrange('send_all_msg_callback',0,-1);// 获取所有数据
-        Redis::ltrim('send_all_msg_callback',count($res),-1);//删除已取出数据
 
-        foreach ($res as $post_data) {
-            self::sendMsg($post_data);
-        }
-
-    }
 
 }
