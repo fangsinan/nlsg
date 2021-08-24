@@ -97,21 +97,22 @@ class ImMsgController extends Controller
             return $this->error('0','Msg Body Error');
         }
         //群发请求较多 list处理
-        Redis::rpush("send_all_msg_callback", [
+        Redis::rpush("send_all_msg_callback", json_encode([
             "from_account"  =>$from_account,
             "msgBody"       =>$msgBody,
             "to_accounts"   =>$to_accounts,
             "to_group"      =>$to_group,
             "collection_id" =>$collection_id,
             "time"          =>date("Y-m-d H:i:s"),
-        ]);
+        ]));
 
         return $this->success();
     }
     //redis list 群发回调入库调用
-    function RedisSendAllMsgCallback(){
+    public function RedisSendAllMsgCallback(){
         $redis_key = 'send_all_msg_callback';
         $redis_data=Redis::lrange($redis_key,0,-1);// 获取所有数据
+        $redis_data = json_decode($redis_data, true);
 
         foreach ($redis_data as $data) {
 
