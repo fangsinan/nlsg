@@ -112,10 +112,9 @@ class ImMsgController extends Controller
     public function RedisSendAllMsgCallback(){
         $redis_key = 'send_all_msg_callback';
         $redis_data=Redis::lrange($redis_key,0,-1);// 获取所有数据
-        $redis_data = json_decode($redis_data, true);
 
         foreach ($redis_data as $data) {
-
+            $data = json_decode($data, true);
             $from_account = $data['from_account'];
             $msgBody = $data['msgBody'];
             $to_group = $data['to_group'];
