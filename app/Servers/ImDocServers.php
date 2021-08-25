@@ -510,7 +510,7 @@ class ImDocServers
 
 
         $query->orderBy('send_at', 'desc')
-            ->orderBy('is_done','asc')
+            ->orderBy('is_done', 'asc')
             ->orderBy('success_at', 'desc')
             ->orderBy('id', 'desc')
             ->select([
@@ -572,7 +572,7 @@ class ImDocServers
                 ->where('month', '=', $v)
                 ->where('status', '<>', 3)
                 ->orderBy('send_at', 'desc')
-                ->orderBy('is_done','asc')
+                ->orderBy('is_done', 'asc')
                 ->orderBy('success_at', 'desc')
                 ->orderBy('id', 'desc')
                 ->select([
@@ -870,7 +870,8 @@ class ImDocServers
 
     public function getMsgRandom()
     {
-        $date = date('YmdHi');
+        //$date = date('YmdHi');
+        $date = date('is');
         $cache_key_name = 'msg_counter_' . $date;
         $expire_num = 60;
         $counter = Cache::get($cache_key_name);
@@ -878,7 +879,7 @@ class ImDocServers
             Cache::put($cache_key_name, 1, $expire_num);
         }
         $counter = Cache::increment($cache_key_name);
-        return $date . sprintf("%010d", $counter);
+        return intval($date . $counter);
     }
 
     public function imgUrl($url)
@@ -1050,8 +1051,9 @@ class ImDocServers
             $query->where('id', '=', $id);
         }
 
-        $job_info = $query->where('is_done', '=', 1)
-            ->where('status', '=', 1)
+//        $query->where('is_done', '=', 1);
+
+        $job_info = $query->where('status', '=', 1)
             ->where(function ($q) {
                 $q->where('send_type', '=', 1)
                     ->orWhere(function ($q) {
@@ -1075,7 +1077,7 @@ class ImDocServers
                 $temp_post_data = [];
                 $temp_post_data['GroupId'] = $vv->groupInfo->group_id;
                 $temp_post_data['From_Account'] = (string)$v->user_id;
-                $temp_post_data['Random'] = $this->getMsgRandom() . $v->id;
+                $temp_post_data['Random'] = $this->getMsgRandom();
                 $temp_post_data['MsgBody'] = [];
                 $temp_msg_type = 0;
                 switch (intval($v->docInfo->type_info)) {
@@ -1185,28 +1187,29 @@ class ImDocServers
                                     $temp_format_num = 4;
                                     break;
                             }
-                            $temp_post_data['Random'] = $this->getMsgRandom() . $v->id;
+                            $temp_post_data['Random'] = $this->getMsgRandom();
                             $temp_post_data['MsgBody'] = [];
                             $fuv = explode(',', $fuv);
                             $temp_fuv_width = (int)$fuv[2];
                             $temp_fuv_height = (int)$fuv[3];
                             $temp_wh_str = '';
 
-                            if ($temp_fuv_height > 396 && $temp_fuv_width > 396){
-                                $temp_w_c = floor($temp_fuv_width/198);
-                                $temp_h_c = floor($temp_fuv_height/198);
+                            if ($temp_fuv_height > 396 && $temp_fuv_width > 396) {
+                                $temp_w_c = floor($temp_fuv_width / 198);
+                                $temp_h_c = floor($temp_fuv_height / 198);
 
                                 $temp_wh = $temp_h_c > $temp_w_c ? $temp_w_c : $temp_h_c;
-                                $temp_wh = floor(100/$temp_wh);
+                                $temp_wh = floor(100 / $temp_wh);
                                 $temp_wh = $temp_wh > 50 ? 50 : $temp_wh;
-                                $temp_wh_str = '?x-oss-process=image/resize,p_'.$temp_wh;
+                                $temp_wh_str = '?x-oss-process=image/resize,p_' . $temp_wh;
                             }
 
                             $temp_post_data['MsgBody'][] = [
                                 "MsgType" => "TIMImageElem",
                                 "MsgContent" => [
 //                                    "UUID" => $fuv[4],
-                                    "UUID" => $this->getMsgRandom() . '.' . $temp_format,
+//                                    "UUID" => $this->getMsgRandom() . '.' . $temp_format,
+                                    "UUID" => $this->getMsgRandom(),
                                     "ImageFormat" => $temp_format_num,
                                     "ImageInfoArray" => [
                                         [
@@ -1228,7 +1231,7 @@ class ImDocServers
                                             "Size" => (int)$fuv[1],
                                             "Width" => 0,
                                             "Height" => 0,
-                                            "URL" => $fuv[0].$temp_wh_str,
+                                            "URL" => $fuv[0] . $temp_wh_str,
                                         ],
                                     ]
                                 ]
@@ -1267,7 +1270,7 @@ class ImDocServers
         if (empty($post_data_array)) {
             return ['code' => true, 'msg' => '没有任务'];
         }
-//dd($post_data_array);
+
         ImDocSendJob::whereIn('id', $job_id_list)->update([
             'is_done' => 2
         ]);
