@@ -510,6 +510,7 @@ class ImDocServers
 
 
         $query->orderBy('send_at', 'desc')
+            ->orderBy('is_done','asc')
             ->orderBy('success_at', 'desc')
             ->orderBy('id', 'desc')
             ->select([
@@ -570,6 +571,8 @@ class ImDocServers
                 })
                 ->where('month', '=', $v)
                 ->where('status', '<>', 3)
+                ->orderBy('send_at', 'desc')
+                ->orderBy('is_done','asc')
                 ->orderBy('success_at', 'desc')
                 ->orderBy('id', 'desc')
                 ->select([
