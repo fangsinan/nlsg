@@ -187,7 +187,7 @@ class LiveInfoServers
                 DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as diamond_identity'),
                 DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
                 'tiktok_ordernum', 'tiktok_time', 'qd',
-                DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "--" else "--" end) as qd_name'),
+                DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" when 4 then "地推" else "--" end) as qd_name'), //1 抖音 2 李婷 3 自有平台 4地推
                 'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
                 DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
             ]);
@@ -211,7 +211,7 @@ class LiveInfoServers
                 DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as diamond_identity'),
                 DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
                 'tiktok_ordernum', 'tiktok_time', 'qd',
-                DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" else "--" end) as qd_name'),
+                DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" when 4 then "地推" else "--" end) as qd_name'),
                 'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
                 DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
             ]);
