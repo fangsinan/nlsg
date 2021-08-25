@@ -258,11 +258,11 @@ class DealServers
         $user_arr=User::query()->where(['is_qd_push'=>2])->get(['id','phone'])->toArray();
         $arr = array_column($user_arr, 'id'); //用户
         //地推账号
-
-        //抖音
-
+        $dt_user_arr=User::query()->where(['is_qd_push'=>1])->get(['id','phone'])->toArray();
+        $dt_arr = array_column($dt_user_arr, 'id'); //用户
         //获取当前直播间
         $subLiveInfo=Subscribe::query()->where(['user_id'=>$user_id,'type'=>3,'relation_id'=>$live_id,'status'=>1])->first();
+        //渠道 1 抖音 2 李婷 3 自有平台 4地推
         if(!empty($subLiveInfo)){
             if(!empty($subLiveInfo->channel_order_sku)){ //抖音
                 $is_tiktok=1;
@@ -274,6 +274,12 @@ class DealServers
                 $SubOrder = Order::where(['id' => $subLiveInfo->order_id])->first();
                 if(in_array($SubOrder->twitter_id,$arr)) {
                     $qd = 2;
+                }
+            }else if(!empty($subLiveInfo->twitter_id)){
+                if(in_array($subLiveInfo->twitter_id,$arr)) { //李婷
+                    $qd = 2;
+                }else if(in_array($subLiveInfo->twitter_id,$dt_arr)){ //地推
+                    $qd = 4;
                 }
             }
         }else{
