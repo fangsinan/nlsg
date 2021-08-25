@@ -1208,8 +1208,8 @@ class ImDocServers
                                 "MsgType" => "TIMImageElem",
                                 "MsgContent" => [
 //                                    "UUID" => $fuv[4],
-//                                    "UUID" => $this->getMsgRandom() . '.' . $temp_format,
-                                    "UUID" => $this->getMsgRandom(),
+                                    "UUID" => $this->getMsgRandom() . '.' . $temp_format,
+//                                    "UUID" => $this->getMsgRandom(),
                                     "ImageFormat" => $temp_format_num,
                                     "ImageInfoArray" => [
                                         [
@@ -1266,7 +1266,7 @@ class ImDocServers
 
             }
         }
-
+//dd($post_data_array);
         if (empty($post_data_array)) {
             return ['code' => true, 'msg' => '没有任务'];
         }
