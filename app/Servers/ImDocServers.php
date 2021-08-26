@@ -1052,7 +1052,7 @@ class ImDocServers
             $query->where('id', '=', $id);
         }
 
-//        $query->where('is_done', '=', 1);
+        $query->where('is_done', '=', 1);
 
         $job_info = $query->where('status', '=', 1)
             ->where(function ($q) {
@@ -1285,7 +1285,7 @@ class ImDocServers
 
             }
         }
-dd([$post_data_array,json_encode($post_data_array)]);
+//dd([$post_data_array,json_encode($post_data_array)]);
         if (empty($post_data_array)) {
             return ['code' => true, 'msg' => '没有任务'];
         }
