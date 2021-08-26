@@ -33,7 +33,8 @@ class AliUploadServers
         '4'=>2871, //文件
         '5'=>2899, //待删除
     ];
-    public static $IMAGES_URL = 'https://audiovideo.ali.nlsgapp.com/';
+    public static $IMAGES_URL = 'http://audiovideo.ali.nlsgapp.com/'; //音视频 图片
+    public static $File_URL = 'http://image.nlsgapp.com/'; //文件
     public static $ImUrlKey = 'https://cos.ap-shanghai.myqcloud.com/';
     public static $ReturnUrl = 'http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback';
 
@@ -475,7 +476,7 @@ class AliUploadServers
             $ossClient->uploadFile($bucket, $object, $filePath);
 
             $data=[
-                'url' => Config('web.Ali.IMAGES_URL'),
+                'url' => self::$File_URL,
                 'name' => $object,
             ];
 

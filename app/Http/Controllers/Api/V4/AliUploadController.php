@@ -339,7 +339,7 @@ class AliUploadController extends Controller
                         if(!empty($data['EventType']) && $data['EventType']=='VideoAnalysisComplete'){ //视频分析完成 1s
                             $map['second'] = $data['Duration']; //时长
                         }else if(!empty($data['EventType']) && $data['EventType']=='SnapshotComplete' && !empty($data['CoverUrl'])) { //封面图  此回调相对较长3-4s
-                            $map['thumb_url'] = $data['CoverUrl'];
+                            $map['thumb_url'] = str_replace("https://","http://",$data['CoverUrl']);
                             $CoverSize = getimagesize($map['thumb_url']);
                             $map['thumb_width'] = $CoverSize[0];
                             $map['thumb_height'] = $CoverSize[1];
@@ -429,7 +429,7 @@ class AliUploadController extends Controller
             $now_date=date('Y-m-d H:i:s');
             $data = [
                 'type' => $type,
-                'url' => $url,
+                'url' => str_replace("https://","http://",$url),
                 'created_at' => $now_date
             ];
             if(in_array($type, [1, 2, 3])) {
