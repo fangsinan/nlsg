@@ -1250,7 +1250,8 @@ class ImDocServers
                         $temp_post_data['MsgBody'][] = [
                             "MsgType" => "TIMFileElem",
                             "MsgContent" => [
-                                "Url" => $v->docInfo->file_url,
+//                                "Url" => $v->docInfo->file_url,
+                                "Url" => str_replace('https:', 'http:', $v->docInfo->file_url),
                                 "FileSize" => $v->docInfo->file_size,
                                 "FileName" => $v->docInfo->content,
                                 "Download_Flag" => 2,
@@ -1263,11 +1264,11 @@ class ImDocServers
                         $temp_post_data['MsgBody'][] = [
                             "MsgType" => "TIMFileElem",
                             "MsgContent" => [
-                                "Url" => $v->docInfo->file_url,
+//                                "Url" => $v->docInfo->file_url,
+                                "Url" => str_replace('https:', 'http:', $v->docInfo->file_url),
                                 "FileSize" => $v->docInfo->file_size,
                                 "FileName" => $v->docInfo->content,
                                 "Download_Flag" => 2,
-                                "fileUUID" => $this->getMsgRandom(),
                             ]
                         ];
                         $post_data_array[] = $temp_post_data;
