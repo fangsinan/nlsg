@@ -1193,6 +1193,8 @@ class ImDocServers
                             $temp_fuv_width = (int)$fuv[2];
                             $temp_fuv_height = (int)$fuv[3];
                             $temp_wh_str = '';
+                            $img_url = $fuv[0];
+                            $img_url = str_replace('https:', 'http:', $img_url);
 
                             if ($temp_fuv_height > 396 && $temp_fuv_width > 396) {
                                 $temp_w_c = floor($temp_fuv_width / 198);
@@ -1217,21 +1219,21 @@ class ImDocServers
                                             "Size" => (int)$fuv[1],
                                             "Width" => (int)$fuv[2],
                                             "Height" => (int)$fuv[3],
-                                            "URL" => $fuv[0],
+                                            "URL" => $img_url,
                                         ],
                                         [
                                             "Type" => 2,
                                             "Size" => (int)$fuv[1],
                                             "Width" => 0,
                                             "Height" => 0,
-                                            "URL" => $fuv[0],
+                                            "URL" => $img_url,
                                         ],
                                         [
                                             "Type" => 3,
                                             "Size" => (int)$fuv[1],
                                             "Width" => 0,
                                             "Height" => 0,
-                                            "URL" => $fuv[0] . $temp_wh_str,
+                                            "URL" => $img_url . $temp_wh_str,
                                         ],
                                     ]
                                 ]
