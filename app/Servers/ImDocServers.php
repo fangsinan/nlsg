@@ -1208,7 +1208,7 @@ class ImDocServers
                                 "MsgType" => "TIMImageElem",
                                 "MsgContent" => [
 //                                    "UUID" => $fuv[4],
-                                    "UUID" => $this->getMsgRandom() . '.' . $temp_format,
+                                    "UUID" => 'ali_rest_image_' . $this->getMsgRandom() . '.' . $temp_format,
 //                                    "UUID" => $this->getMsgRandom(),
                                     "ImageFormat" => $temp_format_num,
                                     "ImageInfoArray" => [
