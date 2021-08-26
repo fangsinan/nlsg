@@ -219,10 +219,10 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
-//            $s = new ImDocServers();
-//            $s->sendGroupDocMsgJob();
-            $servers = new removeDataServers();
-            $servers->worksListOfSub();
+            $s = new ImDocServers();
+            $s->sendGroupDocMsgJob(541);
+//            $servers = new removeDataServers();
+//            $servers->worksListOfSub();
 //            $s = new ErpServers();
 //            $s->pushRun();
 //            $s->logisticsSync();

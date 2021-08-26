@@ -1147,7 +1147,8 @@ class ImDocServers
                         $temp_post_data['MsgBody'][] = [
                             "MsgType" => "TIMVideoFileElem",//视频
                             "MsgContent" => [
-                                "VideoUrl" => $v->docInfo->file_url,
+//                                "VideoUrl" => $v->docInfo->file_url,
+                                "VideoUrl" => str_replace('https:', 'http:', $v->docInfo->file_url),
 //                                "VideoUUID" => $v->docInfo->file_md5,
                                 "VideoUUID" => $this->getMsgRandom(),
                                 "VideoSize" => $v->docInfo->file_size,
