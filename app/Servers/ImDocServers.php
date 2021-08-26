@@ -1267,6 +1267,7 @@ class ImDocServers
                                 "FileSize" => $v->docInfo->file_size,
                                 "FileName" => $v->docInfo->content,
                                 "Download_Flag" => 2,
+                                "fileUUID" => $this->getMsgRandom(),
                             ]
                         ];
                         $post_data_array[] = $temp_post_data;
