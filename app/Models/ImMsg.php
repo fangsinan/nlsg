@@ -240,7 +240,7 @@ class ImMsg extends Base
                 case 'TIMVideoFileElem' : //视频类型元素
                     $msg_content_add['VideoUrl']            = $val['VideoUrl'];
                     $msg_content_add['VideoSize']           = $val['VideoSize']??10;
-                    $msg_content_add['VideoSecond']         = $val['VideoSecond']??0;
+                    $msg_content_add['VideoSecond']         = round($val['VideoSecond'])??0;
                     $msg_content_add['VideoFormat']         = $val['VideoFormat']??0;
                     $msg_content_add['VideoDownloadFlag']   = 2;
                     $msg_content_add['VideoUUID']           = $val['video_uuid']??'';
@@ -249,7 +249,7 @@ class ImMsg extends Base
                     $msg_content_add['ThumbSize']           = $val['ThumbSize']??0;
                     $msg_content_add['ThumbWidth']          = $val['ThumbWidth']??0;
                     $msg_content_add['ThumbHeight']         = $val['ThumbHeight']??0;
-                    $msg_content_add['ThumbFormat']         = $val['ThumbFormat'] ?? 'mp4';
+                    $msg_content_add['ThumbFormat']         = $val['ThumbFormat'] ?? 'JPG';
                     $msg_content_add['ThumbDownloadFlag']         = 2;
                     break;
 
