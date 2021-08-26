@@ -313,7 +313,7 @@ class AliUploadServers
         if(in_array($type,[1,2,3])){
             $data = [
                 'type' => $type,
-                'url' => $new_url,
+                'url' => str_replace("https://","http://",$new_url),
                 'media_id'=>$videoid,
                 'created_at' => $now_date
             ];
