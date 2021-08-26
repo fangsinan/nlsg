@@ -1131,7 +1131,7 @@ class ImDocServers
                         ];
                         $post_data_array[] = $temp_post_data;
                         break;
-                    case 21://音频
+                    case 211://音频
                         $temp_post_data['MsgBody'][] = [
                             "MsgType" => "TIMSoundElem",//音频
                             "MsgContent" => [
@@ -1243,6 +1243,7 @@ class ImDocServers
                             $post_data_array[] = $temp_post_data;
                         }
                         break;
+                    case 21:
                     case 24:
                         //文件
                         $temp_post_data['MsgBody'][] = [
