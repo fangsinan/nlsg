@@ -138,6 +138,7 @@ class ImDocServers
                     $format = $media_info->format ?: 'mp4';
                     $file_size = $media_info->size ?: 1119442;
                     $second = $media_info->second ?: 60;
+                    $second = intval(round($second));
 
                     if ($params['type_info'] != 23) {
                         if (empty($content)) {
