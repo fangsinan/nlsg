@@ -241,7 +241,7 @@ class ImMsg extends Base
                     $msg_content_add['VideoUrl']            = $val['VideoUrl'];
                     $msg_content_add['VideoSize']           = $val['VideoSize']??10;
                     $msg_content_add['VideoSecond']         = round($val['VideoSecond'])??0;
-                    $msg_content_add['VideoFormat']         = $val['VideoFormat']??0;
+                    $msg_content_add['VideoFormat']         = $val['VideoFormat']??'mp4';
                     $msg_content_add['VideoDownloadFlag']   = 2;
                     $msg_content_add['VideoUUID']           = $val['video_uuid']??'';
                     $msg_content_add['ThumbUUID']           = $val['UUID']??'';
