@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin\V4;
 use App\Http\Controllers\ControllerBackend;
 use App\Servers\ImGroupServers;
 use Illuminate\Http\Request;
+use Libraries\ImClient;
 
 class ImGroupController extends ControllerBackend
 {
@@ -241,4 +242,30 @@ class ImGroupController extends ControllerBackend
 
 
 
+    /**
+     * @api {post} api/admin_v4/im_group/get_group_member_info 管理后台-获取群成员
+     * @apiName admin get_group_member_info
+     * @apiVersion 1.0.0
+     * @apiGroup im_group
+     *
+     * @apiParam {string} GroupId  GroupId
+     * @apiParam {string} Limit  最多获取多少个成员的资料  //默认100
+     * @apiParam {string} Offset  从第多少个成员开始获取资料
+
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function getGroupMemberInfo(Request $request){
+        $servers = new ImGroupServers();
+        $this->user['user_id'] = 211172;
+        $data = $servers->getGroupMemberInfo($request->input(), $this->user['user_id']);
+        return $this->getRes($data);
+    }
 }

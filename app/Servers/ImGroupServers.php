@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\ImGroup;
 use App\Models\ImGroupTop;
 use App\Models\ImGroupUser;
+use App\Models\ImUser;
 use Illuminate\Support\Facades\DB;
 use Libraries\ImClient;
 
@@ -351,5 +352,43 @@ class ImGroupServers
 
         return $res;
     }
+
+
+
+    function getGroupMemberInfo($params,$user_id) {
+
+
+        if( empty($params['GroupId']) ){
+            return ['code' => false, 'msg' => 'GroupId错误'];
+        }
+        $group = ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])->first();
+        if(empty($group)){
+            return ['code' => false, 'msg' => 'Group error'];
+        }
+
+        $post_data= [
+            'GroupId'   => (string)$params['GroupId'],
+            'Limit'     => $params['Limit'] ??100,
+            'Offset'    => $params['Offset'] ??0,
+        ];
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/get_group_member_info");
+        $res = ImClient::curlPost($url, json_encode($post_data));
+        $res = json_decode($res, true);
+        $uids = array_column($res['MemberList'], 'Member_Account');
+        $userProfileItem=ImUser::select("tag_im_to_account","tag_im_nick","tag_im_image")
+            //->whereIn('tag_im_to_account',array_slice($uids, 0,20))->get()->toArray();
+            ->whereIn('tag_im_to_account',$uids)->get()->toArray();
+        $new_user = [];
+        foreach ($userProfileItem as $item) {
+            $new_user[$item['tag_im_to_account']] = $item;
+        }
+        foreach ($res['MemberList'] as $key=>&$val){
+            $val['tag_im_nick'] = $new_user[$val['Member_Account']]['tag_im_nick'] ?? '';
+            $val['tag_im_image'] = $new_user[$val['Member_Account']]['tag_im_image'] ?? '';
+        }
+
+        return $res;
+    }
+
 
 }
