@@ -264,7 +264,7 @@ class ImGroupController extends ControllerBackend
      */
     public function getGroupMemberInfo(Request $request){
         $servers = new ImGroupServers();
-        $this->user['user_id'] = 211172;
+        //$this->user['user_id'] = 211172;
         $data = $servers->getGroupMemberInfo($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
