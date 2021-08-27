@@ -212,6 +212,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::post('im_group/create_group', 'ImGroupController@createGroup');
         Route::post('im_group/destroy_group', 'ImGroupController@destroyGroup');
         Route::post('im_group/change_group_owner', 'ImGroupController@changeGroupOwner');
+        Route::post('im_group/get_group_member_info', 'ImGroupController@getGroupMemberInfo');
 
 
         //im用户
