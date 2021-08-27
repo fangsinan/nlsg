@@ -15,7 +15,7 @@ class ImDocSendJob extends Base
             ->select([
                 'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content',
                 'subtitle', 'file_url', 'status', 'second', 'format','file_size',
-                'img_size','img_width','img_height','img_format','file_md5','img_md5'
+                'img_size','img_width','img_height','img_format','file_md5','img_md5','media_id'
             ]);
     }
 

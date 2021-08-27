@@ -1146,6 +1146,14 @@ class ImDocServers
                         $post_data_array[] = $temp_post_data;
                         break;
                     case 22://视频
+                        $temp_media_id = $v->docInfo->media_id;
+                        $temp_meida_info = ImMedia::query()->where('media_id','=',$temp_media_id)->first();
+                        if (!empty($temp_meida_info->second)){
+                            $temp_video_second = intval(round($temp_meida_info->second));
+                        }else{
+                            $temp_video_second = $v->docInfo->second;
+                        }
+
                         $temp_post_data['MsgBody'][] = [
                             "MsgType" => "TIMVideoFileElem",//视频
                             "MsgContent" => [
@@ -1155,7 +1163,7 @@ class ImDocServers
                                 "VideoUUID" => $this->getMsgRandom(),
                                 "videouuid" => $this->getMsgRandom(),
                                 "VideoSize" => $v->docInfo->file_size,
-                                "VideoSecond" => $v->docInfo->second,
+                                "VideoSecond" => $temp_video_second,
                                 "VideoFormat" => $v->docInfo->format,
                                 "VideoDownloadFlag" => 2,
 //                                "ThumbUrl" => $v->docInfo->cover_img,
