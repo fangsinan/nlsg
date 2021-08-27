@@ -361,7 +361,7 @@ class ImGroupServers
         if( empty($params['GroupId']) ){
             return ['code' => false, 'msg' => 'GroupId错误'];
         }
-        $group = ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])->first();
+        $group = ImGroup::where(['group_id'=>$params['GroupId'],'status'=>1])->first();
         if(empty($group)){
             return ['code' => false, 'msg' => 'Group error'];
         }
