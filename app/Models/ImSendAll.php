@@ -28,6 +28,7 @@ class ImSendAll extends Base
 
         if($name_len > 0){
             $uids = array_slice($uids, 0,$name_len);
+            $group_id = array_slice($group_id, 0,$name_len);
         }
         //由于=腾讯的限制(100)   多个获取时 慢
         //$userProfileItem = ImMsgController::getImUser($uids);

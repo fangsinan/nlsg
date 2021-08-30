@@ -221,6 +221,7 @@ class ImMsgController extends Controller
      * @apiGroup im
      *
      * @apiParam {int} page page
+     * @apiParam {int} list_id list_id  如果有该参数  获取全部名字  没有只获取10个名称
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
