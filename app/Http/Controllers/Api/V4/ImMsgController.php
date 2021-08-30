@@ -169,34 +169,46 @@ class ImMsgController extends Controller
             //用户体 群发
             if(!empty($to_accounts)){
                 //本接口不会触发回调  所以需要储存消息体
-                $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
-                //去重后 拆分二维数组 每个500数据
-                $to_accounts_arr = array_chunk(array_unique($to_accounts), 500);
+//                $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/batchsendmsg");
+//                //去重后 拆分二维数组 每个500数据
+//                $to_accounts_arr = array_chunk(array_unique($to_accounts), 500);
+//                //该接口最大支持500人
+//                foreach ($to_accounts_arr as $to_accounts) {
+//                    $post_data['To_Account'] = $to_accounts;
+//                    $post_data['MsgSeq']    = rand(10000000,99999999);
+//                    $post_data['MsgRandom'] = rand(10000000,99999999);
+//                    $res = ImClient::curlPost($url,json_encode($post_data));
+//                    $res = json_decode($res,true);
+//                    if($res['ActionStatus'] == "OK"){
+//                        $post_data['CallbackCommand']   = 'C2C.CallbackAfterSendMsg';
+//                        $post_data['SendMsgResult']     = 0;
+//                        $post_data['UnreadMsgNum']      = 0;
+//                        //$post_data['type']              = 3; //群发
+//                        $post_data['MsgTime']           = time();
+//                        $post_data['MsgKey']            = $res['MsgKey'];
+//                        $post_data['OptPlatform']       = 'RESTAPI' ;
+//                        $to_accounts = array_unique($to_accounts);
+//                        foreach ($to_accounts as $key=>$val){
+//                            $post_data['To_Account'] = $val;
+//                            self::sendMsg($post_data);
+//                        }
+//
+//                    }
+//                }
+
+                $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/sendmsg");
+                // 接口支持200次/秒
+                $to_accounts_arr = array_chunk(array_unique($to_accounts), 200);
                 //该接口最大支持500人
                 foreach ($to_accounts_arr as $to_accounts) {
-                    $post_data['To_Account'] = $to_accounts;
-                    $post_data['MsgSeq']    = rand(10000000,99999999);
-                    $post_data['MsgRandom'] = rand(10000000,99999999);
-                    $res = ImClient::curlPost($url,json_encode($post_data));
-                    $res = json_decode($res,true);
-                    if($res['ActionStatus'] == "OK"){
-                        $post_data['CallbackCommand']   = 'C2C.CallbackAfterSendMsg';
-                        $post_data['SendMsgResult']     = 0;
-                        $post_data['UnreadMsgNum']      = 0;
-                        //$post_data['type']              = 3; //群发
-                        $post_data['MsgTime']           = time();
-                        $post_data['MsgKey']            = $res['MsgKey'];
-                        $post_data['OptPlatform']       = 'RESTAPI' ;
-                        $to_accounts = array_unique($to_accounts);
-                        foreach ($to_accounts as $key=>$val){
-                            $post_data['To_Account'] = $val;
-                            self::sendMsg($post_data);
-                        }
-
+                    foreach ($to_accounts as $to_account_val){
+                        $post_data['To_Account'] = $to_account_val;
+                        $post_data['MsgSeq']    = rand(10000000,99999999);
+                        $post_data['MsgRandom'] = rand(10000000,99999999);
+                        $res = ImClient::curlPost($url,json_encode($post_data));
                     }
+                    sleep(1);
                 }
-
-
             }
 
             //群组体 群发
