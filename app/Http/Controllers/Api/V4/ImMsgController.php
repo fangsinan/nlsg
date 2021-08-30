@@ -74,6 +74,7 @@ class ImMsgController extends Controller
 //        if ( count($to_accounts) > 500 ||  count($to_group) > 100){
 //            return $this->error('0','群发最多支持500人');
 //        }
+        $to_accounts = array_values(array_unique($to_accounts));
         //发送收藏的消息
         if( !empty($collection_id) ){
             $msg_ids = ImCollection::whereIn('id',$collection_id)->pluck('msg_id')->toArray();
