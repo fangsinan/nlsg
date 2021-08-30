@@ -83,58 +83,24 @@ class ImMsgServers
         if(empty($uid)){
             return [];
         }
+        if( !empty($params['list_id']) ){
+            $where = ['id'=>$params['list_id']];
+            $name_len = 0;
+        }else{
+            $name_len = 10;
+            $where = ['from_account' => $uid,'status'=>0];
+        }
         //群发列表
-        //$list = ImSendAll::where(['from_account' => $uid,'status'=>0])->get()->toArray();
-        $lists = ImSendAll::where(['from_account' => $uid,'status'=>0])->orderBy('created_at',"desc")->paginate(20)->toArray();
+        $lists = ImSendAll::where($where)->orderBy('created_at',"desc")->paginate(20)->toArray();
         if(empty($lists['data'])){
             return [];
         }
-        $list = $lists['data'];
-        $uids = [];
-        $group_id = [];
-        foreach ($list as $key=>$value){
-            if(!empty($value['to_account'])){
-                $uids = array_merge($uids, explode(',',$value['to_account']));
-            }
-            if(!empty($value['to_group'])){
-                $group_id = array_merge($group_id, explode(',',$value['to_group']));
-            }
-        }
 
-        //由于=腾讯的限制(100)   多个获取时 慢
-        //$userProfileItem = ImMsgController::getImUser($uids);
-        $userProfileItem=ImUser::select("tag_im_to_account as Tag_Profile_IM_UID","tag_im_nick as Tag_Profile_IM_Nick")
-            //->whereIn('tag_im_to_account',array_slice($uids, 0,20))->get()->toArray();
-            ->whereIn('tag_im_to_account',$uids)->get()->toArray();
+        $obj = new ImSendAll();
+        $list = $obj->getList($lists['data'],$name_len);
 
-        $groups = ImGroup::select('name','group_id')->whereIn('group_id',$group_id)->get()->toArray();
-
-        foreach ($list as $key=>$value){
-            $list[$key]['to_account_name'] = [];
-            $list[$key]['to_group_name'] = [];
-            //群发好友
-            if( !empty($value['to_account']) ){
-                $to_account = (string)','.$value['to_account'].',';  //防止出现有相同数字的不同位数的id
-                foreach ($userProfileItem as $user_v) {
-                    if( strpos($to_account,(string)','.$user_v['Tag_Profile_IM_UID'].',') !== false ){
-                        $list[$key]['to_account_name'][] = $user_v['Tag_Profile_IM_Nick'];
-                    }
-                }
-            }
-            //群发群组
-            if( !empty($value['to_group']) ){
-                foreach ($groups as $group_v) {
-                    if(strpos($value['to_group'],$group_v['group_id']) !== false ){
-                        $list[$key]['to_group_name'][] = $group_v['name'];
-                    }
-                }
-            }
-
-
-        }
         return $list;
     }
-
 
     //清空群发记录 delSendAllList
     public function delSendAllList($params,$uid){
