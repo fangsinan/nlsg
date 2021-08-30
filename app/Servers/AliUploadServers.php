@@ -24,7 +24,8 @@ class AliUploadServers
     const TemplateGroupId='296dad2655536aac8ef30199d528579b'; //视频转码ID
     const WorkflowId='04d6477bd874095952201ff69be42f4e'; //视频工作流ID
 
-    const EndPoint='oss-cn-beijing.aliyuncs.com';//阿里oss上传
+//    const EndPoint='oss-cn-beijing.aliyuncs.com';//阿里oss上传
+    const EndPoint='oss-cn-beijing-internal.aliyuncs.com';//阿里oss上传 内网
 
     const TypeArr=[
         '1'=>2870, //视频
