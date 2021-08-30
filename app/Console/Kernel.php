@@ -61,7 +61,7 @@ class Kernel extends ConsoleKernel
             //IM 群发后入库
             $msg = new ImMsgController();
             for ($i=1;$i<=30;$i++){
-                $msg->RedisSendAllMsgCallback();
+                //$msg->RedisSendAllMsgCallback();
                 sleep(2);
             }
 
