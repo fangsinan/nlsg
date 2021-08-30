@@ -133,6 +133,8 @@ class ImMsgController extends Controller
         $redis_key = 'send_all_msg_callback';
         $redis_data=Redis::lrange($redis_key,0,-1);// 获取所有数据
 
+
+        Redis::ltrim($redis_key,count($redis_data),-1);//删除已取出数据
         foreach ($redis_data as $data) {
             $data = json_decode($data, true);
             $from_account = $data['from_account'];
@@ -222,7 +224,7 @@ class ImMsgController extends Controller
             }
         }
 
-        Redis::ltrim($redis_key,count($redis_data),-1);//删除已取出数据
+
     }
 
 
