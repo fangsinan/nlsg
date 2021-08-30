@@ -198,16 +198,16 @@ class ImMsgController extends Controller
 
                 $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/sendmsg");
                 // 接口支持200次/秒
-                $to_accounts_arr = array_chunk(array_unique($to_accounts), 200);
+                $to_accounts_arr = array_values(array_unique($to_accounts));
                 //该接口最大支持500人
-                foreach ($to_accounts_arr as $to_accounts) {
-                    foreach ($to_accounts as $to_account_val){
-                        $post_data['To_Account'] = $to_account_val;
-                        $post_data['MsgSeq']    = rand(10000000,99999999);
-                        $post_data['MsgRandom'] = rand(10000000,99999999);
-                        $res = ImClient::curlPost($url,json_encode($post_data));
+                foreach ($to_accounts_arr as $key=>$to_accounts) {
+                    if( $key % 200 == 0 ){
+                        sleep(1);
                     }
-                    sleep(1);
+                    $post_data['To_Account'] = $to_accounts;
+                    $post_data['MsgSeq']    = rand(10000000,99999999);
+                    $post_data['MsgRandom'] = rand(10000000,99999999);
+                    $res = ImClient::curlPost($url,json_encode($post_data));
                 }
             }
 
