@@ -16,7 +16,9 @@ use App\Models\VipUser;
 use App\Servers\ErpServers;
 use App\Servers\ImDocServers;
 use App\Servers\removeDataServers;
+use App\Servers\VipServers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MallController extends Controller
 {
@@ -219,9 +221,29 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
-            $s = new ImDocServers();
-            $r = $s->sendGroupDocMsgJob(505);
-            dd($r);
+            if(0){
+                $list = DB::table('wwtest')->get()->toArray();
+                $vs = new VipServers();
+                $res = [];
+                foreach ($list as $v){
+                    $temp = [];
+                    $temp['parent'] = $v->twitter;
+                    $temp['phone'] = $v->phone;
+                    $temp['send_money'] = 0;
+                    $temp_res = $vs->createVip_1($temp,168934);
+                    $res[] = $temp_res;
+                    if ($temp_res['code']){
+                        DB::table('wwtest')->where('id','=',$v->id)->delete();
+                    }
+                }
+                dd([$res,$list]);
+            }
+
+            dd(__LINE__);
+
+//            $s = new ImDocServers();
+//            $r = $s->sendGroupDocMsgJob(505);
+//            dd($r);
 //            $servers = new removeDataServers();
 //            $servers->worksListOfSub();
 //            $s = new ErpServers();
