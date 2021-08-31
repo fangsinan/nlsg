@@ -6,6 +6,7 @@ namespace App\Servers;
 
 use App\Models\CacheTools;
 use App\Models\ConfigModel;
+use App\Models\ImBeatWord;
 use App\Models\ImDoc;
 use App\Models\ImDocSendJob;
 use App\Models\ImDocSendJobInfo;
@@ -1147,10 +1148,10 @@ class ImDocServers
                         break;
                     case 22://视频
                         $temp_media_id = $v->docInfo->media_id;
-                        $temp_meida_info = ImMedia::query()->where('media_id','=',$temp_media_id)->first();
-                        if (!empty($temp_meida_info->second)){
+                        $temp_meida_info = ImMedia::query()->where('media_id', '=', $temp_media_id)->first();
+                        if (!empty($temp_meida_info->second)) {
                             $temp_video_second = intval(round($temp_meida_info->second));
-                        }else{
+                        } else {
                             $temp_video_second = $v->docInfo->second;
                         }
 
@@ -1332,6 +1333,8 @@ class ImDocServers
         $id_res_data['res'] = true;
         $id_res_data['msg'] = 'ok';
         $id_res_data['num'] = 0;
+        $beat_word = [];
+
         foreach ($res_list as $rlv) {
             $temp_res_list_data = [];
             $temp_res_list_data['job_id'] = $rlv['id'];
@@ -1341,12 +1344,24 @@ class ImDocServers
                 $id_res_data['msg'] = $rlv['ErrorInfo'];
                 $id_res_data['num'] = $rlv['ErrorCode'];
             }
+            if ($rlv['ErrorCode'] == 80001) {
+                $str_1 = strpos($rlv['ErrorInfo'], 'beat word:');
+                $str_2 = strpos($rlv['ErrorInfo'], '|requestid');
+                $str = substr($rlv['ErrorInfo'], $str_1 + 10, $str_2 - $str_1 - 10);
+                $beat_word[] = trim($str);
+            }
             $temp_res_list_data['record'] = $rlv['ActionStatus'] . ':' . $rlv['ErrorCode'] . ':' . $rlv['ErrorInfo'];
             $res_list_data[] = $temp_res_list_data;
         }
 
         $logModel = new ImDocSendJobLog();
         $logModel->insert($res_list_data);
+
+        if (!empty($beat_word)){
+            foreach ($beat_word as $bwv){
+                ImBeatWord::updateOrCreate(array('beat_word' => $bwv), array('times' =>DB::raw('times+1')));
+            }
+        }
 
         if (empty($id)) {
             return true;
