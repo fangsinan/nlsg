@@ -472,10 +472,16 @@ class AliUploadController extends Controller
                     $data['file_name']=(empty($ruselt['data']['Mezzanine']['FileName']))?'':$ruselt['data']['Mezzanine']['FileName'];
 
                 }else{ //图片
+                    $url_height=$url_width=0;
+                    if(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']) || empty($ruselt['data']['ImageInfo']['Mezzanine']['Height'])){
+                        $UrlImage = getimagesize($data['url']);
+                        $url_width = $UrlImage[0];
+                        $url_height = $UrlImage[1];
+                    }
                     $data['file_name']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['OriginalFileName']))?'':$ruselt['data']['ImageInfo']['Mezzanine']['OriginalFileName'];
                     $data['size']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['FileSize']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['FileSize'];
-                    $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
-                    $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?0:$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
+                    $data['width']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Width']))?$url_width:$ruselt['data']['ImageInfo']['Mezzanine']['Width'];
+                    $data['height']=(empty($ruselt['data']['ImageInfo']['Mezzanine']['Height']))?$url_height:$ruselt['data']['ImageInfo']['Mezzanine']['Height'];
                     $data['is_finish']=1;
                 }
 

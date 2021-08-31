@@ -132,8 +132,9 @@ class ImMsgController extends Controller
     public function RedisSendAllMsgCallback(){
         $redis_key = 'send_all_msg_callback';
         $redis_data=Redis::lrange($redis_key,0,-1);// 获取所有数据
-
-
+        if(empty($redis_data)){
+            return ;
+        }
         Redis::ltrim($redis_key,count($redis_data),-1);//删除已取出数据
         foreach ($redis_data as $data) {
             $data = json_decode($data, true);
@@ -197,7 +198,7 @@ class ImMsgController extends Controller
 //
 //                    }
 //                }
-
+                //https://cloud.tencent.com/document/product/269/2282
                 $url = ImClient::get_im_url("https://console.tim.qq.com/v4/openim/sendmsg");
                 // 接口支持200次/秒
                 $to_accounts_arr = array_values(array_unique($to_accounts));
@@ -213,7 +214,7 @@ class ImMsgController extends Controller
                 }
             }
 
-            //群组体 群发
+            //群组体 群发 https://cloud.tencent.com/document/product/269/1629
             if(!empty($to_group)) {
                 $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
                 foreach ($to_group as $item) {
@@ -440,7 +441,7 @@ class ImMsgController extends Controller
                     if(!empty($v['MsgContent']['URL'])){
                         $msg_content_add['url'] = $v['MsgContent']['URL'];
                     }
-                    
+
                     //保留缩略图
                     $img_res = true;
                     if(!empty($v['MsgContent']['ImageInfoArray'])){
