@@ -213,7 +213,16 @@ class ImDocServers
                 if (empty($content)) {
                     return ['code' => false, 'msg' => '内容不能为空'];
                 }
+                $beat_word = ImBeatWord::pluck('beat_word')->toArray();
 
+                if (!empty($beat_word)){
+                    foreach ($beat_word as $bwv){
+                        $temp_pos = strpos($content,$bwv);
+                        if ($temp_pos){
+                            return ['code' => false, 'msg' => '敏感词:'.$bwv];
+                        }
+                    }
+                }
                 break;
         }
 
