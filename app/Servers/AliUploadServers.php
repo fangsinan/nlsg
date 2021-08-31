@@ -308,7 +308,8 @@ class AliUploadServers
             $new_url=$res['ImageURL'];
             $videoid=$res['ImageId']; //媒体id
             $file_name=$res['FileName']; //名称
-
+            $image_width = $ImgType[0];
+            $image_height = $ImgType[1];
         }
         if(in_array($type,[1,2,3])){
             $data = [
@@ -321,8 +322,8 @@ class AliUploadServers
                 $data['content_img_id']= $info['id'];
                 $data['file_name']=$file_name;
                 $data['size']=$info['size'];
-                $data['width']=$info['width'];
-                $data['height']=$info['height'];
+                $data['width']=$image_width;//$info['width'];
+                $data['height']=$image_height;//$info['height'];
                 $data['is_finish']=1;
             }else{
                 $data['content_id']= $info['id'];

@@ -542,6 +542,10 @@ class AliUploadController extends Controller
 
         try {
 
+            $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
+            $ImgType=getimagesize($url);
+            var_dump($ImgType);
+            return ;
             /*$map=[];
             for($n=1;$n<=100;$n++){
 
@@ -598,10 +602,10 @@ class AliUploadController extends Controller
 //            echo '媒体信息：'.PHP_EOL;
 //            var_dump($result);
             $result=$AliUploadServer->AlibabaCloudRpcRequest('GetMezzanineInfo',$query);
-//            echo '原始文件：'.PHP_EOL;
+            echo '原始文件：'.PHP_EOL;
             var_dump($result['data']);
             return ;
-            /*$url1='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
+            $url1='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/7bc3-233664/c429a6ec8b00ac994bff2579620799a6-342940?imageMogr2/';
             $url2='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/be3a-166788/46d7b74f9a396ce76539c1c8f8295b44.png?imageMogr2/';
             $url3= 'https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/a18b-318504/1a0aa9b22d14de0f63e16173a5ad955a.png';
             //抓取音视频和图片
@@ -609,7 +613,7 @@ class AliUploadController extends Controller
             $result = $AliUploadServer->UploadMediaByURL(3,$url1);
             $result = $AliUploadServer->UploadMediaByURL(3,$url2);
             $result = $AliUploadServer->UploadMediaByURL(3,$url3);
-            $result = $AliUploadServer->UploadMediaByURL(3,$url4);*/
+            $result = $AliUploadServer->UploadMediaByURL(3,$url4);
 
 
             $url='https://cos.ap-shanghai.myqcloud.com/240b-shanghai-030-shared-08-1256635546/751d-1400536432/eaf5-318699/a26bdb7e80107460cad35cad17c20f18.mp4';
