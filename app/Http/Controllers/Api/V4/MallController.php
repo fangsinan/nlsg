@@ -230,7 +230,7 @@ class MallController extends Controller
                     $temp['parent'] = $v->twitter;
                     $temp['phone'] = $v->phone;
                     $temp['send_money'] = 0;
-                    $temp_res = $vs->createVip_1($temp,168934);
+                    $temp_res = $vs->createVip_1($temp,1);
                     $res[] = $temp_res;
                     if ($temp_res['code']){
                         DB::table('wwtest')->where('id','=',$v->id)->delete();
