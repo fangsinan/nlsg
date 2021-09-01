@@ -13,9 +13,6 @@ use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
-use App\Servers\ErpServers;
-use App\Servers\ImDocServers;
-use App\Servers\removeDataServers;
 use App\Servers\VipServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -221,22 +218,22 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
 
-            if(0){
+            if (0) {
                 $list = DB::table('wwtest')->get()->toArray();
                 $vs = new VipServers();
                 $res = [];
-                foreach ($list as $v){
+                foreach ($list as $v) {
                     $temp = [];
                     $temp['parent'] = $v->twitter;
                     $temp['phone'] = $v->phone;
                     $temp['send_money'] = 0;
-                    $temp_res = $vs->createVip_1($temp,1);
+                    $temp_res = $vs->createVip_1($temp, 1);
                     $res[] = $temp_res;
-                    if ($temp_res['code']){
-                        DB::table('wwtest')->where('id','=',$v->id)->delete();
+                    if ($temp_res['code']) {
+                        DB::table('wwtest')->where('id', '=', $v->id)->delete();
                     }
                 }
-                dd([$res,$list]);
+                dd([$res, $list]);
             }
 
             dd(__LINE__);

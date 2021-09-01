@@ -351,7 +351,12 @@ class VipServers
         if (empty($son)) {
             return ['code' => false, 'msg' => '开通人不能为空'];
         }
-        $check_phone = User::where('phone', '=', $son)->select(['id'])->first();
+        $check_phone = $user = User::firstOrCreate([
+            'phone' => $son,
+        ], [
+            'nickname' => substr_replace($son, '****', 3, 4),
+        ]);
+
         if (empty($check_phone)) {
             return ['code' => false, 'msg' => $son . '没注册'];
         }
