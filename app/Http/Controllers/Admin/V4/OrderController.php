@@ -181,8 +181,8 @@ class OrderController extends ControllerBackend
                 });
             })
             ->when($title, function ($query) use ($title) {
-                $query->whereHas('works', function ($query) use ($title) {
-                    $query->where('title', 'like', '%' . $title . '%');
+                $query->whereHas('column', function ($query) use ($title) {
+                    $query->where('name', 'like', '%' . $title . '%');
                 });
             })
             ->when($ordernum, function ($query) use ($ordernum) {
