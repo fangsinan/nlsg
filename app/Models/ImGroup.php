@@ -95,4 +95,18 @@ class ImGroup extends Base
 
         return ;
     }
+
+
+    public function getForbidList($group_id){
+        if(empty($group_id)){
+            return ['ActionStatus'=>'error','ErrorCode'=>'error','ErrorInfo'=>''];
+        }
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/get_group_shutted_uin");
+        $post_data = [
+            'GroupId' => $group_id,
+        ];
+        $res = ImClient::curlPost($url,json_encode($post_data));
+        return json_decode($res,true);
+    }
+
 }

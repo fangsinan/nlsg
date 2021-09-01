@@ -217,7 +217,17 @@ class ImMsgController extends Controller
             //群组体 群发 https://cloud.tencent.com/document/product/269/1629
             if(!empty($to_group)) {
                 $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+                $ImGroup = new ImGroup();
                 foreach ($to_group as $item) {
+                    //校验改用户在该群中是否禁言
+                    $res = $ImGroup->getForbidList($item);
+                    if($res['ActionStatus'] =='OK'){
+                        $user_ids = array_column($res['ShuttedUinList'],'Member_Account');
+                        if(in_array($from_account,$user_ids)){
+                            continue;
+                        }
+                    }
+
                     $post_data['GroupId'] = $item;
                     $post_data['Random'] = rand(10000000,99999999);
                     ImClient::curlPost($url,json_encode($post_data));

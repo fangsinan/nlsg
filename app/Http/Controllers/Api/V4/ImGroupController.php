@@ -159,13 +159,8 @@ class ImGroupController extends Controller
         if( empty($params['group_id']) ){
             return $this->error('0','request error');
         }
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/get_group_shutted_uin");
-        $post_data = [
-            'GroupId' => $params['group_id'],
-        ];
-        $res = ImClient::curlPost($url,json_encode($post_data));
-        $res = json_decode($res,true);
-
+        $ImGroup = new ImGroup();
+        $res = $ImGroup->getForbidList($params['group_id']);
 
         $group_shut_up_time = ImGroup::where([
             'group_id' =>$params['group_id'],
