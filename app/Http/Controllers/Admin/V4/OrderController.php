@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\Column;
-use App\Models\Order;
-use App\Models\Works;
-use App\Models\Live;
 use App\Models\Comment;
+use App\Models\Live;
+use App\Models\Order;
 use App\Models\Wiki;
+use App\Models\Works;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -65,37 +65,37 @@ class OrderController extends ControllerBackend
                 'user:id,nickname',
                 'works:id,title'
             ])
-            ->when(! is_null($status), function ($query) use ($status) {
+            ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when(! is_null($pay_type), function ($query) use ($pay_type) {
+            ->when(!is_null($pay_type), function ($query) use ($pay_type) {
                 $query->where('pay_type', $pay_type);
             })
-            ->when(! is_null($os_type), function ($query) use ($os_type) {
+            ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
                 });
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%'.$phone.'%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
                 $query->whereHas('user', function ($query) use ($level) {
-                    $query->where('level', 'like', '%'.$level.'%');
+                    $query->where('level', 'like', '%' . $level . '%');
                 });
             })
             ->when($title, function ($query) use ($title) {
                 $query->whereHas('works', function ($query) use ($title) {
-                    $query->where('title', 'like', '%'.$title.'%');
+                    $query->where('title', 'like', '%' . $title . '%');
                 });
             })
             ->when($ordernum, function ($query) use ($ordernum) {
-                $query->where('ordernum', 'like', '%'.$ordernum.'%');
+                $query->where('ordernum', 'like', '%' . $ordernum . '%');
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
@@ -121,11 +121,106 @@ class OrderController extends ControllerBackend
             ->where('status', 1)
             ->orderBy('total', 'desc')
             ->groupBy('relation_id')
+            ->limit(10)
             ->get();
 
         $data = [
             'lists' => $lists,
-            'rank'  => $rank
+            'rank' => $rank
+        ];
+        return success($data);
+
+    }
+
+
+    public function colList(Request $request)
+    {
+        $phone = $request->get('phone');
+        $nickname = $request->get('nickname');
+        $ordernum = $request->get('ordernum');
+        $title = $request->get('title');
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $status = $request->get('status');
+        $level = $request->get('level');
+        $pay_type = $request->get('pay_type');
+        $os_type = $request->get('os_type');
+        $sort = $request->get('sort');
+        $query = Order::with(
+            [
+                'user:id,nickname',
+                'column' => function ($q) {
+                    $q->select(['id', 'name as title', 'name']);
+                }
+            ])
+            ->whereHas('column',function($q){
+                $q->where('type','=',2);
+            })
+            ->when(!is_null($status), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when(!is_null($pay_type), function ($query) use ($pay_type) {
+                $query->where('pay_type', $pay_type);
+            })
+            ->when(!is_null($os_type), function ($query) use ($os_type) {
+                $query->where('os_type', $os_type);
+            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                });
+            })
+            ->when($phone, function ($query) use ($phone) {
+                $query->whereHas('user', function ($query) use ($phone) {
+                    $query->where('phone', 'like', '%' . $phone . '%');
+                });
+            })
+            ->when($level, function ($query) use ($level) {
+                $query->whereHas('user', function ($query) use ($level) {
+                    $query->where('level', 'like', '%' . $level . '%');
+                });
+            })
+            ->when($title, function ($query) use ($title) {
+                $query->whereHas('works', function ($query) use ($title) {
+                    $query->where('title', 'like', '%' . $title . '%');
+                });
+            })
+            ->when($ordernum, function ($query) use ($ordernum) {
+                $query->where('ordernum', 'like', '%' . $ordernum . '%');
+            })
+            ->when($start && $end, function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
+                ]);
+            });
+
+        $direction = $sort == 'asc' ? 'asc' : 'desc';
+        $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
+            'created_at', 'status')
+            ->where('type', 15)
+            ->orderBy('id', $direction)
+            ->paginate(10)
+            ->toArray();
+
+        $rank = Order::with(['column' => function ($q) {
+            $q->select(['id', 'name as title', 'name']);
+        }])->whereHas('column',function($q){
+            $q->where('type','=',2);
+        })->select([
+            DB::raw('count(*) as total'),
+            'user_id',
+            'relation_id'
+        ])->where('type', 15)
+            ->where('status', 1)
+            ->orderBy('total', 'desc')
+            ->groupBy('relation_id')
+            ->limit(10)
+            ->get();
+
+        $data = [
+            'lists' => $lists,
+            'rank' => $rank
         ];
         return success($data);
 
@@ -177,9 +272,9 @@ class OrderController extends ControllerBackend
             ->groupBy('type')
             ->first();
         $data = [
-            'total_num'    => $list['total'] ?? 0,
-            'total_price'  => $list['price'] ?? 0,
-            'today_num'    => $today['total'] ?? 0,
+            'total_num' => $list['total'] ?? 0,
+            'total_price' => $list['price'] ?? 0,
+            'today_num' => $today['total'] ?? 0,
             'totday_price' => $today['price'] ?? 0
         ];
         return success($data);
@@ -223,7 +318,7 @@ class OrderController extends ControllerBackend
                 'works:id,title,user_id,cover_img,price',
                 'works.user:id,nickname'
             ])
-            ->select('id', 'user_id', 'relation_id','vip_order_type', 'ordernum', 'os_type', 'pay_type', 'pay_price', 'created_at')
+            ->select('id', 'user_id', 'relation_id', 'vip_order_type', 'ordernum', 'os_type', 'pay_type', 'pay_price', 'created_at')
             ->where('id', $id)
             ->first();
         return success($list);
@@ -270,7 +365,7 @@ class OrderController extends ControllerBackend
         $start = $request->get('start');
         $end = $request->get('end');
         $status = $request->get('status');
-        $pay_type    = $request->get('pay_type');
+        $pay_type = $request->get('pay_type');
         $vip_order_type = $request->get('vip_order_type');
         $os_type = $request->get('os_type');
         $sort = $request->get('sort');
@@ -280,40 +375,40 @@ class OrderController extends ControllerBackend
                 'user:id,nickname,level',
                 'works:id,title'
             ])
-            ->when(! is_null($status), function ($query) use ($status) {
+            ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when(! is_null($pay_type), function ($query) use ($pay_type) {
+            ->when(!is_null($pay_type), function ($query) use ($pay_type) {
                 $query->where('pay_type', $pay_type);
             })
-            ->when(! is_null($vip_order_type), function ($query) use ($vip_order_type) {
+            ->when(!is_null($vip_order_type), function ($query) use ($vip_order_type) {
                 $query->where('vip_order_type', $vip_order_type);
             })
-            ->when(! is_null($os_type), function ($query) use ($os_type) {
+            ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
                 });
             })
-            ->when(! is_null($level), function ($query) use ($level) {
+            ->when(!is_null($level), function ($query) use ($level) {
                 $query->whereHas('user', function ($query) use ($level) {
                     $query->where('level', $level);
                 });
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%'.$phone.'%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($title, function ($query) use ($title) {
                 $query->whereHas('works', function ($query) use ($title) {
-                    $query->where('title', 'like', '%'.$title.'%');
+                    $query->where('title', 'like', '%' . $title . '%');
                 });
             })
             ->when($ordernum, function ($query) use ($ordernum) {
-                $query->where('ordernum', 'like', '%'.$ordernum.'%');
+                $query->where('ordernum', 'like', '%' . $ordernum . '%');
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
@@ -332,12 +427,12 @@ class OrderController extends ControllerBackend
             ->toArray();
 
         $item = [
-            'yellow'       => 0,
+            'yellow' => 0,
             'yellow_today' => 0,
-            'black'        => 0,
-            'black_today'  => 0,
-            'money'        => 0,
-            'money_today'  => 0,
+            'black' => 0,
+            'black_today' => 0,
+            'money' => 0,
+            'money_today' => 0,
         ];
         $orders = Order::getOrderPrice(16);
         if ($orders['relation_id'] == 1) {
@@ -356,7 +451,7 @@ class OrderController extends ControllerBackend
         $item['money_today'] = $today['price'];
         $data = [
             'lists' => $lists,
-            'rank'  => $item
+            'rank' => $item
         ];
         return success($data);
     }
@@ -410,37 +505,37 @@ class OrderController extends ControllerBackend
                 'user:id,nickname',
                 'column:id,name'
             ])
-            ->when(! is_null($status), function ($query) use ($status) {
+            ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when(! is_null($pay_type), function ($query) use ($pay_type) {
+            ->when(!is_null($pay_type), function ($query) use ($pay_type) {
                 $query->where('pay_type', $pay_type);
             })
-            ->when(! is_null($os_type), function ($query) use ($os_type) {
+            ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
                 });
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%'.$phone.'%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
                 $query->whereHas('user', function ($query) use ($level) {
-                    $query->where('level', 'like', '%'.$level.'%');
+                    $query->where('level', 'like', '%' . $level . '%');
                 });
             })
             ->when($title, function ($query) use ($title) {
                 $query->whereHas('works', function ($query) use ($title) {
-                    $query->where('title', 'like', '%'.$title.'%');
+                    $query->where('title', 'like', '%' . $title . '%');
                 });
             })
             ->when($ordernum, function ($query) use ($ordernum) {
-                $query->where('ordernum', 'like', '%'.$ordernum.'%');
+                $query->where('ordernum', 'like', '%' . $ordernum . '%');
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
@@ -471,7 +566,7 @@ class OrderController extends ControllerBackend
 
         $data = [
             'lists' => $lists,
-            'rank'  => $rank
+            'rank' => $rank
         ];
         return success($data);
     }
@@ -523,40 +618,40 @@ class OrderController extends ControllerBackend
         $os_type = $request->get('os_type');
         $sort = $request->get('sort');
 
-        $query = Order::when(! is_null($status), function ($query) use ($status) {
+        $query = Order::when(!is_null($status), function ($query) use ($status) {
             $query->where('status', $status);
         })
-            ->when(! is_null($pay_type), function ($query) use ($pay_type) {
+            ->when(!is_null($pay_type), function ($query) use ($pay_type) {
                 $query->where('pay_type', $pay_type);
             })
-            ->when(! is_null($os_type), function ($query) use ($os_type) {
+            ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-            ->when(! is_null($reward_type), function ($query) use ($reward_type) {
+            ->when(!is_null($reward_type), function ($query) use ($reward_type) {
                 $query->where('reward_type', $reward_type);
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
                 });
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%'.$phone.'%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
                 $query->whereHas('user', function ($query) use ($level) {
-                    $query->where('level', 'like', '%'.$level.'%');
+                    $query->where('level', 'like', '%' . $level . '%');
                 });
             })
             ->when($title, function ($query) use ($title) {
                 $query->whereHas('works', function ($query) use ($title) {
-                    $query->where('title', 'like', '%'.$title.'%');
+                    $query->where('title', 'like', '%' . $title . '%');
                 });
             })
             ->when($ordernum, function ($query) use ($ordernum) {
-                $query->where('ordernum', 'like', '%'.$ordernum.'%');
+                $query->where('ordernum', 'like', '%' . $ordernum . '%');
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
@@ -645,37 +740,37 @@ class OrderController extends ControllerBackend
             [
                 'user:id,nickname'
             ])
-            ->when(! is_null($status), function ($query) use ($status) {
+            ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when(! is_null($pay_type), function ($query) use ($pay_type) {
+            ->when(!is_null($pay_type), function ($query) use ($pay_type) {
                 $query->where('pay_type', $pay_type);
             })
-            ->when(! is_null($os_type), function ($query) use ($os_type) {
+            ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
             ->when($nickname, function ($query) use ($nickname) {
                 $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
                 });
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%'.$phone.'%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
                 $query->whereHas('user', function ($query) use ($level) {
-                    $query->where('level', 'like', '%'.$level.'%');
+                    $query->where('level', 'like', '%' . $level . '%');
                 });
             })
             ->when($title, function ($query) use ($title) {
                 $query->whereHas('works', function ($query) use ($title) {
-                    $query->where('title', 'like', '%'.$title.'%');
+                    $query->where('title', 'like', '%' . $title . '%');
                 });
             })
             ->when($ordernum, function ($query) use ($ordernum) {
-                $query->where('ordernum', 'like', '%'.$ordernum.'%');
+                $query->where('ordernum', 'like', '%' . $ordernum . '%');
             })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
