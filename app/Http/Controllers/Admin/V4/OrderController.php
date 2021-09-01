@@ -312,16 +312,36 @@ class OrderController extends ControllerBackend
     public function getOrderDetail(Request $request)
     {
         $id = $request->get('id');
-        $list = Order::with(
-            [
-                'user:id,nickname,phone',
-                'works:id,title,user_id,cover_img,price',
-                'works.user:id,nickname'
-            ])
-            ->select('id', 'user_id', 'relation_id', 'vip_order_type', 'ordernum', 'os_type', 'pay_type', 'pay_price', 'created_at')
-            ->where('id', $id)
-            ->first();
-        return success($list);
+        $check = Order::where('id','=',$id)->first();
+        if (empty($check)){
+            return success([]);
+        }else{
+            if ($check->type == 15){
+                $list = Order::with(
+                    [
+                        'user:id,nickname,phone',
+                        'column:id,name as title,user_id,cover_pic as cover_img,price',
+                        'column.user:id,nickname'
+                    ])
+                    ->select('id', 'user_id', 'relation_id', 'vip_order_type', 'ordernum', 'os_type', 'pay_type', 'pay_price', 'created_at')
+                    ->where('id', $id)
+                    ->first();
+                $list->works = $list->column;
+            }else{
+                $list = Order::with(
+                    [
+                        'user:id,nickname,phone',
+                        'works:id,title,user_id,cover_img,price',
+                        'works.user:id,nickname'
+                    ])
+                    ->select('id', 'user_id', 'relation_id', 'vip_order_type', 'ordernum', 'os_type', 'pay_type', 'pay_price', 'created_at')
+                    ->where('id', $id)
+                    ->first();
+            }
+            return success($list);
+        }
+
+
     }
 
     /**
