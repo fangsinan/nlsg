@@ -506,13 +506,13 @@ class AliUploadController extends Controller
                 $data['file_name'] = $name;
                 $data['size'] = $size;
                 $rstId = DB::table(ImMedia::DB_TABLE)->insertGetId($data);
-                if ($rstId === false) {
+                if (!$rstId || $rstId===false) {
                     DB::rollBack();
                     return $this->error(0, '保存失败');
                 }
                 //初始化媒体id
                 $UpRst=DB::table(ImMedia::DB_TABLE)->where('id', $rstId)->update(['media_id' => $rstId,'updated_at' => $now_date]);
-                if($UpRst===false){
+                if(!$UpRst || $UpRst===false){
                     DB::rollBack();
                     return $this->error(0, '保存失败');
                 }
