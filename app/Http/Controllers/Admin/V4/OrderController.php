@@ -150,7 +150,7 @@ class OrderController extends ControllerBackend
             [
                 'user:id,nickname',
                 'column' => function ($q) {
-                    $q->select(['id', 'name as title', 'name']);
+                    $q->select(['id', 'name as title', 'name','cover_pic as cover_img']);
                 }
             ])
             ->whereHas('column',function($q){
@@ -204,7 +204,7 @@ class OrderController extends ControllerBackend
             ->toArray();
 
         $rank = Order::with(['column' => function ($q) {
-            $q->select(['id', 'name as title', 'name']);
+            $q->select(['id', 'name as title', 'name','cover_pic as cover_img']);
         }])->whereHas('column',function($q){
             $q->where('type','=',2);
         })->select([
