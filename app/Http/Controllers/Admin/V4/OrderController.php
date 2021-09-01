@@ -121,6 +121,7 @@ class OrderController extends ControllerBackend
             ->where('status', 1)
             ->orderBy('total', 'desc')
             ->groupBy('relation_id')
+            ->limit(10)
             ->get();
 
         $data = [
