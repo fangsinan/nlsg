@@ -59,7 +59,7 @@ class ImMsg extends Base
                 for ($i=0;$i<4;$i++){
 //                    $media_data = ImMedia::where(['media_id'=>$val['videoId'],'is_finish'=>1])->first();
                     $media_data = ImMedia::where(['media_id'=>$val['videoId'],])->first();
-                    if( !empty($media_data) && !empty($media_data['second'])){
+                    if( !empty($media_data) && !empty($media_data['second']) && !empty($media_data['thumb_url']) ){
                         continue;
                     }
                     sleep(2);
@@ -70,7 +70,7 @@ class ImMsg extends Base
                 }
                 //查询媒体表详情
 
-                if(empty($media_data['thumb_url'])){
+                if(empty($media_data['thumb_url']) || empty($media_data['thumb_size'])){
                     //默认封面
                     $media_data['thumb_url'] = 'https://image.nlsgapp.com/nlsg/works/20210729141614776327.png';
                     $media_data['thumb_size'] = 61440;
