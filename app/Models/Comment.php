@@ -192,6 +192,9 @@ class Comment extends Base
                     $lists['data'][$k]['chapter'] = WorksInfo::where(['id'=>$v['info_id']])->value('title');
                 } elseif ($v['type'] == 5) {
                     $lists['data'][$k]['title'] = Wiki::where(['id'=> $v['relation_id']])->value('name');
+                } elseif ($v['type'] == 6) {
+                    $lists['data'][$k]['title'] = Column::where(['id'=> $v['relation_id'], 'type' => 3
+                    ])->value('name');
                 }
             }
         }
