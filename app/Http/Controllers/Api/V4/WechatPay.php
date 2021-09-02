@@ -1241,7 +1241,7 @@ class WechatPay extends Controller
         }
     }
     public static function joinImGroup($relation_id,$uid){
-        $groups = ImGroup::where(['status'=>1,'works_id'=>$relation_id])
+        $groups = ImGroup::where(['status'=>1,'column_id'=>$relation_id])
                     ->where('member_num','<',2000)  //群满员两千人
                     ->first();
         if(empty($groups)){
