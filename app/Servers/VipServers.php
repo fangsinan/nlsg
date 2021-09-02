@@ -322,7 +322,6 @@ class VipServers
         $inviter_username = '';
         $source = 0;
         $source_vip_id = 0;
-
         $check_parent = [];
         if (!empty($parent)) {
             $check_parent = VipUser::where('username', '=', $parent)
