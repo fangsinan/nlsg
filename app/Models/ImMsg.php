@@ -59,7 +59,7 @@ class ImMsg extends Base
                 for ($i=0;$i<4;$i++){
 //                    $media_data = ImMedia::where(['media_id'=>$val['videoId'],'is_finish'=>1])->first();
                     $media_data = ImMedia::where(['media_id'=>$val['videoId'],])->first();
-                    if(!empty($media_data)){
+                    if( !empty($media_data) && !empty($media_data['second'])){
                         continue;
                     }
                     sleep(2);
