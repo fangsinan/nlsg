@@ -370,7 +370,6 @@ class AliUploadServers
             DB::commit();
             unlink($filePath);
             return ['status' => 1, 'data' => [], 'msg' => '抓取成功'];
-
         }
         if($type==4) {//拉取文件上传oss
 
