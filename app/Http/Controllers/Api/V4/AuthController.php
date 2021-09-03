@@ -70,13 +70,26 @@ class AuthController extends Controller
 //        $dont_check_phone = array_merge($dont_check_phone,$dont_check_phone_2);
 
         $check_easy_code = User::query()->where('phone','=',$phone)
-            ->where('is_code_login','=',1)
+            ->where('is_code_login','>',0)
+            ->select(['id','phone','is_code_login'])
             ->first();
 
 //        if (in_array($phone, $dont_check_phone)) {
         if ($check_easy_code) {
-            if (intval($code) !== 6666) {
-                return error(400, '验证码错误', $sclass);
+            switch (intval($check_easy_code->is_code_login)){
+                case 1:
+                    if (intval($code) !== 6666) {
+                        return error(400, '验证码错误', $sclass);
+                    }
+                    break;
+                case 2:
+                    $temp_code = substr($phone,-4);
+                    if (intval($code) !== intval($temp_code)) {
+                        return error(400, '验证码错误', $sclass);
+                    }
+                    break;
+                default:
+                    return error(400, '验证码错误', $sclass);
             }
         } else {
             $res = Redis::get($phone);
@@ -596,7 +609,8 @@ class AuthController extends Controller
 //        $dont_check_phone = array_merge($dont_check_phone,$dont_check_phone_2);
 
         $check_easy_code = User::query()->where('phone','=',$phone)
-            ->where('is_code_login','=',1)
+            ->where('is_code_login','>',0)
+            ->select(['id','phone','is_code_login'])
             ->first();
 
         if ($check_easy_code) {
