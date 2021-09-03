@@ -77,7 +77,7 @@ class AliUploadServers
         $queryArr=[
             'FileName'=>$fileName, //视频源文件名 必须带扩展名   https://help.aliyun.com/document_detail/55396.htm?spm=a2c4g.11186623.2.11.65b95d4aPwYn08s
             'Title'=>$title,
-            'CateId'=>self::TypeArr[$type], //分类ID  type 1 视频 2音频 3 图片 4文件
+            'CateId'=>self::TypeArr[$type], //分类ID  type 1 视频 2音频 3 图片
             'StorageLocation'=>self::StorageLocation, //存储地址
         ];
         //选择“不转码即分发”的方式上传视频文件后，点播播放服务仅支持MP4、FLV、MP3和M3U8格式的视频
@@ -106,7 +106,7 @@ class AliUploadServers
             'ImageType'=>'default',
             'Title'=>$title,
             'ImageExt'=>$ImageExt, //扩展名 png jpg jpeg gif
-            'CateId'=>self::TypeArr[$type], //分类ID  type 1 视频 2音频 3 图片 4文件
+            'CateId'=>self::TypeArr[$type], //分类ID  type 1 视频 2音频 3 图片
             'StorageLocation'=>self::StorageLocation, //存储地址
         ];
 
