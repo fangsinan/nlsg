@@ -65,6 +65,11 @@ class AuthController extends Controller
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
+
+        $dont_check_phone_2 = User::query()->where('is_code_login','=',1)
+            ->pluck('phone')->toArray();
+        $dont_check_phone = array_merge($dont_check_phone,$dont_check_phone_2);
+
         if (in_array($phone, $dont_check_phone)) {
             if (intval($code) !== 6666) {
                 return error(400, '验证码错误', $sclass);
