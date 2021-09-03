@@ -36,7 +36,7 @@ class AliUploadServers
     public static $IMAGES_URL = 'http://audiovideo.ali.nlsgapp.com/'; //音视频 图片
     public static $File_URL = 'http://image.nlsgapp.com/'; //文件
     public static $ImUrlKey = 'https://cos.ap-shanghai.myqcloud.com/';
-    public static $ReturnUrl = 'http://app.v4.apitest.nlsgapp.com/api/v4/upload/callback';
+    public static $ReturnUrl = '/api/v4/upload/callback';
 
     //初始化
     public function initVodClient($accessKeyId=self::AccessKeyId, $accessKeySecret=self::AccessKeySecret) {
@@ -87,7 +87,7 @@ class AliUploadServers
         }
         $returnArr=[
             'MessageCallback'=>[
-                'CallbackURL'=>self::$ReturnUrl
+                'CallbackURL'=>config('env.APP_URL').self::$ReturnUrl
             ],
             'Extend'=>[
                 'type'=>$type
@@ -268,7 +268,7 @@ class AliUploadServers
             if($type==1) { //视频
                 $returnArr = [
                     'MessageCallback' => [
-                        'CallbackURL' => self::$ReturnUrl
+                        'CallbackURL' => config('env.APP_URL').self::$ReturnUrl
                     ],
                     'Extend' => [
                         'type' => $type
