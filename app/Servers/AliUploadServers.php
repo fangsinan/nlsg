@@ -30,7 +30,6 @@ class AliUploadServers
         '1'=>2870, //视频
         '2'=>2869, //音频
         '3'=>2872, //图片
-        '4'=>2871, //文件
         '5'=>2899, //待删除
     ];
     public static $IMAGES_URL = 'http://audiovideo.ali.nlsgapp.com/'; //音视频 图片

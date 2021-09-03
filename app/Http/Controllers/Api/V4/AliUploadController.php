@@ -532,6 +532,7 @@ class AliUploadController extends Controller
 
     //定时抓取腾讯IM音视频、图片、文件到阿里云平台
     public  function TimingGrab(Request $request){
+
         $params = $request->input();
         $type = (empty($params['type']))?0:$params['type'];
 
