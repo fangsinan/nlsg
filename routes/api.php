@@ -17,7 +17,9 @@ include __DIR__ . '/liveApi.php';
 
 
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
-
+    //李喆活动
+    Route::get('/lizhe/create', 'LiZheController@CreateCode');
+    Route::get('/lizhe/checking', 'LiZheController@Checking');
     //首页
     Route::get('index/announce', 'IndexController@announce');
     Route::get('index/banner', 'IndexController@banner');
