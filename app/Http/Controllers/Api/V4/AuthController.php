@@ -776,7 +776,7 @@ class AuthController extends Controller
                 return $this->getRes(['code' => false, 'msg' => '号码错误']);
             }
         } else {
-            $g = "/^1[34578]\d{9}$/";
+            $g = "/^1[345678]\d{9}$/";
             $g2 = "/^19[0126789]\d{8}$/";
             $g3 = "/^166\d{8}$/";
 
