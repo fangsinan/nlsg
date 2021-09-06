@@ -688,7 +688,7 @@ class ImDocServers
                         'works.id', '=', 'relation.work_id')
                     ->leftJoin('nlsg_user as u',
                         'works.user_id', '=', 'u.id')
-                    ->select(['works.id', 'works.type', 'works.title', 'works.cover_img',
+                    ->select(['works.id', 'works.type', 'works.title', 'works.cover_img','works.status',
                         'works.price', 'works.subtitle', 'works.title as doc_content', 'is_audio_book',
                         DB::raw('if(is_audio_book=1,19,12) as doc_type_info'),
                         DB::raw('1 as doc_type'),
