@@ -389,7 +389,7 @@ class AliUploadServers
             $data = [
                 'content_id'=>$info['id'],
                 'type' => 4,
-                'url' => self::$IMAGES_URL.$PushRst['data']['name'],
+                'url' => self::$File_URL.$PushRst['data']['name'],
                 'file_name' => $info['file_name'],//$PushRst['data']['name'],
                 'size'=>$info['size'],
                 'created_at' => $now_date
