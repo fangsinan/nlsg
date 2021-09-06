@@ -733,7 +733,6 @@ class ImDocServers
                 foreach ($lists as &$v) {
                     $v->stock = $gModel->getGoodsAllStock($v->id);
                 }
-
                 break;
             case 4:
                 $lists = Live::select(['id', 'user_id', 'title', 'price', 'order_num',
