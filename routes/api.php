@@ -324,7 +324,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
         Route::get('auth/logout', 'AuthController@logout');
-
+        //auth注销账号
+        Route::post('auth/cancel_user', 'AuthController@cancelUser');
         //虚拟订单  str
 
         //下单

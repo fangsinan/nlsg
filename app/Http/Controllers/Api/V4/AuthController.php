@@ -900,4 +900,36 @@ class AuthController extends Controller
         return  success($res);
     }
 
+
+    /**
+     * @api {post} api/v4/auth/cancel_user  注销账号
+     * @apiVersion 4.0.0
+     * @apiName  cancel_user
+     * @apiGroup Auth
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/clear_user
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+
+    public function cancelUser(Request $request){
+        $uid = $this->user['id'];
+        if(strpos($this->user['phone'], '_cancel') == false){
+            User::where([ "id"=>$uid, ])->update([
+                "phone" => $this->user['phone'].'_cancel',
+                "unionid" => $this->user['unionid'].'_cancel',
+            ]);
+        }
+        return  success();
+    }
+
+
+
 }
