@@ -920,16 +920,30 @@ class AuthController extends Controller
      */
 
     public function cancelUser(Request $request){
+
         $uid = $this->user['id'];
-        if(strpos($this->user['phone'], '_cancel') == false){
+        $type = $request->input('type');
+        if($type == 1){//提交注销请求
             User::where([ "id"=>$uid, ])->update([
-                "phone" => $this->user['phone'].'_cancel',
-                "unionid" => $this->user['unionid'].'_cancel',
+                "cancel_time" => date("Y-m-d H:i:s"),
             ]);
+            return $this->success();
         }
-        return  success();
+
+        
+        if($type == 2 && !empty($this->user['cancel_time'])){   //二次提交
+            if( time() >= strtotime($this->user['cancel_time']) ){  //过了提交时间
+                if(strpos($this->user['phone'], '_cancel') == false){  //当前账号未注销
+                    User::where([ "id"=>$uid, ])->update([
+                        "phone" => $this->user['phone'].'_cancel',
+                        "unionid" => $this->user['unionid'].'_cancel',
+                    ]);
+                    return $this->success();
+                }
+            }
+        }
+
+        return error(0, 'error');
     }
-
-
 
 }
