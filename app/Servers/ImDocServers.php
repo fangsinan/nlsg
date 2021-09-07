@@ -627,8 +627,12 @@ class ImDocServers
                     $jobModel->status = 3;
                     break;
                 case 'send':
+                    $now = time();
                     $jobModel->status = 1;
                     $jobModel->send_type = 1;
+                    $jobModel->send_at = date('Y-m-d H:i:s', $now);
+                    $jobModel->month = date('Y-m', $now);
+                    $jobModel->day = date('Y-m-d', $now);
                     break;
                 default:
                     return ['code' => false, 'msg' => '参数错误'];
