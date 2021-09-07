@@ -215,11 +215,11 @@ class ImDocServers
                 }
                 $beat_word = ImBeatWord::pluck('beat_word')->toArray();
 
-                if (!empty($beat_word)){
-                    foreach ($beat_word as $bwv){
-                        $temp_pos = strpos($content,$bwv);
-                        if ($temp_pos){
-                            return ['code' => false, 'msg' => '敏感词:'.$bwv];
+                if (!empty($beat_word)) {
+                    foreach ($beat_word as $bwv) {
+                        $temp_pos = strpos($content, $bwv);
+                        if ($temp_pos) {
+                            return ['code' => false, 'msg' => '敏感词:' . $bwv];
                         }
                     }
                 }
@@ -520,8 +520,8 @@ class ImDocServers
         }
 
 
-        $query->orderBy('send_at', 'desc')
-            ->orderBy('is_done', 'asc')
+        $query->orderBy('is_done')
+            ->orderBy('send_at', 'desc')
             ->orderBy('success_at', 'desc')
             ->orderBy('id', 'desc')
             ->select([
@@ -688,7 +688,7 @@ class ImDocServers
                         'works.id', '=', 'relation.work_id')
                     ->leftJoin('nlsg_user as u',
                         'works.user_id', '=', 'u.id')
-                    ->select(['works.id', 'works.type', 'works.title', 'works.cover_img','works.status',
+                    ->select(['works.id', 'works.type', 'works.title', 'works.cover_img', 'works.status',
                         'works.price', 'works.subtitle', 'works.title as doc_content', 'is_audio_book',
                         DB::raw('if(is_audio_book=1,19,12) as doc_type_info'),
                         DB::raw('1 as doc_type'),
@@ -1365,9 +1365,9 @@ class ImDocServers
         $logModel = new ImDocSendJobLog();
         $logModel->insert($res_list_data);
 
-        if (!empty($beat_word)){
-            foreach ($beat_word as $bwv){
-                ImBeatWord::updateOrCreate(array('beat_word' => $bwv), array('times' =>DB::raw('times+1')));
+        if (!empty($beat_word)) {
+            foreach ($beat_word as $bwv) {
+                ImBeatWord::updateOrCreate(array('beat_word' => $bwv), array('times' => DB::raw('times+1')));
             }
         }
 
