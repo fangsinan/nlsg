@@ -203,12 +203,6 @@ class UserController extends Controller
         }
 
 
-        //15天
-        $user['cancel_days'] = 0;
-        if( strtotime($this->user['cancel_time'])+(86400*15) > time() ){
-            $user['cancel_days'] = ceil(strtotime($this->user['cancel_time'])+(86400*15) - time() / 86400);
-        }
-
         return success($user);
     }
 
@@ -1118,6 +1112,14 @@ class UserController extends Controller
                 ->first();
             if (!empty($check_meeting_sales)) {
                 $res['is_meeting_sales'] = 1;
+            }
+
+
+
+            //15天
+            $res['cancel_days'] = 0;
+            if( strtotime($this->user['cancel_time'])+(86400*15) > time() ){
+                $res['cancel_days'] = ceil(strtotime($this->user['cancel_time'])+(86400*15) - time() / 86400);
             }
 
             return success($res);
