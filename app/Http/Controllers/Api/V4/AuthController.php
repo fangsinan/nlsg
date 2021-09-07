@@ -908,7 +908,7 @@ class AuthController extends Controller
      * @apiGroup Auth
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/auth/clear_user
      *
-     * @apiParam {number} type  type1 第一次提交  2二次提交
+     * @apiParam {number} type  type1 第一次提交  2二次提交 3 取消注销
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
      * {
@@ -924,6 +924,11 @@ class AuthController extends Controller
 
         $uid = $this->user['id'];
         $type = $request->input('type');
+
+        if( in_array($type,[1,2]) && $this->user['ios_balance'] >10){
+            return error(1005, '账户余额>10能量币时无法注销');
+        }
+
         if($type == 1){//提交注销请求
             User::where([ "id"=>$uid, ])->update([
                 "cancel_time" => date("Y-m-d"),
@@ -942,6 +947,12 @@ class AuthController extends Controller
                 }
                 return $this->success();
             }
+        }
+
+        if( $type == 3 ){   //取消提交
+            User::where([ "id"=>$uid, ])->update([
+                "cancel_time" => "",
+            ]);
         }
 
         return error(0, 'error');
