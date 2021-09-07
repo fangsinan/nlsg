@@ -38,7 +38,7 @@ class ImGroup extends Base
     public function statistics(int $user_id, int $type = 0)
     {
         $query = ImGroup::query()->with(['groupUser'])
-            ->where('status', '=', 2);
+            ->where('status', '=', 1);
         switch ($type) {
             case 1:
                 $query->where('owner_account', '=', $user_id);
