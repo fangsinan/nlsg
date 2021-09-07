@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Subscribe;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -11,27 +12,32 @@ use Illuminate\Http\Request;
 class LiZheController extends Controller
 {
 
-    //删除李婷老师购买直播间记录 http://127.0.0.1:8000/api/v4/liting/delsub?code=mGC03073s2d141
+    //删除李婷老师购买直播间记录 https://app.v4.api.nlsgapp.com/api/v4/liting/delsub?phone=13522223779&live_id=119
     public function DelSub(Request $request){
 
         $live_id = intval($request->get('live_id', 0));
+        $phone = intval($request->get('phone', '13522223779'));
 
         if (empty($live_id)) {
             return $this->error(0, '直播间id不能为空');
         }
-
-        $info=Order::query()->where(['user_id'=>169209,'live_id'=>$live_id,'status'=>1])->first();
-        echo '直播间ID：'.$live_id.'<br>';
-        if(!empty($info)){
-            $OrderRst = Order::query()->where('id', $info->id)->delete();
-            $SubRst = Subscribe::query()->where('order_id', $info->id)->delete();
-            if($OrderRst && $SubRst){
-                echo '删除成功：<br>';
-            }else{
-                echo '删除失败：'.$OrderRst.$SubRst.'<br>';
+        $UserInfo=User::query()->where(['phone'=>$phone])->first();
+        if(!empty($UserInfo)) {
+            $info = Order::query()->where(['user_id' => $UserInfo->id, 'live_id' => $live_id, 'status' => 1])->first();
+            echo '直播间ID：' . $live_id . '<br>';
+            if (!empty($info)) {
+                $OrderRst = Order::query()->where('id', $info->id)->delete();
+                $SubRst = Subscribe::query()->where('order_id', $info->id)->delete();
+                if ($OrderRst && $SubRst) {
+                    echo '删除成功<br>';
+                } else {
+                    echo '删除失败：' . $OrderRst . $SubRst . '<br>';
+                }
+            } else {
+                echo '未查询到订单<br>';
             }
         }else{
-            echo '未查询到对应订单<br>';
+            echo '用户信息不存在<br>';
         }
 
     }
@@ -67,20 +73,22 @@ class LiZheController extends Controller
     //生成兑换券 http://127.0.0.1:8000/api/v4/lizhe/create
     public  function CreateCode(Request $request)
     {
-        return ;
+//        return ;
         try {
             $code_name = [
-                'MGC' => '古云草',
-                'LFT' => '三度',
-                'HKD' => '盛世文航',
-                'ADQ' => '创华',
-                'MAH' => '企航',
-                'KHT' => '智上成',
-                'NYZ' => '汇成',
-                'OTA' => '慧宇',
-                'DSS' => '智客',
-                'AQW' => '久善今心',
-                'ZBF' => '主办方'
+//                'MGC' => '古云草',
+//                'LFT' => '三度',
+//                'HKD' => '盛世文航',
+//                'ADQ' => '创华',
+//                'MAH' => '企航',
+//                'KHT' => '智上成',
+//                'NYZ' => '汇成',
+//                'OTA' => '慧宇',
+//                'DSS' => '智客',
+//                'AQW' => '久善今心',
+//                'ZBF' => '主办方',
+                  'AQW' => '久善今心',
+                  'ZBF' => '主办方'
             ];
 
             foreach ($code_name as $key => $val) {
