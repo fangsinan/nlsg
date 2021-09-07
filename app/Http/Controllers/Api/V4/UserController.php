@@ -1117,7 +1117,7 @@ class UserController extends Controller
 
 
             //15天
-            $res['cancel_time'] = strtotime($this->user['cancel_time']);
+            $res['cancel_time'] = $this->user['cancel_time'] ? strtotime($this->user['cancel_time']) :0;
             $res['cancel_end_time'] = strtotime($this->user['cancel_time'])+(86400*15);
             $res['cancel_days'] = 0;
             if( strtotime($this->user['cancel_time'])+(86400*15) > time() ){
