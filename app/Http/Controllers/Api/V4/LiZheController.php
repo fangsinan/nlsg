@@ -2,12 +2,39 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\Subscribe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 //李喆八大名师活动
 class LiZheController extends Controller
 {
+
+    //删除李婷老师购买直播间记录 http://127.0.0.1:8000/api/v4/liting/delsub?code=mGC03073s2d141
+    public function DelSub(Request $request){
+
+        $live_id = intval($request->get('live_id', 0));
+
+        if (empty($live_id)) {
+            return $this->error(0, '直播间id不能为空');
+        }
+
+        $info=Order::query()->where(['user_id'=>169209,'live_id'=>$live_id,'status'=>1])->first();
+        echo '直播间ID：'.$live_id.'<br>';
+        if(!empty($info)){
+            $OrderRst = Order::query()->where('id', $info->id)->delete();
+            $SubRst = Subscribe::query()->where('order_id', $info->id)->delete();
+            if($OrderRst && $SubRst){
+                echo '删除成功：<br>';
+            }else{
+                echo '删除失败：'.$OrderRst.$SubRst.'<br>';
+            }
+        }else{
+            echo '未查询到对应订单<br>';
+        }
+
+    }
 
     //验证兑换券 http://127.0.0.1:8000/api/v4/lizhe/checking?code=mGC03073s2d141
     public function Checking(Request $request){

@@ -20,6 +20,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     //李喆活动
     Route::get('/lizhe/create', 'LiZheController@CreateCode');
     Route::get('/lizhe/checking', 'LiZheController@Checking');
+    //李婷老师推广直播间删除购买记录
+    Route::get('/liting/delsub', 'LiZheController@DelSub');
     //首页
     Route::get('index/announce', 'IndexController@announce');
     Route::get('index/banner', 'IndexController@banner');
@@ -322,10 +324,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('live_forbid/add', 'LiveConsoleController@forbid');//禁言
         //*******************************我的直播部分开始*******************************
 
-
         Route::get('auth/logout', 'AuthController@logout');
         //auth注销账号
         Route::post('auth/cancel_user', 'AuthController@cancelUser');
+
         //虚拟订单  str
 
         //下单
