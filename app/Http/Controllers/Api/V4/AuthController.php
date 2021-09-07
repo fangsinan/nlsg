@@ -933,7 +933,7 @@ class AuthController extends Controller
 
 
         if($type == 2 && !empty($this->user['cancel_time'])){   //二次提交
-            if( time() >= strtotime($this->user['cancel_time']) ){  //过了提交时间
+            if( strtotime($this->user['cancel_time'])+(86400*15) < time() ){  //过了提交时间15天之后
                 if(strpos($this->user['phone'], '_cancel') == false){  //当前账号未注销
                     User::where([ "id"=>$uid, ])->update([
                         "phone" => $this->user['phone'].'_cancel',
