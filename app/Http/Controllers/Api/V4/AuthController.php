@@ -5,17 +5,13 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\ConfigModel;
 use App\Models\Coupon;
-use App\Models\UserInvite;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 use App\Models\User;
+use App\Models\UserInvite;
 use AppleSignIn\ASDecoder;
 use GuzzleHttp\Client;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Ecdsa\Sha256;
-use Lcobucci\JWT\Signer\Key;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use PHPUnit\Util\Exception;
-use function GuzzleHttp\headers_from_lines;
 
 class AuthController extends Controller
 {
@@ -69,24 +65,24 @@ class AuthController extends Controller
 //            ->pluck('phone')->toArray();
 //        $dont_check_phone = array_merge($dont_check_phone,$dont_check_phone_2);
 
-        $check_easy_code = User::query()->where('phone','=',$phone)
-            ->where('is_code_login','>',0)
-            ->select(['id','phone','is_code_login'])
+        $check_easy_code = User::query()->where('phone', '=', $phone)
+            ->where('is_code_login', '>', 0)
+            ->select(['id', 'phone', 'is_code_login'])
             ->first();
 
-        if (in_array($phone, $dont_check_phone)) {
+        if (in_array($phone, $dont_check_phone) && !$check_easy_code) {
             if (intval($code) !== 6666) {
                 return error(400, '验证码错误', $sclass);
             }
-        }elseif($check_easy_code) {
-            switch (intval($check_easy_code->is_code_login)){
+        } elseif ($check_easy_code) {
+            switch (intval($check_easy_code->is_code_login)) {
                 case 1:
                     if (intval($code) !== 6666) {
                         return error(400, '验证码错误', $sclass);
                     }
                     break;
                 case 2:
-                    $temp_code = substr($phone,-4);
+                    $temp_code = substr($phone, -4);
                     if (intval($code) !== intval($temp_code)) {
                         return error(400, '验证码错误', $sclass);
                     }
@@ -147,7 +143,7 @@ class AuthController extends Controller
         } else {
             $user->level = 0;
         }
-        $data = $this->get_data($user,$token);
+        $data = $this->get_data($user, $token);
 
 //        $data = [
 //            'id' => $user->id,
@@ -226,7 +222,7 @@ class AuthController extends Controller
         } else {
             $user->level = 0;
         }
-        $data = $this->get_data($user,$token);
+        $data = $this->get_data($user, $token);
 //        $data = [
 //            'id' => $user->id,
 //            'token' => $token,
@@ -271,7 +267,7 @@ class AuthController extends Controller
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone) || $phone =='18600179874' ) {
+        if (in_array($phone, $dont_check_phone) || $phone == '18600179874') {
             if (intval($code) !== 6666) {
                 return error(1000, '验证码错误');
             }
@@ -287,7 +283,7 @@ class AuthController extends Controller
 
         Redis::del($phone);
         $is_wx = 0;
-        if($input['unionid']){
+        if ($input['unionid']) {
             $is_wx = 1;
         }
         $data = [
@@ -311,7 +307,7 @@ class AuthController extends Controller
             }
         }
         $token = auth('api')->login($user);
-        $arra = $this->get_data($user,$token);
+        $arra = $this->get_data($user, $token);
 //        $arra = [
 //            'id' => $user->id,
 //            'token' => $token,
@@ -324,9 +320,6 @@ class AuthController extends Controller
     }
 
 
-
-
-
     /**
      * 静默授权注册登录
      */
@@ -334,7 +327,7 @@ class AuthController extends Controller
     {
         $input = $request->all();
         $arra = [];
-        if(!empty($input['unionid'])){ //渠道新版本
+        if (!empty($input['unionid'])) { //渠道新版本
             $user = User::where('unionid', $input['unionid'])->first();
             if (empty($user)) {
 
@@ -354,7 +347,7 @@ class AuthController extends Controller
                 $phone = date('ymd', $time) . $str_num; //6+7
 
                 $data = [
-                    'nickname' => (!empty($input['nickname'])) ?$input['nickname']:'nlsg' . rand(100000, 999999),
+                    'nickname' => (!empty($input['nickname'])) ? $input['nickname'] : 'nlsg' . rand(100000, 999999),
                     'phone' => $phone,
                     'isNoLogin' => 1,
                     'wxopenid' => $input['wx_openid'],
@@ -371,7 +364,7 @@ class AuthController extends Controller
             } else {
                 $phone = $user->phone;
             }
-        }else {
+        } else {
             if (empty($input['wx_openid'])) {
                 return success($arra);
             }
@@ -445,7 +438,7 @@ class AuthController extends Controller
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone) || $phone =='18600179874' ) {
+        if (in_array($phone, $dont_check_phone) || $phone == '18600179874') {
             if (intval($code) !== 6666) {
                 return error(1000, '验证码错误');
             }
@@ -461,7 +454,7 @@ class AuthController extends Controller
         Redis::del($phone);
         $user = User::where('phone', $phone)->first();
         if (!$user) {
-            User::where('id', $user_id)->update(['phone'=>$phone]);
+            User::where('id', $user_id)->update(['phone' => $phone]);
         } else { //号码已存在
             return error(1000, '此手机号已存在');
         }
@@ -480,18 +473,18 @@ class AuthController extends Controller
         $value = '';
         $curTime = time();
         while (true) { // 独占式抢锁
-            $value = microtime(true).mt_rand(1000, 9999);
+            $value = microtime(true) . mt_rand(1000, 9999);
             if ($redis::setnx($key, $value)) { // 获取到锁 当key不存在时设置key
                 // 锁过期时间5秒
                 $redis::expire($key, 5);
                 break;
-            } else  {
+            } else {
                 if (time() - $curTime >= 10) { // 超过10秒抛异常
                     throw new Exception('lock error', 1);
                     break;
                 }
                 $time = $redis::ttl($key);
-                if(($time / 2) > 0){
+                if (($time / 2) > 0) {
                     sleep($time / 2);
                 }
             }
@@ -600,29 +593,29 @@ class AuthController extends Controller
         if (!$phone) {
             return $this->error(400, '手机号不能为空');
         }
-        if(!preg_match('/^1[3456789]\d{9}$/', $phone)){
+        if (!preg_match('/^1[3456789]\d{9}$/', $phone)) {
             return $this->error(400, '手机号格式错误');
         }
 
         //自己人不发验证码
-//        $dont_check_phone = ConfigModel::getData(35, 1);
-//        $dont_check_phone = explode(',', $dont_check_phone);
+        $dont_check_phone = ConfigModel::getData(35, 1);
+        $dont_check_phone = explode(',', $dont_check_phone);
 //        $dont_check_phone_2 = User::query()->where('is_code_login','=',1)
 //            ->pluck('phone')->toArray();
 //        $dont_check_phone = array_merge($dont_check_phone,$dont_check_phone_2);
 
-        $check_easy_code = User::query()->where('phone','=',$phone)
-            ->where('is_code_login','>',0)
-            ->select(['id','phone','is_code_login'])
+        $check_easy_code = User::query()->where('phone', '=', $phone)
+            ->where('is_code_login', '>', 0)
+            ->select(['id', 'phone', 'is_code_login'])
             ->first();
 
-        if ($check_easy_code) {
+        if ($check_easy_code || in_array($phone, $dont_check_phone)) {
             return success();
         } else {
             $easySms = app('easysms');
 
             try {
-                if ($phone =='18600179874'){
+                if ($phone == '18600179874') {
                     $code = 6666;
                 } else {
                     $code = rand(1000, 9999);
@@ -686,7 +679,7 @@ class AuthController extends Controller
         } else {
             $user->level = 0;
         }
-        $data = $this->get_data($user,$token);
+        $data = $this->get_data($user, $token);
 //        $data = [
 //            'id' => $user->id,
 //            'token' => $token,
@@ -699,10 +692,12 @@ class AuthController extends Controller
 //        ];
         return success($data);
     }
-    //登录返回字段
-    function get_data($user,$token){
 
-        return  [
+    //登录返回字段
+    function get_data($user, $token)
+    {
+
+        return [
             'id' => $user->id,
             'token' => $token,
             'nickname' => $user->nickname,
@@ -725,20 +720,20 @@ class AuthController extends Controller
         $fullName = $request->input('fullName') ?? '';
         $authorizationCode = $request->input('authorizationCode');
         $identityToken = $request->input('identityToken');
-        if(empty($identityToken) || empty($appleid)){
+        if (empty($identityToken) || empty($appleid)) {
             return error(1000, '参数错误');
         }
         $appleSignInPayload = ASDecoder::getAppleSignInPayload($identityToken);
         $isValid = $appleSignInPayload->verifyUser($appleid);
 
-         //当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
+        //当 $isValid 为 true 时验证通过，后续逻辑根据需求编写
         if ($isValid === true) {
             $user = User::where('appleid', $appleid)->first();
             if (!$user) {
-                $rand =  uniqid();
+                $rand = uniqid();
                 $list = User::create([
-                    'nickname'=> '苹果用户'. $rand,
-                    'phone'   => '苹果用户'. $rand,
+                    'nickname' => '苹果用户' . $rand,
+                    'phone' => '苹果用户' . $rand,
                     'appleid' => $appleid ?? ''
                 ]);
                 $user = User::find($list->id);
@@ -769,7 +764,7 @@ class AuthController extends Controller
             $list = [
                 '130', '131', '132', '133', '134', '135', '136', '137', '138', '139',
                 '150', '151', '152', '153', '155', '156', '157', '158', '159',
-                '176', '177', '178','167',
+                '176', '177', '178', '167',
                 '180', '181', '182', '183', '184', '185', '186', '187', '188', '189',
             ];
 
@@ -830,17 +825,16 @@ class AuthController extends Controller
     }
 
     //收集用户信息
-    public function checkWx(Request $request){
-        $uid = $request->input('user_id')??0;//
+    public function checkWx(Request $request)
+    {
+        $uid = $request->input('user_id') ?? 0;//
         $wx_openid = $request->input('wx_openid');
         $user = User::find($uid);
-        if( empty($user['wxopenid']) ){
+        if (empty($user['wxopenid'])) {
             User::where('id', '=', $uid)->update(['wxopenid' => $wx_openid]);
         }
         return success();
     }
-
-
 
 
     /**
@@ -863,7 +857,8 @@ class AuthController extends Controller
      * }
      */
 
-    public function visitorUser(Request $request){
+    public function visitorUser(Request $request)
+    {
         $unionid = $request->input('unionid');
         $timestamp = $request->input('timestamp');
         $sig = $request->input('sig');
@@ -873,24 +868,24 @@ class AuthController extends Controller
 
         //如果开关关闭  直接返回
         $version_config = ConfigModel::getData(52);
-        if($version_config != $version){
+        if ($version_config != $version) {
             return error(0, 'version error');
         }
-        if(empty($unionid)){
+        if (empty($unionid)) {
             return error(0, 'unionid error');
         }
         //如果密串错误  直接返回
 
-        if( !( strtoupper(MD5($unionid.'_'.$timestamp."_"."NLSG")) == strtoupper($sig)) ){
+        if (!(strtoupper(MD5($unionid . '_' . $timestamp . "_" . "NLSG")) == strtoupper($sig))) {
             return error(0, 'sig error');
         }
         $rand = substr(uniqid(), -5);
-        $user = User::where(["is_staff"=>2, 'unionid'=>$unionid])->first();
-        if(empty($user)){
+        $user = User::where(["is_staff" => 2, 'unionid' => $unionid])->first();
+        if (empty($user)) {
             $list = User::create([
-                'phone' => '游客'. $nicke."_".$rand,
+                'phone' => '游客' . $nicke . "_" . $rand,
                 'unionid' => $unionid,
-                'nickname' => '游客'. $nicke."_".$rand,
+                'nickname' => '游客' . $nicke . "_" . $rand,
                 'is_staff' => 2,
             ]);
             $user = User::find($list->id);
@@ -899,8 +894,8 @@ class AuthController extends Controller
 
 
         $token = auth('api')->login($user);
-        $res = $this->get_data($user,$token);
-        return  success($res);
+        $res = $this->get_data($user, $token);
+        return success($res);
     }
 
 
@@ -923,37 +918,38 @@ class AuthController extends Controller
      * }
      */
 
-    public function cancelUser(Request $request){
+    public function cancelUser(Request $request)
+    {
 
         $uid = $this->user['id'];
         $type = $request->input('type');
 
-        if( in_array($type,[1,2]) && $this->user['ios_balance'] >10){
+        if (in_array($type, [1, 2]) && $this->user['ios_balance'] > 10) {
             return error(1005, '账户余额>10能量币时无法注销');
         }
 
-        if($type == 1){//提交注销请求
-            User::where([ "id"=>$uid, ])->update([
+        if ($type == 1) {//提交注销请求
+            User::where(["id" => $uid,])->update([
                 "cancel_time" => date("Y-m-d"),
             ]);
             return $this->success();
         }
 
 
-        if($type == 2 && !empty($this->user['cancel_time'])){   //二次提交
-            if( strtotime($this->user['cancel_time'])+(86400*15) < time() ){  //过了提交时间15天之后
-                if(strpos($this->user['phone'], '_cancel') == false){  //当前账号未注销
-                    User::where([ "id"=>$uid, ])->update([
-                        "phone" => $this->user['phone'].'_cancel',
-                        "unionid" => $this->user['unionid'].'_cancel',
+        if ($type == 2 && !empty($this->user['cancel_time'])) {   //二次提交
+            if (strtotime($this->user['cancel_time']) + (86400 * 15) < time()) {  //过了提交时间15天之后
+                if (strpos($this->user['phone'], '_cancel') == false) {  //当前账号未注销
+                    User::where(["id" => $uid,])->update([
+                        "phone" => $this->user['phone'] . '_cancel',
+                        "unionid" => $this->user['unionid'] . '_cancel',
                     ]);
                 }
                 return $this->success();
             }
         }
 
-        if( $type == 3 ){   //取消提交
-            User::where([ "id"=>$uid, ])->update([
+        if ($type == 3) {   //取消提交
+            User::where(["id" => $uid,])->update([
                 "cancel_time" => null,
             ]);
             return $this->success();
