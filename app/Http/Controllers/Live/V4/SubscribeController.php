@@ -291,7 +291,7 @@ class SubscribeController extends ControllerBackend
 
 
         }
-        $get_twitters = User::whereIn('id',$twitter_get_ids)->get('id','phone','nickname')->toArray();
+        $get_twitters = User::select("id","phone","nickname")->whereIn('id',$twitter_get_ids)->get()->toArray();
         $get_twitter = [];
         foreach ($get_twitters as $twitter_v) {
             $get_twitter[$twitter_v['id']] = $twitter_v;
