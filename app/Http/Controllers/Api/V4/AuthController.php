@@ -953,6 +953,7 @@ class AuthController extends Controller
             User::where([ "id"=>$uid, ])->update([
                 "cancel_time" => null,
             ]);
+            return $this->success();
         }
 
         return error(0, 'error');
