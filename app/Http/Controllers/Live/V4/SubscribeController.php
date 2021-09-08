@@ -319,9 +319,11 @@ class SubscribeController extends ControllerBackend
         $maModel = new MallAddress();
         foreach ($users as $dk => $dv) {
             $new_users[$dv['id']] = $dv;
-            //$new_users[$dv['id']]['address'] = ($maModel->getList($dv['id'], 0, 1))[0] ?? '';
+            if ($get_excel) {
+                $new_users[$dv['id']]['address'] = ($maModel->getList($dv['id'], 0, 1))[0] ?? '';
+            }
         }
-
+        
         foreach ($lists['data'] as &$val) {
 
             // 将推客信息  合并到数据
