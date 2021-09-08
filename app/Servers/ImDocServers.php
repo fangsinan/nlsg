@@ -628,6 +628,7 @@ class ImDocServers
                     break;
                 case 'send':
                     $now = time();
+                    $jobModel->user_id = $user_id;
                     $jobModel->status = 1;
                     $jobModel->send_type = 1;
                     $jobModel->send_at = date('Y-m-d H:i:s', $now);
