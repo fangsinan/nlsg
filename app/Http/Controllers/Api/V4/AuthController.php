@@ -951,7 +951,7 @@ class AuthController extends Controller
 
         if( $type == 3 ){   //取消提交
             User::where([ "id"=>$uid, ])->update([
-                "cancel_time" => "",
+                "cancel_time" => null,
             ]);
         }
 
