@@ -1078,7 +1078,6 @@ class ImDocServers
             ->with(['jobInfo', 'jobInfo.groupInfo:id,group_id', 'docInfo'])
             ->get();
 
-
         if ($job_info->isEmpty()) {
             return ['code' => true, 'msg' => '没有任务'];
         }
@@ -1090,6 +1089,10 @@ class ImDocServers
             $job_id_list[] = $v->id;
             foreach ($v->jobInfo as $vv) {
                 $temp_post_data = [];
+                if (empty($vv->groupInfo->group_id ?? 0)) {
+                    ImDocSendJob::query()->where('id', '=', $v->id)->update(['status' => 2]);
+                    continue;
+                }
                 $temp_post_data['GroupId'] = $vv->groupInfo->group_id;
                 $temp_post_data['From_Account'] = (string)$v->user_id;
                 $temp_post_data['Random'] = $this->getMsgRandom();
