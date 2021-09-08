@@ -154,7 +154,9 @@ class SubscribeController extends ControllerBackend
         $created_at = $request->get('created_at') ?? '';
         $now_date = date('Y-m-d H:i:s');
         $twitter_phone = $request->input('twitter_phone', '');
-
+        if(empty($title)){
+            $title='经营家庭和孩子的秘密V001';
+        }
 
         //1、查询是否有搜索手机号或 id
         //2、2~3个表查数据
@@ -224,9 +226,10 @@ class SubscribeController extends ControllerBackend
 
         $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time',
             'order_id', 'created_at', 'twitter_id')
-            ->where('is_del', 0)
+            ->where('type', 3)
             ->where('status', 1)
-            ->where('type', 3);
+            ->where('is_del', 0)
+            ;
 
         //sub创建时间
         if (!empty($created_at)) {
