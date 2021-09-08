@@ -944,8 +944,8 @@ class AuthController extends Controller
             if( strtotime($this->user['cancel_time'])+(86400*15) < time() ){  //过了提交时间15天之后
                 if(strpos($this->user['phone'], '_cancel') == false){  //当前账号未注销
                     User::where([ "id"=>$uid, ])->update([
-                        "phone" => $this->user['phone'].'_cancel',
-                        "unionid" => $this->user['unionid'].'_cancel',
+                        "phone" => $this->user['phone']."_".strtotime($this->user['cancel_time']).'_cancel',
+                        "unionid" => $this->user['unionid']."_".strtotime($this->user['cancel_time']).'_cancel',
                     ]);
                 }
                 return $this->success();
