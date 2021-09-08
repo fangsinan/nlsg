@@ -1084,12 +1084,12 @@ class ImDocServers
 
         $job_id_list = [];
         $post_data_array = [];
-
+//dd($job_info->toArray());
         foreach ($job_info as $v) {
             $job_id_list[] = $v->id;
             foreach ($v->jobInfo as $vv) {
                 $temp_post_data = [];
-                if (empty($vv->groupInfo->group_id ?? 0)) {
+                if (empty($vv->groupInfo->group_id)) {
                     ImDocSendJob::query()->where('id', '=', $v->id)->update(['status' => 2]);
                     continue;
                 }
@@ -1127,7 +1127,15 @@ class ImDocServers
                         if (empty($temp_msg_type)) {
                             $temp_msg_type = 11;
                         }
-
+                    case 18:
+                        if (empty($temp_msg_type)) {
+                            $temp_msg_type = 4;
+                        }
+                    case 19:
+                        if (empty($temp_msg_type)) {
+                            $temp_msg_type = 8;
+                        }
+                        //类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链 18线下课 19听书
                         $custom_elem_body = [
                             "goodsID" => $temp_msg_type == 10 ? $v->docInfo->subtitle : (string)$v->docInfo->obj_id,
 //                            "goodsID" => (string)$v->docInfo->obj_id,
@@ -1309,7 +1317,6 @@ class ImDocServers
                         $post_data_array[] = $temp_post_data;
                         break;
                 }
-
             }
         }
 //dd([$post_data_array,json_encode($post_data_array)]);

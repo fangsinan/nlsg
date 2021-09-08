@@ -13,6 +13,7 @@ use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
+use App\Servers\ImDocServers;
 use App\Servers\VipServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -236,10 +237,12 @@ class MallController extends Controller
                 dd([$res, $list]);
             }
 
+//            $s = new ImDocServers();
+//            $r = $s->sendGroupDocMsgJob(701);
+
             dd(__LINE__);
 
-//            $s = new ImDocServers();
-//            $r = $s->sendGroupDocMsgJob(505);
+
 //            dd($r);
 //            $servers = new removeDataServers();
 //            $servers->worksListOfSub();
