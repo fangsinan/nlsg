@@ -25,9 +25,15 @@ class Subscribe extends Base
     {
         return $this->belongsTo(Live::class, 'relation_id', 'id')->where('status',4);
     }
+//    public function order()
+//    {
+//        return $this->belongsTo(Order::class, 'order_id', 'id')->where('status',1);
+//    }
+
+
     public function order()
     {
-        return $this->belongsTo(Order::class, 'order_id', 'id')->where('status',1);
+        return $this->belongsTo(Order::class, 'order_id', 'id')->where('status',1)->where( 'type', 10);
     }
 
     /**
