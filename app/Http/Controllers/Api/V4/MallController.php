@@ -10,6 +10,7 @@ use App\Models\MallCategory;
 use App\Models\MallComment;
 use App\Models\MallGoods;
 use App\Models\MallGoodsMsg;
+use App\Models\MallOrder;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
@@ -236,7 +237,7 @@ class MallController extends Controller
                 }
                 dd([$res, $list]);
             }
-
+            MallOrder::testRun();
 //            $s = new ImDocServers();
 //            $r = $s->sendGroupDocMsgJob(701);
 

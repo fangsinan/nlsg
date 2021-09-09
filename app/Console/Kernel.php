@@ -53,6 +53,18 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
+            MallOrder::testRun();
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            MallOrder::testRun();
+        })->everyMinute()->runInBackground();//每分
+
+//        $schedule->call(function () {
+//            MallOrder::testRun();
+//        })->everyMinute()->withoutOverlapping()->runInBackground();//每分
+
+        $schedule->call(function () {
             //im doc
             $s = new ImDocServers();
             $s->sendGroupDocMsgJob();
@@ -171,10 +183,6 @@ class Kernel extends ConsoleKernel
             $AliUploadServer=new AliUploadServers();
             $AliUploadServer->UploadMediaVideoAudio();
         })->everyFiveMinutes()->between('2:00', '6:00')->runInBackground();//5分钟执行一次
-
-        $schedule->call(function () {
-            MallOrder::testRun();
-        })->everyMinute()->withoutOverlapping()->runInBackground();//每分
     }
 
     /**
