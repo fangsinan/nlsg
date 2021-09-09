@@ -1843,6 +1843,13 @@ and o.status = 1 and o.pay_price > 1";
         if ($check_job === false) {
             return true;
         }
+        $r1_key = rand(1,9999);
+        $temp_log_data = [];
+        $temp_log_data[] = [
+            'r1'=>$r1_key,
+            'r2'=>0,
+            'created_at'=>date('Y-m-d H:i:s'),
+        ];
 
         $run = true;
         while ($run) {
@@ -2022,6 +2029,14 @@ and o.status = 1 and o.pay_price > 1";
 
             }
         }
+
+        $temp_log_data[] = [
+            'r1'=>$r1_key,
+            'r2'=>0,
+            'created_at'=>date('Y-m-d H:i:s'),
+        ];
+        DB::table('nlsg_test_k_run')->insert($temp_log_data);
+        
         return true;
     }
 
