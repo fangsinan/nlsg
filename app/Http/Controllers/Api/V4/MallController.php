@@ -239,8 +239,8 @@ class MallController extends Controller
                 dd([$res, $list]);
             }
 
-            $servers = new removeDataServers();
-            $servers->worksListOfSub();
+//            $servers = new removeDataServers();
+//            $servers->worksListOfSub();
 //            MallOrder::testRun(1);
 //            $s = new ImDocServers();
 //            $r = $s->sendGroupDocMsgJob(701);
