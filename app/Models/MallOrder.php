@@ -1716,4 +1716,23 @@ class MallOrder extends Base
             ]);
     }
 
+    public static function testRun(){
+        $r1 = rand(1,9999);
+        $max = rand(10,200);
+        $key = 1;
+        $run = true;
+        while ($run){
+            $temp_data = [];
+            $temp_data['r1'] = $r1;
+            $temp_data['r2'] = rand(1,999999);
+            DB::table('nlsg_test_k_run')->insert($temp_data);
+            $key++;
+            if ($key>$max){
+                $run = false;
+            }
+            sleep(1);
+        }
+        return true;
+    }
+
 }

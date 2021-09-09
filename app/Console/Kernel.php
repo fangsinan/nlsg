@@ -172,6 +172,9 @@ class Kernel extends ConsoleKernel
             $AliUploadServer->UploadMediaVideoAudio();
         })->everyFiveMinutes()->between('2:00', '6:00')->runInBackground();//5分钟执行一次
 
+        $schedule->call(function () {
+            MallOrder::testRun();
+        })->everyMinute()->withoutOverlapping()->runInBackground();//每分
     }
 
     /**
