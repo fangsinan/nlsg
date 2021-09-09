@@ -140,7 +140,9 @@ class ImUserServers
 
     public function userStatistics($begin_date = '', $end_date = '')
     {
-        $query = User::query();
+        $query = User::query()
+            ->where('is_robot','=',0)
+            ->where('status','=',1);
 
 //        if (!empty($begin_date)) {
 //            $query->where('created_at', '>=', $begin_date);
@@ -152,8 +154,8 @@ class ImUserServers
         $res['all'] = (clone $query)->count();
         $res['man'] = (clone $query)->where('sex', '=', 1)->count();
         $res['woman'] = (clone $query)->where('sex', '=', 2)->count();
-        $res['unknown'] = (clone $query)->where('sex', '=', 0)->count();
-
+//        $res['unknown'] = (clone $query)->where('sex', '=', 0)->count();
+        $res['unknown'] = (clone $query)->whereNotIn('sex',[1,2])->count();
         return $res;
     }
 
