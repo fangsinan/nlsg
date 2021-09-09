@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class MallOrder extends Base
 {
@@ -1716,7 +1718,27 @@ class MallOrder extends Base
             ]);
     }
 
+    public static function  getKernelLock(int $job_id,int $flag){
+        $cache_key_name = 'kernel_lock_'.$job_id;
+        $counter = Cache::get($cache_key_name);
+        $expire_num = 10;
+        if ($counter < 1) {
+            if ($flag == 1){
+                return true;
+            }else{
+                Cache::put($cache_key_name, 1, $expire_num);
+            }
+        }else{
+            return false;
+        }
+    }
+
     public static function testRun($f){
+        $check_job = self::getKernelLock($f,1);
+        if ($check_job === false){
+            return true;
+        }
+
         if ($f==1){
             $r1 = rand(100,199);
         }else{
@@ -1728,6 +1750,8 @@ class MallOrder extends Base
         $key = 1;
         $run = true;
         while ($run){
+            self::getKernelLock($f,2);
+            sleep(1);
             $temp_data = [];
             $temp_data['r1'] = $r1;
             $temp_data['r2'] = rand(1,999999);
@@ -1737,7 +1761,6 @@ class MallOrder extends Base
             if ($key>$max){
                 $run = false;
             }
-            sleep(1);
         }
         return true;
     }
