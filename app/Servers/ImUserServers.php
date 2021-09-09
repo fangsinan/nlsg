@@ -181,6 +181,9 @@ class ImUserServers
     {
         $size = $params['size'] ?? 10;
         $query = Order::query()->where('status', '=', 1);
+        if (!empty($params['user_id'] ?? 0)) {
+            $user_id = $params['user_id'];
+        }
         $query->where('user_id', '=', $user_id);
         $query->where('is_shill', '=', 0);
         //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip  18训练营
