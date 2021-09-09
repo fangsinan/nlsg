@@ -1719,12 +1719,14 @@ class MallOrder extends Base
     public static function testRun(){
         $r1 = rand(1,9999);
         $max = rand(10,200);
+        $ctime = date('Y-m-d H:i:s');
         $key = 1;
         $run = true;
         while ($run){
             $temp_data = [];
             $temp_data['r1'] = $r1;
             $temp_data['r2'] = rand(1,999999);
+            $temp_data['created_at'] = $ctime;
             DB::table('nlsg_test_k_run')->insert($temp_data);
             $key++;
             if ($key>$max){
