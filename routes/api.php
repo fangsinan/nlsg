@@ -431,6 +431,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('im_doc/category', 'ImDocController@getCategory');
         Route::get('im_doc/category/product', 'ImDocController@getCategoryProduct');
 
+        Route::post('im/report', 'ImController@report');
+
     });
     Route::post('im_group/forbid_msg_list', 'ImGroupController@forbidMsgList');
 
