@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ImReport;
 use Illuminate\Http\Request;
 use Libraries\ImClient;
 
@@ -28,5 +29,10 @@ class ImController extends Controller
         $user_id = $request->get('user_id');
         $sig = ImClient::getUserSig($user_id);
         return success($sig);
+    }
+
+    public function report(Request $request){
+        $model = new ImReport();
+        return $this->getRes($model->add($request->input()));
     }
 }
