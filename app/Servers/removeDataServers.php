@@ -14,7 +14,6 @@ use App\Models\History;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\MallGoods;
-use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
@@ -1817,24 +1816,21 @@ and o.status = 1 and o.pay_price > 1";
 
     }
 
-    public static function  getKernelLock(int $job_id,int $flag){
-        $cache_key_name = 'kernel_lock_'.$job_id;
+    public static function getKernelLock(int $job_id, int $flag)
+    {
+        $cache_key_name = 'kernel_lock_' . $job_id;
         $counter = Cache::get($cache_key_name);
         $expire_num = 60;
-        if ($flag == 2){
+        if ($flag == 2) {
             Cache::put($cache_key_name, 1, $expire_num);
-        }elseif($flag == 1){
-            if ($counter === false) {
-                if ($flag == 1){
-                    return true;
-                }else{
-                    Cache::put($cache_key_name, 1, $expire_num);
-                }
-            }else{
+        } elseif ($flag == 3) {
+            Cache::pull($cache_key_name);
+        } else {
+            if ($counter < 1) {
+                return true;
+            } else {
                 return false;
             }
-        }else{
-            Cache::pull($cache_key_name);
         }
     }
 
@@ -1843,22 +1839,22 @@ and o.status = 1 and o.pay_price > 1";
         $now_date = date('Y-m-d H:i:s');
         $job_key = 1844;
 
-        $check_job = self::getKernelLock($job_key,1);
-        if ($check_job === false){
+        $check_job = self::getKernelLock($job_key, 1);
+        if ($check_job === false) {
             return true;
         }
 
         $run = true;
-        while ($run){
-            self::getKernelLock($job_key,2);
+        while ($run) {
+            self::getKernelLock($job_key, 2);
             $list = DB::table('works_list_of_sub')
                 ->where('status', '=', 1)
                 ->whereIn('works_type', [2, 6, 3, 7])
                 ->limit(100)
                 ->get();
 
-            if ($list->isEmpty()){
-                self::getKernelLock($job_key,3);
+            if ($list->isEmpty()) {
+                self::getKernelLock($job_key, 3);
                 $run = false;
             }
 
@@ -1927,7 +1923,7 @@ and o.status = 1 and o.pay_price > 1";
                     $temp_data['is_flag'] = $v->flag_name;
                     if ($v->flag_name = '抖音') {
                         $temp_data['channel_order_sku'] = '3460976881036350000';
-                    }else{
+                    } else {
                         $temp_data['channel_order_sku'] = '';
                     }
 

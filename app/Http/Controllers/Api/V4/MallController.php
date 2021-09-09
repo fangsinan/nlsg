@@ -15,6 +15,7 @@ use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
 use App\Servers\ImDocServers;
+use App\Servers\removeDataServers;
 use App\Servers\VipServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -237,7 +238,10 @@ class MallController extends Controller
                 }
                 dd([$res, $list]);
             }
-            MallOrder::testRun(1);
+
+            $servers = new removeDataServers();
+            $servers->worksListOfSub();
+//            MallOrder::testRun(1);
 //            $s = new ImDocServers();
 //            $r = $s->sendGroupDocMsgJob(701);
 
