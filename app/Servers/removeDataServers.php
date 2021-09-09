@@ -1844,13 +1844,6 @@ and o.status = 1 and o.pay_price > 1";
             return true;
         }
 
-        $temp_log_data = [];
-        $temp_log_data[] = [
-            'r1'=>__LINE__,
-            'r2'=>0,
-            'created_at'=>date('Y-m-d H:i:s'),
-        ];
-
         $run = true;
         while ($run) {
             self::getKernelLock($job_key, 2);
@@ -1905,16 +1898,17 @@ and o.status = 1 and o.pay_price > 1";
                 $temp_user_phone = $temp_user->phone;
 
                 $query = Subscribe::where('user_id', '=', $temp_user_id)
-                    ->where('created_at', '>', '2021-01-05')
+//                    ->where('created_at', '>', '2021-01-05 00:00:00')
                     ->where('relation_id', '=', $v->works_id)
                     ->where('type', '=', $v->works_type)
-                    ->where('status', '=', 1);
+                    ->where('status', '=', 1)
+                    ->where('id','>',300000);
 
                 if ($v->works_type != 3) {
                     $query->where('end_time', '>=', $now_date);
                 }
 
-                $check = $query->first();
+                $check = $query->select(['id'])->first();
 
                 $add_sub_data = [];
 
@@ -1959,6 +1953,7 @@ and o.status = 1 and o.pay_price > 1";
                     $check_cd = LiveCountDown::query()
                         ->where('user_id', '=', $temp_user_id)
                         ->where('live_id', '=', $v->works_id)
+                        ->select(['id'])
                         ->first();
                     if (empty($check_cd)) {
                         $cd_data['live_id'] = $v->works_id;
@@ -2027,12 +2022,6 @@ and o.status = 1 and o.pay_price > 1";
 
             }
         }
-        $temp_log_data[] = [
-            'r1'=>__LINE__,
-            'r2'=>0,
-            'created_at'=>date('Y-m-d H:i:s'),
-        ];
-        DB::table('nlsg_test_k_run')->insert($temp_log_data);
         return true;
     }
 
