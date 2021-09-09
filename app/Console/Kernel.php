@@ -56,10 +56,6 @@ $schedule->call(function () {
     MallOrder::testRun();
 })->everyMinute()->runInBackground();//每分
 
-$schedule->call(function () {
-    MallOrder::testRun();
-})->everyMinute()->runInBackground();//每分
-
 //        $schedule->call(function () {
 //            MallOrder::testRun();
 //        })->everyMinute()->withoutOverlapping()->runInBackground();//每分
@@ -78,10 +74,6 @@ $schedule->call(function () {
             }
 
         })->everyMinute()->runInBackground();//每分
-
-$schedule->call(function () {
-    MallOrder::testRun();
-})->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
             $m = new LiveConsole();
