@@ -684,7 +684,7 @@ class ImDocServers
                 $where = [
                     'works.status' => 4,
                     'works.type' => 2,
-//                    'works.is_audio_book' => 0
+                    'works.is_audio_book' => 0
                 ];
                 $relationObj = new WorksCategoryRelation();
                 $worksObj = new Works();
