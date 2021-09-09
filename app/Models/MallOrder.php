@@ -1722,14 +1722,18 @@ class MallOrder extends Base
         $cache_key_name = 'kernel_lock_'.$job_id;
         $counter = Cache::get($cache_key_name);
         $expire_num = 10;
-        if ($counter < 1) {
-            if ($flag == 1){
-                return true;
-            }else{
-                Cache::put($cache_key_name, 1, $expire_num);
-            }
+        if ($flag == 2){
+            Cache::put($cache_key_name, 1, $expire_num);
         }else{
-            return false;
+            if ($counter < 1) {
+                if ($flag == 1){
+                    return true;
+                }else{
+                    Cache::put($cache_key_name, 1, $expire_num);
+                }
+            }else{
+                return false;
+            }
         }
     }
 
