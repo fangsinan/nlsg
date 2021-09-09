@@ -33,6 +33,6 @@ class ImController extends Controller
 
     public function report(Request $request){
         $model = new ImReport();
-        return $this->getRes($model->add($request->input()));
+        return $this->getRes($model->add($request->input(),$this->user));
     }
 }

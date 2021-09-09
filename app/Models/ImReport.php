@@ -8,10 +8,11 @@ class ImReport extends Base
 {
     protected $table = 'nlsg_im_report';
 
-    public function add($params)
+    public function add($params,$user)
     {
         $data = [];
-        $data['from_account'] = $params['from_account'] ?? 0;
+//        $data['from_account'] = $params['from_account'] ?? 0;
+        $data['from_account'] = $user['id'];
         $data['to_account'] = $params['to_account'] ?? 0;
         $data['group_id'] = $params['group_id'] ?? '';
         $data['msg'] = $params['msg'] ?? '';
