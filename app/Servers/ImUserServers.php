@@ -162,6 +162,7 @@ class ImUserServers
     public function friendsList($params, $user_id)
     {
         $size = $params['size'] ?? 10;
+        $phone = $params['phone'] ?? '';
 
         $query = ImUserFriend::query()
             ->where('from_account', '=', $user_id)
@@ -169,6 +170,13 @@ class ImUserServers
 
         $query->with(['UserInfo:id,phone,nickname'])->has('UserInfo');
         $query->with(['ImUser:tag_im_to_account,tag_im_image,tag_im_nick'])->has('UserInfo');
+
+        if (!empty($phone)){
+            $query->whereHas('UserInfo',function($q)use($phone){
+                $q->where('phone','like',"%$phone%");
+            });
+        }
+
         $query->select([
             'id', 'from_account', 'from_name', 'to_account', 'to_name', 'created_at'
         ]);
