@@ -53,7 +53,11 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
 $schedule->call(function () {
-    MallOrder::testRun();
+    MallOrder::testRun(1);
+})->everyMinute()->runInBackground();//每分
+
+$schedule->call(function () {
+    MallOrder::testRun(2);
 })->everyMinute()->runInBackground();//每分
 
 //        $schedule->call(function () {

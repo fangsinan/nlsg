@@ -1716,8 +1716,13 @@ class MallOrder extends Base
             ]);
     }
 
-    public static function testRun(){
-        $r1 = rand(1,999);
+    public static function testRun($f){
+        if ($f==1){
+            $r1 = rand(100,199);
+        }else{
+            $r1 = rand(200,299);
+        }
+
         $max = rand(10,200);
         $ctime = date('Y-m-d H:i:s');
         $key = 1;
