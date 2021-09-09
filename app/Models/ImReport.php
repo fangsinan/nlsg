@@ -18,8 +18,12 @@ class ImReport extends Base
         $data['msg'] = $params['msg'] ?? '';
         $data['type'] = $params['type'] ?? 0;
 
-        if (empty($data['from_account']) || empty($data['to_account']) || empty($data['type'])) {
+        if (empty($data['from_account']) || empty($data['type'])) {
             return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        if ($data['type'] == 8 && empty($data['msg'])){
+            return ['code'=>false,'msg'=>'请填写原因'];
         }
 
         $res = DB::table('nlsg_im_report')->insert($data);
