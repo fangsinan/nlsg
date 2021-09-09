@@ -52,9 +52,9 @@ class Kernel extends ConsoleKernel
             Works::deal(); //自动上架
         })->everyMinute()->runInBackground();//每分
 
-//$schedule->call(function () {
-//    MallOrder::testRun();
-//})->everyMinute()->runInBackground();//每分
+$schedule->call(function () {
+    MallOrder::testRun();
+})->everyMinute()->runInBackground();//每分
 
 //        $schedule->call(function () {
 //            MallOrder::testRun();
