@@ -1725,7 +1725,7 @@ class MallOrder extends Base
         if ($flag == 2){
             Cache::put($cache_key_name, 1, $expire_num);
         }else{
-            if ($counter < 1) {
+            if ($counter === false) {
                 if ($flag == 1){
                     return true;
                 }else{

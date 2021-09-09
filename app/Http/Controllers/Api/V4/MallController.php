@@ -237,7 +237,7 @@ class MallController extends Controller
                 }
                 dd([$res, $list]);
             }
-//            MallOrder::testRun(1);
+            MallOrder::testRun(1);
 //            $s = new ImDocServers();
 //            $r = $s->sendGroupDocMsgJob(701);
 

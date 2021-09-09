@@ -14,6 +14,7 @@ use App\Models\History;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\MallGoods;
+use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
@@ -1816,179 +1817,214 @@ and o.status = 1 and o.pay_price > 1";
 
     }
 
+    public static function  getKernelLock(int $job_id,int $flag){
+        $cache_key_name = 'kernel_lock_'.$job_id;
+        $counter = Cache::get($cache_key_name);
+        $expire_num = 60;
+        if ($flag == 2){
+            Cache::put($cache_key_name, 1, $expire_num);
+        }elseif($flag == 1){
+            if ($counter === false) {
+                if ($flag == 1){
+                    return true;
+                }else{
+                    Cache::put($cache_key_name, 1, $expire_num);
+                }
+            }else{
+                return false;
+            }
+        }else{
+            Cache::pull($cache_key_name);
+        }
+    }
+
     public function worksListOfSub()
     {
         $now_date = date('Y-m-d H:i:s');
+        $job_key = 1844;
 
-        $list = DB::table('works_list_of_sub')
-            ->where('status', '=', 1)
-            ->whereIn('works_type', [2, 6, 3, 7])
-            ->limit(300)
-            ->get();
+        $check_job = self::getKernelLock($job_key,1);
+        if ($check_job === false){
+            return true;
+        }
 
-        foreach ($list as $v) {
+        $run = true;
+        while ($run){
+            self::getKernelLock($job_key,2);
+            $list = DB::table('works_list_of_sub')
+                ->where('status', '=', 1)
+                ->whereIn('works_type', [2, 6, 3, 7])
+                ->limit(100)
+                ->get();
 
-            DB::beginTransaction();
+            if ($list->isEmpty()){
+                self::getKernelLock($job_key,3);
+                $run = false;
+            }
 
-            if (empty($v->user_id) && empty($v->phone)) {
-                DB::table('works_list_of_sub')
-                    ->where('id', '=', $v->id)
-                    ->update([
-                        'status' => 3
+            foreach ($list as $v) {
+                DB::beginTransaction();
+
+                if (empty($v->user_id) && empty($v->phone)) {
+                    DB::table('works_list_of_sub')
+                        ->where('id', '=', $v->id)
+                        ->update([
+                            'status' => 3
+                        ]);
+                    DB::commit();
+                    continue;
+                }
+
+                if (!empty($v->phone)) {
+                    $temp_user = User::firstOrCreate([
+                        'phone' => $v->phone
+                    ], [
+                        'nickname' => substr_replace($v->phone, '****', 3, 4),
                     ]);
-                DB::commit();
-                continue;
-            }
+                } else {
+                    $temp_user = User::firstOrCreate([
+                        'id' => $v->user_id
+                    ]);
+                }
 
-            if (!empty($v->phone)) {
-                $temp_user = User::firstOrCreate([
-                    'phone' => $v->phone
-                ], [
-                    'nickname' => substr_replace($v->phone, '****', 3, 4),
-                ]);
-            } else {
-                $temp_user = User::firstOrCreate([
-                    'id' => $v->user_id
-                ]);
-            }
-
-            if (empty($v->twitter_phone)) {
-                $temp_t_user_id = 0;
-            } else {
-                $temp_t_u = User::query()->where('phone', '=', $v->twitter_phone)->first();
-                if (empty($temp_t_u)) {
+                if (empty($v->twitter_phone)) {
                     $temp_t_user_id = 0;
                 } else {
-                    $temp_t_user_id = $temp_t_u->id;
-                }
-            }
-
-            $temp_user_id = $temp_user->id;
-            $temp_user_phone = $temp_user->phone;
-
-            $query = Subscribe::where('user_id', '=', $temp_user_id)
-                ->where('created_at', '>', '2021-01-05')
-                ->where('relation_id', '=', $v->works_id)
-                ->where('type', '=', $v->works_type)
-                ->where('status', '=', 1);
-
-            if ($v->works_type != 3) {
-                $query->where('end_time', '>=', $now_date);
-            }
-
-            $check = $query->first();
-
-            $add_sub_data = [];
-
-            if (empty($check)) {
-                $temp_data = [];
-                $temp_data['type'] = $v->works_type;
-                $temp_data['user_id'] = $temp_user_id;
-                $temp_data['relation_id'] = $v->works_id;
-                $temp_data['pay_time'] = $now_date;
-                $temp_data['status'] = 1;
-                $temp_data['give'] = 3;
-                $temp_data['twitter_id'] = $temp_t_user_id;
-                $temp_data['is_flag'] = $v->flag_name;
-                if ($v->flag_name = '抖音') {
-                    $temp_data['channel_order_sku'] = '3460976881036350000';
-                }else{
-                    $temp_data['channel_order_sku'] = '';
-                }
-
-                if ($v->works_type != 3) {
-                    $temp_data['start_time'] = $now_date;
-                    $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
-                } else {
-                    $temp_data['start_time'] = $now_date;
-                    $temp_data['end_time'] = $now_date;
-                }
-                $add_sub_data[] = $temp_data;
-            } else {
-                if ($v->works_type != 3) {
-                    $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +$v->years  years"));
-                    $check->end_time = $temp_end_time;
-                    $edit_res = $check->save();
-                    if ($edit_res === false) {
-                        DB::rollBack();
-                        break;
-                    }
-                }
-            }
-
-            //如果是直播,需要记录liveCountDown和live预约人数
-            if ($v->works_type == 3) {
-                $check_cd = LiveCountDown::query()
-                    ->where('user_id', '=', $temp_user_id)
-                    ->where('live_id', '=', $v->works_id)
-                    ->first();
-                if (empty($check_cd)) {
-                    $cd_data['live_id'] = $v->works_id;
-                    $cd_data['user_id'] = $temp_user_id;
-                    $cd_data['phone'] = $temp_user_phone;
-                    $cd_res = DB::table('nlsg_live_count_down')->insert($cd_data);
-                    if (!$cd_res) {
-                        DB::rollBack();
-                        continue;
-                    }
-                }
-                Live::where('id', '=', $v->works_id)->increment('order_num');
-
-                //添加关系保护
-                $check_bind = VipUserBind::getBindParent($v->phone);
-                if ($check_bind == 0) {
-                    //没有绑定记录,则绑定
-                    $bind_data = [];
-                    if (!empty($v->twitter_phone)) {
-                        $bind_data = [
-                            'parent' => $v->twitter_phone,
-                            'son' => $v->phone,
-                            'life' => 2,
-                            'begin_at' => date('Y-m-d H:i:s'),
-                            'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                            'channel' => 1
-                        ];
+                    $temp_t_u = User::query()->where('phone', '=', $v->twitter_phone)->first();
+                    if (empty($temp_t_u)) {
+                        $temp_t_user_id = 0;
                     } else {
-                        if ($v->flag_name = '抖音') {
+                        $temp_t_user_id = $temp_t_u->id;
+                    }
+                }
+
+                $temp_user_id = $temp_user->id;
+                $temp_user_phone = $temp_user->phone;
+
+                $query = Subscribe::where('user_id', '=', $temp_user_id)
+                    ->where('created_at', '>', '2021-01-05')
+                    ->where('relation_id', '=', $v->works_id)
+                    ->where('type', '=', $v->works_type)
+                    ->where('status', '=', 1);
+
+                if ($v->works_type != 3) {
+                    $query->where('end_time', '>=', $now_date);
+                }
+
+                $check = $query->first();
+
+                $add_sub_data = [];
+
+                if (empty($check)) {
+                    $temp_data = [];
+                    $temp_data['type'] = $v->works_type;
+                    $temp_data['user_id'] = $temp_user_id;
+                    $temp_data['relation_id'] = $v->works_id;
+                    $temp_data['pay_time'] = $now_date;
+                    $temp_data['status'] = 1;
+                    $temp_data['give'] = 3;
+                    $temp_data['twitter_id'] = $temp_t_user_id;
+                    $temp_data['is_flag'] = $v->flag_name;
+                    if ($v->flag_name = '抖音') {
+                        $temp_data['channel_order_sku'] = '3460976881036350000';
+                    }else{
+                        $temp_data['channel_order_sku'] = '';
+                    }
+
+                    if ($v->works_type != 3) {
+                        $temp_data['start_time'] = $now_date;
+                        $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
+                    } else {
+                        $temp_data['start_time'] = $now_date;
+                        $temp_data['end_time'] = $now_date;
+                    }
+                    $add_sub_data[] = $temp_data;
+                } else {
+                    if ($v->works_type != 3) {
+                        $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +$v->years  years"));
+                        $check->end_time = $temp_end_time;
+                        $edit_res = $check->save();
+                        if ($edit_res === false) {
+                            DB::rollBack();
+                            break;
+                        }
+                    }
+                }
+
+                //如果是直播,需要记录liveCountDown和live预约人数
+                if ($v->works_type == 3) {
+                    $check_cd = LiveCountDown::query()
+                        ->where('user_id', '=', $temp_user_id)
+                        ->where('live_id', '=', $v->works_id)
+                        ->first();
+                    if (empty($check_cd)) {
+                        $cd_data['live_id'] = $v->works_id;
+                        $cd_data['user_id'] = $temp_user_id;
+                        $cd_data['phone'] = $temp_user_phone;
+                        $cd_res = DB::table('nlsg_live_count_down')->insert($cd_data);
+                        if (!$cd_res) {
+                            DB::rollBack();
+                            continue;
+                        }
+                    }
+                    Live::where('id', '=', $v->works_id)->increment('order_num');
+
+                    //添加关系保护
+                    $check_bind = VipUserBind::getBindParent($v->phone);
+                    if ($check_bind == 0) {
+                        //没有绑定记录,则绑定
+                        $bind_data = [];
+                        if (!empty($v->twitter_phone)) {
                             $bind_data = [
-                                'parent' => '18512378959',
+                                'parent' => $v->twitter_phone,
                                 'son' => $v->phone,
                                 'life' => 2,
                                 'begin_at' => date('Y-m-d H:i:s'),
                                 'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                                'channel' => 3
+                                'channel' => 1
                             ];
+                        } else {
+                            if ($v->flag_name = '抖音') {
+                                $bind_data = [
+                                    'parent' => '18512378959',
+                                    'son' => $v->phone,
+                                    'life' => 2,
+                                    'begin_at' => date('Y-m-d H:i:s'),
+                                    'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                                    'channel' => 3
+                                ];
+                            }
+                        }
+
+                        if (!empty($bind_data)) {
+                            DB::table('nlsg_vip_user_bind')->insert($bind_data);
                         }
                     }
-
-                    if (!empty($bind_data)) {
-                        DB::table('nlsg_vip_user_bind')->insert($bind_data);
-                    }
                 }
-            }
 
-            $edit_res = DB::table('works_list_of_sub')
-                ->where('id', '=', $v->id)
-                ->update([
-                    'user_id' => $temp_user_id,
-                    'phone' => $temp_user_phone,
-                    'status' => 2,
-                ]);
-            if ($edit_res == false) {
-                DB::rollBack();
-                continue;
-            }
-            if (!empty($add_sub_data)) {
-                $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
-                if ($add_res === false) {
+                $edit_res = DB::table('works_list_of_sub')
+                    ->where('id', '=', $v->id)
+                    ->update([
+                        'user_id' => $temp_user_id,
+                        'phone' => $temp_user_phone,
+                        'status' => 2,
+                    ]);
+                if ($edit_res == false) {
                     DB::rollBack();
                     continue;
                 }
+                if (!empty($add_sub_data)) {
+                    $add_res = DB::table('nlsg_subscribe')->insert($add_sub_data);
+                    if ($add_res === false) {
+                        DB::rollBack();
+                        continue;
+                    }
+                }
+                DB::commit();
+
             }
-            DB::commit();
-
         }
-
+        return true;
     }
 
     public function subListSms()
