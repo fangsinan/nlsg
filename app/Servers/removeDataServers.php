@@ -1908,8 +1908,8 @@ and o.status = 1 and o.pay_price > 1";
 //                    ->where('created_at', '>', '2021-01-05 00:00:00')
                     ->where('relation_id', '=', $v->works_id)
                     ->where('type', '=', $v->works_type)
-                    ->where('status', '=', 1)
-                    ->where('id','>',300000);
+                    ->where('status', '=', 1);
+//                    ->where('id','>',300000);
 
                 if ($v->works_type != 3) {
                     $query->where('end_time', '>=', $now_date);
@@ -2036,7 +2036,7 @@ and o.status = 1 and o.pay_price > 1";
             'created_at'=>date('Y-m-d H:i:s'),
         ];
         DB::table('nlsg_test_k_run')->insert($temp_log_data);
-        
+
         return true;
     }
 
