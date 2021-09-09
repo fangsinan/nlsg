@@ -270,6 +270,8 @@ class ImGroupController extends Controller
         if(!empty($adds)){
             $gu_res = ImGroupUser::insert($adds);
         }
+        ImGroup::setGroupInfo([$params['GroupId']]);
+
 
         if($group_add_id && $gu_res){
             DB::commit();
