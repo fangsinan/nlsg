@@ -41,7 +41,7 @@ class ImMsgController extends ControllerBackend
     public function MsgCollection(Request $request){
 
         $imObj = new ImMsgServers();
-        $data = $imObj->MsgCollection($request->input(),$this->user['id']);
+        $data = $imObj->MsgCollection($request->input(),$this->user['user_id']);
         return $this->getRes($data);
     }
 
@@ -66,7 +66,7 @@ class ImMsgController extends ControllerBackend
     public function MsgCollectionList(Request $request){
 
         $imObj = new ImMsgServers();
-        $data = $imObj->MsgCollectionList($request->input(),$this->user['id']);
+        $data = $imObj->MsgCollectionList($request->input(),$this->user['user_id']);
         return $this->getRes($data);
     }
 
