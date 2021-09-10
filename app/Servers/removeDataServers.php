@@ -1843,7 +1843,7 @@ and o.status = 1 and o.pay_price > 1";
         if ($check_job === false) {
             return true;
         }
-        
+
         $run = true;
         while ($run) {
             self::getKernelLock($job_key, 2);
@@ -1965,7 +1965,6 @@ and o.status = 1 and o.pay_price > 1";
                             continue;
                         }
                     }
-                    Live::where('id', '=', $v->works_id)->increment('order_num');
 
                     //添加关系保护
                     $check_bind = VipUserBind::getBindParent($v->phone);
@@ -2017,6 +2016,8 @@ and o.status = 1 and o.pay_price > 1";
                         DB::rollBack();
                         continue;
                     }
+
+                    Live::where('id', '=', $v->works_id)->increment('order_num',count($add_sub_data));
                 }
                 DB::commit();
 
