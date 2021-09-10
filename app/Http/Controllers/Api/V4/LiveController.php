@@ -47,6 +47,7 @@ class LiveController extends Controller
             ->where(['user_id'=>$user_id,'type'=>10,'live_id'=>123,'status'=>1,'is_shill'=>0])
             ->first();
         $data=[];
+        $data['user_id']=$user_id;
         if(empty($OrderInfo)){
             $data['sub']=0;
         }else {

@@ -37,6 +37,38 @@ class AliUploadServers
     public static $ImUrlKey = 'https://cos.ap-shanghai.myqcloud.com/';
     public static $ReturnUrl = '/api/v4/upload/callback';
 
+    //oss web端上传sts
+    public function FileAliOssSts(){
+        //构建一个阿里云客户端，用于发起请求。
+        //构建阿里云客户端时需要设置AccessKey ID和AccessKey Secret。
+        AlibabaCloud::accessKeyClient('LTAI5tBoeuCGBtqDkPgsDsTF', 'BmWfbKL49efFoOY4eq7Mlgf456Fcu5')
+            ->regionId('cn-beijing')
+            ->asDefaultClient();
+        //设置参数，发起请求。
+        try {
+            $result = AlibabaCloud::rpc()
+                ->product('Sts')
+                ->scheme('https') // https | http
+                ->version('2015-04-01')
+                ->action('AssumeRole')
+                ->method('POST')
+                ->host('sts.aliyuncs.com')
+                ->options([
+                    'query' => [
+                        'RegionId' => "cn-beijing",
+                        'RoleArn' => "acs:ram::1255787033270118:role/ramoss",
+                        'RoleSessionName' => "RamOss",
+                    ],
+                ])
+                ->request();
+            return ['status'=>1,'data'=>$result->toArray()];
+        } catch (ClientException $e) {
+            return ['status'=>0,'msg'=>$e->getErrorMessage().' '.$e->getLine().' '.$e->getFile()];
+        } catch (ServerException $e) {
+            return ['status'=>0,'msg'=>$e->getErrorMessage().' '.$e->getLine().' '.$e->getFile()];
+        }
+    }
+
     //初始化
     public function initVodClient($accessKeyId=self::AccessKeyId, $accessKeySecret=self::AccessKeySecret) {
         $regionId = 'cn-beijing';

@@ -285,6 +285,22 @@ class AliUploadController extends Controller
 
     }
 
+    //OSS文件上传web端sts
+    public  function FileAliOssSts(Request $request){
+
+        $params = $request->input();
+        $type = (empty($params['type']))?0:$params['type'];
+
+        $AliUploadServer=new AliUploadServers();
+        $RstData=$AliUploadServer->FileAliOssSts();
+        if($RstData['status']==1){
+            return $this->success($RstData['data']);
+        }else{
+            return $this->error(0, $RstData['msg'], (object)[]);
+        }
+
+    }
+
     /**
      * @api {post} /api/v4/upload/del_ali_oss   删除阿里OSS文件
      * @apiName del_ali_oss
@@ -532,7 +548,6 @@ class AliUploadController extends Controller
 
     //定时抓取腾讯IM音视频、图片、文件到阿里云平台
     public  function TimingGrab(Request $request){
-
         $params = $request->input();
         $type = (empty($params['type']))?0:$params['type'];
 

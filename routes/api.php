@@ -105,6 +105,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('upload/del_ali_ydb', 'AliUploadController@DelAliYdb');
     Route::post('upload/get_play', 'AliUploadController@GetPlay');
     Route::post('upload/file_ali_oss', 'AliUploadController@FileAliOss');
+    Route::post('upload/file_ali_osssts', 'AliUploadController@FileAliOssSts');
     Route::post('upload/del_ali_oss', 'AliUploadController@DelAliOss');
     Route::post('upload/callback', 'AliUploadController@Callback');
     Route::post('upload/addmedia', 'AliUploadController@AddMedia'); //上传成功入库
