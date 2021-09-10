@@ -771,10 +771,13 @@ class IndexController extends ControllerBackend
 
     public function getBackVideos(Request $request)
     {
+        //3701925919134293895 王琨老师直播第一天720  http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/9cce592f3701925919134293895/v.f100030.mp4       947M
+        //3701925924026354682 王琨老师直播第一天540  http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/4939b6c33701925924026354682/v.f100020.mp4      614M
+        //3701925921189014962 王琨老师直播第二天720  http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/1ac858843701925921189014962/v.f100030.mp4      1.33GB
+        //3701925924022337528 王琨老师直播第二天540  http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/152e32df3701925924022337528/v.f100020.mp4      809M
         $res = [
             ['title' => "王琨老师第一天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/9cce592f3701925919134293895/v.f100030.mp4',],
-            ['title' => "王琨老师第二天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/bba62eab3701925919196098502/v.f100030.mp4',],
-            ['title' => "王琨老师第二天直播新版", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/1ac858843701925921189014962/v.f100030.mp4',],
+            ['title' => "王琨老师第二天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/1ac858843701925921189014962/v.f100030.mp4',],
             ['title' => "李婷老师直播",      'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/86674a033701925920092825176/v.f100030.mp4',],
             ['title' => "李婷老师直播新版",      'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/24c43b093701925920528809905/v.f100030.mp4',],
         ];
