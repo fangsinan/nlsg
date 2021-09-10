@@ -378,6 +378,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
         //直播
+        Route::get('live/playback', 'LiveController@PlayBack');
         Route::get('live/channels', 'LiveController@getLiveChannel');
         Route::get('live/show', 'LiveController@show');
         Route::post('live/check_password', 'LiveController@checkLivePassword');

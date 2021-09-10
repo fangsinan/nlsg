@@ -31,6 +31,36 @@ use Predis\Client;
 
 class LiveController extends Controller
 {
+    //渠道王琨老师直播回放单独处理
+    //https://app.v4.api.nlsgapp.com/api/v4/live/playback
+    public function PlayBack(Request $request)
+    {
+
+        $day_num = $request->input('day_num', 1);
+        $user_id = $this->user['id'] ?? 0;
+        //检测下单参数有效性
+        if (empty($user_id)) {
+            return $this->error(0, '用户未登录');
+        }
+
+        $OrderInfo=Order::query()->where('pay_time', '<', '2021-09-10 14:00:00')
+            ->where(['user_id'=>$user_id,'type'=>10,'live_id'=>123,'status'=>1,'is_shill'=>0])
+            ->first();
+        $data=[];
+        if(empty($OrderInfo)){
+            $data['sub']=0;
+        }else {
+            $data['sub']=1;
+            if ($day_num == 1) { //第一天
+                $data['url']='http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/4939b6c33701925924026354682/v.f100020.mp4';
+            } else {
+                $data['url']='http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/152e32df3701925924022337528/v.f100020.mp4';
+            }
+        }
+
+        return success($data);
+    }
+
     /**
      * @api {get} api/v4/live/index  直播首页
      * @apiVersion 4.0.0
