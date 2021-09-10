@@ -31,6 +31,7 @@ class MallOrderServers
     public function listNew($params, $user_id = 0)
     {
         $query = MallOrder::query();
+        $size = $params['size'] ?? 10;
 
         $query->where('status', '>', 1);
 
@@ -130,7 +131,8 @@ class MallOrderServers
         $query->select($field);
 
 
-        $list = $query->orderBy('id', 'desc')->limit(10)->get();
+//        $list = $query->orderBy('id', 'desc')->limit(10)->get();
+        $list = $query->orderBy('id', 'desc')->paginate($size);
 //        return DB::getQueryLog();
 
         foreach ($list as &$v) {

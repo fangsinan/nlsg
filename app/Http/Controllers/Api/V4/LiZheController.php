@@ -70,10 +70,10 @@ class LiZheController extends Controller
 
     }
 
-    //生成兑换券 http://127.0.0.1:8000/api/v4/lizhe/create
+    //生成兑换券 https://app.v4.api.nlsgapp.com/api/v4/lizhe/create
     public  function CreateCode(Request $request)
     {
-//        return ;
+        return ;
         try {
             $code_name = [
 //                'MGC' => '古云草',
@@ -87,8 +87,9 @@ class LiZheController extends Controller
 //                'DSS' => '智客',
 //                'AQW' => '久善今心',
 //                'ZBF' => '主办方',
-                  'AQW' => '久善今心',
-                  'ZBF' => '主办方'
+                  'AAQ' => '华德汇智',
+                  'ZYL' => '收现商学院',
+                  'PQH' => '女素教育'
             ];
 
             foreach ($code_name as $key => $val) {
