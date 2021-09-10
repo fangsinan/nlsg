@@ -206,7 +206,8 @@ class ImUserServers
         ]);
 
         $query->select(['id', 'type', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time',
-            'ordernum', 'pay_price']);
+            'ordernum', 'pay_price'])
+            ->orderBy('id','desc');
 
         $list = $query->paginate($size);
 
