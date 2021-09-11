@@ -443,25 +443,38 @@ GROUP BY
 
             $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
             //在线人数
-            $list_sql = "
-            SELECT
-                count(*) AS counts,
-                time
-            FROM
-                (
-                SELECT
-                    *
-                FROM
-                    (
-                    SELECT
-                        user_id,online_time_str AS time
-                    FROM  `nlsg_live_online_user`
-                    WHERE `live_id` = $live_id
-                    ) AS a
-                 GROUP BY  user_id, time ORDER BY null
-                ) AS b
-            GROUP BY
-                time ORDER BY time asc";
+//            $list_sql = "
+//            SELECT
+//                count(*) AS counts,
+//                time
+//            FROM
+//                (
+//                SELECT
+//                    *
+//                FROM
+//                    (
+//                    SELECT
+//                        user_id,online_time_str AS time
+//                    FROM  `nlsg_live_online_user`
+//                    WHERE `live_id` = $live_id
+//                    ) AS a
+//                 GROUP BY  user_id, time ORDER BY null
+//                ) AS b
+//            GROUP BY
+//                time ORDER BY time asc";
+
+            $list_sql = "select online_time_str as time,count(*) as counts from (
+SELECT
+	online_time_str,
+	id
+FROM
+	nlsg_live_online_user
+WHERE
+	live_id = $live_id
+GROUP BY
+	online_time_str,
+	user_id
+	) as a GROUP BY online_time_str";
         }
 
 
