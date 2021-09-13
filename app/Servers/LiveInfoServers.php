@@ -749,29 +749,33 @@ GROUP BY
         $res['begin_at'] = $check_live_id->begin_at;
         $res['end_at'] = $check_live_id->end_at;
         $res['live_login'] = LiveLogin::where('live_id', '=', $live_id)->count();//人气
+
         //$res['order_num'] = Subscribe::where('relation_id', '=', $live_id)
         //->where(function ($query) {
         //    $query->where('order_id', '>', 0)->orWhere('channel_order_id', '<>', '');
         //})
         //->count();//总预约人数
 
-        $order_num_sql = "
-SELECT
-	count(*) AS counts
-FROM
-	(
-	SELECT
-		*
-	FROM
-		nlsg_subscribe
-	WHERE
-		relation_id = $live_id
-		AND STATUS = 1
-	GROUP BY
-	user_id
-	) AS a";
+//        $order_num_sql = "
+//SELECT
+//	count(*) AS counts
+//FROM
+//	(
+//	SELECT
+//		*
+//	FROM
+//		nlsg_subscribe
+//	WHERE
+//		relation_id = $live_id
+//		AND STATUS = 1
+//	GROUP BY
+//	user_id
+//	) AS a";
+//
+//        $res['order_num'] = DB::select($order_num_sql)[0]->counts;
 
-        $res['order_num'] = DB::select($order_num_sql)[0]->counts;
+        $res['order_num'] = Subscribe::query()->where('relation_id','=',$live_id)
+            ->where('type','=',3)->where('status','=',1)->count();
 
         if ($check_live_id->user_id == 161904) {
             //王琨,统计live_deal
