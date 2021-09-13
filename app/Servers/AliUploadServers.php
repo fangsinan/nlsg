@@ -38,6 +38,8 @@ class AliUploadServers
     public static $ReturnUrl = '/api/v4/upload/callback';
 
     //oss web端上传sts
+    //https://help.aliyun.com/document_detail/100624.htm?spm=a2c4g.11186623.0.0.415062e75nPxYk#concept-xzh-nzk-2gb
+    //https://help.aliyun.com/document_detail/28792.htm?spm=a2c4g.11186623.0.0.5f244bceccu1Nc#concept-esm-kzy-xdb
     public function FileAliOssSts(){
         //构建一个阿里云客户端，用于发起请求。
         //构建阿里云客户端时需要设置AccessKey ID和AccessKey Secret。

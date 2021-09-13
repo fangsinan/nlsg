@@ -22,6 +22,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('/lizhe/checking', 'LiZheController@Checking');
     //李婷老师推广直播间删除购买记录
     Route::get('/liting/delsub', 'LiZheController@DelSub');
+    Route::get('live/playbacksub', 'LiveController@PlayBackSub');//开通回放
     //首页
     Route::get('index/announce', 'IndexController@announce');
     Route::get('index/banner', 'IndexController@banner');

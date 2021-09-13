@@ -13,6 +13,7 @@ use App\Models\LiveCountDown;
 use App\Models\LiveForbiddenWords;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
+use App\Models\LivePlayback;
 use App\Models\LiveSonFlagPoster;
 use App\Models\LiveWorks;
 use App\Models\MallOrder;
@@ -31,8 +32,61 @@ use Predis\Client;
 
 class LiveController extends Controller
 {
+
+    //渠道王琨老师直播回放单独开通
+    //https://app.v4.api.nlsgapp.com/api/v4/live/playback
+    public function PlayBackSub(Request $request)
+    {
+
+        $phone = $request->input('phone', '');
+        if(empty($phone)){
+            echo '开通手机号不能为空<br>';
+            return ;
+        }
+        $list=explode(',',$phone);
+        $map=[];
+        $error='';
+        $now_date = date('Y-m-d H:i:s');
+        foreach ($list as $key=>$val){
+            $phone_str=trim($val); //去掉空格
+            $num=strlen($phone_str);
+            if($num==11){
+                $map[]=[
+                    'phone'=>$phone_str,
+                    'created_at'=>$now_date
+                ];
+            }else{
+                $error.=$val.'|';
+            }
+
+        }
+        if(!empty($map)) {
+            DB::beginTransaction();
+            try {
+                $rst = LivePlayback::query()->insert($map);
+                if ($rst === false) {
+                    DB::rollBack();
+                    echo '开通失败<br>';
+                    return ;
+                }
+            } catch (\Exception $e) {
+                DB::rollBack();
+                echo '开通失败'.$e->getMessage().'<br>';
+                return ;
+            }
+            DB::commit();
+            echo '开通成功<br>';
+        }
+        if(!empty($error)) {
+            echo "开通失败用户：" . $error;
+        }
+
+    }
+
     //渠道王琨老师直播回放单独处理
     //https://app.v4.api.nlsgapp.com/api/v4/live/playback
+    //第一天：https://wechat.nlsgapp.com/appv4/playBackNew?live_info_id=123&day_num=1
+    //第二天：https://wechat.nlsgapp.com/appv4/playBackNew?live_info_id=123&day_num=2
     public function PlayBack(Request $request)
     {
 
@@ -49,9 +103,18 @@ class LiveController extends Controller
         $data=[];
         $data['user_id']=$user_id;
         if(empty($OrderInfo)){
-            $data['sub']=0;
+            //查询单独开通用户
+            $UserInfo=User::query()->where(['id'=>$user_id])->first();
+            $PlayBack=LivePlayback::query()->where(['phone'=>$UserInfo->phone])->first();
+            if(!empty($PlayBack)){
+                $data['sub']=1;
+            }else{
+                $data['sub']=0;
+            }
         }else {
             $data['sub']=1;
+        }
+        if(!empty($data['sub']) && $data['sub']==1){
             if ($day_num == 1) { //第一天
                 $data['url']='http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/4939b6c33701925924026354682/v.f100020.mp4';
             } else {
