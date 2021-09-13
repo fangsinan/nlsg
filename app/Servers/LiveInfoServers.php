@@ -390,24 +390,35 @@ class LiveInfoServers
             $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
 
             //在线人数
-            $list_sql = "
-            SELECT
-	count(*) AS counts,
-	time
+//            $list_sql = "
+//            SELECT
+//	count(*) AS counts,
+//	time
+//FROM
+//	(
+//	SELECT
+//		*
+//	FROM
+//		( SELECT user_id, online_time_str AS time, live_son_flag FROM `nlsg_live_online_user` WHERE `live_id` = $live_id AND live_son_flag = $son_id ) AS a
+//	GROUP BY
+//		user_id,
+//		time ORDER BY null
+//	) AS b
+//GROUP BY
+//	time
+//	ORDER BY time asc
+//            ";
+
+            $list_sql = "SELECT
+	online_time_str as time,
+	count(*) as counts
 FROM
-	(
-	SELECT
-		*
-	FROM
-		( SELECT user_id, online_time_str AS time, live_son_flag FROM `nlsg_live_online_user` WHERE `live_id` = $live_id AND live_son_flag = $son_id ) AS a
-	GROUP BY
-		user_id,
-		time ORDER BY null
-	) AS b
+	nlsg_live_online_user
+WHERE
+	live_id = $live_id and live_son_flag = $son_id
 GROUP BY
-	time
-	ORDER BY time asc
-            ";
+	online_time_str
+	ORDER BY online_time_str asc";
 
         } else { //总数据
             //nlsg_live_online_user 表记录可能重复，同一用户多次刷新，socket fd未能及时回收，存在一个用户同一时段多条记录
@@ -463,18 +474,30 @@ GROUP BY
 //            GROUP BY
 //                time ORDER BY time asc";
 
-            $list_sql = "select online_time_str as time,count(*) as counts from (
-SELECT
-	online_time_str,
-	id
+//            $list_sql = "select online_time_str as time,count(*) as counts from (
+//SELECT
+//	online_time_str,
+//	id
+//FROM
+//	nlsg_live_online_user
+//WHERE
+//	live_id = $live_id
+//GROUP BY
+//	online_time_str,
+//	user_id
+//	) as a GROUP BY online_time_str";
+
+
+
+            $list_sql = "SELECT
+	online_time_str as time,
+	count(*) as counts
 FROM
 	nlsg_live_online_user
 WHERE
 	live_id = $live_id
 GROUP BY
-	online_time_str,
-	user_id
-	) as a GROUP BY online_time_str";
+	online_time_str";
         }
 
 
