@@ -102,14 +102,17 @@ class Works extends Base
         if ( ! $id) {
             return false;
         }
-
+        $limit=2;
+        if($id==566){
+            $limit=1;
+        }
         $list = Works::with([
-            'workInfo' => function ($query) {
+            'workInfo' => function ($query) use ($limit) {
                 $query->select('id', 'pid', 'rank', 'title', 'duration', 'view_num', 'online_time')
                     ->orderBy('rank', 'desc')
                     ->orderBy('id', 'desc')
                     ->where('status', 4)
-                    ->limit(2);
+                    ->limit($limit);
             },
             'user:id,nickname,headimg'
         ])
