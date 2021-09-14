@@ -627,6 +627,9 @@ class ImDocServers
                     $jobModel->status = 3;
                     break;
                 case 'send':
+                    if ($jobModel->is_done > 1){
+                        return ['code' => false, 'msg' => '任务已定时发送'];
+                    }
                     $now = time();
                     $jobModel->user_id = $user_id;
                     $jobModel->status = 1;
@@ -1086,6 +1089,7 @@ class ImDocServers
         if ($job_info->isEmpty()) {
             return ['code' => true, 'msg' => '没有任务'];
         }
+
 
         $job_id_list = [];
         $post_data_array = [];
