@@ -834,7 +834,7 @@ class ImDocServers
         $cache_key_name = 'works_category_list';
         $expire_num = CacheTools::getExpire('goods_category_list');
         $works_category = Cache::get($cache_key_name);
-        if (empty($res)) {
+        if (empty($works_category)) {
             $works_category = WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
                 ->where(['status' => 1,])
                 ->orderBy('sort', 'asc')
