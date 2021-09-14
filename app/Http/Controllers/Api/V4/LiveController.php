@@ -619,8 +619,8 @@ class LiveController extends Controller
             $list['live_son_flag_status'] = 0;
             if(!empty($live_son_flag)){
                 $list['live_son_flag_count'] = Subscribe::where([
-                    "type" => 3,
                     "relation_id" => $list->live_pid,
+                    "type" => 3,
                     "status" => 1,
                     "twitter_id" => $live_son_flag,
                 ])->count();
