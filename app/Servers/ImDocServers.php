@@ -631,6 +631,7 @@ class ImDocServers
                     $jobModel->user_id = $user_id;
                     $jobModel->status = 1;
                     $jobModel->send_type = 1;
+                    $jobModel->is_done = 2;
                     $jobModel->send_at = date('Y-m-d H:i:s', $now);
                     $jobModel->month = date('Y-m', $now);
                     $jobModel->day = date('Y-m-d', $now);
@@ -660,6 +661,9 @@ class ImDocServers
             }
 
             DB::commit();
+            if ($flag == 'send'){
+                return $this->sendGroupDocMsgJob($jobModel->id);
+            }
             return ['code' => true, 'msg' => '成功'];
 
         } else {
@@ -1065,9 +1069,9 @@ class ImDocServers
 
         if (!empty($id)) {
             $query->where('id', '=', $id);
+        }else{
+            $query->where('is_done', '=', 1);
         }
-
-        $query->where('is_done', '=', 1);
 
         $job_info = $query->where('status', '=', 1)
             ->where(function ($q) {
