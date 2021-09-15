@@ -34,7 +34,7 @@ class LiveController extends Controller
 {
 
     //渠道王琨老师直播回放单独开通
-    //https://app.v4.api.nlsgapp.com/api/v4/live/playback
+    //https://app.v4.api.nlsgapp.com/api/v4/live/playbacksub
     public function PlayBackSub(Request $request)
     {
 
