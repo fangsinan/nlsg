@@ -103,9 +103,9 @@ class Works extends Base
             return false;
         }
         $limit=2;
-        if($id==566){
-            $limit=1;
-        }
+//        if($id==566){
+//            $limit=1;
+//        }
         $list = Works::with([
             'workInfo' => function ($query) use ($limit) {
                 $query->select('id', 'pid', 'rank', 'title', 'duration', 'view_num', 'online_time')
