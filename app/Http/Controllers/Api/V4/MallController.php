@@ -10,12 +10,9 @@ use App\Models\MallCategory;
 use App\Models\MallComment;
 use App\Models\MallGoods;
 use App\Models\MallGoodsMsg;
-use App\Models\MallOrder;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
-use App\Servers\ImDocServers;
-use App\Servers\removeDataServers;
 use App\Servers\VipServers;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -240,13 +237,13 @@ class MallController extends Controller
                 dd([$res, $list]);
             }
 
-            $wx_test = $request->input('wx_test',0);
-            if ($wx_test){
+            $wx_test = $request->input('wx_test', 0);
+            if ($wx_test) {
                 $client = new Client();
 
                 $t_url = "http://api.weixin.qq.com/cgi-bin/token?grant_type=authorization_code&appid=wxe24a425adb5102f6&secret=2ded804b74f99ae2f342423dd7952620";
                 $t_res = $client->request('GET', $t_url);
-                dd($t_res);
+                return $this->getRes(json_encode($t_res));
 
 
                 $url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
