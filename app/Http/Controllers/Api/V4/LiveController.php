@@ -647,16 +647,17 @@ class LiveController extends Controller
             if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
                 $live_son_flag_num=$live_son_flag_num+$list['live']['virtual_online_num']; //虚拟值
             }
+            if(empty($key_num) || $key_num<$live_son_flag_num){
+                $redis->setex($key,86400*5,$live_son_flag_num);
+            }
         }else{
-            //数据库实时数据
-            $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->where('live_son_flag', $live_son_flag)->count();
-            //判断key是否存在，否则初始化最新值，防止重启直播框架时删除key
             $key='live_son_flag_'.$id.'_'.$live_son_flag;
-            $key_num=$redis->get($key);
+            $live_son_flag_num=$redis->get($key);
+            if(empty($live_son_flag_num)){
+                $live_son_flag_num=1;
+            }
         }
-        if(empty($key_num) || $key_num<$live_son_flag_num){
-            $redis->setex($key,86400*10,$live_son_flag_num);
-        }
+
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
