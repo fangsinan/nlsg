@@ -240,9 +240,8 @@ class MallController extends Controller
 
             $wx_test = $request->input('wx_test', 0);
             if ($wx_test) {
-                $client = new Client();
-
-                $t_url = "http://api.weixin.qq.com/cgi-bin/token?grant_type=authorization_code&appid=wxe24a425adb5102f6&secret=2ded804b74f99ae2f342423dd7952620";
+                
+                $t_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxe24a425adb5102f6&secret=2ded804b74f99ae2f342423dd7952620";
                 $t_res = Http::get($t_url);
                 $t_res = json_decode($t_res);
                 return $this->getRes($t_res);
