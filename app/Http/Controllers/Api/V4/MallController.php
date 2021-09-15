@@ -17,6 +17,7 @@ use App\Servers\VipServers;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class MallController extends Controller
 {
@@ -242,8 +243,9 @@ class MallController extends Controller
                 $client = new Client();
 
                 $t_url = "http://api.weixin.qq.com/cgi-bin/token?grant_type=authorization_code&appid=wxe24a425adb5102f6&secret=2ded804b74f99ae2f342423dd7952620";
-                $t_res = $client->request('GET', $t_url);
-                return $this->getRes(json_encode($t_res));
+                $t_res = Http::get($t_url);
+                $t_res = json_decode($t_res);
+                return $this->getRes($t_res);
 
 
                 $url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
