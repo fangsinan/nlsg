@@ -17,6 +17,7 @@ use App\Models\VipUser;
 use App\Servers\ImDocServers;
 use App\Servers\removeDataServers;
 use App\Servers\VipServers;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -237,6 +238,31 @@ class MallController extends Controller
                     }
                 }
                 dd([$res, $list]);
+            }
+
+            $wx_test = $request->input('wx_test',0);
+            if ($wx_test){
+                $client = new Client();
+
+                $t_url = "http://api.weixin.qq.com/cgi-bin/token?grant_type=authorization_code&appid=wxe24a425adb5102f6&secret=2ded804b74f99ae2f342423dd7952620";
+                $t_res = $client->request('GET', $t_url);
+                dd($t_res);
+
+
+                $url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
+
+                $access_token = '';
+                $openid = '';
+
+
+                $res = $client->request('GET', $url, [
+                    'access_token' => $access_token,
+                    'openid' => $openid,
+                    'lang' => 'zh_CN',
+                ]);
+
+                dd($res);
+
             }
 
 //            $servers = new removeDataServers();
