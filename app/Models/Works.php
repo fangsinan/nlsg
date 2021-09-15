@@ -104,7 +104,7 @@ class Works extends Base
         }
         $limit=2;
         if($id==566){
-            $limit=3;
+            $limit=2;
         }
         $list = Works::with([
             'workInfo' => function ($query) use ($limit) {
