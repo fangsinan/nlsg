@@ -842,13 +842,12 @@ class ImDocServers
 //                ->toArray();
 
             $works_category = DB::table('nlsg_works_category as wc')
-                ->join('nlsg_works_category_relation as wcr','wc.id ','=','wcr.category_id')
-                ->join('nlsg_works as w','wcr.work_id ','=','w.id')
+                ->join('nlsg_works_category_relation as wcr','wc.id','=','wcr.category_id')
                 ->groupBy('wc.id')
                 ->select(['wc.id','wc.name','wc.pid','wc.level','wc.sort'])
                 ->get()
                 ->toArray();
-            
+
             Cache::put($cache_key_name, $works_category, $expire_num);
         }
 
