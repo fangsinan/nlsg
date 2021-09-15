@@ -524,12 +524,14 @@ GROUP BY
         $img_data['rows'] = [];
         foreach ($res['list'] as $v) {
             $temp_img_data = [];
-            $temp_img_data['时间'] = $v->time;
+//            $temp_img_data['时间'] = $v->time;substr($v->time,-11);
+            $temp_img_data['时间'] = substr($v->time,-11);
             $temp_img_data['人数'] = $v->counts;
             $img_data['rows'][] = $temp_img_data;
         }
 
         $res['img_data'] = $img_data;
+        $res['list'] = [];
 
         return $res;
     }
