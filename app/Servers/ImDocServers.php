@@ -706,7 +706,7 @@ class ImDocServers
                         DB::raw('1 as doc_type'),
                         'relation.category_id', 'works.is_end', 'u.nickname']);
 
-                if ($cate_id_arr && $category_id != 0) {
+                if ($category_id != 0) {
                     $query->whereIn('relation.category_id', $cate_id_arr);
                 }
 
