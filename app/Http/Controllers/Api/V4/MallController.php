@@ -252,7 +252,7 @@ class MallController extends Controller
                     'lang'=>'zh_CN',
                 ]);
 
-                dd($res);
+                return json_decode($res, true);
 
             }
 
