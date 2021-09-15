@@ -683,16 +683,20 @@ class ImDocServers
             case 1:
                 $cate_id_arr = [];
                 $cate_data = WorksCategory::find($category_id);
+
                 if ($cate_data['level'] == 1) {
                     $cate_arr = WorksCategory::select('id')->where(['pid' => $cate_data['id'], 'status' => 1
                     ])->get()->toArray();
                     $cate_id_arr = array_column($cate_arr, 'id');
+                }else{
+                    $cate_id_arr = [$cate_data['id']];
                 }
                 $where = [
                     'works.status' => 4,
                     'works.type' => 2,
                     'works.is_audio_book' => 0
                 ];
+
                 $relationObj = new WorksCategoryRelation();
                 $worksObj = new Works();
                 $query = DB::table($relationObj->getTable(), ' relation')
@@ -706,20 +710,21 @@ class ImDocServers
                         DB::raw('1 as doc_type'),
                         'relation.category_id', 'works.is_end', 'u.nickname']);
 
-                if ($cate_id_arr && $category_id != 0) {
+                if ($category_id != 0) {
                     $query->whereIn('relation.category_id', $cate_id_arr);
                 }
-
+//                DB::connection()->enableQueryLog();
                 $lists = $query->where($where)
                     ->orderBy('works.created_at', 'desc')
                     ->groupBy('works.id')
                     ->paginate($size);
+//                dd(DB::getQueryLog());
                 break;
             case 2:
                 $lists = DB::table('nlsg_column as col')
                     ->join('nlsg_user as u', 'col.user_id', '=', 'u.id')
                     ->where('col.type', '=', 2)
-                    ->where('col.status', '<>', 3)
+                    ->where('col.status', '=', 1)
                     ->orderBy('col.id', 'desc')
                     ->select([
                         'col.id', 'col.user_id', 'col.name', 'col.title', 'col.subtitle',
@@ -731,7 +736,7 @@ class ImDocServers
 
                 break;
             case 3:
-                $query = MallGoods::query();
+                $query = MallGoods::query()->where('status','=',2);
                 if ($category_id != 0) {
                     $query->where('category_id', $category_id);
                 }
@@ -752,6 +757,7 @@ class ImDocServers
                     DB::raw('1 as doc_type'), DB::raw('15 as doc_type_info'),
                     'status', 'begin_at', 'cover_img'])
                     ->where('is_del', 0)
+                    ->where('status','=',4)
                     ->orderBy('created_at', 'desc')
                     ->paginate($size);
                 foreach ($lists as &$val) {
@@ -835,11 +841,24 @@ class ImDocServers
         $expire_num = CacheTools::getExpire('goods_category_list');
         $works_category = Cache::get($cache_key_name);
         if (empty($works_category)) {
-            $works_category = WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
-                ->where(['status' => 1,])
-                ->orderBy('sort', 'asc')
+//            $works_category = WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
+//                ->where(['status' => 1,])
+//                ->orderBy('sort', 'asc')
+//                ->get()
+//                ->toArray();
+
+            $works_category = DB::table('nlsg_works_category as wc')
+                ->join('nlsg_works_category_relation as wcr','wc.id','=','wcr.category_id')
+                ->join('nlsg_works as w','w.id','=','wcr.work_id')
+                ->where('wc.status','=',1)
+                ->where('w.type','=',2)
+                ->where('w.status','=',4)
+                ->where('w.is_audio_book','=',0)
+                ->groupBy('wc.id')
+                ->select(['wc.id','wc.name','wc.pid','wc.level','wc.sort'])
                 ->get()
                 ->toArray();
+
             Cache::put($cache_key_name, $works_category, $expire_num);
         }
 
@@ -1107,7 +1126,7 @@ class ImDocServers
                 $temp_post_data['Random'] = $this->getMsgRandom();
                 $temp_post_data['MsgBody'] = [];
                 $temp_msg_type = 0;
-                switch (intval($v->docInfo->type_info)) {
+                switch ((int)$v->docInfo->type_info) {
                     case 11:
                         if (empty($temp_msg_type)) {
                             $temp_msg_type = 7;

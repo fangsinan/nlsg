@@ -448,7 +448,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::get('ToTwitter', 'IncomeController@ToTwitter');
 
-
+    Route::get('user_wechat/index', 'UserWechat@Index');
 
 });
 
