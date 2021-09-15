@@ -56,6 +56,7 @@ class LiveSonFlagPoster extends Model
         }
 
         $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
+            ->where('status','=',1)
             ->select(['son', 'son_id', 'son_flag'])
             ->get();
 
