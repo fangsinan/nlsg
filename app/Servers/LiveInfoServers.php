@@ -343,6 +343,7 @@ class LiveInfoServers
 
         if (empty($son_flag)) {
             $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
+                ->where('status','=',1)
                 ->select(['son', 'son_id', 'son_flag'])
                 ->orderBy('sort', 'asc')   //按标记排序
                 ->get();
