@@ -683,16 +683,20 @@ class ImDocServers
             case 1:
                 $cate_id_arr = [];
                 $cate_data = WorksCategory::find($category_id);
+
                 if ($cate_data['level'] == 1) {
                     $cate_arr = WorksCategory::select('id')->where(['pid' => $cate_data['id'], 'status' => 1
                     ])->get()->toArray();
                     $cate_id_arr = array_column($cate_arr, 'id');
+                }else{
+                    $cate_id_arr = [$cate_data['id']];
                 }
                 $where = [
                     'works.status' => 4,
                     'works.type' => 2,
                     'works.is_audio_book' => 0
                 ];
+
                 $relationObj = new WorksCategoryRelation();
                 $worksObj = new Works();
                 $query = DB::table($relationObj->getTable(), ' relation')
@@ -709,11 +713,12 @@ class ImDocServers
                 if ($category_id != 0) {
                     $query->whereIn('relation.category_id', $cate_id_arr);
                 }
-
+//                DB::connection()->enableQueryLog();
                 $lists = $query->where($where)
                     ->orderBy('works.created_at', 'desc')
                     ->groupBy('works.id')
                     ->paginate($size);
+//                dd(DB::getQueryLog());
                 break;
             case 2:
                 $lists = DB::table('nlsg_column as col')
@@ -843,6 +848,11 @@ class ImDocServers
 
             $works_category = DB::table('nlsg_works_category as wc')
                 ->join('nlsg_works_category_relation as wcr','wc.id','=','wcr.category_id')
+                ->join('nlsg_works as w','w.id','=','wcr.work_id')
+                ->where('wc.status','=',1)
+                ->where('w.type','=',2)
+                ->where('w.status','=',4)
+                ->where('w.is_audio_book','=',0)
                 ->groupBy('wc.id')
                 ->select(['wc.id','wc.name','wc.pid','wc.level','wc.sort'])
                 ->get()
@@ -1115,7 +1125,7 @@ class ImDocServers
                 $temp_post_data['Random'] = $this->getMsgRandom();
                 $temp_post_data['MsgBody'] = [];
                 $temp_msg_type = 0;
-                switch (intval($v->docInfo->type_info)) {
+                switch ((int)$v->docInfo->type_info) {
                     case 11:
                         if (empty($temp_msg_type)) {
                             $temp_msg_type = 7;
