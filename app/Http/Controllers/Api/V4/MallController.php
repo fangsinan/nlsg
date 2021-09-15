@@ -241,23 +241,15 @@ class MallController extends Controller
             $wx_test = $request->input('wx_test', 0);
             if ($wx_test) {
 
-                $t_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxe24a425adb5102f6&secret=2ded804b74f99ae2f342423dd7952620";
-                $t_res = Http::get($t_url);
-                dd($t_res);
-                $t_res = json_decode($t_res);
-                return $this->getRes($t_res);
+//                $t_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxe24a425adb5102f6&secret=2ded804b74f99ae2f342423dd7952620";
+//                $t_res = Http::get($t_url);
+                $as = '49_kDKgl_TFwjk-9hbwlaKhXpBDjWUrNNpUXG1dSabUQ7HChbjRPQZ008vd9vrN35CXEXSqzsIDpy3T5H-Q_i7v1g';
 
-
-                $url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
-
-                $access_token = '';
-                $openid = '';
-
-
-                $res = $client->request('GET', $url, [
-                    'access_token' => $access_token,
-                    'openid' => $openid,
-                    'lang' => 'zh_CN',
+                $url = "https://api.weixin.qq.com/cgi-bin/user/info";
+                $res = Http::get($url,[
+                    'access_token'=>$as,
+                    'openid'=>'oVWHQwXqOy6POy8z2IVHz-RgRsZ0',
+                    'lang'=>'zh_CN',
                 ]);
 
                 dd($res);
