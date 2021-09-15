@@ -736,7 +736,7 @@ class ImDocServers
 
                 break;
             case 3:
-                $query = MallGoods::query();
+                $query = MallGoods::query()->where('status','=',2);
                 if ($category_id != 0) {
                     $query->where('category_id', $category_id);
                 }
@@ -757,6 +757,7 @@ class ImDocServers
                     DB::raw('1 as doc_type'), DB::raw('15 as doc_type_info'),
                     'status', 'begin_at', 'cover_img'])
                     ->where('is_del', 0)
+                    ->where('status','=',4)
                     ->orderBy('created_at', 'desc')
                     ->paginate($size);
                 foreach ($lists as &$val) {
