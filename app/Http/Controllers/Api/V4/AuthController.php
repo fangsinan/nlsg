@@ -330,35 +330,43 @@ class AuthController extends Controller
         if (!empty($input['unionid'])) { //渠道新版本
             $user = User::where('unionid', $input['unionid'])->first();
             if (empty($user)) {
+                //处理老数据只有openid情况
+                $UserOld = User::where('wxopenid', $input['wx_openid'])->first();
+                if(!empty($UserOld)){
+                    //更新补齐unionid
+                    User::where('id', '=', $UserOld->id)->update(['unionid' => $input['unionid']]);
+                    $user=$UserOld;
+                    $phone = $UserOld->phone;
+                }else {
+                    $time = time();
+                    $redis_phone = 'phone_' . date('Ymd', $time);
 
-                $time = time();
-                $redis_phone = 'phone_' . date('Ymd', $time);
+                    $key = 'phone_lock';
+                    self::lock($key); //加锁
+                    $num = Redis::get($redis_phone);
+                    if (empty($num) || $num <= 0) {
+                        $num = 1;
+                    }
+                    Redis::setex($redis_phone, 86400, $num + 1);
+                    self::unlock($key); //释放锁
 
-                $key = 'phone_lock';
-                self::lock($key); //加锁
-                $num = Redis::get($redis_phone);
-                if (empty($num) || $num <= 0) {
-                    $num = 1;
-                }
-                Redis::setex($redis_phone, 86400, $num + 1);
-                self::unlock($key); //释放锁
+                    $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
+                    $phone = date('ymd', $time) . $str_num; //6+7
 
-                $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
-                $phone = date('ymd', $time) . $str_num; //6+7
-
-                $data = [
-                    'nickname' => (!empty($input['nickname'])) ? $input['nickname'] : 'nlsg' . rand(100000, 999999),
-                    'phone' => $phone,
-                    'isNoLogin' => 1,
-                    'wxopenid' => $input['wx_openid'],
-                    'unionid' => $input['unionid'],
-                    'is_wx' => 1,
-                ];
-                $res = User::create($data);
-                if ($res) {
-                    $user = User::find($res->id);
-                    if (empty($user)) {
-                        return success($arra);
+                    $data = [
+                        'nickname' => (!empty($input['nickname'])) ? $input['nickname'] : 'nlsg' . rand(100000, 999999),
+                        'phone' => $phone,
+                        'isNoLogin' => 1,
+                        'wxopenid' => $input['wx_openid'],
+                        'unionid' => $input['unionid'],
+                        'is_wx' => 1,
+                    ];
+                    $res = User::create($data);
+                    if ($res) {
+                        $user = User::find($res->id);
+                        if (empty($user)) {
+                            return success($arra);
+                        }
                     }
                 }
             } else {
