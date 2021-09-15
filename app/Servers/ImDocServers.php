@@ -835,11 +835,20 @@ class ImDocServers
         $expire_num = CacheTools::getExpire('goods_category_list');
         $works_category = Cache::get($cache_key_name);
         if (empty($works_category)) {
-            $works_category = WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
-                ->where(['status' => 1,])
-                ->orderBy('sort', 'asc')
+//            $works_category = WorksCategory::select('id', 'name', 'pid', 'level', 'sort')
+//                ->where(['status' => 1,])
+//                ->orderBy('sort', 'asc')
+//                ->get()
+//                ->toArray();
+
+            $works_category = DB::table('nlsg_works_category as wc')
+                ->join('nlsg_works_category_relation as wcr','wc.id ','=','wcr.category_id')
+                ->join('nlsg_works as w','wcr.work_id ','=','w.id')
+                ->groupBy('wc.id')
+                ->select(['wc.id','wc.name','wc.pid','wc.level','wc.sort'])
                 ->get()
                 ->toArray();
+            
             Cache::put($cache_key_name, $works_category, $expire_num);
         }
 
