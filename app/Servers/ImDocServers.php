@@ -758,6 +758,7 @@ class ImDocServers
                     'status', 'begin_at', 'cover_img'])
                     ->where('is_del', 0)
                     ->where('status','=',4)
+                    ->where('end_at','>=',date('Y-m-d H:i:s'))
                     ->orderBy('created_at', 'desc')
                     ->paginate($size);
                 foreach ($lists as &$val) {
@@ -781,7 +782,7 @@ class ImDocServers
                 $lists = DB::table('nlsg_column as col')
                     ->join('nlsg_user as u', 'col.user_id', '=', 'u.id')
                     ->where('col.type', '=', 3)
-                    ->where('col.status', '<>', 3)
+                    ->where('col.status', '=', 1)
                     ->orderBy('col.id', 'desc')
                     ->select([
                         'col.id', 'col.user_id', 'col.name', 'col.title', 'col.subtitle',
