@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Http\Controllers\Api\V4\ImMsgController;
+use App\Http\Controllers\Api\V4\UserWechat;
 use App\Models\Coupon;
 use App\Models\LiveConsole;
 use App\Models\MallOrder;
@@ -171,6 +172,11 @@ class Kernel extends ConsoleKernel
             $AliUploadServer=new AliUploadServers();
             $AliUploadServer->UploadMediaVideoAudio();
         })->everyFiveMinutes()->between('2:00', '6:00')->runInBackground();//5分钟执行一次
+
+        $schedule->call(function () {
+            UserWechat::AddUserWechat();//通过部门id获取企业客户
+        })->dailyAt('21:05');
+
     }
 
     /**
