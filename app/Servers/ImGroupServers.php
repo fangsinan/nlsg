@@ -18,6 +18,7 @@ class ImGroupServers
     {
         $size = $params['size'] ?? 10;
         $owner_type = $params['owner_type'] ?? 0;
+        $group_role = $params['group_role'] ?? 0;
 
         if (!empty($params['user_id'] ?? 0)) {
             $user_id = $params['user_id'];
@@ -37,7 +38,7 @@ class ImGroupServers
                 DB::raw('2000 as max_num')
             ])->orderBy('gt.id', 'desc');
 
-        switch (intval($owner_type)) {
+        switch ((int)$owner_type) {
             case 1:
                 //我创建的
                 $query->where('g.owner_account', '=', $user_id);
@@ -52,6 +53,37 @@ class ImGroupServers
                 $query->whereIn('g.group_id', $join_group_id_list);
                 break;
         }
+
+        switch ((int)$group_role) {
+            case 1:
+                $join_group_id_list = ImGroupUser::query()
+                    ->where('group_account', '=', $user_id)
+                    ->where('group_role', '=', 1)
+                    ->where('exit_type', '=', 0)
+                    ->pluck('group_id')
+                    ->toArray();
+                $query->whereIn('g.group_id', $join_group_id_list);
+                break;
+            case 2:
+                $join_group_id_list = ImGroupUser::query()
+                    ->where('group_account', '=', $user_id)
+                    ->where('group_role', '=', 2)
+                    ->where('exit_type', '=', 0)
+                    ->pluck('group_id')
+                    ->toArray();
+                $query->whereIn('g.group_id', $join_group_id_list);
+                break;
+            case 9:
+                $join_group_id_list = ImGroupUser::query()
+                    ->where('group_account', '=', $user_id)
+                    ->whereIn('group_role', [1, 2])
+                    ->where('exit_type', '=', 0)
+                    ->pluck('group_id')
+                    ->toArray();
+                $query->whereIn('g.group_id', $join_group_id_list);
+                break;
+        }
+
 
         switch ($params['ob'] ?? '') {
             case 'time_asc':
@@ -266,17 +298,18 @@ class ImGroupServers
     }
 
     //创建群
-    public function createGroup($params,$user_id){
+    public function createGroup($params, $user_id)
+    {
 
-        if( empty($params['Name']) ){
+        if (empty($params['Name'])) {
             return ['code' => false, 'msg' => '群名称错误'];
         }
 
-        if(count($params['user_id']) < 2 ){
+        if (count($params['user_id']) < 2) {
             return ['code' => false, 'msg' => '初始群最少添加两个用户'];
         }
 
-        $post_data= [
+        $post_data = [
             'Owner_Account' => (string)$user_id,
             'Type' => "Public",
             'Name' => $params['Name'],
@@ -288,8 +321,8 @@ class ImGroupServers
             ]
         ];
 
-        foreach ($params['user_id'] as $k=>$v){
-            $post_data['MemberList'][]=['Member_Account'=>(string)$v];
+        foreach ($params['user_id'] as $k => $v) {
+            $post_data['MemberList'][] = ['Member_Account' => (string)$v];
         }
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/create_group");
         $res = ImClient::curlPost($url, json_encode($post_data));
@@ -298,17 +331,18 @@ class ImGroupServers
     }
 
     //删除群
-    public function destroyGroup($params,$user_id){
+    public function destroyGroup($params, $user_id)
+    {
 
-        if( empty($params['GroupId']) ){
+        if (empty($params['GroupId'])) {
             return ['code' => false, 'msg' => 'GroupId错误'];
         }
-        $group = ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])->first();
-        if(empty($group)){
+        $group = ImGroup::where(['group_id' => $params['GroupId'], 'owner_account' => $user_id, 'status' => 1])->first();
+        if (empty($group)) {
             return ['code' => false, 'msg' => 'Group error'];
         }
 
-        $post_data= [
+        $post_data = [
             'GroupId' => (string)$params['GroupId'],
         ];
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/destroy_group");
@@ -318,71 +352,71 @@ class ImGroupServers
     }
 
 
-
     //转让群
-    public function changeGroupOwner($params,$user_id){
+    public function changeGroupOwner($params, $user_id)
+    {
 
-        if( empty($params['GroupId']) || empty($params['NewOwner_Account']) ){
+        if (empty($params['GroupId']) || empty($params['NewOwner_Account'])) {
             return ['code' => false, 'msg' => 'GroupId or new_user_id error'];
         }
 
-        $group = ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])->first();
-        if(empty($group)){
+        $group = ImGroup::where(['group_id' => $params['GroupId'], 'owner_account' => $user_id, 'status' => 1])->first();
+        if (empty($group)) {
             return ['code' => false, 'msg' => 'Group error'];
         }
 
-        $post_data= [
+        $post_data = [
             'GroupId' => (string)$params['GroupId'],
             'NewOwner_Account' => (string)$params['NewOwner_Account'],
         ];
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/change_group_owner");
         $res = ImClient::curlPost($url, json_encode($post_data));
         $res = json_decode($res, true);
-        if($res['ActionStatus'] == "OK"){
-            ImGroup::where(['group_id'=>$params['GroupId'],'owner_account'=>$user_id,'status'=>1])
-                ->update(['owner_account'=>$params['NewOwner_Account']]);
+        if ($res['ActionStatus'] == "OK") {
+            ImGroup::where(['group_id' => $params['GroupId'], 'owner_account' => $user_id, 'status' => 1])
+                ->update(['owner_account' => $params['NewOwner_Account']]);
 
             //变更普通成员
-            ImGroupUser::where(['group_id'=>$params['GroupId'],'group_account'=>$user_id,])
-                ->update(['group_role'=>0]);
+            ImGroupUser::where(['group_id' => $params['GroupId'], 'group_account' => $user_id,])
+                ->update(['group_role' => 0]);
             //变更新群主
-            ImGroupUser::where(['group_id'=>$params['GroupId'],'group_account'=>$params['NewOwner_Account'],])
-                ->update(['group_role'=>1]);
+            ImGroupUser::where(['group_id' => $params['GroupId'], 'group_account' => $params['NewOwner_Account'],])
+                ->update(['group_role' => 1]);
         }
 
         return $res;
     }
 
 
+    function getGroupMemberInfo($params, $user_id)
+    {
 
-    function getGroupMemberInfo($params,$user_id) {
 
-
-        if( empty($params['GroupId']) ){
+        if (empty($params['GroupId'])) {
             return ['code' => false, 'msg' => 'GroupId错误'];
         }
-        $group = ImGroup::where(['group_id'=>$params['GroupId'],'status'=>1])->first();
-        if(empty($group)){
+        $group = ImGroup::where(['group_id' => $params['GroupId'], 'status' => 1])->first();
+        if (empty($group)) {
             return ['code' => false, 'msg' => 'Group error'];
         }
 
-        $post_data= [
-            'GroupId'   => (string)$params['GroupId'],
-            'Limit'     => $params['Limit'] ??100,
-            'Offset'    => $params['Offset'] ??0,
+        $post_data = [
+            'GroupId' => (string)$params['GroupId'],
+            'Limit' => $params['Limit'] ?? 100,
+            'Offset' => $params['Offset'] ?? 0,
         ];
         $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/get_group_member_info");
         $res = ImClient::curlPost($url, json_encode($post_data));
         $res = json_decode($res, true);
         $uids = array_column($res['MemberList'], 'Member_Account');
-        $userProfileItem=ImUser::select("tag_im_to_account","tag_im_nick","tag_im_image")
+        $userProfileItem = ImUser::select("tag_im_to_account", "tag_im_nick", "tag_im_image")
             //->whereIn('tag_im_to_account',array_slice($uids, 0,20))->get()->toArray();
-            ->whereIn('tag_im_to_account',$uids)->get()->toArray();
+            ->whereIn('tag_im_to_account', $uids)->get()->toArray();
         $new_user = [];
         foreach ($userProfileItem as $item) {
             $new_user[$item['tag_im_to_account']] = $item;
         }
-        foreach ($res['MemberList'] as $key=>&$val){
+        foreach ($res['MemberList'] as $key => &$val) {
             $val['tag_im_nick'] = $new_user[$val['Member_Account']]['tag_im_nick'] ?? '';
             $val['tag_im_image'] = $new_user[$val['Member_Account']]['tag_im_image'] ?? '';
         }

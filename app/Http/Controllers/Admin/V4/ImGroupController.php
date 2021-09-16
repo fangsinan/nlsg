@@ -36,6 +36,7 @@ class ImGroupController extends ControllerBackend
      * @apiParam {string=time_asc,time_desc} [ob] 排序
      * @apiParam {string} [name] 群名
      * @apiParam {number=1,2} [owner_type] 加入类型(1我创建的  2我加入的)
+     * @apiParam {number=1,2,3} [group_role] 级别(1群主 2管理员 9全都是)
      * @apiParam {string=0,1,2} [status] 群状态
      *
      * @apiSuccess {string} id 群id
