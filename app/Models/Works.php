@@ -102,7 +102,7 @@ class Works extends Base
         if ( ! $id) {
             return false;
         }
-        $limit=2;
+        $limit=1;
 //        if($id==566){
 //            $limit=1;
 //        }
