@@ -175,8 +175,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             UserWechat::AddUserWechat();//通过部门id获取企业客户
-        })->dailyAt('21:05');
-
+        })->dailyAt('21:53');
     }
 
     /**
