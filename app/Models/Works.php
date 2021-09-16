@@ -132,6 +132,7 @@ class Works extends Base
                 }
             }
         }
+        return [];
         return $list ?: [];
 
     }
