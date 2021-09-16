@@ -90,7 +90,7 @@ class UserWechat extends Controller {
                     //处理客户信息入库  一次50条
                     foreach ($getList_res['external_contact_list'] as $add_k=>$add_v){
                         //$add_v['external_contact']['external_userid'] = 'wmk8dJEQAALpKQnSTSIqRMYZezZ482eA';
-                        $us = DB::table('nlsg_user_wechat3')->where("external_userid", $add_v['external_contact']['external_userid'])
+                        $us = DB::table('nlsg_user_wechat')->where("external_userid", $add_v['external_contact']['external_userid'])
                             ->get()->toArray();
 
                         if( !empty($us) ){
@@ -114,7 +114,7 @@ class UserWechat extends Controller {
                     }
                     if(!empty($insert_data)){
 
-                        DB::table('nlsg_user_wechat3')->insert($insert_data);
+                        DB::table('nlsg_user_wechat')->insert($insert_data);
                         $insert_data = [];
                     }
                 }
@@ -148,7 +148,7 @@ class UserWechat extends Controller {
 
     public static function UserImport($id, $cursor=''){
 
-        $table = 'nlsg_user_wechat3';
+        $table = 'nlsg_user_wechat';
         //获取access_token
         $corpid = "wwb4a68b6963803c46";
         $Secret = "RB7XUdI7hZy8Y7hDgJ0cw5BqeULPZK0FBgvljcrsY8Q";
