@@ -33,7 +33,7 @@ class MallOrderServers
         $query = MallOrder::query();
         $size = $params['size'] ?? 10;
 
-        $query->where('status', '>', 1);
+//        $query->where('status', '>', 1);
 
         //订单类型
         $order_type = $params['order_type'] ?? '';
