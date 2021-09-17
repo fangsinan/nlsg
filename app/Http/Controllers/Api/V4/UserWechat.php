@@ -12,7 +12,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ConfigModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Libraries\ImClient;
+use WXBizMsgCrypt;
+
 
 /**
  * Description of AddressController
@@ -327,8 +328,43 @@ class UserWechat extends Controller {
 
 
     public function Callback(Request $request){
-        $params = $request->input();
-        \Log::info('User_Wechat_add:   '.json_encode($params));
+        //dd($this->getInputSource->all());
+        //$params = $request->input();
+        $params = [
+            "msg_signature"=> "63fbeac6c5d716ec64dafcf1a3cf675d96f0d400",
+            "timestamp"=>"1631845065",
+            "nonce"=> "1631703378",
+            "echostr"=>"8MVtC6QO0MvhpGwWRvf+EoYPXHrWYQmv5XeOIce+Cnq45UKR1Er2yvNW8Pap00h3FGUIgWGhoMBDvzE3srzHGQ=="
+
+        ];
+        //urldecode($params);
+        //\Log::info('User_Wechat_add:   '.json_encode($params));
+
+
+
+        $corpId = "wwb4a68b6963803c46";
+        $token = "WFwgvZjFOgs5";
+        $encodingAesKey = "zbeDmmie16CQ6fISRboXRABrkH8pl0oY4z6xnnbtscr";
+
+
+        $sVerifyMsgSig      = urldecode($params['msg_signature']);
+        $sVerifyTimeStamp   = urldecode($params['timestamp']);
+        $sVerifyNonce       = urldecode($params['nonce']);
+        $sVerifyEchoStr     = urldecode($params['echostr']);
+
+        //$sVerifyMsgSig
+        $sEchoStr = "";
+        $wxcpt = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
+
+        $errCode = $wxcpt->VerifyURL($sVerifyMsgSig, $sVerifyTimeStamp, $sVerifyNonce, $sVerifyEchoStr, $sEchoStr);
+        if ($errCode == 0) {
+            echo $sEchoStr;
+
+        } else {
+            print("ERR: " . $errCode . "\n\n");
+        }
+
+
 
     }
 
