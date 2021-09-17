@@ -3,7 +3,6 @@
 namespace App\Servers;
 
 use App\Models\ShieldKey;
-use Illuminate\Support\Facades\DB;
 
 class ShieldKeyServers
 {
@@ -30,17 +29,21 @@ class ShieldKeyServers
         $key = preg_replace($reg, ' ', $key);
         $key = array_unique(array_filter(explode(' ', $key)));
 
-        DB::beginTransaction();
-        $res_flag = true;
+//        DB::beginTransaction();
+//        $res_flag = true;
 //        $key_array = [];
+        $error_list = [];
+
         foreach ($key as $v) {
+
 //            $key_array[] = [
 //                'name' => $v,
 //                'status' => 1
 //            ];
             if (mb_strlen($v) > $max_len) {
-                DB::rollBack();
-                return ['code' => false, 'msg' => '单个关键字长度不能大于' . $max_len];
+//                DB::rollBack();
+//                return ['code' => false, 'msg' => '单个关键字长度不能大于' . $max_len];
+                $error_list[] = $v . ' 单个关键字长度不能大于' . $max_len;
             }
 
             $temp_res = ShieldKey::updateOrCreate([
@@ -49,18 +52,20 @@ class ShieldKeyServers
                 'status' => 1
             ]);
             if ($temp_res === false) {
-                $res_flag = false;
+                $error_list[] = $v . ' 添加失败';
             }
 
         }
+        return ['code' => true, 'msg' => '成功', 'error' => $error_list];
 
-        if ($res_flag) {
-            DB::commit();
-            return ['code' => true, 'msg' => '成功'];
-        }
 
-        DB::rollBack();
-        return ['code' => false, 'msg' => '失败'];
+//        if ($res_flag) {
+//            DB::commit();
+//            return ['code' => true, 'msg' => '成功'];
+//        }
+//
+//        DB::rollBack();
+//        return ['code' => false, 'msg' => '失败'];
 
 //        $res = DB::table('nlsg_shield_key')->insert($key_array);
 //
