@@ -571,7 +571,6 @@ class AuthController extends Controller
             'province' => $list->province, //北京
             'city' => $list->city, //朝阳区
             'country' => $list->country, //中国
-            'at' => $res->access_token,
         ];
         return $this->success($data);
 
