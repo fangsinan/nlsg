@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\ConfigModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Libraries\ImClient;
 
@@ -241,6 +242,94 @@ class UserWechat extends Controller {
             }
 
         }
+    }
+
+
+
+    public static function UserImport1($id, $cursor=''){
+
+        $table = 'nlsg_user_wechat';
+        //获取access_token
+        $corpid = "wwb4a68b6963803c46";
+        $Secret = "RB7XUdI7hZy8Y7hDgJ0cw5BqeULPZK0FBgvljcrsY8Q";
+        $url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpid&corpsecret=$Secret";
+        $res = ImClient::curlGet($url);
+        $res = json_decode($res,true);
+        $access_token = $res['access_token'];
+        //dump($access_token);
+        //$access_token = "84vtAyZoX0ot_kSX5tFVeybXetrRLjub2IKlQj6Ua-mVvEWeFmOn3AD0_0496a109huLjSCAmnf1AuUMhRpJqfmlmpgeBgr2vwuTuvB04GyzwgyKNM3prI6AuMaS2W5VohqbNOkSMjYo7pUqY4Me68zwpJIbl_rp9C0xG_dhrWm2NH2Sjj9tvRE9j-EvStL967kBCy58-uK6841Z7eRtOg";
+
+        //通过部门id 获取成员id  唐山部门 id为3
+        $department_id = $id;
+        $department_url = "https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token=$access_token&department_id=$department_id&fetch_child=0";
+        $department_res = ImClient::curlGet($department_url);
+        $department_res = json_decode($department_res,true);
+        //dd($department_res);
+        $getList_uids = [];
+        if( $department_res['errcode'] == 0 ){
+            foreach ($department_res['userlist'] as $key=>$val){
+                $getList_uids[] = $val['userid'];
+            }
+        }
+
+        //通过部门成员id  批量获取客户详情
+        foreach ($getList_uids as $key=>$val){
+            $getUidsList_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/list?access_token=$access_token&userid=$val";
+            $getUidList_res = ImClient::curlGet($getUidsList_url);
+            $getUidList_res = json_decode($getUidList_res,true);
+            $getWechatIds = [];
+            if( $getUidList_res['errcode'] == 0 ){
+                $users = DB::table($table)
+                    ->whereIn("external_userid", $getUidList_res['external_userid'])
+                    ->pluck("external_userid")->toArray();
+
+                $getWechatIds = array_diff($getUidList_res['external_userid'], $users);
+            }
+
+            //$getWechatIds里包含未入库的数据
+            if(empty($getWechatIds)){
+                //该用户已导完 跳出本次循环
+                continue;
+            }
+
+            $insert_data = [];
+            foreach ($getWechatIds as $u_key=>$u_val){
+                $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=$access_token&external_userid=$u_val";
+                $detail_res = ImClient::curlGet($getDetail_url);
+                $detail_res = json_decode($detail_res,true);
+
+                if( $detail_res['errcode'] == 0 ){
+                    $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
+                    $add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';
+                    $add_data['follow_user_description']        = $detail_res['follow_user'][0]['description']??'';
+                    $add_data['follow_user_createtime']         = $detail_res['follow_user'][0]['createtime']??'';
+                    $add_data['follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
+                    $add_data['follow_user_tags_oper_userid']   = $detail_res['follow_user'][0]['oper_userid']??"";
+                    $add_data['external_userid']                = $detail_res['external_contact']['external_userid']??"";
+                    $add_data['name']                           = $detail_res['external_contact']['name']??"";
+                    $add_data['type']                           = $detail_res['external_contact']['type']??"";
+                    $add_data['avatar']                         = $detail_res['external_contact']['avatar']??"";
+                    $add_data['gender']                         = $detail_res['external_contact']['gender']??"";
+                    $add_data['unionid']                        = $detail_res['external_contact']['unionid']??"";
+                    $insert_data[] = $add_data;
+                }
+
+            }
+            //dd($insert_data);
+            if(!empty($insert_data)){
+                DB::table($table)->insert($insert_data);
+                $insert_data = [];
+            }
+
+        }
+    }
+
+
+
+    public function Callback(Request $request){
+        $params = $request->input();
+        \Log::info('User_Wechat_add:   '.json_encode($params));
+
     }
 
 }
