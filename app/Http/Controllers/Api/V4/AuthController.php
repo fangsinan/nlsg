@@ -464,7 +464,7 @@ class AuthController extends Controller
         if (!$user) {
             User::where('id', $user_id)->update(['phone' => $phone]);
         } else { //号码已存在
-            return error(1000, '此手机号已存在');
+            User::where('id', $user_id)->update(['phone' => $phone.'_'.$user->id]);
         }
         $arra = [
             'id' => $user_id,
