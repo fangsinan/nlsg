@@ -393,7 +393,7 @@ class UserWechat extends Controller {
             $json = json_encode($obj);
             $user_arr = json_decode($json, true);
 
-            if($user_arr['Event'] == "change_external_contact" && $user_arr['ChangeType'] == "edit_external_contact"){
+            if($user_arr['Event'] == "change_external_contact" && ($user_arr['ChangeType'] == "edit_external_contact" || $user_arr['ChangeType'] == "del_external_contact")){
                 //添加好友
                 \Log::info('User_Wechat_add_aaa:   '.json_encode($user_arr));
 
