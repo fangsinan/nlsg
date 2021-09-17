@@ -402,6 +402,9 @@ class UserWechat extends Controller {
         $sReqNonce      = urldecode($params['nonce'] ??'');
 
 
+        if(empty($sReqData)){
+            return; 
+        }
         //解析XML
         $errCode = $wxcpt->DecryptMsg($sReqMsgSig, $sReqTimeStamp, $sReqNonce, $sReqData, $sMsg);
         if ($errCode == 0) {
