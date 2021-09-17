@@ -276,5 +276,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('task/users','TaskController@getUsers');
     Route::get('task/works','TaskController@getWorks');
 
-
+    //直播过滤词
+    Route::get('s_key/list', 'ShieldKeyController@list');
+    Route::post('s_key/add', 'ShieldKeyController@add');
+    Route::put('s_key/change_status', 'ShieldKeyController@changeStatus');
 });
