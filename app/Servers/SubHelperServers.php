@@ -108,9 +108,9 @@ class SubHelperServers
 
     public function addOpenList($params, $admin_id)
     {
-        $id = $params['id'] ?? 0;
-        $type = $params['type'] ?? 0;
-        $is_file = $params['is_file'] ?? 0;
+        $id = (int)($params['id'] ?? 0);
+        $type = (int)($params['type'] ?? 0);
+        $is_file = (int)($params['is_file'] ?? 0);
         $file_name = $params['file_name'] ?? '';
         $url = $params['url'] ?? '';
 //        if (!empty($url)){
@@ -121,8 +121,12 @@ class SubHelperServers
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        if ($is_file == 1) {
-            if ($type != 3) {
+        if ($type !== 3 && $is_file === 1) {
+            $is_file = 0;
+        }
+
+        if ($is_file === 1) {
+            if ($type !== 3) {
                 return ['code' => false, 'msg' => '文件必须是直播类型'];
             }
             if (empty($file_name)) {
@@ -239,7 +243,7 @@ class SubHelperServers
                 $temp_add_data['works_id'] = $id;
                 $temp_add_data['status'] = 1;
 
-                if ($type == 2 && $id == 404) {
+                if ($type === 2 && $id === 404) {
                     $temp_add_data['is_sendsms'] = 1;
                 } else {
                     $temp_add_data['is_sendsms'] = 0;
@@ -265,9 +269,8 @@ class SubHelperServers
 
         if ($res) {
             return ['code' => true, 'msg' => '登记成功(1至2分钟后将自动开通).' . $msg];
-        } else {
-            return ['code' => false, 'msg' => '失败.' . $msg];
         }
 
+        return ['code' => false, 'msg' => '失败.' . $msg];
     }
 }
