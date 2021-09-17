@@ -342,6 +342,9 @@ class UserWechat extends Controller {
 //
 //        ];
 
+        $xmlInfo = file_get_contents("php://input");
+        \Log::info('User_Wechat_add-xml:   '.$xmlInfo);
+
         \Log::info('User_Wechat_add:   '.json_encode($params));
 
 
