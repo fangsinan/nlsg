@@ -294,14 +294,23 @@ class UserWechat extends Controller {
                 continue;
             }
 
-            self::getUserDetail($getWechatIds);
+            self::getUserDetail($getWechatIds,$access_token);
 
         }
     }
 
 
+    public static function getAccess_token(){
+        $corpid = "wwb4a68b6963803c46";
+        $Secret = "RB7XUdI7hZy8Y7hDgJ0cw5BqeULPZK0FBgvljcrsY8Q";
+        $url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpid&corpsecret=$Secret";
+        $res = ImClient::curlGet($url);
+        $res = json_decode($res,true);
+        return $res['access_token'];
+    }
 
-    public static function getUserDetail($getWechatIds = []){
+
+    public static function getUserDetail($getWechatIds = [], $access_token){
 
         if( empty($getWechatIds) || !is_array($getWechatIds) ){
             return '';
@@ -345,13 +354,13 @@ class UserWechat extends Controller {
 //
 //
 //
-////        $params = [
-////            "msg_signature"=> "3852e794fbf4dca953444b5a2409ee764eab8421",
-////            "timestamp"=>"1631845073",
-////            "nonce"=> "1631909869",
-////            "echostr"=>"6MJ8dV5OAbEJcL7ZgtxcTXKHiQc7TxMlVKr5zBE8LRUqpShrO4\/HzTZfRTmYFpUGwXljDQRkHJEZt4gmSwxc8Q=="
-////
-////        ];
+//        $params = [
+//            "msg_signature"=> "3852e794fbf4dca953444b5a2409ee764eab8421",
+//            "timestamp"=>"1631845073",
+//            "nonce"=> "1631909869",
+//            "echostr"=>"6MJ8dV5OAbEJcL7ZgtxcTXKHiQc7TxMlVKr5zBE8LRUqpShrO4\/HzTZfRTmYFpUGwXljDQRkHJEZt4gmSwxc8Q=="
+//
+//        ];
 //
         $sReqData = file_get_contents("php://input");
         \Log::info('User_Wechat_add-xml:   '.$sReqData);
@@ -396,9 +405,9 @@ class UserWechat extends Controller {
             if($user_arr['Event'] == "change_external_contact" && ($user_arr['ChangeType'] == "add_external_contact")){
                 //添加好友
                 \Log::info('User_Wechat_add_aaa:   '.json_encode($user_arr));
-
-                ////$user_arr['ExternalUserID'];//外部联系人id
-                self::getUserDetail([$user_arr['ExternalUserID']]);
+                $access_token = self::getAccess_token();
+                //$user_arr['ExternalUserID'];//外部联系人id
+                self::getUserDetail([$user_arr['ExternalUserID']],$access_token);
             }
             var_dump($sMsg);
 
