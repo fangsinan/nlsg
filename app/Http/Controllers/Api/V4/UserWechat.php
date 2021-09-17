@@ -294,36 +294,47 @@ class UserWechat extends Controller {
                 continue;
             }
 
-            $insert_data = [];
-            foreach ($getWechatIds as $u_key=>$u_val){
-                $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=$access_token&external_userid=$u_val";
-                $detail_res = ImClient::curlGet($getDetail_url);
-                $detail_res = json_decode($detail_res,true);
-
-                if( $detail_res['errcode'] == 0 ){
-                    $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
-                    $add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';
-                    $add_data['follow_user_description']        = $detail_res['follow_user'][0]['description']??'';
-                    $add_data['follow_user_createtime']         = $detail_res['follow_user'][0]['createtime']??'';
-                    $add_data['follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
-                    $add_data['follow_user_tags_oper_userid']   = $detail_res['follow_user'][0]['oper_userid']??"";
-                    $add_data['external_userid']                = $detail_res['external_contact']['external_userid']??"";
-                    $add_data['name']                           = $detail_res['external_contact']['name']??"";
-                    $add_data['type']                           = $detail_res['external_contact']['type']??"";
-                    $add_data['avatar']                         = $detail_res['external_contact']['avatar']??"";
-                    $add_data['gender']                         = $detail_res['external_contact']['gender']??"";
-                    $add_data['unionid']                        = $detail_res['external_contact']['unionid']??"";
-                    $insert_data[] = $add_data;
-                }
-
-            }
-            //dd($insert_data);
-            if(!empty($insert_data)){
-                DB::table($table)->insert($insert_data);
-                $insert_data = [];
-            }
+            self::getUserDetail($getWechatIds);
 
         }
+    }
+
+
+
+    public static function getUserDetail($getWechatIds = []){
+
+        if( empty($getWechatIds) || !is_array($getWechatIds) ){
+            return '';
+        }
+        $table = 'nlsg_user_wechat';
+
+        $insert_data = [];
+        foreach ($getWechatIds as $u_key=>$u_val){
+            $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=$access_token&external_userid=$u_val";
+            $detail_res = ImClient::curlGet($getDetail_url);
+            $detail_res = json_decode($detail_res,true);
+
+            if( $detail_res['errcode'] == 0 ){
+                $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
+                $add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';
+                $add_data['follow_user_description']        = $detail_res['follow_user'][0]['description']??'';
+                $add_data['follow_user_createtime']         = $detail_res['follow_user'][0]['createtime']??'';
+                $add_data['follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
+                $add_data['follow_user_tags_oper_userid']   = $detail_res['follow_user'][0]['oper_userid']??"";
+                $add_data['external_userid']                = $detail_res['external_contact']['external_userid']??"";
+                $add_data['name']                           = $detail_res['external_contact']['name']??"";
+                $add_data['type']                           = $detail_res['external_contact']['type']??"";
+                $add_data['avatar']                         = $detail_res['external_contact']['avatar']??"";
+                $add_data['gender']                         = $detail_res['external_contact']['gender']??"";
+                $add_data['unionid']                        = $detail_res['external_contact']['unionid']??"";
+                $insert_data[] = $add_data;
+            }
+        }
+        if(!empty($insert_data)){
+            DB::table($table)->insert($insert_data);
+            $insert_data = [];
+        }
+
     }
 
 
@@ -331,45 +342,70 @@ class UserWechat extends Controller {
     public function Callback(Request $request){
         //dd($this->getInputSource->all());
         $params = $request->input();
-
-
-
-//        $params = [
-//            "msg_signature"=> "3852e794fbf4dca953444b5a2409ee764eab8421",
-//            "timestamp"=>"1631845073",
-//            "nonce"=> "1631909869",
-//            "echostr"=>"6MJ8dV5OAbEJcL7ZgtxcTXKHiQc7TxMlVKr5zBE8LRUqpShrO4\/HzTZfRTmYFpUGwXljDQRkHJEZt4gmSwxc8Q=="
 //
-//        ];
-
-        $xmlInfo = file_get_contents("php://input");
-        \Log::info('User_Wechat_add-xml:   '.$xmlInfo);
-
+//
+//
+////        $params = [
+////            "msg_signature"=> "3852e794fbf4dca953444b5a2409ee764eab8421",
+////            "timestamp"=>"1631845073",
+////            "nonce"=> "1631909869",
+////            "echostr"=>"6MJ8dV5OAbEJcL7ZgtxcTXKHiQc7TxMlVKr5zBE8LRUqpShrO4\/HzTZfRTmYFpUGwXljDQRkHJEZt4gmSwxc8Q=="
+////
+////        ];
+//
+        $sReqData = file_get_contents("php://input");
+        \Log::info('User_Wechat_add-xml:   '.$sReqData);
         \Log::info('User_Wechat_add:   '.json_encode($params));
 
-
-
+//        $params = json_decode('{"msg_signature":"6409389f2b81aeb1715466d8a995c9324354af97","timestamp":"1631864159","nonce":"1631623841"}', true);
+//        $sReqData = "<xml><ToUserName><![CDATA[wwb4a68b6963803c46]]></ToUserName><Encrypt><![CDATA[v03SOyJReHyxyzFhIx8t3Nak2KY2y9hye4hRievr0I7X0r9fA/4uKEBC5TVnhtbvn+L/NWkEuN7a1KDR1eFntdg8uNx3W79HCJelpmze9si/NOhEMdDBlnd4xYmwWDtN+DnsRkbSjmjNw28fGtQ9CnnLzFNSY8X1md8baxVyRHVY0YzUDnaXCjsZY+eq4ePbdXvgkT1Og1DRohUi7367yumH9wtPgv+YsfSpQA0meAWXcbRtUHAsYWws5H1oRNyeFH6PMZmReAoMMt7DzU+J5KZzonFG6B+pDSAK1+S7buD1OkdTqPzw42VhVGnkB/9K3ha0OE5mdbrXP5bLIZ/XOpB0ORQY5JwKsZAKPaU5dMbWnkYSNL3Swh0BWkyGbKuQo7iKNa6wj8ccmukuFodO2ZxqmdJbvog6dWyRwHI/b1+t1ocxv2gouHS9AB8uZaPptmnsPcFRKQ7OnIAWV08HKFUNBOHSFRVh8zazFCC30PL19yJ4j02CIdLS0ApAUbJFtloyIYI1lxfplMcTNVfOs1w3+RylTwe6GrO9wmoCHIekCbKttFNbRrJiwiuaTyict2Q1gf1kBpukKA04Ox7WWhl/NlYSks0oNF7XN/QRQG6qFVWtWOJZjRG4Ynpi3zn7]]></Encrypt><AgentID><![CDATA[2000003]]></AgentID></xml>";
         $corpId = "wwb4a68b6963803c46";
         $token = "80343WWuvAVpa682";
         $encodingAesKey = "gf5YT3368mO2Qgu1X9ht1x951Q3ItXCZw694S5n4yN6";
 
+        $wxcpt = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
 
-        $sVerifyMsgSig      = urldecode($params['msg_signature']) ??'';
-        $sVerifyTimeStamp   = urldecode($params['timestamp']) ??'';
-        $sVerifyNonce       = urldecode($params['nonce']) ??'';
-        $sVerifyEchoStr     = urldecode($params['echostr']) ??'';
-        $sEchoStr = "";
-        $wechatObj = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
-        $errCode = $wechatObj ->VerifyURL($sVerifyMsgSig, $sVerifyTimeStamp, $sVerifyNonce, $sVerifyEchoStr, $sEchoStr);
+//        $sVerifyMsgSig      = urldecode($params['msg_signature'] ??'');
+//        $sVerifyTimeStamp   = urldecode($params['timestamp'] ??'');
+//        $sVerifyNonce       = urldecode($params['nonce'] ??'');
+//        $sVerifyEchoStr     = urldecode($params['echostr'] ??'');
+//        $sEchoStr = "";
+//        $errCode = $wxcpt ->VerifyURL($sVerifyMsgSig, $sVerifyTimeStamp, $sVerifyNonce, $sVerifyEchoStr, $sEchoStr);
+//
+//        if ($errCode == 0) {
+//            echo $sEchoStr;
+//
+//        } else {
+//            print("ERR: " . $errCode . "\n\n");
+//        }
 
+        $sReqMsgSig     = urldecode($params['msg_signature'] ??'');
+        $sReqTimeStamp  = urldecode($params['timestamp'] ??'');
+        $sReqNonce      = urldecode($params['nonce'] ??'');
+
+
+
+        //解析XML
+        $errCode = $wxcpt->DecryptMsg($sReqMsgSig, $sReqTimeStamp, $sReqNonce, $sReqData, $sMsg);
         if ($errCode == 0) {
-            echo $sEchoStr;
+            // 解密成功，sMsg即为xml格式的明文
+            $obj = simplexml_load_string($sMsg, 'SimpleXMLElement', LIBXML_NOCDATA);
+            $json = json_encode($obj);
+            $user_arr = json_decode($json, true);
+
+            if($user_arr['Event'] == "change_external_contact" && ($user_arr['ChangeType'] == "edit_external_contact" || $user_arr['ChangeType'] == "del_external_contact")){
+                //添加好友
+                \Log::info('User_Wechat_add_aaa:   '.json_encode($user_arr));
+
+                //$user_arr['ExternalUserID'];//外部联系人id
+                //self::getUserDetail([$user_arr['ExternalUserID']]);
+            }
+            var_dump($sMsg);
 
         } else {
             print("ERR: " . $errCode . "\n\n");
+            //exit(-1);
         }
-
-
 
     }
 
