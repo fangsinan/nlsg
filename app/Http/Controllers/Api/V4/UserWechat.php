@@ -351,10 +351,10 @@ class UserWechat extends Controller {
         $encodingAesKey = "gf5YT3368mO2Qgu1X9ht1x951Q3ItXCZw694S5n4yN6";
 
 
-        $sVerifyMsgSig      = ($params['msg_signature']);
-        $sVerifyTimeStamp   = ($params['timestamp']);
-        $sVerifyNonce       = ($params['nonce']);
-        $sVerifyEchoStr     = ($params['echostr']);
+        $sVerifyMsgSig      = urldecode($params['msg_signature']) ??'';
+        $sVerifyTimeStamp   = urldecode($params['timestamp']) ??'';
+        $sVerifyNonce       = urldecode($params['nonce']) ??'';
+        $sVerifyEchoStr     = urldecode($params['echostr']) ??'';
         $sEchoStr = "";
         $wechatObj = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
         $errCode = $wechatObj ->VerifyURL($sVerifyMsgSig, $sVerifyTimeStamp, $sVerifyNonce, $sVerifyEchoStr, $sEchoStr);
