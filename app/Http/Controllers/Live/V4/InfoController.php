@@ -263,10 +263,14 @@ class InfoController extends ControllerBackend
             $UserArr=$query->get()->toArray();
             $UnionArr=[];
             foreach ($UserArr as $key=>$val){
-                $UnionArr[$val->id]=(empty($val->qw_name))?'':$val->qw_name;
+                $UnionArr[$val->id]=[
+                    'qw_name'=>(empty($val->qw_name))?'':$val->qw_name,
+                    'follow_user_userid'=>(empty($val->follow_user_userid))?'':$val->follow_user_userid
+                    ];
             }
             foreach ($data as $k=>$v){
-                $v->unionid=$UnionArr[$v->user_id];
+                $v->unionid=$UnionArr[$v->user_id]['qw_name'];
+                $v->follow_user_userid=$UnionArr[$v->user_id]['follow_user_userid'];
             }
         }
         $columns = ['订单编号', '支付金额', '数量', '支付时间', '类型名称',
@@ -275,7 +279,7 @@ class InfoController extends ControllerBackend
             '受益人id', '受益人金额',
             '钻石合伙人id', '钻石合伙人账号', '钻石合伙人昵称', '钻石合伙人身份',
             '是否抖音渠道', '抖音订单号', '抖音下单时间', '渠道类型', '渠道名称',
-            '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款','微信客服'];
+            '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款','微信客服','客服编号'];
 //        $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
         $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
