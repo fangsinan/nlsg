@@ -172,14 +172,14 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             //抓取直播间成交订单
             DealServers::getOrderInfo([], 0, 1);
-        })->everyFiveMinutes()->runInBackground();//每5分钟执行一次
+        })->everyMinute()->between('21:55', '22:10')->runInBackground();//每分钟执行一次
 
         $schedule->call(function () {
             UserWechat::AddUserWechat();//通过部门id获取企业客户
         })->dailyAt('21:51');
         $schedule->call(function () {
             UserWechat::AddUserWechat();//通过部门id获取企业客户
-        })->dailyAt('22:20');
+        })->dailyAt('22:10');
         $schedule->call(function () {
             UserWechat::AddUserWechat();//通过部门id获取企业客户
         })->dailyAt('0:01');
