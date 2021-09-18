@@ -7,6 +7,7 @@ use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\VipUser;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DealServers
 {
@@ -30,7 +31,7 @@ class DealServers
             $now=date('Y-m-d',time());
             //获取当天未抓取的订单
             $LiveOrderObj=Order::query()->where('pay_time', '>', $now.' 00:00:00')
-                ->where(['type'=>14,'status'=>1,'is_deal'=>0])->select(['live_id'])->first();
+                ->where(['type'=>14,'status'=>1,'is_deal'=>0])->select(['live_id'])->where('pay_price', '>', 1)->first();
             if(!empty($LiveOrderObj)) {
                 $live_id = $LiveOrderObj->live_id;
             }else{
@@ -138,6 +139,7 @@ class DealServers
                 $DealAddRst = LiveDeal::Add($map, true);
                 if ($DealAddRst === false) {
                     DB::rollBack();
+//                    Log::channel('aliCrontabPullLog')->info('抓取入库失败：'.json_encode($map));
                     return ['status' => 0, 'data' => [],'msg'=>'抓取入库失败'];
                 }
                 //更新订单抓取状态
