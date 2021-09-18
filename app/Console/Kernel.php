@@ -155,10 +155,6 @@ class Kernel extends ConsoleKernel
 //            Subscribe::expire();
         })->daily();  //每天执行一次
 
-        $schedule->call(function () {
-            //抓取直播间成交订单
-            DealServers::getOrderInfo([], 0, 1);
-        })->everyFiveMinutes()->runInBackground();//每5分钟执行一次
 
         //https://laravelacademy.org/post/8484.html
         $schedule->call(function () {
@@ -173,6 +169,17 @@ class Kernel extends ConsoleKernel
             $AliUploadServer->UploadMediaVideoAudio();
         })->everyFiveMinutes()->between('2:00', '6:00')->runInBackground();//5分钟执行一次
 
+        $schedule->call(function () {
+            //抓取直播间成交订单
+            DealServers::getOrderInfo([], 0, 1);
+        })->everyFiveMinutes()->runInBackground();//每5分钟执行一次
+
+        $schedule->call(function () {
+            UserWechat::AddUserWechat();//通过部门id获取企业客户
+        })->dailyAt('21:51');
+        $schedule->call(function () {
+            UserWechat::AddUserWechat();//通过部门id获取企业客户
+        })->dailyAt('22:20');
         $schedule->call(function () {
             UserWechat::AddUserWechat();//通过部门id获取企业客户
         })->dailyAt('0:01');
