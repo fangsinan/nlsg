@@ -215,6 +215,8 @@ class LiveInfoServers
                 'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
                 DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
             ]);
+//            echo $query->toSql().PHP_EOL;
+//            $query->dd(); //dd 阻断流程
             return $query->get();
         }
 
