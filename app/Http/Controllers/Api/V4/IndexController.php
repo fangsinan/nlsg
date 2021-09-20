@@ -716,11 +716,13 @@ class IndexController extends Controller
      *
      */
 
-    public function recommend()
+    public function recommend(Request $request)
     {
+        $version = $request->get('version');
+        $os_type = intval($request->get('os_type')) ?? 1;
         $user_id = $this->user['id'] ?? 0;
         $works = new Works();
-        $lists = $works->getRecommendWorks(566, $user_id);
+        $lists = $works->getRecommendWorks(566, $user_id,$os_type,$version);
         return success($lists);
     }
 

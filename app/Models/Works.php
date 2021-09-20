@@ -97,15 +97,17 @@ class Works extends Base
      * @param $id
      * @return bool
      */
-    public function getRecommendWorks($id, $user_id = 0)
+    public function getRecommendWorks($id, $user_id = 0,$os_type=0,$version='')
     {
         if ( ! $id) {
             return false;
         }
-        $limit=5;
-//        if($id==566){
-//            $limit=1;
-//        }
+        $limit=2;
+        if($os_type==2 && $version>='4.2.7'){//ios 每日琨说
+            if($id==566){
+                $limit=1;
+            }
+        }
         $list = Works::with([
             'workInfo' => function ($query) use ($limit) {
                 $query->select('id', 'pid', 'rank', 'title', 'duration', 'view_num', 'online_time')
