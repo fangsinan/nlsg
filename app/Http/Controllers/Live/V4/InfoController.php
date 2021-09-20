@@ -240,7 +240,7 @@ class InfoController extends ControllerBackend
             exit();
         }
     }
-
+    //http://127.0.0.1:8000/api/live_v4/live_info/live_order_kun_excel?live_id=130&excel_flag=1
     public function liveOrderKunExcel(Request $request)
     {
         $s = new LiveInfoServers();
