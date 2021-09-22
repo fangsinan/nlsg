@@ -13,6 +13,7 @@ use App\Models\ExpressInfo;
 use App\Models\History;
 use App\Models\Live;
 use App\Models\LiveCountDown;
+use App\Models\LiveOnlineUser;
 use App\Models\MallGoods;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
@@ -25,6 +26,7 @@ use App\Models\VipUserBind;
 use App\Models\WorksListOfSub;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class removeDataServers
 {
@@ -2128,4 +2130,23 @@ ORDER BY
 
     }
 
+    public function liveOnlineUserList(){
+        $redis = Redis::connection();
+        $data = $redis->LPOP('online_user_list');
+
+        print_r($data);
+
+        $data = json_decode($data,true);
+        $check = LiveOnlineUser::where('online_time_str','=',$data['online_time_str'])
+            ->where('user_id','=',$data['user_id'])
+            ->where('live_id','=',$data['live_id'])
+            ->where('live_son_flag','=',$data['live_son_flag'])
+            ->first();
+        if (empty($check)){
+            $res = DB::table('nlsg_live_online_user')->insert($data);
+            if (!$res){
+                $redis->rpush('online_user_list',$data);
+            }
+        }
+    }
 }

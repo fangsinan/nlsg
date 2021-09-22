@@ -85,7 +85,7 @@ class RemoveDataController extends ControllerBackend
         }
 
         if (0) {
-            $servers->liveOrderAddVipDind();
+            $servers->liveOnlineUserList();
         }
 
     }
