@@ -148,7 +148,7 @@ class SubscribeController extends ControllerBackend
      */
     public function index(Request $request, $get_excel = 0, $excel_size = 10, $excel_page = 1)
     {
-       $title = $request->get('title') ?? '';
+        $title = $request->get('title') ?? '';
         $ordernum = $request->get('ordernum') ?? '';
         $phone = $request->get('phone') ?? '';
         $date = $request->get('date') ?? '';
