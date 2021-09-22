@@ -80,7 +80,7 @@ class MallOrderServers
         // status : 订单状态 1待付款  10待发货 20待收货 30已完成
         // gp_status : 补充状态,用于简化拼团订单状态筛选  1拼团中  2拼团成功 3拼团失败
 
-        switch (intval($params['status'] ?? 0)) {
+        switch ((int)($params['status'] ?? 0)) {
             case 1:
                 $query->where('status', '=', 1)
                     ->where('is_stop', '=', 0);
@@ -136,7 +136,7 @@ class MallOrderServers
 //        return DB::getQueryLog();
 
         foreach ($list as &$v) {
-            if (count($v->refundRecord) == 0) {
+            if (count($v->refundRecord) === 0) {
                 $v->refund_type_name = '无售后';
             } else {
                 $v->refund_type_name = '有售后';
