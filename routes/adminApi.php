@@ -244,6 +244,10 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::post('im/msg_collection', 'ImMsgController@MsgCollection');
         Route::post('im/msg_collection_list', 'ImMsgController@MsgCollectionList');
 
+        //直播过滤词
+        Route::get('s_key/list', 'ShieldKeyController@list');
+        Route::post('s_key/add', 'ShieldKeyController@add');
+        Route::put('s_key/change_status', 'ShieldKeyController@changeStatus');
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');

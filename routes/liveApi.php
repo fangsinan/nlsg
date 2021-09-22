@@ -42,11 +42,6 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_info/live_order_kun_excel', 'InfoController@liveOrderKunExcel');
         Route::get('live_info/user_watch_excel', 'InfoController@userWatchExcel');
         Route::get('live_info/online_num_info_excel', 'InfoController@onlineNumInfoExcel');
-        
-        //直播过滤词
-        Route::get('live_s_key/list', 'ShieldKeyController@list');
-        Route::post('live_s_key/add', 'ShieldKeyController@add');
-        Route::put('live_s_key/change_status', 'ShieldKeyController@changeStatus');
 
     });
     //导出
