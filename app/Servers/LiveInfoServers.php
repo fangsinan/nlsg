@@ -63,7 +63,7 @@ class LiveInfoServers
         }
 
         $query->orderBy('s.created_at', 'desc');
-        $query->groupBy('s.user_id');
+//        $query->groupBy('s.user_id');
 
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
@@ -345,7 +345,7 @@ class LiveInfoServers
 
         if (empty($son_flag)) {
             $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
-                ->where('status','=',1)
+                ->where('status', '=', 1)
                 ->select(['son', 'son_id', 'son_flag'])
                 ->orderBy('sort', 'asc')   //按标记排序
                 ->get();
@@ -491,7 +491,6 @@ GROUP BY
 //	) as a GROUP BY online_time_str";
 
 
-
             $list_sql = "SELECT
 	online_time_str as time,
 	count(*) as counts
@@ -527,7 +526,7 @@ GROUP BY
         foreach ($res['list'] as $v) {
             $temp_img_data = [];
 //            $temp_img_data['时间'] = $v->time;substr($v->time,-11);
-            $temp_img_data['时间'] = substr($v->time,-11);
+            $temp_img_data['时间'] = substr($v->time, -11);
             $temp_img_data['人数'] = $v->counts;
             $img_data['rows'][] = $temp_img_data;
         }
@@ -779,8 +778,8 @@ GROUP BY
 //
 //        $res['order_num'] = DB::select($order_num_sql)[0]->counts;
 
-        $res['order_num'] = Subscribe::query()->where('relation_id','=',$live_id)
-            ->where('type','=',3)->where('status','=',1)->count();
+        $res['order_num'] = Subscribe::query()->where('relation_id', '=', $live_id)
+            ->where('type', '=', 3)->where('status', '=', 1)->count();
 
         if ($check_live_id->user_id == 161904) {
             //王琨,统计live_deal
