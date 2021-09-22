@@ -148,6 +148,7 @@ class SubscribeController extends ControllerBackend
      */
     public function index(Request $request, $get_excel = 0, $excel_size = 10, $excel_page = 1)
     {
+        return [];
        $title = $request->get('title') ?? '';
         $ordernum = $request->get('ordernum') ?? '';
         $phone = $request->get('phone') ?? '';
@@ -323,7 +324,7 @@ class SubscribeController extends ControllerBackend
                 $new_users[$dv['id']]['address'] = ($maModel->getList($dv['id'], 0, 1))[0] ?? '';
             }
         }
-        
+
         foreach ($lists['data'] as &$val) {
 
             // 将推客信息  合并到数据
