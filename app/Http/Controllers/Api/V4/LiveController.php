@@ -546,7 +546,8 @@ class LiveController extends Controller
      *     }
      *
      */
-    public function show(Request $request)
+    //旧版
+    public function show_1(Request $request)
     {
         $id = $request->get('live_id');
         $live_son_flag = intval($request->get('live_son_flag',0));
@@ -618,12 +619,13 @@ class LiveController extends Controller
             $list['live_son_flag_count'] = 0;
             $list['live_son_flag_status'] = 0;
             if(!empty($live_son_flag)){
-                $list['live_son_flag_count'] = Subscribe::where([
-                    "relation_id" => $list->live_pid,
-                    "type" => 3,
-                    "status" => 1,
-                    "twitter_id" => $live_son_flag,
-                ])->count();
+                $list['live_son_flag_count'] = 10000;
+//                    Subscribe::where([
+//                    "relation_id" => $list->live_pid,
+//                    "type" => 3,
+//                    "status" => 1,
+//                    "twitter_id" => $live_son_flag,
+//                ])->count();
 
                 //渠道是否开启直播
                 $list['live_son_flag_status'] = LiveSonFlagPoster::where([
@@ -665,6 +667,148 @@ class LiveController extends Controller
         return success($data);
 
     }
+
+    public function show(Request $request)
+    {
+        $id = $request->get('live_id');
+        $live_son_flag = intval($request->get('live_son_flag',0));
+        $os_type = intval($request->input('os_type', 0)); //1 安卓 2ios 3微信
+        if(!empty($os_type) && $os_type==3){
+            $selectArr=['id','live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video'];
+        }else{
+            $selectArr=['id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video'];
+        }
+        $list = LiveInfo::with([
+            'user:id,nickname,headimg,intro,honor',
+            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num',
+            'live.livePoster'=>function($q){
+                $q->where('status','=',1);
+            }
+        ])
+            ->select($selectArr)
+            ->where('id', $id)
+            ->first();
+
+        //初始化人气值
+        $redisConfig = config('database.redis.default');
+        $redis = new Client($redisConfig);
+        $redis->select(0);
+
+
+
+        if ($list) {
+            $column = Column::where('user_id', $list['user_id'])
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $userId = $this->user['id'] ?? 0;
+            $user = new User();
+
+            $columnId = $column ? $column->id : 0;
+
+            $isSub = Subscribe::isSubscribe($userId, $columnId, 1);
+            $subLive = Subscribe::isSubscribe($userId, $list->live_pid, 3);
+
+            $is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
+                ->where('user_id', '=', 0)->where('is_forbid', '=', 1)
+                ->first();
+            $list['is_forbid'] = $is_forbid ? 1 : 0;
+
+            $is_silence = LiveForbiddenWords::where('live_info_id', '=', $id)
+                ->where('user_id', '=', $this->user['id'])
+                ->where('is_forbid', '=', 1)
+                ->select(['id', 'forbid_at', 'length'])
+                ->first();
+            if ($is_silence) {
+                $list['is_silence'] = intval(strtotime($is_silence->forbid_at)) + intval($is_silence->length) - time();
+                $list['is_silence'] = $list['is_silence'] < 0 ? 0 : $list['is_silence'];
+            } else {
+                $list['is_silence'] = 0;
+            }
+
+            $is_appmt = LiveCountDown::where(['user_id' => $this->user['id'], 'live_id' => $id])->first();
+            $list['is_appmt'] = $is_appmt ? 1 : 0;
+            $is_admin = LiveConsole::isAdmininLive($this->user['id'] ?? 0, $list['live_pid']);
+            $list['is_admin'] = $is_admin ? 1 : 0;
+
+            $list['column_id'] = $columnId;
+            $list['is_sub'] = $subLive ?? 0;
+            $list['is_sub_column'] = $isSub ?? 0;
+            $list['level'] = $user->getLevel($userId);
+            $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
+            $list['nick_name'] = $this->user['nickname'] ?? '';
+
+            if ($list->user_id == $userId) {
+                $list['is_password'] = 0;
+            } elseif ($is_admin) {
+                $list['is_password'] = 0;
+            } else {
+                $list['is_password'] = $list->live->password ? 1 : 0;
+            }
+            $list['live_son_flag_count'] = 0;
+            $list['live_son_flag_status'] = 0;
+            if(!empty($live_son_flag)){
+
+                $key = "live_son_flag_".$list->live_pid . '_' . $live_son_flag;
+                $key_num=$redis->get($key);
+                if(!empty($key_num)){
+                    $list['live_son_flag_count'] =  $key_num;
+                }else{
+                    $list['live_son_flag_count'] = Subscribe::where([
+                        "relation_id" => $list->live_pid,
+                        "type" => 3,
+                        "status" => 1,
+                        "twitter_id" => $live_son_flag,
+                    ])->count();
+
+                    $redis->setex($key,86400*5,$list['live_son_flag_count']);
+                }
+
+
+
+                //渠道是否开启直播
+                $list['live_son_flag_status'] = LiveSonFlagPoster::where([
+                    'live_id'   =>$list->live_pid,
+                    'son_id'    =>$live_son_flag,
+                    'is_del'    =>0,
+                ])->value('status');
+                $list['live_son_flag_status'] = $list['live_son_flag_status']??0;
+            }
+//
+        }
+
+        if(empty($live_son_flag)){
+            $key="live_number_$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
+            $key_num=$redis->get($key);
+            //无数据才进行查询
+            if( empty($key_num) ){
+                //数据库实时数据
+                $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
+                if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
+                    $live_son_flag_num=$live_son_flag_num+$list['live']['virtual_online_num']; //虚拟值
+                }
+                if($key_num<$live_son_flag_num){
+                    $redis->setex($key,86400*5,$live_son_flag_num);
+                }
+            }else{
+                $live_son_flag_num = $key_num;
+            }
+
+        }else{
+            $key='live_son_flag_'.$id.'_'.$live_son_flag;
+            $live_son_flag_num=$redis->get($key);
+            if(empty($live_son_flag_num)){
+                $live_son_flag_num=1;
+            }
+        }
+
+        $data = [
+            'info' => $list,
+            'live_son_flag_num' => $live_son_flag_num,
+        ];
+        return success($data);
+
+    }
+
 
 //    public function recommend(Request $request)
 //    {
