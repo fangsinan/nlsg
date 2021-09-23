@@ -14,6 +14,7 @@ class LiveLogin extends Model
 
 //        $live_list = Live::query()->pluck('id')->toArray();
         $live_list = DB::table('nlsg_live_online_user')->groupBy('live_id')
+            ->where('live_id','>',125)
             ->select(['live_id'])->get();
 
         foreach ($live_list as $v) {
@@ -26,11 +27,10 @@ from nlsg_live_online_user where live_id = $v->live_id
             $list = DB::select($sql);
 
             if (!empty($list)){
-                foreach ($list as $v){
-                    $ids = explode(',',$v->ids);
+                foreach ($list as $vv){
+                    $ids = explode(',',$vv->ids);
                     array_shift($ids);
-//                    dd($ids);
-                    $del_res = DB::table('nlsg_live_online_user')->whereIn('id',$ids)->delete();
+                    DB::table('nlsg_live_online_user')->whereIn('id',$ids)->delete();
                 }
             }
 
