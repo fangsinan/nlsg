@@ -2019,7 +2019,7 @@ and o.status = 1 and o.pay_price > 1";
                         continue;
                     }
 
-                    Live::where('id', '=', $v->works_id)->increment('order_num',count($add_sub_data));
+                    Live::where('id', '=', $v->works_id)->increment('order_num', count($add_sub_data));
                 }
                 DB::commit();
 
@@ -2130,22 +2130,64 @@ ORDER BY
 
     }
 
-    public function liveOnlineUserList(){
+    public function liveOnlineUserList()
+    {
         $redis = Redis::connection();
         $data = $redis->LPOP('online_user_list');
 
         print_r($data);
 
-        $data = json_decode($data,true);
-        $check = LiveOnlineUser::where('online_time_str','=',$data['online_time_str'])
-            ->where('user_id','=',$data['user_id'])
-            ->where('live_id','=',$data['live_id'])
-            ->where('live_son_flag','=',$data['live_son_flag'])
+        $data = json_decode($data, true);
+        $check = LiveOnlineUser::where('online_time_str', '=', $data['online_time_str'])
+            ->where('user_id', '=', $data['user_id'])
+            ->where('live_id', '=', $data['live_id'])
+            ->where('live_son_flag', '=', $data['live_son_flag'])
             ->first();
-        if (empty($check)){
+        if (empty($check)) {
             $res = DB::table('nlsg_live_online_user')->insert($data);
-            if (!$res){
-                $redis->rpush('online_user_list',$data);
+            if (!$res) {
+                $redis->rpush('online_user_list', $data);
+            }
+        }
+    }
+
+    public function lours()
+    {
+        $date = date('Y-m-d H:i:s');
+        $log = DB::table('nlsg_live_online_user_clean_log')
+            ->orderBy('id', 'desc')
+            ->select(['id', 'begin_id', 'end_id'])
+            ->first();
+
+        $new_log = DB::table('nlsg_live_online_user')
+            ->orderBy('id', 'desc')
+            ->select(['id'])
+            ->first();
+
+        $log_end_id = $log->end_id ?? 1;
+        $new_end_id = $new_log->id;
+
+        if ($new_end_id <= $log_end_id) {
+            return true;
+        }
+
+        $begin_id = $log_end_id;
+        $end_id = $new_end_id;
+
+        DB::table('nlsg_live_online_user_clean_log')->insert([
+            'begin_id' => $begin_id,
+            'end_id' => $end_id,
+            'created_at' => $date,
+            'updated_at' => $date
+        ]);
+
+        $lours = new LiveOnlineUserRemoveServers(1, 500);
+        foreach ($lours as $v) {
+            try {
+                unset($v['online_time']);
+                DB::table('nlsg_live_online_user_clean')->insert($v);
+            } catch (\Exception $e) {
+                continue;
             }
         }
     }

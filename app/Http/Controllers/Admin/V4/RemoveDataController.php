@@ -88,6 +88,10 @@ class RemoveDataController extends ControllerBackend
             $servers->liveOnlineUserList();
         }
 
+        if (0) {
+            $servers->lours();
+        }
+
     }
 
     public function mallOrders()
