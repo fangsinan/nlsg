@@ -1850,8 +1850,8 @@ and o.status = 1 and o.pay_price > 1";
         while ($run) {
             self::getKernelLock($job_key, 2);
             $list = DB::table('works_list_of_sub')
-                ->where('status', '=', 1)
                 ->whereIn('works_type', [2, 6, 3, 7])
+                ->where('status', '=', 1)
                 ->limit(100)
                 ->get();
 
@@ -2035,9 +2035,9 @@ and o.status = 1 and o.pay_price > 1";
 //        while ($while_flag) {
         //现在只有情商课的sms
         $list = WorksListOfSub::where('works_type', '=', 2)
+            ->where('status', '=', 2)
             ->where('works_id', '=', 404)
             ->where('is_sendsms', '=', 1)
-            ->where('status', '=', 2)
             ->select(['id', 'phone'])
             ->limit(300)
             ->get();
