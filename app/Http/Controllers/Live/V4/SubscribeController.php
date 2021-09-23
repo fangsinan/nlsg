@@ -168,19 +168,41 @@ class SubscribeController extends ControllerBackend
         }
 
 
+        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('status',4)->where('id', '>', 52);
         if ($this->user['live_role'] == 21) {
             $live_user_id = $this->user['user_id'];
-            $live_ids = Live::where('user_id', $live_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
+            //Live::where('user_id', $live_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
+            if (!empty($title)) {
+                $live_query->where('title', 'like', '%' . $title . '%');
+            }
+            $live_data = $live_query->where('user_id', $live_user_id)->get()->toArray();
+
         } elseif ($this->user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $live_ids = Live::whereIn('user_id', $son_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
+            //Live::whereIn('user_id', $son_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
+            if (!empty($title)) {
+                $live_query->where('title', 'like', '%' . $title . '%');
+            }
+            $live_data = $live_query->whereIn('user_id', $son_user_id)->get()->toArray();
         }else{
-            $live_ids = Live::where('status',4)->where('id', '>', 52)->pluck("id");
-
+            //$live_query = Live::where('status',4)->where('id', '>', 52);
+            if (!empty($title)) {
+                $live_query->where('title', 'like', '%' . $title . '%');
+            }
+            $live_data = $live_query->get()->toArray();
         }
+
+        $live_ids = array_column($live_data,"id");
+
+        //处理直播数据
+        $new_live_data = [];
+        foreach ($live_data as $live_key=>$live_val){
+            $new_live_data[$live_val['id']] = $live_val;
+        }
+
         $query = Subscribe::with([
-            'live:id,title,price,twitter_money,is_free',
+            //'live:id,title,price,twitter_money,is_free',
             'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at'
         ]);
 
@@ -188,11 +210,6 @@ class SubscribeController extends ControllerBackend
             $query->has('order');
         }
 
-        if (!empty($title)) {
-            $query->whereHas('live', function ($q) use ($title) {
-                $q->where('title', 'like', '%' . $title . '%');
-            });
-        }
         if (!empty($ordernum)) {
             $query->whereHas('order', function ($q) use ($ordernum) {
                 $q->where('ordernum', $ordernum);
@@ -206,7 +223,6 @@ class SubscribeController extends ControllerBackend
                     $q->where('twitter_id', $twitter_phoneUser['id']);
                 });
             }
-
         }
 
         if (!empty($date)) {
@@ -265,6 +281,9 @@ class SubscribeController extends ControllerBackend
         //  将 twitter_id、ordernum、user_id 取出来  单独查询处理
         $twitter_get_ids = [];
         foreach ($lists['data'] as &$t_val) {
+
+            $t_val['live'] = $new_live_data[$t_val['relation_id']];
+
             $t_val['twitter'] = [];
             $twitter_id = $t_val['order']['twitter_id'] ?? 0;
             //免费的邀约人是live_count_down
