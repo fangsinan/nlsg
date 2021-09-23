@@ -225,15 +225,15 @@ class SubscribeController extends ControllerBackend
             }
         }
 
-        if (!empty($date)) {
-            $query->whereHas('order', function ($q) use ($date, $now_date) {
-                $q->where('pay_time', '>=', $date[0]);
-                if (empty($date[1] ?? '')) {
-                    $date[1] = $now_date;
-                }
-                $q->where('pay_time', '<', $date[1]);
-            });
-        }
+//        if (!empty($date)) {
+//            $query->whereHas('order', function ($q) use ($date, $now_date) {
+//                $q->where('pay_time', '>=', $date[0]);
+//                if (empty($date[1] ?? '')) {
+//                    $date[1] = $now_date;
+//                }
+//                $q->where('pay_time', '<', $date[1]);
+//            });
+//        }
 
         $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time',
             'order_id', 'created_at', 'twitter_id')
@@ -248,6 +248,22 @@ class SubscribeController extends ControllerBackend
 
         $query->where('is_del', 0);
 
+        if (!empty($date)) {
+//            $query->whereHas('order', function ($q) use ($date, $now_date) {
+//                $q->where('pay_time', '>=', $date[0]);
+//                if (empty($date[1] ?? '')) {
+//                    $date[1] = $now_date;
+//                }
+//                $q->where('pay_time', '<', $date[1]);
+//            });
+
+            $query->where('created_at', '>=', $date[0]);
+            if (empty($date[1] ?? '')) {
+                $date[1] = $now_date;
+            }
+            $query->where('created_at', '<', $date[1]);
+
+        }
 
         //sub创建时间
         if (!empty($created_at)) {
@@ -550,4 +566,5 @@ class SubscribeController extends ControllerBackend
 
 
     }
+
 }
