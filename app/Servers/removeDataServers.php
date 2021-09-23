@@ -2154,32 +2154,32 @@ ORDER BY
     public function lours()
     {
         $date = date('Y-m-d H:i:s');
-        $log = DB::table('nlsg_live_online_user_clean_log')
-            ->orderBy('id', 'desc')
-            ->select(['id', 'begin_id', 'end_id'])
-            ->first();
-
-        $new_log = DB::table('nlsg_live_online_user')
-            ->orderBy('id', 'desc')
-            ->select(['id'])
-            ->first();
-
-        $log_end_id = $log->end_id ?? 1;
-        $new_end_id = $new_log->id;
-
-        if ($new_end_id <= $log_end_id) {
-            return true;
-        }
-
-        $begin_id = $log_end_id;
-        $end_id = $new_end_id;
-
-        DB::table('nlsg_live_online_user_clean_log')->insert([
-            'begin_id' => $begin_id,
-            'end_id' => $end_id,
-            'created_at' => $date,
-            'updated_at' => $date
-        ]);
+//        $log = DB::table('nlsg_live_online_user_clean_log')
+//            ->orderBy('id', 'desc')
+//            ->select(['id', 'begin_id', 'end_id'])
+//            ->first();
+//
+//        $new_log = DB::table('nlsg_live_online_user')
+//            ->orderBy('id', 'desc')
+//            ->select(['id'])
+//            ->first();
+//
+//        $log_end_id = $log->end_id ?? 1;
+//        $new_end_id = $new_log->id;
+//
+//        if ($new_end_id <= $log_end_id) {
+//            return true;
+//        }
+//
+//        $begin_id = $log_end_id;
+//        $end_id = $new_end_id;
+//
+//        DB::table('nlsg_live_online_user_clean_log')->insert([
+//            'begin_id' => $begin_id,
+//            'end_id' => $end_id,
+//            'created_at' => $date,
+//            'updated_at' => $date
+//        ]);
 
         $lours = new LiveOnlineUserRemoveServers(1, 500);
         foreach ($lours as $v) {
