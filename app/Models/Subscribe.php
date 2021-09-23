@@ -52,13 +52,12 @@ class Subscribe extends Base
         if( !in_array($type,[3,7]) && $level) return 1;  // 直播和训练营不校验等级
 
         if($user_id && $target_id && $type ){
-            $where = ['type' => $type, 'user_id' => $user_id,];
+            $where = ['relation_id' => $target_id, 'type' => $type, 'user_id' => $user_id,];
             //处理专栏的关注信息
             if( !in_array($type,[1,2,3,4,5,6,7]) ){
                 return 0;
             }
 
-            $where['relation_id'] = $target_id;
             if( in_array($type,[3,5,7]) ){  //直播永久有效不需 判断end_time
                 $sub_data = Subscribe::where($where)
                     ->first();
@@ -92,9 +91,9 @@ class Subscribe extends Base
                 $id = Column::select('id')->where( [ 'user_id'=> $result['user_id'],'type'=> 1] )->first();
 
                 $sub_data = Subscribe::where([
+                    'relation_id' => $id['id'],
                     'type' => 1,  //专栏
                     'user_id' => $user_id,
-                    'relation_id' => $id['id'],
                     ])->where('end_time', '>', date('Y-m-d H:i:s'))->first();
                 if($sub_data){
                     $is_sub = 1;
