@@ -625,6 +625,8 @@ class WechatPay extends Controller
                 if (!empty($orderInfo['twitter_id'])) {
                     $twitter_data = User::find($orderInfo['twitter_id']);
                     $check_bind = VipUserBind::getBindParent($userdata['phone']);
+//                    if ($check_bind == 0) {
+                    //没有绑定记录,则绑定
                     if (($check_bind === 0) && strlen($twitter_data['phone']) === 11 && strlen($userdata['phone']) === 11) {
                         $bind_data = [
                             'parent' => $twitter_data['phone'],
@@ -649,7 +651,7 @@ class WechatPay extends Controller
                 $Profit_Rst = true;
                 $pay_record_flag = 0;
                 if (!empty($twitter_id) && $twitter_id !== $user_id && $liveData['twitter_money'] > 0 && $total_fee > $liveData['twitter_money']) {
-//                if (!empty($twitter_id) && $twitter_id != $user_id && $liveData['twitter_money'] > 0 ) {
+//                if (!empty($twitter_id) && $twitter_id != $user_id && $liveData['twitter_money'] > 0 && $total_fee > $liveData['twitter_money']) {
                     $liveCountDown['new_vip_uid'] = $twitter_id;
                     //固定收益50
                     $ProfitPrice = $liveData['twitter_money'];
