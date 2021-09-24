@@ -36,7 +36,6 @@ class SubscribeController extends ControllerBackend
         $fp = fopen('php://output', 'a');//打开output流
         mb_convert_variables('GBK', 'UTF-8', $columns);
         fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
-
         while ($flag) {
             $list = $this->index($request, 1, $size, $page);
             foreach ($list as $v) {
@@ -72,7 +71,7 @@ class SubscribeController extends ControllerBackend
                 $temp_v['t_price'] = $v['live']['twitter_money'] ?? '-';
                 $temp_v['t_nickname'] = $v['twitter']['nickname'] ?? '-';
                 $temp_v['t_phone'] = $v['twitter']['phone'] ?? '-';
-                switch (intval($v['order']['os_type'])) {
+                switch (intval($v['order']['os_type']??0)) {
                     case 1:
                         $temp_v['os_type'] = '安卓';
                         break;
@@ -87,7 +86,7 @@ class SubscribeController extends ControllerBackend
                 }
                 $temp_v['pay_time'] = $v['order']['pay_time'] ?? '-';
                 $temp_v['pay_price'] = $v['order']['pay_price'] ?? '-';
-                switch (intval($v['order']['pay_type'])) {
+                switch (intval($v['order']['pay_type']??0)) {
                     case 1:
                         $temp_v['pay_type'] = '微信';
                         break;
@@ -104,7 +103,6 @@ class SubscribeController extends ControllerBackend
                         $temp_v['pay_type'] = '-';
                 }
                 $temp_v['created_at'] = $v['order']['created_at'] ?? '-';
-
                 mb_convert_variables('GBK', 'UTF-8', $temp_v);
                 fputcsv($fp, $temp_v);
                 ob_flush();     //刷新输出缓冲到浏览器
@@ -224,7 +222,7 @@ class SubscribeController extends ControllerBackend
         if ($this->user['role_id'] == 13 && $this->user['live_role_button'] == 2) {
             $query->where('sub.order_id', '>',0);
         }
-        
+
 //        $query->where('order.status', 1);
 //        $query->where('order.type', 10);
         if (!empty($ordernum)) {
@@ -640,5 +638,5 @@ class SubscribeController extends ControllerBackend
 
 
     }
-    
+
 }
