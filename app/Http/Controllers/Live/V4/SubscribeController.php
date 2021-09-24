@@ -225,8 +225,8 @@ class SubscribeController extends ControllerBackend
             $query->where('sub.order_id', '>',0);
         }
         
-        $query->where('order.status', 1);
-        $query->where('order.type', 10);
+//        $query->where('order.status', 1);
+//        $query->where('order.type', 10);
         if (!empty($ordernum)) {
             $query->where('order.ordernum', $ordernum);
         }
