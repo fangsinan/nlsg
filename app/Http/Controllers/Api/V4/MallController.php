@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\CouponRule;
 use App\Models\CouponRuleList;
+use App\Models\LiveLogin;
 use App\Models\MallCategory;
 use App\Models\MallComment;
 use App\Models\MallGoods;
@@ -255,6 +256,9 @@ class MallController extends Controller
                 return json_decode($res, true);
 
             }
+
+//            $llModel = new LiveLogin();
+//            $llModel->clear();
 
 //            $servers = new removeDataServers();
 //            $servers->worksListOfSub();
