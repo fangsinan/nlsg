@@ -29,6 +29,7 @@ use App\Models\VipUserBind;
 use App\Models\Works;
 use App\Servers\ImGroupServers;
 use App\Servers\JobServers;
+use App\Servers\MallOrderServers;
 use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -957,6 +958,14 @@ class WechatPay extends Controller
         //erp队列
         MallErpList::addList($order_obj->id);
         DB::commit();
+
+        //如果是拼团订单,立刻填充机器人
+        if ($order_obj->order_type === 3) {
+            $mos = new MallOrderServers();
+            $mos->makeGroupSuccess([
+                'id'=>$order_obj->id
+            ]);
+        }
         return true;
     }
 
