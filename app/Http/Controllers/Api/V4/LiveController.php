@@ -786,9 +786,7 @@ class LiveController extends Controller
                 if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
                     $live_son_flag_num=$live_son_flag_num+$list['live']['virtual_online_num']; //虚拟值
                 }
-                if($key_num<$live_son_flag_num){
-                    $redis->setex($key,86400*5,$live_son_flag_num);
-                }
+                $redis->setex($key,86400*5,$live_son_flag_num);
             }else{
                 $live_son_flag_num = $key_num;
             }
