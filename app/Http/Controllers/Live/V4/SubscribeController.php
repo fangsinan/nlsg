@@ -6,10 +6,12 @@ use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendLiveRole;
 use App\Models\Live;
 use App\Models\MallAddress;
+use App\Models\Order;
 use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SubscribeController extends ControllerBackend
 {
@@ -146,6 +148,7 @@ class SubscribeController extends ControllerBackend
      *    }
      * }
      */
+
     public function index(Request $request, $get_excel = 0, $excel_size = 10, $excel_page = 1)
     {
         $title = $request->get('title') ?? '';
@@ -201,80 +204,132 @@ class SubscribeController extends ControllerBackend
             $new_live_data[$live_val['id']] = $live_val;
         }
 
-        $query = Subscribe::with([
-            //'live:id,title,price,twitter_money,is_free',
-            'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at'
-        ]);
+        //dd($new_live_data);
+
+        $subObj = new Subscribe();
+        $orderObj = new Order();
+
+        $query = DB::table($subObj->getTable().' as sub')
+            ->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id')
+
+            ->whereIn('sub.relation_id', $live_ids)
+            ->where('sub.type', 3)
+            ->where('sub.status', 1);
+        // 加在此处  如有搜索条件 可以走到联合索引
+        if (!empty($phoneUser)) {
+            $query->where('sub.user_id', $phoneUser['id']);
+        }
+
 
         if ($this->user['role_id'] == 13 && $this->user['live_role_button'] == 2) {
-            $query->has('order');
+            $query->where('sub.order_id', '>',0);
         }
 
         if (!empty($ordernum)) {
-            $query->whereHas('order', function ($q) use ($ordernum) {
-                $q->where('ordernum', $ordernum);
-            });
+            $query->where('order.ordernum', $ordernum);
         }
         if (!empty($twitter_phoneUser)) {
             if ($this->user['username'] == 13522223779) {
-                $query->where('twitter_id', $twitter_phoneUser['id']);
+                $query->where('sub.twitter_id', $twitter_phoneUser['id']);
             } else {
-                $query->whereHas('order', function ($q) use ($twitter_phoneUser) {
-                    $q->where('twitter_id', $twitter_phoneUser['id']);
-                });
+                $query->where('order.twitter_id', $twitter_phoneUser['id']);
+
             }
         }
-
-//        if (!empty($date)) {
-//            $query->whereHas('order', function ($q) use ($date, $now_date) {
-//                $q->where('pay_time', '>=', $date[0]);
-//                if (empty($date[1] ?? '')) {
-//                    $date[1] = $now_date;
-//                }
-//                $q->where('pay_time', '<', $date[1]);
-//            });
-//        }
-
-        $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time',
-            'order_id', 'created_at', 'twitter_id')
-            ->whereIn('relation_id', $live_ids)
-            ->where('type', 3)
-            ->where('status', 1);
-
-        // 加在此处  如有搜索条件 可以走到联合索引
-        if (!empty($phoneUser)) {
-            $query->where('user_id', $phoneUser['id']);
-        }
-
-        $query->where('is_del', 0);
-
+        $query->where('sub.is_del', 0);
+        //支付时间
         if (!empty($date)) {
-//            $query->whereHas('order', function ($q) use ($date, $now_date) {
-//                $q->where('pay_time', '>=', $date[0]);
-//                if (empty($date[1] ?? '')) {
-//                    $date[1] = $now_date;
-//                }
-//                $q->where('pay_time', '<', $date[1]);
-//            });
-
-            $query->where('created_at', '>=', $date[0]);
+            $query->where('order.pay_time', '>=', $date[0]);
             if (empty($date[1] ?? '')) {
                 $date[1] = $now_date;
             }
-            $query->where('created_at', '<', $date[1]);
+            $query->where('order.pay_time', '<', $date[1]);
 
         }
-
-        //sub创建时间
+        //创建时间
         if (!empty($created_at)) {
-            $query->where('created_at', '>=', $created_at[0]);
+            $query->where('sub.created_at', '>=', $created_at[0]);
             if (empty($created_at[1] ?? '')) {
                 $created_at[1] = $now_date;
             }
-            $query->where('created_at', '<', $created_at[1]);
+            $query->where('sub.created_at', '<', $created_at[1]);
         }
 
-        $query->orderBy('created_at', 'desc');
+
+
+        $query->select(['sub.id', 'sub.type', 'sub.user_id', 'sub.relation_id', 'sub.pay_time', 'sub.order_id', 'sub.created_at', 'sub.twitter_id',
+            'order.ordernum as order_ordernum','order.pay_price as order_pay_price','order.pay_time as order_pay_time','order.twitter_id as order_twitter_id','order.pay_type as order_pay_type','order.os_type as order_os_type','order.created_at as order_created_at'])
+            ->orderBy('sub.created_at', 'desc');
+
+        //->paginate(10)->toArray();
+
+
+
+//        $query = Subscribe::with([
+//            //'live:id,title,price,twitter_money,is_free',
+//            'order:id,ordernum,pay_price,pay_time,twitter_id,pay_type,os_type,created_at'
+//        ]);
+
+//        if ($this->user['role_id'] == 13 && $this->user['live_role_button'] == 2) {
+//            $query->has('order');
+//        }
+
+//        if (!empty($ordernum)) {
+//            $query->whereHas('order', function ($q) use ($ordernum) {
+//                $q->where('ordernum', $ordernum);
+//            });
+//        }
+//        if (!empty($twitter_phoneUser)) {
+//            if ($this->user['username'] == 13522223779) {
+//                $query->where('twitter_id', $twitter_phoneUser['id']);
+//            } else {
+//                $query->whereHas('order', function ($q) use ($twitter_phoneUser) {
+//                    $q->where('twitter_id', $twitter_phoneUser['id']);
+//                });
+//            }
+//        }
+
+
+//        $query->select('id', 'type', 'user_id', 'relation_id', 'pay_time',
+//            'order_id', 'created_at', 'twitter_id')
+//            ->whereIn('relation_id', $live_ids)
+//            ->where('type', 3)
+//            ->where('status', 1);
+//
+//        // 加在此处  如有搜索条件 可以走到联合索引
+//        if (!empty($phoneUser)) {
+//            $query->where('user_id', $phoneUser['id']);
+//        }
+//
+//        $query->where('is_del', 0);
+
+//        if (!empty($date)) {
+////            $query->whereHas('order', function ($q) use ($date, $now_date) {
+////                $q->where('pay_time', '>=', $date[0]);
+////                if (empty($date[1] ?? '')) {
+////                    $date[1] = $now_date;
+////                }
+////                $q->where('pay_time', '<', $date[1]);
+////            });
+//
+//            $query->where('created_at', '>=', $date[0]);
+//            if (empty($date[1] ?? '')) {
+//                $date[1] = $now_date;
+//            }
+//            $query->where('created_at', '<', $date[1]);
+//
+//        }
+
+//        //sub创建时间
+//        if (!empty($created_at)) {
+//            $query->where('created_at', '>=', $created_at[0]);
+//            if (empty($created_at[1] ?? '')) {
+//                $created_at[1] = $now_date;
+//            }
+//            $query->where('created_at', '<', $created_at[1]);
+//        }
+
+//        $query->orderBy('created_at', 'desc');
 
         if ($get_excel) {
             $excel_offset = ($excel_page - 1) * $excel_size;
@@ -291,15 +346,32 @@ class SubscribeController extends ControllerBackend
         $ordernum = [];
         $user_ids = [];
 
-
-
+        //转下数组 方便后续处理
+        $lists = json_decode(json_encode($lists), true);
         /*************    处理推客信息   *************/
         //  将 twitter_id、ordernum、user_id 取出来  单独查询处理
         $twitter_get_ids = [];
         foreach ($lists['data'] as &$t_val) {
 
-            $t_val['live'] = $new_live_data[$t_val['relation_id']];
+            //dd($t_val);
+            // order 数据
+            if(empty($t_val['order_id'])){
+                $t_val['order'] = [];
+            }else{
+                $t_val['order'] = [
+                    "id"        =>$t_val['order_id'],
+                    "ordernum"  =>$t_val['order_ordernum'],
+                    "pay_price" =>$t_val['order_pay_price'],
+                    "pay_time"  =>$t_val['order_pay_time'],
+                    "twitter_id"=>$t_val['order_twitter_id'],
+                    "pay_type"  =>$t_val['order_pay_type'],
+                    "os_type"   =>$t_val['order_os_type'],
+                    "created_at"=>$t_val['order_created_at'],
+                ];
+            }
 
+            // live 数据
+            $t_val['live'] = $new_live_data[$t_val['relation_id']];
             $t_val['twitter'] = [];
             $twitter_id = $t_val['order']['twitter_id'] ?? 0;
             //免费的邀约人是live_count_down
@@ -566,5 +638,5 @@ class SubscribeController extends ControllerBackend
 
 
     }
-
+    
 }
