@@ -224,7 +224,9 @@ class SubscribeController extends ControllerBackend
         if ($this->user['role_id'] == 13 && $this->user['live_role_button'] == 2) {
             $query->where('sub.order_id', '>',0);
         }
-
+        
+        $query->where('order.status', 1);
+        $query->where('order.type', 10);
         if (!empty($ordernum)) {
             $query->where('order.ordernum', $ordernum);
         }
