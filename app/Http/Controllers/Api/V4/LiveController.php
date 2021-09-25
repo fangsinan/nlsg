@@ -33,6 +33,61 @@ use Predis\Client;
 class LiveController extends Controller
 {
 
+    //在线人数单独处理
+    //https://app.v4.api.nlsgapp.com/api/v4/live/onlineuser?name=111online_user_list_202109252253
+    public function OnlineUser(Request $request)
+    {
+
+        $key_name = $request->input('name', '');
+
+        if(!empty($key_name)){
+
+            //初始化人气值
+            $redisConfig = config('database.redis.default');
+            $Redis = new Client($redisConfig);
+            $Redis->select(0);
+            $list = $Redis->sMembers($key_name);// 获取有序集合
+            if (!empty($list)) {
+                $data=[];
+                $map = [];
+                foreach ($list as $k => $val) {
+                    $map[] = json_decode($val, true);
+                    if(($k+1)%2==0){
+                        $data[]=$map;
+                        $map=[]; //初始化
+                    }
+                }
+                if (!empty($data)) {
+                    DB::beginTransaction();
+                    try {
+                        foreach ($data as $k=>$v) {
+                            $rst = DB::table('nlsg_live_online_user')->insert($v);
+                            if ($rst === false) {
+                                DB::rollBack();
+//                                $Redis->rpush('online_user_list_in', $key_name); //加入队列等待执行
+                                echo '开通失败<br>';
+                                return;
+                            }
+                        }
+                        DB::commit();
+//                        $Redis->del($key_name); //执行成功删除
+                        echo '开通成功<br>';
+                    }catch (\Exception $e) {
+                        DB::rollBack();
+                        $Redis->rpush ('online_user_list_in', $key_name); //加入队列等待执行
+                        echo '开通异常'.$e->getMessage().'<br>';
+                        return ;
+                    }
+                }
+            }else{
+                echo '集合为空<br>';
+            }
+        }else{
+            echo 'key值为空<br>';
+        }
+
+    }
+
     //渠道王琨老师直播回放单独开通
     //https://app.v4.api.nlsgapp.com/api/v4/live/playbacksub
     public function PlayBackSub(Request $request)
