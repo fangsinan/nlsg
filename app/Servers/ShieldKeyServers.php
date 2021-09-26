@@ -14,7 +14,8 @@ class ShieldKeyServers
         if (!empty($key)) {
             $query->where('name', 'like', "%$key%");
         }
-        return $query->where('status', '=', 1)->paginate($size);
+        return $query->where('status', '=', 1)
+            ->orderBy('id','desc')->paginate($size);
     }
 
     public function add($params, $user_id)
