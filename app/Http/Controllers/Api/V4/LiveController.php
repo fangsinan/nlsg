@@ -89,6 +89,7 @@ class LiveController extends Controller
                 DB::beginTransaction();
                 try {
                     $inser_rst=0;
+                    $rst=true;
                     foreach ($data as $k=>$v) {
                         $rst = DB::table('nlsg_live_online_user')->insert($v);
                         if ($rst === false) {
@@ -102,7 +103,7 @@ class LiveController extends Controller
                     }
                     if($inser_rst==1){
                         //日志写入
-                        self::LogIo('liveonlineuser','online_error','写入失败');
+                        self::LogIo('liveonlineuser','online_error','写入失败'.$rst);
                         return '写入失败';
                     }
                     DB::commit();
