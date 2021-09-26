@@ -72,7 +72,7 @@ class LiveController extends Controller
             $map = [];
             foreach ($list as $k => $val) {
                 $map[] = json_decode($val, true);
-                if(($k+1)%2==0){
+                if(($k+1)%10000==0){
                     $data[]=$map;
                     $map=[]; //初始化
                 }
@@ -106,7 +106,7 @@ class LiveController extends Controller
                         return '写入失败';
                     }
                     DB::commit();
-//                    $Redis->del($key_name); //执行成功删除
+                    $Redis->del($key_name); //执行成功删除
                     //日志写入
                     self::LogIo('liveonlineuser','online','执行成功');
                     return  '写入成功';
