@@ -33,59 +33,113 @@ use Predis\Client;
 class LiveController extends Controller
 {
 
-    //在线人数单独处理
-    //https://app.v4.api.nlsgapp.com/api/v4/live/onlineuser?name=111online_user_list_202109252253
+    //直播在线人数入库
+    //https://app.v4.api.nlsgapp.com/api/v4/live/onlineuser?name=111online_user_list_202109261106
     public function OnlineUser(Request $request)
     {
 
         $key_name = $request->input('name', '');
-
         if(!empty($key_name)){
-
-            //初始化人气值
-            $redisConfig = config('database.redis.default');
-            $Redis = new Client($redisConfig);
-            $Redis->select(0);
-            $list = $Redis->sMembers($key_name);// 获取有序集合
-            if (!empty($list)) {
-                $data=[];
-                $map = [];
-                foreach ($list as $k => $val) {
-                    $map[] = json_decode($val, true);
-                    if(($k+1)%2==0){
-                        $data[]=$map;
-                        $map=[]; //初始化
-                    }
-                }
-                if (!empty($data)) {
-                    DB::beginTransaction();
-                    try {
-                        foreach ($data as $k=>$v) {
-                            $rst = DB::table('nlsg_live_online_user')->insert($v);
-                            if ($rst === false) {
-                                DB::rollBack();
-//                                $Redis->rpush('online_user_list_in', $key_name); //加入队列等待执行
-                                echo '开通失败<br>';
-                                return;
-                            }
-                        }
-                        DB::commit();
-//                        $Redis->del($key_name); //执行成功删除
-                        echo '开通成功<br>';
-                    }catch (\Exception $e) {
-                        DB::rollBack();
-                        $Redis->rpush ('online_user_list_in', $key_name); //加入队列等待执行
-                        echo '开通异常'.$e->getMessage().'<br>';
-                        return ;
-                    }
-                }
-            }else{
-                echo '集合为空<br>';
-            }
+            $result=self::CrontabOnlineUser($key_name);
+            echo $result.'<br>';
         }else{
             echo 'key值为空<br>';
         }
 
+    }
+
+    //定时扫描执行在线人数批量入库
+    public static function CrontabOnlineUser($key_name=''){
+
+        $redisConfig = config('database.redis.default');
+        $Redis = new Client($redisConfig);
+        $Redis->select(0);
+        $list_in_flag=0;
+        $list_name='111online_user_list_in';
+        if(empty($key_name)){ //执行队列
+            $num=$Redis->llen($list_name);
+            if($num>0) {
+                $list_in_flag=1;
+                $key_name = $Redis->lPop($list_name); //获取可执行key
+            }else{
+                return  '没有可执行队列';
+            }
+        }
+        $list = $Redis->sMembers($key_name);// 获取有序集合
+
+        if (!empty($list)) {
+            $data=[];
+            $map = [];
+            foreach ($list as $k => $val) {
+                $map[] = json_decode($val, true);
+                if(($k+1)%10000==0){
+                    $data[]=$map;
+                    $map=[]; //初始化
+                }
+            }
+            if(!empty($map)){ //取余剩下的数据
+                $data[]=$map;
+            }
+            //模拟失败，检测事务
+//            $map1[]=json_decode('{"live_id":"19","user_id":"10","live_son_flag":"0","online_time_str":"2021-09-25 22:53"}',true);
+//            $data[]=$map1;
+//            echo '<pre>';
+//            var_dump($data);
+            if (!empty($data)) {
+                DB::beginTransaction();
+                try {
+                    $inser_rst=0;
+                    foreach ($data as $k=>$v) {
+                        $rst = DB::table('nlsg_live_online_user')->insert($v);
+                        if ($rst === false) {
+                            DB::rollBack();
+                            if($list_in_flag==1) {
+                                $Redis->rpush($list_name, $key_name); //加入队列等待执行
+                            }
+                            $inser_rst=1;
+                            break;
+                        }
+                    }
+                    if($inser_rst==1){
+                        //日志写入
+                        self::LogIo('liveonlineuser','online_error','写入失败');
+                        return '写入失败';
+                    }
+                    DB::commit();
+                    $Redis->del($key_name); //执行成功删除
+                    //日志写入
+                    self::LogIo('liveonlineuser','online','执行成功');
+                    return  '写入成功';
+                }catch (\Exception $e) {
+                    DB::rollBack();
+                    if($list_in_flag==1) {
+                        $Redis->rpush($list_name, $key_name); //加入队列等待执行
+                    }
+                    //日志写入
+                    self::LogIo('liveonlineuser','online_error','写入异常'.$e->getMessage());
+                    return  '写入异常'.$e->getMessage();
+                }
+            }
+        }else{
+            return  '集合为空';
+        }
+
+    }
+
+    //日志写入
+    public static function LogIo($dir,$name,$content){
+        //创建目录
+        $dir=storage_path('logs/'.$dir);
+        if ( !is_dir ($dir) ) {
+            mkdir ($dir, 0777, true);
+        }
+        if(is_array($content)){
+            $content=json_encode($content);
+        }
+        $time=time();
+        $content = date('Y-m-d H:i:s',$time) . '  ' . $content. PHP_EOL;
+        $name = $name.date('ymd');
+        file_put_contents($dir . "/$name.log",$content,FILE_APPEND|LOCK_EX);
     }
 
     //渠道王琨老师直播回放单独开通
