@@ -8,6 +8,7 @@ use App\Models\GetPriceTools;
 use App\Models\MallOrder;
 use App\Models\MallRefundRecord;
 use App\Models\OrderPayRefund;
+use App\Models\OrderRefundLog;
 use App\Models\RunRefundRecord;
 use App\Models\Subscribe;
 use App\Models\VipUser;
@@ -494,6 +495,14 @@ class MallRefundJob
                 $prModel->refund_price = $v->refund_price;
                 $prModel->status = 1;
                 $prModel->save();
+
+                //如果批量退款日志有
+                OrderRefundLog::query()->where('ordernum','=',$v->ordernum)
+                    ->where('status','=',1)
+                    ->update([
+                        'status'=>10
+                    ]);
+
             } else {
                 $update_data['is_refund'] = 9;
             }
@@ -597,6 +606,12 @@ class MallRefundJob
                 DB::table('nlsg_order_pay_refund')
                     ->where('id', '=', $v->op_id)
                     ->update(['status' => 2]);
+
+                OrderRefundLog::query()->where('ordernum','=',$v->ordernum)
+                    ->where('status','=',1)
+                    ->update([
+                        'status'=>20
+                    ]);
 
                 if ($v->order_type == 9 || $v->order_type == 15) {
                     $check_sub = Subscribe::where('user_id', '=', $v->user_id)

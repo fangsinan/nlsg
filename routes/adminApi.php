@@ -256,7 +256,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('crontab/mall_refund', 'CrontabController@mallRefund');//商城退款
     Route::get('crontab/mall_refund_check', 'CrontabController@mallRefundCheck');//商城退款查询
 
-
+    //虚拟订单批量退款
+    Route::get('orl/list', 'OrderRefundLogController@list');
+    Route::get('orl/add', 'OrderRefundLogController@add');
 
     //数据迁移
     Route::get('remove_data/goods', 'RemoveDataController@goods');
