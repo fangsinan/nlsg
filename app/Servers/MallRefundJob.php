@@ -607,8 +607,9 @@ class MallRefundJob
                     ->where('id', '=', $v->op_id)
                     ->update(['status' => 2]);
 
+
                 OrderRefundLog::query()->where('ordernum','=',$v->ordernum)
-                    ->where('status','=',1)
+                    ->where('status','=',10)
                     ->update([
                         'status'=>20
                     ]);

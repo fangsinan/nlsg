@@ -17,8 +17,8 @@ class OrderRefundServers
         $file_name = $params['file_name'] ?? '';
         $url = $params['url'] ?? '';
 
-        $file_name = '1111group/20210926订单退款表格实例.xlsx';
-        $url = 'http://image.nlsgapp.com/1111group/20210926订单退款表格实例.xlsx';
+//        $file_name = '1111group/20210926订单退款表格实例.xlsx';
+//        $url = 'http://image.nlsgapp.com/1111group/20210926订单退款表格实例.xlsx';
 
         if (empty($file_name) || empty($url)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -118,30 +118,30 @@ class OrderRefundServers
 //            ]);
 
         $edit_list = DB::table('nlsg_order_refund_log as rl')
-            ->leftJoin('nlsg_order as o','rl.ordernum','=','o.ordernum')
-            ->where('rl.status','=',1)
+            ->leftJoin('nlsg_order as o', 'rl.ordernum', '=', 'o.ordernum')
+            ->where('rl.status', '=', 1)
 //            ->where('rl.excel_id','=',$oreModel->id)
-            ->select(['rl.id','rl.ordernum','rl.check_price','o.id as oid','o.status',
-                'o.is_shill','o.shill_job_price','o.is_refund','o.pay_price'])
+            ->select(['rl.id', 'rl.ordernum', 'rl.check_price', 'o.id as oid', 'o.status',
+                'o.is_shill', 'o.shill_job_price', 'o.is_refund', 'o.pay_price'])
             ->get();
 
 //dd($edit_list->toArray());
 
-//        1:已登记   2本次重复取消  4订单状态错误 5退款金额错误 10退款中(发起退款)   20已完成(校验完成)
-        if ($edit_list->isNotEmpty()){
-            foreach ($edit_list as $v){
+//1:已登记  4订单状态错误 5退款金额错误 10退款中(发起退款)   20已完成(校验完成)
+        if ($edit_list->isNotEmpty()) {
+            foreach ($edit_list as $v) {
                 $check_order_flag = true;
 
                 $temp_orlModel = OrderRefundLog::find($v->id);
-                if ($v->oid === null){
+                if ($v->oid === null) {
                     $check_order_flag = false;
                     $temp_orlModel->status = 4;
-                }else{
-                    if ($v->pay_price !== $v->check_price){
+                } else {
+                    if ($v->pay_price !== $v->check_price) {
                         $check_order_flag = false;
                         $temp_orlModel->status = 5;
                     }
-                    if ($v->is_refund === 2 || $v->is_refund === 3){
+                    if ($v->is_refund === 2 || $v->is_refund === 3) {
                         $temp_orlModel->status = 20;
                     }
                 }
@@ -149,7 +149,7 @@ class OrderRefundServers
                 $temp_orlModel->save();
 
                 //如果数据没有错误,则修改订单表执行退款
-                if ($check_order_flag){
+                if ($check_order_flag) {
                     $temp_oModel = Order::find($v->oid);
                     $temp_oModel->is_shill = 1;
                     $temp_oModel->save();
@@ -159,14 +159,62 @@ class OrderRefundServers
         }
 
 
-
         return ['code' => true, 'msg' => '添加成功'];
 
     }
 
     public function list($params, $admin_id)
     {
+        $size = $params['size'] ?? 10;
+        $ordernum = $params['ordernum'] ?? '';
+        $status = $params['status'] ?? 0;
 
+        $query = OrderRefundLog::query();
+        if (!empty($ordernum)) {
+            $query->where('ordernum', 'like', "%$ordernum%");
+        }
+        if (!empty($status)) {
+            $query->where('status', '=', $status);
+        }
+
+        $query->orderBy('excel_id', 'desc')->orderBy('id');
+        $query->select(['id', 'ordernum', 'check_price', 'created_at', 'status']);
+
+        //1:已登记  4订单状态错误 5退款金额错误 10退款中(发起退款)   20已完成(校验完成)
+
+        $res = $query->paginate($size);
+
+        foreach ($res as $v) {
+            switch ($v->status) {
+                case 1:
+                    $v->status_name = '已登记';
+                    break;
+                case 4:
+                    $v->status_name = '订单状态错误';
+                    break;
+                case 5:
+                    $v->status_name = '退款金额错误';
+                    break;
+                case 10:
+                    $v->status_name = '退款中';
+                    break;
+                case 20:
+                    $v->status_name = '已完成';
+                    break;
+                default:
+                    $v->status_name = '-';
+            }
+        }
+
+        $custom = collect(['status' => [
+            1 => '已登记',
+            4 => '订单状态错误',
+            5 => '退款金额错误',
+            10 => '退款中',
+            20 => '已完成'
+        ]]);
+
+        return $custom->merge($res);
     }
 
 }
