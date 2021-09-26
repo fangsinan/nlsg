@@ -251,7 +251,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
         //虚拟订单批量退款
         Route::get('orl/list', 'OrderRefundLogController@list');
-        Route::get('orl/add', 'OrderRefundLogController@add');
+        Route::post('orl/add', 'OrderRefundLogController@add');
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');
