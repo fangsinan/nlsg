@@ -432,6 +432,7 @@ class IndexController extends ControllerBackend
         $price = $input['price'] ?? 0;
         $twitter = $input['twitter_money'] ?? 0;
         $helper = $input['helper'] ?? '';
+        $helper = preg_replace('/[^0-9]/i', ',', $helper);
         $content = $input['content'] ?? '';
         $playback_url = $input['playback_url'] ?? '';
         $back_video_url = $input['back_video_url'] ?? '';
