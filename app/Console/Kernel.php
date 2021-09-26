@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Http\Controllers\Api\V4\ImMsgController;
+use App\Http\Controllers\Api\V4\LiveController;
 use App\Http\Controllers\Api\V4\UserWechat;
 use App\Models\Coupon;
 use App\Models\LiveConsole;
@@ -44,6 +45,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->call(function () {
+            //直播间在线人数入库，方便调试
+            LiveController::CrontabOnlineUser();
+        })->everyMinute()->runInBackground();//每分
+
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
             MallOrder::clear();//超时订单处理
