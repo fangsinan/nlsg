@@ -34,7 +34,7 @@ class LiveController extends Controller
 {
 
     //在线人数单独处理
-    //https://app.v4.api.nlsgapp.com/api/v4/live/onlineuser?name=111online_user_list_202109252253
+    //https://app.v4.api.nlsgapp.com/api/v4/live/onlineuser?name=111online_user_list_202109261106
     public function OnlineUser(Request $request)
     {
 
@@ -57,6 +57,14 @@ class LiveController extends Controller
                         $map=[]; //初始化
                     }
                 }
+                if(!empty($map)){ //最后剩余的数据
+                    $data[]=$map;
+                }
+                //模拟失败，检测事务
+                $map1[]=json_decode('{"live_id":"19","user_id":"10","live_son_flag":"0","online_time_str":"2021-09-25 22:53"}',true);
+                $data[]=$map1;
+//                echo '<pre>';
+//                var_dump($data);
                 if (!empty($data)) {
                     DB::beginTransaction();
                     try {
@@ -64,18 +72,18 @@ class LiveController extends Controller
                             $rst = DB::table('nlsg_live_online_user')->insert($v);
                             if ($rst === false) {
                                 DB::rollBack();
-//                                $Redis->rpush('online_user_list_in', $key_name); //加入队列等待执行
-                                echo '开通失败<br>';
+//                                $Redis->rpush('111online_user_list_in', $key_name); //加入队列等待执行
+                                echo '写入失败<br>';
                                 return;
                             }
                         }
                         DB::commit();
 //                        $Redis->del($key_name); //执行成功删除
-                        echo '开通成功<br>';
+                        echo '写入成功<br>';
                     }catch (\Exception $e) {
                         DB::rollBack();
-                        $Redis->rpush ('online_user_list_in', $key_name); //加入队列等待执行
-                        echo '开通异常'.$e->getMessage().'<br>';
+//                        $Redis->rpush ('111online_user_list_in', $key_name); //加入队列等待执行
+                        echo '写入异常'.$e->getMessage().'<br>';
                         return ;
                     }
                 }
