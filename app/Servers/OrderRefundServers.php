@@ -24,7 +24,11 @@ class OrderRefundServers
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $file = 'order_refund_' . time() . rand(1, 999) . '.xlsx';
+        try {
+            $file = 'order_refund_' . time() . random_int(1000, 9999) . '.xlsx';
+        } catch (\Exception $e) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
 
         $ch = curl_init();
         $timeout = 10;
