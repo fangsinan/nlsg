@@ -168,7 +168,7 @@ class ImUserServers
             ->where('from_account', '=', $user_id)
             ->where('status', '=', 1);
 
-        $query->with(['UserInfo:id,phone,nickname'])->has('UserInfo');
+        $query->with(['UserInfo:id,phone,nickname,headimg'])->has('UserInfo');
         $query->with(['ImUser:tag_im_to_account,tag_im_image,tag_im_nick'])->has('UserInfo');
 
         if (!empty($phone)){
