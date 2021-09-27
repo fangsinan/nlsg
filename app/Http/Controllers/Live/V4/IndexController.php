@@ -352,10 +352,15 @@ class IndexController extends ControllerBackend
             ->where('status', 1)
             ->count();
         if (!empty($list->begin_at)){
-            $watchNum = LiveLogin::where('live_id', $liveId)
-                          ->whereBetween('ctime', [strtotime($list->begin_at), strtotime($list->end_at)])
-                          ->distinct('user_id')
-                          ->count();
+//            $watchNum = LiveLogin::where('live_id', $liveId)
+//                          ->whereBetween('ctime', [strtotime($list->begin_at), strtotime($list->end_at)])
+//                          ->distinct('user_id')
+//                          ->count();
+            $watchNum = Subscribe::query()
+                ->where('relation_id','=',$liveId)
+                ->where('type','=',3)
+                ->where('live_watched','=',1)
+                ->count();
 
              $unwatchNum = $subscribeNum - $watchNum > 0 ? intval($subscribeNum - $watchNum) : 0;
         } else {
