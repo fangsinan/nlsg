@@ -973,9 +973,23 @@ class LiveController extends Controller
             }
         }
 
+        //如果有推送则在show接口返回
+        $push_live = NULL;
+        if( !empty($live_son_flag) &&  time() >= strtotime(date("Y-m-d 15:0:0")) ){
+            $push_live_id = ConfigModel::getData(59);
+            $push_live_info = LivePush::select("*")->where([
+                'live_info_id'=>$id,
+                'push_type'=>9,
+                'push_gid'=>$push_live_id,
+            ])->first();
+            if(!empty($push_live_info)){
+                $push_live = Live::select("*")->where(['id'=>$push_live_id])->first();
+            }
+        }
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
+            'push_live' => $push_live,
         ];
         return success($data);
 
