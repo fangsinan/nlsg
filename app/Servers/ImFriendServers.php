@@ -38,6 +38,11 @@ class ImFriendServers
     //拉取用户资料
     public function getPortrait($params){
 
+        //直播开始后 此接口可不执行
+        if(  time() >= strtotime(date("Y-m-d 18:30:0")) && time() <= strtotime(date("Y-m-d 21:30:0")) ){
+            return [];
+        }
+
         if( empty($params['user_id']) ){
             return ['code'=>false,   'msg'=>'request user_id error'];
         }
