@@ -266,7 +266,7 @@ class MallController extends Controller
 //            $s = new ImDocServers();
 //            $r = $s->sendGroupDocMsgJob(701);
 
-            dd(__LINE__);
+            dd(__LINE__.date('Y-m-d H:i:s'));
 
 
 //            dd($r);
