@@ -12,14 +12,14 @@ class TestJob extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name {type}';
+    protected $signature = 'testJob:test {type}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'test job';
 
     /**
      * Create a new command instance.
@@ -39,6 +39,6 @@ class TestJob extends Command
     public function handle()
     {
         //
-        OrderRefundServers::test();
+        OrderRefundServers::test($this->argument('type'));
     }
 }
