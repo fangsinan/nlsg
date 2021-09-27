@@ -751,24 +751,24 @@ GROUP BY
         $res['end_at'] = $check_live_id->end_at;
 
 
-        $cache_key_name = 'live_statistics_count_'.$live_id;
-        $expire_num = 60;
-        $temp_res = Cache::get($cache_key_name);
+//        $cache_key_name = 'live_statistics_count_'.$live_id;
+//        $expire_num = 60;
+//        $temp_res = Cache::get($cache_key_name);
 
-        if ($temp_res === null) {
+//        if ($temp_res === null) {
 
             $user_info = User::where('id', '=', $check_live_id->user_id)
                 ->select(['nickname', 'headimg'])->first();
-            $temp_res['headimg'] = $user_info->headimg;
-            $temp_res['nickname'] = $user_info->nickname;
+        $res['headimg'] = $user_info->headimg;
+        $res['nickname'] = $user_info->nickname;
             //累计人次login 人气
-            $temp_res['live_login'] = $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
-            $temp_res['order_num'] = Subscribe::query()->where('relation_id', '=', $live_id)
+        $res['live_login'] = $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
+        $res['order_num'] = Subscribe::query()->where('relation_id', '=', $live_id)
                 ->where('type', '=', 3)
                 ->where('status', '=', 1)->count();
 
             //累计人数sub
-            $temp_res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
+        $res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
                 ->where('type', '=', 3)->where('status','=',1)->count();
 
             if ($check_live_id->user_id === 161904) {
@@ -853,17 +853,17 @@ GROUP BY
                 $temp_order_user = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum']);
             }
 
-            $temp_res['total_order'] = $temp_order['total'] ?? '错误';
-            $temp_res['total_order_money'] = $temp_order_money;
-            $temp_res['total_order_user'] = $temp_order_user;
+        $res['total_order'] = $temp_order['total'] ?? '错误';
+        $res['total_order_money'] = $temp_order_money;
+        $res['total_order_user'] = $temp_order_user;
 
             $total_sub_count_sql = "select count(*) counts from (
 SELECT id from nlsg_subscribe where relation_id = $live_id and type = 3 and status = 1 GROUP BY user_id
 ) as a ";
-            $temp_res['total_sub_count'] = DB::select($total_sub_count_sql)[0]->counts;
+        $res['total_sub_count'] = DB::select($total_sub_count_sql)[0]->counts;
 
             //为购买人数
-            $temp_res['total_not_buy'] = $temp_res['total_sub_count'] - $temp_order_user;
+        $res['total_not_buy'] = $res['total_sub_count'] - $temp_order_user;
 
             //观看时常大于30分钟的
 //            $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
@@ -877,14 +877,14 @@ SELECT id from nlsg_subscribe where relation_id = $live_id and type = 3 and stat
 //) as a where counts >= 60";
 //            $temp_res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
 
-            $temp_res['more_than_30m'] = $temp_res['more_than_60m'] = 0;
+        $res['more_than_30m'] = $res['more_than_60m'] = 0;
 
-            Cache::put($cache_key_name, json_encode($temp_res), $expire_num);
-        }else{
-            $temp_res = json_decode($temp_res, true);
-        }
+//            Cache::put($cache_key_name, json_encode($temp_res), $expire_num);
+//        }else{
+//            $temp_res = json_decode($temp_res, true);
+//        }
 
-        $res = array_merge($res,$temp_res);
+//        $res = array_merge($res,$temp_res);
 
         if(0){
             $user_info = User::where('id', '=', $check_live_id->user_id)
