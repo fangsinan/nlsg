@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\TestJob;
 use App\Http\Controllers\Api\V4\ImMsgController;
 use App\Http\Controllers\Api\V4\LiveController;
 use App\Http\Controllers\Api\V4\UserWechat;
@@ -58,7 +59,9 @@ class Kernel extends ConsoleKernel
             LiveController::CrontabOnlineUser();
         })->everyMinute()->runInBackground();//每分
 
-//        $schedule->command('testJob:test 66')->everyMinute();
+        $schedule->command('testJob:test 20210927')->everyMinute();
+        $schedule->command(TestJob::class,['20210928'])->everyMinute();
+
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
             OrderRefundServers::test(2);
