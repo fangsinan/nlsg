@@ -21,6 +21,7 @@ use App\Servers\DealServers;
 use App\Servers\ErpServers;
 use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
+use App\Servers\OrderRefundServers;
 use App\Servers\removeDataServers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -50,8 +51,10 @@ class Kernel extends ConsoleKernel
             LiveController::CrontabOnlineUser();
         })->everyMinute()->runInBackground();//每分
 
+        $schedule->command(OrderRefundServers::class,['test'])->everyMinute();
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
+            OrderRefundServers::test(2);
             MallOrder::clear();//超时订单处理
             Order::clear(); //线下课超时处理
             MallRefundJob::refundJob(1);//商城订单退款处理
