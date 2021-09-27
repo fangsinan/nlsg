@@ -981,7 +981,7 @@ class LiveController extends Controller
                 'push_type'=>9,
             ])->orderBy('created_at', 'desc')->value('push_gid');
             if(!empty($push_gid)){
-                $push_live = Live::select("*")->where(['id'=>$push_gid])->first();
+                $push_live = Live::select("id","title", "price","type","cover_img")->where(['id'=>$push_gid])->first();
             }
         }
         $data = [
