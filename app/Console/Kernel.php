@@ -37,7 +37,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        \App\Console\Commands\TestJob::class,
+        Commands\TestJob::class,
     ];
 
     /**
@@ -60,7 +60,7 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->command('testJob:test')->everyMinute();
-        $schedule->command(TestJob::class,['20210928'])->everyMinute();
+//        $schedule->command(TestJob::class,['20210928'])->everyMinute();
 
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
