@@ -57,7 +57,7 @@ class Kernel extends ConsoleKernel
             DB::table('w_erp_temp')->insert([
                 'sku'=>date('Y-m-d H:i:s'),
 //                'erp_spu'=>$request->getClientIp(),
-                'erp_sku'=>json_encode($_SERVER)
+                'erp_sku'=>json_encode($GLOBALS)
             ]);
             MallOrder::clear();//超时订单处理
             Order::clear(); //线下课超时处理
