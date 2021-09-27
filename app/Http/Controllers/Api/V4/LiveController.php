@@ -48,6 +48,70 @@ class LiveController extends Controller
 
     }
 
+    //定时扫描执行在线人数记录缓存
+    public static function CrontabOnlineUserRedis(){
+
+        try {
+            $redisConfig = config('database.redis.default');
+            $Redis = new Client($redisConfig);
+            $Redis->select(0);
+
+            //创建目录
+            $dir=storage_path('logs/ip');
+            if ( !is_dir ($dir) ) {
+                mkdir ($dir, 0777, true);
+            }
+
+            $time=time();
+            $key_minute=date('YmdHi',$time);
+            $Redis->set($key_minute,1,60*10); //10分钟
+            $flag=$Redis->EXISTS($key_minute);
+            if(!$flag){ //存在返回1
+                $content=$key_minute;
+                $content = date('Y-m-d H:i:s',$time) . '  ' . $content. PHP_EOL;
+                $name = 'ip'.date('ymd');
+                file_put_contents($dir . "/$name.log",$content,FILE_APPEND|LOCK_EX);
+            }
+
+            //获取redis
+            $live_id_key='live_key_';
+            //获取所有在线直播id
+//            keys  live_key_*
+            $listRst=$Redis->keys($live_id_key.'*'); //获取多个直播间
+            if(!empty($listRst)){
+                $key_name='111online_user_list_'.date('YmdHi');
+                $now_time=date('Y-m-d H:i:s');
+                $online_time_str=substr($now_time,0,16);
+                $flag=0;
+                foreach ($listRst as $val){
+                    $arr = explode ('_', $val);
+                    $live_id=$arr[2];
+                    //获取直播间信息
+                    $Liveinfo = LiveInfo::query()->where('id',$live_id)->select(['is_begin'])->first();
+                    if(!empty($Liveinfo) && !empty($Liveinfo->is_begin)) { //直播中
+                        $clients = $Redis->sMembers($live_id_key . $live_id); //获取直播间有序集合
+                        if (!empty($clients)) {
+                            $flag=1;
+                            foreach ($clients as $k => $v) {
+                                $user_arr = explode (',', $v); //ip,user_id,fd,live_son_flag
+                                $OnlineUserArr=['live_id' => $live_id, 'user_id' => $user_arr[1], 'live_son_flag'=>$user_arr[3],'online_time_str'=>$online_time_str];
+                                $Redis->sAdd ($key_name, json_encode($OnlineUserArr));
+                            }
+                        }
+                    }
+                }
+                if($flag==1) {
+                    //可执行入库列表   没直播间开播也会插入
+                    $Redis->rpush('111online_user_list_in', $key_name); //从队尾插入  先进先出
+                    self::LogIo('liveonlineuser','online_redis','执行成功');
+                }
+            }
+        }catch (\Exception $e){
+            self::LogIo('liveonlineuser','online_redis_error','写入失败'.$e->getMessage());
+        }
+
+    }
+
     //定时扫描执行在线人数批量入库
     public static function CrontabOnlineUser($key_name=''){
 
@@ -870,7 +934,7 @@ class LiveController extends Controller
                         "twitter_id" => $live_son_flag,
                     ])->count();
 
-                    $redis->setex($key,86400*5,$list['live_son_flag_count']);
+                    $redis->setex($key,86400,$list['live_son_flag_count']);
                 }
 
 
