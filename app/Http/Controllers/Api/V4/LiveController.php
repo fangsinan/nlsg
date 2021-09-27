@@ -911,7 +911,7 @@ class LiveController extends Controller
 
         //如果有推送则在show接口返回
         $push_live = [];
-        if( !empty($live_son_flag) &&  time() >= strtotime(date("Y-m-d 20:0:0")) ){
+        if( !empty($live_son_flag) &&  time() >= strtotime(date("Y-m-d 15:0:0")) ){
             $push_live_ids = ConfigModel::getData(59);
             $push_live = Live::select("*")->where(['id'=>$push_live_ids])->first();
         }
