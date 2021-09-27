@@ -24,8 +24,7 @@ use App\Servers\MallRefundJob;
 use App\Servers\removeDataServers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+
 
 class Kernel extends ConsoleKernel
 {
@@ -53,25 +52,6 @@ class Kernel extends ConsoleKernel
 
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
-//            $request->getClientIps();
-            DB::table('w_erp_temp')->insert([
-                'sku'=>date('Y-m-d H:i:s'),
-//                'erp_spu'=>$request->getClientIp(),
-                'erp_sku'=>function(){
-                    exec("ifconfig", $out, $stats);
-                    if (!empty($out)) {
-                        foreach ($out as $k => $row) {
-                            if (isset($row) && (strstr($row, ' 10.') || strstr($row, ' 172.') || strstr($row, ':10.') || strstr($row, ':172.'))) {
-                                $temp = ltrim($row);
-                                break;
-                            }
-                        }
-                    }
-                    $data = explode(' ', $temp);
-                    $pos = strpos($data[1], ':');
-                    return $pos ? substr($data[1], $pos+1) : $data[1];
-                }
-            ]);
             MallOrder::clear();//超时订单处理
             Order::clear(); //线下课超时处理
             MallRefundJob::refundJob(1);//商城订单退款处理
