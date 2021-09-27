@@ -102,6 +102,7 @@ class OrderRefundServers
                 $temp_order_list[] = $temp_add_data['ordernum'];
             }
             $temp_add_data['excel_id'] = $oreModel->id;
+            $temp_add_data['admin_id'] = $admin_id;
 
             $add_data[] = $temp_add_data;
         }
