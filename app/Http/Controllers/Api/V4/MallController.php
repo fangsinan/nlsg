@@ -256,7 +256,7 @@ class MallController extends Controller
                 return json_decode($res, true);
 
             }
-
+//            set_time_limit(0);
 //            $llModel = new LiveLogin();
 //            $llModel->clear();
 

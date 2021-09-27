@@ -14,7 +14,7 @@ class LiveLogin extends Model
 
 //        $live_list = Live::query()->pluck('id')->toArray();
         $live_list = DB::table('nlsg_live_online_user')->groupBy('live_id')
-            ->where('live_id','>',125)
+            ->where('live_id','=',139)
             ->select(['live_id'])->get();
 
         foreach ($live_list as $v) {
