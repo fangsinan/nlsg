@@ -103,7 +103,8 @@ class Works extends Base
             return false;
         }
         $limit=2;
-        if($os_type==2 && $version>='4.2.7'){//ios 每日琨说
+//        if($os_type==2 && $version>='4.2.7'){//ios 每日琨说
+        if( $version>='4.2.7' ){//ios 每日琨说
             if($id==566){
                 $limit=1;
             }

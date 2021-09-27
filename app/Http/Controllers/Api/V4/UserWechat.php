@@ -26,6 +26,8 @@ class UserWechat extends Controller {
 
 /*************************   暂时废弃  ***************************************/
     public function Index(){
+
+
         dd("end");
         set_time_limit(0);
         $department_ids = ConfigModel::getData(58);
@@ -435,5 +437,55 @@ class UserWechat extends Controller {
         }
 
     }
+
+
+
+    public static function UserWechatEdit(){
+
+
+        //获取access_token
+        $access_token = self::getAccess_token();
+        //        $access_token = "2MYfeOyV9Me5iyqqfbQ2_fgdUHEjMtNwmjVI1aC9UiJqwn3gHIV5z96SGCzRWVIdx4gkYhbFWPnOjvIv4BRja3yrtsKeo9BH_jCh_rp8N1a80POzg8_bDW2-1zY0RODE6OkNaU3J6j7lEGH_mzECV84WPpIBnCWyX-5Es1VYYrv4V8CGMADWVwmzIlJtwYsXX6FNYlpqPQpe6nwM_V7PzA";
+
+        //通过部门id 获取成员id  唐山部门 id为3
+        $department_id = 3;
+        $department_url = "https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token=$access_token&department_id=$department_id&fetch_child=0";
+        $department_res = ImClient::curlGet($department_url);
+        $department_res = json_decode($department_res,true);
+
+        $getList_uids = [];
+        $user_ids = DB::table('nlsg_user_wechat_name')->pluck("follow_user_userid")->toArray();
+        if( $department_res['errcode'] == 0 ){
+            foreach ($department_res['userlist'] as $key=>$val){
+                $getList_uids[] = $val['userid'];
+            }
+            //计算出差集  补充到表中
+            $new_user = array_diff($getList_uids,$user_ids);
+
+            $add_data = [];
+            foreach ($department_res['userlist'] as $key=>$val){
+                if( in_array($val['userid'],$new_user)){
+                    $data = [
+                        'qw_name' => $val['name'],
+                        'follow_user_userid' => $val['userid'],
+
+                    ];
+                    $add_data[] = $data;
+                }
+            }
+            if( !empty($add_data) ){
+                DB::table('nlsg_user_wechat_name')->insert($add_data);
+            }
+
+        }
+
+
+
+
+
+        return 1;
+    }
+
+
 
 }
