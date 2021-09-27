@@ -799,39 +799,42 @@ GROUP BY
                 $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
             } else {
                 //李婷,统计order表的9.9
-                $watch_count_sql = "SELECT
-	count(*) AS counts
-FROM
-	(
-	SELECT
-		s.id AS sid
-	FROM
-		nlsg_subscribe AS s
-		JOIN nlsg_user AS u ON s.user_id = u.id
-	WHERE
-		s.relation_id = $live_id
-		AND s.type = 3
-		AND EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
-	GROUP BY
-	s.user_id
-	) AS a";
+//                $watch_count_sql = "SELECT
+//	count(*) AS counts
+//FROM
+//	(
+//	SELECT
+//		s.id AS sid
+//	FROM
+//		nlsg_subscribe AS s
+//		JOIN nlsg_user AS u ON s.user_id = u.id
+//	WHERE
+//		s.relation_id = $live_id
+//		AND s.type = 3
+//		AND EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
+//	GROUP BY
+//	s.user_id
+//	) AS a";
+//
+//                $not_watch_count_sql = "SELECT
+//	count(*) AS counts
+//FROM
+//	(
+//	SELECT
+//		s.id AS sid
+//	FROM
+//		nlsg_subscribe AS s
+//		JOIN nlsg_user AS u ON s.user_id = u.id
+//	WHERE
+//		s.relation_id = $live_id
+//		AND s.type = 3
+//		AND NOT EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
+//	GROUP BY
+//	s.user_id
+//	) AS a";
 
-                $not_watch_count_sql = "SELECT
-	count(*) AS counts
-FROM
-	(
-	SELECT
-		s.id AS sid
-	FROM
-		nlsg_subscribe AS s
-		JOIN nlsg_user AS u ON s.user_id = u.id
-	WHERE
-		s.relation_id = $live_id
-		AND s.type = 3
-		AND NOT EXISTS ( SELECT id FROM nlsg_live_online_user lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
-	GROUP BY
-	s.user_id
-	) AS a";
+                $watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 1";
+                $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 0";
 
                 $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
                 $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
