@@ -52,12 +52,12 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         // $schedule->command('inspire')->hourly();
-        $schedule->call(function (Request $request) {
-            $request->getClientIps();
+        $schedule->call(function () {
+//            $request->getClientIps();
             DB::table('w_erp_temp')->insert([
                 'sku'=>date('Y-m-d H:i:s'),
-                'erp_spu'=>$request->getClientIp(),
-                'erp_sku'=>$request->ip().':'.$_SERVER['REMOTE_ADDR']
+//                'erp_spu'=>$request->getClientIp(),
+//                'erp_sku'=>$request->ip().':'.$_SERVER['REMOTE_ADDR']
             ]);
             MallOrder::clear();//超时订单处理
             Order::clear(); //线下课超时处理
