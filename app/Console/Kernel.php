@@ -46,6 +46,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+
+        $schedule->call(function () {
+            //直播间在线人数存入redis
+            LiveController::CrontabOnlineUserRedis();
+        })->everyMinute()->runInBackground();//每分
+
         $schedule->call(function () {
             //直播间在线人数入库，方便调试
             LiveController::CrontabOnlineUser();
