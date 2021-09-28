@@ -325,6 +325,39 @@ class LiveInfoServers
 
     public function onlineNum($params)
     {
+
+//        $begin_time = '2021-09-27 18:50';
+//        while ($begin_time < '2021-09-27 21:10'){
+//            $temp_list = DB::table('nlsg_live_online_user')
+//                ->where('live_id','=',139)
+//                ->where('online_time_str','=',$begin_time)
+//                ->get();
+//            $all_login_counts = [];
+//
+//            foreach ($temp_list as $v){
+//                $temp_v_key = $v->live_id.'_'.$v->online_time_str.'_'.$v->live_son_flag;
+//                if (!isset($all_login_counts[$temp_v_key])){
+//                    $all_login_counts[$temp_v_key] = [
+//                        'live_id'=>$v->live_id,
+//                        'live_son_flag'=>$v->live_son_flag,
+//                        'online_time_str'=>$v->online_time_str,
+//                        'counts'=>1
+//                    ];
+//                }else{
+//                    $all_login_counts[$temp_v_key]['counts'] += 1;
+//                }
+//            }
+//            DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
+//            $begin_time = date('Y-m-d H:i',strtotime("$begin_time +1 min"));
+//        }
+//        dd(__LINE__);
+
+//
+//        DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
+////        dd(__LINE__);
+//        dd($all_login_counts);
+
+
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
@@ -342,7 +375,7 @@ class LiveInfoServers
 //        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
 //        $chose_table_res = DB::select($chose_table_sql);
 //        if (empty($chose_table_res)){
-            $table_name = 'nlsg_live_online_user';
+        $table_name = 'nlsg_live_online_user';
 //        }else{
 //            $table_name = 'nlsg_live_online_user_'.$live_id;
 //        }
@@ -366,21 +399,6 @@ class LiveInfoServers
         //特定渠道
         if (!empty($son_id)) {
             //观看时常大于30分钟的
-//            $more_than_30_min_sql = "
-//                SELECT count(user_id) as user_count
-//                from (
-//                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id GROUP BY user_id,online_time
-//                ) as a where counts >= 30";
-//            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
-
-            //观看时常大于60分钟的
-//            $more_than_60_min_sql = "
-//                SELECT count(user_id) as user_count
-//                from (
-//                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id  and live_son_flag =$son_id  GROUP BY user_id,online_time
-//                ) as a where counts >= 60";
-//            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
-
             //累计人次login
             $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)
                 ->where('live_son_flag', $son_id)
@@ -400,27 +418,10 @@ class LiveInfoServers
 
             $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
 
-            //在线人数
-//            $list_sql = "
-//            SELECT
-//	count(*) AS counts,
-//	time
-//FROM
-//	(
-//	SELECT
-//		*
-//	FROM
-//		( SELECT user_id, online_time_str AS time, live_son_flag FROM `nlsg_live_online_user` WHERE `live_id` = $live_id AND live_son_flag = $son_id ) AS a
-//	GROUP BY
-//		user_id,
-//		time ORDER BY null
-//	) AS b
-//GROUP BY
-//	time
-//	ORDER BY time asc
-//            ";
-
-            $list_sql = "SELECT
+            if ($live_id >= 139) {
+                $list_sql = "SELECT online_time_str as time,counts from nlsg_live_online_user_counts where live_id = $live_id and live_son_flag = $son_id";
+            } else {
+                $list_sql = "SELECT
 	online_time_str as time,
 	count(*) as counts
 FROM
@@ -430,24 +431,9 @@ WHERE
 GROUP BY
 	online_time_str
 	ORDER BY online_time_str asc";
+            }
 
         } else { //总数据
-            //nlsg_live_online_user 表记录可能重复，同一用户多次刷新，socket fd未能及时回收，存在一个用户同一时段多条记录
-//            $more_than_30_min_sql = "
-//                SELECT count(user_id) as user_count
-//                from (
-//                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id,online_time
-//                ) as a where counts >= 30";
-//            $res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
-
-            //观看时常大于60分钟的
-//            $more_than_60_min_sql = "
-//                SELECT count(user_id) as user_count
-//                from (
-//                    SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id   GROUP BY user_id,online_time
-//                ) as a where counts >= 60";
-//            $res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
-
             //累计人次login
             $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
             //累计人数sub
@@ -465,41 +451,17 @@ GROUP BY
 
             $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
             //在线人数
-//            $list_sql = "
-//            SELECT
-//                count(*) AS counts,
-//                time
-//            FROM
-//                (
-//                SELECT
-//                    *
-//                FROM
-//                    (
-//                    SELECT
-//                        user_id,online_time_str AS time
-//                    FROM  `nlsg_live_online_user`
-//                    WHERE `live_id` = $live_id
-//                    ) AS a
-//                 GROUP BY  user_id, time ORDER BY null
-//                ) AS b
-//            GROUP BY
-//                time ORDER BY time asc";
-
-//            $list_sql = "select online_time_str as time,count(*) as counts from (
-//SELECT
-//	online_time_str,
-//	id
-//FROM
-//	nlsg_live_online_user
-//WHERE
-//	live_id = $live_id
-//GROUP BY
-//	online_time_str,
-//	user_id
-//	) as a GROUP BY online_time_str";
-
-
-            $list_sql = "SELECT
+            if ($live_id >= 139) {
+                $list_sql = "SELECT
+	online_time_str AS time,
+	sum(counts) as counts
+FROM
+	nlsg_live_online_user_counts
+WHERE
+	live_id = $live_id
+	GROUP BY online_time_str";
+            } else {
+                $list_sql = "SELECT
 	online_time_str as time,
 	count(*) as counts
 FROM
@@ -508,16 +470,8 @@ WHERE
 	live_id = $live_id
 GROUP BY
 	online_time_str";
+            }
         }
-
-
-//        DB::connection()->enableQueryLog();
-        //       $res['list'] = $query->groupBy(Db::raw('left(online_time,16)'))
-        //    ->orderBy('online_time')
-        //   ->select([
-        //       DB::raw('count(*) as counts'),
-        //        DB::raw('LEFT(online_time,16) as time')
-        //   ])->get();
 
         //在线人数折线图
         $res['list'] = DB::select($list_sql);
@@ -569,12 +523,12 @@ GROUP BY
 //        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
 //        $chose_table_res = DB::select($chose_table_sql);
 //        if (empty($chose_table_res)){
-            $table_name = 'nlsg_live_online_user';
+        $table_name = 'nlsg_live_online_user';
 //        }else{
 //            $table_name = 'nlsg_live_online_user_'.$live_id;
 //        }
 
-        $query = DB::table($table_name.' as lou')
+        $query = DB::table($table_name . ' as lou')
             ->join('nlsg_user as lu', 'lou.user_id', '=', 'lu.id')
             ->leftJoin('nlsg_live_count_down as cd', function ($query) use ($live_id) {
                 $query->on('cd.user_id', '=', 'lou.user_id')->where('cd.live_id', '=', $live_id);
@@ -629,7 +583,7 @@ GROUP BY
 //        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
 //        $chose_table_res = DB::select($chose_table_sql);
 //        if (empty($chose_table_res)){
-            $table_name = 'nlsg_live_online_user';
+        $table_name = 'nlsg_live_online_user';
 //        }else{
 //            $table_name = 'nlsg_live_online_user_'.$live_id;
 //        }
