@@ -265,9 +265,14 @@ class AuthController extends Controller
             return error(1000, '验证码不能为空',(object)[]);
         }
 
+        $check_easy_code = User::query()->where('phone', '=', $phone)
+            ->where('is_code_login', '>', 0)
+            ->select(['id', 'phone', 'is_code_login'])
+            ->first();
+
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone, true)) {
+        if (in_array($phone, $dont_check_phone, true) && !$check_easy_code) {
             if ((int)$code !== 6666) {
                 return error(1000, '验证码错误',(object)[]);
             }
