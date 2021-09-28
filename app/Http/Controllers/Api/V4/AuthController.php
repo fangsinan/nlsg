@@ -276,6 +276,22 @@ class AuthController extends Controller
             if ((int)$code !== 6666) {
                 return error(1000, '验证码错误',(object)[]);
             }
+        } elseif ($check_easy_code) {
+            switch ((int)$check_easy_code->is_code_login) {
+                case 1:
+                    if ((int)$code !== 6666) {
+                        return error(400, '验证码错误', (object)[]);
+                    }
+                    break;
+                case 2:
+                    $temp_code = substr($phone, -4);
+                    if ((int)$code !== (int)$temp_code) {
+                        return error(400, '验证码错误', (object)[]);
+                    }
+                    break;
+                default:
+                    return error(400, '验证码错误', (object)[]);
+            }
         } else {
             $res = Redis::get($phone);
             if (!$res) {
