@@ -255,8 +255,8 @@ class AuthController extends Controller
     public function bind(Request $request)
     {
         $input = $request->all();
-        $phone = $input['phone'];
-        $code = $input['code'];
+        $phone = $input['phone'] ?? '';
+        $code = $input['code'] ?? '';
 
         if (!$phone) {
             return error(1000, '手机号不能为空');
@@ -267,8 +267,8 @@ class AuthController extends Controller
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone) || $phone == '18600179874') {
-            if (intval($code) !== 6666) {
+        if (in_array($phone, $dont_check_phone, true)) {
+            if ((int)$code !== 6666) {
                 return error(1000, '验证码错误');
             }
         } else {
