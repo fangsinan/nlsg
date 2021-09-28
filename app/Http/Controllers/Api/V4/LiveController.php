@@ -129,14 +129,14 @@ class LiveController extends Controller
             $all_login_counts = [];
 
             foreach ($list as $k => $val) {
-                $map[] = json_decode($val, true);
+                $map[] = $temp_val =  json_decode($val, true);
 
-                $temp_v_key = $val['live_id'].'_'.$val['live_son_flag'];
+                $temp_v_key = $temp_val['live_id'].'_'.$temp_val['live_son_flag'];
                 if (!isset($all_login_counts[$temp_v_key])){
                     $all_login_counts[$temp_v_key] = [
-                        'live_id'=>$val['live_id'],
-                        'live_son_flag'=>$val['live_son_flag'],
-                        'online_time_str'=>$val['online_time_str'],
+                        'live_id'=>$temp_val['live_id'],
+                        'live_son_flag'=>$temp_val['live_son_flag'],
+                        'online_time_str'=>$temp_val['online_time_str'],
                         'counts'=>1
                     ];
                 }else{
