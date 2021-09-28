@@ -131,7 +131,7 @@ class LiveController extends Controller
             foreach ($list as $k => $val) {
                 $map[] = json_decode($val, true);
 
-                $temp_v_key = $val['live_id'].'_'.strtotime($val['online_time_str']).'_'.$val['live_son_flag'];
+                $temp_v_key = $val['live_id'].'_'.$val['live_son_flag'];
                 if (!isset($all_login_counts[$temp_v_key])){
                     $all_login_counts[$temp_v_key] = [
                         'live_id'=>$val['live_id'],
@@ -188,7 +188,7 @@ class LiveController extends Controller
                     if (!empty($all_login_counts)){
                         DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
                     }
-                    
+
                     return  '写入成功';
                 }catch (\Exception $e) {
                     DB::rollBack();
