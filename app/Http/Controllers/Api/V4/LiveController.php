@@ -126,8 +126,22 @@ class LiveController extends Controller
         if (!empty($list)) {
             $data=[];
             $map = [];
+            $all_login_counts = [];
+
             foreach ($list as $k => $val) {
                 $map[] = json_decode($val, true);
+                $temp_v_key = $val['live_id'].'_'.strtotime($val['online_time_str']).'_'.$val['live_son_flag'];
+                if (!isset($all_login_counts[$temp_v_key])){
+                    $all_login_counts[$temp_v_key] = [
+                        'live_id'=>$val['live_id'],
+                        'live_son_flag'=>$val['live_son_flag'],
+                        'online_time_str'=>$val['online_time_str'],
+                        'counts'=>1
+                    ];
+                }else{
+                    $all_login_counts[$temp_v_key]['counts'] += 1;
+                }
+
                 if(($k+1)%10000==0){
                     $data[]=$map;
                     $map=[]; //初始化
@@ -149,8 +163,6 @@ class LiveController extends Controller
                     $inser_rst=0;
                     $rst=true;
 
-                    $all_login_counts = [];
-
                     foreach ($data as $k=>$v) {
                         $rst = DB::table('nlsg_live_online_user')->insert($v);
                         if ($rst === false) {
@@ -160,17 +172,6 @@ class LiveController extends Controller
                             }
                             $inser_rst=1;
                             break;
-                        }
-                        $temp_v_key = $v['online_time_str'].'_'.$v['live_son_flag'];
-                        if (!isset($all_login_counts[$temp_v_key])){
-                            $all_login_counts[$temp_v_key] = [
-                                'live_id'=>$v['live_id'],
-                                'live_son_flag'=>$v['live_son_flag'],
-                                'online_time_str'=>$v['online_time_str'],
-                                'counts'=>1
-                            ];
-                        }else{
-                            $all_login_counts[$temp_v_key]['counts'] += 1;
                         }
                     }
                     if($inser_rst==1){
