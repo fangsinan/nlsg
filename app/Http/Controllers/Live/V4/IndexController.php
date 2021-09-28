@@ -514,6 +514,7 @@ class IndexController extends ControllerBackend
             $live_info_data['id'] = $Live_res->id;
             DB::table('nlsg_live_info')->insert($live_info_data);
 
+            
             //添加,创建对应数据库
             $login_table_name = 'nlsg_live_online_user_'.$live_info_data['live_pid'];
             $create_table_sql = "
