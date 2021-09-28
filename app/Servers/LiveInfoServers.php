@@ -339,13 +339,13 @@ class LiveInfoServers
 //            ->orderBy('sort','asc')   //按标记排序
 //            ->get();
 
-        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
-        $chose_table_res = DB::select($chose_table_sql);
-        if (empty($chose_table_res)){
+//        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
+//        $chose_table_res = DB::select($chose_table_sql);
+//        if (empty($chose_table_res)){
             $table_name = 'nlsg_live_online_user';
-        }else{
-            $table_name = 'nlsg_live_online_user_'.$live_id;
-        }
+//        }else{
+//            $table_name = 'nlsg_live_online_user_'.$live_id;
+//        }
 
         $cache_key_name = 'son_flag_' . $check_live_id->user_id;
         $expire_num = CacheTools::getExpire('son_flag');
@@ -566,13 +566,13 @@ GROUP BY
             return ['code' => false, 'msg' => 'live_id错误'];
         }
 
-        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
-        $chose_table_res = DB::select($chose_table_sql);
-        if (empty($chose_table_res)){
+//        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
+//        $chose_table_res = DB::select($chose_table_sql);
+//        if (empty($chose_table_res)){
             $table_name = 'nlsg_live_online_user';
-        }else{
-            $table_name = 'nlsg_live_online_user_'.$live_id;
-        }
+//        }else{
+//            $table_name = 'nlsg_live_online_user_'.$live_id;
+//        }
 
         $query = DB::table($table_name.' as lou')
             ->join('nlsg_user as lu', 'lou.user_id', '=', 'lu.id')
@@ -626,13 +626,13 @@ GROUP BY
             return ['code' => false, 'msg' => 'live_id错误'];
         }
 
-        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
-        $chose_table_res = DB::select($chose_table_sql);
-        if (empty($chose_table_res)){
+//        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
+//        $chose_table_res = DB::select($chose_table_sql);
+//        if (empty($chose_table_res)){
             $table_name = 'nlsg_live_online_user';
-        }else{
-            $table_name = 'nlsg_live_online_user_'.$live_id;
-        }
+//        }else{
+//            $table_name = 'nlsg_live_online_user_'.$live_id;
+//        }
 
         $flag = $params['flag'] ?? '';
         if (!in_array($flag, [1, 2])) {
