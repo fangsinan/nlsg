@@ -513,6 +513,26 @@ class IndexController extends ControllerBackend
             $live_info_data['live_pid'] = $Live_res->id;
             $live_info_data['id'] = $Live_res->id;
             DB::table('nlsg_live_info')->insert($live_info_data);
+
+            //添加,创建对应数据库
+            $login_table_name = 'nlsg_live_online_user_'.$live_info_data['live_pid'];
+            $create_table_sql = "
+        SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `$login_table_name`;
+CREATE TABLE `$login_table_name`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `live_id` int(11) NULL DEFAULT 0 COMMENT '直播间id',
+  `user_id` int(11) NULL DEFAULT 0 COMMENT '用户id',
+  `live_son_flag` int(10) NULL DEFAULT 0 COMMENT '渠道标记',
+  `online_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '在线时间',
+  `online_time_str` char(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `live_id`(`online_time_str`, `user_id`, `live_son_flag`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '实时在线用户明细' ROW_FORMAT = Dynamic;
+SET FOREIGN_KEY_CHECKS = 1;
+        ";
+            DB::select($create_table_sql);
         }
 
 
