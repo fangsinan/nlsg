@@ -259,25 +259,25 @@ class AuthController extends Controller
         $code = $input['code'] ?? '';
 
         if (!$phone) {
-            return error(1000, '手机号不能为空');
+            return error(1000, '手机号不能为空',(object)[]);
         }
         if (!$code) {
-            return error(1000, '验证码不能为空');
+            return error(1000, '验证码不能为空',(object)[]);
         }
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
         if (in_array($phone, $dont_check_phone, true)) {
             if ((int)$code !== 6666) {
-                return error(1000, '验证码错误');
+                return error(1000, '验证码错误',(object)[]);
             }
         } else {
             $res = Redis::get($phone);
             if (!$res) {
-                return error(1000, '验证码已过期');
+                return error(1000, '验证码已过期',(object)[]);
             }
             if ($code !== $res) {
-                return error(1000, '验证码错误');
+                return error(1000, '验证码错误',(object)[]);
             }
         }
 
