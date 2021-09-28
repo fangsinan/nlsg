@@ -138,14 +138,19 @@ class LiveController extends Controller
             }
             //模拟失败，检测事务
 //            $map1[]=json_decode('{"live_id":"19","user_id":"10","live_son_flag":"0","online_time_str":"2021-09-25 22:53"}',true);
-//            $data[]=$map1;
-//            echo '<pre>';
-//            var_dump($data);
+//            $map1[]=json_decode('{"live_id":"19","user_id":"12","live_son_flag":"0","online_time_str":"2021-09-25 22:53"}',true);
+//            $map1[]=json_decode('{"live_id":"19","user_id":"111","live_son_flag":"7","online_time_str":"2021-09-25 22:53"}',true);
+//            $map1[]=json_decode('{"live_id":"19","user_id":"6","live_son_flag":"0","online_time_str":"2021-09-25 22:55"}',true);
+//            $data=$map1;
+
             if (!empty($data)) {
                 DB::beginTransaction();
                 try {
                     $inser_rst=0;
                     $rst=true;
+
+                    $all_login_counts = [];
+
                     foreach ($data as $k=>$v) {
                         $rst = DB::table('nlsg_live_online_user')->insert($v);
                         if ($rst === false) {
@@ -155,6 +160,17 @@ class LiveController extends Controller
                             }
                             $inser_rst=1;
                             break;
+                        }
+                        $temp_v_key = $v['online_time_str'].'_'.$v['live_son_flag'];
+                        if (!isset($all_login_counts[$temp_v_key])){
+                            $all_login_counts[$temp_v_key] = [
+                                'live_id'=>$v['live_id'],
+                                'live_son_flag'=>$v['live_son_flag'],
+                                'online_time_str'=>$v['online_time_str'],
+                                'counts'=>1
+                            ];
+                        }else{
+                            $all_login_counts[$temp_v_key]['counts'] += 1;
                         }
                     }
                     if($inser_rst==1){
@@ -166,6 +182,9 @@ class LiveController extends Controller
                     $Redis->del($key_name); //执行成功删除
                     //日志写入
                     self::LogIo('liveonlineuser','online','执行成功');
+                    if (!empty($all_login_counts)){
+                        DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
+                    }
                     return  '写入成功';
                 }catch (\Exception $e) {
                     DB::rollBack();
