@@ -102,7 +102,7 @@ class LiveInfo extends Model
 
         $subject        = $info['push_live_url'];
         $back_video_url   = $info['back_video_url'];
-        $str_time       = strtotime($info['begin_at'])+5;  //开始时间需要大于当前时间  多加5秒
+        $str_time       = strtotime($info['begin_at'])-60;  //开始时间需要大于当前时间  提前60秒
         $end_time       = $str_time+3600*3;//  结束时间需要大于当前时间
 
         if( $type == 'create' && $str_time <= time() ){
