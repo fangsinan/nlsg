@@ -123,7 +123,7 @@ class UserController extends Controller
     public function homepage(Request $request)
     {
         $id = $request->get('user_id');
-        $user = User::select('id', 'nickname', 'is_author', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_author')
+        $user = User::select('id', 'nickname', 'phone', 'is_author', 'sex', 'headimg', 'headcover', 'intro', 'follow_num', 'fan_num', 'is_author')
             ->with([
                 'history' => function ($query) {
                     $query->select(['id', 'user_id', 'relation_id', 'relation_type'])
