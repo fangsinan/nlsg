@@ -176,12 +176,10 @@ class ImFriendServers
         if(empty($params['phone'])){
             return [];
         }
-        $user = User::where(['phone'=>$params['phone']])->first();
-        return [
-            'id'=>$user['id'],
-            'nickname'=>$user['nickname'],
-            'headimg'=>$user['headimg'],
-            'phone'=>$user['phone'],
-        ];
+
+        $user = User::select("id","nickname","headimg","phone")
+            ->where('phone', 'like', '%' . $params['phone'] . '%')->limit(30)->get()->toArray();
+
+        return $user;
     }
 }
