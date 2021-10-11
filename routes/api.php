@@ -419,6 +419,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('im_friend/get_im_user', 'ImFriendController@getImUser');
         Route::get('im_friend/portrait_get', 'ImFriendController@getPortrait');
         Route::post('im_friend/friend_check', 'ImFriendController@friendCheck');
+        Route::post('im_friend/get_im_user_id', 'ImController@getImUserId');
 
         //im文案部分
         Route::get('im_doc/list', 'ImDocController@list');
