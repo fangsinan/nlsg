@@ -549,17 +549,22 @@ class MallRefundJob
         $result = $app->refund->byTransactionId(
             $v->transaction_id,
             $v->service_num,
-            intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)),
-            intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
+            (int)GetPriceTools::PriceCalc('*', $v->all_price, 100),
+            (int)GetPriceTools::PriceCalc('*', $v->refund_price, 100),
             [
                 // 可在此处传入其他参数，详细参数见微信支付文档
                 'refund_desc' => '退款',
             ]
         );
-        if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {
-            return ['code' => true, 'refund_id' => $result['refund_id'],'msg_json'=>json_encode($result)];
+
+        DB::table('nlsg_wechat_refund_res_log')->insert([
+            'res_json'=>json_encode($result)
+        ]);
+
+        if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
+            return ['code' => true, 'refund_id' => $result['refund_id']];
         }
-        return ['code' => false, 'refund_id' => 0,'msg_json'=>json_encode($result)];
+        return ['code' => false, 'refund_id' => 0];
     }
 
     private function shillCheck()
