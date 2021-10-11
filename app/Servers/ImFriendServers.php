@@ -181,6 +181,7 @@ class ImFriendServers
             'id'=>$user['id'],
             'nickname'=>$user['nickname'],
             'headimg'=>$user['headimg'],
+            'phone'=>$user['phone'],
         ];
     }
 }
