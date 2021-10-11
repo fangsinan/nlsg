@@ -479,6 +479,11 @@ class MallRefundJob
                     break;
             }
 
+            $rrrModel = new RunRefundRecord();
+            $rrrModel->order_type = 2;
+            $rrrModel->order_id = $v->id;
+            $rrrModel->temp_msg = $temp_res['msg_json'] ?? '';
+
             $update_data = [];
             if ($temp_res['code'] === true) {
                 $update_data['is_refund'] = 2;
@@ -502,10 +507,12 @@ class MallRefundJob
                     ->update([
                         'status'=>10
                     ]);
-
+                $rrrModel->is_success = 1;
             } else {
                 $update_data['is_refund'] = 9;
+                $rrrModel->is_success = 2;
             }
+            $rrrModel->save();
             DB::table('nlsg_order')
                 ->where('id', '=', $v->id)
                 ->update($update_data);
@@ -558,10 +565,9 @@ class MallRefundJob
             ]
         );
         if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {
-            return ['code' => true, 'refund_id' => $result['refund_id']];
-        } else {
-            return ['code' => false, 'refund_id' => 0];
+            return ['code' => true, 'refund_id' => $result['refund_id'],'msg_json'=>json_encode($result)];
         }
+        return ['code' => false, 'refund_id' => 0,'msg_json'=>json_encode($result)];
     }
 
     private function shillCheck()
