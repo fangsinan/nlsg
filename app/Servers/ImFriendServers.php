@@ -6,6 +6,7 @@ namespace App\Servers;
 use App\Http\Controllers\Api\V4\ImMsgController;
 use App\Models\ImUser;
 use App\Models\ImUserFriend;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Libraries\ImClient;
 
@@ -171,4 +172,14 @@ class ImFriendServers
         return $res;
     }
 
+    public function getImUserId($params){
+        if(empty($params['phone'])){
+            return [];
+        }
+
+        $user = User::select("id","nickname","headimg","phone")
+            ->where('phone', 'like', '%' . $params['phone'] . '%')->limit(30)->get()->toArray();
+
+        return $user;
+    }
 }

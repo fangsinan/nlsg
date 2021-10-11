@@ -210,6 +210,31 @@ class ImFriendController extends Controller
 
 
 
+    /**
+     * @api {get} /api/v4/im_friend/get_im_user_id  Im根据手机号查好友
+     * @apiName del_friend
+     * @apiVersion 1.0.0
+     * @apiGroup im_friend
+     *
+     * @apiParam {str} phone   手机号
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *  {
+    "code": 200,
+    "msg": "成功",
+    "data": [
+    ]
+    }
+     */
+    public function getImUserId(Request $request){
+
+        $imObj = new ImFriendServers();
+        $data = $imObj->getImUserId($request->input());
+        return $this->getRes($data);
+    }
+
+
 
 
 
