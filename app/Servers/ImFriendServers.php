@@ -180,6 +180,7 @@ class ImFriendServers
         return [
             'id'=>$user['id'],
             'nickname'=>$user['nickname'],
+            'headimg'=>$user['headimg'],
         ];
     }
 }
