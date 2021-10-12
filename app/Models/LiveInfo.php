@@ -102,11 +102,14 @@ class LiveInfo extends Model
 
         $subject        = $info['push_live_url'];
         $back_video_url   = $info['back_video_url'];
-        if($info['user_id']==161904){
+
+        $str_time = strtotime($info['begin_at']) - 60;
+
+        /*if($info['user_id']==161904){
             $str_time = strtotime($info['begin_at']) - 60;  //提前一分钟播放，防止微信拉取延迟情况
         }else {
             $str_time = strtotime($info['begin_at']) - 50;  //开始时间需要大于当前时间
-        }
+        }*/
         $end_time       = $str_time+3600*3;//  结束时间需要大于当前时间
 
         if( $type == 'create' && $str_time <= time() ){
