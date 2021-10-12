@@ -234,12 +234,25 @@ class ImGroupController extends Controller
             return false;
         }
         DB::beginTransaction();
+
+        $callbackdata['column_id'] = 0;
+        if(!empty($params['UserDefinedDataList'])){
+            foreach ($params['UserDefinedDataList'] as $key=>$val){
+                if($val['Key'] == 'callbackdata'){
+                    $callbackdata = json_decode($val['Value'],true);
+                }
+            }
+        }
+
+        $column_id = $callbackdata['column_id']??0;
+
         $group_add = [
             'group_id'          => $params['GroupId'],
             'operator_account'  => $params['Operator_Account'],
             'owner_account'     => $params['Owner_Account'],
             'type'              => $params['Type'],
             'name'              => $params['Name'],
+            'column_id'         => $column_id,
             'created_at'        => date('Y-m-d H:i:s'),
             'updated_at'        => date('Y-m-d H:i:s'),
         ];

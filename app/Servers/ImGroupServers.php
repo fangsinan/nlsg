@@ -308,7 +308,12 @@ class ImGroupServers
         if (count($params['user_id']) < 2) {
             return ['code' => false, 'msg' => '初始群最少添加两个用户'];
         }
+        $callbackdataarr=[];
+        if(empty($params['column_id'])){
+            $callbackdataarr = ['column_id'=>$params['column_id']];
+        }
 
+        $callbackdata = json_encode($callbackdataarr);
         $post_data = [
             'Owner_Account' => (string)$user_id,
             'Type' => "Public",
@@ -318,6 +323,9 @@ class ImGroupServers
 //                    "Member_Account"=> "211172", // 成员（必填）
 //                    "Role" => "Admin" // 赋予该成员的身份，目前备选项只有 Admin（选填）
 //                ],
+            ],
+            'AppDefinedData' =>[
+                ['Key'=>'callbackdata','Value'=>$callbackdata],
             ]
         ];
 
