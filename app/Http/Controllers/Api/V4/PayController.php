@@ -349,7 +349,7 @@ class PayController extends Controller
 
         //订单号码不存在时报错 捕获异常处理
         try {
-            if ($orderData['pay_type'] == 2 || $orderData['pay_type'] == 1) {
+            if ($orderData['pay_type'] === 2 || $orderData['pay_type'] === 1) {
                 //微信
                 $config = Config('wechat.payment.default');
                 $app = Factory::payment($config);
