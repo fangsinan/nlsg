@@ -570,7 +570,7 @@ class MallRefundJob
             return ['code' => true, 'refund_id' => $result['refund_id'], 'this_time' => 1];
         }
         if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'FAIL' && $result['err_code_des'] === '订单已全额退款') {
-            return ['code' => true, 'refund_id' => $result['refund_id'], 'this_time' => 2];
+            return ['code' => true, 'refund_id' => $result['refund_id']??0, 'this_time' => 2];
         }
 
         return ['code' => false, 'refund_id' => 0];
