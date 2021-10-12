@@ -192,8 +192,6 @@ class LiveInfoServers
                 DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
             ]);
             $res = $query->paginate($size);
-            $custom = collect(['live_user_id' => $check_live_id->user_id]);
-            return $custom->merge($res);
         } else {
             $query->select([
                 DB::raw("CONCAT('`',ordernum) as ordernum"),
@@ -215,10 +213,87 @@ class LiveInfoServers
                 'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
                 DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
             ]);
-//            echo $query->toSql().PHP_EOL;
-//            $query->dd(); //dd 阻断流程
-            return $query->get();
+            $res = $query->get();
         }
+
+        if ($res !== null) {
+            $UserId_Arr = [];
+            foreach ($res as $k => $v) {
+                $UserId_Arr[] = $v->user_id;
+            }
+            $UserArr = DB::table('nlsg_user as U')
+                ->select(['U.id', 'U.unionid', 'N.qw_name', 'W.follow_user_userid'])
+                ->leftjoin('nlsg_user_wechat as W', function ($query) {
+                    $query->on('W.unionid', '=', 'U.unionid')->where('W.unionid', '<>', '');
+                })
+                ->leftJoin('nlsg_user_wechat_name as N', 'N.follow_user_userid', '=', 'W.follow_user_userid')
+                ->whereIn('U.id', $UserId_Arr)->get();
+
+            $address_query = DB::table('nlsg_mall_address as ma')
+                ->join('nlsg_area as a1', 'ma.province', '=', 'a1.id')
+                ->leftJoin('nlsg_area as a2', 'ma.city', '=', 'a2.id')
+                ->leftJoin('nlsg_area as a3', 'ma.area', '=', 'a3.id')
+                ->where('ma.is_default', '=', 1)
+                ->where('ma.is_del', '=', 0)
+                ->whereIn('ma.user_id', $UserId_Arr)
+                ->select(['ma.id', 'ma.user_id', 'ma.name', 'ma.phone', 'a1.name as province_name', 'a2.name as city_name',
+                    'a3.name as area_name', 'ma.details'])
+                ->get();
+
+            $UnionArr = [];
+            foreach ($UserArr as $key => $val) {
+                $UnionArr[$val->id] = [
+                    'qw_name' => (empty($val->qw_name)) ? '' : $val->qw_name,
+                    'follow_user_userid' => (empty($val->follow_user_userid)) ? '' : $val->follow_user_userid
+                ];
+            }
+
+            foreach ($res as $k => $v) {
+                $v->unionid = $UnionArr[$v->user_id]['qw_name'];
+                $v->follow_user_userid = $UnionArr[$v->user_id]['follow_user_userid'];
+                $v->address = '';
+                $v_address_default = '';
+                $v_address_phone = '';
+                foreach ($address_query as $aq_v) {
+                    if ($v->user_id === $aq_v->user_id) {
+                        if (!empty($aq_v->name)) {
+                            $v_address_phone .= ' ' . $aq_v->name;
+                        }
+                        if (!empty($aq_v->phone)) {
+                            $v_address_phone .= ' ' . $aq_v->phone;
+                        }
+                        if (!empty($aq_v->province_name)) {
+                            $v_address_default .= ' ' . $aq_v->province_name;
+                        }
+                        if (!empty($aq_v->city_name)) {
+                            $v_address_default .= ' ' . $aq_v->city_name;
+                        }
+                        if (!empty($aq_v->area_name)) {
+                            $v_address_default .= ' ' . $aq_v->area_name;
+                        }
+                        if (!empty($aq_v->details)) {
+                            $v_address_default .= ' ' . $aq_v->details;
+                        }
+                    }
+                }
+                $v_address_default = trim($v_address_default);
+                $v_address_phone = trim($v_address_phone);
+                if (!empty($v_address_phone)) {
+                    $v->address .= $v_address_phone;
+                }
+                if (!empty($v_address_default)) {
+                    $v->address .= '(' . $v_address_default . ')';
+                }
+
+            }
+        }
+
+        if (empty($excel_flag)) {
+            $custom = collect(['live_user_id' => $check_live_id->user_id]);
+            return $custom->merge($res);
+        }
+
+        return $res;
 
     }
 

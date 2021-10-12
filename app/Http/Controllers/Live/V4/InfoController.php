@@ -248,38 +248,41 @@ class InfoController extends ControllerBackend
         if (($data['code'] ?? true) === false) {
             exit($data['msg']);
         }
-        if(!empty($data)){
-            $UserId_Arr=[];
-            foreach ($data as $k=>$v) {
-                $UserId_Arr[]=$v->user_id;
-            }
-            $query = DB::table('nlsg_user as U')
-                ->select(['U.id','U.unionid','N.qw_name','W.follow_user_userid'])
-                ->leftjoin('nlsg_user_wechat as W',function($query){
-                    $query->on('W.unionid','=','U.unionid')->where('W.unionid','<>','');
-                })
-                ->leftJoin('nlsg_user_wechat_name as N','N.follow_user_userid','=','W.follow_user_userid')
-                ->whereIn('U.id', $UserId_Arr);
-            $UserArr=$query->get()->toArray();
-            $UnionArr=[];
-            foreach ($UserArr as $key=>$val){
-                $UnionArr[$val->id]=[
-                    'qw_name'=>(empty($val->qw_name))?'':$val->qw_name,
-                    'follow_user_userid'=>(empty($val->follow_user_userid))?'':$val->follow_user_userid
-                    ];
-            }
-            foreach ($data as $k=>$v){
-                $v->unionid=$UnionArr[$v->user_id]['qw_name'];
-                $v->follow_user_userid=$UnionArr[$v->user_id]['follow_user_userid'];
-            }
-        }
+//        if(!empty($data)){
+//            $UserId_Arr=[];
+//            foreach ($data as $k=>$v) {
+//                $UserId_Arr[]=$v->user_id;
+//            }
+//            $query = DB::table('nlsg_user as U')
+//                ->select(['U.id','U.unionid','N.qw_name','W.follow_user_userid'])
+//                ->leftjoin('nlsg_user_wechat as W',function($query){
+//                    $query->on('W.unionid','=','U.unionid')->where('W.unionid','<>','');
+//                })
+//                ->leftJoin('nlsg_user_wechat_name as N','N.follow_user_userid','=','W.follow_user_userid')
+//                ->whereIn('U.id', $UserId_Arr);
+//            $UserArr=$query->get()->toArray();
+//            $UnionArr=[];
+//            foreach ($UserArr as $key=>$val){
+//                $UnionArr[$val->id]=[
+//                    'qw_name'=>(empty($val->qw_name))?'':$val->qw_name,
+//                    'follow_user_userid'=>(empty($val->follow_user_userid))?'':$val->follow_user_userid
+//                    ];
+//            }
+//            foreach ($data as $k=>$v){
+//                $v->unionid=$UnionArr[$v->user_id]['qw_name'];
+//                $v->follow_user_userid=$UnionArr[$v->user_id]['follow_user_userid'];
+//            }
+//        }
         $columns = ['订单编号', '支付金额', '数量', '支付时间', '类型名称',
             '购买人账号', '购买人昵称', '购买人id', '购买人身份',
             '推荐人账号', '推荐人昵称', '关系保护id', '关系保护账号', '关系保护昵称', '关系保护身份',
             '受益人id', '受益人金额',
             '钻石合伙人id', '钻石合伙人账号', '钻石合伙人昵称', '钻石合伙人身份',
             '是否抖音渠道', '抖音订单号', '抖音下单时间', '渠道类型', '渠道名称',
-            '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款','微信客服','客服编号'];
+            '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款',
+            '微信客服','客服编号',
+            '收货地址'
+        ];
 //        $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
         $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
