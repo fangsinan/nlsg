@@ -309,7 +309,7 @@ class ImGroupServers
             return ['code' => false, 'msg' => '初始群最少添加两个用户'];
         }
         $callbackdataarr=[];
-        if(empty($params['column_id'])){
+        if(!empty($params['column_id'])){
             $callbackdataarr = ['column_id'=>$params['column_id']];
         }
 

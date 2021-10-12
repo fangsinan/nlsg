@@ -17,6 +17,7 @@ use App\Models\MallGroupBuyList;
 use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
 use App\Models\MeetingSales;
+use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
@@ -463,6 +464,11 @@ class WechatPay extends Controller
                     $AdminInfo = User::find($user_id);
                     self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 //                    Task::send(6, $user_id, $orderInfo['relation_id']);
+                    if ($orderInfo['relation_id'] == 5){
+                        //加群
+                        self::joinImGroup($orderInfo['relation_id'],$user_id,$orderInfo['type']);
+
+                    }
                     return true;
 
                 } else {
@@ -1215,11 +1221,7 @@ class WechatPay extends Controller
                     self::LiveRedis(18, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
                     //发送通知、
 
-                    $send_type = 2;  //专栏
-                    if ($orderInfo['type'] == 15) {
-                        $send_type = 2;  //讲座
-                    } elseif ($orderInfo['type'] == 18) {
-                        $send_type = 7;  //训练营
+                    if ($orderInfo['type'] == 18) {
                         //  加入社群
                         self::joinImGroup($orderInfo['relation_id'],$user_id);
                     }
@@ -1250,9 +1252,21 @@ class WechatPay extends Controller
             return true;
         }
     }
-    public static function joinImGroup($relation_id,$uid){
+    public static function joinImGroup($relation_id,$uid,$type=0){
+        if($type == 14 ){
+            if($relation_id == 5){//训练营
+                //查找当前门票类型对应的训练营
+                $relation_id = OfflineProducts::where('id',$relation_id)->value("column_id");
+            }else{
+                return '';
+            }
+        }
+
+        if($relation_id <= 0){
+            return ;
+        }
         $groups = ImGroup::where(['status'=>1,'column_id'=>$relation_id])
-                    ->where('member_num','<',2000)  //群满员两千人
+                    ->where('member_num','<',200)  //群满员两千人  规定一期200人
                     ->first();
         if(empty($groups)){
             return ;

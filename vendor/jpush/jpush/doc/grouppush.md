@@ -16,7 +16,7 @@ $client = new \JPush\Client('group-' . $group_key, $group_master_secret);
 ```
 
 ## 简单群组推送
-
+    
 ```php
 $client->push()
     ->setPlatform('all')
