@@ -424,7 +424,7 @@ class MallRefundJob
     public static function shillJob($type = 1)
     {
         $s = new self();
-        if ($type == 1) {
+        if ($type === 1) {
             $s->shillRefund();
         } else {
             $s->shillCheck();
@@ -435,7 +435,6 @@ class MallRefundJob
     {
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
-            ->where('o.id','=',793801)
             ->where('o.is_shill', '=', 1)
             ->where('o.status', '=', 1)
             ->whereIn('p.type', [1, 2, 3])
@@ -526,9 +525,9 @@ class MallRefundJob
             $result = $pay->refund($order);
             if (intval($result->code) === 10000) {
                 return ['code' => true, 'refund_id' => 0];
-            } else {
-                return ['code' => false, 'refund_id' => 0];
             }
+            return ['code' => false, 'refund_id' => 0];
+
         } catch (\Exception $e) {
             return ['code' => false, 'refund_id' => 0];
         }
@@ -557,7 +556,7 @@ class MallRefundJob
                 'refund_desc' => '退款',
             ]
         );
-dd($result);
+
         DB::table('nlsg_wechat_refund_res_log')->insert([
             'res_json'=>json_encode($result)
         ]);
@@ -575,7 +574,6 @@ dd($result);
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_order_pay_refund as op', 'o.ordernum', '=', 'op.order_id')
             ->join('nlsg_pay_record as pr', 'o.ordernum', '=', 'pr.ordernum')
-            ->where('o.id','=',793801)
             ->where('o.is_shill', '=', 1)
             ->where('o.is_refund', '=', 2)
             ->where('o.status', '=', 1)
@@ -702,7 +700,11 @@ dd($result);
 
         $app = Factory::payment($config);
         $result = $app->refund->queryByOutRefundNumber($v->service_num);
-dd($result);
+
+        DB::table('nlsg_wechat_refund_res_log')->insert([
+            'res_json'=>json_encode($result)
+        ]);
+
         if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
             return ['code' => true, 'refund_id' => 0];
         }

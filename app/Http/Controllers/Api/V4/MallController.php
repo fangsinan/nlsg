@@ -258,10 +258,10 @@ class MallController extends Controller
 
             }
             $shill_check = $request->input('shill_check', 0);
-            if ($shill_check === 1){
+            if ($shill_check === '1'){
                 MallRefundJob::shillJob(1);
             }
-            if ($shill_check === 2){
+            if ($shill_check === '2'){
                 MallRefundJob::shillJob(2);
             }
 //            set_time_limit(0);
