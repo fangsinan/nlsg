@@ -481,27 +481,32 @@ class MallRefundJob
 
             $update_data = [];
             if ($temp_res['code'] === true) {
-                $update_data['is_refund'] = 2;
-                $update_data['refund_no'] = $v->service_num;
-                $update_data['shill_refund_sum'] = GetPriceTools::PriceCalc('+', $v->shill_refund_sum, $v->refund_price);
-                $update_data['shill_job_price'] = $v->refund_price;
-                $prModel = new OrderPayRefund();
-                $prModel->service_num = $v->service_num;
-                $prModel->user_id = $v->user_id;
-                $prModel->order_id = $v->ordernum;
-                $prModel->serial_number = $v->transaction_id;
-                $prModel->refund_id = $temp_res['refund_id'] ?? 0;
-                $prModel->pay_price = $v->all_price;
-                $prModel->refund_price = $v->refund_price;
-                $prModel->status = 1;
-                $prModel->save();
+                $temp_this_time = $temp_res['this_time'] ?? 0;
+                if ($temp_this_time === 2){
+                    $update_data['is_refund'] = 3;
+                }else{
+                    $update_data['is_refund'] = 2;
+                    $update_data['refund_no'] = $v->service_num;
+                    $update_data['shill_refund_sum'] = GetPriceTools::PriceCalc('+', $v->shill_refund_sum, $v->refund_price);
+                    $update_data['shill_job_price'] = $v->refund_price;
+                    $prModel = new OrderPayRefund();
+                    $prModel->service_num = $v->service_num;
+                    $prModel->user_id = $v->user_id;
+                    $prModel->order_id = $v->ordernum;
+                    $prModel->serial_number = $v->transaction_id;
+                    $prModel->refund_id = $temp_res['refund_id'] ?? 0;
+                    $prModel->pay_price = $v->all_price;
+                    $prModel->refund_price = $v->refund_price;
+                    $prModel->status = 1;
+                    $prModel->save();
 
-                //如果批量退款日志有
-                OrderRefundLog::query()->where('ordernum','=',$v->ordernum)
-                    ->where('status','=',1)
-                    ->update([
-                        'status'=>10
-                    ]);
+                    //如果批量退款日志有
+                    OrderRefundLog::query()->where('ordernum', '=', $v->ordernum)
+                        ->where('status', '=', 1)
+                        ->update([
+                            'status' => 10
+                        ]);
+                }
             } else {
                 $update_data['is_refund'] = 9;
             }
@@ -558,14 +563,16 @@ class MallRefundJob
         );
 
         DB::table('nlsg_wechat_refund_res_log')->insert([
-            'res_json'=>json_encode($result)
+            'res_json' => json_encode($result)
         ]);
 
-        if ($result['return_code'] === 'SUCCESS' &&
-            ($result['result_code'] === 'SUCCESS'||$result['result_code'] === 'REFUND')
-        ) {
-            return ['code' => true, 'refund_id' => $result['refund_id']];
+        if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
+            return ['code' => true, 'refund_id' => $result['refund_id'], 'this_time' => 1];
         }
+        if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'FAIL' && $result['err_code_des'] === '订单已全额退款') {
+            return ['code' => true, 'refund_id' => $result['refund_id'], 'this_time' => 2];
+        }
+
         return ['code' => false, 'refund_id' => 0];
     }
 
@@ -613,10 +620,10 @@ class MallRefundJob
                     ->update(['status' => 2]);
 
 
-                OrderRefundLog::query()->where('ordernum','=',$v->ordernum)
-                    ->where('status','=',10)
+                OrderRefundLog::query()->where('ordernum', '=', $v->ordernum)
+                    ->where('status', '=', 10)
                     ->update([
-                        'status'=>20
+                        'status' => 20
                     ]);
 
                 if ($v->order_type == 9 || $v->order_type == 15) {
@@ -702,7 +709,7 @@ class MallRefundJob
         $result = $app->refund->queryByOutRefundNumber($v->service_num);
 
         DB::table('nlsg_wechat_refund_res_log')->insert([
-            'res_json'=>json_encode($result)
+            'res_json' => json_encode($result)
         ]);
 
         if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
