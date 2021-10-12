@@ -1838,26 +1838,27 @@ and o.status = 1 and o.pay_price > 1";
 
     public function worksListOfSub()
     {
-        $now_date = date('Y-m-d H:i:s');
-        $job_key = 1844;
-
-        $check_job = self::getKernelLock($job_key, 1);
-        if ($check_job === false) {
-            return true;
-        }
-
-        $run = true;
-        while ($run) {
-            self::getKernelLock($job_key, 2);
+//        $now_date = date('Y-m-d H:i:s');
+//        $job_key = 1844;
+//
+//        $check_job = self::getKernelLock($job_key, 1);
+//        if ($check_job === false) {
+//            return true;
+//        }
+//
+//        $run = true;
+//        while ($run) {
+//            self::getKernelLock($job_key, 2);
             $list = DB::table('works_list_of_sub')
                 ->whereIn('works_type', [2, 6, 3, 7])
                 ->where('status', '=', 1)
-                ->limit(100)
+                ->limit(3000)
                 ->get();
 
             if ($list->isEmpty()) {
-                self::getKernelLock($job_key, 3);
-                $run = false;
+//                self::getKernelLock($job_key, 3);
+//                $run = false;
+                return true;
             }
 
             foreach ($list as $v) {
@@ -2024,9 +2025,9 @@ and o.status = 1 and o.pay_price > 1";
                 DB::commit();
 
             }
-        }
+//        }
 
-        return true;
+//        return true;
     }
 
     public function subListSms()
