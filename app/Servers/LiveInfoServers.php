@@ -378,7 +378,7 @@ class LiveInfoServers
                     'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
                     'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
                     'o.id as order_id', 'o.pay_type', 'os_type',
-                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id'
+                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id','o.ordernum'
                 ]);
             $res = $query->paginate($size);
             $custom = collect(['live_user_id' => $check_live_id->user_id]);
@@ -388,6 +388,7 @@ class LiveInfoServers
                 ->groupBy('o.id')
                 ->orderBy('o.id', 'desc')
                 ->select([
+                    DB::raw("CONCAT('`',o.ordernum) as ordernum"),
                     'o.user_id', DB::raw("CONCAT('`',u.phone) as phone"), 'u.nickname', 'o.twitter_id',
                     DB::raw("CONCAT('`',lt.phone) as t_phone"),
                     'lt.nickname as t_nickname', 'lr.son_flag',
