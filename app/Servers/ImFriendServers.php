@@ -8,6 +8,7 @@ use App\Models\ImUser;
 use App\Models\ImUserFriend;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Libraries\ImClient;
 
 class ImFriendServers
@@ -177,7 +178,15 @@ class ImFriendServers
             return [];
         }
 
-        $user = User::select("id","nickname","headimg","phone")
+//        $user = User::select("id","nickname","headimg","phone")
+//            ->where('phone', 'like', '%' . $params['phone'] . '%')->limit(30)->get()->toArray();
+
+
+
+        $user = DB::table('nlsg_user as u')
+            ->select("u.id","u.nickname","u.headimg","u.phone")
+            ->join('nlsg_im_user as iu',
+                'u.id', '=', 'iu.tag_im_to_account')
             ->where('phone', 'like', '%' . $params['phone'] . '%')->limit(30)->get()->toArray();
 
         return $user;
