@@ -1397,11 +1397,11 @@ class LiveController extends Controller
     public function payLiveOrder(Request $request)
     {
         $input = $request->all();
-        $tweeterCode    = $input['inviter'] ?intval($input['inviter']): 0;
-        $liveId         = $input['live_id'] ? intval($input['live_id']): 0;
-        $liveInfoId     = $input['info_id'] ? intval($input['info_id']): 0;
-        $osType         = $input['os_type'] ? intval($input['os_type']): 1;
-        $payType        = $input['pay_type'] ? intval($input['pay_type']): 0;
+        $tweeterCode    = $input['inviter'] ?intval($input['inviter']??0): 0;
+        $liveId         = $input['live_id'] ? intval($input['live_id']??0): 0;
+        $liveInfoId     = $input['info_id'] ? intval($input['info_id']??0): 0;
+        $osType         = $input['os_type'] ? intval($input['os_type']??1): 1;
+        $payType        = $input['pay_type'] ? intval($input['pay_type']??0): 0;
         $activity_tag   = $input['activity_tag'] ? $input['activity_tag']: '';
 
         if( in_array($this->user['id'], [878644, 882057, 882861]) ){
