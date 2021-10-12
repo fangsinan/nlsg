@@ -1410,7 +1410,7 @@ class LiveController extends Controller
         $osType         = intval($input['os_type'] ?? 1);
         $payType        = intval($input['pay_type'] ?? 0);
 
-        $activity_tag   = $input['activity_tag'] ? $input['activity_tag']: '';
+        $activity_tag   = $input['activity_tag'] ??'';
 
         if( in_array($this->user['id'], [878644, 882057, 882861]) ){
             return error(0, '用户异常');
