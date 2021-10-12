@@ -158,7 +158,7 @@ class InfoController extends ControllerBackend
             exit($data['msg']);
         }
         $columns = ['订单编号','用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
-            '推客别名', '支付价格', '支付时间', '直播id', '直播标题'];
+            '推客别名', '支付价格', '支付时间', '直播id', '直播标题','源直播id','源直播标题'];
 //        $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
         $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');

@@ -362,7 +362,6 @@ class LiveInfoServers
 
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
-
             switch ($query_flag) {
                 case 'money_sum':
                     return $query->sum('pay_price');
@@ -381,11 +380,9 @@ class LiveInfoServers
                     'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id','o.ordernum'
                 ]);
             $res = $query->paginate($size);
-            $custom = collect(['live_user_id' => $check_live_id->user_id]);
-            return $custom->merge($res);
+
         } else {
-            $query
-                ->groupBy('o.id')
+            $query->groupBy('o.id')
                 ->orderBy('o.id', 'desc')
                 ->select([
                     DB::raw("CONCAT('`',o.ordernum) as ordernum"),
@@ -394,9 +391,19 @@ class LiveInfoServers
                     'lt.nickname as t_nickname', 'lr.son_flag',
                     'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
                 ]);
-            return $query->get();
+            $res = $query->get();
         }
 
+        foreach ($res as $v){
+            $v->source_live_id = $check_live_id->id;
+            $v->source_live_title = $check_live_id->title;
+        }
+
+        if (empty($excel_flag)) {
+            $custom = collect(['live_user_id' => $check_live_id->user_id]);
+            return $custom->merge($res);
+        }
+        return $res;
     }
 
     public function onlineNum($params)
