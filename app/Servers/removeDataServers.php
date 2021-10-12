@@ -1838,7 +1838,7 @@ and o.status = 1 and o.pay_price > 1";
 
     public function worksListOfSub()
     {
-//        $now_date = date('Y-m-d H:i:s');
+        $now_date = date('Y-m-d H:i:s');
 //        $job_key = 1844;
 //
 //        $check_job = self::getKernelLock($job_key, 1);
