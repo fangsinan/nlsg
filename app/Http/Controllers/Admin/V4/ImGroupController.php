@@ -165,7 +165,7 @@ class ImGroupController extends ControllerBackend
      * @apiGroup im_group
      *
      * @apiParam {array} user_id  user_id  数组类型 群初始人员
-     * @apiParam {array} Name 群名称
+     * @apiParam {string} Name 群名称
 
      *
      * @apiSuccess {string} result json
