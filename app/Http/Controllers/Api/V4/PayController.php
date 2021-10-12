@@ -348,17 +348,18 @@ class PayController extends Controller
         }
 
         //订单号码不存在时报错 捕获异常处理
-//        try {
+        try {
             if ($orderData['pay_type'] == 2 || $orderData['pay_type'] == 1) {
                 //微信
                 $config = Config('wechat.payment.default');
                 $app = Factory::payment($config);
                 $res = $app->order->queryByOutTradeNumber($orderData['ordernum']); //"商户系统内部的订单号（out_trade_no）"
-    var_dump($res);
-                if ($res['return_code'] == 'SUCCESS') {
-                    if ($res['trade_state'] == 'SUCCESS') {
+                if ($res['return_code'] === 'SUCCESS') {
+                    if ($res['trade_state'] === 'SUCCESS' || $res['trade_state'] === 'REFUND') {
                         $res['pay_type'] = 2;
                         $res['total_fee'] = $res['total_fee'] / 100;
+                    }else{
+                        return $this->error(0, '订单有误'.__LINE__);
                     }
                 } else {
                     return $res;
@@ -369,7 +370,6 @@ class PayController extends Controller
                 $config = Config('pay.alipay');
                 $res = Pay::alipay($config)->find(['out_trade_no' => $orderData['ordernum']]);
                 $res = json_decode(json_encode($res), true);
-    var_dump($res);
                 $temp_attach = substr($res['out_trade_no'], -2);
                 switch ($temp_attach) {
                     //todo 其他类型也需要配一下
@@ -377,20 +377,20 @@ class PayController extends Controller
                         $res['attach'] = 8;
                         break;
                 }
-                if ($res['trade_status'] == 'TRADE_SUCCESS') {
+                if ($res['trade_status'] === 'TRADE_SUCCESS') {
                     $res['pay_type'] = 3;
                 } else {
                     return $res;
                 }
             }
-    var_dump([__LINE__,$res]);
+
             //todo 临时用
             WechatPay::PayStatusUp($res);
 
             return $this->success($res);
-//        } catch (\Exception $e) {
-//            return $this->error(0, 'error');
-//        }
+        } catch (\Exception $e) {
+            return $this->error(0, 'error');
+        }
     }
 
     /**
