@@ -234,6 +234,9 @@ class UserWechat extends Controller {
                         $add_data['gender']     = $add_v['external_contact']['gender']??"";
                         $add_data['unionid']     = $add_v['external_contact']['unionid']??"";
                         $insert_data[] = $add_data;
+                        //处理完该uid  删除数组中的uid 防止当前循环中有重复
+                        $del_key = array_search($add_v['external_contact']['external_userid'],$getWechatIds);
+                        unset($getWechatIds[$del_key]);
                     }
                     //dd($insert_data);
                     if(!empty($insert_data)){
