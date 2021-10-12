@@ -435,6 +435,7 @@ class MallRefundJob
     {
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum')
+            ->where('o.id','=',793801)
             ->where('o.is_shill', '=', 1)
             ->where('o.status', '=', 1)
             ->whereIn('p.type', [1, 2, 3])
@@ -556,12 +557,14 @@ class MallRefundJob
                 'refund_desc' => '退款',
             ]
         );
-
+dd($result);
         DB::table('nlsg_wechat_refund_res_log')->insert([
             'res_json'=>json_encode($result)
         ]);
 
-        if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
+        if ($result['return_code'] === 'SUCCESS' &&
+            ($result['result_code'] === 'SUCCESS'||$result['result_code'] === 'REFUND')
+        ) {
             return ['code' => true, 'refund_id' => $result['refund_id']];
         }
         return ['code' => false, 'refund_id' => 0];
@@ -572,6 +575,7 @@ class MallRefundJob
         $list = DB::table('nlsg_order as o')
             ->join('nlsg_order_pay_refund as op', 'o.ordernum', '=', 'op.order_id')
             ->join('nlsg_pay_record as pr', 'o.ordernum', '=', 'pr.ordernum')
+            ->where('o.id','=',793801)
             ->where('o.is_shill', '=', 1)
             ->where('o.is_refund', '=', 2)
             ->where('o.status', '=', 1)
@@ -688,7 +692,7 @@ class MallRefundJob
 
     private function wechatRefundCheckMethod($v, $flag): array
     {
-        if ($flag == 1) {
+        if ($flag === 1) {
             //h5
             $config = Config('wechat.payment.wx_wechat');
         } else {
@@ -698,11 +702,10 @@ class MallRefundJob
 
         $app = Factory::payment($config);
         $result = $app->refund->queryByOutRefundNumber($v->service_num);
-
-        if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {
+dd($result);
+        if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
             return ['code' => true, 'refund_id' => 0];
-        } else {
-            return ['code' => false, 'refund_id' => 0];
         }
+        return ['code' => false, 'refund_id' => 0];
     }
 }

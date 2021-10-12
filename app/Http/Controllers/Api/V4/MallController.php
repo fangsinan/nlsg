@@ -14,6 +14,7 @@ use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
+use App\Servers\MallRefundJob;
 use App\Servers\VipServers;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -255,6 +256,13 @@ class MallController extends Controller
 
                 return json_decode($res, true);
 
+            }
+            $shill_check = $request->input('shill_check', 0);
+            if ($shill_check === 1){
+                MallRefundJob::shillJob(1);
+            }
+            if ($shill_check === 2){
+                MallRefundJob::shillJob(2);
             }
 //            set_time_limit(0);
 //            $llModel = new LiveLogin();
