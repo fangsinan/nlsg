@@ -267,7 +267,7 @@ class SubscribeController extends ControllerBackend
         }
         if($type == "count"){
             $lists = $query->count("sub.id");
-            return success($lists);
+            return success(['total'=>$lists]);
         }
 
 
