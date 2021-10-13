@@ -1305,7 +1305,12 @@ class LiveController extends Controller
             return error(0, '用户异常');
         }
 
-        $live = LiveInfo::where('id', $input['info_id'])->first();
+        if(empty($input['info_id'])){
+            return error(0, '参数有误');
+        }
+        $info_id=$input['info_id']+0;
+
+        $live = LiveInfo::where('id', $info_id)->first();
         if (!$live) {
             return error(0, '直播不存在');
         }
@@ -1322,7 +1327,7 @@ class LiveController extends Controller
             }
         }
 
-        $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
+        $list = Subscribe::where(['relation_id' => $info_id, 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
                         ->first();
         if ( !empty($list) ) {
             return error(0, '已经预约');
@@ -1347,32 +1352,35 @@ class LiveController extends Controller
             Subscribe::create([
                 'user_id' => $this->user['id'],
                 'type' => 3,
-                'relation_id' => $input['info_id'],
+                'relation_id' => $info_id,
                 'status' => 1,
                 'is_flag' => $is_flag,
                 'twitter_id' => $twitter_id,
             ]);
             LiveCountDown::create([
-                'live_id' => $input['info_id'],
+                'live_id' => $info_id,
                 'user_id' => $this->user['id'],
                 'phone' => $user->phone,
                 'new_vip_uid' => $twitter_id,
             ]);
 
-            Live::where(['id' => $input['live_id']])->increment('order_num');
+            Live::where(['id' => $live['live_pid']])->increment('order_num');
+
+            return success('发送成功');
 
             $easySms = app('easysms');
-            try {
-                /*if(strlen($user->phone)==11) {
+
+            /*try {
+                if(strlen($user->phone)==11) {
                     $result = $easySms->send($user->phone, [
                         'template' => 'SMS_169114800',
                     ], ['aliyun']);
-                }*/
+                }
                 return success('发送成功');
             } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
                 $message = $exception->getResults();
                 return $message;
-            }
+            }*/
 
         } else {
             return error(0, '手机号不存在或者错误');
