@@ -1296,7 +1296,10 @@ class LiveController extends Controller
     public function freeLiveOrder(Request $request)
     {
         $input = $request->all();
-
+        if( empty($input) ){
+            return error(0, '参数异常');
+        }
+        
         if( in_array($this->user['id'], [878644, 882057, 882861]) ){
             return error(0, '用户异常');
         }
