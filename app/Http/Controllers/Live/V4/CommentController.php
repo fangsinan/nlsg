@@ -225,8 +225,8 @@ class CommentController extends ControllerBackend
             return $this->error(0,'live_id 为空');
         }
 
-        $columns = ['用户id', '用户昵称', '用户手机', '评论', '时间'];
-        $fileName = '评论列表' . date('Y-m-d H:i') . '.csv';
+        $columns = ['用户id', '用户昵称', '用户手机', '评论', '时间','渠道名称'];
+        $fileName = 'lc' . date('Y-m-d H:i') .rand(10,99). '.csv';
         header('Content-Description: File Transfer');
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
@@ -245,7 +245,7 @@ class CommentController extends ControllerBackend
         $while_flag = true;
         while ($while_flag) {
             $list_query = LiveComment::with([ 'user:id,phone,nickname',])
-                ->select('id', 'live_id', 'user_id', 'content', 'created_at')
+                ->select('id', 'live_id', 'user_id', 'content', 'created_at','live_son_flag')
                 ->where('live_id', $live_id)
                 ->where('type', 0)
                 ->where('status', 1);
@@ -267,6 +267,17 @@ class CommentController extends ControllerBackend
                     $temp_v['phone']    = '`' . ($v->user->phone ?? '');
                     $temp_v['content']  = $v->content ?? '';
                     $temp_v['created_at']  = $v->created_at ?? '';
+                    $temp_v['live_son_flag'] = '';
+                    $temp_v['live_son_phone'] = '';
+                    if (!empty($v->live_son_flag ?? '')){
+                        $temp_check_son_flag = BackendLiveRole::select('son_id', 'son_flag','son')
+                            ->where('son_id','=',$v->live_son_flag)
+                            ->first();
+                        if (!empty($temp_check_son_flag)){
+                            $temp_v['live_son_flag'] = $temp_check_son_flag->son_flag;
+//                            $temp_v['live_son_phone'] = $temp_check_son_flag->son;
+                        }
+                    }
                     mb_convert_variables('GBK', 'UTF-8', $temp_v);
                     fputcsv($fp, $temp_v);
                     ob_flush();     //刷新输出缓冲到浏览器
