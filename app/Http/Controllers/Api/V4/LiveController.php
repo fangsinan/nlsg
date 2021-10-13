@@ -1329,8 +1329,9 @@ class LiveController extends Controller
         }
 
         $user = User::where('id', $this->user['id'])->first();
-        if ($user->phone && (preg_match("/^1((34[0-8]\d{7})|((3[0-3|5-9])|(4[5-7|9])|(5[0-3|5-9])|(66)|(7[2-3|5-8])|(8[0-9])|(9[1|8|9]))\d{8})$/",
-                $user->phone) || strlen($user->phone)==13)) {
+//        if ($user->phone && (preg_match("/^1((34[0-8]\d{7})|((3[0-3|5-9])|(4[5-7|9])|(5[0-3|5-9])|(66)|(7[2-3|5-8])|(8[0-9])|(9[1|8|9]))\d{8})$/",
+//                $user->phone) || strlen($user->phone)==13)) {
+        if ( !empty($user->phone) ) {
 
             $twitter_id = 0;
             if(!empty($input['inviter'])) {
