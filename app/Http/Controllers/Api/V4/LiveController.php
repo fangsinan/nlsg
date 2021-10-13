@@ -1308,7 +1308,7 @@ class LiveController extends Controller
         if(empty($input['info_id'])){
             return error(0, '参数有误');
         }
-        $info_id=$input['info_id']+0;
+        $info_id=intval($input['info_id']);
 
         $live = LiveInfo::where('id', $info_id)->first();
         if (!$live) {
