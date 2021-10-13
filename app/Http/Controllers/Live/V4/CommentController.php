@@ -95,7 +95,7 @@ class CommentController extends ControllerBackend
         }
 
 
-        $lists_query = LiveComment::select('id', 'live_id', 'user_id', 'content', 'created_at')
+        $lists_query = LiveComment::select('id', 'live_id', 'user_id', 'content', 'created_at','live_son_flag')
             ->when($content, function ($query) use ($content) {
                 $query->where('content', 'like', '%' . $content . '%');
             })
@@ -131,13 +131,16 @@ class CommentController extends ControllerBackend
             'data'  => $list ?? []
         ];
 
+        $son_id_list = [];
         foreach ($lists['data'] as $key => $val) {
             $val['user'] = [];  //初值
             $val['live'] = [];
 
             $lists_user_ids[] = $val['user_id'];
             $lists_live_ids[] = $val['live_id'];
+            $son_id_list[] = $val['live_son_flag'];
         }
+
         $new_userData = [];
         if (!empty($lists_user_ids)) {
             $list_userData = User::select('id', 'nickname','phone')->whereIn('id', $lists_user_ids)->get()->toArray();
@@ -145,6 +148,13 @@ class CommentController extends ControllerBackend
                 $new_userData[$val['id']] = $val;
             }
         }
+        $son_id_list_data = [];
+        if (!empty($son_id_list)){
+            $son_id_list_data = BackendLiveRole::select('son_id', 'son_flag','son')
+                ->whereIn('son_id',$son_id_list)
+                ->get();
+        }
+
         $new_list_liveData = [];
         if (!empty($lists_live_ids)) {
             $list_liveData = Live::select('id', 'title')->whereIn('id', $lists_live_ids)->get()->toArray();
@@ -162,7 +172,18 @@ class CommentController extends ControllerBackend
             if (!empty($new_list_liveData)) {
                 $val['live'] = $new_list_liveData[$val['live_id']];
             }
-
+            $val['son_phone'] = '';
+            $val['son_id'] = 0;
+            $val['son_flag'] = '';
+            if (!empty($son_id_list_data)){
+                foreach ($son_id_list_data as $sldv){
+                    if ($val['live_son_flag'] === $sldv['son_id']){
+                        $val['son_phone'] = $sldv['son'];
+                        $val['son_id'] = $sldv['son_id'];
+                        $val['son_flag'] = $sldv['son_flag'];
+                    }
+                }
+            }
         }
 
 
