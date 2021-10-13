@@ -1839,16 +1839,16 @@ and o.status = 1 and o.pay_price > 1";
     public function worksListOfSub()
     {
         $now_date = date('Y-m-d H:i:s');
-//        $job_key = 1844;
-//
-//        $check_job = self::getKernelLock($job_key, 1);
-//        if ($check_job === false) {
-//            return true;
-//        }
-//
-//        $run = true;
-//        while ($run) {
-//            self::getKernelLock($job_key, 2);
+        $job_key = 1844;
+
+        $check_job = self::getKernelLock($job_key, 1);
+        if ($check_job === false) {
+            return true;
+        }
+
+        $run = true;
+        while ($run) {
+            self::getKernelLock($job_key, 2);
             $list = DB::table('works_list_of_sub')
                 ->whereIn('works_type', [2, 6, 3, 7])
                 ->where('status', '=', 1)
@@ -1856,9 +1856,8 @@ and o.status = 1 and o.pay_price > 1";
                 ->get();
 
             if ($list->isEmpty()) {
-//                self::getKernelLock($job_key, 3);
-//                $run = false;
-                return true;
+                self::getKernelLock($job_key, 3);
+                $run = false;
             }
 
             foreach ($list as $v) {
@@ -1952,7 +1951,7 @@ and o.status = 1 and o.pay_price > 1";
                 }
 
                 //如果是直播,需要记录liveCountDown和live预约人数
-                if ($v->works_type == 3) {
+                if ($v->works_type === 3) {
                     $check_cd = LiveCountDown::query()
                         ->where('user_id', '=', $temp_user_id)
                         ->where('live_id', '=', $v->works_id)
@@ -1971,7 +1970,7 @@ and o.status = 1 and o.pay_price > 1";
 
                     //添加关系保护
                     $check_bind = VipUserBind::getBindParent($v->phone);
-                    if ($check_bind == 0) {
+                    if ($check_bind === 0) {
                         //没有绑定记录,则绑定
                         $bind_data = [];
                         if (!empty($v->twitter_phone)) {
@@ -1981,17 +1980,19 @@ and o.status = 1 and o.pay_price > 1";
                                 'life' => 2,
                                 'begin_at' => date('Y-m-d H:i:s'),
                                 'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                                'channel' => 1
+                                'channel' => 1,
+                                'status' => 1
                             ];
                         } else {
-                            if ($v->flag_name = '抖音') {
+                            if ($v->flag_name === '抖音') {
                                 $bind_data = [
                                     'parent' => '18512378959',
                                     'son' => $v->phone,
                                     'life' => 2,
                                     'begin_at' => date('Y-m-d H:i:s'),
                                     'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                                    'channel' => 3
+                                    'channel' => 3,
+                                    'status' => 1
                                 ];
                             }
                         }
@@ -2023,11 +2024,10 @@ and o.status = 1 and o.pay_price > 1";
                     Live::where('id', '=', $v->works_id)->increment('order_num', count($add_sub_data));
                 }
                 DB::commit();
-
             }
-//        }
+        }
 
-//        return true;
+        return true;
     }
 
     public function subListSms()

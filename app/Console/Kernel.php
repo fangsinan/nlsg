@@ -14,6 +14,7 @@ use App\Models\MallOrderGroupBuy;
 use App\Models\Order;
 use App\Models\PayRecordDetailStay;
 use App\Models\Task;
+use App\Models\VipUserBind;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use App\Servers\AliUploadServers;
@@ -171,6 +172,7 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
+            VipUserBind::clear();//关系保护过期修改
 //            Subscribe::expire();
         })->daily();  //每天执行一次
 
