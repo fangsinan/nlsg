@@ -155,7 +155,9 @@ class SubscribeController extends ControllerBackend
         $date = $request->get('date') ?? '';
         $created_at = $request->get('created_at') ?? '';
         $now_date = date('Y-m-d H:i:s');
-        $twitter_phone = $request->input('twitter_phone', '');
+        $twitter_phone = $request->input('twitter_phone') ??'';
+        $page = $request->input('page') ?? 0;
+        $type = $request->input('type' )??'';
 
 
         //1、查询是否有搜索手机号或 id
@@ -207,10 +209,21 @@ class SubscribeController extends ControllerBackend
         $subObj = new Subscribe();
         $orderObj = new Order();
 
-        $query = DB::table($subObj->getTable().' as sub')
-            ->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id')
-
-            ->whereIn('sub.relation_id', $live_ids)
+//        $query = DB::table($subObj->getTable().' as sub')
+//            ->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id')
+//
+//            ->whereIn('sub.relation_id', $live_ids)
+//            ->where('sub.type', 3)
+//            ->where('sub.status', 1);
+        $query = DB::table($subObj->getTable().' as sub');
+        if($type == "count"){ // 统计总数时，如果不走order条件 可不关联表
+            if(!empty($ordernum) || !empty($twitter_phoneUser) || !empty($date)){
+                $query->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id');
+            }
+        }else{
+            $query->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id');
+        }
+        $query->whereIn('sub.relation_id', $live_ids)
             ->where('sub.type', 3)
             ->where('sub.status', 1);
         // 加在此处  如有搜索条件 可以走到联合索引
@@ -223,8 +236,6 @@ class SubscribeController extends ControllerBackend
             $query->where('sub.order_id', '>',0);
         }
 
-//        $query->where('order.status', 1);
-//        $query->where('order.type', 10);
         if (!empty($ordernum)) {
             $query->where('order.ordernum', $ordernum);
         }
@@ -253,6 +264,10 @@ class SubscribeController extends ControllerBackend
                 $created_at[1] = $now_date;
             }
             $query->where('sub.created_at', '<', $created_at[1]);
+        }
+        if($type == "count"){
+            $lists = $query->count("sub.id");
+            return success($lists);
         }
 
 
@@ -340,7 +355,8 @@ class SubscribeController extends ControllerBackend
                 $lists['data'] = $lists['data']->toArray();
             }
         } else {
-            $lists = $query->paginate(10)->toArray();
+            $lists['data'] = $query->limit(10)->offset(($page - 1) * 10 )->get()->toArray();
+//            $lists = $query->paginate(10)->toArray();
         }
 
         $ordernum = [];
