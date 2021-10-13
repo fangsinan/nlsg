@@ -1362,11 +1362,11 @@ class LiveController extends Controller
 
             $easySms = app('easysms');
             try {
-                if(strlen($user->phone)==11) {
+                /*if(strlen($user->phone)==11) {
                     $result = $easySms->send($user->phone, [
                         'template' => 'SMS_169114800',
                     ], ['aliyun']);
-                }
+                }*/
                 return success('发送成功');
             } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
                 $message = $exception->getResults();
