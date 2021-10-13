@@ -157,6 +157,7 @@ class SubscribeController extends ControllerBackend
         $now_date = date('Y-m-d H:i:s');
         $twitter_phone = $request->input('twitter_phone') ??'';
         $page = $request->input('page') ?? 0;
+        $size = $request->input('size') ?? 10;
         $type = $request->input('type' )??'';
 
 
@@ -355,7 +356,7 @@ class SubscribeController extends ControllerBackend
                 $lists['data'] = $lists['data']->toArray();
             }
         } else {
-            $lists['data'] = $query->limit(10)->offset(($page - 1) * 10 )->get()->toArray();
+            $lists['data'] = $query->limit($size)->offset(($page - 1) * $size )->get()->toArray();
 //            $lists = $query->paginate(10)->toArray();
         }
 
