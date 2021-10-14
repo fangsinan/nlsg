@@ -156,7 +156,7 @@ class SubscribeController extends ControllerBackend
         $created_at = $request->get('created_at') ?? '';
         $now_date = date('Y-m-d H:i:s');
         $twitter_phone = $request->input('twitter_phone') ??'';
-        $page = $request->input('page') ?? 0;
+        $page = $request->input('page') ?? 1;
         $size = $request->input('size') ?? 10;
         $type = $request->input('type' )??'';
 
@@ -452,17 +452,17 @@ class SubscribeController extends ControllerBackend
 
             // 将推客信息  合并到数据
             if (!empty($val['twitter']['twitter_id'])) {
-                $val['twitter'] = $get_twitter[$val['twitter']['twitter_id']];
+                $val['twitter'] = $get_twitter[$val['twitter']['twitter_id']]??[];
             }
 
             // 将订单信息  合并到数据
             if (!empty($val['order']) && !empty($new_detailes[$val['order']['ordernum']])) {
-                $val['order']['pay_record_detail'] = $new_detailes[$val['order']['ordernum']];
+                $val['order']['pay_record_detail'] = $new_detailes[$val['order']['ordernum']] ??[];
             }
 
             // 将用户信息  合并到数据
             if (!empty($new_users[$val['user_id']])) {
-                $val['user'] = $new_users[$val['user_id']];
+                $val['user'] = $new_users[$val['user_id']]??[];
             }
 
         }
