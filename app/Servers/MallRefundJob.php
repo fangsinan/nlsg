@@ -480,8 +480,8 @@ class MallRefundJob
             }
 
             $update_data = [];
-            if ($temp_res['code'] === true) {
-                $temp_this_time = $temp_res['this_time'] ?? 0;
+            if (($temp_res['code'] ?? false) === true) {
+                $temp_this_time = (int)($temp_res['this_time'] ?? 0);
                 if ($temp_this_time === 2){
                     $update_data['is_refund'] = 3;
                 }else{
