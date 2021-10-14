@@ -477,7 +477,7 @@ class MallRefundJob
                     $temp_res = $this->aliPayRefundMethod($v);
                     break;
             }
-var_dump($temp_res);
+
             $update_data = [];
             if (!empty($temp_res) && $temp_res['code'] === true) {
                 $temp_this_time = (int)($temp_res['this_time'] ?? 0);
