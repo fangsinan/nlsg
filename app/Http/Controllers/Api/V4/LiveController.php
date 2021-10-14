@@ -28,11 +28,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
+use App\Servers\PhoneRegionServers;
 use Predis\Client;
 
 class LiveController extends Controller
 {
 
+    //http://127.0.0.1:8000/api/v4/live/getphone
+    public function getphone(Request $request)
+    {
+        PhoneRegionServers::getPhoneRegion();
+    }
     //直播在线人数入库
     //https://app.v4.api.nlsgapp.com/api/v4/live/onlineuser?name=111online_user_list_202109261106
     public function OnlineUser(Request $request)
@@ -1425,7 +1431,7 @@ class LiveController extends Controller
 
         $activity_tag   = $input['activity_tag'] ??'';
 
-        if( empty($this->user['id']) || in_array($this->user['id'], [878644, 882057, 882861]) ){
+        if( in_array($this->user['id'], [878644, 882057, 882861]) ){
             return error(0, '用户异常');
         }
 
@@ -1450,10 +1456,9 @@ class LiveController extends Controller
                 ->where('live_id', $input['from_live_info_id'])
                 ->where('user_id', $this->user['id'])
                 ->first();
-            if(!empty($liveCountDown['new_vip_uid'])){
-                $tweeter_code = $liveCountDown['new_vip_uid'];
-            }
-            $live_pid = LiveInfo::find($input['from_live_info_id']);  //推荐 remark
+
+            $tweeter_code = $liveCountDown['new_vip_uid'];
+            $live_pid = LiveInfo::Find($input['from_live_info_id']);  //推荐 remark
             if(!empty($live_pid['live_pid'])){
                 $from_live_info_id = $live_pid['live_pid'];
             }
