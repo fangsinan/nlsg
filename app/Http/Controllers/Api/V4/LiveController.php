@@ -24,11 +24,11 @@ use App\Models\PayRecord;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
-use App\Servers\PhoneRegionServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
+use App\Servers\PhoneRegionServers;
 use Predis\Client;
 
 class LiveController extends Controller
@@ -39,7 +39,6 @@ class LiveController extends Controller
     {
         PhoneRegionServers::getPhoneRegion();
     }
-
     //直播在线人数入库
     //https://app.v4.api.nlsgapp.com/api/v4/live/onlineuser?name=111online_user_list_202109261106
     public function OnlineUser(Request $request)
