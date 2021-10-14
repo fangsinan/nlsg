@@ -154,7 +154,7 @@ WHERE
 
     }
 
-    public function list($params, $user_id)
+    public function list($params, $user_id=0)
     {
         $live_id = $params['live_id'] ?? 0;
         $live_info_id = $params['live_info_id'] ?? 0;
