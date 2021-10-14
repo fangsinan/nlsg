@@ -33,11 +33,13 @@ use Predis\Client;
 
 class LiveController extends Controller
 {
+
     //http://127.0.0.1:8000/api/v4/live/getphone
     public function getphone(Request $request)
     {
         PhoneRegionServers::getPhoneRegion();
     }
+
     //直播在线人数入库
     //https://app.v4.api.nlsgapp.com/api/v4/live/onlineuser?name=111online_user_list_202109261106
     public function OnlineUser(Request $request)

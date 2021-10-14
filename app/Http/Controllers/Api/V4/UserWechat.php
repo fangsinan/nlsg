@@ -198,6 +198,7 @@ class UserWechat extends Controller {
                 //该用户已导完 跳出本次循环
                 continue;
             }
+            $getWechatIds = array_unique($getWechatIds);
             $getList_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/batch/get_by_user?access_token=$access_token";
 
             $post_data = [
