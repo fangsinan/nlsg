@@ -462,6 +462,7 @@ class MallRefundJob
             ->update(['is_refund' => 1]);
 
         foreach ($list as $v) {
+            $temp_res = [];
             switch ($v->client) {
                 case 1:
                     //微信公众号
@@ -475,12 +476,10 @@ class MallRefundJob
                     //支付宝app
                     $temp_res = $this->aliPayRefundMethod($v);
                     break;
-                default:
-                    break;
             }
 
             $update_data = [];
-            if (($temp_res['code'] ?? false) === true) {
+            if (!empty($temp_res) && $temp_res['code']) {
                 $temp_this_time = (int)($temp_res['this_time'] ?? 0);
                 if ($temp_this_time === 2){
                     $update_data['is_refund'] = 3;
