@@ -252,6 +252,11 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //虚拟订单批量退款
         Route::get('orl/list', 'OrderRefundLogController@list');
         Route::post('orl/add', 'OrderRefundLogController@add');
+
+        //im文案文件夹
+        Route::get('im_doc_folder/list', 'ImDocFolderController@list');
+        Route::post('im_doc_folder/add', 'ImDocFolderController@add');
+        Route::put('im_doc_folder/change_status', 'ImDocFolderController@changeStatus');
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');
