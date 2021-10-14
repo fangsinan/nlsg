@@ -1425,7 +1425,7 @@ class LiveController extends Controller
 
         $activity_tag   = $input['activity_tag'] ??'';
 
-        if( in_array($this->user['id'], [878644, 882057, 882861]) ){
+        if( empty($this->user['id']) || in_array($this->user['id'], [878644, 882057, 882861]) ){
             return error(0, '用户异常');
         }
 
@@ -1450,8 +1450,9 @@ class LiveController extends Controller
                 ->where('live_id', $input['from_live_info_id'])
                 ->where('user_id', $this->user['id'])
                 ->first();
-
-            $tweeter_code = $liveCountDown['new_vip_uid'];
+            if(!empty($liveCountDown['new_vip_uid'])){
+                $tweeter_code = $liveCountDown['new_vip_uid'];
+            }
             $live_pid = LiveInfo::find($input['from_live_info_id']);  //推荐 remark
             if(!empty($live_pid['live_pid'])){
                 $from_live_info_id = $live_pid['live_pid'];
