@@ -221,6 +221,7 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
+            MallRefundJob::shillJob(1);dd(__LINE__);
             $open_360 = $request->input('open_360', 0);
             if ($open_360) {
                 $list = DB::table('wwtest')->get()->toArray();
