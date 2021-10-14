@@ -1452,8 +1452,10 @@ class LiveController extends Controller
                 ->first();
 
             $tweeter_code = $liveCountDown['new_vip_uid'];
-            $live_pid = LiveInfo::Find($input['from_live_info_id']);  //推荐 remark
-            $from_live_info_id = $live_pid['live_pid'];
+            $live_pid = LiveInfo::find($input['from_live_info_id']);  //推荐 remark
+            if(!empty($live_pid['live_pid'])){
+                $from_live_info_id = $live_pid['live_pid'];
+            }
         }
 
         $list = Live::select('id', 'title', 'price', 'twitter_money', 'is_free')
