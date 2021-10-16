@@ -24,6 +24,7 @@ use App\Servers\ErpServers;
 use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
 use App\Servers\OrderRefundServers;
+use App\Servers\PhoneRegionServers;
 use App\Servers\removeDataServers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -91,6 +92,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $m = new LiveConsole();
             $m->LiveAutoConfig();//直播自动开始结束和人数
+            PhoneRegionServers::getPhoneRegion();//识别手机号归属地
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
