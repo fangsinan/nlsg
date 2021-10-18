@@ -45,7 +45,8 @@ class ImDocServers
     public function add($params, $user_id)
     {
         if (!empty($params['id'] ?? 0)) {
-            $docModel = ImDoc::where('id', '=', $params['id'])
+            $docModel = ImDoc::query()
+                ->where('id', '=', $params['id'])
                 ->where('status', '=', 1)
                 ->select(['id'])->first();
             if (empty($docModel)) {
@@ -55,12 +56,12 @@ class ImDocServers
             $docModel = new ImDoc();
         }
 
-        $type = $params['type'] ?? 0;
-        if (!in_array($type, [1, 2, 3])) {
+        $type = (int)($params['type'] ?? 0);
+        if (!in_array($type, [1, 2, 3], true)) {
             return ['code' => false, 'msg' => '内容类型错误'];
         }
 
-        $type_info = $params['type_info'] ?? 0;
+        $type_info = (int)($params['type_info'] ?? 0);
         $obj_id = $params['obj_id'] ?? 0;
         $content = $params['content'] ?? '';
         $cover_img = $params['cover_img'] ?? '';
@@ -68,7 +69,6 @@ class ImDocServers
         $status = $params['status'] ?? 1;
         $file_url = $params['file_url'] ?? '';
         $file_size = $params['file_size'] ?? 0;
-//        $for_app = $params['for_app'] ?? 0;
         $second = $params['second'] ?? 0;
         $format = $params['format'] ?? '';
         $img_size = $params['img_size'] ?? 0;
@@ -79,6 +79,11 @@ class ImDocServers
         $img_md5 = $params['img_md5'] ?? '';
         $media_id = $params['media_id'] ?? '';
         $url = $params['url'] ?? '';
+        if (($params['add_flag'] ?? '') === 'new'){
+            $version = 2;
+        }else{
+            $version = 1;
+        }
 
         if (!in_array($status, [1, 2])) {
             return ['code' => false, 'msg' => '状态错误'];
@@ -89,22 +94,18 @@ class ImDocServers
         }
 
         //1商品 2附件 3文本
-        switch (intval($params['type'])) {
+        switch ($type) {
             case 1:
                 // 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链
-                if ($type_info == 17) {
-                    //判断网址
-                } else {
-                    if (empty($obj_id)) {
-                        return ['code' => false, 'msg' => '目标id错误'];
-                    }
+                if (empty($obj_id)) {
+                    return ['code' => false, 'msg' => '目标id错误'];
+                }
 
-                    if (empty($cover_img)) {
-                        return ['code' => false, 'msg' => 'cover_img错误', 'ps' => '封面图'];
-                    }
-                    if (empty($cover_img)) {
-                        return ['code' => false, 'msg' => 'content错误', 'ps' => '标题'];
-                    }
+                if (empty($cover_img)) {
+                    return ['code' => false, 'msg' => 'cover_img错误', 'ps' => '封面图'];
+                }
+                if (empty($content)) {
+                    return ['code' => false, 'msg' => 'content错误', 'ps' => '标题'];
                 }
                 break;
             case 2:
@@ -115,45 +116,37 @@ class ImDocServers
 
                 $media_id_list = explode(',', $media_id);
                 $media_id_list = array_unique($media_id_list);
-                if ($params['type_info'] == 23) {
+                if ($params['type_info'] === 23) {
                     $media_id = $media_id_list[0];
-                } else {
-                    if (count($media_id_list) > 1) {
-                        return ['code' => false, 'msg' => '媒体id错误'];
-                    }
+                } else if (count($media_id_list) > 1) {
+                    return ['code' => false, 'msg' => '媒体id错误'];
                 }
-
-                $media_info = ImMedia::where('media_id', '=', $media_id)->first();
-                //$media_info_type = 20 + $media_info->type;
-
-//                if (intval($type_info) != intval($media_info_type)) {
-//                    return ['code' => false, 'msg' => '媒体类型不匹配'];
-//                }
+                $media_info = ImMedia::query()->where('media_id', '=', $media_id)->first();
 
                 if (empty($media_info)) {
                     return ['code' => false, 'msg' => '媒体信息为空,请重试.'];
-                } else {
+                }
 //                    $content = $media_info->file_name ?: $media_info->id;
 
-                    $file_url = $media_info->url;
-                    $format = $media_info->format ?: 'mp4';
-                    $file_size = $media_info->size ?: 1119442;
-                    $second = $media_info->second ?: 60;
-                    $second = intval(round($second));
+                $file_url = $media_info->url;
+                $format = $media_info->format ?: 'mp4';
+                $file_size = $media_info->size ?: 1119442;
+                $second = $media_info->second ?: 60;
+                $second = (int)round($second);
 
-                    if ($params['type_info'] != 23) {
-                        if (empty($content)) {
-                            $content = $media_info->file_name ?: $media_info->id;
-                        }
-                        $file_md5 = $media_id;
-                        $cover_img = $media_info->thumb_url ?: 'https://image.nlsgapp.com/nlsg/works/20210729141614776327.png';
-                        $img_size = $media_info->thumb_size ?: 61440;
-                        $img_width = $media_info->thumb_width ?: 953;
-                        $img_height = $media_info->thumb_height ?: 535;
-                        $img_format = $media_info->thumb_format ?: 'png';
-                        $img_md5 = $media_id . '_' . 'c';
+                if ($params['type_info'] !== 23) {
+                    if (empty($content)) {
+                        $content = $media_info->file_name ?: $media_info->id;
                     }
+                    $file_md5 = $media_id;
+                    $cover_img = $media_info->thumb_url ?: 'https://image.nlsgapp.com/nlsg/works/20210729141614776327.png';
+                    $img_size = $media_info->thumb_size ?: 61440;
+                    $img_width = $media_info->thumb_width ?: 953;
+                    $img_height = $media_info->thumb_height ?: 535;
+                    $img_format = $media_info->thumb_format ?: 'png';
+                    $img_md5 = $media_id . '_' . 'c';
                 }
+
 
                 if (empty($content)) {
                     return ['code' => false, 'msg' => '内容不能为空'];
@@ -167,45 +160,37 @@ class ImDocServers
                 if (empty($file_size)) {
                     return ['code' => false, 'msg' => 'file_size不能为空'];
                 }
-                if (in_array($params['type_info'], [21, 22])) {
+                if (in_array($params['type_info'], [21, 22], true)) {
                     if (empty($second)) {
                         return ['code' => false, 'msg' => 'second不能为空'];
                     }
                 }
-                if ($params['type_info'] == 22 || $params['type_info'] == 21) {
+                if ($params['type_info'] === 22 || $params['type_info'] === 21) {
                     if (empty($file_md5)) {
                         return ['code' => false, 'msg' => '文件md5不能为空'];
                     }
                 }
-                if ($params['type_info'] == 22) {
+                if ($params['type_info'] === 22) {
                     //如果是视频,必须有封面
                     if (empty($cover_img) || empty($img_size) || empty($img_width)
                         || empty($img_height) || empty($img_format) || empty($img_md5)) {
                         return ['code' => false, 'msg' => '必须有封面和尺寸长宽后缀名参数'];
                     }
                 }
-                if ($params['type_info'] == 23) {
+                if ($params['type_info'] === 23) {
                     $file_url = '';
                     foreach ($media_id_list as $milv) {
-                        $temp_media_info = ImMedia::where('media_id', '=', $milv)->first();
-
+                        $temp_media_info = ImMedia::query()->where('media_id', '=', $milv)->first();
+                        if (empty($temp_media_info)) {
+                            return ['code' => false, 'msg' => '图片信息错误'];
+                        }
                         if (empty($cover_img)) {
                             $cover_img = $temp_media_info->url;
                         }
-
                         $temp_file_url = $temp_media_info->url . ',' . $temp_media_info->size . ',' .
                             $temp_media_info->width . ',' . $temp_media_info->height . ',' . $milv . ';';
                         $file_url .= $temp_file_url;
                     }
-
-                    //url,size,width,height,md5
-//                    $file_url = explode(';', $file_url);
-//                    foreach ($file_url as $fuv) {
-//                        $fuv = explode(',', $fuv);
-//                        if (count($fuv) != 5) {
-//                            return ['code' => false, 'msg' => '图片参数格式错误'];
-//                        }
-//                    }
                 }
                 break;
             case 3:
@@ -213,8 +198,7 @@ class ImDocServers
                 if (empty($content)) {
                     return ['code' => false, 'msg' => '内容不能为空'];
                 }
-                $beat_word = ImBeatWord::pluck('beat_word')->toArray();
-
+                $beat_word = ImBeatWord::query()->pluck('beat_word')->toArray();
                 if (!empty($beat_word)) {
                     foreach ($beat_word as $bwv) {
                         $temp_pos = strpos($content, $bwv);
@@ -245,40 +229,22 @@ class ImDocServers
         $docModel->file_md5 = $file_md5;
         $docModel->img_md5 = $img_md5;
         $docModel->media_id = $media_id;
-
-//        DB::beginTransaction();
+        $docModel->version = $version;
 
         $res = $docModel->save();
         if ($res === false) {
-//            DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
 
-//        if ($for_app == 1) {
-//            $jobModel = new ImDocSendJob();
-//            $jobModel->doc_id = $docModel->id;
-//            $jobModel->status = 2;
-//            $jobModel->send_type = 3;
-//            $jobModel->is_done = 4;
-//            $jobModel->month = date('Y-m');
-//            $jobModel->day = date('Y-m-d');
-//            $job_res = $jobModel->save();
-//            if ($job_res === false) {
-//                DB::rollBack();
-//                return ['code' => false, 'msg' => '失败'];
-//            }
-//        }
-
-//        DB::commit();
+        $doc_id = $docModel->id;
 
         if (!empty($media_id_list)) {
-            $doc_id = $docModel->id;
-            ImMedia::whereIn('media_id', $media_id_list)->update([
+            ImMedia::query()->whereIn('media_id', $media_id_list)->update([
                 'doc_id' => $doc_id
             ]);
         }
 
-        return ['code' => true, 'msg' => '成功'];
+        return ['code' => true, 'msg' => '成功', 'doc_id' => $doc_id];
 
     }
 
@@ -298,7 +264,8 @@ class ImDocServers
             $query->where('content', 'like', '%' . $params['content'] . '%');
         }
 
-        $query->where('status', '=', 1)
+        $query->where('version', '=', 1)
+            ->where('status', '=', 1)
             ->orderBy('id', 'desc')
             ->select([
                 'id', 'type', 'type_info', 'obj_id', 'cover_img', 'content', 'file_url', 'subtitle', 'media_id'
@@ -627,7 +594,7 @@ class ImDocServers
                     $jobModel->status = 3;
                     break;
                 case 'send':
-                    if ($jobModel->is_done > 1){
+                    if ($jobModel->is_done > 1) {
                         return ['code' => false, 'msg' => '任务已定时发送'];
                     }
                     $now = time();
@@ -664,7 +631,7 @@ class ImDocServers
             }
 
             DB::commit();
-            if ($flag == 'send'){
+            if ($flag == 'send') {
                 return $this->sendGroupDocMsgJob($jobModel->id);
             }
             return ['code' => true, 'msg' => '成功'];
@@ -688,7 +655,7 @@ class ImDocServers
                     $cate_arr = WorksCategory::select('id')->where(['pid' => $cate_data['id'], 'status' => 1
                     ])->get()->toArray();
                     $cate_id_arr = array_column($cate_arr, 'id');
-                }else{
+                } else {
                     $cate_id_arr = [$cate_data['id']];
                 }
                 $where = [
@@ -736,7 +703,7 @@ class ImDocServers
 
                 break;
             case 3:
-                $query = MallGoods::query()->where('status','=',2);
+                $query = MallGoods::query()->where('status', '=', 2);
                 if ($category_id != 0) {
                     $query->where('category_id', $category_id);
                 }
@@ -757,8 +724,8 @@ class ImDocServers
                     DB::raw('1 as doc_type'), DB::raw('15 as doc_type_info'),
                     'status', 'begin_at', 'cover_img'])
                     ->where('is_del', 0)
-                    ->where('status','=',4)
-                    ->where('end_at','>=',date('Y-m-d H:i:s'))
+                    ->where('status', '=', 4)
+                    ->where('end_at', '>=', date('Y-m-d H:i:s'))
                     ->orderBy('created_at', 'desc')
                     ->paginate($size);
                 foreach ($lists as &$val) {
@@ -849,14 +816,14 @@ class ImDocServers
 //                ->toArray();
 
             $works_category = DB::table('nlsg_works_category as wc')
-                ->join('nlsg_works_category_relation as wcr','wc.id','=','wcr.category_id')
-                ->join('nlsg_works as w','w.id','=','wcr.work_id')
-                ->where('wc.status','=',1)
-                ->where('w.type','=',2)
-                ->where('w.status','=',4)
-                ->where('w.is_audio_book','=',0)
+                ->join('nlsg_works_category_relation as wcr', 'wc.id', '=', 'wcr.category_id')
+                ->join('nlsg_works as w', 'w.id', '=', 'wcr.work_id')
+                ->where('wc.status', '=', 1)
+                ->where('w.type', '=', 2)
+                ->where('w.status', '=', 4)
+                ->where('w.is_audio_book', '=', 0)
                 ->groupBy('wc.id')
-                ->select(['wc.id','wc.name','wc.pid','wc.level','wc.sort'])
+                ->select(['wc.id', 'wc.name', 'wc.pid', 'wc.level', 'wc.sort'])
                 ->get()
                 ->toArray();
 
@@ -1092,7 +1059,7 @@ class ImDocServers
 
         if (!empty($id)) {
             $query->where('id', '=', $id);
-        }else{
+        } else {
             $query->where('is_done', '=', 1);
         }
 
