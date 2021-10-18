@@ -3,6 +3,7 @@
 namespace App\Servers;
 
 use App\Models\ImDocFolder;
+use App\Models\ImDocFolderBind;
 use Illuminate\Support\Facades\DB;
 
 class ImDocFolderServers
@@ -89,8 +90,65 @@ class ImDocFolderServers
 
     }
 
-    public function changeStatus($params, $user_id)
+    public function changeStatus($params, $user_id): array
     {
+        $id = $params['id'] ?? 0;
+        $flag = $params['flag'] ?? '';
+        if (empty($id) || empty($flag)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        $check = ImDocFolder::query()
+            ->where('id', '=', $id)
+            ->first();
+
+        if (empty($check)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        switch ($flag) {
+            case 'del':
+                //删除
+                if ($check->status === 1) {
+                    return ['code' => true, 'msg' => '成功'];
+                }
+                $check_bind = ImDocFolderBind::query()
+                    ->where('folder_id', '=', $id)
+                    ->where('status', '=', 1)
+                    ->first();
+                if (!empty($check_bind)) {
+                    return ['code' => false, 'msg' => '清空文件夹后重试'];
+                }
+                $check->status = 2;
+                break;
+            case 'remove':
+                //移动
+                $pid = (int)($params['pid'] ?? -1);
+                if ($pid < 0) {
+                    return ['code' => false, 'msg' => '目标参数错误'];
+                }
+                if ($pid > 0) {
+                    $check_pid = ImDocFolder::query()->where('id', '=', $pid)
+                        ->where('status', '=', 1)
+                        ->first();
+                    if (!empty($check_pid)) {
+                        return ['code' => false, 'msg' => '目标错误'];
+                    }
+                }
+                $check->pid = $pid;
+                break;
+            case 'copy':
+                //todo 复制
+                break;
+            default:
+                return ['code' => false, 'msg' => '动作错误'];
+        }
+
+        $res = $check->save();
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+        return ['code' => false, 'msg' => '失败'];
 
     }
 }
