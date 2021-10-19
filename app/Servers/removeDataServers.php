@@ -23,6 +23,7 @@ use App\Models\UserFollow;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Models\VipUserBind;
+use App\Models\VipWorksList;
 use App\Models\WorksListOfSub;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -2192,4 +2193,108 @@ ORDER BY
             }
         }
     }
+
+    public function checkVipSubTime(){
+
+//        $sql = "SELECT vu.id as vuid,sub.id as subid,vu.user_id,vu.`level`,vu.status as vu_status,sub.status as sub_status,
+//       vu.start_time,vu.expire_time,vu.is_open_360,vu.time_begin_360,vu.time_end_360,sub.type sub_type,sub.relation_id,
+//       sub.start_time sub_start_time,sub.end_time as sub_end_time,CONCAT(sub.type,'_',sub.relation_id) as wtid
+//from nlsg_vip_user as vu
+//join nlsg_subscribe as sub on vu.user_id = sub.user_id
+//
+//where sub.order_id = 0 and sub.relation_id in (404,419,567,568,569,570,574,577,586,588,440,441,450,452,630,508,510,512,513,644,638)
+//and  CONCAT(sub.type,'_',sub.relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2_570', '2_574', '2_577', '2_586', '2_588', '6_440', '6_441', '6_450', '6_452', '2_630', '6_508', '6_510', '6_512', '6_513', '2_644', '2_638')
+//and vu.expire_time <> sub.end_time limit 1";
+//
+//        $list = DB::select($sql);
+//
+//
+//        foreach ($list as $v){
+//            $tempSub = Subscribe::query()->where('id','=',$v->subid)->first();
+//            if ($v->vu_status === 0 && $v->sub_status === 1){
+//                $tempSub->status = 0;
+//            }
+//
+//            if ($v->vu_status === 1 && $v->sub_status ===0){
+//                $tempSub->status = 1;
+//            }
+//
+//            $temp_end_time = '';
+//            if ($v->vu_status === 1){
+//                if ($v->level === 1){
+//                    $temp_end_time = $v->expire_time;
+//                }else{
+//                    if ($v->is_open_360 === 1){
+//                        $temp_end_time = $v->time_end_360;
+//                    }
+//                }
+//            }
+//
+//            if (empty($temp_end_time)){
+//                $tempSub->status = 0;
+//            }else{
+//                $tempSub->end_time = $temp_end_time;
+//            }
+////            $tempSub->save();
+//        }
+//        dd($list);
+
+
+        $max_id = 12000;
+//        $works_list = VipWorksList::query()->select(['id','type','works_id'])->get()->toArray();
+//        $works_id_list = VipWorksList::query()->pluck('works_id')->toArray();
+
+
+        $this_time_id = 1;
+
+        while ($this_time_id <= $max_id){
+            $vip = VipUser::query()
+                ->where('id','=',$this_time_id)
+                ->select(['id','user_id','username','level','start_time','expire_time','status',
+                    'is_default','order_id','is_open_360','time_begin_360','time_end_360'])
+                ->first();
+            if (!empty($vip)){
+                $vip = $vip->toArray();
+                //sub表的type 2作品 6讲座
+                //vip works表的type 课程类型 1专栏表  2作品表
+
+                //如果是有效的,修改sub表
+                if ($vip['status'] === 1){
+                    $temp_end_time = '';
+                    if ($vip['level'] === 1){
+                        $temp_end_time = $vip['expire_time'];
+                    }else{
+                        $temp_end_time = $vip['time_end_360'];
+                    }
+                    if (!empty($temp_end_time)){
+
+                        $temp_sql = "UPDATE nlsg_subscribe set end_time = '".$temp_end_time.
+                            "' where user_id = ".$vip['user_id']." and order_id = 0 and status = 1 and
+CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2_570', '2_574', '2_577', '2_586', '2_588', '6_440', '6_441', '6_450', '6_452', '2_630', '6_508', '6_510', '6_512', '6_513', '2_644', '2_638')";
+                        DB::select($temp_sql);
+                    }
+                }else{
+                    //不是有效的,查看是否还有默认的
+                    $status_check = VipUser::query()
+                        ->where('user_id','=',$vip['user_id'])
+                        ->where('status','=',1)
+                        ->where('is_default','=',1)
+                        ->first();
+                    //没有,按照这个修改
+                    if (empty($status_check)){
+                        $temp_works_sql = "UPDATE nlsg_subscribe set status = 0
+where user_id = ".$vip['user_id']." and order_id = 0 and status = 1 and
+CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2_570', '2_574', '2_577', '2_586', '2_588', '6_440', '6_441', '6_450', '6_452', '2_630', '6_508', '6_510', '6_512', '6_513', '2_644', '2_638')";
+                        DB::select($temp_works_sql);
+                    }
+                }
+
+            }
+            $this_time_id++;
+            echo $this_time_id,PHP_EOL;
+        }
+
+
+    }
+
 }
