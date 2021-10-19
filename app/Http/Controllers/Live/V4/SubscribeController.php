@@ -181,6 +181,7 @@ class SubscribeController extends ControllerBackend
         $page = $request->input('page') ?? 1;
         $size = $request->input('size') ?? 10;
         $type = $request->input('type' )??'';
+        $live_id = $request->get('live_id') ?? 0;
 
 
         //1、查询是否有搜索手机号或 id
@@ -194,7 +195,8 @@ class SubscribeController extends ControllerBackend
         }
 
 
-        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('status',4)->where('id', '>', 52);
+//        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('status',4)->where('id', '>', 52);
+        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('id',$live_id)->where('status',4);
         if ($this->user['live_role'] == 21) {
             $live_user_id = $this->user['user_id'];
             //Live::where('user_id', $live_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
@@ -223,8 +225,10 @@ class SubscribeController extends ControllerBackend
 
         //处理直播数据
         $new_live_data = [];
-        foreach ($live_data as $live_key=>$live_val){
-            $new_live_data[$live_val['id']] = $live_val;
+        if(!empty($live_data)){
+            foreach ($live_data as $live_key=>$live_val){
+                $new_live_data[$live_val['id']] = $live_val;
+            }
         }
 
         //dd($new_live_data);
