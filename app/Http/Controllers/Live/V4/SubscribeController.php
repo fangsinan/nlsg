@@ -16,6 +16,28 @@ use Illuminate\Support\Facades\DB;
 class SubscribeController extends ControllerBackend
 {
 
+
+    public function liveSelect(Request $request){
+        
+        $query = Live::select('id', 'user_id', 'title');
+        if ($this->user['live_role'] == 21) {
+            $query->where('user_id', '=', $this->user['user_id']);
+        }elseif ($this->user['live_role'] == 23) {
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+            $query->whereIn('user_id',$son_user_id);
+        }
+        if ($this->user['live_role'] != 0) {
+            $query->where('id', '>',51);
+        }
+        $lists = $query->where('status', 4)
+            ->where('is_del', 0)
+            ->orderBy('created_at', 'desc')
+            ->get()->toArray();
+        //dd($lists);
+        return success(['data'=>$lists]);
+    }
+
     public function indexExcel(Request $request)
     {
         set_time_limit(600);
