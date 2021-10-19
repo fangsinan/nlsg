@@ -48,7 +48,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
     Route::get('live_order/list_excel', 'OrderController@listExcel');
     Route::get('live_order/inviter_list_excel', 'OrderController@inviterLiveListExcel');
     Route::get('live_comment/listExcel', 'CommentController@listExcel');
-
+    
 //    Route::get('live_info/live_sub_order_excel', 'InfoController@liveSubOrderExcel');
 //    Route::get('live_info/live_order_excel', 'InfoController@liveOrderExcel');
 //    Route::get('live_info/live_order_kun_excel', 'InfoController@liveOrderKunExcel');
