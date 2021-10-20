@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\BackendLiveDataRole;
 use App\Models\BackendLiveRole;
 use App\Models\Live;
 use App\Models\LiveConsole;
@@ -180,12 +181,24 @@ class IndexController extends ControllerBackend
                 ]);
             });
 
-        if ($this->user['live_role'] == 21) {
-            $query->where('user_id', '=', $this->user['user_id']);
-        }elseif ($this->user['live_role'] == 23) {
-            $blrModel = new BackendLiveRole();
-            $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $query->whereIn('user_id',$son_user_id);
+//        if ($this->user['live_role'] == 21) {
+//            $query->where('user_id', '=', $this->user['user_id']);
+//        }elseif ($this->user['live_role'] == 23) {
+//            $blrModel = new BackendLiveRole();
+//            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+//            $query->whereIn('user_id',$son_user_id);
+//        }
+
+        //非超管角色可看live
+        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
+            $live_id_role = BackendLiveDataRole::query()
+                ->where('user_id','=',$this->user['user_id'])
+                ->pluck('live_id')
+                ->toArray();
+            if (empty($live_id_role)){
+                return success([]);
+            }
+            $query->whereIn('id',$live_id_role);
         }
 
         if (!empty($live_status)) {
@@ -204,14 +217,14 @@ class IndexController extends ControllerBackend
             }
         }
 
-        if ($this->user['live_role'] != 0) {
+        if ($this->user['live_role'] !== 0) {
             $query->where('id', '>',51);
         }
         $lists = $query->select('id', 'user_id', 'title', 'price',
             'order_num', 'status', 'begin_at', 'cover_img')
             ->where('is_del', 0)
             ->orderBy('sort', 'asc')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
 
@@ -694,20 +707,30 @@ class IndexController extends ControllerBackend
         $end_time = $input['end_time'] ?? 0;
 
         $live_ids = [];
-        if($this->user['live_role'] == 21){
-            $live_user_id = $this->user['user_id'];
-            $live_ids = Live::select("*")->where([
-                'user_id' => $live_user_id
-            ])->where('id','>',52)->get()->toArray();
-            $live_ids = array_column($live_ids,'id');
+//        if($this->user['live_role'] == 21){
+//            $live_user_id = $this->user['user_id'];
+//            $live_ids = Live::select("*")->where([
+//                'user_id' => $live_user_id
+//            ])->where('id','>',52)->get()->toArray();
+//            $live_ids = array_column($live_ids,'id');
+//
+//        }elseif ($this->user['live_role'] == 23) {
+//            $blrModel = new BackendLiveRole();
+//            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+//            $live_ids = Live::select("*")->whereIn('user_id', $son_user_id)->where('id','>',52)->get()->toArray();
+//            $live_ids = array_column($live_ids,'id');
+//        }
 
-        }elseif ($this->user['live_role'] == 23) {
-            $blrModel = new BackendLiveRole();
-            $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $live_ids = Live::select("*")->whereIn('user_id', $son_user_id)->where('id','>',52)->get()->toArray();
-            $live_ids = array_column($live_ids,'id');
+        //非超管角色可看live
+        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
+            $live_ids = BackendLiveDataRole::query()
+                ->where('user_id','=',$this->user['user_id'])
+                ->pluck('live_id')
+                ->toArray();
+            if (empty($live_ids)){
+                return success([]);
+            }
         }
-
 
 
         if (empty($live_id)) { // 不指定直播id时  计算时间
