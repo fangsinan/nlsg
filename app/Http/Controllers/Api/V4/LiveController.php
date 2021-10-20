@@ -1710,14 +1710,25 @@ class LiveController extends Controller
         $live_id = $request->input('live_id')??0;
         $live_son_flag = $request->input('live_son_flag')??null;
 
-        $res = LiveComment::select('content','created_at')->where([
-            "live_id"       => intval($live_id),
-            "status"        => 1,
-            "type"          => 0,
-            "comment_type"  => 1,
-            "live_son_flag" => $live_son_flag,
-        ])->paginate(20)->toArray();
+        $liveCommentObj = new LiveComment();
+        $userObj = new User();
+        $res = DB::table($liveCommentObj->getTable(), ' lc')
+            ->leftJoin($userObj->getTable() . ' as u', 'u.id', '=', 'lc.user_id')
+            ->select('lc.content','lc.created_at',"u.nickname","u.level",'u.expire_time',DB::raw("2 as type"),DB::raw("0 as gift"),DB::raw("0 as num"))
+            ->where([
+                "lc.live_id"       => intval($live_id),
+                "lc.status"        => 1,
+                "lc.type"          => 0,
+                "lc.comment_type"  => 1,
+                "lc.live_son_flag" => $live_son_flag,
+            ])->paginate(20)->toArray();
 
+        foreach ($res['data'] as $key=>&$val){
+            $val['level'] = 0;
+            if (!empty($val['level']) && !empty($val['expire_time']) && $val['expire_time'] > date('Y-m-d H:i:s')) {
+                $val['level'] = $val['level'];
+            }
+        }
         return success($res);
     }
 
@@ -1769,8 +1780,8 @@ class LiveController extends Controller
                     break;
                 case 4:
 
-                    $Info = OfflineProducts::where(['id'=>$res['push_gid']])->first();
-//                    $Info = OfflineProducts::select('id','title as name','price','subtitle','image as img','cover_img as image')->where(['id'=>$res['push_gid']])->first();
+//                    $Info = OfflineProducts::where(['id'=>$res['push_gid']])->first();
+                    $Info = OfflineProducts::select('id','title as name','price','subtitle','image as img','cover_img as image')->where(['id'=>$res['push_gid']])->first();
                     break;
                 case 6:
                     $Info=[
@@ -1806,7 +1817,7 @@ class LiveController extends Controller
      * @apiGroup 直播
      *
      * @apiParam {number} relation_type 类型 1.精品课程2.商城3.直播   4 购买360
-     * @apiParam {number} relation_id   数据id 课程id  商品id  直播id 
+     * @apiParam {number} relation_id   数据id 课程id  商品id  直播id
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
