@@ -10,7 +10,6 @@ use App\Models\LiveConsole;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveNumber;
-use App\Models\LivePoster;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
 use App\Models\Subscribe;
@@ -42,91 +41,115 @@ class IndexController extends ControllerBackend
      * }
      */
     public function index()
-        {
-            //5打赏 9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
-            $type = [9, 10, 14, 15, 16];
-            if ($this->user['live_role'] == 21) {
-                $lives = Live::where('user_id', $this->user['user_id'])
-                            ->where('status', 4)
-                            ->where('begin_at',  '>=', '2021-05-12 00:00:00')
-                            ->get()
-                            ->toArray();
+    {
+        //5打赏 9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
+        $type = [9, 10, 14, 15, 16];
+        if ($this->user['live_role'] == 21) {
+            $lives = Live::where('user_id', $this->user['user_id'])
+                ->where('status', 4)
+                ->where('begin_at', '>=', '2021-05-12 00:00:00')
+                ->get()
+                ->toArray();
 
-                $liveIds = array_column($lives, 'id');
-                $subscribeNum =0;
-                $watchNum =0;
-                if (!empty($lives)){
-                    foreach ($lives as $v){
-                        $num = Subscribe::where('type', 3)
-                            ->where('status', 1)
-                            ->where('relation_id', $v['id'])
-                            ->count();
+            $liveIds = array_column($lives, 'id');
+            $subscribeNum = 0;
+            $watchNum = 0;
+            if (!empty($lives)) {
+                foreach ($lives as $v) {
+                    $num = Subscribe::where('type', 3)
+                        ->where('status', 1)
+                        ->where('relation_id', $v['id'])
+                        ->count();
 
-                        $wnum = LiveLogin::where('live_id', $v['id'])
-                                            ->whereBetween('ctime', [strtotime($v['begin_at']), strtotime($v['end_at'])])
-                                            ->distinct('user_id')
-                                            ->count();
+                    $wnum = LiveLogin::where('live_id', $v['id'])
+                        ->whereBetween('ctime', [strtotime($v['begin_at']), strtotime($v['end_at'])])
+                        ->distinct('user_id')
+                        ->count();
 
-                        $subscribeNum += $num;
-                        $watchNum += $wnum;
+                    $subscribeNum += $num;
+                    $watchNum += $wnum;
 
-                    }
                 }
-
-                $orderNum = Order::whereIn('type', $type)
-                            ->where('user_id', $this->user['user_id'])
-                            ->whereIn('live_id', $liveIds)
-                            ->where('status', 1)
-                            ->count();
-                $orderIncome = Order::whereIn('type', $type)
-                                    ->where('status', 1)
-                                    ->where('user_id', $this->user['user_id'])
-                                    ->whereIn('live_id', $liveIds)
-                                    ->sum('pay_price');
-            }elseif ($this->user['live_role'] == 23) {
-                $ctime = strtotime('2021-05-12 00:00:00');
-                $blrModel = new BackendLiveRole();
-                $son_user_id = $blrModel->getDataUserId($this->user['username']);
-                $subscribeNum = Subscribe::where('type', 3)
-                                ->where('status', 1)
-                                ->whereIn('user_id', $son_user_id)
-                                ->where('created_at', '>=','2021-05-12 00:00:00')
-                                ->count();
-                $watchNum = LiveLogin::whereIn('user_id', $son_user_id)
-                            ->distinct('user_id')
-                            ->where('ctime','>=', $ctime)
-                            ->count();
-                $orderNum = Order::whereIn('type', $type)
-                            ->where('status', 1)
-                            ->whereIn('user_id', $son_user_id)
-                            ->where('created_at', '>=','2021-05-12 00:00:00')
-                            ->count();
-                $orderIncome = Order::whereIn('type', $type)
-                                    ->where('status', 1)
-                                    ->whereIn('user_id', $son_user_id)
-                                    ->where('created_at', '>=','2021-05-12 00:00:00')
-                                    ->sum('pay_price');
-            } else {
-                $subscribeNum = Subscribe::where('type', 3)
-                               ->where('status', 1)
-                               ->count();
-                $watchNum = LiveLogin::distinct('user_id')->count();
-                $orderNum = Order::whereIn('type', $type)
-                           ->where('status', 1)
-                           ->count();
-                $orderIncome = Order::whereIn('type', $type)
-                                   ->where('status', 1)
-                                   ->sum('pay_price');
             }
 
-            $data = [
-                'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
-                'watch_num'     => $watchNum > 0 ? $watchNum : 0,
-                'order_num'     => $orderNum > 0 ? $orderNum : 0,
-                'order_income'  => $orderIncome > 0 ? round($orderIncome, 2) : 0
-            ];
-            return success($data);
+            $orderNum = Order::whereIn('type', $type)
+                ->where('user_id', $this->user['user_id'])
+                ->whereIn('live_id', $liveIds)
+                ->where('status', 1)
+                ->count();
+            $orderIncome = Order::whereIn('type', $type)
+                ->where('status', 1)
+                ->where('user_id', $this->user['user_id'])
+                ->whereIn('live_id', $liveIds)
+                ->sum('pay_price');
+        } elseif ($this->user['live_role'] == 23) {
+            $ctime = strtotime('2021-05-12 00:00:00');
+            $blrModel = new BackendLiveRole();
+            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+            $subscribeNum = Subscribe::where('type', 3)
+                ->where('status', 1)
+                ->whereIn('user_id', $son_user_id)
+                ->where('created_at', '>=', '2021-05-12 00:00:00')
+                ->count();
+            $watchNum = LiveLogin::whereIn('user_id', $son_user_id)
+                ->distinct('user_id')
+                ->where('ctime', '>=', $ctime)
+                ->count();
+            $orderNum = Order::whereIn('type', $type)
+                ->where('status', 1)
+                ->whereIn('user_id', $son_user_id)
+                ->where('created_at', '>=', '2021-05-12 00:00:00')
+                ->count();
+            $orderIncome = Order::whereIn('type', $type)
+                ->where('status', 1)
+                ->whereIn('user_id', $son_user_id)
+                ->where('created_at', '>=', '2021-05-12 00:00:00')
+                ->sum('pay_price');
+        } else {
+            $subscribeNum = Subscribe::where('type', 3)
+                ->where('status', 1)
+                ->count();
+            $watchNum = LiveLogin::distinct('user_id')->count();
+            $orderNum = Order::whereIn('type', $type)
+                ->where('status', 1)
+                ->count();
+            $orderIncome = Order::whereIn('type', $type)
+                ->where('status', 1)
+                ->sum('pay_price');
         }
+
+        $data = [
+            'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
+            'watch_num' => $watchNum > 0 ? $watchNum : 0,
+            'order_num' => $orderNum > 0 ? $orderNum : 0,
+            'order_income' => $orderIncome > 0 ? round($orderIncome, 2) : 0
+        ];
+        return success($data);
+    }
+
+    public static function getLiveRoleIdList($user)
+    {
+
+        if ($user['live_role'] === 21 || $user['live_role'] === 23) {
+            $live_id_role = BackendLiveDataRole::query()
+                ->where('user_id', '=', $user['user_id'])
+                ->pluck('live_id')
+                ->toArray();
+
+            $query = Live::query();
+            if ($user['live_role'] === 21) {
+                $query->where('user_id', '=', $user['user_id']);
+            } else {
+                $blrModel = new BackendLiveRole();
+                $son_user_id = $blrModel->getDataUserId($user['username']);
+                $query->whereIn('user_id', $son_user_id);
+            }
+            $live_list = $query->pluck('id')->toArray();
+            return array_unique(array_merge($live_id_role,$live_list));
+        }
+
+        return null;
+    }
 
     /**
      * @api {get} api/live_v4/index/lives 直播列表
@@ -181,25 +204,16 @@ class IndexController extends ControllerBackend
                 ]);
             });
 
-//        if ($this->user['live_role'] == 21) {
-//            $query->where('user_id', '=', $this->user['user_id']);
-//        }elseif ($this->user['live_role'] == 23) {
-//            $blrModel = new BackendLiveRole();
-//            $son_user_id = $blrModel->getDataUserId($this->user['username']);
-//            $query->whereIn('user_id',$son_user_id);
-//        }
 
         //非超管角色可看live
-        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
-            $live_id_role = BackendLiveDataRole::query()
-                ->where('user_id','=',$this->user['user_id'])
-                ->pluck('live_id')
-                ->toArray();
-            if (empty($live_id_role)){
+        $live_id_role = self::getLiveRoleIdList($this->user);
+        if ($live_id_role !== null){
+            if ($live_id_role === []){
                 return success([]);
             }
             $query->whereIn('id',$live_id_role);
         }
+
 
         if (!empty($live_status)) {
             if ($live_status == 1) {
@@ -218,15 +232,18 @@ class IndexController extends ControllerBackend
         }
 
         if ($this->user['live_role'] !== 0) {
-            $query->where('id', '>',51);
+            $query->where('id', '>', 51);
         }
         $lists = $query->select('id', 'user_id', 'title', 'price',
             'order_num', 'status', 'begin_at', 'cover_img')
             ->where('is_del', 0)
             ->orderBy('sort', 'asc')
             ->orderBy('id', 'desc')
-            ->paginate(10)
+            ->pluck('id')
             ->toArray();
+        dd($lists);
+//            ->paginate(10)
+//            ->toArray();
 
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
@@ -249,7 +266,7 @@ class IndexController extends ControllerBackend
             $live_price_sum_id[] = $val['id'];
             $val['live_price_sum'] = 0;
             $val['live_twitter_price_sum'] = 0;
-            $val['task_id'] = $channel->task_id??0;
+            $val['task_id'] = $channel->task_id ?? 0;
 //            //直播收益
 //            $val['live_price_sum'] = Order::where([
 //                'live_id' => $val['id'],
@@ -266,65 +283,59 @@ class IndexController extends ControllerBackend
 //                ])->where('nlsg_order.twitter_id', '>', 0)->sum('d.price');
         }
         //计算直播收益
-        if( !empty($live_price_sum_id) ) {
+        if (!empty($live_price_sum_id)) {
             //直播收益
             $new_live_price_sum = [];
-            $live_price_sum = Order::select('live_id',DB::raw('sum(pay_price) pay_price'))
-                ->whereIn('live_id',$live_price_sum_id)
+            $live_price_sum = Order::select('live_id', DB::raw('sum(pay_price) pay_price'))
+                ->whereIn('live_id', $live_price_sum_id)
                 ->where([
                     'type' => 10,
                     'status' => 1,
                 ])->groupBy('live_id')->get()->toArray();
-            foreach ( $live_price_sum as $k=>$v ) {
+            foreach ($live_price_sum as $k => $v) {
                 $new_live_price_sum[$v['live_id']] = $v['pay_price'];
             }
 
             //直播推客收益
             $new_live_twitter_price_sum = [];
-            $live_twitter_price_sum = Order::select('nlsg_order.live_id',DB::raw('sum(d.price) price'))->join('nlsg_pay_record_detail as d', 'd.ordernum', '=',
+            $live_twitter_price_sum = Order::select('nlsg_order.live_id', DB::raw('sum(d.price) price'))->join('nlsg_pay_record_detail as d', 'd.ordernum', '=',
                 'nlsg_order.ordernum')
-                ->whereIn('live_id',$live_price_sum_id)
+                ->whereIn('live_id', $live_price_sum_id)
                 ->where([
                     'nlsg_order.type' => 10,
                     'nlsg_order.status' => 1,
                 ])->where('nlsg_order.twitter_id', '>', 0)->groupBy('live_id')->get()->toArray();
-            foreach ( $live_twitter_price_sum as $k=>$v ) {
+            foreach ($live_twitter_price_sum as $k => $v) {
                 $new_live_twitter_price_sum[$v['live_id']] = $v['price'];
             }
 
 
             foreach ($lists['data'] as &$data_v) {
-                if( !empty($new_live_price_sum[$data_v['id']] )){
+                if (!empty($new_live_price_sum[$data_v['id']])) {
                     $data_v['live_price_sum'] = $new_live_price_sum[$data_v['id']];
                 }
-                if( !empty($new_live_twitter_price_sum[$data_v['id']] )){
+                if (!empty($new_live_twitter_price_sum[$data_v['id']])) {
                     $data_v['live_twitter_price_sum'] = $new_live_twitter_price_sum[$data_v['id']];
                 }
             }
         }
 
-        if( !empty($live_price_sum_id) ) {
+        if (!empty($live_price_sum_id)) {
             $new_live_price_sum = [];
-            $live_price_sum = Order::select('live_id',DB::raw('sum(pay_price) pay_price'))->whereIn('live_id',$live_price_sum_id)->where([
+            $live_price_sum = Order::select('live_id', DB::raw('sum(pay_price) pay_price'))->whereIn('live_id', $live_price_sum_id)->where([
                 'type' => 10,
                 'status' => 1,
             ])->groupBy('live_id')->get('pay_price')->toArray();
 
-            foreach ( $live_price_sum as $k=>$v ) {
+            foreach ($live_price_sum as $k => $v) {
                 $new_live_price_sum[$v['live_id']] = $v['pay_price'];
             }
             foreach ($lists['data'] as &$data_v) {
-                if( !empty($new_live_price_sum[$data_v['id']] )){
+                if (!empty($new_live_price_sum[$data_v['id']])) {
                     $data_v['live_price_sum'] = $new_live_price_sum[$data_v['id']];
                 }
             }
         }
-
-
-
-
-
-
 
 
         return success($lists);
@@ -364,23 +375,23 @@ class IndexController extends ControllerBackend
             ->where('relation_id', $liveId)
             ->where('status', 1)
             ->count();
-        if (!empty($list->begin_at)){
+        if (!empty($list->begin_at)) {
 //            $watchNum = LiveLogin::where('live_id', $liveId)
 //                          ->whereBetween('ctime', [strtotime($list->begin_at), strtotime($list->end_at)])
 //                          ->distinct('user_id')
 //                          ->count();
             $watchNum = Subscribe::query()
-                ->where('relation_id','=',$liveId)
-                ->where('type','=',3)
-                ->where('live_watched','=',1)
+                ->where('relation_id', '=', $liveId)
+                ->where('type', '=', 3)
+                ->where('live_watched', '=', 1)
                 ->count();
 
-             $unwatchNum = $subscribeNum - $watchNum > 0 ? intval($subscribeNum - $watchNum) : 0;
+            $unwatchNum = $subscribeNum - $watchNum > 0 ? intval($subscribeNum - $watchNum) : 0;
         } else {
-            $watchNum   = 0;
+            $watchNum = 0;
             $unwatchNum = 0;
         }
-        $popurlarNum =  LiveLogin::where('live_id', $liveId)->count();
+        $popurlarNum = LiveLogin::where('live_id', $liveId)->count();
         $orderNum = Order::whereIn('type', $type)
             ->where('live_id', $liveId)
             ->where('status', 1)
@@ -398,7 +409,7 @@ class IndexController extends ControllerBackend
             'unwatch_num' => $unwatchNum > 0 ? $unwatchNum : 0,
             'popurlar_num' => $popurlarNum > 0 ? $popurlarNum : 0,
             'order_num' => $orderNum > 0 ? $orderNum : 0,
-            'order_income' => $orderIncome > 0 ? round($orderIncome,2) : 0
+            'order_income' => $orderIncome > 0 ? round($orderIncome, 2) : 0
         ];
 
         //折线图数据
@@ -454,7 +465,7 @@ class IndexController extends ControllerBackend
         $content = $input['content'] ?? '';
         $playback_url = $input['playback_url'] ?? '';
         $back_video_url = $input['back_video_url'] ?? '';
-        $need_virtual  = $input['need_virtual'] ?? 0;
+        $need_virtual = $input['need_virtual'] ?? 0;
         $need_virtual_num = $input['need_virtual_num'] ?? 0;
         $now = time();
         $now_date = date('Y-m-s H:i:s');
@@ -500,20 +511,20 @@ class IndexController extends ControllerBackend
         $live_info_data['status'] = 1;
         $live_info_data['length'] = 5;
         $live_info_data['begin_at'] = $begin_at;
-        $live_info_data['end_at']   = $end_at;
-        $live_info_data['playback_url']   = $playback_url;
-        $live_info_data['back_video_url']   = $back_video_url;
+        $live_info_data['end_at'] = $end_at;
+        $live_info_data['playback_url'] = $playback_url;
+        $live_info_data['back_video_url'] = $back_video_url;
 
         if (!empty($input['id'])) {
             Live::where('id', $input['id'])->update($data);
-            $info_first = LiveInfo::select('id','task_id','begin_at','end_at','push_end_time')->where('live_pid', '=', $input['id'])->first();
+            $info_first = LiveInfo::select('id', 'task_id', 'begin_at', 'end_at', 'push_end_time')->where('live_pid', '=', $input['id'])->first();
             $live_info_id = $info_first['id'];
-             // 删除拉流任务
-            if($info_first['task_id'] ){
+            // 删除拉流任务
+            if ($info_first['task_id']) {
                 //当开始时间、结束时间、推流结束时间 变了修改     否则  不变
-                if(($info_first['begin_at'] != $begin_at) || ($info_first['end_at'] != $end_at) || ($info_first['push_end_time'] != $temp_push_end_time) ){
+                if (($info_first['begin_at'] != $begin_at) || ($info_first['end_at'] != $end_at) || ($info_first['push_end_time'] != $temp_push_end_time)) {
                     //校验 推拉流
-                    LiveInfo::liveUrlEdit('del',$live_info_id);
+                    LiveInfo::liveUrlEdit('del', $live_info_id);
                 }
             }
 
@@ -547,12 +558,12 @@ class IndexController extends ControllerBackend
 
 
         $temp_get_url = $lcModel->getPushUrl(
-            md5($userId . $temp_push_end_time.$live_info_data['live_pid']), strtotime($temp_push_end_time)
+            md5($userId . $temp_push_end_time . $live_info_data['live_pid']), strtotime($temp_push_end_time)
         );
         $update_live_info_data['push_live_url'] = $temp_get_url['push_url'];
         $update_live_info_data['live_url'] = $temp_get_url['play_url'];
         $update_live_info_data['live_url_flv'] = $temp_get_url['play_url_flv'];
-        LiveInfo::where('live_pid','=',$live_info_data['live_pid'])->update($update_live_info_data);
+        LiveInfo::where('live_pid', '=', $live_info_data['live_pid'])->update($update_live_info_data);
 
 
 //        if ($userId == 169209){
@@ -660,7 +671,7 @@ class IndexController extends ControllerBackend
         if ($this->user['live_role'] == 21) {
             $son_user_id = $this->user['user_id'];
             $query->where('user_id', '=', $son_user_id);
-        }elseif ($this->user['live_role'] == 23) {
+        } elseif ($this->user['live_role'] == 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this->user['username']);
             $query->whereIn('user_id', $son_user_id);
@@ -722,12 +733,12 @@ class IndexController extends ControllerBackend
 //        }
 
         //非超管角色可看live
-        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
+        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23) {
             $live_ids = BackendLiveDataRole::query()
-                ->where('user_id','=',$this->user['user_id'])
+                ->where('user_id', '=', $this->user['user_id'])
                 ->pluck('live_id')
                 ->toArray();
-            if (empty($live_ids)){
+            if (empty($live_ids)) {
                 return success([]);
             }
         }
@@ -755,7 +766,7 @@ class IndexController extends ControllerBackend
             $query->where('live_id', $live_id);
         }
 
-        if(!empty($live_ids)){  // 校长和老师  只能看指定的直播数据
+        if (!empty($live_ids)) {  // 校长和老师  只能看指定的直播数据
             $query->whereIn('live_id', $live_ids);
         }
 
@@ -801,14 +812,14 @@ class IndexController extends ControllerBackend
     {
         $id = $request->get('id');
         $live = Live::select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
-            'price', 'twitter_money', 'helper', 'content','need_virtual','need_virtual_num')
+            'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num')
             ->with(['livePoster'])
             ->where('id', $id)->first();
         if (!$live) {
             return error('直播不存在');
         }
         //$live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
-        $liveInfo= LiveInfo::select('playback_url','back_video_url')->where('live_pid', $id)->first();
+        $liveInfo = LiveInfo::select('playback_url', 'back_video_url')->where('live_pid', $id)->first();
         $live->playback_url = $liveInfo['playback_url'];
         $live->back_video_url = $liveInfo['back_video_url'];
         return success($live);
@@ -835,7 +846,7 @@ class IndexController extends ControllerBackend
 //            ['title' => "王琨老师第二天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/1ac858843701925921189014962/v.f100030.mp4',],
             ['title' => "王琨老师第二天直播19.9", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/313ed4c03701925925345105941/v.f100020.mp4',],
 //            ['title' => "李婷老师直播",      'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/24c43b093701925920528809905/v.f100030.mp4',],
-            ['title' => "李婷老师直播19.9",      'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/a8b4b43c3701925925153722341/v.f100020.mp4',],
+            ['title' => "李婷老师直播19.9", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/a8b4b43c3701925925153722341/v.f100020.mp4',],
         ];
         return success($res);
     }

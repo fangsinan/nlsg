@@ -21,26 +21,14 @@ class SubscribeController extends ControllerBackend
     public function liveSelect(Request $request){
 
         $query = Live::select('id', 'user_id', 'title');
-//        if ($this->user['live_role'] == 21) {
-//            $query->where('user_id', '=', $this->user['user_id']);
-//        }elseif ($this->user['live_role'] == 23) {
-//            $blrModel = new BackendLiveRole();
-//            $son_user_id = $blrModel->getDataUserId($this->user['username']);
-//            $query->whereIn('user_id',$son_user_id);
-//        }
         //非超管角色可看live
-        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
-            $live_id_role = BackendLiveDataRole::query()
-                ->where('user_id','=',$this->user['user_id'])
-                ->pluck('live_id')
-                ->toArray();
-            if (empty($live_id_role)){
+        $live_id_role = IndexController::getLiveRoleIdList($this->user);
+        if ($live_id_role !== null){
+            if ($live_id_role === []){
                 return success([]);
             }
             $query->whereIn('id',$live_id_role);
         }
-
-
 
         if ($this->user['live_role'] != 0) {
             $query->where('id', '>',51);
@@ -217,12 +205,11 @@ class SubscribeController extends ControllerBackend
         if (!empty($title)) {
             $live_query->where('title', 'like', '%' . $title . '%');
         }
-        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
-            $live_id_role = BackendLiveDataRole::query()
-                ->where('user_id','=',$this->user['user_id'])
-                ->pluck('live_id')
-                ->toArray();
-            if (empty($live_id_role)){
+
+        //非超管角色可看live
+        $live_id_role = IndexController::getLiveRoleIdList($this->user);
+        if ($live_id_role !== null){
+            if ($live_id_role === []){
                 return success([]);
             }
             $live_data = $live_query->whereIn('id', $live_id_role)->get()->toArray();
