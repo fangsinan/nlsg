@@ -27,7 +27,7 @@ class LivePush extends Base
         $push_type = $params['type'] ?? 0;
         $push_gid = $params['gid'] ?? 0;
         $push_at = $params['time'] ?? 0;
-        $length = $params['length'] ?? 180;
+        $length = $params['length'] ?? 7200;
         $now = time();
 
         if (empty($live_id) || empty($live_info_id) || empty($push_gid) || empty($push_type)) {

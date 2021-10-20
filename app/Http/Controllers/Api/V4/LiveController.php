@@ -1843,6 +1843,7 @@ class LiveController extends Controller
             $live = Live::find($relation_id);
             $relation_id = $live['user_id'] ?? 0; //直播是根据user_id 返回二维码
         }else{
+            //目前除了直播 其他不需要根据各个具体产品返二维码
             $relation_id = 0;
         }
 
