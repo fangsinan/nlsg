@@ -152,6 +152,9 @@ class LiveInfoServers
                 case '30天智慧父母(亲子)训练营':
                     $params['type'] = 5;
                     break;
+                case '学业规划训练营':
+                    $params['type'] = 6;
+                    break;
                 case '':
                     $params['type'] = 0;
                     break;
@@ -176,7 +179,7 @@ class LiveInfoServers
             $query->select([
                 'ordernum', 'pay_price', 'num', 'pay_time',
                 DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
-            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "--" end) as type_name'),
+            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" when 6 then "学业规划训练营" else "--" end) as type_name'),
                 'phone', 'nickname', 'user_id',
                 DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
                 'invite_phone', 'invite_nickname',
@@ -197,7 +200,7 @@ class LiveInfoServers
                 DB::raw("CONCAT('`',ordernum) as ordernum"),
                 'pay_price', 'num', 'pay_time',
                 DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
-            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" else "类型错误" end) as type_name'),
+            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" when 6 then "学业规划训练营" else "类型错误" end) as type_name'),
                 DB::raw("CONCAT('`',phone) as phone"), 'nickname', 'user_id',
                 DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
                 DB::raw("CONCAT('`',invite_phone) as invite_phone"), 'invite_nickname',
