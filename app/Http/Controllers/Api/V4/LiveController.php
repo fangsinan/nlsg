@@ -1805,7 +1805,7 @@ class LiveController extends Controller
      * @apiName  get_qr_code
      * @apiGroup 直播
      *
-     * @apiParam {number} relation_type 类型 1.课程2.商城3.直播
+     * @apiParam {number} relation_type 类型 1.精品课程2.商城3.直播
      * @apiParam {number} relation_id   数据id 课程id  商品id  直播id
      *
      * @apiSuccessExample  Success-Response:
