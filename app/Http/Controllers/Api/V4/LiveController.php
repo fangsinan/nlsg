@@ -1724,9 +1724,9 @@ class LiveController extends Controller
             ])->paginate(20)->toArray();
 
         foreach ($res['data'] as $key=>&$val){
-            $val['level'] = 0;
-            if (!empty($val['level']) && !empty($val['expire_time']) && $val['expire_time'] > date('Y-m-d H:i:s')) {
-                $val['level'] = $val['level'];
+            $val->level = 0;
+            if (!empty($val->expire_time) && $val->expire_time > date('Y-m-d H:i:s')) {
+                $val->level = $val->level;
             }
         }
         return success($res);
