@@ -470,7 +470,7 @@ class SubscribeController extends ControllerBackend
         foreach ($users as $dk => $dv) {
             $new_users[$dv['id']] = $dv;
             if ($get_excel) {
-                $new_users[$dv['id']]['address'] = ($maModel->getList($dv['id'], 0, 1))[0] ?? '';
+//                $new_users[$dv['id']]['address'] = ($maModel->getList($dv['id'], 0, 1))[0] ?? '';
             }
         }
 
