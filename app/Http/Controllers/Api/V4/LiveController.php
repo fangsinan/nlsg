@@ -1800,12 +1800,12 @@ class LiveController extends Controller
                     break;
             }
             if(!empty($Info)){
-                return success([
-                    [
-                        'push_info' => $res,
-                        'son_info' => $Info,
-                    ],
-                ]);
+                //与socket数据格式一致
+                $suc = ['type' => 6, 'content' => $res,'ios_content' =>[[
+                    'push_info' => $res,
+                    'son_info' => $Info,
+                ],]];
+                return success($suc);
             }
         }
         return success([]);
