@@ -139,7 +139,7 @@ class SubscribeController extends ControllerBackend
                     default:
                         $temp_v['pay_type'] = '-';
                 }
-                $temp_v['created_at'] = $v['order']['created_at'] ?? '-';
+                $temp_v['created_at'] = $v['created_at'] ?? '-';
                 mb_convert_variables('GBK', 'UTF-8', $temp_v);
                 fputcsv($fp, $temp_v);
                 ob_flush();     //刷新输出缓冲到浏览器
@@ -504,7 +504,7 @@ class SubscribeController extends ControllerBackend
         foreach ($users as $dk => $dv) {
             $new_users[$dv['id']] = $dv;
             if ($get_excel) {
-                $new_users[$dv['id']]['address'] = ($maModel->getList($dv['id'], 0, 1))[0] ?? '';
+//                $new_users[$dv['id']]['address'] = ($maModel->getList($dv['id'], 0, 1))[0] ?? '';
             }
         }
 
