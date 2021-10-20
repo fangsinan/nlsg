@@ -75,6 +75,7 @@ class LivePush extends Base
 //            ->select(['id'])
 //            ->first();
 
+        /**   删除时间推送限制
         $send_timestamp = strtotime($push_at) + 4;
 
         $check_sql = "select * from (
@@ -104,7 +105,7 @@ WHERE
                 return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
             }
         }
-
+         ****/
         if (empty($params['id'] ?? 0)) {
             $model = new LivePush();
         } else {

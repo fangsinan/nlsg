@@ -1721,7 +1721,7 @@ class LiveController extends Controller
                 "lc.type"          => 0,
                 "lc.comment_type"  => 1,
                 "lc.live_son_flag" => $live_son_flag,
-            ])->paginate(20)->toArray();
+            ])->paginate(10)->toArray();
 
         foreach ($res['data'] as $key=>&$val){
             $val->level = 0;
@@ -1800,12 +1800,12 @@ class LiveController extends Controller
                     break;
             }
             if(!empty($Info)){
-                return success([
-                    [
-                        'push_info' => $res,
-                        'son_info' => $Info,
-                    ],
-                ]);
+                //与socket数据格式一致
+                $suc = ['type' => 6,'ios_content' =>[[
+                    'push_info' => $res,
+                    'son_info' => $Info,
+                ],]];
+                return success($suc);
             }
         }
         return success([]);
