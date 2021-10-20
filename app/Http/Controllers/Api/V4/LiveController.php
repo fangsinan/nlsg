@@ -1721,7 +1721,7 @@ class LiveController extends Controller
                 "lc.type"          => 0,
                 "lc.comment_type"  => 1,
                 "lc.live_son_flag" => $live_son_flag,
-            ])->paginate(20)->toArray();
+            ])->paginate(10)->toArray();
 
         foreach ($res['data'] as $key=>&$val){
             $val->level = 0;
