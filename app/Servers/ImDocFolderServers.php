@@ -517,13 +517,52 @@ class ImDocFolderServers
     }
 
 
-    public function jobList($params, $user_id){
+    public function jobList($params, $user_id)
+    {
 
     }
 
     public function addJob($params, $user_id)
     {
+        $folder_id = $params['folder_id'] ?? 0;
+        $group_id = $params['group_id'] ?? '';
+        if (empty($folder_id) || empty($group_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        if (!is_array($group_id)) {
+            $group_id = explode(',', $group_id);
+        }
+        $job_type = (int)($params['job_type'] ?? 0);
+        if (!in_array($job_type, [1, 2])) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $list = $params['list'] ?? [];
+        if (empty($list)){
+            return ['code'=>false,'msg'=>'数据错误'];
+        }
 
+        $now = time();
+        $job_begin_at = date('Y-m-d H:i:s',$now);
+
+        $folder_job_data = [];
+        $folder_job_info_data = [];
+
+        foreach ($list as $v){
+            $temp_info_data = [];
+            $temp_info_data['job_id'] = 0;
+            $temp_info_data['folder_id'] = $v['folder_id'];
+            $temp_info_data['doc_id'] = $v['doc_id'];
+            $temp_info_data['job_time'] = $v['job_time'];
+            $temp_info_data['job_timestamp'] = strtotime($v['job_time']);
+        }
+
+
+
+
+
+
+
+        return $params;
     }
 
     public function changeJobStatus($params, $user_id)

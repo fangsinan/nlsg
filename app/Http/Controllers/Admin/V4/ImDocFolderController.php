@@ -132,8 +132,32 @@ class ImDocFolderController extends ControllerBackend
     //添加文案发送任务
     public function addJob(Request $request)
     {
+        $params = [
+            'folder_id' => 1,
+            'group_id' => '51,52,53',
+            'job_type' => 1,
+            'list' => [
+                [
+                    'folder_id' => 1,
+                    'doc_id' => 611,
+                    'job_time' => '2021-10-21 12:00:00'
+                ],
+                [
+                    'folder_id' => 1,
+                    'doc_id' => 610,
+                    'job_time' => '2021-10-21 12:00:10'
+                ],
+                [
+                    'folder_id' => 1,
+                    'doc_id' => 613,
+                    'job_time' => '2021-10-21 12:01:00'
+                ],
+            ]
+        ];
+
         $servers = new ImDocFolderServers();
-        $data = $servers->addJob($request->input(), $this->user['id']);
+//        $data = $servers->addJob($request->input(), $this->user['id']);
+        $data = $servers->addJob($params, $this->user['id']);
         return $this->getRes($data);
     }
 
