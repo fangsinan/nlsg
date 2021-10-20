@@ -8,6 +8,7 @@ use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
 use App\Models\LiveCheckPhone;
+use App\Models\LiveComment;
 use App\Models\LiveConsole;
 use App\Models\LiveCountDown;
 use App\Models\LiveForbiddenWords;
@@ -16,14 +17,17 @@ use App\Models\LiveLogin;
 use App\Models\LivePlayback;
 use App\Models\LiveSonFlagPoster;
 use App\Models\LiveWorks;
+use App\Models\MallGoods;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\OrderTwitterLog;
 use App\Models\PayRecord;
+use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
+use App\Models\Works;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -1675,6 +1679,160 @@ class LiveController extends Controller
         return [
             'live' => $live_team
         ];
+    }
+
+
+
+
+
+    /**
+     * @api {post} api/v4/live/live_comment_his 直播间评论上滑
+     * @apiVersion 4.0.0
+     * @apiName  live_comment_his
+     * @apiGroup 直播
+     *
+     * @apiParam {number} live_id 直播间id
+     * @apiParam {number} live_son_flag 渠道
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     *
+     */
+    public function liveCommentHis(Request $request){
+
+        $live_id = $request->input('live_id')??0;
+        $live_son_flag = $request->input('live_son_flag')??null;
+
+        $res = LiveComment::select('content','created_at')->where([
+            "live_id"       => intval($live_id),
+            "status"        => 1,
+            "type"          => 0,
+            "comment_type"  => 1,
+            "live_son_flag" => $live_son_flag,
+        ])->paginate(20)->toArray();
+
+        return success($res);
+    }
+
+
+    /**
+     * @api {get} api/v4/live/live_push_one 直播间推送
+     * @apiVersion 4.0.0
+     * @apiName  live_push_one
+     * @apiGroup 直播
+     *
+     * @apiParam {number} live_id 直播间id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function livePushOne(Request $request){
+        $live_id = $request->input('live_id')??0;
+
+        $res = LivePush::select('id','live_id','live_info_id','push_type','push_gid','user_id','click_num','close_num','is_push','is_done','length')->where([
+            "live_id"       => intval($live_id),
+            "is_push"       => 1,
+            "is_done"       => 1,
+        ])->where('done_at','>',date("Y-m-d",time()))->orderBy('done_at', 'desc')->first();
+
+
+        //push_type 产品type  1专栏 2精品课 3商品 4 经营能量 5 一代天骄 6 演说能量 7:讲座 8:听书  9直播   10 直播外链  11 训练营
+        //push_gid 推送产品id，专栏id  精品课id  商品id
+        if(!empty($res['push_gid'])){
+            switch ($res['push_type']){
+                case 1:
+                case 7:
+                case 11:
+                    $Info = Column::select('id','name','price','subtitle','details_pic as img','user_id')->where(['id'=>$res['push_gid'],'status'=>1])->first();
+                    break;
+
+                case 2:
+                case 8:
+                    $Info = Works::select('id','title as name','price','subtitle','details_pic as img','user_id')->where(['id'=>$res['push_gid'],'status'=>4])->first();
+                    break;
+                case 3:
+                    $Info = MallGoods::select('id','name','price','subtitle','picture as img')->where(['id'=>$res['push_gid'],'status'=>2])->first();
+                    break;
+                case 4:
+
+                    $Info = OfflineProducts::where(['id'=>$res['push_gid']])->first();
+//                    $Info = OfflineProducts::select('id','title as name','price','subtitle','image as img','cover_img as image')->where(['id'=>$res['push_gid']])->first();
+                    break;
+                case 6:
+                    $Info=[
+                        'name'=>'幸福360会员',
+                        'price'=>360,
+                        'subtitle'=>'',
+                        'image'=>'/nlsg/works/20201124144228445465.png', //方图
+                        'img'=>'/nlsg/works/20201124144228445466.png'  //长图
+                    ];
+                    break;
+                case 9:
+                    $Info=Live::select('id','id as live_info_id','title as name','price','`describe` as subtitle','cover_img as img','cover_img as image','begin_at','end_at','user_id','is_free')->where(['id'=>$res['push_gid']])->first();
+                    break;
+                case 10:
+                    $Info=Live::select('id','name','`describe`','url','image','img')->where(['id'=>$res['push_gid']])->first();
+                    break;
+            }
+            if(!empty($Info)){
+                return success([
+                    [
+                        'push_info' => $res,
+                        'son_info' => $Info,
+                    ],
+                ]);
+            }
+        }
+        return success([]);
+    }
+    /**
+     * @api {get} api/v4/live/get_qr_code 二维码弹窗
+     * @apiVersion 4.0.0
+     * @apiName  get_qr_code
+     * @apiGroup 直播
+     *
+     * @apiParam {number} relation_type 类型 1.课程2.商城3.直播
+     * @apiParam {number} relation_id   数据id 课程id  商品id  直播id
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function GetQrCode(Request $request){
+
+        $relation_type = $request->input('relation_type')??0;
+        $relation_id = $request->input('relation_id')??0;
+        if($relation_type == 3){
+            $live = Live::find($relation_id);
+            $relation_id = $live['user_id'] ?? 0; //直播是根据user_id 返回二维码
+        }
+
+        $res = Qrcodeimg::select("id","qr_url")->where([
+            'relation_type' => $relation_type,
+            'relation_id'   => $relation_id,
+        ])->first();
+
+        return success($res);
     }
 
 }
