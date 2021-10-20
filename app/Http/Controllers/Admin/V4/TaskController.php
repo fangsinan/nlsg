@@ -75,7 +75,11 @@ class TaskController extends ControllerBackend
             }
             Task::send($input['type'], $user->id, $input['id'],0, $input['title']);
         } elseif($input['send_type'] ==2){
-            JPush::pushNow('all', $input['title'], ['type'=>$input['type'], 'id'=>$input['id']]);
+            if($input['type']==5 && $input['id']==163){
+                JPush::pushNow('all', '②不爱学习的孩子竟然可以对学习上瘾！', ['type'=>$input['type'], 'id'=>$input['id']]);
+            }else{
+                JPush::pushNow('all', $input['title'], ['type'=>$input['type'], 'id'=>$input['id']]);
+            }
         }
         return success();
     }
