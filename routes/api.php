@@ -391,6 +391,12 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('live/retype', 'LiveController@reLiveType');
         Route::post('live/free_order', 'LiveController@freeLiveOrder');
         Route::post('live/pay_order', 'LiveController@payLiveOrder');
+        Route::any('live/live_comment_his', 'LiveController@liveCommentHis');
+        Route::any('live/live_push_one', 'LiveController@livePushOne');
+        Route::any('live/get_qr_code', 'LiveController@GetQrCode');
+
+
+
         //通知列表
         Route::get('notify/list', 'NotifyController@index');
         Route::get('notify/fans', 'NotifyController@fans');
