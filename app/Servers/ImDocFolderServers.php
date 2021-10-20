@@ -213,7 +213,7 @@ class ImDocFolderServers
                 ->max('sort') ?? 0;
     }
 
-    public function folderSortNowList(int $folder_id = 0)
+    public function folderSortNowList(int $folder_id = 0): array
     {
 
         $sort_sql = "UPDATE nlsg_im_doc_folder AS fb
@@ -370,7 +370,6 @@ class ImDocFolderServers
         return ['code' => false, 'msg' => '失败'];
     }
 
-
     public function changeDocStatus($params, $user_id)
     {
         $id = $params['id'] ?? 0;
@@ -452,6 +451,83 @@ class ImDocFolderServers
         }
 
         return ['code' => true, 'msg' => '成功'];
+
+    }
+
+
+    private function folderIdList(&$tree, $id, $begin)
+    {
+        $query = ImDocFolder::query();
+
+        if ($begin === 1 && $id !== 0) {
+            $query->where('id', '=', $id);
+        } else {
+            $query->where('pid', '=', $id);
+        }
+
+        $temp_tree = $query->where('status', '=', 1)
+            ->orderBy('sort')
+            ->orderBy('id')
+            ->pluck('id')
+            ->toArray();
+        $tree = array_merge($tree, $temp_tree);
+
+        if (!empty($temp_tree)) {
+            foreach ($temp_tree as $v) {
+                $this->folderIdList($tree, $v, 2);
+            }
+        }
+    }
+
+    public function folderDocList($params, $user_id)
+    {
+        $folder_id = $params['folder_id'] ?? 0;
+        if (empty($folder_id)) {
+            return ['code' => false, 'msg' => '文件夹不能为空'];
+        }
+
+        $tree = [];
+
+        $this->folderIdList($tree, $folder_id, 1);
+
+        if (empty($tree)) {
+            return [];
+        }
+
+        $doc_list = DB::table('nlsg_im_doc_folder_bind as dfb')
+            ->join('nlsg_im_doc as d', 'dfb.doc_id', '=', 'd.id')
+            ->join('nlsg_im_doc_folder as df', 'dfb.folder_id', '=', 'df.id')
+            ->whereIn('dfb.folder_id', $tree)
+            ->select(['dfb.folder_id', 'df.folder_name', 'dfb.doc_id', 'dfb.sort as doc_sort', 'd.type',
+                'd.type_info', 'd.obj_id', 'd.cover_img', 'd.content', 'd.subtitle'])
+            ->orderBy('dfb.sort')
+            ->get();
+
+        $res = [];
+        foreach ($tree as $v) {
+            foreach ($doc_list as $vv) {
+                $vv->top_folder_id = $folder_id;
+                if ($v === $vv->folder_id) {
+                    $res[] = $vv;
+                }
+            }
+        }
+
+        return $res;
+    }
+
+
+    public function jobList($params, $user_id){
+
+    }
+
+    public function addJob($params, $user_id)
+    {
+
+    }
+
+    public function changeJobStatus($params, $user_id)
+    {
 
     }
 

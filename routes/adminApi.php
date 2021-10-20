@@ -257,8 +257,15 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('im_doc_folder/list', 'ImDocFolderController@list');
         Route::post('im_doc_folder/add', 'ImDocFolderController@add');
         Route::put('im_doc_folder/change_status', 'ImDocFolderController@changeStatus');
+
         Route::post('im_doc_folder/add_doc', 'ImDocFolderController@addDoc');
         Route::put('im_doc_folder/change_doc_status', 'ImDocFolderController@changeDocStatus');
+
+        Route::get('im_doc_folder/folder_doc_List', 'ImDocFolderController@folderDocList');
+        Route::get('im_doc_folder/job_list', 'ImDocFolderController@jobList');
+        Route::post('im_doc_folder/add_job', 'ImDocFolderController@addJob');
+        Route::put('im_doc_folder/change_job_status', 'ImDocFolderController@changeJobStatus');
+
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');

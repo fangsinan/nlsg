@@ -104,4 +104,46 @@ class ImDocFolderController extends ControllerBackend
         $data = $servers->changeDocStatus($request->input(), $this->user['id']);
         return $this->getRes($data);
     }
+
+    /**
+     * @api {get} api/admin_v4/im_doc_folder/folder_doc_List 文件夹下所有文案列表
+     * @apiVersion 4.0.0
+     * @apiName  api/admin_v4/im_doc_folder/folder_doc_List
+     * @apiGroup 后台-社群文案v2
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/im_doc_folder/folder_doc_List
+     * @apiDescription 文件夹下所有文案列表
+     * @apiParam {number} folder_id 文件夹id
+     */
+    public function folderDocList(Request $request)
+    {
+        $servers = new ImDocFolderServers();
+        $data = $servers->folderDocList($request->input(), $this->user['id']);
+        return $this->getRes($data);
+    }
+
+    //文案发送任务列表
+    public function jobList(Request $request)
+    {
+        $servers = new ImDocFolderServers();
+        $data = $servers->jobList($request->input(), $this->user['id']);
+        return $this->getRes($data);
+    }
+
+    //添加文案发送任务
+    public function addJob(Request $request)
+    {
+        $servers = new ImDocFolderServers();
+        $data = $servers->addJob($request->input(), $this->user['id']);
+        return $this->getRes($data);
+    }
+
+    //删除任务
+    public function changeJobStatus(Request $request)
+    {
+        $servers = new ImDocFolderServers();
+        $data = $servers->changeJobStatus($request->input(), $this->user['id']);
+        return $this->getRes($data);
+    }
+
+
 }
