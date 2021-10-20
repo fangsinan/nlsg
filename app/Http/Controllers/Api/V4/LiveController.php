@@ -1833,9 +1833,17 @@ class LiveController extends Controller
 
         $relation_type = $request->input('relation_type')??0;
         $relation_id = $request->input('relation_id')??0;
+        $order_id = $request->input('order_id')??0;
         if($relation_type == 3){
+            //付费客户端不传直播id  需要查询
+            if(!empty($order_id)){  //付费
+                $order = Order::where(['id'=>$order_id])->first();
+                $relation_id = $order['relation_id'];
+            }
             $live = Live::find($relation_id);
             $relation_id = $live['user_id'] ?? 0; //直播是根据user_id 返回二维码
+        }else{
+            $relation_id = 0;
         }
 
         $res = Qrcodeimg::select("id","qr_url")->where([
