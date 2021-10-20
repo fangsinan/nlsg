@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\BackendLiveDataRole;
 use App\Models\BackendLiveRole;
 use App\Models\Live;
 use App\Models\MallAddress;
@@ -18,15 +19,29 @@ class SubscribeController extends ControllerBackend
 
 
     public function liveSelect(Request $request){
-        
+
         $query = Live::select('id', 'user_id', 'title');
-        if ($this->user['live_role'] == 21) {
-            $query->where('user_id', '=', $this->user['user_id']);
-        }elseif ($this->user['live_role'] == 23) {
-            $blrModel = new BackendLiveRole();
-            $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            $query->whereIn('user_id',$son_user_id);
+//        if ($this->user['live_role'] == 21) {
+//            $query->where('user_id', '=', $this->user['user_id']);
+//        }elseif ($this->user['live_role'] == 23) {
+//            $blrModel = new BackendLiveRole();
+//            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+//            $query->whereIn('user_id',$son_user_id);
+//        }
+        //非超管角色可看live
+        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
+            $live_id_role = BackendLiveDataRole::query()
+                ->where('user_id','=',$this->user['user_id'])
+                ->pluck('live_id')
+                ->toArray();
+            if (empty($live_id_role)){
+                return success([]);
+            }
+            $query->whereIn('id',$live_id_role);
         }
+
+
+
         if ($this->user['live_role'] != 0) {
             $query->where('id', '>',51);
         }
@@ -197,29 +212,48 @@ class SubscribeController extends ControllerBackend
 
 //        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('status',4)->where('id', '>', 52);
         $live_query = Live::select("id","title","price","twitter_money","is_free")->where('id',$live_id)->where('status',4);
-        if ($this->user['live_role'] == 21) {
-            $live_user_id = $this->user['user_id'];
-            //Live::where('user_id', $live_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
-            if (!empty($title)) {
-                $live_query->where('title', 'like', '%' . $title . '%');
-            }
-            $live_data = $live_query->where('user_id', $live_user_id)->get()->toArray();
 
-        } elseif ($this->user['live_role'] == 23) {
-            $blrModel = new BackendLiveRole();
-            $son_user_id = $blrModel->getDataUserId($this->user['username']);
-            //Live::whereIn('user_id', $son_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
-            if (!empty($title)) {
-                $live_query->where('title', 'like', '%' . $title . '%');
+        //非超管角色可看live
+        if (!empty($title)) {
+            $live_query->where('title', 'like', '%' . $title . '%');
+        }
+        if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
+            $live_id_role = BackendLiveDataRole::query()
+                ->where('user_id','=',$this->user['user_id'])
+                ->pluck('live_id')
+                ->toArray();
+            if (empty($live_id_role)){
+                return success([]);
             }
-            $live_data = $live_query->whereIn('user_id', $son_user_id)->get()->toArray();
+            $live_data = $live_query->whereIn('id', $live_id_role)->get()->toArray();
         }else{
-            //$live_query = Live::where('status',4)->where('id', '>', 52);
-            if (!empty($title)) {
-                $live_query->where('title', 'like', '%' . $title . '%');
-            }
             $live_data = $live_query->get()->toArray();
         }
+
+
+//        if ($this->user['live_role'] == 21) {
+//            $live_user_id = $this->user['user_id'];
+//            //Live::where('user_id', $live_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
+//            if (!empty($title)) {
+//                $live_query->where('title', 'like', '%' . $title . '%');
+//            }
+//            $live_data = $live_query->where('user_id', $live_user_id)->get()->toArray();
+//
+//        } elseif ($this->user['live_role'] == 23) {
+//            $blrModel = new BackendLiveRole();
+//            $son_user_id = $blrModel->getDataUserId($this->user['username']);
+//            //Live::whereIn('user_id', $son_user_id)->where('status',4)->where('id', '>', 52)->pluck("id");
+//            if (!empty($title)) {
+//                $live_query->where('title', 'like', '%' . $title . '%');
+//            }
+//            $live_data = $live_query->whereIn('user_id', $son_user_id)->get()->toArray();
+//        }else{
+//            //$live_query = Live::where('status',4)->where('id', '>', 52);
+//            if (!empty($title)) {
+//                $live_query->where('title', 'like', '%' . $title . '%');
+//            }
+//            $live_data = $live_query->get()->toArray();
+//        }
 
         $live_ids = array_column($live_data,"id");
 

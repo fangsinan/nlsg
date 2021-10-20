@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Live\V4;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ControllerBackend;
+use App\Models\BackendLiveDataRole;
 use App\Models\BackendLiveRole;
 use App\Models\BackendUser;
 use App\Models\Live;
@@ -79,13 +80,27 @@ class CommentController extends ControllerBackend
             $live_ids = [$live_id];
         }else{
             $query = Live::select('id');
-            if ($this->user['live_role'] == 21) {
-                $query->where('user_id', '=', $this->user['user_id'])->where('id','>',52);
-            } elseif ($this->user['live_role'] == 23) {
-                $blrModel = new BackendLiveRole();
-                $son_user_id = $blrModel->getDataUserId($this->user['username']);
-                $query->whereIn('user_id', $son_user_id)->where('id','>',52);
+//            if ($this->user['live_role'] == 21) {
+//                $query->where('user_id', '=', $this->user['user_id'])->where('id','>',52);
+//            } elseif ($this->user['live_role'] == 23) {
+//                $blrModel = new BackendLiveRole();
+//                $son_user_id = $blrModel->getDataUserId($this->user['username']);
+//                $query->whereIn('user_id', $son_user_id)->where('id','>',52);
+//            }
+
+            //非超管角色可看live
+            if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
+                $live_id_role = BackendLiveDataRole::query()
+                    ->where('user_id','=',$this->user['user_id'])
+                    ->pluck('live_id')
+                    ->toArray();
+                if (empty($live_id_role)){
+                    return success([]);
+                }
+                $query->whereIn('id',$live_id_role);
             }
+
+
             if (!empty($title)) {
                 $query->where('title', 'like', '%' . $title . '%');
             }
