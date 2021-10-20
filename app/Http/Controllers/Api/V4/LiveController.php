@@ -1723,7 +1723,7 @@ class LiveController extends Controller
 
 
     /**
-     * @api {get} api/v4/live/live_push_one 直播间推送
+     * @api {get} api/v4/live/live_push_one 直播间推送最后一条
      * @apiVersion 4.0.0
      * @apiName  live_push_one
      * @apiGroup 直播
