@@ -1793,7 +1793,7 @@ class LiveController extends Controller
                     ];
                     break;
                 case 9:
-                    $Info=Live::select('id','id as live_info_id','title as name','price','`describe` as subtitle','cover_img as img','cover_img as image','begin_at','end_at','user_id','is_free')->where(['id'=>$res['push_gid']])->first();
+                    $Info=Live::select('id','id as live_info_id','title as name','price','describe as subtitle','cover_img as img','cover_img as image','begin_at','end_at','user_id','is_free')->where(['id'=>$res['push_gid']])->first();
                     break;
                 case 10:
                     $Info=Live::select('id','name','`describe`','url','image','img')->where(['id'=>$res['push_gid']])->first();
