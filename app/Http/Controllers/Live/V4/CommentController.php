@@ -89,12 +89,9 @@ class CommentController extends ControllerBackend
 //            }
 
             //非超管角色可看live
-            if ($this->user['live_role'] === 21 || $this->user['live_role'] === 23){
-                $live_id_role = BackendLiveDataRole::query()
-                    ->where('user_id','=',$this->user['user_id'])
-                    ->pluck('live_id')
-                    ->toArray();
-                if (empty($live_id_role)){
+            $live_id_role = IndexController::getLiveRoleIdList($this->user);
+            if ($live_id_role !== null){
+                if ($live_id_role === []){
                     return success([]);
                 }
                 $query->whereIn('id',$live_id_role);
