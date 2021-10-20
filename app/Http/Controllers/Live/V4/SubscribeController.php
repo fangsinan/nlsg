@@ -256,19 +256,15 @@ class SubscribeController extends ControllerBackend
 
         $subObj = new Subscribe();
         $orderObj = new Order();
-
-//        $query = DB::table($subObj->getTable().' as sub')
-//            ->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id')
-//
-//            ->whereIn('sub.relation_id', $live_ids)
-//            ->where('sub.type', 3)
-//            ->where('sub.status', 1);
         $query = DB::table($subObj->getTable().' as sub');
-        if($type == "count"){ // 统计总数时，如果不走order条件 可不关联表
+        $order_flag = 0;
+        if($type == "count" || ($get_excel==1 && $live_data[0]['is_free']==1)){ // 统计总数时，如果不走order条件 可不关联表
             if(!empty($ordernum) || !empty($twitter_phoneUser) || !empty($date)){
+                $order_flag = 1;
                 $query->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id');
             }
         }else{
+            $order_flag = 1;
             $query->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id');
         }
         $query->whereIn('sub.relation_id', $live_ids)
@@ -318,10 +314,14 @@ class SubscribeController extends ControllerBackend
             return success(['total'=>$lists]);
         }
 
-
-
-        $query->select(['sub.id', 'sub.type', 'sub.user_id', 'sub.relation_id', 'sub.pay_time', 'sub.order_id', 'sub.created_at', 'sub.twitter_id',
-            'order.ordernum as order_ordernum','order.pay_price as order_pay_price','order.pay_time as order_pay_time','order.twitter_id as order_twitter_id','order.pay_type as order_pay_type','order.os_type as order_os_type','order.created_at as order_created_at'])
+        $filed = ['sub.id', 'sub.type', 'sub.user_id', 'sub.relation_id', 'sub.pay_time', 'sub.order_id', 'sub.created_at', 'sub.twitter_id',
+            'order.ordernum as order_ordernum','order.pay_price as order_pay_price','order.pay_time as order_pay_time','order.twitter_id as order_twitter_id','order.pay_type as order_pay_type','order.os_type as order_os_type','order.created_at as order_created_at'];
+        if($order_flag == 0){
+            $filed = ['sub.id', 'sub.type', 'sub.user_id', 'sub.relation_id', 'sub.pay_time', 'sub.order_id', 'sub.created_at', 'sub.twitter_id',
+//                '"" as order_ordernum','0 as order_pay_price','0 as order_pay_time','0 as order_twitter_id','0 as order_pay_type','0 as order_os_type','0 as order_created_at'
+            ];
+        }
+        $query->select($filed)
             ->orderBy('sub.created_at', 'desc');
 
         //->paginate(10)->toArray();
