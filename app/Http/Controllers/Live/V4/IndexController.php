@@ -239,11 +239,8 @@ class IndexController extends ControllerBackend
             ->where('is_del', 0)
             ->orderBy('sort', 'asc')
             ->orderBy('id', 'desc')
-            ->pluck('id')
+            ->paginate(10)
             ->toArray();
-        dd($lists);
-//            ->paginate(10)
-//            ->toArray();
 
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
