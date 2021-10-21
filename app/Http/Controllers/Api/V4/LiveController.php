@@ -1803,10 +1803,17 @@ class LiveController extends Controller
             }
             if(!empty($Info)){
                 //与socket数据格式一致
-                $suc = ['type' => 6,'ios_content' =>[[
-                    'push_info' => $res,
-                    'son_info' => $Info,
-                ],]];
+                $suc = [
+                    'type' => 6,
+                    'ios_content' =>[[
+                        'push_info' => $res,
+                        'son_info' => $Info,
+                    ]],
+                    'content' =>[[
+                        'push_info' => $res,
+                        'son_info' => $Info,
+                    ]],
+                ];
                 return success($suc);
             }
         }
