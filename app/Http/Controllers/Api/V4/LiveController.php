@@ -1852,6 +1852,7 @@ class LiveController extends Controller
         $res = Qrcodeimg::select("id","qr_url")->where([
             'relation_type' => $relation_type,
             'relation_id'   => $relation_id,
+            'status'   => 1,
         ])->first();
 
         return success($res);
