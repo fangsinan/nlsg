@@ -4,6 +4,8 @@ namespace App\Servers;
 
 use App\Models\ImDocFolder;
 use App\Models\ImDocFolderBind;
+use App\Models\ImDocFolderJob;
+use App\Models\ImDocFolderJobInfo;
 use Illuminate\Support\Facades\DB;
 
 class ImDocFolderServers
@@ -519,6 +521,24 @@ class ImDocFolderServers
 
     public function jobList($params, $user_id)
     {
+        $size = $params['size'] ?? 10;
+
+        $query = ImDocFolderJob::query()->where('status', '=', 1);
+
+        $query->with([
+            'folderInfo:id,folder_name',
+            'jobInfo:id,id as job_info_id,job_id,folder_id,doc_id,job_time,job_timestamp,job_status',
+            'jobInfo.docInfo:id,type,type_info,obj_id,cover_img,content',
+            'groupInfo:id,group_id,type,name,status'
+        ]);
+
+        $query->select(['id', 'id as job_id', 'folder_id', 'group_id', 'user_id', 'job_begin_at', 'job_type', 'job_status'])
+            ->where('status', '<>', 3)
+            ->orderBy('job_status', 'desc')
+            ->orderBy('job_begin_at', 'desc')
+            ->orderBy('id', 'desc');
+
+        return $query->paginate($size);
 
     }
 
@@ -537,24 +557,24 @@ class ImDocFolderServers
             return ['code' => false, 'msg' => '参数错误'];
         }
         $list = $params['list'] ?? [];
-        if (empty($list)){
-            return ['code'=>false,'msg'=>'数据错误'];
+        if (empty($list)) {
+            return ['code' => false, 'msg' => '数据错误'];
         }
 
         $now = time();
-        $job_begin_at = date('Y-m-d H:i:s',$now);
+        $job_begin_at = date('Y-m-d H:i:s', $now);
 
         $folder_job_data = [];
         $folder_job_info_data = [];
 
-        foreach ($list as $v){
+        foreach ($list as $v) {
             $temp_info_data = [];
             $temp_info_data['job_id'] = 0;
             $temp_info_data['folder_id'] = $v['folder_id'];
             $temp_info_data['doc_id'] = $v['doc_id'];
             $temp_info_data['job_time'] = $v['job_time'];
             $temp_info_data['job_timestamp'] = strtotime($v['job_time']);
-            if ($job_type === 1 && $v['job_time'] < $job_begin_at){
+            if ($job_type === 1 && $v['job_time'] < $job_begin_at) {
                 $job_begin_at = $v['job_time'];
             }
             $temp_info_data['status'] = 1;
@@ -562,7 +582,7 @@ class ImDocFolderServers
             $folder_job_info_data[] = $temp_info_data;
         }
 
-        foreach ($group_id as $giv){
+        foreach ($group_id as $giv) {
             $temp_giv = [];
             $temp_giv['folder_id'] = $folder_id;
             $temp_giv['group_id'] = $giv;
@@ -570,20 +590,111 @@ class ImDocFolderServers
             $temp_giv['job_begin_at'] = $job_begin_at;
             $temp_giv['status'] = 1;
             $temp_giv['job_type'] = $job_type;
-
+            $temp_giv['job_status'] = 1;
+            $folder_job_data[] = $temp_giv;
         }
 
+        DB::beginTransaction();
 
+        $id_list = [];
+        foreach ($folder_job_data as $k => $v) {
+            $id_list[$k] = DB::table('nlsg_im_doc_folder_job')->insertGetId($v);
+            if (!$id_list[$k]) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败'];
+            }
+        }
 
+        $folder_job_info = [];
+        foreach ($id_list as $v) {
+            foreach ($folder_job_info_data as $vv) {
+                $vv['job_id'] = $v;
+                $folder_job_info[] = $vv;
+            }
+        }
 
+        $temp_res = DB::table('nlsg_im_doc_folder_job_info')->insert($folder_job_info);
+        if (!$temp_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
 
-
-
-        return [$params,$folder_job_data,$folder_job_info_data];
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
     }
 
     public function changeJobStatus($params, $user_id)
     {
+        $job_flag = $params['job_flag'] ?? '';
+        if (in_array($job_flag, ['job', 'job_info'])) {
+            return ['code' => true, 'msg' => '参数错误'];
+        }
+
+        $flag = $params['flag'] ?? '';
+        if (empty($flag) || !in_array($flag, ['off', 'del'])) {
+            return ['code' => true, 'msg' => '参数错误'];
+        }
+        $job_id = $params['job_id'] ?? 0;
+        if (empty($job_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check = ImDocFolderJob::query()->where('id', '=', $job_id)->first();
+        if (empty($check)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        if ($job_flag === 'job') {
+            switch ($flag) {
+                case 'on':
+                    $check->status = 1;
+                    break;
+                case 'off':
+                    $check->status = 2;
+                    break;
+                case 'del':
+                    $check->status = 3;
+                    break;
+            }
+
+            $res = $check->save();
+            if ($res) {
+                return ['code' => true, 'msg' => '成功'];
+            }
+            return ['code' => false, 'msg' => '失败'];
+        }
+
+        $job_info_id = $params['job_info_id'] ?? 0;
+        if (empty($job_info_id)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+        $check_info = ImDocFolderJobInfo::query()->where('id', '=', $job_info_id)->first();
+        if (empty($check_info)) {
+            return ['code' => false, 'msg' => '任务文案错误'];
+        }
+        switch ($flag) {
+            case 'on':
+                if ($check->job_type === 1) {
+                    $job_time = $params['job_time'] ?? '';
+                    if (empty($job_time)) {
+                        return ['code' => false, 'msg' => '时间不能为空'];
+                    }
+                }
+                $check_info->job_time = $job_time;
+                $check_info->job_timestamp = strtotime($job_time);
+                $check_info->status = 1;
+                break;
+            case 'off':
+                $check_info->status = 2;
+                break;
+            case 'del':
+                $check_info->status = 3;
+                break;
+        }
+        $res = $check_info->save();
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+        return ['code' => false, 'msg' => '失败'];
 
     }
 
