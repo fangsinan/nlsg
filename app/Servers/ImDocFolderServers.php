@@ -554,6 +554,23 @@ class ImDocFolderServers
             $temp_info_data['doc_id'] = $v['doc_id'];
             $temp_info_data['job_time'] = $v['job_time'];
             $temp_info_data['job_timestamp'] = strtotime($v['job_time']);
+            if ($job_type === 1 && $v['job_time'] < $job_begin_at){
+                $job_begin_at = $v['job_time'];
+            }
+            $temp_info_data['status'] = 1;
+            $temp_info_data['job_status'] = 1;
+            $folder_job_info_data[] = $temp_info_data;
+        }
+
+        foreach ($group_id as $giv){
+            $temp_giv = [];
+            $temp_giv['folder_id'] = $folder_id;
+            $temp_giv['group_id'] = $giv;
+            $temp_giv['user_id'] = $user_id;
+            $temp_giv['job_begin_at'] = $job_begin_at;
+            $temp_giv['status'] = 1;
+            $temp_giv['job_type'] = $job_type;
+
         }
 
 
@@ -562,7 +579,7 @@ class ImDocFolderServers
 
 
 
-        return $params;
+        return [$params,$folder_job_data,$folder_job_info_data];
     }
 
     public function changeJobStatus($params, $user_id)
