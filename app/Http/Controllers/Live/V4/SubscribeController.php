@@ -256,20 +256,28 @@ class SubscribeController extends ControllerBackend
 
         $subObj = new Subscribe();
         $orderObj = new Order();
-        $query = DB::table($subObj->getTable().' as sub');
+
         $order_flag = 0;
-        if($type == "count" || ($get_excel==1 && $live_data[0]['is_free']==1)){ // 统计总数时，如果不走order条件 可不关联表
-            if(!empty($ordernum) || !empty($twitter_phoneUser) || !empty($date)){
-                $order_flag = 1;
-                $query->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id');
-            }
-        }else{
+        if(!empty($live_data[0]['is_free']) && $live_data[0]['is_free']==1){//免费 不需要查order表
+            $query = DB::table($subObj->getTable().' as sub');
+        }else{//付费的情况下 用order表驱动sub表
             $order_flag = 1;
-            $query->leftJoin($orderObj->getTable().' as order', 'sub.order_id', '=', 'order.id');
+            $query = DB::table($orderObj->getTable().' as order');
+            $query->leftJoin($subObj->getTable().' as sub', 'order.id', '=', 'sub.order_id');
+            $query->where('order.type', 10);  //多加一个筛选
         }
+
+
+
+
+
         $query->whereIn('sub.relation_id', $live_ids)
             ->where('sub.type', 3)
             ->where('sub.status', 1);
+        if($live_data[0]['is_free']==0){
+            $query->where('sub.order_id', '>',0);
+        }
+//            ->where('sub.order_id', '>',0);
         // 加在此处  如有搜索条件 可以走到联合索引
         if (!empty($phoneUser)) {
             $query->where('sub.user_id', $phoneUser['id']);
@@ -280,28 +288,19 @@ class SubscribeController extends ControllerBackend
             $query->where('sub.order_id', '>',0);
         }
 
-        if (!empty($ordernum)) {
+        if ($live_data[0]['is_free']==0 && !empty($ordernum)) {
             $query->where('order.ordernum', $ordernum);
         }
         if (!empty($twitter_phoneUser)) {
             if ($this->user['username'] == 13522223779) {
                 $query->where('sub.twitter_id', $twitter_phoneUser['id']);
-            } else {
+            } else if($live_data[0]['is_free']==0){
                 $query->where('order.twitter_id', $twitter_phoneUser['id']);
 
             }
         }
         $query->where('sub.is_del', 0);
         //支付时间
-        if (!empty($date)) {
-            $query->where('order.pay_time', '>=', $date[0]);
-            if (empty($date[1] ?? '')) {
-                $date[1] = $now_date;
-            }
-            $query->where('order.pay_time', '<', $date[1]);
-
-        }
-        //创建时间
         if (!empty($created_at)) {
             $query->where('sub.created_at', '>=', $created_at[0]);
             if (empty($created_at[1] ?? '')) {
