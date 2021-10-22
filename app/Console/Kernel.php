@@ -61,7 +61,7 @@ class Kernel extends ConsoleKernel
             LiveController::CrontabOnlineUser();
         })->everyMinute()->runInBackground();//每分
 
-//        $schedule->command('testJob:test')->everyMinute();
+        $schedule->command('testJob:test')->everyMinute();
 //        $schedule->command(TestJob::class,['20210928'])->everyMinute();
 
         // $schedule->command('inspire')->hourly();
