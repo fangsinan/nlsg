@@ -67,9 +67,10 @@ class WorksInfo extends Base
 
             $works_data[$key]['time_leng'] = 0;
             $works_data[$key]['time_number'] = 0;
+            $works_data[$key]['time_is_end'] = 0;
             if ($user_id) {
                 //单章节 学习记录 百分比
-                $his_data = History::select('time_leng', 'time_number')->where([
+                $his_data = History::select('time_leng', 'time_number','is_end')->where([
                     //'relation_type' => 2,
                     'info_id' => $val['id'],
                     'user_id' => $user_id,
@@ -78,6 +79,7 @@ class WorksInfo extends Base
                 if ($his_data) {
                     $works_data[$key]['time_leng'] = $his_data->time_leng;
                     $works_data[$key]['time_number'] = $his_data->time_number;
+                    $works_data[$key]['time_is_end'] = $his_data->is_end;
                 }
             }
         }
