@@ -136,15 +136,20 @@ class IndexController extends ControllerBackend
                 ->pluck('live_id')
                 ->toArray();
 
-            $query = Live::query();
-            if ($user['live_role'] === 21) {
-                $query->where('user_id', '=', $user['user_id']);
-            } else {
-                $blrModel = new BackendLiveRole();
-                $son_user_id = $blrModel->getDataUserId($user['username']);
-                $query->whereIn('user_id', $son_user_id);
+            if (0){
+                $query = Live::query();
+                if ($user['live_role'] === 21) {
+                    $query->where('user_id', '=', $user['user_id']);
+                } else {
+                    $blrModel = new BackendLiveRole();
+                    $son_user_id = $blrModel->getDataUserId($user['username']);
+                    $query->whereIn('user_id', $son_user_id);
+                }
+                $live_list = $query->pluck('id')->toArray();
+            }else{
+                $live_list = [];
             }
-            $live_list = $query->pluck('id')->toArray();
+
             return array_unique(array_merge($live_id_role,$live_list));
         }
 
