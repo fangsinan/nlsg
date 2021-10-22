@@ -61,6 +61,7 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
         $schedule->command('imJob')->everyMinute()->runInBackground();
+        $schedule->command('command:ImJobTest')->everyMinute()->runInBackground();
 
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
