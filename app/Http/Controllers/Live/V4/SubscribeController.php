@@ -46,7 +46,7 @@ class SubscribeController extends ControllerBackend
         set_time_limit(600);
         $flag = true;
         $page = 1;
-        $size = 50;
+        $size = 5000;
 
         $columns = ['订单编号', '直播标题', '用户昵称', '用户账号','收件人','收件人电话','地址', '直播定价', '分销金额', '分销昵称',
             '分销账号', '订单来源', '支付时间', '支付金额', '支付方式', '创建时间'];
