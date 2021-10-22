@@ -1817,7 +1817,7 @@ class LiveController extends Controller
                 return success($suc);
             }
         }
-        return success([]);
+        return success( (object)[] );
     }
     /**
      * @api {get} api/v4/live/get_qr_code 二维码弹窗
