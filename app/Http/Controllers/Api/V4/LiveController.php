@@ -1862,7 +1862,7 @@ class LiveController extends Controller
             'status'   => 1,
         ])->first();
 
-        return success($res);
+        return success($res ?? (object)[] );
     }
 
 }
