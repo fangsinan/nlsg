@@ -39,7 +39,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        Commands\TestJob::class,
     ];
 
     /**
@@ -61,7 +60,7 @@ class Kernel extends ConsoleKernel
             LiveController::CrontabOnlineUser();
         })->everyMinute()->runInBackground();//每分
 
-        $schedule->command('command:name')->everyMinute();
+        $schedule->command('imJob')->everyMinute();
 
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {

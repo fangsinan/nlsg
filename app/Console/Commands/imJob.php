@@ -12,14 +12,14 @@ class imJob extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'imJob';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'im job test';
 
     /**
      * Create a new command instance.
