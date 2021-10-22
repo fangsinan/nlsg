@@ -65,6 +65,7 @@ class Kernel extends ConsoleKernel
 
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
+            OrderRefundServers::test('callJob');
 //            OrderRefundServers::test(2);
             MallOrder::clear();//超时订单处理
             Order::clear(); //线下课超时处理
