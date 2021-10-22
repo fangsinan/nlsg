@@ -39,6 +39,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
+        Commands\ImJobTest::class,
+        Commands\imJob::class,
     ];
 
     /**
