@@ -44,7 +44,7 @@ class ImJobTest extends Command
         while ($begin < $end_time){
             OrderRefundServers::test($type_name);
             $begin = time();
-            sleep(2);
+            sleep(5);
         }
     }
 }
