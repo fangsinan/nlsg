@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\imJob;
+use App\Console\Commands\ImJobTest;
 use App\Console\Commands\TestJob;
 use App\Http\Controllers\Api\V4\ImMsgController;
 use App\Http\Controllers\Api\V4\LiveController;
@@ -39,8 +41,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        \App\Console\Commands\ImJobTest::class,
-        \App\Console\Commands\imJob::class
+        ImJobTest::class,
+        imJob::class
     ];
 
     /**
@@ -51,6 +53,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('command:ImJobTest')->everyMinute();
 
         $schedule->call(function () {
             //直播间在线人数存入redis
@@ -62,7 +65,7 @@ class Kernel extends ConsoleKernel
             LiveController::CrontabOnlineUser();
         })->everyMinute()->runInBackground();//每分
 
-        $schedule->command('imjobtest')->everyMinute();
+
 
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
