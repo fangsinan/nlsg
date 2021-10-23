@@ -53,8 +53,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-//        $schedule->command('command:ImJobTest')->everyMinute();
-//        $schedule->command('command:ImJobTest')->everyMinute();
+        $schedule->command('command:ImJobTest')->everyMinute();
+        $schedule->command('command:ImJobTest')->everyMinute();
         $schedule->exec('php artisan command:ImJobTest')->everyMinute();
 
         $schedule->call(function () {
@@ -71,8 +71,7 @@ class Kernel extends ConsoleKernel
 
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
-            OrderRefundServers::test('callJob');
-//            OrderRefundServers::test(2);
+//            OrderRefundServers::test('callJob');
             MallOrder::clear();//超时订单处理
             Order::clear(); //线下课超时处理
             MallRefundJob::refundJob(1);//商城订单退款处理
