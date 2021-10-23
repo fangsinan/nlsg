@@ -199,8 +199,12 @@ class SubscribeController extends ControllerBackend
 
 
 //        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('status',4)->where('id', '>', 52);
-        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('id',$live_id)->where('status',4);
-
+//        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('id',$live_id)->where('status',4);
+        if(empty($live_id)){   //管理员看全部
+            $live_query = Live::select("id","title","price","twitter_money","is_free")->where('id',$live_id)->where('status',4);
+        }else{
+            $live_query = Live::select("id","title","price","twitter_money","is_free")->where('status',4);
+        }
         //非超管角色可看live
         if (!empty($title)) {
             $live_query->where('title', 'like', '%' . $title . '%');
