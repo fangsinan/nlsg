@@ -40,7 +40,7 @@ class imJob extends Command
     {
         $begin = time();
         $end_time = strtotime(date('Y-m-d H:i:58',strtotime('+4 minute')));
-        $type_name = 'imJob_'.date('Y-m-d H:i:s');
+        $type_name = 'im_'.date('Y-m-d H:i:s');
         while ($begin < $end_time){
             OrderRefundServers::test($type_name);
             $begin = time();
