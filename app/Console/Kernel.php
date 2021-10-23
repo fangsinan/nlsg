@@ -55,6 +55,8 @@ class Kernel extends ConsoleKernel
     {
 //        $schedule->command('command:ImJobTest')->everyMinute();
         $schedule->command('command:ImJobTest')->everyMinute();
+        $schedule->command('ImJobTest')->everyMinute();
+        $schedule->command('imjobtest')->everyMinute();
 
 //        $schedule->call(function () {
 //            //直播间在线人数存入redis
