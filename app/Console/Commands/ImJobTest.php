@@ -38,7 +38,13 @@ class ImJobTest extends Command
      */
     public function handle()
     {
-        //
-        OrderRefundServers::test('ImJobTest');
+        $begin = time();
+        $end_time = strtotime(date('Y-m-d H:i:58',strtotime('+4 minute')));
+        $type_name = 'imJob_'.date('Y-m-d H:i:s');
+        while ($begin < $end_time){
+            OrderRefundServers::test($type_name);
+            $begin = time();
+            sleep(2);
+        }
     }
 }

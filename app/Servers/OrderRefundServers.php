@@ -222,12 +222,12 @@ class OrderRefundServers
         return $custom->merge($res);
     }
 
-    public static function test($type = 1){
-        $res = DB::table('w_erp_temp')->insert([
-            'sku'=>date('Y-m-d H:i:s'),
-            'erp_spu'=>random_int(1,999),
-            'erp_sku'=>$type,
+    public static function test($type = 1)
+    {
+        DB::table('w_erp_temp')->insert([
+            'sku' => date('Y-m-d H:i:s'),
+            'erp_spu' => random_int(1, 999),
+            'erp_sku' => $type,
         ]);
-        var_dump($res);
     }
 }
