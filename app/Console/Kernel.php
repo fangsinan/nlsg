@@ -41,8 +41,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        ImJobTest::class,
-        imJob::class
+//        ImJobTest::class,
+//        imJob::class
     ];
 
     /**
@@ -54,7 +54,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('command:ImJobTest')->everyMinute();
-        $schedule->exec('php artisan command:ImJobTest')->everyMinute();
+//        $schedule->exec('php artisan command:ImJobTest')->everyMinute();
 
         $schedule->call(function () {
             //直播间在线人数存入redis
