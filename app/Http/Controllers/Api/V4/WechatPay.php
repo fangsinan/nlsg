@@ -192,6 +192,10 @@ class WechatPay extends Controller
                 $pay_record_flag = 0;
 
                 //当有效身份不是钻石合伙人，对vip_user表进行任何处理
+                $e_time = 31536000;
+                if( $total_fee  == 1){ //支付1元
+                    $e_time = 86400*7;
+                }
 
                 if ($level != 2) {
                     if ($supremacy_vip == 1) {   //支付定金不需要走vip表操作
@@ -208,7 +212,7 @@ class WechatPay extends Controller
                         } else {
                             //过期时间延长一年   权益归属不发生改变
                             $Userdata = [
-                                'expire_time' => date('Y-m-d H:i:s', strtotime($UserAttInfo['expire_time']) + 31536000),
+                                'expire_time' => date('Y-m-d H:i:s', strtotime($UserAttInfo['expire_time']) + $e_time),
                             ];
                             $newVip_rst = VipUser::where(['user_id' => $user_id])->update($Userdata);
                             $twitter_top = explode('->', $orderInfo['remark']);
@@ -233,7 +237,7 @@ class WechatPay extends Controller
                     //当有效身份为钻石合伙人，对vip_user表进行任何处理
                     if ($UserAttInfo['is_open_360'] == 1) {
                         $VipUserData = [
-                            'time_end_360' => date('Y-m-d H:i:s', strtotime($UserAttInfo['time_end_360']) + 31536000),
+                            'time_end_360' => date('Y-m-d H:i:s', strtotime($UserAttInfo['time_end_360']) + $e_time),
                         ];
                     } else {
                         $VipUserData = [
@@ -246,71 +250,73 @@ class WechatPay extends Controller
                     $twitter_id = $user_id;
                 }
 
-                //服务商购买时已是优惠价格
-                //购买必须为360会员
-                $PayRDObj = new PayRecordDetail();
-                // 开通续费为360   并且  推客id有 或者  销讲老师id有[推客可能为空]
-                $sales_id = $orderInfo['sales_id']; //销讲老师
-                if ($supremacy_vip == 1 && (!empty($twitter_id) || !empty($sales_id))) { //推客是自己不算 服务商赠送不返利
-                    $tk_vip = VipUser::IsNewVip($twitter_id);
+                if($total_fee > 1){
+                    //服务商购买时已是优惠价格
+                    //购买必须为360会员
+                    $PayRDObj = new PayRecordDetail();
+                    // 开通续费为360   并且  推客id有 或者  销讲老师id有[推客可能为空]
+                    $sales_id = $orderInfo['sales_id']; //销讲老师
+                    if ($supremacy_vip == 1 && (!empty($twitter_id) || !empty($sales_id))) { //推客是自己不算 服务商赠送不返利
+                        $tk_vip = VipUser::IsNewVip($twitter_id);
 
-                    if ($tk_vip && $supremacy_vip == 1) {   //目前只有360会员有收益
-                        $ProfitPrice = GetPriceTools::Income(0, $tk_vip, 0, 5);
+                        if ($tk_vip && $supremacy_vip == 1) {   //目前只有360会员有收益
+                            $ProfitPrice = GetPriceTools::Income(0, $tk_vip, 0, 5);
 
-                        if ($ProfitPrice > 0) {
-                            $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
+                            if ($ProfitPrice > 0) {
+                                $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
 
+                            }
                         }
+
+
+                        /*****************     开通360   有销讲老师的划分收益【】  ****************/
+
+                        if (!empty($map) && (empty($sales_id) || $vip_order_type == 2)) {  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程
+                            //防止重复添加收入
+                            $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
+                            $PrdInfo = PayRecordDetail::where($where)->first('id');
+                            if (empty($PrdInfo)) {
+                                $pay_record_flag = 1;
+                                $Sy_Rst = PayRecordDetail::firstOrCreate($map);
+                            }
+                        } else if (!empty($sales_id) && $vip_order_type == 1) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
+                            //老师收益
+                            $salesData = MeetingSales::where(['id' => $sales_id, 'status' => 1])->first();
+                            $sales_map = array('user_id' => $salesData['user_id'], "type" => 11, "ordernum" => $out_trade_no, 'price' => 100, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
+                            $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
+
+                            //正常是 代理商收益126  公司134
+                            $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
+                            //if( $salesData['type'] == 2 ){  } //需要查绑定关系   钻石合伙人是126   360是54  没有则只有老师有收益
+                            $is_vip = VipUser::IsNewVip($twitter_id);
+                            switch ($is_vip) {
+                                case 1:
+                                    $map['price'] = 54;
+                                    break;
+                                case 2:
+                                    $map['price'] = 126;
+                                    break;
+                                default :
+                                    $map = [];  // 如果没有绑定  则只有老师有收益
+                                    break;
+                            }
+
+                            //代理商收益
+                            if ($map) {
+                                $pay_record_flag = 1;
+                                $Sy_Rst = PayRecordDetail::firstOrCreate($map);
+                            }
+                        }
+
                     }
-
-
-                    /*****************     开通360   有销讲老师的划分收益【】  ****************/
-
-                    if (!empty($map) && (empty($sales_id) || $vip_order_type == 2)) {  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程
-                        //防止重复添加收入
-                        $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
-                        $PrdInfo = PayRecordDetail::where($where)->first('id');
-                        if (empty($PrdInfo)) {
-                            $pay_record_flag = 1;
-                            $Sy_Rst = PayRecordDetail::firstOrCreate($map);
-                        }
-                    } else if (!empty($sales_id) && $vip_order_type == 1) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
-                        //老师收益
-                        $salesData = MeetingSales::where(['id' => $sales_id, 'status' => 1])->first();
-                        $sales_map = array('user_id' => $salesData['user_id'], "type" => 11, "ordernum" => $out_trade_no, 'price' => 100, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
-                        $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
-
-                        //正常是 代理商收益126  公司134
-                        $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
-                        //if( $salesData['type'] == 2 ){  } //需要查绑定关系   钻石合伙人是126   360是54  没有则只有老师有收益
-                        $is_vip = VipUser::IsNewVip($twitter_id);
-                        switch ($is_vip) {
-                            case 1:
-                                $map['price'] = 54;
-                                break;
-                            case 2:
-                                $map['price'] = 126;
-                                break;
-                            default :
-                                $map = [];  // 如果没有绑定  则只有老师有收益
-                                break;
-                        }
-
-                        //代理商收益
-                        if ($map) {
-                            $pay_record_flag = 1;
-                            $Sy_Rst = PayRecordDetail::firstOrCreate($map);
-                        }
+                    //受保护的人 需要给推荐人[非保护者] 加一个收益为0的数据
+                    $top_Sy_Rst = true;
+                    $twitter_top = explode('->', $orderInfo['remark']);
+                    if ($twitter_top[0] > 0) {
+                        $twitter_top_vip_id = VipUser::where(['user_id' => $twitter_top[0], 'is_default' => 1, 'status' => 1])->first('id');
+                        $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id);
+                        $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
                     }
-
-                }
-                //受保护的人 需要给推荐人[非保护者] 加一个收益为0的数据
-                $top_Sy_Rst = true;
-                $twitter_top = explode('->', $orderInfo['remark']);
-                if ($twitter_top[0] > 0) {
-                    $twitter_top_vip_id = VipUser::where(['user_id' => $twitter_top[0], 'is_default' => 1, 'status' => 1])->first('id');
-                    $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id);
-                    $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
                 }
 
                 //  升级续费都需要进行精品课赠送     已经购买的需要折算兑换码
@@ -318,7 +324,7 @@ class WechatPay extends Controller
                 $add_sub_Rst = true;
                 if ($supremacy_vip == 1) {
                     //use
-                    $add_sub_Rst = VipRedeemUser::subWorksOrGetRedeemCode($user_id);
+                    $add_sub_Rst = VipRedeemUser::subWorksOrGetRedeemCode($user_id,$total_fee);
                 }
 
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];

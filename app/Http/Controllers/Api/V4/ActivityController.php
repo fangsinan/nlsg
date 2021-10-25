@@ -10,6 +10,14 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\LiveCountDown;
+use App\Models\MallOrder;
+use App\Models\MeetingSales;
+use App\Models\MeetingSalesBind;
+use App\Models\Order;
+use App\Models\VipUser;
+use App\Models\VipUserBind;
+use Illuminate\Http\Request;
 
 /**
  * Description of AddressController
@@ -34,29 +42,34 @@ class ActivityController extends Controller {
     }
      */
     public function activeImg(){
-        return [
-            '2x'=>[
-                "/nlsg/activity/%402x/1%402x.png",
-                "/nlsg/activity/%402x/2%402x.png",
-                "/nlsg/activity/%402x/3%402x.png",
-                "/nlsg/activity/%402x/4%402x.png",
-                "/nlsg/activity/%402x/5%402x.png",
-                "/nlsg/activity/%402x/6%402x.png",
-                "/nlsg/activity/%402x/7%402x.png",
-                "/nlsg/activity/%402x/8%402x.png",
-            ],
-            '3x'=>[
-                "/nlsg/activity/%402x/1%402x.png",
-                "/nlsg/activity/%402x/2%402x.png",
-                "/nlsg/activity/%402x/3%402x.png",
-                "/nlsg/activity/%402x/4%402x.png",
-                "/nlsg/activity/%402x/5%402x.png",
-                "/nlsg/activity/%402x/6%402x.png",
-                "/nlsg/activity/%402x/7%402x.png",
-                "/nlsg/activity/%402x/8%402x.png",
-            ],
-        ];
-    }
 
+        $data = [
+//            'twox'=>[
+//                "/nlsg/activity/%402x/1%402x.png",
+//                "/nlsg/activity/%402x/2%402x.png",
+//                "/nlsg/activity/%402x/3%402x.png",
+//                "/nlsg/activity/%402x/4%402x.png",
+//                "/nlsg/activity/%402x/5%402x.png",
+//                "/nlsg/activity/%402x/6%402x.png",
+//                "/nlsg/activity/%402x/7%402x.png",
+//                "/nlsg/activity/%402x/8%402x.png",
+//            ],
+//            'threex'=>[
+//                "/nlsg/activity/%403x/1%403x.png",
+//                "/nlsg/activity/%403x/2%403x.png",
+//                "/nlsg/activity/%403x/3%403x.png",
+//                "/nlsg/activity/%403x/4%403x.png",
+//                "/nlsg/activity/%403x/5%403x.png",
+//                "/nlsg/activity/%403x/6%403x.png",
+//                "/nlsg/activity/%403x/7%403x.png",
+//                "/nlsg/activity/%403x/8%403x.png",
+//            ],
+            'img' =>[
+                "top" => "/nlsg/activity/13611635153705_.pic_hd.jpg",
+                "down" => "/nlsg/activity/13631635154129_.pic_hd.jpg",
+            ]
+        ];
+        return success($data);
+    }
 
 }

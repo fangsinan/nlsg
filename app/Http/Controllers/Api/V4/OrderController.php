@@ -1019,6 +1019,7 @@ class OrderController extends Controller
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
      * @apiParam {int} inviter 推客id
+     * @apiParam {int} activity_tag 活动标识
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -1034,6 +1035,7 @@ class OrderController extends Controller
         $os_type = $request->input('os_type', 0);
         $live_id = $request->input('live_id', 0);
         $live_num = $request->input('live_num',1);
+        $activity_tag = $request->input('activity_tag','');//
         $tweeter_code = intval($request->input('inviter', 0));  //推客id
         $user_id = $this->user['id'];
 
@@ -1131,6 +1133,9 @@ class OrderController extends Controller
         } else {
             $price = 1000;
         }
+        if($activity_tag == "2021-11"){
+            $price = 1;
+        }
 
 
         $type = 1;
@@ -1151,6 +1156,7 @@ class OrderController extends Controller
             'cost_price' => $price,
             'live_num'=>$live_num,
             'ip' => $this->getIp($request),
+            'activity_tag' => $activity_tag??'',
             'os_type' => $os_type,
             'live_id' => $live_id,
             'vip_order_type' => $type,  //1开通 2续费 3升级
