@@ -2,24 +2,23 @@
 
 namespace App\Console\Commands;
 
-use App\Servers\OrderRefundServers;
 use Illuminate\Console\Command;
 
-class ImJobTest extends Command
+class erpJob extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:ImJobTest';
+    protected $signature = 'command:erpJob';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Im Doc Job';
+    protected $description = 'erp推送';
 
     /**
      * Create a new command instance.
@@ -38,13 +37,6 @@ class ImJobTest extends Command
      */
     public function handle()
     {
-        $begin = time();
-        $end_time = strtotime(date('Y-m-d H:i:58',strtotime('+4 minute')));
-        $type_name = 'imJob_'.date('Y-m-d H:i:s');
-        while ($begin < $end_time){
-            OrderRefundServers::test($type_name);
-            $begin = time();
-            sleep(5);
-        }
+        //
     }
 }
