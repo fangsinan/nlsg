@@ -97,8 +97,11 @@ class LiveInfoServers
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
-        if ($check_live_id->user_id != 161904) {
-            return ['code' => false, 'msg' => '不是王琨的直播间'];
+//        if ($check_live_id->user_id != 161904) {
+//            return ['code' => false, 'msg' => '不是王琨的直播间'];
+//        }
+        if (!in_array($check_live_id->user_id, [161904, 185689], true)){
+            return ['code' => false, 'msg' => '直播间归属错误'];
         }
 
         $query = DB::table('nlsg_live_deal')->where('live_id', '=', $live_id);
