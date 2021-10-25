@@ -60,6 +60,8 @@ class OrderController extends ControllerBackend
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
         $sort = $request->get('sort');
+        $activity_tag = $request->get('activity_tag','');
+        $is_shill = (int)($request->get('is_shill',-1));
         $query = Order::with(
             [
                 'user:id,nickname',
@@ -102,11 +104,27 @@ class OrderController extends ControllerBackend
                     Carbon::parse($start)->startOfDay()->toDateTimeString(),
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
+            })
+            ->whereHas('user',function($q){
+                $q->where('is_test_pay','=',0);
             });
+
+        if ($activity_tag === 'cytx_on'){
+            $query->where('activity_tag','=','cytx');
+        }
+        if($activity_tag === 'cytx_off'){
+            $query->where('activity_tag','<>','cytx');
+        }
+        if ($is_shill === 0){
+            $query->where('is_shill','=',0);
+        }
+        if ($is_shill === 1){
+            $query->where('is_shill','=',1);
+        }
 
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
-            'created_at', 'status')
+            'created_at', 'status','activity_tag','is_shill')
             ->where('type', 9)
             ->orderBy('id', $direction)
             ->paginate(10)
@@ -146,6 +164,9 @@ class OrderController extends ControllerBackend
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
         $sort = $request->get('sort');
+        $activity_tag = $request->get('activity_tag','');
+        $is_shill = (int)($request->get('is_shill',-1));
+        
         $query = Order::with(
             [
                 'user:id,nickname',
@@ -195,9 +216,22 @@ class OrderController extends ControllerBackend
                 ]);
             });
 
+        if ($activity_tag === 'cytx_on'){
+            $query->where('activity_tag','=','cytx');
+        }
+        if($activity_tag === 'cytx_off'){
+            $query->where('activity_tag','<>','cytx');
+        }
+        if ($is_shill === 0){
+            $query->where('is_shill','=',0);
+        }
+        if ($is_shill === 1){
+            $query->where('is_shill','=',1);
+        }
+
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
-            'created_at', 'status')
+            'created_at', 'status','activity_tag')
             ->where('type', 15)
             ->orderBy('id', $direction)
             ->paginate(10)
