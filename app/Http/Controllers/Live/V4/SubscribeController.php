@@ -200,7 +200,7 @@ class SubscribeController extends ControllerBackend
 
 //        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('status',4)->where('id', '>', 52);
 //        $live_query = Live::select("id","title","price","twitter_money","is_free")->where('id',$live_id)->where('status',4);
-        if(empty($live_id)){   //管理员看全部
+        if(!empty($live_id)){   //管理员看全部
             $live_query = Live::select("id","title","price","twitter_money","is_free")->where('id',$live_id)->where('status',4);
         }else{
             $live_query = Live::select("id","title","price","twitter_money","is_free")->where('status',4);
@@ -212,6 +212,7 @@ class SubscribeController extends ControllerBackend
 
         //非超管角色可看live
         $live_id_role = IndexController::getLiveRoleIdList($this->user);
+
         if ($live_id_role !== null){
             if ($live_id_role === []){
                 return success([]);
@@ -220,7 +221,6 @@ class SubscribeController extends ControllerBackend
         }else{
             $live_data = $live_query->get()->toArray();
         }
-
 
 //        if ($this->user['live_role'] == 21) {
 //            $live_user_id = $this->user['user_id'];
