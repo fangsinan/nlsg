@@ -398,7 +398,7 @@ class VipRedeemUser extends Base
 
 
     //(加事务调用)360课程订阅和生成兑换券
-    public static function subWorksOrGetRedeemCode($user_id)
+    public static function subWorksOrGetRedeemCode($user_id,$total_fee=360)
     {
 
         if (0) {
@@ -494,6 +494,10 @@ class VipRedeemUser extends Base
             $now = time();
             $now_date = date('Y-m-d H:i:s', $now);
             $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
+
+            if($total_fee == 1) {
+                $end_date = date('Y-m-d 23:59:59', strtotime(" +7 days"));
+            }
             $group_name = RedeemCode::createGroupName();
 
             $add_code_data = [];
@@ -522,18 +526,21 @@ class VipRedeemUser extends Base
                             'end_time' => $end_date
                         ];
                     } else {
-                        $add_code_data[] = [
-                            'code' => $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5),
-                            'name' => ($v['title'] ?? '讲座') . '-兑换券',
-                            'new_group' => $group_name,
-                            'can_use' => 1,
-                            'redeem_type' => 3,
-                            'goods_id' => $v['id'],
-                            'user_id' => $user_id,
-                            'is_new_code' => 1,
-                            'created_at' => $now_date,
-                            'updated_at' => $now_date
-                        ];
+                        if($total_fee > 1){
+                            $add_code_data[] = [
+                                'code' => $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5),
+                                'name' => ($v['title'] ?? '讲座') . '-兑换券',
+                                'new_group' => $group_name,
+                                'can_use' => 1,
+                                'redeem_type' => 3,
+                                'goods_id' => $v['id'],
+                                'user_id' => $user_id,
+                                'is_new_code' => 1,
+                                'created_at' => $now_date,
+                                'updated_at' => $now_date
+                            ];
+                        }
+
                     }
 
                 } else {
@@ -558,18 +565,21 @@ class VipRedeemUser extends Base
                             'end_time' => $end_date
                         ];
                     } else {
-                        $add_code_data[] = [
-                            'code' => $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5),
-                            'name' => ($v['title'] ?? '课程') . '-兑换券',
-                            'new_group' => $group_name,
-                            'can_use' => 1,
-                            'redeem_type' => 2,
-                            'goods_id' => $v['id'],
-                            'user_id' => $user_id,
-                            'is_new_code' => 1,
-                            'created_at' => $now_date,
-                            'updated_at' => $now_date
-                        ];
+                        if($total_fee > 1) {
+                            $add_code_data[] = [
+                                'code' => $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5),
+                                'name' => ($v['title'] ?? '课程') . '-兑换券',
+                                'new_group' => $group_name,
+                                'can_use' => 1,
+                                'redeem_type' => 2,
+                                'goods_id' => $v['id'],
+                                'user_id' => $user_id,
+                                'is_new_code' => 1,
+                                'created_at' => $now_date,
+                                'updated_at' => $now_date
+                            ];
+                        }
+
                     }
                 }
             }
