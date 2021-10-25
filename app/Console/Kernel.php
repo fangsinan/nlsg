@@ -2,9 +2,6 @@
 
 namespace App\Console;
 
-use App\Console\Commands\imJob;
-use App\Console\Commands\ImJobTest;
-use App\Console\Commands\TestJob;
 use App\Http\Controllers\Api\V4\ImMsgController;
 use App\Http\Controllers\Api\V4\LiveController;
 use App\Http\Controllers\Api\V4\UserWechat;
@@ -25,7 +22,6 @@ use App\Servers\DealServers;
 use App\Servers\ErpServers;
 use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
-use App\Servers\OrderRefundServers;
 use App\Servers\PhoneRegionServers;
 use App\Servers\removeDataServers;
 use Illuminate\Console\Scheduling\Schedule;
@@ -41,8 +37,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-//        ImJobTest::class,
-//        imJob::class
     ];
 
     /**
@@ -53,16 +47,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('command:ImJobTest')
-            ->everyMinute()
-            ->withoutOverlapping(5)
-            ->runInBackground()
-            ->onOneServer();
-        $schedule->command('imJob')
-            ->everyMinute()
-            ->withoutOverlapping(5)
-            ->runInBackground()
-            ->onOneServer();
+//        $schedule->command('command:ImJobTest')
+//            ->everyMinute()
+//            ->withoutOverlapping(5)
+//            ->runInBackground()
+//            ->onOneServer();
+//        $schedule->command('imJob')
+//            ->everyMinute()
+//            ->withoutOverlapping(5)
+//            ->runInBackground()
+//            ->onOneServer();
+
 //        $schedule->exec('php artisan command:ImJobTest')->everyMinute();
 
         $schedule->call(function () {
@@ -74,7 +69,6 @@ class Kernel extends ConsoleKernel
             //直播间在线人数入库，方便调试
             LiveController::CrontabOnlineUser();
         })->everyMinute()->runInBackground();//每分
-
 
 
         // $schedule->command('inspire')->hourly();
@@ -95,7 +89,7 @@ class Kernel extends ConsoleKernel
 
             //IM 群发后入库
             $msg = new ImMsgController();
-            for ($i=1;$i<=6;$i++){
+            for ($i = 1; $i <= 6; $i++) {
                 $msg->RedisSendAllMsgCallback();
                 sleep(10);
             }
@@ -195,13 +189,13 @@ class Kernel extends ConsoleKernel
         //https://laravelacademy.org/post/8484.html
         $schedule->call(function () {
             //抓取腾讯IM图片到阿里云
-            $AliUploadServer=new AliUploadServers();
+            $AliUploadServer = new AliUploadServers();
             $AliUploadServer->UploadMediaPull();
         })->everyMinute()->between('0:00', '3:00')->runInBackground();//每分钟执行一次
 
         $schedule->call(function () {
             //抓取腾讯IM音视频、文件到阿里云
-            $AliUploadServer=new AliUploadServers();
+            $AliUploadServer = new AliUploadServers();
             $AliUploadServer->UploadMediaVideoAudio();
         })->everyFiveMinutes()->between('2:00', '6:00')->runInBackground();//5分钟执行一次
 
