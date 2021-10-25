@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Servers\OrderRefundServers;
+use App\Servers\ImDocFolderServers;
 use Illuminate\Console\Command;
 
 class imJob extends Command
@@ -38,13 +38,7 @@ class imJob extends Command
      */
     public function handle()
     {
-        $begin = time();
-        $end_time = strtotime(date('Y-m-d H:i:58',strtotime('+2 minute')));
-        $type_name = 'im_'.date('Y-m-d H:i:s');
-        while ($begin < $end_time){
-            OrderRefundServers::test($type_name);
-            $begin = time();
-        }
-
+        $idfServer = new ImDocFolderServers();
+        $idfServer->sendJob();
     }
 }

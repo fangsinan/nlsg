@@ -8,7 +8,12 @@ class ImDocFolderJobInfo extends Base
 
     public function docInfo()
     {
-        return $this->hasOne('App\Models\ImDoc', 'id', 'doc_id');
+        return $this->hasOne(\App\Models\ImDoc::class, 'id', 'doc_id');
+    }
+
+    public function jobTop()
+    {
+        return $this->hasOne(\App\Models\ImDocFolderJob::class, 'id', 'job_id');
     }
 
 }

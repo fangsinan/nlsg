@@ -8,17 +8,17 @@ class ImDocFolderJob extends Base
 
     public function jobInfo()
     {
-        return $this->hasMany('App\Models\ImDocFolderJobInfo', 'job_id', 'id')
+        return $this->hasMany(\App\Models\ImDocFolderJobInfo::class, 'job_id', 'id')
             ->where('status', '<>', 3);
     }
 
     public function groupInfo()
     {
-        return $this->hasOne('App\Models\ImGroup', 'id', 'group_id');
+        return $this->hasOne(\App\Models\ImGroup::class, 'id', 'group_id');
     }
 
     public function folderInfo()
     {
-        return $this->hasOne('App\Models\ImDocFolder', 'id', 'folder_id');
+        return $this->hasOne(\App\Models\ImDocFolder::class, 'id', 'folder_id');
     }
 }

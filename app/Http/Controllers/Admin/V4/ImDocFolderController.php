@@ -163,7 +163,7 @@ class ImDocFolderController extends ControllerBackend
     public function addJob(Request $request)
     {
         $servers = new ImDocFolderServers();
-        $data = $servers->addJob($request->input(), $this->user['id']);
+        $data = $servers->addJob($request->input(), $this->user['user_id']);
         return $this->getRes($data);
     }
 

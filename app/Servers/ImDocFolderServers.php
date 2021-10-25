@@ -2,11 +2,14 @@
 
 namespace App\Servers;
 
+use App\Models\ImBeatWord;
 use App\Models\ImDocFolder;
 use App\Models\ImDocFolderBind;
 use App\Models\ImDocFolderJob;
 use App\Models\ImDocFolderJobInfo;
+use App\Models\ImMedia;
 use Illuminate\Support\Facades\DB;
+use Libraries\ImClient;
 
 class ImDocFolderServers
 {
@@ -372,7 +375,7 @@ class ImDocFolderServers
         return ['code' => false, 'msg' => '失败'];
     }
 
-    public function changeDocStatus($params, $user_id)
+    public function changeDocStatus($params, $user_id): array
     {
         $id = $params['id'] ?? 0;
         $flag = $params['flag'] ?? '';
@@ -457,7 +460,7 @@ class ImDocFolderServers
     }
 
 
-    private function folderIdList(&$tree, $id, $begin)
+    private function folderIdList(&$tree, $id, $begin): void
     {
         $query = ImDocFolder::query();
 
@@ -481,7 +484,7 @@ class ImDocFolderServers
         }
     }
 
-    public function folderDocList($params, $user_id)
+    public function folderDocList($params, $user_id): array
     {
         $folder_id = $params['folder_id'] ?? 0;
         if (empty($folder_id)) {
@@ -542,7 +545,7 @@ class ImDocFolderServers
 
     }
 
-    public function addJob($params, $user_id)
+    public function addJob($params, $user_id): array
     {
         $folder_id = $params['folder_id'] ?? 0;
         $group_id = $params['group_id'] ?? '';
@@ -623,7 +626,7 @@ class ImDocFolderServers
         return ['code' => true, 'msg' => '成功'];
     }
 
-    public function changeJobStatus($params, $user_id)
+    public function changeJobStatus($params, $user_id): array
     {
         $job_flag = $params['job_flag'] ?? '';
         if (in_array($job_flag, ['job', 'job_info'])) {
@@ -696,6 +699,346 @@ class ImDocFolderServers
         }
         return ['code' => false, 'msg' => '失败'];
 
+    }
+
+    public function sendJob($limit = 2)
+    {
+        $limit = $limit < 2 ? 2 : $limit;
+        $end_time = strtotime(date('Y-m-d H:i:59', strtotime('+' . ($limit - 1) . ' minute')));
+
+        $list = ImDocFolderJobInfo::query()
+            ->with(['jobTop:id,status,group_id,user_id', 'docInfo', 'jobTop.groupInfo:id,group_id'])
+            ->where('status', '=', 1)
+            ->where('job_status', '=', 1)
+            ->where('job_timestamp', '<=', $end_time)
+            ->whereHas('jobTop', function ($q) {
+                $q->where('status', '=', 1);
+            })
+            ->orderBy('job_timestamp')
+            ->orderBy('id')
+            ->select(['id', 'job_id', 'doc_id', 'job_time', 'job_timestamp', 'job_status'])
+            ->get();
+        if ($list->isEmpty()) {
+            return true;
+        }
+
+        $list = $list->toArray();
+
+        //获取发送任务
+        foreach ($list as $k => &$v) {
+            $v['send_times'] = 0;
+            $v['sendData'] = [];
+            $group_id = $v['job_top']['group_info']['group_id'] ?? '';
+            $send_user_id = $v['job_top']['user_id'] ?? 0;
+            if (empty($group_id) || empty($send_user_id)) {
+                ImDocFolderJob::query()->where('id', '=', $v['job_id'])
+                    ->update([
+                        'status' => 2, 'remark' => '信息错误' . $group_id . '->' . $send_user_id
+                    ]);
+                ImDocFolderJobInfo::query()->where('id', '=', $v['id'])
+                    ->update([
+                        'status' => 2, 'remark' => '信息错误' . $group_id . '->' . $send_user_id
+                    ]);
+                unset($list[$k]);
+                continue;
+            }
+            $v['sendData'] = $this->getSendGroupMsgPostData($v['doc_info'], $group_id, $send_user_id);
+            unset($v['doc_info']);
+        }
+
+        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+
+        $while_flag = true;
+        $beat_word = [];
+
+        while ($while_flag) {
+            if (empty($list)) {
+                $while_flag = false;
+            }
+            if (time() > $end_time) {
+                $while_flag = false;
+            }
+
+            foreach ($list as $k => $v) {
+                if ($v['job_timestamp'] <= time()) {
+                    $temp_res = ImClient::curlPost($url, json_encode($v['sendData']));
+                    $temp_res = json_decode($temp_res, true);
+
+                    if ($temp_res['ErrorCode'] === 0) {
+                        ImDocFolderJobInfo::query()
+                            ->where('id', '=', $v['id'])
+                            ->update([
+                                'job_status' => 3
+                            ]);
+
+
+                        DB::select("UPDATE nlsg_im_doc_folder_job AS j SET j.job_status = 3
+                            WHERE
+                                j.id = " . $v['job_id'] . "
+                                AND NOT EXISTS (
+                                SELECT * FROM nlsg_im_doc_folder_job_info
+                                WHERE job_id = j.id AND STATUS = 1 AND job_status = 1
+                        )");
+
+                    } else {
+                        if ($temp_res['ErrorCode'] === 80001) {
+                            $str_1 = strpos($temp_res['ErrorInfo'], 'beat word:');
+                            $str_2 = strpos($temp_res['ErrorInfo'], '|requestid');
+                            $str = substr($temp_res['ErrorInfo'], $str_1 + 10, $str_2 - $str_1 - 10);
+                            $beat_word[] = trim($str);
+                        }
+
+                        ImDocFolderJobInfo::query()
+                            ->where('id', '=', $v['id'])
+                            ->update([
+                                'status' => 2,
+                                'remark' => $temp_res['ErrorInfo'] ?? ''
+                            ]);
+
+                    }
+                    unset($list[$k]);
+                }
+            }
+        }
+
+        if (!empty($beat_word)) {
+            foreach ($beat_word as $bwv) {
+                ImBeatWord::query()->updateOrCreate(
+                    array('beat_word' => $bwv),
+                    array('times' => DB::raw('times+1'))
+                );
+            }
+        }
+
+        return true;
+    }
+
+    //拼接消息体
+    public function getSendGroupMsgPostData($doc_info, $to, $from)
+    {
+        try {
+            $idServers = new ImDocServers();
+            $temp_post_data = [];
+            $temp_post_data['GroupId'] = $to;
+            $temp_post_data['From_Account'] = (string)$from;
+            $temp_post_data['Random'] = $idServers->getMsgRandom();
+            $temp_post_data['MsgBody'] = [];
+            $temp_msg_type = 0;
+            switch ((int)$doc_info['type_info']) {
+                case 11:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 7;
+                    }
+                case 12:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 2;
+                    }
+                case 13:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 3;
+                    }
+                case 14:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 6;
+                    }
+                case 15:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 9;
+                    }
+                case 17:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 10;
+                    }
+                case 16:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 11;
+                    }
+                case 18:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 4;
+                    }
+                case 19:
+                    if (empty($temp_msg_type)) {
+                        $temp_msg_type = 8;
+                    }
+                    //类型 11:讲座 12课程 13商品 14会员 15直播 16训练营 17外链 18线下课 19听书
+                    $custom_elem_body = [
+                        "goodsID" => $temp_msg_type === 10 ? $doc_info['subtitle'] : (string)$doc_info['obj_id'],
+                        "cover_pic" => $doc_info['cover_img'],
+                        "titleName" => $doc_info['content'],
+                        "subtitle" => $doc_info['subtitle'],
+                        "type" => (string)$temp_msg_type,
+                    ];
+
+                    $custom_elem_body = json_encode($custom_elem_body);
+                    $temp_post_data['MsgBody'][] = [
+                        "MsgType" => "TIMCustomElem", // 自定义,不成功
+                        "MsgContent" => [
+                            "Data" => $custom_elem_body,
+                            "Desc" => '',
+                            'Ext' => '',
+                            'Sound' => '',
+                        ]
+                    ];
+                    $post_data_array[] = $temp_post_data;
+                    break;
+                case 211://音频
+                    $temp_post_data['MsgBody'][] = [
+                        "MsgType" => "TIMSoundElem",//音频
+                        "MsgContent" => [
+                            "Url" => $doc_info['file_url'],
+                            "Size" => $doc_info['file_size'],
+                            "Second" => $doc_info['second'],
+                            "Download_Flag" => 2
+                        ]
+                    ];
+                    $post_data_array[] = $temp_post_data;
+                    break;
+                case 22://视频
+                    $temp_media_id = $doc_info['media_id'];
+                    $temp_media_info = ImMedia::query()->where('media_id', '=', $temp_media_id)->first();
+                    if (!empty($temp_media_info->second ?? 0)) {
+                        $temp_video_second = (int)(round($temp_media_info->second));
+                    } else {
+                        $temp_video_second = $doc_info['second'];
+                    }
+
+                    $temp_post_data['MsgBody'][] = [
+                        "MsgType" => "TIMVideoFileElem",//视频
+                        "MsgContent" => [
+                            "VideoUrl" => str_replace('https:', 'http:', $doc_info['file_url']),
+                            "VideoUUID" => $idServers->getMsgRandom(),
+                            "videouuid" => $idServers->getMsgRandom(),
+                            "VideoSize" => $doc_info['file_size'],
+                            "VideoSecond" => $temp_video_second,
+                            "VideoFormat" => $doc_info['format'],
+                            "VideoDownloadFlag" => 2,
+                            "ThumbUrl" => str_replace('https:', 'http:', $doc_info['cover_img']),
+                            "ThumbUUID" => $idServers->getMsgRandom(),
+                            "ThumbSize" => $doc_info['img_size'],
+                            "ThumbWidth" => $doc_info['img_width'],
+                            "ThumbHeight" => $doc_info['img_height'],
+                            "ThumbFormat" => $doc_info['img_format'],
+                            "ThumbDownloadFlag" => 2
+                        ]
+                    ];
+                    $post_data_array[] = $temp_post_data;
+                    break;
+                case 23:
+                    //图片
+                    $file_url = explode(';', $doc_info['file_url']);
+                    $file_url = array_filter($file_url);
+                    foreach ($file_url as $fuv) {
+                        $temp_format = pathinfo($fuv[0])['extension'] ?? 'jpg';
+                        $temp_format_num = 255;
+                        switch (strtolower($temp_format)) {
+                            case 'jpg':
+                                $temp_format_num = 1;
+                                break;
+                            case 'gif':
+                                $temp_format_num = 2;
+                                break;
+                            case 'png':
+                                $temp_format_num = 3;
+                                break;
+                            case 'bmp':
+                                $temp_format_num = 4;
+                                break;
+                        }
+                        $temp_post_data['Random'] = $idServers->getMsgRandom();
+                        $temp_post_data['MsgBody'] = [];
+                        $fuv = explode(',', $fuv);
+                        $temp_fuv_width = (int)$fuv[2];
+                        $temp_fuv_height = (int)$fuv[3];
+                        $temp_wh_str = '';
+                        $img_url = $fuv[0];
+                        $img_url = str_replace('https:', 'http:', $img_url);
+
+                        if ($temp_fuv_height > 396 && $temp_fuv_width > 396) {
+                            $temp_w_c = floor($temp_fuv_width / 198);
+                            $temp_h_c = floor($temp_fuv_height / 198);
+
+                            $temp_wh = $temp_h_c > $temp_w_c ? $temp_w_c : $temp_h_c;
+                            $temp_wh = floor(100 / $temp_wh);
+                            $temp_wh = $temp_wh > 50 ? 50 : $temp_wh;
+                            $temp_wh_str = '?x-oss-process=image/resize,p_' . $temp_wh;
+                        }
+
+                        $temp_post_data['MsgBody'][] = [
+                            "MsgType" => "TIMImageElem",
+                            "MsgContent" => [
+                                "UUID" => 'ali_rest_image_' . $idServers->getMsgRandom() . '.' . $temp_format,
+                                "ImageFormat" => $temp_format_num,
+                                "ImageInfoArray" => [
+                                    [
+                                        "Type" => 1,
+                                        "Size" => (int)$fuv[1],
+                                        "Width" => (int)$fuv[2],
+                                        "Height" => (int)$fuv[3],
+                                        "URL" => $img_url,
+                                    ],
+                                    [
+                                        "Type" => 2,
+                                        "Size" => (int)$fuv[1],
+                                        "Width" => 0,
+                                        "Height" => 0,
+                                        "URL" => $img_url,
+                                    ],
+                                    [
+                                        "Type" => 3,
+                                        "Size" => (int)$fuv[1],
+                                        "Width" => 0,
+                                        "Height" => 0,
+                                        "URL" => $img_url . $temp_wh_str,
+                                    ],
+                                ]
+                            ]
+                        ];
+                        $post_data_array[] = $temp_post_data;
+                    }
+                    break;
+                case 21:
+                    //音频
+                    $temp_post_data['MsgBody'][] = [
+                        "MsgType" => "TIMFileElem",
+                        "MsgContent" => [
+                            "Url" => str_replace('https:', 'http:', $doc_info['file_url']),
+                            "FileSize" => $doc_info['file_size'],
+                            "FileName" => $doc_info['content'],
+                            "Download_Flag" => 2,
+                        ]
+                    ];
+                    $post_data_array[] = $temp_post_data;
+                    break;
+                case 24:
+                    //文件
+                    $temp_post_data['MsgBody'][] = [
+                        "MsgType" => "TIMFileElem",
+                        "MsgContent" => [
+                            "Url" => str_replace('https:', 'http:', $doc_info['file_url']),
+                            "FileSize" => $doc_info['file_size'],
+                            "FileName" => $doc_info['content'],
+                            "Download_Flag" => 2,
+                        ]
+                    ];
+                    $post_data_array[] = $temp_post_data;
+                    break;
+                case 31:
+                    //文本
+                    $temp_post_data['MsgBody'][] = [
+                        "MsgType" => "TIMTextElem",
+                        "MsgContent" => [
+                            "Text" => $doc_info['content'],
+                        ]
+                    ];
+                    $post_data_array[] = $temp_post_data;
+                    break;
+            }
+
+            return $temp_post_data;
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
 }
