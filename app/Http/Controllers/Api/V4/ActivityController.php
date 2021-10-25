@@ -64,6 +64,10 @@ class ActivityController extends Controller {
                 "/nlsg/activity/%403x/7%403x.png",
                 "/nlsg/activity/%403x/8%403x.png",
             ],
+            'img' =>[
+                "/nlsg/activity/13611635153705_.pic_hd.jpg",
+                "/nlsg/activity/13621635153710_.pic_hd.jpg",
+            ]
         ];
         return success($data);
     }
