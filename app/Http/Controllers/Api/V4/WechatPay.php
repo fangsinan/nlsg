@@ -519,6 +519,12 @@ class WechatPay extends Controller
                 case 6: //学业规划训练营
                     $res = $nickname . ':您已支付' . $live_num . '张学业规划训练营';
                     break;
+                case 7: //30天智慧父母(亲子)训练营-直播专享
+                    $res = $nickname . ':您已支付' . $live_num . '张30天智慧父母(亲子)训练营-直播专享';
+                    break;
+                case 8: //抖音直播内部教材
+                    $res = $nickname . ':您已支付' . $live_num . '套抖音直播内部教材';
+                    break;
             }
         } else if ($type == 18) {
             $data = Column::find($relation_id);
