@@ -262,7 +262,7 @@ class SubscribeController extends ControllerBackend
         $orderObj = new Order();
 
         $order_flag = 0;
-        if(!empty($live_data[0]['is_free']) && $live_data[0]['is_free']==1){//免费 不需要查order表
+        if( $live_id != 0 && $live_data[0]['is_free']==1){//免费 不需要查order表
             $query = DB::table($subObj->getTable().' as sub');
         }else{//付费的情况下 用order表驱动sub表
             $order_flag = 1;
@@ -278,7 +278,7 @@ class SubscribeController extends ControllerBackend
         $query->whereIn('sub.relation_id', $live_ids)
             ->where('sub.type', 3)
             ->where('sub.status', 1);
-        if($live_data[0]['is_free']==0){
+        if($live_id != 0 && $live_data[0]['is_free']==0){
             $query->where('sub.order_id', '>',0);
         }
 //            ->where('sub.order_id', '>',0);
@@ -292,13 +292,16 @@ class SubscribeController extends ControllerBackend
             $query->where('sub.order_id', '>',0);
         }
 
-        if ($live_data[0]['is_free']==0 && !empty($ordernum)) {
-            $query->where('order.ordernum', $ordernum);
+        if(!empty($ordernum)){
+            if ( $live_id == 0 || $live_data[0]['is_free']==0 ) {
+                $query->where('order.ordernum', $ordernum);
+            }
         }
+
         if (!empty($twitter_phoneUser)) {
             if ($this->user['username'] == 13522223779) {
                 $query->where('sub.twitter_id', $twitter_phoneUser['id']);
-            } else if($live_data[0]['is_free']==0){
+            } else if($live_id == 0 || $live_data[0]['is_free']==0){
                 $query->where('order.twitter_id', $twitter_phoneUser['id']);
 
             }
