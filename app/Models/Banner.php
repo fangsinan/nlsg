@@ -113,7 +113,7 @@ class Banner extends Base
             ->where('start_time', '<=', $now_date)
             ->where('end_time', '>', $now_date)
             ->first();
-        //1:h5(走url,其他都object_id)  2:商品  3:优惠券领取页面4精品课 5.讲座 6.听书 7 360
+        //1:h5(走url,其他都object_id)  2:商品  3:优惠券领取页面4精品课 5.讲座 6.听书 7 360  13活动开屏图
         $res = [];
         if (!empty($data)) {
             $res['id'] = $data->obj_id;
@@ -136,6 +136,9 @@ class Banner extends Base
                     break;
                 case 8:
                     $res['type'] = 1;
+                    break;
+                case 13:
+                    $res['type'] = 13;
                     break;
                 default:
                     $res['type'] = 0;
