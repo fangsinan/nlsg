@@ -1133,6 +1133,9 @@ class OrderController extends Controller
         } else {
             $price = 1000;
         }
+        if($activity_tag == "2021-11"){
+            $price = 1;
+        }
 
 
         $type = 1;
