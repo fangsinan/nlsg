@@ -31,7 +31,7 @@ class ActivityController extends Controller {
      * @api {get} api/v4/activity/activeImg  获取活动图片
      * @apiVersion 4.0.0
      * @apiName  activeImg
-     * @apiGroup im
+     * @apiGroup activity
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
