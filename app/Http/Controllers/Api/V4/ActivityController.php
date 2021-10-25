@@ -44,7 +44,7 @@ class ActivityController extends Controller {
     public function activeImg(){
 
         $data = [
-            '2x'=>[
+            'twox'=>[
                 "/nlsg/activity/%402x/1%402x.png",
                 "/nlsg/activity/%402x/2%402x.png",
                 "/nlsg/activity/%402x/3%402x.png",
@@ -54,7 +54,7 @@ class ActivityController extends Controller {
                 "/nlsg/activity/%402x/7%402x.png",
                 "/nlsg/activity/%402x/8%402x.png",
             ],
-            '3x'=>[
+            'threex'=>[
                 "/nlsg/activity/%402x/1%402x.png",
                 "/nlsg/activity/%402x/2%402x.png",
                 "/nlsg/activity/%402x/3%402x.png",
