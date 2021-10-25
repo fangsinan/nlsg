@@ -19,7 +19,7 @@ class imJob extends Command
      *
      * @var string
      */
-    protected $description = 'im job test';
+    protected $description = 'im文案发送任务';
 
     /**
      * Create a new command instance.
@@ -39,12 +39,11 @@ class imJob extends Command
     public function handle()
     {
         $begin = time();
-        $end_time = strtotime(date('Y-m-d H:i:58',strtotime('+4 minute')));
+        $end_time = strtotime(date('Y-m-d H:i:58',strtotime('+2 minute')));
         $type_name = 'im_'.date('Y-m-d H:i:s');
         while ($begin < $end_time){
             OrderRefundServers::test($type_name);
             $begin = time();
-            sleep(5);
         }
 
     }
