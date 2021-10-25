@@ -1127,6 +1127,9 @@ class CreatePosterController extends Controller
                 return 'https://a.app.qq.com/o/simple.jsp?pkgname=com.huiyujiaoyu.powertime';
             case 23://360分享海报
                 return ConfigModel::getData(33) . '?time=' . time() . '&inviter=' . $uid . '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
+            case 24://2021 双十一360分享海报
+                return ConfigModel::getData(59) . '?time=' . time() . '&inviter=' . $uid . '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
+
         }
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
