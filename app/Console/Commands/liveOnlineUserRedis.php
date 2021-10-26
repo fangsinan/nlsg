@@ -2,24 +2,24 @@
 
 namespace App\Console\Commands;
 
-use App\Servers\MallRefundJob;
+use App\Http\Controllers\Api\V4\LiveController;
 use Illuminate\Console\Command;
 
-class shillJob extends Command
+class liveOnlineUserRedis extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:shillJob';
+    protected $signature = 'command:liveOnlineUserRedis';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '虚拟订单退款任务';
+    protected $description = '直播间在线人数存入redis';
 
     /**
      * Create a new command instance.
@@ -38,7 +38,6 @@ class shillJob extends Command
      */
     public function handle()
     {
-        MallRefundJob::shillJob(1);
-        MallRefundJob::shillJob(2);
+        LiveController::CrontabOnlineUserRedis();
     }
 }

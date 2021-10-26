@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Servers\ErpServers;
 use Illuminate\Console\Command;
 
 class erpJob extends Command
@@ -37,6 +38,8 @@ class erpJob extends Command
      */
     public function handle()
     {
-        //
+        $s = new ErpServers();
+        $s->logisticsSync();
+        $s->pushRun();
     }
 }

@@ -2,24 +2,24 @@
 
 namespace App\Console\Commands;
 
-use App\Servers\MallRefundJob;
+use App\Servers\ChannelServers;
 use Illuminate\Console\Command;
 
-class shillJob extends Command
+class cytxJob extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:shillJob';
+    protected $signature = 'command:cytxJob';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '虚拟订单退款任务';
+    protected $description = '创业天下订单的推送任务';
 
     /**
      * Create a new command instance.
@@ -38,7 +38,6 @@ class shillJob extends Command
      */
     public function handle()
     {
-        MallRefundJob::shillJob(1);
-        MallRefundJob::shillJob(2);
+        ChannelServers::cytxJob();//创业天下推送
     }
 }

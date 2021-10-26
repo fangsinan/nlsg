@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Order;
+use App\Models\Works;
+use App\Models\WorksInfo;
 use Illuminate\Console\Command;
 
 class orderClear extends Command
@@ -18,7 +21,7 @@ class orderClear extends Command
      *
      * @var string
      */
-    protected $description = 'order clear';
+    protected $description = '虚拟订单清理';
 
     /**
      * Create a new command instance.
@@ -37,6 +40,8 @@ class orderClear extends Command
      */
     public function handle()
     {
-        //
+        Order::clear(); //线下课超时处理
+        WorksInfo::covertVideo(); //转换音频视频
+        Works::deal(); //自动上架
     }
 }
