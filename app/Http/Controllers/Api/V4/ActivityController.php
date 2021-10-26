@@ -63,14 +63,13 @@ class ActivityController extends Controller {
 //            return $this->error(0, "活动未开始");
         }
         $active_status = 1;
-
         $tag = ConfigModel::getData(60,1);
 
         //初始化数据
         $data = [
             'img' =>[
-                "top" => "/nlsg/activity/13611635153705_.pic_hd.jpg",
-                "down" => "/nlsg/activity/13631635154129_.pic_hd.jpg",
+                "top" => "/nlsg/activity/action1-t_pic_hd.jpg",
+                "down" => "/nlsg/activity/action1-d_pic_hd.jpg",
             ],
             'is_pay_order' =>(string)0,         //是否购买
             'is_pay_order_count' =>(string)0,   //购买数量
@@ -80,13 +79,13 @@ class ActivityController extends Controller {
 
         if($tag == "2021-11-1"){ //1号活动
             $data['img'] = [
-                "top" => "/nlsg/activity/13611635153705_.pic_hd.jpg",
-                "down" => "/nlsg/activity/13631635154129_.pic_hd.jpg",
+                "top" => "/nlsg/activity/action1-t_pic_hd.jpg",
+                "down" => "/nlsg/activity/action1-d_pic_hd.jpg",
             ];
         }else if($tag == "2021-11-2"){ //2号活动
             $data['img'] = [
-                "top" => "/nlsg/activity/13611635153705_.pic_hd.jpg",
-                "down" => "/nlsg/activity/13631635154129_.pic_hd.jpg",
+                "top" => "/nlsg/activity/action2-t_pic_hd.jpg",
+                "down" => "/nlsg/activity/action2-d_pic_hd.jpg",
             ];
         }else{
             $this->error(0, "活动未开始");
