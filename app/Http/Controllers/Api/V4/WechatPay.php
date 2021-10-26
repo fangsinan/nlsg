@@ -250,7 +250,7 @@ class WechatPay extends Controller
                     $twitter_id = $user_id;
                 }
 
-                if($total_fee > 1){
+                if(in_array($orderInfo['activity_tag'],["2021-11-1","2021-11-2"])) { //活动无实际收益
                     //服务商购买时已是优惠价格
                     //购买必须为360会员
                     $PayRDObj = new PayRecordDetail();
@@ -324,7 +324,7 @@ class WechatPay extends Controller
                 $add_sub_Rst = true;
                 if ($supremacy_vip == 1) {
                     //use
-                    $add_sub_Rst = VipRedeemUser::subWorksOrGetRedeemCode($user_id,$total_fee);
+                    $add_sub_Rst = VipRedeemUser::subWorksOrGetRedeemCode($user_id,$orderInfo['activity_tag']);
                 }
 
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
@@ -448,7 +448,7 @@ class WechatPay extends Controller
 
                 $vip_res = true;
                 //1360
-                if (in_array($orderInfo['relation_id'],[4,7]) && $total_fee > $total_fee_line && $orderInfo['type'] == 14) {
+                if (in_array($orderInfo['relation_id'],[4]) && $total_fee > $total_fee_line && $orderInfo['type'] == 14) {
                     $vipModel = new VipUser();
                     $vip_res = $vipModel->jobOf1360($orderInfo['user_id'], $orderInfo['id'], $orderInfo['live_id']);
                     $vip_res = $vip_res['code'];

@@ -1133,10 +1133,12 @@ class OrderController extends Controller
         } else {
             $price = 1000;
         }
-        if($activity_tag == "2021-11"){
-            $price = 1;
-        }
 
+        if($activity_tag == "2021-11-1"){ //1号活动
+            $price = 1;
+        }else if($activity_tag == "2021-11-2"){ //2号活动
+            $price = 360;
+        }
 
         $type = 1;
         if ($this->user['new_vip']['level'] > 0) { //续费
