@@ -2,25 +2,24 @@
 
 namespace App\Console\Commands;
 
-use App\Servers\ImDocFolderServers;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-class imJob extends Command
+class imJob_2 extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'imJob';
+    protected $signature = 'imJob_2';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'im文案发送任务';
+    protected $description = 'Command description';
 
     /**
      * Create a new command instance.
@@ -43,17 +42,14 @@ class imJob extends Command
         $t = rand(1,9999);
         DB::table('wwwww')->insert([
             'vv'=>date('Y-m-d H:i:s'),
-            't'=>'j_0_'.$t
+            't'=>'j_2_'.$t
         ]);
         while (time()<$end){
             var_dump(time());
         }
         DB::table('wwwww')->insert([
             'vv'=>date('Y-m-d H:i:s'),
-            't'=>'j_0_'.$t
+            't'=>'j_2_'.$t
         ]);
-
-//        $idfServer = new ImDocFolderServers();
-//        $idfServer->sendJob();
     }
 }

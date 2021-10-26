@@ -623,6 +623,13 @@ class ImDocFolderServers
         }
 
         DB::commit();
+
+        ImDocFolderJob::query()
+            ->whereIn('id',$id_list)
+            ->update([
+                'send_group'=>DB::raw('id%3')
+            ]);
+
         return ['code' => true, 'msg' => '成功'];
     }
 
