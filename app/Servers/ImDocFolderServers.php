@@ -2,7 +2,6 @@
 
 namespace App\Servers;
 
-use App\Models\ImBeatWord;
 use App\Models\ImDocFolder;
 use App\Models\ImDocFolderBind;
 use App\Models\ImDocFolderJob;
@@ -625,9 +624,9 @@ class ImDocFolderServers
         DB::commit();
 
         ImDocFolderJob::query()
-            ->whereIn('id',$id_list)
+            ->whereIn('id', $id_list)
             ->update([
-                'send_group'=>DB::raw('id%3')
+                'send_group' => DB::raw('id%3')
             ]);
 
         return ['code' => true, 'msg' => '成功'];
@@ -708,34 +707,31 @@ class ImDocFolderServers
 
     }
 
-    public function sendJob($limit = 2)
-    {
-        $limit = $limit < 2 ? 2 : $limit;
-        $end_time = strtotime(date('Y-m-d H:i:59', strtotime('+' . ($limit - 1) . ' minute')));
 
+    public function sendJob($end_time, $send_group,$url)
+    {
         $list = ImDocFolderJobInfo::query()
             ->with(['jobTop:id,status,group_id,user_id', 'docInfo', 'jobTop.groupInfo:id,group_id'])
             ->where('status', '=', 1)
             ->where('job_status', '=', 1)
             ->where('job_timestamp', '<=', $end_time)
-            ->whereHas('jobTop', function ($q) {
-                $q->where('status', '=', 1);
+            ->whereHas('jobTop', function ($q) use ($send_group) {
+                $q->where('status', '=', 1)->where('job_status', '=', 1)->where('send_group', '=', $send_group);
             })
             ->orderBy('job_timestamp')
             ->orderBy('id')
             ->select(['id', 'job_id', 'doc_id', 'job_time', 'job_timestamp', 'job_status'])
             ->get();
-        if ($list->isEmpty()) {
-            return true;
-        }
 
+        if ($list->isEmpty()) {
+            return false;
+        }
         $list = $list->toArray();
 
         //获取发送任务
         foreach ($list as $k => &$v) {
-            $v['send_times'] = 0;
             $v['sendData'] = [];
-            $group_id = $v['job_top']['group_info']['group_id'] ?? '';
+            $group_id = $v['job_top']['group_info']['group_id'] ?? '0';
             $send_user_id = $v['job_top']['user_id'] ?? 0;
             if (empty($group_id) || empty($send_user_id)) {
                 ImDocFolderJob::query()->where('id', '=', $v['job_id'])
@@ -753,72 +749,54 @@ class ImDocFolderServers
             unset($v['doc_info']);
         }
 
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+        if (empty($list)) {
+            return true;
+        }
 
-        $while_flag = true;
-        $beat_word = [];
+        $job_id_arr = [];
 
-        while ($while_flag) {
-            if (empty($list)) {
-                $while_flag = false;
-            }
-            if (time() > $end_time) {
-                $while_flag = false;
-            }
+        foreach ($list as $k => $v) {
+            $job_id_arr[] = $v['job_id'];
+            $temp_res = ImClient::curlPost($url, json_encode($v['sendData']));
+            $temp_res = json_decode($temp_res, true);
 
-            foreach ($list as $k => $v) {
-                if ($v['job_timestamp'] <= time()) {
-                    $temp_res = ImClient::curlPost($url, json_encode($v['sendData']));
-                    $temp_res = json_decode($temp_res, true);
-
-                    if ($temp_res['ErrorCode'] === 0) {
-                        ImDocFolderJobInfo::query()
-                            ->where('id', '=', $v['id'])
-                            ->update([
-                                'job_status' => 3
-                            ]);
-
-
-                        DB::select("UPDATE nlsg_im_doc_folder_job AS j SET j.job_status = 3
-                            WHERE
-                                j.id = " . $v['job_id'] . "
-                                AND NOT EXISTS (
-                                SELECT * FROM nlsg_im_doc_folder_job_info
-                                WHERE job_id = j.id AND STATUS = 1 AND job_status = 1
-                        )");
-
-                    } else {
-                        if ($temp_res['ErrorCode'] === 80001) {
-                            $str_1 = strpos($temp_res['ErrorInfo'], 'beat word:');
-                            $str_2 = strpos($temp_res['ErrorInfo'], '|requestid');
-                            $str = substr($temp_res['ErrorInfo'], $str_1 + 10, $str_2 - $str_1 - 10);
-                            $beat_word[] = trim($str);
-                        }
-
-                        ImDocFolderJobInfo::query()
-                            ->where('id', '=', $v['id'])
-                            ->update([
-                                'status' => 2,
-                                'remark' => $temp_res['ErrorInfo'] ?? ''
-                            ]);
-
-                    }
-                    unset($list[$k]);
-                }
+            if ($temp_res['ErrorCode'] === 0) {
+                ImDocFolderJobInfo::query()
+                    ->where('id', '=', $v['id'])
+                    ->update([
+                        'job_status' => 3
+                    ]);
+            } else {
+                ImDocFolderJobInfo::query()
+                    ->where('id', '=', $v['id'])
+                    ->update([
+                        'status' => 2,
+                        'remark' => ($temp_res['ErrorCode'] ?? '') . ($temp_res['ErrorInfo'] ?? '')
+                    ]);
             }
         }
 
-        if (!empty($beat_word)) {
-            foreach ($beat_word as $bwv) {
-                ImBeatWord::query()->updateOrCreate(
-                    array('beat_word' => $bwv),
-                    array('times' => DB::raw('times+1'))
-                );
-            }
+        $job_id_str = implode(',',array_unique($job_id_arr));
+        if (!empty($job_id_str)){
+            DB::select("UPDATE nlsg_im_doc_folder_job AS j
+            SET j.job_status = 3
+            WHERE
+                j.id IN ( $job_id_str )
+                AND NOT EXISTS (
+                SELECT
+                    *
+                FROM
+                    nlsg_im_doc_folder_job_info
+                WHERE
+                    job_id = j.id
+                    AND `status` = 1
+                AND job_status = 1
+                )");
         }
 
         return true;
     }
+
 
     //拼接消息体
     public function getSendGroupMsgPostData($doc_info, $to, $from)

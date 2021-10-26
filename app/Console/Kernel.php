@@ -48,21 +48,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-//        $schedule->command('imJob')
-//            ->everyMinute()
-//            ->withoutOverlapping(2)
-//            ->runInBackground()
-//            ->onOneServer();
-//        $schedule->command('imJob_1')
-//            ->everyMinute()
-//            ->withoutOverlapping(2)
-//            ->runInBackground()
-//            ->onOneServer();
-//        $schedule->command('imJob_2')
-//            ->everyMinute()
-//            ->withoutOverlapping(2)
-//            ->runInBackground()
-//            ->onOneServer();
+        $schedule->command('imJob')->everyMinute()->withoutOverlapping(2)
+            ->runInBackground()->onOneServer();
+        $schedule->command('imJob_1')->everyMinute()->withoutOverlapping(2)
+            ->runInBackground()->onOneServer();
+        $schedule->command('imJob_2')->everyMinute()->withoutOverlapping(2)
+            ->runInBackground()->onOneServer();
 //        $schedule->exec('php artisan command:ImJobTest')->everyMinute();
 
         $schedule->call(function () {
