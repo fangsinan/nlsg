@@ -57,12 +57,12 @@ class ActivityController extends Controller {
         $user_id = $this->user['id'] ?? 0;
 
         ActionStatistics::actionAdd(1,$user_id,$request->input("os_type")??0);
-        $active_status = "1";
+        $active_status = 1;
         if ( time() <= 1635696000 || time() > 1636646400 ){
-            $active_status = "0";
+            $active_status = 0;
 //            return $this->error(0, "活动未开始");
         }
-        $active_status = "1";
+        $active_status = 1;
 
         $tag = ConfigModel::getData(60);
 
@@ -72,10 +72,10 @@ class ActivityController extends Controller {
                 "top" => "/nlsg/activity/13611635153705_.pic_hd.jpg",
                 "down" => "/nlsg/activity/13631635154129_.pic_hd.jpg",
             ],
-            'is_pay_order' =>0,         //是否购买
-            'is_pay_order_count' =>0,   //购买数量
+            'is_pay_order' =>(string)0,         //是否购买
+            'is_pay_order_count' =>(string)0,   //购买数量
             'active_flag' =>$tag,       //活动标识 -1 or -2
-            'active_status' =>$active_status,   //1|0 开始  未开始
+            'active_status' =>(string)$active_status,   //1|0 开始  未开始
         ];
 
         if($tag == "2021-11-1"){ //1号活动
