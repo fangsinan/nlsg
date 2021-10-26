@@ -72,7 +72,7 @@ class LiveController extends Controller
             $flag=$Redis->EXISTS($key_minute);
 
             if($flag!=1){ //存在返回1
-                $Redis->setex($key_minute,60*2,1);//10分钟
+                $Redis->setex($key_minute,60,1);//10分钟
                 //获取redis
                 $live_id_key='live_key_';
                 //获取所有在线直播id
@@ -1780,7 +1780,12 @@ class LiveController extends Controller
                     $Info = MallGoods::select('id','name','price','subtitle','picture as img')->where(['id'=>$res['push_gid'],'status'=>2])->first();
                     break;
                 case 4:
+                    /*$H=date('H');
+                    if($H<20){
+                        $Info=[];
+                    }else {
 
+                    }*/
 //                    $Info = OfflineProducts::where(['id'=>$res['push_gid']])->first();
                     $Info = OfflineProducts::select('id','title as name','price','subtitle','image as img','cover_img as image')->where(['id'=>$res['push_gid']])->first();
                     break;
