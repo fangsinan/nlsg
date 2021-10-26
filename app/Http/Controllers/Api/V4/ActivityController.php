@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\ActionStatistics;
 use App\Models\ConfigModel;
 use App\Models\LiveCountDown;
 use App\Models\MallOrder;
@@ -55,11 +56,14 @@ class ActivityController extends Controller {
 
         $user_id = $this->user['id'] ?? 0;
 
-        $active_status = 1;
+        ActionStatistics::actionAdd(1,$user_id,$request->input("os_type")??0);
+        $active_status = "1";
         if ( time() <= 1635696000 || time() > 1636646400 ){
-            $active_status = 0;
+            $active_status = "0";
 //            return $this->error(0, "活动未开始");
         }
+        $active_status = "1";
+
         $tag = ConfigModel::getData(60);
 
         //初始化数据
@@ -110,6 +114,31 @@ class ActivityController extends Controller {
         $data['is_pay_order_count'] = $is_pay_order_count >= 10000 ? $is_pay_order_count/10000 .'w' : $is_pay_order_count;
 
         return success($data);
+    }
+
+
+
+
+    /**
+     * @api {get} api/v4/activity/track  双十一活动埋点
+     * @apiVersion 4.0.0
+     * @apiName  track
+     * @apiGroup activity
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+    {
+        code: 200,
+        msg: "成功",
+        data: {
+        }
+    }
+     */
+    public function trackStatistics(Request $request){
+
+        ActionStatistics::actionAdd($request->input("type"),$this->user['id'] ?? 0,$request->input("os_type")??0);
+        return success();
+
     }
 
 }
