@@ -193,8 +193,12 @@ class WechatPay extends Controller
 
                 //当有效身份不是钻石合伙人，对vip_user表进行任何处理
                 $e_time = 31536000;
-                if( $total_fee  == 1){ //支付1元
-                    $e_time = 86400*7;
+                if($orderInfo['activity_tag'] == "2021-11-1" ) { //支付1元
+                    $e_time = 86400*7;   //7天
+                    $Userdata['expire_time'] = date("Y-m-d 23:59:59", strtotime("+7day", time()));;
+                }elseif($orderInfo['activity_tag'] == "2021-11-2" ) { //支付1元
+                    $e_time = 31536000+86400*100;  //一年零100天
+                    $Userdata['expire_time'] = date("Y-m-d 23:59:59", strtotime("+1years +100day", time()));;
                 }
 
                 if ($level != 2) {
@@ -250,7 +254,7 @@ class WechatPay extends Controller
                     $twitter_id = $user_id;
                 }
 
-                if(in_array($orderInfo['activity_tag'],["2021-11-1","2021-11-2"])) { //活动无实际收益
+                if(!in_array($orderInfo['activity_tag'],["2021-11-1","2021-11-2"])) { //活动无实际收益
                     //服务商购买时已是优惠价格
                     //购买必须为360会员
                     $PayRDObj = new PayRecordDetail();
