@@ -24,7 +24,7 @@ class VipUserBind extends Base
                     ->where('vu.status', '=', 1);
             })
             ->where('son', '=', $phone)
-            ->where('status','=',1)
+            ->where('vub.status','=',1)
             ->whereRaw('(life = 1 or (life = 2 AND FROM_UNIXTIME(UNIX_TIMESTAMP()) BETWEEN begin_at and end_at))')
             ->select(['parent', 'u.id as parent_user_id', 'vu.user_id as vuid'])
             ->first();
