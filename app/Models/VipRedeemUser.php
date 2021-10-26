@@ -530,7 +530,7 @@ class VipRedeemUser extends Base
                             'end_time' => $end_date
                         ];
                     } else {
-                        if(in_array($activity_tag,["2021-11-1","2021-11-2"])) {
+                        if(!in_array($activity_tag,["2021-11-1","2021-11-2"])) {
 
                             $add_code_data[] = [
                                 'code' => $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5),
@@ -570,7 +570,7 @@ class VipRedeemUser extends Base
                             'end_time' => $end_date
                         ];
                     } else {
-                        if(in_array($activity_tag,["2021-11-1","2021-11-2"])) {
+                        if(!in_array($activity_tag,["2021-11-1","2021-11-2"])) {
 
                             $add_code_data[] = [
                                 'code' => $group_name . RedeemCode::get_34_Number(RedeemCode::createCodeTemp(), 5),

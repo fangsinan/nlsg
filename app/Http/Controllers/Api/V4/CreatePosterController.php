@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\ActionStatistics;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\CreatePost;
@@ -98,6 +99,10 @@ class CreatePosterController extends Controller
 
             if ($post_type == 23) {
                 $src = ConfigModel::getData(34);
+            }
+            if ($post_type == 24) {
+                //双十一活动二维码生成
+                ActionStatistics::actionAdd(4,$uid,$request->input("os_type")??0);
             }
             $user_info = [
                 'nickname' => $this->user['nickname'] ?? '',
@@ -1128,6 +1133,7 @@ class CreatePosterController extends Controller
             case 23://360分享海报
                 return ConfigModel::getData(33) . '?time=' . time() . '&inviter=' . $uid . '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
             case 24://2021 双十一360分享海报
+
                 return ConfigModel::getData(59) . '?time=' . time() . '&inviter=' . $uid . '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
 
         }
