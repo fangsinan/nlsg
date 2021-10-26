@@ -64,7 +64,7 @@ class ActivityController extends Controller {
         }
         $active_status = 1;
 
-        $tag = ConfigModel::getData(60);
+        $tag = ConfigModel::getData(60,1);
 
         //初始化数据
         $data = [
