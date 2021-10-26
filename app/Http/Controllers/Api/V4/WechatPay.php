@@ -190,7 +190,7 @@ class WechatPay extends Controller
                 $newVip_rst = true;
                 $Sales_Rst = true;
                 $pay_record_flag = 0;
-
+                $top_Sy_Rst = true;
                 //当有效身份不是钻石合伙人，对vip_user表进行任何处理
                 $e_time = 31536000;
                 if($orderInfo['activity_tag'] == "2021-11-1" ) { //支付1元
@@ -314,7 +314,7 @@ class WechatPay extends Controller
 
                     }
                     //受保护的人 需要给推荐人[非保护者] 加一个收益为0的数据
-                    $top_Sy_Rst = true;
+
                     $twitter_top = explode('->', $orderInfo['remark']);
                     if ($twitter_top[0] > 0) {
                         $twitter_top_vip_id = VipUser::where(['user_id' => $twitter_top[0], 'is_default' => 1, 'status' => 1])->first('id');
