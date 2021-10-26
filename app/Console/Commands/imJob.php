@@ -39,19 +39,19 @@ class imJob extends Command
      */
     public function handle()
     {
-        $end = strtotime(date('Y-m-d H:i:59',strtotime('+1 minute')));
-        $t = rand(1,9999);
-        DB::table('wwwww')->insert([
-            'vv'=>date('Y-m-d H:i:s'),
-            't'=>'j_0_'.$t
-        ]);
-        while (time()<$end){
-            var_dump(time());
-        }
-        DB::table('wwwww')->insert([
-            'vv'=>date('Y-m-d H:i:s'),
-            't'=>'j_0_'.$t
-        ]);
+//        $end = strtotime(date('Y-m-d H:i:59',strtotime('+1 minute')));
+//        $t = rand(1,9999);
+//        DB::table('wwwww')->insert([
+//            'vv'=>date('Y-m-d H:i:s'),
+//            't'=>'j_0_'.$t
+//        ]);
+//        while (time()<$end){
+//            var_dump(time());
+//        }
+//        DB::table('wwwww')->insert([
+//            'vv'=>date('Y-m-d H:i:s'),
+//            't'=>'j_0_'.$t
+//        ]);
 
 //        $idfServer = new ImDocFolderServers();
 //        $idfServer->sendJob();
