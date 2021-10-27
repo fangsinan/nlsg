@@ -241,8 +241,8 @@ class GoodsServers
                 $sku->status = $v['status'];
                 $sku->weight = $v['weight'];
                 $sku->volume = $v['volume'];
-                $sku->erp_enterprise_code = $v['erp_enterprise_code'] ?? '';
-                $sku->erp_goods_code = $v['erp_goods_code'] ?? '';
+                $sku->erp_spec_no = $v['erp_enterprise_code'] ?? '';
+                $sku->erp_goods_no = $v['erp_goods_code'] ?? '';
                 $edit_sku_res = $sku->save();
 
                 if (!$edit_sku_res) {
