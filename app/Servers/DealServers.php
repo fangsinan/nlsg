@@ -84,12 +84,12 @@ class DealServers
         if(!empty($list)){
 
             $user_arr = array_column($list, 'user_id'); //用户
-            //顶级钻石合伙人
-            $DiamondArr=self::DiamondInfo($user_arr);
-
             //处理用户等级  邀约人等级
             $invite_user_arr = array_column($list, 'twitter_id');  //邀约人       邀约人关系不清
             $protect_user_arr = array_column($list, 'protect_user_id'); //保护人
+
+            //顶级钻石合伙人
+            $DiamondArr=self::DiamondInfo($protect_user_arr);
             $UserArr=self::InviteInfo($user_arr,$invite_user_arr,$protect_user_arr);
 
             $OrderIdArr = array_column($list, 'id'); //用于更新订单状态
@@ -126,10 +126,10 @@ class DealServers
                     'protect_identity'=>(!empty($UserArr[$val->protect_user_id]))?$UserArr[$val->protect_user_id]:0,
                     'profit_user_id'=>$val->profit_user_id,
                     'profit_price'=>$val->profit_price,
-                    'diamond_user_id'=>(empty($DiamondArr[$val->user_id]))?0:$DiamondArr[$val->user_id]['diamond_user_id'],
-                    'diamond_phone'=>(empty($DiamondArr[$val->user_id]))?'':$DiamondArr[$val->user_id]['diamond_phone'],
-                    'diamond_nickname'=>(empty($DiamondArr[$val->user_id]))?'':$DiamondArr[$val->user_id]['diamond_nickname'],
-                    'diamond_identity'=>(empty($DiamondArr[$val->user_id]))?0:$DiamondArr[$val->user_id]['diamond_identity'],
+                    'diamond_user_id'=>(empty($DiamondArr[$val->protect_user_id]))?0:$DiamondArr[$val->protect_user_id]['diamond_user_id'],
+                    'diamond_phone'=>(empty($DiamondArr[$val->protect_user_id]))?'':$DiamondArr[$val->protect_user_id]['diamond_phone'],
+                    'diamond_nickname'=>(empty($DiamondArr[$val->protect_user_id]))?'':$DiamondArr[$val->protect_user_id]['diamond_nickname'],
+                    'diamond_identity'=>(empty($DiamondArr[$val->protect_user_id]))?0:$DiamondArr[$val->protect_user_id]['diamond_identity'],
                     'is_tiktok'=>$QdInfo['is_tiktok'],
                     'tiktok_ordernum'=>$QdInfo['tiktok_ordernum'],
                     'tiktok_time'=>$QdInfo['tiktok_time'],
