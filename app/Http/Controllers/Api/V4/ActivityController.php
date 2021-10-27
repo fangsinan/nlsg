@@ -97,8 +97,8 @@ class ActivityController extends Controller {
             ];
         }else if($tag === "2021-11-2"){ //2号活动
             $data['img'] = [
-                "top" => "/nlsg/activity/action2-t_pic_hd.jpg",
-                "down" => "/nlsg/activity/action2-d_pic_hd.jpg",
+                "top" => "/nlsg/works/20211027174906146584.png",
+                "down" => "/nlsg/works/20211027174924961001.png",
             ];
         }else{
             $this->error(0, "活动未开始");
