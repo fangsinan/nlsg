@@ -66,12 +66,15 @@ class DealServers
                 $query->on('O.user_id','=','invite.user_id')->where('invite.live_id','=',$live_id)->where('invite.type','=',10)->where('invite.status','=',1);
             })
             ->leftJoin('nlsg_user as TJ','TJ.id','=','invite.twitter_id')
-            ->leftJoin('nlsg_vip_user_bind as B','B.son','=','U.phone') //查看用户是否被绑定
+            ->leftJoin('nlsg_vip_user_bind as B',function($query){ //查看用户是否被绑定
+                $query->on('B.son','=','U.phone')->where('B.status','=',1); //排除绑定失效
+            })
             ->leftJoin('nlsg_user as BU','B.parent','=','BU.phone')     //查询绑定人信息
             ->leftJoin('nlsg_pay_record_detail as PRD',function ($join){
                 $join->on('PRD.ordernum','=','O.ordernum')->where('PRD.type',11);  //会员收益类型11
             })
             ;
+        $query->groupBy('O.id');
         $query->orderBy('O.id','asc')->limit(5); //暂时每次收集5条，10条sql长度需设置my.ini配置
 
 //        echo $query->toSql().PHP_EOL;
