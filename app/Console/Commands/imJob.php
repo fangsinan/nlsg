@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Servers\ImDocFolderServers;
 use Illuminate\Console\Command;
 use Libraries\ImClient;
+use Illuminate\Support\Facades\DB;
 
 class imJob extends Command
 {
@@ -39,15 +40,21 @@ class imJob extends Command
      */
     public function handle()
     {
-        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
+//        $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
         $end = strtotime(date('Y-m-d H:i:59', strtotime('+1 minute')));
-        $servers = new ImDocFolderServers();
+//        $servers = new ImDocFolderServers();
 
+        $temp = random_int(1,99999);
         while (time() < $end) {
-            $job_res = $servers->sendJob($end, 0, $url);
-            if ($job_res === false) {
-                sleep(1);
-            }
+            DB::table('wwwww')->insert([
+                'vv'=>date('Y-m-d H:i:s'),
+                't'=>$temp
+            ]);
+            sleep(10);
+//            $job_res = $servers->sendJob($end, 0, $url);
+//            if ($job_res === false) {
+//                sleep(1);
+//            }
         }
     }
 }
