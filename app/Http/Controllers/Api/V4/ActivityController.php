@@ -124,7 +124,7 @@ class ActivityController extends Controller {
             ])->count();
             //初始值3.5w  每单加100
             $is_pay_order_count = (35000 + $order_count*100);
-            $data['is_pay_order_count'] = $is_pay_order_count >= 10000 ? $is_pay_order_count/10000 .'w' : $is_pay_order_count;
+            $data['is_pay_order_count'] = $is_pay_order_count >= 10000 ? $is_pay_order_count/10000 .'万' : $is_pay_order_count;
         }else{
             $data['is_pay_order_count'] = 0;
         }
