@@ -104,22 +104,30 @@ class LiveInfoServers
             return ['code' => false, 'msg' => '直播间归属错误'];
         }
 
-        $query = DB::table('nlsg_live_deal')->where('live_id', '=', $live_id);
+        $query = DB::table('nlsg_live_deal as ld')
+            ->join('nlsg_order as o','ld.ordernum','=','o.ordernum')
+            ->where('o.is_shill','=',0);
+
+        $query->where('ld.live_id','=',$live_id);
+
+//        $query->where('ld.pay_time','>=','2021-09-26 00:00:00')
+//            ->where('ld.pay_time','<','2021-10-27 00:00:00')
+//            ->where('ld.pay_price','=',1980);
 
         if (!empty($params['ordernum'] ?? '')) {
-            $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
+            $query->where('ld.ordernum', 'like', '%' . $params['ordernum'] . '%');
         }
         if (!empty($params['phone'] ?? '')) {
-            $query->where('phone', 'like', '%' . $params['phone'] . '%');
+            $query->where('ld.phone', 'like', '%' . $params['phone'] . '%');
         }
         if (!empty($params['invite_phone'] ?? '')) {
-            $query->where('invite_phone', 'like', '%' . $params['invite_phone'] . '%');
+            $query->where('ld.invite_phone', 'like', '%' . $params['invite_phone'] . '%');
         }
         if (!empty($params['protect_phone'] ?? '')) {
-            $query->where('protect_phone', 'like', '%' . $params['protect_phone'] . '%');
+            $query->where('ld.protect_phone', 'like', '%' . $params['protect_phone'] . '%');
         }
         if (!empty($params['diamond_phone'] ?? '')) {
-            $query->where('diamond_phone', 'like', '%' . $params['diamond_phone'] . '%');
+            $query->where('ld.diamond_phone', 'like', '%' . $params['diamond_phone'] . '%');
         }
         if (!empty($params['qd_name'] ?? '')) {
             switch ($params['qd_name']) {
@@ -134,7 +142,7 @@ class LiveInfoServers
             }
         }
         if (!empty($params['qd'] ?? '')) {
-            $query->where('qd', '=', $params['qd']);
+            $query->where('ld.qd', '=', $params['qd']);
         }
 
         $params['type'] = 0;
@@ -167,57 +175,59 @@ class LiveInfoServers
         }
 
         if (!empty($params['type'])) {
-            $query->where('type', '=', $params['type']);
+            $query->where('ld.type', '=', $params['type']);
         }
 
         switch ($query_flag) {
             case 'money_sum':
-                return $query->sum('pay_price');
+                return $query->sum('ld.pay_price');
             case 'user_sum':
-                return $query->count('user_id');
+                return $query->count('ld.user_id');
         }
 
         $excel_flag = $params['excel_flag'] ?? 0;
         if (empty($excel_flag)) {
             $query->select([
-                'ordernum', 'pay_price', 'num', 'pay_time',
-                DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
-            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" when 6 then "学业规划训练营" else "--" end) as type_name'),
-                'phone', 'nickname', 'user_id',
-                DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
-                'invite_phone', 'invite_nickname',
-                'protect_user_id', 'protect_phone', 'protect_nickname',
-                DB::raw('(case protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as protect_identity_name'),
-                'profit_user_id', 'profit_price',
-                'diamond_user_id', 'diamond_phone', 'diamond_nickname',
-                DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as diamond_identity'),
-                DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
-                'tiktok_ordernum', 'tiktok_time', 'qd',
-                DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" when 4 then "地推" else "--" end) as qd_name'), //1 抖音 2 李婷 3 自有平台 4地推
-                'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
-                DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
+                'ld.ordernum', 'ld.pay_price', 'ld.num', 'ld.pay_time',
+                DB::raw('(case ld.type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
+            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" when 6 then "学业规划训练营"
+            when 7 then "30天智慧父母(亲子)训练营-直播专享" when 8 then "抖音直播内部教材" else "--" end) as type_name'),
+                'ld.phone', 'ld.nickname', 'ld.user_id',
+                DB::raw('(case ld.identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
+                'ld.invite_phone', 'ld.invite_nickname',
+                'ld.protect_user_id', 'ld.protect_phone', 'ld.protect_nickname',
+                DB::raw('(case ld.protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as protect_identity_name'),
+                'ld.profit_user_id', 'ld.profit_price',
+                'ld.diamond_user_id', 'ld.diamond_phone', 'ld.diamond_nickname',
+                DB::raw('(case ld.diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as diamond_identity'),
+                DB::raw('(case ld.is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
+                'ld.tiktok_ordernum', 'ld.tiktok_time', 'ld.qd',
+                DB::raw('(case ld.qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" when 4 then "地推" else "--" end) as qd_name'), //1 抖音 2 李婷 3 自有平台 4地推
+                'ld.sub_live_id', 'ld.sub_live_pay_price', 'ld.sub_live_pay_time',
+                DB::raw('(case o.is_shill when 1 then "是"  else "否" end) as is_refund'),
             ]);
             $res = $query->paginate($size);
         } else {
             $query->select([
-                DB::raw("CONCAT('`',ordernum) as ordernum"),
-                'pay_price', 'num', 'pay_time',
-                DB::raw('(case type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
-            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" when 6 then "学业规划训练营" else "类型错误" end) as type_name'),
-                DB::raw("CONCAT('`',phone) as phone"), 'nickname', 'user_id',
-                DB::raw('(case identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
-                DB::raw("CONCAT('`',invite_phone) as invite_phone"), 'invite_nickname',
-                'protect_user_id', 'protect_phone', 'protect_nickname',
-                DB::raw('(case protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as protect_identity_name'),
-                'profit_user_id', 'profit_price',
-                'diamond_user_id',
-                DB::raw("CONCAT('`',diamond_phone) as diamond_phone"), 'diamond_nickname',
-                DB::raw('(case diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as diamond_identity'),
-                DB::raw('(case is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
-                'tiktok_ordernum', 'tiktok_time', 'qd',
-                DB::raw('(case qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" when 4 then "地推" else "--" end) as qd_name'),
-                'sub_live_id', 'sub_live_pay_price', 'sub_live_pay_time',
-                DB::raw('(case is_refund when 1 then "是"  else "否" end) as is_refund'),
+                DB::raw("CONCAT('`',ld.ordernum) as ordernum"),
+                'ld.pay_price', 'ld.num', 'ld.pay_time',
+                DB::raw('(case ld.type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
+            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" when 6 then "学业规划训练营"
+            when 7 then "30天智慧父母(亲子)训练营-直播专享" when 8 then "抖音直播内部教材" else "类型错误" end) as type_name'),
+                DB::raw("CONCAT('`',ld.phone) as phone"), 'ld.nickname', 'ld.user_id',
+                DB::raw('(case ld.identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
+                DB::raw("CONCAT('`',ld.invite_phone) as invite_phone"), 'invite_nickname',
+                'ld.protect_user_id', 'ld.protect_phone', 'ld.protect_nickname',
+                DB::raw('(case ld.protect_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as protect_identity_name'),
+                'ld.profit_user_id', 'ld.profit_price',
+                'ld.diamond_user_id',
+                DB::raw("CONCAT('`',ld.diamond_phone) as diamond_phone"), 'ld.diamond_nickname',
+                DB::raw('(case ld.diamond_identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as diamond_identity'),
+                DB::raw('(case ld.is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
+                'ld.tiktok_ordernum', 'ld.tiktok_time', 'qd',
+                DB::raw('(case ld.qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" when 4 then "地推" else "--" end) as qd_name'),
+                'ld.sub_live_id', 'ld.sub_live_pay_price', 'ld.sub_live_pay_time',
+                DB::raw('(case o.is_shill  when 1 then "是"  else "否" end) as is_refund'),
             ]);
             $res = $query->get();
         }
