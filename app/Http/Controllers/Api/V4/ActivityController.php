@@ -58,11 +58,16 @@ class ActivityController extends Controller {
 
         ActionStatistics::actionAdd(1,$user_id,$request->input("os_type")??0);
         $active_status = 1;
-        if ( time() <= 1635696000 || time() > 1636646400 ){
+        $now = time();
+        if ( $now <= 1635696000 || $now > 1636646400 ){
             $active_status = 0;
 //            return $this->error(0, "活动未开始");
         }
-        $active_status = 1;
+        $test_begin = $request->input('test_begin',0);
+        if ($test_begin){
+            $active_status = 1;
+        }
+
         $tag = ConfigModel::getData(60,1);
 
         //初始化数据
@@ -102,15 +107,19 @@ class ActivityController extends Controller {
             $data['is_pay_order'] = 1;
         }
 
-        $order_count= Order::select("id")->where([
-            'activity_tag' => $tag,
-            'relation_id' => 1,
-            'type' => 16,
-            'status' => 1,
-        ])->count();
-        //初始值3.5w  每单加100
-        $is_pay_order_count = (35000 + $order_count*100);
-        $data['is_pay_order_count'] = $is_pay_order_count >= 10000 ? $is_pay_order_count/10000 .'w' : $is_pay_order_count;
+        if ($active_status===1){
+            $order_count= Order::select("id")->where([
+                'activity_tag' => $tag,
+                'relation_id' => 1,
+                'type' => 16,
+                'status' => 1,
+            ])->count();
+            //初始值3.5w  每单加100
+            $is_pay_order_count = (35000 + $order_count*100);
+            $data['is_pay_order_count'] = $is_pay_order_count >= 10000 ? $is_pay_order_count/10000 .'w' : $is_pay_order_count;
+        }else{
+            $data['is_pay_order_count'] = 0;
+        }
 
         return success($data);
     }
