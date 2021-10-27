@@ -71,7 +71,12 @@ class ActivityController extends Controller {
 //            return $this->error(0, "活动未开始");
         }
 
-        $tag = ConfigModel::getData(60,1);
+        $is_h5 = $request->input('is_h5','0');
+        if (empty($is_h5)){
+            $tag = ConfigModel::getData(60,1);
+        }else{
+            $tag = $request->input('activity_tag','2021-11-1');
+        }
 
         //初始化数据
         $data = [
