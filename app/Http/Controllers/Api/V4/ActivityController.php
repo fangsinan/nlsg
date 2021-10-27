@@ -76,8 +76,8 @@ class ActivityController extends Controller {
         //初始化数据
         $data = [
             'img' =>[
-                "top" => "/nlsg/activity/action1-t_pic_hd.jpg",
-                "down" => "/nlsg/activity/action1-d_pic_hd.jpg",
+                "top" => "/nlsg/works/20211027172729660684.png",
+                "down" => "/nlsg/works/20211027172042976642.png",
             ],
             'is_pay_order' =>(string)0,         //是否购买
             'is_pay_order_count' =>(string)0,   //购买数量
@@ -87,8 +87,8 @@ class ActivityController extends Controller {
 
         if($tag === "2021-11-1"){ //1号活动
             $data['img'] = [
-                "top" => "/nlsg/activity/action1-t_pic_hd.jpg",
-                "down" => "/nlsg/activity/action1-d_pic_hd.jpg",
+                "top" => "/nlsg/works/20211027172729660684.png",
+                "down" => "/nlsg/works/20211027172042976642.png",
             ];
         }else if($tag === "2021-11-2"){ //2号活动
             $data['img'] = [
