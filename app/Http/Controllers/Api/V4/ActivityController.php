@@ -59,13 +59,16 @@ class ActivityController extends Controller {
         ActionStatistics::actionAdd(1,$user_id,$request->input("os_type")??0);
         $active_status = 1;
         $now = time();
-        if ( $now <= 1635696000 || $now > 1636646400 ){
+
+        $active_time = ConfigModel::getData(61,1);
+        $active_time = explode(',',$active_time);
+        $begin_time = strtotime($active_time[0]);
+        $end_time = strtotime($active_time[1]);
+
+
+        if ( $now <= $begin_time || $now > $end_time ){
             $active_status = 0;
 //            return $this->error(0, "活动未开始");
-        }
-        $test_begin = $request->input('test_begin',0);
-        if ($test_begin){
-            $active_status = 1;
         }
 
         $tag = ConfigModel::getData(60,1);
@@ -82,12 +85,12 @@ class ActivityController extends Controller {
             'active_status' =>(string)$active_status,   //1|0 开始  未开始
         ];
 
-        if($tag == "2021-11-1"){ //1号活动
+        if($tag === "2021-11-1"){ //1号活动
             $data['img'] = [
                 "top" => "/nlsg/activity/action1-t_pic_hd.jpg",
                 "down" => "/nlsg/activity/action1-d_pic_hd.jpg",
             ];
-        }else if($tag == "2021-11-2"){ //2号活动
+        }else if($tag === "2021-11-2"){ //2号活动
             $data['img'] = [
                 "top" => "/nlsg/activity/action2-t_pic_hd.jpg",
                 "down" => "/nlsg/activity/action2-d_pic_hd.jpg",
