@@ -106,7 +106,7 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
 
-         $schedule->command('inspire')->hourly();
+//        $schedule->command('inspire')->hourly();
         $schedule->call(function () {
 //            OrderRefundServers::test('callJob');
             MallOrder::clear();//超时订单处理

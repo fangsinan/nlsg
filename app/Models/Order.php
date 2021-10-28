@@ -134,11 +134,11 @@ class Order extends Base
      * 订单超时30分钟取消
      */
     public static function clear()
-    {
+    {     DB::connection()->enableQueryLog();
         $past = Carbon::parse('-30 minutes')->toDateTimeString();
-        $subHour = now()->subHours(5);
+//        $subHour = now()->subHours(5);
         $res = Order::where('created_at', '<', $past)
-            ->where('created_at', '>', $subHour)
+//            ->where('created_at', '>', $subHour)
             ->where('status', 0)->where('pay_check',1)
             ->update([
                 'status' => 2
