@@ -4,6 +4,7 @@
 namespace App\Servers;
 
 use Illuminate\Support\Facades\Cache;
+use Predis\Client;
 
 class CacheServers
 {
@@ -36,4 +37,18 @@ class CacheServers
 
     //coupon_rule_list  商品优惠券的缓存
 
+    //获取微信的access_token
+    public static function wechatAccessToken(){
+        $redis_config  = [
+            'url' => '8.140.167.113',
+            'host' => '8.140.167.113',
+            'password' => 'NLSG2020*beijin*0906BJ',
+            'port' => '6379',
+            'database' => 0,
+        ];
+        $Redis = new Client($redis_config);
+        $Redis->select(1);
+
+        return $Redis->get('swoole_wechat_access_token');
+    }
 }

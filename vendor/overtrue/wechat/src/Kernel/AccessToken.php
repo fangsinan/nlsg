@@ -11,6 +11,7 @@
 
 namespace EasyWeChat\Kernel;
 
+use App\Servers\CacheServers;
 use EasyWeChat\Kernel\Contracts\AccessTokenInterface;
 use EasyWeChat\Kernel\Exceptions\HttpException;
 use EasyWeChat\Kernel\Exceptions\InvalidArgumentException;
@@ -102,6 +103,10 @@ abstract class AccessToken implements AccessTokenInterface
      */
     public function getToken(bool $refresh = false): array
     {
+        return [
+            "access_token"=>CacheServers::wechatAccessToken(),
+            "expires_in"=>3600
+        ];
         $cacheKey = $this->getCacheKey();
         $cache = $this->getCache();
 
