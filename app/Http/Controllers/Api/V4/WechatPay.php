@@ -83,6 +83,15 @@ class WechatPay extends Controller
         }
     }
 
+    static function  filterEmoji($str)
+    {
+        return preg_replace_callback(
+            '/./u',
+            function (array $match) {
+                return strlen($match[0]) >= 4 ? '' : $match[0];
+            },
+            $str);
+    }
 
     //微信购买vip---
     public static function PayNewVip($data)
@@ -162,7 +171,7 @@ class WechatPay extends Controller
                 $Userdata['user_id'] = $user_id;
                 $Userdata['level'] = $supremacy_vip;
                 $Userdata['username'] = $AdminInfo['phone'];
-                $Userdata['nickname'] = $AdminInfo['nickname'];
+                $Userdata['nickname'] = self::filterEmoji($AdminInfo['nickname']);
                 $Userdata['inviter'] = $twitter_id;         //推荐人user_id
                 $Userdata['source'] = $source;              //代理商user_id
                 $Userdata['source_vip_id'] = $source_vip_id;//代理商的vip表id
