@@ -82,6 +82,9 @@ class CreatePosterController extends Controller
         }
 
         $expire_num = 600;
+        if ($post_type === 24){
+            $expire_num = 60;
+        }
 
         //海报二维码  [客户端生成]
         if ($is_qrcode == 1) {
