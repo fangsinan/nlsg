@@ -53,14 +53,14 @@ class CreatePosterController extends Controller
     public function CreatePoster(Request $request)
     {
         $uid_flag = $request->input('uf',0);
-        if ($uid_flag == '213ef87359f3e5175cefc6ff30b09a06'){
+        if ($uid_flag === '213ef87359f3e5175cefc6ff30b09a06'){
             $uid = $request->input('user_id',0);
         }else{
             $uid = $this->user['id'] ?? 0;
         }
 
-        $gid = intval($request->input('relation_id', 0));
-        $post_type = intval($request->input('post_type', 0));
+        $gid = (int)$request->input('relation_id', 0);
+        $post_type = (int)$request->input('post_type', 0);
         $is_qrcode = $request->input('is_qrcode', 0);
         $flag = $request->input('flag', 0);
         $live_id = $request->input('live_id', 0);
@@ -77,8 +77,8 @@ class CreatePosterController extends Controller
 
 
         $save_path = base_path() . '/public/image/';//存储路径
-        if (!file_exists($save_path)) {
-            mkdir($save_path, 0777, true);
+        if (!file_exists($save_path) && !mkdir($save_path, 0777, true) && !is_dir($save_path)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $save_path));
         }
 
         $expire_num = 600;
@@ -100,10 +100,10 @@ class CreatePosterController extends Controller
                 Cache::put($cache_key_name, $res, $expire_num);
             }
 
-            if ($post_type == 23) {
+            if ($post_type === 23) {
                 $src = ConfigModel::getData(34);
             }
-            if ($post_type == 24) {
+            if ($post_type === 24) {
                 //双十一活动二维码生成
                 ActionStatistics::actionAdd(4,$uid,$request->input("os_type")??0);
             }
@@ -112,12 +112,12 @@ class CreatePosterController extends Controller
                 'headimg' => $this->user['headimg'] ?? '',
             ];
 
-            if ($res['code'] == 0) {
+            if ($res['code'] === 0) {
                 return $this->success(['url' => $res['url'] . $res['name'], 'src' => $src, 'user_info' => $user_info]);
 
-            } else {
-                return $this->error(0, $res['msg']);
             }
+            return $this->error(0, $res['msg']);
+
         }
 
         if (empty($uid)) {
