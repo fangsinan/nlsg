@@ -103,9 +103,9 @@ abstract class AccessToken implements AccessTokenInterface
      */
     public function getToken(bool $refresh = false): array
     {
-//        $cacheKey = $this->getCacheKey();
-//        $cache = $this->getCache();
-//
+        $cacheKey = $this->getCacheKey();
+        $cache = $this->getCache();
+
 //        if (!$refresh && $cache->has($cacheKey)) {
 //            return $cache->get($cacheKey);
 //        }
