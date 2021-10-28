@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
 
 class LiveDeal extends Base
 {
@@ -25,6 +26,11 @@ class LiveDeal extends Base
         }
 
         return $rst;
+    }
+
+    public function orderInfo()
+    {
+        return $this->hasOne(Order::class, 'ordernum', 'ordernum');
     }
 
 }
