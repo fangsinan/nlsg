@@ -103,19 +103,22 @@ abstract class AccessToken implements AccessTokenInterface
      */
     public function getToken(bool $refresh = false): array
     {
-//        return [
-//            "access_token"=>CacheServers::wechatAccessToken(),
-//            "expires_in"=>3600
-//        ];
-        $cacheKey = $this->getCacheKey();
-        $cache = $this->getCache();
+//        $cacheKey = $this->getCacheKey();
+//        $cache = $this->getCache();
+//
+//        if (!$refresh && $cache->has($cacheKey)) {
+//            return $cache->get($cacheKey);
+//        }
 
-        if (!$refresh && $cache->has($cacheKey)) {
-            return $cache->get($cacheKey);
+        $token_cache = CacheServers::wechatAccessToken(1);
+        if (!$refresh  && $token_cache){
+            return $token_cache;
         }
 
         /** @var array $token */
         $token = $this->requestToken($this->getCredentials(), true);
+
+        CacheServers::wechatAccessToken(2,$token['access_token']);
 
         $this->setToken($token[$this->tokenKey], $token['expires_in'] ?? 7200);
 

@@ -31,15 +31,17 @@ class CacheServers
         Cache::forget('set_kill_list');
     }
 
-    protected static function clearWorks(){
+    protected static function clearWorks()
+    {
         Cache::forget('vip_works_list');
     }
 
     //coupon_rule_list  商品优惠券的缓存
 
-    //获取微信的access_token
-    public static function wechatAccessToken(){
-        $redis_config  = [
+    //获取微信的access_token 1拿2设
+    public static function wechatAccessToken(int $flag, $token = '')
+    {
+        $redis_config = [
             'url' => '8.140.167.113',
             'host' => '8.140.167.113',
             'password' => 'NLSG2020*beijin*0906BJ',
@@ -49,6 +51,14 @@ class CacheServers
         $Redis = new Client($redis_config);
         $Redis->select(1);
 
-        return $Redis->get('swoole_wechat_access_token');
+        if ($flag === 1) {
+            return [
+                "access_token" => $Redis->get('swoole_wechat_access_token'),
+                "expires_in" => 3600
+            ];
+        }
+
+        $Redis->set('swoole_wechat_access_token', $token, 7200);
+
     }
 }

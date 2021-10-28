@@ -1061,7 +1061,9 @@ class IndexController extends Controller
 
         $app = Factory::officialAccount($config);
         if (($request->input('test',0)) == 1 ){
-            dd($app->access_token->getToken());
+            $app->access_token->getRefreshedToken();
+//            dd($app->access_token->getToken());
+            dd(__LINE__);
         }
 
 
