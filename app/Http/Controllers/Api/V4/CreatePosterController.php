@@ -61,7 +61,7 @@ class CreatePosterController extends Controller
 
         $gid = (int)$request->input('relation_id', 0);
         $post_type = (int)$request->input('post_type', 0);
-        $is_qrcode = $request->input('is_qrcode', 0);
+        $is_qrcode = (int)$request->input('is_qrcode', 0);
         $flag = $request->input('flag', 0);
         $live_id = $request->input('live_id', 0);
         $live_info_id = $request->input('live_info_id', 0);
@@ -87,7 +87,7 @@ class CreatePosterController extends Controller
         }
 
         //海报二维码  [客户端生成]
-        if ($is_qrcode == 1) {
+        if ($is_qrcode === 1) {
 
             $cache_key_name = 'qr_' . $is_qrcode . '_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid . '_' . $flag. '_' . $info_id;
             $res = Cache::get($cache_key_name);
