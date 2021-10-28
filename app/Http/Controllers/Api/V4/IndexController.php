@@ -1060,6 +1060,11 @@ class IndexController extends Controller
         ];
 
         $app = Factory::officialAccount($config);
+        if (($request->input('test',0)) == 1 ){
+            dd($app->access_token->getToken());
+        }
+
+
         $app->jssdk->setUrl($url);
         $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'], $debug = true, $beta = false, $json = true);
         return success($jssdk);
