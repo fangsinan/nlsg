@@ -1133,8 +1133,15 @@ class CreatePosterController extends Controller
             case 23://360分享海报
                 return ConfigModel::getData(33) . '?time=' . time() . '&inviter=' . $uid . '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
             case 24://2021 双十一360分享海报
+                $temp_active_flag = ConfigModel::getData(60,1);
+                if ($temp_active_flag === '2021-11-1'){
+                    $url_temp = 'elevenActivity';
+                }else{
+                    $url_temp = 'elevenActivityDouble';
+                }
 
-                return ConfigModel::getData(59) . '?time=' . time() . '&inviter=' . $uid . '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
+                return ConfigModel::getData(45) .$url_temp. '?time=' . time() . '&inviter=' . $uid .
+                    '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
 
         }
         $twitterObj = new MallTwitter();
