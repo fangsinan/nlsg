@@ -17,6 +17,7 @@ use App\Models\VipUserBind;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use App\Servers\AliUploadServers;
+use App\Servers\CacheServers;
 use App\Servers\ChannelServers;
 use App\Servers\DealServers;
 use App\Servers\ErpServers;
@@ -24,6 +25,7 @@ use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
 use App\Servers\PhoneRegionServers;
 use App\Servers\removeDataServers;
+use EasyWeChat\Factory;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -192,7 +194,16 @@ class Kernel extends ConsoleKernel
             MallRefundJob::shillJob(2);
         })->everyFiveMinutes()->runInBackground();
 
-        $schedule->call(function () {})->hourly();//每小时
+        $schedule->call(function () {
+//            $config = [
+//                'app_id' => 'wxe24a425adb5102f6',
+//                'secret' => '2ded804b74f99ae2f342423dd7952620',
+//                'response_type' => 'array'
+//            ];
+//
+//            $app = Factory::officialAccount($config);
+//            $app->access_token->getRefreshedToken();
+        })->hourly();//每小时
 
         $schedule->call(function () {
             MallOrder::receipt();//自动收货
