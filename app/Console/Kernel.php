@@ -8,14 +8,20 @@ use App\Http\Controllers\Api\V4\UserWechat;
 use App\Models\Coupon;
 use App\Models\LiveConsole;
 use App\Models\MallOrder;
+use App\Models\MallOrderFlashSale;
+use App\Models\MallOrderGroupBuy;
+use App\Models\Order;
 use App\Models\PayRecordDetailStay;
 use App\Models\Task;
 use App\Models\VipUserBind;
 use App\Models\Works;
+use App\Models\WorksInfo;
 use App\Servers\AliUploadServers;
 use App\Servers\ChannelServers;
 use App\Servers\DealServers;
+use App\Servers\ErpServers;
 use App\Servers\ImDocServers;
+use App\Servers\MallRefundJob;
 use App\Servers\PhoneRegionServers;
 use App\Servers\removeDataServers;
 use Illuminate\Console\Scheduling\Schedule;
@@ -43,9 +49,9 @@ class Kernel extends ConsoleKernel
     {
 
         //im社群的发送任务
-        $schedule->command('imJob')
-            ->everyMinute()->withoutOverlapping(2)
-            ->runInBackground()->onOneServer();
+//        $schedule->command('imJob')
+//            ->everyMinute()->withoutOverlapping(2)
+//            ->runInBackground()->onOneServer();
 //        $schedule->command('imJob_1')
 //            ->everyMinute()->withoutOverlapping(2)
 //            ->runInBackground()->onOneServer();
@@ -56,59 +62,59 @@ class Kernel extends ConsoleKernel
 
 
 
-        $schedule->command('command:orderClear')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-
-        $schedule->command('command:mallOrderClear')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-
-        $schedule->command('command:cytxJob')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-
-        $schedule->command('command:shillJob')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-
-        $schedule->command('command:erpJob')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-
-
-        //直播间在线人数入库，方便调试
-        $schedule->command('command:liveOnlineUser')
-            ->everyMinute()
-            ->runInBackground()->onOneServer();
-
-        //直播间在线人数存入redis
-        $schedule->command('command:liveOnlineUserRedis')
-            ->everyMinute()
-            ->runInBackground()->onOneServer();
+//        $schedule->command('command:orderClear')
+//            ->everyMinute()->withoutOverlapping(1)
+//            ->runInBackground()->onOneServer();
+//
+//        $schedule->command('command:mallOrderClear')
+//            ->everyMinute()->withoutOverlapping(1)
+//            ->runInBackground()->onOneServer();
+//
+//        $schedule->command('command:cytxJob')
+//            ->everyMinute()->withoutOverlapping(1)
+//            ->runInBackground()->onOneServer();
+//
+//        $schedule->command('command:shillJob')
+//            ->everyMinute()->withoutOverlapping(1)
+//            ->runInBackground()->onOneServer();
+//
+//        $schedule->command('command:erpJob')
+//            ->everyMinute()->withoutOverlapping(1)
+//            ->runInBackground()->onOneServer();
+//
+//
+//        //直播间在线人数入库，方便调试
+//        $schedule->command('command:liveOnlineUser')
+//            ->everyMinute()
+//            ->runInBackground()->onOneServer();
+//
+//        //直播间在线人数存入redis
+//        $schedule->command('command:liveOnlineUserRedis')
+//            ->everyMinute()
+//            ->runInBackground()->onOneServer();
 
 //        $schedule->exec('php artisan imJob')->everyMinute();
 
-//        $schedule->call(function () {
-//            //直播间在线人数存入redis
-//            LiveController::CrontabOnlineUserRedis();
-//        })->everyMinute()->runInBackground();//每分
+        $schedule->call(function () {
+            //直播间在线人数存入redis
+            LiveController::CrontabOnlineUserRedis();
+        })->everyMinute()->runInBackground();//每分
 
-//        $schedule->call(function () {
-//            //直播间在线人数入库，方便调试
-//            LiveController::CrontabOnlineUser();
-//        })->everyMinute()->runInBackground();//每分
+        $schedule->call(function () {
+            //直播间在线人数入库，方便调试
+            LiveController::CrontabOnlineUser();
+        })->everyMinute()->runInBackground();//每分
 
 
-        // $schedule->command('inspire')->hourly();
-//        $schedule->call(function () {
-////            OrderRefundServers::test('callJob');
-//            MallOrder::clear();//超时订单处理
-//            Order::clear(); //线下课超时处理
-//            MallRefundJob::refundJob(1);//商城订单退款处理
-//            WorksInfo::covertVideo(); //转换音频视频
-//            Works::deal(); //自动上架
-//        })->everyMinute()->runInBackground();//每分
+         $schedule->command('inspire')->hourly();
+        $schedule->call(function () {
+//            OrderRefundServers::test('callJob');
+            MallOrder::clear();//超时订单处理
+            Order::clear(); //线下课超时处理
+            MallRefundJob::refundJob(1);//商城订单退款处理
+            WorksInfo::covertVideo(); //转换音频视频
+            Works::deal(); //自动上架
+        })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
             //im doc
@@ -131,33 +137,33 @@ class Kernel extends ConsoleKernel
             PhoneRegionServers::getPhoneRegion();//识别手机号归属地
         })->everyMinute()->runInBackground();//每分
 
-//        $schedule->call(function () {
-//            ChannelServers::cytxJob();//创业天下推送
-//        })->everyMinute()->runInBackground();//每分
+        $schedule->call(function () {
+            ChannelServers::cytxJob();//创业天下推送
+        })->everyMinute()->runInBackground();//每分
 
-//        $schedule->call(function () {
-//            MallOrderGroupBuy::clear();//拼团超时订单处理和退款登记
-//        })->everyMinute()->runInBackground();//每分
-//
-//        $schedule->call(function () {
-//            MallOrderFlashSale::clear();//秒杀订单处理
-//        })->everyMinute()->runInBackground();//每分
-//
-//        $schedule->call(function () {
-//            MallRefundJob::shillJob(1);
-//        })->everyMinute()->runInBackground();//每分
+        $schedule->call(function () {
+            MallOrderGroupBuy::clear();//拼团超时订单处理和退款登记
+        })->everyMinute()->runInBackground();//每分
 
-//        $schedule->call(function () {
-//            //erp物流同步与回写
-//            $s = new ErpServers();
-//            $s->logisticsSync();
-//        })->everyMinute()->runInBackground();//每分
-//
-//        $schedule->call(function () {
-//            //erp订单创建与更新
-//            $s = new ErpServers();
-//            $s->pushRun();
-//        })->everyMinute()->runInBackground();//每分
+        $schedule->call(function () {
+            MallOrderFlashSale::clear();//秒杀订单处理
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            MallRefundJob::shillJob(1);
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            //erp物流同步与回写
+            $s = new ErpServers();
+            $s->logisticsSync();
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            //erp订单创建与更新
+            $s = new ErpServers();
+            $s->pushRun();
+        })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
             //开通订阅队列
@@ -178,13 +184,13 @@ class Kernel extends ConsoleKernel
 //            $cs->douYinJob();
         })->everyMinute()->runInBackground();//每分
 
-//        $schedule->call(function () {
-//            MallRefundJob::refundJob(2);//商城订单退款查询
-//        })->everyFiveMinutes();//每五分
-//
-//        $schedule->call(function () {
-//            MallRefundJob::shillJob(2);
-//        })->everyFiveMinutes()->runInBackground();
+        $schedule->call(function () {
+            MallRefundJob::refundJob(2);//商城订单退款查询
+        })->everyFiveMinutes();//每五分
+
+        $schedule->call(function () {
+            MallRefundJob::shillJob(2);
+        })->everyFiveMinutes()->runInBackground();
 
         $schedule->call(function () {})->hourly();//每小时
 
