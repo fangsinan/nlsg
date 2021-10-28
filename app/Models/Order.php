@@ -139,7 +139,8 @@ class Order extends Base
 //        $subHour = now()->subHours(5);
         $res = Order::where('created_at', '<', $past)
 //            ->where('created_at', '>', $subHour)
-            ->where('status', 0)->where('pay_check',1)
+            ->where('status', 0)
+//            ->where('pay_check',1)
             ->update([
                 'status' => 2
             ]);
