@@ -461,6 +461,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::any('user_wechat/callback', 'UserWechat@Callback');
 
     Route::any('activity/activeImg', 'ActivityController@activeImg');
+    Route::any('activity/track', 'ActivityController@trackStatistics');
 
 });
 
