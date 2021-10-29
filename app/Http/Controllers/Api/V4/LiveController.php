@@ -68,7 +68,7 @@ class LiveController extends Controller
             $Redis->select(0);
 
             $time=time();
-            $key_minute=date('YmdHi',$time);
+            $key_minute='111OnlineUser'.date('Hi',$time);
             $flag=$Redis->EXISTS($key_minute);
 
             if($flag!=1){ //存在返回1
