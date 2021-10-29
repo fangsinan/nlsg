@@ -41,14 +41,25 @@ class DealServers
         $Redis->setex($key_minute,60,1);//10分钟
 
         if(!empty($crontab)){ //定时任务执行
-            $now=date('Y-m-d',time());
-            //获取当天未抓取的订单
-            $LiveOrderObj=Order::query()->where('pay_time', '>', $now.' 00:00:00')
-                ->where(['type'=>14,'status'=>1,'is_deal'=>0])->select(['live_id'])->where('pay_price', '>', 1)->first();
-            if(!empty($LiveOrderObj)) {
-                $live_id = $LiveOrderObj->live_id;
+            $now = date('Y-m-d', time());
+            if(empty($live_id)) {
+                //获取当天未抓取的订单
+                $LiveOrderObj = Order::query()->where('pay_time', '>', $now . ' 00:00:00')
+                    ->where(['type' => 14, 'status' => 1, 'is_deal' => 0])->select(['live_id'])->where('pay_price', '>', 1)->first();
+                if (!empty($LiveOrderObj)) {
+                    $live_id = $LiveOrderObj->live_id;
+                } else {
+                    return ['status' => 1, 'data' => [], 'msg' => '没有直播间开播'];
+                }
             }else{
-                return ['status' => 1, 'data' => [],'msg'=>'没有直播间开播'];
+                /*$LiveOrderObj = Order::query()->where('pay_time', '>', $now . ' 00:00:00')
+                    ->where(['type' => 14, 'status' => 1, 'is_deal' => 0])->select(['live_id'])->where('pay_price', '>', 1)
+                    ->groupBy('live_id')->get()->toArray() ?: [];
+                if (!empty($LiveOrderObj)) {
+                    $user_arr = array_column($LiveOrderObj, 'live_id');
+                } else {
+                    return ['status' => 1, 'data' => [], 'msg' => '没有直播间开播'];
+                }*/
             }
         }
 
