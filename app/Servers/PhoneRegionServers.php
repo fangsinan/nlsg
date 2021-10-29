@@ -16,7 +16,7 @@ class PhoneRegionServers
         $Redis->select(0);
 
         $time=time();
-        $key_name='111Phone'.date('YmdHi',$time);
+        $key_name='111PhoneRegion'.date('Hi',$time);
         $flag=$Redis->EXISTS($key_name);
         if($flag==1) { //存在返回1
             return ;

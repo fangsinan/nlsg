@@ -33,7 +33,7 @@ class DealServers
         $Redis->select(0);
 
         $time=time();
-        $key_minute=date('YmdHi',$time).'_order';
+        $key_minute='111dealorder'.date('Hi',$time);
         $flag=$Redis->EXISTS($key_minute);
         if($flag==1) { //存在返回1
             return;
