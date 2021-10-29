@@ -64,11 +64,15 @@ class ActivityController extends Controller {
         $active_time = explode(',',$active_time);
         $begin_time = strtotime($active_time[0]);
         $end_time = strtotime($active_time[1]);
+        $is_end = 0;
 
 
         if ( $now <= $begin_time || $now > $end_time ){
             $active_status = 0;
 //            return $this->error(0, "活动未开始");
+        }
+        if ($now > $end_time){
+            $is_end = 1;
         }
 
         $is_h5 = $request->input('is_h5','0');
@@ -129,6 +133,7 @@ class ActivityController extends Controller {
             $data['is_pay_order_count'] = 0;
         }
 
+        $data['is_end'] = $is_end;
         return success($data);
     }
 
