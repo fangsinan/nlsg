@@ -56,7 +56,7 @@ class DealController extends Controller
         }*/
 
         $DealObj=new DealServers();
-        $RstData=$DealObj::getOrderInfo($data,$live_id);
+        $RstData=$DealObj::getOrderInfo($data,$live_id,1);
         if($RstData['status']!=1){
             return $this->error(0, $RstData['msg']);
         }else{
