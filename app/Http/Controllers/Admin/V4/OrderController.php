@@ -243,6 +243,7 @@ class OrderController extends ControllerBackend
                 flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
             }
 
+            $page++;
             if (empty($list)){
                 $while_flag = false;
             }
@@ -322,7 +323,7 @@ class OrderController extends ControllerBackend
                 ob_flush();     //刷新输出缓冲到浏览器
                 flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
             }
-
+            $page++;
             if (empty($list)){
                 $while_flag = false;
             }
