@@ -1859,7 +1859,7 @@ class LiveController extends Controller
             if(!empty($order_id)){  //付费
                 $order = Order::where(['id'=>$order_id])->first();
                 $relation_id = $order['relation_id'];
-                if(!in_array($relation_id,[119,123,124])){
+                if(!in_array($relation_id,[119,123,124,177])){
                     return success((object)[] );
                 }
             }
