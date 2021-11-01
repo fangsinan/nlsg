@@ -47,7 +47,7 @@ class OrderController extends ControllerBackend
      *    }
      * }
      */
-    public function list(Request $request)
+    public function list(Request $request, $flag = 1)
     {
         $phone = $request->get('phone');
         $nickname = $request->get('nickname');
@@ -60,11 +60,13 @@ class OrderController extends ControllerBackend
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
         $sort = $request->get('sort');
-        $activity_tag = $request->get('activity_tag','');
-        $is_shill = (int)($request->get('is_shill',-1));
+        $activity_tag = $request->get('activity_tag', '');
+        $is_shill = (int)($request->get('is_shill', -1));
+        $page = $request->input('page', 1);
+        $size = $request->input('size', 10);
         $query = Order::with(
             [
-                'user:id,nickname',
+                'user:id,nickname,phone',
                 'works:id,title'
             ])
             ->when(!is_null($status), function ($query) use ($status) {
@@ -105,30 +107,41 @@ class OrderController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             })
-            ->whereHas('user',function($q){
-                $q->where('is_test_pay','=',0);
+            ->whereHas('user', function ($q) {
+                $q->where('is_test_pay', '=', 0);
             });
 
-        if ($activity_tag === 'cytx_on'){
-            $query->where('activity_tag','=','cytx');
+        if ($activity_tag === 'cytx_on') {
+            $query->where('activity_tag', '=', 'cytx');
         }
-        if($activity_tag === 'cytx_off'){
-            $query->where('activity_tag','<>','cytx');
+        if ($activity_tag === 'cytx_off') {
+            $query->where('activity_tag', '<>', 'cytx');
         }
-        if ($is_shill === 0){
-            $query->where('is_shill','=',0);
+        if ($is_shill === 0) {
+            $query->where('is_shill', '=', 0);
         }
-        if ($is_shill === 1){
-            $query->where('is_shill','=',1);
+        if ($is_shill === 1) {
+            $query->where('is_shill', '=', 1);
         }
 
-        $direction = $sort == 'asc' ? 'asc' : 'desc';
-        $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
-            'created_at', 'status','activity_tag','is_shill')
-            ->where('type', 9)
-            ->orderBy('id', $direction)
-            ->paginate(10)
-            ->toArray();
+        $direction = $sort === 'asc' ? 'asc' : 'desc';
+        $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price',
+            'os_type', 'pay_type', 'created_at', 'status', 'activity_tag', 'is_shill')
+            ->where('type', 9)->orderBy('id', $direction);
+
+        if ($flag === 1) {
+            $lists = $query
+                ->paginate($size)
+                ->toArray();
+        } else {
+            $lists = $query->limit($size)->offset(($page - 1) * $size)->get();
+            if ($lists->isEmpty()) {
+                return [];
+            }
+            return $lists->toArray();
+
+        }
+
         $rank = Order::with('works:id,title,cover_img')
             ->select([
                 DB::raw('count(*) as total'),
@@ -150,8 +163,169 @@ class OrderController extends ControllerBackend
 
     }
 
+    public function listExcel(Request $request)
+    {
 
-    public function colList(Request $request)
+        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
+
+        $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
+        $fp = fopen('php://output', 'a');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
+        $while_flag =true;
+        $page = 1;
+        $size = 500;
+
+        while ($while_flag){
+
+            $request->offsetSet('page',$page);
+            $request->offsetSet('size',$size);
+
+            $list = $this->list($request, 2);
+
+
+            foreach ($list as $v) {
+                $v = json_decode(json_encode($v), true);
+                $temp_v = [
+                    $v['ordernum'],$v['user']['phone'],$v['user']['nickname'],
+                    $v['works']['title'],$v['pay_price'],$v['created_at']
+                ];
+
+                switch ((int)$v['os_type']){
+                    case 1:
+                        $temp_v[] = '安卓';
+                        break;
+                    case 2:
+                        $temp_v[] = '苹果';
+                        break;
+                    case 3:
+                        $temp_v[] = '微信';
+                        break;
+                    default:
+                        $temp_v[] = '-';
+                }
+
+                if ($v['activity_tag'] === 'cytx'){
+                    $temp_v[] = '创业天下';
+                }else{
+                    $temp_v[] = '-';
+                }
+                if ($v['is_shill'] === 1){
+                    $temp_v[] = '已退款';
+                }else{
+                    $temp_v[] = '未退款';
+                }
+                if ($v['status'] === 1){
+                    $temp_v[] = '已支付';
+                }else{
+                    $temp_v[] = '未支付';
+                }
+
+                mb_convert_variables('GBK', 'UTF-8', $temp_v);
+                fputcsv($fp, $temp_v);
+                ob_flush();     //刷新输出缓冲到浏览器
+                flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+            }
+
+            if (empty($list)){
+                $while_flag = false;
+            }
+        }
+
+        fclose($fp);
+        exit();
+    }
+
+    public function colListExcel(Request $request){
+        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
+
+        $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
+        $fp = fopen('php://output', 'ab');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
+        $while_flag =true;
+        $page = 1;
+        $size = 500;
+
+        while ($while_flag){
+
+            $request->offsetSet('page',$page);
+            $request->offsetSet('size',$size);
+
+            $list = $this->colList($request, 2);
+
+
+            foreach ($list as $v) {
+                $v = json_decode(json_encode($v), true);
+                $temp_v = [
+                    $v['ordernum'],$v['user']['phone'],$v['user']['nickname'],
+                    $v['column']['title'],$v['pay_price'],$v['created_at']
+                ];
+
+
+                switch ((int)$v['os_type']){
+                    case 1:
+                        $temp_v[] = '安卓';
+                        break;
+                    case 2:
+                        $temp_v[] = '苹果';
+                        break;
+                    case 3:
+                        $temp_v[] = '微信';
+                        break;
+                    default:
+                        $temp_v[] = '-';
+                }
+
+                if ($v['activity_tag'] === 'cytx'){
+                    $temp_v[] = '创业天下';
+                }else{
+                    $temp_v[] = '-';
+                }
+                if ($v['is_shill'] === 1){
+                    $temp_v[] = '已退款';
+                }else{
+                    $temp_v[] = '未退款';
+                }
+                if ($v['status'] === 1){
+                    $temp_v[] = '已支付';
+                }else{
+                    $temp_v[] = '未支付';
+                }
+
+                mb_convert_variables('GBK', 'UTF-8', $temp_v);
+                fputcsv($fp, $temp_v);
+                ob_flush();     //刷新输出缓冲到浏览器
+                flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+            }
+
+            if (empty($list)){
+                $while_flag = false;
+            }
+        }
+
+        fclose($fp);
+        exit();
+
+    }
+
+    public function colList(Request $request,$flag = 1)
     {
         $phone = $request->get('phone');
         $nickname = $request->get('nickname');
@@ -164,18 +338,20 @@ class OrderController extends ControllerBackend
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
         $sort = $request->get('sort');
-        $activity_tag = $request->get('activity_tag','');
-        $is_shill = (int)($request->get('is_shill',-1));
-        
+        $activity_tag = $request->get('activity_tag', '');
+        $is_shill = (int)($request->get('is_shill', -1));
+        $page = $request->input('page', 1);
+        $size = $request->input('size', 10);
+
         $query = Order::with(
             [
-                'user:id,nickname',
+                'user:id,nickname,phone',
                 'column' => function ($q) {
-                    $q->select(['id', 'name as title', 'name','cover_pic as cover_img']);
+                    $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
                 }
             ])
-            ->whereHas('column',function($q){
-                $q->where('type','=',2);
+            ->whereHas('column', function ($q) {
+                $q->where('type', '=', 2);
             })
             ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
@@ -216,31 +392,41 @@ class OrderController extends ControllerBackend
                 ]);
             });
 
-        if ($activity_tag === 'cytx_on'){
-            $query->where('activity_tag','=','cytx');
+        if ($activity_tag === 'cytx_on') {
+            $query->where('activity_tag', '=', 'cytx');
         }
-        if($activity_tag === 'cytx_off'){
-            $query->where('activity_tag','<>','cytx');
+        if ($activity_tag === 'cytx_off') {
+            $query->where('activity_tag', '<>', 'cytx');
         }
-        if ($is_shill === 0){
-            $query->where('is_shill','=',0);
+        if ($is_shill === 0) {
+            $query->where('is_shill', '=', 0);
         }
-        if ($is_shill === 1){
-            $query->where('is_shill','=',1);
+        if ($is_shill === 1) {
+            $query->where('is_shill', '=', 1);
         }
 
         $direction = $sort == 'asc' ? 'asc' : 'desc';
-        $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
-            'created_at', 'status','activity_tag')
+        $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
+            'created_at', 'status', 'activity_tag','is_shill')
             ->where('type', 15)
-            ->orderBy('id', $direction)
-            ->paginate(10)
-            ->toArray();
+            ->orderBy('id', $direction);
+
+        if ($flag === 1) {
+            $lists = $query
+                ->paginate($size)
+                ->toArray();
+        } else {
+            $lists = $query->limit($size)->offset(($page - 1) * $size)->get();
+            if ($lists->isEmpty()) {
+                return [];
+            }
+            return $lists->toArray();
+        }
 
         $rank = Order::with(['column' => function ($q) {
-            $q->select(['id', 'name as title', 'name','cover_pic as cover_img']);
-        }])->whereHas('column',function($q){
-            $q->where('type','=',2);
+            $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
+        }])->whereHas('column', function ($q) {
+            $q->where('type', '=', 2);
         })->select([
             DB::raw('count(*) as total'),
             'user_id',
@@ -346,11 +532,11 @@ class OrderController extends ControllerBackend
     public function getOrderDetail(Request $request)
     {
         $id = $request->get('id');
-        $check = Order::where('id','=',$id)->first();
-        if (empty($check)){
+        $check = Order::where('id', '=', $id)->first();
+        if (empty($check)) {
             return success([]);
-        }else{
-            if ($check->type == 15){
+        } else {
+            if ($check->type == 15) {
                 $list = Order::with(
                     [
                         'user:id,nickname,phone',
@@ -361,7 +547,7 @@ class OrderController extends ControllerBackend
                     ->where('id', $id)
                     ->first();
                 $list->works = $list->column;
-            }else{
+            } else {
                 $list = Order::with(
                     [
                         'user:id,nickname,phone',

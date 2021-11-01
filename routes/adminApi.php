@@ -297,5 +297,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('task/users','TaskController@getUsers');
     Route::get('task/works','TaskController@getWorks');
 
+    Route::get('order/list_excel', 'OrderController@listExcel');
+    Route::get('order/col_list_excel', 'OrderController@colListExcel');
+
 
 });
