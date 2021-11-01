@@ -420,7 +420,7 @@ class OrderController extends ControllerBackend
             $query->where('is_shill', '=', 1);
         }
 
-        $direction = $sort == 'asc' ? 'asc' : 'desc';
+        $direction = $sort === 'asc' ? 'asc' : 'desc';
         $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
             'created_at', 'status', 'activity_tag','is_shill')
             ->where('type', 15)
