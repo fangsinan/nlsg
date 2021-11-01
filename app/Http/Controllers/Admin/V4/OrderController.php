@@ -64,10 +64,12 @@ class OrderController extends ControllerBackend
         $is_shill = (int)($request->get('is_shill', -1));
         $page = $request->input('page', 1);
         $size = $request->input('size', 10);
+        $teacher_name = $request->input('teacher_name','');
         $query = Order::with(
             [
                 'user:id,nickname,phone',
-                'works:id,title'
+                'works:id,title,user_id',
+                'works.user:id,nickname,phone'
             ])
             ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
@@ -110,6 +112,12 @@ class OrderController extends ControllerBackend
             ->whereHas('user', function ($q) {
                 $q->where('is_test_pay', '=', 0);
             });
+
+        if (!empty($teacher_name)){
+            $query->whereHas('works.user',function($q)use($teacher_name){
+                $q->where('nickname','like',"%$teacher_name%");
+            });
+        }
 
         if ($activity_tag === 'cytx_on') {
             $query->where('activity_tag', '=', 'cytx');
@@ -166,7 +174,7 @@ class OrderController extends ControllerBackend
     public function listExcel(Request $request)
     {
 
-        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
+        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称','老师', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
 
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -196,7 +204,7 @@ class OrderController extends ControllerBackend
                 $v = json_decode(json_encode($v), true);
                 $temp_v = [
                     $v['ordernum'],$v['user']['phone'],$v['user']['nickname'],
-                    $v['works']['title'],$v['pay_price'],$v['created_at']
+                    $v['works']['title'],$v['works']['user']['nickname'],$v['pay_price'],$v['created_at']
                 ];
 
                 switch ((int)$v['os_type']){
@@ -245,7 +253,7 @@ class OrderController extends ControllerBackend
     }
 
     public function colListExcel(Request $request){
-        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
+        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称','老师', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
 
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -275,7 +283,7 @@ class OrderController extends ControllerBackend
                 $v = json_decode(json_encode($v), true);
                 $temp_v = [
                     $v['ordernum'],$v['user']['phone'],$v['user']['nickname'],
-                    $v['column']['title'],$v['pay_price'],$v['created_at']
+                    $v['column']['title'],$v['column']['user']['nickname'],$v['pay_price'],$v['created_at']
                 ];
 
 
@@ -342,13 +350,15 @@ class OrderController extends ControllerBackend
         $is_shill = (int)($request->get('is_shill', -1));
         $page = $request->input('page', 1);
         $size = $request->input('size', 10);
+        $teacher_name = $request->input('teacher_name','');
 
         $query = Order::with(
             [
                 'user:id,nickname,phone',
                 'column' => function ($q) {
-                    $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
-                }
+                    $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img','user_id']);
+                },
+                'column.user:id,nickname,phone'
             ])
             ->whereHas('column', function ($q) {
                 $q->where('type', '=', 2);
@@ -392,6 +402,11 @@ class OrderController extends ControllerBackend
                 ]);
             });
 
+        if (!empty($teacher_name)){
+            $query->whereHas('column.user',function($q)use($teacher_name){
+                $q->where('nickname','like',"%$teacher_name%");
+            });
+        }
         if ($activity_tag === 'cytx_on') {
             $query->where('activity_tag', '=', 'cytx');
         }
