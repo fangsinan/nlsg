@@ -203,7 +203,7 @@ class OrderController extends ControllerBackend
             foreach ($list as $v) {
                 $v = json_decode(json_encode($v), true);
                 $temp_v = [
-                    $v['ordernum'],$v['user']['phone'],$v['user']['nickname'],
+                    '`'.$v['ordernum'],'`'.$v['user']['phone'],$v['user']['nickname'],
                     $v['works']['title'],$v['works']['user']['nickname'],$v['pay_price'],$v['created_at']
                 ];
 
@@ -283,7 +283,7 @@ class OrderController extends ControllerBackend
             foreach ($list as $v) {
                 $v = json_decode(json_encode($v), true);
                 $temp_v = [
-                    $v['ordernum'],$v['user']['phone'],$v['user']['nickname'],
+                    '`'.$v['ordernum'],'`'.$v['user']['phone'],$v['user']['nickname'],
                     $v['column']['title'],$v['column']['user']['nickname'],$v['pay_price'],$v['created_at']
                 ];
 
