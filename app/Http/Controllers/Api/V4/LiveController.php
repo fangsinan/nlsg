@@ -1849,13 +1849,21 @@ class LiveController extends Controller
         $relation_id = $request->input('relation_id')??0;
         $order_id = $request->input('order_id')??0;
         if($relation_type == 3){
-            //付费客户端不传直播id  需要查询
-            if(!empty($order_id)){  //付费
-                $order = Order::where(['id'=>$order_id])->first();
-                $relation_id = $order['relation_id'];
+
+            //relation_type=3时    免费传relation_id=live_id   付费传order_id
+            if(empty($order_id)){ //直播免费预约取消二维码
+                return success((object)[] );
             }
-            $live = Live::find($relation_id);
-            $relation_id = $live['user_id'] ?? 0; //直播是根据user_id 返回二维码
+            //付费直播
+            $order = Order::where(['id'=>$order_id])->first();
+            if(empty($order)) {
+                return success((object)[] );
+            }
+            $relation_id = $order['relation_id'];
+            if(!in_array($relation_id,[119,123,124,177])){
+                return success((object)[] );
+            }
+
         }else{
             //目前除了直播 其他不需要根据各个具体产品返二维码
             $relation_id = 0;
@@ -1867,7 +1875,11 @@ class LiveController extends Controller
             'status'   => 1,
         ])->first();
 
-        return success($res ?? (object)[] );
+        if(empty($res)){
+            $res=(object)[];
+        }
+
+        return success($res);
     }
 
 }
