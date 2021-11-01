@@ -207,15 +207,18 @@ class OrderController extends ControllerBackend
                     $v['works']['title'],$v['works']['user']['nickname'],$v['pay_price'],$v['created_at']
                 ];
 
-                switch ((int)$v['os_type']){
+                switch ((int)$v['pay_type']){
                     case 1:
-                        $temp_v[] = '安卓';
+                        $temp_v[] = '微信端';
                         break;
                     case 2:
-                        $temp_v[] = '苹果';
+                        $temp_v[] = 'app微信';
                         break;
                     case 3:
-                        $temp_v[] = '微信';
+                        $temp_v[] = 'app支付宝';
+                        break;
+                    case 4:
+                        $temp_v[] = '苹果';
                         break;
                     default:
                         $temp_v[] = '-';
@@ -235,6 +238,19 @@ class OrderController extends ControllerBackend
                     $temp_v[] = '已支付';
                 }else{
                     $temp_v[] = '未支付';
+                }
+                switch ((int)$v['os_type']){
+                    case 1:
+                        $temp_v[] = '安卓';
+                        break;
+                    case 2:
+                        $temp_v[] = '苹果';
+                        break;
+                    case 3:
+                        $temp_v[] = '微信';
+                        break;
+                    default:
+                        $temp_v[] = '-';
                 }
 
                 mb_convert_variables('GBK', 'UTF-8', $temp_v);
@@ -288,15 +304,18 @@ class OrderController extends ControllerBackend
                 ];
 
 
-                switch ((int)$v['os_type']){
+                switch ((int)$v['pay_type']){
                     case 1:
-                        $temp_v[] = '安卓';
+                        $temp_v[] = '微信端';
                         break;
                     case 2:
-                        $temp_v[] = '苹果';
+                        $temp_v[] = 'app微信';
                         break;
                     case 3:
-                        $temp_v[] = '微信';
+                        $temp_v[] = 'app支付宝';
+                        break;
+                    case 4:
+                        $temp_v[] = '苹果';
                         break;
                     default:
                         $temp_v[] = '-';
@@ -318,6 +337,20 @@ class OrderController extends ControllerBackend
                     $temp_v[] = '未支付';
                 }
 
+                switch ((int)$v['os_type']){
+                    case 1:
+                        $temp_v[] = '安卓';
+                        break;
+                    case 2:
+                        $temp_v[] = '苹果';
+                        break;
+                    case 3:
+                        $temp_v[] = '微信';
+                        break;
+                    default:
+                        $temp_v[] = '-';
+                }
+                
                 mb_convert_variables('GBK', 'UTF-8', $temp_v);
                 fputcsv($fp, $temp_v);
                 ob_flush();     //刷新输出缓冲到浏览器
