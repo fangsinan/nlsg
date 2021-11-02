@@ -329,7 +329,7 @@ class InfoController extends ControllerBackend
     public function onlineNum(Request $request)
     {
         $s = new LiveInfoServers();
-        $data = $s->onlineNum($request->input());
+        $data = $s->onlineNum($request->input(),$this->user);
         return $this->getRes($data);
     }
 

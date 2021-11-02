@@ -423,41 +423,8 @@ class LiveInfoServers
         return $res;
     }
 
-    public function onlineNum($params)
+    public function onlineNum($params,$user)
     {
-
-//        $begin_time = '2021-09-27 18:50';
-//        while ($begin_time < '2021-09-27 21:10'){
-//            $temp_list = DB::table('nlsg_live_online_user')
-//                ->where('live_id','=',139)
-//                ->where('online_time_str','=',$begin_time)
-//                ->get();
-//            $all_login_counts = [];
-//
-//            foreach ($temp_list as $v){
-//                $temp_v_key = $v->live_id.'_'.$v->online_time_str.'_'.$v->live_son_flag;
-//                if (!isset($all_login_counts[$temp_v_key])){
-//                    $all_login_counts[$temp_v_key] = [
-//                        'live_id'=>$v->live_id,
-//                        'live_son_flag'=>$v->live_son_flag,
-//                        'online_time_str'=>$v->online_time_str,
-//                        'counts'=>1
-//                    ];
-//                }else{
-//                    $all_login_counts[$temp_v_key]['counts'] += 1;
-//                }
-//            }
-//            DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
-//            $begin_time = date('Y-m-d H:i',strtotime("$begin_time +1 min"));
-//        }
-//        dd(__LINE__);
-
-//
-//        DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
-////        dd(__LINE__);
-//        dd($all_login_counts);
-
-
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
@@ -467,24 +434,18 @@ class LiveInfoServers
             return ['code' => false, 'msg' => 'live_id错误'];
         }
         //获取所有渠道
-//        $res['son_flag'] = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
-//            ->select(['son', 'son_id', 'son_flag'])
-//            ->orderBy('sort','asc')   //按标记排序
-//            ->get();
 
-//        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
-//        $chose_table_res = DB::select($chose_table_sql);
-//        if (empty($chose_table_res)){
         $table_name = 'nlsg_live_online_user';
-//        }else{
-//            $table_name = 'nlsg_live_online_user_'.$live_id;
-//        }
-
         $cache_key_name = 'son_flag_' . $check_live_id->user_id;
         $expire_num = CacheTools::getExpire('son_flag');
         $son_flag = Cache::get($cache_key_name);
 
         if (empty($son_flag)) {
+
+            if ($user['role_id'] === 1 || ($user['user_id'] === 169209)){
+                $check_live_id->user_id = 169209;
+            }
+
             $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
                 ->where('status', '=', 1)
                 ->select(['son', 'son_id', 'son_flag'])
