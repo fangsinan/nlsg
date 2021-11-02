@@ -55,7 +55,7 @@ class LiveSonFlagPoster extends Model
 
     public function createPosterByLiveId($live_id = 0,$top_user_id = 0)
     {
-        $check_live_id = Live::where('id', '=', $live_id)->first();
+        $check_live_id = Live::query()->where('id', '=', $live_id)->first();
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
@@ -63,7 +63,7 @@ class LiveSonFlagPoster extends Model
             $check_live_id->user_id = $top_user_id;
         }
 
-        $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
+        $son_flag = BackendLiveRole::query()->where('parent_id', '=', $check_live_id->user_id)
             ->where('status','=',1)
             ->select(['son', 'son_id', 'son_flag'])
             ->get();
@@ -75,7 +75,7 @@ class LiveSonFlagPoster extends Model
 
         $son_flag = $son_flag->toArray();
         //已经添加的
-        $old = LiveSonFlagPoster::where('live_id', '=', $live_id)
+        $old = self::query()->where('live_id', '=', $live_id)
             ->where('is_del', '=', 0)
             ->pluck('son_id')
             ->toArray();
@@ -90,14 +90,14 @@ class LiveSonFlagPoster extends Model
         DB::beginTransaction();
 
         if (!empty($del_son_list)) {
-            $del_res = LiveSonFlagPoster::where('live_id', '=', $live_id)
+            $del_res = self::query()->where('live_id', '=', $live_id)
                 ->where('is_del', '=', 0)
                 ->whereIn('son_id', $del_son_list)
                 ->update([
                     'is_del' => 1
                 ]);
 
-            if ($del_res == false) {
+            if (!$del_res) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '失败' . __LINE__];
             }
@@ -114,7 +114,7 @@ class LiveSonFlagPoster extends Model
             }
 
             $add_res = DB::table('nlsg_live_son_flag_poster')->insert($add_data);
-            if ($add_res == false) {
+            if (!$add_res) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '失败' . __LINE__];
             }
