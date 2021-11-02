@@ -793,17 +793,7 @@ GROUP BY
 
             $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
             $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
-        } else {
-            //李婷,统计order表的9.9
-            $watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 1";
-            $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 0";
 
-            $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
-            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
-        }
-
-        //成交单数 总金额,购买人数,未购买人数
-        if ($check_live_id->user_id === 161904) {
             //王琨,统计live_deal
             $res['total_order'] = DB::table('nlsg_live_deal as ld')
                 ->where('live_id','=',$live_id)
@@ -831,6 +821,13 @@ GROUP BY
 
         } else {
             //李婷,统计order表的9.9
+            $watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 1";
+            $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 0";
+
+            $res['watch_counts'] = DB::select($watch_count_sql)[0]->counts;
+            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+
+            //李婷,统计order表的9.9
             $temp_order = $this->liveOrder(['live_id' => $live_id]);
             $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum']);
             $temp_order_user = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum']);
@@ -839,12 +836,6 @@ GROUP BY
             $res['total_order_money'] = $temp_order_money;
             $res['total_order_user'] = $temp_order_user;
         }
-
-
-//        $total_sub_count_sql = "select count(*) counts from (
-//SELECT id from nlsg_subscribe where relation_id = $live_id and type = 3 and status = 1 GROUP BY user_id
-//) as a ";
-//        $res['total_sub_count'] = DB::select($total_sub_count_sql)[0]->counts;
 
         $res['total_sub_count'] = Subscribe::query()
             ->where('relation_id','=',$live_id)
@@ -874,12 +865,13 @@ GROUP BY
             ->where('status', 1)
             ->orderBy('id', 'desc')
             ->first();
+
         if ($channel) {
-            if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+            if ($channel->is_begin === 0 && $channel->is_finish === 0) {
                 $res['live_status'] = 1;
-            } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+            } elseif ($channel->is_begin === 1 && $channel->is_finish === 0) {
                 $res['live_status'] = 3;
-            } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+            } elseif ($channel->is_begin === 0 && $channel->is_finish === 1) {
                 $res['live_status'] = 2;
             }
         }
