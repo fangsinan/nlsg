@@ -131,7 +131,7 @@ class OrderController extends ControllerBackend
         fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
 
         $model = new Order();
-        $size = 100;
+        $size = 500;
         $page = 1;
         $request->offsetSet('size', $size);
         $request->offsetSet('excel_flag', '1');
