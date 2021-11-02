@@ -131,15 +131,21 @@ class OrderController extends ControllerBackend
         fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
 
         $model = new Order();
-        $size = 500;
+//        $size = 500;
         $page = 1;
-        $request->offsetSet('size', $size);
-        $request->offsetSet('excel_flag', '1');
+//        $request->offsetSet('size', $size);
+//        $request->offsetSet('excel_flag', '1');
+        $params = $request->all();
+        $params['size'] = 500;
+        $params['excel_flag'] = 1;
+
         $while_flag = true;
         while ($while_flag) {
-            $request->offsetSet('page', $page);
-            $list = $model->orderInLive($request->input(), $this->user);
-
+//            $request->offsetSet('page', $page);
+            $params['page'] = $page;
+//            $list = $model->orderInLive($request->input(), $this->user);
+            $list = $model->orderInLive($params, $this->user);
+            $page++;
             if ($list->isEmpty()) {
                 $while_flag = false;
             } else {
@@ -151,7 +157,7 @@ class OrderController extends ControllerBackend
                     $temp_v['phone'] = '`' . ($v->user->phone ?? '');
                     $temp_v['goods_name'] = $v->goods['title'] ?? '';
 
-                    switch (intval($v->type)) {
+                    switch ((int)$v->type) {
                         case 9:
                             $temp_v['type'] = '精品课';
                             break;
@@ -173,8 +179,8 @@ class OrderController extends ControllerBackend
 
                     $temp_v['g_p'] = $v->goods['price'] ?? '';
                     $temp_v['p_p'] = $v->pay_price ?? '';
-                    $temp_v['t_p'] = $v->payRecordDetail->user->phone ?? '';
-                    switch (intval($v->status)) {
+                    $temp_v['t_p'] = $v->pay_record_detail->user->phone ?? '';
+                    switch ((int)$v->status) {
                         case 1:
                             $temp_v['p_status'] = '已支付';
                             break;
@@ -206,7 +212,7 @@ class OrderController extends ControllerBackend
                     }
 
                     $temp_v['time'] = $v->pay_time ?? '';
-                    switch (intval($v->os_type)) {
+                    switch ((int)$v->os_type) {
                         case 1:
                             $temp_v['os'] = '安卓';
                             break;
@@ -225,7 +231,7 @@ class OrderController extends ControllerBackend
                     ob_flush();     //刷新输出缓冲到浏览器
                     flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
                 }
-                $page++;
+
             }
         }
 
