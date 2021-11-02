@@ -117,7 +117,7 @@ class OrderController extends ControllerBackend
         $this->user = BackendUser::where('id', '=', $user_id)->first()->toArray();
 
         $columns = ['订单编号', '直播标题', '用户昵称', '用户手机', '商品', '类型',
-            '商品价格', '支付价格', '推荐账户', '支付状态', '支付方式', '下单时间', '订单来源'];
+            '商品价格', '支付价格', '推荐账户','推荐账户昵称', '支付状态', '支付方式', '下单时间', '订单来源'];
         $fileName = '直播商品列表' . date('Y-m-d H:i') . '.csv';
         header('Content-Description: File Transfer');
         header('Content-Type: application/vnd.ms-excel');
@@ -180,6 +180,7 @@ class OrderController extends ControllerBackend
                     $temp_v['g_p'] = $v->goods['price'] ?? '';
                     $temp_v['p_p'] = $v->pay_price ?? '';
                     $temp_v['t_p'] = $v->pay_record_detail->user->phone ?? '';
+                    $temp_v['t_pn'] = $v->pay_record_detail->user->nickname ?? '';
                     switch ((int)$v->status) {
                         case 1:
                             $temp_v['p_status'] = '已支付';
