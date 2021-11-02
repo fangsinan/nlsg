@@ -514,7 +514,7 @@ class InfoController extends ControllerBackend
     public function flagPosterList(Request $request)
     {
         $s = new LiveInfoServers();
-        $data = $s->flagPosterList($request->input());
+        $data = $s->flagPosterList($request->input(),$this->user);
         return $this->getRes($data);
     }
 

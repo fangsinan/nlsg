@@ -937,7 +937,7 @@ GROUP BY
         })->pluck('son_id')->toArray();
     }
 
-    public function flagPosterList($params)
+    public function flagPosterList($params,$user)
     {
         $live_id = $params['live_id'] ?? 0;
         $page = $params['page'] ?? 1;
@@ -953,9 +953,18 @@ GROUP BY
         }
 
         $model = new LiveSonFlagPoster();
-        $model->createPosterByLiveId($live_id);
 
-        return $model->getList(['live_id' => $live_id, 'page' => $page, 'size' => $size, 'status' => $status]);
+        $top_user_id = 0;
+        if ($user['role_id'] === 1 || ($user['user_id'] === 169209)){
+            $top_user_id = 169209;
+        }
+
+        $model->createPosterByLiveId($live_id,$top_user_id);
+
+        return $model->getList([
+            'live_id' => $live_id, 'page' => $page, 'size' => $size,
+            'status' => $status,'top_user_id'=>$top_user_id
+        ]);
     }
 
     public function flagPosterStatus($params)
@@ -984,9 +993,9 @@ GROUP BY
         $res = $check_id->save();
         if ($res === false) {
             return ['code' => false, 'msg' => '失败'];
-        } else {
-            return ['code' => true, 'msg' => '成功'];
         }
+
+        return ['code' => true, 'msg' => '成功'];
 
     }
 

@@ -15,8 +15,13 @@ class LiveSonFlagPoster extends Model
     {
         $live_id = $params['live_id'];
         $size = $params['size'];
-        $check_live_id = Live::where('id', '=', $live_id)->first();
-
+        $check_live_id = Live::query()->where('id', '=', $live_id)->first();
+        if (empty($check_live_id)){
+            return [];
+        }
+        if (($params['top_user_id']??0) !== 0){
+            $check_live_id->user_id = $params['top_user_id'];
+        }
 
         $query = DB::table('nlsg_live_son_flag_poster as p')
             ->join('nlsg_backend_live_role as lr', 'p.son_id', '=', 'lr.son_id')
@@ -48,11 +53,14 @@ class LiveSonFlagPoster extends Model
         return $custom->merge($res);
     }
 
-    public function createPosterByLiveId($live_id = 0)
+    public function createPosterByLiveId($live_id = 0,$top_user_id = 0)
     {
         $check_live_id = Live::where('id', '=', $live_id)->first();
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        if ($top_user_id !== 0){
+            $check_live_id->user_id = $top_user_id;
         }
 
         $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
