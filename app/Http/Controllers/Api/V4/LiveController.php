@@ -1312,23 +1312,27 @@ class LiveController extends Controller
             return error(0, '参数异常');
         }
 
-        if( in_array($this->user['id'], [878644, 882057, 882861]) ){
+        if(in_array($this->user['id'], [878644, 882057, 882861], true)){
             return error(0, '用户异常');
         }
 
         if(empty($input['info_id'])){
             return error(0, '参数有误');
         }
-        $info_id=intval($input['info_id']);
+        $info_id= (int)$input['info_id'];
 
-        $live = LiveInfo::where('id', $info_id)->first();
+        $live = LiveInfo::query()->where('id', $info_id)->first();
         if (!$live) {
             return error(0, '直播不存在');
         }
 
-        $live_data = Live::where('id', $live['live_pid'])->first();
+        $live_data = Live::query()->where('id', $live['live_pid'])->first();
+        if (!$live_data){
+            return error(0, '直播不存在');
+        }
+
         if ($live_data['flag'] > 0) {   //flag > 0 为限定直播  限定值与flag一致
-            $flag = LiveCheckPhone::where([
+            $flag = LiveCheckPhone::query()->where([
                 'phone' => $this->user['phone'],
                 'flag' => $live_data['flag'],
             ])->first();
@@ -1338,8 +1342,9 @@ class LiveController extends Controller
             }
         }
 
-        $list = Subscribe::where(['relation_id' => $info_id, 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
-                        ->first();
+        $list = Subscribe::query()
+            ->where(['relation_id' => $info_id, 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
+            ->first();
         if ( !empty($list) ) {
             return error(0, '已经预约');
         }
@@ -1379,7 +1384,7 @@ class LiveController extends Controller
 
             return success('发送成功');
 
-            $easySms = app('easysms');
+            //$easySms = app('easysms');
 
             /*try {
                 if(strlen($user->phone)==11) {
@@ -1393,9 +1398,8 @@ class LiveController extends Controller
                 return $message;
             }*/
 
-        } else {
-            return error(0, '手机号不存在或者错误');
         }
+        return error(0, '手机号不存在或者错误');
     }
 
     /**
