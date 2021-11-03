@@ -162,6 +162,31 @@ class WechatPay extends Controller
                         $source = $twitter['source'];
                         $source_vip_id = $twitter['source_vip_id'];
                     }
+
+                    //写入关系保护
+                    $twitter_data = User::find($twitter);
+                    $check_bind = VipUserBind::getBindParent($AdminInfo['phone']);
+                    //没有绑定记录,则绑定
+                    if (($check_bind === 0) && strlen($twitter_data['phone']) === 11 && strlen($AdminInfo['phone']) === 11) {
+                        $bind_data = [
+                            'parent' => $twitter_data['phone'],
+                            'son' => $AdminInfo['phone'],
+                            'life' => 2,
+                            'begin_at' => date('Y-m-d H:i:s'),
+                            'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                            'channel' => 2
+                        ];
+                        if($orderInfo['activity_tag'] === "2021-11-1" ) { //支付1元
+                            $bind_data['end_at'] = date("Y-m-d 23:59:59", strtotime("+7day"));
+                        }elseif($orderInfo['activity_tag'] === "2021-11-2" ) { //支付1元
+                            $bind_data['end_at'] = date("Y-m-d 23:59:59", strtotime("+1years +100day"));
+                        }else{
+                            $bind_data['end_at'] = date("Y-m-d 23:59:59", strtotime("+1years"));
+                        }
+                        DB::table('nlsg_vip_user_bind')->insert($bind_data);
+                    }
+
+
                 } else {
                     $source = 0;
                     $source_vip_id = 0;
@@ -204,10 +229,10 @@ class WechatPay extends Controller
                 $e_time = 31536000;
                 if($orderInfo['activity_tag'] == "2021-11-1" ) { //支付1元
                     $e_time = 86400*7;   //7天
-                    $Userdata['expire_time'] = date("Y-m-d 23:59:59", strtotime("+7day", time()));;
+                    $Userdata['expire_time'] = date("Y-m-d 23:59:59", strtotime("+7day", time()));
                 }elseif($orderInfo['activity_tag'] == "2021-11-2" ) { //支付1元
                     $e_time = 31536000+86400*100;  //一年零100天
-                    $Userdata['expire_time'] = date("Y-m-d 23:59:59", strtotime("+1years +100day", time()));;
+                    $Userdata['expire_time'] = date("Y-m-d 23:59:59", strtotime("+1years +100day", time()));
                 }
 
                 if ($level != 2) {
