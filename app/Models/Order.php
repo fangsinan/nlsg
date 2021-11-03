@@ -276,12 +276,13 @@ class Order extends Base
         //下单时间
         if (!empty($params['created_at'])) {
             $created_at = explode(',', $params['created_at']);
-            $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
+//            $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
             if (empty($created_at[1] ?? '')) {
                 $created_at[1] = $now_date;
-            } else {
-                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[1]));
             }
+//            else {
+//                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[1]));
+//            }
             $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
         }
 
