@@ -373,7 +373,16 @@ class LiveInfoServers
             $query->where('pay_price', '=', $params['pay_price']);
         }
 
-        $query->where('o.remark', '=', $live_id);
+
+        if($user['role_id'] === 1){
+            $temp_live_time_begin = date('Y-m-d 00:00:00',$check_live_id->begin_at);
+            $temp_live_time_end = date('Y-m-d 23:59:59',$check_live_id->end_at);
+            $query->where('o.created_at','>=',$temp_live_time_begin)
+                ->where('o.created_at','<=',$temp_live_time_end);
+        }else{
+            $query->where('o.remark', '=', $live_id);
+        }
+
 
         if ($twitter_id_list !== null){
             $query->whereIn('o.twitter_id', $twitter_id_list);
@@ -401,7 +410,7 @@ class LiveInfoServers
                     'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
                     'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
                     'o.id as order_id', 'o.pay_type', 'os_type',
-                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id','o.ordernum'
+                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id','o.ordernum','o.remark'
                 ]);
             $res = $query->paginate($size);
 
