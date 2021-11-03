@@ -422,14 +422,23 @@ class LiveInfoServers
                     'o.user_id', DB::raw("CONCAT('`',u.phone) as phone"), 'u.nickname', 'o.twitter_id',
                     DB::raw("CONCAT('`',lt.phone) as t_phone"),
                     'lt.nickname as t_nickname', 'lr.son_flag',
-                    'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
+                    'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title','o.remark'
                 ]);
             $res = $query->get();
         }
 
-        foreach ($res as $v){
-            $v->source_live_id = $check_live_id->id;
-            $v->source_live_title = $check_live_id->title;
+        foreach ($res as &$v){
+            //修改源直播名称
+            if ($v->remark == $check_live_id->id){
+                $v->source_live_id = $check_live_id->id;
+                $v->source_live_title = $check_live_id->title;
+            }elseif (empty($v->remark)){
+                $v->source_live_id = $v->source_live_title = '';
+            }else{
+                $v->source_live_id = $v->remark;
+                $v->source_live_title = Live::query()->where('id','=',$v->remark)->value('title');
+            }
+            unset($v->remark);
         }
 
         if (empty($excel_flag)) {
