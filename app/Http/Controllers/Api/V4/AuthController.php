@@ -41,7 +41,7 @@ class AuthController extends Controller
      *
      */
 
-    public function login(Request $request)
+    public function loginBak(Request $request)
     {
 
         $phone = $request->input('phone');
@@ -159,6 +159,105 @@ class AuthController extends Controller
         return success($data);
     }
 
+    public function login(Request $request){
+        $phone = $request->input('phone','');
+        $code = (int)($request->input('code','0'));
+        $is_invite = $request->input('is_invite',0);
+        $user_id = $request->input('user_id',0);
+        $inviter = (int)$request->input('inviter', 0);
+        $ref = $request->input('ref', 0);
+
+        $sClass = new \StdClass();
+
+        if (!$phone || strlen($phone) !== 11) {
+            return error(400, '手机号不能为空', $sClass);
+        }
+        if (!$code) {
+            return error(400, '验证码不能为空', $sClass);
+        }
+
+        $select_arr = ['id','nickname','headimg','phone','level','sex','is_community_admin','login_flag','is_code_login'];
+
+        $check_phone = User::query()->where('phone', '=', $phone)
+            ->select($select_arr)
+            ->first();
+
+        if (empty($check_phone)){
+            //新号逻辑
+            $res = Redis::get($phone);
+            if (!$res) {
+                return error(400, '验证码已过期', $sClass);
+            }
+            if ($code !== $res) {
+                return error(400, '验证码错误', $sClass);
+            }
+
+            $list = User::query()->create([
+                'phone' => $phone,
+                'inviter' => $inviter,
+                'login_flag' => ($inviter === 0) ? 0 : 1,
+                'nickname' => substr_replace($phone, '****', 3, 4),
+                'ref' => $ref
+            ]);
+            $check_phone = User::query()->where('id','=',$list->id)
+                ->select($select_arr)
+                ->first();
+
+            //新人优惠券
+            $cpModel = new Coupon();
+            $cpModel->giveCoupon($check_phone->id, ConfigModel::getData(41));
+            if ($is_invite && $user_id) {
+                //邀请人优惠券
+                $cpModel->giveCoupon($user_id, ConfigModel::getData(42));
+                UserInvite::query()->create([
+                    'from_uid' => $user_id,
+                    'to_uid' => $check_phone->id,
+                    'type' => 1
+                ]);
+            }
+
+        }else{
+            switch ($check_phone->is_code_login){
+                case 1:
+                    if ($code !== 6666){
+                        return error(400, '验证码错误', $sClass);
+                    }
+                    break;
+                case 2:
+                    $temp_code = (int)(substr($phone,-4));
+                    if ($code !== $temp_code){
+                        return error(400, '验证码错误', $sClass);
+                    }
+                    break;
+                default:
+                    $dont_check_phone = ConfigModel::getData(35, 1);
+                    $dont_check_phone = explode(',', $dont_check_phone);
+                    if (in_array($phone, $dont_check_phone, true)){
+                        if ($code !== 6666){
+                            return error(400, '验证码错误', $sClass);
+                        }
+                    }else{
+                        $res = Redis::get($phone);
+                        if (!$res) {
+                            return error(400, '验证码已过期', $sClass);
+                        }
+                        if ($code !== $res) {
+                            return error(400, '验证码错误', $sClass);
+                        }
+
+                    }
+            }
+            User::query()->where('id', '=', $check_phone->id)->update(['login_flag' => 2]);
+        }
+
+        Redis::del($phone);
+        $token = auth('api')->login($check_phone);
+        $time = strtotime(date('Y-m-d', time())) + 86400;
+        if ($check_phone->expire_time <= $time || !in_array($check_phone->level, [3, 4, 5], true)) {
+            $check_phone->level = 0;
+        }
+        return success($this->get_data($check_phone, $token));
+    }
     /**
      * @api {get} api/v4/auth/logout 退出
      * @apiVersion 4.0.0
