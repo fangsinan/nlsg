@@ -375,8 +375,8 @@ class LiveInfoServers
 
 
         if($user['role_id'] === 1){
-            $temp_live_time_begin = date('Y-m-d 00:00:00',$check_live_id->begin_at);
-            $temp_live_time_end = date('Y-m-d 23:59:59',$check_live_id->end_at);
+            $temp_live_time_begin = date('Y-m-d 00:00:00',strtotime($check_live_id->begin_at));
+            $temp_live_time_end = date('Y-m-d 23:59:59',strtotime($check_live_id->end_at));
             $query->where('o.created_at','>=',$temp_live_time_begin)
                 ->where('o.created_at','<=',$temp_live_time_end);
         }else{
