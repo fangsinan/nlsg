@@ -158,11 +158,11 @@ WHERE
     {
         $live_id = $params['live_id'] ?? 0;
         $live_info_id = $params['live_info_id'] ?? 0;
-        $page = intval($params['page'] ?? 1);
-        $size = intval($params['size'] ?? 10);
+        $page = (int)($params['page'] ?? 1);
+        $size = (int)($params['size'] ?? 10);
         $type = $params['type'] ?? 1;
 
-        if (empty($live_id) || empty($live_info_id)) {
+        if (empty($live_id) || empty($live_info_id) || $live_id === 'undefined') {
             return ['code' => false, 'msg' => '参数错误'];
         }
 //        $check_is_admin = LiveConsole::isAdmininLive($user_id, $live_id);
