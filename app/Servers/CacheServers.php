@@ -64,6 +64,7 @@ class CacheServers
 
     public static function getOrSetWechatAccessToken($flag, $token = '')
     {
+        return true;
         $redisCacheKey = 'v4_wechat_access_token';
 
         $redis_config = [
