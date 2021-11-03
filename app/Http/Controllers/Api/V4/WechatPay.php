@@ -633,7 +633,13 @@ class WechatPay extends Controller
                     'relation_id' => $live_id,
                     'twitter_id' => $orderInfo['twitter_id'],
                 ];
-                $subscribeRst = Subscribe::firstOrCreate($subscribe);
+
+                $userdata = User::find($user_id);
+                $subscribeRst=true;
+                if($userdata['is_test_pay']==0){ //测试用户不添加订阅记录
+                    $subscribeRst = Subscribe::firstOrCreate($subscribe);
+                }
+
                 $liveData = Live::find($live_id);
 
                 Live::where('id', $live_id)->increment('order_num');
@@ -649,8 +655,6 @@ class WechatPay extends Controller
                     Subscribe::firstOrCreate($subscribe);
                     Live::where('id', $liveData['relation_live'])->increment('order_num');
                 }
-
-                $userdata = User::find($user_id);
 
                 //21-03-22 补充的课程
                 if (in_array($liveData['user_id'] ?? 0, [161904, 250550, 423403])) {
