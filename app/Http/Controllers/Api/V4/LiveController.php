@@ -1498,7 +1498,7 @@ class LiveController extends Controller
             'relation_id' => $liveInfoId,
             'cost_price' => $list['price'],
             'price' => $list['price'],
-            'twitter_id' => $tweeter_code,
+            'twitter_id' => $tweeter_code??0,
             'coupon_id' => 0,
             'ip' => $this->getIp($request),
             'os_type' => $osType,
