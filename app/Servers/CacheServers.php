@@ -61,4 +61,28 @@ class CacheServers
         $Redis->set('swoole_wechat_access_token', $token, 7200);
 
     }
+
+    public static function getOrSetWechatAccessToken($flag,$token){
+        $redisCacheKey = 'v4_wechat_access_token';
+
+        $redis_config = [
+            'url' => '8.140.167.113',
+            'host' => '8.140.167.113',
+            'password' => 'NLSG2020*beijin*0906BJ',
+            'port' => '6379',
+            'database' => 0,
+        ];
+        $Redis = new Client($redis_config);
+        $Redis->select(1);
+
+        if ($flag === 1){
+            return [
+                "access_token" => $Redis->get($redisCacheKey),
+                "expires_in" => 7200
+            ];
+        }
+
+        $Redis->set($redisCacheKey, $token, 7200);
+
+    }
 }
