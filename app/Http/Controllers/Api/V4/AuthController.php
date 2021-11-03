@@ -566,8 +566,8 @@ class AuthController extends Controller
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone) || $phone == '18600179874') {
-            if (intval($code) !== 6666) {
+        if (in_array($phone, $dont_check_phone, true) || $phone === '18600179874') {
+            if ((int)$code !== 6666) {
                 return error(1000, '验证码错误');
             }
         } else {
@@ -584,7 +584,7 @@ class AuthController extends Controller
         if (!$user) {
             User::where('id', $user_id)->update(['phone' => $phone]);
         } else { //号码已存在
-            User::where('id', $user_id)->update(['phone' => $phone.'_'.$user->id]);
+            User::where('id', $user_id)->update(['phone' => $phone.'_'.$user->id.'_'.random_int(1,999)]);
         }
         $arra = [
             'id' => $user_id,
