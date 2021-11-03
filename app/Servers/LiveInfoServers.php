@@ -323,12 +323,10 @@ class LiveInfoServers
         if (empty($live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
-        $check_live_id = Live::where('id', '=', $live_id)->first();
+        $check_live_id = Live::query()->where('id', '=', $live_id)->first();
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
-
-        $twitter_id_list = $this->twitterIdList('', $check_live_id->user_id);
 
         $query = DB::table('nlsg_order as o')
             ->join('nlsg_live as l', 'o.live_id', '=', 'l.id')
@@ -370,7 +368,11 @@ class LiveInfoServers
         }
 
         $query->where('o.remark', '=', $live_id);
-        $query->whereIn('o.twitter_id', $twitter_id_list);
+
+        if ($check_live_id->user_id !== 161904){
+            $twitter_id_list = $this->twitterIdList('', $check_live_id->user_id);
+            $query->whereIn('o.twitter_id', $twitter_id_list);
+        }
 
 //        $query->where('o.live_id', '=', $live_id);
         $query->whereRaw('o.type=10 and o.`status`=1 and u.is_test_pay=0

@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Live\V4;
 use App\Http\Controllers\ControllerBackend;
 use App\Servers\LiveInfoServers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class InfoController extends ControllerBackend
 {
@@ -121,32 +120,32 @@ class InfoController extends ControllerBackend
         $data = $s->liveOrder($request->input());
         if (empty($excel_flag)) {
             return $this->getRes($data);
-        } else {
-            $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
-                '推客别名', '支付价格', '支付时间', '直播id', '直播标题', '订单id'];
-//            $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
-            $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/vnd.ms-excel');
-            header('Content-Disposition: attachment; filename="' . $fileName . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header("Access-Control-Allow-Origin: *");
-            $fp = fopen('php://output', 'a');//打开output流
-            mb_convert_variables('GBK', 'UTF-8', $columns);
-            fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
-
-            foreach ($data as $v) {
-                $v = json_decode(json_encode($v), true);
-                mb_convert_variables('GBK', 'UTF-8', $v);
-                fputcsv($fp, $v);
-                ob_flush();     //刷新输出缓冲到浏览器
-                flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
-            }
-            fclose($fp);
-            exit();
         }
+
+        $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
+            '推客别名', '支付价格', '支付时间', '直播id', '直播标题', '订单id'];
+//            $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
+        $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
+        $fp = fopen('php://output', 'a');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
+        foreach ($data as $v) {
+            $v = json_decode(json_encode($v), true);
+            mb_convert_variables('GBK', 'UTF-8', $v);
+            fputcsv($fp, $v);
+            ob_flush();     //刷新输出缓冲到浏览器
+            flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+        }
+        fclose($fp);
+        exit();
 
     }
 
@@ -157,8 +156,8 @@ class InfoController extends ControllerBackend
         if (($data['code'] ?? true) === false) {
             exit($data['msg']);
         }
-        $columns = ['订单编号','用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
-            '推客别名', '支付价格', '支付时间', '直播id', '直播标题','源直播id','源直播标题'];
+        $columns = ['订单编号', '用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
+            '推客别名', '支付价格', '支付时间', '直播id', '直播标题', '源直播id', '源直播标题'];
 //        $fileName = '直播间预约下单列表' . date('Y-m-d H:i') . '.csv';
         $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -240,6 +239,7 @@ class InfoController extends ControllerBackend
             exit();
         }
     }
+
     //http://127.0.0.1:8000/api/live_v4/live_info/live_order_kun_excel?live_id=130&excel_flag=1
     public function liveOrderKunExcel(Request $request)
     {
@@ -280,7 +280,7 @@ class InfoController extends ControllerBackend
             '钻石合伙人id', '钻石合伙人账号', '钻石合伙人昵称', '钻石合伙人身份',
             '是否抖音渠道', '抖音订单号', '抖音下单时间', '渠道类型', '渠道名称',
             '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款',
-            '微信客服','客服编号',
+            '微信客服', '客服编号',
             '收货地址'
         ];
 //        $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
@@ -329,7 +329,7 @@ class InfoController extends ControllerBackend
     public function onlineNum(Request $request)
     {
         $s = new LiveInfoServers();
-        $data = $s->onlineNum($request->input(),$this->user);
+        $data = $s->onlineNum($request->input(), $this->user);
         return $this->getRes($data);
     }
 
@@ -514,7 +514,7 @@ class InfoController extends ControllerBackend
     public function flagPosterList(Request $request)
     {
         $s = new LiveInfoServers();
-        $data = $s->flagPosterList($request->input(),$this->user);
+        $data = $s->flagPosterList($request->input(), $this->user);
         return $this->getRes($data);
     }
 

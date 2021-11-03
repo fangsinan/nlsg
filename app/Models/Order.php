@@ -253,9 +253,10 @@ class Order extends Base
         $size = $params['size'] ?? 10;
         $page = $params['page'] ?? 1;
         $now_date = date('Y-m-d H:i:s');
+        $excel_flag = (int)($params['excel_flag'] ?? 0);
 
         //9精品课  10直播  14 线下产品(门票类)   15讲座  16新vip
-        $query = Order::query();
+        $query = self::query();
 
         $query->where('id', '>', 341864)
             ->where('status', '=', 1)
@@ -304,13 +305,13 @@ class Order extends Base
         //21是老师,只看自己
         //22是管理员,全都能看
         //23是校长,看名下老师
-        if ($this_user['live_role'] == 21) {
+        if ($this_user['live_role'] === 21) {
             $live_user_id = $this_user['user_id'];
             $query->where('live_id','>',52);
             $query->whereHas('live', function ($q) use ($live_user_id) {
                 $q->where('user_id', '=', $live_user_id);
             });
-        } elseif ($this_user['live_role'] == 23) {
+        } elseif ($this_user['live_role'] === 23) {
             $blrModel = new BackendLiveRole();
             $son_user_id = $blrModel->getDataUserId($this_user['username']);
             $query->where('live_id','>',52);
@@ -333,7 +334,7 @@ class Order extends Base
 
             if (!empty($params['goods_title']??'')){
                 $goods_title = trim($params['goods_title']);
-                switch (intval($params['type'])){
+                switch ((int)$params['type']){
                     case 9:
                         $query->whereHas('works', function ($q) use ($goods_title) {
                             $q->where('title', 'like', "%$goods_title%");
@@ -420,7 +421,7 @@ class Order extends Base
             Cache::put($cache_key_name, $list_money, $expire_num);
         }
 
-        if (($params['excel_flag'] ?? 0) == 1){
+        if ($excel_flag === 1){
             $list = $query->orderBy('id', 'desc')
                 ->limit($size)
                 ->offset(($page - 1) * $size)
@@ -432,7 +433,7 @@ class Order extends Base
 
         foreach ($list as &$v) {
             $goods = [];
-            switch (intval($v->type)) {
+            switch ((int)$v->type) {
                 case 9:
                     $goods['goods_id'] = $v->works->id ?? 0;
                     $goods['title'] = $v->works->title ?? '数据错误';
@@ -478,13 +479,12 @@ class Order extends Base
             unset($v->works, $v->column, $v->offline, $v->liveGoods);
         }
 
-        if (($params['excel_flag'] ?? 0) == 1){
+        if ($excel_flag === 1){
             return $list;
-        }else{
-            $total_money = collect(['total_money'=>$list_money]);
-            return $total_money->merge($list);
         }
 
+        $total_money = collect(['total_money'=>$list_money]);
+        return $total_money->merge($list);
     }
 
     public function inviterLiveList($params,$this_user = []){
