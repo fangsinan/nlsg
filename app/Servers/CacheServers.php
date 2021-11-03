@@ -62,7 +62,8 @@ class CacheServers
 
     }
 
-    public static function getOrSetWechatAccessToken($flag,$token){
+    public static function getOrSetWechatAccessToken($flag, $token = '')
+    {
         $redisCacheKey = 'v4_wechat_access_token';
 
         $redis_config = [
@@ -75,7 +76,7 @@ class CacheServers
         $Redis = new Client($redis_config);
         $Redis->select(1);
 
-        if ($flag === 1){
+        if ($flag === 1) {
             return [
                 "access_token" => $Redis->get($redisCacheKey),
                 "expires_in" => 7200
