@@ -118,7 +118,7 @@ class Banner extends Base
         if (!empty($data)) {
             $res['id'] = $data->obj_id;
             $res['info_id'] = 0;
-            switch ((int)$data->jump_type) {
+            switch ($data->jump_type) {
                 case 2:
                     $res['type'] = 3;
                     break;
