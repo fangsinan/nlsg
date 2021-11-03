@@ -112,7 +112,7 @@ abstract class AccessToken implements AccessTokenInterface
         }
 
         $token = $this->requestToken($this->getCredentials(), true);
-
+return $token;
         $this->setToken($token[$this->tokenKey], $token['expires_in'] ?? 7200);
 
         $this->app->events->dispatch(new Events\AccessTokenRefreshed($this));
