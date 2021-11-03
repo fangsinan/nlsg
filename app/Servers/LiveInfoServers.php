@@ -762,7 +762,7 @@ GROUP BY
 
     }
 
-    public function statistics($params)
+    public function statistics($params,$this_user)
     {
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
@@ -835,9 +835,9 @@ GROUP BY
             $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
 
             //李婷,统计order表的9.9
-            $temp_order = $this->liveOrder(['live_id' => $live_id]);
-            $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum']);
-            $temp_order_user = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum']);
+            $temp_order = $this->liveOrder(['live_id' => $live_id],$this_user);
+            $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum'],$this_user);
+            $temp_order_user = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum'],$this_user);
 
             $res['total_order'] = $temp_order['total'] ?? '错误';
             $res['total_order_money'] = $temp_order_money;

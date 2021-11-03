@@ -492,7 +492,7 @@ class InfoController extends ControllerBackend
     public function statistics(Request $request)
     {
         $s = new LiveInfoServers();
-        $data = $s->statistics($request->input());
+        $data = $s->statistics($request->input(),$this->user);
         return $this->getRes($data);
     }
 
