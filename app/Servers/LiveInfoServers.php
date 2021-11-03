@@ -314,7 +314,7 @@ class LiveInfoServers
 
     }
 
-    public function liveOrder($params)
+    public function liveOrder($params,$user)
     {
         $size = $params['size'] ?? 10;
         $query_flag = $params['query_flag'] ?? '';
@@ -326,6 +326,12 @@ class LiveInfoServers
         $check_live_id = Live::query()->where('id', '=', $live_id)->first();
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
+        }
+
+        if ($user['role_id'] === 1){
+            $twitter_id_list = null;
+        }else{
+            $twitter_id_list = $this->twitterIdList($user['username']);
         }
 
         $query = DB::table('nlsg_order as o')
@@ -369,8 +375,7 @@ class LiveInfoServers
 
         $query->where('o.remark', '=', $live_id);
 
-        if ($check_live_id->user_id !== 161904){
-            $twitter_id_list = $this->twitterIdList('', $check_live_id->user_id);
+        if ($twitter_id_list !== null){
             $query->whereIn('o.twitter_id', $twitter_id_list);
         }
 
