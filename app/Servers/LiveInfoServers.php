@@ -7,7 +7,6 @@ namespace App\Servers;
 use App\Models\BackendLiveRole;
 use App\Models\CacheTools;
 use App\Models\Live;
-use App\Models\LiveDeal;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveOnlineUser;
@@ -869,7 +868,8 @@ GROUP BY
             ->count();
 
         //为购买人数
-        $res['total_not_buy'] = $res['total_sub_count'] -  $res['total_order_user'];
+        $res['total_not_buy'] = $res['total_sub_count'] - $res['total_order_user'];
+        $res['total_not_buy'] = $res['total_not_buy'] < 0 ? 0 : $res['total_not_buy'];
 
         //观看时常大于30分钟的
 //            $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
