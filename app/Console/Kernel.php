@@ -106,6 +106,8 @@ class Kernel extends ConsoleKernel
             //直播间在线人数入库，方便调试
             LiveConsoleServers::CrontabOnlineUser();
             LiveConsoleServers::CrontabJoinRedis();
+            LiveConsoleServers::CrontabCommentRedis();
+            LiveConsoleServers::CrontabGiftRedis();
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {

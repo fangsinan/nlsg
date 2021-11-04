@@ -9,6 +9,182 @@ use Predis\Client;
 class LiveConsoleServers
 {
 
+    //定时入库打赏
+    public static function CrontabGiftRedis(){
+
+        try {
+            $redisConfig = config('database.redis.default');
+            $Redis = new Client($redisConfig);
+            $Redis->select(0);
+
+            $time=time();
+            $key_minute='111_live_gift'.date('Hi',$time);
+            $flag=$Redis->EXISTS($key_minute);
+
+            $list_key='111_live_gift';
+            if($flag!=1){ //存在返回1
+                $Redis->setex($key_minute,60,1);//1分钟
+
+                $list=$Redis->lrange($list_key,0,-1);// 获取所有数据
+//                $list = $Redis->sMembers($list_key);// 获取有序集合
+                if (!empty($list)) {
+                    $data=[];
+                    $map = [];
+                    $start=0;
+                    foreach ($list as $k => $val) {
+                        $start=$k;
+                        $map[] =  json_decode($val, true);
+                        if(($k+1)%10000==0){
+                            $data[]=$map;
+                            $map=[]; //初始化
+                        }
+                    }
+                    $Redis->ltrim($list_key,$start+1,-1);//删除已取出数据
+
+                    if(!empty($map)){ //取余剩下的数据
+                        $data[]=$map;
+                    }
+
+                    if (!empty($data)) {
+                        DB::beginTransaction();
+                        try {
+                            $inser_rst=0;
+                            $rst=true;
+
+                            foreach ($data as $k=>$v) {
+                                $rst = DB::table('nlsg_live_comment')->insert($v);
+                                if ($rst === false) {
+                                    DB::rollBack();
+                                    $inser_rst=1;
+                                    break;
+                                }
+                            }
+                            if($inser_rst==1){
+                                //日志写入
+                                self::LogIo('livegift','gift_error','写入失败'.$rst);
+                                //回写数据
+                                foreach ($list as $k => $val) {
+                                    $Redis->sadd($list_key,$val);
+                                }
+                                return '写入失败';
+                            }
+                            DB::commit();
+                            //日志写入
+                            self::LogIo('livegift','gift','执行成功');
+                            return  '写入成功';
+                        }catch (\Exception $e) {
+                            DB::rollBack();
+                            //日志写入
+                            self::LogIo('livegift','gift_error','写入异常'.$e->getMessage());
+                            //回写数据
+                            foreach ($list as $k => $val) {
+                                $Redis->sadd($list_key,$val);
+                            }
+                            return  '写入异常'.$e->getMessage();
+                        }
+                    }
+                }else{
+                    return  '集合为空';
+                }
+
+
+            }else{
+                self::LogIo('livegift','gift_redis','不执行'.$key_minute);
+            }
+        }catch (\Exception $e){
+            self::LogIo('livegift','gift_redis_error','写入失败'.$e->getMessage());
+        }
+
+    }
+
+    //定时入库评论
+    public static function CrontabCommentRedis(){
+
+        try {
+            $redisConfig = config('database.redis.default');
+            $Redis = new Client($redisConfig);
+            $Redis->select(0);
+
+            $time=time();
+            $key_minute='111_live_comment'.date('Hi',$time);
+            $flag=$Redis->EXISTS($key_minute);
+
+            $list_key='111_live_comment';
+            if($flag!=1){ //存在返回1
+                $Redis->setex($key_minute,60,1);//1分钟
+
+                $list=$Redis->lrange($list_key,0,-1);// 获取所有数据
+//                $list = $Redis->sMembers($list_key);// 获取有序集合
+                if (!empty($list)) {
+                    $data=[];
+                    $map = [];
+                    $start=0;
+                    foreach ($list as $k => $val) {
+                        $start=$k;
+                        $map[] =  json_decode($val, true);
+                        if(($k+1)%10000==0){
+                            $data[]=$map;
+                            $map=[]; //初始化
+                        }
+                    }
+                    $Redis->ltrim($list_key,$start+1,-1);//删除已取出数据
+
+                    if(!empty($map)){ //取余剩下的数据
+                        $data[]=$map;
+                    }
+
+                    if (!empty($data)) {
+                        DB::beginTransaction();
+                        try {
+                            $inser_rst=0;
+                            $rst=true;
+
+                            foreach ($data as $k=>$v) {
+                                $rst = DB::table('nlsg_live_comment')->insert($v);
+                                if ($rst === false) {
+                                    DB::rollBack();
+                                    $inser_rst=1;
+                                    break;
+                                }
+                            }
+                            if($inser_rst==1){
+                                //日志写入
+                                self::LogIo('livecomment','comment_error','写入失败'.$rst);
+                                //回写数据
+                                foreach ($list as $k => $val) {
+                                    $Redis->sadd($list_key,$val);
+                                }
+                                return '写入失败';
+                            }
+                            DB::commit();
+                            //日志写入
+                            self::LogIo('livecomment','comment','执行成功');
+                            return  '写入成功';
+                        }catch (\Exception $e) {
+                            DB::rollBack();
+                            //日志写入
+                            self::LogIo('livecomment','comment_error','写入异常'.$e->getMessage());
+                            //回写数据
+                            foreach ($list as $k => $val) {
+                                $Redis->sadd($list_key,$val);
+                            }
+                            return  '写入异常'.$e->getMessage();
+                        }
+                    }
+                }else{
+                    return  '集合为空';
+                }
+
+
+            }else{
+                self::LogIo('livecomment','comment_redis','不执行'.$key_minute);
+            }
+        }catch (\Exception $e){
+            self::LogIo('livecomment','comment_redis_error','写入失败'.$e->getMessage());
+        }
+
+    }
+
     //定时入库加入直播间
     public static function CrontabJoinRedis(){
 
@@ -61,7 +237,7 @@ class LiveConsoleServers
                             }
                             if($inser_rst==1){
                                 //日志写入
-                                self::LogIo('livejoin','online_error','写入失败'.$rst);
+                                self::LogIo('livejoin','join_error','写入失败'.$rst);
                                 //回写数据
                                 foreach ($list as $k => $val) {
                                     $Redis->sadd($list_key,$val);
@@ -70,7 +246,7 @@ class LiveConsoleServers
                             }
                             DB::commit();
                             //日志写入
-                            self::LogIo('livejoin','online','执行成功');
+                            self::LogIo('livejoin','join','执行成功');
                             return  '写入成功';
                         }catch (\Exception $e) {
                             DB::rollBack();
