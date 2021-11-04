@@ -25,17 +25,22 @@ class LiveConsoleServers
             if($flag!=1){ //存在返回1
                 $Redis->setex($key_minute,60,1);//1分钟
 
-                $list = $Redis->sMembers($list_key);// 获取有序集合 console
+                $list=$Redis->lrange($list_key,0,-1);// 获取所有数据
+//                $list = $Redis->sMembers($list_key);// 获取有序集合
                 if (!empty($list)) {
                     $data=[];
                     $map = [];
+                    $start=0;
                     foreach ($list as $k => $val) {
+                        $start=$k;
                         $map[] =  json_decode($val, true);
                         if(($k+1)%10000==0){
                             $data[]=$map;
                             $map=[]; //初始化
                         }
                     }
+                    $Redis->ltrim($list_key,$start+1,-1);//删除已取出数据
+
                     if(!empty($map)){ //取余剩下的数据
                         $data[]=$map;
                     }
