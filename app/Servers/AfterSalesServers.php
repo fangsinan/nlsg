@@ -172,7 +172,7 @@ class AfterSalesServers
         }
         $now_date = date('Y-m-d H:i:s');
         DB::beginTransaction();
-        if ($flag == 'check') {
+        if ($flag === 'check') {
             if ($check->status === 10) {
                 if ($value == 1) {
                     //通过
@@ -221,7 +221,7 @@ class AfterSalesServers
                 DB::rollBack();
                 return ['code' => false, 'msg' => '状态错误'];
             }
-        } elseif ($flag == 'identify') {
+        } elseif ($flag === 'identify') {
             if ($check->status === 30) {
                 $check->status = 40;
                 $check->is_authenticate_reject = 2;
@@ -248,9 +248,10 @@ class AfterSalesServers
         if ($res) {
             DB::commit();
             return ['code' => true, 'msg' => '成功'];
-        } else {
-            DB::rollBack();
-            return ['code' => false, 'msg' => '失败'];
         }
+
+        DB::rollBack();
+        return ['code' => false, 'msg' => '失败'];
+
     }
 }
