@@ -98,17 +98,18 @@ class Kernel extends ConsoleKernel
 //        $schedule->exec('php artisan imJob')->everyMinute();
 
         $schedule->call(function () {
-            //直播间在线人数存入redis
-            LiveConsoleServers::CrontabOnlineUserRedis();
+            LiveConsoleServers::CrontabOnlineUserRedis();//直播间在线人数存入redis
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
-            //直播间在线人数入库，方便调试
-            LiveConsoleServers::CrontabOnlineUser();
-            LiveConsoleServers::CrontabJoinRedis();
-            LiveConsoleServers::CrontabCommentRedis();
-            LiveConsoleServers::CrontabGiftRedis();
+            LiveConsoleServers::CrontabOnlineUser();//直播间在线人数入库，方便调试
+            LiveConsoleServers::CrontabJoinRedis();//加入直播间记录入库
+            LiveConsoleServers::CrontabCommentRedis();//评论入库
         })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
+        })->everyFiveMinutes()->runInBackground();//每5分
 
         $schedule->call(function () {
             $m = new LiveConsole();
