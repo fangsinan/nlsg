@@ -133,9 +133,9 @@ class MallRefundRecord extends Base
 
     public function createOrder($params, $user)
     {
-        $type = intval($params['type'] ?? 0);
-        $order_id = intval($params['order_id'] ?? 0);
-        $order_detail_id = intval($params['order_detail_id'] ?? 0);
+        $type = (int)($params['type'] ?? 0);
+        $order_id = (int)($params['order_id'] ?? 0);
+        $order_detail_id = (int)($params['order_detail_id'] ?? 0);
         if (!$order_id || !$order_detail_id) {
             return ['code' => false, 'msg' => '参数错误',
                 'ps' => 'order_id,order_detail_id'];
@@ -176,7 +176,7 @@ class MallRefundRecord extends Base
 
         $data['num'] = $params['num'] ?? 0;
 
-        if (true || $type == 2) {
+        if ($type === 2) {
             //退货
             $data['order_detail_id'] = $order_detail_id;
             if ($data['num'] == 0 || $data['num'] > $get_data->num) {
