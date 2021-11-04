@@ -130,7 +130,7 @@ class PayController extends Controller
             }
         } else {
             Log::error('微信支付签名失败:' . var_export($result, 1));
-            return $this->error(0, $result['err_code_des'] ?? '微信支付签名失败');
+            return $this->error(0, $result['err_code_des'] ?? '微信支付签名失败',$data);
 
         }
 
