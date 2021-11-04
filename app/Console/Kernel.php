@@ -23,7 +23,7 @@ use App\Servers\DealServers;
 use App\Servers\ErpServers;
 use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
-use App\Servers\PhoneRegionServers;
+use App\Servers\LiveConsoleServers;
 use App\Servers\removeDataServers;
 use EasyWeChat\Factory;
 use Illuminate\Console\Scheduling\Schedule;
@@ -107,6 +107,12 @@ class Kernel extends ConsoleKernel
             LiveController::CrontabOnlineUser();
         })->everyMinute()->runInBackground();//每分
 
+        $schedule->call(function () {
+            $m = new LiveConsole();
+            $m->LiveAutoConfig();//直播自动开始结束和人数
+            LiveConsoleServers::getPhoneRegion();//识别手机号归属地
+        })->everyMinute()->runInBackground();//每分
+
 
 //        $schedule->command('inspire')->hourly();
         $schedule->call(function () {
@@ -131,12 +137,6 @@ class Kernel extends ConsoleKernel
                 sleep(10);
             }
 
-        })->everyMinute()->runInBackground();//每分
-
-        $schedule->call(function () {
-            $m = new LiveConsole();
-            $m->LiveAutoConfig();//直播自动开始结束和人数
-            PhoneRegionServers::getPhoneRegion();//识别手机号归属地
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
