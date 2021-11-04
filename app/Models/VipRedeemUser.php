@@ -252,7 +252,7 @@ class VipRedeemUser extends Base
                     }
                 } else {
                     //不是0 对比是否一直
-                    if ($check_vip != $check_vip['source_vip_id']) {
+                    if ($check->vip_id != $check_vip['source_vip_id']) {
                         return ['code' => false, 'msg' => '您的账号已受保护,无法领取.'];
                     }
                 }
