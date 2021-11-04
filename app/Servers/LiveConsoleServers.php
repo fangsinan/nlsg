@@ -26,7 +26,6 @@ class LiveConsoleServers
                 $Redis->setex($key_minute,60,1);//1分钟
 
                 $list=$Redis->lrange($list_key,0,-1);// 获取所有数据
-//                $list = $Redis->sMembers($list_key);// 获取有序集合
                 if (!empty($list)) {
                     $data=[];
                     $map = [];
@@ -114,7 +113,6 @@ class LiveConsoleServers
                 $Redis->setex($key_minute,60,1);//1分钟
 
                 $list=$Redis->lrange($list_key,0,-1);// 获取所有数据
-//                $list = $Redis->sMembers($list_key);// 获取有序集合
                 if (!empty($list)) {
                     $data=[];
                     $map = [];
@@ -202,7 +200,6 @@ class LiveConsoleServers
                 $Redis->setex($key_minute,60,1);//1分钟
 
                 $list=$Redis->lrange($list_key,0,-1);// 获取所有数据
-//                $list = $Redis->sMembers($list_key);// 获取有序集合
                 if (!empty($list)) {
                     $data=[];
                     $map = [];
