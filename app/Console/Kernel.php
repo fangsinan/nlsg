@@ -23,7 +23,7 @@ use App\Servers\DealServers;
 use App\Servers\ErpServers;
 use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
-use App\Servers\PhoneRegionServers;
+use App\Servers\LiveConsoleServers;
 use App\Servers\removeDataServers;
 use EasyWeChat\Factory;
 use Illuminate\Console\Scheduling\Schedule;
@@ -99,12 +99,21 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             //直播间在线人数存入redis
-            LiveController::CrontabOnlineUserRedis();
+            LiveConsoleServers::CrontabOnlineUserRedis();
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
             //直播间在线人数入库，方便调试
-            LiveController::CrontabOnlineUser();
+            LiveConsoleServers::CrontabOnlineUser();
+            LiveConsoleServers::CrontabJoinRedis();
+            LiveConsoleServers::CrontabCommentRedis();
+            LiveConsoleServers::CrontabGiftRedis();
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            $m = new LiveConsole();
+            $m->LiveAutoConfig();//直播自动开始结束和人数
+            LiveConsoleServers::getPhoneRegion();//识别手机号归属地
         })->everyMinute()->runInBackground();//每分
 
 
@@ -131,12 +140,6 @@ class Kernel extends ConsoleKernel
                 sleep(10);
             }
 
-        })->everyMinute()->runInBackground();//每分
-
-        $schedule->call(function () {
-            $m = new LiveConsole();
-            $m->LiveAutoConfig();//直播自动开始结束和人数
-            PhoneRegionServers::getPhoneRegion();//识别手机号归属地
         })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
