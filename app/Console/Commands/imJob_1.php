@@ -53,14 +53,13 @@ class imJob_1 extends Command
             }
         }else{
             //测试方法
-            $end = strtotime(date('Y-m-d H:i:59', strtotime('+1 minute')));
+            $end = strtotime(date('Y-m-d H:i:59'));
             $value = time();
             while (time() < $end) {
                 DB::table('nlsg_command_test')->insert([
                     'value'=>$value
                 ]);
-               sleep(20);
-
+               sleep(1);
             }
         }
 
