@@ -618,10 +618,14 @@ class LiveConsole extends Base
             ->where('live_pid', $live_id)
             ->where('user_id', $user_id)
             ->first();
-        if (empty($check) || !empty($check['task_id'])) {
+        if (empty($check)) {
             return ['code' => false, 'msg' => '直播不存在'];
         }
 
+
+        if (!empty($check['task_id'])) {
+            return ['code' => false, 'msg' => '直播正在自动推流中，请在管理后台关闭'];
+        }
         switch ($flag) {
             case 'on':
                 $data['is_begin'] = 1;
