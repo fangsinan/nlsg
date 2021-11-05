@@ -355,12 +355,30 @@ class UserWechat extends Controller {
                 $add_data['gender']                         = $detail_res['external_contact']['gender']??"";
                 $add_data['unionid']                        = $detail_res['external_contact']['unionid']??"";
                 $insert_data[] = $add_data;
+
+
+
+                //user_wechat_name
+                $add_name_data = [
+                    'follow_user_userid' => $detail_res['follow_user'][0]['userid'] ??'',
+                    'qw_name' => $detail_res['external_contact']['name']??"",
+
+                ];
+                $insert_name_data[] = $add_name_data;
+
             }
+
         }
         //dump($insert_data);
         if(!empty($insert_data)){
             DB::table($table)->insert($insert_data);
             $insert_data = [];
+        }
+
+        //dump($insert_data);
+        if(!empty($insert_name_data)){
+            DB::table("nlsg_user_wechat_name")->insert($insert_name_data);
+            $insert_name_data = [];
         }
 
     }
@@ -430,10 +448,11 @@ class UserWechat extends Controller {
                     $access_token = self::getAccess_token();
                     //$user_arr['ExternalUserID'];//外部联系人id
                     self::getUserDetail([$user_arr['ExternalUserID']],$access_token);
+
                 }
 
             }
-            var_dump($sMsg);
+            dump($sMsg);
 
         } else {
             print("ERR: " . $errCode . "\n\n");
@@ -482,9 +501,6 @@ class UserWechat extends Controller {
             }
 
         }
-
-
-
 
 
         return 1;
