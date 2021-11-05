@@ -40,7 +40,8 @@ class imJob_1 extends Command
      */
     public function handle()
     {
-        if(0){
+        return true;
+        if(1){
             $url = ImClient::get_im_url("https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg");
             $end = strtotime(date('Y-m-d H:i:59', strtotime('+1 minute')));
             $servers = new ImDocFolderServers();

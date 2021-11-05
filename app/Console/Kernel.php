@@ -54,11 +54,11 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('imJob')
 //            ->everyMinute()->withoutOverlapping(2)
 //            ->runInBackground()->onOneServer();
-        $schedule->command('imJob_1')
-            ->everyMinute()
-            ->withoutOverlapping(1)
-            ->runInBackground()
-            ->onOneServer();
+//        $schedule->command('imJob_1')
+//            ->everyMinute()
+//            ->withoutOverlapping(1)
+//            ->runInBackground()
+//            ->onOneServer();
 //        $schedule->command('imJob_2')
 //            ->everyMinute()->withoutOverlapping(2)
 //            ->runInBackground()->onOneServer();
