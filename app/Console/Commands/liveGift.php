@@ -5,21 +5,21 @@ namespace App\Console\Commands;
 use App\Servers\LiveConsoleServers;
 use Illuminate\Console\Command;
 
-class liveOnlineUserRedis extends Command
+class liveGift extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:liveOnlineUserRedis';
+    protected $signature = 'command:liveGift';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '直播间在线人数存入redis';
+    protected $description = '直播打赏入库';
 
     /**
      * Create a new command instance.
@@ -38,6 +38,6 @@ class liveOnlineUserRedis extends Command
      */
     public function handle()
     {
-        LiveConsoleServers::CrontabOnlineUser();//直播间在线人数入库，方便调试
+        LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
     }
 }

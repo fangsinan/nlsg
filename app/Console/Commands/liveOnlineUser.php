@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\Api\V4\LiveController;
+use App\Servers\LiveConsoleServers;
 use Illuminate\Console\Command;
 
 class liveOnlineUser extends Command
@@ -38,6 +38,6 @@ class liveOnlineUser extends Command
      */
     public function handle()
     {
-        LiveController::CrontabOnlineUser();
+        LiveConsoleServers::CrontabOnlineUserRedis();//直播间在线人数存入redis
     }
 }
