@@ -618,7 +618,7 @@ class LiveConsole extends Base
             ->where('live_pid', $live_id)
             ->where('user_id', $user_id)
             ->first();
-        if (empty($check)) {
+        if (empty($check) || !empty($check['task_id'])) {
             return ['code' => false, 'msg' => '直播不存在'];
         }
 
