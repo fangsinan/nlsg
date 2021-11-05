@@ -109,7 +109,7 @@ class LiveSonFlagPoster extends Model
                 $temp_add_data = [];
                 $temp_add_data['live_id'] = $live_id;
                 $temp_add_data['son_id'] = $v;
-                $temp_add_data['status'] = 1;
+                $temp_add_data['status'] = 2;
                 $add_data[] = $temp_add_data;
             }
 
