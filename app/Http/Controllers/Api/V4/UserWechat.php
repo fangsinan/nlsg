@@ -358,13 +358,13 @@ class UserWechat extends Controller {
 
 
 
-                //user_wechat_name
-                $add_name_data = [
-                    'follow_user_userid' => $detail_res['follow_user'][0]['userid'] ??'',
-                    'qw_name' => $detail_res['external_contact']['name']??"",
-
-                ];
-                $insert_name_data[] = $add_name_data;
+//                //user_wechat_name
+//                $add_name_data = [
+//                    'follow_user_userid' => $detail_res['follow_user'][0]['userid'] ??'',
+//                    'qw_name' => $detail_res['external_contact']['name']??"",
+//
+//                ];
+//                $insert_name_data[] = $add_name_data;
 
             }
 
@@ -375,11 +375,11 @@ class UserWechat extends Controller {
             $insert_data = [];
         }
 
-        //dump($insert_data);
-        if(!empty($insert_name_data)){
-            DB::table("nlsg_user_wechat_name")->insert($insert_name_data);
-            $insert_name_data = [];
-        }
+//        //dump($insert_data);
+//        if(!empty($insert_name_data)){
+//            DB::table("nlsg_user_wechat_name")->insert($insert_name_data);
+//            $insert_name_data = [];
+//        }
 
     }
 
