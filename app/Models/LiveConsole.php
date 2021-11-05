@@ -622,6 +622,10 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '直播不存在'];
         }
 
+
+        if (!empty($check['task_id'])) {
+            return ['code' => false, 'msg' => '直播正在自动推流中，请在管理后台关闭'];
+        }
         switch ($flag) {
             case 'on':
                 $data['is_begin'] = 1;

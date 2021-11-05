@@ -103,7 +103,13 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             LiveConsoleServers::CrontabOnlineUser();//直播间在线人数入库，方便调试
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
             LiveConsoleServers::CrontabJoinRedis();//加入直播间记录入库
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
             LiveConsoleServers::CrontabCommentRedis();//评论入库
         })->everyMinute()->runInBackground();//每分
 
