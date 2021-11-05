@@ -55,7 +55,7 @@ class imJob_1 extends Command
             //测试方法
             $end = strtotime(date('Y-m-d H:i:59'));
             $value = time();
-            while (time() < $end) {
+            while (time() <= $end) {
                 DB::table('nlsg_command_test')->insert([
                     'value'=>$value
                 ]);
