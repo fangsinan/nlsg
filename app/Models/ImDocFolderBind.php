@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\Model;
 class ImDocFolderBind extends Base
 {
     protected $table = 'nlsg_im_doc_folder_bind';
@@ -12,6 +12,6 @@ class ImDocFolderBind extends Base
 
     public function docInfo()
     {
-        return $this->hasOne('App\Models\Imdoc', 'id', 'doc_id');
+        return $this->hasOne(ImDoc::class, 'id', 'doc_id');
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
 
 class ImDocFolder extends Base
 {
@@ -8,7 +9,7 @@ class ImDocFolder extends Base
 
     public function docList()
     {
-        return $this->hasMany('App\Models\ImDocFolderBind', 'folder_id', 'id')
+        return $this->hasMany(ImDocFolderBind::class, 'folder_id', 'id')
             ->where('status','=',1)
             ->orderBy('sort')
             ->select(['id','folder_id','doc_id']);
