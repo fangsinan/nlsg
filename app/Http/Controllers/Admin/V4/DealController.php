@@ -35,9 +35,9 @@ class DealController extends Controller
      * @apiGroup Deal
      */
     //https://app.v4.api.nlsgapp.com/api/admin_v4/deal/get_order_info?live_id=122
+    //http://127.0.0.1:8000/api/admin_v4/deal/get_order_info?live_id=177
     public function getOrderInfo(Request $request)
     {
-
         $data = $request->input();
         $live_id = intval($request->get('live_id', 0));
         /*$rules = [
