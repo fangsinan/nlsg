@@ -672,9 +672,18 @@ class AuthController extends Controller
             return $this->error(401, '授权失败');
         }
 
+        if (empty($res->openid)) {
+            return $this->error(401, '授权失败');
+        }
+
         if ($type == 1) {
             return $this->success(['openid' => $res->openid]); //获取code  再获取openid
         }
+
+        if (empty($res->access_token)) {
+            return $this->error(401, '授权失败');
+        }
+
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res->access_token,
             'openid' => $res->openid,
@@ -682,6 +691,11 @@ class AuthController extends Controller
         if (!$list) {
             return $this->error(400, '获取用户信息失败');
         }
+
+        if (empty($list->unionid)) {
+            return $this->error(400, '获取用户信息失败');
+        }
+
         $data = [
             'unionid' => $list->unionid,
             'nickname' => $list->nickname,

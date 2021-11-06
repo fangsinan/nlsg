@@ -63,7 +63,7 @@ class LiveConsoleServers
                                 self::LogIo('livegift','gift_error','写入失败'.$rst);
                                 //回写数据
                                 foreach ($list as $k => $val) {
-                                    $Redis->sadd($list_key,$val);
+                                    $Redis->rpush($list_key,$val);
                                 }
                                 return '写入失败';
                             }
@@ -77,7 +77,7 @@ class LiveConsoleServers
                             self::LogIo('livegift','gift_error','写入异常'.$e->getMessage());
                             //回写数据
                             foreach ($list as $k => $val) {
-                                $Redis->sadd($list_key,$val);
+                                $Redis->rpush($list_key,$val);
                             }
                             return  '写入异常'.$e->getMessage();
                         }
@@ -150,7 +150,7 @@ class LiveConsoleServers
                                 self::LogIo('livecomment','comment_error','写入失败'.$rst);
                                 //回写数据
                                 foreach ($list as $k => $val) {
-                                    $Redis->sadd($list_key,$val);
+                                    $Redis->rpush($list_key,$val);
                                 }
                                 return '写入失败';
                             }
@@ -164,7 +164,7 @@ class LiveConsoleServers
                             self::LogIo('livecomment','comment_error','写入异常'.$e->getMessage());
                             //回写数据
                             foreach ($list as $k => $val) {
-                                $Redis->sadd($list_key,$val);
+                                $Redis->rpush($list_key,$val);
                             }
                             return  '写入异常'.$e->getMessage();
                         }
@@ -237,7 +237,7 @@ class LiveConsoleServers
                                 self::LogIo('livejoin','join_error','写入失败'.$rst);
                                 //回写数据
                                 foreach ($list as $k => $val) {
-                                    $Redis->sadd($list_key,$val);
+                                    $Redis->rpush($list_key,$val);
                                 }
                                 return '写入失败';
                             }
@@ -251,7 +251,7 @@ class LiveConsoleServers
                             self::LogIo('livejoin','join_error','写入异常'.$e->getMessage());
                             //回写数据
                             foreach ($list as $k => $val) {
-                                $Redis->sadd($list_key,$val);
+                                $Redis->rpush($list_key,$val);
                             }
                             return  '写入异常'.$e->getMessage();
                         }
