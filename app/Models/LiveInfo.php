@@ -110,7 +110,7 @@ class LiveInfo extends Model
         }else {
             $str_time = strtotime($info['begin_at']) - 50;  //开始时间需要大于当前时间
         }*/
-        $end_time       = $str_time+3600*3;//  结束时间需要大于当前时间
+        $end_time       = $str_time+3600*3+600;//  结束时间需要大于当前时间 目前有视频超过3小时
 
         if( $type == 'create' && $str_time <= time() ){
             return ['code'=>0,'msg'=>'直播开始时间必须大于当前时间','data'=>[]];
