@@ -696,7 +696,7 @@ class LiveController extends Controller
 
     public function show(Request $request)
     {
-        $id = $request->get('live_id');
+        $id = intval($request->get('live_id',0));
         $live_son_flag = intval($request->get('live_son_flag',0));
         $os_type = intval($request->input('os_type', 0)); //1 安卓 2ios 3微信
         if(!empty($os_type) && $os_type==3){
