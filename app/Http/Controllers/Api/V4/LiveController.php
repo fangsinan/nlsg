@@ -786,7 +786,7 @@ class LiveController extends Controller
                         "twitter_id" => $live_son_flag,
                     ])->count();
 
-                    $redis->setex($key,86400,$list['live_son_flag_count']);
+                    $redis->setex($key,3600*5,$list['live_son_flag_count']);
                 }
 
 
