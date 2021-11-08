@@ -342,7 +342,8 @@ class UserWechat extends Controller {
             $detail_res = json_decode($detail_res,true);
 
             if( $detail_res['errcode'] == 0 ){
-                $userr = UserWechat::where(['external_userid' => $detail_res['external_contact']['external_userid']])->first();
+                $userr=DB::table('nlsg_user_wechat')->where('external_userid',$detail_res['external_contact']['external_userid'])->first();
+//                $userr = UserWechat::where(['external_userid' => $detail_res['external_contact']['external_userid']])->first();
                 if(empty($userr)) {  //只保留第一个数据
 
                     $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
@@ -431,7 +432,7 @@ class UserWechat extends Controller {
 
 
         if(empty($sReqData)){
-            return; 
+            return;
         }
         //解析XML
         $errCode = $wxcpt->DecryptMsg($sReqMsgSig, $sReqTimeStamp, $sReqNonce, $sReqData, $sMsg);
