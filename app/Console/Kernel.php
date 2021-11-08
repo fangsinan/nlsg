@@ -260,14 +260,14 @@ class Kernel extends ConsoleKernel
             DealServers::getOrderInfo([], 0, 1);
         })->everyMinute()->between('21:55', '22:10')->runInBackground();//每分钟执行一次
 
-        $schedule->call(function () {
+        /*$schedule->call(function () {
             UserWechat::AddUserWechat();//通过部门id获取企业客户
         })->dailyAt('21:51');
         $schedule->call(function () {
             UserWechat::AddUserWechat();//通过部门id获取企业客户
-        })->dailyAt('22:10');
+        })->dailyAt('22:10');*/
         $schedule->call(function () {
-            UserWechat::AddUserWechat();//通过部门id获取企业客户
+//            UserWechat::AddUserWechat();//通过部门id获取企业客户
             UserWechat::UserWechatEdit();
         })->dailyAt('0:01');
     }
