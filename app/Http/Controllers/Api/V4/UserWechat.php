@@ -342,20 +342,24 @@ class UserWechat extends Controller {
             $detail_res = json_decode($detail_res,true);
 
             if( $detail_res['errcode'] == 0 ){
-                $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
-                $add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';
-                $add_data['follow_user_description']        = $detail_res['follow_user'][0]['description']??'';
-                $add_data['follow_user_createtime']         = $detail_res['follow_user'][0]['createtime']??'';
-                $add_data['follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
-                $add_data['follow_user_tags_oper_userid']   = $detail_res['follow_user'][0]['oper_userid']??"";
-                $add_data['external_userid']                = $detail_res['external_contact']['external_userid']??"";
-                $add_data['name']                           = $detail_res['external_contact']['name']??"";
-                $add_data['type']                           = $detail_res['external_contact']['type']??"";
-                $add_data['avatar']                         = $detail_res['external_contact']['avatar']??"";
-                $add_data['gender']                         = $detail_res['external_contact']['gender']??"";
-                $add_data['unionid']                        = $detail_res['external_contact']['unionid']??"";
-                $insert_data[] = $add_data;
+                $userr = UserWechat::where(['external_userid' => $detail_res['external_contact']['external_userid']])->first();
+                if(empty($userr)) {  //只保留第一个数据
 
+                    $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
+                    $add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';
+                    $add_data['follow_user_description']        = $detail_res['follow_user'][0]['description']??'';
+                    $add_data['follow_user_createtime']         = $detail_res['follow_user'][0]['createtime']??'';
+                    $add_data['follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
+                    $add_data['follow_user_tags_oper_userid']   = $detail_res['follow_user'][0]['oper_userid']??"";
+                    $add_data['external_userid']                = $detail_res['external_contact']['external_userid']??"";
+                    $add_data['name']                           = $detail_res['external_contact']['name']??"";
+                    $add_data['type']                           = $detail_res['external_contact']['type']??"";
+                    $add_data['avatar']                         = $detail_res['external_contact']['avatar']??"";
+                    $add_data['gender']                         = $detail_res['external_contact']['gender']??"";
+                    $add_data['unionid']                        = $detail_res['external_contact']['unionid']??"";
+                    $insert_data[] = $add_data;
+
+                }
 
 
 //                //user_wechat_name
