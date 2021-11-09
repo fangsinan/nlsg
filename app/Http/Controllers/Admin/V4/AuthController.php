@@ -68,6 +68,7 @@ class AuthController extends ControllerBackend
         if (empty($check_user)) {
             return $this->getRes(['code' => false, 'msg' => '账号或密码错误']);
         }
+        
         if (Hash::check($password, $check_user->password)) {
             $token = auth('backendApi')->login($check_user);
             $data = [
