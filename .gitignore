@@ -8,3 +8,5 @@ public/pay_cb.txt
 public/
 bootstrap/
 vendor/mews/captcha/.gitignore
+storage/logs
+apidoc

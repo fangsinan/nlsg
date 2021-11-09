@@ -1,0 +1,16 @@
+{
+  "name": "能量时光V4.0",
+  "version": "4.0.0",
+  "description": "apiDoc",
+  "title": "能量时光V4.0 API文档",
+  "url": "https://app.v4.api.nlsgapp.com/",
+  "sampleUrl": false,
+  "defaultVersion": "0.0.0",
+  "apidoc": "0.3.0",
+  "generator": {
+    "name": "apidoc",
+    "time": "2021-10-20T06:44:11.558Z",
+    "url": "http://apidocjs.com",
+    "version": "0.17.7"
+  }
+}

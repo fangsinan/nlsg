@@ -118,9 +118,17 @@ class LiveInfo extends Model
         if( $type == 'create' && empty($back_video_url) ){
             return ['code'=>0,'msg'=>'源播放地址不存在','data'=>[]];
         }
-
+        //老版
         $SecretId="AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
         $SECRET_KEY="MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
+
+
+        //新版
+        //$appId="1308168117";
+        $SecretId="AKIDYv1qOfeMqCI8h03oTs0tWtymKcdNr40g";
+        $SECRET_KEY="RghRu61f17ycz5uSjkV0EBsIRJyOZsug";
+
+
         //加密
         $rand = rand (100, 10000000); //9031868223070871051
         $time = time ();
@@ -135,12 +143,14 @@ class LiveInfo extends Model
             'SignatureMethod' => 'HmacSHA256',
         ];
 
+        $DomainName = config('env.LIVE_PUSH_URL');;
         switch ($type){
             case "create":
 
-                $pattern_1 = '/rtmp:\/\/push.live.nlsgapp.com\/live\/(.*?)\?txSecret=(.*?)/';
-                $num = preg_match_all($pattern_1, $subject, $matches_1,PREG_PATTERN_ORDER);
-                if( $num <= 0 ){
+//                $pattern_1 = '/rtmp:\/\/push.live.nlsgapp.com\/live\/(.*?)\?txSecret=(.*?)/';
+                $pattern_1 = '/rtmp:\/\/'.$DomainName.'\/live\/(.*?)\?txSecret=(.*?)/';
+                $num1 = preg_match_all($pattern_1, $subject, $matches_1,PREG_PATTERN_ORDER);
+                if( $num1 <= 0 ){
                     break;
                 }
                 $StreamName = $matches_1[1][0];
@@ -149,7 +159,8 @@ class LiveInfo extends Model
                 $data_key['SourceType'] = 'PullVodPushLive'; //点播 类型
                 //$data_key['SourceUrls.0'] = 'http://1253639599.vod2.myqcloud.com/32a152b3vodgzp1253639599/d590feb55285890818716274924/Ja0YTxwJYVIA.mp4';
                 $data_key['SourceUrls.0'] = $back_video_url;
-                $data_key['DomainName'] = 'push.live.nlsgapp.com'; //推流域名
+//                $data_key['DomainName'] = 'push.live.nlsgapp.com'; //推流域名
+                $data_key['DomainName'] = $DomainName; //推流域名
                 $data_key['AppName'] = 'live';  //推流路径。
                 $data_key['StreamName'] = $StreamName; //推流名称。。
                 // 北京时间值 = UTC 时间值 + 8 小时
