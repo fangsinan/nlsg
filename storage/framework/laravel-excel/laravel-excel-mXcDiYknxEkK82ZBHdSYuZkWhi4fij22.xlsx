@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Error>
-  <Code>NoSuchKey</Code>
-  <Message>The specified key does not exist.</Message>
-  <RequestId>6152BDE45C8CDB33342EF7CC</RequestId>
-  <HostId>nlsgapp.oss-cn-beijing.aliyuncs.com</HostId>
-  <Key>file/upload/2021092815014534064.xlsx</Key>
-</Error>
