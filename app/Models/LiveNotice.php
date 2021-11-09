@@ -161,7 +161,9 @@ WHERE
         $page = (int)($params['page'] ?? 1);
         $size = (int)($params['size'] ?? 10);
         $type = $params['type'] ?? 1;
-
+        if (!$user_id){
+            $user_id = 0;
+        }
         if (empty($live_id) || empty($live_info_id) || $live_id === 'undefined') {
             return ['code' => false, 'msg' => '参数错误'];
         }
