@@ -131,6 +131,11 @@ class ErpServers
         //true
         $res = $this->pushOrderJob($trade_list);
 
+        DB::table('wwwww')->insert([
+            'vv'=>json_encode($res),
+            't'=>json_encode($trade_list),
+        ]);
+
         if ($res['code'] != true) {
             $error_message = json_decode($res['msg'], true);
 
