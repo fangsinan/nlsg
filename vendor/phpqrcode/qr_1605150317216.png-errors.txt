@@ -1,1 +1,0 @@
-2020-11-12 11:05:17: imagepng(/home/wwwroot/nlsg/app_v4_api/storage/app/public/PosterMaterial/qr_1605150317216.png): failed to open stream: Permission denied
