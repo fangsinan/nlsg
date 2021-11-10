@@ -602,14 +602,13 @@ class IndexController extends ControllerBackend
                 ->where('live_id', '=', $live_info_data['live_pid'])
                 ->delete();
         } else {
-            $add_role_data = [];
             foreach ($channel_user_id as $cui) {
-                $temp_role_data = [];
-                $temp_role_data['user_id'] = $cui;
-                $temp_role_data['live_id'] = $live_info_data['live_pid'];
-                $add_role_data[] = $temp_role_data;
+                BackendLiveDataRole::query()
+                    ->firstOrCreate([
+                        'user_id' => $cui,
+                        'live_id' => $live_info_data['live_pid'],
+                    ]);
             }
-            DB::table('nlsg_backend_live_data_role')->insert($add_role_data);
             BackendLiveDataRole::query()
                 ->where('live_id', '=', $live_info_data['live_pid'])
                 ->whereNotIn('user_id', $channel_user_id)
