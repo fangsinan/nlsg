@@ -587,31 +587,33 @@ class IndexController extends ControllerBackend
             ]
         );
 
-        if (!is_array($channel_show)){
-            $channel_show = explode(',',$channel_show);
-            $channel_user_id = [];
-            foreach ($channel_show as $cs_v){
-                $channel_user_id[] = $this->channelUserData($cs_v);
+        if (!is_array($channel_show)) {
+            $channel_show = explode(',', $channel_show);
+        }
+        $channel_user_id = [];
+        foreach ($channel_show as $cs_v) {
+            $channel_user_id[] = $this->channelUserData($cs_v);
+        }
+
+        $channel_user_id = array_filter($channel_user_id);
+
+        if (empty($channel_user_id)) {
+            BackendLiveDataRole::query()
+                ->where('live_id', '=', $live_info_data['live_pid'])
+                ->delete();
+        } else {
+            $add_role_data = [];
+            foreach ($channel_user_id as $cui) {
+                $temp_role_data = [];
+                $temp_role_data['user_id'] = $cui;
+                $temp_role_data['live_id'] = $live_info_data['live_pid'];
+                $add_role_data[] = $temp_role_data;
             }
-            $channel_user_id = array_filter($channel_user_id);
-            if (empty($channel_user_id)){
-                BackendLiveDataRole::query()
-                    ->where('live_id','=',$live_info_data['live_pid'])
-                    ->delete();
-            }else{
-                $add_role_data = [];
-                foreach ($channel_user_id as $cui){
-                    $temp_role_data = [];
-                    $temp_role_data['user_id'] = $cui;
-                    $temp_role_data['live_id'] = $live_info_data['live_pid'];
-                    $add_role_data[] = $temp_role_data;
-                }
-                DB::table('nlsg_backend_live_data_role')->insert($add_role_data);
-                BackendLiveDataRole::query()
-                    ->where('live_id','=',$live_info_data['live_pid'])
-                    ->whereNotIn('user_id',$channel_user_id)
-                    ->delete();
-            }
+            DB::table('nlsg_backend_live_data_role')->insert($add_role_data);
+            BackendLiveDataRole::query()
+                ->where('live_id', '=', $live_info_data['live_pid'])
+                ->whereNotIn('user_id', $channel_user_id)
+                ->delete();
         }
 
 //        if ($userId == 169209){
@@ -835,11 +837,12 @@ class IndexController extends ControllerBackend
 
     }
 
-    public function channelUserData($key,$flag=1){
+    public function channelUserData($key, $flag = 1)
+    {
         $channel = [
-            'liting'=>169209,
+            'liting' => 169209,
         ];
-        if ($flag === 1){
+        if ($flag === 1) {
             return $channel[$key] ?? 0;
         }
         return array_search($key, $channel, true);
@@ -869,7 +872,7 @@ class IndexController extends ControllerBackend
     {
         $id = $request->get('id');
         $live = Live::select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
-            'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num','is_test')
+            'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test')
             ->with(['livePoster'])
             ->where('id', $id)->first();
         if (!$live) {
@@ -880,22 +883,22 @@ class IndexController extends ControllerBackend
         $live->playback_url = $liveInfo['playback_url'];
         $live->back_video_url = $liveInfo['back_video_url'];
         $live_qr_code = Qrcodeimg::query()
-            ->where('relation_type','=',3)
-            ->where('relation_id','=',$id)
-            ->where('status','=',1)
+            ->where('relation_type', '=', 3)
+            ->where('relation_id', '=', $id)
+            ->where('status', '=', 1)
             ->first();
-        $live->qr_code = $live_qr_code?1:0;
+        $live->qr_code = $live_qr_code ? 1 : 0;
 
         $channel_user_id = BackendLiveDataRole::query()
-            ->where('live_id','=',$id)
+            ->where('live_id', '=', $id)
             ->pluck('user_id')
             ->toArray();
 
         $channel_show = [];
-        if (!empty($channel_user_id)){
-            foreach ($channel_user_id as $cui){
-                $temp_cud = $this->channelUserData($cui,2);
-                if ($temp_cud){
+        if (!empty($channel_user_id)) {
+            foreach ($channel_user_id as $cui) {
+                $temp_cud = $this->channelUserData($cui, 2);
+                if ($temp_cud) {
                     $channel_show[] = $temp_cud;
                 }
             }
