@@ -929,7 +929,7 @@ class IndexController extends ControllerBackend
             ['title' => "王琨老师第二天直播19.9", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/313ed4c03701925925345105941/v.f100020.mp4',],
 //            ['title' => "李婷老师直播",      'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/24c43b093701925920528809905/v.f100030.mp4',],
             ['title' => "李婷老师直播19.9", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/a8b4b43c3701925925153722341/v.f100020.mp4',],
-            ['title' => "王琨老师公益课", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/98f8f9c28602268011344689108/v.f100020.mp4',],
+            ['title' => "王琨老师公益课", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/f55a5eb1387702291257482009/v.f100020.mp4',],
             ['title' => "十商交付第一天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/698cac358602268011401148246/v.f100020.mp4',],
             ['title' => "十商交付第二天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/2bd483f98602268011431020789/v.f100020.mp4',],
         ];
