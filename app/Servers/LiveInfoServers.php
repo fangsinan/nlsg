@@ -7,10 +7,12 @@ namespace App\Servers;
 use App\Models\BackendLiveRole;
 use App\Models\CacheTools;
 use App\Models\Live;
+use App\Models\LiveDeal;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveOnlineUser;
 use App\Models\LiveSonFlagPoster;
+use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
@@ -104,9 +106,23 @@ class LiveInfoServers
             return ['code' => false, 'msg' => '直播间归属错误'];
         }
 
+        $temp_begin_order = LiveDeal::query()
+            ->where('live_id','=',$live_id)
+            ->value('ordernum');
+
+
         $query = DB::table('nlsg_live_deal as ld')
             ->join('nlsg_order as o','ld.ordernum','=','o.ordernum')
             ->where('o.is_shill','=',0);
+
+        if (!empty($temp_begin_order)){
+            $temp_begin_order_id = Order::query()
+                ->where('ordernum','=',$temp_begin_order)
+                ->value('id');
+            if (!empty($temp_begin_order_id)){
+                $query->where('o.id','>=',$temp_begin_order_id);
+            }
+        }
 
         $query->where('ld.live_id','=',$live_id);
 
