@@ -66,6 +66,7 @@ class InfoController extends ControllerBackend
 
     public function liveSubOrderExcel(Request $request)
     {
+        set_time_limit(120);
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称', '推客别名', '邀约时间', '直播id'];
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -81,7 +82,7 @@ class InfoController extends ControllerBackend
 
         $s = new LiveInfoServers();
 
-        $request->offsetSet('size', 10000);
+        $request->offsetSet('size', 20000);
         $page = 1;
         $while_flag = true;
 
@@ -101,7 +102,7 @@ class InfoController extends ControllerBackend
                 ob_flush();     //刷新输出缓冲到浏览器
                 flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
             }
-            
+
         }
 
         fclose($fp);
