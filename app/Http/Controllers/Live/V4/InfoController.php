@@ -90,19 +90,17 @@ class InfoController extends ControllerBackend
             $request->offsetSet('page', $page);
             $data = $s->liveSubOrder($request->input());
             $page++;
-
-            if (empty($data)) {
+            if ($data->isEmpty()) {
                 $while_flag = false;
+            }else{
+                foreach ($data as $v) {
+                    $v = json_decode(json_encode($v), true);
+                    mb_convert_variables('GBK', 'UTF-8', $v);
+                    fputcsv($fp, $v);
+                }
             }
-
-            foreach ($data as $v) {
-                $v = json_decode(json_encode($v), true);
-                mb_convert_variables('GBK', 'UTF-8', $v);
-                fputcsv($fp, $v);
-                ob_flush();     //刷新输出缓冲到浏览器
-                flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
-            }
-
+            ob_flush();     //刷新输出缓冲到浏览器
+            flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
         }
 
         fclose($fp);
