@@ -1684,14 +1684,14 @@ class LiveController extends Controller
             if(empty($order_id)){ //直播免费预约取消二维码
                 return success((object)[] );
             }
-            //付费直播
-            $order = Order::where(['id'=>$order_id])->first();
-            if(empty($order)) {
-                return success((object)[] );
-            }
-            $relation_id = $order['relation_id'];
-            if(!in_array($relation_id,[119,123,124,177])){
-                return success((object)[] );
+
+            //付费客户端不传直播id  需要查询
+            if(!empty($order_id)){  //付费
+                $order = Order::where(['id'=>$order_id])->first();
+                $relation_id = $order['relation_id'];
+//                if(!in_array($relation_id,[119,123,124,177,182])){
+//                    return success((object)[] );
+//                }
             }
 
         }else{

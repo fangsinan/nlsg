@@ -36,44 +36,11 @@ class InfoController extends ControllerBackend
 
         if (empty($excel_flag)) {
             return $this->getRes($data);
-        } else {
-            $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
-                '推客别名', '邀约时间', '直播id'];
-//            $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
-            $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/vnd.ms-excel');
-            header('Content-Disposition: attachment; filename="' . $fileName . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header("Access-Control-Allow-Origin: *");
-            $fp = fopen('php://output', 'a');//打开output流
-            mb_convert_variables('GBK', 'UTF-8', $columns);
-            fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
-
-            foreach ($data as $v) {
-                $v = json_decode(json_encode($v), true);
-                mb_convert_variables('GBK', 'UTF-8', $v);
-                fputcsv($fp, $v);
-                ob_flush();     //刷新输出缓冲到浏览器
-                flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
-            }
-            fclose($fp);
-            exit();
         }
-    }
 
-    public function liveSubOrderExcel(Request $request)
-    {
-        $s = new LiveInfoServers();
-        $data = $s->liveSubOrder($request->input());
-        if (($data['code'] ?? true) === false) {
-            exit($data['msg']);
-        }
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
             '推客别名', '邀约时间', '直播id'];
-//        $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
+//            $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
         $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
         header('Content-Type: application/vnd.ms-excel');
@@ -93,6 +60,49 @@ class InfoController extends ControllerBackend
             ob_flush();     //刷新输出缓冲到浏览器
             flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
         }
+        fclose($fp);
+        exit();
+    }
+
+    public function liveSubOrderExcel(Request $request)
+    {
+        set_time_limit(120);
+        $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称', '推客别名', '邀约时间', '直播id'];
+        $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
+        $fp = fopen('php://output', 'ab');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
+        $s = new LiveInfoServers();
+
+        $request->offsetSet('size', 20000);
+        $page = 1;
+        $while_flag = true;
+
+        while ($while_flag) {
+            $request->offsetSet('page', $page);
+            $data = $s->liveSubOrder($request->input());
+            $page++;
+            if ($data->isEmpty()) {
+                $while_flag = false;
+            }else{
+                foreach ($data as $v) {
+                    $v = json_decode(json_encode($v), true);
+                    mb_convert_variables('GBK', 'UTF-8', $v);
+                    fputcsv($fp, $v);
+                }
+            }
+            ob_flush();     //刷新输出缓冲到浏览器
+            flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+        }
+
         fclose($fp);
         exit();
     }

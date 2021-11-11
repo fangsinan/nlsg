@@ -23,6 +23,7 @@ class LiveInfoServers
     public function liveSubOrder($params)
     {
         $size = $params['size'] ?? 10;
+        $page = $params['page'] ?? 1;
 
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
@@ -82,7 +83,7 @@ class LiveInfoServers
                 DB::raw("CONCAT('`',tu.phone) as t_phone"),
                 'tu.nickname as t_nickname', 'lr.son_flag', 's.created_at', 's.relation_id'
             ]);
-            return $query->get();
+            return $query->limit($size)->offset(($page-1)*$size)->get();
         }
     }
 

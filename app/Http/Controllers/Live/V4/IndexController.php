@@ -12,6 +12,7 @@ use App\Models\LiveLogin;
 use App\Models\LiveNumber;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
+use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
 use Carbon\Carbon;
@@ -136,7 +137,7 @@ class IndexController extends ControllerBackend
                 ->pluck('live_id')
                 ->toArray();
 
-            if (0){
+            if (0) {
                 $query = Live::query();
                 if ($user['live_role'] === 21) {
                     $query->where('user_id', '=', $user['user_id']);
@@ -146,11 +147,11 @@ class IndexController extends ControllerBackend
                     $query->whereIn('user_id', $son_user_id);
                 }
                 $live_list = $query->pluck('id')->toArray();
-            }else{
+            } else {
                 $live_list = [];
             }
 
-            return array_unique(array_merge($live_id_role,$live_list));
+            return array_unique(array_merge($live_id_role, $live_list));
         }
 
         return null;
@@ -212,11 +213,11 @@ class IndexController extends ControllerBackend
 
         //非超管角色可看live
         $live_id_role = self::getLiveRoleIdList($this->user);
-        if ($live_id_role !== null){
-            if ($live_id_role === []){
+        if ($live_id_role !== null) {
+            if ($live_id_role === []) {
                 return success([]);
             }
-            $query->whereIn('id',$live_id_role);
+            $query->whereIn('id', $live_id_role);
         }
 
 
@@ -469,6 +470,7 @@ class IndexController extends ControllerBackend
         $back_video_url = $input['back_video_url'] ?? '';
         $need_virtual = $input['need_virtual'] ?? 0;
         $need_virtual_num = $input['need_virtual_num'] ?? 0;
+
         $now = time();
         $now_date = date('Y-m-s H:i:s');
 
@@ -478,6 +480,11 @@ class IndexController extends ControllerBackend
         if (!$begin_at) {
             return error(1000, '开始时间不能为空');
         }
+
+        $is_test = (int)($input['is_test'] ?? 0);
+        $qr_code = (int)($input['qr_code'] ?? 0);
+        $channel_show = $input['channel_show'] ?? [];
+
 
         $data = [
             'user_id' => $userId,
@@ -493,6 +500,7 @@ class IndexController extends ControllerBackend
             'need_virtual' => $need_virtual,
             'need_virtual_num' => $need_virtual_num,
             'is_free' => $price < '0.01' ? 1 : 0,
+            'is_test' => $is_test,
         ];
 
         //todo 临时添加
@@ -567,6 +575,45 @@ class IndexController extends ControllerBackend
         $update_live_info_data['live_url_flv'] = $temp_get_url['play_url_flv'];
         LiveInfo::where('live_pid', '=', $live_info_data['live_pid'])->update($update_live_info_data);
 
+        //是否弹出二维码
+        Qrcodeimg::query()->updateOrCreate(
+            [
+                'relation_type' => 3,
+                'relation_id' => $live_info_data['live_pid']
+            ],
+            [
+                'status' => $qr_code,
+                'qr_url' => '/nlsg/qrcode/nlsg_paySuccess_QRCode_live_new.png'
+            ]
+        );
+
+        if (!is_array($channel_show)) {
+            $channel_show = explode(',', $channel_show);
+        }
+        $channel_user_id = [];
+        foreach ($channel_show as $cs_v) {
+            $channel_user_id[] = $this->channelUserData($cs_v);
+        }
+
+        $channel_user_id = array_filter($channel_user_id);
+
+        if (empty($channel_user_id)) {
+            BackendLiveDataRole::query()
+                ->where('live_id', '=', $live_info_data['live_pid'])
+                ->delete();
+        } else {
+            foreach ($channel_user_id as $cui) {
+                BackendLiveDataRole::query()
+                    ->firstOrCreate([
+                        'user_id' => $cui,
+                        'live_id' => $live_info_data['live_pid'],
+                    ]);
+            }
+            BackendLiveDataRole::query()
+                ->where('live_id', '=', $live_info_data['live_pid'])
+                ->whereNotIn('user_id', $channel_user_id)
+                ->delete();
+        }
 
 //        if ($userId == 169209){
 //            LivePoster::firstOrCreate([
@@ -789,6 +836,16 @@ class IndexController extends ControllerBackend
 
     }
 
+    public function channelUserData($key, $flag = 1)
+    {
+        $channel = [
+            'liting' => 169209,
+        ];
+        if ($flag === 1) {
+            return $channel[$key] ?? 0;
+        }
+        return array_search($key, $channel, true);
+    }
 
     /**
      * @api {get} api/live_v4/live/info 直播详情
@@ -814,7 +871,7 @@ class IndexController extends ControllerBackend
     {
         $id = $request->get('id');
         $live = Live::select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
-            'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num')
+            'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test')
             ->with(['livePoster'])
             ->where('id', $id)->first();
         if (!$live) {
@@ -824,6 +881,29 @@ class IndexController extends ControllerBackend
         $liveInfo = LiveInfo::select('playback_url', 'back_video_url')->where('live_pid', $id)->first();
         $live->playback_url = $liveInfo['playback_url'];
         $live->back_video_url = $liveInfo['back_video_url'];
+        $live_qr_code = Qrcodeimg::query()
+            ->where('relation_type', '=', 3)
+            ->where('relation_id', '=', $id)
+            ->where('status', '=', 1)
+            ->first();
+        $live->qr_code = $live_qr_code ? 1 : 0;
+
+        $channel_user_id = BackendLiveDataRole::query()
+            ->where('live_id', '=', $id)
+            ->pluck('user_id')
+            ->toArray();
+
+        $channel_show = [];
+        if (!empty($channel_user_id)) {
+            foreach ($channel_user_id as $cui) {
+                $temp_cud = $this->channelUserData($cui, 2);
+                if ($temp_cud) {
+                    $channel_show[] = $temp_cud;
+                }
+            }
+        }
+        $live->channel_show = $channel_show;
+
         return success($live);
     }
 
@@ -849,7 +929,7 @@ class IndexController extends ControllerBackend
             ['title' => "王琨老师第二天直播19.9", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/313ed4c03701925925345105941/v.f100020.mp4',],
 //            ['title' => "李婷老师直播",      'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/24c43b093701925920528809905/v.f100030.mp4',],
             ['title' => "李婷老师直播19.9", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/a8b4b43c3701925925153722341/v.f100020.mp4',],
-            ['title' => "王琨老师公益课", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/98f8f9c28602268011344689108/v.f100020.mp4',],
+            ['title' => "王琨老师公益课", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/f55a5eb1387702291257482009/v.f100020.mp4',],
             ['title' => "十商交付第一天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/698cac358602268011401148246/v.f100020.mp4',],
             ['title' => "十商交付第二天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/2bd483f98602268011431020789/v.f100020.mp4',],
         ];

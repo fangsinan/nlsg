@@ -1,4 +1,4 @@
-.env
+.env正式
 .env_bak
 .idea/
 node_modules/
@@ -8,3 +8,5 @@ public/pay_cb.txt
 public/
 bootstrap/
 vendor/mews/captcha/.gitignore
+storage/logs
+apidoc
