@@ -15,6 +15,8 @@ use App\Models\Subscribe;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use App\Models\LiveDeal;
+use App\Models\Order;
 
 class LiveInfoServers
 {
