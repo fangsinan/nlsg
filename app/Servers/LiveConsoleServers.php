@@ -452,9 +452,16 @@ class LiveConsoleServers
         array_push($headers, "Authorization:APPCODE " . $appcode);
 
         $day_time=date('Y-m-d');
+
+        $userInfo = User::query()->select(['id'])->where('created_at','>',$day_time)->orderBy('id','asc')->first();
+        if(empty($userInfo)){
+            return ;
+        }
+
         $query = User::query()->select(['id','phone','nickname','province','city','created_at'])
 //            ->where('created_at', '>', '2015-09-01')->where('created_at', '<', '2021-12-01')
-            ->where('created_at', '>', $day_time)
+//            ->where('created_at', '>', $day_time)
+            ->where('id', '>', $userInfo['id'])
             ->where('phone','like' , "1%")->where('ref',0)->where('province','')
             ->orderBy('id','asc')->limit(300)
             ;
