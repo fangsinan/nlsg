@@ -453,15 +453,21 @@ class LiveConsoleServers
 
         $day_time=date('Y-m-d');
 
-        $userInfo = User::query()->select(['id'])->where('created_at','>',$day_time)->orderBy('id','asc')->first();
-        if(empty($userInfo)){
-            return ;
+        $redis_user_id_key='111PhoneRegion_UserId'.date('Ymd',$time);
+        $RedisUserId=$Redis->get($redis_user_id_key);
+        if(empty($RedisUserId)){
+            $userInfo = User::query()->select(['id'])->where('created_at','>',$day_time)->orderBy('id','asc')->first();
+            if(empty($userInfo)){
+                return ;
+            }
+            $RedisUserId=$userInfo['id'];
+            $Redis->setex($redis_user_id_key,86400,$userInfo['id']);//1天
         }
 
         $query = User::query()->select(['id','phone','nickname','province','city','created_at'])
 //            ->where('created_at', '>', '2015-09-01')->where('created_at', '<', '2021-12-01')
 //            ->where('created_at', '>', $day_time)
-            ->where('id', '>', $userInfo['id'])
+            ->where('id', '>', $RedisUserId)
             ->where('phone','like' , "1%")->where('ref',0)->where('province','')
             ->orderBy('id','asc')->limit(300)
             ;
@@ -473,6 +479,7 @@ class LiveConsoleServers
 //        var_dump($list);
 //        exit;
         if (!empty($list)) {
+            $UpUserId=0;
             foreach ($list as $key => $val) {
                 //兼容手机号后带用户id情况
                 $phone=substr($val['phone'],0,11);
@@ -516,7 +523,11 @@ class LiveConsoleServers
                     ];
                 }
                 $UserRst=User::query()->where('id', $val['id'])->update($data);
+                $UpUserId=$val['id'];
                 echo ($key+1).':'.$phone.' - '.$UserRst.'<br>';
+            }
+            if(!empty($UpUserId)) {
+                $Redis->setex($redis_user_id_key, 86400, $UpUserId);//1天
             }
         }
 
