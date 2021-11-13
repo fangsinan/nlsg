@@ -398,7 +398,7 @@ class VipRedeemUser extends Base
 
 
     //(加事务调用)360课程订阅和生成兑换券
-    public static function subWorksOrGetRedeemCode($user_id,$activity_tag="2021-11-1")
+    public static function subWorksOrGetRedeemCode($user_id,$activity_tag="")
     {
 
         if (0) {
@@ -496,9 +496,9 @@ class VipRedeemUser extends Base
             $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
 
             //2021 双十一活动
-            if($activity_tag == "2021-11-1"){ //1号活动
+            if($activity_tag === "2021-11-1"){ //1号活动
                 $end_date = date('Y-m-d 23:59:59', strtotime(" +7day"));
-            }else if($activity_tag == "2021-11-2"){ //2号活动
+            }else if($activity_tag === "2021-11-2"){ //2号活动
                 $end_date = date('Y-m-d 23:59:59', strtotime("+1years +100day"));
             }
 
