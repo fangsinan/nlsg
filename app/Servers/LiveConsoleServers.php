@@ -453,7 +453,7 @@ class LiveConsoleServers
 
         $day_time=date('Y-m-d');
 
-        $redis_user_id_key='111PhoneRegion_UserId'.date('Ymd',$time);
+        $redis_user_id_key='111PhoneRegionUserId'.date('md',$time);
         $RedisUserId=$Redis->get($redis_user_id_key);
         if(empty($RedisUserId)){
             $userInfo = User::query()->select(['id'])->where('created_at','>',$day_time)->orderBy('id','asc')->first();
