@@ -17,8 +17,6 @@ use App\Models\Subscribe;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use App\Models\LiveDeal;
-use App\Models\Order;
 
 class LiveInfoServers
 {
@@ -85,7 +83,7 @@ class LiveInfoServers
                 DB::raw("CONCAT('`',tu.phone) as t_phone"),
                 'tu.nickname as t_nickname', 'lr.son_flag', 's.created_at', 's.relation_id'
             ]);
-            return $query->limit($size)->offset(($page-1)*$size)->get();
+            return $query->limit($size)->offset(($page - 1) * $size)->get();
         }
     }
 
@@ -105,29 +103,29 @@ class LiveInfoServers
 //        if ($check_live_id->user_id != 161904) {
 //            return ['code' => false, 'msg' => '不是王琨的直播间'];
 //        }
-        if (!in_array($check_live_id->user_id, [161904, 185689], true)){
+        if (!in_array($check_live_id->user_id, [161904, 185689], true)) {
             return ['code' => false, 'msg' => '直播间归属错误'];
         }
 
         $temp_begin_order = LiveDeal::query()
-            ->where('live_id','=',$live_id)
+            ->where('live_id', '=', $live_id)
             ->value('ordernum');
 
 
         $query = DB::table('nlsg_live_deal as ld')
-            ->join('nlsg_order as o','ld.ordernum','=','o.ordernum')
-            ->where('o.is_shill','=',0);
+            ->join('nlsg_order as o', 'ld.ordernum', '=', 'o.ordernum')
+            ->where('o.is_shill', '=', 0);
 
-        if (!empty($temp_begin_order)){
+        if (!empty($temp_begin_order)) {
             $temp_begin_order_id = Order::query()
-                ->where('ordernum','=',$temp_begin_order)
+                ->where('ordernum', '=', $temp_begin_order)
                 ->value('id');
-            if (!empty($temp_begin_order_id)){
-                $query->where('o.id','>=',$temp_begin_order_id);
+            if (!empty($temp_begin_order_id)) {
+                $query->where('o.id', '>=', $temp_begin_order_id);
             }
         }
 
-        $query->where('ld.live_id','=',$live_id);
+        $query->where('ld.live_id', '=', $live_id);
 
 //        $query->where('ld.pay_time','>=','2021-09-26 00:00:00')
 //            ->where('ld.pay_time','<','2021-10-27 00:00:00')
@@ -332,7 +330,7 @@ class LiveInfoServers
 
     }
 
-    public function liveOrder($params,$user)
+    public function liveOrder($params, $user)
     {
         $size = $params['size'] ?? 10;
         $query_flag = $params['query_flag'] ?? '';
@@ -346,9 +344,9 @@ class LiveInfoServers
             return ['code' => false, 'msg' => 'live_id错误'];
         }
 
-        if ($user['role_id'] === 1){
+        if ($user['role_id'] === 1) {
             $twitter_id_list = null;
-        }else{
+        } else {
             $twitter_id_list = $this->twitterIdList($user['username']);
         }
 
@@ -392,17 +390,23 @@ class LiveInfoServers
         }
 
 
-        if($user['role_id'] === 1){
-            $temp_live_time_begin = date('Y-m-d 00:00:00',strtotime($check_live_id->begin_at));
-            $temp_live_time_end = date('Y-m-d 23:59:59',strtotime($check_live_id->end_at));
-            $query->where('o.created_at','>=',$temp_live_time_begin)
-                ->where('o.created_at','<=',$temp_live_time_end);
-        }else{
+        if ($user['role_id'] === 1) {
+            $temp_live_time_begin = date('Y-m-d 00:00:00', strtotime($check_live_id->begin_at));
+            $temp_live_time_end = date('Y-m-d 23:59:59', strtotime($check_live_id->end_at));
+            $temp_order_begin_id = Order::query()
+                ->where('type','=',10)
+                ->where('status','=',1)
+                ->where('pay_time','>=',$temp_live_time_begin)
+                ->value('id');
+
+            $query->where('o.id', '>=', $temp_order_begin_id)
+                ->where('o.created_at', '<=', $temp_live_time_end);
+        } else {
             $query->where('o.remark', '=', $live_id);
         }
 
 
-        if ($twitter_id_list !== null){
+        if ($twitter_id_list !== null) {
             $query->whereIn('o.twitter_id', $twitter_id_list);
         }
 
@@ -428,7 +432,7 @@ class LiveInfoServers
                     'lt.phone as t_phone', 'lt.nickname as t_nickname', 'lr.son_flag',
                     'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
                     'o.id as order_id', 'o.pay_type', 'os_type',
-                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id','o.ordernum','o.remark'
+                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id', 'o.ordernum', 'o.remark'
                 ]);
             $res = $query->paginate($size);
 
@@ -440,21 +444,21 @@ class LiveInfoServers
                     'o.user_id', DB::raw("CONCAT('`',u.phone) as phone"), 'u.nickname', 'o.twitter_id',
                     DB::raw("CONCAT('`',lt.phone) as t_phone"),
                     'lt.nickname as t_nickname', 'lr.son_flag',
-                    'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title','o.remark'
+                    'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title', 'o.remark'
                 ]);
             $res = $query->get();
         }
 
-        foreach ($res as &$v){
+        foreach ($res as &$v) {
             //修改源直播名称
-            if ($v->remark == $check_live_id->id){
+            if ($v->remark == $check_live_id->id) {
                 $v->source_live_id = $check_live_id->id;
                 $v->source_live_title = $check_live_id->title;
-            }elseif (empty($v->remark)){
+            } elseif (empty($v->remark)) {
                 $v->source_live_id = $v->source_live_title = '';
-            }else{
+            } else {
                 $v->source_live_id = $v->remark;
-                $v->source_live_title = Live::query()->where('id','=',$v->remark)->value('title');
+                $v->source_live_title = Live::query()->where('id', '=', $v->remark)->value('title');
             }
             unset($v->remark);
         }
@@ -466,7 +470,7 @@ class LiveInfoServers
         return $res;
     }
 
-    public function onlineNum($params,$user)
+    public function onlineNum($params, $user)
     {
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
@@ -485,7 +489,7 @@ class LiveInfoServers
 
         if (empty($son_flag)) {
 
-            if ($user['role_id'] === 1 || ($user['user_id'] === 169209)){
+            if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
                 $check_live_id->user_id = 169209;
             }
 
@@ -798,7 +802,7 @@ GROUP BY
 
     }
 
-    public function statistics($params,$this_user)
+    public function statistics($params, $this_user)
     {
         $live_id = $params['live_id'] ?? 0;
         if (empty($live_id)) {
@@ -839,27 +843,27 @@ GROUP BY
 
             //王琨,统计live_deal
             $res['total_order'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id','=',$live_id)
-                ->whereNotExists(function($q){
+                ->where('live_id', '=', $live_id)
+                ->whereNotExists(function ($q) {
                     $q->from('nlsg_order as o')
-                        ->where('o.ordernum','=','ld.ordernum')
-                        ->where('o.is_shill','=',1);
+                        ->where('o.ordernum', '=', 'ld.ordernum')
+                        ->where('o.is_shill', '=', 1);
                 })->count();
 
             $res['total_order_money'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id','=',$live_id)
-                ->whereNotExists(function($q){
+                ->where('live_id', '=', $live_id)
+                ->whereNotExists(function ($q) {
                     $q->from('nlsg_order as o')
-                        ->where('o.ordernum','=','ld.ordernum')
-                        ->where('o.is_shill','=',1);
+                        ->where('o.ordernum', '=', 'ld.ordernum')
+                        ->where('o.is_shill', '=', 1);
                 })->sum('pay_price');
 
             $res['total_order_user'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id','=',$live_id)
-                ->whereNotExists(function($q){
+                ->where('live_id', '=', $live_id)
+                ->whereNotExists(function ($q) {
                     $q->from('nlsg_order as o')
-                        ->where('o.ordernum','=','ld.ordernum')
-                        ->where('o.is_shill','=',1);
+                        ->where('o.ordernum', '=', 'ld.ordernum')
+                        ->where('o.is_shill', '=', 1);
                 })->count('user_id');
 
         } else {
@@ -871,9 +875,9 @@ GROUP BY
             $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
 
             //李婷,统计order表的9.9
-            $temp_order = $this->liveOrder(['live_id' => $live_id],$this_user);
-            $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum'],$this_user);
-            $temp_order_user = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum'],$this_user);
+            $temp_order = $this->liveOrder(['live_id' => $live_id], $this_user);
+            $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum'], $this_user);
+            $temp_order_user = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum'], $this_user);
 
             $res['total_order'] = $temp_order['total'] ?? '错误';
             $res['total_order_money'] = $temp_order_money;
@@ -881,9 +885,9 @@ GROUP BY
         }
 
         $res['total_sub_count'] = Subscribe::query()
-            ->where('relation_id','=',$live_id)
-            ->where('type','=',3)
-            ->where('status','=',1)
+            ->where('relation_id', '=', $live_id)
+            ->where('type', '=', 3)
+            ->where('status', '=', 1)
             ->count();
 
         //为购买人数
@@ -934,7 +938,7 @@ GROUP BY
         })->pluck('son_id')->toArray();
     }
 
-    public function flagPosterList($params,$user)
+    public function flagPosterList($params, $user)
     {
         $live_id = $params['live_id'] ?? 0;
         $page = $params['page'] ?? 1;
@@ -952,15 +956,15 @@ GROUP BY
         $model = new LiveSonFlagPoster();
 
         $top_user_id = 0;
-        if ($user['role_id'] === 1 || ($user['user_id'] === 169209)){
+        if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
             $top_user_id = 169209;
         }
 
-        $model->createPosterByLiveId($live_id,$top_user_id);
+        $model->createPosterByLiveId($live_id, $top_user_id);
 
         return $model->getList([
             'live_id' => $live_id, 'page' => $page, 'size' => $size,
-            'status' => $status,'top_user_id'=>$top_user_id
+            'status' => $status, 'top_user_id' => $top_user_id
         ]);
     }
 
