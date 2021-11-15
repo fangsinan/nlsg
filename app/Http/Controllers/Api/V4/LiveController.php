@@ -1273,7 +1273,7 @@ class LiveController extends Controller
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();
         if ( !empty($list) ) {
-            return error(0, '已经预约');
+            return error(201, '已经预约',['order_id'=>$list['order_id']]);
         }
 
         $model = new Order();
