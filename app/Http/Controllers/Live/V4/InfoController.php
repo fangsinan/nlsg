@@ -213,7 +213,7 @@ class InfoController extends ControllerBackend
     {
         $excel_flag = $request->input('excel_flag', 0);
         $s = new LiveInfoServers();
-        $data = $s->liveOrderKun($request->input());
+        $data = $s->liveOrderKun($request->input(),$this->user);
         if (empty($excel_flag)) {
             return $this->getRes($data);
         } else {

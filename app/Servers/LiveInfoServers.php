@@ -87,7 +87,7 @@ class LiveInfoServers
         }
     }
 
-    public function liveOrderKun($params)
+    public function liveOrderKun($params,$admin)
     {
         $size = $params['size'] ?? 10;
         $query_flag = $params['query_flag'] ?? '';
@@ -115,6 +115,11 @@ class LiveInfoServers
         $query = DB::table('nlsg_live_deal as ld')
             ->join('nlsg_order as o', 'ld.ordernum', '=', 'o.ordernum')
             ->where('o.is_shill', '=', 0);
+
+        $admin_live_role = (int)($admin['live_role']??0);
+        if (in_array($admin_live_role,[21,23])){
+            $query->where('ld.type','<>',8);
+        }
 
         if (!empty($temp_begin_order)) {
             $temp_begin_order_id = Order::query()
