@@ -910,12 +910,11 @@ class IndexController extends ControllerBackend
         $liveInfo = LiveInfo::select('playback_url', 'back_video_url')->where('live_pid', $id)->first();
         $live->playback_url = $liveInfo['playback_url'];
         $live->back_video_url = $liveInfo['back_video_url'];
-        $live_qr_code = Qrcodeimg::query()
+        $live->qr_code = Qrcodeimg::query()
             ->where('relation_type', '=', 3)
             ->where('relation_id', '=', $id)
             ->where('status', '=', 1)
-            ->first();
-        $live->qr_code = $live_qr_code ? 1 : 0;
+            ->value('qr_url');
 
         $channel_user_id = BackendLiveDataRole::query()
             ->where('live_id', '=', $id)
