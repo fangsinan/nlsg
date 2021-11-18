@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Live\V4;
 use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendLiveDataRole;
 use App\Models\BackendLiveRole;
+use App\Models\ConfigModel;
 use App\Models\Live;
 use App\Models\LiveConsole;
 use App\Models\LiveInfo;
@@ -422,6 +423,27 @@ class IndexController extends ControllerBackend
 
     }
 
+    public function liveQrImg(){
+        $data = ConfigModel::getData(62);
+        $data = array_filter(explode(';',$data));
+        $res = [
+            [
+                'key'=>'无',
+                'value'=>'',
+            ]
+        ];
+
+        foreach ($data as $v){
+            $v = explode(':',$v);
+            array_push($res,[
+                'key'=>$v[0],
+                'value'=>$v[1]
+            ]);
+        }
+
+        return success($res);
+    }
+
     /**
      * @api {post} api/live_v4/index/create 直播创建/编辑
      * @apiVersion 4.0.0
@@ -482,7 +504,7 @@ class IndexController extends ControllerBackend
         }
 
         $is_test = (int)($input['is_test'] ?? 0);
-        $qr_code = (int)($input['qr_code'] ?? 0);
+        $qr_code = $input['qr_code'] ?? '';
         $channel_show = $input['channel_show'] ?? [];
 
 
@@ -576,16 +598,23 @@ class IndexController extends ControllerBackend
         LiveInfo::where('live_pid', '=', $live_info_data['live_pid'])->update($update_live_info_data);
 
         //是否弹出二维码
-        Qrcodeimg::query()->updateOrCreate(
-            [
-                'relation_type' => 3,
-                'relation_id' => $live_info_data['live_pid']
-            ],
-            [
-                'status' => $qr_code,
-                'qr_url' => '/nlsg/qrcode/nlsg_paySuccess_QRCode_live_new.png'
-            ]
-        );
+        Qrcodeimg::query()
+            ->where('relation_type','=',3)
+            ->where('relation_id','=',$live_info_data['live_pid'])
+            ->update(['status'=>0]);
+        if (!empty($qr_code)){
+            Qrcodeimg::query()->updateOrCreate(
+                [
+                    'relation_type' => 3,
+                    'relation_id' => $live_info_data['live_pid'],
+                    'qr_url'=>$qr_code
+                ],
+                [
+                    'status' => 1,
+                ]
+            );
+        }
+
 
         if (!is_array($channel_show)) {
             $channel_show = explode(',', $channel_show);
