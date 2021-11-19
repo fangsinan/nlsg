@@ -254,7 +254,7 @@ class InfoController extends ControllerBackend
     public function liveOrderKunExcel(Request $request)
     {
         $s = new LiveInfoServers();
-        $data = $s->liveOrderKun($request->input());
+        $data = $s->liveOrderKun($request->input(),$this->user);
         if (($data['code'] ?? true) === false) {
             exit($data['msg']);
         }
