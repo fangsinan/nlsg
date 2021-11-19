@@ -1152,7 +1152,7 @@ class LiveController extends Controller
             return error(0, '直播不存在');
         }
 
-        $live_data = Live::query()->where('id', $live['live_pid'])->first();
+        $live_data = Live::query()->where(['id'=>$live['live_pid'],'is_free'=>1])->first();
         if (!$live_data){
             return error(0, '直播不存在');
         }
