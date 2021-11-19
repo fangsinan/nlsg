@@ -960,6 +960,8 @@ class IndexController extends ControllerBackend
             ['title' => "王琨老师公益课", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/f55a5eb1387702291257482009/v.f100020.mp4',],
             ['title' => "十商交付第一天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/698cac358602268011401148246/v.f100020.mp4',],
             ['title' => "十商交付第二天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/2bd483f98602268011431020789/v.f100020.mp4',],
+            ['title' => "汤蓓老师第一天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/8d4e71b7387702291622984606/v.f100030.mp4',],
+            ['title' => "汤蓓老师第二天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/a5e382be387702291629895164/v.f100030.mp4',],
         ];
         return success($res);
     }
