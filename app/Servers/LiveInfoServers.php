@@ -403,7 +403,9 @@ class LiveInfoServers
                 ->where('status','=',1)
                 ->where('pay_time','>=',$temp_live_time_begin)
                 ->value('id');
-
+            if (empty($temp_order_begin_id)){
+                $temp_order_begin_id = Order::query()->max('id');
+            }
             $query->where('o.id', '>=', $temp_order_begin_id)
                 ->where('o.created_at', '<=', $temp_live_time_end);
         } else {
