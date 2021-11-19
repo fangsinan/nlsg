@@ -626,11 +626,11 @@ class IndexController extends ControllerBackend
 
         $channel_user_id = array_filter($channel_user_id);
 
-        if (empty($channel_user_id)) {
-            BackendLiveDataRole::query()
-                ->where('live_id', '=', $live_info_data['live_pid'])
-                ->delete();
-        } else {
+        if (!empty($channel_user_id)) {
+//            BackendLiveDataRole::query()
+//                ->where('live_id', '=', $live_info_data['live_pid'])
+//                ->delete();
+//        } else {
             foreach ($channel_user_id as $cui) {
                 BackendLiveDataRole::query()
                     ->firstOrCreate([
@@ -638,10 +638,10 @@ class IndexController extends ControllerBackend
                         'live_id' => $live_info_data['live_pid'],
                     ]);
             }
-            BackendLiveDataRole::query()
-                ->where('live_id', '=', $live_info_data['live_pid'])
-                ->whereNotIn('user_id', $channel_user_id)
-                ->delete();
+//            BackendLiveDataRole::query()
+//                ->where('live_id', '=', $live_info_data['live_pid'])
+//                ->whereNotIn('user_id', $channel_user_id)
+//                ->delete();
         }
 
 //        if ($userId == 169209){
