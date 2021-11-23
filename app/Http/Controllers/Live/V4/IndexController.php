@@ -949,7 +949,7 @@ class IndexController extends ControllerBackend
         //3701925921189014962 王琨老师直播第二天720  http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/1ac858843701925921189014962/v.f100030.mp4      1.33GB
         //3701925924022337528 王琨老师直播第二天540  http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/152e32df3701925924022337528/v.f100020.mp4      809M
         //3701925920528809905 李婷老师直播新版720    http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/24c43b093701925920528809905/v.f100030.mp4       717.83M
-        $res = [
+        /*$res = [
 //            ['title' => "王琨老师第一天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/787e2d3evodtranscq1253639599/9cce592f3701925919134293895/v.f100030.mp4',],
             ['title' => "王琨老师第一天直播19.9", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/2f548dea3701925925345062697/v.f100020.mp4',],
 //            ['title' => "王琨老师第一天直播", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/4939b6c33701925924026354682/v.f100020.mp4',],
@@ -962,6 +962,17 @@ class IndexController extends ControllerBackend
             ['title' => "十商交付第二天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/2bd483f98602268011431020789/v.f100020.mp4',],
             ['title' => "汤蓓老师第一天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/8d4e71b7387702291622984606/v.f100030.mp4',],
             ['title' => "汤蓓老师第二天", 'video_url' => 'http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/a5e382be387702291629895164/v.f100030.mp4',],
+        ];*/
+
+        $res = [
+            ['title' => "王琨老师第一天直播19.9", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cb0b514e387702291813440392/v.f100020.mp4',],
+            ['title' => "王琨老师第二天直播19.9", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/42785d86387702291818025002/v.f100020.mp4',],
+            ['title' => "李婷老师直播19.9", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/42798414387702291818027383/v.f100020.mp4',],
+            ['title' => "王琨老师公益课", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd2ad1f6387702291813511887/v.f100020.mp4',],
+            ['title' => "十商交付第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd3e6ccd387702291813524028/v.f100020.mp4',],
+            ['title' => "十商交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d20eb67f387702291813747849/v.f100020.mp4',],
+            ['title' => "汤蓓老师第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d1fd0c94387702291813738145/v.f100030.mp4',],
+            ['title' => "汤蓓老师第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d21cdad1387702291813750166/v.f100030.mp4',],
         ];
         return success($res);
     }

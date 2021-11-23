@@ -25,7 +25,7 @@ use JPush\Client as JPushClient;
 
 class IndexController extends Controller
 {
-
+    
     /**
      * @api {get} api/v4/index/announce 首页-公告
      * @apiVersion 4.0.0
