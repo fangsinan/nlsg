@@ -69,10 +69,10 @@ class DealServers
 
         $fields=[
             'O.id','O.ordernum','O.live_id','O.relation_id','O.user_id','O.pay_price','O.pay_time','invite.twitter_id as twitter_id','O.live_num',
-            'U.phone','U.nickname',
-            'TJ.phone as invite_phone','TJ.nickname as invite_nickname',
+            'U.phone','U.nickname','U.internal_remarks',
+            'TJ.phone as invite_phone','TJ.nickname as invite_nickname','TJ.internal_remarks TJ_internal_remarks',
             'B.parent as protect_phone',
-            'BU.id as protect_user_id','BU.nickname as protect_nickname',
+            'BU.id as protect_user_id','BU.nickname as protect_nickname','BU.internal_remarks BU_internal_remarks',
             'PRD.user_id as profit_user_id','PRD.price as profit_price'
         ];
 
@@ -210,7 +210,7 @@ class DealServers
         $query->whereIn('VIP.user_id', $user_arr);
         $query->where('VIP.status',1)->where('VIP.is_default',1);
         $query->where('U.id','>',0);
-        $query->select(['VIP.user_id','U.id','U.phone','U.nickname'])
+        $query->select(['VIP.user_id','U.id','U.phone','U.nickname','U.internal_remarks'])
             ->leftJoin('nlsg_user as U','U.id','=','VIP.source')
         ;
 
@@ -225,6 +225,7 @@ class DealServers
                     'diamond_user_id'=>$v->id,
                     'diamond_phone'=>$v->phone,
                     'diamond_nickname'=>$v->nickname,
+                    'internal_remarks'=>$v->internal_remarks,
                     'diamond_identity'=>2 //钻石
                 ];
             }
