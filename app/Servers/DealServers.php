@@ -20,12 +20,15 @@ class DealServers
             '2'=>'一代天骄门票',
             '3'=>'演说能量门票',
             '4'=>'经营能量+360套餐',
-            '5'=>'30天智慧父母(亲子)训练营'
+            '5'=>'30天智慧父母(亲子)训练营',
+            '6'=>'学业规划训练营(直播间)',
+            '7'=>'30天智慧父母(亲子)训练营-直播专享',
+            '8'=>'抖音直播内部教材'
         ];
     }
 
     //获取成交订单
-    //https://app.v4.api.nlsgapp.com/api/admin_v4/deal/get_order_info?live_id=122
+    //https://app.v4.api.nlsgapp.com/api/admin_v4/deal/get_order_info?live_id=199
     public static function getOrderInfo($data,$live_id,$crontab=0)
     {
 

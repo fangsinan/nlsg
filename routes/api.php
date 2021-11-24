@@ -26,6 +26,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('/liting/delsub', 'LiZheController@DelSub');
     Route::get('live/playbacksub', 'LiveController@PlayBackSub');//开通回放
     //首页
+    Route::get('demo/ceshi', 'DemoController@ceshi');
     Route::get('index/announce', 'IndexController@announce');
     Route::get('index/banner', 'IndexController@banner');
     Route::get('index/live', 'IndexController@live');
