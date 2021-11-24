@@ -28,6 +28,8 @@ class DealServers
     //https://app.v4.api.nlsgapp.com/api/admin_v4/deal/get_order_info?live_id=122
     public static function getOrderInfo($data,$live_id,$crontab=0)
     {
+        DB::table('wwwww')->insert(['vv'=>date('Y-m-d H:i:s'),'t'=>time()]);
+        return true;
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
