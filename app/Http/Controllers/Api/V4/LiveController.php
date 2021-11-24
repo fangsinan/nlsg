@@ -772,6 +772,7 @@ class LiveController extends Controller
             }
             $list['live_son_flag_count'] = 0;
             $list['live_son_flag_status'] = 0;
+            $list['live_son_flag_brush_status'] = 1;
             if(!empty($live_son_flag)){
 
                 $key = "live_son_flag_".$list->live_pid . '_' . $live_son_flag;
@@ -792,12 +793,21 @@ class LiveController extends Controller
 
 
                 //渠道是否开启直播
-                $list['live_son_flag_status'] = LiveSonFlagPoster::where([
+//                $list['live_son_flag_status'] = LiveSonFlagPoster::where([
+//                    'live_id'   =>$list->live_pid,
+//                    'son_id'    =>$live_son_flag,
+//                    'is_del'    =>0,
+//                ])->value('status');
+//                $list['live_son_flag_status'] = $list['live_son_flag_status']??0;
+                $SonFlagInfo= LiveSonFlagPoster::query()->where([
                     'live_id'   =>$list->live_pid,
                     'son_id'    =>$live_son_flag,
                     'is_del'    =>0,
-                ])->value('status');
-                $list['live_son_flag_status'] = $list['live_son_flag_status']??0;
+                ])->first();
+                if(!empty($SonFlagInfo)){
+                    $list['live_son_flag_status']=$SonFlagInfo->status;
+                    $list['live_son_flag_brush_status'] = $SonFlagInfo->live_son_flag_brush_status;
+                }
             }
 //
         }
