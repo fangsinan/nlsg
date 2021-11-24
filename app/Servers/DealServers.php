@@ -70,9 +70,9 @@ class DealServers
         $fields=[
             'O.id','O.ordernum','O.live_id','O.relation_id','O.user_id','O.pay_price','O.pay_time','invite.twitter_id as twitter_id','O.live_num',
             'U.phone','U.nickname','U.internal_remarks',
-            'TJ.phone as invite_phone','TJ.nickname as invite_nickname','TJ.internal_remarks TJ_internal_remarks',
+            'TJ.phone as invite_phone','TJ.nickname as invite_nickname','TJ.internal_remarks as TJ_internal_remarks',
             'B.parent as protect_phone',
-            'BU.id as protect_user_id','BU.nickname as protect_nickname','BU.internal_remarks BU_internal_remarks',
+            'BU.id as protect_user_id','BU.nickname as protect_nickname','BU.internal_remarks as BU_internal_remarks',
             'PRD.user_id as profit_user_id','PRD.price as profit_price'
         ];
 
