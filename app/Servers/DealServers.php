@@ -141,20 +141,43 @@ class DealServers
             //处理渠道
             $QdInfo=self::getQd($val->user_id,$val->live_id);
 
+            if(!empty($val->internal_remarks)){ //用户
+                $nickname=$val->internal_remarks;
+            }else{
+                $nickname=$val->nickname;
+            }
+            if(!empty($val->TJ_internal_remarks)){ //推荐人
+                $tj_nickname=$val->TJ_internal_remarks;
+            }else{
+                $tj_nickname=(empty($val->invite_nickname))?'':$val->invite_nickname;
+            }
+            if(!empty($val->BU_internal_remarks)){ //保护人
+                $bu_nickname=$val->BU_internal_remarks;
+            }else{
+                $bu_nickname=(empty($val->protect_nickname))?'':$val->protect_nickname;
+            }
+            $diamond_nickname='';
+            if(!empty($DiamondArr[$val->protect_user_id])){ //钻石
+                if(!empty($DiamondArr[$val->protect_user_id]['internal_remarks'])){
+                    $diamond_nickname=$DiamondArr[$val->protect_user_id]['internal_remarks'];
+                }else{
+                    $diamond_nickname=$DiamondArr[$val->protect_user_id]['diamond_nickname'];
+                }
+            }
             $map[]=[
                 'ordernum'=>$val->ordernum,
                 'live_id'=>(!empty($val->live_id))?$val->live_id:0,
                 'type'=>$val->relation_id,
                 'user_id'=>$val->user_id,
                 'phone'=>$val->phone,
-                'nickname'=>$val->nickname,
+                'nickname'=>$nickname,
                 'identity'=>(!empty($UserArr[$val->user_id]))?$UserArr[$val->user_id]:0,
                 'pay_price'=>$val->pay_price,
                 'num'=>$val->live_num,
                 'pay_time'=>$val->pay_time,
                 'invite_user_id'=>(empty($val->twitter_id))?0:$val->twitter_id,
                 'invite_phone'=>(empty($val->invite_phone))?'':$val->invite_phone,
-                'invite_nickname'=>(empty($val->invite_nickname))?'':$val->invite_nickname,
+                'invite_nickname'=>$tj_nickname,
                 'invite_identity'=>(!empty($UserArr[$val->twitter_id]))?$UserArr[$val->twitter_id]:0,
                 'created_at'=>$val->pay_time,
                 'sub_live_id'=>$SubInfo['sub_live_id'],
@@ -162,13 +185,13 @@ class DealServers
                 'sub_live_pay_time'=>$SubInfo['sub_live_pay_time'],
                 'protect_user_id'=>(empty($val->protect_user_id))?0:$val->protect_user_id,
                 'protect_phone'=>(empty($val->protect_phone))?'':$val->protect_phone,
-                'protect_nickname'=>(empty($val->protect_nickname))?'':$val->protect_nickname,
+                'protect_nickname'=>$bu_nickname,
                 'protect_identity'=>(!empty($UserArr[$val->protect_user_id]))?$UserArr[$val->protect_user_id]:0,
                 'profit_user_id'=>$val->profit_user_id,
                 'profit_price'=>$val->profit_price,
                 'diamond_user_id'=>(empty($DiamondArr[$val->protect_user_id]))?0:$DiamondArr[$val->protect_user_id]['diamond_user_id'],
                 'diamond_phone'=>(empty($DiamondArr[$val->protect_user_id]))?'':$DiamondArr[$val->protect_user_id]['diamond_phone'],
-                'diamond_nickname'=>(empty($DiamondArr[$val->protect_user_id]))?'':$DiamondArr[$val->protect_user_id]['diamond_nickname'],
+                'diamond_nickname'=>$diamond_nickname,
                 'diamond_identity'=>(empty($DiamondArr[$val->protect_user_id]))?0:$DiamondArr[$val->protect_user_id]['diamond_identity'],
                 'is_tiktok'=>$QdInfo['is_tiktok'],
                 'tiktok_ordernum'=>$QdInfo['tiktok_ordernum'],
