@@ -29,7 +29,8 @@ class LiveSonFlagPoster extends Model
             ->where('p.live_id', '=', $live_id)
             ->where('p.is_del', '=', 0)
             ->where('lr.parent_id', '=', $check_live_id->user_id)
-            ->select(['p.id', 'p.live_id', 'p.son_id', 'p.status', 'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at']);
+            ->select(['p.id', 'p.live_id', 'p.son_id', 'p.status','p.live_son_flag_brush_status',
+                'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at']);
 
         if (!empty($params['status'] ?? 0)) {
             $query->where('p.status', '=', $params['status']);
