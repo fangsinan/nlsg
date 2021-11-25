@@ -1000,9 +1000,11 @@ GROUP BY
                 break;
             case 'off':
                 $check_id->status = 1;
+                $check_id->live_son_flag_brush_status = 0;
                 break;
             case 'del':
                 $check_id->is_del = 1;
+                $check_id->live_son_flag_brush_status = 0;
                 break;
             case 'brush_on':
                 if ($check_id->status !== 2){
