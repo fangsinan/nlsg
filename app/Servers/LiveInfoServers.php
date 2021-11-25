@@ -1004,6 +1004,15 @@ GROUP BY
             case 'del':
                 $check_id->is_del = 1;
                 break;
+            case 'brush_on':
+                if ($check_id->status !== 2){
+                    return ['code'=>false,'msg'=>'直播未开启'];
+                }
+                $check_id->live_son_flag_brush_status = 1;
+                break;
+            case 'brush_off':
+                $check_id->live_son_flag_brush_status = 0;
+                break;
             default:
                 return ['code' => false, 'msg' => '参数错误'];
         }
