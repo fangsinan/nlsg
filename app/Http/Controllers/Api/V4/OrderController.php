@@ -94,7 +94,7 @@ class OrderController extends Controller
     //下单check
     protected function addOrderCheck($user_id, $tweeter_code, $target_id, $type)
     {
-        
+
         if(empty($user_id)){
             return ['code' => 0, 'msg' => '请先登录'];
         }
