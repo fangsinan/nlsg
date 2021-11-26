@@ -37,6 +37,7 @@ class DemoController extends Controller
         return json_decode($content);
     }
 
+    //http://127.0.0.1:8000/api/v4/demo/ceshi
     public function ceshi()
     {
 
@@ -44,7 +45,7 @@ class DemoController extends Controller
 //        $Redis = new Client($redisConfig);
 //        $Redis->select(1);
 
-        $query=DB::table('nlsg_user_tag as t')->where('t.status',0)->select(['id','phone','internal_remarks'])->limit(1000);
+        /*$query=DB::table('nlsg_user_tag as t')->where('t.status',0)->select(['id','phone','internal_remarks'])->limit(1000);
         $list=$query->get()->toArray() ?: [];
         if(!empty($list)){
             foreach ($list as $key=>$val){
@@ -69,11 +70,14 @@ class DemoController extends Controller
             echo '数据为空';
         }
 
-        return ;
+        return ;*/
 
         $info=LiveComment::query()->where('id',13843220)->first();
         var_dump($info->content);
         $content=$info->content;
+        $num=strlen($content);
+        var_dump($num);
+        return ;
 
         $content_json=json_encode($content); var_dump($content_json);
         $content_json = str_replace("\ud83d\udc4f",'#01#',$content_json); //鼓掌
