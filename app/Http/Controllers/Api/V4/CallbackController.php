@@ -52,7 +52,7 @@ class CallbackController extends Controller
         $app = Factory::payment($config);
         $response = $app->handlePaidNotify(function ($message, $fail) {
             PayRecord::PayLog('Wechat notify',json_encode($message));
-            \Log::info('Wechat h5 notify'.json_encode($message));
+//            \Log::info('Wechat h5 notify'.json_encode($message));
             // 你的逻辑
             $data = [
                 'out_trade_no'      => $message['out_trade_no'], //获取订单号
@@ -88,9 +88,7 @@ class CallbackController extends Controller
             //元数据
             PayRecord::PayLog('Alipay notify',json_encode($res_data->all()));
 
-            Log::info('Alipay notify', $res_data->all());
-
-
+//            Log::info('Alipay notify', $res_data->all());
 
             $res_data = $res_data->all();
             // 请自行对 trade_status 进行判断及其它逻辑进行判断，在支付宝的业务通知中，只有交易通知状态为 TRADE_SUCCESS 或 TRADE_FINISHED 时，支付宝才会认定为买家付款成功。
@@ -124,7 +122,7 @@ class CallbackController extends Controller
         $params = $request->input();
         PayRecord::PayLog('im_log',json_encode($params));
 
-        \Log::info('im_log'.json_encode($params));
+//        \Log::info('im_log'.json_encode($params));
 //        $json = '{"CallbackCommand":"Sns.CallbackFriendDelete","PairList":[{"From_Account":"211172","To_Account":"425214"},{"From_Account":"425214","To_Account":"211172"}],"ClientIP":"36.112.173.178","OptPlatform":"iOS","RequestId":"2ea4e023-2859-4512-b629-3089f77dff70","SdkAppid":"1400483163","contenttype":"json"}';
 //        $params = json_decode($json,true);
 
