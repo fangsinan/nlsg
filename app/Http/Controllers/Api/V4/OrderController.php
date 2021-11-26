@@ -95,6 +95,10 @@ class OrderController extends Controller
     protected function addOrderCheck($user_id, $tweeter_code, $target_id, $type)
     {
 
+        if(empty($user_id)){
+            return ['code' => 0, 'msg' => '请先登录'];
+        }
+
         //校验用户等级
         if($type != 7){  //训练营不校验vip
             $rst = User::getLevel($user_id);
