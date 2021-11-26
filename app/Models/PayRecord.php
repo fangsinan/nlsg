@@ -51,7 +51,7 @@ class PayRecord extends Base
 
     }
 
-
+    
     public static function PayLog($notice='',$msg=''){
         if(!empty($notice) && !empty($msg)){
             DB::table('nlsg_pay_log')->insert([
