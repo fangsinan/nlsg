@@ -273,6 +273,11 @@ class OrderController extends Controller
         $activity_tag = $request->input('activity_tag', '');
         $user_id = $this->user['id'] ?? 0;
 
+
+
+        if(empty($user_id)){
+            return $this->error(0, '请先登录');
+        }
         //$work_id 课程信息
         //$works_data = Works::find($work_id);
         $works_data = Works::where(['id' => $work_id, 'type' => 2])->first();//音频课程
