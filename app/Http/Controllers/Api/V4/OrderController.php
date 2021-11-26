@@ -94,6 +94,10 @@ class OrderController extends Controller
     //下单check
     protected function addOrderCheck($user_id, $tweeter_code, $target_id, $type)
     {
+        
+        if(empty($user_id)){
+            return ['code' => 0, 'msg' => '请先登录'];
+        }
 
         //校验用户等级
         if($type != 7){  //训练营不校验vip
@@ -273,11 +277,6 @@ class OrderController extends Controller
         $activity_tag = $request->input('activity_tag', '');
         $user_id = $this->user['id'] ?? 0;
 
-
-
-        if(empty($user_id)){
-            return $this->error(0, '请先登录');
-        }
         //$work_id 课程信息
         //$works_data = Works::find($work_id);
         $works_data = Works::where(['id' => $work_id, 'type' => 2])->first();//音频课程
