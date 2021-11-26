@@ -57,6 +57,7 @@ class VipUser extends Base
         $card_data['surplus_days'] = 0;
         $card_data['price'] = ConfigModel::getData(25);
         $card_data['is_login'] = empty($user) ? 0 : 1;
+        $now_date = date('Y-m-d H:i:s');
 
         if (empty($user['new_vip']['level'] ?? 0)) {
             $card_data['is_open'] = 0;
@@ -69,9 +70,13 @@ class VipUser extends Base
                 $card_data['expire_time'] = $user['new_vip']['expire_time'];
             } else {
                 if ($user['new_vip']['is_open_360'] == 1) {
-                    $card_data['is_open'] = 1;
-                    $card_data['surplus_days'] = intval((strtotime($user['new_vip']['time_end_360']) - time()) / 86400);
-                    $card_data['expire_time'] = $user['new_vip']['time_end_360'];
+                    if ($user['new_vip']['time_end_360'] > $now_date){
+                        $card_data['is_open'] = 1;
+                        $card_data['surplus_days'] = intval((strtotime($user['new_vip']['time_end_360']) - time()) / 86400);
+                        $card_data['expire_time'] = $user['new_vip']['time_end_360'];
+                    }else{
+                        $card_data['is_open'] = 0;
+                    }
                 } else {
                     $card_data['is_open'] = 0;
                 }

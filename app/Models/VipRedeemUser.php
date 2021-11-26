@@ -370,7 +370,7 @@ class VipRedeemUser extends Base
                 if (empty($this_vip->time_begin_360)) {
                     $this_vip->time_begin_360 = $now_date;
                 }
-                if (empty($this_vip->time_end_360)) {
+                if (empty($this_vip->time_end_360) || $this_vip->time_end_360 < $now_date) {
                     $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime('+1 year'));
                 } else {
                     $this_vip->time_end_360 = date('Y-m-d 23:59:59', strtotime($this_vip->time_end_360 . ' +1 year'));
