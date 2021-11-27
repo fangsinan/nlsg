@@ -783,8 +783,7 @@ class IncomeController extends Controller
         //现在只显示 提现和个税  用户分享收益     2：用户专栏分享提成  5电商推客收益  6专栏推客收益 7精品课 8会员 9沙画  12
         if($earn_type == 1){
             //earn_type==1时    type[7支付宝提现  8微信提现   9代扣个税  10电商支付  11精品课支付  12机构提现  18能量币充值 19讲座 20赠送  21线下门票]
-
-            $order_type_val = [7,8,9,10,12,17,18];//默认全部查询
+            $order_type_val = [1,2,5,7,8,9,10,11,12,16,17,18,19,20,21,22];//默认全部查询
             if( !empty($type) &&  in_array($type,[1,2,3,4,18]) ){
                 // 改需求后的 type类型  1电商支付   2内容支付   3 会员  4 所有提现 5能量币充值记录
                 switch ($type){
@@ -792,7 +791,7 @@ class IncomeController extends Controller
                         $order_type_val = [10];
                         break;
                     case 2:
-                        $order_type_val = [1,11,19,20,21];
+                        $order_type_val = [1,11,16,19,20,22];
                         break;
                     case 3:
                         $order_type_val = [2,17,];
