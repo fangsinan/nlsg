@@ -18,10 +18,10 @@ class LiveConsoleServers
             $Redis->select(0);
 
             $time=time();
-            $key_minute='111_live_gift'.date('Hi',$time);
+            $key_minute='11LiveConsole:live_gift'.date('Hi',$time);
             $flag=$Redis->EXISTS($key_minute);
 
-            $list_key='111_live_gift';
+            $list_key='11LiveConsole:live_gift';
             if($flag!=1){ //存在返回1
                 $Redis->setex($key_minute,60,1);//1分钟
 
@@ -105,10 +105,10 @@ class LiveConsoleServers
             $Redis->select(0);
 
             $time=time();
-            $key_minute='111_live_comment'.date('Hi',$time);
+            $key_minute='11LiveConsole:live_comment'.date('Hi',$time);
             $flag=$Redis->EXISTS($key_minute);
 
-            $list_key='111_live_comment';
+            $list_key='11LiveConsole:live_comment';
             if($flag!=1){ //存在返回1
                 $Redis->setex($key_minute,60,1);//1分钟
 
@@ -192,10 +192,10 @@ class LiveConsoleServers
             $Redis->select(0);
 
             $time=time();
-            $key_minute='111_live_join'.date('Hi',$time);
+            $key_minute='11LiveConsole:live_join'.date('Hi',$time);
             $flag=$Redis->EXISTS($key_minute);
 
-            $list_key='111_live_join';
+            $list_key='11LiveConsole:live_join';
             if($flag!=1){ //存在返回1
                 $Redis->setex($key_minute,60,1);//1分钟
 
@@ -277,7 +277,7 @@ class LiveConsoleServers
         $Redis = new Client($redisConfig);
         $Redis->select(0);
         $list_in_flag=0;
-        $list_name='111online_user_list_in';
+        $list_name='11LiveConsole:online_user_list_in';
         if(empty($key_name)){ //执行队列
             $num=$Redis->llen($list_name);
             if($num>0) {
@@ -381,7 +381,7 @@ class LiveConsoleServers
             $Redis->select(0);
 
             $time=time();
-            $key_minute='111OnlineUser'.date('Hi',$time);
+            $key_minute='11LiveConsole:OnlineUser'.date('Hi',$time);
             $flag=$Redis->EXISTS($key_minute);
 
             if($flag!=1){ //存在返回1
@@ -391,7 +391,7 @@ class LiveConsoleServers
                 //获取所有在线直播id
                 $listRst=$Redis->keys($live_id_key.'*'); //获取多个直播间
                 if(!empty($listRst)){
-                    $key_name='111online_user_list_'.date('YmdHi');
+                    $key_name='11LiveConsole:online_user_list_'.date('YmdHi');
                     $now_time=date('Y-m-d H:i:s');
                     $online_time_str=substr($now_time,0,16);
                     $flag=0;
@@ -414,7 +414,7 @@ class LiveConsoleServers
                     }
                     if($flag==1) {
                         //可执行入库列表   没直播间开播也会插入
-                        $Redis->rpush('111online_user_list_in', $key_name); //从队尾插入  先进先出
+                        $Redis->rpush('11LiveConsole:online_user_list_in', $key_name); //从队尾插入  先进先出
                         self::LogIo('liveonlineuser','online_redis','执行成功'.$key_minute);
                     }
                 }
@@ -437,7 +437,7 @@ class LiveConsoleServers
         $Redis->select(0);
 
         $time=time();
-        $key_name='111PhoneRegion'.date('Hi',$time);
+        $key_name='11API_PhoneRegion:'.date('md_Hi',$time);
         $flag=$Redis->EXISTS($key_name);
         if($flag==1) { //存在返回1
             return ;
@@ -453,7 +453,7 @@ class LiveConsoleServers
 
         $day_time=date('Y-m-d');
 
-        $redis_user_id_key='111PhoneRegionUserId'.date('md',$time);
+        $redis_user_id_key='11API_PhoneRegion:UserId'.date('md',$time);
         $RedisUserId=$Redis->get($redis_user_id_key);
         if(empty($RedisUserId)){
             $userInfo = User::query()->select(['id'])->where('created_at','>',$day_time)->orderBy('id','asc')->first();
