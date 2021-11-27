@@ -934,6 +934,8 @@ class IncomeController extends Controller
                     break;
                 case 12:$res['content'] = '机构提现';
                     break;
+                case 16:$res['content'] = '直播';
+                    break;
                 case 17:$res['content'] = '幸福360会员';
                     break;
                 case 18:$res['content'] = '能量币充值';
