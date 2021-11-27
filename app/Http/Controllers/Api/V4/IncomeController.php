@@ -921,6 +921,8 @@ class IncomeController extends Controller
                     break;
                 case 2:$res['content'] = '会员支付';
                     break;
+                case 5:$res['content'] = '打赏';
+                    break;
                 case 7:$res['content'] = '支付宝收益提现';
                     break;
                 case 8:$res['content'] = '微信收益提现';
@@ -945,6 +947,8 @@ class IncomeController extends Controller
                 case 20:$res['content'] = '赠送购买';
                     break;
                 case 21:$res['content'] = '线下门票购买';
+                    break;
+                case 22:$res['content'] = '训练营购买';
                     break;
             }
         }else{
