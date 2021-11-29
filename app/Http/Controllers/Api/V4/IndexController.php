@@ -1044,7 +1044,7 @@ class IndexController extends Controller
         if( !empty($input['tag']) && $input['tag'] == 1 ){  //训练营分享参数
             $res = [
                 'title' => '训练营',
-                'sub_title' => '训练开营了-副标题',
+                'sub_title' => '训练开营了',
                 'share_url' => 'https://wechat.nlsgapp.com/trainingCampList',
                 'cove_img' => 'https://image.nlsgapp.com/nlsg/authorpt/20210106142306594001.jpg',
             ];
