@@ -406,6 +406,7 @@ class AuthController extends Controller
         if ($input['unionid']) {
             $is_wx = 1;
         }
+        $inviter = $input['inviter'] ?? '';
         $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex' => $input['sex'] == '男' ? 1 : 2,
@@ -414,7 +415,8 @@ class AuthController extends Controller
             'unionid' => $input['unionid'] ?? '',
             'wxopenid' => $input['wx_openid'] ?? '',
             'headimg' => $input['headimg'] ?? '',
-            'inviter' => $input['inviter'] ?? '',
+            'inviter' => $inviter,
+            'login_flag' => ($inviter === 0) ? 0 : 1,
             'is_wx' => $is_wx
         ];
         $user = User::where('phone', $phone)->first();
