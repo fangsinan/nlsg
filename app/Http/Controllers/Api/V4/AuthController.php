@@ -414,6 +414,7 @@ class AuthController extends Controller
             'unionid' => $input['unionid'] ?? '',
             'wxopenid' => $input['wx_openid'] ?? '',
             'headimg' => $input['headimg'] ?? '',
+            'inviter' => $input['inviter'] ?? '',
             'is_wx' => $is_wx
         ];
         $user = User::where('phone', $phone)->first();
