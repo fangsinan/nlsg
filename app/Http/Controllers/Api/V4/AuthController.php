@@ -406,7 +406,11 @@ class AuthController extends Controller
         if ($input['unionid']) {
             $is_wx = 1;
         }
-        $inviter = $input['inviter'] ?? '';
+
+
+
+
+
         $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex' => $input['sex'] == '男' ? 1 : 2,
@@ -415,18 +419,43 @@ class AuthController extends Controller
             'unionid' => $input['unionid'] ?? '',
             'wxopenid' => $input['wx_openid'] ?? '',
             'headimg' => $input['headimg'] ?? '',
-            'inviter' => $inviter,
-            'login_flag' => ($inviter === 0) ? 0 : 1,
             'is_wx' => $is_wx
         ];
         $user = User::where('phone', $phone)->first();
         if ($user) {
             User::where('phone', $phone)->update($data); //如果有手机号，以前有微信覆盖
         } else {
+
+            //新增
+
+            $inviter = $input['inviter'] ?? '';
+            $is_invite = $input['is_invite'] ?? 0;
+
+
+            $data['inviter'] = $inviter;
+            $data['login_flag'] = ($inviter === 0) ? 0 : 1;
+
+
             $data['phone'] = $phone;
             $res = User::create($data);
             if ($res) {
                 $user = User::find($res->id);
+
+                //新人优惠券
+                $cpModel = new Coupon();
+                $cpModel->giveCoupon($res->id, ConfigModel::getData(41));
+                if ($is_invite && $inviter) {
+                    //邀请人优惠券
+                    $cpModel->giveCoupon($inviter, ConfigModel::getData(42));
+                    UserInvite::query()->create([
+                        'from_uid' => $inviter,
+                        'to_uid' => $res->id,
+                        'type' => 1
+                    ]);
+                }
+
+
+
             }
         }
         $token = auth('api')->login($user);
