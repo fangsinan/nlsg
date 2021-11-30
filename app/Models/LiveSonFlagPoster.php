@@ -7,19 +7,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class LiveSonFlagPoster extends Model
-{
+class LiveSonFlagPoster extends Model {
     protected $table = 'nlsg_live_son_flag_poster';
 
-    public function getList($params)
-    {
-        $live_id = $params['live_id'];
-        $size = $params['size'];
+    public function getList($params) {
+        $live_id       = $params['live_id'];
+        $size          = $params['size'];
         $check_live_id = Live::query()->where('id', '=', $live_id)->first();
-        if (empty($check_live_id)){
+        if (empty($check_live_id)) {
             return [];
         }
-        if (($params['top_user_id']??0) !== 0){
+        if (($params['top_user_id'] ?? 0) !== 0) {
             $check_live_id->user_id = $params['top_user_id'];
         }
 
@@ -29,13 +27,15 @@ class LiveSonFlagPoster extends Model
             ->where('p.live_id', '=', $live_id)
             ->where('p.is_del', '=', 0)
             ->where('lr.parent_id', '=', $check_live_id->user_id)
-            ->select(['p.id', 'p.live_id', 'p.son_id', 'p.status','p.live_son_flag_brush_status',
-                'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at']);
+            ->select([
+                'p.id', 'p.live_id', 'p.son_id', 'p.status', 'p.live_son_flag_brush_status',
+                'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at'
+            ]);
 
         if (!empty($params['status'] ?? 0)) {
             $query->where('p.status', '=', $params['status']);
         }
-        $query->orderBy('lr.sort','asc'); //海报排序
+        $query->orderBy('lr.sort', 'asc'); //海报排序
 
 //        $bg_img = LivePoster::where('live_id', '=', $live_id)->where('status', '=', 1)
 //            ->select(['image'])
@@ -43,32 +43,37 @@ class LiveSonFlagPoster extends Model
 
         $temp_bg_img = ConfigModel::getData(57);
         $temp_bg_img = explode(',', $temp_bg_img);
-        $bg_img = [];
+        $bg_img      = [];
         foreach ($temp_bg_img as $v) {
             $temp_data['image'] = $v;
-            $bg_img[] = $temp_data;
+            $bg_img[]           = $temp_data;
         }
 
-        $res = $query->paginate($size);
+        $res    = $query->paginate($size);
         $custom = collect(['bg_img' => $bg_img]);
         return $custom->merge($res);
     }
 
-    public function createPosterByLiveId($live_id = 0,$top_user_id = 0)
-    {
+    public function createPosterByLiveId($live_id = 0, $top_user_id = 0) {
         $check_live_id = Live::query()->where('id', '=', $live_id)->first();
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
-        if ($top_user_id !== 0){
-            $check_live_id->user_id = $top_user_id;
+//        if ($top_user_id !== 0){
+//            $check_live_id->user_id = $top_user_id;
+//        }
+
+        if ($top_user_id === -1) {
+            $son_flag = BackendLiveRole::query()
+                ->where('status', '=', 1)
+                ->select(['son', 'son_id', 'son_flag'])
+                ->get();
+        } else {
+            $son_flag = BackendLiveRole::query()->where('parent_id', '=', $top_user_id)
+                ->where('status', '=', 1)
+                ->select(['son', 'son_id', 'son_flag'])
+                ->get();
         }
-
-        $son_flag = BackendLiveRole::query()->where('parent_id', '=', $check_live_id->user_id)
-            ->where('status','=',1)
-            ->select(['son', 'son_id', 'son_flag'])
-            ->get();
-
 
         if ($son_flag->isEmpty()) {
             return ['code' => true, 'msg' => '没有渠道'];
@@ -107,11 +112,11 @@ class LiveSonFlagPoster extends Model
         if (!empty($add_son_list)) {
             $add_data = [];
             foreach ($add_son_list as &$v) {
-                $temp_add_data = [];
+                $temp_add_data            = [];
                 $temp_add_data['live_id'] = $live_id;
-                $temp_add_data['son_id'] = $v;
-                $temp_add_data['status'] = 2;
-                $add_data[] = $temp_add_data;
+                $temp_add_data['son_id']  = $v;
+                $temp_add_data['status']  = 2;
+                $add_data[]               = $temp_add_data;
             }
 
             $add_res = DB::table('nlsg_live_son_flag_poster')->insert($add_data);

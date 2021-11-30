@@ -18,10 +18,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class LiveInfoServers
-{
-    public function liveSubOrder($params)
-    {
+class LiveInfoServers {
+    public function liveSubOrder($params) {
         $size = $params['size'] ?? 10;
         $page = $params['page'] ?? 1;
 
@@ -90,8 +88,7 @@ class LiveInfoServers
 
     }
 
-    public function liveOrderKun($params, $admin)
-    {
+    public function liveOrderKun($params, $admin) {
         $size       = $params['size'] ?? 10;
         $query_flag = $params['query_flag'] ?? '';
 
@@ -340,8 +337,462 @@ class LiveInfoServers
 
     }
 
-    public function liveOrder($params, $user)
-    {
+    public function onlineNum($params, $user) {
+        $live_id = $params['live_id'] ?? 0;
+        if (empty($live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+        if (empty($check_live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        //获取所有渠道
+
+        $table_name     = 'nlsg_live_online_user';
+        $cache_key_name = 'son_flag_' . $check_live_id->user_id;
+        $expire_num     = CacheTools::getExpire('son_flag');
+        $son_flag       = Cache::get($cache_key_name);
+
+        if (empty($son_flag)) {
+
+            if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
+                $check_live_id->user_id = 169209;
+            }
+
+            $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
+                ->where('status', '=', 1)
+                ->select(['son', 'son_id', 'son_flag'])
+                ->orderBy('sort', 'asc')   //按标记排序
+                ->get();
+            Cache::put($cache_key_name, $son_flag, $expire_num);
+        }
+        $res['son_flag'] = $son_flag;
+
+        $son_id = (int)($params['son_id'] ?? 0);
+
+        //特定渠道
+        if (!empty($son_id)) {
+            //观看时常大于30分钟的
+            //累计人次login
+            $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)
+                ->where('live_son_flag', $son_id)
+                ->count();
+            //累计人数sub
+            $order_num_sql = "
+            SELECT
+                count(*) AS counts
+            FROM
+                (
+                    SELECT
+                        id
+                    FROM  nlsg_subscribe
+                    WHERE  relation_id = $live_id and type=3  AND STATUS = 1 AND twitter_id =$son_id
+                    GROUP BY user_id
+                ) AS a";
+
+            $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
+
+            if ($live_id >= 139) {
+                $list_sql = "SELECT online_time_str as time,counts from nlsg_live_online_user_counts where live_id = $live_id and live_son_flag = $son_id";
+            } else {
+                $list_sql = "SELECT
+	online_time_str as time,
+	count(*) as counts
+FROM
+	$table_name
+WHERE
+	live_id = $live_id and live_son_flag = $son_id
+GROUP BY
+	online_time_str
+	ORDER BY online_time_str asc";
+            }
+
+        } else { //总数据
+            //累计人次login
+            $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
+            //累计人数sub
+            $order_num_sql = "
+            SELECT
+                count(*) AS counts
+            FROM
+                (
+                SELECT
+                    id
+                FROM nlsg_subscribe
+                WHERE relation_id = $live_id and type=3 AND STATUS = 1
+                GROUP BY user_id
+                ) AS a";
+
+            $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
+            //在线人数
+            if ($live_id >= 139) {
+                $list_sql = "SELECT
+	online_time_str AS time,
+	sum(counts) as counts
+FROM
+	nlsg_live_online_user_counts
+WHERE
+	live_id = $live_id
+	GROUP BY online_time_str";
+            } else {
+                $list_sql = "SELECT
+	online_time_str as time,
+	count(*) as counts
+FROM
+	$table_name
+WHERE
+	live_id = $live_id
+GROUP BY
+	online_time_str";
+            }
+        }
+
+        //在线人数折线图
+        $res['list'] = DB::select($list_sql);
+
+        if (($params['only_list'] ?? 0) == 1) {
+            return $res['list'];
+        }
+
+        $img_data            = [];
+        $img_data['columns'] = [
+            '时间', '人数'
+        ];
+        $img_data['rows']    = [];
+        foreach ($res['list'] as $v) {
+            $temp_img_data = [];
+//            $temp_img_data['时间'] = $v->time;substr($v->time,-11);
+            $temp_img_data['时间'] = substr($v->time, -11);
+            $temp_img_data['人数'] = $v->counts;
+            $img_data['rows'][]  = $temp_img_data;
+        }
+
+        $res['img_data'] = $img_data;
+        $res['list']     = [];
+
+        return $res;
+    }
+
+    public function onlineNumInfo($params) {
+        $size    = $params['size'] ?? 10;
+        $live_id = $params['live_id'] ?? 0;
+        $date    = $params['date'] ?? '';
+        if (empty($date)) {
+            $temp_data = LiveOnlineUser::where('live_id', '=', $live_id)->orderBy('id', 'desc')->first();
+            $date      = $temp_data->online_time_str ?? date('Y-m-d 00:00:00');
+        }
+
+        $begin_time = date('Y-m-d H:i:00', strtotime($date));
+        $end_time   = date('Y-m-d H:i:59', strtotime($date));
+
+        if (empty($live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+        if (empty($check_live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+
+//        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
+//        $chose_table_res = DB::select($chose_table_sql);
+//        if (empty($chose_table_res)){
+        $table_name = 'nlsg_live_online_user';
+//        }else{
+//            $table_name = 'nlsg_live_online_user_'.$live_id;
+//        }
+
+        $query = DB::table($table_name . ' as lou')
+            ->join('nlsg_user as lu', 'lou.user_id', '=', 'lu.id')
+            ->leftJoin('nlsg_live_count_down as cd', function ($query) use ($live_id) {
+                $query->on('cd.user_id', '=', 'lou.user_id')->where('cd.live_id', '=', $live_id);
+            })
+            ->leftJoin('nlsg_user as u', 'u.id', '=', 'cd.new_vip_uid');
+
+        $query->where('lou.live_id', '=', $live_id)
+            ->whereBetween('lou.online_time', [$begin_time, $end_time])
+            ->groupBy('lou.user_id');
+
+
+        $excel_flag = $params['excel_flag'] ?? 0;
+        if (empty($excel_flag)) {
+            $query->select([
+                'lou.user_id', 'lu.phone', 'cd.new_vip_uid as t_user_id', 'u.phone as t_phone',
+                'u.nickname as t_nickname', 'online_time_str as online_time'
+            ]);
+            $res    = $query->paginate($size);
+            $custom = collect(['live_user_id' => $check_live_id->user_id, 'date' => $begin_time]);
+            return $custom->merge($res);
+        } else {
+            $query->select([
+                'lou.user_id',
+                DB::raw("CONCAT('`',lu.phone) as phone"),
+                'cd.new_vip_uid as t_user_id',
+                DB::raw("CONCAT('`',u.phone) as t_phone"),
+                'u.nickname as t_nickname',
+                'online_time_str as online_time'
+            ]);
+            return $query->get();
+        }
+
+    }
+
+    public function userWatch($params) {
+        $size   = $params['size'] ?? 10;
+        $page   = $params['page'] ?? 1;
+        $offset = ($page - 1) * $size;
+
+        $excel_flag = $params['excel_flag'] ?? 0;
+
+        $live_id = $params['live_id'] ?? 0;
+        if (empty($live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+        if (empty($check_live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+
+//        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
+//        $chose_table_res = DB::select($chose_table_sql);
+//        if (empty($chose_table_res)){
+        $table_name = 'nlsg_live_online_user';
+//        }else{
+//            $table_name = 'nlsg_live_online_user_'.$live_id;
+//        }
+
+        $flag = $params['flag'] ?? '';
+        if (!in_array($flag, [1, 2])) {
+            return ['code' => false, 'msg' => 'flag参数错误'];
+        }
+
+        $phone = $params['phone'] ?? '';
+        $son   = $params['son'] ?? '';
+
+        if ($flag == 1) {
+            $where_str = 'EXISTS';
+        } else {
+            $where_str = 'NOT EXISTS';
+        }
+
+//        $sql = "
+//        SELECT
+//            s.id,
+//            s.user_id,
+//            u.phone ,s.created_at,lr.son,lr.son_flag
+//        FROM
+//            nlsg_subscribe AS s
+//            JOIN nlsg_user AS u ON s.user_id = u.id
+//            LEFT JOIN nlsg_live_count_down as cd on s.user_id = cd.user_id and cd.live_id = $live_id
+//            LEFT JOIN nlsg_backend_live_role as lr on cd.new_vip_uid = lr.son_id
+//        WHERE
+//            ( s.order_id > 9 OR s.channel_order_id > 0 )
+//            AND s.relation_id = $live_id";
+
+        $sql = "
+        SELECT
+            s.id,
+            s.user_id,
+            u.phone,
+            s.created_at,
+            t.phone as son,
+            lr.son_flag
+        FROM
+            nlsg_subscribe AS s
+            JOIN nlsg_user AS u ON s.user_id = u.id
+            LEFT JOIN nlsg_user as t on s.twitter_id = t.id
+            LEFT JOIN nlsg_backend_live_role AS lr ON t.id = lr.son_id
+        WHERE
+            ( s.order_id > 9 OR s.channel_order_id > 0 )
+            AND s.relation_id = $live_id";
+
+        if (!empty($phone)) {
+            $sql .= " AND u.phone like '%$phone%' ";
+        }
+
+        if (!empty($son)) {
+            $sql .= " AND lr.son like '%$son%' ";
+        }
+
+        $son_flag = $params['son_flag'] ?? '';
+        if (!empty($son_flag)) {
+            $sql .= " AND lr.son_flag like '%$son_flag%' ";
+        }
+
+        $sql .= "
+            AND s.type = 3
+            AND $where_str ( SELECT id FROM $table_name lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
+        ";
+
+        if (empty($excel_flag)) {
+            $count_sql = "
+        SELECT
+           count(*) as counts
+        FROM
+            nlsg_subscribe AS s
+            JOIN nlsg_user AS u ON s.user_id = u.id
+            LEFT JOIN nlsg_user as t on s.twitter_id = t.id
+            LEFT JOIN nlsg_backend_live_role AS lr ON t.id = lr.son_id
+        WHERE
+            ( s.order_id > 9 OR s.channel_order_id > 0 )
+            AND s.relation_id = $live_id ";
+
+            if (!empty($phone)) {
+                $count_sql .= " AND u.phone like '%$phone%' ";
+            }
+
+            if (!empty($son)) {
+                $count_sql .= " AND lr.son like '%$son%' ";
+            }
+
+            $son_flag = $params['son_flag'] ?? '';
+            if (!empty($son_flag)) {
+                $count_sql .= " AND lr.son_flag like '%$son_flag%' ";
+            }
+
+            $count_sql .= "
+            AND s.type = 3
+            AND $where_str ( SELECT id FROM $table_name lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
+        ";
+
+            $sql .= " limit $size offset $offset ";
+
+            $list['data']         = DB::select($sql);
+            $list['total']        = DB::select($count_sql)[0]->counts;
+            $list['live_user_id'] = $check_live_id->user_id;
+            return $list;
+        }
+
+        return DB::select($sql);
+
+    }
+
+    public function statistics($params, $this_user) {
+        $live_id = $params['live_id'] ?? 0;
+        if (empty($live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+        if (empty($check_live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $res             = [];
+        $res['user_id']  = $check_live_id->user_id;
+        $res['begin_at'] = $check_live_id->begin_at;
+        $res['end_at']   = $check_live_id->end_at;
+
+        $user_info       = User::where('id', '=', $check_live_id->user_id)
+            ->select(['nickname', 'headimg'])->first();
+        $res['headimg']  = $user_info->headimg;
+        $res['nickname'] = $user_info->nickname;
+        //累计人次login 人气
+        $res['live_login'] = $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
+        $res['order_num']  = Subscribe::query()->where('relation_id', '=', $live_id)
+            ->where('type', '=', 3)
+            ->where('status', '=', 1)->count();
+
+        //累计人数sub
+        $res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
+            ->where('type', '=', 3)->where('status', '=', 1)->count();
+
+        if ($check_live_id->user_id === 161904) {
+            //王琨,统计live_deal
+            $watch_count_sql     = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3
+                                                and live_watched = 1 and (order_id > 9 or channel_order_id > 0)";
+            $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3
+                                                and live_watched = 0 and (order_id > 9 or channel_order_id > 0)";
+
+            $res['watch_counts']     = DB::select($watch_count_sql)[0]->counts;
+            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+
+            //王琨,统计live_deal
+            $res['total_order'] = DB::table('nlsg_live_deal as ld')
+                ->where('live_id', '=', $live_id)
+                ->whereNotExists(function ($q) {
+                    $q->from('nlsg_order as o')
+                        ->where('o.ordernum', '=', 'ld.ordernum')
+                        ->where('o.is_shill', '=', 1);
+                })->count();
+
+            $res['total_order_money'] = DB::table('nlsg_live_deal as ld')
+                ->where('live_id', '=', $live_id)
+                ->whereNotExists(function ($q) {
+                    $q->from('nlsg_order as o')
+                        ->where('o.ordernum', '=', 'ld.ordernum')
+                        ->where('o.is_shill', '=', 1);
+                })->sum('pay_price');
+
+            $res['total_order_user'] = DB::table('nlsg_live_deal as ld')
+                ->where('live_id', '=', $live_id)
+                ->whereNotExists(function ($q) {
+                    $q->from('nlsg_order as o')
+                        ->where('o.ordernum', '=', 'ld.ordernum')
+                        ->where('o.is_shill', '=', 1);
+                })->count('user_id');
+
+        } else {
+            //李婷,统计order表的9.9
+            $watch_count_sql     = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 1";
+            $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 0";
+
+            $res['watch_counts']     = DB::select($watch_count_sql)[0]->counts;
+            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+
+            //李婷,统计order表的9.9
+            $temp_order       = $this->liveOrder(['live_id' => $live_id], $this_user);
+            $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum'], $this_user);
+            $temp_order_user  = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum'], $this_user);
+
+            $res['total_order']       = $temp_order['total'] ?? '错误';
+            $res['total_order_money'] = $temp_order_money;
+            $res['total_order_user']  = $temp_order_user;
+        }
+
+        $res['total_sub_count'] = Subscribe::query()
+            ->where('relation_id', '=', $live_id)
+            ->where('type', '=', 3)
+            ->where('status', '=', 1)
+            ->count();
+
+        //为购买人数
+        $res['total_not_buy'] = $res['total_sub_count'] - $res['total_order_user'];
+        $res['total_not_buy'] = $res['total_not_buy'] < 0 ? 0 : $res['total_not_buy'];
+
+        //观看时常大于30分钟的
+//            $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
+//SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
+//) as a where counts >= 30";
+//            $temp_res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
+
+        //观看时常大于60分钟的
+//            $more_than_60_min_sql = "SELECT count(user_id) as user_count from (
+//SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
+//) as a where counts >= 60";
+//            $temp_res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
+
+        $res['more_than_30m'] = $res['more_than_60m'] = 0;
+
+        $res['live_status'] = 1;  //默认值
+        $channel            = LiveInfo::where('live_pid', $live_id)
+            ->where('status', 1)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($channel) {
+            if ($channel->is_begin === 0 && $channel->is_finish === 0) {
+                $res['live_status'] = 1;
+            } elseif ($channel->is_begin === 1 && $channel->is_finish === 0) {
+                $res['live_status'] = 3;
+            } elseif ($channel->is_begin === 0 && $channel->is_finish === 1) {
+                $res['live_status'] = 2;
+            }
+        }
+
+
+        return $res;
+
+    }
+
+    public function liveOrder($params, $user) {
         $size       = $params['size'] ?? 10;
         $query_flag = $params['query_flag'] ?? '';
 
@@ -487,476 +938,16 @@ class LiveInfoServers
         return $res;
     }
 
-    public function onlineNum($params, $user)
-    {
-        $live_id = $params['live_id'] ?? 0;
-        if (empty($live_id)) {
-            return ['code' => false, 'msg' => 'live_id错误'];
-        }
-        $check_live_id = Live::where('id', '=', $live_id)->first();
-        if (empty($check_live_id)) {
-            return ['code' => false, 'msg' => 'live_id错误'];
-        }
-        //获取所有渠道
-
-        $table_name     = 'nlsg_live_online_user';
-        $cache_key_name = 'son_flag_' . $check_live_id->user_id;
-        $expire_num     = CacheTools::getExpire('son_flag');
-        $son_flag       = Cache::get($cache_key_name);
-
-        if (empty($son_flag)) {
-
-            if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
-                $check_live_id->user_id = 169209;
-            }
-
-            $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
-                ->where('status', '=', 1)
-                ->select(['son', 'son_id', 'son_flag'])
-                ->orderBy('sort', 'asc')   //按标记排序
-                ->get();
-            Cache::put($cache_key_name, $son_flag, $expire_num);
-        }
-        $res['son_flag'] = $son_flag;
-
-        $son_id = (int)($params['son_id'] ?? 0);
-
-        //特定渠道
-        if (!empty($son_id)) {
-            //观看时常大于30分钟的
-            //累计人次login
-            $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)
-                ->where('live_son_flag', $son_id)
-                ->count();
-            //累计人数sub
-            $order_num_sql = "
-            SELECT
-                count(*) AS counts
-            FROM
-                (
-                    SELECT
-                        id
-                    FROM  nlsg_subscribe
-                    WHERE  relation_id = $live_id and type=3  AND STATUS = 1 AND twitter_id =$son_id
-                    GROUP BY user_id
-                ) AS a";
-
-            $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
-
-            if ($live_id >= 139) {
-                $list_sql = "SELECT online_time_str as time,counts from nlsg_live_online_user_counts where live_id = $live_id and live_son_flag = $son_id";
-            } else {
-                $list_sql = "SELECT
-	online_time_str as time,
-	count(*) as counts
-FROM
-	$table_name
-WHERE
-	live_id = $live_id and live_son_flag = $son_id
-GROUP BY
-	online_time_str
-	ORDER BY online_time_str asc";
-            }
-
-        } else { //总数据
-            //累计人次login
-            $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
-            //累计人数sub
-            $order_num_sql = "
-            SELECT
-                count(*) AS counts
-            FROM
-                (
-                SELECT
-                    id
-                FROM nlsg_subscribe
-                WHERE relation_id = $live_id and type=3 AND STATUS = 1
-                GROUP BY user_id
-                ) AS a";
-
-            $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
-            //在线人数
-            if ($live_id >= 139) {
-                $list_sql = "SELECT
-	online_time_str AS time,
-	sum(counts) as counts
-FROM
-	nlsg_live_online_user_counts
-WHERE
-	live_id = $live_id
-	GROUP BY online_time_str";
-            } else {
-                $list_sql = "SELECT
-	online_time_str as time,
-	count(*) as counts
-FROM
-	$table_name
-WHERE
-	live_id = $live_id
-GROUP BY
-	online_time_str";
-            }
-        }
-
-        //在线人数折线图
-        $res['list'] = DB::select($list_sql);
-
-        if (($params['only_list'] ?? 0) == 1) {
-            return $res['list'];
-        }
-
-        $img_data            = [];
-        $img_data['columns'] = [
-            '时间', '人数'
-        ];
-        $img_data['rows']    = [];
-        foreach ($res['list'] as $v) {
-            $temp_img_data = [];
-//            $temp_img_data['时间'] = $v->time;substr($v->time,-11);
-            $temp_img_data['时间'] = substr($v->time, -11);
-            $temp_img_data['人数'] = $v->counts;
-            $img_data['rows'][]  = $temp_img_data;
-        }
-
-        $res['img_data'] = $img_data;
-        $res['list']     = [];
-
-        return $res;
-    }
-
-    public function onlineNumInfo($params)
-    {
-        $size    = $params['size'] ?? 10;
-        $live_id = $params['live_id'] ?? 0;
-        $date    = $params['date'] ?? '';
-        if (empty($date)) {
-            $temp_data = LiveOnlineUser::where('live_id', '=', $live_id)->orderBy('id', 'desc')->first();
-            $date      = $temp_data->online_time_str ?? date('Y-m-d 00:00:00');
-        }
-
-        $begin_time = date('Y-m-d H:i:00', strtotime($date));
-        $end_time   = date('Y-m-d H:i:59', strtotime($date));
-
-        if (empty($live_id)) {
-            return ['code' => false, 'msg' => 'live_id错误'];
-        }
-        $check_live_id = Live::where('id', '=', $live_id)->first();
-        if (empty($check_live_id)) {
-            return ['code' => false, 'msg' => 'live_id错误'];
-        }
-
-//        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
-//        $chose_table_res = DB::select($chose_table_sql);
-//        if (empty($chose_table_res)){
-        $table_name = 'nlsg_live_online_user';
-//        }else{
-//            $table_name = 'nlsg_live_online_user_'.$live_id;
-//        }
-
-        $query = DB::table($table_name . ' as lou')
-            ->join('nlsg_user as lu', 'lou.user_id', '=', 'lu.id')
-            ->leftJoin('nlsg_live_count_down as cd', function ($query) use ($live_id) {
-                $query->on('cd.user_id', '=', 'lou.user_id')->where('cd.live_id', '=', $live_id);
-            })
-            ->leftJoin('nlsg_user as u', 'u.id', '=', 'cd.new_vip_uid');
-
-        $query->where('lou.live_id', '=', $live_id)
-            ->whereBetween('lou.online_time', [$begin_time, $end_time])
-            ->groupBy('lou.user_id');
-
-
-        $excel_flag = $params['excel_flag'] ?? 0;
-        if (empty($excel_flag)) {
-            $query->select([
-                'lou.user_id', 'lu.phone', 'cd.new_vip_uid as t_user_id', 'u.phone as t_phone',
-                'u.nickname as t_nickname', 'online_time_str as online_time'
-            ]);
-            $res    = $query->paginate($size);
-            $custom = collect(['live_user_id' => $check_live_id->user_id, 'date' => $begin_time]);
-            return $custom->merge($res);
-        } else {
-            $query->select([
-                'lou.user_id',
-                DB::raw("CONCAT('`',lu.phone) as phone"),
-                'cd.new_vip_uid as t_user_id',
-                DB::raw("CONCAT('`',u.phone) as t_phone"),
-                'u.nickname as t_nickname',
-                'online_time_str as online_time'
-            ]);
-            return $query->get();
-        }
-
-    }
-
-    public function userWatch($params)
-    {
-        $size   = $params['size'] ?? 10;
-        $page   = $params['page'] ?? 1;
-        $offset = ($page - 1) * $size;
-
-        $excel_flag = $params['excel_flag'] ?? 0;
-
-        $live_id = $params['live_id'] ?? 0;
-        if (empty($live_id)) {
-            return ['code' => false, 'msg' => 'live_id错误'];
-        }
-        $check_live_id = Live::where('id', '=', $live_id)->first();
-        if (empty($check_live_id)) {
-            return ['code' => false, 'msg' => 'live_id错误'];
-        }
-
-//        $chose_table_sql = "SHOW TABLES LIKE 'nlsg_live_online_user_".$live_id."'";
-//        $chose_table_res = DB::select($chose_table_sql);
-//        if (empty($chose_table_res)){
-        $table_name = 'nlsg_live_online_user';
-//        }else{
-//            $table_name = 'nlsg_live_online_user_'.$live_id;
-//        }
-
-        $flag = $params['flag'] ?? '';
-        if (!in_array($flag, [1, 2])) {
-            return ['code' => false, 'msg' => 'flag参数错误'];
-        }
-
-        $phone = $params['phone'] ?? '';
-        $son   = $params['son'] ?? '';
-
-        if ($flag == 1) {
-            $where_str = 'EXISTS';
-        } else {
-            $where_str = 'NOT EXISTS';
-        }
-
-//        $sql = "
-//        SELECT
-//            s.id,
-//            s.user_id,
-//            u.phone ,s.created_at,lr.son,lr.son_flag
-//        FROM
-//            nlsg_subscribe AS s
-//            JOIN nlsg_user AS u ON s.user_id = u.id
-//            LEFT JOIN nlsg_live_count_down as cd on s.user_id = cd.user_id and cd.live_id = $live_id
-//            LEFT JOIN nlsg_backend_live_role as lr on cd.new_vip_uid = lr.son_id
-//        WHERE
-//            ( s.order_id > 9 OR s.channel_order_id > 0 )
-//            AND s.relation_id = $live_id";
-
-        $sql = "
-        SELECT
-            s.id,
-            s.user_id,
-            u.phone,
-            s.created_at,
-            t.phone as son,
-            lr.son_flag
-        FROM
-            nlsg_subscribe AS s
-            JOIN nlsg_user AS u ON s.user_id = u.id
-            LEFT JOIN nlsg_user as t on s.twitter_id = t.id
-            LEFT JOIN nlsg_backend_live_role AS lr ON t.id = lr.son_id
-        WHERE
-            ( s.order_id > 9 OR s.channel_order_id > 0 )
-            AND s.relation_id = $live_id";
-
-        if (!empty($phone)) {
-            $sql .= " AND u.phone like '%$phone%' ";
-        }
-
-        if (!empty($son)) {
-            $sql .= " AND lr.son like '%$son%' ";
-        }
-
-        $son_flag = $params['son_flag'] ?? '';
-        if (!empty($son_flag)) {
-            $sql .= " AND lr.son_flag like '%$son_flag%' ";
-        }
-
-        $sql .= "
-            AND s.type = 3
-            AND $where_str ( SELECT id FROM $table_name lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
-        ";
-
-        if (empty($excel_flag)) {
-            $count_sql = "
-        SELECT
-           count(*) as counts
-        FROM
-            nlsg_subscribe AS s
-            JOIN nlsg_user AS u ON s.user_id = u.id
-            LEFT JOIN nlsg_user as t on s.twitter_id = t.id
-            LEFT JOIN nlsg_backend_live_role AS lr ON t.id = lr.son_id
-        WHERE
-            ( s.order_id > 9 OR s.channel_order_id > 0 )
-            AND s.relation_id = $live_id ";
-
-            if (!empty($phone)) {
-                $count_sql .= " AND u.phone like '%$phone%' ";
-            }
-
-            if (!empty($son)) {
-                $count_sql .= " AND lr.son like '%$son%' ";
-            }
-
-            $son_flag = $params['son_flag'] ?? '';
-            if (!empty($son_flag)) {
-                $count_sql .= " AND lr.son_flag like '%$son_flag%' ";
-            }
-
-            $count_sql .= "
-            AND s.type = 3
-            AND $where_str ( SELECT id FROM $table_name lou WHERE lou.user_id = s.user_id AND lou.live_id = $live_id )
-        ";
-
-            $sql .= " limit $size offset $offset ";
-
-            $list['data']         = DB::select($sql);
-            $list['total']        = DB::select($count_sql)[0]->counts;
-            $list['live_user_id'] = $check_live_id->user_id;
-            return $list;
-        }
-
-        return DB::select($sql);
-
-    }
-
-    public function statistics($params, $this_user)
-    {
-        $live_id = $params['live_id'] ?? 0;
-        if (empty($live_id)) {
-            return ['code' => false, 'msg' => 'live_id错误'];
-        }
-        $check_live_id = Live::where('id', '=', $live_id)->first();
-        if (empty($check_live_id)) {
-            return ['code' => false, 'msg' => 'live_id错误'];
-        }
-        $res             = [];
-        $res['user_id']  = $check_live_id->user_id;
-        $res['begin_at'] = $check_live_id->begin_at;
-        $res['end_at']   = $check_live_id->end_at;
-
-        $user_info       = User::where('id', '=', $check_live_id->user_id)
-            ->select(['nickname', 'headimg'])->first();
-        $res['headimg']  = $user_info->headimg;
-        $res['nickname'] = $user_info->nickname;
-        //累计人次login 人气
-        $res['live_login'] = $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
-        $res['order_num']  = Subscribe::query()->where('relation_id', '=', $live_id)
-            ->where('type', '=', 3)
-            ->where('status', '=', 1)->count();
-
-        //累计人数sub
-        $res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
-            ->where('type', '=', 3)->where('status', '=', 1)->count();
-
-        if ($check_live_id->user_id === 161904) {
-            //王琨,统计live_deal
-            $watch_count_sql     = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3
-                                                and live_watched = 1 and (order_id > 9 or channel_order_id > 0)";
-            $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3
-                                                and live_watched = 0 and (order_id > 9 or channel_order_id > 0)";
-
-            $res['watch_counts']     = DB::select($watch_count_sql)[0]->counts;
-            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
-
-            //王琨,统计live_deal
-            $res['total_order'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id', '=', $live_id)
-                ->whereNotExists(function ($q) {
-                    $q->from('nlsg_order as o')
-                        ->where('o.ordernum', '=', 'ld.ordernum')
-                        ->where('o.is_shill', '=', 1);
-                })->count();
-
-            $res['total_order_money'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id', '=', $live_id)
-                ->whereNotExists(function ($q) {
-                    $q->from('nlsg_order as o')
-                        ->where('o.ordernum', '=', 'ld.ordernum')
-                        ->where('o.is_shill', '=', 1);
-                })->sum('pay_price');
-
-            $res['total_order_user'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id', '=', $live_id)
-                ->whereNotExists(function ($q) {
-                    $q->from('nlsg_order as o')
-                        ->where('o.ordernum', '=', 'ld.ordernum')
-                        ->where('o.is_shill', '=', 1);
-                })->count('user_id');
-
-        } else {
-            //李婷,统计order表的9.9
-            $watch_count_sql     = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 1";
-            $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 0";
-
-            $res['watch_counts']     = DB::select($watch_count_sql)[0]->counts;
-            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
-
-            //李婷,统计order表的9.9
-            $temp_order       = $this->liveOrder(['live_id' => $live_id], $this_user);
-            $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum'], $this_user);
-            $temp_order_user  = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum'], $this_user);
-
-            $res['total_order']       = $temp_order['total'] ?? '错误';
-            $res['total_order_money'] = $temp_order_money;
-            $res['total_order_user']  = $temp_order_user;
-        }
-
-        $res['total_sub_count'] = Subscribe::query()
-            ->where('relation_id', '=', $live_id)
-            ->where('type', '=', 3)
-            ->where('status', '=', 1)
-            ->count();
-
-        //为购买人数
-        $res['total_not_buy'] = $res['total_sub_count'] - $res['total_order_user'];
-        $res['total_not_buy'] = $res['total_not_buy'] < 0 ? 0 : $res['total_not_buy'];
-
-        //观看时常大于30分钟的
-//            $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
-//SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
-//) as a where counts >= 30";
-//            $temp_res['more_than_30m'] = DB::select($more_than_30_min_sql)[0]->user_count;
-
-        //观看时常大于60分钟的
-//            $more_than_60_min_sql = "SELECT count(user_id) as user_count from (
-//SELECT user_id,count(*) counts from nlsg_live_online_user where live_id = $live_id GROUP BY user_id
-//) as a where counts >= 60";
-//            $temp_res['more_than_60m'] = DB::select($more_than_60_min_sql)[0]->user_count;
-
-        $res['more_than_30m'] = $res['more_than_60m'] = 0;
-
-        $res['live_status'] = 1;  //默认值
-        $channel            = LiveInfo::where('live_pid', $live_id)
-            ->where('status', 1)
-            ->orderBy('id', 'desc')
-            ->first();
-
-        if ($channel) {
-            if ($channel->is_begin === 0 && $channel->is_finish === 0) {
-                $res['live_status'] = 1;
-            } elseif ($channel->is_begin === 1 && $channel->is_finish === 0) {
-                $res['live_status'] = 3;
-            } elseif ($channel->is_begin === 0 && $channel->is_finish === 1) {
-                $res['live_status'] = 2;
-            }
-        }
-
-
-        return $res;
-
-    }
-
     //获得名下所有渠道的user_id
-    public function twitterIdList($phone = '', $user_id = '')
-    {
+
+    public function twitterIdList($phone = '', $user_id = '') {
         return BackendLiveRole::where(function ($query) use ($phone, $user_id) {
             $query->where('parent', '=', $phone)
                 ->orWhere('parent_id', '=', $user_id);
         })->pluck('son_id')->toArray();
     }
 
-    public function flagPosterList($params, $user)
-    {
+    public function flagPosterList($params, $user) {
         $live_id = $params['live_id'] ?? 0;
         $page    = $params['page'] ?? 1;
         $size    = $params['size'] ?? 10;
@@ -973,9 +964,14 @@ GROUP BY
         $model = new LiveSonFlagPoster();
 
         $top_user_id = 0;
-        if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
-            $top_user_id = 169209;
+        if ($user['role_id'] === 1) {
+            $top_user_id = -1;
+        }else{
+            $top_user_id = $user['user_id'];
         }
+//        if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
+//            $top_user_id = 169209;
+//        }
 
         $model->createPosterByLiveId($live_id, $top_user_id);
 
@@ -985,8 +981,7 @@ GROUP BY
         ]);
     }
 
-    public function flagPosterStatus($params)
-    {
+    public function flagPosterStatus($params) {
         $id   = $params['id'] ?? 0;
         $flag = $params['flag'] ?? '';
         if (empty($id)) {
@@ -999,16 +994,16 @@ GROUP BY
                 $check_id->status = 2;
                 break;
             case 'off':
-                $check_id->status = 1;
+                $check_id->status                     = 1;
                 $check_id->live_son_flag_brush_status = 0;
                 break;
             case 'del':
-                $check_id->is_del = 1;
+                $check_id->is_del                     = 1;
                 $check_id->live_son_flag_brush_status = 0;
                 break;
             case 'brush_on':
-                if ($check_id->status !== 2){
-                    return ['code'=>false,'msg'=>'直播未开启'];
+                if ($check_id->status !== 2) {
+                    return ['code' => false, 'msg' => '直播未开启'];
                 }
                 $check_id->live_son_flag_brush_status = 1;
                 break;
