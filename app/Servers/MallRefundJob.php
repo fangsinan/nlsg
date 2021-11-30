@@ -231,6 +231,10 @@ class MallRefundJob
 
         try {
             $result = $alipay->refund($order);
+            DB::table('wwwww')->insert([
+                'vv'=>$now_date,
+                't'=>json_encode($result)
+            ]);
             if (intval($result->code) === 10000) {
                 $mrr = MallRefundRecord::find($v->service_id);
                 $mrr->status = 50;
@@ -290,6 +294,11 @@ class MallRefundJob
         try {
             $xml = simplexml_load_string($res, 'SimpleXMLElement',
                 LIBXML_NOCDATA);
+            DB::table('wwwww')->insert([
+                'vv'=>$now_date,
+                't'=>json_encode($xml)
+            ]);
+
             $xml = json_decode(json_encode($xml), true);
 
             $rrrModel = new RunRefundRecord();
