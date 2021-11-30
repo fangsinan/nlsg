@@ -188,7 +188,7 @@ class AuthController extends Controller
             if (!$res) {
                 return error(400, '验证码已过期', $sClass);
             }
-            if ($code !== $res) {
+            if (intval($code) !== intval($res)) {
                 return error(400, '验证码错误', $sClass);
             }
 
@@ -241,7 +241,7 @@ class AuthController extends Controller
                         if (!$res) {
                             return error(400, '验证码已过期', $sClass);
                         }
-                        if ($code !== $res) {
+                        if (intval($code) !== intval($res)) {
                             return error(400, '验证码错误', $sClass);
                         }
 
