@@ -977,7 +977,7 @@ GROUP BY
 
         return $model->getList([
             'live_id' => $live_id, 'page' => $page, 'size' => $size,
-            'status'  => $status, 'top_user_id' => $top_user_id,'tmu'=>$user
+            'status'  => $status, 'top_user_id' => $top_user_id,
         ]);
     }
 

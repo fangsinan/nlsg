@@ -25,9 +25,12 @@ class LiveSonFlagPoster extends Model {
             ->join('nlsg_backend_live_role as lr', 'p.son_id', '=', 'lr.son_id')
             ->join('nlsg_live as l', 'p.live_id', '=', 'l.id')
             ->where('p.live_id', '=', $live_id)
-            ->where('p.is_del', '=', 0)
-            ->where('lr.parent_id', '=', $check_live_id->user_id)
-            ->select([
+            ->where('p.is_del', '=', 0);
+        if ($params['top_user_id'] !== -1){
+            $query->where('lr.parent_id', '=', $params['top_user_id']);
+        }
+
+        $query->select([
                 'p.id', 'p.live_id', 'p.son_id', 'p.status', 'p.live_son_flag_brush_status',
                 'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at'
             ]);
