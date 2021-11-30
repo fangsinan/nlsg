@@ -10,6 +10,7 @@ use App\Models\BackendUser;
 use App\Models\Live;
 use App\Models\User;
 use App\Models\LiveComment;
+use App\Servers\LiveInfoServers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -126,7 +127,8 @@ class CommentController extends ControllerBackend
         if ($this->user['role_id'] === 1) {
             $twitter_id_list = null;
         } else {
-            $twitter_id_list = $this->twitterIdList($this->user['username']);
+            $liServers = new LiveInfoServers();
+            $twitter_id_list = $liServers->twitterIdList($this->user['username']);
         }
 
         if ($twitter_id_list !== null) {
