@@ -22,7 +22,10 @@ class LiveSonFlagPoster extends Model {
         }
 
         $query = DB::table('nlsg_live_son_flag_poster as p')
-            ->join('nlsg_backend_live_role as lr', 'p.son_id', '=', 'lr.son_id')
+            ->join('nlsg_backend_live_role as lr', function ($join) {
+                $join->on('p.son_id', '=', 'lr.son_id')
+                    ->where('lr.status', '=', 1);
+            })
             ->join('nlsg_live as l', 'p.live_id', '=', 'l.id')
             ->where('p.live_id', '=', $live_id)
             ->where('p.is_del', '=', 0);
