@@ -32,7 +32,7 @@ class InfoController extends ControllerBackend
     {
         $excel_flag = $request->input('excel_flag', 0);
         $s = new LiveInfoServers();
-        $data = $s->liveSubOrder($request->input());
+        $data = $s->liveSubOrder($request->input(),$this->user);
 
         if (empty($excel_flag)) {
             return $this->getRes($data);
@@ -88,7 +88,7 @@ class InfoController extends ControllerBackend
 
         while ($while_flag) {
             $request->offsetSet('page', $page);
-            $data = $s->liveSubOrder($request->input());
+            $data = $s->liveSubOrder($request->input(),$this->user);
             $page++;
             if ($data->isEmpty()) {
                 $while_flag = false;

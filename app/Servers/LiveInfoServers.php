@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class LiveInfoServers {
-    public function liveSubOrder($params) {
+    public function liveSubOrder($params,$user) {
         $size = $params['size'] ?? 10;
         $page = $params['page'] ?? 1;
 
@@ -41,6 +41,16 @@ class LiveInfoServers {
             ->leftJoin('nlsg_backend_live_role as lr', 'tu.id', '=', 'lr.son_id')
             ->where('s.type', '=', 3)
             ->where('s.relation_id', '=', $live_id);
+
+        if ($user['role_id'] === 1) {
+            $twitter_id_list = null;
+        } else {
+            $twitter_id_list = $this->twitterIdList($user['username']);
+        }
+
+        if ($twitter_id_list !== null) {
+            $query->whereIn('s.twitter_id', $twitter_id_list);
+        }
 
         //筛选
         //用户昵称 推荐人昵称
@@ -119,6 +129,16 @@ class LiveInfoServers {
         $admin_live_role = (int)($admin['live_role'] ?? 0);
         if (in_array($admin_live_role, [21, 23])) {
             $query->where('ld.type', '<>', 8);
+        }
+
+        if ($admin['role_id'] === 1) {
+            $twitter_id_list = null;
+        } else {
+            $twitter_id_list = $this->twitterIdList($admin['username']);
+        }
+
+        if ($twitter_id_list !== null) {
+            $query->whereIn('ld.invite_user_id', $twitter_id_list);
         }
 
         if (!empty($temp_begin_order)) {
@@ -354,13 +374,12 @@ class LiveInfoServers {
         $son_flag       = Cache::get($cache_key_name);
 
         if (empty($son_flag)) {
-
-            if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
-                $check_live_id->user_id = 169209;
+            $query = BackendLiveRole::query();
+            if ($user['role_id'] !== 1) {
+                $query->where('parent_id', '=', $user['user_id']);
             }
 
-            $son_flag = BackendLiveRole::where('parent_id', '=', $check_live_id->user_id)
-                ->where('status', '=', 1)
+            $son_flag = $query->where('status', '=', 1)
                 ->select(['son', 'son_id', 'son_flag'])
                 ->orderBy('sort', 'asc')   //按标记排序
                 ->get();
@@ -862,9 +881,19 @@ GROUP BY
             if (empty($temp_order_begin_id)) {
                 $temp_order_begin_id = Order::query()->max('id');
             }
-            $query->where('o.id', '>=', $temp_order_begin_id)
-                ->where('o.created_at', '<=', $temp_live_time_end);
+            $query->where('o.id', '>=', $temp_order_begin_id);
+
+            $query->where('o.created_at', '<=', $temp_live_time_end);
         } else {
+            $temp_order_begin_id  = Order::query()
+                ->where('type', '=', 10)
+                ->where('status', '=', 1)
+                ->where('remark', '=', $live_id)
+                ->value('id');
+            if (empty($temp_order_begin_id)) {
+                $temp_order_begin_id = Order::query()->max('id');
+            }
+            $query->where('o.id', '>=', $temp_order_begin_id);
             $query->where('o.remark', '=', $live_id);
         }
 

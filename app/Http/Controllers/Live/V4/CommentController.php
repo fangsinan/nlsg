@@ -122,6 +122,17 @@ class CommentController extends ControllerBackend
             })
             ->where('status', 1)
             ->where('type', 0);
+
+        if ($this->user['role_id'] === 1) {
+            $twitter_id_list = null;
+        } else {
+            $twitter_id_list = $this->twitterIdList($this->user['username']);
+        }
+
+        if ($twitter_id_list !== null) {
+            $lists_query->whereIn('live_son_flag', $twitter_id_list);
+        }
+
         if (!empty($live_ids)) {
             $lists_query->whereIn('live_id', $live_ids);
         }
