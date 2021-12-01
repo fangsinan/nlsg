@@ -11,6 +11,17 @@ define("AppID", "wxe24a425adb5102f6");//定义AppID
 
 class OpenweixinApiServers {
 
+    public function getConfig() {
+        return [
+            'app_id'   => 'wx4d6465c48b0346a1',
+            'secret'   => '087881d600c1c591c06a0462b8b3be2e',
+            'token'    => 'HSby24Le9HLDzki40zAhlpcb8PuIEzOV',
+            'aes_key'  => 'G0Hbz7HqeV0VSXyhJgGHSfqZhHcAPebVPbdAeqNSY8v'
+        ];
+    }
+
+
+
     public function valid() {
         $echoStr = $_GET["echostr"];
         if($this->checkSignature()){

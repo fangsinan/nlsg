@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Servers\OpenweixinApiServers;
 use EasyWeChat\Factory;
 use App\Models\PayRecord;
+use EasyWeChat\OpenPlatform\Server\Guard;
 use Illuminate\Http\Request;
 use Yansongda\Pay\Log;
 use Yansongda\Pay\Pay;
@@ -197,6 +198,27 @@ class CallbackController extends Controller
         PayRecord::PayLog('openweixin_msg',json_encode($request->input()));
 
         $wechatObj = new OpenweixinApiServers();//实例化wechatCallbackapiTest类
+
+        $openPlatform = Factory::openPlatform($wechatObj->getConfig());
+        $server = $openPlatform->server;
+
+        // 处理授权成功事件，其他事件同理
+        $server->push(function ($message) {
+
+
+            PayRecord::PayLog('openweixin_msg-info',json_encode($message));
+
+            // $message 为微信推送的通知内容，不同事件不同内容，详看微信官方文档
+            // 获取授权公众号 AppId： $message['AuthorizerAppid']
+            // 获取 AuthCode：$message['AuthorizationCode']
+            // 然后进行业务处理，如存数据库等...
+        }, Guard::EVENT_AUTHORIZED);
+
+        return $server->serve();
+
+
+
+
 //        //解析XML
 //        $wxcpt = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
 //        $errCode = $wxcpt->DecryptMsg($sReqMsgSig, $sReqTimeStamp, $sReqNonce, $sReqData, $sMsg);
@@ -214,30 +236,29 @@ class CallbackController extends Controller
 
     public  function getWechatVerify(Request $request) {
         PayRecord::PayLog('openweixin_Verify',json_encode($request->input()));
-        echo "";exit();
-        $config = [
-            'corp_id'              => '服务商的corpid',
-            'secret'               => '服务商的secret，在服务商管理后台可见',
-            'suite_id'             => '以ww或wx开头应用id',
-            'suite_secret'         => '应用secret',
-            'token'                => '应用的Token',
-            'aes_key'              => '应用的EncodingAESKey',
-            'reg_template_id'      => '注册定制化模板ID',
-            'redirect_uri_install' => '安装应用的回调url（可选）',
-            'redirect_uri_single'  => '单点登录回调url （可选）',
-            'redirect_uri_oauth'   => '网页授权第三方回调url （可选）',
 
-        ];
+        $wechatObj = new OpenweixinApiServers();//实例化wechatCallbackapiTest类
 
-        $app = Factory::openWork($config);
-        $token = $app->suite_access_token->getToken();
-        $code = $app->corp->getPreAuthCode();
-        $app->corp->setSession( $preAuthCode,  $sessionInfo);
+        $openPlatform = Factory::openPlatform($wechatObj->getConfig());
+        $server = $openPlatform->server;
+
+        // 处理授权成功事件，其他事件同理
+        $server->push(function ($message) {
+
+            PayRecord::PayLog('openweixin_Verify-info',json_encode($message));
+
+            // $message 为微信推送的通知内容，不同事件不同内容，详看微信官方文档
+            // 获取授权公众号 AppId： $message['AuthorizerAppid']
+            // 获取 AuthCode：$message['AuthorizationCode']
+            // 然后进行业务处理，如存数据库等...
+        }, Guard::EVENT_AUTHORIZED);
 
 
-
-
+        return $server->serve();
 
     }
+
+
+
 
 }
