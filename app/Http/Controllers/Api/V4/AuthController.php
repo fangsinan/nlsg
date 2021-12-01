@@ -428,7 +428,7 @@ class AuthController extends Controller
 
             //新增
 
-            $inviter = $input['inviter'] ?? '';
+            $inviter = $input['inviter'] ?? 0;
             $is_invite = $input['is_invite'] ?? 0;
 
 
