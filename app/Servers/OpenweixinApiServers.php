@@ -24,14 +24,14 @@ class OpenweixinApiServers {
 
 
 
-        $timestamp  = $_GET['timestamp'];
-        $nonce      = $_GET["nonce"];
-        $msg_signature  = $_GET['msg_signature'];
+        $timestamp  = $_GET['timestamp'] ??'';
+        $nonce      = $_GET["nonce"] ??'';
+        $msg_signature  = $_GET['msg_signature'] ??'';
         $encrypt_type = (isset($_GET['encrypt_type']) && ($_GET['encrypt_type'] == 'aes')) ? "aes" : "raw";
 
 
 
-        $postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+        $postStr = $GLOBALS["HTTP_RAW_POST_DATA"] ??'';
         if (!empty($postStr)){
             if ($encrypt_type == 'aes'){
                 $pc = new WXBizMsgCrypt(TOKEN,EncodingAESKey,AppID);

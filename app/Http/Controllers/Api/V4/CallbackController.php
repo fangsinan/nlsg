@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 
 
 use App\Http\Controllers\Controller;
+use App\Servers\OpenweixinApiServers;
 use EasyWeChat\Factory;
 use App\Models\PayRecord;
 use Illuminate\Http\Request;
@@ -191,6 +192,20 @@ class CallbackController extends Controller
     }
 
 
+    //微信公众号回调
+    public function callBackWeixinEvent(Request $request){
+        PayRecord::PayLog('openweixin_msg',json_encode($request->input()));
 
+        $wechatObj = new OpenweixinApiServers();//实例化wechatCallbackapiTest类
+//        //解析XML
+//        $wxcpt = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
+//        $errCode = $wxcpt->DecryptMsg($sReqMsgSig, $sReqTimeStamp, $sReqNonce, $sReqData, $sMsg);
+        if(!isset($_GET["echostr"])){
+            $wechatObj->responseMsg();
+
+        }else{
+            $wechatObj->valid();
+        }
+    }
 
 }
