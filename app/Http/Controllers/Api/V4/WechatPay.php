@@ -569,6 +569,9 @@ class WechatPay extends Controller
                 case 8: //抖音直播内部教材
                     $res = $nickname . ':您已支付' . $live_num . '套抖音直播内部教材';
                     break;
+                case 9: //经营幸福人生
+                    $res = $nickname . ':您已支付' . $live_num . '张经营幸福人生';
+                    break;
             }
         } else if ($type == 18) {
             $data = Column::find($relation_id);
