@@ -406,10 +406,12 @@ class Coupon extends Base
             return error(1000, '规则不存在');
         }
 
-        $created_at = User::where('id', $user_id)->value('created_at');
-        if (empty($created_at)) {
-            $created_at = date('Y-m-d H:i:s');
-        }
+//        $created_at = User::where('id', $user_id)->value('created_at');
+//        if (empty($created_at)) {
+//            $created_at = date('Y-m-d H:i:s');
+//        }
+        $created_at = date('Y-m-d');
+        
         $res = Coupon::create([
             'name' => $rule->name,
             'number' => self::createCouponNum($rule->buffet, $cid),
