@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class LiveInfoServers {
-    public function liveSubOrder($params,$user) {
+    public function liveSubOrder($params, $user) {
         $size = $params['size'] ?? 10;
         $page = $params['page'] ?? 1;
 
@@ -98,6 +98,13 @@ class LiveInfoServers {
 
     }
 
+    public function twitterIdList($phone = '', $user_id = '') {
+        return BackendLiveRole::where(function ($query) use ($phone, $user_id) {
+            $query->where('parent', '=', $phone)
+                ->orWhere('parent_id', '=', $user_id);
+        })->pluck('son_id')->toArray();
+    }
+
     public function liveOrderKun($params, $admin) {
         $size       = $params['size'] ?? 10;
         $query_flag = $params['query_flag'] ?? '';
@@ -124,6 +131,7 @@ class LiveInfoServers {
 
         $query = DB::table('nlsg_live_deal as ld')
             ->join('nlsg_order as o', 'ld.ordernum', '=', 'o.ordernum')
+            ->Join('nlsg_offline_products as op', 'ld.type', '=', 'op.id')
             ->where('o.is_shill', '=', 0);
 
         $admin_live_role = (int)($admin['live_role'] ?? 0);
@@ -189,35 +197,7 @@ class LiveInfoServers {
 
         $params['type'] = 0;
         if (!empty($params['type_name'] ?? '')) {
-            switch ($params['type_name']) {
-                case '经营能量门票':
-                    $params['type'] = 1;
-                    break;
-                case '一代天骄门票':
-                    $params['type'] = 2;
-                    break;
-                case '演说能量门票':
-                    $params['type'] = 3;
-                    break;
-                case '经营能量 360套餐':
-                    $params['type'] = 4;
-                    break;
-                case '30天智慧父母(亲子)训练营':
-                    $params['type'] = 5;
-                    break;
-                case '学业规划训练营':
-                    $params['type'] = 6;
-                    break;
-                case '':
-                    $params['type'] = 0;
-                    break;
-                default:
-                    $params['type'] = 999;
-            }
-        }
-
-        if (!empty($params['type'])) {
-            $query->where('ld.type', '=', $params['type']);
+            $query->where('op', 'like', '%' . $params['type_name'] . '%');
         }
 
         switch ($query_flag) {
@@ -231,9 +211,7 @@ class LiveInfoServers {
         if (empty($excel_flag)) {
             $query->select([
                 'ld.ordernum', 'ld.pay_price', 'ld.num', 'ld.pay_time',
-                DB::raw('(case ld.type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
-            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" when 6 then "学业规划训练营"
-            when 7 then "30天智慧父母(亲子)训练营-直播专享" when 8 then "抖音直播内部教材" else "--" end) as type_name'),
+                'op.title as type_name',
                 'ld.phone', 'ld.nickname', 'ld.user_id',
                 DB::raw('(case ld.identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
                 'ld.invite_phone', 'ld.invite_nickname',
@@ -253,9 +231,7 @@ class LiveInfoServers {
             $query->select([
                 DB::raw("CONCAT('`',ld.ordernum) as ordernum"),
                 'ld.pay_price', 'ld.num', 'ld.pay_time',
-                DB::raw('(case ld.type when 1 then "经营能量门票" when 2 then "一代天骄门票" when 3 then "演说能量门票"
-            when 4 then "经营能量+360套餐" when 5 then "30天智慧父母(亲子)训练营" when 6 then "学业规划训练营"
-            when 7 then "30天智慧父母(亲子)训练营-直播专享" when 8 then "抖音直播内部教材" else "类型错误" end) as type_name'),
+                'op.title as type_name',
                 DB::raw("CONCAT('`',ld.phone) as phone"), 'ld.nickname', 'ld.user_id',
                 DB::raw('(case ld.identity when 1 then "幸福大师" when 2 then "钻石经销商" else "--" end) as identity_name'),
                 DB::raw("CONCAT('`',ld.invite_phone) as invite_phone"), 'invite_nickname',
@@ -811,6 +787,8 @@ GROUP BY
 
     }
 
+    //获得名下所有渠道的user_id
+
     public function liveOrder($params, $user) {
         $size       = $params['size'] ?? 10;
         $query_flag = $params['query_flag'] ?? '';
@@ -885,7 +863,7 @@ GROUP BY
 
             $query->where('o.created_at', '<=', $temp_live_time_end);
         } else {
-            $temp_order_begin_id  = Order::query()
+            $temp_order_begin_id = Order::query()
                 ->where('type', '=', 10)
                 ->where('status', '=', 1)
                 ->where('remark', '=', $live_id)
@@ -967,15 +945,6 @@ GROUP BY
         return $res;
     }
 
-    //获得名下所有渠道的user_id
-
-    public function twitterIdList($phone = '', $user_id = '') {
-        return BackendLiveRole::where(function ($query) use ($phone, $user_id) {
-            $query->where('parent', '=', $phone)
-                ->orWhere('parent_id', '=', $user_id);
-        })->pluck('son_id')->toArray();
-    }
-
     public function flagPosterList($params, $user) {
         $live_id = $params['live_id'] ?? 0;
         $page    = $params['page'] ?? 1;
@@ -995,7 +964,7 @@ GROUP BY
         $top_user_id = 0;
         if ($user['role_id'] === 1) {
             $top_user_id = -1;
-        }else{
+        } else {
             $top_user_id = $user['user_id'];
         }
 //        if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
