@@ -81,7 +81,7 @@ class DealServers
         $query->where('O.live_id',$live_id); //有没在直播间购买此条件非必须
         $query->where('O.type',14);
         $query->where('O.status',1);
-        $query->whereIn('O.relation_id', [1,2,3,4,5,6,7,8]);
+//        $query->whereIn('O.relation_id', [1,2,3,4,5,6,7,8,9,10]);
         $query->where('O.pay_price','>', 1);
         $query->whereNotIn('O.user_id', [211370,211172]);
         $query->where('U.is_test_pay',0); //排除测试用户
