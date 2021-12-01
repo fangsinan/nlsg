@@ -949,7 +949,7 @@ class AuthController extends Controller
             }
         } else {
             $g = "/^1[345678]\d{9}$/";
-            $g2 = "/^19[01236789]\d{8}$/";
+            $g2 = "/^19[012356789]\d{8}$/";
             $g3 = "/^166\d{8}$/";
 
             if (preg_match($g, $phone)) {
