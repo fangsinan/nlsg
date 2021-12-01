@@ -767,7 +767,8 @@ class AuthController extends Controller
         if (!$phone) {
             return $this->error(400, '手机号不能为空');
         }
-        if (!preg_match('/^1[3456789]\d{9}$/', $phone)) {
+//        if (!preg_match('/^1[3456789]\d{9}$/', $phone)) {
+        if (!preg_match('/^1\d{10}$/', $phone)) {
             return $this->error(400, '手机号格式错误');
         }
 
@@ -948,15 +949,21 @@ class AuthController extends Controller
                 return $this->getRes(['code' => false, 'msg' => '号码错误']);
             }
         } else {
-            $g = "/^1[345678]\d{9}$/";
-            $g2 = "/^19[012356789]\d{8}$/";
-            $g3 = "/^166\d{8}$/";
+//            $g = "/^1[345678]\d{9}$/";
+//            $g2 = "/^19[012356789]\d{8}$/";
+//            $g3 = "/^166\d{8}$/";
+//
+//            if (preg_match($g, $phone)) {
+//                return $this->getRes(['code' => true, 'msg' => '正确']);
+//            } else if (preg_match($g2, $phone)) {
+//                return $this->getRes(['code' => true, 'msg' => '正确']);
+//            } else if (preg_match($g3, $phone)) {
+//                return $this->getRes(['code' => true, 'msg' => '正确']);
+//            }
 
+
+            $g = "/^1\d{10}$/";
             if (preg_match($g, $phone)) {
-                return $this->getRes(['code' => true, 'msg' => '正确']);
-            } else if (preg_match($g2, $phone)) {
-                return $this->getRes(['code' => true, 'msg' => '正确']);
-            } else if (preg_match($g3, $phone)) {
                 return $this->getRes(['code' => true, 'msg' => '正确']);
             }
             return $this->getRes(['code' => false, 'msg' => '号码错误']);
