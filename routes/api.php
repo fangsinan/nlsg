@@ -99,6 +99,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('wechat_pay/wechat_notify', 'CallbackController@WechatNotify');
     Route::post('wechat_pay/wechat_jsapi_notify', 'CallbackController@WechatNotifyJsapi');
     Route::post('wechat_pay/ali_notify', 'CallbackController@AliNotify');
+    Route::any('wechat/open_weixin_event', 'CallbackController@callBackWeixinEvent');
 
 
     //生成海报
