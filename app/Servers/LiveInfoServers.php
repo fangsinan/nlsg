@@ -345,7 +345,7 @@ class LiveInfoServers {
         //获取所有渠道
 
         $table_name     = 'nlsg_live_online_user';
-        $cache_key_name = 'son_flag_' . $check_live_id->user_id;
+        $cache_key_name = 'son_flag_' . $user['user_id'];
         $expire_num     = CacheTools::getExpire('son_flag');
         $son_flag       = Cache::get($cache_key_name);
 
