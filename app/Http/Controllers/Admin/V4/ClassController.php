@@ -1614,10 +1614,10 @@ class ClassController extends ControllerBackend
         $status = $input['status'] ?? 2;
         $online_type = $input['online_type'] ?? 1;
         $is_start = $input['is_start'] ?? 0;
-        $show_info_num = $input['show_info_num'] ?? 0;
-        $online_time   = $input['online_time'] ?? 0;
-        $info_column_id= $input['info_column_id'] ?? 0;
-        $subscribe_num = $input['subscribe_num'] ?? 0;
+        $show_info_num = (int)($input['show_info_num'] ?? 0);
+        $online_time   = (int)($input['online_time'] ?? 0);
+        $info_column_id= (int)($input['info_column_id'] ?? 0);
+        $subscribe_num = (int)($input['subscribe_num'] ?? 0);
 
         $data = [
             'index_pic'      => $index_pic,
