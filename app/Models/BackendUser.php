@@ -207,7 +207,7 @@ class BackendUser extends Authenticatable implements JWTSubject
             $um = BackendUser::where('id', '=', $id)->first();
             if (empty($um)) {
                 return ['code' => false, 'msg' => '用户不存在'];
-            } else {
+            }
                 if ($um->username != $username) {
                     $check_username = BackendUser::where('username', '=', $username)
                         ->where('id', '<>', $id)
@@ -216,15 +216,22 @@ class BackendUser extends Authenticatable implements JWTSubject
                         return ['code' => false, 'msg' => '手机号被占用'];
                     }
                 }
-            }
+
         }
         $um->username = $username;
         $res = $um->save();
+
+        User::firstOrCreate([
+            'phone' => $username
+        ], [
+            'nickname' => substr_replace($username, '****', 3, 4),
+        ]);
+
         if ($res) {
             return ['code' => true, 'msg' => '成功'];
-        } else {
-            return ['code' => false, 'msg' => '失败'];
         }
+            return ['code' => false, 'msg' => '失败'];
+
     }
 
 }
