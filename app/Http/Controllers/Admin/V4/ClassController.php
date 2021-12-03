@@ -1615,7 +1615,7 @@ class ClassController extends ControllerBackend
         $online_type = $input['online_type'] ?? 1;
         $is_start = $input['is_start'] ?? 0;
         $show_info_num = (int)($input['show_info_num'] ?? 0);
-        $online_time   = (int)($input['online_time'] ?? 0);
+        $online_time   = $input['online_time'] ?? '';
         $info_column_id= (int)($input['info_column_id'] ?? 0);
         $subscribe_num = (int)($input['subscribe_num'] ?? 0);
 
@@ -1631,12 +1631,15 @@ class ClassController extends ControllerBackend
             'original_price' => $original_price,
             'is_start'       => $is_start,
             'show_info_num'  => $show_info_num,
-            'online_time'    => $online_time,
             'info_column_id' => $info_column_id,
             'subscribe_num'  => $subscribe_num,
             'type'           => 3,
             'status'         => $status
         ];
+
+        if (!empty($online_time)){
+            $data['online_time'] = $online_time;
+        }
 
         if ( ! empty($input['id'])) {
             Column::where('id', $input['id'])->update($data);
