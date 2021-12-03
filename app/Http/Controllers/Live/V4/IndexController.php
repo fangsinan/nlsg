@@ -906,6 +906,9 @@ class IndexController extends ControllerBackend
         }
         //$live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
         $liveInfo             = LiveInfo::query()->select('playback_url', 'back_video_url')->where('live_pid', $id)->first();
+        if (!$liveInfo){
+            return error('直播不存在');
+        }
         $live->playback_url   = $liveInfo['playback_url'];
         $live->back_video_url = $liveInfo['back_video_url'];
         $live->qr_code        = Qrcodeimg::query()
