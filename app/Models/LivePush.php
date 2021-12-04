@@ -12,6 +12,7 @@ namespace App\Models;
 use App\Servers\JobServers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Predis\Client;
 
 
 class LivePush extends Base
@@ -127,8 +128,24 @@ WHERE
         $model->length = $length;;
 
         $res = $model->save();
+        //推送缓存
+//        $this->getPushWorks($live_id, $push_type, $push_gid);
 
-        $this->getPushWorks($live_id, $push_type, $push_gid);
+        //每台服务器配置执行标记
+        $redisConfig = config('database.redis.default');
+        $redis = new Client($redisConfig);
+        $redis->select(0);
+        $IpData = $redis->get('111live_serverload_iplist'); //服务器ip列表
+        if(!empty($IpData)){
+            $IpLoadArr = explode(',', $IpData);
+            $time=date('Y-m-d H:i:s');
+            $data=json_encode(['status'=>0,'time'=>$time]);
+            foreach ($IpLoadArr as $key => $val) {
+                $ip_str=str_replace(".","_",$val);
+                $push_key_name='11111livepush:'.$ip_str . ':' . $model->id;
+                $redis->setex($push_key_name,3600*5,$data);
+            }
+        }
 
         if ($res) {
             JobServers::pushToSocket($live_id, $live_info_id, 6);
