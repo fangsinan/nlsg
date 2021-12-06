@@ -782,12 +782,13 @@ class LiveController extends Controller
                 if(!empty($key_num)){
                     $list['live_son_flag_count'] =  $key_num;
                 }else{
-                    $list['live_son_flag_count'] = Subscribe::where([
+                    $list['live_son_flag_count']= LiveLogin::query()->where(['live_id'=>$list->live_pid,'live_son_flag'=>$live_son_flag])->count();
+                    /*$list['live_son_flag_count'] = Subscribe::where([
                         "relation_id" => $list->live_pid,
                         "type" => 3,
                         "status" => 1,
                         "twitter_id" => $live_son_flag,
-                    ])->count();
+                    ])->count();*/
 
                     $redis->setex($key,3600*5,$list['live_son_flag_count']);
                 }
