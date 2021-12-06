@@ -719,6 +719,7 @@ class LiveController extends Controller
         $redis = new Client($redisConfig);
         $redis->select(0);
 
+        $live_son_flag_num=0;
         if ($list) {
 //            $column = Column::where('user_id', $list['user_id'])
 //                ->orderBy('created_at', 'desc')
@@ -776,7 +777,7 @@ class LiveController extends Controller
 			$list['live_son_flag_brush_status'] = 1;
             if(!empty($live_son_flag)){
 
-                $key = "live_son_flag_".$list->live_pid . '_' . $live_son_flag;
+                $key = "live_son_flag:".$list->live_pid . '_' . $live_son_flag;
                 $key_num=$redis->get($key);
                 if(!empty($key_num)){
                     $list['live_son_flag_count'] =  $key_num;
