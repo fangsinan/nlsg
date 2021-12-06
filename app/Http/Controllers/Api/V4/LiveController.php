@@ -805,7 +805,7 @@ class LiveController extends Controller
                     $list['live_son_flag_brush_status'] = $SonFlagInfo->live_son_flag_brush_status;
                 }
             }else{
-                $key="live_number_$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
+                $key="live_number:$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
                 $key_num=$redis->get($key);
                 if( empty($key_num) ){
                     //数据库实时数据
