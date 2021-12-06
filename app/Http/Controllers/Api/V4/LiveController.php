@@ -58,7 +58,6 @@ class LiveController extends Controller
         }
 
     }
-
     //渠道王琨老师直播回放单独开通
     //https://app.v4.api.nlsgapp.com/api/v4/live/playbacksub
     public function PlayBackSub(Request $request)
@@ -720,24 +719,23 @@ class LiveController extends Controller
         $redis = new Client($redisConfig);
         $redis->select(0);
 
-
-
         if ($list) {
-            $column = Column::where('user_id', $list['user_id'])
-                ->orderBy('created_at', 'desc')
-                ->first();
+//            $column = Column::where('user_id', $list['user_id'])
+//                ->orderBy('created_at', 'desc')
+//                ->first();
             $userId = $this->user['id'] ?? 0;
             $user = new User();
 
-            $columnId = $column ? $column->id : 0;
-
-            $isSub = Subscribe::isSubscribe($userId, $columnId, 1);
+//            $columnId = $column ? $column->id : 0;
+            //专栏订阅
+//            $isSub = Subscribe::isSubscribe($userId, $columnId, 1);
             $subLive = Subscribe::isSubscribe($userId, $list->live_pid, 3);
-
-            $is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
+            //全员禁言
+            /*$is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
                 ->where('user_id', '=', 0)->where('is_forbid', '=', 1)
                 ->first();
-            $list['is_forbid'] = $is_forbid ? 1 : 0;
+            $list['is_forbid'] = $is_forbid ? 1 : 0;*/
+            $list['is_forbid'] = 0;
 
             $is_silence = LiveForbiddenWords::where('live_info_id', '=', $id)
                 ->where('user_id', '=', $this->user['id'])
@@ -756,10 +754,13 @@ class LiveController extends Controller
             $is_admin = LiveConsole::isAdmininLive($this->user['id'] ?? 0, $list['live_pid']);
             $list['is_admin'] = $is_admin ? 1 : 0;
 
-            $list['column_id'] = $columnId;
+//            $list['column_id'] = $columnId;
+            $list['column_id'] = 0;
             $list['is_sub'] = $subLive ?? 0;
-            $list['is_sub_column'] = $isSub ?? 0;
-            $list['level'] = $user->getLevel($userId);
+//            $list['is_sub_column'] = $isSub ?? 0;
+//            $list['level'] = $user->getLevel($userId);
+            $list['is_sub_column'] = 0;
+            $list['level'] = 0;
             $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
             $list['nick_name'] = $this->user['nickname'] ?? '';
 
@@ -772,7 +773,7 @@ class LiveController extends Controller
             }
             $list['live_son_flag_count'] = 0;
             $list['live_son_flag_status'] = 0;
-            $list['live_son_flag_brush_status'] = 1;
+			$list['live_son_flag_brush_status'] = 1;
             if(!empty($live_son_flag)){
 
                 $key = "live_son_flag_".$list->live_pid . '_' . $live_son_flag;
@@ -790,16 +791,10 @@ class LiveController extends Controller
                     $redis->setex($key,3600*5,$list['live_son_flag_count']);
                 }
 
-
+                $live_son_flag_num=$list['live_son_flag_count'];
 
                 //渠道是否开启直播
-//                $list['live_son_flag_status'] = LiveSonFlagPoster::where([
-//                    'live_id'   =>$list->live_pid,
-//                    'son_id'    =>$live_son_flag,
-//                    'is_del'    =>0,
-//                ])->value('status');
-//                $list['live_son_flag_status'] = $list['live_son_flag_status']??0;
-                $SonFlagInfo= LiveSonFlagPoster::query()->where([
+				$SonFlagInfo= LiveSonFlagPoster::query()->where([
                     'live_id'   =>$list->live_pid,
                     'son_id'    =>$live_son_flag,
                     'is_del'    =>0,
@@ -808,36 +803,28 @@ class LiveController extends Controller
                     $list['live_son_flag_status']=$SonFlagInfo->status;
                     $list['live_son_flag_brush_status'] = $SonFlagInfo->live_son_flag_brush_status;
                 }
-            }
-//
-        }
-
-        if(empty($live_son_flag)){
-            $key="live_number_$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
-            $key_num=$redis->get($key);
-            //无数据才进行查询
-            if( empty($key_num) ){
-                //数据库实时数据
-                $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
-                if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
-                    $live_son_flag_num=$live_son_flag_num+$list['live']['virtual_online_num']; //虚拟值
-                }
-                $redis->setex($key,3600*5,$live_son_flag_num);
             }else{
-                $live_son_flag_num = $key_num;
+                $key="live_number_$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
+                $key_num=$redis->get($key);
+                if( empty($key_num) ){
+                    //数据库实时数据
+                    $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
+                    if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
+                        $live_son_flag_num=$live_son_flag_num+$list['live']['virtual_online_num']; //虚拟值
+                    }
+                    $redis->setex($key,3600*5,$live_son_flag_num);
+                }else{
+                    $live_son_flag_num = $key_num;
+                }
+
             }
 
-        }else{
-            $key='live_son_flag_'.$id.'_'.$live_son_flag;
-            $live_son_flag_num=$redis->get($key);
-            if(empty($live_son_flag_num)){
-                $live_son_flag_num=1;
-            }
         }
-
         //如果有推送则在show接口返回
         $push_live = NULL;
-        if( !empty($live_son_flag) &&  time() >= strtotime(date("Y-m-d 16:0:0")) ){
+        $time=time();
+        $start_time=strtotime(date("Y-m-d 19:30:0"));
+        if( !empty($live_son_flag) &&  $time >= $start_time ){
             $push_gid = LivePush::where([
                 'live_info_id'=>$id,
                 'push_type'=>9,
@@ -1148,27 +1135,23 @@ class LiveController extends Controller
             return error(0, '参数异常');
         }
 
-        if(in_array($this->user['id'], [878644, 882057, 882861], true)){
+        if( in_array($this->user['id'], [878644, 882057, 882861]) ){
             return error(0, '用户异常');
         }
 
         if(empty($input['info_id'])){
             return error(0, '参数有误');
         }
-        $info_id= (int)$input['info_id'];
+        $info_id=intval($input['info_id']);
 
-        $live = LiveInfo::query()->where('id', $info_id)->first();
+        $live = LiveInfo::where('id', $info_id)->first();
         if (!$live) {
             return error(0, '直播不存在');
         }
 
-        $live_data = Live::query()->where(['id'=>$live['live_pid'],'is_free'=>1])->first();
-        if (!$live_data){
-            return error(0, '直播不存在');
-        }
-
+        $live_data = Live::where('id', $live['live_pid'])->first();
         if ($live_data['flag'] > 0) {   //flag > 0 为限定直播  限定值与flag一致
-            $flag = LiveCheckPhone::query()->where([
+            $flag = LiveCheckPhone::where([
                 'phone' => $this->user['phone'],
                 'flag' => $live_data['flag'],
             ])->first();
@@ -1178,9 +1161,8 @@ class LiveController extends Controller
             }
         }
 
-        $list = Subscribe::query()
-            ->where(['relation_id' => $info_id, 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
-            ->first();
+        $list = Subscribe::where(['relation_id' => $info_id, 'type'=>3,'user_id' => $this->user['id'],'status'=>1])
+                        ->first();
         if ( !empty($list) ) {
             return error(0, '已经预约');
         }
@@ -1220,7 +1202,7 @@ class LiveController extends Controller
 
             return success('发送成功');
 
-            //$easySms = app('easysms');
+//            $easySms = app('easysms');
 
             /*try {
                 if(strlen($user->phone)==11) {
@@ -1234,8 +1216,9 @@ class LiveController extends Controller
                 return $message;
             }*/
 
+        } else {
+            return error(0, '手机号不存在或者错误');
         }
-        return error(0, '手机号不存在或者错误');
     }
 
     /**
