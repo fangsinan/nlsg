@@ -38,7 +38,7 @@ class InfoController extends ControllerBackend
 
     public function liveSubOrderExcel(Request $request)
     {
-        set_time_limit(120);
+        set_time_limit(300);
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称', '推客别名', '邀约时间', '直播id'];
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
