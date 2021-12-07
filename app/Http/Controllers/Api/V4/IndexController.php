@@ -28,16 +28,31 @@ class IndexController extends Controller
 {
 
 
-
     /**
-     * 首页排序
-     * 1首页  2每日琨说  3专栏 4课程 5讲座 6 360会员 7驯训练营  8商场  9线下门票   10直播  11大咖主持人 13精品专题 14热门榜单
+     * @api {get} api/v4/index/index_position  首页位置API
+     * @apiVersion 4.0.0
+     * @apiName  works
+     * @apiGroup Index
      *
+     * @apiSuccess {number} head    头部按钮
+     * @apiSuccess {number} icon    中间icon部分
+     * @apiSuccess {number} bottom  底部模块
+     * @apiSuccess {number} title   标题
+     * @apiSuccess {string} icon_pic   icon
+     * @apiSuccess {string} jump_type 跳转类型1首页  2每日琨说  3专栏 4课程 5讲座 6 360会员 7驯训练营  8商场  9线下门票   10直播  11大咖主持人 13精品专题 14热门榜单
+     * @apiSuccess {string} modular_type  模块展示类型  1每日琨说   2 课程  3大咖主持人  4专题   5 榜单   6专题课
+     * @apiSuccess {string} sort     排序
      *
-     * 1 每日琨说   2 课程  3大咖主持人  4专题   5 榜单   6专题课
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[]
+     *     }
      *
-    */
-    public function indexOrder()
+     */
+    public function indexPosition()
     {
 
         $head = RecommendConfig::select("title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>1, 'is_show'=>1,])->get()->toArray();
@@ -54,7 +69,39 @@ class IndexController extends Controller
     }
 
 
-    /**/
+    /**
+     * 5.0 第一版首页接口的合并
+     * @api {get} api/v4/index/index_position  首页   大咖主讲人-精品专题-热门榜单【合并】
+     * @apiVersion 4.0.0
+     * @apiName  works
+     * @apiGroup Index
+     *
+     * @apiSuccess {number} teacher_list    大咖主讲人
+     * @apiSuccess {number} special_list 精品专题
+     * @apiSuccess {number} hot_list  热门榜单
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[]
+     *     }
+     *
+     */
+    function indexMiddle(){
+        $recommendModel = new Recommend();
+        //大咖主讲人
+        $res["teacher_list"] = $recommendModel->getIndexRecommend(14, 35);
+        //精品专题
+        $res['special_list'] = $recommendModel->getIndexRecommend(15, 37);
+
+        //榜单
+        $model = new Lists();
+        $res['hot_list'] = $model->getList();
+
+        return $this->success($res);
+    }
 
 
 
@@ -278,6 +325,7 @@ class IndexController extends Controller
      *     }
      *
      */
+    //12月30后废弃该接口
     public function works()
     {
         $recommendModel = new Recommend();
@@ -285,6 +333,59 @@ class IndexController extends Controller
         return $this->success($lists);
     }
 
+    /**
+     * @api {get} api/v4/index/works  首页-精选课程-主题课程模块-专题课
+     * @apiVersion 4.0.0
+     * @apiName  works
+     * @apiGroup Index
+     *
+     * @apiSuccess {number} user_id   用户id
+     * @apiSuccess {string} title     标题
+     * @apiSuccess {string} cover_img 封面
+     * @apiSuccess {string} subtitle  副标题
+     * @apiSuccess {string} price     价格
+     * @apiSuccess {string} is_new    是否为新上架 1 是 0 否
+     * @apiSuccess {string} is_free   是否为限免   1 是 0 否
+     * @apiSuccess {string} user    用户
+     * @apiSuccess {number} user.id      用户id
+     * @apiSuccess {string} user.nickname 用户昵称
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *               {
+     *                   "id": 16,
+     *                   "user_id": 168934,
+     *                   "title": "如何经营幸福婚姻",
+     *                   "cover_img": "/nlsg/works/20190822150244797760.png",
+     *                   "subtitle": "",
+     *                   "price": "29.90",
+     *                   "user": {
+     *                      "id": 168934,
+     *                      "nickname": "chandler"
+     *                   },
+     *                   "is_new": 1,
+     *                   "is_free": 1
+     *                }
+     *       ]
+     *     }
+     *
+     */
+    public function indexWorks()
+    {
+        $recommendModel = new Recommend();
+        //精品课程模块
+        $res['work_lists'] = $recommendModel->getIndexRecommend(2, 1);
+        //主题课程模块
+        $res['theme_works'] = $recommendModel->getIndexRecommend(2, 36);
+        //专题课模块
+        $res['special_works'] = $recommendModel->getIndexRecommend(2, 39);
+
+        return $this->success($res);
+    }
     /**
      * @api {get} api/v4/index/book  首页-听书推荐
      * @apiVersion 4.0.0

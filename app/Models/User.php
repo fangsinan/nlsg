@@ -324,4 +324,8 @@ class User extends Authenticatable implements JWTSubject
            }
 
     }
+
+    function getIndexUser($ids){
+        return self::select("id","phone","nickname","sex","city","headimg")->where(['is_author'=>1])->whereIn('id',$ids)->get()->Toarray();
+    }
 }

@@ -45,6 +45,9 @@ class Recommend extends Base
             ->orderBy('created_at', 'desc')
             ->pluck('relation_id')
             ->toArray();
+        if(empty($ids)){
+            return [];
+        }
 
         switch ($type) {
             case 1:
@@ -86,6 +89,13 @@ class Recommend extends Base
                 $model = new Lists();
                 $result = $model->getIndexListCourse($ids, 1);
                 break;
+            case 14:
+                $model = new User();
+                $result = $model->getIndexUser($ids);
+                break;
+            case 15:
+                $model = new Lists();
+                $result = $model->getIndexListWorks($ids, 7);
 
         }
         $expire_num = CacheTools::getExpire('index_recommend');

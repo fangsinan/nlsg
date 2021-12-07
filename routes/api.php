@@ -17,6 +17,25 @@ include __DIR__ . '/liveApi.php';
 
 
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
+
+
+    /*
+     * 5.0 API  START
+     * **/
+
+    //首页排序
+    Route::get('index/index_position', 'IndexController@indexPosition');
+    Route::get('index/index_middle', 'IndexController@indexMiddle');
+    Route::get('index/index_works', 'IndexController@indexWorks');
+
+
+
+    /*
+     * 5.0 API  END
+     * **/
+
+
+
     Route::get('live/getphone', 'LiveController@getphone');//执行直播在线人数入库
     Route::get('live/onlineuser', 'LiveController@OnlineUser');//执行直播在线人数入库
     //李喆活动
@@ -53,6 +72,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     //统计
     Route::get('index/Kunsaid', 'IndexController@kunSaid');
+
+
+
 
     //专栏
     Route::get('column/get_column_list', 'ColumnController@getColumnList');
