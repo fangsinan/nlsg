@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChannelWorksList;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
@@ -14,7 +15,6 @@ use App\Models\LiveForbiddenWords;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LivePlayback;
-use App\Models\LivePush;
 use App\Models\LiveSonFlagPoster;
 use App\Models\LiveUrl;
 use App\Models\LiveWorks;
@@ -27,11 +27,13 @@ use App\Models\PayRecord;
 use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\LivePush;
 use App\Models\Works;
-use App\Servers\PhoneRegionServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
+use App\Servers\PhoneRegionServers;
 use Predis\Client;
 
 class LiveController extends Controller
