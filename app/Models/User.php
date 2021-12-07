@@ -186,6 +186,11 @@ class User extends Authenticatable implements JWTSubject
             ->where('is_default','=',1);
     }
 
+    public function getLName()
+    {
+        return $this->hasOne(BackendLiveRole::class, 'son_id','id');
+    }
+
     protected function serializeDate(DateTimeInterface $date) {
         return $date->format('Y-m-d H:i:s');
     }

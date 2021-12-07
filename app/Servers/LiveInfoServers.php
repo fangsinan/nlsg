@@ -19,6 +19,110 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class LiveInfoServers {
+    public function liveSubOrderNew($params,$user){
+        $size = $params['size'] ?? 10;
+        $page = $params['page'] ?? 1;
+        $user_id = $params['user_id'] ?? 0;
+        $phone = $params['phone'] ?? '';
+        $t_user_id = $params['t_user_id'] ?? 0;
+        $t_phone = $params['t_phone'] ?? '';
+        $son_flag = $params['son_flag'] ?? '';
+        $live_id = $params['live_id'] ?? 0;
+
+        if (empty($live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        $check_live_id = Live::where('id', '=', $live_id)->first();
+        if (empty($check_live_id)) {
+            return ['code' => false, 'msg' => 'live_id错误'];
+        }
+        if ($user['role_id'] === 1) {
+            $twitter_id_list = null;
+        } else {
+            $twitter_id_list = $this->twitterIdList($user['username']);
+        }
+
+        $query = Subscribe::query()
+            ->with([
+                'UserInfo:id,phone,nickname',
+                'twitterUser:id,phone,nickname,internal_remarks',
+                'twitterUser.getLName:id,son,son_id,son_flag'
+            ])
+            ->where('type','=',3)
+            ->where('relation_id','=',$live_id)
+            ->orderBy('id','desc');
+
+        if ($twitter_id_list !== null) {
+            $query->whereIn('twitter_id', $twitter_id_list);
+        }
+
+        if (!empty($user_id)) {
+            $query->whereHas('UserInfo',function ($q)use($user_id){
+                $q->where('id','=',$user_id);
+            });
+        }
+        if (!empty($phone)) {
+            $query->whereHas('UserInfo',function ($q)use($phone){
+                $q->where('phone','like',"%$phone%");
+            });
+        }
+        if (!empty($t_user_id)) {
+            $query->whereHas('twitterUser',function ($q)use($t_user_id){
+                $q->where('id','=',$t_user_id);
+            });
+        }
+        if (!empty($t_phone)) {
+            $query->whereHas('twitterUser',function ($q)use($t_phone){
+                $q->where('phone','like',"%$t_phone%");
+            });
+        }
+        if (!empty($son_flag)) {
+            $query->whereHas('twitterUser.getLName',function ($q)use($son_flag){
+                $q->where('son_flag','like',"%$son_flag%");
+            });
+        }
+
+        $query->select([
+            'id', 'user_id', 'created_at', 'relation_id','twitter_id'
+        ]);
+
+        $excel_flag = $params['excel_flag'] ?? 0;
+        if (empty($excel_flag)){
+            $res   = $query->paginate($size);
+            foreach ($res as $v){
+                $v->phone = $v->UserInfo->phone;
+                $v->nickname = $v->UserInfo->nickname;
+                $v->t_user_id = $v->twitterUser->id ?? 0;
+                $v->t_phone = $v->twitterUser->phone ?? '';
+                $v->t_nickname = $v->twitterUser->internal_remarks ?: $v->twitterUser->nickname;
+                $v->son_flag = $v->twitterUser->getLName->son_flag ?? '';
+                unset($v->UserInfo,$v->twitterUser);
+            }
+            $custom = collect(['live_user_id' => $check_live_id->user_id]);
+            return $custom->merge($res);
+        }
+
+        $data = [];
+        $list = $query->limit($size)->offset(($page - 1) * $size)->get();
+
+        foreach ($list as $v){
+            $temp_data =[];
+            $temp_data['id'] = $v->id;
+            $temp_data['user_id'] = $v->user_id;
+            $temp_data['phone'] = $v->UserInfo->phone;
+            $temp_data['nickname'] = $v->UserInfo->nickname;
+            $temp_data['t_user_id'] = $v->twitterUser->id ?? 0;
+            $temp_data['t_phone'] = $v->twitterUser->phone ?? '';
+            $temp_data['t_nickname'] = $v->twitterUser->internal_remarks ?: $v->twitterUser->nickname;
+            $temp_data['son_flag'] = $v->twitterUser->getLName->son_flag ?? '';
+            $temp_data['created_at'] = date('Y-m-d H:i:s',strtotime($v->created_at));
+            $temp_data['relation_id'] = $v->relation_id;
+            $data[] = $temp_data;
+        }
+
+        return $data;
+
+    }
     public function liveSubOrder($params, $user) {
         $size = $params['size'] ?? 10;
         $page = $params['page'] ?? 1;

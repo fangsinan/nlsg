@@ -28,40 +28,12 @@ class InfoController extends ControllerBackend
      * @apiParam {string} [t_phone] 推荐账号
      * @apiParam {string} [son_flag] 别名
      **/
-    public function liveSubOrder(Request $request)
-    {
-        $excel_flag = $request->input('excel_flag', 0);
+    public function liveSubOrder(Request $request) {
+        $request->input('excel_flag', 0);
         $s = new LiveInfoServers();
-        $data = $s->liveSubOrder($request->input(),$this->user);
-
-        if (empty($excel_flag)) {
-            return $this->getRes($data);
-        }
-
-        $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称',
-            '推客别名', '邀约时间', '直播id'];
-//            $fileName = '直播预约订单列表' . date('Y-m-d H:i') . '.csv';
-        $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header("Access-Control-Allow-Origin: *");
-        $fp = fopen('php://output', 'a');//打开output流
-        mb_convert_variables('GBK', 'UTF-8', $columns);
-        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
-
-        foreach ($data as $v) {
-            $v = json_decode(json_encode($v), true);
-            mb_convert_variables('GBK', 'UTF-8', $v);
-            fputcsv($fp, $v);
-            ob_flush();     //刷新输出缓冲到浏览器
-            flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
-        }
-        fclose($fp);
-        exit();
+//        $data = $s->liveSubOrder($request->input(),$this->user);
+        $data = $s->liveSubOrderNew($request->input(),$this->user);
+        return $this->getRes($data);
     }
 
     public function liveSubOrderExcel(Request $request)
@@ -88,7 +60,8 @@ class InfoController extends ControllerBackend
 
         while ($while_flag) {
             $request->offsetSet('page', $page);
-            $data = $s->liveSubOrder($request->input(),$this->user);
+//            $data = $s->liveSubOrder($request->input(),$this->user);
+            $data = $s->liveSubOrderNew($request->input(),$this->user);
             $page++;
             if ($data->isEmpty()) {
                 $while_flag = false;

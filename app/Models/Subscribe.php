@@ -21,6 +21,11 @@ class Subscribe extends Base
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    public function twitterUser()
+    {
+        return $this->hasOne(User::class, 'id','twitter_id');
+    }
+
     public function live()
     {
         return $this->belongsTo(Live::class, 'relation_id', 'id')->where('status',4);
