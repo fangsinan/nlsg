@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
-use App\Models\ChannelWorksList;
 use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
@@ -15,6 +14,7 @@ use App\Models\LiveForbiddenWords;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LivePlayback;
+use App\Models\LivePush;
 use App\Models\LiveSonFlagPoster;
 use App\Models\LiveUrl;
 use App\Models\LiveWorks;
@@ -27,13 +27,11 @@ use App\Models\PayRecord;
 use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
-use App\Models\LivePush;
 use App\Models\Works;
+use App\Servers\PhoneRegionServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redis;
-use App\Servers\PhoneRegionServers;
 use Predis\Client;
 
 class LiveController extends Controller
@@ -1531,31 +1529,64 @@ class LiveController extends Controller
      * }
      *
      */
-    public function liveCommentHis(Request $request){
+    public function liveCommentHis(Request $request) {
 
-        $live_id = $request->input('live_id')??0;
-        $live_son_flag = $request->input('live_son_flag')??null;
+        if (0) {
+            $live_id       = $request->input('live_id') ?? 0;
+            $live_son_flag = $request->input('live_son_flag') ?? null;
 
-        $liveCommentObj = new LiveComment();
-        $userObj = new User();
-        $res = DB::table($liveCommentObj->getTable(), ' lc')
-            ->leftJoin($userObj->getTable() . ' as u', 'u.id', '=', 'lc.user_id')
-            ->select('lc.content','lc.created_at',"u.nickname","u.level",'u.expire_time',DB::raw("2 as type"),DB::raw("0 as gift"),DB::raw("0 as num"))
-            ->where([
-                "lc.live_id"       => intval($live_id),
-                "lc.status"        => 1,
-                "lc.type"          => 0,
-                "lc.comment_type"  => 1,
-                "lc.live_son_flag" => $live_son_flag,
-            ])->paginate(10)->toArray();
+            $liveCommentObj = new LiveComment();
+            $userObj        = new User();
+            $res            = DB::table($liveCommentObj->getTable(), ' lc')
+                ->leftJoin($userObj->getTable() . ' as u', 'u.id', '=', 'lc.user_id')
+                ->select('lc.content', 'lc.created_at', "u.nickname", "u.level", 'u.expire_time', DB::raw("2 as type"), DB::raw("0 as gift"), DB::raw("0 as num"))
+                ->where([
+                    "lc.live_id"       => intval($live_id),
+                    "lc.status"        => 1,
+                    "lc.type"          => 0,
+                    "lc.comment_type"  => 1,
+                    "lc.live_son_flag" => $live_son_flag,
+                ])->paginate(10)->toArray();
 
-        foreach ($res['data'] as $key=>&$val){
-            $val->level = 0;
-            if (!empty($val->expire_time) && $val->expire_time > date('Y-m-d H:i:s')) {
-                $val->level = $val->level;
+            foreach ($res['data'] as $key => &$val) {
+                $val->level = 0;
+                if (!empty($val->expire_time) && $val->expire_time > date('Y-m-d H:i:s')) {
+                    $val->level = $val->level;
+                }
             }
+            return success($res);
         }
-        return success($res);
+
+        $live_id       = $request->input('live_id', 0);
+        $live_son_flag = $request->input('live_son_flag', '');
+        if (empty($live_id) || empty($live_son_flag)) {
+            return $this->success([]);
+        }
+        $min_id = LiveComment::query()->where('live_id', '=', $live_id)->min('id');
+        if (empty($min_id)) {
+            $min_id = LiveComment::query()->max('id');
+        }
+
+        $res = LiveComment::query()
+            ->with(['user:id,nickname,level,expire_time'])
+            ->where('id', '>=', $min_id)
+            ->where('live_id', '=', $live_id)
+            ->where('live_son_flag', '=', $live_son_flag)
+            ->where('status', '=', 1)
+            ->where('type', '=', 0)
+            ->where('comment_type', '=', 1)
+            ->orderBy('id')
+            ->select(['content', 'created_at', 'user_id', DB::raw('2 as type'), DB::raw('0 as gift'), DB::raw('0 as num')])
+            ->paginate(10);
+
+        foreach ($res as $v) {
+            $v->nickname    = $v->user->nickname;
+            $v->level       = 0;
+            $v->expire_time = '';
+        }
+
+        return $this->success($res);
+
     }
 
 
