@@ -17,8 +17,12 @@ class LiveSonFlagPoster extends Model {
         if (empty($check_live_id)) {
             return [];
         }
+
         if (($params['top_user_id'] ?? 0) !== 0) {
             $check_live_id->user_id = $params['top_user_id'];
+            $top_user_id = $params['top_user_id'];
+        }else{
+            $top_user_id = 0;
         }
 
         $query = DB::table('nlsg_live_son_flag_poster as p')
@@ -29,6 +33,7 @@ class LiveSonFlagPoster extends Model {
             ->join('nlsg_live as l', 'p.live_id', '=', 'l.id')
             ->where('p.live_id', '=', $live_id)
             ->where('p.is_del', '=', 0);
+
         if ($params['top_user_id'] !== -1){
             $query->where('lr.parent_id', '=', $params['top_user_id']);
         }
@@ -42,7 +47,10 @@ class LiveSonFlagPoster extends Model {
             $query->where('p.status', '=', $params['status']);
         }
         $query->orderBy('lr.sort', 'asc'); //海报排序
-
+        $query->groupBy('son_id');
+//        DB::connection()->enableQueryLog();
+//        $query->get();
+//        dd(DB::getQueryLog());
 //        $bg_img = LivePoster::where('live_id', '=', $live_id)->where('status', '=', 1)
 //            ->select(['image'])
 //            ->get();
