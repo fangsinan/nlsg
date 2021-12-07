@@ -1568,7 +1568,7 @@ class LiveController extends Controller
         }
 
         $res = LiveComment::query()
-            ->with(['user:id,nickname,level,expire_time'])
+            ->with(['user:id,nickname'])
             ->where('id', '>=', $min_id)
             ->where('live_id', '=', $live_id)
             ->where('live_son_flag', '=', $live_son_flag)
@@ -1576,10 +1576,13 @@ class LiveController extends Controller
             ->where('type', '=', 0)
             ->where('comment_type', '=', 1)
             ->orderBy('id')
-            ->select(['content', 'created_at', 'user_id', DB::raw('2 as type'), DB::raw('0 as gift'), DB::raw('0 as num')])
+            ->select(['content', 'created_at', 'user_id'])
             ->paginate(10);
 
         foreach ($res as $v) {
+            $v->type        = 2;
+            $v->gift        = 0;
+            $v->num         = 0;
             $v->nickname    = $v->user->nickname;
             $v->level       = 0;
             $v->expire_time = '';
