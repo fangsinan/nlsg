@@ -8,6 +8,7 @@
 
 namespace App\Models;
 
+use App\Servers\LiveInfoServers;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,12 @@ class Order extends Base
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function twitter()
+    {
+        return $this->belongsTo(User::class, 'twitter_id', 'id');
+    }
+
 
     public function works()
     {
@@ -488,6 +495,7 @@ class Order extends Base
         return $total_money->merge($list);
     }
 
+    //渠道 过滤type=15 relation=8
     public function inviterLiveList($params,$this_user = []){
 
         $lu_list_query = DB::table('nlsg_order as o')
@@ -498,7 +506,8 @@ class Order extends Base
                 $q->on('cd.user_id','=','o.user_id')->on('cd.live_id','=','li.id');
             })
             ->leftJoin('nlsg_user as u2','cd.new_vip_uid','=','u2.id')
-            ->where('o.id','>',341864)
+//            ->where('o.id','>',341864)
+            ->where('o.id','>',1167372)
             ->where('o.status','=',1)
             ->where('o.type','=',10)
             ->where('o.pay_price','>',0.01);
@@ -551,6 +560,7 @@ class Order extends Base
         $now_date = date('Y-m-d H:i:s');
 
         $query = Order::query();
+
         $query->where('id', '>', 341864)
             ->where('status', '=', 1)
             ->whereIn('type', [10,14,16])
@@ -699,5 +709,170 @@ class Order extends Base
         }
 
         return $list;
+    }
+
+    public function inviterLiveListNew($params, $this_user = []) {
+        $size     = $params['size'] ?? 10;
+        $page     = $params['page'] ?? 1;
+        $now_date = date('Y-m-d H:i:s');
+
+        $query = self::query()
+            ->where('id', '>', 341864)
+            ->whereIn('type', [10, 14])
+            ->where('status', '=', 1)
+            ->where('live_id', '<>', 0)
+            ->where('is_shill', '=', 0)
+            ->where('pay_price', '>', 0.01)
+            ->select([
+                'id', 'type', 'relation_id', 'pay_time', 'price', 'user_id', 'pay_price', 'pay_type', 'ordernum',
+                'live_id', 'os_type', 'remark', 'status', 'twitter_id'
+            ])
+            ->orderBy('id', 'desc');
+
+        $query->where('id', '=', 1268203);
+
+        if ($this_user['role_id'] !== 1) {
+            $query->where('relation_id', '<>', 8);
+            $liServers       = new LiveInfoServers();
+            $twitter_id_list = $liServers->twitterIdList($this_user['username']);
+            if ($twitter_id_list !== null) {
+                $query->whereIn('twitter_id', $twitter_id_list);
+            }
+        }
+
+        $query->with([
+            'offline:id,title,subtitle,price,cover_img,image',
+            'liveGoods:id,title,describe,cover_img,price',
+            'payRecord:ordernum,price,type,created_at',
+            'live:id,title,describe,begin_at,cover_img,user_id',
+            'live.user:id,phone,nickname',
+            'liveRemark:id,title,describe,begin_at,cover_img,user_id',
+            'user:id,phone,nickname',
+            'twitter:id,phone,nickname',
+            'pay_record_detail:id,type,ordernum,user_id,price',
+            'pay_record_detail.user:id,phone,nickname',
+        ]);
+
+        //订单编号
+        if (!empty($params['ordernum'] ?? '')) {
+            $query->where('ordernum', 'like', '%' . $params['ordernum'] . '%');
+        }
+        //直播标题
+        if (!empty($params['title'] ?? '')) {
+            $temp_id_list = Live::query()
+                ->where('title','like',"%".$params['title']."%")
+                ->pluck('id')
+                ->toArray();
+            $query->whereIn('live_id',$temp_id_list);
+        }
+        //用户账号
+        if (!empty($params['phone'] ?? '')) {
+            $phone = $params['phone'];
+            $query->whereHas('user',function ($q)use($phone){
+                $q->where('phone','like',"%$phone%");
+            });
+        }
+        //订单来源
+        if (!empty($params['os_type'] ?? 0)) {
+            $query->where('os_type', '=', $params['os_type']);
+        }
+        //订单类型 商品标题
+        if (!empty($params['type'] ?? 0)) {
+            $query->where('type', '=', $params['type']);
+            if (!empty($params['goods_title']??'')){
+                $goods_title = trim($params['goods_title']);
+                if ($params['type'] === 14){
+                    $query->whereHas('offline', function ($q) use ($goods_title) {
+                        $q->where('title', 'like', "%$goods_title%");
+                    });
+                }
+            }
+        }
+        //支付方式
+        if (!empty($params['pay_type'] ?? 0)) {
+            $query->where('pay_type', '=', $params['pay_type']);
+        }
+        //下单时间
+        if (!empty($params['created_at']??'')) {
+            $created_at = explode(',', $params['created_at']);
+            $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
+            if (empty($created_at[1] ?? '')) {
+                $created_at[1] = $now_date;
+            } else {
+                $created_at[1] = date('Y-m-d 23:59:59', strtotime($created_at[1]));
+            }
+            $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
+        }
+        //源推荐账户
+        if (!empty($params['t_live_phone'] ?? '')) {
+            $t_live_phone = $params['t_live_phone'];
+            $query->whereHas('twitter', function ($q) use ($t_live_phone) {
+                $q->where('phone', 'like', "%$t_live_phone%");
+            });
+        }
+        //源直播
+        if (!empty($params['t_title'] ?? '')) {
+            $t_title = $params['t_title'];
+            $query->whereHas('live', function ($q) use ($t_title) {
+                $q->where('title', 'like', "%$t_title%");
+            });
+        }
+        //源账户
+        if (!empty($params['t_phone'] ?? '')) {
+            $t_phone = $params['t_phone'];
+            $query->whereHas('live.user', function ($q) use ($t_phone) {
+                $q->where('phone', 'like', "%$t_phone%");
+            });
+        }
+
+        if (($params['excel_flag'] ?? 0)) {
+            $list = $query->limit($size)->offset(($page - 1) * $size)->get();
+        } else {
+            $list = $query->paginate($size);
+        }
+
+        foreach ($list as &$v) {
+            //为什么这么取值?
+            $temp_inviter = [];
+            $temp_inviter['user_id'] = $v->user_id;
+            $temp_inviter['username'] = $v->user->phone ?? '';
+            $temp_inviter['nickname'] = $v->user->nickname ?? '';
+            $temp_inviter['live_id'] = $v->live_id ?? 0;
+            $temp_inviter['title'] = $v->live->title ?? '';
+            $v->inviter_info = $temp_inviter;
+
+
+            $v->t_live_user_id  = $v->twitter->id ?? 0;
+            $v->t_live_phone    = $v->twitter->phone ?? '';
+            $v->t_live_nickname = $v->twitter->nickname ?? '';
+            $goods              = [];
+            switch ($v->type) {
+                case 10:
+                    $goods['goods_id']   = $v->liveGoods->id ?? 0;
+                    $goods['title']      = $v->liveGoods->title ?? '数据错误';
+                    $goods['subtitle']   = '';
+                    $goods['cover_img']  = $v->liveGoods->cover_img ?? '';
+                    $goods['detail_img'] = '';
+                    $goods['price']      = $v->liveGoods->price ?? '价格数据错误';
+                    $v->live             = $v->liveRemark;
+                    break;
+                case 14:
+                    $goods['goods_id']   = $v->offline->id ?? 0;
+                    $goods['title']      = $v->offline->title ?? '数据错误';
+                    $goods['subtitle']   = $v->offline->subtitle ?? '';
+                    $goods['cover_img']  = $v->offline->cover_img ?? '';
+                    $goods['detail_img'] = $v->offline->image ?? '';
+                    $goods['price']      = $v->offline->price ?? '价格数据错误';
+                    break;
+            }
+            $v->goods = $goods;
+            unset($v->offline, $v->liveGoods);
+        }
+
+//        DB::connection()->enableQueryLog();
+//        $list =  $query->limit(10)->get();
+//        dd(DB::getQueryLog());
+        return $list;
+
     }
 }
