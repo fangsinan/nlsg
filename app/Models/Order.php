@@ -506,8 +506,7 @@ class Order extends Base
                 $q->on('cd.user_id','=','o.user_id')->on('cd.live_id','=','li.id');
             })
             ->leftJoin('nlsg_user as u2','cd.new_vip_uid','=','u2.id')
-//            ->where('o.id','>',341864)
-            ->where('o.id','>',1167372)
+            ->where('o.id','>',341864)
             ->where('o.status','=',1)
             ->where('o.type','=',10)
             ->where('o.pay_price','>',0.01);
@@ -728,8 +727,6 @@ class Order extends Base
                 'live_id', 'os_type', 'remark', 'status', 'twitter_id'
             ])
             ->orderBy('id', 'desc');
-
-        $query->where('id', '=', 1268203);
 
         if ($this_user['role_id'] !== 1) {
             $query->where('relation_id', '<>', 8);
