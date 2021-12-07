@@ -11,6 +11,7 @@ use App\Models\ConfigModel;
 use App\Models\Coupon;
 use App\Models\Lists;
 use App\Models\Recommend;
+use App\Models\RecommendConfig;
 use App\Models\User;
 use App\Models\Versions;
 use App\Models\Works;
@@ -25,6 +26,38 @@ use JPush\Client as JPushClient;
 
 class IndexController extends Controller
 {
+
+
+
+    /**
+     * 首页排序
+     * 1首页  2每日琨说  3专栏 4课程 5讲座 6 360会员 7驯训练营  8商场  9线下门票   10直播  11大咖主持人 13精品专题 14热门榜单
+     *
+     *
+     * 1 每日琨说   2 课程  3大咖主持人  4专题   5 榜单   6专题课
+     *
+    */
+    public function indexOrder()
+    {
+
+        $head = RecommendConfig::select("title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>1, 'is_show'=>1,])->get()->toArray();
+        $icon = RecommendConfig::select("title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>2, 'is_show'=>1,])->get()->toArray();
+        $bottom = RecommendConfig::select("title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>3, 'is_show'=>1,])->get()->toArray();
+
+        $res = [
+            'head' => $head,
+            'icon' => $icon,
+            'bottom' => $bottom,
+
+        ];
+        return $this->success($res);
+    }
+
+
+    /**/
+
+
+
 
     /**
      * @api {get} api/v4/index/announce 首页-公告
