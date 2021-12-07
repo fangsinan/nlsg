@@ -974,6 +974,7 @@ class IndexController extends ControllerBackend
             ['title' => "十商交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/3bb9b74a387702292234507161/v.f100020.mp4',],
             ['title' => "汤蓓老师第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d1fd0c94387702291813738145/v.f100030.mp4',],
             ['title' => "汤蓓老师第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d21cdad1387702291813750166/v.f100030.mp4',],
+            ['title' => "孟祥玲12.3", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/09098962387702292515310042/v.f100020.mp4',],
         ];
         return success($res);
     }
