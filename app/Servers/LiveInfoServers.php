@@ -1062,12 +1062,13 @@ GROUP BY
 
         $model = new LiveSonFlagPoster();
 
-        $top_user_id = 0;
-        if ($user['role_id'] === 1) {
-            $top_user_id = -1;
-        } else {
-            $top_user_id = $user['user_id'];
-        }
+//        $top_user_id = 0;
+//        if ($user['role_id'] === 1) {
+//            $top_user_id = -1;
+//        } else {
+//            $top_user_id = $user['user_id'];
+//        }
+        $top_user_id = -1;
 //        if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
 //            $top_user_id = 169209;
 //        }
