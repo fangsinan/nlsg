@@ -63,7 +63,8 @@ class InfoController extends ControllerBackend
 //            $data = $s->liveSubOrder($request->input(),$this->user);
             $data = $s->liveSubOrderNew($request->input(),$this->user);
             $page++;
-            if ($data->isEmpty()) {
+//            if ($data->isEmpty()) {
+            if (empty($data)) {
                 $while_flag = false;
             }else{
                 foreach ($data as $v) {

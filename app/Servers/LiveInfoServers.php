@@ -94,7 +94,7 @@ class LiveInfoServers {
                 $v->nickname = $v->UserInfo->nickname;
                 $v->t_user_id = $v->twitterUser->id ?? 0;
                 $v->t_phone = $v->twitterUser->phone ?? '';
-                $v->t_nickname = $v->twitterUser->internal_remarks ?: $v->twitterUser->nickname;
+                $v->t_nickname = $v->twitterUser->internal_remarks ?? $v->twitterUser->nickname ?? '';
                 $v->son_flag = $v->twitterUser->getLName->son_flag ?? '';
                 unset($v->UserInfo,$v->twitterUser);
             }
