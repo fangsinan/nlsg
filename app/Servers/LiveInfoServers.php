@@ -1062,18 +1062,16 @@ GROUP BY
 
         $model = new LiveSonFlagPoster();
 
-//        $top_user_id = 0;
-//        if ($user['role_id'] === 1) {
-//            $top_user_id = -1;
-//        } else {
-//            $top_user_id = $user['user_id'];
-//        }
-        $top_user_id = -1;
+        if ($user['role_id'] === 1) {
+            $top_user_id = -1;
+        } else {
+            $top_user_id = $user['user_id'];
+        }
 //        if ($user['role_id'] === 1 || ($user['user_id'] === 169209)) {
 //            $top_user_id = 169209;
 //        }
 
-        $model->createPosterByLiveId($live_id, $top_user_id);
+        $model->createPosterByLiveId($live_id, -1);
 
         return $model->getList([
             'live_id' => $live_id, 'page' => $page, 'size' => $size,
