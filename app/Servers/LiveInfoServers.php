@@ -87,6 +87,7 @@ class LiveInfoServers {
         ]);
 
         $excel_flag = $params['excel_flag'] ?? 0;
+
         if (empty($excel_flag)){
             $res   = $query->paginate($size);
             foreach ($res as $v){
@@ -94,7 +95,13 @@ class LiveInfoServers {
                 $v->nickname = $v->UserInfo->nickname;
                 $v->t_user_id = $v->twitterUser->id ?? 0;
                 $v->t_phone = $v->twitterUser->phone ?? '';
-                $v->t_nickname = $v->twitterUser->internal_remarks ?: ($v->twitterUser->nickname??'');
+//                $v->t_nickname = $v->twitterUser->internal_remarks ?: ($v->twitterUser->nickname??'');
+                if (!empty($v->twitterUser->internal_remarks??'')){
+                    $v->t_nickname = $v->twitterUser->internal_remarks;
+                }else{
+                    $v->t_nickname = $v->twitterUser->nickname??'';
+                }
+
                 $v->son_flag = $v->twitterUser->getLName->son_flag ?? '';
 //                unset($v->UserInfo,$v->twitterUser);
             }
@@ -109,10 +116,13 @@ class LiveInfoServers {
             $temp_data =[];
             $temp_data['id'] = $v->id;
             $temp_data['user_id'] = $v->user_id;
-            $temp_data['phone'] = $v->UserInfo->phone;
+            $temp_data['phone'] = '`'.$v->UserInfo->phone;
             $temp_data['nickname'] = $v->UserInfo->nickname;
             $temp_data['t_user_id'] = $v->twitterUser->id ?? 0;
             $temp_data['t_phone'] = $v->twitterUser->phone ?? '';
+            if (!empty($temp_data['t_phone'])){
+                $temp_data['t_phone'] = '`'.$temp_data['t_phone'];
+            }
             $temp_data['t_nickname'] = $v->twitterUser->internal_remarks ?: $v->twitterUser->nickname;
             $temp_data['son_flag'] = $v->twitterUser->getLName->son_flag ?? '';
             $temp_data['created_at'] = date('Y-m-d H:i:s',strtotime($v->created_at));
@@ -121,7 +131,6 @@ class LiveInfoServers {
         }
 
         return $data;
-
     }
     public function liveSubOrder($params, $user) {
         $size = $params['size'] ?? 10;
