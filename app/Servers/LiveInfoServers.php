@@ -123,7 +123,12 @@ class LiveInfoServers {
             if (!empty($temp_data['t_phone'])){
                 $temp_data['t_phone'] = '`'.$temp_data['t_phone'];
             }
-            $temp_data['t_nickname'] = $v->twitterUser->internal_remarks ?: $v->twitterUser->nickname;
+//            $temp_data['t_nickname'] = $v->twitterUser->internal_remarks ?: $v->twitterUser->nickname;
+            if (!empty($v->twitterUser->internal_remarks??'')){
+                $temp_data['t_nickname'] = $v->twitterUser->internal_remarks;
+            }else{
+                $temp_data['t_nickname'] = $v->twitterUser->nickname??'';
+            }
             $temp_data['son_flag'] = $v->twitterUser->getLName->son_flag ?? '';
             $temp_data['created_at'] = date('Y-m-d H:i:s',strtotime($v->created_at));
             $temp_data['relation_id'] = $v->relation_id;

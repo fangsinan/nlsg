@@ -38,7 +38,7 @@ class InfoController extends ControllerBackend
 
     public function liveSubOrderExcel(Request $request)
     {
-        set_time_limit(300);
+        set_time_limit(240);
         $columns = ['用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称', '推客别名', '邀约时间', '直播id'];
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -54,16 +54,14 @@ class InfoController extends ControllerBackend
 
         $s = new LiveInfoServers();
 
-        $request->offsetSet('size', 20000);
+        $request->offsetSet('size', 10000);
         $page = 1;
         $while_flag = true;
 
         while ($while_flag) {
             $request->offsetSet('page', $page);
-//            $data = $s->liveSubOrder($request->input(),$this->user);
             $data = $s->liveSubOrderNew($request->input(),$this->user);
             $page++;
-//            if ($data->isEmpty()) {
             if (empty($data)) {
                 $while_flag = false;
             }else{
