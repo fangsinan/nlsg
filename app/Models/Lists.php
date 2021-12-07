@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -12,6 +13,33 @@ class Lists extends Model
     protected $fillable = [
         'title', 'subtitle', 'status', 'type','cover','details_pic','sort'
     ];
+
+
+    // 获取热门榜单
+    public function getList()
+    {
+
+        $cache_key_name = 'index_rank_data';
+        $data = Cache::get($cache_key_name);
+
+        if (empty($data)) {
+
+            $data = [
+                'works' => $this->getRankWorks(),
+//                'wiki' => $model->getRankWiki(),
+//                'goods' => $model->getRankGoods()
+            ];
+
+            $expire_num = CacheTools::getExpire($cache_key_name);
+            Cache::put($cache_key_name, $data, $expire_num);
+        }
+        return $data;
+
+    }
+
+
+
+
 
     /**
      * 首页听书推荐
@@ -28,6 +56,7 @@ class Lists extends Model
             ->select('id', 'title', 'subtitle', 'cover', 'num')
             ->whereIn('id', $ids)
             ->where('type', $type)
+            ->where('status', 1)
             ->limit(3)
             ->get()
             ->toArray();
