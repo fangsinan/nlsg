@@ -339,6 +339,9 @@ class IndexController extends Controller
      * @apiName  index_works
      * @apiGroup Index
      *
+     * @apiSuccess {number} work_lists   精品课程模块
+     * @apiSuccess {number} theme_works   主题课程模块
+     * @apiSuccess {number} special_works   专题课模块
      * @apiSuccess {number} user_id   用户id
      * @apiSuccess {string} title     标题
      * @apiSuccess {string} cover_img 封面
