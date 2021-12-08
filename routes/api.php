@@ -29,6 +29,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/index_works', 'IndexController@indexWorks');
 
 
+    Route::get('column/get_camp_list', 'ColumnController@getCampList');
 
     /*
      * 5.0 API  END

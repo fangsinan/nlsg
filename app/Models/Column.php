@@ -181,4 +181,20 @@ class Column extends Base
         }
 
     }
+
+
+    //获取list
+    public function getColumn($param_where=[],$order_str='desc',$page=10){
+
+        if(empty($param_where)){
+            return ["data"=>[]];
+        }
+        $where = array_merge(["status" => 1,],$param_where);
+        $field = ['id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time','index_pic', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num', 'is_free', 'is_start','show_info_num'];
+        $list = Column::select($field)->where($where)->orderBy('updated_at', 'desc')
+            ->orderBy('sort', $order_str)->paginate($page)->toArray();
+
+        return $list;
+    }
+
 }
