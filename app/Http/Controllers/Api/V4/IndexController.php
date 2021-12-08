@@ -31,7 +31,7 @@ class IndexController extends Controller
     /**
      * @api {get} api/v4/index/index_position  首页位置API
      * @apiVersion 4.0.0
-     * @apiName  works
+     * @apiName  index_position
      * @apiGroup Index
      *
      * @apiSuccess {number} head    头部按钮
@@ -71,9 +71,9 @@ class IndexController extends Controller
 
     /**
      * 5.0 第一版首页接口的合并
-     * @api {get} api/v4/index/index_position  首页   大咖主讲人-精品专题-热门榜单【合并】
+     * @api {get} api/v4/index/index_middle  首页   大咖主讲人-精品专题-热门榜单【合并】
      * @apiVersion 4.0.0
-     * @apiName  works
+     * @apiName  index_middle
      * @apiGroup Index
      *
      * @apiSuccess {number} teacher_list    大咖主讲人
@@ -334,9 +334,9 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/works  首页-精选课程-主题课程模块-专题课
+     * @api {get} api/v4/index/index_works  首页-精选课程-主题课程模块-专题课
      * @apiVersion 4.0.0
-     * @apiName  works
+     * @apiName  index_works
      * @apiGroup Index
      *
      * @apiSuccess {number} user_id   用户id
