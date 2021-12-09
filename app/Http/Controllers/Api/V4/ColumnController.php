@@ -79,20 +79,32 @@ class ColumnController extends Controller
         //排序
         $order_str = $request->input('order') ??"desc";
 
-        $columnObj = new Column();
-        $list = $columnObj->getColumn(['type'=>3],$order_str);
-
         $uid = $this->user['id'] ?? 0;
+        $columnObj = new Column();
+        $subObj = new Subscribe();
+        //我的订阅 id
+        $relation_id = $subObj->getMySub($uid,7);
+        $my_list = $columnObj->getColumn([
+                            ['type','=',3],
+                            ['id','NotIn',$relation_id],
+                        ],$order_str);
+        //非我的订阅
+        $list = $columnObj->getColumn([
+                        ['type','=',3],
+                        ['id','NotIn',$relation_id],
+                    ],$order_str);
+//        dd($list);
 
 
         $new_res = [
+            "my_list"=>$my_list['data'],
             "start_list"=>[],
             "list"=>[],
         ];
         foreach ($list['data'] as $v) {
 
             $user_info = User::find($v['user_id']);
-            $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 7);//训练营订阅
+            //$v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 7);//训练营订阅
             $v['nickname'] = $user_info['nickname'] ?? '';
             $v['title'] = $user_info['honor'] ?? '';
             if($v['is_start'] == 0){

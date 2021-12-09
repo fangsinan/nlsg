@@ -189,11 +189,29 @@ class Column extends Base
         if(empty($param_where)){
             return ["data"=>[]];
         }
-        $where = array_merge(["status" => 1,],$param_where);
+        $where = ["status" => 1,];
         $field = ['id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time','index_pic', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num', 'is_free', 'is_start','show_info_num'];
-        $list = Column::select($field)->where($where)->orderBy('updated_at', 'desc')
-            ->orderBy('sort', $order_str)->paginate($page)->toArray();
+        $query = Column::select($field);
+        foreach ($param_where as $key=>$val){
+//            if(count($val) !== 3 || empty($val[2])){
+            if(count($val) !== 3){
+                continue;
+            }
+            switch ($val[1]){
+                case "=":
+                    $where[$val[0]] = $val[2];
+                    break;
+                case "In":
+                    $query->whereIn($val[0],$val[2]);
+                    break;
+                case "NotIn":
+                    $query->whereNotIn($val[0],$val[2]);
+                    break;
+            }
 
+        }
+       $list = $query->where($where)->orderBy('updated_at', 'desc')
+            ->orderBy('sort', $order_str)->paginate($page)->toArray();
         return $list;
     }
 

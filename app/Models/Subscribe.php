@@ -260,4 +260,17 @@ class Subscribe extends Base
 
     }
 
+
+    // 获取我的订阅
+    public function getMySub($uid,$type){
+        $query = self::where([
+            'user_id' => $uid,
+            'type' => $type,
+            'status' => 1,
+        ]);
+        if( !in_array($type,[3,5,7]) ){  // 3直播  5线下产品  7训练营 不需判断end_time
+            $query->where('end_time', '>', date('Y-m-d H:i:s'));
+        }
+        return $query->pluck("relation_id")->toArray();
+    }
 }
