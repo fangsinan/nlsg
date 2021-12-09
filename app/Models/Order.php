@@ -838,7 +838,6 @@ class Order extends Base
             $temp_inviter['title'] = $v->live->title ?? '';
             $v->inviter_info = $temp_inviter;
 
-
             $v->t_live_user_id  = $v->twitter->id ?? 0;
             $v->t_live_phone    = $v->twitter->phone ?? '';
             $v->t_live_nickname = $v->twitter->nickname ?? '';
