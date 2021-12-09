@@ -89,6 +89,10 @@ class Recommend extends Base
                 $model = new Lists();
                 $result = $model->getIndexListCourse($ids, 1);
                 break;
+            case 11:
+                $model = new Lists();
+                $result = $model->getNewIndexListCourse($ids);
+                break;
             case 14:
                 $model = new User();
                 $result = $model->getIndexUser($ids);
