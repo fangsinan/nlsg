@@ -33,8 +33,8 @@ class ColumnController extends Controller
     /**
      * @api {get} /api/v4/column/get_camp_list 训练营
      * @apiName get_camp_list
-     * @apiVersion 1.0.0
-     * @apiGroup Column
+     * @apiVersion 5.0.0
+     * @apiGroup five_Column
      *
      * @apiParam {int} page
      * @apiParam {int} order desc 默认倒序 asc 正序
