@@ -12163,7 +12163,7 @@ return array(
     'App\\Http\\Controllers\\Api\\V4\\LikeController' => $baseDir . '/app/Http/Controllers/Api/V4/LikeController.php',
     'App\\Http\\Controllers\\Api\\V4\\ListenBookController' => $baseDir . '/app/Http/Controllers/Api/V4/ListenBookController.php',
     'App\\Http\\Controllers\\Api\\V4\\LiveConsoleController' => $baseDir . '/app/Http/Controllers/Api/V4/LiveConsoleController.php',
-    'App\\Http\\Controllers\\Api\\V4\\LiveController' => $baseDir . '/app/Http/Controllers/Api/V4/LiveController.php',
+    'App\\Http\\Controllers\\Api\\V4\\LiveController1206' => $baseDir . '/app/Http/Controllers/Api/V4/LiveController.php',
     'App\\Http\\Controllers\\Api\\V4\\MallController' => $baseDir . '/app/Http/Controllers/Api/V4/MallController.php',
     'App\\Http\\Controllers\\Api\\V4\\MallOrderController' => $baseDir . '/app/Http/Controllers/Api/V4/MallOrderController.php',
     'App\\Http\\Controllers\\Api\\V4\\MeetingController' => $baseDir . '/app/Http/Controllers/Api/V4/MeetingController.php',
