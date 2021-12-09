@@ -480,8 +480,8 @@ class IndexController extends ControllerBackend
         $title             = $input['title'] ?? '';
         $describe          = $input['describe'] ?? '';
         $userId            = (int)($input['user_id'] ?? 0);
-        $begin_at          = $input['begin_at'] ?? date('Y-m-d H:i:s', time());
-        $end_at            = $input['end_at'] ?? date('Y-m-d H:i:s', time());
+        $begin_at          = $input['begin_at'] ?? date('Y-m-d H:i:s');
+        $end_at            = $input['end_at'] ?? date('Y-m-d H:i:s');
         $price             = $input['price'] ?? 0;
         $twitter           = $input['twitter_money'] ?? 0;
         $helper            = $input['helper'] ?? '';
@@ -494,9 +494,6 @@ class IndexController extends ControllerBackend
         $poster_begin_time = $input['poster_begin_time'] ?? '';
         $poster_end_time   = $input['poster_end_time'] ?? '';
         $steam_begin_time  = $input['steam_begin_time'] ?? '';
-
-        $now      = time();
-        $now_date = date('Y-m-s H:i:s');
 
         if (!$title) {
             return error(1000, '标题不能为空');
@@ -602,7 +599,8 @@ class IndexController extends ControllerBackend
         $update_live_info_data['push_live_url'] = $temp_get_url['push_url'];
         $update_live_info_data['live_url']      = $temp_get_url['play_url'];
         $update_live_info_data['live_url_flv']  = $temp_get_url['play_url_flv'];
-        LiveInfo::where('live_pid', '=', $live_info_data['live_pid'])->update($update_live_info_data);
+        LiveInfo::query()->where('live_pid', '=', $live_info_data['live_pid'])
+            ->update($update_live_info_data);
 
         //是否弹出二维码
         Qrcodeimg::query()
@@ -622,22 +620,17 @@ class IndexController extends ControllerBackend
             );
         }
 
-
         if (!is_array($channel_show)) {
-            $channel_show = explode(',', $channel_show);
+            $channel_user_id  = explode(',', $channel_show);
         }
-        $channel_user_id = [];
-        foreach ($channel_show as $cs_v) {
-            $channel_user_id[] = $this->channelUserData($cs_v);
-        }
+//        $channel_user_id = [];
+//        foreach ($channel_show as $cs_v) {
+//            $channel_user_id[] = $this->channelUserData($cs_v);
+//        }
 
         $channel_user_id = array_filter($channel_user_id);
 
         if (!empty($channel_user_id)) {
-//            BackendLiveDataRole::query()
-//                ->where('live_id', '=', $live_info_data['live_pid'])
-//                ->delete();
-//        } else {
             foreach ($channel_user_id as $cui) {
                 BackendLiveDataRole::query()
                     ->firstOrCreate([
@@ -645,10 +638,6 @@ class IndexController extends ControllerBackend
                         'live_id' => $live_info_data['live_pid'],
                     ]);
             }
-//            BackendLiveDataRole::query()
-//                ->where('live_id', '=', $live_info_data['live_pid'])
-//                ->whereNotIn('user_id', $channel_user_id)
-//                ->delete();
         }
         return success();
     }
@@ -861,11 +850,31 @@ class IndexController extends ControllerBackend
 
     }
 
+    public function channelSelect(Request $request,$return_type = 1){
+        $res = DB::table('nlsg_backend_user as bu')
+            ->join('nlsg_user as u','bu.username','=','u.phone')
+            ->where('bu.channel_select_show','=',2)
+            ->select(['u.id','bu.channel_select_title'])
+            ->get();
+        if ($res->isEmpty()){
+            $res = [];
+        }else{
+            $res = $res->toArray();
+        }
+
+        if ($return_type === 1){
+            return $this->success($res);
+        }
+
+        return $res;
+    }
+
     public function channelUserData($key, $flag = 1)
     {
         $channel = [
             'liting' => 169209,
         ];
+
         if ($flag === 1) {
             return $channel[$key] ?? 0;
         }
@@ -922,16 +931,17 @@ class IndexController extends ControllerBackend
             ->pluck('user_id')
             ->toArray();
 
-        $channel_show = [];
-        if (!empty($channel_user_id)) {
-            foreach ($channel_user_id as $cui) {
-                $temp_cud = $this->channelUserData($cui, 2);
-                if ($temp_cud) {
-                    $channel_show[] = $temp_cud;
-                }
-            }
-        }
-        $live->channel_show = $channel_show;
+//        $channel_show = [];
+//        if (!empty($channel_user_id)) {
+//            foreach ($channel_user_id as $cui) {
+//                $temp_cud = $this->channelUserData($cui, 2);
+//                if ($temp_cud) {
+//                    $channel_show[] = $temp_cud;
+//                }
+//            }
+//        }
+        $live->channel_show = $channel_user_id;
+        $live->channelSelect = $this->channelSelect($request,2);
 
         return success($live);
     }
