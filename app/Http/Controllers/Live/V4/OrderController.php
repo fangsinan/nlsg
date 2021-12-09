@@ -275,7 +275,7 @@ class OrderController extends ControllerBackend
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
         header("Access-Control-Allow-Origin: *");
-        $fp = fopen('php://output', 'a');//打开output流
+        $fp = fopen('php://output', 'ab');//打开output流
         mb_convert_variables('GBK', 'UTF-8', $columns);
         fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
 
@@ -287,7 +287,8 @@ class OrderController extends ControllerBackend
         $while_flag = true;
         while ($while_flag) {
             $request->offsetSet('page', $page);
-            $list = $model->inviterLiveList($request->input(), $this->user);
+//            $list = $model->inviterLiveList($request->input(), $this->user);
+            $list = $model->inviterLiveListNew($request->input(), $this->user);
             if ($list->isEmpty()) {
                 $while_flag = false;
             } else {
@@ -299,7 +300,7 @@ class OrderController extends ControllerBackend
                     $temp_v['phone'] = '`' . ($v->user->phone ?? '');
                     $temp_v['goods_name'] = $v->goods['title'] ?? '';
 
-                    switch (intval($v->type)) {
+                    switch ((int)$v->type) {
                         case 9:
                             $temp_v['type'] = '精品课';
                             break;
@@ -325,7 +326,7 @@ class OrderController extends ControllerBackend
                     $temp_v['t_t'] = $v->t_title ?? '';
                     $temp_v['t_l'] = $v->live_phone ?? '';
 
-                    switch (intval($v->status)) {
+                    switch ((int)$v->status) {
                         case 1:
                             $temp_v['p_status'] = '已支付';
                             break;
@@ -339,7 +340,7 @@ class OrderController extends ControllerBackend
                             $temp_v['type'] = '错误';
                     }
                     $temp_v['p_status'] = '已支付' ?? '';
-                    switch (intval($v->pay_type)) {
+                    switch ((int)$v->pay_type) {
                         case 1:
                             $temp_v['pay_type'] = '微信';
                             break;
@@ -357,7 +358,7 @@ class OrderController extends ControllerBackend
                     }
 
                     $temp_v['time'] = $v->pay_time ?? '';
-                    switch (intval($v->os_type)) {
+                    switch ((int)$v->os_type) {
                         case 1:
                             $temp_v['os'] = '安卓';
                             break;
