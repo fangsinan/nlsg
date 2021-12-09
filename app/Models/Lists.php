@@ -25,9 +25,13 @@ class Lists extends Model
         if (empty($data)) {
 
             $data = [
-                'works' => $this->getRankWorks(),
-//                'wiki' => $model->getRankWiki(),
-//                'goods' => $model->getRankGoods()
+                [
+                    "title" => "销售榜单 Top10",
+                    "type" => "1",
+                    'data' => $this->getRankWorks(),
+                ],
+
+                
             ];
 
             $expire_num = CacheTools::getExpire($cache_key_name);
