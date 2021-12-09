@@ -857,18 +857,30 @@ class LiveController extends Controller
 
     }
 
-
-//    public function recommend(Request $request)
-//    {
-//        $id = $request->get('live_id');
-//        $liveWork = new LiveWorks();
-//        $recommend = $liveWork->getLiveWorks($id, 2, 10);
-//        return success($recommend);
-//    }
-
     public function recommend(Request $request)
     {
-        $id = $request->get('live_id');
+        $id = intval($request->get('live_id',0));
+
+        //直播结束后第二天上午9点后购物车返回空
+        $key_name='live:'.$id;
+        $RedisInfo = Redis::get($key_name);
+        if(empty($RedisInfo)){
+            $LiveInfo=LiveInfo::query()->where('live_pid',$id)->select(['is_finish','begin_at'])->first()->toArray();
+            if(!empty($LiveInfo)){
+                Redis::setex($key_name, 600, json_encode($LiveInfo));
+            }
+        }else{
+            $LiveInfo=json_decode($RedisInfo,true);
+        }
+        if(!empty($LiveInfo) && $LiveInfo['is_finish']==1){ //直播已结束
+            $second_day=strtotime($LiveInfo['begin_at'])+86400; //直播结束第二天
+            $end_time=strtotime(date('Y-m-d 09:00:00',$second_day));
+            $time=time();
+            if($time>$end_time){
+                return success([]);
+            }
+        }
+
         $livePush = new LivePush();
         $recommend = $livePush->getPushWorks($id);
         return success($recommend);
