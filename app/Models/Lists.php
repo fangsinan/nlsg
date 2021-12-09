@@ -267,4 +267,70 @@ class Lists extends Model
     }
 
 
+
+    //5.0新加入
+    public function getNewIndexListCourse($ids)
+    {
+        $lists = Lists::select('id', 'title', 'num', 'cover','type')
+            ->whereIn('id',$ids) ->get()->toArray();
+
+
+        if ($lists) {
+            foreach ($lists as &$v) {
+                $work_ids = ListsWork::where('lists_id', $v['id'])
+                    ->where('state', 1)->orderBy('sort')
+                    ->orderBy('created_at', 'desc')->pluck('works_id')->toArray();
+                $v['data'] = [];
+
+
+
+
+                //
+                if($v['type'] == 9){ //用户学习排序榜单
+                    $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
+                        ->orderBy('num', 'desc')->GroupBy("user_id")->limit(3)->get()->toArray();
+
+                    $user_ids = array_column($his_data,'user_id');
+                    $user = User::select('id','nickname', 'phone','headimg')
+                        ->whereIn('id', $user_ids)
+                        ->orderByRaw('FIELD(id,'.implode(',', $user_ids).')')
+                        ->get()->toArray();
+
+
+                    foreach ($user as &$user_v){
+                        foreach ($his_data as $his_datum){
+                            if($user_v['id'] == $his_datum['user_id']){
+                                $user_v['his_num'] = $his_datum['num'];
+                            }
+                        }
+                    }
+                    $v['data'] = $user;
+                }
+
+
+                if(empty($work_ids)){
+                    continue;
+                }
+                //课程榜单
+                if($v['type'] == 8){
+
+                    $works = Works::with([
+                        'user:id,nickname,teacher_title'
+                    ])->select('id as works_id', 'title',"user_id")
+                        ->whereIn('id', $work_ids)
+                        ->orderByRaw('FIELD(id,'.implode(',', $work_ids).')')
+                        ->orderBy('created_at', 'desc')
+                        ->get()
+                        ->toArray();
+                    $v['data'] = $works;
+                }
+
+
+            }
+
+        }
+        return $lists;
+    }
+
+
 }

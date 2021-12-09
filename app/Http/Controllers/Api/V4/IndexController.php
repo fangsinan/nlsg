@@ -99,8 +99,10 @@ class IndexController extends Controller
         $res['special_list'] = $recommendModel->getIndexRecommend(15, 37);
 
         //榜单
-        $model = new Lists();
-        $res['hot_list'] = $model->getList();
+        $res['hot_list'] = $recommendModel->getIndexRecommend(11, 38);
+
+//        $model = new Lists();
+//        $res['hot_list'] = $model->getList();
 
         return $this->success($res);
     }
@@ -788,12 +790,7 @@ class IndexController extends Controller
 
         if (empty($data)) {
             $model = new Lists();
-            $data = [
-                'works' => $model->getRankWorks(),
-                'wiki' => $model->getRankWiki(),
-                'goods' => $model->getRankGoods()
-            ];
-
+            $data = $model->getRankWorks();
             $expire_num = CacheTools::getExpire($cache_key_name);
             Cache::put($cache_key_name, $data, $expire_num);
         }
