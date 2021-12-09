@@ -822,10 +822,21 @@ class LiveController extends Controller
             }
 
         }
+
+        //微信端渠道直播结束,不会链接socket,人气值返回0
+        if(!empty($live_son_flag) && isset($list->is_finish) && $list->is_finish==1){
+            $list['live_son_flag_count']=0;
+            $live_son_flag_num=0;
+        }
+
         //如果有推送则在show接口返回
         $push_live = NULL;
         $time=time();
-        $start_time=strtotime(date("Y-m-d 19:30:0"));
+        if(in_array($id,[19,226])){
+            $start_time=strtotime(date("Y-m-d 09:00:0"));
+        }else {
+            $start_time = strtotime(date("Y-m-d 19:30:0"));
+        }
         if( !empty($live_son_flag) &&  $time >= $start_time ){
             $push_gid = LivePush::where([
                 'live_info_id'=>$id,
