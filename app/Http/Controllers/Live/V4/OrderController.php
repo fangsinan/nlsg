@@ -251,6 +251,7 @@ class OrderController extends ControllerBackend
 
     public function inviterLiveListExcel(Request $request)
     {
+        set_time_limit(180);
         $user_id = $request->input('user_id', 0);
         if (empty($user_id)) {
             exit();
