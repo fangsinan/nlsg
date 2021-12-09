@@ -35,12 +35,11 @@ class IndexController extends Controller
      * @apiGroup five_Index
      *
      * @apiSuccess {number} head    头部按钮
-     * @apiSuccess {number} icon    中间icon部分
      * @apiSuccess {number} bottom  底部模块
      * @apiSuccess {number} title   标题
      * @apiSuccess {string} icon_pic   icon
-     * @apiSuccess {string} jump_type 跳转类型1首页  2每日琨说  3专栏 4课程 5讲座 6 360会员 7驯训练营  8商场  9线下门票   10直播  11大咖主持人 13精品专题 14热门榜单
-     * @apiSuccess {string} modular_type  模块展示类型  1每日琨说   2 课程  3大咖主持人  4专题   5 榜单   6专题课
+     * @apiSuccess {string} jump_type 跳转类型 1首页  2每日琨说  3专栏 4课程 5讲座 6 360会员 7训练营  8商场  9线下门票   10直播  11大咖主持人 13精品专题 14热门榜单   15课程全部分类页面  16 banner   17短视频
+     * @apiSuccess {string} modular_type  模块类型：  1   banner, 2  金刚区（icon）, 3  每日琨说, 4  直播, 5  精品课程, 6  短视频, 7  大咖主讲人, 8  1-3岁父母  主题课程, 9  精品专题, 10 热门榜单, 11 亲子专题',
      * @apiSuccess {string} sort     排序
      *
      * @apiSuccessExample  Success-Response:
@@ -55,15 +54,18 @@ class IndexController extends Controller
     public function indexPosition()
     {
 
-        $head = RecommendConfig::select("title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>1, 'is_show'=>1,])->get()->toArray();
-        $icon = RecommendConfig::select("title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>2, 'is_show'=>1,])->get()->toArray();
-        $bottom = RecommendConfig::select("title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>3, 'is_show'=>1,])->get()->toArray();
+        $head   = RecommendConfig::select("id","title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>1, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
+        $bottom = RecommendConfig::select("id","title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>3, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
+        $icon   = RecommendConfig::select("id","title","icon_pic","jump_type","modular_type","sort")->where(['show_position'=>2, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
+        foreach ($bottom as &$value){
+            if($value['modular_type'] == 2){ //icon
+                $value['icon'] = $icon;
+            }
+        }
 
         $res = [
             'head' => $head,
-            'icon' => $icon,
             'bottom' => $bottom,
-
         ];
         return $this->success($res);
     }
