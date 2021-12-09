@@ -35,7 +35,6 @@ class IndexController extends Controller
      * @apiGroup five_Index
      *
      * @apiSuccess {number} head    头部按钮
-     * @apiSuccess {number} icon    中间icon部分
      * @apiSuccess {number} bottom  底部模块
      * @apiSuccess {number} title   标题
      * @apiSuccess {string} icon_pic   icon
