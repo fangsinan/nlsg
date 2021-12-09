@@ -261,12 +261,11 @@ class OrderController extends ControllerBackend
         }
         $this->user = BackendUser::where('id', '=', $user_id)->first()->toArray();
 
-
         $request->offsetSet('excel_flag', '1');
 
         $columns = ['订单编号', '直播标题', '用户昵称', '用户手机', '商品', '类型',
             '商品价格', '支付价格', '源账户', '源直播', '源推荐账户', '支付状态', '支付方式', '下单时间', '订单来源'];
-        $fileName = '直播销售列表' . date('Y-m-d H:i') . '.csv';
+        $fileName = 'XiaoShouLieBiao' . date('Y-m-d H:i') . '.csv';
 
         header('Content-Description: File Transfer');
         header('Content-Type: application/vnd.ms-excel');
