@@ -263,6 +263,9 @@ class Subscribe extends Base
 
     // 获取我的订阅
     public function getMySub($uid,$type){
+        if(empty($uid)){
+            return [];
+        }
         $query = self::where([
             'user_id' => $uid,
             'type' => $type,
