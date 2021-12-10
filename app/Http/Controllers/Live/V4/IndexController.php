@@ -619,10 +619,11 @@ class IndexController extends ControllerBackend
                 ]
             );
         }
-
-        $channel_user_id = [];
+        
         if (!is_array($channel_show)) {
             $channel_user_id  = explode(',', $channel_show);
+        }else{
+            $channel_user_id = $channel_show;
         }
 //        $channel_user_id = [];
 //        foreach ($channel_show as $cs_v) {
