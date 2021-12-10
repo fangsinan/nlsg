@@ -620,6 +620,7 @@ class IndexController extends ControllerBackend
             );
         }
 
+        $channel_user_id = [];
         if (!is_array($channel_show)) {
             $channel_user_id  = explode(',', $channel_show);
         }
@@ -627,7 +628,6 @@ class IndexController extends ControllerBackend
 //        foreach ($channel_show as $cs_v) {
 //            $channel_user_id[] = $this->channelUserData($cs_v);
 //        }
-
         $channel_user_id = array_filter($channel_user_id);
 
         if (!empty($channel_user_id)) {
