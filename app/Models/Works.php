@@ -35,7 +35,7 @@ class Works extends Base
             'is_audio_book', 'cover_img as cover_pic', 'detail_img as detail_pic',"view_num")
             ->with([
                 'user' => function ($query) {
-                    $query->select('id', 'nickname', 'headimg');
+                    $query->select('id', 'nickname', 'headimg', 'teacher_title');
                 }
             ])
             ->whereIn('id', $ids)

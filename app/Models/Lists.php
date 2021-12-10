@@ -316,7 +316,7 @@ class Lists extends Model
 
                     $works = Works::with([
                         'user:id,nickname,teacher_title'
-                    ])->select('id as works_id', 'title',"user_id")
+                    ])->select('id as works_id', 'title',"user_id",'cover_img')
                         ->whereIn('id', $work_ids)
                         ->orderByRaw('FIELD(id,'.implode(',', $work_ids).')')
                         ->orderBy('created_at', 'desc')
