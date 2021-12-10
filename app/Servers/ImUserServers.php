@@ -8,10 +8,8 @@ use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\User;
 
-class ImUserServers
-{
-    public function list($params, $user_id)
-    {
+class ImUserServers {
+    public function list($params, $user_id) {
         $size = $params['size'] ?? 10;
 
         $query = User::query();
@@ -21,7 +19,7 @@ class ImUserServers
             $query->where('id', '=', $params['id']);
         }
 
-        if (!empty($params['phone']) ?? '') {
+        if (!empty($params['phone'] ?? '')) {
             $query->where('phone', 'like', '%' . $params['phone'] . '%');
         }
 
@@ -57,7 +55,7 @@ class ImUserServers
         //订单(1已完成,2未完成)
         $order_type = intval($params['order_type'] ?? 0);
         if (!empty($order_type)) {
-            $now = date('Y-m-d H:i:s');
+            $now               = date('Y-m-d H:i:s');
             $not_pay_user_list = MallOrder::query()
                 ->where('status', '=', 1)
                 ->where('is_del', '=', 0)
@@ -84,7 +82,7 @@ class ImUserServers
         //注册时间
         $created_at = (string)($params['created_at'] ?? '');
         $begin_date = '';
-        $end_date = '';
+        $end_date   = '';
         switch ($created_at) {
             case '':
                 break;
@@ -97,9 +95,9 @@ class ImUserServers
             default:
                 if (!is_numeric($created_at)) {
                     $temp_date = explode(',', $created_at);
-                    if (is_array($temp_date) && count($temp_date) == 2) {
+                    if (is_array($temp_date) && count($temp_date) === 2) {
                         $begin_date = $temp_date[0];
-                        $end_date = $temp_date[1];
+                        $end_date   = $temp_date[1];
                     }
                 }
                 break;
@@ -138,11 +136,10 @@ class ImUserServers
         return $res;
     }
 
-    public function userStatistics($begin_date = '', $end_date = '')
-    {
+    public function userStatistics($begin_date = '', $end_date = '') {
         $query = User::query()
-            ->where('is_robot','=',0)
-            ->where('status','=',1);
+            ->where('is_robot', '=', 0)
+            ->where('status', '=', 1);
 
 //        if (!empty($begin_date)) {
 //            $query->where('created_at', '>=', $begin_date);
@@ -151,17 +148,16 @@ class ImUserServers
 //            $query->where('created_at', '<', $end_date);
 //        }
 
-        $res['all'] = (clone $query)->count();
-        $res['man'] = (clone $query)->where('sex', '=', 1)->count();
+        $res['all']   = (clone $query)->count();
+        $res['man']   = (clone $query)->where('sex', '=', 1)->count();
         $res['woman'] = (clone $query)->where('sex', '=', 2)->count();
 //        $res['unknown'] = (clone $query)->where('sex', '=', 0)->count();
-        $res['unknown'] = (clone $query)->whereNotIn('sex',[1,2])->count();
+        $res['unknown'] = (clone $query)->whereNotIn('sex', [1, 2])->count();
         return $res;
     }
 
-    public function friendsList($params, $user_id)
-    {
-        $size = $params['size'] ?? 10;
+    public function friendsList($params, $user_id) {
+        $size  = $params['size'] ?? 10;
         $phone = $params['phone'] ?? '';
 
         $query = ImUserFriend::query()
@@ -171,9 +167,9 @@ class ImUserServers
         $query->with(['UserInfo:id,phone,nickname,headimg'])->has('UserInfo');
         $query->with(['ImUser:tag_im_to_account,tag_im_image,tag_im_nick'])->has('UserInfo');
 
-        if (!empty($phone)){
-            $query->whereHas('UserInfo',function($q)use($phone){
-                $q->where('phone','like',"%$phone%");
+        if (!empty($phone)) {
+            $query->whereHas('UserInfo', function ($q) use ($phone) {
+                $q->where('phone', 'like', "%$phone%");
             });
         }
 
@@ -181,13 +177,12 @@ class ImUserServers
             'id', 'from_account', 'from_name', 'to_account', 'to_name', 'created_at'
         ]);
 
-        return ['list'=>$query->paginate($size),'count'=>$query->count(),];
+        return ['list' => $query->paginate($size), 'count' => $query->count(),];
 
     }
 
-    public function orderList($params, $user_id)
-    {
-        $size = $params['size'] ?? 10;
+    public function orderList($params, $user_id) {
+        $size  = $params['size'] ?? 10;
         $query = Order::query()->where('status', '=', 1);
         if (!empty($params['user_id'] ?? 0)) {
             $user_id = $params['user_id'];
@@ -205,9 +200,11 @@ class ImUserServers
             'offline:id,title,cover_img'
         ]);
 
-        $query->select(['id', 'type', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time',
-            'ordernum', 'pay_price'])
-            ->orderBy('id','desc');
+        $query->select([
+            'id', 'type', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time',
+            'ordernum', 'pay_price'
+        ])
+            ->orderBy('id', 'desc');
 
         $list = $query->paginate($size);
 
@@ -215,9 +212,9 @@ class ImUserServers
             $v->category_name = '';
             switch (intval($v->type)) {
                 case 9:
-                    $v->type_name = '课程';
-                    $v->cover_img = $v->works->cover_img ?? '';
-                    $v->title = $v->works->title ?? '-';
+                    $v->type_name       = '课程';
+                    $v->cover_img       = $v->works->cover_img ?? '';
+                    $v->title           = $v->works->title ?? '-';
                     $temp_category_name = [];
                     foreach ($v->works->categoryRelation as $vv) {
                         $temp_category_name[] = $vv->categoryName['name'];
@@ -227,32 +224,32 @@ class ImUserServers
                 case 10:
                     $v->type_name = '直播';
                     $v->cover_img = $v->live->cover_img ?? '';
-                    $v->title = $v->live->title ?? '-';
+                    $v->title     = $v->live->title ?? '-';
                     break;
                 case 14:
                     $v->type_name = '线下课';
                     $v->cover_img = $v->offline->cover_img ?? '';
-                    $v->title = $v->offline->title ?? '-';
+                    $v->title     = $v->offline->title ?? '-';
                     break;
                 case 15:
                     $v->type_name = '讲座';
                     $v->cover_img = $v->column->cover_img ?? '';
-                    $v->title = $v->column->name ?? '-';
+                    $v->title     = $v->column->name ?? '-';
                     break;
                 case 16:
                     $v->type_name = 'vip';
                     $v->cover_img = '/nlsg/works/20210105102849884378.png';
-                    $v->title = 'vip';
+                    $v->title     = 'vip';
                     break;
                 case 18:
                     $v->type_name = '训练营';
                     $v->cover_img = $v->column->cover_img ?? '';
-                    $v->title = $v->column->name ?? '-';
+                    $v->title     = $v->column->name ?? '-';
                     break;
                 default:
                     $v->type_name = '-';
                     $v->cover_img = '';
-                    $v->title = '';
+                    $v->title     = '';
             }
             unset(
                 $v->works,
@@ -265,30 +262,28 @@ class ImUserServers
         return $list;
     }
 
-    public function mallOrderList($params, $user_id)
-    {
+    public function mallOrderList($params, $user_id) {
         $servers = new MallOrderServers();
-        if (empty($params['user_id'] ?? 0)){
-            return ['code'=>false,'msg'=>'用户错误'];
+        if (empty($params['user_id'] ?? 0)) {
+            return ['code' => false, 'msg' => '用户错误'];
         }
         return $servers->listNew($params, $user_id);
     }
 
-    public function rechargeOrder($params,$user_id){
-        if (empty($params['user_id'] ?? 0)){
-            return ['code'=>false,'msg'=>'用户错误'];
+    public function rechargeOrder($params, $user_id) {
+        if (empty($params['user_id'] ?? 0)) {
+            return ['code' => false, 'msg' => '用户错误'];
         }
         $size = $params['size'] ?? 10;
 
         $query = Order::query()
-            ->where('user_id','=',$params['user_id'])
-            ->where('type','=',3)
-            ->where('status','=',1);
-        $query->select(['id','user_id','pay_time','pay_price','status']);
+            ->where('user_id', '=', $params['user_id'])
+            ->where('type', '=', 3)
+            ->where('status', '=', 1);
+        $query->select(['id', 'user_id', 'pay_time', 'pay_price', 'status']);
 
         return $query->paginate($size);
     }
-
 
 
 }
