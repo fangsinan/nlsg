@@ -728,6 +728,10 @@ class Order extends Base
             ])
             ->orderBy('id', 'desc');
 
+        if (!empty($params['id'] ?? 0)) {
+            $query->where('id', '=', $params['id']);
+        }
+
         if ($this_user['role_id'] !== 1) {
             $query->where('relation_id', '<>', 8);
             $liServers       = new LiveInfoServers();
