@@ -7,12 +7,14 @@ use App\Models\ImUserFriend;
 use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ImUserServers {
     public function list($params, $user_id) {
         $size = $params['size'] ?? 10;
 
-        $query = User::query();
+        $query = User::query()->where('status', '=', 1);
 
         //详情
         if (!empty($params['id'] ?? 0)) {
@@ -124,12 +126,17 @@ class ImUserServers {
 
         $res['list'] = $query->where('is_robot', '=', 0)->paginate($size);
 
+
         foreach ($res['list'] as &$v) {
-            $v->open_count = Order::query()
-                ->where('user_id', '=', $v->id)
-                ->where('type', '=', 16)
-                ->where('status', '=', 1)
-                ->count();
+            if (!empty($params['id'] ?? 0)) {
+                $v->open_count = Order::query()
+                    ->where('user_id', '=', $v->id)
+                    ->where('type', '=', 16)
+                    ->where('status', '=', 1)
+                    ->count();
+            } else {
+                $v->open_count = 0;
+            }
         }
 
         $res['statistics'] = $this->userStatistics();
@@ -137,22 +144,51 @@ class ImUserServers {
     }
 
     public function userStatistics($begin_date = '', $end_date = '') {
-        $query = User::query()
-            ->where('is_robot', '=', 0)
-            ->where('status', '=', 1);
+//        $query = User::query()
+//            ->where('is_robot', '=', 0)
+//            ->where('status', '=', 1);
+//
+////        if (!empty($begin_date)) {
+////            $query->where('created_at', '>=', $begin_date);
+////        }
+////        if (!empty($end_date)) {
+////            $query->where('created_at', '<', $end_date);
+////        }
+//
+//        $res['all']   = (clone $query)->count();
+//        $res['man']   = (clone $query)->where('sex', '=', 1)->count();
+//        $res['woman'] = (clone $query)->where('sex', '=', 2)->count();
+////        $res['unknown'] = (clone $query)->where('sex', '=', 0)->count();
+//        $res['unknown'] = (clone $query)->whereNotIn('sex', [1, 2])->count();
 
-//        if (!empty($begin_date)) {
-//            $query->where('created_at', '>=', $begin_date);
-//        }
-//        if (!empty($end_date)) {
-//            $query->where('created_at', '<', $end_date);
-//        }
 
-        $res['all']   = (clone $query)->count();
-        $res['man']   = (clone $query)->where('sex', '=', 1)->count();
-        $res['woman'] = (clone $query)->where('sex', '=', 2)->count();
-//        $res['unknown'] = (clone $query)->where('sex', '=', 0)->count();
-        $res['unknown'] = (clone $query)->whereNotIn('sex', [1, 2])->count();
+        $cache_key_name = 'imUserSexStatistics';
+        $expire_num     = 120;
+        $res            = Cache::get($cache_key_name);
+        if ($res === null) {
+            $list       = User::query()
+                ->where('status', '=', 1)
+                ->where('is_robot', '=', 0)
+                ->groupBy('sex')
+                ->select(['sex', DB::raw('count(*) as counts')])
+                ->get();
+            $res['all'] = $res['man'] = $res['woman'] = $res['unknown'] = 0;
+            foreach ($list as $v) {
+                $res['all'] += $v->counts;
+                switch ($v->sex) {
+                    case 1:
+                        $res['man'] += $v->counts;
+                        break;
+                    case 2:
+                        $res['woman'] += $v->counts;
+                        break;
+                    default:
+                        $res['unknown'] += $v->counts;
+                }
+            }
+            Cache::put($cache_key_name, $res, $expire_num);
+        }
+
         return $res;
     }
 
