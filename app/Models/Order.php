@@ -864,10 +864,6 @@ class Order extends Base
             $v->goods = $goods;
             unset($v->offline, $v->liveGoods);
         }
-
-//        DB::connection()->enableQueryLog();
-//        $list =  $query->limit(10)->get();
-//        dd(DB::getQueryLog());
         return $list;
 
     }
