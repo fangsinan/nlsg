@@ -86,7 +86,7 @@ class ColumnController extends Controller
         $relation_id = $subObj->getMySub($uid,7);
         $my_list = $columnObj->getColumn([
                             ['type','=',3],
-                            ['id','NotIn',$relation_id],
+                            ['id','In',$relation_id],
                         ],$order_str);
         //非我的订阅
         $list = $columnObj->getColumn([
