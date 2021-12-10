@@ -217,10 +217,11 @@ class LiveInfoServers {
     }
 
     public function twitterIdList($phone = '', $user_id = '') {
-        return BackendLiveRole::where(function ($query) use ($phone, $user_id) {
+        $res =  BackendLiveRole::where(function ($query) use ($phone, $user_id) {
             $query->where('parent', '=', $phone)
                 ->orWhere('parent_id', '=', $user_id);
         })->pluck('son_id')->toArray();
+        return array_filter(array_unique($res));
     }
 
     public function liveOrderKun($params, $admin) {
@@ -990,8 +991,7 @@ GROUP BY
             $query->where('o.remark', '=', $live_id);
         }
 
-
-        if ($twitter_id_list !== null) {
+        if ($twitter_id_list !== null && !empty($twitter_id_list)) {
             $query->whereIn('o.twitter_id', $twitter_id_list);
         }
 
