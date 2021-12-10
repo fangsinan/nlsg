@@ -141,7 +141,9 @@ class Withdrawals extends Base
         }
         if($channel == 'WeChat'){
             //微信提现
-            $config = Config('wechat.payment.default');
+//            $config = Config('wechat.payment.default');
+            $config = Config('wechat.payment.old_default');// 提现用老账户
+
             $app    = Factory::payment($config);
             $result = $app->transfer->toBalance([
                 'partner_trade_no' => $orderid, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)
