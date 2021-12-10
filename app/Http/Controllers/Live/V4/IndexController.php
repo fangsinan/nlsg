@@ -491,8 +491,7 @@ class IndexController extends ControllerBackend
         $back_video_url    = $input['back_video_url'] ?? '';
         $need_virtual      = $input['need_virtual'] ?? 0;
         $need_virtual_num  = $input['need_virtual_num'] ?? 0;
-        $poster_begin_time = $input['poster_begin_time'] ?? '';
-        $poster_end_time   = $input['poster_end_time'] ?? '';
+        $steam_end_time   = $input['steam_end_time'] ?? '';
         $steam_begin_time  = $input['steam_begin_time'] ?? '';
 
         if (!$title) {
@@ -502,12 +501,8 @@ class IndexController extends ControllerBackend
             return error(1000, '开始时间不能为空');
         }
 
-        if (empty($poster_begin_time) || empty($poster_end_time)) {
-            return error(1000, '海报时间不能为空');
-        }
-
-        if (empty($steam_begin_time)) {
-            return error(1000, '宣传开始时间不能为空');
+        if (empty($steam_end_time) || empty($steam_begin_time)) {
+            return error(1000, '拉流时间范围不能为空');
         }
 
         $is_test      = (int)($input['is_test'] ?? 0);
@@ -529,8 +524,7 @@ class IndexController extends ControllerBackend
             'need_virtual_num'  => $need_virtual_num,
             'is_free'           => $price < '0.01' ? 1 : 0,
             'is_test'           => $is_test,
-            'poster_begin_time' => $poster_begin_time,
-            'poster_end_time'   => $poster_end_time,
+            'steam_end_time'   => $steam_end_time,
             'steam_begin_time'  => $steam_begin_time,
         ];
 
@@ -911,7 +905,7 @@ class IndexController extends ControllerBackend
         $live = Live::query()
             ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
                 'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test',
-                'poster_begin_time', 'poster_end_time', 'steam_begin_time'
+                'steam_end_time', 'steam_begin_time'
             )
             ->with(['livePoster'])
             ->where('id', $id)->first();
