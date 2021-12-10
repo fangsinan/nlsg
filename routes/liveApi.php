@@ -45,12 +45,13 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_info/user_watch_excel', 'InfoController@userWatchExcel');
         Route::get('live_info/online_num_info_excel', 'InfoController@onlineNumInfoExcel');
 
+        Route::get('live_index/channel_s', 'IndexController@channelSelect');
+
     });
     //导出
     Route::get('live_order/list_excel', 'OrderController@listExcel');
     Route::get('live_order/inviter_list_excel', 'OrderController@inviterLiveListExcel');
     Route::get('live_comment/listExcel', 'CommentController@listExcel');
-    Route::get('live_index/channel_s', 'IndexController@channelSelect');
 
 //    Route::get('live_info/live_sub_order_excel', 'InfoController@liveSubOrderExcel');
 //    Route::get('live_info/live_order_excel', 'InfoController@liveOrderExcel');

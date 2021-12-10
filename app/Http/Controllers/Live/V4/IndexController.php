@@ -850,6 +850,11 @@ class IndexController extends ControllerBackend
     }
 
     public function channelSelect(Request $request,$return_type = 1){
+        $role_id = $this->user['role_id'] ?? 0;
+        if ($role_id !== 1){
+            return [];
+        }
+
         $res = DB::table('nlsg_backend_user as bu')
             ->join('nlsg_user as u','bu.username','=','u.phone')
             ->where('bu.channel_select_show','=',2)
@@ -940,7 +945,6 @@ class IndexController extends ControllerBackend
 //            }
 //        }
         $live->channel_show = $channel_user_id;
-        $live->channelSelect = $this->channelSelect($request,2);
 
         return success($live);
     }
