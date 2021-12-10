@@ -619,7 +619,7 @@ class IndexController extends ControllerBackend
                 ]
             );
         }
-        
+
         if (!is_array($channel_show)) {
             $channel_user_id  = explode(',', $channel_show);
         }else{
@@ -630,6 +630,10 @@ class IndexController extends ControllerBackend
 //            $channel_user_id[] = $this->channelUserData($cs_v);
 //        }
         $channel_user_id = array_filter($channel_user_id);
+
+        BackendLiveDataRole::query()
+            ->where('live_id','=',$live_info_data['live_pid'])
+            ->delete();
 
         if (!empty($channel_user_id)) {
             foreach ($channel_user_id as $cui) {
