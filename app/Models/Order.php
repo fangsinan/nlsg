@@ -831,11 +831,11 @@ class Order extends Base
         foreach ($list as &$v) {
             //为什么这么取值?
             $temp_inviter = [];
-            $temp_inviter['user_id'] = $v->user_id;
-            $temp_inviter['username'] = $v->user->phone ?? '';
-            $temp_inviter['nickname'] = $v->user->nickname ?? '';
-            $temp_inviter['live_id'] = $v->live_id ?? 0;
-            $temp_inviter['title'] = $v->live->title ?? '';
+            $temp_inviter['user_id'] = $v->twitter->id ?? 0;
+            $temp_inviter['username'] = $v->twitter->phone ?? '';
+            $temp_inviter['nickname'] = $v->twitter->nickname ?? '';
+            $temp_inviter['live_id'] = $v->liveRemark->id ?? 0;
+            $temp_inviter['title'] = $v->liveRemark->title ?? '';
             $v->inviter_info = $temp_inviter;
 
             $v->t_live_user_id  = $v->twitter->id ?? 0;
