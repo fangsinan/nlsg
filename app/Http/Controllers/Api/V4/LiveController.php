@@ -831,11 +831,11 @@ class LiveController extends Controller
 
         //如果有推送则在show接口返回
         $push_live = NULL;
-        $time=time();
-        if(in_array($id,[19,226])){
+        /*$time=time();
+        if(in_array($id,[19])){
             $start_time=strtotime(date("Y-m-d 09:00:0"));
         }else {
-            $start_time = strtotime(date("Y-m-d 19:30:0"));
+            $start_time = strtotime(date("Y-m-d 20:00:0"));
         }
         if( !empty($live_son_flag) &&  $time >= $start_time ){
             $push_gid = LivePush::where([
@@ -847,7 +847,7 @@ class LiveController extends Controller
                 $push_live = Live::select("id","title", "price","type","cover_img","is_free")->where(['id'=>$push_gid])->first();
 
             }
-        }
+        }*/
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
@@ -856,6 +856,15 @@ class LiveController extends Controller
         return success($data);
 
     }
+
+
+//    public function recommend(Request $request)
+//    {
+//        $id = $request->get('live_id');
+//        $liveWork = new LiveWorks();
+//        $recommend = $liveWork->getLiveWorks($id, 2, 10);
+//        return success($recommend);
+//    }
 
     public function recommend(Request $request)
     {
