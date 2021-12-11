@@ -253,6 +253,12 @@ class Order extends Base
         return $this->belongsTo(Live::class, 'live_id', 'id');
     }
 
+    public function remarkSubInfo(){
+        return $this->hasMany(Subscribe::class,'user_id','user_id')
+            ->where('type','=',3)
+            ->where('status','=',1);
+    }
+
     public function orderInLive($params, $this_user = [])
     {
         $params = array_filter($params);
@@ -711,6 +717,15 @@ class Order extends Base
     }
 
     public function inviterLiveListNew($params, $this_user = []) {
+        /**
+         * select * from nlsg_user where phone=15278464531;
+         * select * from nlsg_subscribe where type=3 and user_id=5171282;
+         * select * from nlsg_order where type=10 and user_id=5171282 and status=1;
+         *
+         * 这一单如果在销售列表的数据就应该是
+         * 直播标题是live238标题  商品标题也是live238标题  推荐人是order表的twitter
+         * 源直播是remark的live232标题  源推荐人应该是sub表relation=232的twitter
+         */
         $size     = $params['size'] ?? 10;
         $page     = $params['page'] ?? 1;
         $now_date = date('Y-m-d H:i:s');
@@ -743,15 +758,16 @@ class Order extends Base
 
         $query->with([
             'offline:id,title,subtitle,price,cover_img,image',
-            'liveGoods:id,title,describe,cover_img,price',
             'payRecord:ordernum,price,type,created_at',
-            'live:id,title,describe,begin_at,cover_img,user_id',
-            'live.user:id,phone,nickname',
-            'liveRemark:id,title,describe,begin_at,cover_img,user_id',
+            'live:id,title,describe,begin_at,cover_img,user_id,price',
+            'liveRemark:id,title',
             'user:id,phone,nickname',
             'twitter:id,phone,nickname',
+            'twitter.getLName:id,son_id,son_flag',
             'pay_record_detail:id,type,ordernum,user_id,price',
             'pay_record_detail.user:id,phone,nickname',
+            'remarkSubInfo:id,user_id,type,relation_id,twitter_id',
+            'remarkSubInfo.twitterUser:id,phone,nickname',
         ]);
 
         //订单编号
@@ -761,16 +777,16 @@ class Order extends Base
         //直播标题
         if (!empty($params['title'] ?? '')) {
             $temp_id_list = Live::query()
-                ->where('title','like',"%".$params['title']."%")
+                ->where('title', 'like', "%" . $params['title'] . "%")
                 ->pluck('id')
                 ->toArray();
-            $query->whereIn('live_id',$temp_id_list);
+            $query->whereIn('live_id', $temp_id_list);
         }
         //用户账号
         if (!empty($params['phone'] ?? '')) {
             $phone = $params['phone'];
-            $query->whereHas('user',function ($q)use($phone){
-                $q->where('phone','like',"%$phone%");
+            $query->whereHas('user', function ($q) use ($phone) {
+                $q->where('phone', 'like', "%$phone%");
             });
         }
         //订单来源
@@ -780,22 +796,23 @@ class Order extends Base
         //订单类型 商品标题
         if (!empty($params['type'] ?? 0)) {
             $query->where('type', '=', $params['type']);
-            if (!empty($params['goods_title']??'')){
+            if (!empty($params['goods_title'] ?? '')) {
                 $goods_title = trim($params['goods_title']);
-                if ($params['type'] === 14){
+                if ((int)$params['type'] === 14) {
                     $query->whereHas('offline', function ($q) use ($goods_title) {
                         $q->where('title', 'like', "%$goods_title%");
                     });
                 }
             }
         }
+
         //支付方式
         if (!empty($params['pay_type'] ?? 0)) {
             $query->where('pay_type', '=', $params['pay_type']);
         }
         //下单时间
-        if (!empty($params['created_at']??'')) {
-            $created_at = explode(',', $params['created_at']);
+        if (!empty($params['created_at'] ?? '')) {
+            $created_at    = explode(',', $params['created_at']);
             $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
             if (empty($created_at[1] ?? '')) {
                 $created_at[1] = $now_date;
@@ -804,27 +821,28 @@ class Order extends Base
             }
             $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
         }
-        //源推荐账户
-        if (!empty($params['t_live_phone'] ?? '')) {
-            $t_live_phone = $params['t_live_phone'];
-            $query->whereHas('twitter', function ($q) use ($t_live_phone) {
-                $q->where('phone', 'like', "%$t_live_phone%");
-            });
-        }
+
         //源直播
         if (!empty($params['t_title'] ?? '')) {
             $t_title = $params['t_title'];
-            $query->whereHas('live', function ($q) use ($t_title) {
+            $query->whereHas('liveRemark', function ($q) use ($t_title) {
                 $q->where('title', 'like', "%$t_title%");
             });
         }
-        //源账户
+        //源账户 order表的twitter
         if (!empty($params['t_phone'] ?? '')) {
             $t_phone = $params['t_phone'];
-            $query->whereHas('live.user', function ($q) use ($t_phone) {
+            $query->whereHas('twitter', function ($q) use ($t_phone) {
                 $q->where('phone', 'like', "%$t_phone%");
             });
         }
+        //源推荐账户  sub表的twitter
+//        if (!empty($params['t_live_phone'] ?? '')) {
+//            $t_live_phone = $params['t_live_phone'];
+//            $query->whereHas('twitter', function ($q) use ($t_live_phone) {
+//                $q->where('phone', 'like', "%$t_live_phone%");
+//            });
+//        }
 
         if (($params['excel_flag'] ?? 0)) {
             $list = $query->limit($size)->offset(($page - 1) * $size)->get();
@@ -833,14 +851,29 @@ class Order extends Base
         }
 
         foreach ($list as &$v) {
+            $v->remarkSub = [];
+            if (!empty($v->remark??'') && !empty($v->remarkSubInfo??[])){
+                foreach ($v->remarkSubInfo as $vv){
+                    if ((int)$vv['relation_id'] === (int)$v->remark){
+                        $v->remarkSub = [
+                            'twitter_id' => $vv->twitter_id,
+                            'twitter_phone'=>$vv->twitterUser->phone,
+                            'twitter_nickname'=>$vv->twitterUser->nickname,
+                        ];
+                    }
+                }
+            }
+            unset($v->remarkSubInfo);
+
             //为什么这么取值?
-            $temp_inviter = [];
-            $temp_inviter['user_id'] = $v->twitter->id ?? 0;
+            $temp_inviter             = [];
+            $temp_inviter['user_id']  = $v->twitter->id ?? 0;
             $temp_inviter['username'] = $v->twitter->phone ?? '';
             $temp_inviter['nickname'] = $v->twitter->nickname ?? '';
-            $temp_inviter['live_id'] = $v->liveRemark->id ?? 0;
-            $temp_inviter['title'] = $v->liveRemark->title ?? '';
-            $v->inviter_info = $temp_inviter;
+            $temp_inviter['son_flag'] = $v->twitter->getLName->son_flag ?? '';
+            $temp_inviter['live_id']  = $v->liveRemark->id ?? 0;
+            $temp_inviter['title']    = $v->liveRemark->title ?? '';
+            $v->inviter_info          = $temp_inviter;
 
             $v->t_live_user_id  = $v->twitter->id ?? 0;
             $v->t_live_phone    = $v->twitter->phone ?? '';
@@ -848,12 +881,12 @@ class Order extends Base
             $goods              = [];
             switch ($v->type) {
                 case 10:
-                    $goods['goods_id']   = $v->liveGoods->id ?? 0;
-                    $goods['title']      = $v->liveGoods->title ?? '数据错误';
+                    $goods['goods_id']   = $v->live->id ?? 0;
+                    $goods['title']      = $v->live->title ?? '数据错误';
                     $goods['subtitle']   = '';
-                    $goods['cover_img']  = $v->liveGoods->cover_img ?? '';
+                    $goods['cover_img']  = $v->live->cover_img ?? '';
                     $goods['detail_img'] = '';
-                    $goods['price']      = $v->liveGoods->price ?? '价格数据错误';
+                    $goods['price']      = $v->live->price ?? '价格数据错误';
                     $v->live             = $v->liveRemark;
                     break;
                 case 14:
