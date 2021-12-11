@@ -887,7 +887,6 @@ class Order extends Base
                     $goods['cover_img']  = $v->live->cover_img ?? '';
                     $goods['detail_img'] = '';
                     $goods['price']      = $v->live->price ?? '价格数据错误';
-                    $v->live             = $v->liveRemark;
                     break;
                 case 14:
                     $goods['goods_id']   = $v->offline->id ?? 0;
