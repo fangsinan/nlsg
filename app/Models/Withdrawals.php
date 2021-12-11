@@ -132,6 +132,7 @@ class Withdrawals extends Base
             ->whereIn('status',[1,2])->count();
 
         if(!empty($Submission_flag) && $Submission_flag>1){
+            PayRecord::where(['id'=>$pay_id])->update(['status' =>3,'product_id'=>"请勿重复提现"]);
             return ['status'=>0, 'msg'=>'请勿重复提现',];
         }
 
