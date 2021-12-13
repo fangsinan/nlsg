@@ -30,6 +30,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('vip/new_home_page', 'VipController@newHomePage');
 
 
+    Route::get('video/get_random_video', 'VideoController@getRandomVideo');
+    Route::get('video/like', 'VideoController@like');
     /**     5.0 API  END    ***/
 
 
