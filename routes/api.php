@@ -19,9 +19,7 @@ include __DIR__ . '/liveApi.php';
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
-    /*
-     * 5.0 API  START
-     * **/
+    /**   5.0 API  START   ***/
 
     //首页排序
     Route::get('index/index_position', 'IndexController@indexPosition');
@@ -32,9 +30,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('vip/new_home_page', 'VipController@newHomePage');
     });
-        /*
-         * 5.0 API  END
-         * **/
+
+    
+    /**     5.0 API  END    ***/
 
 
 
