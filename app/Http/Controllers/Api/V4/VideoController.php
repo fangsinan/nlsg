@@ -20,9 +20,8 @@ class VideoController extends Controller
      * @apiGroup five_video
      *
      * @apiParam {int} page
+     * @apiParam {int} top_id  当前页面id  防止重复获取数据
      *
-     * @apiSuccess {number} start_list   即将开营
-     * @apiSuccess {number} list   训练营
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
         {
@@ -57,9 +56,10 @@ class VideoController extends Controller
         $uid = $this->user['id'] ?? 0;
 
         $page = $request->input('page') ??1;
+        $top_id = $request->input('top_id') ??0;
 
         $videoObj = new ShortVideoModel();
-        $relation_id = $videoObj->getVideo($uid,$page);
+        $relation_id = $videoObj->getVideo($uid,$page,$top_id);
 
         return $this->success($relation_id);
     }

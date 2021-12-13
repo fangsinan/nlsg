@@ -10,13 +10,18 @@ class ShortVideoModel extends Base
 
 
     //获取短视频
-    function getVideo ($uid,$page){
+    function getVideo ($uid,$page,$top_id=0){
         //按照rand、创建时间排序
         $field = ["id","user_id","share_img","title","introduce","view_num","like_num","comment_num","share_num","duration","url"];
         $data = self::select($field)->where('status',2)
             ->orderBy('rank','desc')->orderBy("created_at","desc")//->first();
-            ->offset(($page - 1))->first()->toArray();
+            ->offset(($page - 1))->first();//->toArray();
 
+        if( !empty($data) ){
+            $data = $data->toArray();
+        }else{// 如果为空则随机取一条不是当前id的数据
+            $data = self::select($field)->where('status',2)->where('id','!=',$top_id)->inRandomOrder()->first()->toArray();
+        }
         $data['user_info'] = User::getTeacherInfo($data['user_id']);
 
         $follow = UserFollow::where(['from_uid'=>$uid,'to_uid'=>$data['user_id']])->first();
