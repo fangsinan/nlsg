@@ -28,13 +28,13 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/index_middle', 'IndexController@indexMiddle');
     Route::get('index/index_works', 'IndexController@indexWorks');
 
-
     Route::get('column/get_camp_list', 'ColumnController@getCampList');
-    Route::get('vip/new_home_page', 'VipController@newHomePage');
-
-    /*
-     * 5.0 API  END
-     * **/
+    Route::group(['middleware' => ['auth.jwt']], function () {
+        Route::get('vip/new_home_page', 'VipController@newHomePage');
+    });
+        /*
+         * 5.0 API  END
+         * **/
 
 
 
