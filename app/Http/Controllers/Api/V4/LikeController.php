@@ -14,7 +14,6 @@ use JPush;
 
 class LikeController extends Controller
 {
-
     /**
      * @api {post} api/v4/like 点赞
      * @apiVersion 4.0.0

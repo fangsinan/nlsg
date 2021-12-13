@@ -20,7 +20,6 @@ class VideoController extends Controller
      * @apiGroup five_video
      *
      * @apiParam {int} page
-     * @apiParam {int} order desc 默认倒序 asc 正序
      *
      * @apiSuccess {number} start_list   即将开营
      * @apiSuccess {number} list   训练营
@@ -75,6 +74,7 @@ class VideoController extends Controller
      *
      * @apiParam  id  短视频id、
      * @apiParam  type  类型 1短视频
+     * @apiParam  is_like 1点赞  0取消
      *
      * @apiSuccessExample 成功响应:
      *   {
