@@ -10,13 +10,13 @@ class VipWorksList extends Base
 {
     protected $table = 'nlsg_vip_works_list';
 
-    public function getList($flag = 1, $category_id = 0, $size = 0)
+    public function getList($flag = 1, $category_id = 0, $size = 0,$version=0)
     {
-        $cache_key_name = 'vip_works_list';
+        $cache_key_name = 'vip_works_list_'.$version;
         $expire_num = CacheTools::getExpire('vip_works_list');
         $data = Cache::get($cache_key_name);
         if (empty($data)) {
-            $data = $this->getListFromDB();
+            $data = $this->getListFromDB($version);
             Cache::put($cache_key_name, $data, $expire_num);
         }
 
@@ -44,7 +44,7 @@ class VipWorksList extends Base
         }
     }
 
-    public function getListFromDB()
+    public function getListFromDB($version)
     {
         $list = VipWorksList::where('status', '=', 1)
             ->with([
@@ -58,6 +58,7 @@ class VipWorksList extends Base
             ->toArray();
 
         $res = [];
+        $new_res = [];
 
         $category_res = [];
 
@@ -110,12 +111,27 @@ class VipWorksList extends Base
             } else {
                 continue;
             }
+            if($version == '5.0.0'){
+                $new_res[$temp_res['user_id']]["user_info"] = User::getTeacherInfo($temp_res['user_id']);;
+                $new_res[$temp_res['user_id']]["list"][] = $temp_res;
+                $new_res[$temp_res['user_id']]["count"] = count($new_res[$temp_res['user_id']]["list"]);
 
-            $temp_res['user_info'] = User::getTeacherInfo($temp_res['user_id']);
-            $res[] = $temp_res;
+
+            }else{
+                $temp_res['user_info'] = User::getTeacherInfo($temp_res['user_id']);
+                $res[] = $temp_res;
+            }
+
+
+
         }
 
-        return ['list' => $res, 'category' => $category_res];
+        if($version == '5.0.0'){
+            $new_res = array_values($new_res);
+            array_multisort(array_column($new_res,'count'),SORT_DESC,$new_res);
+            return ['list' => $new_res, 'category' => $category_res];
+        }
+        return ['list' => $res, 'category' => $category_res,"new_list"=>$new_res];
     }
 
     public function column()

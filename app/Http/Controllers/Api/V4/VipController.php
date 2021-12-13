@@ -238,6 +238,14 @@ class VipController extends Controller
         return $this->getRes($data);
     }
 
+
+    public function newHomePage(Request $request)
+    {
+        $model = new VipUser();
+        $data = $model->homePage($this->user, $request->input());
+        return $this->getRes($data);
+    }
+
     /**
      * 说明
      * @api {get} /api/v4/vip/explain 说明

@@ -30,6 +30,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
     Route::get('column/get_camp_list', 'ColumnController@getCampList');
+    Route::get('vip/new_home_page', 'VipController@newHomePage');
 
     /*
      * 5.0 API  END

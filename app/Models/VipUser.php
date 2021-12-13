@@ -83,6 +83,14 @@ class VipUser extends Base
             }
         }
 
+        if(!empty($params['version']) && $params['version']="5.0.0"){
+            //精品课
+            $vwlModel = new VipWorksList();
+            $works_list = $vwlModel->getList(1, 0, 6,$params['version']);
+            $res['card_data'] = $card_data;
+            $res['works_list'] = ['cover_img' => ConfigModel::getData(32), 'list' => $works_list];
+        }
+
         //师资阵容
         $author_order_str = ConfigModel::getData(30);
         $author_order_str = 'FIELD(id,' . $author_order_str . ') desc';
@@ -113,7 +121,7 @@ class VipUser extends Base
         } else {
             //精品课
             $vwlModel = new VipWorksList();
-            $works_list = $vwlModel->getList(1, 0, 6);
+            $works_list = $vwlModel->getList(1, 0, 6,$params['version']??0);
         }
 
 
