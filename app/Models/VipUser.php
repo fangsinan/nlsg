@@ -53,7 +53,7 @@ class VipUser extends Base
         $card_data['nickname'] = $user['nickname'] ?? '';
         $card_data['headimg'] = $user['headimg'] ?? '/image/202009/13f952e04c720a550193e5655534be86.jpg';
         $card_data['level'] = 0;
-        $card_data['expire_time'] = '';
+        $card_data['expire_time'] = $user['new_vip']['expire_time']??'';
         $card_data['surplus_days'] = 0;
         $card_data['price'] = ConfigModel::getData(25);
         $card_data['is_login'] = empty($user) ? 0 : 1;
