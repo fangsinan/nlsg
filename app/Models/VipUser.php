@@ -89,6 +89,7 @@ class VipUser extends Base
             $works_list = $vwlModel->getList(1, 0, 6,$params['version']);
             $res['card_data'] = $card_data;
             $res['works_list'] = ['cover_img' => ConfigModel::getData(32), 'list' => $works_list];
+            return $res;
         }
 
         //师资阵容
