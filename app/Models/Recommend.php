@@ -48,6 +48,20 @@ class Recommend extends Base
         if(empty($ids)){
             return [];
         }
+        $result = $this->getResult($type,$ids);
+
+
+        $expire_num = CacheTools::getExpire('index_recommend');
+        Cache::put($cache_key_name, $result, $expire_num);
+
+        return $result;
+    }
+
+
+
+    public function getResult($type,$ids){
+        $result =[];
+
 
         switch ($type) {
             case 1:
@@ -102,9 +116,6 @@ class Recommend extends Base
                 $result = $model->getIndexListWorks($ids, 7);
 
         }
-        $expire_num = CacheTools::getExpire('index_recommend');
-        Cache::put($cache_key_name, $result, $expire_num);
-
         return $result;
     }
 

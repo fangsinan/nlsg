@@ -25,6 +25,9 @@ class ShortVideoModel extends Base
         $isLike = Like::where(['relation_id' => $data['id'], 'type' => 3, 'user_id' => $uid])->first();
         $data['user_info']['is_like'] = $isLike ? 1 : 0;
 
+        //推荐
+        $recomObj = new ShortVideoRecommedModel();
+        $data["recomment"] = $recomObj->getRecomment($data['id']);
 
         return $data;
     }
