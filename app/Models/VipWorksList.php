@@ -14,7 +14,7 @@ class VipWorksList extends Base
     {
         $cache_key_name = 'vip_works_list_'.$version;
         $expire_num = CacheTools::getExpire('vip_works_list');
-//        $data = Cache::get($cache_key_name);
+        $data = Cache::get($cache_key_name);
         if (empty($data)) {
             $data = $this->getListFromDB($version);
             Cache::put($cache_key_name, $data, $expire_num);
