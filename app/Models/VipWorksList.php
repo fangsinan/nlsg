@@ -14,7 +14,7 @@ class VipWorksList extends Base
     {
         $cache_key_name = 'vip_works_list_'.$version;
         $expire_num = CacheTools::getExpire('vip_works_list');
-        $data = Cache::get($cache_key_name);
+//        $data = Cache::get($cache_key_name);
         if (empty($data)) {
             $data = $this->getListFromDB($version);
             Cache::put($cache_key_name, $data, $expire_num);
@@ -58,7 +58,7 @@ class VipWorksList extends Base
             ->toArray();
 
         $res = [];
-        $new_res = [];
+        $new_data = [];
 
         $category_res = [];
 
@@ -111,10 +111,10 @@ class VipWorksList extends Base
             } else {
                 continue;
             }
-            if($version == '5.0.0'){
-                $new_res[$temp_res['user_id']]["user_info"] = User::getTeacherInfo($temp_res['user_id']);;
-                $new_res[$temp_res['user_id']]["list"][] = $temp_res;
-                $new_res[$temp_res['user_id']]["count"] = count($new_res[$temp_res['user_id']]["list"]);
+            if($version == '5.0.0'){ //根据uid 分组
+                $new_data[$temp_res['user_id']]["user_info"] = User::getTeacherInfo($temp_res['user_id']);;
+                $new_data[$temp_res['user_id']]["list"][] = $temp_res;
+                $new_data[$temp_res['user_id']]["count"] = count($new_data[$temp_res['user_id']]["list"]);
 
 
             }else{
@@ -122,16 +122,42 @@ class VipWorksList extends Base
                 $res[] = $temp_res;
             }
 
-
-
         }
 
         if($version == '5.0.0'){
-            $new_res = array_values($new_res);
-            array_multisort(array_column($new_res,'count'),SORT_DESC,$new_res);
+            //客户端要求 分开返回 一个字段是多个  一个字段是单个  并且单个需要两个一组
+            $new_res = [ 'multiple' =>[], 'one_arr' =>[], ];
+            $one_arr = [];
+            $flag_f =0;
+            $new_data = array_values($new_data);
+            $new_data_c = count($new_data);
+            foreach ($new_data as $new_key=>$new_val){
+
+                if($new_val['count'] > 1) {
+                    $new_res['multiple'][] = $new_val;
+                }else{
+                    if($flag_f==2){
+                        //重置
+                        $new_res['one_arr'][] = $one_arr;
+                        $one_arr = [];
+                        $flag_f=0;
+                    }else{
+                        $one_arr[$flag_f] =$new_val;
+                        $flag_f++;
+                    }
+//                    //防止外层循环结束
+                    if($new_key == $new_data_c-1){
+                        $new_res['one_arr'][] = $one_arr;
+                    }
+
+
+                }
+            }
+
+//            array_multisort(array_column($new_res,'count'),SORT_DESC,$new_res);
             return ['list' => $new_res, 'category' => $category_res];
         }
-        return ['list' => $res, 'category' => $category_res,"new_list"=>$new_res];
+        return ['list' => $res, 'category' => $category_res];
     }
 
     public function column()
