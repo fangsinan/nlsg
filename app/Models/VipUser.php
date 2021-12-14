@@ -84,11 +84,20 @@ class VipUser extends Base
         }
 
         if(!empty($params['version']) && $params['version']="5.0.0"){
+
+            $card_data['overdue_time'] = 0;
+            if($card_data['is_open'] == 0 && !empty($user['new_vip']['vip_id'])){ //查询过期几天
+                $newVip = VipUser::find($user['new_vip']['vip_id']);
+                $card_data['overdue_time'] = (time() - strtotime($newVip['expire_time'])) / 86400;
+
+
+            }
             //精品课
             $vwlModel = new VipWorksList();
             $works_list = $vwlModel->getList(1, 0, 6,$params['version']);
             $res['card_data'] = $card_data;
-            $res['works_list'] = ['cover_img' => ConfigModel::getData(32), 'list' => $works_list];
+//            $res['works_list'] = ['cover_img' => ConfigModel::getData(32), 'list' => $works_list];
+            $res['works_list'] = $works_list;
             return $res;
         }
 
