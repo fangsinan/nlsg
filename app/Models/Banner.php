@@ -206,4 +206,19 @@ class Banner extends Base
         return $res;
 
     }
+
+
+    //获取banner
+    public static function getBannerImg($type){
+
+
+
+        $now_date = date('Y-m-d H:i:s');
+        $data = Banner::where('type', '=', $type)
+            ->where('status', '=', 1)
+//            ->where('start_time', '<=', $now_date)
+//            ->where('end_time', '>', $now_date)
+            ->get()->toArray();
+        return $data;
+    }
 }
