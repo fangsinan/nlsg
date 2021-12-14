@@ -15,8 +15,9 @@ class WorksInfo extends Base
 
 
     // $type  1 单课程  2 多课程  3讲座 4训练营
-    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$is_free = 0,$os_type=1)
+    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$column_data = [],$os_type=1)
     {
+        $is_free = $column_data['is_free']??0;
         $where = ['status' => 4];
         if ($type == 1) {
             $where['pid'] = $works_id;
@@ -68,10 +69,19 @@ class WorksInfo extends Base
             $works_data[$key]['time_leng'] = 0;
             $works_data[$key]['time_number'] = 0;
             $works_data[$key]['time_is_end'] = 0;
+
             if ($user_id) {
+
+                //训练营共用章节id
+                if(empty($column_data['id'])){
+                    $relation_id = $works_id;
+                }else{
+                    $relation_id = $column_data['id'];
+                }
                 //单章节 学习记录 百分比
                 $his_data = History::select('time_leng', 'time_number','is_end')->where([
                     //'relation_type' => 2,
+                    'relation_id' => $relation_id,
                     'info_id' => $val['id'],
                     'user_id' => $user_id,
                     'is_del' => 0,
