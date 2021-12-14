@@ -27,6 +27,34 @@ use JPush\Client as JPushClient;
 class IndexController extends Controller
 {
 
+    /**
+     * @api {get} api/v4/index/get_top_img  各个列表头图
+     * @apiVersion 5.0.0
+     * @apiName  get_top_img
+     * @apiGroup five_Index
+     *
+     * @apiSuccess {number} live_img    直播
+     * @apiSuccess {number} teacher_img  大咖讲书
+     * @apiSuccess {number} works_img   课程
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[]
+     *     }
+     *
+     */
+    public function getTopImg(Request $request) {
+
+        $res['live_img']    = Banner::getBannerImg(81);//直播
+        $res['teacher_img'] = Banner::getBannerImg(82);//大咖讲书
+        $res['works_img']   = Banner::getBannerImg(83);//课程首页
+
+        return success($res);
+
+    }
 
     /**
      * @api {get} api/v4/index/index_position  首页位置API
