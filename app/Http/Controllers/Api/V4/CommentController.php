@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\CommentReply;
 use App\Models\Notify;
+use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Attach;
@@ -211,6 +212,9 @@ class CommentController extends Controller
             switch ($input['type']){
                 case  5:
                     Wiki::where('id', $input['id'])->increment('comment_num');
+                    break;
+                case  7:
+                    ShortVideoModel::where('id', $input['id'])->increment('comment_num');
                     break;
             }
             if ( ! empty($img)) {

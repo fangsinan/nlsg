@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Doctrine\Inflector\Rules\Word;
+use EasyWeChat\Kernel\Messages\ShortVideo;
 
 class Comment extends Base
 {
@@ -24,8 +25,10 @@ class Comment extends Base
         } elseif ($type == 3 || $type == 4) {
             //$res = WorksInfo::where('id',$id)->first()->toArray();
             $res = Works::where('id', $id)->first();
-        } else {
+        } elseif ($type == 5 ) {
             $res = Wiki::where('id', $id)->first();
+        } elseif ($type == 7 ) {  //短视频
+            $res = ShortVideoModel::where('id', $id)->first();
         }
 
         $order = $order == 1 ? 'reply_num' : 'created_at';
