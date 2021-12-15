@@ -718,6 +718,7 @@ class ColumnController extends Controller
         $size = $request->input('size', 10);
         $order = $order ?? 'asc';
 
+        $page = intval($page) <= 0 ?1:$page;
         $user_id = $this->user['id'] ?? 0;
         if (empty($lecture_id)) {
             return $this->error(0, '参数有误：lecture_id ');
