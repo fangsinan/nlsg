@@ -913,8 +913,11 @@ class WorksController extends Controller
      * @apiSuccess {string} works.is_sub 1为当前用户订阅了
      */
     public function neighbor(Request $request){
+
+
+        $user = $this->user ?? ["id" =>0, "level" =>0, "expire_time" =>0, "new_vip" =>[], ];
         $model = new WorksInfo();
-        $data = $model->neighbor($request->input(),$this->user);
+        $data = $model->neighbor($request->input(),$user);
         return $this->getRes($data);
     }
 

@@ -33,6 +33,15 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::get('video/get_random_video', 'VideoController@getRandomVideo');
     Route::get('video/like', 'VideoController@like');
+
+
+
+    //切歌
+    Route::get('works/neighbor', 'WorksController@neighbor');
+
+
+
+
     /**     5.0 API  END    ***/
 
 
@@ -268,7 +277,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('remove/wechat', 'UserController@removeWechat');
         Route::get('user/edit_user', 'UserController@editUserInfo');
         //切歌
-        Route::get('works/neighbor', 'WorksController@neighbor');
+//        Route::get('works/neighbor', 'WorksController@neighbor');
 
         //会场销售
         Route::get('meeting_sales/index', 'MeetingController@salesIndex');
