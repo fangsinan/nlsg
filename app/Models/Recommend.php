@@ -166,7 +166,7 @@ class Recommend extends Base
         if ( ! $ids) {
             return false;
         }
-        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
+        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num','length',
             'is_free', 'helper')
             ->whereIn('id', $ids)
             ->where('is_del', 0)
