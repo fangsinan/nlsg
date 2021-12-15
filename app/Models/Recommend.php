@@ -166,12 +166,13 @@ class Recommend extends Base
         if ( ! $ids) {
             return false;
         }
-        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num','length',
+        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
             'is_free', 'helper')
             ->whereIn('id', $ids)
             ->where('is_del', 0)
             ->orderBy('created_at', 'desc')
             ->first();
+        $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
         if (!$list){
             return  [];
         }
