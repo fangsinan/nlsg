@@ -317,7 +317,7 @@ class LiveController extends Controller
         }
         $lists = $query->with('user:id,nickname')
             ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
-                'playback_price', 'is_free', 'password')
+                'playback_price', 'is_free', 'password', 'order_num')
             ->where('status', 4)
             ->where('is_finish', 0)
             ->where('is_del', 0)
