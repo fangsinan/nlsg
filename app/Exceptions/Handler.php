@@ -5,7 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class Handler extends ExceptionHandler
 {
@@ -70,8 +70,10 @@ class Handler extends ExceptionHandler
         //
         // }
         //
+        $parameter=json_encode($request->all());
         DB::table('nlsg_log')->insert([
             'url'     => $request->fullUrl(),
+            'parameter'    =>  $parameter,
             'message' => $exception->getMessage(),
             'code'    =>  $exception->getCode(),
             'file'    =>  $exception->getFile(),
