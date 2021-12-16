@@ -82,9 +82,12 @@ class IndexController extends Controller
     public function indexPosition()
     {
 
-        $head   = RecommendConfig::select("id","title","icon_pic","jump_type","modular_type","sort","jump_url",'icon_mark')->where(['show_position'=>1, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
-        $bottom = RecommendConfig::select("id","title","icon_pic","jump_type","modular_type","sort","jump_url",'icon_mark')->where(['show_position'=>3, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
-        $icon   = RecommendConfig::select("id","title","icon_pic","jump_type","modular_type","sort","jump_url",'icon_mark')->where(['show_position'=>2, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
+
+        $filed = ["id","title","icon_pic","jump_type","modular_type","sort","jump_url",'icon_mark','icon_mark_rang'];
+
+        $head   = RecommendConfig::select($filed)->where(['show_position'=>1, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
+        $bottom = RecommendConfig::select($filed)->where(['show_position'=>3, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
+        $icon   = RecommendConfig::select($filed)->where(['show_position'=>2, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
         foreach ($bottom as &$value){
             if($value['modular_type'] == 2){ //icon
                 $value['icon'] = $icon;
