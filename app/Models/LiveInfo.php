@@ -98,7 +98,7 @@ class LiveInfo extends Model
         if($type == 'del' && empty($info['task_id'])){
             return ['code'=>0,'msg'=>'当前拉流任务不存在','data'=>[]];
         }
-        
+
         $subject        = $info['push_live_url'];
         $back_video_url   = $info['back_video_url'];
 
