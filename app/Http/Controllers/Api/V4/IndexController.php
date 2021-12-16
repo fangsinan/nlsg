@@ -83,7 +83,7 @@ class IndexController extends Controller
     {
 
 
-        $filed = ["id","title","icon_pic","jump_type","modular_type","sort","jump_url",'icon_mark','icon_mark_rang'];
+        $filed = ["id","title","icon_pic","jump_type","modular_type","sort","jump_url",'icon_mark','icon_mark_rang','lists_id'];
 
         $head   = RecommendConfig::select($filed)->where(['show_position'=>1, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();
         $bottom = RecommendConfig::select($filed)->where(['show_position'=>3, 'is_show'=>1,])->OrderBy("sort",'asc')->get()->toArray();

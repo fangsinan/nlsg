@@ -9,6 +9,7 @@ use App\Models\Collection;
 use App\Models\Column;
 use App\Models\GetPriceTools;
 use App\Models\History;
+use App\Models\Lists;
 use App\Models\Materials;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -28,6 +29,19 @@ class WorksController extends Controller
     {
         return 'hello world';
     }
+
+    // 获取集合 模块 数据
+    function getListsWorks(Request $request){
+        $lists_id = $request->input("lists_id");
+        if(empty($lists_id)){
+            return $this->error(0,'参数错误');
+        }
+        $model = new Lists();
+        $result = $model->getIndexListWorks([$lists_id], 7);
+        return $this->success($result);
+
+    }
+
 
 
     /**

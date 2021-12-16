@@ -57,7 +57,7 @@ class Lists extends Model
         }
 
         $lists = Lists::with(['listWorks:id,lists_id,type,works_id'])
-            ->select('id', 'title', 'subtitle', 'cover', 'num')
+            ->select('id', 'title', 'subtitle', 'cover', 'num','details_pic')
             ->whereIn('id', $ids)
             ->where('type', $type)
             ->where('status', 1)

@@ -41,6 +41,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
 
+    Route::get('works/get_lists_works', 'WorksController@getListsWorks');
+
+
+
 
     /**     5.0 API  END    ***/
 
