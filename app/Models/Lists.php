@@ -70,9 +70,9 @@ class Lists extends Model
                 foreach ($v['list_works'] as $kk => &$vv) {
 
                     if ($vv['type']==1){
-                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free'])
+                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','view_num',])
                             ->with(['user'=>function($query){
-                                $query->select('id','nickname', 'headimg');
+                                $query->select('id','nickname', 'headimg','teacher_title');
                             }])
                             ->where('id', $vv['works_id'])
                             ->first();
@@ -81,11 +81,11 @@ class Lists extends Model
                     }else if ($vv['type'] == 2) {
                         $listen = Works::select([
                             'id', 'user_id', 'type', 'title', 'subtitle', 'cover_img', 'original_price', 'price',
-                            'message', 'is_free'
+                            'message', 'is_free','view_num',
                         ])
                             ->with([
                                 'user' => function ($query) {
-                                    $query->select('id', 'nickname', 'headimg');
+                                    $query->select('id', 'nickname', 'headimg','teacher_title');
                                 }
                             ])
                             ->where('id', $vv['works_id'])
@@ -96,11 +96,11 @@ class Lists extends Model
                     } elseif ($vv['type'] == 4) {
                         $column = Column::select([
                             'id', 'user_id', 'title', 'subtitle', 'cover_pic', 'original_price', 'price', 'message',
-                            'is_free'
+                            'is_free','view_num',
                         ])
                             ->with([
                                 'user' => function ($query) {
-                                    $query->select('id', 'nickname', 'headimg');
+                                    $query->select('id', 'nickname', 'headimg','teacher_title');
                                 }
                             ])
                             ->where('id', $vv['works_id'])
