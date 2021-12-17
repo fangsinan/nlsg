@@ -257,6 +257,7 @@ class User extends Authenticatable implements JWTSubject
 
     public static function getTeacherInfo($user_id){
 
+        $res['id'] = $user_id;
         $res['name'] = '';
         $res['title'] = '';
         $res['subtitle'] = '';
