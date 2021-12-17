@@ -568,7 +568,7 @@ class UserController extends Controller
 //        }
         $res = FeedBack::create([
             'type' => $input['type'],
-            'user_id' => 1,
+            'user_id' => $this->user['id'],
             'content' => $input['content'],
             'pic' => $input['pic']
         ]);
