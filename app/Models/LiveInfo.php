@@ -99,18 +99,19 @@ class LiveInfo extends Model
             return ['code'=>0,'msg'=>'当前拉流任务不存在','data'=>[]];
         }
 
-
         $subject        = $info['push_live_url'];
         $back_video_url   = $info['back_video_url'];
 
-        $str_time = strtotime($info['begin_at']) - 60;
+        $liveObj=Live::query()->where('id',$live_info_id)->select(['steam_begin_time','steam_end_time'])->first();
+        if(empty($liveObj)){
+            return ['code'=>0,'msg'=>'直播间ID有误','data'=>[]];
+        }
 
-        /*if($info['user_id']==161904){
-            $str_time = strtotime($info['begin_at']) - 60;  //提前一分钟播放，防止微信拉取延迟情况
-        }else {
-            $str_time = strtotime($info['begin_at']) - 50;  //开始时间需要大于当前时间
-        }*/
-        $end_time       = $str_time+3600*3+600;//  结束时间需要大于当前时间 目前有视频超过3小时
+        $str_time = strtotime($liveObj->steam_begin_time) - 60;
+        $end_time = strtotime($liveObj->steam_end_time)+300;
+
+//        $str_time = strtotime($info['begin_at']) - 60;
+//        $end_time       = $str_time+3600*3+600;//  结束时间需要大于当前时间 目前有视频超过3小时
 
         if( $type == 'create' && $str_time <= time() ){
             return ['code'=>0,'msg'=>'直播开始时间必须大于当前时间','data'=>[]];
