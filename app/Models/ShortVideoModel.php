@@ -61,7 +61,7 @@ class ShortVideoModel extends Base
         }
 
 
-        $recomObj = new ShortVideoRecommedModel();
+        $recomObj = new ShortVideoRecommendModel();
 
         foreach ($re_data as &$re_value){
             $re_value['w_len'] = 0;
@@ -84,7 +84,7 @@ class ShortVideoModel extends Base
             $re_value['user_info']['is_follow'] = $follow ? 1 :0;
 
             //推荐
-            $re_value["recomment"] = $recomObj->getRecomment($re_value['id']);
+            $re_value["recomment"] = $recomObj->getRecommend($re_value['id']);
 
         }
 
