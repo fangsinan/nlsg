@@ -72,14 +72,16 @@ class ShortVideoModel extends Base
                 $re_value['h_len'] = $size[1];
             }
 
+            //是否点赞
+            $isLike = ShortVideoLikeModel::where(['relation_id' => $re_value['id'], 'type' => 1, 'user_id' => $uid, 'status'=>1])->first();
+            $re_value['is_like'] = $isLike ? 1 : 0;
+
+
 
             $re_value['user_info'] = User::getTeacherInfo($re_value['user_id']);
 
             $follow = UserFollow::where(['from_uid'=>$uid,'to_uid'=>$re_value['user_id']])->first();
             $re_value['user_info']['is_follow'] = $follow ? 1 :0;
-            //是否点赞
-            $isLike = Like::where(['relation_id' => $re_value['id'], 'type' => 3, 'user_id' => $uid])->first();
-            $re_value['user_info']['is_like'] = $isLike ? 1 : 0;
 
             //推荐
             $re_value["recomment"] = $recomObj->getRecomment($re_value['id']);
