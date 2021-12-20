@@ -110,7 +110,7 @@ class ShortVideoModel extends Base
 
         $data = self::select($field)->where($where)
             ->whereNotIn('id',$not_id)
-            ->orderBy('rank','desc')->orderBy("created_at","desc")//->first();
+            ->orderBy('rank','desc')->orderBy("like_num","desc")->orderBy("created_at","desc")//->first();
             ->inRandomOrder()->limit($size)->get()->toArray();
 
         //计算总数 count
