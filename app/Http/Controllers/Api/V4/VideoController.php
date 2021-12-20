@@ -97,8 +97,9 @@ class VideoController extends Controller
         $uid = $this->user['id'] ?? 0;
 
         $videoLikeObj = new ShortVideoLikeModel();
-        $videoLikeObj->Like($id,$type,$is_like,$uid);
-        return success();
+        $res = $videoLikeObj->Like($id,$type,$is_like,$uid);
+        return $this->getRes($res);
+
     }
 
 

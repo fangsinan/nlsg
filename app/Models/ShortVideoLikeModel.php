@@ -35,7 +35,7 @@ class ShortVideoLikeModel extends Base
             ShortVideoModel::where('id', $id)->increment('like_num');
         }
 
-        return ['code'=>0,'msg'=>"操作成功"];
+        return ['code'=>200,'msg'=>"操作成功"];
 
     }
 

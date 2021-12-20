@@ -98,8 +98,9 @@ class ShortVideoModel extends Base
 
 
     static  function getVideoInfo($id=0,$not_id=[],$size=3){
+
         if(!is_array($not_id) || $size<=0){
-            return [];
+            return ['list'=>[],'count'=>0];
         }
         //按照rand、创建时间排序
         $field = ["id","user_id","share_img","cover_img","title","introduce","view_num","like_num","comment_num","share_num","duration","url","attribute_url"];
