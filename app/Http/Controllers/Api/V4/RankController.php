@@ -114,7 +114,7 @@ class RankController extends Controller
             ->orderBy('created_at', 'desc')
             ->pluck('works_id')
             ->toArray();
-        $works = Works::with('user:id,nickname,headimg')
+        $works = Works::with('user:id,nickname,headimg,teacher_title')
             ->whereIn('id', $works_id)
             ->whereIn('type', [2,3])
             ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num', 'subscribe_num', 'is_free',
