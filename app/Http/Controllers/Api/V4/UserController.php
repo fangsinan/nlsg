@@ -1461,11 +1461,11 @@ class UserController extends Controller
         if(!empty($uid)){
             $user_data = History::select("user_id")->selectRaw('sum(time_number) as num')
                 ->where('is_del',0)->where('user_id',$uid)->first()->toArray();
+
             $his_data = DB::select('select count(*) as count from (select  sum(time_number) as num,user_id 
-            from nlsg_history where is_del = 0 group by user_id HAVING sum(time_number )>='.$user_data['num'].') as count_table');
+                        from nlsg_history where is_del = 0 group by user_id HAVING sum(time_number )>='.$user_data['num'].') as count_table');
 
-
-            $u_data['time_leng']    = (floor($user_data['num'] / 60))."小时".($user_data['num']%60).'分钟';
+            $u_data['time_leng']    = SecToTime($user_data['num']);
             $u_data['rank']         = $his_data[0]->count;
         }
 

@@ -360,11 +360,12 @@ class User extends Authenticatable implements JWTSubject
             foreach ($his_data as $his_datum){
                 if($user_v['id'] == $his_datum['user_id']){
                     $user_v['his_num_n'] = $his_datum['num'];
-                    $user_v['his_num'] = (floor($his_datum['num'] / 60))."小时".($his_datum['num']%60).'分钟';
+//                    $user_v['his_num'] = (floor($his_datum['num'] / 3600))."小时".($his_datum['num']%3600).'分钟';
+                    $user_v['his_num'] = SecToTime($his_datum['num']);
                 }
             }
         }
-        Cache::put($cache_key_name, $result, 86400);
+        Cache::put($cache_key_name, $user, 86400);
         return $user;
     }
 
