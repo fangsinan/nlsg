@@ -856,9 +856,9 @@ class Order extends Base
                 foreach ($v->remarkSubInfo as $vv){
                     if ((int)$vv['relation_id'] === (int)$v->remark){
                         $v->remarkSub = [
-                            'twitter_id' => $vv->twitter_id,
-                            'twitter_phone'=>$vv->twitterUser->phone,
-                            'twitter_nickname'=>$vv->twitterUser->nickname,
+                            'twitter_id' => $vv->twitter_id ?? 0,
+                            'twitter_phone'=>$vv->twitterUser->phone ?? '',
+                            'twitter_nickname'=>$vv->twitterUser->nickname ?? '',
                         ];
                     }
                 }
