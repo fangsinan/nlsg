@@ -21,6 +21,30 @@ use Illuminate\Support\Facades\Http;
 
 class ChannelServers
 {
+    //************************创业天下改版************************
+    public function pushToCytxV2($order_data){
+        if (is_object($order_data)) {
+            $order_data = json_decode(json_encode($order_data), true);
+        }
+
+        if (empty($order_data['id'] ?? 0)) {
+            return true;
+        }
+        $is_test = (int)ConfigModel::getData(37, 1);
+        if (!empty($is_test)) {
+            $url = 'http://39.107.71.116:8084/partner/instant-score';
+        } else {
+            $url = 'https://cytxapi.chuangyetianxia.com/partner/instant-score';
+        }
+    }
+    public function refundCytxV2(){
+
+    }
+    //积分计算规则
+    public function cytxScore(){
+
+    }
+    //**********************************************************
 
     //推送到创业天下
     private function pushToCytx($order_data)
@@ -32,7 +56,7 @@ class ChannelServers
         if (empty($order_data['id'] ?? 0)) {
             return true;
         }
-        $is_test = intval(ConfigModel::getData(37, 1));
+        $is_test = (int)ConfigModel::getData(37, 1);
         if (!empty($is_test)) {
             $url = 'http://39.107.71.116:8081/v1/partner/notify';
         } else {
@@ -46,13 +70,13 @@ class ChannelServers
         $data['source_id'] = $order_data['ordernum'];
 
         $res = Http::post($url, $data);
-        $res = json_decode($res);
+        $res = json_decode($res, false);
 
         $order = Order::find($order_data['id']);
         if ($res->code === 200) {
             $order->cytx_job = -1;
         } else {
-            $order->cytx_job = $order->cytx_job + 1;
+            ++$order->cytx_job;
         }
         $order->cytx_res = json_encode($res);
         $order->cytx_check_time = date('Y-m-d H:i:s');
