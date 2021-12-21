@@ -36,7 +36,7 @@ class WorksController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup works
      *
-     * @apiParam {int} lists_id  集合id'
+     * @apiParam {int} lists_id  集合id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:

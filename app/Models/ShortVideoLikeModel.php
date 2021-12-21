@@ -4,11 +4,14 @@
 namespace App\Models;
 
 
-use EasyWeChat\Kernel\Messages\ShortVideo;
-
 class ShortVideoLikeModel extends Base
 {
     protected $table = 'nlsg_short_video_like';
+
+    protected $fillable = [
+        'relation_id', 'user_id', 'type', 'status',
+    ];
+
 
     //点赞 取消点赞
     function Like($id,$type=1,$is_like=0,$uid=0){
@@ -16,22 +19,24 @@ class ShortVideoLikeModel extends Base
             return ['code'=>0,'msg'=>"参数错误"];
         }
         $list = ShortVideoLikeModel::where(['relation_id'=> $id, 'user_id'=> $uid, 'type'=>$type])->first();
-        if(!empty($list['status'])){
+
+        if(!empty($list)){
             if ($list['status'] == $is_like ){
-                return ['code'=>1000,'msg'=>"不要重复操作"];
+                return ['code'=>1000,'msg'=>"重复操作"];
             }
             ShortVideoLikeModel::where(['relation_id'=> $id, 'user_id'=> $uid, 'type'=>$type])
-                ->updtae(['status' => $is_like,'updated_at'=>date("Y-m-d H:i:s")]);
-
+                ->update(['status' => $is_like]);
             ShortVideoModel::where('id', $id)->decrement('like_num');
 
         }else{
-            ShortVideoLikeModel::create([
+
+            ShortVideoLikeModel::firstOrCreate([
                 'relation_id' => $id,
                 'user_id'     => $uid,
                 'type'        => $type,
                 'status'      => $is_like,
             ]);
+
             ShortVideoModel::where('id', $id)->increment('like_num');
         }
 
