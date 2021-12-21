@@ -34,6 +34,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::get('video/get_random_video', 'VideoController@getRandomVideo');
     Route::get('video/like', 'VideoController@like');
+    Route::get('user/user_his_list', 'UserController@userHisList');
 
 
 
