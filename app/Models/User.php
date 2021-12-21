@@ -346,6 +346,7 @@ class User extends Authenticatable implements JWTSubject
 
 
         $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
+            ->where('is_del',0)
             ->orderBy('num', 'desc')->GroupBy("user_id")->limit($size)->get()->toArray();
 
         $user_ids = array_column($his_data,'user_id');
@@ -358,7 +359,8 @@ class User extends Authenticatable implements JWTSubject
         foreach ($user as &$user_v){
             foreach ($his_data as $his_datum){
                 if($user_v['id'] == $his_datum['user_id']){
-                    $user_v['his_num'] = $his_datum['num'];
+                    $user_v['his_num_n'] = $his_datum['num'];
+                    $user_v['his_num'] = (floor($his_datum['num'] / 60))."小时".($his_datum['num']%60).'分钟';
                 }
             }
         }

@@ -14,6 +14,7 @@ use App\Models\UserInvite;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use GuzzleHttp\Client;
 use JWTAuth;
@@ -1369,7 +1370,7 @@ class UserController extends Controller
      *
      */
     public function editUserInfo(Request $request){
-        $uid = $this->user['id'] ?? 211172;
+        $uid = $this->user['id'] ?? 0;
 
         //sex 性别  0 未知 1 男 2 女
         $sex = $request->input('sex') ?? 0;
@@ -1446,8 +1447,29 @@ class UserController extends Controller
      *
      */
     public function userHisList(){
+        $uid = $this->user['id'] ?? 0;
+
         $data = User::getUserHisLen(10);
-        return success($data);
+
+
+        //自己的排名
+
+        $u_data = [
+            "time_leng" => "0分钟",
+            "rank"      => "暂无排名",
+        ];
+        if(!empty($uid)){
+            $user_data = History::select("user_id")->selectRaw('sum(time_number) as num')
+                ->where('is_del',0)->where('user_id',$uid)->first()->toArray();
+            $his_data = DB::select('select count(*) as count from (select  sum(time_number) as num,user_id 
+            from nlsg_history where is_del = 0 group by user_id HAVING sum(time_number )>='.$user_data['num'].') as count_table');
+
+
+            $u_data['time_leng']    = (floor($user_data['num'] / 60))."小时".($user_data['num']%60).'分钟';
+            $u_data['rank']         = $his_data[0]->count;
+        }
+
+        return success(['rank_data'=>$data,'user'=>$u_data]);
     }
 
 
