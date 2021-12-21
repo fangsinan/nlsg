@@ -26,7 +26,6 @@ class ShortVideoLikeModel extends Base
             }
             ShortVideoLikeModel::where(['relation_id'=> $id, 'user_id'=> $uid, 'type'=>$type])
                 ->update(['status' => $is_like]);
-            ShortVideoModel::where('id', $id)->decrement('like_num');
 
         }else{
 
@@ -36,7 +35,11 @@ class ShortVideoLikeModel extends Base
                 'type'        => $type,
                 'status'      => $is_like,
             ]);
+        }
 
+        if($is_like == 0){
+            ShortVideoModel::where('id', $id)->decrement('like_num');
+        }else{
             ShortVideoModel::where('id', $id)->increment('like_num');
         }
 
