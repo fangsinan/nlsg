@@ -785,9 +785,20 @@ class Order extends Base
         //用户账号
         if (!empty($params['phone'] ?? '')) {
             $phone = $params['phone'];
-            $query->whereHas('user', function ($q) use ($phone) {
-                $q->where('phone', 'like', "%$phone%");
-            });
+            if(strlen($phone) >= 8){
+                $where_user_id = User::query()
+                    ->where('phone','like',"%$phone%")
+                    ->pluck('id')
+                    ->toArray();
+                $query->whereIn('user_id',$where_user_id);
+            }else{
+                $query->whereHas('user', function ($q) use ($phone) {
+                    $q->where('phone', 'like', "%$phone%");
+                });
+            }
+
+
+
         }
         //订单来源
         if (!empty($params['os_type'] ?? 0)) {
@@ -843,7 +854,6 @@ class Order extends Base
 //                $q->where('phone', 'like', "%$t_live_phone%");
 //            });
 //        }
-
         if (($params['excel_flag'] ?? 0)) {
             $list = $query->limit($size)->offset(($page - 1) * $size)->get();
         } else {
