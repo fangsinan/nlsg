@@ -287,24 +287,25 @@ class Lists extends Model
 
                 //
                 if($v['type'] == 9){ //用户学习排序榜单
-                    $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
-                        ->orderBy('num', 'desc')->GroupBy("user_id")->limit(3)->get()->toArray();
-
-                    $user_ids = array_column($his_data,'user_id');
-                    $user = User::select('id','nickname', 'phone','headimg')
-                        ->whereIn('id', $user_ids)
-                        ->orderByRaw('FIELD(id,'.implode(',', $user_ids).')')
-                        ->get()->toArray();
-
-
-                    foreach ($user as &$user_v){
-                        foreach ($his_data as $his_datum){
-                            if($user_v['id'] == $his_datum['user_id']){
-                                $user_v['his_num'] = $his_datum['num'];
-                            }
-                        }
-                    }
-                    $v['data'] = $user;
+//                    $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
+//                        ->orderBy('num', 'desc')->GroupBy("user_id")->limit(3)->get()->toArray();
+//
+//                    $user_ids = array_column($his_data,'user_id');
+//                    $user = User::select('id','nickname', 'phone','headimg')
+//                        ->whereIn('id', $user_ids)
+//                        ->orderByRaw('FIELD(id,'.implode(',', $user_ids).')')
+//                        ->get()->toArray();
+//
+//
+//                    foreach ($user as &$user_v){
+//                        foreach ($his_data as $his_datum){
+//                            if($user_v['id'] == $his_datum['user_id']){
+//                                $user_v['his_num'] = $his_datum['num'];
+//                            }
+//                        }
+//                    }
+//                    $v['data'] = $user;
+                    $v['data'] = User::getUserHisLen();
                 }
 
 

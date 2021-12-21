@@ -103,7 +103,7 @@ class ShortVideoModel extends Base
             return ['list'=>[],'count'=>0];
         }
         //按照rand、创建时间排序
-        $field = ["id","user_id","share_img","cover_img","title","introduce","view_num","like_num","comment_num","share_num","duration","url","attribute_url"];
+        $field = ["id","user_id","share_img","cover_img","detail_img","title","introduce","view_num","like_num","comment_num","share_num","duration","url","attribute_url"];
         $where['status'] = 2;
         if(!empty($id)){
             $where["id"] = $id;

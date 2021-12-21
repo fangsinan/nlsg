@@ -19,8 +19,7 @@ class VideoController extends Controller
      * @apiVersion 5.0.0
      * @apiGroup five_video
      *
-     * @apiParam {int} page
-     * @apiParam {int} id      视频id
+     * @apiParam {int} id      需要请求的视频id
      * @apiParam {int} top_id  当前播放的id  防止重复获取数据
      *
      * @apiSuccess {string} result json

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Medz\Laravel\Notifications\JPush\Sender as JPushSender;
 use Illuminate\Support\Facades\DB;
@@ -331,4 +332,38 @@ class User extends Authenticatable implements JWTSubject
     function getIndexUser($ids){
         return self::select("id","phone","nickname","sex","city","headimg","teacher_title")->where(['is_author'=>1])->whereIn('id',$ids)->get()->Toarray();
     }
+
+
+
+    //获取用学习时长
+    public static function getUserHisLen($size=3){
+
+        $cache_key_name = 'user_his_len_list_'.$size;
+        $result = Cache::get($cache_key_name);
+        if ($result) {
+            return $result;
+        }
+
+
+        $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
+            ->orderBy('num', 'desc')->GroupBy("user_id")->limit($size)->get()->toArray();
+
+        $user_ids = array_column($his_data,'user_id');
+        $user = User::select('id','nickname', 'phone','headimg')
+            ->whereIn('id', $user_ids)
+            ->orderByRaw('FIELD(id,'.implode(',', $user_ids).')')
+            ->get()->toArray();
+
+
+        foreach ($user as &$user_v){
+            foreach ($his_data as $his_datum){
+                if($user_v['id'] == $his_datum['user_id']){
+                    $user_v['his_num'] = $his_datum['num'];
+                }
+            }
+        }
+        Cache::put($cache_key_name, $result, 86400);
+        return $user;
+    }
+
 }

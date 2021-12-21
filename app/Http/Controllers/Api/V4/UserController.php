@@ -1424,4 +1424,36 @@ class UserController extends Controller
 
 
 
+    /**
+     * @api {post} api/v4/user/user_his_list   获取学习榜单
+     * @apiVersion 4.0.0
+     * @apiName  user_his_list
+     * @apiGroup User
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/user_his_list
+     *
+     * @apiParam {string}   token  当前用户token
+     * @apiParam {string}   phone  手机号
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public function userHisList(){
+        $data = User::getUserHisLen(10);
+        return success($data);
+    }
+
+
+
+
+
+
+
 }
