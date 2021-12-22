@@ -288,7 +288,7 @@ class WechatPay extends Controller
                     $twitter_id = $user_id;
                 }
 
-                if(!in_array($orderInfo['activity_tag'],["2021-11-1","2021-11-2"])) { //活动无实际收益
+//                if(!in_array($orderInfo['activity_tag'],["2021-11-1","2021-11-2"])) { //活动无实际收益
                     //服务商购买时已是优惠价格
                     //购买必须为360会员
                     $PayRDObj = new PayRecordDetail();
@@ -352,10 +352,13 @@ class WechatPay extends Controller
                     $twitter_top = explode('->', $orderInfo['remark']);
                     if ($twitter_top[0] > 0) {
                         $twitter_top_vip_id = VipUser::where(['user_id' => $twitter_top[0], 'is_default' => 1, 'status' => 1])->first('id');
-                        $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id);
-                        $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
+                        if ($twitter_top_vip_id){
+                            $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id);
+                            $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
+                        }
                     }
-                }
+
+//                }
 
                 //  升级续费都需要进行精品课赠送     已经购买的需要折算兑换码
                 //查询关注里是否有这些课程   有的话是送优惠券  没有直接添加
