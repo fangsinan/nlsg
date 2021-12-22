@@ -19,10 +19,43 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
-class ChannelServers
-{
+class ChannelServers {
     //************************创业天下改版************************
-    public function pushToCytxV2($order_data){
+    public function cytxPost($type, $data) {
+        //0正式 1测试 2预发布
+        $is_test = (int)ConfigModel::getData(37, 1);
+        switch ($is_test) {
+            case 0:
+                $url = [
+                    'push'   => 'https://cytxapi.chuangyetianxia.com/partner/instant-score',
+                    'refund' => 'https://cytxapi.chuangyetianxia.com/partner/refund-score'
+                ];
+                break;
+            case 1:
+                $url = [
+                    'push'   => 'http://39.107.71.116:8084/partner/instant-score',
+                    'refund' => 'http://39.107.71.116:8084/partner/refund-score'
+                ];
+                break;
+            default:
+                $url = [
+                    'push'   => 'https://cytx-stage-new-api.chuangyetianxia.com/partner/instant-score',
+                    'refund' => 'https://cytx-stage-new-api.chuangyetianxia.com/partner/refund-score'
+                ];
+        }
+
+        $url = $url[$type] ?? '';
+        if (empty($url)) {
+            return false;
+        }
+
+        $res = Http::post($url, $data);
+        $res = json_decode($res, false);
+        return $res;
+
+    }
+
+    public function pushToCytxV2($order_data): bool {
         if (is_object($order_data)) {
             $order_data = json_decode(json_encode($order_data), true);
         }
@@ -30,25 +63,63 @@ class ChannelServers
         if (empty($order_data['id'] ?? 0)) {
             return true;
         }
-        $is_test = (int)ConfigModel::getData(37, 1);
-        if (!empty($is_test)) {
-            $url = 'http://39.107.71.116:8084/partner/instant-score';
-        } else {
-            $url = 'https://cytxapi.chuangyetianxia.com/partner/instant-score';
-        }
-    }
-    public function refundCytxV2(){
 
+        $data              = [];
+        $data['telephone'] = $order_data['username'];
+        $data['source']    = 'nlsg';
+        $data['source_id'] = $order_data['ordernum'];
+        $data['price']     = $order_data['price'];
+        $data['score']     = $order_data['price'];
+        $data['name']      = $order_data['title'];
+
+        $res = $this->cytxPost('push', $data);
+
+        $order = Order::find($order_data['id']);
+        if ($res->code === 200) {
+            $order->cytx_job = -1;
+        } else {
+            ++$order->cytx_job;
+        }
+        $order->cytx_res        = json_encode($res);
+        $order->cytx_check_time = date('Y-m-d H:i:s');
+        $order->save();
+        return true;
     }
-    //积分计算规则
-    public function cytxScore(){
+
+    public function refundCytxV2($order_id, $order_num): bool {
+        if (empty($order_id) || empty($order_num)) {
+            return false;
+        }
+        $check = Order::query()->where('id', '=', $order_id)
+            ->where('ordernum', '=', $order_num)
+            ->where('activity_tag', '=', 'cytx')
+            ->where('status', '=', 1)
+            ->where('is_shill', '=', 1)
+            ->first();
+        if (empty($check)) {
+            return false;
+        }
+
+        $data              = [];
+        $data['source']    = 'nlsg';
+        $data['source_id'] = $order_num;
+        $res               = $this->cytxPost('refund', $data);
+
+        if ($res->code === 200) {
+            $check->cytx_refund = 1;
+            $check->save();
+            return true;
+        }
+        return false;
+    }
+
+    public function cytxOrderCheck() {
 
     }
     //**********************************************************
 
     //推送到创业天下
-    private function pushToCytx($order_data)
-    {
+    private function pushToCytx($order_data) {
         if (is_object($order_data)) {
             $order_data = json_decode(json_encode($order_data), true);
         }
@@ -64,9 +135,9 @@ class ChannelServers
         }
 
         $data['telephone'] = $order_data['username'];
-        $data['name'] = $order_data['title'];
-        $data['price'] = $order_data['price'];
-        $data['source'] = 'nlsg';
+        $data['name']      = $order_data['title'];
+        $data['price']     = $order_data['price'];
+        $data['source']    = 'nlsg';
         $data['source_id'] = $order_data['ordernum'];
 
         $res = Http::post($url, $data);
@@ -78,20 +149,18 @@ class ChannelServers
         } else {
             ++$order->cytx_job;
         }
-        $order->cytx_res = json_encode($res);
+        $order->cytx_res        = json_encode($res);
         $order->cytx_check_time = date('Y-m-d H:i:s');
         $order->save();
     }
 
-    public static function cytxJob()
-    {
+    public static function cytxJob() {
         $c = new self();
         $c->cytxOrderList();
     }
 
     //创业天下订单获取
-    public function cytxOrderList($order_id = 0)
-    {
+    public function cytxOrderList($order_id = 0) {
         $query = DB::table('nlsg_user as u')
             ->join('nlsg_order as o', 'u.id', '=', 'o.user_id')
             ->join('nlsg_pay_record as p', 'o.ordernum', '=', 'p.ordernum');
@@ -137,13 +206,13 @@ class ChannelServers
             $v->title = '';
             if ($v->type == 9) {
                 $temp_info = Works::whereId($v->relation_id)->select('id', 'title')->first();
-                $v->title = $temp_info->title;
+                $v->title  = $temp_info->title;
             } elseif ($v->type == 15) {
                 $temp_info = Column::whereId($v->relation_id)->select(['id', 'name'])->first();
-                $v->title = $temp_info->name;
+                $v->title  = $temp_info->name;
             } elseif ($v->type == 10) {
                 $temp_info = Live::whereId($v->relation_id)->select(['id', 'title'])->first();
-                $v->title = $temp_info->title;
+                $v->title  = $temp_info->title;
             }
         }
 
@@ -157,8 +226,7 @@ class ChannelServers
     }
 
     //抖音订单拉取(定时任务)
-    public function getDouYinOrder()
-    {
+    public function getDouYinOrder() {
         $is_test = intval(ConfigModel::getData(37, 1));
         if (!empty($is_test)) {
             ConfigModel::where('id', '=', 49)->update([
@@ -169,7 +237,7 @@ class ChannelServers
 
         $begin_date = ConfigModel::getData(38, 1);
         if (empty($begin_date)) {
-            $min = date('i');
+            $min      = date('i');
             $job_type = $min % 3;
             switch ($job_type) {
                 case 0:
@@ -194,7 +262,7 @@ class ChannelServers
                 return true;
             }
             $begin_date = date('Y-m-d H:i:00', strtotime($begin_date));
-            $end_date = date('Y-m-d H:i:00', strtotime("$begin_date +300 minutes"));
+            $end_date   = date('Y-m-d H:i:00', strtotime("$begin_date +300 minutes"));
             ConfigModel::whereId(38)->update(['value' => $end_date]);
         }
 
@@ -202,15 +270,15 @@ class ChannelServers
         $size = 100;
         $args = [
             'start_time' => $begin_date,
-            'end_time' => $end_date,
-            'size' => strval($size),
-            'order_by' => 'create_time'
+            'end_time'   => $end_date,
+            'size'       => strval($size),
+            'order_by'   => 'create_time'
         ];
 
         $go_on = true;
         while ($go_on) {
             $args['page'] = strval($page);
-            $temp_res = $this->douYinQuery($args);
+            $temp_res     = $this->douYinQuery($args);
             $page++;
             if (empty($temp_res['err_no'])) {
                 $this->insertDouYinOrder($temp_res['data']['list']);
@@ -224,8 +292,7 @@ class ChannelServers
     }
 
     //抖音订单入库
-    private function insertDouYinOrder($list)
-    {
+    private function insertDouYinOrder($list) {
         if (!is_array($list) || empty($list)) {
             return true;
         }
@@ -245,12 +312,12 @@ class ChannelServers
                     $temp_data = new ChannelOrder();
                 }
 
-                $temp_data->order_id = $v['order_id'];
-                $temp_data->channel = 1;
-                $temp_data->sku = $vv['product_id'] ?? 0;
-                $temp_data->phone = $v['post_tel'] ?? 0;
+                $temp_data->order_id     = $v['order_id'];
+                $temp_data->channel      = 1;
+                $temp_data->sku          = $vv['product_id'] ?? 0;
+                $temp_data->phone        = $v['post_tel'] ?? 0;
                 $temp_data->order_status = $v['order_status'];
-                $temp_data->create_time = date('Y-m-d H:i:s', $v['create_time']);
+                $temp_data->create_time  = date('Y-m-d H:i:s', $v['create_time']);
                 if (empty($v['pay_time'])) {
                     $temp_data->pay_time = null;
                 } else {
@@ -263,8 +330,7 @@ class ChannelServers
     }
 
     //抖音订单补全(定时任务)
-    public function supplementDouYinOrder()
-    {
+    public function supplementDouYinOrder() {
         $is_test = intval(ConfigModel::getData(37, 1));
         if (!empty($is_test)) {
             ConfigModel::where('id', '=', 49)->update([
@@ -287,11 +353,11 @@ class ChannelServers
             if (empty($v->skuInfo) || $v->order_status == 4) {
                 $v->status = 9;
             } else {
-                $user = User::firstOrCreate([
+                $user       = User::firstOrCreate([
                     'phone' => $v->phone,
                 ], [
                     'nickname' => substr_replace($v->phone, '****', 3, 4),
-                    'ref' => 11,
+                    'ref'      => 11,
                 ]);
                 $v->user_id = $user->id;
             }
@@ -299,50 +365,48 @@ class ChannelServers
         }
     }
 
-    private function douYinQuery($args)
-    {
+    private function douYinQuery($args) {
 
-        $token = $this->getDouYinToken();
+        $token    = $this->getDouYinToken();
         $now_date = date('Y-m-d H:i:s');
-        $host = 'https://openapi-fxg.jinritemai.com';
-        $v = '2';
-        $c = 'order';
-        $a = 'list';
-        $method = $c . '.' . $a;
+        $host     = 'https://openapi-fxg.jinritemai.com';
+        $v        = '2';
+        $c        = 'order';
+        $a        = 'list';
+        $method   = $c . '.' . $a;
 
-        $APP_KEY = config('env.DOUYIN_APP_KEY');
+        $APP_KEY    = config('env.DOUYIN_APP_KEY');
         $APP_SECRET = config('env.DOUYIN_APP_SECRET');
         ksort($args);
         $args_json = json_encode($args);
 
         // 计算签名
-        $str = 'app_key' . $APP_KEY . 'method' . $method . 'param_json' .
+        $str      = 'app_key' . $APP_KEY . 'method' . $method . 'param_json' .
             $args_json . 'timestamp' . $now_date . 'v' . $v;
-        $md5_str = $APP_SECRET . $str . $APP_SECRET;
-        $sign = md5($md5_str);
+        $md5_str  = $APP_SECRET . $str . $APP_SECRET;
+        $sign     = md5($md5_str);
         $base_url = $host . '/' . $c . '/' . $a;
 
         $request_data = [
             'access_token' => $token,
-            'app_key' => $APP_KEY,
-            'method' => $method,
-            'param_json' => $args_json,
-            'timestamp' => $now_date,
-            'v' => $v,
-            'sign' => $sign,
+            'app_key'      => $APP_KEY,
+            'method'       => $method,
+            'param_json'   => $args_json,
+            'timestamp'    => $now_date,
+            'v'            => $v,
+            'sign'         => $sign,
         ];
 
         $res = Http::get($base_url . '?' . http_build_query($request_data));
         return json_decode($res, true);
     }
 
-    private function getDouYinToken()
-    {
+    private function getDouYinToken() {
         $cache_key_name = 'douyin_token';
-        $access_token = Cache::get($cache_key_name);
+        $access_token   = Cache::get($cache_key_name);
 
         if (empty($access_token)) {
-            $APP_KEY = config('env.DOUYIN_APP_KEY');
+            $APP_KEY    = config('env.DOUYIN_APP_KEY');
             $APP_SECRET = config('env.DOUYIN_APP_SECRET');
 
             $url = "https://openapi-fxg.jinritemai.com/oauth2/access_token?" .
@@ -360,8 +424,7 @@ class ChannelServers
     }
 
     //抖音开通(定时任务)
-    public function douYinJob()
-    {
+    public function douYinJob() {
         $is_test = intval(ConfigModel::getData(37, 1));
         if (!empty($is_test)) {
             ConfigModel::where('id', '=', 49)->update([
@@ -372,7 +435,7 @@ class ChannelServers
 
         //抖音订单 order_status=3,5  就可以执行
         $begin_date = date('Y-m-d 00:00:00', strtotime('-20 days'));
-        $now_date = date('Y-m-d H:i:s');
+        $now_date   = date('Y-m-d H:i:s');
 
         $list = ChannelOrder::where('create_time', '>', $begin_date)
             ->where('user_id', '>', 0)
@@ -408,22 +471,22 @@ class ChannelServers
                                 ->where('status', '=', 1)
                                 ->first();
                             if (empty($check)) {
-                                $temp_data = [];
-                                $temp_data['type'] = 6;
-                                $temp_data['user_id'] = $v->user_id;
-                                $temp_data['relation_id'] = $tv;
-                                $temp_data['pay_time'] = $now_date;
-                                $temp_data['start_time'] = $now_date;
-                                $temp_data['status'] = 1;
-                                $temp_data['give'] = 15;
-                                $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 years'));
-                                $temp_data['channel_order_id'] = $v->order_id;
+                                $temp_data                      = [];
+                                $temp_data['type']              = 6;
+                                $temp_data['user_id']           = $v->user_id;
+                                $temp_data['relation_id']       = $tv;
+                                $temp_data['pay_time']          = $now_date;
+                                $temp_data['start_time']        = $now_date;
+                                $temp_data['status']            = 1;
+                                $temp_data['give']              = 15;
+                                $temp_data['end_time']          = date('Y-m-d 23:59:59', strtotime('+1 years'));
+                                $temp_data['channel_order_id']  = $v->order_id;
                                 $temp_data['channel_order_sku'] = $v->sku;
-                                $add_sub_data[] = $temp_data;
+                                $add_sub_data[]                 = $temp_data;
                             } else {
-                                $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +1 years"));
+                                $temp_end_time   = date('Y-m-d 23:59:59', strtotime("$check->end_time +1 years"));
                                 $check->end_time = $temp_end_time;
-                                $edit_res = $check->save();
+                                $edit_res        = $check->save();
                                 if ($edit_res === false) {
                                     DB::rollBack();
                                     break;
@@ -433,7 +496,7 @@ class ChannelServers
                         $edit_res = DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1,
+                                'status'     => 1,
                                 'success_at' => $now_date
                             ]);
                         if ($edit_res === false) {
@@ -461,22 +524,22 @@ class ChannelServers
                                 ->where('status', '=', 1)
                                 ->first();
                             if (empty($check)) {
-                                $temp_data = [];
-                                $temp_data['type'] = 2;
-                                $temp_data['user_id'] = $v->user_id;
-                                $temp_data['relation_id'] = $tv;
-                                $temp_data['pay_time'] = $now_date;
-                                $temp_data['start_time'] = $now_date;
-                                $temp_data['status'] = 1;
-                                $temp_data['give'] = 15;
-                                $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime('+1 years'));
-                                $temp_data['channel_order_id'] = $v->order_id;
+                                $temp_data                      = [];
+                                $temp_data['type']              = 2;
+                                $temp_data['user_id']           = $v->user_id;
+                                $temp_data['relation_id']       = $tv;
+                                $temp_data['pay_time']          = $now_date;
+                                $temp_data['start_time']        = $now_date;
+                                $temp_data['status']            = 1;
+                                $temp_data['give']              = 15;
+                                $temp_data['end_time']          = date('Y-m-d 23:59:59', strtotime('+1 years'));
+                                $temp_data['channel_order_id']  = $v->order_id;
                                 $temp_data['channel_order_sku'] = $v->sku;
-                                $add_sub_data[] = $temp_data;
+                                $add_sub_data[]                 = $temp_data;
                             } else {
-                                $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +1 years"));
+                                $temp_end_time   = date('Y-m-d 23:59:59', strtotime("$check->end_time +1 years"));
                                 $check->end_time = $temp_end_time;
-                                $edit_res = $check->save();
+                                $edit_res        = $check->save();
                                 if ($edit_res === false) {
                                     DB::rollBack();
                                     break;
@@ -486,7 +549,7 @@ class ChannelServers
                         $edit_res = DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1,
+                                'status'     => 1,
                                 'success_at' => $now_date
                             ]);
                         if ($edit_res === false) {
@@ -506,7 +569,7 @@ class ChannelServers
                         //21-03-22 补充的课程
                         Subscribe::appendSub([$v->user_id], 1);
                         $add_sub_data = [];
-                        $add_cd_data = [];
+                        $add_cd_data  = [];
                         DB::beginTransaction();
                         foreach ($v->skuInfo->to_id as $tv) {
                             Live::where('id', $tv)->increment('order_num');
@@ -517,33 +580,33 @@ class ChannelServers
                                 ->where('status', '=', 1)
                                 ->first();
                             if (empty($check)) {
-                                $temp_data = [];
-                                $temp_data['type'] = 3;
-                                $temp_data['user_id'] = $v->user_id;
-                                $temp_data['relation_id'] = $tv;
-                                $temp_data['pay_time'] = $now_date;
-                                $temp_data['status'] = 1;
-                                $temp_data['give'] = 15;
-                                $temp_data['channel_order_id'] = $v->order_id;
+                                $temp_data                      = [];
+                                $temp_data['type']              = 3;
+                                $temp_data['user_id']           = $v->user_id;
+                                $temp_data['relation_id']       = $tv;
+                                $temp_data['pay_time']          = $now_date;
+                                $temp_data['status']            = 1;
+                                $temp_data['give']              = 15;
+                                $temp_data['channel_order_id']  = $v->order_id;
                                 $temp_data['channel_order_sku'] = $v->sku;
-                                $add_sub_data[] = $temp_data;
+                                $add_sub_data[]                 = $temp_data;
                             }
                             $check_cd = LiveCountDown::where('user_id', '=', $v->user_id)
                                 ->where('phone', '=', $v->phone)
                                 ->where('live_id', '=', $tv)
                                 ->first();
                             if (empty($check_cd)) {
-                                $temp_cd_data = [];
+                                $temp_cd_data            = [];
                                 $temp_cd_data['live_id'] = 8;
                                 $temp_cd_data['user_id'] = $v->user_id;
-                                $temp_cd_data['phone'] = $v->phone;
-                                $add_cd_data[] = $temp_cd_data;
+                                $temp_cd_data['phone']   = $v->phone;
+                                $add_cd_data[]           = $temp_cd_data;
                             }
                         }
                         $edit_res = DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1,
+                                'status'     => 1,
                                 'success_at' => $now_date
                             ]);
                         if ($edit_res === false) {
@@ -568,12 +631,12 @@ class ChannelServers
                             if ($check_bind == 0) {
                                 //没有绑定记录,则绑定
                                 $bind_data = [
-                                    'parent' => '18512378959',
-                                    'son' => $v->phone,
-                                    'life' => 2,
+                                    'parent'   => '18512378959',
+                                    'son'      => $v->phone,
+                                    'life'     => 2,
                                     'begin_at' => date('Y-m-d H:i:s'),
-                                    'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                                    'channel' => 3
+                                    'end_at'   => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                                    'channel'  => 3
                                 ];
                                 DB::table('nlsg_vip_user_bind')->insert($bind_data);
                             }
@@ -591,29 +654,29 @@ class ChannelServers
                         break;
                     case 4:
                         $servers = new VipServers();
-                        $servers->openVip($v->user_id, $v->phone,'douyin');
+                        $servers->openVip($v->user_id, $v->phone, 'douyin');
                         DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1,
+                                'status'     => 1,
                                 'success_at' => $now_date
                             ]);
 
                         foreach ($v->skuInfo->to_id as $to_id) {
                             if ($to_id == 2) {
                                 //如果是2  表示为1360订单 需要写入order表
-                                $orderModel = new Order();
-                                $orderModel->type = 14;
-                                $orderModel->live_num = 1;
-                                $orderModel->relation_id = 4;
-                                $orderModel->live_id = 0;
-                                $orderModel->user_id = $v->user_id;
-                                $orderModel->status = 1;
-                                $orderModel->pay_time = $now_date;
-                                $orderModel->cost_price = 1360;
-                                $orderModel->price = 1360;
-                                $orderModel->pay_price = 1360;
-                                $orderModel->ordernum = $v->order_id;
+                                $orderModel               = new Order();
+                                $orderModel->type         = 14;
+                                $orderModel->live_num     = 1;
+                                $orderModel->relation_id  = 4;
+                                $orderModel->live_id      = 0;
+                                $orderModel->user_id      = $v->user_id;
+                                $orderModel->status       = 1;
+                                $orderModel->pay_time     = $now_date;
+                                $orderModel->cost_price   = 1360;
+                                $orderModel->price        = 1360;
+                                $orderModel->pay_price    = 1360;
+                                $orderModel->ordernum     = $v->order_id;
                                 $orderModel->activity_tag = 'dy_1360';
                                 $orderModel->save();
                             }
@@ -642,17 +705,17 @@ class ChannelServers
                         $live_id_list = array_unique($live_id_list);
 
                         $add_sub_data = [];
-                        $add_cd_data = [];
+                        $add_cd_data  = [];
                         $add_sms_data = [];
                         DB::beginTransaction();
                         foreach ($live_id_list as $tv) {
                             Live::where('id', $tv)->increment('order_num');
 
-                            $live_data = Live::where('id', $tv)->select(['id', 'begin_at'])->first();
-                            $temp_add_sms_data = [];
+                            $live_data                  = Live::where('id', $tv)->select(['id', 'begin_at'])->first();
+                            $temp_add_sms_data          = [];
                             $temp_add_sms_data['phone'] = $v->phone;
-                            $temp_add_sms_data['time'] = date('m月d日', strtotime($live_data->begin_at));
-                            $add_sms_data[] = $temp_add_sms_data;
+                            $temp_add_sms_data['time']  = date('m月d日', strtotime($live_data->begin_at));
+                            $add_sms_data[]             = $temp_add_sms_data;
 
                             $check = Subscribe::where('user_id', '=', $v->user_id)
                                 ->where('created_at', '>', '2021-01-05')
@@ -661,34 +724,34 @@ class ChannelServers
                                 ->where('status', '=', 1)
                                 ->first();
                             if (empty($check)) {
-                                $temp_data = [];
-                                $temp_data['type'] = 3;
-                                $temp_data['user_id'] = $v->user_id;
-                                $temp_data['relation_id'] = $tv;
-                                $temp_data['pay_time'] = $now_date;
-                                $temp_data['status'] = 1;
-                                $temp_data['give'] = 15;
-                                $temp_data['channel_order_id'] = $v->order_id;
+                                $temp_data                      = [];
+                                $temp_data['type']              = 3;
+                                $temp_data['user_id']           = $v->user_id;
+                                $temp_data['relation_id']       = $tv;
+                                $temp_data['pay_time']          = $now_date;
+                                $temp_data['status']            = 1;
+                                $temp_data['give']              = 15;
+                                $temp_data['channel_order_id']  = $v->order_id;
                                 $temp_data['channel_order_sku'] = $v->sku;
-                                $add_sub_data[] = $temp_data;
+                                $add_sub_data[]                 = $temp_data;
                             }
                             $check_cd = LiveCountDown::where('user_id', '=', $v->user_id)
                                 ->where('phone', '=', $v->phone)
                                 ->where('live_id', '=', $tv)
                                 ->first();
                             if (empty($check_cd)) {
-                                $temp_cd_data = [];
+                                $temp_cd_data            = [];
                                 $temp_cd_data['live_id'] = 8;
                                 $temp_cd_data['user_id'] = $v->user_id;
-                                $temp_cd_data['phone'] = $v->phone;
-                                $add_cd_data[] = $temp_cd_data;
+                                $temp_cd_data['phone']   = $v->phone;
+                                $add_cd_data[]           = $temp_cd_data;
                             }
                         }
 
                         $edit_res = DB::table('nlsg_channel_order')
                             ->where('id', '=', $v->id)
                             ->update([
-                                'status' => 1,
+                                'status'     => 1,
                                 'success_at' => $now_date
                             ]);
                         if ($edit_res === false) {
@@ -713,12 +776,12 @@ class ChannelServers
                             if ($check_bind == 0) {
                                 //没有绑定记录,则绑定
                                 $bind_data = [
-                                    'parent' => '18512378959',
-                                    'son' => $v->phone,
-                                    'life' => 2,
+                                    'parent'   => '18512378959',
+                                    'son'      => $v->phone,
+                                    'life'     => 2,
                                     'begin_at' => date('Y-m-d H:i:s'),
-                                    'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                                    'channel' => 3
+                                    'end_at'   => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                                    'channel'  => 3
                                 ];
                                 DB::table('nlsg_vip_user_bind')->insert($bind_data);
                             }
@@ -731,7 +794,7 @@ class ChannelServers
                                 foreach ($add_sms_data as $sms_v) {
                                     $easySms->send($sms_v['phone'], [
                                         'template' => 'SMS_218028527',
-                                        'data' => [
+                                        'data'     => [
                                             'time' => $sms_v['time'],
                                         ],
                                     ], ['aliyun']);
@@ -760,8 +823,7 @@ class ChannelServers
     }
 
     //抖音课程列表
-    public function getList($params)
-    {
+    public function getList($params) {
         $size = $params['size'] ?? 10;
 
         $query = ChannelWorksList::where('status', '=', 1)
@@ -788,11 +850,11 @@ class ChannelServers
 
         //标题搜索
         if (!empty($params['title'] ?? '')) {
-            $title = $params['title'];
-            $w_id_list = Works::where('title', 'like', "%$title%")
+            $title        = $params['title'];
+            $w_id_list    = Works::where('title', 'like', "%$title%")
                 ->where('status', '=', 4)->where('type', '=', 2)
                 ->pluck('id')->toArray();
-            $c_id_list = Column::where('title', 'like', "%$title%")
+            $c_id_list    = Column::where('title', 'like', "%$title%")
                 ->where('status', '=', 1)->where('type', '=', 2)
                 ->pluck('id')->toArray();
             $temp_id_list = array_unique(array_merge($w_id_list, $c_id_list));
@@ -828,15 +890,15 @@ class ChannelServers
             ->paginate($size);
 
         foreach ($list as $k => $v) {
-            $temp_res = [];
-            $temp_res['id'] = $v['id'];
-            $temp_res['rank'] = $v['rank'];
-            $temp_res['works_id'] = $v['works_id'];
+            $temp_res               = [];
+            $temp_res['id']         = $v['id'];
+            $temp_res['rank']       = $v['rank'];
+            $temp_res['works_id']   = $v['works_id'];
             $temp_res['works_type'] = $v['type'];
-            $temp_res['price'] = $v['price'];
-            $temp_res['view_num'] = $v['view_num'];
+            $temp_res['price']      = $v['price'];
+            $temp_res['view_num']   = $v['view_num'];
             $temp_res['created_at'] = $v['created_at'];
-            $temp_res['is_buy'] = ($v['check_sub_count'] > 0) ? 1 : 0;
+            $temp_res['is_buy']     = ($v['check_sub_count'] > 0) ? 1 : 0;
 
             $temp_res['category_info'] = [];
             foreach ($v['categoryBind'] as $cbv) {
@@ -849,42 +911,41 @@ class ChannelServers
                 if (empty($v['column'])) {
                     continue;
                 }
-                $temp_res['title'] = $v['column']['title'];
-                $temp_res['subtitle'] = $v['column']['subtitle'];
-                $temp_res['cover_img'] = $v['column']['cover_img'];
-                $temp_res['detail_img'] = $v['column']['cover_img'];
-                $temp_res['type'] = 1;
-                $temp_res['column_type'] = $v['column']['column_type'];
-                $temp_res['user_id'] = $v['column']['user_id'];
+                $temp_res['title']         = $v['column']['title'];
+                $temp_res['subtitle']      = $v['column']['subtitle'];
+                $temp_res['cover_img']     = $v['column']['cover_img'];
+                $temp_res['detail_img']    = $v['column']['cover_img'];
+                $temp_res['type']          = 1;
+                $temp_res['column_type']   = $v['column']['column_type'];
+                $temp_res['user_id']       = $v['column']['user_id'];
                 $temp_res['subscribe_num'] = $v['column']['subscribe_num'];
-                $temp_res['info_num'] = $v['column']['info_num'];
+                $temp_res['info_num']      = $v['column']['info_num'];
             } else if ($v['type'] == 2) {
                 if (empty($v['works'])) {
                     continue;
                 }
-                $temp_res['title'] = $v['works']['title'];
-                $temp_res['subtitle'] = $v['works']['subtitle'];
-                $temp_res['cover_img'] = $v['works']['cover_img'];
-                $temp_res['detail_img'] = $v['works']['cover_img'];
-                $temp_res['type'] = $v['works']['type'];
-                $temp_res['column_type'] = 1;
-                $temp_res['user_id'] = $v['works']['user_id'];
+                $temp_res['title']         = $v['works']['title'];
+                $temp_res['subtitle']      = $v['works']['subtitle'];
+                $temp_res['cover_img']     = $v['works']['cover_img'];
+                $temp_res['detail_img']    = $v['works']['cover_img'];
+                $temp_res['type']          = $v['works']['type'];
+                $temp_res['column_type']   = 1;
+                $temp_res['user_id']       = $v['works']['user_id'];
                 $temp_res['subscribe_num'] = $v['works']['subscribe_num'];
-                $temp_res['info_num'] = $v['works']['info_num'];
+                $temp_res['info_num']      = $v['works']['info_num'];
             } else {
                 continue;
             }
 
             $temp_res['user_info'] = User::getTeacherInfo($temp_res['user_id']);
-            $list[$k] = $temp_res;
+            $list[$k]              = $temp_res;
         }
 
         return $list;
     }
 
-    public function rank($params)
-    {
-        $id = $params['id'] ?? 0;
+    public function rank($params) {
+        $id   = $params['id'] ?? 0;
         $rank = $params['rank'] ?? 0;
         if (empty($id) || empty($rank)) {
             return ['code' => false, 'msg' => '参数错误'];
