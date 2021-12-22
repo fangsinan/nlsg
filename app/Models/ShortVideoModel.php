@@ -13,7 +13,7 @@ class ShortVideoModel extends Base
         'comment_num', 'size', 'duration', 'url', 'like_num', 'share_num', 'attribute_url',
     ];
     //获取短视频
-    function getVideo ($uid,$id=0,$not_id=0,$page=1,$size=3){
+    function getVideo ($uid,$id=0,$not_id=0,$page=1,$size=3,$is_home=0){
 
         $re_data = [];
         $flag_data_len = 0;
@@ -27,7 +27,7 @@ class ShortVideoModel extends Base
                 $get_flag = false;
             }else{
                 //视频数量不够
-                $getVideo = self::getVideoInfo($id,$not_ids,$size-$flag_data_len);
+                $getVideo = self::getVideoInfo($id,$not_ids,$size-$flag_data_len,$is_home);
                 $flag_data = $getVideo['list'];
                 $id = 0;  //二次循环重置id
                 if($i ==1 && empty($flag_data)){//首次循环如果为空直接返回
@@ -100,16 +100,21 @@ class ShortVideoModel extends Base
 
 
 
-    static  function getVideoInfo($id=0,$not_id=[],$size=3){
+    static  function getVideoInfo($id=0,$not_id=[],$size=3,$is_home){
 
         if(!is_array($not_id) || $size<=0){
             return ['list'=>[],'count'=>0];
         }
         //按照rand、创建时间排序
         $field = ["id","user_id","share_img","cover_img","detail_img","title","introduce","view_num","like_num","comment_num","share_num","duration","url","attribute_url"];
+
         $where['status'] = 2;
         if(!empty($id)){
             $where["id"] = $id;
+        }
+        //首页展示横屏
+        if($is_home == 1){
+            $where["video_type"] = 1;
         }
 
         $data = self::select($field)->where($where)

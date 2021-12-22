@@ -57,10 +57,11 @@ class VideoController extends Controller
 
         $page = $request->input('page') ??1;
         $top_id = $request->input('top_id') ??0;
+        $is_home = $request->input('is_home');
         $id = $request->input('id') ??0;
 
         $videoObj = new ShortVideoModel();
-        $relation_id = $videoObj->getVideo($uid,$id,$top_id,$page,3);
+        $relation_id = $videoObj->getVideo($uid,$id,$top_id,$page,3,$is_home);
 
         return $this->success($relation_id);
     }
