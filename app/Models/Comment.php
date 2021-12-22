@@ -39,7 +39,7 @@ class Comment extends Base
                     ->where('status', 1);
                 //->limit(5); limit是只显示列表评论总体的5条回复
             },
-            'reply.from_user:id,nickname', 'reply.to_user:id,nickname'
+            'reply.from_user:id,nickname,headimg', 'reply.to_user:id,nickname,headimg'
         ])
             ->select('id', 'pid', 'user_id', 'relation_id', 'info_id', 'content', 'forward_num',
                 'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality')
