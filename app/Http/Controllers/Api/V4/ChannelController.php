@@ -9,10 +9,18 @@ use App\Models\ChannelWorksList;
 use App\Models\Click;
 use App\Models\User;
 use App\Models\Works;
+use App\Servers\ChannelServers;
 use Illuminate\Http\Request;
 
 class ChannelController extends Controller
 {
+    //创业天下推送校验
+    public function cytxOrderCheck(Request $request){
+        $cs = new ChannelServers();
+        $res = $cs->cytxOrderCheck($request->input());
+        return $this->getRes($res);
+    }
+
     /**
      * 创业天下课程列表(旧)
      * @api {get} /api/v4/channel/cytx 创业天下课程列表(旧)

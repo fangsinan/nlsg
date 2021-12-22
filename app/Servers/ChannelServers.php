@@ -113,8 +113,35 @@ class ChannelServers {
         return false;
     }
 
-    public function cytxOrderCheck() {
+    public function cytxOrderCheck($params) {
+        $phone     = $params['telephone'] ?? 0;
+        $source    = $params['source'] ?? '';
+        $order_num = $params['source_id'] ?? '';
+        $price     = $params['price'] ?? 0;
+        $score     = $params['score'] ?? 0;
+        if ($source !== 'cytx') {
+            return ['code' => false, 'msg' => '信息错误'];
+        }
+        if (empty($phone) || empty($order_num) || empty($price)) {
+            return ['code' => false, 'msg' => '信息错误'];
+        }
+        if ($price !== $score) {
+            return ['code' => false, 'msg' => '信息错误'];
+        }
 
+        $check = DB::table('nlsg_order as o')
+            ->join('nlsg_user as u', 'o.user_id', '=', 'u.id')
+            ->where('o.ordernum', '=', $order_num)
+            ->where('u.phone', '=', $phone)
+            ->where('o.status', '=', 1)
+            ->where('o.activity_tag', '=', 'cytx')
+            ->where('o.pay_price', '=', $price)
+            ->first();
+        if ($check) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败'];
     }
     //**********************************************************
 
