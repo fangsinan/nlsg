@@ -70,7 +70,7 @@ class Lists extends Model
                 foreach ($v['list_works'] as $kk => &$vv) {
 
                     if ($vv['type']==1){
-                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','view_num',"info_num",])
+                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','view_num',"chapter_num as info_num",])
                             ->with(['user'=>function($query){
                                 $query->select('id','nickname', 'headimg','teacher_title');
                             }])
@@ -81,7 +81,7 @@ class Lists extends Model
                     }else if ($vv['type'] == 2) {
                         $listen = Works::select([
                             'id', 'user_id', 'type', 'title', 'subtitle', 'cover_img', 'original_price', 'price',
-                            'message', 'is_free','view_num',"info_num",
+                            'message', 'is_free','view_num',"chapter_num as info_num",
                         ])
                             ->with([
                                 'user' => function ($query) {
