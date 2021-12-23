@@ -39,7 +39,7 @@ class LikeController extends Controller
         $id   = $request->input('id');
         $type = $request->input('type');
         $comment_type = $request->input('comment_type');
-        if (!$id || !$type || $comment_type){
+        if (empty($id) || empty($type) || empty($comment_type)){
             return error(1000, '参数不全');
         }
         $list = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type])->first();
