@@ -20,6 +20,9 @@ class Comment extends Base
         if ( ! $id) {
             return false;
         }
+
+
+        $like_type = 1;
         if ($type == 1 || $type == 2 || $type == 6) {
             $res = Column::where('id', $id)->first();
         } elseif ($type == 3 || $type == 4) {
@@ -27,8 +30,10 @@ class Comment extends Base
             $res = Works::where('id', $id)->first();
         } elseif ($type == 5 ) {
             $res = Wiki::where('id', $id)->first();
+            $like_type = 2;
         } elseif ($type == 7 ) {  //短视频
             $res = ShortVideoModel::where('id', $id)->first();
+            $like_type = 3;
         }
 
         $order = $order == 1 ? 'reply_num' : 'created_at';
@@ -68,7 +73,8 @@ class Comment extends Base
                 if(!empty($v['reply'])){
                     foreach ($v['reply'] as $rep_k=>$rep_v){
 //                        $rep_v = $this->getReplay($rep_v['id']);
-                        $v['reply'][$rep_k]['reply'] = $this->getReplay($rep_v['id']);
+                        $v['reply'][$rep_k]['is_like'] = Like::isLike($rep_v['id'],2,$uid,$like_type);
+                        $v['reply'][$rep_k]['reply'] = $this->getReplay($rep_v['id'],$uid,$like_type);
 
                     }
                 }
@@ -77,12 +83,13 @@ class Comment extends Base
 
                 $follow = UserFollow::where(['from_uid' => $uid, 'to_uid' => $v['user_id']])->first();
                 $v['is_follow'] = $follow ? 1 : 0;
-                $like_type = 1;
-                if ($type == 5) { //百科
-                    $like_type = 2;
-                }
-                $isLike = Like::where(['relation_id' => $v['id'], 'type' => $like_type, 'user_id' => $uid])->first();
-                $v['is_like'] = $isLike ? 1 : 0;
+//                $like_type = 1;
+//                if ($type == 5) { //百科
+//                    $like_type = 2;
+//                }
+                $v['is_like'] = Like::isLike($v['id'],1,$uid,$like_type);
+//                $isLike = Like::where(['relation_id' => $v['id'], 'type' => $like_type, 'user_id' => $uid])->first();
+//                $v['is_like'] = $isLike ? 1 : 0;
                 //只展示五条
                 $v['reply'] = array_slice($v['reply'], 0, 5);
 
@@ -93,7 +100,7 @@ class Comment extends Base
 
 
     //递归查询回复者的多级评论
-    function getReplay($pid){
+    function getReplay($pid,$uid,$like_type){
         $subs = [];
 
         $reply_data = CommentReply::with([
@@ -102,7 +109,9 @@ class Comment extends Base
 
         if(!empty($reply_data)){
             foreach ($reply_data as $getReplay_key=>$getReplay_val){
-                $getReplay_val['reply'] = $this->getReplay($getReplay_val['id']);
+                //是否喜欢
+                $getReplay_val['is_like'] = Like::isLike($getReplay_val['id'],2,$uid,$like_type);
+                $getReplay_val['reply'] = $this->getReplay($getReplay_val['id'],$uid,$like_type);
                 $subs[] = $getReplay_val;
             }
         }

@@ -14,4 +14,20 @@ class Like extends Model
     public function  user(){
         return  $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    /*
+     * cid   评论id
+     * $ctype   1主评 2次级评论
+     * $uid    用户id
+     * $like_type    1想法  2百科  3短视频
+     * */
+    public static function isLike($cid=0,$ctype=1,$uid=0,$like_type=3){
+        $is_like = 0;
+
+        $res = Like::where(['comment_type'=>$ctype,'relation_id' => $cid, 'type' => $like_type, 'user_id' => $uid])->first();
+        if($res){
+            $is_like = 1;
+        }
+        return $is_like;
+    }
 }
