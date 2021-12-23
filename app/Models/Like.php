@@ -9,7 +9,7 @@ class Like extends Model
     protected $table = 'nlsg_like';
 
     // 允许批量赋值
-    protected  $fillable = ['relation_id','user_id','type'];
+    protected  $fillable = ['comment_type','relation_id','user_id','type','status'];
 
     public function  user(){
         return  $this->belongsTo(User::class, 'user_id', 'id');
