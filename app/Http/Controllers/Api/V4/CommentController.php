@@ -428,6 +428,7 @@ class CommentController extends Controller
      * @apiGroup Comment
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/destroy
      * @apiParam {int} id 评论id
+     * @apiParam {number} type  1主评论  2 次级评论
      *
      *
      * @apiSuccessExample  Success-Response:
@@ -443,28 +444,47 @@ class CommentController extends Controller
     public function destroy(Request $request)
     {
         $id = $request->input('id');
-        $comment =  Comment::where('id', $id)->first();
+
+        if(!empty($input['type']) && $input['type'] == 1){
+            $comment =  Comment::where('id', $id)->first();
+        }else{
+            $comment = CommentReply::where('id', $input['comment_id'])->first();
+        }
+
+
+
         if (!$comment){
             return error(1000,'评论不存在');
         }
         if ($comment->user_id !== $this->user['id']){
             return error(1000,'没有权限删除');
         }
-        $res = Comment::where('id', $id)
-            ->update(['status' => 0]);
-        if ($res) {
-            CommentReply::where('comment_id', $id)->update(['status' => 0]);
-            switch ($comment->type){
-                case 5:
-                    Wiki::where('id', $comment->relation_id)->decrement('comment_num');
-                    break;
-                case 7:
-                    ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num');
-                    break;
 
+        //主评论
+        if(!empty($input['type']) && $input['type'] == 1){
+            $res = Comment::where('id', $id)
+                ->update(['status' => 0]);
+            if ($res) {
+                CommentReply::where('comment_id', $id)->update(['status' => 0]);
+                switch ($comment->type){
+                    case 5:
+                        Wiki::where('id', $comment->relation_id)->decrement('comment_num');
+                        break;
+                    case 7:
+                        ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num');
+                        break;
+                }
             }
-            return $this->success();
+
+        }else{
+            CommentReply::where('id', $id)->update(['status' => 0]);
         }
+
+
+
+        return $this->success();
+
+
     }
 
     /**
