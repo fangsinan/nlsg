@@ -50,7 +50,7 @@ class Lists extends Model
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexListWorks($ids, $type = 1)
+    public function getIndexListWorks($ids, $type = [1])
     {
         if ( ! $ids) {
             return false;

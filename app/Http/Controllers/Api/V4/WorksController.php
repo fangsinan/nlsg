@@ -85,7 +85,7 @@ class WorksController extends Controller
             return $this->error(0,'参数错误');
         }
         $model = new Lists();
-        $result = $model->getIndexListWorks([$lists_id], 7);
+        $result = $model->getIndexListWorks([$lists_id], [7,10]);
         $re = $result[0] ?? [];
         return $this->success($re);
 
