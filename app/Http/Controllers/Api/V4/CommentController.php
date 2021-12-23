@@ -444,6 +444,8 @@ class CommentController extends Controller
     public function destroy(Request $request)
     {
         $id = $request->input('id');
+        $input = $request->input();
+
 
         if(!empty($input['comment_type']) && $input['comment_type'] == 1){
             $comment =  Comment::where('id', $id)->first();
