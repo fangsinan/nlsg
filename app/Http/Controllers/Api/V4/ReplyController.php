@@ -53,7 +53,7 @@ class ReplyController extends Controller
                 'comment_id'    => $comment['comment_id'],
                 'reply_pid'     => $input['comment_id'],
                 'from_uid'      => $user_id,
-                'to_uid'        => $comment->user_id,
+                'to_uid'        => $comment->from_uid,
                 'content'       => $input['content']
             ];
         }

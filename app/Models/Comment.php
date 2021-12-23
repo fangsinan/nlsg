@@ -80,19 +80,13 @@ class Comment extends Base
                 }
 
 
-
                 $follow = UserFollow::where(['from_uid' => $uid, 'to_uid' => $v['user_id']])->first();
                 $v['is_follow'] = $follow ? 1 : 0;
-//                $like_type = 1;
-//                if ($type == 5) { //百科
-//                    $like_type = 2;
-//                }
                 $v['is_like'] = Like::isLike($v['id'],1,$uid,$like_type);
-//                $isLike = Like::where(['relation_id' => $v['id'], 'type' => $like_type, 'user_id' => $uid])->first();
-//                $v['is_like'] = $isLike ? 1 : 0;
-                //只展示五条
-                $v['reply'] = array_slice($v['reply'], 0, 5);
-
+                if($type != 7){
+                    //只展示五条
+                    $v['reply'] = array_slice($v['reply'], 0, 5);
+                }
             }
         }
         return $lists;
