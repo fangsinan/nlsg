@@ -504,5 +504,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::any('activity/activeImg', 'ActivityController@activeImg');
     Route::any('activity/track', 'ActivityController@trackStatistics');
 
+    Route::post('channel/cytx_order_check', 'ChannelController@cytxOrderCheck');
 });
 

@@ -50,9 +50,7 @@ class ChannelServers {
         }
 
         $res = Http::post($url, $data);
-        $res = json_decode($res, false);
-        return $res;
-
+        return json_decode($res, false);
     }
 
     public function pushToCytxV2($order_data): bool {
