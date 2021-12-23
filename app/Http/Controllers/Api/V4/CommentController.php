@@ -447,8 +447,12 @@ class CommentController extends Controller
 
         if(!empty($input['type']) && $input['type'] == 1){
             $comment =  Comment::where('id', $id)->first();
+            $c_type = $comment['type'];
         }else{
             $comment = CommentReply::where('id', $input['comment_id'])->first();
+
+            $main_comment = Comment::where('id', $comment['comment_id'])->first();
+            $c_type = $main_comment['type'];
         }
 
 
@@ -478,6 +482,10 @@ class CommentController extends Controller
 
         }else{
             CommentReply::where('id', $id)->update(['status' => 0]);
+            
+            if($c_type == 7){
+                ShortVideoModel::where('id', $input['id'])->increment('comment_num');
+            }
         }
 
 
