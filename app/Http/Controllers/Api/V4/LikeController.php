@@ -42,8 +42,9 @@ class LikeController extends Controller
         if (empty($id) || empty($type) || empty($comment_type)){
             return error(1000, '参数不全');
         }
+
         $list = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type])->first();
-        if ($list){
+        if (!empty($list)){
             return error(1000,'不要重复操作');
         }
 

@@ -428,7 +428,7 @@ class CommentController extends Controller
      * @apiGroup Comment
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/destroy
      * @apiParam {int} id 评论id
-     * @apiParam {number} type  1主评论  2 次级评论
+     * @apiParam {number} comment_type  1主评论  2 次级评论
      *
      *
      * @apiSuccessExample  Success-Response:
@@ -445,7 +445,7 @@ class CommentController extends Controller
     {
         $id = $request->input('id');
 
-        if(!empty($input['type']) && $input['type'] == 1){
+        if(!empty($input['comment_type']) && $input['comment_type'] == 1){
             $comment =  Comment::where('id', $id)->first();
             $c_type = $comment['type'];
         }else{
@@ -465,7 +465,7 @@ class CommentController extends Controller
         }
 
         //主评论
-        if(!empty($input['type']) && $input['type'] == 1){
+        if(!empty($input['comment_type']) && $input['comment_type'] == 1){
             $res = Comment::where('id', $id)
                 ->update(['status' => 0]);
             if ($res) {
