@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\CommentReply;
 use App\Models\Notify;
+use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\User;
@@ -47,6 +48,7 @@ class ReplyController extends Controller
                 'to_uid'    => $comment->user_id,
                 'content'   => $input['content']
             ];
+            $c_type = $comment['type'];
         }else{
             $comment = CommentReply::where('id', $input['comment_id'])->first();
             $add_data = [
@@ -56,15 +58,21 @@ class ReplyController extends Controller
                 'to_uid'        => $comment->from_uid,
                 'content'       => $input['content']
             ];
+
+
+            $main_comment = Comment::where('id', $comment['comment_id'])->first();
+            $c_type = $main_comment['type'];
+
         }
         if (!$comment){
             return error(1000,'评论不存在');
         }
         $result  = CommentReply::create($add_data);
         if ($result){
-
-            Comment::where('id', $input['comment_id'])->increment('reply_num');
-
+            Comment::where('id', $input['comment_id'])->increment('reply_num') ;
+            if($c_type == 7){
+                ShortVideoModel::where('id', $input['id'])->increment('comment_num');
+            }
 //            //发送通知
 //            $notify = new Notify();
 //            $notify->from_uid = $user_id;
