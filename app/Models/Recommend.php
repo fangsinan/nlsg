@@ -80,7 +80,7 @@ class Recommend extends Base
 //                break;
             case 4:
                 $model = new Lists();
-                $result = $model->getIndexListWorks($ids, 3);
+                $result = $model->getIndexListWorks($ids, [3]);
                 break;
             case 5:
                 $model = new Wiki();
@@ -113,7 +113,7 @@ class Recommend extends Base
                 break;
             case 15:
                 $model = new Lists();
-                $result = $model->getIndexListWorks($ids, 7);
+                $result = $model->getIndexListWorks($ids, [7]);
 
         }
         return $result;

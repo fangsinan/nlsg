@@ -67,7 +67,7 @@ class Collection extends Base
                 break;
             case 4:   //书单
                 $model = new Lists();
-                $result = $model->getIndexListWorks($ids, 3);
+                $result = $model->getIndexListWorks($ids, [3]);
                 break;
             case 5:  //百科
                 $model = new Wiki();
