@@ -35,7 +35,7 @@ class Comment extends Base
         $query = Comment::with([
             'user:id,nickname,headimg', 'quote:id,pid,content', 'attach:id,relation_id,img',
             'reply' => function ($query) {
-                $query->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at')
+                $query->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
                     ->where('status', 1);
                 //->limit(5); limit是只显示列表评论总体的5条回复
             },
@@ -64,6 +64,17 @@ class Comment extends Base
 
         if ($lists['data']) {
             foreach ($lists['data'] as &$v) {
+                //需求变化需要展示回复【回复者】的评论内容
+                if(!empty($v['reply'])){
+                    foreach ($v['reply'] as $rep_k=>$rep_v){
+//                        $rep_v = $this->getReplay($rep_v['id']);
+                        $v['reply'][$rep_k]['reply'] = $this->getReplay($rep_v['id']);
+
+                    }
+                }
+
+
+
                 $follow = UserFollow::where(['from_uid' => $uid, 'to_uid' => $v['user_id']])->first();
                 $v['is_follow'] = $follow ? 1 : 0;
                 $like_type = 1;
@@ -79,6 +90,26 @@ class Comment extends Base
         }
         return $lists;
     }
+
+
+    //递归查询回复者的多级评论
+    function getReplay($pid){
+        $subs = [];
+
+        $reply_data = CommentReply::with([
+            'from_user:id,nickname,headimg', 'to_user:id,nickname,headimg'
+        ])->where(['reply_pid'=>$pid,'status'=>1])->get()->toArray();
+
+        if(!empty($reply_data)){
+            foreach ($reply_data as $getReplay_key=>$getReplay_val){
+                $getReplay_val['reply'] = $this->getReplay($getReplay_val['id']);
+                $subs[] = $getReplay_val;
+            }
+        }
+        return $subs;
+
+    }
+
 
 
     public function getCommentList($id, $uid, $page = 1)

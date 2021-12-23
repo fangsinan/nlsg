@@ -21,6 +21,7 @@ class ReplyController extends Controller
      * @apiGroup Reply
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/reply/store
      *
+     * @apiParam {number} type 1主评论  2 回复评论
      * @apiParam {number} comment_id 评论id
      * @apiParam {string} content    回复内容
      *
@@ -38,37 +39,48 @@ class ReplyController extends Controller
     {
         $user_id  = $this->user['id'];
         $input    = $request->all();
-
-        $comment = Comment::where('id', $input['comment_id'])->first();
+        if($input['type'] == 1){
+            $comment = Comment::where('id', $input['comment_id'])->first();
+            $add_data = [
+                'comment_id'=> $input['comment_id'],
+                'from_uid'  => $user_id,
+                'to_uid'    => $comment->user_id,
+                'content'   => $input['content']
+            ];
+        }else{
+            $comment = CommentReply::where('id', $input['comment_id'])->first();
+            $add_data = [
+                'comment_id'    => $comment['comment_id'],
+                'reply_pid'     => $input['comment_id'],
+                'from_uid'      => $user_id,
+                'to_uid'        => $comment->user_id,
+                'content'       => $input['content']
+            ];
+        }
         if (!$comment){
             return error(1000,'评论不存在');
         }
-        $result  = CommentReply::create([
-            'comment_id'=> $input['comment_id'],
-            'from_uid'  => $user_id,
-            'to_uid'    => $comment->user_id,
-            'content'   => $input['content']
-        ]);
+        $result  = CommentReply::create($add_data);
         if ($result){
 
             Comment::where('id', $input['comment_id'])->increment('reply_num');
 
-            //发送通知
-            $notify = new Notify();
-            $notify->from_uid = $user_id;
-            $notify->to_uid   = $comment->user_id;
-            $notify->source_id= $result->id;
-            $notify->type     = 2;
-            $notify->subject  = '回复了你的评论';
-            $content = [
-                'summary'   => $input['content'],
-            ];
-            $notify->content = $input['content'] ? serialize($content) : '';
-            $notify->save();
-
-            $from_user = User::where('id', $user_id)->value('nickname');
-            //发送通知
-            Task::send(12, $comment->user_id, $result->id, 0, '',false,false, 0, $from_user, $comment->type, $comment->relation_id);
+//            //发送通知
+//            $notify = new Notify();
+//            $notify->from_uid = $user_id;
+//            $notify->to_uid   = $comment->user_id;
+//            $notify->source_id= $result->id;
+//            $notify->type     = 2;
+//            $notify->subject  = '回复了你的评论';
+//            $content = [
+//                'summary'   => $input['content'],
+//            ];
+//            $notify->content = $input['content'] ? serialize($content) : '';
+//            $notify->save();
+//
+//            $from_user = User::where('id', $user_id)->value('nickname');
+//            //发送通知
+//            Task::send(12, $comment->user_id, $result->id, 0, '',false,false, 0, $from_user, $comment->type, $comment->relation_id);
 
             return success();
         }
