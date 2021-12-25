@@ -233,9 +233,9 @@ class OrderController extends Controller
             'coupon_id' => $coupon_id,
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
-            'live_id' => $live_id,
+            'live_id' => $live_id ?? 0,
             'pay_type' => $pay_type,
-            'activity_tag' => $activity_tag,
+            'activity_tag' => $activity_tag ?? '',
             'live_num'=>$live_num,
         ];
         $order = Order::firstOrCreate($data);
@@ -321,9 +321,9 @@ class OrderController extends Controller
             'coupon_id' => $coupon_id,
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
-            'live_id' => $live_id,
+            'live_id' => $live_id ?? 0,
             'pay_type' => $pay_type,
-            'activity_tag' => $activity_tag,
+            'activity_tag' => $activity_tag ?? '',
         ];
         $order = Order::firstOrCreate($data);
         return $this->success($order['id']);
@@ -433,7 +433,7 @@ class OrderController extends Controller
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
             'pay_type' => $pay_type,
-            'live_id' => $live_pid,
+            'live_id' => $live_pid ?? 0,
         ];
         $order = Order::firstOrCreate($data);
         return $this->success($order['id']);
@@ -1003,7 +1003,7 @@ class OrderController extends Controller
             'os_type' => $os_type,
             'coupon_id' => $coupon_id,
             'pay_type' => $pay_type,
-            'live_id' => $live_id,
+            'live_id' => $live_id ?? 0,
             'send_type' => $add_order_type,
             'remark' => $remark,
         ];
@@ -1164,7 +1164,7 @@ class OrderController extends Controller
             'ip' => $this->getIp($request),
             'activity_tag' => $activity_tag??'',
             'os_type' => $os_type,
-            'live_id' => $live_id,
+            'live_id' => $live_id ?? 0,
             'vip_order_type' => $type,  //1开通 2续费 3升级
             'remark' => $remark,
             'twitter_id' => $tweeter_code,
@@ -1233,7 +1233,7 @@ class OrderController extends Controller
             'ip' => $this->getIp($request),
             'os_type' => $os_type,
             'pay_type' => $pay_type,
-            'live_id' => $live_id,
+            'live_id' => $live_id ?? 0,
             'live_num' => $num,
             'twitter_id' => $tweeter_code,
         ];
