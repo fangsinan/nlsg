@@ -592,13 +592,14 @@ class MallRefundJob
             ->where('o.is_shill', '=', 1)
             ->where('o.is_refund', '=', 2)
             ->where('o.status', '=', 1)
-            ->select(['o.id', 'op.id as op_id', 'o.user_id', 'o.ordernum', 'o.refund_no as service_num',
+            ->select(['o.id', 'op.id as op_id', 'o.user_id', 'o.ordernum', 'o.refund_no as service_num','o.activity_tag',
                 'op.pay_price', 'op.refund_price', 'pr.type as client', 'o.type as order_type', 'o.relation_id'])
             ->get();
 
         if ($list->isEmpty()) {
             return true;
         }
+        $channel_servers = new ChannelServers();
 
         foreach ($list as $v) {
             switch ($v->client) {
@@ -627,6 +628,9 @@ class MallRefundJob
                     ->where('id', '=', $v->op_id)
                     ->update(['status' => 2]);
 
+                if ($v->activity_tag === 'cytx'){
+                    $channel_servers->refundCytxV2($v->id,$v->ordernum);
+                }
 
                 OrderRefundLog::query()->where('ordernum', '=', $v->ordernum)
                     ->where('status', '=', 10)

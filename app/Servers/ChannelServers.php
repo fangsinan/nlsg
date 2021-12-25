@@ -244,7 +244,8 @@ class ChannelServers {
         if ($list->isNotEmpty()) {
             $list = $list->toArray();
             foreach ($list as $v) {
-                $this->pushToCytx($v);
+//                $this->pushToCytx($v);
+                $this->pushToCytxV2($v);
             }
         }
 
