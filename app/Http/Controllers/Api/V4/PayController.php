@@ -94,7 +94,8 @@ class PayController extends Controller
             $trade_type = 'MWEB';
             $pay_info['openid'] = '';
         } else if ($is_h5 == 2) {
-            $trade_type = 'JSAPI';
+//            $trade_type = 'JSAPI';
+            $trade_type = 'MWEB';
         } else {
             //app 支付不需要openid
             $pay_info['openid'] = '';
