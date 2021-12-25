@@ -136,6 +136,8 @@ class ChannelServers {
             ->where('o.pay_price', '=', $price)
             ->first();
         if ($check) {
+            $check->cytx_call_back_time = date('Y-m-d H:i:s');
+            $check->save();
             return ['code' => true, 'msg' => '成功'];
         }
 
@@ -205,16 +207,17 @@ class ChannelServers {
 
         $query->where('o.activity_tag', '=', 'cytx')
             ->where('o.status', '=', 1)
-            ->where('p.price', '>', 0.01)
+//            ->where('p.price', '>', 0.01)
             ->whereIn('o.type', $type_list)
             ->where('cytx_job', '<>', -1);
 
-        $is_test = intval(ConfigModel::getData(37));
-        if (!$is_test) {
-            $query->where('p.price', '>', 1);
-        }
+//        $is_test = intval(ConfigModel::getData(37));
+//        if (!$is_test) {
+//            $query->where('p.price', '>', 1);
+//        }
 
-        $query->where('u.is_staff', '=', 0)
+        $query
+//            ->where('u.is_staff', '=', 0)
             ->where('o.is_shill', '=', 0)
             ->where('cytx_job', '<', 11)
             ->whereRaw('(cytx_job = 0 or ((cytx_job*600) + UNIX_TIMESTAMP(cytx_check_time) <= UNIX_TIMESTAMP()))');
