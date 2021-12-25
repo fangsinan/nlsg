@@ -71,7 +71,7 @@ class ChannelServers {
 
         $res = $this->cytxPost('push', $data);
 
-        $order = Order::find($order_data['id']);
+        $order = Order::query()->find($order_data['id']);
         if ($res->code === 200) {
             $order->cytx_job = -1;
         } else {
@@ -135,8 +135,10 @@ class ChannelServers {
             ->where('o.pay_price', '=', $price)
             ->first();
         if ($check) {
-            $check->cytx_call_back_time = date('Y-m-d H:i:s');
-            $check->save();
+            Order::query()->where('ordernum','=',$order_num)
+                ->update([
+                    'cytx_call_back_time'=>date('Y-m-d H:i:s')
+                ]);
             return ['code' => true, 'msg' => '成功'];
         }
 
@@ -210,7 +212,7 @@ class ChannelServers {
             ->where('cytx_job', '<>', -1);
 
         $is_test = (int)ConfigModel::getData(37, 1);
-        if ($is_test !== 0){
+        if ($is_test === 0){
             $query->where('p.price', '>', 0.01)
                 ->where('u.is_staff', '=', 0)
                 ->where('p.price', '>', 1);
