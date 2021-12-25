@@ -43,7 +43,7 @@ class ChannelServers {
                     'refund' => 'https://cytx-stage-new-api.chuangyetianxia.com/partner/refund-score'
                 ];
         }
-
+//dd($data);
         $url = $url[$type] ?? '';
         if (empty($url)) {
             return false;
@@ -116,7 +116,7 @@ class ChannelServers {
         $order_num = $params['source_id'] ?? '';
         $price     = $params['price'] ?? 0;
         $score     = $params['score'] ?? 0;
-        if ($source !== 'nlsg') {
+        if ($source !== 'cytx') {
             return ['code' => false, 'msg' => '信息错误'];
         }
         if (empty($phone) || empty($order_num) || empty($price)) {
