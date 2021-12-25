@@ -65,8 +65,7 @@ class ChannelServers {
         $data['telephone'] = $order_data['username'];
         $data['source']    = 'nlsg';
         $data['source_id'] = $order_data['ordernum'];
-        $data['price']     = (float)$order_data['price'];
-        $data['score']     = (float)$order_data['price'];
+        $data['price']     = $data['score'] = (float)$order_data['price'];
         $data['name']      = $order_data['title'];
 
         $res = $this->cytxPost('push', $data);
@@ -98,12 +97,12 @@ class ChannelServers {
             return false;
         }
 
-        $data              = [];
-        $data['source']    = 'nlsg';
-        $data['source_id'] = $order_num;
-        $res               = $this->cytxPost('refund', $data);
+        $data                    = [];
+        $data['source']          = 'nlsg';
+        $data['source_id']       = $order_num;
+        $res                     = $this->cytxPost('refund', $data);
         $check->cytx_refund_code = $res->code;
-        $check->cytx_refund_msg = $res->message;
+        $check->cytx_refund_msg  = $res->message;
 
         if ($res->code === 200) {
             $check->cytx_refund = 1;
@@ -140,9 +139,9 @@ class ChannelServers {
             ->where('o.pay_price', '=', $price)
             ->first();
         if ($check) {
-            Order::query()->where('ordernum','=',$order_num)
+            Order::query()->where('ordernum', '=', $order_num)
                 ->update([
-                    'cytx_call_back_time'=>date('Y-m-d H:i:s')
+                    'cytx_call_back_time' => date('Y-m-d H:i:s')
                 ]);
             return ['code' => true, 'msg' => '成功'];
         }
@@ -217,7 +216,7 @@ class ChannelServers {
             ->where('cytx_job', '<>', -1);
 
         $is_test = (int)ConfigModel::getData(37, 1);
-        if ($is_test === 0){
+        if ($is_test === 0) {
             $query->where('p.price', '>', 0.01)
                 ->where('u.is_staff', '=', 0)
                 ->where('p.price', '>', 1);
