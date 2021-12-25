@@ -43,7 +43,7 @@ class ChannelServers {
                     'refund' => 'https://cytx-stage-new-api.chuangyetianxia.com/partner/refund-score'
                 ];
         }
-//dd($data);
+
         $url = $url[$type] ?? '';
         if (empty($url)) {
             return false;
@@ -65,8 +65,8 @@ class ChannelServers {
         $data['telephone'] = $order_data['username'];
         $data['source']    = 'nlsg';
         $data['source_id'] = $order_data['ordernum'];
-        $data['price']     = $order_data['price'];
-        $data['score']     = $order_data['price'];
+        $data['price']     = (float)$order_data['price'];
+        $data['score']     = (float)$order_data['price'];
         $data['name']      = $order_data['title'];
 
         $res = $this->cytxPost('push', $data);
@@ -93,6 +93,7 @@ class ChannelServers {
             ->where('status', '=', 1)
             ->where('is_shill', '=', 1)
             ->first();
+
         if (empty($check)) {
             return false;
         }
@@ -101,12 +102,16 @@ class ChannelServers {
         $data['source']    = 'nlsg';
         $data['source_id'] = $order_num;
         $res               = $this->cytxPost('refund', $data);
+        $check->cytx_refund_code = $res->code;
+        $check->cytx_refund_msg = $res->message;
 
         if ($res->code === 200) {
             $check->cytx_refund = 1;
             $check->save();
             return true;
         }
+
+        $check->save();
         return false;
     }
 
@@ -228,7 +233,8 @@ class ChannelServers {
         }
 
         $list = $query->select([
-            'o.id', 'o.ordernum', 'u.phone as username', 'o.type', 'o.relation_id', 'u.nickname', 'p.price', 'o.cytx_job', 'o.pay_time'
+            'o.id', 'o.ordernum', 'u.phone as username', 'o.type', 'o.relation_id',
+            'u.nickname', 'p.price', 'o.cytx_job', 'o.pay_time'
         ])->get();
 
         foreach ($list as $v) {

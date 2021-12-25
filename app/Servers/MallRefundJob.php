@@ -616,7 +616,7 @@ class MallRefundJob
                     $temp_res = $this->aliPayRefundCheckMethod($v);
                     break;
                 default:
-                    break;
+                    return false;
             }
 
             if ($temp_res['code'] === true) {
