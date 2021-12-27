@@ -1272,7 +1272,7 @@ class OrderController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup order
      *
-     * @apiParam {int} product_id      产品id
+     * @apiParam {int} lists_id      id
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
      * @apiParam {int} inviter 推客id
