@@ -133,6 +133,10 @@ class Order extends Base
                     }
                 }
                 break;
+            case 19:
+                $model = new Lists();
+                $result = $model->getIndexListWorks([$relation_id],[7]);
+                break;
         }
         return $result;
     }
