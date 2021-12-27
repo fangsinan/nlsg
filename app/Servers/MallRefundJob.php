@@ -629,7 +629,15 @@ class MallRefundJob
                     ->update(['status' => 2]);
 
                 if ($v->activity_tag === 'cytx'){
+                    //推送创业天下
                     $channel_servers->refundCytxV2($v->id,$v->ordernum);
+                    //同时取消订阅
+                    Subscribe::query()
+                        ->where('user_id','=',$v->user_id)
+                        ->where('order_id','=',$v->id)
+                        ->update([
+                            'status'=>0
+                        ]);
                 }
 
                 OrderRefundLog::query()->where('ordernum', '=', $v->ordernum)
