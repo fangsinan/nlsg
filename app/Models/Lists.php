@@ -57,7 +57,7 @@ class Lists extends Model
         }
 
         $lists = Lists::with(['listWorks:id,lists_id,type,works_id'])
-            ->select('id', 'title', 'subtitle', 'cover', 'num','details_pic')
+            ->select('id', 'title', 'subtitle', 'cover', 'num','details_pic','describe')
             ->whereIn('id', $ids)
             ->whereIn('type', $type)
             ->where('status', 1)
@@ -70,7 +70,7 @@ class Lists extends Model
                 foreach ($v['list_works'] as $kk => &$vv) {
 
                     if ($vv['type']==1){
-                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'describe', 'cover_img','original_price','price', 'message','is_free','view_num',"chapter_num as info_num",])
+                        $works = Works::select(['id','user_id','type', 'title', 'describe', 'cover_img','original_price','price', 'message','is_free','view_num',"chapter_num as info_num",])
                             ->with(['user'=>function($query){
                                 $query->select('id','nickname', 'headimg','teacher_title');
                             }])
@@ -80,7 +80,7 @@ class Lists extends Model
                         $v['list_works'][$kk]['works'] = $works;
                     }else if ($vv['type'] == 2) {
                         $listen = Works::select([
-                            'id', 'user_id', 'type', 'title', 'subtitle', 'describe', 'cover_img', 'original_price', 'price',
+                            'id', 'user_id', 'type', 'title', 'subtitle', 'cover_img', 'original_price', 'price',
                             'message', 'is_free','view_num',"chapter_num as info_num",
                         ])
                             ->with([
