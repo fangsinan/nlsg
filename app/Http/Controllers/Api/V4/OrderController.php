@@ -1288,7 +1288,7 @@ class OrderController extends Controller
      */
     public function createTeacherOrder(Request $request)
     {
-        $product_id = $request->input('lists_id', 1);   //目标id
+        $product_id = $request->input('lists_id', 0);   //目标id
         $os_type = $request->input('os_type', 0);
         $pay_type = $request->input('pay_type', 0);
         $live_id = $request->input('live_id', 0);
@@ -1304,7 +1304,7 @@ class OrderController extends Controller
 //            }
 //        }
 
-        $lists = Lists::fing($product_id);
+        $lists = Lists::find($product_id);
         //检测下单参数有效性
         if (empty($lists)) {
             return $this->error(0, '产品id有误');
