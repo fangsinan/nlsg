@@ -57,7 +57,7 @@ class Lists extends Model
         }
 
         $lists = Lists::with(['listWorks:id,lists_id,type,works_id'])
-            ->select('id', 'title', 'subtitle', 'cover', 'num','details_pic','describe','price')
+            ->select('id', 'title', 'subtitle', 'cover', 'num','details_pic','describe','price','type')
             ->whereIn('id', $ids)
             ->whereIn('type', $type)
             ->where('status', 1)
@@ -69,6 +69,24 @@ class Lists extends Model
 
         if ($lists) {
             foreach ($lists as $k => &$v) {
+
+
+
+                if(!empty($v['type']) && $v['type'] == 10){ //大咖讲书 单独判断   因为需要返回时间
+                    $where = ['relation_id' => $v['id'], 'type' => $type, 'user_id' => $uid,'status'=>1,];
+                    $sub_data = Subscribe::where($where)
+                        ->where('end_time', '>', date('Y-m-d H:i:s'))
+                        ->first();
+                    $v['is_sub'] = 0;
+                    $v['end_time'] = "";
+                    if(!empty($sub_data)){
+                        $v['is_sub'] = 1;
+                        $v['end_time'] = $sub_data['end_time'];
+                    }
+                }
+
+
+
                 foreach ($v['list_works'] as $kk => &$vv) {
 
                     if ($vv['type']==1){
@@ -120,20 +138,7 @@ class Lists extends Model
             }
         }
 
-        if($lists[0]['type'] == 10){ //大咖讲书 单独判断   因为需要返回时间
-//            $lists[0]['is_sub'] = Subscribe::isSubscribe($uid,$lists[0]['id'],8);
-            $where = ['relation_id' => $lists[0]['id'], 'type' => $type, 'user_id' => $uid,'status'=>1,];
-            $sub_data = Subscribe::where($where)
-                ->where('end_time', '>', date('Y-m-d H:i:s'))
-                ->first();
-            if(empty($sub_data)){
-                $lists[0]['is_sub'] = 0;
-            }else{
-                $lists[0]['is_sub'] = 1;
-                $lists[0]['end_time'] = $sub_data['end_time'];
-            }
 
-        }
 
         return $lists;
     }
