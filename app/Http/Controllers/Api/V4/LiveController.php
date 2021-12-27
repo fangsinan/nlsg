@@ -724,7 +724,10 @@ class LiveController extends Controller
 //            $column = Column::where('user_id', $list['user_id'])
 //                ->orderBy('created_at', 'desc')
 //                ->first();
-            $userId = $this->user['id'] ?? 0;
+            $userId=0;
+            if(isset($this->user['id']) && !empty($this->user['id'])){
+                $userId = $this->user['id'] ?? 0;
+            }
             $user = new User();
 
 //            $columnId = $column ? $column->id : 0;
@@ -739,7 +742,7 @@ class LiveController extends Controller
             $list['is_forbid'] = 0;
 
             $is_silence = LiveForbiddenWords::where('live_info_id', '=', $id)
-                ->where('user_id', '=', $this->user['id'])
+                ->where('user_id', '=', $userId)
                 ->where('is_forbid', '=', 1)
                 ->select(['id', 'forbid_at', 'length'])
                 ->first();
@@ -750,9 +753,9 @@ class LiveController extends Controller
                 $list['is_silence'] = 0;
             }
 
-            $is_appmt = LiveCountDown::where(['user_id' => $this->user['id'], 'live_id' => $id])->first();
+            $is_appmt = LiveCountDown::where(['user_id' => $userId, 'live_id' => $id])->first();
             $list['is_appmt'] = $is_appmt ? 1 : 0;
-            $is_admin = LiveConsole::isAdmininLive($this->user['id'] ?? 0, $list['live_pid']);
+            $is_admin = LiveConsole::isAdmininLive($userId ?? 0, $list['live_pid']);
             $list['is_admin'] = $is_admin ? 1 : 0;
 
 //            $list['column_id'] = $columnId;
