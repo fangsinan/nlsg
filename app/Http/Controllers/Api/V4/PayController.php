@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\Lists;
 use App\Models\Live;
 use App\Models\MallOrder;
 use App\Models\Order;
@@ -24,7 +25,7 @@ class PayController extends Controller
      * @apiGroup pay
      *
      * @apiParam {int} id 订单id
-     * @apiParam {int} type  1专栏 2会员 5打赏 8  电商   9精品课 11直播 14线下课购买 15讲座  16幸福360购买   17赠送  18 训练营
+     * @apiParam {int} type  1专栏 2会员 5打赏 8  电商   9精品课 11直播 14线下课购买 15讲座  16幸福360购买   17赠送  18 训练营 19专题lists
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -153,7 +154,7 @@ class PayController extends Controller
     {
 
         $body = '';
-        if (in_array($attach, [1, 2, 5, 9, 11, 14, 8, 15, 16, 17, 18])) { //1专栏 2会员 5打赏 9精品课 听课
+        if (in_array($attach, [1, 2, 5, 9, 11, 14, 8, 15, 16, 17, 18, 19])) { //1专栏 2会员 5打赏 9精品课 听课
             $device_info = '';
             if ($attach == 8) {
                 $OrderInfo = MallOrder::where('status', '=', 1)
@@ -225,6 +226,9 @@ class PayController extends Controller
             } else if ($attach == 18) {
                 $ColumnInfo = Column::find($OrderInfo['relation_id']);
                 $body = "能量时光-训练营购买-" . $ColumnInfo['name'];
+            } else if ($attach == 19) {
+                $Info = Lists::find($OrderInfo['relation_id']);
+                $body = "能量时光-专题购买-" . $Info['name'];
             }
         } else {
             return false;

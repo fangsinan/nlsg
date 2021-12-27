@@ -9,6 +9,7 @@ use App\Models\ChannelWorksList;
 use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\History;
+use App\Models\Lists;
 use App\Models\LiveCountDown;
 use App\Models\LiveInfo;
 use App\Models\MallOrder;
@@ -1253,6 +1254,82 @@ class OrderController extends Controller
     public function createWorksCytxOrder(Request  $request){
         $request->offsetSet('activity_tag','cytx');
         return $this->createWorksOrder($request);
+    }
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * @api {post} /api//v4/order/create_teacher_order 大咖讲书专题下单
+     * @apiName create_teacher_order
+     * @apiVersion 1.0.0
+     * @apiGroup order
+     *
+     * @apiParam {int} product_id      产品id
+     * @apiParam {int} os_type os_type 1 安卓 2ios
+     * @apiParam {int} live_id 直播id
+     * @apiParam {int} inviter 推客id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": { }
+     * }
+     */
+    public function createTeacherOrder(Request $request)
+    {
+        $product_id = $request->input('lists_id', 1);   //目标id
+        $os_type = $request->input('os_type', 0);
+        $pay_type = $request->input('pay_type', 0);
+        $live_id = $request->input('live_id', 0);
+        $tweeter_code = $request->input('inviter', 0);  //推客id
+        $num = 1;
+        $user_id = $this->user['id'];
+
+//        if( $tweeter_code > 0 && $live_id > 0 ){  //需要校验推客id
+//            $info = LiveInfo::where(['live_pid'=>$live_id])->first();
+//            $count_data = LiveCountDown::where(['user_id'=>$user_id,'live_id'=>$info['id']])->first();
+//            if($count_data['new_vip_uid']){
+//                $tweeter_code = $count_data['new_vip_uid'];  //推客id 为邀约人id
+//            }
+//        }
+
+        $lists = Lists::fing($product_id);
+        //检测下单参数有效性
+        if (empty($lists)) {
+            return $this->error(0, '产品id有误');
+        }
+
+        $price = 100;
+
+        $ordernum = MallOrder::createOrderNumber($user_id, 3);
+        $data = [
+            'ordernum' => $ordernum,
+            'type' => 19,
+            'user_id' => $user_id,
+            'relation_id' => $product_id,
+            'cost_price' => $price,
+            'price' => ($price*$num),
+            'ip' => $this->getIp($request),
+            'os_type' => $os_type,
+            'pay_type' => $pay_type,
+            'live_id' => $live_id,
+            'live_num' => $num,
+            'twitter_id' => $tweeter_code,
+        ];
+
+        $order = Order::firstOrCreate($data);
+        return $this->success($order['id']);
+
     }
 
 }
