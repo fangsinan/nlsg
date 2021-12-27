@@ -1833,11 +1833,14 @@ class WechatPay extends Controller
 
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
+            $starttime = strtotime(date('Y-m-d', $time));
+            $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
 
             DB::beginTransaction();
             try {
 
                 $user_id = $orderInfo['user_id']; //用户
+                $orderId = $orderInfo['id'];
                 //更新订单状态
                 $data1 = [
                     'status' => 1,
@@ -1862,9 +1865,26 @@ class WechatPay extends Controller
                 $recordRst = PayRecord::firstOrCreate($record);
 
 
+                $subscribe = [
+                    'user_id' => $user_id, //会员id
+                    'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+                    'type' => 8, //专题
+                    'status' => 1,
+                    'order_id' => $orderId, //订单id
+                    'relation_id' => $orderInfo['relation_id'],
+                    'start_time' => date("Y-m-d H:i:s", $starttime),
+                    'end_time' => date("Y-m-d H:i:s", $endtime),
+                ];
+
+
+                $subscribeRst = Subscribe::firstOrCreate($subscribe);
+
+
+
+
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
-                if ($orderRst && $recordRst && $userRst) {
+                if ($orderRst && $recordRst && $userRst && $subscribeRst) {
 //                    if (!empty($orderInfo['live_id'])) {
 //                        JobServers::pushToSocket($orderInfo['live_id'], $orderInfo['relation_id'], 12);
 //                    }
