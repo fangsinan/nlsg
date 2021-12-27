@@ -80,6 +80,8 @@ class WechatPay extends Controller
             return self::PaySend($data);
         } elseif ($data['attach'] == 18) { //处理训练营
             return self::PayColumn($data);
+        } elseif ($data['attach'] == 19) { //处理专题
+            return self::PayLists($data);
         }
     }
 
@@ -1793,6 +1795,81 @@ class WechatPay extends Controller
                     DB::commit();
                     return true;
 
+                } else {
+                    DB::rollBack();
+                    return false;
+                }
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return false;
+            }
+
+        } else {
+            //订单状态已更新，直接返回
+            return true;
+        }
+    }
+
+
+
+
+
+    //专题
+    public static function PayLists($data)
+    {
+
+
+        $time = time();
+        //$out_trade_no   = substr($data['out_trade_no'], 0, -5);
+        $out_trade_no = $data['out_trade_no'];
+        $total_fee = $data['total_fee'];
+        $transaction_id = $data['transaction_id'];
+        $pay_type = $data['pay_type'];
+
+
+        //支付处理正确-判断是否已处理过支付状态
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+
+        if (!empty($orderInfo)) {
+            $orderInfo = $orderInfo->toArray();
+
+            DB::beginTransaction();
+            try {
+
+                $user_id = $orderInfo['user_id']; //用户
+                //更新订单状态
+                $data1 = [
+                    'status' => 1,
+                    'pay_time' => date("Y-m-d H:i:s", $time),
+                    'pay_price' => $total_fee,
+                    'pay_type' => $pay_type,
+                ];
+                $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
+
+
+                //添加支付记录
+                $record = [
+                    'ordernum' => $out_trade_no, //订单编号
+                    'price' => $total_fee, //支付金额
+                    'transaction_id' => $transaction_id, //流水号
+                    'user_id' => $user_id, //会员id
+                    'type' => $pay_type, //1：微信  2：支付宝
+//                    'client'         => $data['client'],          //微信
+                    'order_type' => 23, //精品课
+                    'status' => 1                         //收入
+                ];
+                $recordRst = PayRecord::firstOrCreate($record);
+
+
+                $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
+
+                if ($orderRst && $recordRst && $userRst) {
+//                    if (!empty($orderInfo['live_id'])) {
+//                        JobServers::pushToSocket($orderInfo['live_id'], $orderInfo['relation_id'], 12);
+//                    }
+                    DB::commit();
+                    return true;
                 } else {
                     DB::rollBack();
                     return false;
