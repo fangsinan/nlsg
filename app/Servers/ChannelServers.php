@@ -48,7 +48,6 @@ class ChannelServers {
         if (empty($url)) {
             return false;
         }
-
         $res = Http::post($url, $data);
         return json_decode($res, false);
     }
@@ -66,13 +65,12 @@ class ChannelServers {
         $data['telephone'] = $order_data['username'];
         $data['source']    = 'nlsg';
         $data['source_id'] = $order_data['ordernum'];
-        $data['price']     = $order_data['price'];
-        $data['score']     = $order_data['price'];
+        $data['price']     = $data['score'] = (float)$order_data['price'];
         $data['name']      = $order_data['title'];
 
         $res = $this->cytxPost('push', $data);
 
-        $order = Order::find($order_data['id']);
+        $order = Order::query()->find($order_data['id']);
         if ($res->code === 200) {
             $order->cytx_job = -1;
         } else {
@@ -94,20 +92,25 @@ class ChannelServers {
             ->where('status', '=', 1)
             ->where('is_shill', '=', 1)
             ->first();
+
         if (empty($check)) {
             return false;
         }
 
-        $data              = [];
-        $data['source']    = 'nlsg';
-        $data['source_id'] = $order_num;
-        $res               = $this->cytxPost('refund', $data);
+        $data                    = [];
+        $data['source']          = 'nlsg';
+        $data['source_id']       = $order_num;
+        $res                     = $this->cytxPost('refund', $data);
+        $check->cytx_refund_code = $res->code;
+        $check->cytx_refund_msg  = $res->message;
 
         if ($res->code === 200) {
             $check->cytx_refund = 1;
             $check->save();
             return true;
         }
+
+        $check->save();
         return false;
     }
 
@@ -117,6 +120,7 @@ class ChannelServers {
         $order_num = $params['source_id'] ?? '';
         $price     = $params['price'] ?? 0;
         $score     = $params['score'] ?? 0;
+return ['code' => true, 'msg' => '成功'];
         if ($source !== 'cytx') {
             return ['code' => false, 'msg' => '信息错误'];
         }
@@ -136,6 +140,10 @@ class ChannelServers {
             ->where('o.pay_price', '=', $price)
             ->first();
         if ($check) {
+            Order::query()->where('ordernum', '=', $order_num)
+                ->update([
+                    'cytx_call_back_time' => date('Y-m-d H:i:s')
+                ]);
             return ['code' => true, 'msg' => '成功'];
         }
 
@@ -205,16 +213,17 @@ class ChannelServers {
 
         $query->where('o.activity_tag', '=', 'cytx')
             ->where('o.status', '=', 1)
-            ->where('p.price', '>', 0.01)
             ->whereIn('o.type', $type_list)
             ->where('cytx_job', '<>', -1);
 
-        $is_test = intval(ConfigModel::getData(37));
-        if (!$is_test) {
-            $query->where('p.price', '>', 1);
+        $is_test = (int)ConfigModel::getData(37, 1);
+        if ($is_test === 0) {
+            $query->where('p.price', '>', 0.01)
+                ->where('u.is_staff', '=', 0)
+                ->where('p.price', '>', 1);
         }
 
-        $query->where('u.is_staff', '=', 0)
+        $query
             ->where('o.is_shill', '=', 0)
             ->where('cytx_job', '<', 11)
             ->whereRaw('(cytx_job = 0 or ((cytx_job*600) + UNIX_TIMESTAMP(cytx_check_time) <= UNIX_TIMESTAMP()))');
@@ -224,7 +233,8 @@ class ChannelServers {
         }
 
         $list = $query->select([
-            'o.id', 'o.ordernum', 'u.phone as username', 'o.type', 'o.relation_id', 'u.nickname', 'p.price', 'o.cytx_job', 'o.pay_time'
+            'o.id', 'o.ordernum', 'u.phone as username', 'o.type', 'o.relation_id',
+            'u.nickname', 'p.price', 'o.cytx_job', 'o.pay_time'
         ])->get();
 
         foreach ($list as $v) {
@@ -244,7 +254,8 @@ class ChannelServers {
         if ($list->isNotEmpty()) {
             $list = $list->toArray();
             foreach ($list as $v) {
-                $this->pushToCytx($v);
+//                $this->pushToCytx($v);
+                $this->pushToCytxV2($v);
             }
         }
 
