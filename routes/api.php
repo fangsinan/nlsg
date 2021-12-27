@@ -385,6 +385,14 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('order/create_new_vip_order', 'OrderController@createNewVipOrder'); //360下单
         Route::post('order/create_products_order', 'OrderController@createProductsOrder'); //线下课
 
+        Route::post('order/create_teacher_order', 'OrderController@createTeacherOrder');
+
+
+
+
+
+
+
         Route::get('order/get_coupon', 'OrderController@getCoupon');
         Route::get('order/order_list', 'OrderController@orderList');
         Route::get('order/order_detail', 'OrderController@orderDetail');
