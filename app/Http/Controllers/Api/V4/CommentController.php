@@ -24,7 +24,7 @@ class CommentController extends Controller
      *
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/comment/list?id=1&type=1
      *
-     * @apiParam {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科 6.训练营 7训练营
+     * @apiParam {number} type  类型 1.专栏 2.讲座 3.听书 4.精品课 5.百科 6.训练营 7短视频
      * @apiParam {number} id    模块id
      * @apiParam {number} info_id    次级id
      * @apiParam {number} order  默认1  最新是2

@@ -130,7 +130,7 @@ class ReplyController extends Controller
     }
 
     /**
-     * @api {get} api/v4/reply/destroy 回复删除
+     * @api {get} api/v4/reply/destroy 回复删除（新版本统一用【comment/destroy】）
      * @apiVersion 4.0.0
      * @apiName  destroy
      * @apiGroup Reply
