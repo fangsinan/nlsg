@@ -1273,9 +1273,10 @@ class OrderController extends Controller
      * @apiGroup order
      *
      * @apiParam {int} lists_id      id
-     * @apiParam {int} os_type os_type 1 安卓 2ios
-     * @apiParam {int} live_id 直播id
-     * @apiParam {int} inviter 推客id
+     * @apiParam {int} os_type      os_type 1 安卓 2ios
+     * @apiParam {int} pay_type     pay_type
+     * @apiParam {int} live_id      直播id
+     * @apiParam {int} inviter      推客id
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
