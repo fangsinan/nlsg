@@ -267,7 +267,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::get('work/convert', 'WorksController@convert');//获取订单详情
 
-    Route::get('live/show', 'LiveController@show');
+    Route::get('live/show_wechat', 'LiveController@showWechat');
     Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
 
     Route::group(['middleware' => ['auth.jwt']], function () {
@@ -436,7 +436,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         //直播
         Route::get('live/playback', 'LiveController@PlayBack');
         Route::get('live/channels', 'LiveController@getLiveChannel');
-//        Route::get('live/show', 'LiveController@show');
+        Route::get('live/show', 'LiveController@show');
         Route::post('live/check_password', 'LiveController@checkLivePassword');
         Route::get('offline/info', 'LiveController@getOfflineInfo');
         Route::get('offline/order', 'LiveController@getOfflineOrder');
