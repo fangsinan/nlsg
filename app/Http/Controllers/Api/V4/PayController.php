@@ -518,7 +518,7 @@ class PayController extends Controller
      *
      * @apiParam {int} user_id user_id
      * @apiParam {int} order_id order_id
-     * @apiParam {int} pay_type 当类型为[ 专栏  会员  打赏  精品课]时 传1   类型为[ 月卡  季卡 押金  违约金 退押金] 传2
+     * @apiParam {int} pay_type 当类型为[ 专栏  会员  打赏  精品课 ]时 传1   类型为[ 月卡  季卡 押金  违约金 退押金] 传2
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -557,7 +557,7 @@ class PayController extends Controller
             if ($type == 10) { //type 与order_deposit 的 $attach重复了
                 $attach = 11;
             }
-            if (!in_array($type, [1, 2, 5, 9, 10, 14, 15, 16, 17, 18])) {
+            if (!in_array($type, [1, 2, 5, 9, 10, 14, 15, 16, 17, 18, 19])) {
                 //商品不支持能量币支付
                 return $this->error(0, '当前产品不支持能量币支付');
             }
