@@ -620,7 +620,7 @@ class OrderController extends Controller
         }
 
         $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id','pay_type')
-            ->whereIn('type', [1, 9, 10, 13, 14, 15, 16, 17, 18])
+            ->whereIn('type', [1, 9, 10, 13, 14, 15, 16, 17, 18,19])
             ->where($where);
 
         //  订单状态
