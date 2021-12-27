@@ -484,7 +484,11 @@ class LiveConsoleController extends Controller
     {
         $params = $request->input();
         $model = new LiveNotice();
-        $data = $model->list($params, $this->user['id']);
+        $user_id=0;
+        if(isset($this->user['id']) && !empty($this->user['id'])){
+            $user_id=$this->user['id'];
+        }
+        $data = $model->list($params, $user_id);
         return $this->getRes($data);
     }
 
