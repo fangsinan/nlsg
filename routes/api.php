@@ -268,7 +268,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('work/convert', 'WorksController@convert');//获取订单详情
 
     Route::get('live/show', 'LiveController@show');
-    
+    Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
+
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/coupon', 'UserController@getUserCoupon');
         Route::get('user/base', 'UserController@base');
@@ -365,7 +366,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::put('live_console/change_push_msg_state', 'LiveConsoleController@changePushMsgState');//推送记录状态修改
 
         Route::post('live_notice/add', 'LiveConsoleController@createLiveNotice');
-        Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
+//        Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
         Route::put('live_notice/change_state', 'LiveConsoleController@changeLiveNoticeState');
 
         Route::post('live_forbid/add', 'LiveConsoleController@forbid');//禁言
