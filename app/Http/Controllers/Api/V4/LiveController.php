@@ -1741,9 +1741,9 @@ class LiveController extends Controller
         if($relation_type == 3){
 
             //relation_type=3时    免费传relation_id=live_id   付费传order_id
-            if(empty($order_id)){ //直播免费预约取消二维码
-                return success((object)[] );
-            }
+//            if(empty($order_id)){ //直播免费预约取消二维码
+//                return success((object)[] );
+//            }
 
             //付费客户端不传直播id  需要查询
             if(!empty($order_id)){  //付费
