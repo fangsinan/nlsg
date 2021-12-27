@@ -40,7 +40,7 @@ class OrderController extends Controller
      * @apiGroup order
      *
      * @apiParam {int} user_id 用户id
-     * @apiParam {int} type  类型 1专栏  2会员  5课程  6赠送专用  7讲座  8训练营
+     * @apiParam {int} type  类型 1专栏  2会员  5课程  6赠送专用  7讲座  8训练营  9大咖讲书
      * @apiParam {int} price  订单金额
      *
      * @apiSuccess {string} result json
