@@ -1310,7 +1310,7 @@ class OrderController extends Controller
             return $this->error(0, '产品id有误');
         }
 
-        $price = 100;
+        $price = $lists['price'];
 
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [

@@ -84,8 +84,10 @@ class WorksController extends Controller
         if(empty($lists_id)){
             return $this->error(0,'参数错误');
         }
+        $user_id = $this->user['id'] ?? 0;
+
         $model = new Lists();
-        $result = $model->getIndexListWorks([$lists_id], [7,10]);
+        $result = $model->getIndexListWorks([$lists_id], [7,10],$user_id);
         $re = $result[0] ?? [];
         return $this->success($re);
 

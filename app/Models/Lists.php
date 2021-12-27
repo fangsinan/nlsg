@@ -50,7 +50,7 @@ class Lists extends Model
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexListWorks($ids, $type = [1])
+    public function getIndexListWorks($ids, $type = [1],$uid=0)
     {
         if ( ! $ids) {
             return false;
@@ -64,6 +64,8 @@ class Lists extends Model
             ->limit(3)
             ->get()
             ->toArray();
+
+
 
         if ($lists) {
             foreach ($lists as $k => &$v) {
@@ -117,6 +119,22 @@ class Lists extends Model
 
             }
         }
+
+        if($lists[0]['type'] == 10){ //大咖讲书 单独判断   因为需要返回时间
+//            $lists[0]['is_sub'] = Subscribe::isSubscribe($uid,$lists[0]['id'],8);
+            $where = ['relation_id' => $lists[0]['id'], 'type' => $type, 'user_id' => $uid,'status'=>1,];
+            $sub_data = Subscribe::where($where)
+                ->where('end_time', '>', date('Y-m-d H:i:s'))
+                ->first();
+            if(empty($sub_data)){
+                $lists[0]['is_sub'] = 0;
+            }else{
+                $lists[0]['is_sub'] = 1;
+                $lists[0]['end_time'] = $sub_data['end_time'];
+            }
+
+        }
+
         return $lists;
     }
 

@@ -44,7 +44,7 @@ class Subscribe extends Base
     /**
      * $user_id  登录者用户
      * $target_id  目标id  1为专栏的id  2作品id ....
-     * type 1 专栏  2作品 3直播  4会员 5线下产品  6讲座
+     * type 1 专栏  2作品 3直播  4会员 5线下产品  6讲座 7训练营 8专题
      * */
     static function isSubscribe ($user_id=0,$target_id=0,$type=0){
         $is_sub = 0;
@@ -54,12 +54,12 @@ class Subscribe extends Base
         $level = User::getLevel($user_id);
 
 
-        if( !in_array($type,[3,7]) && $level) return 1;  // 直播和训练营不校验等级
+        if( !in_array($type,[3,7,8]) && $level) return 1;  // 直播和训练营不校验等级
 
         if($user_id && $target_id && $type ){
-            $where = ['relation_id' => $target_id, 'type' => $type, 'user_id' => $user_id,];
+            $where = ['relation_id' => $target_id, 'type' => $type, 'user_id' => $user_id,'status'=>1,];
             //处理专栏的关注信息
-            if( !in_array($type,[1,2,3,4,5,6,7]) ){
+            if( !in_array($type,[1,2,3,4,5,6,7,8]) ){
                 return 0;
             }
 
@@ -104,6 +104,20 @@ class Subscribe extends Base
                     $is_sub = 1;
                 }
             }
+
+            //判断是否购买课程所对应的专题
+            if($type == 2 && $is_sub==0){
+                $lists_id = ListsWork::where(['type'=>1,'works_id'=>$target_id,'state'=>1])->pluck('lists_id')->toArray();
+                $sub_data = Subscribe::where(['type'=>8,'status'=>1,'user_id' => $user_id,])
+                    ->whereIn('relation_id',$lists_id)
+                    ->where('end_time', '>', date('Y-m-d H:i:s'))
+                    ->first();
+                if($sub_data){
+                    $is_sub = 1;
+                }
+            }
+
+
         }
         return $is_sub;
     }
