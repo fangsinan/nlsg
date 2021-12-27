@@ -856,6 +856,7 @@ class LiveController extends Controller
         return success($data);
 
     }
+
     //公众号调用
     public function showWechat(Request $request)
     {
@@ -1023,7 +1024,6 @@ class LiveController extends Controller
         return success($data);
 
     }
-
 
 //    public function recommend(Request $request)
 //    {
