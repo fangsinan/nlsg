@@ -1317,6 +1317,11 @@ class OrderController extends Controller
             return $this->error(0, '产品id有误');
         }
 
+        $is_sub = Subscribe::isSubscribe($user_id,$product_id,8);
+        if (!empty($is_sub)) {
+            return $this->error(0, '已购买');
+        }
+
         $price = $lists['price'];
 
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
