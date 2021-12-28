@@ -1865,19 +1865,33 @@ class WechatPay extends Controller
                 $recordRst = PayRecord::firstOrCreate($record);
 
 
-                $subscribe = [
-                    'user_id' => $user_id, //会员id
-                    'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
-                    'type' => 8, //专题
-                    'status' => 1,
-                    'order_id' => $orderId, //订单id
-                    'relation_id' => $orderInfo['relation_id'],
-                    'start_time' => date("Y-m-d H:i:s", $starttime),
-                    'end_time' => date("Y-m-d H:i:s", $endtime),
-                ];
+                $is_sub = Subscribe::isSubscribe($user_id,$orderInfo['relation_id'],8);
+                if(empty($is_sub)){
 
+                    $subscribe = [
+                        'user_id' => $user_id, //会员id
+                        'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+                        'type' => 8, //专题
+                        'status' => 1,
+                        'order_id' => $orderId, //订单id
+                        'relation_id' => $orderInfo['relation_id'],
+                        'start_time' => date("Y-m-d H:i:s", $starttime),
+                        'end_time' => date("Y-m-d H:i:s", $endtime),
+                    ];
 
-                $subscribeRst = Subscribe::firstOrCreate($subscribe);
+                    $subscribeRst = Subscribe::firstOrCreate($subscribe);
+                }else{
+                    $subscribeRst = Subscribe::where([
+                        'user_id'   => $user_id, //会员id
+                        'type'      => 8, //专题
+                        'status'    => 1,
+                        'relation_id' => $orderInfo['relation_id'],
+                    ])->update([
+                        'end_time' => DB::raw("DATE_ADD(end_time,interval+1 day)"),
+                    ]);;
+
+                }
+
 
 
 
