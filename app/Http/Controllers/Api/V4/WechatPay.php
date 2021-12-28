@@ -1881,14 +1881,15 @@ class WechatPay extends Controller
 
                     $subscribeRst = Subscribe::firstOrCreate($subscribe);
                 }else{
-                    $subscribeRst = Subscribe::where([
-                        'user_id'   => $user_id, //会员id
+
+                    $subscribeRst = DB::table('nlsg_subscribe')->where([
+                        'user_id'   => 318504, //会员id
                         'type'      => 8, //专题
                         'status'    => 1,
-                        'relation_id' => $orderInfo['relation_id'],
+                        'relation_id' => 40,
                     ])->update([
-                        'end_time' => DB::raw("DATE_ADD(end_time,interval+1 day)"),
-                    ]);;
+                        'end_time' => DB::raw("DATE_ADD(end_time, interval+1 year)"),
+                        ]);
 
                 }
 
