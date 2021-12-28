@@ -782,7 +782,7 @@ class OrderController extends Controller
      * @apiGroup order
      *
      * @apiParam {int} user_id 用户id
-     * @apiParam {int} type  1 专栏  2作品 3直播  4会员 5线下产品  6讲座
+     * @apiParam {int} type  1 专栏  2作品 3直播  4会员 5线下产品  6讲座 7训练营  8专题
      * @apiParam {int} is_audio_book  当type == 2(作品)时  0课程  1 听书  2全部
      *
      *
@@ -821,6 +821,10 @@ class OrderController extends Controller
                     $model = new Column();
                     $result = $model->getIndexColumn([$val['relation_id']], 0);
                     break;
+                case 8:
+                    $model = new Lists();
+                    $result = $model->getIndexListWorks([$val['relation_id']], [7,10],$user_id);
+                    break;
             }
             if ($result == false) {
                 unset($data[$key]);
@@ -841,6 +845,9 @@ class OrderController extends Controller
                         break;
                     case 7:
                         $hist_type = 2;
+                        break;
+                    default:
+                        $hist_type = 0;
                         break;
 
                 }
