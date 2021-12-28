@@ -73,7 +73,8 @@ class Lists extends Model
 
 
                 if(!empty($v['type']) && $v['type'] == 10){ //大咖讲书 单独判断   因为需要返回时间
-                    $where = ['relation_id' => $v['id'], 'type' => $type, 'user_id' => $uid,'status'=>1,];
+                    //专题订阅
+                    $where = ['relation_id' => $v['id'], 'type' => 8, 'user_id' => $uid,'status'=>1,];
                     $sub_data = Subscribe::where($where)
                         ->where('end_time', '>', date('Y-m-d H:i:s'))
                         ->first();
