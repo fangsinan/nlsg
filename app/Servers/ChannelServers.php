@@ -71,8 +71,7 @@ class ChannelServers {
         $res = $this->cytxPost('push', $data);
 
         $order = Order::query()->find($order_data['id']);
-        $res_code = (int)($res->code??0);
-        if ($res_code === 200) {
+        if ($res->code == 200) {
             $order->cytx_job = -1;
         } else {
             ++$order->cytx_job;
