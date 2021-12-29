@@ -1905,12 +1905,16 @@ class LiveController extends Controller
         $relation_type = $request->input('relation_type')??0;
         $relation_id = $request->input('relation_id')??0;
         $order_id = $request->input('order_id')??0;
+        $is_wechat = $request->input('is_wechat')??0;
         if($relation_type == 3){
 
             //relation_type=3时    免费传relation_id=live_id   付费传order_id
 //            if(empty($order_id)){ //直播免费预约取消二维码
 //                return success((object)[] );
 //            }
+            if(empty($order_id) && empty($is_wechat)){ //免费并且是渠道不弹
+                return success((object)[] );
+            }
 
             //付费客户端不传直播id  需要查询
             if(!empty($order_id)){  //付费
