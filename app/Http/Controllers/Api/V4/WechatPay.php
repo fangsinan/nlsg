@@ -1560,9 +1560,9 @@ class WechatPay extends Controller
 //                    Io::WriteFile('', '', $content, true);
 //                    self::$user_id = $user_id;
                     //创业天下推送队列
-                    if (($orderInfo['activity_tag'] ?? '') == 'cytx') {
-                        JobServers::pushToCytx($orderInfo['id']);
-                    }
+//                    if (($orderInfo['activity_tag'] ?? '') == 'cytx') {
+//                        JobServers::pushToCytx($orderInfo['id']);
+//                    }
 
 
 //                    Task::send(1, $user_id, $orderInfo['relation_id']);
