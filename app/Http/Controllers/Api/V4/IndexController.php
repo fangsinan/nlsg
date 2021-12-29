@@ -416,7 +416,7 @@ class IndexController extends Controller
     {
         $recommendModel = new Recommend();
         //精品课程模块
-        $res['work_lists'] = $recommendModel->getIndexRecommend(2, 1);
+        $res['work_lists'] = $recommendModel->getIndexRecommend(2, 44);
         //主题课程模块
         $res['theme_works'] = $recommendModel->getIndexRecommend(2, 36);
         //专题课模块
