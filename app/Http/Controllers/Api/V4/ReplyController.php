@@ -42,6 +42,9 @@ class ReplyController extends Controller
         $input    = $request->all();
         if(!empty($input['type']) && $input['type'] == 1){
             $comment = Comment::where('id', $input['comment_id'])->first();
+            if(empty($comment)){
+                return error(1000,'评论不存在');
+            }
             $add_data = [
                 'comment_id'=> $input['comment_id'],
                 'from_uid'  => $user_id,
@@ -51,6 +54,9 @@ class ReplyController extends Controller
             $c_type = $comment['type'];
         }else{
             $comment = CommentReply::where('id', $input['comment_id'])->first();
+            if(empty($comment)){
+                return error(1000,'评论不存在');
+            }
             $add_data = [
                 'comment_id'    => $comment['comment_id'],
                 'reply_pid'     => $input['comment_id'],
@@ -64,9 +70,9 @@ class ReplyController extends Controller
             $c_type = $main_comment['type'];
 
         }
-        if (!$comment){
-            return error(1000,'评论不存在');
-        }
+//        if (!$comment){
+//            return error(1000,'评论不存在');
+//        }
         $result  = CommentReply::create($add_data);
         if ($result){
             Comment::where('id', $input['comment_id'])->increment('reply_num') ;
