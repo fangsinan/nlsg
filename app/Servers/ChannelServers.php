@@ -71,7 +71,8 @@ class ChannelServers {
         $res = $this->cytxPost('push', $data);
 
         $order = Order::query()->find($order_data['id']);
-        if ($res->code === 200) {
+        $res_code = (int)($res->code??0);
+        if ($res_code === 200) {
             $order->cytx_job = -1;
         } else {
             ++$order->cytx_job;
@@ -79,6 +80,12 @@ class ChannelServers {
         $order->cytx_res        = json_encode($res);
         $order->cytx_check_time = date('Y-m-d H:i:s');
         $order->save();
+
+        DB::table('wwwww')->insert([
+            'vv'=>'cytx_'.$order_data['ordernum'],
+            't'=>json_encode($res)
+        ]);
+
         return true;
     }
 
