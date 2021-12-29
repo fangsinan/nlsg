@@ -52,6 +52,8 @@ class ReplyController extends Controller
                 'content'   => $input['content']
             ];
             $c_type = $comment['type'];
+            $Video_id = $comment['relation_id'];
+
         }else{
             $comment = CommentReply::where('id', $input['comment_id'])->first();
             if(empty($comment)){
@@ -68,16 +70,19 @@ class ReplyController extends Controller
 
             $main_comment = Comment::where('id', $comment['comment_id'])->first();
             $c_type = $main_comment['type'];
+            $Video_id = $main_comment['relation_id'];
 
         }
+
 //        if (!$comment){
 //            return error(1000,'评论不存在');
 //        }
         $result  = CommentReply::create($add_data);
+
         if ($result){
             Comment::where('id', $input['comment_id'])->increment('reply_num') ;
             if($c_type == 7){
-                ShortVideoModel::where('id', $input['id'])->increment('comment_num');
+                ShortVideoModel::where('id', $Video_id)->increment('comment_num');
             }
 //            //发送通知
 //            $notify = new Notify();
