@@ -158,6 +158,7 @@ class ChannelServers {
 
     //推送到创业天下
     private function pushToCytx($order_data) {
+        return true;
         if (is_object($order_data)) {
             $order_data = json_decode(json_encode($order_data), true);
         }
