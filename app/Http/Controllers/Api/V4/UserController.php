@@ -303,6 +303,7 @@ class UserController extends Controller
                 'reply_num', 'created_at')
             ->where('user_id', $id)
             ->where('status', 1)
+            ->where('type', '!=',7)
             ->orderBy('created_at', 'desc');
 
         if ($activity_tag === 'cytx'){
