@@ -18,6 +18,7 @@ use App\Models\Works;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Predis\Client;
 
 class ChannelServers {
     //************************创业天下改版************************
@@ -81,8 +82,8 @@ class ChannelServers {
         $order->save();
 
         DB::table('wwwww')->insert([
-            'vv'=>'cytx_'.$order_data['ordernum'],
-            't'=>json_encode($res)
+            'vv' => 'cytx_' . $order_data['ordernum'],
+            't'  => json_encode($res)
         ]);
 
         return true;
@@ -194,8 +195,16 @@ class ChannelServers {
     }
 
     public static function cytxJob() {
-        $c = new self();
-        $c->cytxOrderList();
+        $redisConfig = config('database.redis.default');
+        $Redis       = new Client($redisConfig);
+        $Redis->select(0);
+        $key_minute = 'cytx_job_flag';
+        $flag       = $Redis->EXISTS($key_minute);
+        if ($flag !== 1) {
+            $Redis->setex($key_minute, 60, 1);//1分钟
+            $c = new self();
+            $c->cytxOrderList();
+        }
     }
 
     //创业天下订单获取
