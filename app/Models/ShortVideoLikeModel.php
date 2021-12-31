@@ -24,24 +24,27 @@ class ShortVideoLikeModel extends Base
             if ($list['status'] == $is_like ){
                 return ['code'=>1000,'msg'=>"重复操作"];
             }
-            ShortVideoLikeModel::where(['relation_id'=> $id, 'user_id'=> $uid, 'type'=>$type])
+             $res = ShortVideoLikeModel::where(['relation_id'=> $id, 'user_id'=> $uid, 'type'=>$type])
                 ->update(['status' => $is_like]);
 
         }else{
 
-            ShortVideoLikeModel::firstOrCreate([
+            $res = ShortVideoLikeModel::firstOrCreate([
                 'relation_id' => $id,
                 'user_id'     => $uid,
                 'type'        => $type,
                 'status'      => $is_like,
             ]);
         }
-
-        if($is_like == 0){
-            ShortVideoModel::where('id', $id)->decrement('like_num');
-        }else{
-            ShortVideoModel::where('id', $id)->increment('like_num');
+        
+        if(!empty($res)){
+            if($is_like == 0){
+                ShortVideoModel::where('id', $id)->decrement('like_num');
+            }else{
+                ShortVideoModel::where('id', $id)->increment('like_num');
+            }
         }
+
 
         return ['code'=>200,'msg'=>"操作成功"];
 
