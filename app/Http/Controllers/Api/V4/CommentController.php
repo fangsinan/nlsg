@@ -471,13 +471,15 @@ class CommentController extends Controller
             $res = Comment::where('id', $id)
                 ->update(['status' => 0]);
             if ($res) {
+                //子评论数量
+                $count = CommentReply::where('comment_id', $id)->count();
                 CommentReply::where('comment_id', $id)->update(['status' => 0]);
                 switch ($comment->type){
                     case 5:
-                        Wiki::where('id', $comment->relation_id)->decrement('comment_num');
+                        Wiki::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
                         break;
                     case 7:
-                        ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num');
+                        ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
                         break;
                 }
             }
@@ -486,7 +488,7 @@ class CommentController extends Controller
             CommentReply::where('id', $id)->update(['status' => 0]);
             
             if($c_type == 7){
-                ShortVideoModel::where('id', $input['id'])->increment('comment_num');
+                ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num');
             }
         }
 
