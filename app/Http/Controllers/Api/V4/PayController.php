@@ -257,7 +257,7 @@ class PayController extends Controller
      * @apiVersion 1.0.0
      * @apiGroup pay
      *
-     * @apiParam {int} type 类型 1专栏 2会员 5打赏 8  电商   9精品课 11直播 14线下课购买 15讲座  16幸福360购买   17赠送  18 训练营
+     * @apiParam {int} type 类型 1专栏 2会员 5打赏 8  电商   9精品课 11直播 14线下课购买 15讲座  16幸福360购买   17赠送  18 训练营 19专题lists
      * @apiParam {int} id 订单id
      *
      * @apiSuccess {string} result json
