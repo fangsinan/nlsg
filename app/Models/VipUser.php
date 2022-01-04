@@ -106,7 +106,7 @@ class VipUser extends Base
         $author = User::where('is_author', '=', 1)
             ->where('status', '=', 1)
             ->where('show_in_vip_page', '=', 1)
-            ->select(['id', 'nickname', 'image_for_vip_page as headimg', 'intro_for_360'])
+            ->select(['id', 'nickname', 'image_for_vip_page as headimg', 'intro_for_360','vip_headcover'])
             ->orderByRaw($author_order_str)
             ->orderBy('id', 'asc')
             ->limit(10)
