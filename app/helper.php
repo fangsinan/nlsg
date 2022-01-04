@@ -84,9 +84,9 @@
                 $time = ($time % 60);
                 $t .= $value["minutes"] . "分";
             }
-            $value["seconds"] = floor($time);
+//            $value["seconds"] = floor($time);
             //return (array) $value;
-            $t .= $value["seconds"] . "秒";
+//            $t .= $value["seconds"] . "秒";
             return $t;
 
         } else {
