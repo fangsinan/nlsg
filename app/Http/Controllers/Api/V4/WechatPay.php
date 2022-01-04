@@ -1883,7 +1883,7 @@ class WechatPay extends Controller
                 }else{
 
                     $subscribeRst = DB::table('nlsg_subscribe')->where([
-                        'user_id'   => 318504, //会员id
+                        'user_id'   => $user_id, //会员id
                         'type'      => 8, //专题
                         'status'    => 1,
                         'relation_id' => 40,
