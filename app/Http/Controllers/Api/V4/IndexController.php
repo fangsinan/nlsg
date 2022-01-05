@@ -275,7 +275,7 @@ class IndexController extends Controller
         $user_id = $this->user['id'] ?? 0;
         
 
-//        $recommendModel = new Recommend();
+        $recommendModel = new Recommend();
 //        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
         $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
             'is_free', 'helper')
@@ -286,7 +286,9 @@ class IndexController extends Controller
             ->first();
         if (!empty($list)){
             $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
-            $lists = $this->getLiveRelation($user_id, $list);
+
+
+            $lists = $recommendModel->getLiveRelation($user_id, $list);
         }else{
             $lists = (object)[];
         }
