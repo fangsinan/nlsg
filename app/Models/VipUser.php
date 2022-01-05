@@ -83,7 +83,7 @@ class VipUser extends Base
             }
         }
 
-        if(!empty($params['version']) && $params['version']="5.0.0"){
+        if(!empty($params['version']) && version_compare($params['version'],"5.0.0") >= 0){
 
             $card_data['overdue_time'] = 0;
             if($card_data['is_open'] == 0 && !empty($user['id'])){ //查询过期几天

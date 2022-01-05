@@ -111,7 +111,7 @@ class VipWorksList extends Base
             } else {
                 continue;
             }
-            if($version == '5.0.0'){ //根据uid 分组
+            if(version_compare($version,"5.0.0") >= 0){ //根据uid 分组
                 $new_data[$temp_res['user_id']]["user_info"] = User::getTeacherInfo($temp_res['user_id']);;
                 $new_data[$temp_res['user_id']]["list"][] = $temp_res;
                 $new_data[$temp_res['user_id']]["count"] = count($new_data[$temp_res['user_id']]["list"]);
@@ -124,7 +124,7 @@ class VipWorksList extends Base
 
         }
 
-        if($version == '5.0.0'){
+        if(version_compare($version,"5.0.0") >= 0){
             //客户端要求 分开返回 一个字段是多个  一个字段是单个  并且单个需要两个一组
             $new_res = [ 'multiple' =>[], 'one_arr' =>[], ];
             $one_arr = [];

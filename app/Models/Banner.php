@@ -25,7 +25,7 @@ class Banner extends Base
 //        $res = Cache::get($cache_key_name);
 //        if (empty($res)) {
         $today = date('Y-m-d H:i:s', time());
-        $res = $this->select('id', 'pic', 'title', 'url', 'jump_type', 'obj_id')
+        $res = $this->select('id', 'pic', 'title', 'url', 'jump_type', 'obj_id', 'info_id')
             ->where('status', 1)
             ->where('type', 1)
             ->where('start_time', '<=', $today)
@@ -64,14 +64,14 @@ class Banner extends Base
             ->where('status', '=', 1)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
-            ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
+            ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id','info_id'])
             ->limit($banner_limit)
             ->get();
         $res['recommend'] = Banner::where('type', '=', 52)
             ->where('status', '=', 1)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
-            ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
+            ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id','info_id'])
             ->limit($recommend_limit)
             ->get();
         $res['goods_list'] = MallGoodsList::where('show_index', '=', 1)
@@ -85,7 +85,7 @@ class Banner extends Base
             ->where('status', '=', 1)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
-            ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
+            ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id','info_id'])
             ->limit($recommend_limit)
             ->get();
         $res['postage_line'] = ConfigModel::getData(1);
@@ -117,7 +117,7 @@ class Banner extends Base
         $res = [];
         if (!empty($data)) {
             $res['obj_id'] = $data->obj_id;
-            $res['info_id'] = 0;
+            $res['info_id'] = $data->info_id;
             $res['type'] = $data->jump_type;
             $res['jump_type'] = $data->jump_type;
             $res['url'] = $data->url;
