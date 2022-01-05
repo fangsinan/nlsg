@@ -824,6 +824,15 @@ class OrderController extends Controller
                 case 8:
                     $model = new Lists();
                     $result = $model->getIndexListWorks([$val['relation_id']], [7,10],$user_id);
+                    //安卓 客户端要求只返回课程list 不返回专题
+//                    $model = new Lists();
+//                    $list_result = $model->getIndexListWorks([$val['relation_id']], [7,10],$user_id);
+//                    foreach ($list_result as $list_key=>$list_val){
+//                        if($list_val['type'] == 10){
+//                            $result = $list_val['list_works'];
+//                        }
+//                    }
+
                     break;
             }
             if ($result == false) {
