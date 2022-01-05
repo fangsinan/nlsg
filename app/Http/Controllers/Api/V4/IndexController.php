@@ -286,7 +286,7 @@ class IndexController extends Controller
             ->first();
         if (!empty($list)){
             $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
-
+            $list->begin_at =  date('H:i:s',strtotime($list->begin_at));
 
             $lists = $recommendModel->getLiveRelation($user_id, $list);
         }else{
