@@ -14,6 +14,7 @@ use App\Models\UserInvite;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use GuzzleHttp\Client;
@@ -1461,16 +1462,22 @@ class UserController extends Controller
             "rank"      => 0,
         ];
         if(!empty($uid)){
-            $user_data = History::select("user_id")->selectRaw('sum(time_number) as num')
-                ->where('is_del',0)->where('user_id',$uid)->first()->toArray();
+            $cache_key_name = 'his_len_deteil_'.$uid;
+            $u_data = Cache::get($cache_key_name);
+            if (empty($u_data)) {
+                $user_data = History::select("user_id")->selectRaw('sum(time_number) as num')
+                    ->where('is_del',0)->where('user_id',$uid)->first()->toArray();
 
-            $his_data = DB::select('select count(*) as count from (select  sum(time_number) as num,user_id 
+                $his_data = DB::select('select count(*) as count from (select  sum(time_number) as num,user_id 
                         from nlsg_history where is_del = 0 group by user_id HAVING sum(time_number )>='.$user_data['num'].') as count_table');
 
-            $u_data['nickname'] = $this->user['nickname'];
-            $u_data['headimg']  = $this->user['headimg'];
-            $u_data['his_num']  = SecToTime($user_data['num']);
-            $u_data['rank']     = $his_data[0]->count;
+                $u_data['nickname'] = $this->user['nickname'];
+                $u_data['headimg']  = $this->user['headimg'];
+                $u_data['his_num']  = SecToTime($user_data['num']);
+                $u_data['rank']     = $his_data[0]->count;
+                Cache::put($cache_key_name, $u_data, 86400);
+            }
+
         }
 
         return success(['rank_data'=>$data,'user'=>$u_data]);
