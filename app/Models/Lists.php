@@ -132,6 +132,9 @@ class Lists extends Model
                     } else {
                         unset($lists[$k]['list_works'][$kk]);
                     }
+                    $vv['historyData'] = History::getHistoryData($vv['id'], 4, $uid);
+
+
                 }
                 $lists[$k]['list_works'] = array_values($lists[$k]['list_works']);
                 $lists[$k]['num'] = count($lists[$k]['list_works']);
