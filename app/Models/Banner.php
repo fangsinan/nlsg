@@ -128,20 +128,20 @@ class Banner extends Base
                 case 4:
                     $res['type'] = 2;
                     break;
-                case 5:
-                    $res['type'] = 5;
-                    break;
-                case 6:
-                    $res['type'] = 6;
-                    break;
+//                case 5:
+//                    $res['type'] = 5;
+//                    break;
+//                case 6:
+//                    $res['type'] = 6;
+//                    break;
                 case 8:
                     $res['type'] = 1;
                     break;
-                case 13:
-                    $res['type'] = 13;
-                    break;
+//                case 13:
+//                    $res['type'] = 13;
+//                    break;
                 default:
-                    $res['type'] = 0;
+                    $res['type'] = $data->jump_type;
             }
             $res['url'] = $data->url;
             $res['img'] = 'https://image.nlsgapp.com/' . $data->pic;
