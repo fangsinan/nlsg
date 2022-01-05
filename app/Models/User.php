@@ -263,14 +263,16 @@ class User extends Authenticatable implements JWTSubject
         $res['title'] = '';
         $res['subtitle'] = '';
         $res['headimg'] = '';
+        $res['vip_headcover'] = '';
 
 
-        $user = self::where('id','=',$user_id)->first('nickname');
+        $user = self::where('id','=',$user_id)->first();
         $col = Column::where('user_id','=',$user_id)->where('type','=',1)->select(['title','subtitle'])->first();
 
         if (!empty($user->nickname)){
             $res['name'] = $user->nickname;
             $res['headimg'] = $user->headimg;
+            $res['vip_headcover'] = $user->vip_headcover;
         }
 
         if (!empty($col)){
