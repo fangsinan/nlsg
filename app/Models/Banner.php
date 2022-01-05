@@ -118,31 +118,32 @@ class Banner extends Base
         if (!empty($data)) {
             $res['id'] = $data->obj_id;
             $res['info_id'] = 0;
-            switch ($data->jump_type) {
-                case 2:
-                    $res['type'] = 3;
-                    break;
-                case 3:
-                    $res['type'] = 0;
-                    break;
-//                case 4:
-//                    $res['type'] = 2;
+//            switch ($data->jump_type) {
+//                case 2:
+//                    $res['type'] = 3;
 //                    break;
-//                case 5:
-//                    $res['type'] = 5;
+//                case 3:
+//                    $res['type'] = 0;
 //                    break;
-//                case 6:
-//                    $res['type'] = 6;
+////                case 4:
+////                    $res['type'] = 2;
+////                    break;
+////                case 5:
+////                    $res['type'] = 5;
+////                    break;
+////                case 6:
+////                    $res['type'] = 6;
+////                    break;
+//                case 8:
+//                    $res['type'] = 1;
 //                    break;
-                case 8:
-                    $res['type'] = 1;
-                    break;
-//                case 13:
-//                    $res['type'] = 13;
-//                    break;
-                default:
-                    $res['type'] = $data->jump_type;
-            }
+////                case 13:
+////                    $res['type'] = 13;
+////                    break;
+//                default:
+//                    $res['type'] = $data->jump_type;
+//            }
+            $res['type'] = $data->jump_type;
             $res['url'] = $data->url;
             $res['img'] = 'https://image.nlsgapp.com/' . $data->pic;
         }
