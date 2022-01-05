@@ -10,6 +10,7 @@ use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Coupon;
 use App\Models\Lists;
+use App\Models\Live;
 use App\Models\Recommend;
 use App\Models\RecommendConfig;
 use App\Models\User;
@@ -272,9 +273,28 @@ class IndexController extends Controller
         }
 
         $user_id = $this->user['id'] ?? 0;
-        $recommendModel = new Recommend();
-        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
+        
+
+//        $recommendModel = new Recommend();
+//        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
+        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
+            'is_free', 'helper')
+            ->where('begin_at', '>', date("Y-m-d"))
+            ->where('end_at',   '<', date("Y-m-d"))
+            ->where('is_del', 0)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if (!empty($list)){
+            $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
+            $lists = $this->getLiveRelation($user_id, $list);
+        }else{
+            $lists = (object)[];
+        }
+
         return success($lists);
+
+
+
     }
 
     /**
