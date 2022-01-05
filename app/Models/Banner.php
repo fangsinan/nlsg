@@ -125,9 +125,9 @@ class Banner extends Base
                 case 3:
                     $res['type'] = 0;
                     break;
-                case 4:
-                    $res['type'] = 2;
-                    break;
+//                case 4:
+//                    $res['type'] = 2;
+//                    break;
 //                case 5:
 //                    $res['type'] = 5;
 //                    break;
