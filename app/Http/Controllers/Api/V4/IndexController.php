@@ -280,7 +280,7 @@ class IndexController extends Controller
         $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
             'is_free', 'helper')
             ->where('begin_at', '>', date("Y-m-d"))
-            ->where('end_at',   '<', date("Y-m-d"))
+            ->where('end_at',   '<', date('Y-m-d',strtotime('+1 day')))
             ->where('is_del', 0)
             ->orderBy('created_at', 'desc')
             ->first();
