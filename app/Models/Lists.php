@@ -82,7 +82,7 @@ class Lists extends Model
                     $v['end_time'] = "";
                     if(!empty($sub_data)){
                         $v['is_sub'] = 1;
-                        $v['end_time'] = $sub_data['end_time'];
+                        $v['end_time'] = date("Y-m-d",strtotime($sub_data['end_time']));
                     }
                 }
 
