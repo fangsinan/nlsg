@@ -228,7 +228,7 @@ class PayController extends Controller
                 $body = "能量时光-训练营购买-" . $ColumnInfo['name'];
             } else if ($attach == 19) {
                 $Info = Lists::find($OrderInfo['relation_id']);
-                $body = "能量时光-专题购买-" . $Info['name'];
+                $body = "能量时光-专题购买-" . $Info['title'];
             }
         } else {
             return false;
