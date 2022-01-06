@@ -355,9 +355,9 @@ class LiveController extends Controller
                 if( $begin_at_time > strtotime(date("Y-1-1")) &&  $begin_at_time < strtotime(date("Y-1-1",strtotime("+1 year")))){
                     $v['live_time'] = date('m.d H:i', strtotime($v['begin_at']));
                 }
-                if($v['live_status'] == 3){
-                    $v['live_time'] = "正在直播";
-                }
+//                if($v['live_status'] == 3){
+//                    $v['live_time'] = "正在直播";
+//                }
 
             }
         }
