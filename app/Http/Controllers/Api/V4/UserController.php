@@ -1448,10 +1448,14 @@ class UserController extends Controller
      *     }
      *
      */
-    public function userHisList(){
+    public function userHisList(Request $request){
         $uid = $this->user['id'] ?? 0;
-
-        $data = User::getUserHisLen(10);
+        $page = $request->input('page');
+        if($page <= 1){
+            $data = User::getUserHisLen(20);
+        }else{
+            $data = [];
+        }
 
         //自己的排名
         $u_data = [
