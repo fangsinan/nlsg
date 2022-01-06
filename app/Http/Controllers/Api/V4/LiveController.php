@@ -332,6 +332,7 @@ class LiveController extends Controller
                     ->orderBy('id', 'desc')
                     ->first();
                 if ($channel) {
+//                    1未开始  2已结束  3直播中
                     if ($channel->is_begin == 0 && $channel->is_finish == 0) {
                         $v['live_status'] = 1;
                     } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
@@ -348,11 +349,14 @@ class LiveController extends Controller
 
                 $v['is_password'] = $v['password'] ? 1 : 0;
 
-
+                //判断显示
                 $begin_at_time = strtotime($v['begin_at']);
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
                 if( $begin_at_time > strtotime(date("Y-1-1")) &&  $begin_at_time < strtotime(date("Y-1-1",strtotime("+1 year")))){
                     $v['live_time'] = date('m.d H:i', strtotime($v['begin_at']));
+                }
+                if($v['live_status'] == 3){
+                    $v['live_time'] = "正在直播";
                 }
 
             }
