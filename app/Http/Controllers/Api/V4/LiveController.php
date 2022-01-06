@@ -348,6 +348,10 @@ class LiveController extends Controller
 
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+                if( $v['begin_at'] > date("Y-1-1") && $v['begin_at'] < date("Y-1-1",strtotime("+1 year"))){
+                    $v['live_time'] = date('m.d H:i', strtotime($v['begin_at']));
+                }
+
             }
         }
 
