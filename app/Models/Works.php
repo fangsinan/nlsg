@@ -373,6 +373,9 @@ class Works extends Base
             ->toArray();
         if ($lists) {
             foreach ($lists as $v) {
+                if($v == 9 ){ //学习榜单 无需统计
+                    continue;
+                }
                 $num = ListsWork::where('lists_id', $v['id'])
                     ->where('state', 1)
                     ->count();
