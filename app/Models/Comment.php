@@ -63,7 +63,9 @@ class Comment extends Base
             ->when($self, function ($query) use ($res) {
                 return $query->where('user_id', $res['user_id']);
             })
-            ->orderBy($order, 'desc')
+//            ->orderBy($order, 'desc')
+            ->orderBy('reply_num', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();
 
