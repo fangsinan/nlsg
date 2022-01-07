@@ -76,6 +76,7 @@ class Comment extends Base
                     foreach ($v['reply'] as $rep_k=>$rep_v){
 //                        $rep_v = $this->getReplay($rep_v['id']);
                         $v['reply'][$rep_k]['is_like'] = Like::isLike($rep_v['id'],2,$uid,$like_type);
+                        $v['reply'][$rep_k]['created_at'] = History::DateTime($rep_v['created_at']);
                         $v['reply'][$rep_k]['reply'] = $this->getReplay($rep_v['id'],$uid,$like_type);
 
                     }
