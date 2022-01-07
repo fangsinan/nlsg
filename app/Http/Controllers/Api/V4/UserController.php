@@ -1449,8 +1449,10 @@ class UserController extends Controller
      *
      */
     public function userHisList(Request $request){
-        $uid = $this->user['id'] ?? 211172;
+
+        $uid = $this->user['id']??0;
         $page = $request->input('page');
+
         //本周一
         $week_one = date("Y-m-d H:i:s",strtotime("last Monday"));
         //上周一
@@ -1461,14 +1463,14 @@ class UserController extends Controller
         }else{
             $data = [];
         }
-
         //自己的排名
         $u_data = [
             "id" => $uid,
-            "nickname" => '',
-            "headimg" => '',
-            "his_num" => 0,
+            "nickname"  => '',
+            "headimg"   => '',
+            "his_num"   => 0,
             "rank"      => 0,
+            "is_like"   => 0,
         ];
         if(!empty($uid)){
             $cache_key_name = 'his_len_deteil_'.$uid;
@@ -1482,7 +1484,7 @@ class UserController extends Controller
 
                 $sql = 'select count(*) as count from (select  sum(time_number) as num,user_id from nlsg_history where created_at > ? and created_at < ? and is_del = 0 group by user_id HAVING sum(time_number )>=?) as count_table';
                 $his_data = DB::select($sql,[$top_week_one,$week_one,$user_data['num']]);
-                
+
                 $u_data['nickname'] = $this->user['nickname']??'';
                 $u_data['headimg']  = $this->user['headimg']??'';
                 $u_data['his_num']  = SecToTime($user_data['num']);
@@ -1490,12 +1492,35 @@ class UserController extends Controller
                 Cache::put($cache_key_name, $u_data, 86400*7);
             }
 
+
+
+            //是否页面自我点赞
+            $cache_key_name = 'his_like_'.$uid.'_'.$top_week_one;
+            $is_like = Cache::get($cache_key_name);
+            if(!empty($is_like)){
+                $u_data['is_like'] = 1;
+            }
+
+
         }
 
         return success(['rank_data'=>$data,'user'=>$u_data]);
     }
 
+    public function histLike(Request $request){
+        $uid = $this->user['id'];
+        $is_like = 1;
+        //上周一
+        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
 
+        //页面自我点赞
+        $cache_key_name = 'his_like_'.$uid.'_'.$top_week_one;
+        Cache::put($cache_key_name, $is_like, 86400*7);
+
+
+
+        return success();
+    }
 
 
 
