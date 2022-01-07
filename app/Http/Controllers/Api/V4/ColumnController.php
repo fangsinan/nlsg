@@ -110,7 +110,8 @@ class ColumnController extends Controller
             if($v['is_start'] == 0){
                 $new_res['start_list'][] = $v;
             }else{
-                $new_res['list'][] = $v;
+                //  5.0.1 暂时不需要线下课
+//                $new_res['list'][] = $v;
             }
         }
         return $this->success($new_res);

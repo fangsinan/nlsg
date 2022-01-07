@@ -108,7 +108,7 @@ class LiveInfo extends Model
         }
 
         $str_time = strtotime($liveObj->steam_begin_time) - 60;
-        $end_time = strtotime($liveObj->steam_end_time)+300;
+        $end_time = strtotime($liveObj->steam_end_time)+60;
 
 //        $str_time = strtotime($info['begin_at']) - 60;
 //        $end_time       = $str_time+3600*3+600;//  结束时间需要大于当前时间 目前有视频超过3小时
