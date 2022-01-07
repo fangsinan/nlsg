@@ -338,16 +338,23 @@ class User extends Authenticatable implements JWTSubject
 
 
     //获取用学习时长
-    public static function getUserHisLen($size=3){
+    public static function getUserHisLen($size=3,$top_week_one){
 
-        $cache_key_name = 'user_his_len_list_'.$size;
+        $cache_key_name = 'user_his_len_list_'.$size.'_'.$top_week_one;
         $result = Cache::get($cache_key_name);
         if ($result) {
             return $result;
         }
 
+        //时间小于本周一
+        $week_one = date("Y-m-d H:i:s",strtotime("last Monday"));
+        //大于上周一
+//        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
+
 
         $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
+            ->where('created_at','>',$top_week_one)
+            ->where('created_at','<',$week_one)
             ->where('is_del',0)
             ->orderBy('num', 'desc')->GroupBy("user_id")->limit($size)->get()->toArray();
 
@@ -367,7 +374,7 @@ class User extends Authenticatable implements JWTSubject
                 }
             }
         }
-        Cache::put($cache_key_name, $user, 86400);
+        Cache::put($cache_key_name, $user, 86400*7);
         return $user;
     }
 
