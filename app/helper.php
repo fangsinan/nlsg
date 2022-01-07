@@ -84,12 +84,16 @@
                 $time = ($time % 60);
                 $t .= $value["minutes"] . "分";
             }
-//            $value["seconds"] = floor($time);
-            //return (array) $value;
-//            $t .= $value["seconds"] . "秒";
+            //分钟数如果都为空 则单独显示秒
+            if($t == ''){
+                $value["seconds"] = floor($time);
+//            return (array) $value;
+                $t .= $value["seconds"] . "秒";
+            }
+
             return $t;
 
         } else {
-            return (bool) false;
+            return '0秒';
         }
     }

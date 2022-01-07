@@ -99,10 +99,12 @@ class RankController extends Controller
      *     }
      *
      */
-    public function works()
+    public function works(Request $request)
     {
+        $lists_id = $request->get('lists_id') ?? 0;
+
         $lists = Lists::select('id', 'title', 'num', 'cover')
-            ->where('type', 4)
+            ->where('id', $lists_id)
             ->orderBy('created_at', 'desc')
             ->first();
         if ( ! $lists) {

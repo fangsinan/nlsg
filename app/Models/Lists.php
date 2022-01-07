@@ -302,7 +302,7 @@ class Lists extends Model
             ->whereIn('id',$ids) ->get()->toArray();
 
 
-        if ($lists) {
+        if (!empty($lists)) {
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
                     ->where('state', 1)->orderBy('sort')

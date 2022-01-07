@@ -46,7 +46,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('works/get_lists_works', 'WorksController@getListsWorks');
 
 
+    Route::group(['middleware' => ['auth.jwt']], function () {
+        Route::get('user/history_like', 'UserController@histLike');
 
+    });
 
     /**     5.0 API  END    ***/
 
