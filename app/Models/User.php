@@ -338,7 +338,9 @@ class User extends Authenticatable implements JWTSubject
 
 
     //获取用学习时长
-    public static function getUserHisLen($size=3,$top_week_one){
+    public static function getUserHisLen($size=3){
+
+        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
 
         $cache_key_name = 'user_his_len_list_'.$size.'_'.$top_week_one;
         $result = Cache::get($cache_key_name);

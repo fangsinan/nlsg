@@ -1459,7 +1459,7 @@ class UserController extends Controller
         $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
 
         if($page <= 1){
-            $data = User::getUserHisLen(20,$top_week_one);
+            $data = User::getUserHisLen(20);
         }else{
             $data = [];
         }
@@ -1509,14 +1509,13 @@ class UserController extends Controller
 
     public function histLike(Request $request){
         $uid = $this->user['id'];
-        $is_like = 1;
-        //上周一
-        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
-
-        //页面自我点赞
-        $cache_key_name = 'his_like_'.$uid.'_'.$top_week_one;
-        Cache::put($cache_key_name, $is_like, 86400*7);
-
+        if(!empty($uid)){
+            //上周一
+            $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
+            //页面自我点赞
+            $cache_key_name = 'his_like_'.$uid.'_'.$top_week_one;
+            Cache::put($cache_key_name, 1, 86400*7);
+        }
 
 
         return success();
