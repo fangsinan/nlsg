@@ -1508,7 +1508,7 @@ class UserController extends Controller
     }
 
     public function histLike(Request $request){
-        $uid = $this->user['id'];
+        $uid = $this->user['id']??0;
         if(!empty($uid)){
             //上周一
             $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一

@@ -230,6 +230,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::post('user/check_phone', 'UserController@checkPhone');
 
     //历史记录
+    Route::get('user/history_like', 'UserController@histLike');
     Route::get('user/history', 'UserController@history');
     Route::get('user/new_history', 'UserController@new_history');
     Route::get('user/clear_history', 'UserController@clearHistory');
