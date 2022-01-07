@@ -13,7 +13,7 @@ class ShortVideoRecommendModel extends Base
     public function getRecommend ($id){
         //按照rand、创建时间排序
         $field = ["relation_type","relation_id","push_time"];
-        $data = self::select($field)->where(['status'=>1,'video_id'=>$id])->OrderBy('push_time')->get()->toArray();
+        $data = self::select($field)->where(['video_id'=>$id, 'status'=>1,])->OrderBy('push_time')->get()->toArray();
 
         $recomObj = new Recommend();
         foreach ($data as $key=>&$com_val){
