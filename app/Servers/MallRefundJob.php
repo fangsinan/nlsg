@@ -274,64 +274,123 @@ class MallRefundJob
         }
 
         $now_date = date('Y-m-d H:i:s');
-        $data = array(
-            'appid' => $config['app_id'], //公众账号ID
-            'mch_id' => $config['mch_id'], //商户号
-            'refund_account' => 'REFUND_SOURCE_RECHARGE_FUNDS',
-            'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
-            'out_refund_no' => $v->service_num, //商户退款单号
-            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
-            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
-            'transaction_id' => $v->transaction_id, //微信订单号
-        );
-        $data['sign'] = self::sign_data($data, $config['key']); //加密串
-        $xml = self::ToXml($data); //数据包拼接
-        $res = self::postXmlCurl($config['refund_url'], $xml, 1);
-        libxml_disable_entity_loader(true);
-        if (!$res) {
-            return true;
-        }
-        try {
-            $xml = simplexml_load_string($res, 'SimpleXMLElement',
-                LIBXML_NOCDATA);
-            DB::table('wwwww')->insert([
-                'vv'=>$now_date,
-                't'=>json_encode($xml)
-            ]);
 
-            $xml = json_decode(json_encode($xml), true);
+        $app = Factory::payment($config);
+
+        try {
+            $result = $app->refund->byTransactionId(
+                $v->transaction_id,
+                $v->service_num,
+                (int)GetPriceTools::PriceCalc('*', $v->all_price, 100),
+                (int)GetPriceTools::PriceCalc('*', $v->refund_price, 100),
+                [
+                    // 可在此处传入其他参数，详细参数见微信支付文档
+                    'refund_desc' => '退款',
+                ]
+            );
+
+            DB::table('nlsg_wechat_refund_res_log')->insert([
+                'res_json' => json_encode($result)
+            ]);
 
             $rrrModel = new RunRefundRecord();
             $rrrModel->order_type = 1;
             $rrrModel->order_id = $v->service_id;
 
-            if ((strtolower($xml['return_msg']) === 'ok' || empty($xml['return_msg'])) &&
-                strtolower($xml['return_code']) === 'success') {
+            $rrrModel->error_code = $result['return_code'] ?? '';
+            $rrrModel->error_msg  = $result['return_code'] . ' : ' . $result['err_code_des'] ?? '';
 
-                $mrr = MallRefundRecord::find($v->service_id);
-                $mrr->status = 50;
+            if (
+                ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') ||
+                ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'FAIL' &&
+                    $result['err_code_des'] === '订单已全额退款')
+            ) {
+                $mrr                = MallRefundRecord::query()->find($v->service_id);
+                $mrr->status        = 50;
                 $mrr->refund_sub_at = $now_date;
-                $mrr->run_refund = 2;
+                $mrr->run_refund    = 2;
                 $mrr->save();
+                $rrrModel->is_success   = 1;
+                $rrrModel->refund_money = $v->refund_price;
 
-                if (strtolower($xml['result_code']) == 'success') {
-                    $rrrModel->is_success = 1;
-                    $rrrModel->refund_money = GetPriceTools::PriceCalc('/', $xml['refund_fee'], 100);
-                } else {
-                    $rrrModel->is_success = 2;
-                    $rrrModel->error_code = $xml['err_code'] ?? '';
-                    $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
-                }
             } else {
                 $rrrModel->is_success = 2;
-                $rrrModel->error_code = $xml['err_code'] ?? '';
-                $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
             }
+
             $rrrModel->save();
             return true;
+
         } catch (\Exception $e) {
             return true;
         }
+
+
+
+
+
+
+
+
+//        $now_date = date('Y-m-d H:i:s');
+//        $data = array(
+//            'appid' => $config['app_id'], //公众账号ID
+//            'mch_id' => $config['mch_id'], //商户号
+//            'refund_account' => 'REFUND_SOURCE_RECHARGE_FUNDS',
+//            'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
+//            'out_refund_no' => $v->service_num, //商户退款单号
+//            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
+//            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
+//            'transaction_id' => $v->transaction_id, //微信订单号
+//        );
+//        $data['sign'] = self::sign_data($data, $config['key']); //加密串
+//        $xml = self::ToXml($data); //数据包拼接
+//        $res = self::postXmlCurl($config['refund_url'], $xml, 1);
+//
+//        libxml_disable_entity_loader(true);
+//        if (!$res) {
+//            return true;
+//        }
+//        try {
+//            $xml = simplexml_load_string($res, 'SimpleXMLElement',
+//                LIBXML_NOCDATA);
+//            DB::table('wwwww')->insert([
+//                'vv'=>$now_date,
+//                't'=>json_encode($xml)
+//            ]);
+//
+//            $xml = json_decode(json_encode($xml), true);
+//
+//            $rrrModel = new RunRefundRecord();
+//            $rrrModel->order_type = 1;
+//            $rrrModel->order_id = $v->service_id;
+//
+//            if ((strtolower($xml['return_msg']) === 'ok' || empty($xml['return_msg'])) &&
+//                strtolower($xml['return_code']) === 'success') {
+//
+//                $mrr = MallRefundRecord::find($v->service_id);
+//                $mrr->status = 50;
+//                $mrr->refund_sub_at = $now_date;
+//                $mrr->run_refund = 2;
+//                $mrr->save();
+//
+//                if (strtolower($xml['result_code']) == 'success') {
+//                    $rrrModel->is_success = 1;
+//                    $rrrModel->refund_money = GetPriceTools::PriceCalc('/', $xml['refund_fee'], 100);
+//                } else {
+//                    $rrrModel->is_success = 2;
+//                    $rrrModel->error_code = $xml['err_code'] ?? '';
+//                    $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
+//                }
+//            } else {
+//                $rrrModel->is_success = 2;
+//                $rrrModel->error_code = $xml['err_code'] ?? '';
+//                $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
+//            }
+//            $rrrModel->save();
+//            return true;
+//        } catch (\Exception $e) {
+//            return true;
+//        }
     }
 
     /**

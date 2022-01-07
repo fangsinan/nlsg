@@ -750,8 +750,8 @@ class LiveConsole extends Base
         $begin_list_sql = "select l.id as live_id from nlsg_live as l
 join nlsg_live_info as li on l.id = li.live_pid and li.task_id <> 0 and li.is_begin = 0
 where l.status = 4
-and li.begin_at >= '$date_begin'
-and li.begin_at <= '$date_end'";
+and l.steam_begin_time >= '$date_begin'
+and l.steam_begin_time <= '$date_end'";
 
         $begin_list = DB::select($begin_list_sql);
 
@@ -768,8 +768,8 @@ and li.begin_at <= '$date_end'";
         $end_list_sql = "select l.id as live_id from nlsg_live as l
 join nlsg_live_info as li on l.id = li.live_pid and li.task_id > 0 and li.is_begin = 1 and li.is_finish = 0
 where l.status = 4
-and li.end_at >= '$date_begin'
-and li.end_at <= '$date_end'";
+and l.steam_end_time >= '$date_begin'
+and l.steam_end_time <= '$date_end'";
         $end_list = DB::select($end_list_sql);
         if (!empty($end_list)) {
             foreach ($end_list as $v) {
