@@ -89,6 +89,7 @@ class Comment extends Base
                     //只展示五条
                     $v['reply'] = array_slice($v['reply'], 0, 5);
                 }
+                $v['created_at'] = History::DateTime($v['created_at']);
             }
         }
         return $lists;
@@ -107,6 +108,7 @@ class Comment extends Base
             foreach ($reply_data as $getReplay_key=>$getReplay_val){
                 //是否喜欢
                 $getReplay_val['is_like'] = Like::isLike($getReplay_val['id'],2,$uid,$like_type);
+                $getReplay_val['created_at'] = History::DateTime($getReplay_val['created_at']);
                 $getReplay_val['reply'] = $this->getReplay($getReplay_val['id'],$uid,$like_type);
                 $subs[] = $getReplay_val;
             }
