@@ -562,7 +562,7 @@ class WorksController extends Controller
 //        }
         //查询章节
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size);
+        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size,$works_data);
         if ($flag === 'catalog'){
             $res = [
                 'works_info'          => $info,
