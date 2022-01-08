@@ -697,6 +697,10 @@ class LiveConsole extends Base
                         'is_begin' => 1,
                         'is_finish' => 0
                     ]);
+                Live::query()->where('id','=',$live_id)
+                    ->update([
+                        'sort'=>10
+                    ]);
                 break;
             case 2:
                 $res = LiveInfo::where('live_pid', '=', $live_id)
@@ -705,10 +709,11 @@ class LiveConsole extends Base
                         'is_finish' => 0,
                         'finished_at' => null
                     ]);
-                Live::where('id', '=', $live_id)
+                Live::query()->where('id', '=', $live_id)
                     ->update([
                         'is_finish' => 0,
                         'finished_at' => null,
+                        'sort'=>20,
                     ]);
                 break;
             case 3:
@@ -724,6 +729,7 @@ class LiveConsole extends Base
                         'is_finish' => 1,
                         'finished_at' => $now_date,
                         'virtual_online_num' => 0,
+                        'sort'=>30,
                     ]);
                 break;
             default:
