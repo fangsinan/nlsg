@@ -536,11 +536,21 @@ class WorksController extends Controller
         if( empty($works_id) ){
             return $this->error(0,'works_id 不能为空');
         }
+        //是否订阅
+        $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
+        if( $is_sub ==1 ){
+            $where = [];
+        }else{
+            $where = ['status'=>4];
+        }
+
+
         //查询当前课程
         $works_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price',
             'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num',
             'collection_num','comment_num','chapter_num','is_free','is_audio_book','view_num'])
-            ->where('status',4)->find($works_id);
+            ->where($where)
+            ->find($works_id);
         if ($channel_tag === 'cytx') {
             $temp_price = ChannelWorksList::getPrice(2, $works_id);
             if (!empty($temp_price)) {
@@ -554,8 +564,7 @@ class WorksController extends Controller
         }
         $works_data = $works_data->toArray();
 
-        //是否订阅
-        $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
+
 
 //        if($works_data['is_free'] == 1){
 //            $is_sub = 1; // 免费时全部按关注处理url
