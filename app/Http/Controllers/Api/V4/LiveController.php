@@ -316,7 +316,8 @@ class LiveController extends Controller
             $query->whereIn('is_test', [0, 1]);
         }
         $lists = $query->with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at',
+            ->select('id', 'user_id', 'title', 'describe', 'price',
+                'cover_img', 'begin_at', 'type', 'end_at','steam_begin_time',
                 'playback_price', 'is_free', 'password', 'order_num')
             ->where('status', 4)
             ->where('is_finish', 0)
@@ -355,9 +356,17 @@ class LiveController extends Controller
                 if( $begin_at_time > strtotime(date("Y-1-1")) &&  $begin_at_time < strtotime(date("Y-1-1",strtotime("+1 year")))){
                     $v['live_time'] = date('m.d H:i', strtotime($v['begin_at']));
                 }
+
+//                if (empty($v['steam_begin_time'])){
+//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+//                }else{
+//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['steam_begin_time']));
+//                }
+
 //                if($v['live_status'] == 3){
 //                    $v['live_time'] = "正在直播";
 //                }
+
 
             }
         }

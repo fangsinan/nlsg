@@ -104,13 +104,13 @@ class MallRefundJob
         } else {
             $config = Config('wechat.payment.default');
         }
-        $data = array(
-            'appid' => $config['app_id'], //公众账号ID
-            'mch_id' => $config['mch_id'], //商户号
-            'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
-            'out_refund_no' => $v->service_num, //商户退款单号
-            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
-            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
+        $data         = array(
+            'appid'          => $config['app_id'], //公众账号ID
+            'mch_id'         => $config['mch_id'], //商户号
+            'nonce_str'      => \Illuminate\Support\Str::random(16), //随机字符串
+            'out_refund_no'  => $v->service_num, //商户退款单号
+            'refund_fee'     => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
+            'total_fee'      => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
             'transaction_id' => $v->transaction_id, //微信订单号
         );
         $data['sign'] = self::sign_data($data, $config['key']); //加密串
@@ -140,18 +140,18 @@ class MallRefundJob
     {
         require_once base_path() . '/vendor/alipay-sdk/aop/AopClient.php';
         require_once base_path() . '/vendor/alipay-sdk/aop/request/AlipayTradeFastpayRefundQueryRequest.php';
-        $aop = new \AopClient();
-        $aop->appId = config('env.ALI_APP_ID');
+        $aop                     = new \AopClient();
+        $aop->appId              = config('env.ALI_APP_ID');
         $aop->alipayrsaPublicKey = config('env.ALI_PUBLIC_KEY');
-        $aop->rsaPrivateKey = config('env.ALI_PRIVATE_KEY2');
-        $aop->gatewayUrl = config('env.ALI_PAYMENT_REFUND_CHECK_URL');
-        $aop->apiVersion = '1.0';
-        $aop->signType = 'RSA2';
-        $aop->postCharset = 'UTF-8';
-        $aop->format = 'json';
-        $request = new \AlipayTradeFastpayRefundQueryRequest();
-        $out_request_no = $v->service_num;
-        $trade_no = $v->transaction_id;
+        $aop->rsaPrivateKey      = config('env.ALI_PRIVATE_KEY2');
+        $aop->gatewayUrl         = config('env.ALI_PAYMENT_REFUND_CHECK_URL');
+        $aop->apiVersion         = '1.0';
+        $aop->signType           = 'RSA2';
+        $aop->postCharset        = 'UTF-8';
+        $aop->format             = 'json';
+        $request                 = new \AlipayTradeFastpayRefundQueryRequest();
+        $out_request_no          = $v->service_num;
+        $trade_no                = $v->transaction_id;
 
         $request->setBizContent("{" .
             "\"trade_no\":\"$trade_no\"," .
@@ -160,10 +160,10 @@ class MallRefundJob
             "}");
 
         try {
-            $result = $aop->execute($request);
+            $result       = $aop->execute($request);
             $responseNode = str_replace(".", "_",
                     $request->getApiMethodName()) . "_response";
-            $resultCode = $result->$responseNode->code;
+            $resultCode   = $result->$responseNode->code;
             if (!empty($resultCode) && $resultCode == 10000) {
                 $refund_amount = $result->$responseNode->refund_amount; //退款金额
                 $this->toChange($refund_amount, $v);
@@ -178,8 +178,8 @@ class MallRefundJob
     {
         $config = Config('pay.alipay');
         $alipay = Pay::alipay($config);
-        $order = [
-            'out_trade_no' => $v->ordernum,
+        $order  = [
+            'out_trade_no'   => $v->ordernum,
             'out_request_no' => $v->service_num
         ];
         $result = $alipay->find($order, 'refund');
@@ -204,8 +204,8 @@ class MallRefundJob
         $now_date = date('Y-m-d H:i:s');
 
         //修改售后表
-        $mrr = MallRefundRecord::find($order->service_id);
-        $mrr->status = 60;
+        $mrr             = MallRefundRecord::find($order->service_id);
+        $mrr->status     = 60;
         $mrr->succeed_at = $now_date;
         $mrr->run_refund = 3;
         $mrr->refund_fee = $fee;
@@ -218,40 +218,40 @@ class MallRefundJob
     {
         $config = Config('pay.alipay');
         $alipay = Pay::alipay($config);
-        $order = [
-            'out_trade_no' => $v->ordernum,
-            'refund_amount' => $v->refund_price,
+        $order  = [
+            'out_trade_no'   => $v->ordernum,
+            'refund_amount'  => $v->refund_price,
             'out_request_no' => $v->service_num,
         ];
 
-        $now_date = date('Y-m-d H:i:s');
-        $rrrModel = new RunRefundRecord();
+        $now_date             = date('Y-m-d H:i:s');
+        $rrrModel             = new RunRefundRecord();
         $rrrModel->order_type = 1;
-        $rrrModel->order_id = $v->service_id;
+        $rrrModel->order_id   = $v->service_id;
 
         try {
             $result = $alipay->refund($order);
             DB::table('wwwww')->insert([
-                'vv'=>$now_date,
-                't'=>json_encode($result)
+                'vv' => $now_date,
+                't'  => json_encode($result)
             ]);
             if (intval($result->code) === 10000) {
-                $mrr = MallRefundRecord::find($v->service_id);
-                $mrr->status = 50;
+                $mrr                = MallRefundRecord::find($v->service_id);
+                $mrr->status        = 50;
                 $mrr->refund_sub_at = $now_date;
-                $mrr->run_refund = 2;
+                $mrr->run_refund    = 2;
                 $mrr->save();
-                $rrrModel->is_success = 1;
+                $rrrModel->is_success   = 1;
                 $rrrModel->refund_money = $result->refund_fee;
             } else {
                 $rrrModel->is_success = 2;
                 $rrrModel->error_code = '';
-                $rrrModel->error_msg = '';
+                $rrrModel->error_msg  = '';
             }
         } catch (\Exception $e) {
             $rrrModel->is_success = 2;
             $rrrModel->error_code = $e->getCode();
-            $rrrModel->error_msg = substr($e->getMessage() ?? '', 0, 1000);
+            $rrrModel->error_msg  = substr($e->getMessage() ?? '', 0, 1000);
         }
         $rrrModel->save();
         return true;
@@ -272,66 +272,117 @@ class MallRefundJob
             //微信app
             $config = Config('wechat.payment.default');
         }
-
         $now_date = date('Y-m-d H:i:s');
-        $data = array(
-            'appid' => $config['app_id'], //公众账号ID
-            'mch_id' => $config['mch_id'], //商户号
-            'refund_account' => 'REFUND_SOURCE_RECHARGE_FUNDS',
-            'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
-            'out_refund_no' => $v->service_num, //商户退款单号
-            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
-            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
-            'transaction_id' => $v->transaction_id, //微信订单号
-        );
-        $data['sign'] = self::sign_data($data, $config['key']); //加密串
-        $xml = self::ToXml($data); //数据包拼接
-        $res = self::postXmlCurl($config['refund_url'], $xml, 1);
-        libxml_disable_entity_loader(true);
-        if (!$res) {
-            return true;
-        }
+        $app      = Factory::payment($config);
+
         try {
-            $xml = simplexml_load_string($res, 'SimpleXMLElement',
-                LIBXML_NOCDATA);
-            DB::table('wwwww')->insert([
-                'vv'=>$now_date,
-                't'=>json_encode($xml)
+            $result = $app->refund->byTransactionId(
+                $v->transaction_id,
+                $v->service_num,
+                (int)GetPriceTools::PriceCalc('*', $v->all_price, 100),
+                (int)GetPriceTools::PriceCalc('*', $v->refund_price, 100),
+                [
+                    // 可在此处传入其他参数，详细参数见微信支付文档
+                    'refund_desc' => '退款',
+                ]
+            );
+
+            DB::table('nlsg_wechat_refund_res_log')->insert([
+                'res_json' => json_encode($result)
             ]);
 
-            $xml = json_decode(json_encode($xml), true);
-
-            $rrrModel = new RunRefundRecord();
+            $rrrModel             = new RunRefundRecord();
             $rrrModel->order_type = 1;
-            $rrrModel->order_id = $v->service_id;
+            $rrrModel->order_id   = $v->service_id;
 
-            if ((strtolower($xml['return_msg']) === 'ok' || empty($xml['return_msg'])) &&
-                strtolower($xml['return_code']) === 'success') {
+            $rrrModel->error_code = $result['return_code'] ?? '';
+            $rrrModel->error_msg  = ($result['return_code'] ?? '') . ' : ' . ($result['err_code_des'] ?? '');
 
-                $mrr = MallRefundRecord::find($v->service_id);
-                $mrr->status = 50;
+            if (
+                ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') ||
+                ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'FAIL' &&
+                    $result['err_code_des'] === '订单已全额退款')
+            ) {
+                $mrr                = MallRefundRecord::query()->find($v->service_id);
+                $mrr->status        = 50;
                 $mrr->refund_sub_at = $now_date;
-                $mrr->run_refund = 2;
+                $mrr->run_refund    = 2;
                 $mrr->save();
+                $rrrModel->is_success   = 1;
+                $rrrModel->refund_money = $v->refund_price;
 
-                if (strtolower($xml['result_code']) == 'success') {
-                    $rrrModel->is_success = 1;
-                    $rrrModel->refund_money = GetPriceTools::PriceCalc('/', $xml['refund_fee'], 100);
-                } else {
-                    $rrrModel->is_success = 2;
-                    $rrrModel->error_code = $xml['err_code'] ?? '';
-                    $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
-                }
             } else {
                 $rrrModel->is_success = 2;
-                $rrrModel->error_code = $xml['err_code'] ?? '';
-                $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
             }
+
             $rrrModel->save();
             return true;
+
         } catch (\Exception $e) {
             return true;
         }
+
+
+//        $now_date = date('Y-m-d H:i:s');
+//        $data = array(
+//            'appid' => $config['app_id'], //公众账号ID
+//            'mch_id' => $config['mch_id'], //商户号
+//            'refund_account' => 'REFUND_SOURCE_RECHARGE_FUNDS',
+//            'nonce_str' => \Illuminate\Support\Str::random(16), //随机字符串
+//            'out_refund_no' => $v->service_num, //商户退款单号
+//            'refund_fee' => intval(GetPriceTools::PriceCalc('*', $v->refund_price, 100)),
+//            'total_fee' => intval(GetPriceTools::PriceCalc('*', $v->all_price, 100)), //订单金额
+//            'transaction_id' => $v->transaction_id, //微信订单号
+//        );
+//        $data['sign'] = self::sign_data($data, $config['key']); //加密串
+//        $xml = self::ToXml($data); //数据包拼接
+//        $res = self::postXmlCurl($config['refund_url'], $xml, 1);
+//
+//        libxml_disable_entity_loader(true);
+//        if (!$res) {
+//            return true;
+//        }
+//        try {
+//            $xml = simplexml_load_string($res, 'SimpleXMLElement',
+//                LIBXML_NOCDATA);
+//            DB::table('wwwww')->insert([
+//                'vv'=>$now_date,
+//                't'=>json_encode($xml)
+//            ]);
+//
+//            $xml = json_decode(json_encode($xml), true);
+//
+//            $rrrModel = new RunRefundRecord();
+//            $rrrModel->order_type = 1;
+//            $rrrModel->order_id = $v->service_id;
+//
+//            if ((strtolower($xml['return_msg']) === 'ok' || empty($xml['return_msg'])) &&
+//                strtolower($xml['return_code']) === 'success') {
+//
+//                $mrr = MallRefundRecord::find($v->service_id);
+//                $mrr->status = 50;
+//                $mrr->refund_sub_at = $now_date;
+//                $mrr->run_refund = 2;
+//                $mrr->save();
+//
+//                if (strtolower($xml['result_code']) == 'success') {
+//                    $rrrModel->is_success = 1;
+//                    $rrrModel->refund_money = GetPriceTools::PriceCalc('/', $xml['refund_fee'], 100);
+//                } else {
+//                    $rrrModel->is_success = 2;
+//                    $rrrModel->error_code = $xml['err_code'] ?? '';
+//                    $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
+//                }
+//            } else {
+//                $rrrModel->is_success = 2;
+//                $rrrModel->error_code = $xml['err_code'] ?? '';
+//                $rrrModel->error_msg = $xml['return_msg'] . ' : ' . $xml['err_code_des'] ?? '';
+//            }
+//            $rrrModel->save();
+//            return true;
+//        } catch (\Exception $e) {
+//            return true;
+//        }
     }
 
     /**
@@ -349,7 +400,7 @@ class MallRefundJob
         }
         $sign_temp = trim($sign_temp, '&');
         $sign_temp = $sign_temp . '&key=' . $appkey;
-        $sign = md5($sign_temp);
+        $sign      = md5($sign_temp);
         return strtoupper($sign);
     }
 
@@ -490,22 +541,22 @@ class MallRefundJob
             $update_data = [];
             if (!empty($temp_res) && $temp_res['code'] === true) {
                 $temp_this_time = (int)($temp_res['this_time'] ?? 0);
-                if ($temp_this_time === 2){
+                if ($temp_this_time === 2) {
                     $update_data['is_refund'] = 3;
-                }else{
-                    $update_data['is_refund'] = 2;
-                    $update_data['refund_no'] = $v->service_num;
+                } else {
+                    $update_data['is_refund']        = 2;
+                    $update_data['refund_no']        = $v->service_num;
                     $update_data['shill_refund_sum'] = GetPriceTools::PriceCalc('+', $v->shill_refund_sum, $v->refund_price);
-                    $update_data['shill_job_price'] = $v->refund_price;
-                    $prModel = new OrderPayRefund();
-                    $prModel->service_num = $v->service_num;
-                    $prModel->user_id = $v->user_id;
-                    $prModel->order_id = $v->ordernum;
-                    $prModel->serial_number = $v->transaction_id;
-                    $prModel->refund_id = $temp_res['refund_id'] ?? 0;
-                    $prModel->pay_price = $v->all_price;
-                    $prModel->refund_price = $v->refund_price;
-                    $prModel->status = 1;
+                    $update_data['shill_job_price']  = $v->refund_price;
+                    $prModel                         = new OrderPayRefund();
+                    $prModel->service_num            = $v->service_num;
+                    $prModel->user_id                = $v->user_id;
+                    $prModel->order_id               = $v->ordernum;
+                    $prModel->serial_number          = $v->transaction_id;
+                    $prModel->refund_id              = $temp_res['refund_id'] ?? 0;
+                    $prModel->pay_price              = $v->all_price;
+                    $prModel->refund_price           = $v->refund_price;
+                    $prModel->status                 = 1;
                     $prModel->save();
 
                     //如果批量退款日志有
@@ -528,10 +579,10 @@ class MallRefundJob
     private function aliPayRefundMethod($v): array
     {
         $config = Config('pay.alipay');
-        $pay = Pay::alipay($config);
-        $order = [
-            'out_trade_no' => $v->ordernum,
-            'refund_amount' => $v->refund_price,
+        $pay    = Pay::alipay($config);
+        $order  = [
+            'out_trade_no'   => $v->ordernum,
+            'refund_amount'  => $v->refund_price,
             'out_request_no' => $v->service_num,
         ];
         try {
@@ -592,7 +643,7 @@ class MallRefundJob
             ->where('o.is_shill', '=', 1)
             ->where('o.is_refund', '=', 2)
             ->where('o.status', '=', 1)
-            ->select(['o.id', 'op.id as op_id', 'o.user_id', 'o.ordernum', 'o.refund_no as service_num','o.activity_tag',
+            ->select(['o.id', 'op.id as op_id', 'o.user_id', 'o.ordernum', 'o.refund_no as service_num', 'o.activity_tag',
                 'op.pay_price', 'op.refund_price', 'pr.type as client', 'o.type as order_type', 'o.relation_id'])
             ->get();
 
@@ -628,15 +679,15 @@ class MallRefundJob
                     ->where('id', '=', $v->op_id)
                     ->update(['status' => 2]);
 
-                if ($v->activity_tag === 'cytx'){
+                if ($v->activity_tag === 'cytx') {
                     //推送创业天下
-                    $channel_servers->refundCytxV2($v->id,$v->ordernum);
+                    $channel_servers->refundCytxV2($v->id, $v->ordernum);
                     //同时取消订阅
                     Subscribe::query()
-                        ->where('user_id','=',$v->user_id)
-                        ->where('order_id','=',$v->id)
+                        ->where('user_id', '=', $v->user_id)
+                        ->where('order_id', '=', $v->id)
                         ->update([
-                            'status'=>0
+                            'status' => 0
                         ]);
                 }
 
@@ -698,9 +749,9 @@ class MallRefundJob
     private function aliPayRefundCheckMethod($v): array
     {
         $config = Config('pay.alipay');
-        $pay = Pay::alipay($config);
-        $order = [
-            'out_trade_no' => $v->ordernum,
+        $pay    = Pay::alipay($config);
+        $order  = [
+            'out_trade_no'   => $v->ordernum,
             'out_request_no' => $v->service_num,
         ];
         try {
@@ -725,7 +776,7 @@ class MallRefundJob
             $config = Config('wechat.payment.default');
         }
 
-        $app = Factory::payment($config);
+        $app    = Factory::payment($config);
         $result = $app->refund->queryByOutRefundNumber($v->service_num);
 
         DB::table('nlsg_wechat_refund_res_log')->insert([

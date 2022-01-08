@@ -984,7 +984,9 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
         $now_data = date('Y-m-d H:i:s');
         //2是作品 6是讲座
         $works_list = [
-            ['type' => 2, 'id' => 644]
+//            ['type' => 2, 'id' => 638],
+//            ['type' => 2, 'id' => 658],
+            ['type' => 2, 'id' => 527],
         ];
 
         $add_data = [];
@@ -1008,11 +1010,14 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
             }
         }
 
-        DB::beginTransaction();
-        $res = DB::table('nlsg_subscribe')->insert($add_data);
-        DB::rollBack();
+//        DB::beginTransaction();
+//        $res = DB::table('nlsg_subscribe')->insert($add_data);
+//        foreach ($add_data as $ad){
+//            DB::table('nlsg_subscribe')->insert($ad);
+//        }
+//        DB::rollBack();
 
-        dd($res);
+        dd(__LINE__);
 
     }
 
