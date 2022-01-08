@@ -64,6 +64,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('/liting/delsub', 'LiZheController@DelSub');
     Route::get('live/playbacksub', 'LiveController@PlayBackSub');//开通回放
     //首页
+    Route::get('demo/ImportLive', 'DemoController@ImportLive');
     Route::get('demo/ceshi', 'DemoController@ceshi');
     Route::get('index/announce', 'IndexController@announce');
     Route::get('index/banner', 'IndexController@banner');
@@ -272,6 +273,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::get('live/show_wechat', 'LiveController@showWechat');
     Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
+    Route::post('channel/cytx_order_check', 'ChannelController@cytxOrderCheck');
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/coupon', 'UserController@getUserCoupon');

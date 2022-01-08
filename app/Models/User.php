@@ -359,7 +359,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('created_at','<',$week_one)
             ->where('is_del',0)
             ->orderBy('num', 'desc')->GroupBy("user_id")->limit($size)->get()->toArray();
-        //统计num
+        //重新统计num
         if($size != 3){
             Lists::where(['type'=>9])->update(['num'=>count($his_data)]);
         }
