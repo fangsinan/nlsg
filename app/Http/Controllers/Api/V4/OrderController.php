@@ -809,17 +809,14 @@ class OrderController extends Controller
         foreach ($data as $key => $val) {
             switch ($val['type']) {
                 case 1:
+                case 6:
                 case 7:
                     $model = new Column();
-                    $result = $model->getIndexColumn([$val['relation_id']], 0);
+                    $result = $model->getIndexColumn([$val['relation_id']], 0,0);
                     break;
                 case 2:
                     $model = new Works();
-                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book, $user_id, 0);
-                    break;
-                case 6:
-                    $model = new Column();
-                    $result = $model->getIndexColumn([$val['relation_id']], 0);
+                    $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book, $user_id, 0,0);
                     break;
                 case 8:
                     $model = new Lists();

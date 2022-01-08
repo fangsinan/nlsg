@@ -25,7 +25,7 @@ class Works extends Base
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0, $is_free = false)
+    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0, $is_free = false,$check_offline=1)
     {
         if ( ! $ids) {
             return false;
@@ -39,8 +39,13 @@ class Works extends Base
                 }
             ])
             ->whereIn('id', $ids)
-            ->whereIn('type', [2, 3]) //课程只有音频
-            ->where('status', 4);
+            ->whereIn('type', [2, 3]); //课程只有音频
+
+        if ($check_offline){
+            $WorksObj->where('status', 4);
+        }else{
+            $WorksObj->whereIn('status', [4,5]);
+        }
         //2时   不考虑是否听书
         if ($is_audio_book !== 2) {
             $WorksObj->where('is_audio_book', $is_audio_book);

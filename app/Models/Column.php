@@ -101,12 +101,14 @@ class Column extends Base
      * @param $ids
      * @return bool
      */
-    public function getIndexColumn($ids,$is_free=false)
+    public function getIndexColumn($ids,$is_free=false,$check_offline=1)
     {
         if (!$ids){
             return false;
         }
-        $where = ['status'=>self::STATUS_ONE];
+        if ($check_offline === 1){
+            $where = ['status'=>self::STATUS_ONE];
+        }
         if($is_free !== false ){
             $where['is_free'] = $is_free;
         }
