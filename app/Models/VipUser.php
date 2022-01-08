@@ -91,7 +91,7 @@ class VipUser extends Base
                 if(empty($newVip['expire_time'])){
                     $card_data['overdue_time'] = 0;
                 }else{
-                    $card_data['overdue_time'] = intval((time() - strtotime($newVip['expire_time'])) / 86400);
+                    $card_data['overdue_time'] = intval((strtotime(date("Y-m-d 23:59:59")) - strtotime($newVip['expire_time'])) / 86400);
                 }
 
             }
