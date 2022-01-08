@@ -87,18 +87,15 @@ class LiZheController extends Controller
 //                'DSS' => '智客',
 //                'AQW' => '久善今心',
 //                'ZBF' => '主办方',
-//                'AAQ' => '华德汇智',
-//                'ZYL' => '收现商学院',
-//                'PQH' => '女素教育',
-                'UUA' => '智慧卡神',
-                'GFR' => '美在当下',
-                'YYQ' => '中企汇聚'
+                  'AAQ' => '华德汇智',
+                  'ZYL' => '收现商学院',
+                  'PQH' => '女素教育'
             ];
 
             foreach ($code_name as $key => $val) {
                 $add_code_data = [];
                 $i = 1;
-                while ($i <= 500) {
+                while ($i <= 1000) {
                     $add_code_data[] = [
                         'sign'=>$key,
                         'name' => $val,
