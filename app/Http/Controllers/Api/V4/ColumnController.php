@@ -111,7 +111,7 @@ class ColumnController extends Controller
                 $new_res['start_list'][] = $v;
             }else{
                 //  5.0.1 暂时不需要线下课
-                $new_res['list'][] = $v;
+//                $new_res['list'][] = $v;
             }
         }
         return $this->success($new_res);
