@@ -242,7 +242,7 @@ class IndexController extends ControllerBackend
             $query->where('id', '>', 51);
         }
         $lists = $query->select('id', 'user_id', 'title', 'price',
-            'order_num', 'status', 'begin_at', 'cover_img')
+            'order_num', 'status', 'steam_begin_time as begin_at', 'cover_img')
             ->where('is_del', 0)
             ->orderBy('sort', 'asc')
             ->orderBy('id', 'desc')

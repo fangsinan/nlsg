@@ -357,11 +357,11 @@ class LiveController extends Controller
                     $v['live_time'] = date('m.d H:i', strtotime($v['begin_at']));
                 }
 
-                if (empty($v['steam_begin_time'])){
-                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['begin_at']));
-                }else{
-                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['steam_begin_time']));
-                }
+//                if (empty($v['steam_begin_time'])){
+//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+//                }else{
+//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['steam_begin_time']));
+//                }
 
 //                if($v['live_status'] == 3){
 //                    $v['live_time'] = "正在直播";

@@ -105,11 +105,11 @@ class Live extends Base
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
 
-                if (empty($v['steam_begin_time'])){
-                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['begin_at']));
-                }else{
-                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['steam_begin_time']));
-                }
+//                if (empty($v['steam_begin_time'])){
+//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+//                }else{
+//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['steam_begin_time']));
+//                }
 
             }
         }
