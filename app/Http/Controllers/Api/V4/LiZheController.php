@@ -12,32 +12,63 @@ use Illuminate\Http\Request;
 class LiZheController extends Controller
 {
 
-    //删除李婷老师购买直播间记录 https://app.v4.api.nlsgapp.com/api/v4/liting/delsub?phone=13522223779&live_id=119
+    //删除李婷老师购买直播间记录 https://app.v4.api.nlsgapp.com/api/v4/liting/delsub?type=1&live_id=119
+    //删除刷单用户购买直播间记录 https://app.v4.api.nlsgapp.com/api/v4/liting/delsub?type=2&live_id=119&phone=
     public function DelSub(Request $request){
 
+        $type = intval($request->get('type', 0));
         $live_id = intval($request->get('live_id', 0));
-        $phone = intval($request->get('phone', '13522223779'));
-
+        if(empty($type) || !in_array($type,[1,2])){
+            return $this->error(0, '链接不可用');
+        }
         if (empty($live_id)) {
             return $this->error(0, '直播间id不能为空');
         }
-        $UserInfo=User::query()->where(['phone'=>$phone])->first();
-        if(!empty($UserInfo)) {
-            $info = Order::query()->where(['user_id' => $UserInfo->id, 'live_id' => $live_id, 'status' => 1])->first();
-            echo '直播间ID：' . $live_id . '<br>';
-            if (!empty($info)) {
-                $OrderRst = Order::query()->where('id', $info->id)->delete();
-                $SubRst = Subscribe::query()->where('order_id', $info->id)->delete();
-                if ($OrderRst && $SubRst) {
-                    echo '删除成功<br>';
+        if($type==1) {
+            $phone =13522223779;//默认李婷老师
+            $UserInfo = User::query()->where(['phone' => $phone])->first();
+            if (!empty($UserInfo)) {
+                $info = Order::query()->where(['user_id' => $UserInfo->id, 'live_id' => $live_id, 'status' => 1])->first();
+                echo '直播间ID：' . $live_id . '<br>';
+                if (!empty($info)) {
+                    $OrderRst = Order::query()->where('id', $info->id)->delete();
+                    $SubRst = Subscribe::query()->where('order_id', $info->id)->delete();
+                    if ($OrderRst && $SubRst) {
+                        echo '删除成功<br>';
+                    } else {
+                        echo '删除失败：' . $OrderRst . $SubRst . '<br>';
+                    }
                 } else {
-                    echo '删除失败：' . $OrderRst . $SubRst . '<br>';
+                    echo '未查询到订单<br>';
                 }
             } else {
-                echo '未查询到订单<br>';
+                echo '用户信息不存在<br>';
             }
         }else{
-            echo '用户信息不存在<br>';
+            $phone = intval($request->get('phone', ''));
+            if(!empty($phone)){
+                $UserInfo = User::query()->where(['phone' => $phone])->first();
+                if (!empty($UserInfo)) {
+                    $SubRst = Subscribe::query()->where(['user_id'=>$UserInfo->id,'type'=>3,'relation_id'=>$live_id])->delete();
+                    if ($SubRst) {
+                        echo '删除成功<br>';
+                    } else {
+                        echo '删除失败：' . $SubRst . '<br>';
+                    }
+                } else {
+                    echo '用户信息不存在<br>';
+                }
+            }else{ //删除所有测试用户
+                $UserInfo = User::query()->select(['id'])->where(['is_test_pay' => 1])->whereNotIn('id', [211370,324111])->get()->toArray();
+                $user_arr = array_column($UserInfo, 'id');
+                $SubRst = Subscribe::query()->whereIn('user_id', $user_arr)->where(['type'=>3,'relation_id'=>$live_id])->delete();
+                if ($SubRst) {
+                    echo '删除成功<br>';
+                } else {
+                    echo '删除失败：' . $SubRst . '<br>';
+                }
+            }
+
         }
 
     }
