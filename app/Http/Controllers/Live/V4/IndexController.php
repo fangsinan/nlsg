@@ -501,6 +501,20 @@ class IndexController extends ControllerBackend
             return error(1000, '开始时间不能为空');
         }
 
+        if(!empty($steam_begin_time)){
+            $Y=substr($steam_begin_time,0,1);
+            if($Y!=2){
+                return error(1000, '拉流开始时间不能为空');
+            }
+        }
+
+        if(!empty($steam_end_time)){
+            $Y=substr($steam_end_time,0,1);
+            if($Y!=2){
+                return error(1000, '拉流结束时间不能为空');
+            }
+        }
+
         if (empty($steam_end_time) || empty($steam_begin_time)) {
             return error(1000, '拉流时间范围不能为空');
         }
