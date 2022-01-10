@@ -296,7 +296,7 @@ class Lists extends Model
 
 
     //5.0新加入
-    public function getNewIndexListCourse($ids)
+    public function getNewIndexListCourse($ids,$limit)
     {
         $lists = Lists::select('id', 'title', 'num', 'cover','type')
             ->whereIn('id',$ids) ->get()->toArray();
@@ -306,7 +306,7 @@ class Lists extends Model
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
                     ->where('state', 1)->orderBy('sort')
-                    ->orderBy('created_at', 'desc')->pluck('works_id')->toArray();
+                    ->orderBy('created_at', 'desc')->limit($limit)->pluck('works_id')->toArray();
                 $v['data'] = [];
 
 

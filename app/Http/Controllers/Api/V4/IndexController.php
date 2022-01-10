@@ -131,7 +131,7 @@ class IndexController extends Controller
         $res['special_list'] = $recommendModel->getIndexRecommend(15, 37);
  
         //榜单
-        $res['hot_list'] = $recommendModel->getIndexRecommend(11, 38);
+        $res['hot_list'] = $recommendModel->getIndexRecommend(11, 38,3);
 
 //        $model = new Lists();
 //        $res['hot_list'] = $model->getList();

@@ -48,7 +48,7 @@ class Recommend extends Base
         if(empty($ids)){
             return [];
         }
-        $result = $this->getResult($type,$ids);
+        $result = $this->getResult($type,$ids,$limit);
 
 
         $expire_num = CacheTools::getExpire('index_recommend');
@@ -59,7 +59,7 @@ class Recommend extends Base
 
 
 
-    public function getResult($type,$ids){
+    public function getResult($type,$ids,$limit){
         $result =[];
 
 
@@ -105,7 +105,7 @@ class Recommend extends Base
                 break;
             case 11:
                 $model = new Lists();
-                $result = $model->getNewIndexListCourse($ids);
+                $result = $model->getNewIndexListCourse($ids,$limit);
                 break;
             case 14:
                 $model = new User();
