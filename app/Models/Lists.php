@@ -296,7 +296,7 @@ class Lists extends Model
 
 
     //5.0新加入
-    public function getNewIndexListCourse($ids,$limit)
+    public function getNewIndexListCourse($ids,$limit=100)
     {
         $lists = Lists::select('id', 'title', 'num', 'cover','type')
             ->whereIn('id',$ids) ->get()->toArray();
