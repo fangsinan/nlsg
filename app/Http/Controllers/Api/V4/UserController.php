@@ -1469,6 +1469,7 @@ class UserController extends Controller
             "nickname"  => '',
             "headimg"   => '',
             "his_num"   => 0,
+            "his_num_n"      => 0,
             "rank"      => 0,
             "is_like"   => 0,
         ];
