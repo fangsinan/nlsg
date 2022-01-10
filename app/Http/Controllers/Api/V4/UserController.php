@@ -1473,7 +1473,7 @@ class UserController extends Controller
             "is_like"   => 0,
         ];
         if(!empty($uid)){
-            $cache_key_name = 'his_len_deteil_'.$uid;
+            $cache_key_name = 'his_len_deteil_'.$uid.'_'.$top_week_one;
             $u_data = Cache::get($cache_key_name);
             if (empty($u_data)) {
                 $user_data = History::select("user_id")->selectRaw('sum(time_number) as num')
