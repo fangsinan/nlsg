@@ -91,6 +91,7 @@ class ColumnController extends Controller
         //非我的订阅
         $list = $columnObj->getColumn([
                         ['type','=',3],
+                        ['is_start','=',0],
                         ['id','NotIn',$relation_id],
                     ],$order_str);
 //        dd($list);
