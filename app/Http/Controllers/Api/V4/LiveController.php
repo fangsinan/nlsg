@@ -322,8 +322,8 @@ class LiveController extends Controller
             ->where('status', 4)
             ->where('is_finish', 0)
             ->where('is_del', 0)
-            ->orderBy('begin_at', 'desc')
             ->orderBy('sort', 'asc')
+            ->orderBy('begin_at', 'desc')
             ->paginate(10)
             ->toArray();
 
