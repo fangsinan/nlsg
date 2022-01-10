@@ -59,7 +59,7 @@ class Recommend extends Base
 
 
 
-    public function getResult($type,$ids,$limit){
+    public function getResult($type,$ids,$limit=3){
         $result =[];
 
 
