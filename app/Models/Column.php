@@ -212,7 +212,7 @@ class Column extends Base
             }
 
         }
-       $list = $query->where($where)->orderBy('online_time', 'desc')
+       $list = $query->where($where)->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->paginate($page)->toArray();
         return $list;
     }
