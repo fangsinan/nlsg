@@ -107,12 +107,13 @@ class ColumnController extends Controller
             //$v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], 7);//训练营订阅
             $v['nickname'] = $user_info['nickname'] ?? '';
             $v['title'] = $user_info['honor'] ?? '';
-            if($v['is_start'] == 0){
-                $new_res['start_list'][] = $v;
-            }else{
-                //  5.0.1 暂时不需要线下课
+            $new_res['start_list'][] = $v;
+//            if($v['is_start'] == 0){
+//                $new_res['start_list'][] = $v;
+//            }else{
+//                //  5.0.1 暂时不需要线下课
 //                $new_res['list'][] = $v;
-            }
+//            }
         }
         return $this->success($new_res);
     }
