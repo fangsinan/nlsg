@@ -1511,7 +1511,7 @@ class UserController extends Controller
         $uid = $this->user['id']??0;
         if(!empty($uid)){
             //上周一
-            $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
+            $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday"));//上周一
             //页面自我点赞
             $cache_key_name = 'his_like_'.$uid.'_'.$top_week_one;
             Cache::put($cache_key_name, 1, 86400*7);
