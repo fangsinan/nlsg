@@ -1454,9 +1454,9 @@ class UserController extends Controller
         $page = $request->input('page');
 
         //本周一
-        $week_one = date("Y-m-d H:i:s",strtotime("last Monday"));
+        $week_one = date("Y-m-d H:i:s",strtotime("Monday"));
         //上周一
-        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
+        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday"));//上周一
 
         if($page <= 1){
             $data = User::getUserHisLen(20);

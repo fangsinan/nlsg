@@ -340,7 +340,7 @@ class User extends Authenticatable implements JWTSubject
     //获取用学习时长
     public static function getUserHisLen($size=3){
 
-        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
+        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday"));
 
         $cache_key_name = 'user_his_len_list_'.$size.'_'.$top_week_one;
         $result = Cache::get($cache_key_name);
@@ -349,9 +349,8 @@ class User extends Authenticatable implements JWTSubject
         }
 
         //时间小于本周一
-        $week_one = date("Y-m-d H:i:s",strtotime("last Monday"));
+        $week_one = date("Y-m-d H:i:s",strtotime("Monday"));
         //大于上周一
-//        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
 
 
         $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
