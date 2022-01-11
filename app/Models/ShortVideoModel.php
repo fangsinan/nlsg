@@ -11,6 +11,7 @@ class ShortVideoModel extends Base
     protected $fillable = [
         'title', 'introduce', 'status', 'share_img', 'cover_img', 'detail_img', 'user_id', 'rank', 'online_time', 'view_num', 'real_view_num', 'video_id',
         'comment_num', 'size', 'duration', 'url', 'like_num', 'share_num', 'attribute_url',
+        'video_adopt','callback_url','callback_attribute',
     ];
     //获取短视频
     function getVideo ($uid,$id=0,$not_id=0,$page=1,$size=3,$is_home=0){
@@ -126,4 +127,54 @@ class ShortVideoModel extends Base
         $count = self::select($field)->where(['status'=>2])->count();
         return ['list'=>$data,'count'=>$count];
     }
+
+
+
+    /*
+     * 短视频上传转换
+     * */
+    public static function  toVideo()
+    {
+
+        $ids = ShortVideoModel::where('video_adopt', 1)
+            ->where('video_id','!=', '')
+            ->pluck('video_id')
+            ->toArray();
+
+        $map = WorksInfo::editVideo($ids);
+
+        if($map['msg'] == "OK"){
+            foreach ($map['data'] as $key=>$val){
+
+                if (!empty($val['callback_url1'])) {
+                    $val['callback_url'] =  $val['callback_url1'];
+                    $val['callback_attribute'] =  $val['attribute_url1'];
+                    unset($val['callback_url1']);
+                    unset($val['attribute_url1']);
+                }
+                if (!empty($val['callback_url2'])) {
+                    $val['callback_url'] =  $val['callback_url2'];
+                    $val['callback_attribute'] =  $val['attribute_url2'];
+                    unset($val['callback_url2']);
+                    unset($val['attribute_url2']);
+                }
+                if (!empty($val['callback_url3'])) {
+                    $val['callback_url'] =  $val['callback_url3'];
+                    $val['callback_attribute'] =  $val['attribute_url1'];
+                    unset($val['callback_url3']);
+                    unset($val['attribute_url1']);
+                }
+                $video_id = $val['video_id'];
+                ShortVideoModel::where('video_id', $video_id)->update($val);
+            }
+        }
+        echo $map['msg'];
+    }
+
+
+
+
+
+
+
 }
