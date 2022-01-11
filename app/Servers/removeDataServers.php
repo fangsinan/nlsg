@@ -2036,6 +2036,83 @@ and o.status = 1 and o.pay_price > 1";
         return true;
     }
 
+    public function worksListOfDelSub()
+    {
+        $model_name = 'works_list_of_del_sub';
+        $now_date = date('Y-m-d H:i:s');
+        $job_key = 2043;
+
+        $check_job = self::getKernelLock($job_key, 1);
+
+        if ($check_job === false) {
+            return true;
+        }
+
+        $run = true;
+        while ($run) {
+            self::getKernelLock($job_key, 2);
+            $list = DB::table($model_name)
+                ->whereIn('works_type', [2, 6, 3, 7])
+                ->where('status', '=', 1)
+                ->limit(3000)
+                ->get();
+
+            if ($list->isEmpty()) {
+                self::getKernelLock($job_key, 3);
+                $run = false;
+            }
+
+            foreach ($list as $v) {
+                DB::beginTransaction();
+
+                $check_phone = User::query()->where('phone','=',$v->phone)->first();
+                if (empty($check_phone)){
+                    DB::commit();
+                    continue;
+                }
+
+                $temp_user_id = $check_phone->id;
+                $temp_user_phone = $check_phone->phone;
+
+                $query = Subscribe::query()->where('user_id', '=', $temp_user_id)
+                    ->where('relation_id', '=', $v->works_id)
+                    ->where('type', '=', $v->works_type)
+                    ->where('status', '=', 1);
+
+                if ($v->works_type != 3) {
+                    $query->where('end_time', '>=', $now_date);
+                }
+
+                $check = $query->select(['id'])->first();
+
+                if (!empty($check)) {
+                    $check->status = 0;
+                    $edit_res = $check->save();
+                    if ($edit_res === false) {
+                        DB::rollBack();
+                        break;
+                    }
+                }
+
+                $edit_res = DB::table($model_name)
+                    ->where('id', '=', $v->id)
+                    ->update([
+                        'user_id' => $temp_user_id,
+                        'phone' => $temp_user_phone,
+                        'status' => 2,
+                    ]);
+                if ($edit_res == false) {
+                    DB::rollBack();
+                    continue;
+                }
+
+                DB::commit();
+            }
+        }
+
+        return true;
+    }
+
     public function subListSms()
     {
 //        $while_flag = true;

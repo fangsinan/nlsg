@@ -55,4 +55,10 @@ class SubHelperController  extends ControllerBackend
         return $this->getRes($data);
     }
 
+    public function close(Request $request){
+        $servers = new SubHelperServers();
+        $data = $servers->delSubList($request->input(),$this->user['id'] ?? 0);
+        return $this->getRes($data);
+    }
+
 }

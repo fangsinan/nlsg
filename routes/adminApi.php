@@ -187,6 +187,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //自助开通
         Route::get('sub_helper/ojb_list', 'SubHelperController@objList');
         Route::post('sub_helper/open', 'SubHelperController@open');
+        Route::post('sub_helper/close', 'SubHelperController@close');
 
         Route::get('sub_helper/com_ojb_list', 'SubHelperController@comObjList');
 

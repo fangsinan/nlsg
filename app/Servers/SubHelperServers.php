@@ -40,9 +40,9 @@ class SubHelperServers
 
         return [
             'column_list' => $column_list,
-            'works_list' => $works_list,
-            'live_list' => $live_list,
-            'xly_list' => $xly_list,
+            'works_list'  => $works_list,
+            'live_list'   => $live_list,
+            'xly_list'    => $xly_list,
         ];
     }
 
@@ -60,7 +60,7 @@ class SubHelperServers
 
         return [
             'column_list' => $column_list,
-            'works_list' => $works_list,
+            'works_list'  => $works_list,
         ];
     }
 
@@ -81,7 +81,7 @@ class SubHelperServers
         }
         //获取远程文件所采用的方法
         if ($type) {
-            $ch = curl_init();
+            $ch      = curl_init();
             $timeout = 5;
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -108,11 +108,11 @@ class SubHelperServers
 
     public function addOpenList($params, $admin_id)
     {
-        $id = (int)($params['id'] ?? 0);
-        $type = (int)($params['type'] ?? 0);
-        $is_file = (int)($params['is_file'] ?? 0);
+        $id        = (int)($params['id'] ?? 0);
+        $type      = (int)($params['type'] ?? 0);
+        $is_file   = (int)($params['is_file'] ?? 0);
         $file_name = $params['file_name'] ?? '';
-        $url = $params['url'] ?? '';
+        $url       = $params['url'] ?? '';
 //        if (!empty($url)){
 //            $url = str_replace('https://','http://',$url);
 //        }
@@ -140,7 +140,7 @@ class SubHelperServers
             $file = 'shs' . time() . rand(1, 999) . '.xlsx';
 
             if (1) {
-                $ch = curl_init();
+                $ch      = curl_init();
                 $timeout = 10;
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -185,10 +185,10 @@ class SubHelperServers
             }
 
             $error_phone = [];
-            $add_data = [];
+            $add_data    = [];
 
             foreach ($excel_data as $v) {
-                $phone = preg_replace('/[^0-9]/i', ',', $v[0]);
+                $phone   = preg_replace('/[^0-9]/i', ',', $v[0]);
                 $t_phone = preg_replace('/[^0-9]/i', ',', $v[1]);
                 if (strlen($phone) !== 11) {
                     $error_phone[] = $phone;
@@ -198,13 +198,13 @@ class SubHelperServers
                     $error_phone[] = $t_phone;
                     continue;
                 }
-                $temp_add_data = [];
-                $temp_add_data['phone'] = $phone;
+                $temp_add_data                  = [];
+                $temp_add_data['phone']         = $phone;
                 $temp_add_data['twitter_phone'] = $t_phone;
-                $temp_add_data['flag_name'] = trim($v[2] ?? '');
-                $temp_add_data['works_type'] = $type;
-                $temp_add_data['works_id'] = $id;
-                $temp_add_data['status'] = 1;
+                $temp_add_data['flag_name']     = trim($v[2] ?? '');
+                $temp_add_data['works_type']    = $type;
+                $temp_add_data['works_id']      = $id;
+                $temp_add_data['status']        = 1;
 
                 if ($type == 2 && $id == 404) {
                     $temp_add_data['is_sendsms'] = 1;
@@ -213,7 +213,7 @@ class SubHelperServers
                 }
 
                 $temp_add_data['admin_id'] = $admin_id;
-                $add_data[] = $temp_add_data;
+                $add_data[]                = $temp_add_data;
             }
 
             if (!empty($add_data)) {
@@ -231,17 +231,17 @@ class SubHelperServers
             }
 
             $error_phone = [];
-            $add_data = [];
+            $add_data    = [];
             foreach ($phone as $v) {
                 if (strlen($v) !== 11) {
                     $error_phone[] = $v;
                     continue;
                 }
-                $temp_add_data = [];
-                $temp_add_data['phone'] = $v;
+                $temp_add_data               = [];
+                $temp_add_data['phone']      = $v;
                 $temp_add_data['works_type'] = $type;
-                $temp_add_data['works_id'] = $id;
-                $temp_add_data['status'] = 1;
+                $temp_add_data['works_id']   = $id;
+                $temp_add_data['status']     = 1;
 
                 if ($type === 2 && $id === 404) {
                     $temp_add_data['is_sendsms'] = 1;
@@ -250,7 +250,7 @@ class SubHelperServers
                 }
 
                 $temp_add_data['admin_id'] = $admin_id;
-                $add_data[] = $temp_add_data;
+                $add_data[]                = $temp_add_data;
             }
 
             if (!empty($add_data)) {
@@ -262,13 +262,59 @@ class SubHelperServers
         }
 
         $error_phone = implode(',', $error_phone);
-        $msg = '';
+        $msg         = '';
         if (!empty($error_phone)) {
             $msg = '无效号码:' . $error_phone;
         }
 
         if ($res) {
             return ['code' => true, 'msg' => '登记成功(1至2分钟后将自动开通).' . $msg];
+        }
+
+        return ['code' => false, 'msg' => '失败.' . $msg];
+    }
+
+    public function delSubList($params, $admin_id): array
+    {
+        $id    = (int)($params['id'] ?? 0);
+        $type  = (int)($params['type'] ?? 0);
+        $phone = $params['phone'] ?? '';
+        $phone = preg_replace('/[^0-9]/i', ',', $phone);
+        $phone = explode(',', $phone);
+        if (empty($phone)) {
+            return ['code' => false, 'msg' => '手机号信息错误'];
+        }
+
+        $error_phone = [];
+        $add_data    = [];
+        foreach ($phone as $v) {
+            if (strlen($v) !== 11) {
+                $error_phone[] = $v;
+                continue;
+            }
+            $temp_add_data               = [];
+            $temp_add_data['phone']      = $v;
+            $temp_add_data['works_type'] = $type;
+            $temp_add_data['works_id']   = $id;
+            $temp_add_data['status']     = 1;
+            $temp_add_data['admin_id']   = $admin_id;
+            $add_data[]                  = $temp_add_data;
+        }
+
+        if (!empty($add_data)) {
+            $res = DB::table('works_list_of_del_sub')
+                ->insert($add_data);
+        } else {
+            $res = true;
+        }
+        $error_phone = implode(',', $error_phone);
+        $msg         = '';
+        if (!empty($error_phone)) {
+            $msg = '无效号码:' . $error_phone;
+        }
+
+        if ($res) {
+            return ['code' => true, 'msg' => '登记成功(1至2分钟后将自动取消).' . $msg];
         }
 
         return ['code' => false, 'msg' => '失败.' . $msg];
