@@ -40,6 +40,7 @@ class ReplyController extends Controller
     {
         $user_id  = $this->user['id'];
         $input    = $request->all();
+        $input['type'] = $input['type']??1;
         if(!empty($input['type']) && $input['type'] == 1){
             $comment = Comment::where('id', $input['comment_id'])->first();
             if(empty($comment)){
