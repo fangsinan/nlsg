@@ -453,6 +453,125 @@ class WorksInfo extends Base
         }
     }
 
+
+
+
+    /**
+     * 获取音视频详情
+     * $ids   视频的video集合
+     */
+    public static function  editVideo($ids=[])
+    {
+        $SecretId  = "AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
+        $SECRET_KEY= "MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
+        $res = [];
+        $msg = 'fail';
+
+        if ($ids){
+            foreach ($ids as $v) {
+                $video_id = $v;
+                //加密
+                $rand   = rand (100, 10000000); //9031868223070871051
+                $time   = time ();
+                $Region = "gz";
+                $Region = "ap-guangzhou";
+                $data_key = [
+                    'Action' => 'GetVideoInfo',
+                    'fileId' => $video_id,
+                    'infoFilter.0' => 'transcodeInfo',
+                    'Region' => $Region,
+                    'SecretId' => $SecretId,
+                    'Timestamp' => $time,
+                    'Nonce' => $rand,
+                    'SignatureMethod' => 'HmacSHA256',
+                ];
+                ksort ($data_key); //排序
+                // 计算签名
+                $srcStr    = "POSTvod.api.qcloud.com/v2/index.php?" . http_build_query ($data_key);
+                $signature = base64_encode (hash_hmac ('sha256', $srcStr, $SECRET_KEY, true)); //SHA1  sha256
+                $data_key['Signature'] = $signature;
+                ksort ($data_key); //排序
+
+                //拉取转码成功信息
+                $url = "https://vod.api.qcloud.com/v2/index.php"; //?Action=PullEvent&COMMON_PARAMS
+                $info = self::curlPost ($url, $data_key);  //post
+
+                if ( !empty($info) ) {
+                    $info = json_decode ($info, true);
+
+                    if ( isset($info['code']) && isset($info['codeDesc']) && $info['code'] == 0 && $info['codeDesc'] == 'Success' ) {
+
+                        //获取所有视频参数
+                        foreach($info['transcodeInfo']['transcodeList'] as $k=>$v){
+                            //音频
+                            if(isset($info['transcodeInfo']['transcodeList'][0]['container']) &&
+                                stristr($info['transcodeInfo']['transcodeList'][0]['url'],".mp3")){
+                                $type=2;
+                            }else{
+                                if (stristr ($v['url'], ".f10.mp4")  ||$v['definition'] == '100030') {
+                                    $map['callback_url1'] = $v['url'];
+                                    $map['attribute_url1'] = $v['width']."#".$v['height'];
+                                } elseif (stristr ($v['url'], ".f20.mp4") ) {
+                                    $map['callback_url2'] = $v['url'];
+                                    $map['attribute_url2'] = $v['width']."#".$v['height'];
+                                } elseif (stristr ($v['url'], ".f30.mp4") ) {
+                                    $map['callback_url3'] = $v['url'];
+                                    $map['attribute_url3'] = $v['width']."#".$v['height'];
+                                }else{
+                                    $map['attribute_url'] = $v['width']."#".$v['height']; //原视频
+//                                   $map['url'] = $v['url']; //原视频
+                                }
+                                $type=1;
+                            }
+
+                        }
+
+                        if ( (!empty($map) && (!empty($map['callback_url1']) || !empty($map['callback_url2']) || !empty($map['callback_url3']))) || $type==2) {
+                            $map['video_adopt'] = 1;
+
+                            $seconds = $v['duration'];
+                            $second = $seconds % 60;
+                            $minit = floor($seconds / 60);
+
+                            $m_num=mb_strlen($minit, 'utf-8');
+                            $s_num=mb_strlen($second, 'utf-8');
+                            if($m_num==1){
+                                $minit='0'.$minit;
+                            }
+                            if($s_num==1){
+                                $second='0'.$second;
+                            }
+
+                            $map['duration'] = $minit . ':' . $second;
+
+                            gmstrftime("%H:%M:%S",$time); //转换视频时间
+
+                            $map['size']=round($v['size']/(1024*1024), 2);  //大小
+                            $map['video_id'] = $video_id;
+                            $msg =  'OK';
+                            //处理防止腾讯传回参数不符合 检查转换链接是否包含视频id
+//                            if((isset($map['callback_url3']) && stristr ($map['callback_url3'], "$video_id")) || $type==2) {
+////                                WorksInfo::where('video_id', $video_id)->update($map);
+//                                $msg =  'OK';
+//                            }
+                        }
+
+                    } else {
+                        $msg =  'fail';
+                    }
+
+                } else {
+                    $msg =  'fail';
+                }
+                $res[] = $map;
+            }
+        }
+
+
+        return ['msg'=>$msg,'data'=>$res];
+    }
+
+
     /**
      * @curl抓取页面数据
      * @param $url 访问地址

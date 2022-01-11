@@ -40,6 +40,7 @@ class ReplyController extends Controller
     {
         $user_id  = $this->user['id'];
         $input    = $request->all();
+        $input['type'] = $input['type']??1;
         if(!empty($input['type']) && $input['type'] == 1){
             $comment = Comment::where('id', $input['comment_id'])->first();
             if(empty($comment)){
@@ -53,6 +54,9 @@ class ReplyController extends Controller
             ];
             $c_type = $comment['type'];
             $Video_id = $comment['relation_id'];
+
+
+            $replay_num_id = $input['comment_id'];
 
         }else{
             $comment = CommentReply::where('id', $input['comment_id'])->first();
@@ -71,6 +75,7 @@ class ReplyController extends Controller
             $main_comment = Comment::where('id', $comment['comment_id'])->first();
             $c_type = $main_comment['type'];
             $Video_id = $main_comment['relation_id'];
+            $replay_num_id = $comment['comment_id'];
 
         }
 
@@ -80,7 +85,7 @@ class ReplyController extends Controller
         $result  = CommentReply::create($add_data);
 
         if ($result){
-            Comment::where('id', $input['comment_id'])->increment('reply_num') ;
+            Comment::where('id', $replay_num_id)->increment('reply_num') ;
             if($c_type == 7){
                 ShortVideoModel::where('id', $Video_id)->increment('comment_num');
             }

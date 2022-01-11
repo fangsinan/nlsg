@@ -12,6 +12,7 @@ use App\Models\MallOrderFlashSale;
 use App\Models\MallOrderGroupBuy;
 use App\Models\Order;
 use App\Models\PayRecordDetailStay;
+use App\Models\ShortVideoModel;
 use App\Models\Task;
 use App\Models\VipUserBind;
 use App\Models\Works;
@@ -133,6 +134,7 @@ class Kernel extends ConsoleKernel
             Order::clear(); //线下课超时处理
             MallRefundJob::refundJob(1);//商城订单退款处理
             WorksInfo::covertVideo(); //转换音频视频
+            ShortVideoModel::toVideo(); //转换音频视频
             Works::deal(); //自动上架
         })->everyMinute()->runInBackground();//每分
 
