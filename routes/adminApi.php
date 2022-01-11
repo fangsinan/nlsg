@@ -266,6 +266,15 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::post('im_doc_folder/add_job', 'ImDocFolderController@addJob');
         Route::put('im_doc_folder/change_job_status', 'ImDocFolderController@changeJobStatus');
 
+
+
+        /* 5.0 */
+
+        Route::get('video/video-list', 'VideoController@video_list');
+        Route::post('video/add-video-info', 'VideoController@addVideoInfo');
+        Route::get('video/del-video', 'VideoController@delVideoInfo');
+        /* 5.0 */
+
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');

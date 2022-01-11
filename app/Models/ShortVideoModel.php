@@ -164,6 +164,14 @@ class ShortVideoModel extends Base
                     unset($val['callback_url3']);
                     unset($val['attribute_url1']);
                 }
+
+                $val['video_type'] = 1;
+                if( !empty($val['callback_attribute']) ){
+                    $attr = explode("#",$val['callback_attribute']);
+                    if($attr[0] < $attr[1]){
+                        $val['video_type'] = 2;
+                    }
+                }
                 $video_id = $val['video_id'];
                 ShortVideoModel::where('video_id', $video_id)->update($val);
             }
