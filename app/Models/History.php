@@ -22,6 +22,9 @@ class History extends Base
         //date_default_timezone_set('PRC');
         $ptime = strtotime($param_time);
         $etime = time() - $ptime;
+        if($etime < 0){  // 防止提前请求
+            return '刚刚';
+        }
         switch ($etime){
             case $etime <= 60:
                 $msg = '刚刚';
