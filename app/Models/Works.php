@@ -379,11 +379,10 @@ class Works extends Base
         if ($lists) {
             foreach ($lists as $v) {
                 if($v['type'] == 9 ){ //学习榜单 统计人数
-                    //时间小于本周一
-                    $week_one = date("Y-m-d H:i:s",strtotime("last Monday"));
-                    //大于上周一
-                    $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday",strtotime("-1 week")));//上周一
-
+                    $week_day       = getWeekDay();
+                    $week_one       = $week_day['monday'];
+                    $top_week_one   = $week_day['top_monday'];
+                    //时间小于本周一    大于上周一
                     $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
                         ->where('created_at','>',$top_week_one)
                         ->where('created_at','<',$week_one)

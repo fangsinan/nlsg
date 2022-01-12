@@ -97,3 +97,31 @@
             return '0秒';
         }
     }
+
+
+    /*
+     * $type = 1  本周周一   2 上周周一
+     * */
+    function getWeekDay(){
+        $timestr = time();         //当前时间戳
+        $now_day = date('w',$timestr);      //当前是周几
+        $now_day = $now_day?$now_day:7;         //周日为0
+
+        //获取周一
+        $monday_str = $timestr - ($now_day-1)*86400;
+        $monday = date('Y-m-d', $monday_str);
+
+        //获取周日
+//        $sunday_str = $timestr + (7-$now_day)*86400;
+//        $sunday = date('Y-m-d', $sunday_str);
+//        for($i=0;$i<7;$i++)
+//        {
+//            $arr[$i]=date('Y-m-d',strtotime($monday.'+'.$i.'day'));
+//        }
+        $top_monday = date('Y-m-d', $monday_str-86400*7);
+
+        return [
+            'monday'    =>$monday,
+            'top_monday'=>$top_monday,
+        ];
+    }

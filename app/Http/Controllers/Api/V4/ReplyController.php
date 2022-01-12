@@ -85,7 +85,7 @@ class ReplyController extends Controller
         $result  = CommentReply::create($add_data);
 
         if ($result){
-            Comment::where('id', $replay_num_id)->increment('reply_num') ;
+            Comment::where('id', $replay_num_id)->increment('reply_num');
             if($c_type == 7){
                 ShortVideoModel::where('id', $Video_id)->increment('comment_num');
             }

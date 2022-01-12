@@ -1453,10 +1453,9 @@ class UserController extends Controller
         $uid = $this->user['id']??0;
         $page = $request->input('page');
 
-        //本周一
-        $week_one = date("Y-m-d H:i:s",strtotime("Monday"));
-        //上周一
-        $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday"));//上周一
+        $week_day       = getWeekDay();
+        $week_one       = $week_day['monday'];
+        $top_week_one   = $week_day['top_monday'];
 
         if($page <= 1){
             $data = User::getUserHisLen(20);
@@ -1513,7 +1512,9 @@ class UserController extends Controller
         $uid = $this->user['id']??0;
         if(!empty($uid)){
             //上周一
-            $top_week_one = date("Y-m-d H:i:s",strtotime("last Monday"));//上周一
+            $week_day       = getWeekDay();
+            $top_week_one   = $week_day['top_monday'];
+
             //页面自我点赞
             $cache_key_name = 'his_like_'.$uid.'_'.$top_week_one;
             Cache::put($cache_key_name, 1, 86400*7);
