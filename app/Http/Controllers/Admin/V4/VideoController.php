@@ -59,7 +59,7 @@ class VideoController extends ControllerBackend
 
         $query = ShortVideoModel::select([
             'id', 'title', 'introduce', 'status', 'share_img', 'cover_img', 'user_id', 'online_time', 'attribute_url','video_type','view_num',
-            'comment_num','like_num','share_num','callback_url'
+            'comment_num','like_num','share_num','callback_url','url','video_id'
         ])
             ->when($video_id, function ($query) use ($video_id) {
                 $query->where('id', $video_id);
