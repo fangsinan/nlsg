@@ -150,7 +150,7 @@ class VideoController extends ControllerBackend
             'share_img'     => $input['share_img'] ?? '',
             'cover_img'     => $input['cover_img'] ?? '',
             'detail_img'    => $input['detail_img'] ?? '',
-            'user_id'       => $input['user_id'] ?? '',
+            'user_id'       => $input['user_id'] ?? 0,
             'rank'          => $input['rank'] ?? 0,
             'online_time'   => $online_time,
 //            'view_num'      => $input['view_num'] ?? '',
