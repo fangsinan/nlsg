@@ -122,7 +122,9 @@ class VideoController extends ControllerBackend
      */
     public function addVideoInfo(Request $request)
     {
-        $input = $request->all();
+        $data= $request->getContent();
+        $input = json_decode($data,true);
+//        $input = $request->all();
         $id = $request->get('id');
         $video = ShortVideoModel::where('id', $id)->first();
         if (!empty($id) && empty($video)) {
