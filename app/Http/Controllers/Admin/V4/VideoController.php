@@ -198,7 +198,7 @@ class VideoController extends ControllerBackend
      */
     public function delVideoInfo(Request $request)
     {
-        $video_id = $request->get('video_id')??0;
+        $id = $request->get('id')??0;
         $status = $request->get('status');
 
         if(!empty($status)){
@@ -207,7 +207,7 @@ class VideoController extends ControllerBackend
                 $data['online_time'] = date('Y-m-d H:i:s');
             }
 
-            $res = ShortVideoModel::where('id', $video_id)->update($data);
+            $res = ShortVideoModel::where('id', $id)->update($data);
             if($res){
                 return success();
             }else{
