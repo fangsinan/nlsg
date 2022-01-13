@@ -272,7 +272,7 @@ class Lists extends Model
 
     public function listWorks()
     {
-        return $this->hasMany('App\Models\ListsWork', 'lists_id', 'id')->where('state',1);
+        return $this->hasMany('App\Models\ListsWork', 'lists_id', 'id')->where('state',1)->orderBy("sort");
     }
 
     public function works()
