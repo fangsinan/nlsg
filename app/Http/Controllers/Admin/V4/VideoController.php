@@ -125,7 +125,7 @@ class VideoController extends ControllerBackend
         $input = $request->all();
         $id = $request->get('id');
         $video = ShortVideoModel::where('id', $id)->first();
-        if (empty($video)) {
+        if (!empty($id) && empty($video)) {
             return error(1000, '视频不存在');
         }
         $online_time = '';
@@ -140,7 +140,7 @@ class VideoController extends ControllerBackend
             'cover_img'     => $input['cover_img'] ?? '',
             'detail_img'    => $input['detail_img'] ?? '',
             'user_id'       => $input['user_id'] ?? '',
-            'rank'          => $input['rank'] ?? 5,
+            'rank'          => $input['rank'] ?? 0,
             'online_time'   => $online_time,
 //            'view_num'      => $input['view_num'] ?? '',
             'video_id'      => $input['video_id'] ?? 0,
