@@ -38,7 +38,7 @@ class LikeController extends Controller
     {
         $id   = $request->input('id');
         $type = $request->input('type');
-        $comment_type = $request->input('comment_type');
+        $comment_type = $request->input('comment_type')??1;
         if (empty($id) || empty($type) || empty($comment_type)){
             return error(1000, '参数不全');
         }
@@ -101,7 +101,7 @@ class LikeController extends Controller
     {
         $id   = $request->input('id');
         $type = $request->input('type');
-        $comment_type = $request->input('comment_type');
+        $comment_type = $request->input('comment_type')??1;
 
         if (empty($id) || empty($comment_type)){
             return error(1000, '参数不全');
