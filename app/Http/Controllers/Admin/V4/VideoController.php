@@ -128,14 +128,25 @@ class VideoController extends ControllerBackend
         if (!empty($id) && empty($video)) {
             return error(1000, '视频不存在');
         }
+
         $online_time = '';
-        if($input['status'] == 2){
+        $status = $input['status']??1;
+        if($status == 2){
             $online_time = date("Y-m-d H:i:s");
         }
+        if(empty($input['title'])) {
+            return error(1000, '标题不存在');
+        }
+        if(empty($input['introduce'])) {
+            return error(1000, '简介不存在');
+        }
+        if(empty($input['url']) && empty($input['video_id'])) {
+            return error(1000, '视频链接错误');
+        }
         $data = [
-            'title'         => $input['title'] ?? 99,
-            'introduce'     => $input['introduce'] ?? 0,
-            'status'        => $input['status'] ?? 0,
+            'title'         => $input['title'] ?? "",
+            'introduce'     => $input['introduce'] ?? "",
+            'status'        => $status,
             'share_img'     => $input['share_img'] ?? '',
             'cover_img'     => $input['cover_img'] ?? '',
             'detail_img'    => $input['detail_img'] ?? '',
@@ -148,7 +159,7 @@ class VideoController extends ControllerBackend
 //            'duration'      => $input['duration'] ?? 0,
 //            'size'          => $input['size'] ?? 0,
 //            'attribute_url' => $input['attribute_url'] ?? 0,
-            'video_type'    => $input['video_type'] ?? 1,
+//            'video_type'    => $input['video_type'] ?? 1,
         ];
 
 
