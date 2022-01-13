@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\ShortVideoModel;
-use App\Models\Works;
-use App\Models\WorksInfo;
 use Illuminate\Http\Request;
 
 
@@ -109,6 +107,7 @@ class VideoController extends ControllerBackend
      * @apiParam {string} cover_img 封面
      * @apiParam {string} detail_img 封面
      * @apiParam {string} share_img  分享图
+     * @apiParam {string} user_id  user_id
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
