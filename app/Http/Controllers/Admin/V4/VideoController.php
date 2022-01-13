@@ -130,7 +130,7 @@ class VideoController extends ControllerBackend
             return error(1000, '视频不存在');
         }
 
-        $online_time = '';
+        $online_time = null;
         $status = $input['status']??1;
         if($status == 2){
             $online_time = date("Y-m-d H:i:s");
