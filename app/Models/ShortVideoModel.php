@@ -11,7 +11,7 @@ class ShortVideoModel extends Base
     protected $fillable = [
         'title', 'introduce', 'status', 'share_img', 'cover_img', 'detail_img', 'user_id', 'rank', 'online_time', 'view_num', 'real_view_num', 'video_id',
         'comment_num', 'size', 'duration', 'url', 'like_num', 'share_num', 'attribute_url',
-        'video_adopt','callback_url','callback_attribute',
+        'video_adopt','callback_url','callback_attribute','video_type',
     ];
     //获取短视频
     function getVideo ($uid,$id=0,$not_id=0,$page=1,$size=3,$is_home=0){
