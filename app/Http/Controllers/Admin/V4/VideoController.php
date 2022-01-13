@@ -20,7 +20,7 @@ class VideoController extends ControllerBackend
      * @apiDescription 短视频列表
      *
      * @apiParam {number} page 分页
-     * @apiParam {number} video_id 编号
+     * @apiParam {number} id 视频id
      * @apiParam {string} title 标题
      * @apiParam {number} status 上下架
      * @apiParam {string} sort  排序 浏览view_num 评论comment_num  点赞like_num   分享share_num
@@ -51,7 +51,7 @@ class VideoController extends ControllerBackend
     {
 
 
-        $video_id = $request->get('video_id');
+        $video_id = $request->get('id');
         $title = $request->get('title');
         $status = $request->get('status');
         $sort = $request->get('sort') ?? 'created_at';
