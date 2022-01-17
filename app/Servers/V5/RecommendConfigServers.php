@@ -16,7 +16,9 @@ class RecommendConfigServers
         $size          = $params['size'] ?? 10;
 
         $query = RecommendConfig::query()
-            ->where('show_position','=',3)
+            ->where('show_position', '=', 3)
+            ->whereIn('jump_type', [4, 11, 13])
+            ->whereIn('modular_type', [5, 7, 8, 9, 11])
             ->when($title, function ($q, $title) {
                 $q->where('title', 'like', "%$title%");
             })
@@ -87,11 +89,42 @@ class RecommendConfigServers
 
     }
 
-    public function info($params){
+    public function info($params) {
         $id = $params['id'] ?? 0;
-        if (empty($id)){
-            return ['code'=>false,'msg'=>'id错误'];
+        if (empty($id)) {
+            return ['code' => false, 'msg' => 'id错误'];
         }
+
+        $check_id = RecommendConfig::query()
+            ->where('id', '=', $id)
+            ->select(['id', 'modular_type'])
+            ->first();
+        if (empty($check_id)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        switch ($check_id->modular_type) {
+            case 5:
+            case 8:
+            case 11:
+                $with_str = 'recommendInfo.works';
+                break;
+            case 7:
+                $with_str = 'recommendInfo.teacher';
+                break;
+            default:
+                $with_str = 'recommendInfo.lists';
+                break;
+        }
+
+        $query = RecommendConfig::query()
+            ->where('id', '=', $id)
+            ->select([
+                'id', 'title', 'icon_pic', 'icon_mark', 'icon_mark_rang', 'show_position',
+                'jump_type', 'modular_type', 'is_show', 'sort', 'jump_url', 'lists_id', 'created_at'
+            ])->with(['recommendInfo',$with_str]);
+
+        return $query->first();
 
 
     }

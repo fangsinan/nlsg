@@ -287,5 +287,14 @@ class Recommend extends Base
         return $this->belongsTo('App\Models\Live', 'relation_id', 'id');
     }
 
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'relation_id', 'id');
+    }
+
+    public function lists()
+    {
+        return $this->belongsTo(Lists::class, 'relation_id', 'id');
+    }
 
 }
