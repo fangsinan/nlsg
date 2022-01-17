@@ -325,6 +325,9 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
 
         Route::get('select_data/recommend_type_list', 'SelectDataController@recommendTypeList');
+        Route::get('select_data/works_list', 'SelectDataController@worksList');
+        Route::get('select_data/works_lists_list', 'SelectDataController@worksListsList');
+        Route::get('select_data/teacher_list', 'SelectDataController@teacherList');
 
     });
 });
