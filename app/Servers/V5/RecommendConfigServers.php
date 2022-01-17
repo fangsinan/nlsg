@@ -3,6 +3,7 @@
 namespace App\Servers\V5;
 
 use App\Models\RecommendConfig;
+use Illuminate\Support\Facades\Validator;
 
 class RecommendConfigServers
 {
@@ -37,7 +38,7 @@ class RecommendConfigServers
             'jump_type', 'modular_type', 'is_show', 'sort', 'jump_url', 'lists_id', 'created_at'
         ]);
 
-        $query->withCount('recommendInfo');
+        $query->withCount('recommendInfo')->orderBy('sort')->orderBy('id', 'desc');
 
         $list = $query->paginate($size);
 
@@ -50,8 +51,39 @@ class RecommendConfigServers
         return $list;
     }
 
-    public function add($params) {
-        return [1, 2, 3];
+    public function add($data): array {
+        $params             = [];
+        $params['title']    = $data['title'] ?? '';
+        $params['icon_pic'] = $data['icon_pic'] ?? '';
+
+        $params['show_position'] = (int)($data['show_position'] ?? 0);
+        $params['jump_type']     = (int)($data['jump_type'] ?? 0);
+        $params['modular_type']  = (int)($data['modular_type'] ?? 0);
+
+        $params['is_show']  = $data['is_show'] ?? -1;
+        $params['jump_url'] = $data['jump_url'] ?? '';
+
+        $validator = Validator::make($params, [
+                'title'         => 'bail|required',
+                'show_position' => 'bail|required|min:1',
+                'jump_type'     => 'bail|required|min:1',
+                'modular_type'  => 'bail|required|min:1',
+                'is_show'       => 'bail|required|min:0|max:1',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $res = RecommendConfig::query()->updateOrCreate(['id' => $data['id'] ?? 0], $params);
+
+        if (!$res) {
+            return ['code' => false, 'msg' => '失败,请重试.'];
+        }
+
+        return ['code' => true, 'msg' => '成功'];
+
     }
 
     public function sort($params) {
