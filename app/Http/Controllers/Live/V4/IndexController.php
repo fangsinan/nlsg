@@ -998,6 +998,7 @@ class IndexController extends ControllerBackend
             ['title' => "李婷老师直播19.9", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/42798414387702291818027383/v.f100020.mp4',],
             ['title' => "王琨老师公益课", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd2ad1f6387702291813511887/v.f100020.mp4',],
             ['title' => "十商交付第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd3e6ccd387702291813524028/v.f100020.mp4',],
+            ['title' => "十商交付第一天新版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/9a8b03a5387702294592959843/v.f100020.mp4',],
             ['title' => "十商交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/3bb9b74a387702292234507161/v.f100020.mp4',],
             ['title' => "2022年十商第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/17031e14387702294366503473/v.f100020.mp4',],
             ['title' => "2022年十商第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/4671b130387702294353646033/v.f100020.mp4',],
