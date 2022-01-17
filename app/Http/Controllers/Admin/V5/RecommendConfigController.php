@@ -49,4 +49,8 @@ class RecommendConfigController extends ControllerBackend
         return $this->getRes((new rcs())->add($request->input()));
     }
 
+    public function Info(Request $request): JsonResponse {
+        return $this->getRes((new rcs())->Info($request->input()));
+    }
+
 }

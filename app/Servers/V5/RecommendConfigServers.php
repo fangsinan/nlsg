@@ -12,10 +12,11 @@ class RecommendConfigServers
         $show_position = $params['show_position'] ?? '';
         $jump_type     = $params['jump_type'] ?? '';
         $modular_type  = $params['modular_type'] ?? '';
-        $is_show       = $params['is_show'] ?? '';
+        $is_show       = $params['is_show'] ?? -1;
         $size          = $params['size'] ?? 10;
 
         $query = RecommendConfig::query()
+            ->where('show_position','=',3)
             ->when($title, function ($q, $title) {
                 $q->where('title', 'like', "%$title%");
             })
@@ -83,6 +84,15 @@ class RecommendConfigServers
         }
 
         return ['code' => true, 'msg' => '成功'];
+
+    }
+
+    public function info($params){
+        $id = $params['id'] ?? 0;
+        if (empty($id)){
+            return ['code'=>false,'msg'=>'id错误'];
+        }
+
 
     }
 
