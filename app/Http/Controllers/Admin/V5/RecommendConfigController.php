@@ -13,6 +13,14 @@ class RecommendConfigController extends ControllerBackend
         return $this->getRes((new rcs())->list($request->input()));
     }
 
+    public function sort(Request $request){
+        return $this->getRes((new rcs())->sort($request->input()));
+    }
+
+    public function selectList(Request $request) {
+        return $this->getRes((new rcs())->selectList($request->input()));
+    }
+
     public function add(Request $request) {
         return $this->getRes((new rcs())->add($request->input()));
     }

@@ -319,6 +319,8 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
         //推荐位
         Route::get('recommend_config/list', 'RecommendConfigController@list');
+        Route::get('recommend_config/select_list', 'RecommendConfigController@selectList');
+        Route::post('recommend_config/sort', 'RecommendConfigController@sort');
         Route::post('recommend_config/add', 'RecommendConfigController@add');
 
 
