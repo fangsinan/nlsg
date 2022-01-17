@@ -1,6 +1,7 @@
 <?php
 
 //后台
+
 Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     Route::get('deal/get_order_info', 'DealController@getOrderInfo');
@@ -312,3 +313,15 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
 
 });
+
+Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
+    Route::group(['middleware' => ['auth.backend.jwt']], function () {
+
+        //推荐位
+        Route::get('recommend_config/list', 'RecommendConfigController@list');
+        Route::post('recommend_config/add', 'RecommendConfigController@add');
+
+
+    });
+});
+
