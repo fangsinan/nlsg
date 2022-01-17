@@ -3,6 +3,8 @@
 namespace App\Models;
 
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class RecommendConfig extends Base
 {
     protected $table = 'nlsg_recommend_config';
@@ -11,13 +13,13 @@ class RecommendConfig extends Base
         'title', 'icon_pic', 'show_position', 'jump_type', 'modular_type', 'is_show', 'sort', 'icon_mark',
     ];
 
-    public $show_position = [
+    public $show_position_array = [
         '1' => '顶部按钮',
         '2' => '中间ICON',
         '3' => '底部模块',
     ];
 
-    public $jump_type = [
+    public $jump_type_array = [
         '1'  => '首页',
         '2'  => '每日琨说',
         '3'  => '专栏',
@@ -37,7 +39,7 @@ class RecommendConfig extends Base
         '18' => '活动类型'
     ];
 
-    public $modular_type = [
+    public $modular_type_array = [
         '1'  => ' banner',
         '2'  => 'icon',
         '3'  => '每日琨说',
@@ -50,5 +52,9 @@ class RecommendConfig extends Base
         '10' => '热门榜单',
         '11' => '亲子专题',
     ];
+
+    public function recommendInfo(): HasMany {
+        return $this->hasMany(Recommend::class, 'position', 'id');
+    }
 
 }
