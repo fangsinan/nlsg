@@ -59,6 +59,9 @@
     function SecToTime($time)
     {
         if (is_numeric($time)) {
+            if($time <=0 ){
+                return '1秒';
+            }
             $value = array(
                 "years" => 0, "days" => 0, "hours" => 0,
                 "minutes" => 0, "seconds" => 0,
@@ -94,7 +97,7 @@
             return $t;
 
         } else {
-            return '0秒';
+            return '1秒';
         }
     }
 
