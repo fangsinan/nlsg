@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 include __DIR__ . '/adminApi.php';
 include __DIR__ . '/liveApi.php';
+include __DIR__ . '/V5Api.php';
 /*
   |--------------------------------------------------------------------------
   | API Routes
