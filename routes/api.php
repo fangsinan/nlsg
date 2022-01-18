@@ -562,6 +562,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::post('comment/store', 'CommentController@store');
     Route::post('comment/destroy', 'CommentController@destroy');
 
+    Route::get('index/recommend', 'IndexController@recommend');
 
 
     Route::group(['middleware' => ['auth.jwt']], function () {
