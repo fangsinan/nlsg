@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\V4;
+namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\CommentReply;
-use App\Models\Notify;
 use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
-use App\Models\Task;
-use App\Models\User;
 
 class ReplyController extends Controller
 {
@@ -70,18 +67,12 @@ class ReplyController extends Controller
                 'to_uid'        => $comment->from_uid,
                 'content'       => $input['content']
             ];
-
-
             $main_comment = Comment::where('id', $comment['comment_id'])->first();
             $c_type = $main_comment['type'];
             $Video_id = $main_comment['relation_id'];
             $replay_num_id = $comment['comment_id'];
 
         }
-
-//        if (!$comment){
-//            return error(1000,'评论不存在');
-//        }
         $result  = CommentReply::create($add_data);
 
         if ($result){
@@ -89,23 +80,6 @@ class ReplyController extends Controller
             if($c_type == 7){
                 ShortVideoModel::where('id', $Video_id)->increment('comment_num');
             }
-//            //发送通知
-//            $notify = new Notify();
-//            $notify->from_uid = $user_id;
-//            $notify->to_uid   = $comment->user_id;
-//            $notify->source_id= $result->id;
-//            $notify->type     = 2;
-//            $notify->subject  = '回复了你的评论';
-//            $content = [
-//                'summary'   => $input['content'],
-//            ];
-//            $notify->content = $input['content'] ? serialize($content) : '';
-//            $notify->save();
-//
-//            $from_user = User::where('id', $user_id)->value('nickname');
-//            //发送通知
-//            Task::send(12, $comment->user_id, $result->id, 0, '',false,false, 0, $from_user, $comment->type, $comment->relation_id);
-
             return success();
         }
     }
