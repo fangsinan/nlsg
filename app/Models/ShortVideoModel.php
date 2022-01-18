@@ -136,44 +136,46 @@ class ShortVideoModel extends Base
     public static function  toVideo()
     {
 
-        $ids = ShortVideoModel::where('video_adopt', 1)
-            ->where('video_id','!=', '')
+        $ids = ShortVideoModel::where('video_adopt', 0)
+            ->where('video_id','!=', '')->limit(1 )
             ->pluck('video_id')
             ->toArray();
-
+//dd($ids);
         $map = WorksInfo::editVideo($ids);
 
         if($map['msg'] == "OK"){
             foreach ($map['data'] as $key=>$val){
 
+                $update_data = $val;
+
                 if (!empty($val['callback_url1'])) {
-                    $val['callback_url'] =  $val['callback_url1'];
-                    $val['callback_attribute'] =  $val['attribute_url1'];
-                    unset($val['callback_url1']);
-                    unset($val['attribute_url1']);
+                    $update_data['callback_url'] =  $val['callback_url1'];
+                    $update_data['callback_attribute'] =  $val['attribute_url1'];
+                    unset($update_data['callback_url1']);
+                    unset($update_data['attribute_url1']);
                 }
                 if (!empty($val['callback_url2'])) {
-                    $val['callback_url'] =  $val['callback_url2'];
-                    $val['callback_attribute'] =  $val['attribute_url2'];
-                    unset($val['callback_url2']);
-                    unset($val['attribute_url2']);
+                    $update_data['callback_url'] =  $val['callback_url2'];
+                    $update_data['callback_attribute'] =  $val['attribute_url2'];
+                    unset($update_data['callback_url2']);
+                    unset($update_data['attribute_url2']);
                 }
                 if (!empty($val['callback_url3'])) {
-                    $val['callback_url'] =  $val['callback_url3'];
-                    $val['callback_attribute'] =  $val['attribute_url1'];
-                    unset($val['callback_url3']);
-                    unset($val['attribute_url1']);
-                }
 
+                    $update_data['callback_url'] =  $val['callback_url3'];
+                    $update_data['callback_attribute'] =  $val['attribute_url3'];
+                    unset($update_data['callback_url3']);
+                    unset($update_data['attribute_url3']);
+                }
                 $val['video_type'] = 1;
-                if( !empty($val['callback_attribute']) ){
-                    $attr = explode("#",$val['callback_attribute']);
+                if( !empty($val['attribute_url']) ){
+                    $attr = explode("#",$val['attribute_url']);
                     if($attr[0] < $attr[1]){
-                        $val['video_type'] = 2;
+                        $update_data['video_type'] = 2;
                     }
                 }
                 $video_id = $val['video_id'];
-                ShortVideoModel::where('video_id', $video_id)->update($val);
+                ShortVideoModel::where('video_id', $video_id)->update($update_data);
             }
         }
         echo $map['msg'];
