@@ -20,9 +20,9 @@ class WorksController extends Controller
 
 
     /**
-     * @api {get} /api/v4/works/get_lists_works  专题list      获取集合 模块 数据
+     * @api {get} /api/v5/works/get_lists_works  专题list      获取集合 模块 数据
      * @apiName get_works_index
-     * @apiVersion 1.0.0
+     * @apiVersion 5.0.0
      * @apiGroup works
      *
      * @apiParam {int} lists_id  集合id
@@ -90,9 +90,9 @@ class WorksController extends Controller
 
 
     /**
-     * @api {get} /api/v4/works/get_works_index  课程首页
+     * @api {get} /api/v5/works/get_works_index  课程首页
      * @apiName get_works_index
-     * @apiVersion 1.0.0
+     * @apiVersion 5.0.0
      * @apiGroup works
      *
      * @apiParam {int} order   1 最多学习  2 最新上架  3最多收藏  4 最多分享
@@ -410,9 +410,9 @@ class WorksController extends Controller
 
     /**
      * 相邻章节
-     * @api {post} /api/v4/works/neighbor 相邻章节
-     * @apiVersion 1.0.0
-     * @apiName /api/v4/works/neighbor
+     * @api {post} /api/v5/works/neighbor 相邻章节
+     * @apiVersion 5.0.0
+     * @apiName /api/v5/works/neighbor
      * @apiGroup works
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/works/neighbor
      * @apiDescription 相邻章节

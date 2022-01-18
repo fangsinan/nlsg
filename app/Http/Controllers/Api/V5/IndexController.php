@@ -15,7 +15,7 @@ class IndexController extends Controller
 {
 
     /**
-     * @api {get} api/v4/index/get_top_img  各个列表头图
+     * @api {get} api/v5/index/get_top_img  各个列表头图
      * @apiVersion 5.0.0
      * @apiName  get_top_img
      * @apiGroup five_Index
@@ -44,7 +44,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @api {get} api/v4/index/index_position  首页位置API
+     * @api {get} api/v5/index/index_position  首页位置API
      * @apiVersion 5.0.0
      * @apiName  index_position
      * @apiGroup five_Index
@@ -91,7 +91,7 @@ class IndexController extends Controller
 
     /**
      * 5.0 第一版首页接口的合并
-     * @api {get} api/v4/index/index_middle  首页   大咖主讲人-精品专题-热门榜单【合并】
+     * @api {get} api/v5/index/index_middle  首页   大咖主讲人-精品专题-热门榜单【合并】
      * @apiVersion 5.0.0
      * @apiName  index_middle
      * @apiGroup five_Index
@@ -128,8 +128,8 @@ class IndexController extends Controller
 
 
     /**
-     * @api {get} api/v4/index/lives  首页-直播推荐
-     * @apiVersion 4.0.0
+     * @api {get} api/v5/index/lives  首页-直播推荐
+     * @apiVersion 5.0.0
      * @apiName  live
      * @apiGroup Index
      *
@@ -197,7 +197,7 @@ class IndexController extends Controller
 
 
     /**
-     * @api {get} api/v4/index/index_works  首页-精选课程-主题课程模块-专题课
+     * @api {get} api/v5/index/index_works  首页-精选课程-主题课程模块-专题课
      * @apiVersion 5.0.0
      * @apiName  index_works
      * @apiGroup five_Index
@@ -255,8 +255,8 @@ class IndexController extends Controller
 
 
     /**
-     * @api {get} api/v4/index/recommend  首页-每日琨说
-     * @apiVersion 4.0.0
+     * @api {get} api/v5/index/recommend  首页-每日琨说
+     * @apiVersion 5.0.0
      * @apiName  recommend
      * @apiGroup Index
      *

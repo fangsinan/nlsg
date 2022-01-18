@@ -553,8 +553,23 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('works/neighbor', 'WorksController@neighbor');
     Route::any('works/get_lists_works', 'WorksController@getListsWorks');
 
+
+
+    Route::any('rank/works', 'RankController@works');
+    //评论
+    Route::post('reply/store', 'ReplyController@store');
+    Route::get('comment/list', 'CommentController@index');
+    Route::post('comment/store', 'CommentController@store');
+    Route::post('comment/destroy', 'CommentController@destroy');
+
+
+
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::any('user/history_like', 'UserController@histLike');
+
+        //想法的喜欢
+        Route::post('like', 'LikeController@like');
+        Route::post('unlike', 'LikeController@unlike');
 
     });
 

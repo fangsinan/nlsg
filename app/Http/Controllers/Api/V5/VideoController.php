@@ -14,7 +14,7 @@ class VideoController extends Controller
 
 
     /**
-     * @api {get} /api/v4/video/get_random_video 获取短视频信息
+     * @api {get} /api/v5/video/get_random_video 获取短视频信息
      * @apiName get_random_video
      * @apiVersion 5.0.0
      * @apiGroup five_video
@@ -69,7 +69,7 @@ class VideoController extends Controller
 
 
     /**
-     * @api {get} /api/v4/video/like 短视频点赞
+     * @api {get} /api/v5/video/like 短视频点赞
      * @apiName like
      * @apiVersion 5.0.0
      * @apiGroup five_video

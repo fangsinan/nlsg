@@ -32,8 +32,8 @@ class UserController extends Controller
 
 
     /**
-     * @api {post} api/v4/user/user_his_list   获取学习榜单
-     * @apiVersion 4.0.0
+     * @api {post} api/v5/user/user_his_list   获取学习榜单
+     * @apiVersion 5.0.0
      * @apiName  user_his_list
      * @apiGroup User
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/user/user_his_list

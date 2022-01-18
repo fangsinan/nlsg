@@ -14,8 +14,8 @@ class VipController extends Controller
 
     /**
      * 会员详情页
-     * @api {get} /api/v4/vip/home_page 会员详情页
-     * @apiVersion 4.0.0
+     * @api {get} /api/v5/vip/home_page 会员详情页
+     * @apiVersion 5.0.0
      * @apiName /api/v4/vip/home_page
      * @apiGroup  360会员
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/vip/home_page
