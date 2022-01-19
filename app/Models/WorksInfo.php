@@ -508,7 +508,8 @@ class WorksInfo extends Base
                                 stristr($info['transcodeInfo']['transcodeList'][0]['url'],".mp3")){
                                 $type=2;
                             }else{
-                                if (stristr ($v['url'], ".f10.mp4")  ||$v['definition'] == '100030') {
+                                //definition 模板id 会总变化
+                                if (stristr ($v['url'], ".f10.mp4")  || $v['definition'] == '100030') {
                                     $map['callback_url1'] = $v['url'];
                                     $map['attribute_url1'] = $v['width']."#".$v['height'];
                                 } elseif (stristr ($v['url'], ".f20.mp4") ) {
@@ -518,7 +519,9 @@ class WorksInfo extends Base
                                     $map['callback_url3'] = $v['url'];
                                     $map['attribute_url3'] = $v['width']."#".$v['height'];
                                 }else{
-                                    $map['attribute_url'] = $v['width']."#".$v['height']; //原视频
+                                    if( $v['definition'] == '0'){ //原视频
+                                        $map['attribute_url'] = $v['width']."#".$v['height']; //原视频
+                                    }
 //                                   $map['url'] = $v['url']; //原视频
                                 }
                                 $type=1;

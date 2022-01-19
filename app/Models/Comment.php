@@ -17,7 +17,8 @@ class Comment extends Base
      */
     public function getIndexComment($id, $type = 1, $uid = 0, $order = 1, $self = false, $info_id = 0)
     {
-        if ( ! $id) {
+
+        if (empty($id)) {
             return false;
         }
 
