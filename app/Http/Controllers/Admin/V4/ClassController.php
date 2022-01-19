@@ -899,7 +899,8 @@ class ClassController extends ControllerBackend
             'video_id'      => $input['video_id'] ?? '',
             'share_img'     => $input['share_img'] ?? '',
             'free_trial'    => $input['free_trial'] ?? 0,
-            'timing_online' => $timing_online ?? 0
+            'timing_online' => $timing_online ?? 0,
+            'video_adopt' => 0,
         ];
         if ($input['type'] == 1) {
             $data['column_id'] = $work_id;
