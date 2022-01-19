@@ -73,6 +73,7 @@ class CampServers
     public function CampClockInInfo($params) {
         $works_id      = $params['works_id'] ?? 0;
         $works_info_id = $params['works_info_id'] ?? 0;
+        $is_end        = (int)($params['is_end'] ?? -1);
 
         if (empty($works_id) || empty($works_info_id)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -87,6 +88,10 @@ class CampServers
                 DB::raw("IF(is_end = 0,'-',(IF(end_time is NULL,updated_at,end_time))) as end_time")
             ])
             ->with(['userInfo:id,phone']);
+
+        if ($is_end !== -1) {
+            $query->where('is_end', '=', $is_end);
+        }
 
         return $query->paginate($params['size'] ?? 10);
     }
