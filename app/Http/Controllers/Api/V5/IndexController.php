@@ -317,4 +317,36 @@ class IndexController extends Controller
         return success($lists);
     }
 
+
+    /**
+     * @api {get} api/v4/index/flash_banner  首页闪屏图
+     * @apiVersion 4.0.0
+     * @apiName  flash_banner
+     * @apiGroup Index
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/index/flash_banner
+     *
+     * @apiSuccess {string} pic  图片
+     * @apiSuccess {string} url  h5跳转链接
+     * @apiSuccess {number} type  1 h5 2 app商品  4精品课 5.讲座 6.听书 7 360  8直播详情  13活动开屏图
+     * @apiSuccess {number} obj_id  商品id
+     *
+     * @apiSuccessExample  Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "code": 200,
+     *       "msg" : '成功',
+     *       "data":[
+     *
+     *         ]
+     *     }
+     *
+     */
+    public function flashBanner()
+    {
+        $bannerModel = new Banner();
+        $data = $bannerModel->appPopup(61);
+        $data  = !empty($data) ? $data : new \StdClass();
+        return success($data);
+    }
+
 }
