@@ -35,6 +35,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('class/get-work-list', 'ClassController@getWorkList');
         Route::get('class/get-chapter-info', 'ClassController@getChapterInfo');
 
+        Route::get('class/camp_clock_in', 'ClassController@CampClockIn');
+        Route::get('class/camp_clock_in_info', 'ClassController@CampClockInInfo');
+
 
         Route::post('class/add-column', 'ClassController@addColumn');
         Route::post('class/add-camp', 'ClassController@addCamp');

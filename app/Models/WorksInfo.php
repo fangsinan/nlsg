@@ -611,4 +611,8 @@ class WorksInfo extends Base
         return $tmpInfo;
     }
 
+    public function worksInfoHistory(){
+        return $this->hasMany(History::class,'info_id','id');
+    }
+
 }

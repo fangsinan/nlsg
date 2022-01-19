@@ -12,6 +12,7 @@ use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
 use App\Models\WorksInfoContent;
+use App\Servers\V5\CampServers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -1690,6 +1691,19 @@ class ClassController extends ControllerBackend
                 'details_pic', 'created_at', 'timing_online', 'timing_time','is_start','show_info_num','online_time','info_column_id')
             ->where('id', $id)->first();
         return success($list);
+    }
+
+
+    public function CampClockIn(Request $request){
+        $servers = new CampServers();
+        $data = $servers->CampClockIn($request->input());
+        return $this->getRes($data);
+    }
+
+    public function CampClockInInfo(Request $request){
+        $servers = new CampServers();
+        $data = $servers->CampClockInInfo($request->input());
+        return $this->getRes($data);
     }
 
 
