@@ -55,12 +55,16 @@ class VideoController extends ControllerBackend
         $title = $request->get('title');
         $status = $request->get('status');
         $sort = $request->get('sort') ?? 'created_at';
+        $video_type = $request->get('video_type') ?? 0;
         $sort_type = $request->get('sort_type') ?? 'desc';
 
         $query = ShortVideoModel::select([
             'id', 'title', 'introduce', 'status', 'share_img', 'cover_img', 'user_id', 'online_time', 'attribute_url','video_type','view_num',
             'comment_num','like_num','share_num','callback_url','url','video_id'
         ])
+            ->when($video_type, function ($query) use ($video_type) {
+                $query->where('video_type', $video_type);
+            })
             ->when($video_id, function ($query) use ($video_id) {
                 $query->where('id', $video_id);
             })
@@ -70,6 +74,7 @@ class VideoController extends ControllerBackend
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             });
+
         $lists = $query->where('status', '>', 0)
             ->orderBy($sort, $sort_type)
             ->paginate(10)
