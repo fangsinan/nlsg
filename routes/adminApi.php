@@ -325,6 +325,8 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('recommend_config/sort', 'RecommendConfigController@sort');
         Route::post('recommend_config/add', 'RecommendConfigController@add');
         Route::get('recommend_config/info', 'RecommendConfigController@info');
+        Route::get('recommend_config/info_select_list', 'RecommendConfigController@infoSelectList');
+        Route::post('recommend_config/info_bind', 'RecommendConfigController@infoBind');
 
 
 

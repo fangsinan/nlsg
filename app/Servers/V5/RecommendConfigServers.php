@@ -107,13 +107,13 @@ class RecommendConfigServers
             case 5:
             case 8:
             case 11:
-                $with_str = 'recommendInfo.works';
+                $with_str = 'recommendInfo.works:id,title,cover_img';
                 break;
             case 7:
-                $with_str = 'recommendInfo.teacher';
+                $with_str = 'recommendInfo.teacher:id,nickname,headimg';
                 break;
             default:
-                $with_str = 'recommendInfo.lists';
+                $with_str = 'recommendInfo.lists:id,title,cover';
                 break;
         }
 
@@ -122,15 +122,56 @@ class RecommendConfigServers
             ->select([
                 'id', 'title', 'icon_pic', 'icon_mark', 'icon_mark_rang', 'show_position',
                 'jump_type', 'modular_type', 'is_show', 'sort', 'jump_url', 'lists_id', 'created_at'
-            ])->with(['recommendInfo',$with_str]);
+            ])->with(['recommendInfo', $with_str]);
 
-        return $query->first();
+        $res = $query->first();
 
+        foreach ($res->recommendInfo as $v) {
+            switch ($check_id->modular_type) {
+                case 5:
+                case 8:
+                case 11:
+                    $v->info_id    = $v->works->id;
+                    $v->info_title = $v->works->title;
+                    $v->info_img   = $v->works->cover_img;
+                    break;
+                case 7:
+                    $v->info_id    = $v->works->id;
+                    $v->info_title = $v->works->nickname;
+                    $v->info_img   = $v->works->headimg;
+                    break;
+                default:
+                    $v->info_id    = $v->works->id;
+                    $v->info_title = $v->works->title;
+                    $v->info_img   = $v->works->cover;
+                    break;
+            }
+        }
 
+        return $res;
     }
 
     public function sort($params) {
         return [1, 2, 3];
+    }
+
+    public function infoSelectList($params) {
+        $modular_type = (int)($params['modular_type'] ?? 0);
+        if (empty($modular_type)) {
+            return [];
+        }
+
+        $sds = new SelectDataServers();
+        switch ($modular_type) {
+            case 5:
+            case 8:
+            case 11:
+                return $sds->worksList($params);
+            case 7:
+                return $sds->teacherList($params);
+            default:
+                return $sds->worksListsList($params);
+        }
     }
 
     public function selectList($params): array {
@@ -140,6 +181,10 @@ class RecommendConfigServers
             'jump_type'     => $rcModel->jump_type_array,
             'modular_type'  => $rcModel->modular_type_array,
         ];
+    }
+
+    public function infoBind($params){
+        return [1,2,3];
     }
 
 }
