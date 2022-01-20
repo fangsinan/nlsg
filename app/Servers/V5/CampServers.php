@@ -87,7 +87,7 @@ class CampServers
                 'id', 'user_id', 'is_end',
                 DB::raw("IF(is_end = 0,'-',(IF(end_time is NULL,updated_at,end_time))) as end_time")
             ])
-            ->with(['userInfo:id,phone']);
+            ->with(['userInfo:id,phone,nickname']);
 
         if ($is_end !== -1) {
             $query->where('is_end', '=', $is_end);
