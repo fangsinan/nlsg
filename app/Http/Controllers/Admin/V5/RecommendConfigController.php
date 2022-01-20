@@ -31,7 +31,7 @@ class RecommendConfigController extends ControllerBackend
 
     /**
      * 添加推荐位
-     * @api {get} /api/admin_v5/recommend_config/add 添加推荐位
+     * @api {post} /api/admin_v5/recommend_config/add 添加推荐位
      * @apiVersion 5.0.0
      * @apiName /api/admin_v5/recommend_config/add
      * @apiGroup  后台-v5-推荐位
@@ -51,7 +51,7 @@ class RecommendConfigController extends ControllerBackend
 
     /**
      * 推荐位详情
-     * @api {get} /api/admin_v5/recommend_config/info 推荐位详情
+     * @api {post} /api/admin_v5/recommend_config/info 推荐位详情
      * @apiVersion 5.0.0
      * @apiName /api/admin_v5/recommend_config/info
      * @apiGroup  后台-v5-推荐位
