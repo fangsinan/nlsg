@@ -71,12 +71,27 @@ class RecommendConfigController extends ControllerBackend
      * @apiGroup  后台-v5-推荐位
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v5/recommend_config/info_select_list
      * @apiDescription 推荐位详情可添加课程的列表
-     * @apiParam {number} id 推荐位id
+     * @apiParam {number} modular_type 推荐位的modular_type
      */
     public function infoSelectList(Request $request): JsonResponse {
         return $this->getRes((new rcs())->infoSelectList($request->input()));
     }
 
+    /**
+     * 推荐位详情绑定新元素
+     * @api {get} /api/admin_v5/recommend_config/info_bind 推荐位详情绑定新元素
+     * @apiVersion 5.0.0
+     * @apiName /api/admin_v5/recommend_config/info_bind
+     * @apiGroup  后台-v5-推荐位
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v5/recommend_config/info_bind
+     * @apiDescription 推荐位详情绑定新元素
+     * @apiParam {number} recommend_config_id 推荐位id
+     * @apiParam {number} show_position 推荐位的show_position
+     * @apiParam {number} jump_type 推荐位的jump_type
+     * @apiParam {number} modular_type 推荐位的modular_type
+     * @apiParam {number} obj_id 绑定元素的目标id
+     * @apiParam {number} [recommend_info_id] 如果是编辑,传原来绑定元素的id
+     */
     public function infoBind(Request $request): JsonResponse {
         return $this->getRes((new rcs())->infoBind($request->input()));
     }
