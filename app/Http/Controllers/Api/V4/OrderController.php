@@ -800,7 +800,7 @@ class OrderController extends Controller
         $type = $request->input('type', 1);
         $is_audio_book = $request->input('is_audio_book', 2);
         $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
-            ->where(['type' => $type, 'user_id' => $user_id,])
+            ->where(['type' => $type, 'user_id' => $user_id,'status'=>1,])
             ->orderBy('created_at', 'desc')->paginate(50)->toArray();
 
         $data = $data['data'];
