@@ -2,7 +2,9 @@
 
 namespace App\Servers\V5;
 
+use App\Models\Recommend;
 use App\Models\RecommendConfig;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RecommendConfigServers
@@ -120,7 +122,7 @@ class RecommendConfigServers
         $query = RecommendConfig::query()
             ->where('id', '=', $id)
             ->select([
-                'id', 'title', 'icon_pic', 'icon_mark', 'icon_mark_rang', 'show_position',
+                'id', 'id as recommend_config_id', 'title', 'icon_pic', 'icon_mark', 'icon_mark_rang', 'show_position',
                 'jump_type', 'modular_type', 'is_show', 'sort', 'jump_url', 'lists_id', 'created_at'
             ])->with(['recommendInfo', $with_str]);
 
@@ -183,8 +185,66 @@ class RecommendConfigServers
         ];
     }
 
-    public function infoBind($params){
-        return [1,2,3];
+    public function infoBind($data) {
+        $params                        = [];
+        $params['recommend_config_id'] = (int)($data['recommend_config_id'] ?? 0);
+        $params['show_position']       = (int)($data['show_position'] ?? 0);
+        $params['jump_type']           = (int)($data['jump_type'] ?? 0);
+        $params['modular_type']        = (int)($data['modular_type'] ?? 0);
+        $params['obj_id']              = (int)($data['obj_id'] ?? 0);
+
+        $validator = Validator::make($params, [
+                'recommend_config_id' => 'bail|required',
+                'show_position'       => 'bail|required|in:3',
+                'jump_type'           => 'bail|required|in:4,11,13',
+                'modular_type'        => 'bail|required|in:5,7,8,9,11',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        DB::beginTransaction();
+        if (!empty($data['recommend_info_id'])) {
+            $res = Recommend::query()->where('id', '=', $data['recommend_info_id'])
+                ->where('position', '=', $params['recommend_config_id'])
+                ->update(['status' => 0]);
+            if (!$res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败'];
+            }
+        }
+
+        $d                  = [];
+        $d['relation_id']   = $params['obj_id'];
+        $d['relation_type'] = 0;
+        $d['position']      = $params['recommend_config_id'];
+        $d['type']          = '';
+
+        switch ($params['modular_type']) {
+            case 5:
+            case 8:
+            case 11:
+                $d['type'] = 3;
+                break;
+            case 7:
+                $d['type'] = 14;
+                break;
+            case 9:
+                $d['type'] = 15;
+                break;
+        }
+
+        $d['created_at'] = $d['updated_at'] = date('Y-m-d H:i:s');
+
+        $res = DB::table('nlsg_recommend')->insert($d);
+        if (!$res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
+
+        return ['code' => true, 'msg' => '成功'];
     }
 
 }
