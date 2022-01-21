@@ -81,8 +81,7 @@ class CampServers
         $size = $params['size'] ?? 10;
         $page = $params['page'] ?? 1;
 
-        $offset = max(($page - 1) * $size,0);
-
+        $offset = max(($page - 1) * $size, 0);
 
 
         $sql = " from (
@@ -106,16 +105,15 @@ where sub.relation_id = $works_id and sub.type = 7 and sub.`status` = 1 and sub.
             $sql .= ' where is_end = 1';
         }
 
-        if ($is_end === 0){
+        if ($is_end === 0) {
             $sql .= ' where is_end = 0';
         }
 
-        $count_sql = 'select count(*) as counts '.$sql;
-        $query_sql = 'select *  '.$sql.' limit '.$size.' offset '.$offset;
+        $count_sql = 'select count(*) as counts ' . $sql;
+        $query_sql = 'select *  ' . $sql . ' limit ' . $size . ' offset ' . $offset;
 
         $total = DB::select($count_sql);
-        $data = DB::select($query_sql);
-
+        $data  = DB::select($query_sql);
 
 
 //current_page: 1
@@ -131,17 +129,17 @@ where sub.relation_id = $works_id and sub.type = 7 and sub.`status` = 1 and sub.
 //to: 10
 //total: 298
 
-        foreach ($data as &$v){
-            $v->userInfo = [
-                'id'=>$v->user_id,
-                'nickname'=>$v->nickname,
-                'phone'=>$v->phone,
+        foreach ($data as &$v) {
+            $v->user_info = [
+                'id'       => $v->user_id ?? '',
+                'nickname' => $v->nickname ?? '',
+                'phone'    => $v->phone ?? '',
             ];
         }
 
         $res['current_page'] = $page;
-        $res['data'] = $data;
-        $res['total'] = $total[0]->counts ?? 0;
+        $res['data']         = $data;
+        $res['total']        = $total[0]->counts ?? 0;
 
         return $res;
 
