@@ -291,4 +291,8 @@ class Subscribe extends Base
         }
         return $query->pluck("relation_id")->toArray();
     }
+
+    public function historyInfo(){
+        return $this->hasOne(History::class,'user_id','user_id');
+    }
 }
