@@ -3,7 +3,6 @@
 namespace App\Servers\V5;
 
 use App\Models\Column;
-use App\Models\History;
 use App\Models\Subscribe;
 use App\Models\WorksInfo;
 use Illuminate\Support\Facades\DB;
@@ -79,19 +78,39 @@ class CampServers
             return ['code' => false, 'msg' => '参数错误'];
         }
 
-        $query = History::query()
-            ->where('relation_type', '=', 5)
-            ->where('relation_id', '=', $works_id)
-            ->where('info_id', '=', $works_info_id)
+//        $query = History::query()
+//            ->where('relation_type', '=', 5)
+//            ->where('relation_id', '=', $works_id)
+//            ->where('info_id', '=', $works_info_id)
+//            ->select([
+//                'id', 'user_id', 'is_end',
+//                DB::raw("IF(is_end = 0,'-',(IF(end_time is NULL,updated_at,end_time))) as end_time")
+//            ])
+//            ->with(['userInfo:id,phone,nickname']);
+//
+//        if ($is_end !== -1) {
+//            $query->where('is_end', '=', $is_end);
+//        }
+//
+//        return $query->paginate($params['size'] ?? 10);
+
+        $query = Subscribe::query()->from('nlsg_subscribe as sub')
+            ->leftJoin('nlsg_history as his', function ($q) use ($works_id, $works_info_id) {
+                $q->on('sub.user_id', '=', 'his.user_id')
+                    ->where('his.relation_type', '=', 5)
+                    ->where('his.relation_id', '=', $works_id)
+                    ->where('his.info_id', '=', $works_info_id);
+            })
+            ->where('sub.relation_id', '=', $works_id)
+            ->where('sub.type', '=', 7)
+            ->where('sub.status', '=', 1)
+            ->where('sub.is_del', '=', 0)
             ->select([
-                'id', 'user_id', 'is_end',
-                DB::raw("IF(is_end = 0,'-',(IF(end_time is NULL,updated_at,end_time))) as end_time")
+                'sub.id', 'sub.user_id',
+                DB::raw("if(his.is_end = 1,1,0) as is_end"),
+                DB::raw("if(his.is_end = 1,(IF(his.end_time is NULL,his.updated_at,his.end_time)),'-') as end_time"),
             ])
             ->with(['userInfo:id,phone,nickname']);
-
-        if ($is_end !== -1) {
-            $query->where('is_end', '=', $is_end);
-        }
 
         return $query->paginate($params['size'] ?? 10);
     }
