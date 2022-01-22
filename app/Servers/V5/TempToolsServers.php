@@ -36,7 +36,8 @@ class TempToolsServers
 
                     foreach ($temp_query as $v) {
                         $temp_user_array[] = ['user_id' => $v['user_id']];
-                        $temp_live_array[] = ['live_id' => $v['live_id']];
+                        $temp_live_array[] = ['live_id' => $v['live_id'],'day_flag'=>1];
+                        $temp_live_array[] = ['live_id' => $v['live_id'],'day_flag'=>2];
                     }
 
                     DB::table('temp_tool_meikan_user')->insertOrIgnore($temp_user_array);
@@ -53,15 +54,20 @@ class TempToolsServers
             $live_check = Live::query()
                 ->from('nlsg_live as l')
                 ->join('temp_tool_meikan_live as ml', 'l.id', '=', 'ml.live_id')
-                ->select(['ml.live_id', 'ml.id', 'l.begin_at'])
+                ->select(['ml.live_id', 'ml.id', 'l.begin_at','ml.day_flag'])
                 ->get();
 
             $week_array = [7, 1, 2, 3, 4, 5, 6];
 
             foreach ($live_check as $v) {
                 $temp              = [];
-                $temp['first_day'] = date('Y-m-d', strtotime("$v->begin_at -1 days"));
-                $temp['week']      = $week_array[date('w', strtotime($temp['first_day']))];
+
+                if ($v->day_flag === 1){
+                    $temp['first_day'] = date('Y-m-d', strtotime("$v->begin_at -1 days"));
+                }else{
+                    $temp['first_day'] = date('Y-m-d', strtotime("$v->begin_at"));
+                }
+                $temp['week'] = $week_array[date('w', strtotime($temp['first_day']))];
 
                 DB::table('temp_tool_meikan_live')
                     ->where('id', '=', $v->id)
