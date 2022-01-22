@@ -36,8 +36,8 @@ class TempToolsServers
 
                     foreach ($temp_query as $v) {
                         $temp_user_array[] = ['user_id' => $v['user_id']];
-                        $temp_live_array[] = ['live_id' => $v['live_id'],'day_flag'=>1];
-                        $temp_live_array[] = ['live_id' => $v['live_id'],'day_flag'=>2];
+                        $temp_live_array[] = ['live_id' => $v['live_id'], 'day_flag' => 1];
+                        $temp_live_array[] = ['live_id' => $v['live_id'], 'day_flag' => 2];
                     }
 
                     DB::table('temp_tool_meikan_user')->insertOrIgnore($temp_user_array);
@@ -54,17 +54,17 @@ class TempToolsServers
             $live_check = Live::query()
                 ->from('nlsg_live as l')
                 ->join('temp_tool_meikan_live as ml', 'l.id', '=', 'ml.live_id')
-                ->select(['ml.live_id', 'ml.id', 'l.begin_at','ml.day_flag'])
+                ->select(['ml.live_id', 'ml.id', 'l.begin_at', 'ml.day_flag'])
                 ->get();
 
             $week_array = [7, 1, 2, 3, 4, 5, 6];
 
             foreach ($live_check as $v) {
-                $temp              = [];
+                $temp = [];
 
-                if ($v->day_flag === 1){
+                if ($v->day_flag === 1) {
                     $temp['first_day'] = date('Y-m-d', strtotime("$v->begin_at -1 days"));
-                }else{
+                } else {
                     $temp['first_day'] = date('Y-m-d', strtotime("$v->begin_at"));
                 }
                 $temp['week'] = $week_array[date('w', strtotime($temp['first_day']))];
@@ -76,7 +76,7 @@ class TempToolsServers
         }
 
 
-        if (0) {
+        if (1) {
             //匹配观看记录
             $online_user_model = [
                 'nlsg_live_online_user',
@@ -88,7 +88,7 @@ class TempToolsServers
             ];
 
             $live_id_array = DB::table('temp_tool_meikan_live')
-                ->whereIn('week', [1, 4])
+                ->whereIn('week', [1, 2, 4, 5])
                 ->get();
 
             foreach ($online_user_model as $uv) {
@@ -101,9 +101,6 @@ where mu.meikan = 0 and ou.live_id = ' . $lv->live_id . ' and ou.online_time_str
                 }
             }
         }
-
-
-
 
 
         return ['code' => true, 'msg' => 'ok', 'begin' => $begin_time, 'end' => date('Y-m-d H:i:s')];
