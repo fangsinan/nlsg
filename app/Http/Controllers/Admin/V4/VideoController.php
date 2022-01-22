@@ -207,20 +207,17 @@ class VideoController extends ControllerBackend
         $id = $request->get('id')??0;
         $status = $request->get('status');
 
-        if(!empty($status)){
-            $data['status'] = $status;
-            if($status == 2){
-                $data['online_time'] = date('Y-m-d H:i:s');
-            }
-
-            $res = ShortVideoModel::where('id', $id)->update($data);
-            if($res){
-                return success();
-            }else{
-                return error(1000, '删除错误');
-            }
-        }else{
-            return error(1000, '状态有误');
+        $data['status'] = intval($status);
+        if($status == 2){
+            $data['online_time'] = date('Y-m-d H:i:s');
         }
+
+        $res = ShortVideoModel::where('id', $id)->update($data);
+        if($res){
+            return success();
+        }else{
+            return error(1000, '删除错误');
+        }
+
     }
 }
