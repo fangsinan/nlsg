@@ -225,7 +225,7 @@ class WorksInfo extends Base
             return ['code' => false, 'msg' => '课程不存在'];
         }
         $info_list = $info_list->toArray();
-
+dd($info_list);
         $info_key = -1;
         foreach ($info_list as $k => $v) {
             if (empty($v['info_history'])) {
