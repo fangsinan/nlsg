@@ -22,6 +22,8 @@ class TempToolsServers
                     ->where('pay_price', '=', 49.9)
                     ->where('is_shill', '=', 0)
                     ->where('status', '=', 1)
+                    ->where('live_id','>',177)
+                    ->where('live_id','<=',294)
                     ->select(['user_id', 'live_id'])
                     ->limit($size)
                     ->offset(($page - 1) * $size)
@@ -76,7 +78,7 @@ class TempToolsServers
         }
 
 
-        if (1) {
+        if (0) {
             //匹配观看记录
             $online_user_model = [
                 'nlsg_live_online_user',
