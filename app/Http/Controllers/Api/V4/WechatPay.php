@@ -166,7 +166,7 @@ class WechatPay extends Controller
                     }
 
                     //写入关系保护
-                    $twitter_data = User::find($twitter);
+                    $twitter_data = User::find($twitter_id);
                     $check_bind = VipUserBind::getBindParent($AdminInfo['phone']);
                     //没有绑定记录,则绑定
                     if (($check_bind === 0) && strlen($twitter_data['phone']) === 11 && strlen($AdminInfo['phone']) === 11) {
