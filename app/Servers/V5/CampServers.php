@@ -30,26 +30,29 @@ class CampServers
             ->where('type', '=', 7)
             ->where('relation_id', '=', $id)
             ->where('status', '=', 1)
+            ->where('is_del','=',0)
             ->count();
 
         $query = WorksInfo::query()
             ->where('column_id', '=', $column_id)
             ->where('status', '=', 4)
             ->select(['id', 'title', DB::raw("$id as works_id"), 'id as works_info_id'])
-            ->withCount(['worksInfoHistory' => function ($q) use ($id) {
-                $q->where('relation_type', '=', 5)
-                    ->where('relation_id', '=', $id)
-                    ->where('is_end', '=', 1);
-            }])
+//            ->withCount(['worksInfoHistory' => function ($q) use ($id) {
+//                $q->where('relation_type', '=', 5)
+//                    ->where('relation_id', '=', $id)
+//                    ->where('is_end', '=', 1);
+//            }])
             ->orderBy('rank')
             ->orderBy('id');
 
         $list = $query->paginate($params['size'] ?? 10);
 
         foreach ($list as $v) {
-            $v->clock_in_counts     = $v->works_info_history_count;
+            $v->sub_counts = $all_sub_counts;
+            $v->clock_in_counts = $this->tempClockInQuery($v->works_id,$v->works_info_id);
+//            $v->clock_in_counts     = $v->works_info_history_count;
             $v->not_clock_in_counts = max(
-                $all_sub_counts - $v->works_info_history_count,
+                $all_sub_counts - $v->clock_in_counts,
                 0
             );
 
@@ -66,6 +69,30 @@ class CampServers
         }
 
         return $list;
+    }
+
+    public function tempClockInQuery($works_id,$works_info_id){
+        $sql = "SELECT
+	count(*) AS counts
+FROM
+	(
+		SELECT sub.id AS sub_id,
+		his.id AS history_id,
+		sub.user_id,
+		u.nickname,
+		u.phone,
+		if ( his.is_end = 1, 1, 0 ) AS is_end,
+		if ( his.is_end = 1,( IF ( his.end_time IS NULL, his.updated_at, his.end_time )), '-' ) AS end_time from nlsg_subscribe AS sub LEFT
+		JOIN ( SELECT * FROM nlsg_history WHERE relation_type = 5 AND relation_id = $works_id AND info_id = $works_info_id  ) AS his on sub.user_id = his.user_id left
+		JOIN nlsg_user AS u ON sub.user_id = u.id where sub.relation_id = $works_id
+		AND sub.type = 7
+		AND sub.`status` = 1
+		AND sub.is_del = 0
+	) AS a
+WHERE
+	is_end = 1";
+        $total = DB::select($sql);
+        return $total[0]->counts ?? 0;
     }
 
 
