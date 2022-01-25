@@ -167,7 +167,7 @@ class ShortVideoModel extends Base
                     unset($update_data['callback_url3']);
                     unset($update_data['attribute_url3']);
                 }
-                $val['video_type'] = 1;
+                $update_data['video_type'] = 1;
                 if( !empty($val['attribute_url']) ){
                     $attr = explode("#",$val['attribute_url']);
                     if($attr[0] < $attr[1]){
