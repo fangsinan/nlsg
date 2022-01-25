@@ -68,6 +68,15 @@ class ShortVideoModel extends Base
         $recomObj = new ShortVideoRecommendModel();
 
         foreach ($re_data as &$re_value){
+
+
+            //转码 url
+            if( !empty($re_value['callback_url']) && !empty($re_value['callback_attribute']) ){
+                $re_value['url'] = $re_value['callback_url'];
+                $re_value['attribute_url'] = $re_value['callback_attribute'];
+            }
+
+
             $re_value['w_len'] = 0;
             $re_value['h_len'] = 0;
             if( !empty($re_value['attribute_url'])){
@@ -107,7 +116,7 @@ class ShortVideoModel extends Base
             return ['list'=>[],'count'=>0];
         }
         //按照rand、创建时间排序
-        $field = ["id","user_id","share_img","cover_img","detail_img","title","introduce","view_num","like_num","comment_num","share_num","duration","url","attribute_url"];
+        $field = ["id","user_id","share_img","cover_img","detail_img","title","introduce","view_num","like_num","comment_num","share_num","duration","url","attribute_url","callback_url","callback_attribute"];
 
         $where['status'] = 2;
         if(!empty($id)){
