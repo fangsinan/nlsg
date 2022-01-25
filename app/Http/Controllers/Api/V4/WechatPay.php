@@ -672,7 +672,7 @@ class WechatPay extends Controller
                 if($userdata['is_test_pay']==0){ //测试用户不添加订阅记录
                     $subscribeRst = Subscribe::firstOrCreate($subscribe);
                 }
-                $subscribeRst = Subscribe::firstOrCreate($subscribe);
+//                $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
                 $liveData = Live::find($live_id);
 
