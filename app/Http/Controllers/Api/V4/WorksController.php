@@ -814,7 +814,7 @@ class WorksController extends Controller
             'time_leng'=>$time_leng,
             'time_number'=>$time_number,
         ];
-        if( $time_leng == 100 ){
+        if( $time_leng >= 96 ){
             $edit_data['is_end'] = 1;
         }
 
