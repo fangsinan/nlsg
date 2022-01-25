@@ -184,6 +184,7 @@ class ShortVideoModel extends Base
                     }
                 }
                 $video_id = $val['video_id'];
+                $update_data['cover_img'] = $val['coverUrl'];
                 ShortVideoModel::where('video_id', $video_id)->update($update_data);
             }
         }

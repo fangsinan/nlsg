@@ -479,12 +479,14 @@ class WorksInfo extends Base
                     'Action' => 'GetVideoInfo',
                     'fileId' => $video_id,
                     'infoFilter.0' => 'transcodeInfo',
+                    'infoFilter.1' => 'basicInfo',
                     'Region' => $Region,
                     'SecretId' => $SecretId,
                     'Timestamp' => $time,
                     'Nonce' => $rand,
                     'SignatureMethod' => 'HmacSHA256',
                 ];
+
                 ksort ($data_key); //排序
                 // 计算签名
                 $srcStr    = "POSTvod.api.qcloud.com/v2/index.php?" . http_build_query ($data_key);
@@ -551,6 +553,7 @@ class WorksInfo extends Base
 
                             $map['size']=round($v['size']/(1024*1024), 2);  //大小
                             $map['video_id'] = $video_id;
+                            $map['coverUrl'] = $info['basicInfo']["coverUrl"];   //封面
                             $msg =  'OK';
                             //处理防止腾讯传回参数不符合 检查转换链接是否包含视频id
 //                            if((isset($map['callback_url3']) && stristr ($map['callback_url3'], "$video_id")) || $type==2) {
