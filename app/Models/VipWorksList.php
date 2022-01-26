@@ -129,7 +129,8 @@ class VipWorksList extends Base
             $new_res = [ 'multiple' =>[], 'one_arr' =>[], ];
             $one_arr = [];
             $flag_f =0;
-            $new_data = array_values($new_data);
+            // 5.0 只获取前六条数据
+            $new_data = array_values(array_slice($new_data,0,6));
             $new_data_c = count($new_data);
             foreach ($new_data as $new_key=>$new_val){
 
