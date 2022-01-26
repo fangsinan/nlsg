@@ -553,7 +553,7 @@ class WorksInfo extends Base
 
                             $map['size']=round($v['size']/(1024*1024), 2);  //大小
                             $map['video_id'] = $video_id;
-                            $map['coverUrl'] = $info['basicInfo']["coverUrl"];   //封面
+                            $map['cover_img'] = $info['basicInfo']["coverUrl"];   //封面
                             $msg =  'OK';
                             //处理防止腾讯传回参数不符合 检查转换链接是否包含视频id
 //                            if((isset($map['callback_url3']) && stristr ($map['callback_url3'], "$video_id")) || $type==2) {
