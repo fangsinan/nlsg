@@ -149,7 +149,9 @@ class ShortVideoModel extends Base
             ->where('video_id','!=', '')->limit(20)
             ->pluck('video_id')
             ->toArray();
-//dd($ids);
+        if(empty($ids)){
+            return ;
+        }
         $map = WorksInfo::editVideo($ids);
 
         if($map['msg'] == "OK"){
