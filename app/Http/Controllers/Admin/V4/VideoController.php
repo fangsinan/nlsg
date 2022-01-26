@@ -162,6 +162,7 @@ class VideoController extends ControllerBackend
 //            'view_num'      => $input['view_num'] ?? '',
             'video_id'      => $input['video_id'] ?? 0,
             'url'           => $input['url'] ?? 0,
+            'video_adopt'   => 0,
 //            'duration'      => $input['duration'] ?? 0,
 //            'size'          => $input['size'] ?? 0,
 //            'attribute_url' => $input['attribute_url'] ?? 0,
