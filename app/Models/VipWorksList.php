@@ -130,31 +130,33 @@ class VipWorksList extends Base
             $one_arr = [];
             $flag_f =0;
             // 5.0 只获取前六条数据
-            $new_data = array_values(array_slice($new_data,0,6));
+            $new_data = array_values(array_slice($new_data,0,7));
+//            $new_data = array_values($new_data);
             $new_data_c = count($new_data);
             foreach ($new_data as $new_key=>$new_val){
 
                 if($new_val['count'] > 1) {
                     $new_res['multiple'][] = $new_val;
                 }else{
+
                     if($flag_f==2){
                         //重置
                         $new_res['one_arr'][] = $one_arr;
                         $one_arr = [];
                         $flag_f=0;
-                    }else{
-                        $one_arr[$flag_f] =$new_val;
-                        $flag_f++;
                     }
-//                    //防止外层循环结束
+                    $one_arr[$flag_f] =$new_val;
+                    $flag_f++;
+
+                    //防止外层循环结束
                     if($new_key == $new_data_c-1){
                         $new_res['one_arr'][] = $one_arr;
                     }
 
 
                 }
-            }
 
+            }
 //            array_multisort(array_column($new_res,'count'),SORT_DESC,$new_res);
             return ['list' => $new_res, 'category' => $category_res];
         }
