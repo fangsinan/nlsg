@@ -146,7 +146,7 @@ class ShortVideoModel extends Base
     {
 
         $ids = ShortVideoModel::where('video_adopt', 0)
-            ->where('video_id','!=', '')->limit(1 )
+            ->where('video_id','!=', '')->limit(20)
             ->pluck('video_id')
             ->toArray();
 //dd($ids);
@@ -184,9 +184,21 @@ class ShortVideoModel extends Base
                     }
                 }
                 $video_id = $val['video_id'];
-                $update_data['cover_img'] = $val['coverUrl'];
+//                $update_data['cover_img'] = $val['coverUrl'];
+
                 ShortVideoModel::where('video_id', $video_id)->update($update_data);
+//                dd($update_data);
+
             }
+        }else{
+            //失败后修改 video_adopt
+            foreach ($ids as $v){
+                $video_id = $v['video_id'];
+                dump($video_id);
+                ShortVideoModel::where('video_id', $video_id)->update(['video_adopt'=>1]);
+
+            }
+
         }
         echo $map['msg'];
     }
