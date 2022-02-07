@@ -15,6 +15,7 @@ use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
 use App\Servers\MallRefundJob;
+use App\Servers\V5\TempToolsServers;
 use App\Servers\VipServers;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -221,6 +222,10 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
+//            set_time_limit(0);
+//            $res = (new TempToolsServers())->meiKan();
+//            return $this->getRes($res);
+
             $open_360 = $request->input('open_360', 0);
             if ($open_360) {
                 $list = DB::table('wwtest')->get()->toArray();

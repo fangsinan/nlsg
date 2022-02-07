@@ -23,7 +23,7 @@ class TempToolsServers
                     ->where('is_shill', '=', 0)
                     ->where('status', '=', 1)
                     ->where('live_id','>',177)
-                    ->where('live_id','<=',294)
+                    ->where('live_id','<=',300)
                     ->select(['user_id', 'live_id'])
                     ->limit($size)
                     ->offset(($page - 1) * $size)
