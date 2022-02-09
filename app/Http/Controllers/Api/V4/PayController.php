@@ -7,6 +7,7 @@ use App\Models\Column;
 use App\Models\Lists;
 use App\Models\Live;
 use App\Models\MallOrder;
+use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\User;
 use EasyWeChat\Factory;
@@ -210,6 +211,10 @@ class PayController extends Controller
                             break;
                         case 5:
                             $relation_str = '30天智慧父母(亲子)训练营';
+                            break;
+                        default :
+                            $Info = OfflineProducts::find($OrderInfo['relation_id']);
+                            $relation_str = $Info['title'];
                             break;
                     }
                 }
