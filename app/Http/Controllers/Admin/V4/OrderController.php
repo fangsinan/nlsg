@@ -1175,8 +1175,8 @@ class OrderController extends ControllerBackend
         })
 
         ->when($title, function ($query) use ($title) {
-            $query->whereHas('works', function ($query) use ($title) {
-                $query->where('title', 'like', '%' . $title . '%');
+            $query->whereHas('column', function ($query) use ($title) {
+                $query->where('name', 'like', '%' . $title . '%');
             });
         })
         ->when($ordernum, function ($query) use ($ordernum) {
@@ -1191,12 +1191,12 @@ class OrderController extends ControllerBackend
         ->whereHas('user', function ($q) {
             $q->where('is_test_pay', '=', 0);
         });
-
-        if (!empty($teacher_name)){
-            $query->whereHas('works.user',function($q)use($teacher_name){
-                $q->where('nickname','like',"%$teacher_name%");
-            });
-        }
+//
+//        if (!empty($teacher_name)){
+//            $query->whereHas('works.user',function($q)use($teacher_name){
+//                $q->where('nickname','like',"%$teacher_name%");
+//            });
+//        }
 
         if ($is_shill === 0) {
             $query->where('is_shill', '=', 0);
