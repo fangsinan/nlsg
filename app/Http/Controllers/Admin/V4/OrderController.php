@@ -1222,7 +1222,6 @@ class OrderController extends ControllerBackend
             return $lists->toArray();
 
         }
-dd($lists);
 //        $rank = Order::with('column:id,name')
 //            ->select([
 //                DB::raw('count(*) as total'),
