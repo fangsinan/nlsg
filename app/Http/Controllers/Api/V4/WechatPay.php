@@ -537,7 +537,7 @@ class WechatPay extends Controller
         }
     }
     static private function PayTestLog($order_id = 0,$user =[]){
-        if(!empty($user) &&  !empty($user['is_test_pay'])){
+        if(!empty($user) &&  $user['is_test_pay'] == 1){
             DB::table('nlsg_user_edit_log')->insert([
                 'user_id'       => $user['id'],
                 'order_id'      => $order_id,
