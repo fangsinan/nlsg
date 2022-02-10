@@ -541,7 +541,7 @@ class WechatPay extends Controller
             DB::table('nlsg_user_edit_log')->insert([
                 'user_id'       => $user['id'],
                 'order_id'      => $order_id,
-                'message'     => " 手机号：".$user['phone'].'   昵称：'.$user['nickname'],
+                'message'     => "用户id：".$user['id']. "   手机号：".$user['phone'].'   昵称：'.$user['nickname'],
                 'created_at'    =>date('Y-m-d H:i:s', time())
             ]);
         }
