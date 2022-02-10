@@ -1131,7 +1131,7 @@ class OrderController extends ControllerBackend
         $pay_type = $request->get('pay_type');
 //        $nickname = $request->get('nickname');
 //        $level = $request->get('level');
-//        $os_type = $request->get('os_type');
+        $os_type = $request->get('os_type');
         $sort = $request->get('sort');
 //        $activity_tag = $request->get('activity_tag', '');
         $is_shill = (int)($request->get('is_shill', -1));
@@ -1173,7 +1173,9 @@ class OrderController extends ControllerBackend
                 $query->where('phone', 'like', '%' . $phone . '%');
             });
         })
-
+        ->when(!is_null($os_type), function ($query) use ($os_type) {
+            $query->where('os_type', $os_type);
+        })
         ->when($title, function ($query) use ($title) {
             $query->whereHas('column', function ($query) use ($title) {
                 $query->where('name', 'like', '%' . $title . '%');
