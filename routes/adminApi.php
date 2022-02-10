@@ -280,6 +280,12 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         Route::get('video/del-video', 'VideoController@delVideoInfo');
         /* 5.0 */
 
+
+        //后台训练营订单
+        Route::get('order/campList', 'OrderController@campList');
+        Route::get('order/campListExcel', 'OrderController@campListExcel');
+
+
     });
 
     Route::post('vip/create_vip', 'VipController@createVip');

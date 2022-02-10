@@ -1081,4 +1081,277 @@ class OrderController extends ControllerBackend
         return success($lists);
     }
 
+
+
+
+
+
+
+
+
+    /**
+     * @api {get} api/admin_v4/order/campList 训练营订单
+     * @apiVersion 4.0.0
+     * @apiName  order/campList
+     * @apiGroup 后台-虚拟订单
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/order/campList
+     * @apiDescription 训练营订单
+     *
+     * @apiParam {number} page 分页
+     * @apiParam {string} title  训练营名称
+     * @apiParam {number} status   0 待支付  1已支付
+     * @apiParam {string} phone    手机号
+     * @apiParam {string} ordernum 订单号
+     * @apiParam {string} start  开始时间
+     * @apiParam {string} end    结束时间
+     * @apiParam {string} os_type  订单来源
+     * @apiParam {string} pay_type  支付方式
+     * @apiParam {string} is_shill  是否退款
+     *
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function campList(Request $request, $flag = 1)
+    {
+        $order_id = $request->get('id');
+        $ordernum = $request->get('ordernum');
+        $phone = $request->get('phone');
+        $title = $request->get('title');
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $status = $request->get('status');
+        $pay_type = $request->get('pay_type');
+//        $nickname = $request->get('nickname');
+//        $level = $request->get('level');
+//        $os_type = $request->get('os_type');
+        $sort = $request->get('sort');
+//        $activity_tag = $request->get('activity_tag', '');
+        $is_shill = (int)($request->get('is_shill', -1));
+        $page = $request->input('page', 1);
+        $size = $request->input('size', 10);
+//        $teacher_name = $request->input('teacher_name','');
+
+        if($flag ===1 ){
+            $query = Order::with(
+                [
+                    'user:id,nickname,phone',
+                    'column:id,name',
+                ]);
+        }else{
+            //导出时需要加地址
+            $query = Order::with(
+            [
+                'user:id,nickname,phone',
+                'column:id,name',
+                'mallAddress:id,user_id,name,phone,details,province,city,area',
+                'mallAddress.area_province:id,name',
+                'mallAddress.area_city:id,name',
+                'mallAddress.area_area:id,name',
+            ]);
+        }
+
+        $query->when(!is_null($order_id), function ($query) use ($order_id) {
+            $query->where('id', $order_id);
+        })
+        ->when(!is_null($status), function ($query) use ($status) {
+            $query->where('status', $status);
+        })
+        ->when(!is_null($pay_type), function ($query) use ($pay_type) {
+            $query->where('pay_type', $pay_type);
+        })
+
+        ->when($phone, function ($query) use ($phone) {
+            $query->whereHas('user', function ($query) use ($phone) {
+                $query->where('phone', 'like', '%' . $phone . '%');
+            });
+        })
+
+        ->when($title, function ($query) use ($title) {
+            $query->whereHas('works', function ($query) use ($title) {
+                $query->where('title', 'like', '%' . $title . '%');
+            });
+        })
+        ->when($ordernum, function ($query) use ($ordernum) {
+            $query->where('ordernum', 'like', '%' . $ordernum . '%');
+        })
+        ->when($start && $end, function ($query) use ($start, $end) {
+            $query->whereBetween('pay_time', [
+                Carbon::parse($start)->startOfDay()->toDateTimeString(),
+                Carbon::parse($end)->endOfDay()->toDateTimeString(),
+            ]);
+        })
+        ->whereHas('user', function ($q) {
+            $q->where('is_test_pay', '=', 0);
+        });
+
+        if (!empty($teacher_name)){
+            $query->whereHas('works.user',function($q)use($teacher_name){
+                $q->where('nickname','like',"%$teacher_name%");
+            });
+        }
+
+        if ($is_shill === 0) {
+            $query->where('is_shill', '=', 0);
+        }
+        if ($is_shill === 1) {
+            $query->where('is_shill', '=', 1);
+        }
+
+        $direction = $sort === 'asc' ? 'asc' : 'desc';
+        $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price',
+            'os_type', 'pay_type', 'created_at', 'status', 'activity_tag', 'is_shill','pay_time')
+            ->where('type', 18)->orderBy('pay_time', $direction);
+
+        if ($flag === 1) {
+            $lists = $query
+                ->paginate($size)
+                ->toArray();
+        } else {
+            $lists = $query->limit($size)->offset(($page - 1) * $size)->get();
+            if ($lists->isEmpty()) {
+                return [];
+            }
+            return $lists->toArray();
+
+        }
+dd($lists);
+//        $rank = Order::with('column:id,name')
+//            ->select([
+//                DB::raw('count(*) as total'),
+//                'user_id',
+//                'relation_id'
+//            ])
+//            ->where('type', 14)
+//            ->where('status', 1)
+//            ->orderBy('total', 'desc')
+//            ->groupBy('relation_id')
+//            ->limit(10)
+//            ->get();
+
+        $data = [
+            'lists' => $lists,
+        ];
+        return success($data);
+
+    }
+
+    public function campListExcel(Request $request)
+    {
+
+//        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称','老师', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
+        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称', '支付金额', '支付时间', '支付方式', '是否退款', '订单状态', '订单来源','收货人姓名','收货人手机号','详细地址'];
+
+        $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
+        $fp = fopen('php://output', 'a');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
+        $while_flag =true;
+        $page = 1;
+        $size = 500;
+
+        while ($while_flag){
+
+            $request->offsetSet('page',$page);
+            $request->offsetSet('size',$size);
+
+            $list = $this->campList($request, 2);
+            foreach ($list as $v) {
+                $v = json_decode(json_encode($v), true);
+                $temp_v = [
+                    '`'.$v['ordernum'],'`'.$v['user']['phone'],$v['user']['nickname'],
+                    $v['column']['name'],$v['pay_price'],$v['pay_time']
+                ];
+
+                switch ((int)$v['pay_type']){
+                    case 1:
+                        $temp_v[] = '微信端';
+                        break;
+                    case 2:
+                        $temp_v[] = 'app微信';
+                        break;
+                    case 3:
+                        $temp_v[] = 'app支付宝';
+                        break;
+                    case 4:
+                        $temp_v[] = '苹果';
+                        break;
+                    default:
+                        $temp_v[] = '-';
+                }
+                if ($v['is_shill'] === 1){
+                    $temp_v[] = '已退款';
+                }else{
+                    $temp_v[] = '未退款';
+                }
+                if ($v['status'] === 1){
+                    $temp_v[] = '已支付';
+                }else{
+                    $temp_v[] = '未支付';
+                }
+                switch ((int)$v['os_type']){
+                    case 1:
+                        $temp_v[] = '安卓';
+                        break;
+                    case 2:
+                        $temp_v[] = '苹果';
+                        break;
+                    case 3:
+                        $temp_v[] = '微信';
+                        break;
+                    default:
+                        $temp_v[] = '-';
+                }
+
+                if (empty($v['mall_address'])){
+                    $temp_v[] = '';
+                    $temp_v[] = '';
+                    $temp_v[] = '';
+                }else{
+                    $temp_v[] = $v['mall_address']['name'];
+                    $temp_v[] = $v['mall_address']['phone'];
+                    if(!empty($v['mall_address']['area_province']) && !empty($v['mall_address']['area_city']) && !empty($v['mall_address']['area_area']) ){
+                        $temp_v[] = $v['mall_address']['area_province']['name'].$v['mall_address']['area_city']['name'].$v['mall_address']['area_area']['name'].$v['mall_address']['details'];
+                    }else{
+                        $temp_v[] = ' ';
+                    }
+
+                }
+
+                mb_convert_variables('GBK', 'UTF-8', $temp_v);
+                fputcsv($fp, $temp_v);
+                ob_flush();     //刷新输出缓冲到浏览器
+                flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+            }
+
+            $page++;
+            if (empty($list)){
+                $while_flag = false;
+            }
+        }
+
+        fclose($fp);
+        exit();
+    }
+
+
+
+
+
+
 }

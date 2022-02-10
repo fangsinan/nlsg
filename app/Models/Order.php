@@ -59,6 +59,14 @@ class Order extends Base
         return $this->belongsTo(PayRecordDetail::class, 'ordernum', 'ordernum');
     }
 
+
+    public function mallAddress()
+    {
+        return $this->hasOne(MallAddress::class, 'user_id', 'user_id')->where([
+            'is_del' => 0,
+            'is_default' => 1,
+        ]);
+    }
     //下单check
     public function addOrderLiveCheck($user_id, $tweeter_code, $target_id, $type)
     {

@@ -20,6 +20,22 @@ class MallAddress extends Base
 
     protected $table = 'nlsg_mall_address';
 
+
+
+    public function area_province()
+    {
+        return $this->belongsTo(Area::class, 'province', 'id');
+    }
+    public function area_city()
+    {
+        return $this->belongsTo(Area::class, 'city', 'id');
+    }
+    public function area_area()
+    {
+        return $this->belongsTo(Area::class, 'area', 'id');
+    }
+
+
     public function create($params, $user_id)
     {
         $province = $params['province'] ?? 0;
