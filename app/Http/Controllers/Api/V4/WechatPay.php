@@ -518,6 +518,8 @@ class WechatPay extends Controller
                         self::joinImGroup($orderInfo['relation_id'],$user_id,$orderInfo['type']);
 
                     }
+                    // 内容刷单记录
+                    self::PayTestLog($orderId,$AdminInfo);
                     return true;
 
                 } else {
@@ -532,6 +534,16 @@ class WechatPay extends Controller
 
         } else {
             return true;
+        }
+    }
+    static private function PayTestLog($order_id = 0,$user =[]){
+        if(!empty($user) &&  !empty($user['is_test_pay'])){
+            DB::table('nlsg_user_edit_log')->insert([
+                'user_id'       => $user['id'],
+                'order_id'      => $order_id,
+                'message'     => " 手机号：".$user['phone'].'   昵称：'.$user['nickname'],
+                'created_at'    =>date('Y-m-d H:i:s', time())
+            ]);
         }
     }
 
@@ -758,6 +770,10 @@ class WechatPay extends Controller
                     if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
                         self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
                     }
+
+                    // 内容刷单记录
+                    self::PayTestLog($orderId,$userdata);
+
 
                     //暂时先不启用直接分账
 //                    //调用直播分账
