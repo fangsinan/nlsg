@@ -222,9 +222,9 @@ class MallController extends Controller
     public function goodsList(Request $request)
     {
         if ($request->input('aa', 0) == 1) {
-//            set_time_limit(0);
-//            $res = (new TempToolsServers())->meiKan();
-//            return $this->getRes($res);
+            set_time_limit(0);
+            $res = (new TempToolsServers())->meikan2();
+            return $this->getRes($res);
 
             $open_360 = $request->input('open_360', 0);
             if ($open_360) {
