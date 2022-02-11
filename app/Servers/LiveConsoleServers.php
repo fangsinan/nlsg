@@ -346,7 +346,7 @@ class LiveConsoleServers
                         self::LogIo('liveonlineuser','online_error','写入失败'.$rst);
                         return '写入失败';
                     }
-                    if (!empty($all_login_counts)){
+                    if (!empty($all_login_counts) && $inser_rst!=1){ //插入成功写入
                         DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
                     }
                     DB::commit();
