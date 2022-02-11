@@ -333,6 +333,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('recommend_config/info', 'RecommendConfigController@info');
         Route::get('recommend_config/info_select_list', 'RecommendConfigController@infoSelectList');
         Route::post('recommend_config/info_bind', 'RecommendConfigController@infoBind');
+        Route::post('recommend_config/del_info_bind', 'RecommendConfigController@delInfoBind');
 
 
 

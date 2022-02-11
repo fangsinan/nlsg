@@ -185,7 +185,34 @@ class RecommendConfigServers
         ];
     }
 
-    public function infoBind($data) {
+    public function delInfoBind($data): array {
+        $params                        = [];
+        $params['recommend_config_id'] = (int)($data['recommend_config_id'] ?? 0);
+        $params['recommend_info_id']   = (int)($data['recommend_info_id'] ?? 0);
+
+        $validator = Validator::make($params, [
+                'recommend_config_id' => 'bail|required|min:1',
+                'recommend_info_id'   => 'bail|required|in:3',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        DB::beginTransaction();
+        $res = Recommend::query()->where('id', '=', $params['recommend_info_id'])
+            ->where('position', '=', $params['recommend_config_id'])
+            ->update(['status' => 0]);
+        if (!$res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
+    }
+
+    public function infoBind($data): array {
         $params                        = [];
         $params['recommend_config_id'] = (int)($data['recommend_config_id'] ?? 0);
         $params['show_position']       = (int)($data['show_position'] ?? 0);
@@ -238,7 +265,6 @@ class RecommendConfigServers
         }
 
         $now_date = date('Y-m-d H:i:s');
-//        $d['created_at'] = $d['updated_at'] = date('Y-m-d H:i:s');
         $res = Recommend::query()->firstOrCreate(
             $d,
             [

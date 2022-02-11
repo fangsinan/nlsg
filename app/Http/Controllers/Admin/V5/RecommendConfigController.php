@@ -96,4 +96,8 @@ class RecommendConfigController extends ControllerBackend
         return $this->getRes((new rcs())->infoBind($request->input()));
     }
 
+    public function delInfoBind(Request $request): JsonResponse {
+        return $this->getRes((new rcs())->delInfoBind($request->input()));
+    }
+
 }
