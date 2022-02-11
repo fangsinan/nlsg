@@ -346,14 +346,17 @@ class LiveConsoleServers
                         self::LogIo('liveonlineuser','online_error','写入失败'.$rst);
                         return '写入失败';
                     }
+                    if (!empty($all_login_counts)){
+                        DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
+                    }
                     DB::commit();
                     $Redis->del($key_name); //执行成功删除
                     //日志写入
                     self::LogIo('liveonlineuser','online','执行成功');
 
-                    if (!empty($all_login_counts)){
-                        DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
-                    }
+//                    if (!empty($all_login_counts)){
+//                        DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
+//                    }
 
                     return  '写入成功';
                 }catch (\Exception $e) {
