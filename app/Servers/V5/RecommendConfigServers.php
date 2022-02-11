@@ -220,7 +220,8 @@ class RecommendConfigServers
         $d['relation_id']   = $params['obj_id'];
         $d['relation_type'] = 0;
         $d['position']      = $params['recommend_config_id'];
-        $d['type']          = '';
+        $d['type']          = 0;
+        $d['status']        = 1;
 
         switch ($params['modular_type']) {
             case 5:
@@ -236,9 +237,16 @@ class RecommendConfigServers
                 break;
         }
 
-        $d['created_at'] = $d['updated_at'] = date('Y-m-d H:i:s');
+        $now_date = date('Y-m-d H:i:s');
+//        $d['created_at'] = $d['updated_at'] = date('Y-m-d H:i:s');
+        $res = Recommend::query()->firstOrCreate(
+            $d,
+            [
+                'created_at' => $now_date,
+                'nickname'   => $now_date,
+            ]
+        );
 
-        $res = DB::table('nlsg_recommend')->insert($d);
         if (!$res) {
             DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
