@@ -14,6 +14,11 @@ class OrderRefundServers
 {
     public function add($params, $admin_id)
     {
+        //1是上传文件  2是直接添加
+        $is_file = (int)($params['is_file'] ?? 1);
+
+
+
         $file_name = $params['file_name'] ?? '';
         $url = $params['url'] ?? '';
 
@@ -81,17 +86,12 @@ class OrderRefundServers
         foreach ($excel_data as $v) {
             $temp_add_data = [];
             $temp_add_data['status'] = 1;
-//            if (!is_int($v[0])){
-//                return ['code'=>false,'msg'=>'请确保商户订单数据格式正确'];
-//            }
             $temp_add_data['ordernum'] = $v[0];
-//            $temp_add_data['ordernum'] = substr($temp_add_data['ordernum'],0,-1);
             $temp_add_data['check_price'] = (float)($v[1] ?? 0);
             if (empty($temp_add_data['ordernum'])) {
                 $temp_add_data['status'] = 4;
             }
             if (in_array($temp_add_data['ordernum'], $temp_order_list, true)) {
-//                $temp_add_data['status'] = 2;
                 continue;
             }
             if (empty($temp_add_data['check_price'])) {
@@ -115,28 +115,18 @@ class OrderRefundServers
         }
 
         //初步过滤数据
-//        DB::table('nlsg_order_refund_log')
-//            ->where('excel_id','=',$ore_res->id)
-//            ->where('check_price','=',0)
-//            ->update([
-//                'status'=>5
-//            ]);
-
         $edit_list = DB::table('nlsg_order_refund_log as rl')
             ->leftJoin('nlsg_order as o', 'rl.ordernum', '=', 'o.ordernum')
             ->where('rl.status', '=', 1)
-//            ->where('rl.excel_id','=',$oreModel->id)
             ->select(['rl.id', 'rl.ordernum', 'rl.check_price', 'o.id as oid', 'o.status',
                 'o.is_shill', 'o.shill_job_price', 'o.is_refund', 'o.pay_price'])
             ->get();
 
-//dd($edit_list->toArray());
 
-//1:已登记  4订单状态错误 5退款金额错误 10退款中(发起退款)   20已完成(校验完成)
+        //1:已登记  4订单状态错误 5退款金额错误 10退款中(发起退款)   20已完成(校验完成)
         if ($edit_list->isNotEmpty()) {
             foreach ($edit_list as $v) {
                 $check_order_flag = true;
-
                 $temp_orlModel = OrderRefundLog::find($v->id);
                 if ($v->oid === null) {
                     $check_order_flag = false;
@@ -150,7 +140,6 @@ class OrderRefundServers
                         $temp_orlModel->status = 20;
                     }
                 }
-
                 $temp_orlModel->save();
 
                 //如果数据没有错误,则修改订单表执行退款

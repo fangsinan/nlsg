@@ -244,6 +244,7 @@ class RecommendConfigServers
             return ['code' => false, 'msg' => '失败'];
         }
 
+        DB::commit();
         return ['code' => true, 'msg' => '成功'];
     }
 
