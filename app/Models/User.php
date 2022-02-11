@@ -361,22 +361,27 @@ class User extends Authenticatable implements JWTSubject
         if($size != 3){
             Lists::where(['type'=>9])->update(['num'=>count($his_data)]);
         }
-        $user_ids = array_column($his_data,'user_id');
-        $user = User::select('id','nickname', 'phone','headimg')
-            ->whereIn('id', $user_ids)
-            ->orderByRaw('FIELD(id,'.implode(',', $user_ids).')')
-            ->get()->toArray();
+        $user = [];
+        if(!empty($his_data)){
+            $user_ids = array_column($his_data,'user_id');
+
+            $user = User::select('id','nickname', 'phone','headimg')
+                ->whereIn('id', $user_ids)
+                ->orderByRaw('FIELD(id,'.implode(',', $user_ids).')')
+                ->get()->toArray();
 
 
-        foreach ($user as &$user_v){
-            foreach ($his_data as $his_datum){
-                if($user_v['id'] == $his_datum['user_id']){
-                    $user_v['his_num_n'] = $his_datum['num'];
-//                    $user_v['his_num'] = (floor($his_datum['num'] / 3600))."小时".($his_datum['num']%3600).'分钟';
-                    $user_v['his_num'] = SecToTime($his_datum['num']);
+            foreach ($user as &$user_v){
+                foreach ($his_data as $his_datum){
+                    if($user_v['id'] == $his_datum['user_id']){
+                        $user_v['his_num_n'] = $his_datum['num'];
+    //                    $user_v['his_num'] = (floor($his_datum['num'] / 3600))."小时".($his_datum['num']%3600).'分钟';
+                        $user_v['his_num'] = SecToTime($his_datum['num']);
+                    }
                 }
             }
         }
+
         Cache::put($cache_key_name, $user, 86400*7);
         return $user;
     }

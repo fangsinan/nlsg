@@ -283,7 +283,6 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
         //后台训练营订单
         Route::get('order/campList', 'OrderController@campList');
-        Route::get('order/campListExcel', 'OrderController@campListExcel');
 
 
     });
@@ -319,6 +318,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
     Route::get('order/list_excel', 'OrderController@listExcel');
     Route::get('order/col_list_excel', 'OrderController@colListExcel');
+    Route::get('order/campListExcel', 'OrderController@campListExcel');
 
 
 });
