@@ -1189,10 +1189,10 @@ class OrderController extends ControllerBackend
                 Carbon::parse($start)->startOfDay()->toDateTimeString(),
                 Carbon::parse($end)->endOfDay()->toDateTimeString(),
             ]);
-        })
-        ->whereHas('user', function ($q) {
-            $q->where('is_test_pay', '=', 0);
         });
+//        ->whereHas('user', function ($q) {
+//            $q->where('is_test_pay', '=', 0);
+//        });
 //
 //        if (!empty($teacher_name)){
 //            $query->whereHas('works.user',function($q)use($teacher_name){
