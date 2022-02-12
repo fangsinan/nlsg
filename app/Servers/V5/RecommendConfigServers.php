@@ -192,7 +192,7 @@ class RecommendConfigServers
 
         $validator = Validator::make($params, [
                 'recommend_config_id' => 'bail|required|min:1',
-                'recommend_info_id'   => 'bail|required|in:3',
+                'recommend_info_id'   => 'bail|required|min:1',
             ]
         );
 
