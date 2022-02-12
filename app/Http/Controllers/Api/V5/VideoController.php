@@ -102,6 +102,37 @@ class VideoController extends Controller
 
     }
 
+    /**
+     * @api {get} /api/v5/video/show 短视频阅读增加
+     * @apiName show
+     * @apiVersion 5.0.0
+     * @apiGroup five_video
+     *
+     * @apiParam  id  短视频id、
+//     * @apiParam  type  类型 1短视频
+     *
+     * @apiSuccessExample 成功响应:
+     *   {
+     *      "code": 200,
+     *      "msg" : '成功',
+     *      "data": {
+     *
+     *       }
+     *   }
+     *
+     */
+    public function show(Request $request)
+    {
+        $id   = $request->input('id')??0;
+        if(!empty($id)){
+            ShortVideoModel::where(['id'=>$id])->increment('real_view_num');
+            ShortVideoModel::where(['id'=>$id])->increment('view_num');
+        }
+
+        return $this->getRes([]);
+
+
+    }
 
 
 
