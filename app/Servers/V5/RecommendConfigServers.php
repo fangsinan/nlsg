@@ -124,7 +124,11 @@ class RecommendConfigServers
             ->select([
                 'id', 'id as recommend_config_id', 'title', 'icon_pic', 'icon_mark', 'icon_mark_rang', 'show_position',
                 'jump_type', 'modular_type', 'is_show', 'sort', 'jump_url', 'lists_id', 'created_at'
-            ])->with(['recommendInfo', $with_str]);
+            ])->with([
+                'recommendInfo' => function ($q) {
+                    $q->where('status', '=', 1);
+                }, $with_str
+            ]);
 
         $res = $query->first();
 
@@ -265,7 +269,7 @@ class RecommendConfigServers
         }
 
         $now_date = date('Y-m-d H:i:s');
-        $res = Recommend::query()->firstOrCreate(
+        $res      = Recommend::query()->firstOrCreate(
             $d,
             [
                 'created_at' => $now_date,
