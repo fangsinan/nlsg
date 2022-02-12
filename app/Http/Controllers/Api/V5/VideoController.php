@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShortVideoLikeModel;
 use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VideoController extends Controller
 {
@@ -102,6 +103,43 @@ class VideoController extends Controller
 
     }
 
+    /**
+     * @api {get} /api/v5/video/show 短视频阅读增加
+     * @apiName show
+     * @apiVersion 5.0.0
+     * @apiGroup five_video
+     *
+     * @apiParam  id  短视频id、
+//     * @apiParam  type  类型 1短视频
+     *
+     * @apiSuccessExample 成功响应:
+     *   {
+     *      "code": 200,
+     *      "msg" : '成功',
+     *      "data": {
+     *
+     *       }
+     *   }
+     *
+     */
+    public function show(Request $request)
+    {
+        $id   = $request->input('id')??0;//多个用逗号拼接
+        if(!empty($id)){
+            $ids = explode(',', $id);
+            if(is_array($ids)){
+                $rst = DB::table("nlsg_short_video")->whereIn('id', $ids)
+                    ->update([
+                        'view_num' => DB::raw("view_num + 1"),
+                        'real_view_num' => DB::raw("real_view_num + 1")
+                    ]);
+            }
+        }
+
+        return $this->getRes([]);
+
+
+    }
 
 
 

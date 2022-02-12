@@ -544,6 +544,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
     Route::any('video/get_random_video', 'VideoController@getRandomVideo');
     Route::any('video/like', 'VideoController@like');
+    Route::any('video/show', 'VideoController@show');
 
     Route::any('user/user_his_list', 'UserController@userHisList');
     Route::any('vip/new_home_page', 'VipController@newHomePage');

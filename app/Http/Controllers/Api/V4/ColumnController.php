@@ -729,7 +729,8 @@ class ColumnController extends Controller
         //IOS 通过审核后修改  并删除返回值works_data
         $column_data = Column::select(['id', 'name', 'name as title','type' , 'title', 'subtitle','index_pic', 'cover_pic as cover_img', 'details_pic as detail_img', 'message','details_pic','cover_pic',
             'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num','show_info_num','info_column_id'])
-            ->where(['id' => $lecture_id, 'status' => 1])->first();
+//            ->where(['id' => $lecture_id, 'status' => 1])->first();
+            ->where(['id' => $lecture_id, ])->first();
 
 
         if (empty($column_data)) {
@@ -751,6 +752,13 @@ class ColumnController extends Controller
 
         }
         $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
+
+        //因为需要根据$column_data的type类型校验 sub表  所以需要全部查询后进行上下架状态校验
+        //未关注   正常按照上下架 显示数据
+        //已关注则不操作
+        if($is_sub == 0 && $column_data['status']==0){  //未关注 下架 不显示数据
+            return $this->error(0, '产品已下架');
+        }
 
         //1、加字段控制需要查询的章节
         $page_per_page = 50;
