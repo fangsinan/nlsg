@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShortVideoLikeModel;
 use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VideoController extends Controller
 {
@@ -123,10 +124,16 @@ class VideoController extends Controller
      */
     public function show(Request $request)
     {
-        $id   = $request->input('id')??0;
+        $id   = $request->input('id')??0;//多个用逗号拼接
         if(!empty($id)){
-            ShortVideoModel::where(['id'=>$id])->increment('real_view_num');
-            ShortVideoModel::where(['id'=>$id])->increment('view_num');
+            $ids = explode(',', $id);
+            if(is_array($ids)){
+                $rst = DB::table("nlsg_short_video")->whereIn('id', $ids)
+                    ->update([
+                        'view_num' => DB::raw("view_num + 1"),
+                        'real_view_num' => DB::raw("real_view_num + 1")
+                    ]);
+            }
         }
 
         return $this->getRes([]);
