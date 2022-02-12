@@ -41,7 +41,7 @@ class AuthController extends Controller
      *
      */
 
-    public function login(Request $request)
+    public function loginBak(Request $request)
     {
 
         $phone = $request->input('phone');
@@ -159,6 +159,105 @@ class AuthController extends Controller
         return success($data);
     }
 
+    public function login(Request $request){
+        $phone = $request->input('phone','');
+        $code = (int)($request->input('code','0'));
+        $is_invite = $request->input('is_invite',0);
+        $user_id = $request->input('user_id',0);
+        $inviter = (int)$request->input('inviter', 0);
+        $ref = $request->input('ref', 0);
+
+        $sClass = new \StdClass();
+
+        if (!$phone || strlen($phone) !== 11) {
+            return error(400, '手机号不能为空', $sClass);
+        }
+        if (!$code) {
+            return error(400, '验证码不能为空', $sClass);
+        }
+
+        $select_arr = ['id','nickname','headimg','phone','level','sex','is_community_admin','login_flag','is_code_login'];
+
+        $check_phone = User::query()->where('phone', '=', $phone)
+            ->select($select_arr)
+            ->first();
+
+        if (empty($check_phone)){
+            //新号逻辑
+            $res = Redis::get($phone);
+            if (!$res) {
+                return error(400, '验证码已过期', $sClass);
+            }
+            if (intval($code) !== intval($res)) {
+                return error(400, '验证码错误', $sClass);
+            }
+
+            $list = User::query()->create([
+                'phone' => $phone,
+                'inviter' => $inviter,
+                'login_flag' => ($inviter === 0) ? 0 : 1,
+                'nickname' => substr_replace($phone, '****', 3, 4),
+                'ref' => $ref
+            ]);
+            $check_phone = User::query()->where('id','=',$list->id)
+                ->select($select_arr)
+                ->first();
+
+            //新人优惠券
+            $cpModel = new Coupon();
+            $cpModel->giveCoupon($check_phone->id, ConfigModel::getData(41));
+            if ($is_invite && $user_id) {
+                //邀请人优惠券
+                $cpModel->giveCoupon($user_id, ConfigModel::getData(42));
+                UserInvite::query()->create([
+                    'from_uid' => $user_id,
+                    'to_uid' => $check_phone->id,
+                    'type' => 1
+                ]);
+            }
+
+        }else{
+            switch ($check_phone->is_code_login){
+                case 1:
+                    if ($code !== 6666){
+                        return error(400, '验证码错误', $sClass);
+                    }
+                    break;
+                case 2:
+                    $temp_code = (int)(substr($phone,-4));
+                    if ($code !== $temp_code){
+                        return error(400, '验证码错误', $sClass);
+                    }
+                    break;
+                default:
+                    $dont_check_phone = ConfigModel::getData(35, 1);
+                    $dont_check_phone = explode(',', $dont_check_phone);
+                    if (in_array($phone, $dont_check_phone, true)){
+                        if ($code !== 6666){
+                            return error(400, '验证码错误', $sClass);
+                        }
+                    }else{
+                        $res = Redis::get($phone);
+                        if (!$res) {
+                            return error(400, '验证码已过期', $sClass);
+                        }
+                        if (intval($code) !== intval($res)) {
+                            return error(400, '验证码错误', $sClass);
+                        }
+
+                    }
+            }
+            User::query()->where('id', '=', $check_phone->id)->update(['login_flag' => 2]);
+        }
+
+        Redis::del($phone);
+        $token = auth('api')->login($check_phone);
+        $time = strtotime(date('Y-m-d', time())) + 86400;
+        if ($check_phone->expire_time <= $time || !in_array($check_phone->level, [3, 4, 5], true)) {
+            $check_phone->level = 0;
+        }
+        return success($this->get_data($check_phone, $token));
+    }
     /**
      * @api {get} api/v4/auth/logout 退出
      * @apiVersion 4.0.0
@@ -307,6 +406,11 @@ class AuthController extends Controller
         if ($input['unionid']) {
             $is_wx = 1;
         }
+
+
+
+
+
         $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex' => $input['sex'] == '男' ? 1 : 2,
@@ -321,10 +425,37 @@ class AuthController extends Controller
         if ($user) {
             User::where('phone', $phone)->update($data); //如果有手机号，以前有微信覆盖
         } else {
+
+            //新增
+
+            $inviter = $input['inviter'] ?? 0;
+            $is_invite = $input['is_invite'] ?? 0;
+
+
+            $data['inviter'] = $inviter;
+            $data['login_flag'] = ($inviter === 0) ? 0 : 1;
+
+
             $data['phone'] = $phone;
             $res = User::create($data);
             if ($res) {
                 $user = User::find($res->id);
+
+                //新人优惠券
+                $cpModel = new Coupon();
+                $cpModel->giveCoupon($res->id, ConfigModel::getData(41));
+                if ($is_invite && $inviter) {
+                    //邀请人优惠券
+                    $cpModel->giveCoupon($inviter, ConfigModel::getData(42));
+                    UserInvite::query()->create([
+                        'from_uid' => $inviter,
+                        'to_uid' => $res->id,
+                        'type' => 1
+                    ]);
+                }
+
+
+
             }
         }
         $token = auth('api')->login($user);
@@ -467,8 +598,8 @@ class AuthController extends Controller
 
         $dont_check_phone = ConfigModel::getData(35, 1);
         $dont_check_phone = explode(',', $dont_check_phone);
-        if (in_array($phone, $dont_check_phone) || $phone == '18600179874') {
-            if (intval($code) !== 6666) {
+        if ( $phone === '18600179874' || in_array($phone, $dont_check_phone, true)) {
+            if ((int)$code !== 6666) {
                 return error(1000, '验证码错误');
             }
         } else {
@@ -481,7 +612,7 @@ class AuthController extends Controller
             }
         }
         Redis::del($phone);
-        /*$user = User::where('phone', $phone)->first();
+        $user = User::where('phone', $phone)->first();
         if (!$user) {
             User::where('id', $user_id)->update(['phone' => $phone]);
         } else { //号码已存在
@@ -490,23 +621,7 @@ class AuthController extends Controller
         $arra = [
             'id' => $user_id,
             'phone' => $phone,
-        ];*/
-
-        $arra = [
-            'phone' => $phone
         ];
-        $user = User::where('phone', $phone)->first();
-        if (!$user) { //没有此手机号，直接绑定
-            User::where('id', $user_id)->update(['phone' => $phone]);
-            $arra['id'] = $user_id;
-            $arra['data'] = [];
-        } else { //号码已存在
-            $token = auth('api')->login($user);
-            $data = $this->get_data($user, $token);
-            $arra['id'] = $user->id;
-            $arra['data'] = $data;
-        }
-
         return success($arra);
 
     }
@@ -589,16 +704,18 @@ class AuthController extends Controller
             return $this->error(401, '授权失败');
         }
 
-		if (empty($res->openid)) {
-			return $this->error(401, '授权失败');
-		}
+        if (empty($res->openid)) {
+            return $this->error(401, '授权失败');
+        }
 
         if ($type == 1) {
             return $this->success(['openid' => $res->openid]); //获取code  再获取openid
         }
-		if (empty($res->access_token)) {
-			return $this->error(401, '授权失败');
-		}
+
+        if (empty($res->access_token)) {
+            return $this->error(401, '授权失败');
+        }
+
         $list = $this->getRequest('https://api.weixin.qq.com/sns/userinfo', [
             'access_token' => $res->access_token,
             'openid' => $res->openid,
@@ -606,9 +723,11 @@ class AuthController extends Controller
         if (!$list) {
             return $this->error(400, '获取用户信息失败');
         }
-		if (empty($list->unionid)) {
-			return $this->error(400, '获取用户信息失败');
-		}
+
+        if (empty($list->unionid)) {
+            return $this->error(400, '获取用户信息失败');
+        }
+
         $data = [
             'unionid' => $list->unionid,
             'nickname' => $list->nickname,
@@ -649,8 +768,6 @@ class AuthController extends Controller
             return $this->error(400, '手机号不能为空');
         }
 //        if (!preg_match('/^1[3456789]\d{9}$/', $phone)) {
-//            return $this->error(400, '手机号格式错误');
-//        }
         if (!preg_match('/^1\d{10}$/', $phone)) {
             return $this->error(400, '手机号格式错误');
         }
@@ -832,22 +949,23 @@ class AuthController extends Controller
                 return $this->getRes(['code' => false, 'msg' => '号码错误']);
             }
         } else {
-            /* $g = "/^1[345678]\d{9}$/";
-            $g2 = "/^19[01236789]\d{8}$/";
-            $g3 = "/^166\d{8}$/";
+//            $g = "/^1[345678]\d{9}$/";
+//            $g2 = "/^19[012356789]\d{8}$/";
+//            $g3 = "/^166\d{8}$/";
+//
+//            if (preg_match($g, $phone)) {
+//                return $this->getRes(['code' => true, 'msg' => '正确']);
+//            } else if (preg_match($g2, $phone)) {
+//                return $this->getRes(['code' => true, 'msg' => '正确']);
+//            } else if (preg_match($g3, $phone)) {
+//                return $this->getRes(['code' => true, 'msg' => '正确']);
+//            }
 
+
+            $g = "/^1\d{10}$/";
             if (preg_match($g, $phone)) {
                 return $this->getRes(['code' => true, 'msg' => '正确']);
-            } else if (preg_match($g2, $phone)) {
-                return $this->getRes(['code' => true, 'msg' => '正确']);
-            } else if (preg_match($g3, $phone)) {
-                return $this->getRes(['code' => true, 'msg' => '正确']);
-            } */
-
-			$g = "/^1\d{10}$/";
-			if (preg_match($g, $phone)) {
-				return $this->getRes(['code' => true, 'msg' => '正确']);
-			}
+            }
             return $this->getRes(['code' => false, 'msg' => '号码错误']);
         }
 
@@ -859,6 +977,9 @@ class AuthController extends Controller
 
         $version = $request->input('version', '');//1 获取是否有提交信息  2修改
         $config_version = ConfigModel::getData(52);
+
+
+
         $switchAll = [
             //精确版本
 //            '4.1.0' => [
@@ -872,12 +993,14 @@ class AuthController extends Controller
                 'Vip_Switch' => '0',//提现开关   0关闭  1开启
                 'vipCode' => '0', //钻石兑换码
                 'worksCode' => '0',//课程兑换码
+
             ],
             'default' => [
                 'money_switch' => '1',//app赚钱开关   0关闭  1开启
                 'Vip_Switch' => '1',//提现开关   0关闭  1开启
                 'vipCode' => '1',
                 'worksCode' => '1',
+
             ],
 
         ];
