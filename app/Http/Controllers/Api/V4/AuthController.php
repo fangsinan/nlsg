@@ -501,6 +501,9 @@ class AuthController extends Controller
             $arra['id'] = $user_id;
             $arra['data'] = [];
         } else { //号码已存在
+            $wechatObj=User::where('id', $user_id)->first();//获取当前用户微信信息
+            User::where('id', $user_id)->update(['wxopenid' => '','unionid'=>'']); //清空微信信息
+            User::where('id', $user->id)->update(['wxopenid' => $wechatObj->wxopenid,'unionid'=>$wechatObj->unionid]); //绑定微信信息
             $token = auth('api')->login($user);
             $data = $this->get_data($user, $token);
             $arra['id'] = $user->id;
