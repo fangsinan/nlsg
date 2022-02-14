@@ -126,14 +126,7 @@ class VideoController extends Controller
     {
         $id   = $request->input('id')??0;//多个用逗号拼接
         if(!empty($id)){
-            $ids = explode(',', $id);
-            if(is_array($ids)){
-                $rst = DB::table("nlsg_short_video")->whereIn('id', $ids)
-                    ->update([
-                        'view_num' => DB::raw("view_num + 1"),
-                        'real_view_num' => DB::raw("real_view_num + 1")
-                    ]);
-            }
+            ShortVideoModel::readVideo(explode(',', $id));
         }
 
         return $this->getRes([]);

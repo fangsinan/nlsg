@@ -4,6 +4,8 @@
 namespace App\Models;
 
 
+use Illuminate\Support\Facades\DB;
+
 class ShortVideoModel extends Base
 {
     protected $table = 'nlsg_short_video';
@@ -99,6 +101,8 @@ class ShortVideoModel extends Base
             //推荐
             $re_value["recomment"] = $recomObj->getRecommend($re_value['id']);
 
+            // 请求即代表阅读   有单独的阅读接口
+            self::readVideo([$re_value['id']]);
         }
 
 
@@ -207,8 +211,20 @@ class ShortVideoModel extends Base
 
 
 
+    /*
+     * 短视频阅读
+     * */
+    public static function readVideo($ids){
 
-
+        if( !empty($ids) && is_array($ids) ){
+            $rst = DB::table("nlsg_short_video")->whereIn('id', $ids)
+                ->update([
+                    'view_num' => DB::raw("view_num + 1"),
+                    'real_view_num' => DB::raw("real_view_num + 1")
+                ]);
+        }
+        return ;
+    }
 
 
 }
