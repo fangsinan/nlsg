@@ -804,7 +804,7 @@ class WorksController extends Controller
             ->where('user_id','=',$user_id)
             ->where('is_del','=',0)
             ->first();
-        $id = $check_his->id ?? 0;
+
 
         if( empty($check_his)){
             //防止 show接口未请求
@@ -821,6 +821,8 @@ class WorksController extends Controller
                 User::where(['id'=>$user_id])->increment('history_num');
             }
             $id = $his->id;
+        }else{
+            $id = $check_his->id ?? 0;
         }
 
 
