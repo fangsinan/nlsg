@@ -12,7 +12,7 @@ class History extends Base
 
     // 允许批量赋值
     protected  $fillable = [
-        'relation_type','relation_id','info_id','user_id','is_del', 'time_leng','time_number'
+        'relation_type','relation_id','info_id','user_id','is_del', 'time_leng','time_number','os_type'
     ];
 
 
