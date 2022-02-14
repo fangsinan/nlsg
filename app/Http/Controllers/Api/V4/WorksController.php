@@ -707,6 +707,7 @@ class WorksController extends Controller
         $works_info_id = $request->input('works_info_id',0);
         $relation_type = $request->input('relation_type',0);
         $relation_id = $request->input('relation_id',0);
+        $os_type = $request->input('os_type',0);
         if( empty($relation_type) || empty($relation_id)){
             return $this->success();
         }
@@ -749,6 +750,7 @@ class WorksController extends Controller
             'info_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
+            'os_type'   =>$os_type??0,//  1 安卓 2ios 3微信
         ]);
         //学习记录条数会只按relation_id算   不根据章节走
         if(empty($check_his) && $his->wasRecentlyCreated){
@@ -785,6 +787,7 @@ class WorksController extends Controller
         $time_leng  = $request->input('time_leng',0);
         $time_number= $request->input('time_number',0);
         $works_info_id = $request->input('works_info_id',0);
+        $os_type = $request->input('os_type',0);
 
         if( empty($user_id) || empty($relation_id) || empty($relation_type)){
             return $this->success();
@@ -803,6 +806,7 @@ class WorksController extends Controller
             'info_id' =>$works_info_id,
             'user_id'   =>$user_id,
             'is_del'    =>0,
+            'os_type'   =>$os_type ?? 0,
         ]);
         if(empty($check_his) && $his->wasRecentlyCreated){
             // 学习记录数增一
@@ -813,6 +817,7 @@ class WorksController extends Controller
         $edit_data = [
             'time_leng'=>$time_leng,
             'time_number'=>$time_number,
+            'os_type'   =>$os_type ?? 0,
         ];
         if( $time_leng >= 96 ){
             $edit_data['is_end'] = 1;
