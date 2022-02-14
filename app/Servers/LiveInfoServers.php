@@ -1122,6 +1122,12 @@ GROUP BY
             case 'brush_off':
                 $check_id->live_son_flag_brush_status = 0;
                 break;
+            case 'wechat_button_on':
+                $check_id->show_wechat_button = 1;
+                break;
+            case 'wechat_button_off':
+                $check_id->show_wechat_button = 2;
+                break;
             default:
                 return ['code' => false, 'msg' => '参数错误'];
         }

@@ -40,7 +40,7 @@ class LiveSonFlagPoster extends Model {
 
         $query->select([
                 'p.id', 'p.live_id', 'p.son_id', 'p.status', 'p.live_son_flag_brush_status',
-                'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at'
+                'lr.son', 'lr.son_flag', 'l.title', 'l.begin_at','p.show_wechat_button'
             ]);
 
         if (!empty($params['status'] ?? 0)) {
