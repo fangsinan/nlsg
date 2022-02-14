@@ -741,6 +741,7 @@ class WorksController extends Controller
         $check_his = History::where('relation_id','=',$relation_id)
             ->where('relation_type','=',$relation_type)
             ->where('user_id','=',$user_id)
+            ->where('info_id','=',$works_info_id)
             ->where('is_del','=',0)
             ->first();
 
@@ -801,6 +802,7 @@ class WorksController extends Controller
 
         $check_his = History::where('relation_id','=',$relation_id)
             ->where('relation_type','=',$relation_type)
+            ->where('info_id','=',$works_info_id)
             ->where('user_id','=',$user_id)
             ->where('is_del','=',0)
             ->first();
