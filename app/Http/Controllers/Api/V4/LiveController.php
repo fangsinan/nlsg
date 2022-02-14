@@ -796,6 +796,7 @@ class LiveController extends Controller
             $list['live_son_flag_count'] = 0;
             $list['live_son_flag_status'] = 0;
 			$list['live_son_flag_brush_status'] = 1;
+            $list['show_wechat_button_status'] = 1;
             if(!empty($live_son_flag)){
 
                 $key = "live_son_flag:".$list->live_pid . '_' . $live_son_flag;
@@ -823,6 +824,7 @@ class LiveController extends Controller
                     'is_del'    =>0,
                 ])->first();
                 if(!empty($SonFlagInfo)){
+                    $list['show_wechat_button_status']=$SonFlagInfo->show_wechat_button;
                     $list['live_son_flag_status']=$SonFlagInfo->status;
                     $list['live_son_flag_brush_status'] = $SonFlagInfo->live_son_flag_brush_status;
                 }
@@ -964,6 +966,7 @@ class LiveController extends Controller
             $list['live_son_flag_count'] = 0;
             $list['live_son_flag_status'] = 0;
             $list['live_son_flag_brush_status'] = 1;
+            $list['show_wechat_button_status'] = 1;
             if(!empty($live_son_flag)){
 
                 $key = "live_son_flag:".$list->live_pid . '_' . $live_son_flag;
@@ -991,6 +994,7 @@ class LiveController extends Controller
                     'is_del'    =>0,
                 ])->first();
                 if(!empty($SonFlagInfo)){
+                    $list['show_wechat_button_status']=$SonFlagInfo->show_wechat_button;
                     $list['live_son_flag_status']=$SonFlagInfo->status;
                     $list['live_son_flag_brush_status'] = $SonFlagInfo->live_son_flag_brush_status;
                 }
