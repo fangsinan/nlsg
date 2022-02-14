@@ -744,19 +744,25 @@ class WorksController extends Controller
             ->where('is_del','=',0)
             ->first();
 
-        $his= History::firstOrCreate([
-            'relation_id' =>$relation_id,
-            'relation_type'  =>$relation_type,
-            'info_id' =>$works_info_id,
-            'user_id'   =>$user_id,
-            'is_del'    =>0,
-            'os_type'   =>$os_type??0,//  1 安卓 2ios 3微信
-        ]);
-        //学习记录条数会只按relation_id算   不根据章节走
-        if(empty($check_his) && $his->wasRecentlyCreated){
-            // 学习记录数增一
-            User::where(['id'=>$user_id])->increment('history_num');
+
+        if(empty($check_his)){
+            $his= History::firstOrCreate([
+                'relation_id' =>$relation_id,
+                'relation_type'  =>$relation_type,
+                'info_id' =>$works_info_id,
+                'user_id'   =>$user_id,
+                'is_del'    =>0,
+                'os_type'   =>$os_type??0,//  1 安卓 2ios 3微信
+            ]);
+            //学习记录条数会只按relation_id算   不根据章节走
+            if($his->wasRecentlyCreated){
+                // 学习记录数增一
+                User::where(['id'=>$user_id])->increment('history_num');
+            }
         }
+
+
+
         return $this->success();
     }
 
@@ -798,20 +804,25 @@ class WorksController extends Controller
             ->where('user_id','=',$user_id)
             ->where('is_del','=',0)
             ->first();
+        $id = $check_his->id;
 
-        //防止 show接口未请求
-        $his = History::firstOrCreate([
-            'relation_id' =>$relation_id,
-            'relation_type'  =>$relation_type,
-            'info_id' =>$works_info_id,
-            'user_id'   =>$user_id,
-            'is_del'    =>0,
-            'os_type'   =>$os_type ?? 0,
-        ]);
-        if(empty($check_his) && $his->wasRecentlyCreated){
-            // 学习记录数增一
-            User::where(['id'=>$user_id])->increment('history_num');
+        if( empty($check_his)){
+            //防止 show接口未请求
+            $his = History::firstOrCreate([
+                'relation_id' =>$relation_id,
+                'relation_type'  =>$relation_type,
+                'info_id' =>$works_info_id,
+                'user_id'   =>$user_id,
+                'is_del'    =>0,
+                'os_type'   =>$os_type ?? 0,
+            ]);
+            if( $his->wasRecentlyCreated){
+                // 学习记录数增一
+                User::where(['id'=>$user_id])->increment('history_num');
+            }
+            $id = $his->id;
         }
+
 
 
         $edit_data = [
@@ -824,7 +835,7 @@ class WorksController extends Controller
         }
 
         //更新学习进度
-        History::where('id',$his->id)->update($edit_data);
+        History::where('id',$id)->update($edit_data);
         return $this->success();
     }
 
