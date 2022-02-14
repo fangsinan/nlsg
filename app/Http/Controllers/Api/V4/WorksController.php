@@ -804,7 +804,7 @@ class WorksController extends Controller
             ->where('user_id','=',$user_id)
             ->where('is_del','=',0)
             ->first();
-        $id = $check_his->id;
+        $id = $check_his->id ?? 0;
 
         if( empty($check_his)){
             //防止 show接口未请求
