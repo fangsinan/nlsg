@@ -16,12 +16,14 @@ class SubHelperServers
 {
     public function ojbList()
     {
-        $column_list = Column::where('status', '=', 1)
+        $column_list = Column::query()
+            ->whereIn('status',[1,2])
             ->where('type', '=', 2)
             ->select('id', DB::raw('6 as type'), 'name as title')
             ->get();
 
-        $works_list = Works::where('status', '=', 4)
+        $works_list = Works::query()
+            ->whereIn('status',[4,5])
             ->where('type', '=', 2)
             ->select('id', DB::raw('2 as type'), 'title')
             ->get();
@@ -48,14 +50,12 @@ class SubHelperServers
 
     public function comObjList()
     {
-        $column_list = Column::query()
-            ->whereIn('status',[1,2])
+        $column_list = Column::where('status', '=', 1)
             ->where('type', '=', 2)
             ->select('id', DB::raw('2 as type'), 'name as title')
             ->get();
 
-        $works_list = Works::query()
-            ->whereIn('status',[4,5])
+        $works_list = Works::where('status', '=', 4)
             ->where('type', '=', 2)
             ->select('id', DB::raw('4 as type'), 'title')
             ->get();
