@@ -82,7 +82,16 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:shillJob')
             ->everyMinute()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
-//
+
+        //开通课程与直播
+        $schedule->command('command:subListClose')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        //关闭课程与直播
+        $schedule->command('command:subListOpen')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+
 //        $schedule->command('command:erpJob')
 //            ->everyMinute()->withoutOverlapping(1)
 //            ->runInBackground()->onOneServer();
@@ -181,17 +190,17 @@ class Kernel extends ConsoleKernel
             $s->pushRun();
         })->everyMinute()->runInBackground();//每分
 
-        $schedule->call(function () {
-            //开通订阅队列
-            $servers = new removeDataServers();
-            $servers->worksListOfSub();
-        })->everyMinute()->runInBackground();//每分
-
-        $schedule->call(function () {
-            //关闭订阅队列
-            $servers = new removeDataServers();
-            $servers->worksListOfDelSub();
-        })->everyMinute()->runInBackground();//每分
+//        $schedule->call(function () {
+//            //开通订阅队列
+//            $servers = new removeDataServers();
+//            $servers->worksListOfSub();
+//        })->everyMinute()->runInBackground();//每分
+//
+//        $schedule->call(function () {
+//            //关闭订阅队列
+//            $servers = new removeDataServers();
+//            $servers->worksListOfDelSub();
+//        })->everyMinute()->runInBackground();//每分
 
         $schedule->call(function () {
             //队列消息发送
