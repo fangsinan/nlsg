@@ -47,6 +47,8 @@ class LiveSonFlagPoster extends Model {
             $query->where('p.status', '=', $params['status']);
         }
         $query->orderBy('lr.sort', 'asc'); //海报排序
+        $query->orderBy('p.id');
+
         $query->groupBy('son_id');
 //        DB::connection()->enableQueryLog();
 //        $query->get();
