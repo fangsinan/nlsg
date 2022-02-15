@@ -185,6 +185,11 @@ class Kernel extends ConsoleKernel
             //开通订阅队列
             $servers = new removeDataServers();
             $servers->worksListOfSub();
+        })->everyMinute()->runInBackground();//每分
+
+        $schedule->call(function () {
+            //关闭订阅队列
+            $servers = new removeDataServers();
             $servers->worksListOfDelSub();
         })->everyMinute()->runInBackground();//每分
 
