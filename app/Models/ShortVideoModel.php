@@ -100,9 +100,7 @@ class ShortVideoModel extends Base
 
             //推荐
             $re_value["recomment"] = $recomObj->getRecommend($re_value['id']);
-
-            // 请求即代表阅读   有单独的阅读接口
-            self::readVideo([$re_value['id']]);
+            
         }
 
 
