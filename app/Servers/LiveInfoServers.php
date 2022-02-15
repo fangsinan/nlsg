@@ -1123,6 +1123,9 @@ GROUP BY
                 $check_id->live_son_flag_brush_status = 0;
                 break;
             case 'wechat_button_on':
+                if ($check_id->status !== 2) {
+                    return ['code' => false, 'msg' => '直播未开启'];
+                }
                 $check_id->show_wechat_button = 1;
                 break;
             case 'wechat_button_off':
