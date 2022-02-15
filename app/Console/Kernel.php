@@ -78,10 +78,10 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('command:cytxJob')
 //            ->everyMinute()->withoutOverlapping(1)
 //            ->runInBackground()->onOneServer();
-//
-//        $schedule->command('command:shillJob')
-//            ->everyMinute()->withoutOverlapping(1)
-//            ->runInBackground()->onOneServer();
+
+        $schedule->command('command:shillJob')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
 //
 //        $schedule->command('command:erpJob')
 //            ->everyMinute()->withoutOverlapping(1)

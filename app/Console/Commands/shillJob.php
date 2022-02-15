@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Servers\MallRefundJob;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class shillJob extends Command
 {
@@ -38,7 +39,11 @@ class shillJob extends Command
      */
     public function handle()
     {
-        MallRefundJob::shillJob(1);
-        MallRefundJob::shillJob(2);
+        DB::table('wwtest')->insert([
+            'phone'=>time(),
+            'twitter'=>rand(1,999999),
+        ]);
+//        MallRefundJob::shillJob(1);
+//        MallRefundJob::shillJob(2);
     }
 }
