@@ -133,6 +133,10 @@ WHERE
             }
         }
 
+        $content = str_replace(
+            "http://nlsgapp.oss-cn-beijing.aliyuncs.com",
+            "https://image.nlsgapp.com",
+            $content);
         $model->type = $type;
         $model->user_id = $user_id;
         $model->live_id = $live_id;
