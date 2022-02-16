@@ -25,6 +25,22 @@ class RecommendConfigController extends ControllerBackend
         return $this->getRes((new rcs())->list($request->input()));
     }
 
+    /**
+     * 修改推荐位状态
+     * @api {post} /api/admin_v5/recommend_config/change_status 修改推荐位状态
+     * @apiVersion 5.0.0
+     * @apiName /api/admin_v5/recommend_config/change_status
+     * @apiGroup  后台-v5-推荐位
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v5/recommend_config/change_status
+     * @apiDescription 修改推荐位状态
+     * @apiParam {number} id id
+     * @apiParam {string=sort,is_show} flag 类型
+     * @apiParam {number} value 值(is_show:1显示 0隐藏,sort时value=排序值)
+     */
+    public function changeStatus(Request $request): JsonResponse {
+        return $this->getRes((new rcs())->changeStatus($request->input()));
+    }
+
     public function sort(Request $request): JsonResponse {
         return $this->getRes((new rcs())->sort($request->input()));
     }

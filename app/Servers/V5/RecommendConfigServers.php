@@ -56,6 +56,70 @@ class RecommendConfigServers
         return $list;
     }
 
+    public function changeStatus($data) {
+        $params          = [];
+        $params['id']    = (int)($data['id'] ?? 0);
+        $params['flag']  = $data['flag'] ?? '';
+        $params['value'] = (int)($data['value'] ?? 0);
+
+        $validator = Validator::make($params, [
+                'id'    => 'bail|required|integer|min:0',
+                'flag'  => 'bail|required|in:sort,is_show',
+                'value' => 'bail|required|integer|max:9999|min:0',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $check_id = RecommendConfig::query()->where('id', '=', $params['id'])->first();
+        if (!$check_id) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        switch ($params['flag']) {
+            case 'is_show':
+                $check_id->is_show = $params['value'] === 1 ? 1 : 0;
+                break;
+            case 'sort':
+                RecommendConfig::query()
+                    ->where('show_position', '=', 3)
+                    ->whereIn('jump_type', [4, 11, 13])
+                    ->whereIn('modular_type', [5, 7, 8, 9, 11])
+                    ->where('sort','>=',$params['value'])
+                    ->increment('sort',1);
+                $check_id->sort = $params['value'];
+                break;
+        }
+
+        $res = $check_id->save();
+//        if ($params['flag'] === 'sort'){
+//            $this->rc2Rank();
+//        }
+
+        if (!$res){
+            return ['code'=>false,'msg'=>'失败请重试'];
+        }
+
+        return ['code'=>true,'msg'=>'成功'];
+    }
+
+    public function rc2Rank(){
+        DB::select(
+            'update nlsg_recommend_config as c join (
+SELECT
+id,sort,@sort_line := @sort_line + 1 as line_num
+from nlsg_recommend_config,(SELECT @sort_line := 0) a
+where show_position = 3 and jump_type in (4,11,13)
+and modular_type in (5,7,8,9,11)
+ORDER BY sort asc,id asc
+) as b on c.id = b.id
+set c.sort = b.line_num'
+        );
+    }
+
+
     public function add($data): array {
         $params             = [];
         $params['title']    = $data['title'] ?? '';
