@@ -83,40 +83,47 @@ class RecommendConfigServers
                 $check_id->is_show = $params['value'] === 1 ? 1 : 0;
                 break;
             case 'sort':
-                RecommendConfig::query()
+                $inc = RecommendConfig::query()
                     ->where('show_position', '=', 3)
                     ->whereIn('jump_type', [4, 11, 13])
-                    ->whereIn('modular_type', [5, 7, 8, 9, 11])
-                    ->where('sort','>=',$params['value'])
-                    ->increment('sort',1);
+                    ->whereIn('modular_type', [5, 7, 8, 9, 11]);
+                if ($params['value'] === 1) {
+                    $inc->where('sort', '>=', $params['value']);
+                } else {
+                    $inc->where('sort', '>', $params['value']);
+                }
+                $inc->increment('sort');
+
                 $check_id->sort = $params['value'];
                 break;
         }
 
         $res = $check_id->save();
-//        if ($params['flag'] === 'sort'){
-//            $this->rc2Rank();
-//        }
-
-        if (!$res){
-            return ['code'=>false,'msg'=>'失败请重试'];
+        if ($params['flag'] === 'sort') {
+            $this->rc2Rank();
         }
 
-        return ['code'=>true,'msg'=>'成功'];
+        if (!$res) {
+            return ['code' => false, 'msg' => '失败请重试'];
+        }
+
+        return ['code' => true, 'msg' => '成功'];
     }
 
-    public function rc2Rank(){
-        DB::select(
-            'update nlsg_recommend_config as c join (
-SELECT
-id,sort,@sort_line := @sort_line + 1 as line_num
-from nlsg_recommend_config,(SELECT @sort_line := 0) a
-where show_position = 3 and jump_type in (4,11,13)
-and modular_type in (5,7,8,9,11)
-ORDER BY sort asc,id asc
-) as b on c.id = b.id
-set c.sort = b.line_num'
-        );
+    public function rc2Rank() {
+        $temp_line = 1;
+        $temp_list = RecommendConfig::query()
+            ->where('show_position', '=', 3)
+            ->whereIn('jump_type', [4, 11, 13])
+            ->whereIn('modular_type', [5, 7, 8, 9, 11])
+            ->select(['id'])
+            ->orderBy('sort')
+            ->get();
+        foreach ($temp_list as $v) {
+            $v->sort = $temp_line;
+            $v->save();
+            $temp_line++;
+        }
     }
 
 
