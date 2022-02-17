@@ -20,33 +20,30 @@ class RecommendConfig extends Base
         '3' => '底部模块',
     ];
 
+    // 3,4,6只能参与排序
     public $jump_type_array = [
-//        '1'  => '首页',
-//        '2'  => '每日琨说',
-//        '3'  => '专栏',
-//        '5'  => '讲座',
-//        '6'  => '360会员',
-//        '7'  => '训练营',
-//        '8'  => '商场',
-//        '9'  => '线下门票',
-//        '10' => '直播',
-//        '14' => '热门榜单',
-//        '15' => '课程全部分类页面',
-//        '16' => 'banner',
-//        '17' => '短视频',
-//        '18' => '活动类型',
+        '3'  => '专栏',
+        '5'  => '讲座',
+        '6'  => '360会员',
+        '7'  => '训练营',
+        '8'  => '商场',
+        '9'  => '线下门票',
+        '10' => '直播',
+        '14' => '热门榜单',
+        '15' => '课程全部分类页面',
+        '16' => 'banner',
+        '17' => '短视频',
+        '18' => '活动类型',
         '4'  => '课程',
         '11' => '大咖主持人',
         '13' => '精品专题',
     ];
 
     public $modular_type_array = [
-//        '1'  => 'banner',
-//        '2'  => 'icon',
-//        '3'  => '每日琨说',
-//        '4'  => '直播',
-//        '6'  => '短视频',
-//        '10' => '热门榜单',
+        '3'  => '每日琨说',
+        '4'  => '直播',
+        '6'  => '短视频',
+        '10' => '热门榜单',
 
         //works  下面只有能是works   绑定一个list_id
         '5'  => '精品课程',
@@ -58,6 +55,15 @@ class RecommendConfig extends Base
         '9'  => '精品专题',//推荐多个list 本身list_id=0
 
     ];
+
+    public $jump_type_array_keys;
+    public $modular_type_array_keys;
+
+    public function __construct(array $attributes = []) {
+        parent::__construct($attributes);
+        $this->jump_type_array_keys = array_keys($this->jump_type_array);
+        $this->modular_type_array_keys = array_keys($this->modular_type_array);
+    }
 
     public function recommendInfo(): HasMany {
         return $this->hasMany(Recommend::class, 'position', 'id');

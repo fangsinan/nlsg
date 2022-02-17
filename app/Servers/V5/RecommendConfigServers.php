@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class RecommendConfigServers
 {
+
     public function list($params) {
         $title         = $params['title'] ?? '';
         $show_position = $params['show_position'] ?? '';
@@ -17,10 +18,19 @@ class RecommendConfigServers
         $is_show       = $params['is_show'] ?? -1;
         $size          = $params['size'] ?? 10;
 
+        $rcModel = new RecommendConfig();
+
+        /*
+         * 3  每日琨说, 4  直播, 5  精品课程, 6  短视频, 7  大咖主讲人, 8  1-3岁父母  主题课程, 9  精品专题, 10 热门榜单, 11 亲子专题
+         *
+         *
+         * 3,4,6只能参与排序
+         *
+         * */
         $query = RecommendConfig::query()
             ->where('show_position', '=', 3)
-            ->whereIn('jump_type', [4, 11, 13])
-            ->whereIn('modular_type', [5, 7, 8, 9, 11])
+            ->whereIn('jump_type', $rcModel->jump_type_array_keys)
+            ->whereIn('modular_type', $rcModel->modular_type_array_keys)
             ->when($title, function ($q, $title) {
                 $q->where('title', 'like', "%$title%");
             })
@@ -51,6 +61,11 @@ class RecommendConfigServers
             $v->show_position_name = ($v->show_position_array)[$v->show_position] ?? '';
             $v->jump_type_name     = ($v->jump_type_array)[$v->jump_type] ?? '';
             $v->modular_type_name  = ($v->modular_type_array)[$v->modular_type] ?? '';
+            if(in_array($v->modular_type,[3,4,6])){
+                $v->can_bind = 0;
+            }else{
+                $v->can_bind = 1;
+            }
         }
 
         return $list;
@@ -77,7 +92,7 @@ class RecommendConfigServers
         if (!$check_id) {
             return ['code' => false, 'msg' => 'id错误'];
         }
-
+        $rcModel = new RecommendConfig();
         switch ($params['flag']) {
             case 'is_show':
                 $check_id->is_show = $params['value'] === 1 ? 1 : 0;
@@ -85,8 +100,8 @@ class RecommendConfigServers
             case 'sort':
                 $inc = RecommendConfig::query()
                     ->where('show_position', '=', 3)
-                    ->whereIn('jump_type', [4, 11, 13])
-                    ->whereIn('modular_type', [5, 7, 8, 9, 11]);
+                    ->whereIn('jump_type', $rcModel->jump_type_array_keys)
+                    ->whereIn('modular_type', $rcModel->modular_type_array_keys);
                 if ($params['value'] === 1) {
                     $inc->where('sort', '>=', $params['value']);
                 } else {
@@ -111,11 +126,12 @@ class RecommendConfigServers
     }
 
     public function rc2Rank() {
+        $rcModel = new RecommendConfig();
         $temp_line = 1;
         $temp_list = RecommendConfig::query()
             ->where('show_position', '=', 3)
-            ->whereIn('jump_type', [4, 11, 13])
-            ->whereIn('modular_type', [5, 7, 8, 9, 11])
+            ->whereIn('jump_type', $rcModel->jump_type_array_keys)
+            ->whereIn('modular_type', $rcModel->modular_type_array_keys)
             ->select(['id'])
             ->orderBy('sort')
             ->get();
