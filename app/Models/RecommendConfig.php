@@ -10,7 +10,7 @@ class RecommendConfig extends Base
     protected $table = 'nlsg_recommend_config';
 
     protected $fillable = [
-        'title', 'icon_pic', 'show_position', 'jump_type', 'modular_type', 'is_show', 'sort', 'icon_mark','jump_url',
+        'title', 'icon_pic', 'show_position', 'jump_type', 'modular_type', 'is_show', 'sort', 'icon_mark', 'jump_url',
     ];
 
 
@@ -22,6 +22,7 @@ class RecommendConfig extends Base
 
     // 3,4,6只能参与排序
     public $jump_type_array = [
+        '2'  => '每日琨说',
         '3'  => '专栏',
         '5'  => '讲座',
         '6'  => '360会员',
@@ -51,8 +52,8 @@ class RecommendConfig extends Base
         '11' => '亲子专题',
 
 
-        '7'  => '大咖主讲人',//is_author
-        '9'  => '精品专题',//推荐多个list 本身list_id=0
+        '7' => '大咖主讲人',//is_author
+        '9' => '精品专题',//推荐多个list 本身list_id=0
 
     ];
 
@@ -61,7 +62,7 @@ class RecommendConfig extends Base
 
     public function __construct(array $attributes = []) {
         parent::__construct($attributes);
-        $this->jump_type_array_keys = array_keys($this->jump_type_array);
+        $this->jump_type_array_keys    = array_keys($this->jump_type_array);
         $this->modular_type_array_keys = array_keys($this->modular_type_array);
     }
 

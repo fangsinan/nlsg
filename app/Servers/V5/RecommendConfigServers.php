@@ -61,9 +61,9 @@ class RecommendConfigServers
             $v->show_position_name = ($v->show_position_array)[$v->show_position] ?? '';
             $v->jump_type_name     = ($v->jump_type_array)[$v->jump_type] ?? '';
             $v->modular_type_name  = ($v->modular_type_array)[$v->modular_type] ?? '';
-            if(in_array($v->modular_type,[3,4,6])){
+            if (in_array($v->modular_type, [3, 4, 6])) {
                 $v->can_bind = 0;
-            }else{
+            } else {
                 $v->can_bind = 1;
             }
         }
@@ -126,7 +126,7 @@ class RecommendConfigServers
     }
 
     public function rc2Rank() {
-        $rcModel = new RecommendConfig();
+        $rcModel   = new RecommendConfig();
         $temp_line = 1;
         $temp_list = RecommendConfig::query()
             ->where('show_position', '=', 3)
