@@ -223,7 +223,7 @@ class MallController extends Controller
     {
         if ($request->input('aa', 0) == 1) {
             set_time_limit(0);
-            $res = (new TempToolsServers())->meikan2();
+            $res = (new TempToolsServers())->meikan3();
             return $this->getRes($res);
 
             $open_360 = $request->input('open_360', 0);
