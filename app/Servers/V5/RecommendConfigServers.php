@@ -345,7 +345,7 @@ class RecommendConfigServers
             case 5:
             case 8:
             case 11:
-                $d['type'] = 3;
+                $d['type'] = 2;
                 break;
             case 7:
                 $d['type'] = 14;
