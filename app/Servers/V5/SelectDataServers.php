@@ -23,6 +23,7 @@ class SelectDataServers
         return Works::query()
             ->where('type', '=', 2)
             ->where('status', '=', 1)
+            ->where('is_audio_book','=',0)
             ->select(['id', 'title'])
             ->get();
     }
