@@ -24,7 +24,7 @@ class RecommendConfigServers
          * 3  每日琨说, 4  直播, 5  精品课程, 6  短视频, 7  大咖主讲人, 8  1-3岁父母  主题课程, 9  精品专题, 10 热门榜单, 11 亲子专题
          *
          *
-         * 3,4,6只能参与排序
+         * 3,4,6,10只能参与排序
          *
          * */
         $query = RecommendConfig::query()
