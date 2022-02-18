@@ -1234,6 +1234,13 @@ class OrderController extends Controller
             return $this->error(0, '产品id有误');
         }
 
+        if($product_id==10){ //限制每个用户只能买一单
+            $OrderPayInfo=Order::query()->where(['user_id' => $user_id,'relation_id' => $product_id,'status'=>1])->first();
+            if(!empty($OrderPayInfo)){
+                return $this->error(0, '每个用户限购一单');
+            }
+        }
+
         $price = $ProductInfo['price'];
 
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
