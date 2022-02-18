@@ -22,7 +22,7 @@ class SelectDataServers
     public function worksList($params) {
         return Works::query()
             ->where('type', '=', 2)
-            ->where('status', '=', 1)
+            ->where('status', '=', 4)
             ->where('is_audio_book','=',0)
             ->select(['id', 'title'])
             ->get();
