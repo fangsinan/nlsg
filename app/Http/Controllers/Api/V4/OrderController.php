@@ -1238,7 +1238,7 @@ class OrderController extends Controller
             if($num>1){
                 return $this->error(0, '每个用户限购一本');
             }
-            $OrderPayInfo=Order::query()->where(['user_id' => $user_id,'relation_id' => $product_id,'status'=>1])->first();
+            $OrderPayInfo=Order::query()->where(['user_id' => $user_id,'type'=>14,'relation_id' => $product_id,'status'=>1])->first();
             if(!empty($OrderPayInfo)){
                 if(isset($this->user['is_test_pay']) && $this->user['is_test_pay']==0){ //刷单用户可购买多单
                     return $this->error(0, '每个用户限购一本');
