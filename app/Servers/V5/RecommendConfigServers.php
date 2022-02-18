@@ -229,14 +229,14 @@ class RecommendConfigServers
                     $v->info_img   = $v->works->cover_img;
                     break;
                 case 7:
-                    $v->info_id    = $v->works->id;
-                    $v->info_title = $v->works->nickname;
-                    $v->info_img   = $v->works->headimg;
+                    $v->info_id    = $v->teacher->id;
+                    $v->info_title = $v->teacher->nickname;
+                    $v->info_img   = $v->teacher->headimg;
                     break;
                 default:
-                    $v->info_id    = $v->works->id;
-                    $v->info_title = $v->works->title;
-                    $v->info_img   = $v->works->cover;
+                    $v->info_id    = $v->lists->id;
+                    $v->info_title = $v->lists->title;
+                    $v->info_img   = $v->lists->cover;
                     break;
             }
         }
