@@ -127,7 +127,7 @@ class RecommendConfigServers
 
     public function rc2Rank() {
         $rcModel   = new RecommendConfig();
-        $temp_line = 1;
+        $temp_line = 11;
         $temp_list = RecommendConfig::query()
             ->where('show_position', '=', 3)
             ->whereIn('jump_type', $rcModel->jump_type_array_keys)
