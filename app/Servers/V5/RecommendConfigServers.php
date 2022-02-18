@@ -6,6 +6,7 @@ use App\Models\Recommend;
 use App\Models\RecommendConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class RecommendConfigServers
 {
@@ -370,6 +371,9 @@ class RecommendConfigServers
         }
 
         DB::commit();
+
+        Cache::forget('index_recommend_'.$d['type'] .'_'.$d['position']);
+
         return ['code' => true, 'msg' => '成功'];
     }
 
