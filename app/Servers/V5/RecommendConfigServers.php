@@ -329,8 +329,8 @@ class RecommendConfigServers
         $validator = Validator::make($params, [
                 'recommend_config_id' => 'bail|required',
                 'show_position'       => 'bail|required|in:3',
-                'jump_type'           => 'bail|required|in:4,11,13',
-                'modular_type'        => 'bail|required|in:5,7,8,9,11',
+                'jump_type'           => 'bail|required',
+                'modular_type'        => 'bail|required',
             ]
         );
 
