@@ -293,14 +293,26 @@ class RecommendConfigServers
         }
 
         DB::beginTransaction();
-        $res = Recommend::query()->where('id', '=', $params['recommend_info_id'])
+//        $res = Recommend::query()->where('id', '=', $params['recommend_info_id'])
+//            ->where('position', '=', $params['recommend_config_id'])
+//            ->update(['status' => 0]);
+
+        $check = Recommend::query()->where('id', '=', $params['recommend_info_id'])
             ->where('position', '=', $params['recommend_config_id'])
-            ->update(['status' => 0]);
+            ->select(['id','type','position'])
+            ->first();
+
+        $check->status = 0;
+        $res = $check->save();
+
         if (!$res) {
             DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
         DB::commit();
+
+        $this->delRecommendCache($check['type'],$check['position']);
+
         return ['code' => true, 'msg' => '成功'];
     }
 
@@ -371,10 +383,13 @@ class RecommendConfigServers
         }
 
         DB::commit();
-
-        Cache::forget('index_recommend_'.$d['type'] .'_'.$d['position']);
+        $this->delRecommendCache($d['type'],$d['position']);
 
         return ['code' => true, 'msg' => '成功'];
+    }
+
+    public function delRecommendCache($type=0,$position=0){
+        Cache::forget('index_recommend_'.$type .'_'.$position);
     }
 
 }
