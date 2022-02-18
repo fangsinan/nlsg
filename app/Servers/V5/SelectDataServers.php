@@ -6,6 +6,7 @@ use App\Models\Lists;
 use App\Models\RecommendConfig;
 use App\Models\User;
 use App\Models\Works;
+use Illuminate\Support\Facades\DB;
 
 class SelectDataServers
 {
@@ -19,12 +20,32 @@ class SelectDataServers
     }
 
 
-    public function worksList($params) {
-        return Works::query()
-            ->where('type', '=', 2)
-            ->where('status', '=', 4)
-            ->where('is_audio_book','=',0)
-            ->select(['id', 'title'])
+    public function worksList($params, $id = 0) {
+        if ($id === 0) {
+            return Works::query()
+                ->where('type', '=', 2)
+                ->where('status', '=', 4)
+                ->where('is_audio_book', '=', 0)
+                ->select(['id', 'title'])
+                ->get();
+        }
+
+        $check = RecommendConfig::query()
+            ->where('id', '=', $id)
+            ->select(['id', 'lists_id'])
+            ->first();
+
+        if (empty($check['lists_id'])) {
+            return [];
+        }
+
+        return DB::table('nlsg_works as w')
+            ->join('nlsg_lists_work as l', 'w.id', '=', 'l.works_id')
+            ->where('w.status', '=', 4)
+            ->where('l.state', '=', 1)
+            ->orderBy('l.sort')
+            ->orderBy('l.id')
+            ->select(['w.id', 'w.title'])
             ->get();
     }
 
@@ -40,7 +61,7 @@ class SelectDataServers
             ->where('is_author', '=', 1)
             ->where('status', '=', 1)
             ->where('id', '<>', 1)
-            ->select(['id', 'nickname', 'nickname as title','honor'])
+            ->select(['id', 'nickname', 'nickname as title', 'honor'])
             ->get();
     }
 

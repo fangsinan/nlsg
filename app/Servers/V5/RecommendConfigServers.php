@@ -4,9 +4,9 @@ namespace App\Servers\V5;
 
 use App\Models\Recommend;
 use App\Models\RecommendConfig;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
 
 class RecommendConfigServers
 {
@@ -251,6 +251,8 @@ class RecommendConfigServers
 
     public function infoSelectList($params) {
         $modular_type = (int)($params['modular_type'] ?? 0);
+        $id           = (int)($params['id'] ?? 0);
+
         if (empty($modular_type)) {
             return [];
         }
@@ -260,7 +262,7 @@ class RecommendConfigServers
             case 5:
             case 8:
             case 11:
-                return $sds->worksList($params);
+                return $sds->worksList($params,$id);
             case 7:
                 return $sds->teacherList($params);
             default:
@@ -299,11 +301,11 @@ class RecommendConfigServers
 
         $check = Recommend::query()->where('id', '=', $params['recommend_info_id'])
             ->where('position', '=', $params['recommend_config_id'])
-            ->select(['id','type','position'])
+            ->select(['id', 'type', 'position'])
             ->first();
 
         $check->status = 0;
-        $res = $check->save();
+        $res           = $check->save();
 
         if (!$res) {
             DB::rollBack();
@@ -311,7 +313,7 @@ class RecommendConfigServers
         }
         DB::commit();
 
-        $this->delRecommendCache($check['type'],$check['position']);
+        $this->delRecommendCache($check['type'], $check['position']);
 
         return ['code' => true, 'msg' => '成功'];
     }
@@ -383,13 +385,13 @@ class RecommendConfigServers
         }
 
         DB::commit();
-        $this->delRecommendCache($d['type'],$d['position']);
+        $this->delRecommendCache($d['type'], $d['position']);
 
         return ['code' => true, 'msg' => '成功'];
     }
 
-    public function delRecommendCache($type=0,$position=0){
-        Cache::forget('index_recommend_'.$type .'_'.$position);
+    public function delRecommendCache($type = 0, $position = 0) {
+        Cache::forget('index_recommend_' . $type . '_' . $position);
     }
 
 }
