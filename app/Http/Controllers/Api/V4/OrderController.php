@@ -1193,7 +1193,7 @@ class OrderController extends Controller
 
 
     /**
-     * @api {post} /api//v4/order/create_products_order 线下产品下单
+     * @api {post} /api/v4/order/create_products_order 线下产品下单
      * @apiName create_products_order
      * @apiVersion 1.0.0
      * @apiGroup order
@@ -1235,9 +1235,14 @@ class OrderController extends Controller
         }
 
         if($product_id==10){ //限制每个用户只能买一单
+            if($num>1){
+                return $this->error(0, '每个用户限购一本');
+            }
             $OrderPayInfo=Order::query()->where(['user_id' => $user_id,'relation_id' => $product_id,'status'=>1])->first();
             if(!empty($OrderPayInfo)){
-                return $this->error(0, '每个用户限购一单');
+                if(isset($this->user['is_test_pay']) && $this->user['is_test_pay']==0){ //刷单用户可购买多单
+                    return $this->error(0, '每个用户限购一本');
+                }
             }
         }
 
