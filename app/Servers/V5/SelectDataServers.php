@@ -39,7 +39,7 @@ class SelectDataServers
             ->where('is_author', '=', 1)
             ->where('status', '=', 1)
             ->where('id', '<>', 1)
-            ->select(['id', 'nickname', 'honor'])
+            ->select(['id', 'nickname', 'nickname as title','honor'])
             ->get();
     }
 
