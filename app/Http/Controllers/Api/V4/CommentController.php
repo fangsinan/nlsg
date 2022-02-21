@@ -221,6 +221,12 @@ class CommentController extends Controller
                 $imgArr = explode(',', $img);
                 $data = [];
                 foreach ($imgArr as $v) {
+                    $v = str_replace(
+                        "http://nlsgapp.oss-cn-beijing.aliyuncs.com",
+                        "https://image.nlsgapp.com",
+                        $v);
+
+
                     $data[] = [
                         'relation_id' => $result->id,
                         'img'         => $v,
