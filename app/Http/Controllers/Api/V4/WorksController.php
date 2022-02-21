@@ -351,7 +351,7 @@ class WorksController extends Controller
             if(!empty($cate_id_arr)){
                 $worksDb->whereIn('relation.category_id',$cate_id_arr);
             }
-
+            $where['works.is_show'] =1;  //是否展示
             $worksData = $worksDb->where($where)
                 ->orderBy('works.'.$order_str,$sort)
                 ->groupBy('works.id')->paginate($this->page_per_page)->toArray();
@@ -478,7 +478,7 @@ class WorksController extends Controller
         $Teacher = Works::select(DB::raw('max(subscribe_num) subscribe_num'),'user_id')->with([
             'userName'=>function($query){
                 $query->select('id','nickname');
-            }])->where('status',4)->where('type',2)
+            }])->where('status',4)->where('type',2)->where('is_show',1)
             ->orderBy('subscribe_num','desc')->groupBy('user_id')
             ->paginate(6)->toArray();
         $newTeacher[] = ['id'=>0,'nickname'=>'全部'];
