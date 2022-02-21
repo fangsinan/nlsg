@@ -98,7 +98,7 @@ class IncomeController extends Controller
 
         $is_withdrawal=1;
         if (in_array($user_id, [317437,60895,92931,158291,164463,171507,174858,215209,229413,233148,234965,238291,247036,250593,303717,306448,314220,
-            303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291,167756,
+            303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291,167756,247036,
             184911,234586,242322,271061,177506])) { //禁止提现
             $is_withdrawal=0;
         }
@@ -299,6 +299,11 @@ class IncomeController extends Controller
             $idcard = $request->input('idcard', ''); //身份证号
             $truename = $request->input('truename', ''); //真实姓名
             $idcard_cover = $request->input('idcard_cover', ''); //身份证图片
+            $idcard_cover = str_replace(
+                "http://nlsgapp.oss-cn-beijing.aliyuncs.com",
+                "https://image.nlsgapp.com",
+                $idcard_cover);
+
             $idcard_type = $request->input('idcard_type', ''); //身份证类型
 
             if(empty($idcard) || empty($truename) || empty($idcard)){
@@ -523,7 +528,7 @@ class IncomeController extends Controller
 
 
         if (in_array($user_id, [317437,60895,92931,158291,164463,171507,174858,215209,229413,233148,234965,238291,247036,250593,303717,306448,314220,
-            303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291,167756,
+            303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291,167756,247036,
             184911,234586,242322,271061,177506])) { //禁止提现
             return $this->error(0,'此账号被锁定提现,请联系客服');
         }
