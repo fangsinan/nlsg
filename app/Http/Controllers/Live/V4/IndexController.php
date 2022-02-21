@@ -1004,6 +1004,8 @@ class IndexController extends ControllerBackend
             ['title' => "2022年十商第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/4671b130387702294353646033/v.f100020.mp4',],
             ['title' => "汤蓓老师第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d1fd0c94387702291813738145/v.f100030.mp4',],
             ['title' => "汤蓓老师第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d21cdad1387702291813750166/v.f100030.mp4',],
+            ['title' => "汤蓓老师第一天新版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/09b9e7ee387702296264213191/v.f100030.mp4',],
+            ['title' => "汤蓓老师第二天新版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/0bfb6b6c387702296264300714/v.f100030.mp4',],
             ['title' => "孟祥玲12.3", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/09098962387702292515310042/v.f100020.mp4',],
         ];
         return success($res);
