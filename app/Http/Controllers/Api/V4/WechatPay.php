@@ -12,6 +12,7 @@ use App\Models\GetPriceTools;
 use App\Models\ImGroup;
 use App\Models\Live;
 use App\Models\LiveCountDown;
+use App\Models\LivePayCheck;
 use App\Models\MallErpList;
 use App\Models\MallGroupBuyList;
 use App\Models\MallOrder;
@@ -777,6 +778,9 @@ class WechatPay extends Controller
                     // 内容刷单记录
                     self::PayTestLog($orderId,$userdata);
 
+                    // 下单记录王琨老师的直播
+                    self::PayTeacherLives($user_id,$liveData,$orderInfo);
+
 
                     //暂时先不启用直接分账
 //                    //调用直播分账
@@ -805,6 +809,19 @@ class WechatPay extends Controller
             //订单状态已更新，直接返回
             return true;
         }
+    }
+    static function PayTeacherLives($user_id,$liveData,$order){
+        if(empty($user_id) || empty($liveData) || empty($order)){
+            return ;
+        }
+        DB::table(LivePayCheck::$table_name)->insert([
+            'live_id' =>$liveData['id'],
+            'teacher_id' =>$liveData['user_id'],
+            'user_id' =>$user_id,
+            'order_id' =>$order['id'],
+            'ordernum' =>$order['ordernum'],
+        ]);
+        return ;
     }
 
     /**
