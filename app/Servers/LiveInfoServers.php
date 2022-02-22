@@ -473,7 +473,8 @@ class LiveInfoServers {
 
             $son_flag = $query->where('status', '=', 1)
                 ->select(['son', 'son_id', 'son_flag'])
-                ->orderBy('sort', 'asc')   //按标记排序
+                ->orderBy('sort', 'asc')
+                ->groupBy('son_id')
                 ->get();
             Cache::put($cache_key_name, $son_flag, $expire_num);
         }
