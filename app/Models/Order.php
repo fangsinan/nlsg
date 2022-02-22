@@ -925,4 +925,11 @@ class Order extends Base
         return $list;
 
     }
+
+    public function addressInfo(){
+        return $this->hasOne(MallAddress::class,'id','address_id');
+    }
+    public function textbookInfo(){
+        return $this->hasOne(Textbook::class,'id','textbook_id');
+    }
 }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\CouponRule;
 use App\Models\CouponRuleList;
-use App\Models\LiveLogin;
 use App\Models\MallCategory;
 use App\Models\MallComment;
 use App\Models\MallGoods;
@@ -14,10 +13,10 @@ use App\Models\MallGoodsMsg;
 use App\Models\RedeemCode;
 use App\Models\SpecialPriceModel;
 use App\Models\VipUser;
+use App\Servers\ErpServers;
 use App\Servers\MallRefundJob;
 use App\Servers\V5\TempToolsServers;
 use App\Servers\VipServers;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -219,9 +218,11 @@ class MallController extends Controller
      * ]
      * }
      */
-    public function goodsList(Request $request)
-    {
+    public function goodsList(Request $request) {
         if ($request->input('aa', 0) == 1) {
+            $eos = new ErpServers();
+            $eos->pushRunForOrder();
+            dd(__LINE__);
             set_time_limit(0);
             $res = (new TempToolsServers())->meikan3();
             return $this->getRes($res);
@@ -229,15 +230,15 @@ class MallController extends Controller
             $open_360 = $request->input('open_360', 0);
             if ($open_360) {
                 $list = DB::table('wwtest')->get()->toArray();
-                $vs = new VipServers();
-                $res = [];
+                $vs   = new VipServers();
+                $res  = [];
                 foreach ($list as $v) {
-                    $temp = [];
-                    $temp['parent'] = $v->twitter;
-                    $temp['phone'] = $v->phone;
+                    $temp               = [];
+                    $temp['parent']     = $v->twitter;
+                    $temp['phone']      = $v->phone;
                     $temp['send_money'] = 0;
-                    $temp_res = $vs->createVip_1($temp, 1);
-                    $res[] = $temp_res;
+                    $temp_res           = $vs->createVip_1($temp, 1);
+                    $res[]              = $temp_res;
                     if ($temp_res['code']) {
                         DB::table('wwtest')->where('id', '=', $v->id)->delete();
                     }
@@ -253,20 +254,20 @@ class MallController extends Controller
                 $as = '49_kDKgl_TFwjk-9hbwlaKhXpBDjWUrNNpUXG1dSabUQ7HChbjRPQZ008vd9vrN35CXEXSqzsIDpy3T5H-Q_i7v1g';
 
                 $url = "https://api.weixin.qq.com/cgi-bin/user/info";
-                $res = Http::get($url,[
-                    'access_token'=>$as,
-                    'openid'=>'oVWHQwXqOy6POy8z2IVHz-RgRsZ0',
-                    'lang'=>'zh_CN',
+                $res = Http::get($url, [
+                    'access_token' => $as,
+                    'openid'       => 'oVWHQwXqOy6POy8z2IVHz-RgRsZ0',
+                    'lang'         => 'zh_CN',
                 ]);
 
                 return json_decode($res, true);
 
             }
             $shill_check = $request->input('shill_check', 0);
-            if ($shill_check === '1'){
+            if ($shill_check === '1') {
                 MallRefundJob::shillJob(1);
             }
-            if ($shill_check === '2'){
+            if ($shill_check === '2') {
                 MallRefundJob::shillJob(2);
             }
 //            set_time_limit(0);
@@ -279,7 +280,7 @@ class MallController extends Controller
 //            $s = new ImDocServers();
 //            $r = $s->sendGroupDocMsgJob(701);
 
-            dd(__LINE__.date('Y-m-d H:i:s'));
+            dd(__LINE__ . date('Y-m-d H:i:s'));
 
 
 //            dd($r);
@@ -307,29 +308,29 @@ class MallController extends Controller
 
             if (0) {
                 $data = [
-                    'out_trade_no' => '21040900168934727026601', //获取订单号
-                    'total_fee' => 0.01, //价格
+                    'out_trade_no'   => '21040900168934727026601', //获取订单号
+                    'total_fee'      => 0.01, //价格
                     'transaction_id' => 88888888888, //交易单号
-                    'attach' => 8,
-                    'pay_type' => 1,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
+                    'attach'         => 8,
+                    'pay_type'       => 1,  //支付方式 1 微信端 2app微信 3app支付宝  4ios
                 ];
-                $res = WechatPay::PayStatusUp($data);
+                $res  = WechatPay::PayStatusUp($data);
                 dd($res);
             }
 
             if (0) {
                 $vipModel = new VipUser();
-                $res = $vipModel->jobOf1360(168934, 376481, 645);
+                $res      = $vipModel->jobOf1360(168934, 376481, 645);
                 dd($res);
             }
 
             exit(date('Y-m-d H:i:s'));
         } else {
-            $params = $request->input();
+            $params         = $request->input();
             $params['page'] = $params['page'] ?? 1;
             $params['size'] = $params['size'] ?? 10;
-            $model = new MallGoods();
-            $data = $model->getList($params, $this->user);
+            $model          = new MallGoods();
+            $data           = $model->getList($params, $this->user);
             return $this->success($data);
         }
     }
@@ -387,13 +388,12 @@ class MallController extends Controller
      * ]
      * }
      */
-    public function couponList(Request $request)
-    {
-        $model = new CouponRule();
-        $params = $request->input();
+    public function couponList(Request $request) {
+        $model          = new CouponRule();
+        $params         = $request->input();
         $params['page'] = 1;
         $params['size'] = 4;
-        $data = $model->getList($params, $this->user['id'] ?? 0);
+        $data           = $model->getList($params, $this->user['id'] ?? 0);
         return $this->success($data);
     }
 
@@ -504,11 +504,10 @@ class MallController extends Controller
      * }
      * }
      */
-    public function commentList(Request $request)
-    {
-        $model = new MallComment();
+    public function commentList(Request $request) {
+        $model  = new MallComment();
         $params = $request->input();
-        $data = $model->getList($params);
+        $data   = $model->getList($params);
         return $this->getRes($data);
     }
 
@@ -543,10 +542,9 @@ class MallController extends Controller
      * ]
      * }
      */
-    public function categoryList()
-    {
+    public function categoryList() {
         $model = new MallCategory();
-        $data = $model->getUsedList();
+        $data  = $model->getUsedList();
         return $this->success($data);
     }
 
@@ -638,10 +636,9 @@ class MallController extends Controller
      * }
      * }
      */
-    public function bannerList()
-    {
+    public function bannerList() {
         $model = new Banner();
-        $data = $model->mallBannerList();
+        $data  = $model->mallBannerList();
         return $this->success($data);
     }
 
@@ -718,12 +715,11 @@ class MallController extends Controller
      * }
      * }
      */
-    public function homeSpList()
-    {
-        $model = new SpecialPriceModel();
-        $data['sec'] = $model->homeSecList();
+    public function homeSpList() {
+        $model         = new SpecialPriceModel();
+        $data['sec']   = $model->homeSecList();
         $data['group'] = $model->homeGroupList();
-        $data['now'] = time();
+        $data['now']   = time();
         return $this->success($data);
     }
 
@@ -800,10 +796,9 @@ class MallController extends Controller
      * ]
      * }
      */
-    public function flashSaleList()
-    {
+    public function flashSaleList() {
         $model = new SpecialPriceModel();
-        $data = $model->getSecList(2);
+        $data  = $model->getSecList(2);
         return $this->success($data);
     }
 
@@ -851,10 +846,9 @@ class MallController extends Controller
      * ]
      * }
      */
-    public function groupBuyList()
-    {
+    public function groupBuyList() {
         $model = new SpecialPriceModel();
-        $data = $model->groupBuyList();
+        $data  = $model->groupBuyList();
         return $this->success($data);
     }
 
@@ -891,10 +885,9 @@ class MallController extends Controller
      * ]
      * }
      */
-    public function mallServiceDescription()
-    {
+    public function mallServiceDescription() {
         $model = new MallGoods();
-        $res = $model->mallServiceDescription();
+        $res   = $model->mallServiceDescription();
         return $this->success($res);
     }
 
@@ -923,10 +916,9 @@ class MallController extends Controller
      * ]
      * }
      */
-    public function buyerReading()
-    {
+    public function buyerReading() {
         $model = new MallGoods();
-        $res = $model->buyerReading();
+        $res   = $model->buyerReading();
         return $this->success($res);
     }
 
@@ -939,8 +931,7 @@ class MallController extends Controller
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/goods/buyer_reading_gb
      * @apiDescription 拼团购买须知
      */
-    public function buyerReadingForGroupBuy()
-    {
+    public function buyerReadingForGroupBuy() {
         $res = \App\Models\ConfigModel::getData(17);
         $res = json_decode($res);
         return $this->success($res);
@@ -956,11 +947,10 @@ class MallController extends Controller
      * @apiDescription 拼团商品详情(返回值参考商品详情. group_num拼团需要人数 order_numn已拼人数 normal_price单独购买价格,goods和sku都有这个字段)
      * @apiSuccess {number} group_buy_id 拼团列表id
      */
-    public function groupByGoodsInfo(Request $request)
-    {
+    public function groupByGoodsInfo(Request $request) {
         $params = $request->input();
-        $model = new MallGoods();
-        $data = $model->groupByGoodsInfo($params, $this->user);
+        $model  = new MallGoods();
+        $data   = $model->groupByGoodsInfo($params, $this->user);
 
         return $this->getRes($data);
     }
@@ -976,11 +966,10 @@ class MallController extends Controller
      * @apiParam {number} goods_id 商品id
      *
      */
-    public function collect(Request $request)
-    {
+    public function collect(Request $request) {
         $goods_id = $request->input('goods_id', 0);
-        $model = new MallGoods();
-        $data = $model->collect($goods_id, $this->user['id']);
+        $model    = new MallGoods();
+        $data     = $model->collect($goods_id, $this->user['id']);
         return $this->getRes($data);
     }
 
@@ -995,11 +984,10 @@ class MallController extends Controller
      * @apiParam {number} [num] 显示数量
      *
      */
-    public function forYourReference(Request $request)
-    {
-        $num = $request->input('num', 4);
+    public function forYourReference(Request $request) {
+        $num   = $request->input('num', 4);
         $model = new MallGoods();
-        $data = $model->forYourReference($num, $this->user);
+        $data  = $model->forYourReference($num, $this->user);
         return $this->getRes($data);
     }
 
@@ -1014,11 +1002,10 @@ class MallController extends Controller
      * @apiParam {number} id id
      *
      */
-    public function getCouponList(Request $request)
-    {
-        $id = $request->input('id', 0);
+    public function getCouponList(Request $request) {
+        $id    = $request->input('id', 0);
         $model = new CouponRuleList();
-        $data = $model->list($id, $this->user['id'] ?? 0);
+        $data  = $model->list($id, $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 
@@ -1034,10 +1021,9 @@ class MallController extends Controller
      * @apiParam {number} goods_id 商品id
      *
      */
-    public function sub(Request $request)
-    {
+    public function sub(Request $request) {
         $model = new MallGoodsMsg();
-        $data = $model->add($request->input(), $this->user);
+        $data  = $model->add($request->input(), $this->user);
         return $this->getRes($data);
     }
 
@@ -1053,10 +1039,9 @@ class MallController extends Controller
      * @apiParam {number=1,2,3} os_type 系统( 1 安卓 2ios 3微信)
      *
      */
-    public function redeemCode(Request $request)
-    {
+    public function redeemCode(Request $request) {
         $model = new RedeemCode();
-        $data = $model->redeem($request->input(), $this->user);
+        $data  = $model->redeem($request->input(), $this->user);
         return $this->getRes($data);
     }
 
@@ -1073,10 +1058,9 @@ class MallController extends Controller
      * @apiParam {number} status 筛选(不传都饭,1是已使用,0是未使用)
      *
      */
-    public function redeemCodeList(Request $request)
-    {
+    public function redeemCodeList(Request $request) {
         $model = new RedeemCode();
-        $data = $model->redeemList($request->input(), $this->user);
+        $data  = $model->redeemList($request->input(), $this->user);
         return $this->getRes($data);
     }
 }
