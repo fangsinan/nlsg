@@ -1248,6 +1248,12 @@ class OrderController extends Controller
 
         $price = $ProductInfo['price'];
 
+        $liveIdArr=explode(",",$live_id);
+        $liveIdNum=count($liveIdArr);
+        if($liveIdNum>1){
+            $live_id=$liveIdArr[0];
+        }
+
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
             'ordernum' => $ordernum,
