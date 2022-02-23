@@ -859,7 +859,7 @@ class LiveController extends Controller
             $push_gid = LivePush::where([
                 'live_info_id'=>$id,
                 'push_type'=>4,
-                'push_id'=>10,
+                'push_gid'=>10,
             ])->first();
 
 
