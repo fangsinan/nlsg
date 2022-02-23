@@ -1,17 +1,22 @@
 <?php
 
-
 namespace App\Models;
 
-
-class MallErpList extends Base
+class OrderErpList extends Base
 {
-    protected $table = 'nlsg_mall_order_erp_list';
+    protected $table = 'nlsg_order_erp_list';
 
-    public static function addList($order_id) {
-        $check_order = MallOrder::where('id', '=', $order_id)->select([
-            'id', 'pay_price'
-        ])->first();
+    public function orderInfo() {
+        return $this->hasOne(Order::class, 'id', 'order_id');
+    }
+
+    public static function addList($order_id): bool {
+        $check_order = Order::query()
+            ->where('id', '=', $order_id)
+            ->where('status', '=', 1)
+            ->whereIn('type', [14, 18])
+            ->select(['id', 'pay_price'])
+            ->first();
 
         if (empty($check_order)) {
             return true;
@@ -31,7 +36,8 @@ class MallErpList extends Base
                 break;
         }
 
-        $check_list = self::where('order_id', '=', $order_id)
+        $check_list = self::query()
+            ->where('order_id', '=', $order_id)
             ->where('flag', '=', 1)
             ->first();
         if (!empty($check_list)) {

@@ -28,10 +28,9 @@ use Illuminate\Support\Facades\DB;
 class MallOrderServers
 {
 
-    public function listNew($params, $user_id = 0)
-    {
+    public function listNew($params, $user_id = 0) {
         $query = MallOrder::query();
-        $size = $params['size'] ?? 10;
+        $size  = $params['size'] ?? 10;
 
 //        $query->where('status', '>', 1);
 
@@ -149,8 +148,7 @@ class MallOrderServers
         return $list;
     }
 
-    public function getList($params)
-    {
+    public function getList($params) {
         $order_type = $params['order_type'] ?? 0;
 
         switch (strtolower($order_type)) {
@@ -164,8 +162,7 @@ class MallOrderServers
         return $res;
     }
 
-    public function makeGroupSuccess($params)
-    {
+    public function makeGroupSuccess($params) {
         $order_id = $params['id'] ?? 0;
         if (empty($order_id)) {
             return ['code' => false, 'msg' => 'id错误'];
@@ -179,8 +176,8 @@ class MallOrderServers
             return ['code' => false, 'msg' => '状态错误,无法操作.'];
         }
 
-        $now_date = date('Y-m-d H:i:s');
-        $group_key = $check_group->group_key;
+        $now_date   = date('Y-m-d H:i:s');
+        $group_key  = $check_group->group_key;
         $group_name = $check_group->group_name;
 
         //拼团活动的详情
@@ -212,32 +209,32 @@ class MallOrderServers
 
         $tr_flag = true;
         foreach ($robot as $v) {
-            $oModel = new MallOrder();
-            $oModel->ordernum = MallOrder::createOrderNumber($v['id'], 1);
-            $oModel->user_id = $v['id'];
+            $oModel             = new MallOrder();
+            $oModel->ordernum   = MallOrder::createOrderNumber($v['id'], 1);
+            $oModel->user_id    = $v['id'];
             $oModel->order_type = 3;
-            $oModel->status = 30;
-            $oModel->gp_status = 2;
+            $oModel->status     = 30;
+            $oModel->gp_status  = 2;
             $oModel->cost_price = $price_info->group_price;
-            $oModel->price = $price_info->group_price;
-            $oModel->pay_price = $price_info->group_price;
-            $oModel->pay_time = $now_date;
-            $o_res = $oModel->save();
+            $oModel->price      = $price_info->group_price;
+            $oModel->pay_price  = $price_info->group_price;
+            $oModel->pay_time   = $now_date;
+            $o_res              = $oModel->save();
             if ($o_res === false) {
                 $tr_flag = false;
                 continue;
             }
-            $gModel = new MallGroupBuyList();
+            $gModel               = new MallGroupBuyList();
             $gModel->group_buy_id = $check_group->group_buy_id;
-            $gModel->group_key = $check_group->group_key;
-            $gModel->group_name = $check_group->group_name;
-            $gModel->order_id = $oModel->id;
-            $gModel->created_at = $now_date;
-            $gModel->updated_at = $now_date;
-            $gModel->user_id = $v['id'];
-            $gModel->begin_at = $check_group->begin_at;
-            $gModel->end_at = $check_group->end_at;
-            $g_res = $gModel->save();
+            $gModel->group_key    = $check_group->group_key;
+            $gModel->group_name   = $check_group->group_name;
+            $gModel->order_id     = $oModel->id;
+            $gModel->created_at   = $now_date;
+            $gModel->updated_at   = $now_date;
+            $gModel->user_id      = $v['id'];
+            $gModel->begin_at     = $check_group->begin_at;
+            $gModel->end_at       = $check_group->end_at;
+            $g_res                = $gModel->save();
             if ($g_res === false) {
                 $tr_flag = false;
                 continue;
@@ -277,9 +274,8 @@ class MallOrderServers
         }
     }
 
-    protected function listOfNormal($params)
-    {
-        $now = time();
+    protected function listOfNormal($params) {
+        $now      = time();
         $now_date = date('Y-m-d H:i:s', $now);
 
         $size = $params['size'] ?? 10;
@@ -306,7 +302,7 @@ class MallOrderServers
 
         //时间,支付时间,支付渠道,客户端类型 created_at,pay_time,pay_type,os_type
         if (!empty($params['created_at'])) {
-            $created_at = explode(',', $params['created_at']);
+            $created_at    = explode(',', $params['created_at']);
             $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
             if (empty($created_at[1] ?? '')) {
                 $created_at[1] = $now_date;
@@ -316,7 +312,7 @@ class MallOrderServers
             $query->whereBetween('created_at', [$created_at[0], $created_at[1] ?? $now_date]);
         }
         if (!empty($params['pay_time'])) {
-            $pay_time = explode(',', $params['pay_time']);
+            $pay_time    = explode(',', $params['pay_time']);
             $pay_time[0] = date('Y-m-d 00:00:00', strtotime($pay_time[0]));
             if (empty($pay_time[1] ?? '')) {
                 $pay_time[1] = $now_date;
@@ -375,7 +371,7 @@ class MallOrderServers
             'id', 'ordernum', 'price', 'dead_time', 'user_id', 'order_type', 'pay_price', 'messages', 'created_at',
             DB::raw('(case when is_stop = 1 then 99 ELSE `status` END) `status`'), 'address_history'
         ];
-        $with = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo', 'refundRecord'];
+        $with  = ['orderDetails', 'orderDetails.goodsInfo', 'userInfo', 'refundRecord'];
 
 //        if (($params['flag'] ?? 0) == 1) {
         $field[] = 'cost_price';
@@ -392,8 +388,8 @@ class MallOrderServers
         $field[] = 'bill_title';
         $field[] = 'bill_number';
         $field[] = 'bill_format';
-        $with[] = 'orderChild';
-        $with[] = 'orderChild.expressInfo';
+        $with[]  = 'orderChild';
+        $with[]  = 'orderChild.expressInfo';
 //        }
 
 //        $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
@@ -406,7 +402,7 @@ class MallOrderServers
         foreach ($list as $v) {
             $v->goods_count = 0;
             foreach ($v->orderDetails as $vv) {
-                $v->goods_count += $vv->num;
+                $v->goods_count  += $vv->num;
                 $vv->sku_history = json_decode($vv->sku_history);
             }
             $v->address_history = json_decode($v->address_history);
@@ -419,11 +415,10 @@ class MallOrderServers
         return $list;
     }
 
-    protected function listOfGroupBy($params)
-    {
-        $now = time();
+    protected function listOfGroupBy($params) {
+        $now      = time();
         $now_date = date('Y-m-d H:i:s', $now);
-        $size = $params['size'] ?? 10;
+        $size     = $params['size'] ?? 10;
         //库数据:订单状态 1待付款  10待发货 20待收货 30已完成
         //全部0,拼团中95,待付款1,代发货10,待签收20,已完成30,已取消99
         //展示数据:订单编号,状态,商品列表,价格,数量,取消时间,金额
@@ -445,7 +440,7 @@ class MallOrderServers
 
         //时间,支付时间,支付渠道,客户端类型 created_at,pay_time,pay_type,os_type
         if (!empty($params['created_at'])) {
-            $created_at = explode(',', $params['created_at']);
+            $created_at    = explode(',', $params['created_at']);
             $created_at[0] = date('Y-m-d 00:00:00', strtotime($created_at[0]));
             if (empty($created_at[1] ?? '')) {
                 $created_at[1] = $now_date;
@@ -455,7 +450,7 @@ class MallOrderServers
             $query->whereBetween('nlsg_mall_order.created_at', [$created_at[0], $created_at[1] ?? $now_date]);
         }
         if (!empty($params['pay_time'])) {
-            $pay_time = explode(',', $params['pay_time']);
+            $pay_time    = explode(',', $params['pay_time']);
             $pay_time[0] = date('Y-m-d 00:00:00', strtotime($pay_time[0]));
             if (empty($pay_time[1] ?? '')) {
                 $pay_time[1] = $now_date;
@@ -565,7 +560,7 @@ class MallOrderServers
             $field[] = 'bill_title';
             $field[] = 'bill_number';
             $field[] = 'bill_format';
-            $with[] = 'orderChild';
+            $with[]  = 'orderChild';
         }
 
         $query->whereRaw('(case when `status` = 1 AND dead_time < "' .
@@ -582,7 +577,7 @@ class MallOrderServers
         foreach ($list as $v) {
             $v->goods_count = 0;
             foreach ($v->orderDetails as $vv) {
-                $v->goods_count += $vv->num;
+                $v->goods_count  += $vv->num;
                 $vv->sku_history = json_decode($vv->sku_history);
             }
             $v->address_history = json_decode($v->address_history);
@@ -591,8 +586,7 @@ class MallOrderServers
         return $list;
     }
 
-    public function send($params)
-    {
+    public function send($params) {
         if (empty($params)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
@@ -608,7 +602,7 @@ class MallOrderServers
             return ['code' => false, 'msg' => '包含状态错误订单'];
         }
 
-        $now = time();
+        $now      = time();
         $now_date = date('Y-m-d H:i:s', $now);
 
         DB::beginTransaction();
@@ -624,9 +618,9 @@ class MallOrderServers
             }
 
             //只要有发货的  order状态就是已发货
-            $order_obj = MallOrder::find($v['order_id']);
+            $order_obj         = MallOrder::find($v['order_id']);
             $order_obj->status = 20;
-            $order_res = $order_obj->save();
+            $order_res         = $order_obj->save();
             if (!$order_res) {
                 DB::rollBack();
                 return ['code' => false, 'msg' => '错误', 'ps' => $v['order_id'] . ' order error'];
@@ -639,19 +633,19 @@ class MallOrderServers
                 $express_info_id = $check_ex->id;
             } else {
                 //$c_res = DB::table('nlsg_mall_comment')->insertGetId($c_data);
-                $ex_data['express_id'] = $v['express_id'];
+                $ex_data['express_id']  = $v['express_id'];
                 $ex_data['express_num'] = $v['num'];
 
-                $express_company_info = ExpressCompany::find($v['express_id']);
-                $history = [];
-                $history['number'] = $v['num'];
-                $history['type'] = $express_company_info->code;
-                $history['typename'] = $express_company_info->name;
+                $express_company_info     = ExpressCompany::find($v['express_id']);
+                $history                  = [];
+                $history['number']        = $v['num'];
+                $history['type']          = $express_company_info->code;
+                $history['typename']      = $express_company_info->name;
                 $history['express_phone'] = $express_company_info->phone;
-                $history['logo'] = $express_company_info->logo;
-                $history['list'] = [
+                $history['logo']          = $express_company_info->logo;
+                $history['list']          = [
                     [
-                        'time' => $now_date,
+                        'time'   => $now_date,
                         'status' => '商家发货'
                     ]
                 ];
@@ -659,7 +653,7 @@ class MallOrderServers
                 $ex_data['history'] = json_encode($history);
 
                 $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
-                $express_info_id = DB::table('nlsg_express_info')->insertGetId($ex_data);
+                $express_info_id       = DB::table('nlsg_express_info')->insertGetId($ex_data);
                 if (!$express_info_id) {
                     DB::rollBack();
                     return ['code' => false, 'msg' => '错误', 'ps' => $v['order_id'] . ' ex error'];
@@ -672,22 +666,22 @@ class MallOrderServers
             if ($check_oc) {
                 $check_oc->express_info_id = $express_info_id;
             } else {
-                $check_oc = new MallOrderChild();
-                $check_oc->order_id = $v['order_id'];
+                $check_oc                  = new MallOrderChild();
+                $check_oc->order_id        = $v['order_id'];
                 $check_oc->order_detail_id = $v['order_detail_id'];
                 $check_oc->express_info_id = $express_info_id;
             }
             $child_res = $check_oc->save();
 
             $notify_data = [
-                'from_uid' => 0,
-                'to_uid' => $order_obj->user_id,
-                'type' => 5,
+                'from_uid'      => 0,
+                'to_uid'        => $order_obj->user_id,
+                'type'          => 5,
                 'relation_type' => 6,
-                'content' => '',
-                'source_id' => $order_obj->id,
-                'created_at' => $now_date,
-                'updated_at' => $now_date
+                'content'       => '',
+                'source_id'     => $order_obj->id,
+                'created_at'    => $now_date,
+                'updated_at'    => $now_date
             ];
             DB::table('nlsg_notify')->insert($notify_data);
             //todo 极光推送
@@ -714,9 +708,8 @@ class MallOrderServers
 
 
     //群组
-    public function allMallOrder($params, $user_id)
-    {
-        $size = $params['size'] ?? 10;
+    public function allMallOrder($params, $user_id) {
+        $size  = $params['size'] ?? 10;
         $query = MallOrder::query();
         $query->with([
             'userInfo',
