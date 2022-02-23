@@ -102,12 +102,12 @@ class LiveInfo extends Model
         $subject        = $info['push_live_url'];
         $back_video_url   = $info['back_video_url'];
 
-        $liveObj=Live::query()->where('id',$live_info_id)->select(['steam_begin_time','steam_end_time'])->first();
+        $liveObj=Live::query()->where('id',$live_info_id)->select(['steam_begin_time','steam_end_time','pre_push_time'])->first();
         if(empty($liveObj)){
             return ['code'=>0,'msg'=>'直播间ID有误','data'=>[]];
         }
 
-        $str_time = strtotime($liveObj->steam_begin_time) - 60;
+        $str_time = strtotime($liveObj->steam_begin_time) - $liveObj->pre_push_time;
         $end_time = strtotime($liveObj->steam_end_time)+60;
 
 //        $str_time = strtotime($info['begin_at']) - 60;
