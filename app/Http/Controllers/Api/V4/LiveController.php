@@ -854,6 +854,18 @@ class LiveController extends Controller
 
         //如果有推送则在show接口返回
         $push_live = NULL;
+        $is_push_goods = 0;
+        if(time() > strtotime(date("Y-m-d 09:00:0"))){
+            $push_gid = LivePush::where([
+                'live_info_id'=>$id,
+                'push_type'=>4,
+                'push_id'=>10,
+            ])->first();
+
+
+            $is_push_goods = empty($push_gid) ? 0 : 1;
+        }
+
         /*$time=time();
         if(in_array($id,[19])){
             $start_time=strtotime(date("Y-m-d 09:00:0"));
@@ -875,6 +887,7 @@ class LiveController extends Controller
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
             'push_live' => $push_live,
+            'is_push_goods' => $is_push_goods,
         ];
         return success($data);
 
