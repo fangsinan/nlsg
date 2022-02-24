@@ -493,6 +493,7 @@ class IndexController extends ControllerBackend
         $need_virtual_num  = $input['need_virtual_num'] ?? 0;
         $steam_end_time   = $input['steam_end_time'] ?? '';
         $steam_begin_time  = $input['steam_begin_time'] ?? '';
+        $pre_push_time  = $input['pre_push_time'] ?? 60;
 
         if (!$title) {
             return error(1000, '标题不能为空');
@@ -540,6 +541,7 @@ class IndexController extends ControllerBackend
             'is_test'           => $is_test,
             'steam_end_time'   => $steam_end_time,
             'steam_begin_time'  => $steam_begin_time,
+            'pre_push_time'  => $pre_push_time,
         ];
 
         $lcModel            = new LiveConsole();
@@ -924,7 +926,7 @@ class IndexController extends ControllerBackend
         $live = Live::query()
             ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
                 'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test',
-                'steam_end_time', 'steam_begin_time'
+                'steam_end_time', 'steam_begin_time','pre_push_time'
             )
             ->with(['livePoster'])
             ->where('id', $id)->first();
@@ -997,6 +999,7 @@ class IndexController extends ControllerBackend
             ['title' => "王琨老师第二天直播19.9", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/42785d86387702291818025002/v.f100020.mp4',],
             ['title' => "李婷老师直播19.9", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/42798414387702291818027383/v.f100020.mp4',],
             ['title' => "王琨老师公益课", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd2ad1f6387702291813511887/v.f100020.mp4',],
+            ['title' => "王琨老师公益课改版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/759d778d387702296506162026/v.f100020.mp4',],
             ['title' => "十商交付第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd3e6ccd387702291813524028/v.f100020.mp4',],
             ['title' => "十商交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/3bb9b74a387702292234507161/v.f100020.mp4',],
             ['title' => "2022年十商第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/17031e14387702294366503473/v.f100020.mp4',],
