@@ -5,12 +5,11 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 
-use App\Models\PayRecord;
+
 use App\Models\ShortVideoLikeModel;
 use App\Models\ShortVideoModel;
 use App\Models\ShortVideoShow;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class VideoController extends Controller
 {
@@ -130,18 +129,12 @@ class VideoController extends Controller
         $id   = $request->input('id')??0;//多个用逗号拼接
         $os_type   = $request->input('os_type')??0;
         $uid = $this->user['id'] ?? 0;
+        $is_finish   = $request->input('is_finish')??0;// 是否完播
         $show_id   = $request->input('show_id')??0;// 当前记录id
         $res = ['show_id'=>0];
 
-        PayRecord::PayLog('1',json_encode($request->input()));
-
         if(empty($id)){
             return $this->getRes($res);
-        }
-        if(empty($show_id)){
-            $is_finish = 0;
-        }else{
-            $is_finish = 1;
         }
 
 
@@ -150,7 +143,6 @@ class VideoController extends Controller
         //uid存在的情况下  记录该用户的行为
         if(!empty($uid)){
             //   完播再请求一次
-
             if(empty($show_id)){
                 $show = ShortVideoShow::create([
                     'relation_id' => $id,
