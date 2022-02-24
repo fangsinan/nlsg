@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 
 use App\Models\ShortVideoLikeModel;
 use App\Models\ShortVideoModel;
+use App\Models\ShortVideoShow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -110,7 +111,8 @@ class VideoController extends Controller
      * @apiGroup five_video
      *
      * @apiParam  id  短视频id、
-//     * @apiParam  type  类型 1短视频
+     * @apiParam  is_finish 是否完播
+     * @apiParam  show_id  当前阅读记录id
      *
      * @apiSuccessExample 成功响应:
      *   {
@@ -125,11 +127,36 @@ class VideoController extends Controller
     public function show(Request $request)
     {
         $id   = $request->input('id')??0;//多个用逗号拼接
+        $is_finish   = $request->input('is_finish')??0;
+
         if(!empty($id)){
-            ShortVideoModel::readVideo(explode(',', $id));
+            ShortVideoModel::readVideo(explode(',', $id), $is_finish);
+        }
+        // 返回 3秒阅读
+        $uid = $this->user['id'] ?? 0;
+        $res = ['show_id'=>0];
+        if(!empty($uid)){
+            //   完播再请求一次
+            $show_id   = $request->input('show_id')??0;// 当前记录id
+            if(empty($show_id)){
+                $show = ShortVideoShow::create([
+                    'relation_id' => $id,
+                    'user_id'     => $uid,
+                    'is_finish'   => $is_finish,
+                    'is_finish'   => $is_finish,
+                ]);
+                $res['show_id'] = $show->id;
+
+            }else{
+                ShortVideoShow::where(['id'=>$show_id])->update(['is_finish'   => $is_finish]);
+            }
+
         }
 
-        return $this->getRes([]);
+
+
+
+        return $this->getRes($res);
 
 
     }

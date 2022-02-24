@@ -212,14 +212,18 @@ class ShortVideoModel extends Base
     /*
      * 短视频阅读
      * */
-    public static function readVideo($ids){
+    public static function readVideo($ids,$is_finish){
 
+        $update_data = [
+            'view_num' => DB::raw("view_num + 1"),
+            'real_view_num' => DB::raw("real_view_num + 1"),
+        ];
+        if(!empty($is_finish)){
+            $update_data['finish_show_num'] = DB::raw("finish_show_num + 1");
+        }
         if( !empty($ids) && is_array($ids) ){
             $rst = DB::table("nlsg_short_video")->whereIn('id', $ids)
-                ->update([
-                    'view_num' => DB::raw("view_num + 1"),
-                    'real_view_num' => DB::raw("real_view_num + 1")
-                ]);
+                ->update($update_data);
         }
         return ;
     }
