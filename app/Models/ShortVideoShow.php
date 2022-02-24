@@ -14,7 +14,7 @@ class ShortVideoShow extends Base
     protected $table = 'nlsg_short_video_show';
 
     protected $fillable = [
-        'relation_id', 'user_id', 'is_finish',
+        'relation_id', 'user_id', 'is_finish','os_type',
     ];
 
 
