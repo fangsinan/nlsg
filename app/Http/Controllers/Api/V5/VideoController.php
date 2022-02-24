@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 
+use App\Models\PayRecord;
 use App\Models\ShortVideoLikeModel;
 use App\Models\ShortVideoModel;
 use App\Models\ShortVideoShow;
@@ -132,6 +133,8 @@ class VideoController extends Controller
         $show_id   = $request->input('show_id')??0;// 当前记录id
         $res = ['show_id'=>0];
 
+        PayRecord::PayLog('1',json_encode($request->input()));
+
         if(empty($id)){
             return $this->getRes($res);
         }
@@ -165,7 +168,7 @@ class VideoController extends Controller
             }
 
         }
-        
+
 
         return $this->getRes($res);
 
