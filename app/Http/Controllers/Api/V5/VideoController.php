@@ -135,6 +135,7 @@ class VideoController extends Controller
         // 返回 3秒阅读
         $uid = $this->user['id'] ?? 0;
         $res = ['show_id'=>0];
+
         if(!empty($uid)){
             //   完播再请求一次
             $show_id   = $request->input('show_id')??0;// 当前记录id
@@ -142,7 +143,6 @@ class VideoController extends Controller
                 $show = ShortVideoShow::create([
                     'relation_id' => $id,
                     'user_id'     => $uid,
-                    'is_finish'   => $is_finish,
                     'is_finish'   => $is_finish,
                 ]);
                 $res['show_id'] = $show->id;
