@@ -127,18 +127,26 @@ class VideoController extends Controller
     public function show(Request $request)
     {
         $id   = $request->input('id')??0;//多个用逗号拼接
-        $is_finish   = $request->input('is_finish')??0;
-
-        if(!empty($id)){
-            ShortVideoModel::readVideo(explode(',', $id), $is_finish);
-        }
-        // 返回 3秒阅读
         $uid = $this->user['id'] ?? 0;
+        $show_id   = $request->input('show_id')??0;// 当前记录id
         $res = ['show_id'=>0];
 
+        if(empty($id)){
+            return $this->getRes($res);
+        }
+        if(empty($show_id)){
+            $is_finish = 0;
+        }else{
+            $is_finish = 1;
+        }
+
+
+        // 返回 3秒阅读
+        ShortVideoModel::readVideo(explode(',', $id), $is_finish);
+        //uid存在的情况下  记录该用户的行为
         if(!empty($uid)){
             //   完播再请求一次
-            $show_id   = $request->input('show_id')??0;// 当前记录id
+
             if(empty($show_id)){
                 $show = ShortVideoShow::create([
                     'relation_id' => $id,
@@ -152,7 +160,6 @@ class VideoController extends Controller
             }
 
         }
-
 
 
 
