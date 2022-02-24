@@ -127,6 +127,7 @@ class VideoController extends Controller
     public function show(Request $request)
     {
         $id   = $request->input('id')??0;//多个用逗号拼接
+        $os_type   = $request->input('os_type')??0;
         $uid = $this->user['id'] ?? 0;
         $show_id   = $request->input('show_id')??0;// 当前记录id
         $res = ['show_id'=>0];
@@ -152,16 +153,19 @@ class VideoController extends Controller
                     'relation_id' => $id,
                     'user_id'     => $uid,
                     'is_finish'   => $is_finish,
+                    'os_type'   => $os_type,
                 ]);
                 $res['show_id'] = $show->id;
 
             }else{
-                ShortVideoShow::where(['id'=>$show_id])->update(['is_finish'   => $is_finish]);
+                ShortVideoShow::where(['id'=>$show_id])->update([
+                    'is_finish'   => $is_finish,
+                    'os_type'   => $os_type,
+                ]);
             }
 
         }
-
-
+        
 
         return $this->getRes($res);
 
