@@ -936,30 +936,29 @@ class Order extends Base
 
     public static function  getSendInfo($order){
 
-//        $expressInfo = ExpressInfo::find($order['express_info_id']);
-//        $address = MallAddress::find($order['address_id']);
-//        $textbook = Textbook::find($order['textbook_id']);
+        $expressInfo = ExpressInfo::find($order['express_info_id']);
+        $address = MallAddress::find($order['address_id']);
+        $textbook = Textbook::find($order['textbook_id']);
 
 
-        $res = [
-            'expressInfo' => ExpressInfo::find($order['express_info_id']),
-            'address' => MallAddress::find($order['address_id']),
-            'textbook' => Textbook::find($order['textbook_id']),
-        ];
-        if(!empty($res['address'])){
-            $details_string = MallAddress::getNameById($res['address']->province).
-                MallAddress::getNameById($res['address']->city).
-                MallAddress::getNameById($res['address']->area);
-            $res['address']->details = $details_string.$res['address']->details;
+        if(!empty($address)){
+            $details_string = MallAddress::getNameById($address->province).
+                MallAddress::getNameById($address->city).
+                MallAddress::getNameById($address->area);
+            $address->details = $details_string.$address->details;
 
         }
-        if(!empty($res['expressInfo'])){
-            $res['expressInfo']['express_name'] = ExpressCompany::onlyGetName(
-                $res['expressInfo']['express_id'] ?? 0
+        if(!empty($expressInfo)){
+            $expressInfo['express_name'] = ExpressCompany::onlyGetName(
+                $expressInfo['express_id'] ?? 0
             );
         }
 
-
+        $res = [
+            'expressInfo' => $expressInfo??(object)[],
+            'address' => $address??(object)[],
+            'textbook' => $textbook??(object)[],
+        ];
 
         return $res;
     }

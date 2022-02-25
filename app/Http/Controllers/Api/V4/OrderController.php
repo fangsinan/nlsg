@@ -619,7 +619,7 @@ class OrderController extends Controller
             $where = ['user_id' => $user_id, 'type' => $type];
         }
 
-        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id','pay_type')
+        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id','pay_type','express_info_id','textbook_id','address_id')
             ->whereIn('type', [1, 9, 10, 13, 14, 15, 16, 17, 18,19])
             ->where($where);
 
@@ -635,6 +635,7 @@ class OrderController extends Controller
 
         $data = $list['data'];
         foreach ($data as $key => $val) {
+
 
             $result = Order::getInfo($val['type'], $val['relation_id'], $val['send_type'], $user_id);
             if ($result === false) {
@@ -655,6 +656,9 @@ class OrderController extends Controller
 
             $data[$key]['created_time'] = strtotime($val['created_at']);
             $data[$key]['end_time'] = $data[$key]['created_time'] + 1800;
+            // 训练营订单 物流信息
+            $sendInfo = Order::getSendInfo($val);
+            $data[$key] = array_merge($data[$key],$sendInfo);
 
         }
         $data = array_values($data);
