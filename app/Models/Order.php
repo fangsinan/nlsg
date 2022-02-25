@@ -939,14 +939,21 @@ class Order extends Base
 //        $expressInfo = ExpressInfo::find($order['express_info_id']);
 //        $address = MallAddress::find($order['address_id']);
 //        $textbook = Textbook::find($order['textbook_id']);
-//
 
 
 
-        return[
+        $res = [
             'expressInfo' => ExpressInfo::find($order['express_info_id']),
             'address' => MallAddress::find($order['address_id']),
             'textbook' => Textbook::find($order['textbook_id']),
         ];
+        $details_string = MallAddress::getNameById($res['address']->province).
+                        MallAddress::getNameById($res['address']->city).
+                        MallAddress::getNameById($res['address']->area);
+
+
+        $res['address']->details = $details_string.$res['address']->details;
+
+        return $res;
     }
 }
