@@ -710,7 +710,7 @@ class OrderController extends Controller
     {
         $user_id = $this->user['id'] ?? 0;
         $order_id = $request->input('id', 0);
-        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type', 'send_type', 'send_user_id')
+        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type', 'send_type', 'send_user_id','express_info_id','textbook_id','address_id')
             ->where(['id' => $order_id, 'user_id' => $user_id])->first()->toArray();
 
         //查询优惠券金额
@@ -734,6 +734,11 @@ class OrderController extends Controller
 
         $data['created_time'] = strtotime($data['created_at']);
         $data['end_time'] = $data['created_time'] + 1800;
+
+        // 训练营订单 物流信息
+        $sendInfo = Order::getSendInfo($data);
+        $data = array_merge($data,$sendInfo);
+
         return $this->success($data);
 
     }
