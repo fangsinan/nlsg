@@ -951,7 +951,9 @@ class Order extends Base
                         MallAddress::getNameById($res['address']->city).
                         MallAddress::getNameById($res['address']->area);
 
-
+        $res['expressInfo']['express_name'] = ExpressCompany::onlyGetName(
+            $res['expressInfo']['express_id'] ?? 0
+        );
         $res['address']->details = $details_string.$res['address']->details;
 
         return $res;
