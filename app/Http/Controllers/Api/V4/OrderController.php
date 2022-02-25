@@ -656,9 +656,9 @@ class OrderController extends Controller
 
             $data[$key]['created_time'] = strtotime($val['created_at']);
             $data[$key]['end_time'] = $data[$key]['created_time'] + 1800;
-            // 训练营订单 物流信息
-            $sendInfo = Order::getSendInfo($val);
-            $data[$key] = array_merge($data[$key],$sendInfo);
+//            // 训练营订单 物流信息
+//            $sendInfo = Order::getSendInfo($val);
+//            $data[$key] = array_merge($data[$key],$sendInfo);
 
         }
         $data = array_values($data);
