@@ -1819,7 +1819,7 @@ class LiveController extends Controller
             ->paginate(10);
 
         foreach ($res as $v) {
-            $v->nickname    = $v->user->nickname;
+            $v->nickname    = $v->user->nickname??'';
             $v->level       = 0;
             $v->expire_time = '';
         }
