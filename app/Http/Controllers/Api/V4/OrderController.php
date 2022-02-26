@@ -661,9 +661,9 @@ class OrderController extends Controller
 //            $sendInfo = Order::getSendInfo($val);
 //            $data[$key] = array_merge($data[$key],$sendInfo);
             $express_data = ExpressInfo::select('express_id','express_num','history')->where(['id'=>$val['express_info_id']])->first();
-            $data[$key]['express_id'] = $express_data->express_id;
-            $data[$key]['express_num'] = $express_data->express_num;
-            $data[$key]['history'] = $express_data->history;
+            $data[$key]['express_id'] = $express_data->express_id ??'';
+            $data[$key]['express_num'] = $express_data->express_num ??'';
+            $data[$key]['history'] = $express_data->history ??'';
 
         }
         $data = array_values($data);
