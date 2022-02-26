@@ -1248,7 +1248,7 @@ class OrderController extends Controller
 
         $price = $ProductInfo['price'];
 
-        $liveIdArr=explode(",",$live_id);
+        $liveIdArr=explode(",",$live_id); //处理渠道分享导致"live_id":"311,311,311,311"
         $liveIdNum=count($liveIdArr);
         if($liveIdNum>1){
             $live_id=$liveIdArr[0];
