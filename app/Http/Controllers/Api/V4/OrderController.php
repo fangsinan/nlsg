@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ChannelWorksList;
 use App\Models\Column;
 use App\Models\Coupon;
+use App\Models\ExpressInfo;
 use App\Models\History;
 use App\Models\Lists;
 use App\Models\LiveCountDown;
@@ -659,6 +660,7 @@ class OrderController extends Controller
 //            // 训练营订单 物流信息
 //            $sendInfo = Order::getSendInfo($val);
 //            $data[$key] = array_merge($data[$key],$sendInfo);
+            $data[$key]['express_num'] = ExpressInfo::where(['id'=>$val['express_info_id']])->value('express_num');
 
         }
         $data = array_values($data);
