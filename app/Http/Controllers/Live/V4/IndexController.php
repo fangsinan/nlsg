@@ -493,7 +493,7 @@ class IndexController extends ControllerBackend
         $need_virtual_num  = $input['need_virtual_num'] ?? 0;
         $steam_end_time   = $input['steam_end_time'] ?? '';
         $steam_begin_time  = $input['steam_begin_time'] ?? '';
-        $pre_push_time  = $input['pre_push_time'] ?? 60; //预拉流时间
+        $pre_push_time  = $input['pre_push_time'] ?? 60;
 
         if (!$title) {
             return error(1000, '标题不能为空');
