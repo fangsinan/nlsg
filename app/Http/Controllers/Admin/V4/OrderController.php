@@ -1149,7 +1149,7 @@ class OrderController extends ControllerBackend
             //导出时需要加地址
             $query = Order::with(
             [
-                'user:id,nickname,phone',
+                'user:id,nickname,phone,is_test_pay',
                 'column:id,name',
                 'mallAddress:id,user_id,name,phone,details,province,city,area',
                 'mallAddress.area_province:id,name',
@@ -1189,10 +1189,10 @@ class OrderController extends ControllerBackend
                 Carbon::parse($start)->startOfDay()->toDateTimeString(),
                 Carbon::parse($end)->endOfDay()->toDateTimeString(),
             ]);
+        })
+        ->whereHas('user', function ($q) {
+            $q->where('is_test_pay', '=', 0);
         });
-//        ->whereHas('user', function ($q) {
-//            $q->where('is_test_pay', '=', 0);
-//        });
 //
 //        if (!empty($teacher_name)){
 //            $query->whereHas('works.user',function($q)use($teacher_name){

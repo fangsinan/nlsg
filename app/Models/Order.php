@@ -932,4 +932,34 @@ class Order extends Base
     public function textbookInfo(){
         return $this->hasOne(Textbook::class,'id','textbook_id');
     }
+
+
+    public static function  getSendInfo($order){
+
+        $expressInfo = ExpressInfo::find($order['express_info_id']);
+        $address = MallAddress::find($order['address_id']);
+        $textbook = Textbook::find($order['textbook_id']);
+
+
+        if(!empty($address)){
+            $details_string = MallAddress::getNameById($address->province).
+                MallAddress::getNameById($address->city).
+                MallAddress::getNameById($address->area);
+            $address->details = $details_string.$address->details;
+
+        }
+        if(!empty($expressInfo)){
+            $expressInfo['express_name'] = ExpressCompany::onlyGetName(
+                $expressInfo['express_id'] ?? 0
+            );
+        }
+
+        $res = [
+            'expressInfo' => $expressInfo??(object)[],
+            'address' => $address??(object)[],
+            'textbook' => $textbook??(object)[],
+        ];
+
+        return $res;
+    }
 }
