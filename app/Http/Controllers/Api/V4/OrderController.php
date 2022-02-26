@@ -660,7 +660,10 @@ class OrderController extends Controller
 //            // 训练营订单 物流信息
 //            $sendInfo = Order::getSendInfo($val);
 //            $data[$key] = array_merge($data[$key],$sendInfo);
-            $data[$key]['express_num'] = ExpressInfo::where(['id'=>$val['express_info_id']])->value('express_num');
+            $express_data = ExpressInfo::select('express_id','express_num','history')->where(['id'=>$val['express_info_id']])->first();
+            $data[$key]['express_id'] = $express_data->express_id;
+            $data[$key]['express_num'] = $express_data->express_num;
+            $data[$key]['history'] = $express_data->history;
 
         }
         $data = array_values($data);
