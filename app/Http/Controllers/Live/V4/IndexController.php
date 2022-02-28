@@ -1010,6 +1010,8 @@ class IndexController extends ControllerBackend
             ['title' => "汤蓓老师第一天新版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/09b9e7ee387702296264213191/v.f100030.mp4',],
             ['title' => "汤蓓老师第二天新版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/0bfb6b6c387702296264300714/v.f100030.mp4',],
             ['title' => "孟祥玲12.3", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/09098962387702292515310042/v.f100020.mp4',],
+            ['title' => "六大能力交付第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/3e5b1780387702296648557660/v.f100020.mp4',],
+            ['title' => "六大能力交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/39f66604387702296648392559/v.f100020.mp4',],
         ];
         return success($res);
     }
