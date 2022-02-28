@@ -278,6 +278,8 @@ class IndexController extends Controller
             ->where('begin_at', '>', date("Y-m-d"))
             ->where('end_at',   '<', date('Y-m-d',strtotime('+1 day')))
             ->where('is_del', 0)
+            ->where('is_show', 1)
+            ->where('is_test', 0)
             ->orderBy('created_at', 'desc')
             ->first();
         if (!empty($list)){

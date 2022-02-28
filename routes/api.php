@@ -575,6 +575,14 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         Route::post('like', 'LikeController@like');
         Route::post('unlike', 'LikeController@unlike');
 
+
+
+        //虚拟订单
+
+        //添加地址
+        Route::get('order/create_order_address', 'OrderController@addOrderAddress');
+
+
     });
 
     /**     5.0 API  END    ***/
