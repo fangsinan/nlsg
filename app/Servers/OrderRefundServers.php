@@ -49,7 +49,7 @@ class OrderRefundServers
         Storage::put($file, $content);
 
         $check_file = Storage::exists($file);
-return [__LINE__,rand(1,99)];
+
         if (!$check_file) {
             return ['code' => false, 'msg' => '文件不存在'];
         }
@@ -57,7 +57,7 @@ return [__LINE__,rand(1,99)];
         $excel_data = Excel::toArray(new UsersImport, base_path() . '/storage/app/' . $file);
 
         Storage::delete($file);
-
+return [__LINE__,rand(1,99)];
         $excel_data = $excel_data[0] ?? [];
         if (empty($excel_data)) {
             return ['code' => false, 'msg' => '数据错误:表1'];
