@@ -17,15 +17,12 @@ class OrderRefundServers
         //1是上传文件  2是直接添加
         $is_file = (int)($params['is_file'] ?? 1);
 
-
-
         $file_name = $params['file_name'] ?? '';
         $url = $params['url'] ?? '';
 
 //        $file_name = '1111group/20210926订单退款表格实例.xlsx';
 //        $url = 'http://image.nlsgapp.com/1111group/20210926订单退款表格实例.xlsx';
 
-        if(0){
             if (empty($file_name) || empty($url)) {
                 return ['code' => false, 'msg' => '参数错误'];
             }
@@ -48,9 +45,8 @@ class OrderRefundServers
             }
 
             Storage::put($file, $content);
-        }
 
-        $file = 'order_refund_16460300976017.xlsx';
+
         $check_file = Storage::exists($file);
 
         if (!$check_file) {
@@ -59,11 +55,8 @@ class OrderRefundServers
         try {
             $excel_data = Excel::toArray(new UsersImport, base_path() . '/storage/app/' . $file);
         }catch (\Exception  $e){
-            dd($e);
+            return ['code' => false, 'msg' => '读取文件失败'.__LINE__];
         }
-        return [__LINE__,$file,rand(1,99)];
-        $excel_data = Excel::toArray(new UsersImport, base_path() . '/storage/app/' . $file);
-        return [__LINE__,$file,rand(1,99)];
 
         Storage::delete($file);
 
