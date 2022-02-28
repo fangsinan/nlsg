@@ -98,7 +98,7 @@ class MallAddress extends Base
 
         if ($res) {
             DB::commit();
-            return ['code' => true, 'msg' => '成功'];
+            return ['code' => true, 'msg' => '成功','data'=>['id'=>$res->id]];
         } else {
             DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
