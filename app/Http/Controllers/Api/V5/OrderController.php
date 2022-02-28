@@ -50,7 +50,7 @@ class OrderController extends Controller
             ])->first('id');
 
             if(empty($address)){
-                $this->error((object)[]);
+                return $this->error(1000, '地址不存在');
             }
 
             $res = Order::where(['id' => $order_id,'user_id'=>$user_id ])->update([
@@ -60,7 +60,8 @@ class OrderController extends Controller
                 return $this->success((object)[]);
             }
         }
-        return $this->error((object)[]);
+        return $this->error(1000, 'address_id或order_id不存在');
+
 
     }
 
