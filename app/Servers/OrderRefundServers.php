@@ -57,7 +57,7 @@ class OrderRefundServers
         $excel_data = Excel::toArray(new UsersImport, base_path() . '/storage/app/' . $file);
 
         Storage::delete($file);
-
+return [__LINE__,rand(1,99)];
         $excel_data = $excel_data[0] ?? [];
         if (empty($excel_data)) {
             return ['code' => false, 'msg' => '数据错误:表1'];

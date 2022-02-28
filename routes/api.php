@@ -275,6 +275,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
     Route::post('channel/cytx_order_check', 'ChannelController@cytxOrderCheck');
 
+    Route::get('redis/demo', 'RedisController@Demo');
+
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/coupon', 'UserController@getUserCoupon');
         Route::get('user/base', 'UserController@base');
