@@ -404,9 +404,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('order/order_detail', 'OrderController@orderDetail');
         Route::get('order/close_order', 'OrderController@closeOrder');
 
-        //虚拟订单添加地址
-        Route::post('order/create_order_address', 'OrderController@addOrderAddress');
-
         Route::post('works/subscribe', 'WorksController@subscribe');
         Route::get('works/works_sub_works', 'WorksController@worksSubWorks');
 
@@ -575,6 +572,14 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         //想法的喜欢
         Route::post('like', 'LikeController@like');
         Route::post('unlike', 'LikeController@unlike');
+
+
+
+        //虚拟订单
+
+        //添加地址
+        Route::get('order/create_order_address', 'OrderController@addOrderAddress');
+
 
     });
 

@@ -552,11 +552,11 @@ class WechatPay extends Controller
         if(in_array($orderInfo['relation_id'],[7,8])){
 
             //地址
-            $address_id = MallAddress::where(['is_default' => 1, 'is_del' => 0,])->pluck('id');
+            $address_id = MallAddress::where(['is_default' => 1, 'is_del' => 0,])->first();
             //对应订单写三个值
             Order::where(['id' => $orderInfo['id'] ])->update([
                 'textbook_id'=> ConfigModel::getData(36,1)??0,
-                'address_id'=>$address_id??0,
+                'address_id'=>$address_id->id ?? 0,
             ]);
             //erp同步表
             OrderErpList::addList($orderInfo['id']);
