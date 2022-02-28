@@ -140,6 +140,7 @@ class OrderRefundServers
                     }
                     if ($v->is_refund === 2 || $v->is_refund === 3) {
                         $temp_orlModel->status = 20;
+                        $temp_orlModel->check_price = $v->pay_price;
                     }
                 }
                 $temp_orlModel->save();
