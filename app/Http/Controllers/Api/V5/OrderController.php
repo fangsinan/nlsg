@@ -50,17 +50,17 @@ class OrderController extends Controller
             ])->first('id');
 
             if(empty($address)){
-                $this->error();
+                $this->error((object)[]);
             }
 
             $res = Order::where(['id' => $order_id,'user_id'=>$user_id ])->update([
                 'address_id'=>$address_id,
             ]);
             if(!empty($res)){
-                return $this->success();
+                return $this->success((object)[]);
             }
         }
-        return $this->error();
+        return $this->error((object)[]);
 
     }
 
