@@ -25,33 +25,41 @@ class OrderRefundServers
 //        $file_name = '1111group/20210926订单退款表格实例.xlsx';
 //        $url = 'http://image.nlsgapp.com/1111group/20210926订单退款表格实例.xlsx';
 
-        if (empty($file_name) || empty($url)) {
-            return ['code' => false, 'msg' => '参数错误'];
+        if(0){
+            if (empty($file_name) || empty($url)) {
+                return ['code' => false, 'msg' => '参数错误'];
+            }
+
+            try {
+                $file = 'order_refund_' . time() . random_int(1000, 9999) . '.xlsx';
+            } catch (\Exception $e) {
+                return ['code' => false, 'msg' => '参数错误'];
+            }
+
+            $ch = curl_init();
+            $timeout = 10;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);//在需要用户检测的网页里需要增加下面两行
+            $content = curl_exec($ch);
+
+            if (empty($content)) {
+                return ['code' => false, 'msg' => '文件数据错误'];
+            }
+
+            Storage::put($file, $content);
         }
 
-        try {
-            $file = 'order_refund_' . time() . random_int(1000, 9999) . '.xlsx';
-        } catch (\Exception $e) {
-            return ['code' => false, 'msg' => '参数错误'];
-        }
-
-        $ch = curl_init();
-        $timeout = 10;
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);//在需要用户检测的网页里需要增加下面两行
-        $content = curl_exec($ch);
-
-        if (empty($content)) {
-            return ['code' => false, 'msg' => '文件数据错误'];
-        }
-
-        Storage::put($file, $content);
-
+        $file = 'order_refund_16460300976017.xlsx';
         $check_file = Storage::exists($file);
 
         if (!$check_file) {
             return ['code' => false, 'msg' => '文件不存在'];
+        }
+        try {
+            $excel_data = Excel::toArray(new UsersImport, base_path() . '/storage/app/' . $file);
+        }catch (\Exception  $e){
+            dd($e);
         }
         return [__LINE__,$file,rand(1,99)];
         $excel_data = Excel::toArray(new UsersImport, base_path() . '/storage/app/' . $file);
