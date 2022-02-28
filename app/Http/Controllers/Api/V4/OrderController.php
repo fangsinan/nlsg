@@ -1379,4 +1379,19 @@ class OrderController extends Controller
 
     }
 
+
+
+    public function addOrderAddress(Request $request)
+    {
+        $address_id = $request->input('address_id', 0);
+        $order_id = $request->input('order_id', 0);
+        if($address_id && $order_id){
+            Order::where(['id' => $order_id ])->update([
+                'address_id'=>$address_id,
+            ]);
+        }
+        return $this->success([]);
+
+    }
+
 }

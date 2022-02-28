@@ -13,6 +13,7 @@ use App\Models\ImGroup;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\LivePayCheck;
+use App\Models\MallAddress;
 use App\Models\MallErpList;
 use App\Models\MallGroupBuyList;
 use App\Models\MallOrder;
@@ -20,6 +21,7 @@ use App\Models\MallOrderDetails;
 use App\Models\MeetingSales;
 use App\Models\OfflineProducts;
 use App\Models\Order;
+use App\Models\OrderErpList;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
 use App\Models\PayRecordDetailStay;
@@ -511,6 +513,7 @@ class WechatPay extends Controller
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $vip_res) {
                     DB::commit();
+                    //下单完成之后的动作
                     $AdminInfo = User::find($user_id);
                     self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 //                    Task::send(6, $user_id, $orderInfo['relation_id']);
@@ -521,6 +524,12 @@ class WechatPay extends Controller
                     }
                     // 内容刷单记录
                     self::PayTestLog($orderId,$AdminInfo);
+
+
+                    //  下单需要显示地址
+                    self::MallAddress($orderInfo);
+
+
                     return true;
 
                 } else {
@@ -537,6 +546,24 @@ class WechatPay extends Controller
             return true;
         }
     }
+
+    //同步地址
+    static private function MallAddress($orderInfo){
+        if(in_array($orderInfo['relation_id'],[7,8])){
+
+            //地址
+            $address_id = MallAddress::where(['is_default' => 1, 'is_del' => 0,])->pluck('id');
+            //对应订单写三个值
+            Order::where(['id' => $orderInfo['id'] ])->update([
+                'textbook_id'=> ConfigModel::getData(36,1)??0,
+                'address_id'=>$address_id??0,
+            ]);
+            //erp同步表
+            OrderErpList::addList($orderInfo['id']);
+        }
+    }
+
+
     static private function PayTestLog($order_id = 0,$user =[]){
         if(!empty($user) &&  $user['is_test_pay'] == 1){
             DB::table('nlsg_user_edit_log')->insert([

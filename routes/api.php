@@ -404,6 +404,9 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('order/order_detail', 'OrderController@orderDetail');
         Route::get('order/close_order', 'OrderController@closeOrder');
 
+        //虚拟订单添加地址
+        Route::post('order/create_order_address', 'OrderController@addOrderAddress');
+
         Route::post('works/subscribe', 'WorksController@subscribe');
         Route::get('works/works_sub_works', 'WorksController@worksSubWorks');
 
