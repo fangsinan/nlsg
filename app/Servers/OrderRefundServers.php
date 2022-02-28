@@ -53,9 +53,9 @@ class OrderRefundServers
         if (!$check_file) {
             return ['code' => false, 'msg' => '文件不存在'];
         }
-
+        return [__LINE__,$file,rand(1,99)];
         $excel_data = Excel::toArray(new UsersImport, base_path() . '/storage/app/' . $file);
-        return [$excel_data,__LINE__,$file,rand(1,99)];
+        return [__LINE__,$file,rand(1,99)];
 
         Storage::delete($file);
 
