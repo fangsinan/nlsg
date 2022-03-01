@@ -482,34 +482,33 @@ class AuthController extends Controller
         }
         Redis::del($phone);
         /*$user = User::where('phone', $phone)->first();
-        if (!$user) {
-            User::where('id', $user_id)->update(['phone' => $phone]);
-        } else { //号码已存在
-            User::where('id', $user_id)->update(['phone' => $phone.'_'.$user->id.'_'.random_int(1,999)]);
-        }
-        $arra = [
-            'id' => $user_id,
-            'phone' => $phone,
-        ];*/
+		if (!$user) {
+			User::where('id', $user_id)->update(['phone' => $phone]);
+		} else { //号码已存在
+			User::where('id', $user_id)->update(['phone' => $phone.'_'.$user->id.'_'.random_int(1,999)]);
+		}
+		$arra = [
+			'id' => $user_id,
+			'phone' => $phone,
+		];*/
 
-        $arra = [
-            'phone' => $phone
-        ];
-        $user = User::where('phone', $phone)->first();
-        if (!$user) { //没有此手机号，直接绑定
-            User::where('id', $user_id)->update(['phone' => $phone]);
-            $arra['id'] = $user_id;
-            $arra['data'] = [];
-        } else { //号码已存在
-            $wechatObj=User::where('id', $user_id)->first();//获取当前用户微信信息
-            User::where('id', $user_id)->update(['wxopenid' => '','unionid'=>'']); //清空微信信息
-            User::where('id', $user->id)->update(['wxopenid' => $wechatObj->wxopenid,'unionid'=>$wechatObj->unionid]); //绑定微信信息
-            $token = auth('api')->login($user);
-            $data = $this->get_data($user, $token);
-            $arra['id'] = $user->id;
-            $arra['data'] = $data;
-        }
-
+		$arra = [
+			'phone' => $phone
+		];
+		$user = User::where('phone', $phone)->first();
+		if (!$user) { //没有此手机号，直接绑定
+			User::where('id', $user_id)->update(['phone' => $phone]);
+			$arra['id'] = $user_id;
+			$arra['data'] = [];
+		} else { //号码已存在
+			$wechatObj=User::where('id', $user_id)->first();//获取当前用户微信信息
+			User::where('id', $user_id)->update(['wxopenid' => '','unionid'=>'']); //清空微信信息
+			User::where('id', $user->id)->update(['wxopenid' => $wechatObj->wxopenid,'unionid'=>$wechatObj->unionid]); //绑定微信信息
+			$token = auth('api')->login($user);
+			$data = $this->get_data($user, $token);
+			$arra['id'] = $user->id;
+			$arra['data'] = $data;
+		}
         return success($arra);
 
     }
@@ -846,11 +845,11 @@ class AuthController extends Controller
             } else if (preg_match($g3, $phone)) {
                 return $this->getRes(['code' => true, 'msg' => '正确']);
             } */
-
+			
 			$g = "/^1\d{10}$/";
 			if (preg_match($g, $phone)) {
 				return $this->getRes(['code' => true, 'msg' => '正确']);
-			}
+			}	
             return $this->getRes(['code' => false, 'msg' => '号码错误']);
         }
 
