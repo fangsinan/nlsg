@@ -107,7 +107,7 @@ class LiveInfo extends Model
             return ['code'=>0,'msg'=>'直播间ID有误','data'=>[]];
         }
 
-        $str_time = strtotime($liveObj->steam_begin_time) - $liveObj->pre_push_time;
+        $str_time = strtotime($liveObj->steam_begin_time) - $liveObj->pre_push_time;//预拉取时间
         $end_time = strtotime($liveObj->steam_end_time)+60;
 
 //        $str_time = strtotime($info['begin_at']) - 60;
