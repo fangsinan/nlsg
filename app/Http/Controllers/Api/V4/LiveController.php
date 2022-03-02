@@ -1503,8 +1503,8 @@ class LiveController extends Controller
         }
 
         //虚拟用户
-        if(empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2 ){
-            return error(0, '请修改手机号');
+        if($osType ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
+            return error(4000, '请修改手机号');
         }
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();

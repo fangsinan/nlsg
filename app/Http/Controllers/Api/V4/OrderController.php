@@ -169,8 +169,8 @@ class OrderController extends Controller
         $live_num = $request->input('live_num',1);
 
         //虚拟用户
-        if(empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2 ){
-            return error(0, '请修改手机号');
+        if($os_type ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
+            return error(4000, '请修改手机号');
         }
 
         //$column_id 专栏信息
@@ -284,9 +284,10 @@ class OrderController extends Controller
         $activity_tag = $request->input('activity_tag', '');
         $user_id = $this->user['id'] ?? 0;
 
+
         //虚拟用户
-        if(empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2 ){
-            return error(0, '请修改手机号');
+        if($os_type ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
+            return error(4000, '请修改手机号');
         }
         //$work_id 课程信息
         //$works_data = Works::find($work_id);
@@ -1244,8 +1245,8 @@ class OrderController extends Controller
         $num = $request->input('num', 1);  //
         $user_id = $this->user['id'];
         //虚拟用户
-        if(empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2 ){
-            return error(0, '请修改手机号');
+        if($os_type ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
+            return error(4000, '请修改手机号');
         }
         if( $tweeter_code > 0 && $live_id > 0 ){  //需要校验推客id
             $info = LiveInfo::where(['live_pid'=>$live_id])->first();
