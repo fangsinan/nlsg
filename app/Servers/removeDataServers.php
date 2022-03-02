@@ -2067,6 +2067,11 @@ and o.status = 1 and o.pay_price > 1";
 
                 $check_phone = User::query()->where('phone','=',$v->phone)->first();
                 if (empty($check_phone)){
+                    DB::table($model_name)
+                        ->where('id', '=', $v->id)
+                        ->update([
+                            'status' => 3,
+                        ]);
                     DB::commit();
                     continue;
                 }
