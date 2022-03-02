@@ -2079,9 +2079,9 @@ and o.status = 1 and o.pay_price > 1";
                     ->where('type', '=', $v->works_type)
                     ->where('status', '=', 1);
 
-                if ($v->works_type != 3) {
-                    $query->where('end_time', '>=', $now_date);
-                }
+//                if ($v->works_type != 3) {
+//                    $query->where('end_time', '>=', $now_date);
+//                }
 
                 $check = $query->select(['id'])->first();
 
