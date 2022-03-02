@@ -789,7 +789,7 @@ class WorksController extends Controller
      */
     public function editHistoryTime(Request $request){
 
-        DB::table('nlsg_log')->insert([
+        DB::table('nlsg_log_info')->insert([
             'url'     => 'infoLog:'.$request->fullUrl(),
             'parameter'    =>  json_encode($request->all()),
             'created_at' =>date('Y-m-d H:i:s', time())
