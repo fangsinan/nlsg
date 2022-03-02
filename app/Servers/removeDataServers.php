@@ -2074,16 +2074,12 @@ and o.status = 1 and o.pay_price > 1";
                 $temp_user_id = $check_phone->id;
                 $temp_user_phone = $check_phone->phone;
 
-                $query = Subscribe::query()->where('user_id', '=', $temp_user_id)
+                $check = Subscribe::query()
+                    ->where('user_id', '=', $temp_user_id)
                     ->where('relation_id', '=', $v->works_id)
                     ->where('type', '=', $v->works_type)
-                    ->where('status', '=', 1);
-
-//                if ($v->works_type != 3) {
-//                    $query->where('end_time', '>=', $now_date);
-//                }
-
-                $check = $query->select(['id'])->first();
+                    ->where('status', '=', 1)
+                    ->first();
 
                 if (!empty($check)) {
                     $check->status = 0;
@@ -2094,17 +2090,13 @@ and o.status = 1 and o.pay_price > 1";
                     }
                 }
 
-                $edit_res = DB::table($model_name)
+                DB::table($model_name)
                     ->where('id', '=', $v->id)
                     ->update([
                         'user_id' => $temp_user_id,
                         'phone' => $temp_user_phone,
                         'status' => 2,
                     ]);
-                if ($edit_res == false) {
-                    DB::rollBack();
-                    continue;
-                }
 
                 DB::commit();
             }
