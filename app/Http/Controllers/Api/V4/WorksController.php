@@ -781,11 +781,11 @@ class WorksController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
-    {
-    "code": 200,
-    "msg": "成功",
-    "data": { }
-    }
+     *{
+     *  "code": 200,
+     *  "msg": "成功",
+     *  "data": { }
+     *}
      */
     public function editHistoryTime(Request $request){
 

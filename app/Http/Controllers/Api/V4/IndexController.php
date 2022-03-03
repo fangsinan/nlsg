@@ -24,6 +24,7 @@ use JPush;
 use Carbon\Carbon;
 use App\Models\Task;
 use JPush\Client as JPushClient;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 class IndexController extends Controller
 {
@@ -1282,6 +1283,8 @@ class IndexController extends Controller
 
     public function share(Request $request)
     {
+        
+
         $input = $request->all();
 
         if( !empty($input['tag']) && $input['tag'] == 1 ){  //训练营分享参数
@@ -1301,8 +1304,10 @@ class IndexController extends Controller
             'secret' => '2ded804b74f99ae2f342423dd7952620',
             'response_type' => 'array'
         ];
-
         $app = Factory::officialAccount($config);
+        // 创建缓存实例
+        $cache = new RedisAdapter(app('redis')->connection()->client());
+        $app->rebind('cache', $cache);
         $app->jssdk->setUrl($url);
         $jssdk = $app->jssdk->buildConfig(['updateAppMessageShareData', 'updateTimelineShareData'], $debug = true, $beta = false, $json = true);
         return success($jssdk);
