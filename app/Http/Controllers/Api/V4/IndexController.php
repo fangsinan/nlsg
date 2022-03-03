@@ -1302,7 +1302,8 @@ class IndexController extends Controller
         $config = [
             'app_id' => 'wxe24a425adb5102f6',
             'secret' => '2ded804b74f99ae2f342423dd7952620',
-            'response_type' => 'array'
+            'response_type' => 'array',
+            'cache' => "redis"
         ];
         $app = Factory::officialAccount($config);
         // 创建缓存实例
