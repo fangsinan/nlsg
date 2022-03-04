@@ -45,6 +45,13 @@ class MallAddress extends Base
         $name = $params['name'] ?? '';
         $phone = $params['phone'] ?? '';
 
+
+        if (substr($city,-2) !== '00' && empty($area)){
+            $area = $city;
+            $city = $province;
+        }
+
+
         if (empty($province) || empty($city) ||
             empty($details) || empty($name) ||
             empty($phone)) {
