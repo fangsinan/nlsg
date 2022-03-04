@@ -436,9 +436,9 @@ class ErpServers
                 $temp_trade_list['receiver_name']    = $v->orderInfo->addressInfo->name;
                 $temp_trade_list['receiver_mobile']  = $v->orderInfo->addressInfo->phone;
                 $temp_trade_list['receiver_address'] = trim(
-                    $v->orderInfo->addressInfo->area_province->fullname . ' ' .
-                    $v->orderInfo->addressInfo->area_city->fullname . ' ' .
-                    $v->orderInfo->addressInfo->area_area->fullname . ' ' .
+                    ($v->orderInfo->addressInfo->area_province->fullname ?? '') . ' ' .
+                    ($v->orderInfo->addressInfo->area_city->fullname ?? ''). ' ' .
+                    ($v->orderInfo->addressInfo->area_area->fullname ?? '') . ' ' .
                     $v->orderInfo->addressInfo->details
                 );
                 $temp_trade_list['buyer_message']    = '';
