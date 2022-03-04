@@ -550,13 +550,15 @@ class WechatPay extends Controller
 
     //同步地址
     static private function MallAddress($orderInfo){
-        if(in_array($orderInfo['relation_id'],[7,8])){
-
+        if(in_array($orderInfo['relation_id'],[7,8,10])){
+            $offdata  =OfflineProducts::find($orderInfo['relation_id']);
+            $textbook_id = $offdata['textbook_id'] ?? 0;
+        
             //地址
             $address_id = MallAddress::where(['is_default' => 1, 'is_del' => 0,"user_id"=>$orderInfo['user_id'],])->first();
             //对应订单写三个值
             Order::where(['id' => $orderInfo['id'] ])->update([
-                'textbook_id'=> ConfigModel::getData(63,1)??0,
+                'textbook_id'=> $textbook_id,
                 'address_id'=>$address_id->id ?? 0,
             ]);
             //erp同步表
