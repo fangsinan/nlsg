@@ -37,6 +37,7 @@ use App\Servers\MallOrderServers;
 use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use Predis\Client;
 
 class WechatPay extends Controller
 {
@@ -628,6 +629,17 @@ class WechatPay extends Controller
             $res = $nickname . ':您已订阅' . $relation_id;
         }
         Redis::rpush($key, $res);
+
+        if(in_array($type,[11,14,16,18])){
+//            if($live_id==19) {
+                $redisConfig = config('database.redis.default');
+                $redis = new Client($redisConfig);
+                $redis->select(0);
+                $publishMsg=json_encode(['live_id'=>$live_id,'order_id'=>$orderid,'msg'=>$res]);
+                $redis->publish('pushOrder', $publishMsg);
+//            }
+        }
+
 //        Redis::setex($key,600,json_encode($res,true));
         if ($orderid) {
             Order::where(['id' => $orderid])->update(['is_live_order_send' => 1]);
