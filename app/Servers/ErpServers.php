@@ -262,7 +262,8 @@ class ErpServers
                         ->where('express_id', '=', $send_data['express_id'])
                         ->where('express_num', '=', $send_data['num'])
                         ->first();
-                    if (empty($check_ex)) {
+
+                    if ($check_ex) {
                         $express_info_id = $check_ex->id;
                     } else {
                         $ex_data['express_id']  = $send_data['express_id'];
@@ -270,7 +271,7 @@ class ErpServers
 
                         $express_company_info     = ExpressCompany::query()->find($send_data['express_id']);
                         $history                  = [];
-                        $history['number']        = $v['num'];
+                        $history['number']        = $v['logistics_no'];
                         $history['type']          = $express_company_info->code;
                         $history['typename']      = $express_company_info->name;
                         $history['express_phone'] = $express_company_info->phone;
@@ -436,9 +437,9 @@ class ErpServers
                 $temp_trade_list['receiver_name']    = $v->orderInfo->addressInfo->name;
                 $temp_trade_list['receiver_mobile']  = $v->orderInfo->addressInfo->phone;
                 $temp_trade_list['receiver_address'] = trim(
-                    $v->orderInfo->addressInfo->area_province->fullname . ' ' .
-                    $v->orderInfo->addressInfo->area_city->fullname . ' ' .
-                    $v->orderInfo->addressInfo->area_area->fullname . ' ' .
+                    ($v->orderInfo->addressInfo->area_province->fullname ?? '') . ' ' .
+                    ($v->orderInfo->addressInfo->area_city->fullname ?? ''). ' ' .
+                    ($v->orderInfo->addressInfo->area_area->fullname ?? '') . ' ' .
                     $v->orderInfo->addressInfo->details
                 );
                 $temp_trade_list['buyer_message']    = '';
@@ -495,7 +496,7 @@ class ErpServers
     }
 
     public function __construct() {
-        //= config('env.ALI_APP_ID');
+
         $this->sid                  = config('env.ERP_SID');
         $this->shop_no              = config('env.ERP_SHOP_NO');
         $this->appkey               = config('env.ERP_APPKEY');
@@ -503,6 +504,15 @@ class ErpServers
         $this->trade_push           = config('env.ERP_TRADE_PUSH');
         $this->logistics_sync_query = config('env.ERP_LOGISTICS_SYNC_QUERY');
         $this->logistics_sync_ack   = config('env.ERP_LOGISTICS_SYNC_ACK');
+        
+//        $this->sid                  = 'nlsg2';
+//        $this->shop_no              = '04';
+//        $this->appkey               = 'nlsg2-gw';
+//        $this->appsecret            = 'c93045fe195cc51977ad8daab2e4b664';
+//        $this->trade_push           = 'https://api.wangdian.cn/openapi2/trade_push.php';
+//        $this->logistics_sync_query = 'https://api.wangdian.cn/openapi2/logistics_sync_query.php';
+//        $this->logistics_sync_ack   = 'https://api.wangdian.cn/openapi2/logistics_sync_ack.php';
+
     }
 
     //去掉昵称的emoji

@@ -92,6 +92,21 @@ class Kernel extends ConsoleKernel
             ->everyMinute()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
 
+        //order表推送到erp
+        $schedule->command('command:ErpOrderPush')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+
+        //mall order表推送到erp
+        $schedule->command('command:ErpMallOrderPush')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+
+        //erp物流回写
+        $schedule->command('command:ErpQuery')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+
 //        $schedule->command('command:erpJob')
 //            ->everyMinute()->withoutOverlapping(1)
 //            ->runInBackground()->onOneServer();
@@ -178,17 +193,17 @@ class Kernel extends ConsoleKernel
             MallRefundJob::shillJob(1);
         })->everyMinute()->runInBackground();//每分
 
-        $schedule->call(function () {
-            //erp物流同步与回写
-            $s = new ErpServers();
-            $s->logisticsSync();
-        })->everyMinute()->runInBackground();//每分
+//        $schedule->call(function () {
+//            //erp物流同步与回写
+//            $s = new ErpServers();
+//            $s->logisticsSync();
+//        })->everyMinute()->runInBackground();//每分
 
-        $schedule->call(function () {
-            //erp订单创建与更新
-            $s = new ErpServers();
-            $s->pushRun();
-        })->everyMinute()->runInBackground();//每分
+//        $schedule->call(function () {
+//            //erp订单创建与更新
+//            $s = new ErpServers();
+//            $s->pushRun();
+//        })->everyMinute()->runInBackground();//每分
 
 //        $schedule->call(function () {
 //            //开通订阅队列
