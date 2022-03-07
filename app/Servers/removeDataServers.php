@@ -986,7 +986,7 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
         $works_list = [
 //            ['type' => 2, 'id' => 638],
 //            ['type' => 2, 'id' => 658],
-            ['type' => 2, 'id' => 527],
+            ['type' => 6, 'id' => 441],
         ];
 
         $add_data = [];
@@ -1010,8 +1010,9 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
             }
         }
 
+        $add_data = array_chunk($add_data,300);
+
 //        DB::beginTransaction();
-//        $res = DB::table('nlsg_subscribe')->insert($add_data);
 //        foreach ($add_data as $ad){
 //            DB::table('nlsg_subscribe')->insert($ad);
 //        }
