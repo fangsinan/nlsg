@@ -253,15 +253,15 @@ class LiveInfoServers {
             $query->where('ld.type', '<>', 8);
         }
 
-        if ($admin['role_id'] === 1) {
-            $twitter_id_list = null;
-        } else {
+        if ($admin['role_id'] !== 1) {
             $twitter_id_list = $this->twitterIdList($admin['username']);
+            $query->whereIn('ld.invite_user_id', $twitter_id_list);
+            $query->where('ld.type','<>',8);
         }
 
-        if ($twitter_id_list !== null) {
-            $query->whereIn('ld.invite_user_id', $twitter_id_list);
-        }
+//        if ($twitter_id_list !== null) {
+//            $query->whereIn('ld.invite_user_id', $twitter_id_list);
+//        }
 
         $temp_begin_order_id = Order::query()
             ->where('live_id', '=', $live_id)
@@ -796,78 +796,90 @@ GROUP BY
             ->select(['nickname', 'headimg'])->first();
         $res['headimg']  = $user_info->headimg;
         $res['nickname'] = $user_info->nickname;
-        //累计人次login 人气
-        $res['live_login'] = $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
-        $res['order_num']  = Subscribe::query()->where('relation_id', '=', $live_id)
-            ->where('type', '=', 3)
-            ->where('status', '=', 1)->count();
 
-        //累计人数sub
-        $res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
-            ->where('type', '=', 3)->where('status', '=', 1)->count();
-
-        if ($check_live_id->user_id === 161904) {
-            //王琨,统计live_deal
-            $watch_count_sql     = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3
-                                                and live_watched = 1 and (order_id > 9 or channel_order_id > 0)";
-            $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3
-                                                and live_watched = 0 and (order_id > 9 or channel_order_id > 0)";
-
-            $res['watch_counts']     = DB::select($watch_count_sql)[0]->counts;
-            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
-
-            //王琨,统计live_deal
-            $res['total_order'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id', '=', $live_id)
-                ->whereNotExists(function ($q) {
-                    $q->from('nlsg_order as o')
-                        ->where('o.ordernum', '=', 'ld.ordernum')
-                        ->where('o.is_shill', '=', 1);
-                })->count();
-
-            $res['total_order_money'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id', '=', $live_id)
-                ->whereNotExists(function ($q) {
-                    $q->from('nlsg_order as o')
-                        ->where('o.ordernum', '=', 'ld.ordernum')
-                        ->where('o.is_shill', '=', 1);
-                })->sum('pay_price');
-
-            $res['total_order_user'] = DB::table('nlsg_live_deal as ld')
-                ->where('live_id', '=', $live_id)
-                ->whereNotExists(function ($q) {
-                    $q->from('nlsg_order as o')
-                        ->where('o.ordernum', '=', 'ld.ordernum')
-                        ->where('o.is_shill', '=', 1);
-                })->count('user_id');
-
-        } else {
-            //李婷,统计order表的9.9
-            $watch_count_sql     = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 1";
-            $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 0";
-
-            $res['watch_counts']     = DB::select($watch_count_sql)[0]->counts;
-            $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
-
-            //李婷,统计order表的9.9
-            $temp_order       = $this->liveOrder(['live_id' => $live_id], $this_user);
-            $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum'], $this_user);
-            $temp_order_user  = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum'], $this_user);
-
-            $res['total_order']       = $temp_order['total'] ?? '错误';
-            $res['total_order_money'] = $temp_order_money;
-            $res['total_order_user']  = $temp_order_user;
+        if(0){
+            //累计人次login 人气
+            $res['live_login'] = $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
+            $res['order_num']  = Subscribe::query()->where('relation_id', '=', $live_id)
+                ->where('type', '=', 3)
+                ->where('status', '=', 1)->count();
+            //累计人数sub
+            $res['total_sub'] = Subscribe::where('relation_id', '=', $live_id)
+                ->where('type', '=', 3)->where('status', '=', 1)->count();
+        }else{
+            $res['live_login'] = $res['order_num']  = $res['total_sub'] = 0;
         }
 
-        $res['total_sub_count'] = Subscribe::query()
-            ->where('relation_id', '=', $live_id)
-            ->where('type', '=', 3)
-            ->where('status', '=', 1)
-            ->count();
 
-        //为购买人数
-        $res['total_not_buy'] = $res['total_sub_count'] - $res['total_order_user'];
-        $res['total_not_buy'] = $res['total_not_buy'] < 0 ? 0 : $res['total_not_buy'];
+        if(0){
+            if ($check_live_id->user_id === 161904) {
+                //王琨,统计live_deal
+                $watch_count_sql     = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3
+                                                and live_watched = 1 and (order_id > 9 or channel_order_id > 0)";
+                $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3
+                                                and live_watched = 0 and (order_id > 9 or channel_order_id > 0)";
+
+                $res['watch_counts']     = DB::select($watch_count_sql)[0]->counts;
+                $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+
+                //王琨,统计live_deal
+                $res['total_order'] = DB::table('nlsg_live_deal as ld')
+                    ->where('live_id', '=', $live_id)
+                    ->whereNotExists(function ($q) {
+                        $q->from('nlsg_order as o')
+                            ->where('o.ordernum', '=', 'ld.ordernum')
+                            ->where('o.is_shill', '=', 1);
+                    })->count();
+
+                $res['total_order_money'] = DB::table('nlsg_live_deal as ld')
+                    ->where('live_id', '=', $live_id)
+                    ->whereNotExists(function ($q) {
+                        $q->from('nlsg_order as o')
+                            ->where('o.ordernum', '=', 'ld.ordernum')
+                            ->where('o.is_shill', '=', 1);
+                    })->sum('pay_price');
+
+                $res['total_order_user'] = DB::table('nlsg_live_deal as ld')
+                    ->where('live_id', '=', $live_id)
+                    ->whereNotExists(function ($q) {
+                        $q->from('nlsg_order as o')
+                            ->where('o.ordernum', '=', 'ld.ordernum')
+                            ->where('o.is_shill', '=', 1);
+                    })->count('user_id');
+
+            } else {
+                //李婷,统计order表的9.9
+                $watch_count_sql     = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 1";
+                $not_watch_count_sql = "SELECT count(*) as counts from nlsg_subscribe where relation_id = $live_id and type = 3 and live_watched = 0";
+
+                $res['watch_counts']     = DB::select($watch_count_sql)[0]->counts;
+                $res['not_watch_counts'] = DB::select($not_watch_count_sql)[0]->counts;
+
+                //李婷,统计order表的9.9
+                $temp_order       = $this->liveOrder(['live_id' => $live_id], $this_user);
+                $temp_order_money = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'money_sum'], $this_user);
+                $temp_order_user  = $this->liveOrder(['live_id' => $live_id, 'query_flag' => 'user_sum'], $this_user);
+
+                $res['total_order']       = $temp_order['total'] ?? '错误';
+                $res['total_order_money'] = $temp_order_money;
+                $res['total_order_user']  = $temp_order_user;
+            }
+
+            $res['total_sub_count'] = Subscribe::query()
+                ->where('relation_id', '=', $live_id)
+                ->where('type', '=', 3)
+                ->where('status', '=', 1)
+                ->count();
+
+            //为购买人数
+            $res['total_not_buy'] = $res['total_sub_count'] - $res['total_order_user'];
+            $res['total_not_buy'] = $res['total_not_buy'] < 0 ? 0 : $res['total_not_buy'];
+        }else{
+            $res['watch_counts']     =$res['not_watch_counts'] =
+            $res['total_order'] = $res['total_order_money'] =
+                $res['total_order_user'] = $res['total_sub_count'] =   $res['total_not_buy'] = 0;
+        }
+
 
         //观看时常大于30分钟的
 //            $more_than_30_min_sql = "SELECT count(user_id) as user_count from (
@@ -918,7 +930,7 @@ GROUP BY
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
-
+        
         if ($user['role_id'] === 1) {
             $twitter_id_list = null;
         } else {
@@ -964,7 +976,6 @@ GROUP BY
             $query->where('pay_price', '=', $params['pay_price']);
         }
 
-
         if ($user['role_id'] === 1) {
             $temp_live_time_begin = date('Y-m-d 00:00:00', strtotime($check_live_id->begin_at));
             $temp_live_time_end   = date('Y-m-d 23:59:59', strtotime($check_live_id->end_at));
@@ -990,6 +1001,7 @@ GROUP BY
             }
             $query->where('o.id', '>=', $temp_order_begin_id);
             $query->where('o.remark', '=', $live_id);
+            $query->where('o.relation_id','<>',8);
         }
 
         if ($twitter_id_list !== null && !empty($twitter_id_list)) {

@@ -374,46 +374,59 @@ class IndexController extends ControllerBackend
             return error(1000, '直播不存在');
         }
 
-        $type = [9, 10, 14, 15, 16];
-        $subscribeNum = Subscribe::where('type', 3)
-            ->where('relation_id', $liveId)
-            ->where('status', 1)
-            ->count();
-        if (!empty($list->begin_at)) {
+        if(0){
+            $type = [9, 10, 14, 15, 16];
+            $subscribeNum = Subscribe::where('type', 3)
+                ->where('relation_id', $liveId)
+                ->where('status', 1)
+                ->count();
+            if (!empty($list->begin_at)) {
 //            $watchNum = LiveLogin::where('live_id', $liveId)
 //                          ->whereBetween('ctime', [strtotime($list->begin_at), strtotime($list->end_at)])
 //                          ->distinct('user_id')
 //                          ->count();
-            $watchNum = Subscribe::query()
-                ->where('relation_id', '=', $liveId)
-                ->where('type', '=', 3)
-                ->where('live_watched', '=', 1)
+                $watchNum = Subscribe::query()
+                    ->where('relation_id', '=', $liveId)
+                    ->where('type', '=', 3)
+                    ->where('live_watched', '=', 1)
+                    ->count();
+
+                $unwatchNum = $subscribeNum - $watchNum > 0 ? intval($subscribeNum - $watchNum) : 0;
+            } else {
+                $watchNum = 0;
+                $unwatchNum = 0;
+            }
+            $popurlarNum = LiveLogin::where('live_id', $liveId)->count();
+            $orderNum = Order::whereIn('type', $type)
+                ->where('live_id', $liveId)
+                ->where('status', 1)
                 ->count();
 
-            $unwatchNum = $subscribeNum - $watchNum > 0 ? intval($subscribeNum - $watchNum) : 0;
-        } else {
-            $watchNum = 0;
-            $unwatchNum = 0;
+            $orderIncome = Order::whereIn('type', $type)
+                ->where('live_id', $liveId)
+                ->where('status', 1)
+                ->sum('pay_price');
         }
-        $popurlarNum = LiveLogin::where('live_id', $liveId)->count();
-        $orderNum = Order::whereIn('type', $type)
-            ->where('live_id', $liveId)
-            ->where('status', 1)
-            ->count();
 
-        $orderIncome = Order::whereIn('type', $type)
-            ->where('live_id', $liveId)
-            ->where('status', 1)
-            ->sum('pay_price');
+
+//        $data = [
+//            'live' => $list,
+//            'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
+//            'watch_num' => $watchNum > 0 ? $watchNum : 0,
+//            'unwatch_num' => $unwatchNum > 0 ? $unwatchNum : 0,
+//            'popurlar_num' => $popurlarNum > 0 ? $popurlarNum : 0,
+//            'order_num' => $orderNum > 0 ? $orderNum : 0,
+//            'order_income' => $orderIncome > 0 ? round($orderIncome, 2) : 0
+//        ];
 
         $data = [
             'live' => $list,
-            'subscribe_num' => $subscribeNum > 0 ? $subscribeNum : 0,
-            'watch_num' => $watchNum > 0 ? $watchNum : 0,
-            'unwatch_num' => $unwatchNum > 0 ? $unwatchNum : 0,
-            'popurlar_num' => $popurlarNum > 0 ? $popurlarNum : 0,
-            'order_num' => $orderNum > 0 ? $orderNum : 0,
-            'order_income' => $orderIncome > 0 ? round($orderIncome, 2) : 0
+            'subscribe_num' => 0,
+            'watch_num' => 0,
+            'unwatch_num' => 0,
+            'popurlar_num' => 0,
+            'order_num' => 0,
+            'order_income' => 0,
         ];
 
         //折线图数据
