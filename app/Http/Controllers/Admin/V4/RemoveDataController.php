@@ -96,6 +96,10 @@ class RemoveDataController extends ControllerBackend
             //$servers->checkVipSubTime();
         //}
 
+        if(1){
+            $servers->liveStatistics();
+        }
+
     }
 
     public function mallOrders()
