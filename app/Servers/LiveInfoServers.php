@@ -481,6 +481,14 @@ class LiveInfoServers {
         $res['son_flag'] = $son_flag;
 
         $son_id = (int)($params['son_id'] ?? 0);
+        if (empty($son_id) && $user['role_id'] !== 1) {
+            $temp_son_flag = $son_flag->toArray()[0] ?? [];
+            if (!empty($temp_son_flag)){
+                $son_id = $temp_son_flag['son_id'];
+            }else{
+                $son_id = -1;
+            }
+        }
 
         //特定渠道
         if (!empty($son_id)) {
@@ -930,7 +938,7 @@ GROUP BY
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
-        
+
         if ($user['role_id'] === 1) {
             $twitter_id_list = null;
         } else {

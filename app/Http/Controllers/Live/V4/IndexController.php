@@ -11,6 +11,7 @@ use App\Models\LiveConsole;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveNumber;
+use App\Models\LiveStatistics;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
 use App\Models\Qrcodeimg;
@@ -135,22 +136,24 @@ class IndexController extends ControllerBackend
         if ($user['live_role'] === 21 || $user['live_role'] === 23) {
             $live_id_role = BackendLiveDataRole::query()
                 ->where('user_id', '=', $user['user_id'])
+                ->select(['live_id'])
+                ->groupBy('live_id')
                 ->pluck('live_id')
                 ->toArray();
 
-            if (0) {
-                $query = Live::query();
-                if ($user['live_role'] === 21) {
-                    $query->where('user_id', '=', $user['user_id']);
-                } else {
-                    $blrModel = new BackendLiveRole();
-                    $son_user_id = $blrModel->getDataUserId($user['username']);
-                    $query->whereIn('user_id', $son_user_id);
-                }
-                $live_list = $query->pluck('id')->toArray();
-            } else {
+//            if (0) {
+//                $query = Live::query();
+//                if ($user['live_role'] === 21) {
+//                    $query->where('user_id', '=', $user['user_id']);
+//                } else {
+//                    $blrModel = new BackendLiveRole();
+//                    $son_user_id = $blrModel->getDataUserId($user['username']);
+//                    $query->whereIn('user_id', $son_user_id);
+//                }
+//                $live_list = $query->pluck('id')->toArray();
+//            } else {
                 $live_list = [];
-            }
+//            }
 
             return array_unique(array_merge($live_id_role, $live_list));
         }
@@ -211,7 +214,6 @@ class IndexController extends ControllerBackend
                 ]);
             });
 
-
         //非超管角色可看live
         $live_id_role = self::getLiveRoleIdList($this->user);
         if ($live_id_role !== null) {
@@ -251,7 +253,6 @@ class IndexController extends ControllerBackend
 
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
-
             $val['live_status'] = 1;  //默认值
             $channel = LiveInfo::where('live_pid', $val['id'])
                 ->where('status', 1)
@@ -266,83 +267,75 @@ class IndexController extends ControllerBackend
                     $val['live_status'] = 2;
                 }
             }
-
-            $live_price_sum_id[] = $val['id'];
+//            $live_price_sum_id[] = $val['id'];
             $val['live_price_sum'] = 0;
             $val['live_twitter_price_sum'] = 0;
             $val['task_id'] = $channel->task_id ?? 0;
-//            //直播收益
-//            $val['live_price_sum'] = Order::where([
-//                'live_id' => $val['id'],
-//                'type' => 10,
-//                'status' => 1,
-//            ])->sum('pay_price');
 
-//            $val['live_twitter_price_sum'] = Order::join('nlsg_pay_record_detail as d', 'd.ordernum', '=',
-//                'nlsg_order.ordernum')
+            if ($this->user['role_id'] !== 1) {
+                $val['order_num'] = LiveStatistics::getCounts($val['id'],1,$this->user['id']);
+            }
+        }
+        return success($lists);
+
+        //计算直播收益
+//        if (!empty($live_price_sum_id)) {
+//            //直播收益
+//            $new_live_price_sum = [];
+//            $live_price_sum = Order::select('live_id', DB::raw('sum(pay_price) pay_price'))
+//                ->whereIn('live_id', $live_price_sum_id)
 //                ->where([
-//                    'nlsg_order.live_id' => $val['id'],
+//                    'type' => 10,
+//                    'status' => 1,
+//                ])->groupBy('live_id')->get()->toArray();
+//            foreach ($live_price_sum as $k => $v) {
+//                $new_live_price_sum[$v['live_id']] = $v['pay_price'];
+//            }
+//
+//            //直播推客收益
+//            $new_live_twitter_price_sum = [];
+//            $live_twitter_price_sum = Order::select('nlsg_order.live_id', DB::raw('sum(d.price) price'))->join('nlsg_pay_record_detail as d', 'd.ordernum', '=',
+//                'nlsg_order.ordernum')
+//                ->whereIn('live_id', $live_price_sum_id)
+//                ->where([
 //                    'nlsg_order.type' => 10,
 //                    'nlsg_order.status' => 1,
-//                ])->where('nlsg_order.twitter_id', '>', 0)->sum('d.price');
-        }
-        //计算直播收益
-        if (!empty($live_price_sum_id)) {
-            //直播收益
-            $new_live_price_sum = [];
-            $live_price_sum = Order::select('live_id', DB::raw('sum(pay_price) pay_price'))
-                ->whereIn('live_id', $live_price_sum_id)
-                ->where([
-                    'type' => 10,
-                    'status' => 1,
-                ])->groupBy('live_id')->get()->toArray();
-            foreach ($live_price_sum as $k => $v) {
-                $new_live_price_sum[$v['live_id']] = $v['pay_price'];
-            }
+//                ])->where('nlsg_order.twitter_id', '>', 0)->groupBy('live_id')->get()->toArray();
+//            foreach ($live_twitter_price_sum as $k => $v) {
+//                $new_live_twitter_price_sum[$v['live_id']] = $v['price'];
+//            }
+//
+//
+//            foreach ($lists['data'] as &$data_v) {
+//                if (!empty($new_live_price_sum[$data_v['id']])) {
+//                    $data_v['live_price_sum'] = $new_live_price_sum[$data_v['id']];
+//                }
+//                if (!empty($new_live_twitter_price_sum[$data_v['id']])) {
+//                    $data_v['live_twitter_price_sum'] = $new_live_twitter_price_sum[$data_v['id']];
+//                }
+//            }
+//        }
 
-            //直播推客收益
-            $new_live_twitter_price_sum = [];
-            $live_twitter_price_sum = Order::select('nlsg_order.live_id', DB::raw('sum(d.price) price'))->join('nlsg_pay_record_detail as d', 'd.ordernum', '=',
-                'nlsg_order.ordernum')
-                ->whereIn('live_id', $live_price_sum_id)
-                ->where([
-                    'nlsg_order.type' => 10,
-                    'nlsg_order.status' => 1,
-                ])->where('nlsg_order.twitter_id', '>', 0)->groupBy('live_id')->get()->toArray();
-            foreach ($live_twitter_price_sum as $k => $v) {
-                $new_live_twitter_price_sum[$v['live_id']] = $v['price'];
-            }
-
-
-            foreach ($lists['data'] as &$data_v) {
-                if (!empty($new_live_price_sum[$data_v['id']])) {
-                    $data_v['live_price_sum'] = $new_live_price_sum[$data_v['id']];
-                }
-                if (!empty($new_live_twitter_price_sum[$data_v['id']])) {
-                    $data_v['live_twitter_price_sum'] = $new_live_twitter_price_sum[$data_v['id']];
-                }
-            }
-        }
-
-        if (!empty($live_price_sum_id)) {
-            $new_live_price_sum = [];
-            $live_price_sum = Order::select('live_id', DB::raw('sum(pay_price) pay_price'))->whereIn('live_id', $live_price_sum_id)->where([
-                'type' => 10,
-                'status' => 1,
-            ])->groupBy('live_id')->get('pay_price')->toArray();
-
-            foreach ($live_price_sum as $k => $v) {
-                $new_live_price_sum[$v['live_id']] = $v['pay_price'];
-            }
-            foreach ($lists['data'] as &$data_v) {
-                if (!empty($new_live_price_sum[$data_v['id']])) {
-                    $data_v['live_price_sum'] = $new_live_price_sum[$data_v['id']];
-                }
-            }
-        }
+//        if (!empty($live_price_sum_id)) {
+//            $new_live_price_sum = [];
+//            $live_price_sum = Order::select('live_id', DB::raw('sum(pay_price) pay_price'))
+//                ->whereIn('live_id', $live_price_sum_id)->where([
+//                'type' => 10,
+//                'status' => 1,
+//            ])->groupBy('live_id')->get('pay_price')->toArray();
+//
+//            foreach ($live_price_sum as $k => $v) {
+//                $new_live_price_sum[$v['live_id']] = $v['pay_price'];
+//            }
+//            foreach ($lists['data'] as &$data_v) {
+//                if (!empty($new_live_price_sum[$data_v['id']])) {
+//                    $data_v['live_price_sum'] = $new_live_price_sum[$data_v['id']];
+//                }
+//            }
+//        }
 
 
-        return success($lists);
+//        return success($lists);
     }
 
     /**
