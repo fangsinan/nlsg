@@ -16,6 +16,7 @@ use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LivePlayback;
 use App\Models\LiveSonFlagPoster;
+use App\Models\LiveStatistics;
 use App\Models\LiveUrl;
 use App\Models\LiveWorks;
 use App\Models\MallGoods;
@@ -1430,6 +1431,9 @@ class LiveController extends Controller
                 'is_flag' => $is_flag,
                 'twitter_id' => $twitter_id,
             ]);
+            //按渠道更新预约人数
+            LiveStatistics::countsJob($info_id,1,$twitter_id);
+
             LiveCountDown::create([
                 'live_id' => $info_id,
                 'user_id' => $this->user['id'],
