@@ -589,5 +589,6 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     //训练营
     
     Route::any('camp/get_camp_list', 'CampController@getCampList');
+    Route::any('camp/get_camp_detail', 'CampController@getCampDetail');
     /**     5.0 API  END    ***/
 });
