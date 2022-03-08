@@ -14,6 +14,7 @@ use App\Models\History;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\LiveOnlineUser;
+use App\Models\LiveStatistics;
 use App\Models\MallGoods;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
@@ -23,7 +24,6 @@ use App\Models\UserFollow;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Models\VipUserBind;
-use App\Models\VipWorksList;
 use App\Models\WorksListOfSub;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -2376,5 +2376,44 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
 
 
     }
+
+    public function liveStatistics() {
+        $begin_time = date('Y-m-d H:i:s');
+        $begin_id = 1;
+        $end_id   = 18331020;
+        $page     = 1;
+        $size     = 100;
+
+        $while_flag = true;
+
+        while ($while_flag) {
+            $list = DB::table('nlsg_subscribe as s')
+                ->join('nlsg_order as o', 's.order_id', '=', 'o.id')
+                ->join('nlsg_user as u', 'o.user_id', '=', 'u.id')
+                ->where('s.type', '=', 3)
+                ->where('s.status', '=', 1)
+                ->where('s.twitter_id', '>', 0)
+                ->where('u.is_test_pay', '=', 0)
+                ->whereBetween('s.id', [$begin_id, $end_id])
+                ->limit($size)
+                ->offset(($page - 1) * $size)
+                ->select(['s.relation_id', 's.twitter_id'])
+                ->get();
+
+            if ($list->isEmpty()) {
+                $while_flag = false;
+            }else{
+                $page++;
+                $list = $list->toArray();
+                foreach ($list as $v){
+                    LiveStatistics::countsJob($v->relation_id,1,$v->twitter_id);
+                }
+            }
+        }
+
+        dd([$begin_time,date('Y-m-d H:i:s')]);
+    }
+
+
 
 }

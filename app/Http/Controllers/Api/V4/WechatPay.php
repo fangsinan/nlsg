@@ -13,6 +13,7 @@ use App\Models\ImGroup;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\LivePayCheck;
+use App\Models\LiveStatistics;
 use App\Models\MallAddress;
 use App\Models\MallErpList;
 use App\Models\MallGroupBuyList;
@@ -553,7 +554,7 @@ class WechatPay extends Controller
         if(in_array($orderInfo['relation_id'],[7,8,10])){
             $offdata  =OfflineProducts::find($orderInfo['relation_id']);
             $textbook_id = $offdata['textbook_id'] ?? 0;
-        
+
             //地址
             $address_id = MallAddress::where(['is_default' => 1, 'is_del' => 0,"user_id"=>$orderInfo['user_id'],])->first();
             //对应订单写三个值
@@ -728,12 +729,15 @@ class WechatPay extends Controller
                 $subscribeRst=true;
                 if($userdata['is_test_pay']==0){ //测试用户不添加订阅记录
                     $subscribeRst = Subscribe::firstOrCreate($subscribe);
+
+                    Live::where('id', $live_id)->increment('order_num');
+                    //按渠道更新预约人数
+                    LiveStatistics::countsJob($live_id,1,$orderInfo['twitter_id']);
                 }
 //                $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
                 $liveData = Live::find($live_id);
 
-                Live::where('id', $live_id)->increment('order_num');
                 if ($liveData['relation_live'] > 0) {
                     $subscribe = [
                         'user_id' => $user_id, //会员id
@@ -803,6 +807,9 @@ class WechatPay extends Controller
 
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $Profit_Rst) {
                     DB::commit();
+
+                    //更新预约人数
+
                     //SMS_211275363
                     //短信
                     if ($userdata['phone'] && $live_id == 12 && strlen($userdata['phone']) == 11) {

@@ -528,42 +528,79 @@ GROUP BY
             }
 
         } else { //总数据
-            //累计人次login
-            $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
-            //累计人数sub
-            $order_num_sql = "
-            SELECT
-                count(*) AS counts
-            FROM
-                (
+            if ($user['role_id'] === 1){
+                //累计人次login
+                $res['total_login'] = LiveLogin::where('live_id', '=', $live_id)->count();
+                //累计人数sub
+                $order_num_sql = "
                 SELECT
-                    id
-                FROM nlsg_subscribe
-                WHERE relation_id = $live_id and type=3 AND STATUS = 1
-                GROUP BY user_id
-                ) AS a";
+                    count(*) AS counts
+                FROM
+                    (
+                    SELECT
+                        id
+                    FROM nlsg_subscribe
+                    WHERE relation_id = $live_id and type=3 AND STATUS = 1
+                    GROUP BY user_id
+                    ) AS a";
 
-            $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
-            //在线人数
-            if ($live_id >= 139) {
-                $list_sql = "SELECT
-	online_time_str AS time,
-	sum(counts) as counts
-FROM
-	nlsg_live_online_user_counts
-WHERE
-	live_id = $live_id
-	GROUP BY online_time_str";
-            } else {
-                $list_sql = "SELECT
-	online_time_str as time,
-	count(*) as counts
-FROM
-	$table_name
-WHERE
-	live_id = $live_id
-GROUP BY
-	online_time_str";
+                $res['total_sub'] = DB::select($order_num_sql)[0]->counts;
+                //在线人数
+                if ($live_id >= 139) {
+                    $list_sql = "SELECT
+                        online_time_str AS time,
+                        sum(counts) as counts
+                    FROM
+                        nlsg_live_online_user_counts
+                    WHERE
+                        live_id = $live_id
+                        GROUP BY online_time_str";
+                } else {
+                    $list_sql = "SELECT
+                        online_time_str as time,
+                        count(*) as counts
+                    FROM
+                        $table_name
+                    WHERE
+                        live_id = $live_id
+                    GROUP BY
+                        online_time_str";
+                }
+            }else{
+                $twitter_id_list = $this->twitterIdList($user['username']);
+                $res['total_login'] = LiveLogin::query()
+                    ->where('live_id','=',$live_id)
+                    ->whereIn('live_son_flag',$twitter_id_list)
+                    ->count();
+                $res['total_sub'] = Subscribe::query()
+                    ->where('relation_id','=',$live_id)
+                    ->where('type','=',3)
+                    ->where('status','=',1)
+                    ->whereIn('twitter_id',$twitter_id_list)
+                    ->count();
+                $twitter_id_list_str = implode(',',$twitter_id_list);
+
+                //在线人数
+                if ($live_id >= 139) {
+                    $list_sql = "SELECT
+                        online_time_str AS time,
+                        sum(counts) as counts
+                    FROM
+                        nlsg_live_online_user_counts
+                    WHERE
+                        live_id = $live_id and live_son_flag in ($twitter_id_list_str)
+                        GROUP BY online_time_str";
+                } else {
+                    $list_sql = "SELECT
+                        online_time_str as time,
+                        count(*) as counts
+                    FROM
+                        $table_name
+                    WHERE
+                        live_id = $live_id
+                    GROUP BY
+                        online_time_str";
+                }
             }
         }
 
