@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V5;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\GetPriceTools;
+use App\Models\History;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\WorksInfo;
@@ -157,6 +158,150 @@ class CampController extends Controller
 
         return $this->success([
             'list' => $column,
+        ]);
+    }
+
+
+
+
+    /**
+     * @api {get} /api/v5/camp/get_lecture_list  训练营目录 
+     * @apiName get_lecture_list
+     * @apiVersion 5.0.0
+     * @apiGroup five_Camp
+     *
+     * @apiParam {int} lecture_id  讲座id
+     * @apiParam {int} user_id 用户id  默认0
+     * @apiParam {int} order asc和 desc  默认asc
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "works_data": {
+     * "id": 16,
+     * "title": "如何经营幸福婚姻",  //标题
+     * "subtitle": "",             //副标题
+     * "cover_img": "/nlsg/works/20190822150244797760.png",   //封面
+     * "detail_img": "/nlsg/works/20191023183946478177.png",   //详情图
+     * "content": "<p>幸福的婚姻是“同床同梦”，悲情的婚姻是“同床异梦”。两个相爱的人因为一时的爱慕之情走到一起，但在经过柴米油盐酱醋茶的考验后他们未必会幸福、未必会长久；两个不相爱的人走到一起，但在长时间的磨合之后他们未必不幸福、未必不长久。</p>",
+     * "view_num": 1295460,     //浏览数
+     * "price": "29.90",
+     * "subscribe_num": 287,       关注数
+     * "is_free": 0,
+     * "is_end": 1,
+     * "info_num": 2       //现有章节数
+     * "history_ount": 2%       //总进度
+     * },
+     * "info": [
+     * {
+     * "id": 2,
+     * "type": 1,
+     * "title": "02坚毅品格的重要性",
+     * "section": "第二章",       //章节数
+     * "introduce": "第二章",     //章节简介
+     * "view_num": 246,        //观看数
+     * "duration": "03:47",
+     * "free_trial": 0,     //是否可以免费试听
+     * "href_url": "",
+     * "time_leng": "10",      //观看 百分比
+     * "time_number": "5"      //观看 分钟数
+     * },
+     * {
+     * "id": 3,
+     * "type": 2,
+     * "title": "03培养坚毅品格的方法",
+     * "section": "第三章",
+     * "introduce": "第三章",
+     * "view_num": 106,
+     * "duration": "09:09",
+     * "free_trial": 0,
+     * "href_url": "",
+     * "time_leng": "10",
+     * "time_number": "5"
+     * }
+     * ]
+     * }
+     * }
+     */
+    public function getLectureList(Request $request)
+    {
+
+        $lecture_id = $request->input('lecture_id', 0);
+        $order = $request->input('order', 'asc');
+        $flag = $request->input('flag', '');
+        $page = $request->input('page', 1);
+        $size = $request->input('size', 10);
+        $order = $order ?? 'asc';
+
+        $page = intval($page) <= 0 ?1:$page;
+        $user_id = $this->user['id'] ?? 0;
+        if (empty($lecture_id)) {
+            return $this->error(0, '参数有误：lecture_id ');
+        }
+        //IOS 通过审核后修改  并删除返回值works_data
+        $column_data = Column::select(['id', 'name', 'name as title','type' , 'title', 'subtitle','index_pic', 'cover_pic as cover_img', 'details_pic as detail_img', 'message','details_pic','cover_pic',
+            'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num','show_info_num','info_column_id','status'])
+        //    ->where(['id' => $lecture_id, 'status' => 1])->first();
+            ->where(['id' => $lecture_id,'type'=>3 ])->first();  // 已购中 不需要操作status
+
+
+        if (empty($column_data)) {
+            return $this->error(0, '参数有误：无此信息');
+        }
+        $type = 7;
+        $history_type = 5; //训练营 历史记录type值
+        $getInfo_type = 4; //训练营 info type值
+
+        $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
+
+        //因为需要根据$column_data的type类型校验 sub表  所以需要全部查询后进行上下架状态校验
+        //未关注   正常按照上下架 显示数据
+        //已关注则不操作
+        if($is_sub == 0 && $column_data['type'] == 2 && $column_data['status'] !==1){  //未关注 下架 不显示数据
+            return $this->error(0, '产品已下架');
+        }
+
+        //1、加字段控制需要查询的章节
+        $page_per_page = 50;
+        $size = $column_data['show_info_num'];
+        $page = $page>1?100:$page;
+
+        $os_type = $request->input('os_type', 0);
+
+        //仅限于训练营  因为多期训练营共用同一章节
+        $getInfo_id = $lecture_id;
+        if($column_data['info_column_id'] > 0 ){
+            $getInfo_id = $column_data['info_column_id'];
+        }
+        //查询章节、
+        $infoObj = new WorksInfo();
+        $info = $infoObj->getInfo($getInfo_id, $is_sub, $user_id, $getInfo_type, $order, $page_per_page, $page, $size, $column_data,$os_type);
+        if($column_data['type'] == 3) {
+            //训练营规定展示章节
+            $info = array_reverse($info);
+        }
+
+
+
+        $column_data['is_sub'] = $is_sub;
+        //查询总的历史记录进度`
+        $hisCount = History::getHistoryCount($lecture_id, $history_type, $user_id);  //讲座
+
+
+        $column_data['history_count'] = 0;
+        if ($column_data['info_num'] > 0) {
+            $column_data['history_count'] = round($hisCount / $column_data['info_num'] * 100);
+        }
+
+        $historyData = History::getHistoryData($lecture_id, $history_type, $user_id);
+
+        return $this->success([
+            'lecture_data' => $column_data,
+            'info' => $info,
+            'historyData' => $historyData
         ]);
     }
 

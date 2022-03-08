@@ -590,5 +590,6 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     
     Route::any('camp/get_camp_list', 'CampController@getCampList');
     Route::any('camp/get_camp_detail', 'CampController@getCampDetail');
+    Route::any('camp/get_lecture_list', 'CampController@getLectureList');
     /**     5.0 API  END    ***/
 });
