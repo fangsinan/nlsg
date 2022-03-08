@@ -949,6 +949,7 @@ class Order extends Base
 
         }
         if(!empty($expressInfo)){
+            $expressInfo['updated_at'] = date('Y-m-d',strtotime($expressInfo['updated_at'])) ;
             $expressInfo['express_name'] = ExpressCompany::onlyGetName(
                 $expressInfo['express_id'] ?? 0
             );
