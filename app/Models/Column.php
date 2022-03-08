@@ -33,10 +33,10 @@ class Column extends Base
         }else{
             $column = Column::where(['type'=>1,'user_id'=>$teacher_id])->first($field);
         }
-        $column_id = $column['id'];
         if( empty($column) )    {
             return [];
         }
+        $column_id = $column['id'];
         $category = WorksCategory::select('name')->where(['id'=>$column['category_id'],'type'=>2])->first();
         $column['category_name'] = $category->name ??'';
         //作者信息

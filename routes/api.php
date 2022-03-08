@@ -545,7 +545,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
 
     Route::any('video/get_random_video', 'VideoController@getRandomVideo');
-    Route::any('video/like', 'VideoController@like');
+
     Route::any('video/show', 'VideoController@show');
 
     Route::any('user/user_his_list', 'UserController@userHisList');
@@ -560,9 +560,9 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
     Route::any('rank/works', 'RankController@works');
     //评论
-    Route::post('reply/store', 'ReplyController@store');
+    // Route::post('reply/store', 'ReplyController@store');
     Route::get('comment/list', 'CommentController@index');
-    Route::post('comment/store', 'CommentController@store');
+    
     Route::post('comment/destroy', 'CommentController@destroy');
 
     Route::get('index/recommend', 'IndexController@recommend');
@@ -570,13 +570,14 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::any('user/history_like', 'UserController@histLike');
-
         //想法的喜欢
         Route::post('like', 'LikeController@like');
         Route::post('unlike', 'LikeController@unlike');
-
-
-
+        //评论
+        Route::post('reply/store', 'ReplyController@store');
+        Route::post('comment/store', 'CommentController@store');
+        //短视频
+        Route::any('video/like', 'VideoController@like');
         //虚拟订单
 
         //添加地址
@@ -585,5 +586,9 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
     });
 
+    //训练营
+    
+    Route::any('camp/get_camp_list', 'CampController@getCampList');
+    Route::any('camp/get_camp_detail', 'CampController@getCampDetail');
     /**     5.0 API  END    ***/
 });
