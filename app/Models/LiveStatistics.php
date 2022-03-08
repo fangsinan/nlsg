@@ -21,13 +21,12 @@ class LiveStatistics extends Model
             return 0;
         }
         $channel_user_id_list[] = $channel_user_id;
-
+        
         return max(doubleval(self::query()
             ->where('live_id', '=', $live_id)
             ->where('type', '=', $type)
             ->whereIn('channel_user_id',$channel_user_id_list)
-//            ->where('channel_user_id', '=', $channel_user_id)
-            ->value('counts')), 0);
+            ->sum('counts')), 0);
     }
 
 
