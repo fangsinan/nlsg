@@ -1374,6 +1374,10 @@ class LiveController extends Controller
         if( empty($input) ){
             return error(0, '参数异常');
         }
+        //虚拟用户
+        if($input['os_type'] ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
+            return error(4000, '请修改手机号');
+        }
 
         if( in_array($this->user['id'], [878644, 882057, 882861]) ){
             return error(0, '用户异常');
