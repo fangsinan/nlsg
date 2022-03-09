@@ -175,8 +175,8 @@ class IndexController extends Controller
 //        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
         $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
             'is_free', 'helper')
-            ->where('begin_at', '>', date("Y-m-d"))
-            ->where('end_at',   '<', date('Y-m-d',strtotime('+1 day')))
+            ->where('begin_at', '>=', date("Y-m-d"))
+            ->where('end_at',   '<=', date('Y-m-d',strtotime('+1 day')))
             ->where('is_del', 0)
             ->where('is_show', 1)
             ->where('is_test', 0)
