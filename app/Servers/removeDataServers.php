@@ -2377,16 +2377,14 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
 
     }
 
-    public function liveStatistics() {
-        $begin_time = date('Y-m-d H:i:s');
-        $begin_id = 1;
-        $end_id   = 18331020;
-        $page     = 1;
-        $size     = 100;
+    public function liveStatistics(){
+        $live_id_list = Live::query()->orderBy('id')->pluck('id')->toArray();
 
-        $while_flag = true;
+        $end_id   = 18762290;
 
-        while ($while_flag) {
+        $db_name = 'nlsg_live_statistics_copy1';
+
+        foreach ($live_id_list as $lid){
             $list = DB::table('nlsg_subscribe as s')
                 ->join('nlsg_order as o', 's.order_id', '=', 'o.id')
                 ->join('nlsg_user as u', 'o.user_id', '=', 'u.id')
@@ -2394,24 +2392,33 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
                 ->where('s.status', '=', 1)
                 ->where('s.twitter_id', '>', 0)
                 ->where('u.is_test_pay', '=', 0)
-                ->whereBetween('s.id', [$begin_id, $end_id])
-                ->limit($size)
-                ->offset(($page - 1) * $size)
-                ->select(['s.relation_id', 's.twitter_id'])
+                ->where('s.id','<=',$end_id)
+                ->where('s.relation_id','=',$lid)
+                ->groupBy(['s.relation_id','s.twitter_id'])
+                ->select(['s.relation_id','s.twitter_id',DB::raw('count(*) as counts')])
                 ->get();
 
-            if ($list->isEmpty()) {
-                $while_flag = false;
-            }else{
-                $page++;
-                $list = $list->toArray();
-                foreach ($list as $v){
-                    LiveStatistics::countsJob($v->relation_id,1,$v->twitter_id);
+            foreach ($list as $v){
+                $temp_check = DB::table($db_name)
+                    ->where('live_id','=',$v->relation_id)
+                    ->where('channel_user_id','=',$v->twitter_id)
+                    ->where('type','=',1)
+                    ->first();
+                if (empty($temp_check)){
+                    DB::table($db_name)->insert([
+                        'live_id'=>$v->relation_id,
+                        'channel_user_id'=>$v->twitter_id,
+                        'type'=>1,
+                        'counts'=>$v->counts,
+                    ]);
+                }else{
+                    DB::table($db_name)
+                        ->where('id','=',$temp_check->id)
+                        ->increment('counts',$v->counts);
                 }
             }
         }
 
-        dd([$begin_time,date('Y-m-d H:i:s')]);
     }
 
 

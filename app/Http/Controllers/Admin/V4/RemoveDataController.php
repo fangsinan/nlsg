@@ -96,7 +96,7 @@ class RemoveDataController extends ControllerBackend
             //$servers->checkVipSubTime();
         //}
 
-        if(1){
+        if(0){
             $servers->liveStatistics();
         }
 
