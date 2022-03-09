@@ -2381,14 +2381,15 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
         dd(__LINE__);
         $live_id_list = Live::query()->orderBy('id')->pluck('id')->toArray();
 
-        $end_id   = 18762290;
+        $end_id   = 18762889;
 
         $db_name = 'nlsg_live_statistics';
 
         foreach ($live_id_list as $lid){
+
             $list = DB::table('nlsg_subscribe as s')
-                ->join('nlsg_order as o', 's.order_id', '=', 'o.id')
-                ->join('nlsg_user as u', 'o.user_id', '=', 'u.id')
+                ->join('nlsg_user as u', 's.user_id', '=', 'u.id')
+                ->join('nlsg_backend_live_role as lr','s.twitter_id','=','lr.son_id')
                 ->where('s.type', '=', 3)
                 ->where('s.status', '=', 1)
                 ->where('s.twitter_id', '>', 0)

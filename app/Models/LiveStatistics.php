@@ -14,14 +14,14 @@ class LiveStatistics extends Model
         'live_id', 'type', 'channel_user_id', 'counts', 'created_at', 'updated_at'
     ];
 
-    public static function getCounts($live_id, $type, $channel_user_id) {
+    public static function getCounts($live_id, $type, $channel_user_id,$channel_user_phone = '') {
         $lis = new LiveInfoServers();
-        $channel_user_id_list = $lis->twitterIdList('',$channel_user_id);
+        $channel_user_id_list = $lis->twitterIdList($channel_user_phone,$channel_user_id);
         if (empty($channel_user_id_list)){
             return 0;
         }
         $channel_user_id_list[] = $channel_user_id;
-        
+
         return max(doubleval(self::query()
             ->where('live_id', '=', $live_id)
             ->where('type', '=', $type)

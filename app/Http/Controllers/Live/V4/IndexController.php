@@ -273,7 +273,7 @@ class IndexController extends ControllerBackend
             $val['task_id'] = $channel->task_id ?? 0;
 
             if ($this->user['role_id'] !== 1) {
-                $val['order_num'] = LiveStatistics::getCounts($val['id'],1,$this->user['id']);
+                $val['order_num'] = LiveStatistics::getCounts($val['id'],1,$this->user['id'],$this->user['username']);
             }
         }
         return success($lists);
