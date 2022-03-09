@@ -2378,11 +2378,12 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
     }
 
     public function liveStatistics(){
+        dd(__LINE__);
         $live_id_list = Live::query()->orderBy('id')->pluck('id')->toArray();
 
         $end_id   = 18762290;
 
-        $db_name = 'nlsg_live_statistics_copy1';
+        $db_name = 'nlsg_live_statistics';
 
         foreach ($live_id_list as $lid){
             $list = DB::table('nlsg_subscribe as s')
