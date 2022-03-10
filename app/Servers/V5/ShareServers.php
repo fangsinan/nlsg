@@ -40,7 +40,7 @@ class ShareServers
 
             $redisConfig = config('database.redis.default');
             $Redis = new Client($redisConfig);
-            $Redis->select(1);
+            $Redis->select(2);
 
             $app_id = 'wxe24a425adb5102f6';
             $app_secret = '2ded804b74f99ae2f342423dd7952620';
@@ -53,7 +53,7 @@ class ShareServers
 
                 if (isset($rstJson->access_token)) {
                     //写入redis
-                    $Redis->setex('swoole_wechat_access_token',7200,$rstJson->access_token);//设置redis缓存
+                    $Redis->setex('crontab_wechat_access_token',7200,$rstJson->access_token);//设置redis缓存
                     LiveConsoleServers::LogIo('accesstoken','wechat','1');
                 } else {
                     //写入报错日志
