@@ -1279,11 +1279,26 @@ class IndexController extends Controller
         $data  = !empty($data) ? $data : new \StdClass();
         return success($data);
     }
-
+    public function share1(){
+        $config = [
+            'app_id' => 'wxe24a425adb5102f6',
+            'secret' => '2ded804b74f99ae2f342423dd7952620',
+            'response_type' => 'array',
+            'cache' => "redis"
+        ];
+        $app = Factory::officialAccount($config);
+        // 创建缓存实例
+        $cache = new RedisAdapter(app('redis')->connection()->client());
+        $app->rebind('cache', $cache);
+        $jssdk = $app->jssdk->getTicket();
+        dd($jssdk);
+    }
 
     public function share(Request $request)
     {
-        
+        $this->share1();
+        dd(1);
+    
 
         $input = $request->all();
 
