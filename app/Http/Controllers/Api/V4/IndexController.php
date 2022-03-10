@@ -1287,6 +1287,8 @@ class IndexController extends Controller
 
     public function share(Request $request)
     {
+
+        dd($_SERVER);
         if(isset($_SERVER)){
             if($_SERVER['SERVER_ADDR']){
                 $server_ip=$_SERVER['SERVER_ADDR'];
