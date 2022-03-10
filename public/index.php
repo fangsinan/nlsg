@@ -1,4 +1,5 @@
 <?php
+echo phpinfo();
 
 /**
  * Laravel - A PHP Framework For Web Artisans
