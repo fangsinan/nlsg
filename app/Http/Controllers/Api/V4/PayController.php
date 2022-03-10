@@ -155,7 +155,7 @@ class PayController extends Controller
     {
 
         $body = '';
-        if (in_array($attach, [1, 2, 5, 9, 11, 14, 8, 15, 16, 17, 18, 19])) { //1专栏 2会员 5打赏 9精品课 听课
+        if (in_array($attach, [1, 2, 5, 9, 10, 11, 14, 8, 15, 16, 17, 18, 19])) { //1专栏 2会员 5打赏 9精品课 听课
             $device_info = '';
             if ($attach == 8) {
                 $OrderInfo = MallOrder::where('status', '=', 1)
@@ -185,7 +185,7 @@ class PayController extends Controller
                 $body = "能量时光-打赏-" . $OrderInfo['ordernum'];
             } else if ($attach == 9) {
                 $body = "能量时光-精品课购买-" . $OrderInfo['ordernum'];
-            } else if ($attach == 11) {
+            } else if ($attach == 11 || $attach ==10) {
                 $live = Live::find($OrderInfo['live_id']);
                 $profit_sharing = $live['profit_sharing'];
 
