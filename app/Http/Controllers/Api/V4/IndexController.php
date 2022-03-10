@@ -1287,21 +1287,6 @@ class IndexController extends Controller
 
     public function share(Request $request)
     {
-
-        dd($_SERVER);
-        if(isset($_SERVER)){
-            if($_SERVER['SERVER_ADDR']){
-                $server_ip=$_SERVER['SERVER_ADDR'];
-            }else{
-                $server_ip=$_SERVER['LOCAL_ADDR'];
-            }
-    
-        }else{
-    
-            $server_ip = getenv('SERVER_ADDR');
-    
-        }
-        dd($server_ip);
         $input = $request->all();
 
         if( !empty($input['tag']) && $input['tag'] == 1 ){  //训练营分享参数
