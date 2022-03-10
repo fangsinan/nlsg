@@ -3,6 +3,7 @@
 namespace App\Servers\V5;
 
 use App\Models\WorksInfo;
+use App\Servers\LiveConsoleServers;
 use EasyWeChat\Factory;
 use Predis\Client;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -53,14 +54,14 @@ class ShareServers
                 if (isset($rstJson->access_token)) {
                     //写入redis
                     $Redis->setex('swoole_wechat_access_token',7200,$rstJson->access_token);//设置redis缓存
-                    self::LogIo('accesstoken','wechat','1');
+                    LiveConsoleServers::LogIo('accesstoken','wechat','1');
                 } else {
                     //写入报错日志
-                    self::LogIo('accesstoken','wechat_error','WechatToken：access_token null');
+                    LiveConsoleServers::LogIo('accesstoken','wechat_error','WechatToken：access_token null');
                 }
             }
         } catch (\Exception $e) {
-            self::LogIo('accesstoken','wechat_error','WechatToken：' . $e->getMessage());
+            LiveConsoleServers::LogIo('accesstoken','wechat_error','WechatToken：' . $e->getMessage());
         }
 
 
