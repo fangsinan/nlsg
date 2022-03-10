@@ -630,7 +630,7 @@ class OrderController extends Controller
             $where = ['user_id' => $user_id, 'type' => $type];
         }
 
-        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id','pay_type','express_info_id','textbook_id','address_id')
+        $OrderObj = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'send_type', 'send_user_id','pay_type','express_info_id','textbook_id','address_id','os_type')
             ->whereIn('type', [1, 9, 10, 13, 14, 15, 16, 17, 18,19])
             ->where($where);
 
@@ -729,7 +729,7 @@ class OrderController extends Controller
     {
         $user_id = $this->user['id'] ?? 0;
         $order_id = $request->input('id', 0);
-        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type', 'send_type', 'send_user_id','express_info_id','textbook_id','address_id')
+        $data = Order::select('id', 'type', 'relation_id', 'user_id', 'status', 'cost_price', 'price', 'pay_price', 'coupon_id', 'pay_time', 'ordernum', 'created_at', 'pay_type', 'send_type', 'send_user_id','express_info_id','textbook_id','address_id','os_type')
             ->where(['id' => $order_id, 'user_id' => $user_id])->first()->toArray();
 
         //查询优惠券金额
