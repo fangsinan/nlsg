@@ -1287,7 +1287,7 @@ class IndexController extends Controller
 
     public function share(Request $request)
     {
-        dd($_SERVER['SERVER_ADDR']);
+        dd($_SERVER['REMOTE_ADDR']);
         $input = $request->all();
 
         if( !empty($input['tag']) && $input['tag'] == 1 ){  //训练营分享参数
