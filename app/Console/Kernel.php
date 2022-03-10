@@ -26,6 +26,7 @@ use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
 use App\Servers\LiveConsoleServers;
 use App\Servers\removeDataServers;
+use App\Servers\V5\ShareServers;
 use EasyWeChat\Factory;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -142,6 +143,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
+            ShareServers::SetTicket();
         })->everyFiveMinutes()->runInBackground();//每5分
 
         $schedule->call(function () {
