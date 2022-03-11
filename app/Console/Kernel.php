@@ -93,6 +93,11 @@ class Kernel extends ConsoleKernel
             ->everyMinute()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
 
+        //vip新增课程追加订阅
+        $schedule->command('command:VipWorksListAppendSub')
+            ->everyFiveMinutes()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+
         //order表推送到erp
         $schedule->command('command:ErpOrderPush')
             ->everyMinute()->withoutOverlapping(1)
