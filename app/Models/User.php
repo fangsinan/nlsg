@@ -382,7 +382,7 @@ class User extends Authenticatable implements JWTSubject
             }
         }
 
-        Cache::put($cache_key_name, $user, 86400*7);
+        Cache::put($cache_key_name, $user, 86400);
         return $user;
     }
 

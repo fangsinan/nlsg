@@ -94,7 +94,7 @@ class UserController extends Controller
                 $u_data['his_num_n']  = $user_data['num'] >0 ?$user_data['num']: 0;
                 $u_data['his_num']  = SecToTime($user_data['num']);
                 $u_data['rank']     = $his_data[0]->count;
-                Cache::put($cache_key_name, $u_data, 86400*7);
+                Cache::put($cache_key_name, $u_data, 86400);
             }
 
 
