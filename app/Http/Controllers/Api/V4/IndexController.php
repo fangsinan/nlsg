@@ -1287,8 +1287,6 @@ class IndexController extends Controller
 
     public function share(Request $request)
     {
-        $server_ip = exec("ip a | grep 'inet' | grep -v inet6 | grep -v 127.0.0.1 | awk '{print $2}' | awk -F '/' '{print $1}'");
-        dd($server_ip);
         $input = $request->all();
 
         if( !empty($input['tag']) && $input['tag'] == 1 ){  //训练营分享参数

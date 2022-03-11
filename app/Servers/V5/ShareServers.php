@@ -12,9 +12,9 @@ class ShareServers
 {
      // 更新access_token缓存
      public static function SetTicket(){
-        $server_ip = exec("ip a | grep 'inet' | grep -v inet6 | grep -v 127.0.0.1 | awk '{print $2}' | awk -F '/' '{print $1}'");
-        if($server_ip == "172.17.212.212" || $server_ip == ""){
-            
+        // $server_ip = exec("ip a | grep 'inet' | grep -v inet6 | grep -v 127.0.0.1 | awk '{print $2}' | awk -F '/' '{print $1}'");
+        // if($server_ip == "172.17.212.212" || $server_ip == ""){
+        // }
             $app = Factory::officialAccount([
                 'app_id' => 'wxe24a425adb5102f6',
                 'secret' => '2ded804b74f99ae2f342423dd7952620',
@@ -28,7 +28,7 @@ class ShareServers
 
 
 
-        }
+
     }
 
     /**
