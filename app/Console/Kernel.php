@@ -143,7 +143,6 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
-            ShareServers::SetTicket();
         })->everyFiveMinutes()->runInBackground();//每5分
 
         $schedule->call(function () {
@@ -249,6 +248,7 @@ class Kernel extends ConsoleKernel
 //
 //            $app = Factory::officialAccount($config);
 //            $app->access_token->getRefreshedToken();
+            ShareServers::SetTicket();
         })->hourly();//每小时
 
         $schedule->call(function () {

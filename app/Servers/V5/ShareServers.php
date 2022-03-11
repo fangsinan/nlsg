@@ -24,9 +24,7 @@ class ShareServers
             // 创建缓存实例
             $cache = new RedisAdapter(app('redis')->connection()->client());
             $app->rebind('cache', $cache);
-            $app->jssdk->getTicket();
-
-
+            $app->jssdk->getTicket(true);
 
 
     }
