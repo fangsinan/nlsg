@@ -11,6 +11,7 @@ use App\Models\LiveConsole;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveNumber;
+use App\Models\LivePoster;
 use App\Models\LiveStatistics;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
@@ -501,6 +502,11 @@ class IndexController extends ControllerBackend
         $steam_begin_time  = $input['steam_begin_time'] ?? '';
         $pre_push_time  = $input['pre_push_time'] ?? 60;
 
+        $poster_list = $input['poster'] ?? [];
+        if (is_string($poster_list)){
+            $poster_list = explode(',',$poster_list);
+        }
+
         if (!$title) {
             return error(1000, '标题不能为空');
         }
@@ -660,6 +666,27 @@ class IndexController extends ControllerBackend
                     ]);
             }
         }
+
+        if (!empty($poster_list)){
+            LivePoster::query()
+                ->where('live_id','=',$live_info_data['live_pid'])
+                ->whereNotIn('image',$poster_list)
+                ->update([
+                    'status'=>3
+                ]);
+
+            foreach ($poster_list as $pl_v){
+                LivePoster::query()->firstOrCreate(
+                    [
+                        'live_id'=>$live_info_data['live_pid'],
+                        'image'=>$pl_v,
+                        'status'=>1
+                    ]
+                );
+            }
+        }
+
+
         return success();
     }
 
@@ -934,7 +961,7 @@ class IndexController extends ControllerBackend
                 'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test',
                 'steam_end_time', 'steam_begin_time','pre_push_time'
             )
-            ->with(['livePoster'])
+//            ->with(['livePoster'])
             ->where('id', $id)->first();
         if (!$live) {
             return error('直播不存在');
@@ -967,6 +994,12 @@ class IndexController extends ControllerBackend
 //            }
 //        }
         $live->channel_show = $channel_user_id;
+
+        $live->poster_list = LivePoster::query()
+            ->where('live_id','=',$id)
+            ->where('status','=',1)
+            ->pluck('image')
+            ->toArray();
 
         return success($live);
     }
