@@ -326,6 +326,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('user_wechat/get_wechat_staff_user_list', 'UserWechatController@get_wechat_staff_user_list');
     Route::get('user_wechat/transfer_customer', 'UserWechatController@transfer_customer');
     Route::get('user_wechat/transfer_result', 'UserWechatController@transfer_result');
+    Route::get('user_wechat/search_transfer_record', 'UserWechatController@search_transfer_record');
 
 });
 

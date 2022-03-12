@@ -192,6 +192,9 @@ class UserWechatServers
         $userids_arr_chunk=array_chunk($userids_arr,100);
         $count=count($userids_arr_chunk);
 
+        $redisConfig = config('database.redis.default');
+        $Redis = new Client($redisConfig);
+
         foreach ($userids_arr_chunk as $k=>$userids){
 
             $push_data=[
@@ -204,12 +207,25 @@ class UserWechatServers
             if($count <= ($k+1)){
                 $push_data['is_finish']=1;
             }
-            $redisConfig = config('database.redis.default');
-            $Redis = new Client($redisConfig);
+
             $Redis->rpush('user_wechat_transfer_customer',$push_data);
+
         }
 
         return  true;
+    }
+
+    /**
+     * 消费redis转移客户队列
+     */
+    public function consume_redis_transfer_customer(){
+
+        $redisConfig = config('database.redis.default');
+        $Redis = new Client($redisConfig);
+        while ($msg = $Redis->rPop('user_wechat_transfer_customer')) {
+            $data=json_decode($msg,true);
+            $this->transfer_customer($data);
+        }
     }
 
     /**
@@ -369,6 +385,8 @@ class UserWechatServers
     }
 
 
+
+
     /**
      * 查询分配结果
      */
@@ -501,11 +519,20 @@ class UserWechatServers
             if($record_list){
                 foreach ($record_list as $record){
 
+
+                    //完成转移的数量
+                    $record->finish_total=UserWechatTransferLog::query()->where('transfer_record_id',$record->id)->where('status',UserWechat::TRANSFER_STATUS_FINISH)->count();
+
+                    //等待转移的数量
+                    $record->wait_total=UserWechatTransferLog::query()->where('transfer_record_id',$record->id)->where('status',UserWechat::TRANSFER_STATUS_WAIT)->count();
+
+                    //判断是否转移完成
                     $log_count=UserWechatTransferLog::query()->where('transfer_record_id',$record->id)->where('status','<>',UserWechat::TRANSFER_STATUS_WAIT)->count();
                     if($record->total <= $log_count){
                         $record->status=UserWechatTransferRecord::STATUS_FINISH;
-                        $record->save();
                     }
+
+                    $record->save();
 
                 }
             }
