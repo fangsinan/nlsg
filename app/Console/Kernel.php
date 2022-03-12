@@ -26,6 +26,7 @@ use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
 use App\Servers\LiveConsoleServers;
 use App\Servers\removeDataServers;
+use App\Servers\V5\ShareServers;
 use EasyWeChat\Factory;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -90,6 +91,11 @@ class Kernel extends ConsoleKernel
         //关闭课程与直播
         $schedule->command('command:subListOpen')
             ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+
+        //vip新增课程追加订阅
+        $schedule->command('command:VipWorksListAppendSub')
+            ->everyFiveMinutes()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
 
         //order表推送到erp
@@ -247,6 +253,7 @@ class Kernel extends ConsoleKernel
 //
 //            $app = Factory::officialAccount($config);
 //            $app->access_token->getRefreshedToken();
+            ShareServers::SetTicket();
         })->hourly();//每小时
 
         $schedule->call(function () {
@@ -300,7 +307,8 @@ class Kernel extends ConsoleKernel
         })->dailyAt('22:10');*/
         $schedule->call(function () {
 //            UserWechat::AddUserWechat();//通过部门id获取企业客户
-            UserWechat::UserWechatEdit();
+            UserWechat::UserWechatEdit(3);
+            UserWechat::UserWechatEdit(11);
         })->dailyAt('0:01');
     }
 

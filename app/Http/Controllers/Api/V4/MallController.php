@@ -17,6 +17,7 @@ use App\Servers\ErpServers;
 use App\Servers\MallRefundJob;
 use App\Servers\V5\TempToolsServers;
 use App\Servers\VipServers;
+use App\Servers\VipWorksListServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -220,13 +221,7 @@ class MallController extends Controller
      */
     public function goodsList(Request $request) {
         if ($request->input('aa', 0) == 1) {
-            $eos = new ErpServers();
-            $eos->pushRunForOrder();
             dd(__LINE__);
-            set_time_limit(0);
-            $res = (new TempToolsServers())->meikan3();
-            return $this->getRes($res);
-
             $open_360 = $request->input('open_360', 0);
             if ($open_360) {
                 $list = DB::table('wwtest')->get()->toArray();

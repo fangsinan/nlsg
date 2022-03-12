@@ -65,8 +65,8 @@ class WechatPay extends Controller
             return self::mallOrder($data);
         } elseif ($data['attach'] == 9) { //精品课 OK  代理商返佣50%
             return self::PayExcellent($data);
-        } elseif ($data['attach'] == 10) { //借书 月卡 季卡 违约金
-            return self::BorrowBooks($data);
+        } elseif ($data['attach'] == 10) { //过度到直播类型  
+            return self::PayLive($data);
         } elseif ($data['attach'] == 11) { // 处理直播视频
             return self::PayLive($data);
         } elseif ($data['attach'] == 12) { // 直播预约
