@@ -65,6 +65,24 @@ class UserWechatServers
     }
 
     /**
+     * @param $userid
+     * 获取员工下客户列表
+     */
+    public function get_user_list($userid){
+
+        $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/list?access_token=" . $this->token . '&userid=' . $userid;
+        $detail_res = ImClient::curlGet($getDetail_url);
+        $detail_res = json_decode($detail_res, true);
+
+        if ($detail_res['errcode'] == 0) {
+            return $detail_res['external_userid'];
+        }
+
+        return  false;
+
+    }
+
+    /**
      * @param $external_userid
      * @return bool|mixed
      * 获取客户详情
@@ -328,9 +346,10 @@ class UserWechatServers
         ];
 
         $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_customer?access_token=' . $this->token, json_encode($data));
+        \Log::info('transfer_customer:   '.$detail_res);
+
         $detail_res = json_decode($detail_res, true);
 
-//        var_dump($detail_res);
 
         if ($detail_res['errcode'] != 0) {
             DB::rollBack();
@@ -425,9 +444,11 @@ class UserWechatServers
         ];
 
         $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_result?access_token=' . $this->token, json_encode($data));
+        \Log::info('transfer_result:   '.$detail_res);
+
         $detail_res = json_decode($detail_res, true);
 
-//        var_dump($detail_res);
+        var_dump($detail_res);
 
         $next_cursor = $detail_res['next_cursor'] ?? '';
 
