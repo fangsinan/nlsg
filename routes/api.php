@@ -582,14 +582,16 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
         //添加地址
         Route::get('order/create_order_address', 'OrderController@addOrderAddress');
-
-
+        
+        //课程
+        Route::get('works/edit_history_time', 'WorksController@editHistoryTime');
     });
-
-    //训练营
     
+    //训练营
     Route::any('camp/get_camp_list', 'CampController@getCampList');
     Route::any('camp/get_camp_detail', 'CampController@getCampDetail');
     Route::any('camp/get_lecture_list', 'CampController@getLectureList');
+    Route::any('camp/camp_study', 'CampController@campStudy');
+    
     /**     5.0 API  END    ***/
 });

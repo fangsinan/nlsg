@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Api\V5;
 
+use AlibabaCloud\Client\Request\Request as RequestRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\ColumnWeekReward;
 use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use LDAP\Result;
 
 class CampController extends Controller
 {
@@ -162,8 +165,6 @@ class CampController extends Controller
     }
 
 
-
-
     /**
      * @api {get} /api/v5/camp/get_lecture_list  训练营目录 
      * @apiName get_lecture_list
@@ -305,9 +306,60 @@ class CampController extends Controller
         ]);
     }
 
-    // 学习奖励
-    function study(){
 
+    /**
+     * @api {get} /api/v5/camp/camp_study 训练营学习奖励
+     * @apiName camp_study
+     * @apiVersion 5.0.0
+     * @apiGroup five_Camp
+     *
+     * @apiParam {int} id  训练营id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "column_info": {
+     * }
+     * }
+     * }
+     */
+    public function campStudy(Request $request){
+        $camp_id = $request->input('id', 0);  //训练营id
+        $user_id = $this->user['id'] ?? 0;
+
+
+        $column_data = Column::find($camp_id);
+        if (empty($column_data)) {
+            return $this->error(0, '参数有误：无此信息');
+        }
+        // 训练营 每周开放六节课程 周日不开课  
+        // 查询训练营目前开放的全部课程 ，没六个章节为一周，查询历史记录表是否完结
+        $is_sub = Subscribe::isSubscribe($user_id, $column_data['id'], 7);
+        if($is_sub ==0){
+            return $this->error(0,'您当前尚未加入该训练营');
+        }
+        
+        $reward = ColumnWeekReward::select('week_num','is_get','is_end','end_time')->where([
+            'user_id'       => $user_id,
+            'relation_id'   => $column_data['id'],
+            // 'is_get'        => 0,  //  未领取奖励
+            // 'is_end'        => 1,   // 已完成听课
+        ])->get()->toArray();
+
+        $is_show = 0;
+        foreach($reward as $key=>$val){
+            if($val['is_get'] == 0&&$val['is_end']==1){
+                $is_show = 1;
+            }
+        }
+
+        return $this->success([
+            'is_show' => $is_show,
+            'week_day' => $reward,
+        ]);
     }
 
 
