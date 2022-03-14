@@ -455,7 +455,7 @@ class WorksController extends Controller
      * @api {get} api/v5/works/edit_history_time  更新学习进度 时长及百分比
      * @apiName edit_history_time
      * @apiVersion 1.0.0
-     * @apiGroup works
+     * @apiGroup five_Camp
      *
      * @apiParam {int} relation_id  对应id
      * @apiParam {int} relation_type 1专栏   2讲座   3听书    4精品课程    5训练营
