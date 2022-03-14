@@ -305,5 +305,10 @@ class CampController extends Controller
         ]);
     }
 
+    // 学习奖励
+    function study(){
+
+    }
+
 
 }
