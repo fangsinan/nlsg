@@ -128,3 +128,21 @@
             'top_monday'=>$top_monday,
         ];
     }
+
+/**
+ * @param $res
+ * @return bool
+ * 检查返回结果
+ */
+function checkRes($res){
+
+    if($res === true ||  is_array($res) ||is_object($res)){
+        return true;
+    }
+    if(is_numeric($res)){
+        return true;
+    }
+
+    return false;
+
+}

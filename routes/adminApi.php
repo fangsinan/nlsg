@@ -320,8 +320,17 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('order/col_list_excel', 'OrderController@colListExcel');
     Route::get('order/campListExcel', 'OrderController@campListExcel');
 
+    Route::get('user_wechat/test', 'UserWechatController@test');
+    Route::get('user_wechat/search_wechat_user_list', 'UserWechatController@search_wechat_user_list');
+    Route::get('user_wechat/search_wechat_staff_user_list', 'UserWechatController@search_wechat_staff_user_list');
+    Route::get('user_wechat/get_wechat_staff_user_list', 'UserWechatController@get_wechat_staff_user_list');
+    Route::get('user_wechat/transfer_customer', 'UserWechatController@transfer_customer');
+    Route::get('user_wechat/transfer_result', 'UserWechatController@transfer_result');
+    Route::get('user_wechat/search_transfer_record', 'UserWechatController@search_transfer_record');
 
 });
+
+
 
 Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
@@ -342,7 +351,6 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('select_data/works_list', 'SelectDataController@worksList');
         Route::get('select_data/works_lists_list', 'SelectDataController@worksListsList');
         Route::get('select_data/teacher_list', 'SelectDataController@teacherList');
-
 
         Route::get('temp_tools/live_tools', 'TempToolsController@liveTools');
 
