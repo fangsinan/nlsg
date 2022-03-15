@@ -10,6 +10,10 @@ class VipUserBind extends Base
 {
     protected $table = 'nlsg_vip_user_bind';
 
+    protected $fillable = [
+        'parent','son','life','begin_at','end_at','channel','status'
+    ];
+
     //0没绑定   -1绑定但是无效   其他父类用户id
     public static function getBindParent($phone = '')
     {

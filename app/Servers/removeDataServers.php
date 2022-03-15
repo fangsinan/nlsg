@@ -2390,6 +2390,9 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
     }
 
     public function liveSubAddUserBind() {
+        $s = new VipServers();
+        $s->vipUserBindClear();
+
         $source     = [
             [
                 'user_id' => 884066,
@@ -2419,23 +2422,19 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
                 ->pluck('u.phone')
                 ->toArray();
 
-            $temp_array = [];
             foreach ($sub_list as $slv) {
-                $temp_array[] = [
+                VipUserBind::query()->firstOrCreate([
+                    'son'=>$slv,
+                    'status'=>1
+                ],[
                     'parent'   => $v['phone'],
-                    'son'      => $slv,
                     'life'     => 2,
                     'begin_at' => $begin_time,
                     'end_at' => $end_time,
                     'channel'  => 4,
-                    'status'   => 1
-                ];
+                ]);
             }
 
-            $temp_array = array_chunk($temp_array,200);
-            foreach ($temp_array as $tav){
-                DB::table('nlsg_vip_user_bind')->insertOrIgnore($tav);
-            }
         }
 
 

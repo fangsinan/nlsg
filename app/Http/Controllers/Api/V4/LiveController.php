@@ -29,6 +29,7 @@ use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
+use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1465,17 +1466,16 @@ class LiveController extends Controller
                 }else{
                     $t_phone = 18511111002;
                 }
-
-                $temp_user_bind_array = [
+                VipUserBind::query()->firstOrCreate([
+                    'son'=>$this->user['phone'],
+                    'status'=>1
+                ],[
                     'parent'   => $t_phone,
-                    'son'      => $this->user['phone'],
                     'life'     => 2,
                     'begin_at' => date('Y-m-d 00:00:00'),
                     'end_at' => date('Y-m-d 23:59:59', strtotime("+1 years")),
                     'channel'  => 4,
-                    'status'   => 1
-                ];
-                DB::table('nlsg_vip_user_bind')->insertOrIgnore($temp_user_bind_array);
+                ]);
             }
 
             return success('发送成功');
