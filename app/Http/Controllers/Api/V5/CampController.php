@@ -138,7 +138,8 @@ class CampController extends Controller
         
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
-            'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'];
+            'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'
+        ,'comment_num'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
             return $this->error(0, '内容不存在不能为空');
@@ -150,9 +151,9 @@ class CampController extends Controller
         //训练营无试听章节
         $column['free_trial_id'] = '';
 
-        $column['twitter_price'] = (string)GetPriceTools::Income(1, 2, 0, 1, $column_id);
-        $column['emperor_price'] = (string)GetPriceTools::Income(1, 4, 0, 1, $column_id);
-        $column['service_price'] = (string)GetPriceTools::Income(1, 5, 0, 1, $column_id);
+        // $column['twitter_price'] = (string)GetPriceTools::Income(1, 2, 0, 1, $column_id);
+        // $column['emperor_price'] = (string)GetPriceTools::Income(1, 4, 0, 1, $column_id);
+        // $column['service_price'] = (string)GetPriceTools::Income(1, 5, 0, 1, $column_id);
         $column['online_time'] = date('Y-m-d',strtotime($column['online_time']));
         
 
