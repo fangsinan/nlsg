@@ -176,14 +176,14 @@ class CampController extends Controller
 
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $type);
         $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image');
-        $column_data['is_sub'] = $is_sub;
+        $column['is_sub'] = $is_sub;
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($column_id, $history_type, $user_id);  //讲座
 
 
-        $column_data['history_count'] = 0;
-        if ($column_data['info_num'] > 0) {
-            $column_data['history_count'] = round($hisCount / $column_data['info_num'] * 100);
+        $column['history_count'] = 0;
+        if ($column['info_num'] > 0) {
+            $column['history_count'] = round($hisCount / $column['info_num'] * 100);
         }
 
         //历史记录
