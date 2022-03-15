@@ -1382,7 +1382,7 @@ class LiveController extends Controller
             }
         }
 
-        
+
 
         if( in_array($this->user['id'], [878644, 882057, 882861]) ){
             return error(0, '用户异常');
@@ -1442,6 +1442,32 @@ class LiveController extends Controller
             ]);
             //按渠道更新预约人数
             LiveStatistics::countsJob($info_id,1,$twitter_id);
+
+            //334 团中央预约保护 18511111002
+            //276 电视渠道  18522222291
+            //添加关系保护
+            $twitter_id = (int)$twitter_id;
+            if (
+                ($info_id === 276 && $twitter_id === 884066) ||
+                ($info_id === 334 && $twitter_id === 5920535)
+            ){
+                if ($twitter_id == 884066){
+                    $t_phone = 18522222291;
+                }else{
+                    $t_phone = 18511111002;
+                }
+
+                $temp_user_bind_array = [
+                    'parent'   => $t_phone,
+                    'son'      => $this->user['phone'],
+                    'life'     => 2,
+                    'begin_at' => date('Y-m-d 00:00:00'),
+                    'end_at' => date('Y-m-d 23:59:59', strtotime("+1 years")),
+                    'channel'  => 4,
+                    'status'   => 1
+                ];
+                DB::table('nlsg_vip_user_bind')->insertOrIgnore($temp_user_bind_array);
+            }
 
             LiveCountDown::create([
                 'live_id' => $info_id,
