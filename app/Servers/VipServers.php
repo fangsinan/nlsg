@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\VipRedeemAssign;
 use App\Models\VipRedeemUser;
 use App\Models\VipUser;
+use App\Models\VipUserBind;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -592,6 +593,15 @@ class VipServers
                 return ['code' => false, 'msg' => '开通类型错误'];
         }
 
+    }
+
+    public function vipUserBindClear(){
+        VipUserBind::query()
+            ->where('status','=',1)
+            ->where('end_at','<=',date('Y-m-d H:i:s'))
+            ->update([
+                'status'=>2
+            ]);
     }
 
 }
