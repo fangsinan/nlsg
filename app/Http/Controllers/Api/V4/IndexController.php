@@ -840,12 +840,17 @@ class IndexController extends Controller
     public function rank(Request $request)
     {
 
+
         $cache_key_name = 'index_rank_data';
         $data = Cache::get($cache_key_name);
 
         if (empty($data)) {
             $model = new Lists();
-            $data = $model->getRankWorks();
+            $data = [
+                'works' => $model->getRankWorks(),
+                'wiki' => $model->getRankWiki(),
+                'goods' => $model->getRankGoods()
+            ];
             $expire_num = CacheTools::getExpire($cache_key_name);
             Cache::put($cache_key_name, $data, $expire_num);
         }
