@@ -1466,17 +1466,6 @@ class LiveController extends Controller
                 }else{
                     $t_phone = 18511111002;
                 }
-
-//                $temp_user_bind_array = [
-//                    'parent'   => $t_phone,
-//                    'son'      => $this->user['phone'],
-//                    'life'     => 2,
-//                    'begin_at' => date('Y-m-d 00:00:00'),
-//                    'end_at' => date('Y-m-d 23:59:59', strtotime("+1 years")),
-//                    'channel'  => 4,
-//                    'status'   => 1
-//                ];
-
                 VipUserBind::query()->firstOrCreate([
                     'son'=>$this->user['phone'],
                     'status'=>1
@@ -1487,8 +1476,6 @@ class LiveController extends Controller
                     'end_at' => date('Y-m-d 23:59:59', strtotime("+1 years")),
                     'channel'  => 4,
                 ]);
-
-//                DB::table('nlsg_vip_user_bind')->insertOrIgnore($temp_user_bind_array);
             }
 
             return success('发送成功');
