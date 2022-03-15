@@ -9,11 +9,15 @@ use App\Servers\removeDataServers;
 
 class RemoveDataController extends ControllerBackend
 {
-    public function goods()
-    {
+    public function goods() {
         set_time_limit(0);
 
         $servers = new removeDataServers();
+
+        if (0){
+            $servers->liveSubAddUserBind();
+        }
+
         if (0) {
             //迁移商品,规格,图片,评论
             $servers->removeGoods();
@@ -93,17 +97,16 @@ class RemoveDataController extends ControllerBackend
         }
 
         //if(0){
-            //$servers->checkVipSubTime();
+        //$servers->checkVipSubTime();
         //}
 
-        if(0){
+        if (0) {
             $servers->liveStatistics();
         }
 
     }
 
-    public function mallOrders()
-    {
+    public function mallOrders() {
         if (0) {
             //需要先执行 addressExpress
             $servers = new removeDataServers();
@@ -111,8 +114,7 @@ class RemoveDataController extends ControllerBackend
         }
     }
 
-    public function addressExpress()
-    {
+    public function addressExpress() {
         if (0) {
             $servers = new removeDataServers();
             $servers->addressExpress();
@@ -120,16 +122,14 @@ class RemoveDataController extends ControllerBackend
     }
 
     //补全vip表新加字段
-    public function vip()
-    {
+    public function vip() {
         if (0) {
             $servers = new removeDataServers();
             $servers->vip();
         }
     }
 
-    public function redeemCode()
-    {
+    public function redeemCode() {
         set_time_limit(0);
 
         $servers = new removeDataServers();

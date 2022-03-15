@@ -14,7 +14,6 @@ use App\Models\History;
 use App\Models\Live;
 use App\Models\LiveCountDown;
 use App\Models\LiveOnlineUser;
-use App\Models\LiveStatistics;
 use App\Models\MallGoods;
 use App\Models\Order;
 use App\Models\PayRecordDetail;
@@ -31,32 +30,31 @@ use Illuminate\Support\Facades\Redis;
 
 class removeDataServers
 {
-    public function removeGoods()
-    {
+    public function removeGoods() {
 //        $copy_flag = '_copy1';
         $copy_flag = '';
 
         if (0) {
             //商品评论
-            $old_comment = DB::connection('mysql_old_zs')
+            $old_comment  = DB::connection('mysql_old_zs')
                 ->table('nlsg_mall_comment')
                 ->where('id', '<=', 1808)
                 ->get()->toArray();
             $comment_data = [];
             foreach ($old_comment as $v) {
-                $temp_comment = [];
-                $temp_comment['id'] = $v->id;
-                $temp_comment['user_id'] = $v->user_id;
-                $temp_comment['content'] = $v->content;
-                $temp_comment['picture'] = $v->picture;
-                $temp_comment['order_id'] = $v->order_id;
+                $temp_comment                    = [];
+                $temp_comment['id']              = $v->id;
+                $temp_comment['user_id']         = $v->user_id;
+                $temp_comment['content']         = $v->content;
+                $temp_comment['picture']         = $v->picture;
+                $temp_comment['order_id']        = $v->order_id;
                 $temp_comment['order_detail_id'] = $v->order_detail_id;
-                $temp_comment['goods_id'] = $v->goods_id;
-                $temp_comment['sku_number'] = $v->sku_number;
-                $temp_comment['star'] = $v->star;
-                $temp_comment['status'] = $v->status;
-                $temp_comment['reply_comment'] = $v->reply_comment;
-                $temp_comment['reply_user_id'] = $v->reply_user_id;
+                $temp_comment['goods_id']        = $v->goods_id;
+                $temp_comment['sku_number']      = $v->sku_number;
+                $temp_comment['star']            = $v->star;
+                $temp_comment['status']          = $v->status;
+                $temp_comment['reply_comment']   = $v->reply_comment;
+                $temp_comment['reply_user_id']   = $v->reply_user_id;
                 if (!empty($v->reply_time)) {
                     $temp_comment['replied_at'] = date('Y-m-d H:i:s');
                 } else {
@@ -71,11 +69,11 @@ class removeDataServers
 
         if (0) {
             //单独补全sku
-            $list = DB::connection('mysql_old_zs')
+            $list           = DB::connection('mysql_old_zs')
                 ->table('nlsg_mall_sku')
                 ->get()
                 ->toArray();
-            $sku_data = [];
+            $sku_data       = [];
             $sku_value_data = [];
             foreach ($list as $v) {
                 $check = DB::table('nlsg_mall_sku')
@@ -84,31 +82,31 @@ class removeDataServers
                 if ($check) {
                     continue;
                 }
-                $temp_sku = [];
-                $temp_sku['id'] = $v->id;
-                $temp_sku['goods_id'] = $v->goods_id;
-                $temp_sku['sku_number'] = $v->sku_number;
-                $temp_sku['picture'] = $v->picture;
-                $temp_sku['original_price'] = $v->original_price;
-                $temp_sku['price'] = $v->price;
-                $temp_sku['cost'] = $v->cost;
-                $temp_sku['promotion_cost'] = $v->promotion_cost;
-                $temp_sku['stock'] = $v->stock;
-                $temp_sku['warning_stock'] = $v->warning_stock;
-                $temp_sku['status'] = $v->status;
+                $temp_sku                        = [];
+                $temp_sku['id']                  = $v->id;
+                $temp_sku['goods_id']            = $v->goods_id;
+                $temp_sku['sku_number']          = $v->sku_number;
+                $temp_sku['picture']             = $v->picture;
+                $temp_sku['original_price']      = $v->original_price;
+                $temp_sku['price']               = $v->price;
+                $temp_sku['cost']                = $v->cost;
+                $temp_sku['promotion_cost']      = $v->promotion_cost;
+                $temp_sku['stock']               = $v->stock;
+                $temp_sku['warning_stock']       = $v->warning_stock;
+                $temp_sku['status']              = $v->status;
                 $temp_sku['erp_enterprise_code'] = $v->erp_enterprise_code ?? '';
-                $temp_sku['erp_goods_code'] = $v->erp_goods_code ?? '';
-                $sku_data[] = $temp_sku;
+                $temp_sku['erp_goods_code']      = $v->erp_goods_code ?? '';
+                $sku_data[]                      = $temp_sku;
 
                 $temp_sku_json = $v->sku_json;
                 $temp_sku_json = json_decode($temp_sku_json);
                 foreach ($temp_sku_json as $kk => $vv) {
-                    $temp_sku_value = [];
-                    $temp_sku_value['goods_id'] = $v->goods_id;
-                    $temp_sku_value['sku_id'] = $v->id;
-                    $temp_sku_value['key_name'] = $kk;
+                    $temp_sku_value               = [];
+                    $temp_sku_value['goods_id']   = $v->goods_id;
+                    $temp_sku_value['sku_id']     = $v->id;
+                    $temp_sku_value['key_name']   = $kk;
                     $temp_sku_value['value_name'] = $vv;
-                    $sku_value_data[] = $temp_sku_value;
+                    $sku_value_data[]             = $temp_sku_value;
                 }
             }
 
@@ -119,18 +117,18 @@ class removeDataServers
 
         if (0) {
             //商品信息
-            $old_picture = DB::connection('mysql_old')
+            $old_picture  = DB::connection('mysql_old')
                 ->table('nlsg_mall_picture')
                 ->where('status', '=', 1)
                 ->get()->toArray();
             $picture_data = [];
             foreach ($old_picture as $v) {
-                $temp_picture = [];
-                $temp_picture['url'] = $v->url;
+                $temp_picture             = [];
+                $temp_picture['url']      = $v->url;
                 $temp_picture['goods_id'] = $v->goods_id;
-                $temp_picture['status'] = 1;
-                $temp_picture['is_main'] = $v->is_main;
-                $picture_data[] = $temp_picture;
+                $temp_picture['status']   = 1;
+                $temp_picture['is_main']  = $v->is_main;
+                $picture_data[]           = $temp_picture;
             }
 
             $old_sku = DB::connection('mysql_old')
@@ -139,44 +137,44 @@ class removeDataServers
                 ->get()
                 ->toArray();
 
-            $sku_data = [];
+            $sku_data       = [];
             $sku_value_data = [];
             foreach ($old_sku as $v) {
-                $temp_sku = [];
-                $temp_sku['id'] = $v->id;
-                $temp_sku['goods_id'] = $v->goods_id;
-                $temp_sku['sku_number'] = $v->sku_number;
-                $temp_sku['picture'] = $v->picture;
-                $temp_sku['original_price'] = $v->original_price;
-                $temp_sku['price'] = $v->price;
-                $temp_sku['cost'] = $v->cost;
-                $temp_sku['promotion_cost'] = $v->promotion_cost;
-                $temp_sku['stock'] = $v->stock;
-                $temp_sku['warning_stock'] = $v->warning_stock;
-                $temp_sku['status'] = $v->status;
+                $temp_sku                        = [];
+                $temp_sku['id']                  = $v->id;
+                $temp_sku['goods_id']            = $v->goods_id;
+                $temp_sku['sku_number']          = $v->sku_number;
+                $temp_sku['picture']             = $v->picture;
+                $temp_sku['original_price']      = $v->original_price;
+                $temp_sku['price']               = $v->price;
+                $temp_sku['cost']                = $v->cost;
+                $temp_sku['promotion_cost']      = $v->promotion_cost;
+                $temp_sku['stock']               = $v->stock;
+                $temp_sku['warning_stock']       = $v->warning_stock;
+                $temp_sku['status']              = $v->status;
                 $temp_sku['erp_enterprise_code'] = $v->erp_enterprise_code;
-                $temp_sku['erp_goods_code'] = $v->erp_goods_code;
-                $sku_data[] = $temp_sku;
+                $temp_sku['erp_goods_code']      = $v->erp_goods_code;
+                $sku_data[]                      = $temp_sku;
 
                 $temp_sku_json = $v->sku_json;
                 $temp_sku_json = json_decode($temp_sku_json);
                 foreach ($temp_sku_json as $kk => $vv) {
-                    $temp_sku_value = [];
-                    $temp_sku_value['goods_id'] = $v->goods_id;
-                    $temp_sku_value['sku_id'] = $v->id;
-                    $temp_sku_value['key_name'] = $kk;
+                    $temp_sku_value               = [];
+                    $temp_sku_value['goods_id']   = $v->goods_id;
+                    $temp_sku_value['sku_id']     = $v->id;
+                    $temp_sku_value['key_name']   = $kk;
                     $temp_sku_value['value_name'] = $vv;
-                    $sku_value_data[] = $temp_sku_value;
+                    $sku_value_data[]             = $temp_sku_value;
                 }
 
             }
 
-            $old_goods = DB::connection('mysql_old')
+            $old_goods  = DB::connection('mysql_old')
                 ->table('nlsg_mall_goods')
                 ->get()->toArray();
             $goods_data = [];
             foreach ($old_goods as $v) {
-                $temp = [];
+                $temp       = [];
                 $temp['id'] = $v->id;
                 switch ($v->category_id) {
                     case 40:
@@ -208,21 +206,21 @@ class removeDataServers
                     default:
                         $temp['category_id'] = 0;
                 }
-                $temp['name'] = $v->name;
-                $temp['subtitle'] = $v->subtitle;
-                $temp['picture'] = $v->picture;
-                $temp['freight_id'] = 14;
-                $temp['number'] = $v->number;
-                $temp['original_price'] = $v->original_price;
-                $temp['price'] = $v->price;
+                $temp['name']              = $v->name;
+                $temp['subtitle']          = $v->subtitle;
+                $temp['picture']           = $v->picture;
+                $temp['freight_id']        = 14;
+                $temp['number']            = $v->number;
+                $temp['original_price']    = $v->original_price;
+                $temp['price']             = $v->price;
                 $temp['sales_num_virtual'] = 0;
-                $temp['sales_num'] = $v->sales_num;
-                $temp['keywords'] = '';
-                $temp['content'] = $v->content;
-                $temp['view_num'] = $v->view_num;
-                $temp['collection_num'] = $v->collection_num;
-                $temp['status'] = $v->status;
-                $goods_data[] = $temp;
+                $temp['sales_num']         = $v->sales_num;
+                $temp['keywords']          = '';
+                $temp['content']           = $v->content;
+                $temp['view_num']          = $v->view_num;
+                $temp['collection_num']    = $v->collection_num;
+                $temp['status']            = $v->status;
+                $goods_data[]              = $temp;
             }
             $r1 = DB::table('nlsg_mall_goods' . $copy_flag)->insert($goods_data);
             $r2 = DB::table('nlsg_mall_sku' . $copy_flag)->insert($sku_data);
@@ -232,8 +230,7 @@ class removeDataServers
     }
 
     //修改商品价格和规格价格不匹配的临时方法
-    public function updateGoodsSkuPrice()
-    {
+    public function updateGoodsSkuPrice() {
         $list = MallGoods::query()
             ->with(['sku_list'])
             ->select(['id', 'name', 'original_price', 'price'])
@@ -246,23 +243,23 @@ class removeDataServers
                 continue;
             }
             $op = $v['original_price'];
-            $p = $v['price'];
+            $p  = $v['price'];
 
             $op_list = array_column($v['sku_list'], 'original_price');
-            $p_list = array_column($v['sku_list'], 'price');
+            $p_list  = array_column($v['sku_list'], 'price');
             sort($op_list);
             sort($p_list);
 
             if (!in_array($op, $op_list) || !in_array($p, $p_list)) {
-                $g = MallGoods::find($v['id']);
-                $temp_res = [];
+                $g                    = MallGoods::find($v['id']);
+                $temp_res             = [];
                 $temp_res['goods_id'] = $v['id'];
-                $new_op = array_shift($op_list);
-                $new_p = array_shift($p_list);
-                $temp_res['update'] = $g->original_price . '-' . $new_op . '|' . $g->price . '-' . $new_p;
-                $res[] = $temp_res;
-                $g->original_price = $new_op;
-                $g->price = $new_p;
+                $new_op               = array_shift($op_list);
+                $new_p                = array_shift($p_list);
+                $temp_res['update']   = $g->original_price . '-' . $new_op . '|' . $g->price . '-' . $new_p;
+                $res[]                = $temp_res;
+                $g->original_price    = $new_op;
+                $g->price             = $new_p;
                 $g->save();
             }
         }
@@ -271,16 +268,15 @@ class removeDataServers
     }
 
     //批量添加机器人
-    public function addRobot()
-    {
+    public function addRobot() {
         //id 8000-11000  两千个虚拟用户位
         $begin_num = [137, 186, 139, 151, 159, 188, 131, 189, 138, 139];
-        $i = 8000;
+        $i         = 8000;
         while ($i <= 11000) {
-            $now = date('Y-m-d H:i:s');
+            $now      = date('Y-m-d H:i:s');
             $temp_num = rand(10000000, 99999999);
-            $num = $begin_num[rand(0, 3)] . $temp_num;
-            $num = substr_replace($num, '****', 3, 4);
+            $num      = $begin_num[rand(0, 3)] . $temp_num;
+            $num      = substr_replace($num, '****', 3, 4);
 
 //            $model = new User();
 //            $model->id = $i;
@@ -291,13 +287,13 @@ class removeDataServers
 //            $model->is_robot = 1;
 //            $res = $model->save();
 
-            $temp_data = [];
-            $temp_data['id'] = $i;
-            $temp_data['phone'] = $i;
-            $temp_data['nickname'] = $num;
+            $temp_data               = [];
+            $temp_data['id']         = $i;
+            $temp_data['phone']      = $i;
+            $temp_data['nickname']   = $num;
             $temp_data['created_at'] = $temp_data['updated_at'] = $now;
-            $temp_data['is_robot'] = 1;
-            $res = DB::connection('mysql_new_zs')
+            $temp_data['is_robot']   = 1;
+            $res                     = DB::connection('mysql_new_zs')
                 ->table('nlsg_user')->insert($temp_data);
             if ($res) {
                 $i++;
@@ -307,8 +303,7 @@ class removeDataServers
 
     //发货记录迁移
 
-    public function vip()
-    {
+    public function vip() {
         $list = VipUser::query()
             ->where('level', '=', 2)
             ->where('status', '=', 1)
@@ -319,7 +314,7 @@ class removeDataServers
 
         foreach ($list as $v) {
             if (!empty($v['order_history']) || !empty($v['code_history'])) {
-                $update_data = [];
+                $update_data                = [];
                 $update_data['is_open_360'] = 1;
 
                 $begin_time = '2020-09-01';
@@ -331,7 +326,7 @@ class removeDataServers
                     $begin_time = $v['code_history']['updated_at'];
                 }
                 $update_data['time_begin_360'] = $begin_time;
-                $update_data['time_end_360'] = date('Y-m-d 23:59:59', strtotime(" +1 years", strtotime($begin_time)));
+                $update_data['time_end_360']   = date('Y-m-d 23:59:59', strtotime(" +1 years", strtotime($begin_time)));
 
                 DB::connection('mysql_new_zs')
                     ->table('nlsg_vip_user')->where('id', '=', $v['id'])
@@ -340,16 +335,14 @@ class removeDataServers
         }
     }
 
-    public function addressExpress()
-    {
+    public function addressExpress() {
         $this->removeAddress();//迁移收货地址
         $this->removeExpress();//迁移快递信息
     }
 
     //地址和快递信息
 
-    public function removeAddress()
-    {
+    public function removeAddress() {
         $list = DB::connection('mysql_old_zs')
             ->table('nlsg_mall_address')
             ->where('id', '<=', 4998)
@@ -361,8 +354,8 @@ class removeDataServers
         $add_data = [];
         foreach ($list as &$v) {
             $v->province_code = 0;
-            $v->city_code = 0;
-            $v->county_code = 0;
+            $v->city_code     = 0;
+            $v->county_code   = 0;
 
             foreach ($area as $vv) {
                 if ($v->province == $vv['name'] || $v->province == $vv['fullname']) {
@@ -379,18 +372,18 @@ class removeDataServers
                 $v->detail = $v->county . $v->detail;
             }
 
-            $temp_data = [];
-            $temp_data['id'] = $v->id;
-            $temp_data['name'] = $v->name;
-            $temp_data['phone'] = $v->phone;
-            $temp_data['province'] = $v->province_code;
-            $temp_data['city'] = $v->city_code;
-            $temp_data['area'] = $v->county_code;
-            $temp_data['user_id'] = $v->user_id;
+            $temp_data               = [];
+            $temp_data['id']         = $v->id;
+            $temp_data['name']       = $v->name;
+            $temp_data['phone']      = $v->phone;
+            $temp_data['province']   = $v->province_code;
+            $temp_data['city']       = $v->city_code;
+            $temp_data['area']       = $v->county_code;
+            $temp_data['user_id']    = $v->user_id;
             $temp_data['is_default'] = $v->is_default;
-            $temp_data['details'] = $v->detail;
+            $temp_data['details']    = $v->detail;
             $temp_data['created_at'] = date('Y-m-d H:i:s', $v->ctime);
-            $add_data[] = $temp_data;
+            $add_data[]              = $temp_data;
         }
         $add_data = array_chunk($add_data, 50);
         foreach ($add_data as $av) {
@@ -398,8 +391,7 @@ class removeDataServers
         }
     }
 
-    public function removeExpress()
-    {
+    public function removeExpress() {
         $express_data = ExpressCompany::query()->get()->toArray();
 
         $data = DB::connection('mysql_old_zs')
@@ -417,7 +409,7 @@ class removeDataServers
                 if (strtolower($v->express_company) == strtolower($vv['code'])) {
                     $temp_add_data = [];
 
-                    $temp_add_data['express_id'] = $vv['id'];
+                    $temp_add_data['express_id']  = $vv['id'];
                     $temp_add_data['express_num'] = trim($v->express_number);
 
 
@@ -429,43 +421,43 @@ class removeDataServers
 
                     if (empty($v->receive_goods_time)) {
                         $temp_add_data['delivery_status'] = 1;
-                        $temp_history = [
-                            "number" => trim($v->express_number),
-                            "type" => $vv['code'],
-                            "typename" => $vv['name'],
-                            "logo" => $vv['logo'],
+                        $temp_history                     = [
+                            "number"          => trim($v->express_number),
+                            "type"            => $vv['code'],
+                            "typename"        => $vv['name'],
+                            "logo"            => $vv['logo'],
                             "delivery_status" => 1,
-                            "express_phone" => $vv['phone'],
-                            "list" => [
+                            "express_phone"   => $vv['phone'],
+                            "list"            => [
                                 [
-                                    "time" => date('Y-m-d H:i:s', $v->deliver_goods_time),
+                                    "time"   => date('Y-m-d H:i:s', $v->deliver_goods_time),
                                     "status" => '商家已发货'
                                 ]
                             ]
                         ];
                     } else {
                         $temp_add_data['delivery_status'] = 4;
-                        $temp_history = [
-                            "number" => trim($v->express_number),
-                            "type" => $vv['code'],
-                            "typename" => $vv['name'],
-                            "logo" => $vv['logo'],
+                        $temp_history                     = [
+                            "number"          => trim($v->express_number),
+                            "type"            => $vv['code'],
+                            "typename"        => $vv['name'],
+                            "logo"            => $vv['logo'],
                             "delivery_status" => 1,
-                            "express_phone" => $vv['phone'],
-                            "list" => [
+                            "express_phone"   => $vv['phone'],
+                            "list"            => [
                                 [
-                                    "time" => date('Y-m-d H:i:s', $v->receive_goods_time),
+                                    "time"   => date('Y-m-d H:i:s', $v->receive_goods_time),
                                     "status" => '客户已签收'
                                 ],
                                 [
-                                    "time" => date('Y-m-d H:i:s', $v->deliver_goods_time),
+                                    "time"   => date('Y-m-d H:i:s', $v->deliver_goods_time),
                                     "status" => '商家已发货'
                                 ]
                             ]
                         ];
                     }
                     $temp_add_data['history'] = json_encode($temp_history);
-                    $add_data[] = $temp_add_data;
+                    $add_data[]               = $temp_add_data;
                 }
             }
         }
@@ -480,8 +472,7 @@ class removeDataServers
 
     //商城订单迁移
 
-    public function removeMallOrders()
-    {
+    public function removeMallOrders() {
         set_time_limit(0);
         $i = 1;
         $w = true;
@@ -496,10 +487,9 @@ class removeDataServers
         }
     }
 
-    public function getOrderData($page = 1, $size = 50, $flag = '')
-    {
-        $now = time();
-        $now_date = date('Y-m-d H:i:s', $now);
+    public function getOrderData($page = 1, $size = 50, $flag = '') {
+        $now            = time();
+        $now_date       = date('Y-m-d H:i:s', $now);
         $begin_order_id = 11755;//11755
 
         $old_order = DB::connection('mysql_old_zs')
@@ -529,70 +519,70 @@ class removeDataServers
             $v->details = $temp_details;
         }
 
-        $order_data = [];
+        $order_data        = [];
         $order_detail_data = [];
-        $order_child_data = [];
+        $order_child_data  = [];
 
         foreach ($old_order as $ov) {
-            $temp_order = [];
-            $temp_order['id'] = $ov->id;
-            $temp_order['ordernum'] = $ov->ordernum;
-            $temp_order['user_id'] = $ov->user_id;
-            $temp_order['order_type'] = 1;
-            $temp_order['status'] = $ov->status;
-            $temp_order['cost_price'] = $ov->cost_price;
-            $temp_order['freight'] = $ov->freight;
-            $temp_order['vip_cut'] = $ov->vip_cut;
-            $temp_order['coupon_id'] = $ov->coupon_id;
-            $temp_order['coupon_money'] = $ov->coupon_money;
+            $temp_order                      = [];
+            $temp_order['id']                = $ov->id;
+            $temp_order['ordernum']          = $ov->ordernum;
+            $temp_order['user_id']           = $ov->user_id;
+            $temp_order['order_type']        = 1;
+            $temp_order['status']            = $ov->status;
+            $temp_order['cost_price']        = $ov->cost_price;
+            $temp_order['freight']           = $ov->freight;
+            $temp_order['vip_cut']           = $ov->vip_cut;
+            $temp_order['coupon_id']         = $ov->coupon_id;
+            $temp_order['coupon_money']      = $ov->coupon_money;
             $temp_order['coupon_freight_id'] = 0;
             $temp_order['special_price_cut'] = $ov->special_price_cut;
-            $temp_order['price'] = $ov->price;
-            $temp_order['pay_price'] = $ov->pay_price;
+            $temp_order['price']             = $ov->price;
+            $temp_order['pay_price']         = $ov->pay_price;
             if (!empty($ov->pay_time)) {
                 $temp_order['pay_time'] = date('Y-m-d H:i:s', $ov->pay_time);
             } else {
                 $temp_order['pay_time'] = null;
             }
             $temp_order['pay_type'] = $ov->pay_type;
-            $temp_order['os_type'] = $ov->os_type;
+            $temp_order['os_type']  = $ov->os_type;
             $temp_order['messages'] = $ov->messages;
-            $temp_order['remark'] = $ov->remark;
+            $temp_order['remark']   = $ov->remark;
             if ($ov->address_method) {
                 $temp_order['post_type'] = 2;
             } else {
                 $temp_order['post_type'] = 1;
             }
-            $temp_order['address_id'] = 0;
+            $temp_order['address_id']      = 0;
             $temp_order['address_history'] = json_encode([
-                'id' => 0,
-                "name" => $ov->address_name,
-                "phone" => $ov->address_phone,
-                "details" => $ov->address_detail,
-                "is_default" => 0,
-                "province" => 0,
-                "city" => 0,
-                "area" => 0,
+                'id'            => 0,
+                "name"          => $ov->address_name,
+                "phone"         => $ov->address_phone,
+                "details"       => $ov->address_detail,
+                "is_default"    => 0,
+                "province"      => 0,
+                "city"          => 0,
+                "area"          => 0,
                 "province_name" => $ov->address_province,
-                "city_name" => $ov->address_city,
-                "area_name" => $ov->address_county,
+                "city_name"     => $ov->address_city,
+                "area_name"     => $ov->address_county,
             ]);
-            $temp_order['bill_type'] = $ov->bill_title_type;
-            $temp_order['bill_title'] = $ov->bill_title;
-            $temp_order['bill_number'] = $ov->bill_number;
-            $temp_order['bill_format'] = $ov->bill_format;
-            $temp_order['active_flag'] = $ov->active_flag;
-            $temp_order['created_at'] = date('Y-m-d H:i:s', $ov->ctime);
-            $temp_order['updated_at'] = $now_date;
-            $temp_order['is_stop'] = $ov->is_stop;
-            $temp_order['stop_by'] = $ov->stop_by;
+            $temp_order['bill_type']       = $ov->bill_title_type;
+            $temp_order['bill_title']      = $ov->bill_title;
+            $temp_order['bill_number']     = $ov->bill_number;
+            $temp_order['bill_format']     = $ov->bill_format;
+            $temp_order['active_flag']     = $ov->active_flag;
+            $temp_order['created_at']      = date('Y-m-d H:i:s', $ov->ctime);
+            $temp_order['updated_at']      = $now_date;
+            $temp_order['is_stop']         = $ov->is_stop;
+            $temp_order['stop_by']         = $ov->stop_by;
             if (!empty($ov->stop_at)) {
                 $temp_order['stop_at'] = date('Y-m-d H:i:s', $ov->stop_at);
             } else {
                 $temp_order['stop_at'] = null;
             }
             $temp_order['stop_reason'] = $ov->stop_reason;
-            $temp_order['is_del'] = $ov->is_del;
+            $temp_order['is_del']      = $ov->is_del;
             if (!empty($ov->del_at)) {
                 $temp_order['del_at'] = date('Y-m-d H:i:s', $ov->del_at);
             } else {
@@ -606,26 +596,26 @@ class removeDataServers
             $order_data[] = $temp_order;
 
             foreach ($ov->details as $odv) {
-                $temp_details = [];
-                $temp_details['id'] = $odv->id;
-                $temp_details['order_id'] = $odv->order_id;
+                $temp_details                   = [];
+                $temp_details['id']             = $odv->id;
+                $temp_details['order_id']       = $odv->order_id;
                 $temp_details['order_child_id'] = $odv->order_child_id;
-                $temp_details['user_id'] = $odv->user_id;
-                $temp_details['status'] = $odv->status;
-                $temp_details['goods_id'] = $odv->goods_id ?? 0;
-                $temp_details['sku_number'] = $odv->sku_number ?? '';
-                $temp_details['num'] = $odv->num ?? 1;
+                $temp_details['user_id']        = $odv->user_id;
+                $temp_details['status']         = $odv->status;
+                $temp_details['goods_id']       = $odv->goods_id ?? 0;
+                $temp_details['sku_number']     = $odv->sku_number ?? '';
+                $temp_details['num']            = $odv->num ?? 1;
                 if ($temp_details['num'] < 1) {
                     $temp_details['num'] = 1;
                 }
                 $temp_details['after_sale_used_num'] = 0;
-                $temp_details['comment_id'] = $odv->comment_id ?? 0;
-                $temp_details['inviter'] = $odv->twitter_id ?? 0;
-                $temp_details['created_at'] = date('Y-m-d H:i:s', $odv->ctime);
-                $temp_details['updated_at'] = $now_date;
-                $temp_details['t_money'] = 0;
-                $temp_details['special_price_type'] = 0;
-                $temp_check_sku = DB::connection('mysql_new_zs')
+                $temp_details['comment_id']          = $odv->comment_id ?? 0;
+                $temp_details['inviter']             = $odv->twitter_id ?? 0;
+                $temp_details['created_at']          = date('Y-m-d H:i:s', $odv->ctime);
+                $temp_details['updated_at']          = $now_date;
+                $temp_details['t_money']             = 0;
+                $temp_details['special_price_type']  = 0;
+                $temp_check_sku                      = DB::connection('mysql_new_zs')
                     ->table('nlsg_mall_sku')
                     ->where('sku_number', '=', $odv->sku_number)
                     ->first();
@@ -636,41 +626,41 @@ class removeDataServers
 
                 if (is_array($sku_json)) {
                     foreach ($sku_json as $kk => $vv) {
-                        $t = [];
-                        $t['key_name'] = $kk;
+                        $t               = [];
+                        $t['key_name']   = $kk;
                         $t['value_name'] = $vv;
                         $temp_sku_json[] = $t;
                     }
                 }
 
                 $temp_details['sku_history'] = json_encode([
-                    'actual_num' => $odv->num ?? 0,
-                    'actual_price' => $odv->price ?? 0,
+                    'actual_num'     => $odv->num ?? 0,
+                    'actual_price'   => $odv->price ?? 0,
                     'original_price' => $odv->price ?? 0,
-                    'sku_value' => $temp_sku_json,
-                    'stock' => $temp_check_sku->stock ?? 0,
+                    'sku_value'      => $temp_sku_json,
+                    'stock'          => $temp_check_sku->stock ?? 0,
                 ]);
-                $order_detail_data[] = $temp_details;
+                $order_detail_data[]         = $temp_details;
             }
 
             if ($ov->status > 1 && !empty($ov->express_company) && !empty($ov->express_number)) {
                 foreach ($ov->details as $odv) {
-                    $temp_order_child_data = [];
-                    $temp_order_child_data['order_id'] = $ov->id;
+                    $temp_order_child_data                    = [];
+                    $temp_order_child_data['order_id']        = $ov->id;
                     $temp_order_child_data['order_detail_id'] = $odv->id;
-                    $temp_order_child_data['created_at'] = date('Y-m-d H:i:s', $ov->ctime);
+                    $temp_order_child_data['created_at']      = date('Y-m-d H:i:s', $ov->ctime);
                     if (!empty($ov->receive_goods_time)) {
-                        $temp_order_child_data['status'] = 2;
+                        $temp_order_child_data['status']     = 2;
                         $temp_order_child_data['receipt_at'] = date('Y-m-d H:i:s', $ov->receive_goods_time);
                     } else {
-                        $temp_order_child_data['status'] = 1;
+                        $temp_order_child_data['status']     = 1;
                         $temp_order_child_data['receipt_at'] = null;
                     }
 
-                    $get_express_info = ExpressInfo::where('express_num', '=', trim($ov->express_number))
+                    $get_express_info                         = ExpressInfo::where('express_num', '=', trim($ov->express_number))
                         ->select(['id'])->first();
                     $temp_order_child_data['express_info_id'] = $get_express_info->id ?? 0;
-                    $order_child_data[] = $temp_order_child_data;
+                    $order_child_data[]                       = $temp_order_child_data;
                 }
             }
         }
@@ -699,8 +689,7 @@ class removeDataServers
         }
     }
 
-    public function removeMallOrdersOld()
-    {
+    public function removeMallOrdersOld() {
         $now_date = date('Y-m-d H:i:s');
 
         if (0) {
@@ -725,7 +714,7 @@ class removeDataServers
                 ->get()
                 ->toArray();
 
-            $order_data = [];
+            $order_data       = [];
             $order_child_data = [];
 
             foreach ($old_order as $v) {
@@ -742,7 +731,7 @@ class removeDataServers
                     foreach ($get_all_details_id as $di_v) {
                         $temp_di_v = [];
 
-                        $temp_di_v['order_id'] = $v->id;
+                        $temp_di_v['order_id']        = $v->id;
                         $temp_di_v['order_detail_id'] = $di_v;
 
                         $temp_di_v['express_info_id'] = 0;
@@ -750,10 +739,10 @@ class removeDataServers
                         $temp_di_v['created_at'] = date('Y-m-d H:i:s', $v->deliver_goods_time);
                         $temp_di_v['updated_at'] = date('Y-m-d H:i:s', $v->deliver_goods_time);
                         if (!empty($v->receive_goods_time)) {
-                            $temp_di_v['status'] = 2;
+                            $temp_di_v['status']     = 2;
                             $temp_di_v['receipt_at'] = date('Y-m-d H:i:s', $v->receive_goods_time);
                         } else {
-                            $temp_di_v['status'] = 1;
+                            $temp_di_v['status']     = 1;
                             $temp_di_v['receipt_at'] = null;
                         }
 
@@ -761,65 +750,65 @@ class removeDataServers
                     }
                 }
 
-                $temp_order = [];
-                $temp_order['id'] = $v->id;
-                $temp_order['ordernum'] = $v->ordernum;
-                $temp_order['user_id'] = $v->user_id;
-                $temp_order['order_type'] = 1;
-                $temp_order['status'] = $v->status;
-                $temp_order['cost_price'] = $v->cost_price;
-                $temp_order['freight'] = $v->freight;
-                $temp_order['vip_cut'] = $v->vip_cut;
-                $temp_order['coupon_id'] = $v->coupon_id;
-                $temp_order['coupon_money'] = $v->coupon_money;
+                $temp_order                      = [];
+                $temp_order['id']                = $v->id;
+                $temp_order['ordernum']          = $v->ordernum;
+                $temp_order['user_id']           = $v->user_id;
+                $temp_order['order_type']        = 1;
+                $temp_order['status']            = $v->status;
+                $temp_order['cost_price']        = $v->cost_price;
+                $temp_order['freight']           = $v->freight;
+                $temp_order['vip_cut']           = $v->vip_cut;
+                $temp_order['coupon_id']         = $v->coupon_id;
+                $temp_order['coupon_money']      = $v->coupon_money;
                 $temp_order['coupon_freight_id'] = 0;
                 $temp_order['special_price_cut'] = $v->special_price_cut;
-                $temp_order['price'] = $v->price;
-                $temp_order['pay_price'] = $v->pay_price;
+                $temp_order['price']             = $v->price;
+                $temp_order['pay_price']         = $v->pay_price;
                 if (!empty($v->pay_time)) {
                     $temp_order['pay_time'] = date('Y-m-d H:i:s', $v->pay_time);
                 } else {
                     $temp_order['pay_time'] = null;
                 }
                 $temp_order['pay_type'] = $v->pay_type;
-                $temp_order['os_type'] = $v->os_type;
+                $temp_order['os_type']  = $v->os_type;
                 $temp_order['messages'] = $v->messages;
-                $temp_order['remark'] = $v->remark;
+                $temp_order['remark']   = $v->remark;
                 if ($v->address_method) {
                     $temp_order['post_type'] = 2;
                 } else {
                     $temp_order['post_type'] = 1;
                 }
-                $temp_order['address_id'] = 0;
+                $temp_order['address_id']      = 0;
                 $temp_order['address_history'] = json_encode([
-                    'id' => 0,
-                    "name" => $v->address_name,
-                    "phone" => $v->address_phone,
-                    "details" => $v->address_detail,
-                    "is_default" => 0,
-                    "province" => 0,
-                    "city" => 0,
-                    "area" => 0,
+                    'id'            => 0,
+                    "name"          => $v->address_name,
+                    "phone"         => $v->address_phone,
+                    "details"       => $v->address_detail,
+                    "is_default"    => 0,
+                    "province"      => 0,
+                    "city"          => 0,
+                    "area"          => 0,
                     "province_name" => $v->address_province,
-                    "city_name" => $v->address_city,
-                    "area_name" => $v->address_county,
+                    "city_name"     => $v->address_city,
+                    "area_name"     => $v->address_county,
                 ]);
-                $temp_order['bill_type'] = $v->bill_title_type;
-                $temp_order['bill_title'] = $v->bill_title;
-                $temp_order['bill_number'] = $v->bill_number;
-                $temp_order['bill_format'] = $v->bill_format;
-                $temp_order['active_flag'] = $v->active_flag;
-                $temp_order['created_at'] = date('Y-m-d H:i:s', $v->ctime);
-                $temp_order['updated_at'] = $now_date;
-                $temp_order['is_stop'] = $v->is_stop;
-                $temp_order['stop_by'] = $v->stop_by;
+                $temp_order['bill_type']       = $v->bill_title_type;
+                $temp_order['bill_title']      = $v->bill_title;
+                $temp_order['bill_number']     = $v->bill_number;
+                $temp_order['bill_format']     = $v->bill_format;
+                $temp_order['active_flag']     = $v->active_flag;
+                $temp_order['created_at']      = date('Y-m-d H:i:s', $v->ctime);
+                $temp_order['updated_at']      = $now_date;
+                $temp_order['is_stop']         = $v->is_stop;
+                $temp_order['stop_by']         = $v->stop_by;
                 if (!empty($v->stop_at)) {
                     $temp_order['stop_at'] = date('Y-m-d H:i:s', $v->stop_at);
                 } else {
                     $temp_order['stop_at'] = null;
                 }
                 $temp_order['stop_reason'] = $v->stop_reason;
-                $temp_order['is_del'] = $v->is_del;
+                $temp_order['is_del']      = $v->is_del;
                 if (!empty($v->del_at)) {
                     $temp_order['del_at'] = date('Y-m-d H:i:s', $v->del_at);
                 } else {
@@ -836,31 +825,31 @@ class removeDataServers
 
 
         if (1) {
-            $old_details = DB::connection('mysql_old')
+            $old_details  = DB::connection('mysql_old')
                 ->table('nlsg_mall_order_detail')
                 ->where('user_id', '=', 168934)
                 ->get()
                 ->toArray();
             $details_data = [];
             foreach ($old_details as $v) {
-                $temp_details = [];
-                $temp_details['id'] = $v->id;
-                $temp_details['order_id'] = $v->order_id;
-                $temp_details['order_child_id'] = $v->order_child_id;
-                $temp_details['user_id'] = $v->user_id;
-                $temp_details['status'] = $v->status;
-                $temp_details['goods_id'] = $v->goods_id;
-                $temp_details['sku_number'] = $v->sku_number;
-                $temp_details['num'] = $v->num;
+                $temp_details                        = [];
+                $temp_details['id']                  = $v->id;
+                $temp_details['order_id']            = $v->order_id;
+                $temp_details['order_child_id']      = $v->order_child_id;
+                $temp_details['user_id']             = $v->user_id;
+                $temp_details['status']              = $v->status;
+                $temp_details['goods_id']            = $v->goods_id;
+                $temp_details['sku_number']          = $v->sku_number;
+                $temp_details['num']                 = $v->num;
                 $temp_details['after_sale_used_num'] = 0;
-                $temp_details['comment_id'] = $v->comment_id;
-                $temp_details['inviter'] = $v->twitter_id;
-                $temp_details['created_at'] = date('Y-m-d H:i:s', $v->ctime);
-                $temp_details['updated_at'] = $now_date;
-                $temp_details['t_money'] = 0;
-                $temp_details['special_price_type'] = 0;
-                $temp_details['inviter_history'] = '';
-                $temp_check_sku = DB::connection('mysql_old')
+                $temp_details['comment_id']          = $v->comment_id;
+                $temp_details['inviter']             = $v->twitter_id;
+                $temp_details['created_at']          = date('Y-m-d H:i:s', $v->ctime);
+                $temp_details['updated_at']          = $now_date;
+                $temp_details['t_money']             = 0;
+                $temp_details['special_price_type']  = 0;
+                $temp_details['inviter_history']     = '';
+                $temp_check_sku                      = DB::connection('mysql_old')
                     ->table('nlsg_mall_sku')
                     ->where('sku_number', '=', $v->sku_number)
                     ->first();
@@ -871,21 +860,21 @@ class removeDataServers
 
                 if (is_array($sku_json)) {
                     foreach ($sku_json as $kk => $vv) {
-                        $t = [];
-                        $t['key_name'] = $kk;
+                        $t               = [];
+                        $t['key_name']   = $kk;
                         $t['value_name'] = $vv;
                         $temp_sku_json[] = $t;
                     }
                 }
 
                 $temp_details['sku_history'] = json_encode([
-                    'actual_num' => $v->num ?? 0,
-                    'actual_price' => $temp_check_sku->price ?? 0,
+                    'actual_num'     => $v->num ?? 0,
+                    'actual_price'   => $temp_check_sku->price ?? 0,
                     'original_price' => $temp_check_sku->original_price ?? 0,
-                    'sku_value' => $temp_sku_json,
-                    'stock' => $temp_check_sku->stock ?? 0,
+                    'sku_value'      => $temp_sku_json,
+                    'stock'          => $temp_check_sku->stock ?? 0,
                 ]);
-                $details_data[] = $temp_details;
+                $details_data[]              = $temp_details;
             }
 
         }
@@ -894,8 +883,7 @@ class removeDataServers
 
     }
 
-    public function redeemCode()
-    {
+    public function redeemCode() {
         $page = 1;
         $size = 1000;
 
@@ -912,36 +900,35 @@ class removeDataServers
         $add_data = [];
 
         foreach ($old_data as $v) {
-            $temp_data = [];
-            $temp_data['id'] = $v->id;
-            $temp_data['name'] = $v->name;
-            $temp_data['number'] = $v->number;
-            $temp_data['type'] = $v->type;
-            $temp_data['user_id'] = $v->user_id;
-            $temp_data['status'] = $v->status;
-            $temp_data['price'] = $v->money;
-            $temp_data['full_cut'] = $v->fullcut_price;
-            $temp_data['explain'] = $v->explain;
-            $temp_data['order_id'] = $v->order_id;
-            $temp_data['flag'] = $v->flag;
-            $temp_data['get_way'] = $v->get_way;
-            $temp_data['cr_id'] = $v->cr_id;
+            $temp_data               = [];
+            $temp_data['id']         = $v->id;
+            $temp_data['name']       = $v->name;
+            $temp_data['number']     = $v->number;
+            $temp_data['type']       = $v->type;
+            $temp_data['user_id']    = $v->user_id;
+            $temp_data['status']     = $v->status;
+            $temp_data['price']      = $v->money;
+            $temp_data['full_cut']   = $v->fullcut_price;
+            $temp_data['explain']    = $v->explain;
+            $temp_data['order_id']   = $v->order_id;
+            $temp_data['flag']       = $v->flag;
+            $temp_data['get_way']    = $v->get_way;
+            $temp_data['cr_id']      = $v->cr_id;
             $temp_data['created_at'] = $v->ctime > 0 ? (date('Y-m-d H:i:s', $v->ctime)) : ($now_date);
             $temp_data['begin_time'] = date('Y-m-d H:i:s', $v->starttime);
-            $temp_data['end_time'] = date('Y-m-d H:i:s', $v->deadline);
-            $temp_data['used_time'] = $v->use_time > 0 ? (date('Y-m-d H:i:s', $v->use_time)) : null;
-            $add_data[] = $temp_data;
+            $temp_data['end_time']   = date('Y-m-d H:i:s', $v->deadline);
+            $temp_data['used_time']  = $v->use_time > 0 ? (date('Y-m-d H:i:s', $v->use_time)) : null;
+            $add_data[]              = $temp_data;
         }
 
         DB::connection('mysql_new_zs')->table('nlsg_coupon')->insert($add_data);
 
     }
 
-    public function douyinLiveError()
-    {
+    public function douyinLiveError() {
         exit();
         $begin_id = 3345;
-        $end_id = 3822;
+        $end_id   = 3822;
 
         $list = ChannelOrder::query()
             ->where('id', '>=', $begin_id)
@@ -953,13 +940,13 @@ class removeDataServers
 
         $add_data = [];
         foreach ($list as $v) {
-            $temp_data = [];
-            $temp_data['type'] = 3;
-            $temp_data['user_id'] = $v->user_id;
-            $temp_data['relation_id'] = 17;
-            $temp_data['pay_time'] = $v->success_at;
-            $temp_data['status'] = 1;
-            $temp_data['channel_order_id'] = $v->order_id;
+            $temp_data                      = [];
+            $temp_data['type']              = 3;
+            $temp_data['user_id']           = $v->user_id;
+            $temp_data['relation_id']       = 17;
+            $temp_data['pay_time']          = $v->success_at;
+            $temp_data['status']            = 1;
+            $temp_data['channel_order_id']  = $v->order_id;
             $temp_data['channel_order_sku'] = $v->sku;
 
             $add_data[] = $temp_data;
@@ -971,8 +958,7 @@ class removeDataServers
         dd($res);
     }
 
-    public function addVipWorksToSub()
-    {
+    public function addVipWorksToSub() {
         $sql = 'SELECT user_id,username,`level`,start_time,expire_time,is_open_360,time_begin_360,time_end_360,
 floor((UNIX_TIMESTAMP(expire_time) - UNIX_TIMESTAMP(start_time)) / 31536000 ) as l_1,
 floor((UNIX_TIMESTAMP(time_end_360) - UNIX_TIMESTAMP(time_begin_360)) / 31536000 ) as l_2
@@ -993,24 +979,24 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 
         foreach ($list as $v) {
             foreach ($works_list as $wlv) {
-                $temp_data = [];
-                $temp_data['type'] = $wlv['type'];
-                $temp_data['user_id'] = $v->user_id;
+                $temp_data                = [];
+                $temp_data['type']        = $wlv['type'];
+                $temp_data['user_id']     = $v->user_id;
                 $temp_data['relation_id'] = $wlv['id'];
-                $temp_data['pay_time'] = $now_data;
+                $temp_data['pay_time']    = $now_data;
                 if ($v->level == 1) {
                     $temp_data['start_time'] = $v->start_time;
-                    $temp_data['end_time'] = $v->expire_time;
+                    $temp_data['end_time']   = $v->expire_time;
                 } else {
                     $temp_data['start_time'] = $v->time_begin_360;
-                    $temp_data['end_time'] = $v->time_end_360;
+                    $temp_data['end_time']   = $v->time_end_360;
                 }
                 $temp_data['give'] = 3;
-                $add_data[] = $temp_data;
+                $add_data[]        = $temp_data;
             }
         }
 
-        $add_data = array_chunk($add_data,300);
+        $add_data = array_chunk($add_data, 300);
 
 //        DB::beginTransaction();
 //        foreach ($add_data as $ad){
@@ -1022,8 +1008,7 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 
     }
 
-    public function douyinAddCD()
-    {
+    public function douyinAddCD() {
         $sku = [
             '3467290641875230890',
             '3412364163681537433'
@@ -1052,16 +1037,16 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
                 ->where('relation_id', '=', 17)
                 ->first();
             if (empty($check)) {
-                $temp_data = [];
-                $temp_data['type'] = 3;
-                $temp_data['user_id'] = $v->user_id;
-                $temp_data['relation_id'] = 17;
-                $temp_data['pay_time'] = $v->pay_time;
-                $temp_data['status'] = 1;
-                $temp_data['give'] = 15;
-                $temp_data['channel_order_id'] = $v->order_id;
+                $temp_data                      = [];
+                $temp_data['type']              = 3;
+                $temp_data['user_id']           = $v->user_id;
+                $temp_data['relation_id']       = 17;
+                $temp_data['pay_time']          = $v->pay_time;
+                $temp_data['status']            = 1;
+                $temp_data['give']              = 15;
+                $temp_data['channel_order_id']  = $v->order_id;
                 $temp_data['channel_order_sku'] = $v->sku;
-                $add_data[] = $temp_data;
+                $add_data[]                     = $temp_data;
             } else {
 //                if ($check->channel_order_sku != '3467290641875230890'){
 //                    $check->channel_order_sku = '3467290641875230890';
@@ -1092,12 +1077,11 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 
     }
 
-    public function del_bind_not_vip()
-    {
+    public function del_bind_not_vip() {
 
         $now_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d 17:59:59', strtotime('+1 years'));
-        $list = DB::table('nlsg_live_count_down as cd')
+        $list     = DB::table('nlsg_live_count_down as cd')
             ->join('nlsg_vip_user as vu', 'cd.new_vip_uid', '=', 'vu.user_id')
             ->where('cd.created_at', '<=', '2021-01-22 23:00:00')
             ->where('vu.level', '=', 2)
@@ -1111,11 +1095,11 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 
         $add_data = [];
         foreach ($list as $v) {
-            $temp_add_data = [];
+            $temp_add_data           = [];
             $temp_add_data['parent'] = $v->username;
-            $temp_add_data['son'] = $v->phone;
-            $temp_add_data['life'] = 5;
-            $add_data[] = $temp_add_data;
+            $temp_add_data['son']    = $v->phone;
+            $temp_add_data['life']   = 5;
+            $add_data[]              = $temp_add_data;
         }
 
         foreach ($add_data as $vv) {
@@ -1131,9 +1115,8 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
         //dd($add_data);
     }
 
-    public function check_1360_job()
-    {
-        $now = time();
+    public function check_1360_job() {
+        $now      = time();
         $now_date = date('Y-m-d H:i:s', $now);
 
         $list = DB::table('nlsg_order as o')
@@ -1180,35 +1163,35 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 
             if (empty($temp_inviter) && empty($temp_parent)) {
                 //continue;
-                $v->t_vip_id = 0;
-                $v->t_name = 0;
-                $v->t_uid = 0;
-                $v->t_level = 0;
-                $v->t_inviter = 0;
+                $v->t_vip_id         = 0;
+                $v->t_name           = 0;
+                $v->t_uid            = 0;
+                $v->t_level          = 0;
+                $v->t_inviter        = 0;
                 $v->t_inviter_vip_id = 0;
-                $v->t_source = 0;
-                $v->t_source_vip_id = 0;
-                $temp_list[] = $v;
+                $v->t_source         = 0;
+                $v->t_source_vip_id  = 0;
+                $temp_list[]         = $v;
             } else {
                 continue;
                 if (!empty($temp_parent)) {
-                    $v->t_vip_id = $temp_parent->vip_id;
-                    $v->t_name = $temp_parent->username;
-                    $v->t_uid = $temp_parent->user_id;
-                    $v->t_level = $temp_parent->level;
-                    $v->t_inviter = $temp_parent->inviter;
+                    $v->t_vip_id         = $temp_parent->vip_id;
+                    $v->t_name           = $temp_parent->username;
+                    $v->t_uid            = $temp_parent->user_id;
+                    $v->t_level          = $temp_parent->level;
+                    $v->t_inviter        = $temp_parent->inviter;
                     $v->t_inviter_vip_id = $temp_parent->inviter_vip_id;
-                    $v->t_source = $temp_parent->source;
-                    $v->t_source_vip_id = $temp_parent->source_vip_id;
+                    $v->t_source         = $temp_parent->source;
+                    $v->t_source_vip_id  = $temp_parent->source_vip_id;
                 } else {
-                    $v->t_vip_id = $temp_inviter->vip_id;
-                    $v->t_name = $temp_inviter->username;
-                    $v->t_uid = $temp_inviter->user_id;
-                    $v->t_level = $temp_inviter->level;
-                    $v->t_inviter = $temp_inviter->inviter;
+                    $v->t_vip_id         = $temp_inviter->vip_id;
+                    $v->t_name           = $temp_inviter->username;
+                    $v->t_uid            = $temp_inviter->user_id;
+                    $v->t_level          = $temp_inviter->level;
+                    $v->t_inviter        = $temp_inviter->inviter;
                     $v->t_inviter_vip_id = $temp_inviter->inviter_vip_id;
-                    $v->t_source = $temp_inviter->source;
-                    $v->t_source_vip_id = $temp_inviter->source_vip_id;
+                    $v->t_source         = $temp_inviter->source;
+                    $v->t_source_vip_id  = $temp_inviter->source_vip_id;
                 }
                 $temp_list[] = $v;
             }
@@ -1243,13 +1226,13 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
                 $v->vip_id = $check_open_vip->id;
 
                 if ($v->t_uid != $check_open_vip->inviter) {
-                    $check_open_vip->inviter = $v->t_uid;
+                    $check_open_vip->inviter        = $v->t_uid;
                     $check_open_vip->inviter_vip_id = $v->t_vip_id;
                     if ($v->t_level == 1) {
-                        $check_open_vip->source = $v->t_source;
+                        $check_open_vip->source        = $v->t_source;
                         $check_open_vip->source_vip_id = $v->t_source_vip_id;
                     } else {
-                        $check_open_vip->source = $v->t_uid;
+                        $check_open_vip->source        = $v->t_uid;
                         $check_open_vip->source_vip_id = $v->t_vip_id;
                     }
                     $check_open_vip->save();
@@ -1265,18 +1248,18 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
             if (empty($check_prd)) {
                 echo $v->ordernum, '没有收益是对的', PHP_EOL;
                 if (0) {
-                    $pdModel = new PayRecordDetail();
-                    $pdModel->type = 11;
+                    $pdModel           = new PayRecordDetail();
+                    $pdModel->type     = 11;
                     $pdModel->ordernum = $v->ordernum;
-                    $pdModel->ctime = $now;
+                    $pdModel->ctime    = $now;
                     if ($v->t_level == 1) {
                         $pdModel->price = 108;
                     } else {
                         $pdModel->price = 180;
                     }
-                    $pdModel->user_id = $v->t_uid;
+                    $pdModel->user_id     = $v->t_uid;
                     $pdModel->user_vip_id = $v->t_vip_id;
-                    $pdModel->vip_id = $v->vip_id;
+                    $pdModel->vip_id      = $v->vip_id;
                     $pdModel->save();
                     echo $v->ordernum, '添加收益', PHP_EOL;
                 }
@@ -1301,8 +1284,7 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 
     }
 
-    public function add_live_to_bind()
-    {
+    public function add_live_to_bind() {
         $now_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
 
@@ -1323,13 +1305,13 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
             }
 
             if (empty($v->ubid)) {
-                $temp_data = [];
-                $temp_data['parent'] = $v->parent;
-                $temp_data['son'] = $v->son;
-                $temp_data['life'] = 5;
+                $temp_data             = [];
+                $temp_data['parent']   = $v->parent;
+                $temp_data['son']      = $v->son;
+                $temp_data['life']     = 5;
                 $temp_data['begin_at'] = $now_date;
-                $temp_data['end_at'] = $end_date;
-                $add_data[] = $temp_data;
+                $temp_data['end_at']   = $end_date;
+                $add_data[]            = $temp_data;
             }
         }
 
@@ -1341,34 +1323,33 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
         dd([count($list), count($add_data), $res]);
     }
 
-    public function runPoster()
-    {
+    public function runPoster() {
         $list = Subscribe::where('type', '=', 3)
             ->where('relation_id', '=', 1)
             ->select(['user_id'])
             ->groupBy('user_id')
             ->get()->toArray();
 
-        $cpC = new CreatePosterController();
+        $cpC        = new CreatePosterController();
         $expire_num = 86400;
 
         foreach ($list as $v) {
             //post_type=21&relation_id=1&uid=168934&live_id=1&live_info_id=1
-            $post_type = 21;
-            $gid = 1;
-            $uid = $v['user_id'];
-            $live_id = 1;
+            $post_type    = 21;
+            $gid          = 1;
+            $uid          = $v['user_id'];
+            $live_id      = 1;
             $live_info_id = 1;
-            $level = User::getLevel($v['user_id']);
-            $save_path = base_path() . '/public/image/';//存储路径
+            $level        = User::getLevel($v['user_id']);
+            $save_path    = base_path() . '/public/image/';//存储路径
             if (!file_exists($save_path)) {
                 mkdir($save_path, 0777, true);
             }
             $cache_key_name = 'poster_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid;
-            $source_name = 'zhibo.png';
-            $source = storage_path() . '/app/public/PosterMaterial/' . $source_name;
-            $init = [
-                'path' => $save_path,
+            $source_name    = 'zhibo.png';
+            $source         = storage_path() . '/app/public/PosterMaterial/' . $source_name;
+            $init           = [
+                'path'   => $save_path,
                 'source' => $source,
             ];
 
@@ -1380,14 +1361,14 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
             }
             //dd($draw);
             $temp_del_path = $draw['QR']['path'];
-            $res = $cp::draw($draw);
+            $res           = $cp::draw($draw);
             if (!empty($draw['QR']['path'])) {
                 unlink($temp_del_path);
             }
             $file_path = $save_path . $res;
             if ($fp = fopen($file_path, "rb", 0)) {
                 $base64 = $cpC->imgToBase64($file_path);
-                $res = ConfigModel::base64Upload(101, $base64);
+                $res    = ConfigModel::base64Upload(101, $base64);
                 fclose($fp);
                 //unlink($file_path);
                 Cache::put($cache_key_name, $res, $expire_num);
@@ -1397,8 +1378,7 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
 
     }
 
-    public function changeVipSource()
-    {
+    public function changeVipSource() {
         $sql = "SELECT id,user_id,inviter,inviter_vip_id,source,source_vip_id
 from nlsg_vip_user where created_at > '2021-01-22 00:00:00' and inviter > 0 and inviter = source";
 
@@ -1410,7 +1390,7 @@ from nlsg_vip_user where created_at > '2021-01-22 00:00:00' and inviter > 0 and 
                 DB::table('nlsg_vip_user')
                     ->where('id', '=', $v->id)
                     ->update([
-                        'source' => $check_inviter->source,
+                        'source'        => $check_inviter->source,
                         'source_vip_id' => $check_inviter->source_vip_id
                     ]);
             }
@@ -1418,10 +1398,9 @@ from nlsg_vip_user where created_at > '2021-01-22 00:00:00' and inviter > 0 and 
 
     }
 
-    public function do_1360_job()
-    {
+    public function do_1360_job() {
         $now_date = date('Y-m-d H:i:s');
-        $ctime = time();
+        $ctime    = time();
 
         $sql = "SELECT o.ordernum,o.user_id,u.phone,o.pay_price,c.new_vip_uid t_id,bind.parent from nlsg_order as o
 LEFT JOIN nlsg_live_count_down as c on o.user_id = c.user_id and c.live_id = 1
@@ -1441,10 +1420,10 @@ and o.status = 1 and o.pay_price > 1";
                 ->where('is_default', '=', 1)
                 ->first();
             if (empty($temp_user_vip_info)) {
-                $v->user_level = 0;
+                $v->user_level  = 0;
                 $v->user_vip_id = 0;
             } else {
-                $v->user_level = $temp_user_vip_info->level;
+                $v->user_level  = $temp_user_vip_info->level;
                 $v->user_vip_id = $temp_user_vip_info->id;
             }
 
@@ -1455,16 +1434,16 @@ and o.status = 1 and o.pay_price > 1";
                 ->where('is_default', '=', 1)
                 ->first();
             if (empty($temp_vip_info)) {
-                $v->t_level = 0;
+                $v->t_level  = 0;
                 $v->t_vip_id = 0;
             } else {
-                $v->t_level = $temp_vip_info->level;
+                $v->t_level  = $temp_vip_info->level;
                 $v->t_vip_id = $temp_vip_info->id;
             }
             if (empty($v->parent)) {
-                $v->parent_level = 0;
+                $v->parent_level  = 0;
                 $v->parent_vip_id = 0;
-                $v->parent_uid = 0;
+                $v->parent_uid    = 0;
             } else {
                 $temp_vip_info = DB::table('nlsg_vip_user')
                     ->where('username', '=', $v->parent)
@@ -1473,13 +1452,13 @@ and o.status = 1 and o.pay_price > 1";
                     ->where('is_default', '=', 1)
                     ->first();
                 if (empty($temp_vip_info)) {
-                    $v->parent_level = 0;
+                    $v->parent_level  = 0;
                     $v->parent_vip_id = 0;
-                    $v->parent_uid = 0;
+                    $v->parent_uid    = 0;
                 } else {
-                    $v->parent_level = $temp_vip_info->level;
+                    $v->parent_level  = $temp_vip_info->level;
                     $v->parent_vip_id = $temp_vip_info->id;
-                    $v->parent_uid = $temp_vip_info->user_id;
+                    $v->parent_uid    = $temp_vip_info->user_id;
                 }
             }
         }
@@ -1492,16 +1471,16 @@ and o.status = 1 and o.pay_price > 1";
             switch (intval($v->user_level)) {
                 case 0:
                     //不是360  开通
-                    $pdModel = new PayRecordDetail();
-                    $pdModel->type = 11;
+                    $pdModel           = new PayRecordDetail();
+                    $pdModel->type     = 11;
                     $pdModel->ordernum = $v->ordernum;
-                    $pdModel->ctime = $ctime;
+                    $pdModel->ctime    = $ctime;
                     if ($v->parent_level > 0 && $v->parent_vip_id > 0) {
-                        $source_info = VipUser::whereId($v->parent_vip_id)->first();
-                        $temp_source_id = $source_info->user_id;
+                        $source_info        = VipUser::whereId($v->parent_vip_id)->first();
+                        $temp_source_id     = $source_info->user_id;
                         $temp_source_vip_id = $source_info->id;
 
-                        $pdModel->user_id = $v->parent_uid;
+                        $pdModel->user_id     = $v->parent_uid;
                         $pdModel->user_vip_id = $v->parent_vip_id;
                         if ($v->parent_level == 1) {
                             $pdModel->price = 108;
@@ -1511,11 +1490,11 @@ and o.status = 1 and o.pay_price > 1";
                         //如果有绑定的并且绑定是vip就走绑定
                     } elseif ($v->t_level > 0 && $v->t_vip_id > 0) {
                         //没有绑定并且推荐人是vip就走推荐
-                        $source_info = VipUser::whereId($v->t_vip_id)->first();
-                        $temp_source_id = $source_info->user_id;
+                        $source_info        = VipUser::whereId($v->t_vip_id)->first();
+                        $temp_source_id     = $source_info->user_id;
                         $temp_source_vip_id = $source_info->id;
 
-                        $pdModel->user_id = $v->t_id;
+                        $pdModel->user_id     = $v->t_id;
                         $pdModel->user_vip_id = $v->t_vip_id;
                         if ($v->t_level == 1) {
                             $pdModel->price = 108;
@@ -1523,7 +1502,7 @@ and o.status = 1 and o.pay_price > 1";
                             $pdModel->price = 180;
                         }
                     } else {
-                        $temp_source_id = 0;
+                        $temp_source_id     = 0;
                         $temp_source_vip_id = 0;
                     }
 
@@ -1534,33 +1513,33 @@ and o.status = 1 and o.pay_price > 1";
                         ->where('is_default', '=', 1)
                         ->first();
                     if (empty($check_add_user_vip)) {
-                        $vip_add_data['user_id'] = $v->user_id;
-                        $vip_add_data['nickname'] = substr_replace($v->phone, '****', 3, 4);
-                        $vip_add_data['username'] = $v->phone;
-                        $vip_add_data['level'] = 1;
-                        $vip_add_data['inviter'] = $temp_source_id;
+                        $vip_add_data['user_id']        = $v->user_id;
+                        $vip_add_data['nickname']       = substr_replace($v->phone, '****', 3, 4);
+                        $vip_add_data['username']       = $v->phone;
+                        $vip_add_data['level']          = 1;
+                        $vip_add_data['inviter']        = $temp_source_id;
                         $vip_add_data['inviter_vip_id'] = $temp_source_vip_id;
 
                         if (!isset($source_info->level)) {
-                            $vip_add_data['source'] = 0;
+                            $vip_add_data['source']        = 0;
                             $vip_add_data['source_vip_id'] = 0;
                         } else {
                             if ($source_info->level == 1) {
-                                $vip_add_data['source'] = $source_info->source ?? 0;
+                                $vip_add_data['source']        = $source_info->source ?? 0;
                                 $vip_add_data['source_vip_id'] = $source_info->source_vip_id ?? 0;
                             } else {
-                                $vip_add_data['source'] = $source_info->user_id ?? 0;
+                                $vip_add_data['source']        = $source_info->user_id ?? 0;
                                 $vip_add_data['source_vip_id'] = $source_info->id ?? 0;
                             }
                         }
 
 
-                        $vip_add_data['is_default'] = 1;
-                        $vip_add_data['created_at'] = $now_date;
-                        $vip_add_data['start_time'] = $now_date;
-                        $vip_add_data['updated_at'] = $now_date;
+                        $vip_add_data['is_default']  = 1;
+                        $vip_add_data['created_at']  = $now_date;
+                        $vip_add_data['start_time']  = $now_date;
+                        $vip_add_data['updated_at']  = $now_date;
                         $vip_add_data['expire_time'] = date('Y-m-d 23:59:59', strtotime('+1 year'));
-                        $add_res = DB::table('nlsg_vip_user')->insertGetId($vip_add_data);
+                        $add_res                     = DB::table('nlsg_vip_user')->insertGetId($vip_add_data);
                     } else {
                         $check_add_user_vip->expire_time = date('Y-m-d 23:59:59', strtotime($check_add_user_vip->expire_time . ' +1 year'));
                         $check_add_user_vip->save();
@@ -1575,13 +1554,13 @@ and o.status = 1 and o.pay_price > 1";
                     break;
                 case 1:
                     //是360 延长
-                    $this_vip = VipUser::whereId($v->user_vip_id)->first();
+                    $this_vip              = VipUser::whereId($v->user_vip_id)->first();
                     $this_vip->expire_time = date('Y-m-d 23:59:59', strtotime($this_vip->expire_time . ' +1 year'));
                     $this_vip->save();
                     break;
                 case 2:
                     //钻石 修改
-                    $this_vip = VipUser::whereId($v->user_vip_id)->first();
+                    $this_vip              = VipUser::whereId($v->user_vip_id)->first();
                     $this_vip->is_open_360 = 1;
                     if (empty($this_vip->time_begin_360)) {
                         $this_vip->time_begin_360 = $now_date;
@@ -1593,14 +1572,14 @@ and o.status = 1 and o.pay_price > 1";
                     }
                     $this_vip->save();
 
-                    $pdModel = new PayRecordDetail();
-                    $pdModel->type = 11;
-                    $pdModel->ordernum = $v->ordernum;
-                    $pdModel->ctime = $ctime;
-                    $pdModel->user_id = $this_vip->user_id;
+                    $pdModel              = new PayRecordDetail();
+                    $pdModel->type        = 11;
+                    $pdModel->ordernum    = $v->ordernum;
+                    $pdModel->ctime       = $ctime;
+                    $pdModel->user_id     = $this_vip->user_id;
                     $pdModel->user_vip_id = $this_vip->id;
-                    $pdModel->vip_id = $this_vip->id;
-                    $pdModel->price = 180;
+                    $pdModel->vip_id      = $this_vip->id;
+                    $pdModel->price       = 180;
                     $pdModel->save();
                     break;
             }
@@ -1608,8 +1587,7 @@ and o.status = 1 and o.pay_price > 1";
         dd($list);
     }
 
-    public function douyinLiveOrder()
-    {
+    public function douyinLiveOrder() {
         $list = DB::table('wwtest as wt')
             ->leftJoin('nlsg_user as u', 'wt.phone', '=', 'u.phone')
             ->select(['wt.phone', 'u.id as user_id'])
@@ -1617,8 +1595,8 @@ and o.status = 1 and o.pay_price > 1";
 
         foreach ($list as $v) {
             if (!is_numeric($v->user_id)) {
-                $userModel = new User();
-                $userModel->phone = $v->phone;
+                $userModel           = new User();
+                $userModel->phone    = $v->phone;
                 $userModel->nickname = substr_replace($v->phone, '****', 3, 4);
                 $userModel->save();
                 $v->user_id = $userModel->id;
@@ -1630,14 +1608,14 @@ and o.status = 1 and o.pay_price > 1";
         foreach ($list as $v) {
             $w = 1;
             while ($w < 3) {
-                $temp_data = [];
-                $temp_data['type'] = 3;
-                $temp_data['user_id'] = $v->user_id;
+                $temp_data                = [];
+                $temp_data['type']        = 3;
+                $temp_data['user_id']     = $v->user_id;
                 $temp_data['relation_id'] = $w;
-                $temp_data['pay_time'] = $now_date;
-                $temp_data['status'] = 1;
-                $temp_data['give'] = 3;
-                $add_data[] = $temp_data;
+                $temp_data['pay_time']    = $now_date;
+                $temp_data['status']      = 1;
+                $temp_data['give']        = 3;
+                $add_data[]               = $temp_data;
                 $w++;
             }
         }
@@ -1645,8 +1623,7 @@ and o.status = 1 and o.pay_price > 1";
         dd($add_data);
     }
 
-    public function countUserData()
-    {
+    public function countUserData() {
         if (0) {
             $sql = 'select from_uid as uid from nlsg_user_follow
                 UNION
@@ -1659,13 +1636,13 @@ and o.status = 1 and o.pay_price > 1";
 
             foreach ($list as $v) {
                 $from_count = UserFollow::where('from_uid', '=', $v)->where('status', '=', 1)->count();
-                $to_count = UserFollow::where('to_uid', '=', $v)->where('status', '=', 1)->count();
+                $to_count   = UserFollow::where('to_uid', '=', $v)->where('status', '=', 1)->count();
 
                 DB::table('nlsg_user')
                     ->where('id', '=', $v)
                     ->update([
                         'follow_num' => $from_count,
-                        'fan_num' => $to_count
+                        'fan_num'    => $to_count
                     ]);
             }
         }
@@ -1692,8 +1669,7 @@ and o.status = 1 and o.pay_price > 1";
 
     }
 
-    public function normalCodeRun($page, $size)
-    {
+    public function normalCodeRun($page, $size) {
         $old_data = DB::connection('mysql_old_zs')
             ->table('nlsg_redeem_code')
             ->where('id', '>', 407373)
@@ -1706,13 +1682,13 @@ and o.status = 1 and o.pay_price > 1";
         $old_data = $old_data->toArray();
         $add_data = [];
         foreach ($old_data as $v) {
-            $temp_add_data = [];
-            $temp_add_data['id'] = $v->id;
-            $temp_add_data['number'] = $v->number;
-            $temp_add_data['code'] = $v->code;
-            $temp_add_data['name'] = $v->name;
-            $temp_add_data['status'] = $v->status;
-            $temp_add_data['phone'] = $v->phone;
+            $temp_add_data            = [];
+            $temp_add_data['id']      = $v->id;
+            $temp_add_data['number']  = $v->number;
+            $temp_add_data['code']    = $v->code;
+            $temp_add_data['name']    = $v->name;
+            $temp_add_data['status']  = $v->status;
+            $temp_add_data['phone']   = $v->phone;
             $temp_add_data['user_id'] = $v->user_id ?? 0;
             if ($v->status === 1) {
                 //已使用
@@ -1720,14 +1696,14 @@ and o.status = 1 and o.pay_price > 1";
             } else {
                 $temp_add_data['to_user_id'] = 0;
             }
-            $temp_add_data['service_id'] = $v->service_id ?? 0;
-            $temp_add_data['is_new_code'] = $v->is_new_code ?? 0;
-            $temp_add_data['new_group'] = $v->new_group ?? 0;
-            $temp_add_data['can_use'] = $v->can_use ?? 0;
-            $temp_add_data['redeem_type'] = $v->redeem_type;
-            $temp_add_data['goods_id'] = $v->goods_id;
+            $temp_add_data['service_id']   = $v->service_id ?? 0;
+            $temp_add_data['is_new_code']  = $v->is_new_code ?? 0;
+            $temp_add_data['new_group']    = $v->new_group ?? 0;
+            $temp_add_data['can_use']      = $v->can_use ?? 0;
+            $temp_add_data['redeem_type']  = $v->redeem_type;
+            $temp_add_data['goods_id']     = $v->goods_id;
             $temp_add_data['add_admin_id'] = $v->add_admin_id;
-            $temp_add_data['os_type'] = $v->os_type;
+            $temp_add_data['os_type']      = $v->os_type;
 
             if (empty($v->ctime)) {
                 $temp_add_data['created_at'] = date('Y-m-d H:i:s');
@@ -1759,8 +1735,7 @@ and o.status = 1 and o.pay_price > 1";
     }
 
     //迁移兑换券
-    public function normalCode()
-    {
+    public function normalCode() {
         $page = 1;
         $size = 200;
 
@@ -1776,8 +1751,7 @@ and o.status = 1 and o.pay_price > 1";
     }
 
     //老兑换券的视频转讲座
-    public function editCode()
-    {
+    public function editCode() {
         $w_list = DB::connection('mysql_new_zs')
             ->table('nlsg_column')
             ->where('type', '=', 2)
@@ -1818,18 +1792,17 @@ and o.status = 1 and o.pay_price > 1";
                 ->where('can_use', '<>', 3)
                 ->where('is_new_code', '=', 1)
                 ->update([
-                    'goods_id' => $change_id,
+                    'goods_id'    => $change_id,
                     'redeem_type' => 3
                 ]);
         }
 
     }
 
-    public static function getKernelLock(int $job_id, int $flag)
-    {
+    public static function getKernelLock(int $job_id, int $flag) {
         $cache_key_name = 'kernel_lock_' . $job_id;
-        $counter = Cache::get($cache_key_name);
-        $expire_num = 60;
+        $counter        = Cache::get($cache_key_name);
+        $expire_num     = 60;
         if ($flag == 2) {
             Cache::put($cache_key_name, 1, $expire_num);
         } elseif ($flag == 3) {
@@ -1843,10 +1816,9 @@ and o.status = 1 and o.pay_price > 1";
         }
     }
 
-    public function worksListOfSub()
-    {
+    public function worksListOfSub() {
         $now_date = date('Y-m-d H:i:s');
-        $job_key = 1844;
+        $job_key  = 1844;
 
         $check_job = self::getKernelLock($job_key, 1);
         if ($check_job === false) {
@@ -1903,7 +1875,7 @@ and o.status = 1 and o.pay_price > 1";
                     }
                 }
 
-                $temp_user_id = $temp_user->id;
+                $temp_user_id    = $temp_user->id;
                 $temp_user_phone = $temp_user->phone;
 
                 $query = Subscribe::where('user_id', '=', $temp_user_id)
@@ -1922,15 +1894,15 @@ and o.status = 1 and o.pay_price > 1";
                 $add_sub_data = [];
 
                 if (empty($check)) {
-                    $temp_data = [];
-                    $temp_data['type'] = $v->works_type;
-                    $temp_data['user_id'] = $temp_user_id;
+                    $temp_data                = [];
+                    $temp_data['type']        = $v->works_type;
+                    $temp_data['user_id']     = $temp_user_id;
                     $temp_data['relation_id'] = $v->works_id;
-                    $temp_data['pay_time'] = $now_date;
-                    $temp_data['status'] = 1;
-                    $temp_data['give'] = 3;
-                    $temp_data['twitter_id'] = $temp_t_user_id;
-                    $temp_data['is_flag'] = $v->flag_name;
+                    $temp_data['pay_time']    = $now_date;
+                    $temp_data['status']      = 1;
+                    $temp_data['give']        = 3;
+                    $temp_data['twitter_id']  = $temp_t_user_id;
+                    $temp_data['is_flag']     = $v->flag_name;
                     if ($v->flag_name = '抖音') {
                         $temp_data['channel_order_sku'] = '3460976881036350000';
                     } else {
@@ -1939,17 +1911,17 @@ and o.status = 1 and o.pay_price > 1";
 
                     if ($v->works_type != 3) {
                         $temp_data['start_time'] = $now_date;
-                        $temp_data['end_time'] = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
+                        $temp_data['end_time']   = date('Y-m-d 23:59:59', strtotime("+$v->years years"));
                     } else {
                         $temp_data['start_time'] = $now_date;
-                        $temp_data['end_time'] = $now_date;
+                        $temp_data['end_time']   = $now_date;
                     }
                     $add_sub_data[] = $temp_data;
                 } else {
                     if ($v->works_type != 3) {
-                        $temp_end_time = date('Y-m-d 23:59:59', strtotime("$check->end_time +$v->years  years"));
+                        $temp_end_time   = date('Y-m-d 23:59:59', strtotime("$check->end_time +$v->years  years"));
                         $check->end_time = $temp_end_time;
-                        $edit_res = $check->save();
+                        $edit_res        = $check->save();
                         if ($edit_res === false) {
                             DB::rollBack();
                             break;
@@ -1967,8 +1939,8 @@ and o.status = 1 and o.pay_price > 1";
                     if (empty($check_cd)) {
                         $cd_data['live_id'] = $v->works_id;
                         $cd_data['user_id'] = $temp_user_id;
-                        $cd_data['phone'] = $temp_user_phone;
-                        $cd_res = DB::table('nlsg_live_count_down')->insert($cd_data);
+                        $cd_data['phone']   = $temp_user_phone;
+                        $cd_res             = DB::table('nlsg_live_count_down')->insert($cd_data);
                         if (!$cd_res) {
                             DB::rollBack();
                             continue;
@@ -1982,24 +1954,24 @@ and o.status = 1 and o.pay_price > 1";
                         $bind_data = [];
                         if (!empty($v->twitter_phone)) {
                             $bind_data = [
-                                'parent' => $v->twitter_phone,
-                                'son' => $v->phone,
-                                'life' => 2,
+                                'parent'   => $v->twitter_phone,
+                                'son'      => $v->phone,
+                                'life'     => 2,
                                 'begin_at' => date('Y-m-d H:i:s'),
-                                'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                                'channel' => 1,
-                                'status' => 1
+                                'end_at'   => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                                'channel'  => 1,
+                                'status'   => 1
                             ];
                         } else {
                             if ($v->flag_name === '抖音') {
                                 $bind_data = [
-                                    'parent' => '18512378959',
-                                    'son' => $v->phone,
-                                    'life' => 2,
+                                    'parent'   => '18512378959',
+                                    'son'      => $v->phone,
+                                    'life'     => 2,
                                     'begin_at' => date('Y-m-d H:i:s'),
-                                    'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
-                                    'channel' => 3,
-                                    'status' => 1
+                                    'end_at'   => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                                    'channel'  => 3,
+                                    'status'   => 1
                                 ];
                             }
                         }
@@ -2014,8 +1986,8 @@ and o.status = 1 and o.pay_price > 1";
                     ->where('id', '=', $v->id)
                     ->update([
                         'user_id' => $temp_user_id,
-                        'phone' => $temp_user_phone,
-                        'status' => 2,
+                        'phone'   => $temp_user_phone,
+                        'status'  => 2,
                     ]);
                 if ($edit_res == false) {
                     DB::rollBack();
@@ -2037,11 +2009,10 @@ and o.status = 1 and o.pay_price > 1";
         return true;
     }
 
-    public function worksListOfDelSub()
-    {
+    public function worksListOfDelSub() {
         $model_name = 'works_list_of_del_sub';
-        $now_date = date('Y-m-d H:i:s');
-        $job_key = 2043;
+        $now_date   = date('Y-m-d H:i:s');
+        $job_key    = 2043;
 
         $check_job = self::getKernelLock($job_key, 1);
 
@@ -2066,8 +2037,8 @@ and o.status = 1 and o.pay_price > 1";
             foreach ($list as $v) {
                 DB::beginTransaction();
 
-                $check_phone = User::query()->where('phone','=',$v->phone)->first();
-                if (empty($check_phone)){
+                $check_phone = User::query()->where('phone', '=', $v->phone)->first();
+                if (empty($check_phone)) {
                     DB::table($model_name)
                         ->where('id', '=', $v->id)
                         ->update([
@@ -2077,7 +2048,7 @@ and o.status = 1 and o.pay_price > 1";
                     continue;
                 }
 
-                $temp_user_id = $check_phone->id;
+                $temp_user_id    = $check_phone->id;
                 $temp_user_phone = $check_phone->phone;
 
                 $check = Subscribe::query()
@@ -2089,7 +2060,7 @@ and o.status = 1 and o.pay_price > 1";
 
                 if (!empty($check)) {
                     $check->status = 0;
-                    $edit_res = $check->save();
+                    $edit_res      = $check->save();
                     if ($edit_res === false) {
                         DB::rollBack();
                         break;
@@ -2100,8 +2071,8 @@ and o.status = 1 and o.pay_price > 1";
                     ->where('id', '=', $v->id)
                     ->update([
                         'user_id' => $temp_user_id,
-                        'phone' => $temp_user_phone,
-                        'status' => 2,
+                        'phone'   => $temp_user_phone,
+                        'status'  => 2,
                     ]);
 
                 DB::commit();
@@ -2111,8 +2082,7 @@ and o.status = 1 and o.pay_price > 1";
         return true;
     }
 
-    public function subListSms()
-    {
+    public function subListSms() {
 //        $while_flag = true;
 //        while ($while_flag) {
         //现在只有情商课的sms
@@ -2128,10 +2098,10 @@ and o.status = 1 and o.pay_price > 1";
 //                $while_flag = false;
             return true;
         } else {
-            $list = $list->toArray();
-            $phone = array_column($list, 'phone');
-            $phone = array_unique($phone);
-            $phone = implode(',', $phone);
+            $list    = $list->toArray();
+            $phone   = array_column($list, 'phone');
+            $phone   = array_unique($phone);
+            $phone   = implode(',', $phone);
             $id_list = array_column($list, 'id');
             $easySms = app('easysms');
             $easySms->send($phone, [
@@ -2145,8 +2115,7 @@ and o.status = 1 and o.pay_price > 1";
         return true;
     }
 
-    public function liveOrderAddVipDind()
-    {
+    public function liveOrderAddVipDind() {
         $sql = "SELECT
 	o.id,
 	o.user_id,
@@ -2178,22 +2147,22 @@ ORDER BY
         $list = DB::select($sql);
 
         $begin_date = date('2021-03-27 14:00:00');
-        $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
+        $end_date   = date('Y-m-d 23:59:59', strtotime('+1 years'));
 
         foreach ($list as $v) {
             DB::beginTransaction();
             $bind_data = [
-                'parent' => $v->tphone,
-                'son' => $v->phone,
-                'life' => 2,
+                'parent'   => $v->tphone,
+                'son'      => $v->phone,
+                'life'     => 2,
                 'begin_at' => $v->pay_time,
-                'end_at' => date('Y-m-d 23:59:59', strtotime("$v->pay_time +1 years")),
-                'channel' => 2
+                'end_at'   => date('Y-m-d 23:59:59', strtotime("$v->pay_time +1 years")),
+                'channel'  => 2
             ];
 
             $b_res = DB::table('nlsg_vip_user_bind')->insert($bind_data);
             $o_res = Order::where('id', '=', $v->id)->update([
-                'is_ascription' => 1,
+                'is_ascription'   => 1,
                 'ascription_time' => $begin_date
             ]);
             if ($b_res && $o_res) {
@@ -2207,19 +2176,17 @@ ORDER BY
         exit('完毕');
     }
 
-    public function mysqlTest()
-    {
+    public function mysqlTest() {
 
     }
 
-    public function liveOnlineUserList()
-    {
+    public function liveOnlineUserList() {
         $redis = Redis::connection();
-        $data = $redis->LPOP('online_user_list');
+        $data  = $redis->LPOP('online_user_list');
 
         print_r($data);
 
-        $data = json_decode($data, true);
+        $data  = json_decode($data, true);
         $check = LiveOnlineUser::where('online_time_str', '=', $data['online_time_str'])
             ->where('user_id', '=', $data['user_id'])
             ->where('live_id', '=', $data['live_id'])
@@ -2233,8 +2200,7 @@ ORDER BY
         }
     }
 
-    public function lours()
-    {
+    public function lours() {
         $date = date('Y-m-d H:i:s');
 //        $log = DB::table('nlsg_live_online_user_clean_log')
 //            ->orderBy('id', 'desc')
@@ -2274,7 +2240,7 @@ ORDER BY
         }
     }
 
-    public function checkVipSubTime(){
+    public function checkVipSubTime() {
 
 //        $sql = "SELECT vu.id as vuid,sub.id as subid,vu.user_id,vu.`level`,vu.status as vu_status,sub.status as sub_status,
 //       vu.start_time,vu.expire_time,vu.is_open_360,vu.time_begin_360,vu.time_end_360,sub.type sub_type,sub.relation_id,
@@ -2327,43 +2293,43 @@ ORDER BY
 
         $this_time_id = 1;
 
-        while ($this_time_id <= $max_id){
+        while ($this_time_id <= $max_id) {
             $vip = VipUser::query()
-                ->where('id','=',$this_time_id)
-                ->select(['id','user_id','username','level','start_time','expire_time','status',
-                    'is_default','order_id','is_open_360','time_begin_360','time_end_360'])
+                ->where('id', '=', $this_time_id)
+                ->select(['id', 'user_id', 'username', 'level', 'start_time', 'expire_time', 'status',
+                    'is_default', 'order_id', 'is_open_360', 'time_begin_360', 'time_end_360'])
                 ->first();
-            if (!empty($vip)){
+            if (!empty($vip)) {
                 $vip = $vip->toArray();
                 //sub表的type 2作品 6讲座
                 //vip works表的type 课程类型 1专栏表  2作品表
 
                 //如果是有效的,修改sub表
-                if ($vip['status'] === 1){
+                if ($vip['status'] === 1) {
                     $temp_end_time = '';
-                    if ($vip['level'] === 1){
+                    if ($vip['level'] === 1) {
                         $temp_end_time = $vip['expire_time'];
-                    }else{
+                    } else {
                         $temp_end_time = $vip['time_end_360'];
                     }
-                    if (!empty($temp_end_time)){
+                    if (!empty($temp_end_time)) {
 
-                        $temp_sql = "UPDATE nlsg_subscribe set end_time = '".$temp_end_time.
-                            "' where user_id = ".$vip['user_id']." and order_id = 0 and status = 1 and
+                        $temp_sql = "UPDATE nlsg_subscribe set end_time = '" . $temp_end_time .
+                            "' where user_id = " . $vip['user_id'] . " and order_id = 0 and status = 1 and
 CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2_570', '2_574', '2_577', '2_586', '2_588', '6_440', '6_441', '6_450', '6_452', '2_630', '6_508', '6_510', '6_512', '6_513', '2_644', '2_638')";
                         DB::select($temp_sql);
                     }
-                }else{
+                } else {
                     //不是有效的,查看是否还有默认的
                     $status_check = VipUser::query()
-                        ->where('user_id','=',$vip['user_id'])
-                        ->where('status','=',1)
-                        ->where('is_default','=',1)
+                        ->where('user_id', '=', $vip['user_id'])
+                        ->where('status', '=', 1)
+                        ->where('is_default', '=', 1)
                         ->first();
                     //没有,按照这个修改
-                    if (empty($status_check)){
+                    if (empty($status_check)) {
                         $temp_works_sql = "UPDATE nlsg_subscribe set status = 0
-where user_id = ".$vip['user_id']." and order_id = 0 and status = 1 and
+where user_id = " . $vip['user_id'] . " and order_id = 0 and status = 1 and
 CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2_570', '2_574', '2_577', '2_586', '2_588', '6_440', '6_441', '6_450', '6_452', '2_630', '6_508', '6_510', '6_512', '6_513', '2_644', '2_638')";
                         DB::select($temp_works_sql);
                     }
@@ -2371,58 +2337,108 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
 
             }
             $this_time_id++;
-            echo $this_time_id,PHP_EOL;
+            echo $this_time_id, PHP_EOL;
         }
 
 
     }
 
-    public function liveStatistics(){
+    public function liveStatistics() {
         dd(__LINE__);
         $live_id_list = Live::query()->orderBy('id')->pluck('id')->toArray();
 
-        $end_id   = 18762889;
+        $end_id = 18762889;
 
         $db_name = 'nlsg_live_statistics';
 
-        foreach ($live_id_list as $lid){
+        foreach ($live_id_list as $lid) {
 
             $list = DB::table('nlsg_subscribe as s')
                 ->join('nlsg_user as u', 's.user_id', '=', 'u.id')
-                ->join('nlsg_backend_live_role as lr','s.twitter_id','=','lr.son_id')
+                ->join('nlsg_backend_live_role as lr', 's.twitter_id', '=', 'lr.son_id')
                 ->where('s.type', '=', 3)
                 ->where('s.status', '=', 1)
                 ->where('s.twitter_id', '>', 0)
                 ->where('u.is_test_pay', '=', 0)
-                ->where('s.id','<=',$end_id)
-                ->where('s.relation_id','=',$lid)
-                ->groupBy(['s.relation_id','s.twitter_id'])
-                ->select(['s.relation_id','s.twitter_id',DB::raw('count(*) as counts')])
+                ->where('s.id', '<=', $end_id)
+                ->where('s.relation_id', '=', $lid)
+                ->groupBy(['s.relation_id', 's.twitter_id'])
+                ->select(['s.relation_id', 's.twitter_id', DB::raw('count(*) as counts')])
                 ->get();
 
-            foreach ($list as $v){
+            foreach ($list as $v) {
                 $temp_check = DB::table($db_name)
-                    ->where('live_id','=',$v->relation_id)
-                    ->where('channel_user_id','=',$v->twitter_id)
-                    ->where('type','=',1)
+                    ->where('live_id', '=', $v->relation_id)
+                    ->where('channel_user_id', '=', $v->twitter_id)
+                    ->where('type', '=', 1)
                     ->first();
-                if (empty($temp_check)){
+                if (empty($temp_check)) {
                     DB::table($db_name)->insert([
-                        'live_id'=>$v->relation_id,
-                        'channel_user_id'=>$v->twitter_id,
-                        'type'=>1,
-                        'counts'=>$v->counts,
+                        'live_id'         => $v->relation_id,
+                        'channel_user_id' => $v->twitter_id,
+                        'type'            => 1,
+                        'counts'          => $v->counts,
                     ]);
-                }else{
+                } else {
                     DB::table($db_name)
-                        ->where('id','=',$temp_check->id)
-                        ->increment('counts',$v->counts);
+                        ->where('id', '=', $temp_check->id)
+                        ->increment('counts', $v->counts);
                 }
             }
         }
 
     }
 
+    public function liveSubAddUserBind() {
+        $source     = [
+            [
+                'user_id' => 884066,
+                'live_id' => 276,
+                'phone'   => 18522222291,
+            ],
+            [
+                'user_id' => 5920535,
+                'live_id' => 334,
+                'phone'   => 18511111002
+            ]
+        ];
+        $begin_time = date('Y-m-d 00:00:00');
+        $end_time   = date('Y-m-d 23:59:59', strtotime("+1 years"));
 
+        foreach ($source as $v) {
+            $sub_list = DB::table('nlsg_subscribe as s')
+                ->join('nlsg_user as u', 's.user_id', '=', 'u.id')
+                ->where('s.type', '=', 3)
+                ->where('s.relation_id', '=', $v['live_id'])
+                ->where('s.twitter_id', '=', $v['user_id'])
+                ->where('s.status', '=', 1)
+                ->where('s.is_del', '=', 0)
+                ->where('u.is_test_pay', '=', 0)
+                ->where('u.phone', 'like', '1%')
+                ->groupBy('u.id')
+                ->pluck('u.phone')
+                ->toArray();
+
+            $temp_array = [];
+            foreach ($sub_list as $slv) {
+                $temp_array[] = [
+                    'parent'   => $v['phone'],
+                    'son'      => $slv,
+                    'life'     => 2,
+                    'begin_at' => $begin_time,
+                    'end_at' => $end_time,
+                    'channel'  => 4,
+                    'status'   => 1
+                ];
+            }
+
+            $temp_array = array_chunk($temp_array,200);
+            foreach ($temp_array as $tav){
+                DB::table('nlsg_vip_user_bind')->insertOrIgnore($tav);
+            }
+        }
+
+
+    }
 
 }
