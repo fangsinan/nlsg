@@ -592,6 +592,8 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('camp/get_camp_detail', 'CampController@getCampDetail');
     Route::any('camp/get_lecture_list', 'CampController@getLectureList');
     Route::any('camp/camp_study', 'CampController@campStudy');
+    // 海报图
+    Route::any('image/get_qr_code', 'ImageController@GetQrCode');
     
     /**     5.0 API  END    ***/
 });
