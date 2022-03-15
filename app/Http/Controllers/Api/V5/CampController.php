@@ -169,11 +169,28 @@ class CampController extends Controller
                 $column['end_show'] = 1;
             }
         }
+        $type = 7;
+        $history_type = 5; //训练营 历史记录type值
+        $getInfo_type = 4; //训练营 info type值
 
+
+        $is_sub = Subscribe::isSubscribe($user_id, $column_id, $type);
         $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image');
+        $column_data['is_sub'] = $is_sub;
+        //查询总的历史记录进度`
+        $hisCount = History::getHistoryCount($column_id, $history_type, $user_id);  //讲座
 
+
+        $column_data['history_count'] = 0;
+        if ($column_data['info_num'] > 0) {
+            $column_data['history_count'] = round($hisCount / $column_data['info_num'] * 100);
+        }
+
+        //历史记录
+        $historyData = History::getHistoryData($column_id, $history_type, $user_id);
         return $this->success([
             'list' => $column,
+            'historyData' => $historyData,
         ]);
     }
 
@@ -299,22 +316,19 @@ class CampController extends Controller
 
 
 
-        $column_data['is_sub'] = $is_sub;
+        // $column_data['is_sub'] = $is_sub;
         //查询总的历史记录进度`
-        $hisCount = History::getHistoryCount($lecture_id, $history_type, $user_id);  //讲座
+        // $hisCount = History::getHistoryCount($lecture_id, $history_type, $user_id);  //讲座
 
 
-        $column_data['history_count'] = 0;
-        if ($column_data['info_num'] > 0) {
-            $column_data['history_count'] = round($hisCount / $column_data['info_num'] * 100);
-        }
+        // $column_data['history_count'] = 0;
+        // if ($column_data['info_num'] > 0) {
+        //     $column_data['history_count'] = round($hisCount / $column_data['info_num'] * 100);
+        // }
 
-        $historyData = History::getHistoryData($lecture_id, $history_type, $user_id);
+        // $historyData = History::getHistoryData($lecture_id, $history_type, $user_id);
 
-        return $this->success([
-            'info' => $info,
-            'historyData' => $historyData
-        ]);
+        return $this->success($info);
     }
 
 
