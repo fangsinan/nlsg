@@ -684,6 +684,12 @@ class IndexController extends ControllerBackend
                     ]
                 );
             }
+        }else{
+            LivePoster::query()
+                ->where('live_id','=',$live_info_data['live_pid'])
+                ->update([
+                    'status'=>3
+                ]);
         }
 
 
