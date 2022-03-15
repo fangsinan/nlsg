@@ -187,10 +187,9 @@ class CampController extends Controller
         }
 
         //历史记录
-        $historyData = History::getHistoryData($column_id, $history_type, $user_id);
+        $column['historyData'] = History::getHistoryData($column_id, $history_type, $user_id);
         return $this->success([
-            'list' => $column,
-            'historyData' => $historyData,
+            'list' => $column
         ]);
     }
 
