@@ -7,6 +7,7 @@ use App\Models\Column;
 use App\Models\ColumnEndShow;
 use App\Models\ColumnWeekReward;
 use App\Models\History;
+use App\Models\Poster;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\WorksInfo;
@@ -168,6 +169,8 @@ class CampController extends Controller
                 $column['end_show'] = 1;
             }
         }
+
+        $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image');
 
         return $this->success([
             'list' => $column,

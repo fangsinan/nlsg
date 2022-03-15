@@ -9,11 +9,12 @@ use Illuminate\Http\Request;
 
 class ImageController extends Controller
 {
+    
    /**
-     * @api {get} api/v5/image/get_qr_code 海报多图弹窗
-     * @apiVersion 4.0.0
+     * @api {get} api/v5/image/get_qr_poster 海报多图弹窗
+     * @apiVersion 5.0.0
      * @apiName  get_qr_code
-     * @apiGroup Five Code
+     * @apiGroup FiveCode
      *
      * @apiParam {number} relation_type 类型 1.精品课程2.商城3.直播   4 购买360   5 大咖讲书  6训练营
      * @apiParam {number} relation_id   数据id 课程id  商品id  直播id
