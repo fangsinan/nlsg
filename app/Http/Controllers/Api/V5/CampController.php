@@ -230,7 +230,6 @@ class CampController extends Controller
      */
     public function getLectureList(Request $request)
     {
-
         $lecture_id = $request->input('lecture_id', 0);
         $order = $request->input('order', 'asc');
         $flag = $request->input('flag', '');
@@ -301,7 +300,7 @@ class CampController extends Controller
         $historyData = History::getHistoryData($lecture_id, $history_type, $user_id);
 
         return $this->success([
-            'lecture_data' => $column_data,
+            // 'lecture_data' => $column_data,
             'info' => $info,
             'historyData' => $historyData
         ]);
