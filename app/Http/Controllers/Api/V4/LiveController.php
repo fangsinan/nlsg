@@ -1444,6 +1444,15 @@ class LiveController extends Controller
             //按渠道更新预约人数
             LiveStatistics::countsJob($info_id,1,$twitter_id);
 
+            LiveCountDown::create([
+                'live_id' => $info_id,
+                'user_id' => $this->user['id'],
+                'phone' => $user->phone,
+                'new_vip_uid' => $twitter_id,
+            ]);
+
+            Live::where(['id' => $live['live_pid']])->increment('order_num');
+
             //334 团中央预约保护 18511111002
             //276 电视渠道  18522222291
             //添加关系保护
@@ -1481,15 +1490,6 @@ class LiveController extends Controller
 
 //                DB::table('nlsg_vip_user_bind')->insertOrIgnore($temp_user_bind_array);
             }
-
-            LiveCountDown::create([
-                'live_id' => $info_id,
-                'user_id' => $this->user['id'],
-                'phone' => $user->phone,
-                'new_vip_uid' => $twitter_id,
-            ]);
-
-            Live::where(['id' => $live['live_pid']])->increment('order_num');
 
             return success('发送成功');
 

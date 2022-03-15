@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers\Api\V5;
 
-use AlibabaCloud\Client\Request\Request as RequestRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\ColumnEndShow;
 use App\Models\ColumnWeekReward;
-use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
-use LDAP\Result;
 
 class CampController extends Controller
 {
@@ -159,6 +157,17 @@ class CampController extends Controller
 
         $user = User::find($column['user_id']);
         $column['title'] = $user['honor'] ?? '';
+        // 结营后是否弹学习证书
+        $column['end_show'] = 0;
+        if($column['is_start'] == 2){
+            $show = ColumnEndShow::where([
+                'user_id' =>$user_id,
+                'relation_id' =>$column_id,
+            ])->first();
+            if(!empty($show)){
+                $column['end_show'] = 1;
+            }
+        }
 
         return $this->success([
             'list' => $column,
@@ -300,7 +309,6 @@ class CampController extends Controller
         $historyData = History::getHistoryData($lecture_id, $history_type, $user_id);
 
         return $this->success([
-            // 'lecture_data' => $column_data,
             'info' => $info,
             'historyData' => $historyData
         ]);
@@ -361,6 +369,48 @@ class CampController extends Controller
             'week_day' => $reward,
         ]);
     }
+
+
+
+
+        /**
+     * @api {get} /api/v5/camp/camp_end_show 训练营结营弹窗
+     * @apiName camp_end_show
+     * @apiVersion 5.0.0
+     * @apiGroup five_Camp
+     *
+     * @apiParam {int} id  训练营id
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "column_info": {
+     * }
+     * }
+     * }
+     */
+
+    public function campEndShow(Request $request)
+    {
+        $column_id = $request->input('id', 0);
+       
+        $user_id = $this->user['id'] ?? 0;
+        if (empty($column_id)) {
+            return $this->error(0, 'column_id 不能为空');
+        }
+        ColumnEndShow::firstOrCreate([
+            'user_id' =>$user_id,
+            'relation_id' =>$column_id,
+        ]);
+
+        return $this->success();
+    }
+
+
+
 
 
 }
