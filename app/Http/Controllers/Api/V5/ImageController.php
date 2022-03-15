@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 
 class ImageController extends Controller
 {
-    
+
    /**
-     * @api {get} api/v5/image/get_qr_poster 海报多图弹窗
+     * @api {get} api/v5/image/get_qr_poster 弹窗
      * @apiVersion 5.0.0
      * @apiName  get_qr_code
      * @apiGroup FiveCode
