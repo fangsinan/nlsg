@@ -12,6 +12,7 @@ use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LDAP\Result;
 
 class CampController extends Controller
@@ -159,6 +160,17 @@ class CampController extends Controller
 
         $user = User::find($column['user_id']);
         $column['title'] = $user['honor'] ?? '';
+        // 结营后是否弹学习证书
+        $column['end_show'] = 0;
+        if($column['is_start'] == 2){
+            $show = DB::table("nlsg_column_end_show")->where([
+                'user_id' =>$user_id,
+                'relation_id' =>$column_id,
+            ])->first();
+            if(!empty($show)){
+                $column['end_show'] = 1;
+            }
+        }
 
         return $this->success([
             'list' => $column,
@@ -300,7 +312,6 @@ class CampController extends Controller
         $historyData = History::getHistoryData($lecture_id, $history_type, $user_id);
 
         return $this->success([
-            // 'lecture_data' => $column_data,
             'info' => $info,
             'historyData' => $historyData
         ]);
