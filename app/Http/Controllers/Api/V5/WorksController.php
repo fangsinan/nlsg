@@ -516,8 +516,10 @@ class WorksController extends Controller
                 User::where(['id'=>$user_id])->increment('history_num');
             }
             $id = $his->id;
+            $end_time = [];
         }else{
             $id = $check_his->id ?? 0;
+            $end_time = $check_his->end_time ?? '';
         }
 
 
@@ -529,6 +531,10 @@ class WorksController extends Controller
         ];
         if( $time_leng >= 96 ){
             $edit_data['is_end'] = 1;
+            //更新end时间
+            if( empty($end_time) ){
+                $edit_data['end_time'] = date("Y-m-d H:i:s");
+            }
             // is_end 之后需要统计是否奖励
             $column = new Column();
             $column->campStudy($relation_id,$user_id,$os_type);
