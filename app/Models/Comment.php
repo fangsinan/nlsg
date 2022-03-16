@@ -48,7 +48,7 @@ class Comment extends Base
             'reply.from_user:id,nickname,headimg', 'reply.to_user:id,nickname,headimg'
         ])
             ->select('id', 'pid', 'user_id', 'relation_id', 'info_id', 'content', 'forward_num',
-                'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality')
+                'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality','is_top')
             ->where('relation_id', $id);
         if ($info_id) {
             $query->where('info_id', $info_id);
@@ -65,6 +65,7 @@ class Comment extends Base
                 return $query->where('user_id', $res['user_id']);
             })
 //            ->orderBy($order, 'desc')
+            ->orderBy('is_top', 'desc')            
             ->orderBy('reply_num', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
