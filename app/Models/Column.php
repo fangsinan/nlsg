@@ -40,7 +40,8 @@ class Column extends Base
         $category = WorksCategory::select('name')->where(['id'=>$column['category_id'],'type'=>2])->first();
         $column['category_name'] = $category->name ??'';
         //作者信息
-        $user = User::find($column['user_id']);
+        $user = User::select('id','phone','nickname','openid','wxopenid','unionid','birthday','sex','teacher_title','province','city','headimg','headcover','intro','fan_num')
+                ->find($column['user_id']);
         $column['teacher_data'] = $user;
 
         //是否关注

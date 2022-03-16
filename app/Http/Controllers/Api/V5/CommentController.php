@@ -13,6 +13,7 @@ use App\Models\Attach;
 use App\Models\Like;
 use App\Models\Works;
 use App\Models\Wiki;
+use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
@@ -319,6 +320,34 @@ class CommentController extends Controller
 
 
     }
+    // 评论置顶
+    public function editTop(Request $request)
+    {
+        $id = $request->input('id');
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'bail:required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first());
+        }
 
 
+        if( empty($this->user['backend_user']) ){
+            return $this->error(1000,'没有权限操作');
+        }
+
+        $comment =  Comment::where('id', $id)->first();
+        if (!$comment){
+            return $this->error(1000,'评论不存在');
+        }
+       
+        $res = Comment::where('id', $id)->update(['is_top' => 1]);
+        if(empty($res)){
+            return $this->error(0,'操作失败');
+        }
+        return $this->success();
+
+
+    }
 }
