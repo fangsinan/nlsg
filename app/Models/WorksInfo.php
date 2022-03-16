@@ -91,6 +91,11 @@ class WorksInfo extends Base
                     $works_data[$key]['time_number'] = $his_data->time_number;
                     $works_data[$key]['time_is_end'] = $his_data->is_end;
                 }
+
+                // 章节是否点赞
+                if($type ==4){
+                    $works_data[$key]['info_is_like'] = ContentLike::isLike(5,$relation_id,$user_id,$val['id']);
+                }
             }
         }
 

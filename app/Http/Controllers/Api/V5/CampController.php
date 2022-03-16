@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\ColumnEndShow;
 use App\Models\ColumnWeekReward;
+use App\Models\ContentLike;
 use App\Models\History;
 use App\Models\Poster;
 use App\Models\Subscribe;
@@ -426,7 +427,31 @@ class CampController extends Controller
     }
 
 
+    /**
+     * @api {get} /api/v5/camp/camp_like  点赞
+     * 
+     * @apiParam {int} relation_id  对应id
+     * @apiParam {int} user_id  用户id
+     * @apiParam {int} info_id  当前章节
 
+     */
+    public function campLike(Request $request)
+    {
+        // $type = $request->input('type', 0);
+        $relation_id = $request->input('relation_id', 0);
+        $info_id = $request->input('info_id', 0);
+        $user_id = $this->user['id'] ?? 0;
+
+        if (empty($relation_id) || empty($user_id) || empty($info_id)) {
+            return $this->error(0, 'relation_id 或者 user_id 、info_id不能为空');
+        }
+
+        $like_res = ContentLike::editLike($user_id, $relation_id, 5, $info_id);
+        if(empty($like_res)){
+            return $this->error(0,'点赞失败');
+        }
+        return $this->success();
+    }
 
 
 }

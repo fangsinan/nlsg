@@ -455,7 +455,7 @@ class WorksController extends Controller
      * @api {get} api/v5/works/edit_history_time  更新学习进度 时长及百分比
      * @apiName edit_history_time
      * @apiVersion 1.0.0
-     * @apiGroup five_Camp
+     * @apiGroup works
      *
      * @apiParam {int} relation_id  对应id
      * @apiParam {int} relation_type 1专栏   2讲座   3听书    4精品课程    5训练营
@@ -481,7 +481,7 @@ class WorksController extends Controller
         ]);
 
 
-        $user_id    = 211172;//$this->user['id'] ?? 0;
+        $user_id    = $this->user['id'] ?? 0;
         $relation_id  = $request->input('relation_id',0);
         $relation_type  = $request->input('relation_type',0);
         $time_leng  = $request->input('time_leng',0);

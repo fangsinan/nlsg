@@ -587,10 +587,14 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         Route::get('works/edit_history_time', 'WorksController@editHistoryTime');
         //训练营
         Route::any('camp/camp_end_show', 'CampController@campEndShow');
+        Route::get('camp/camp_like', 'CampController@campLike');
 
 
 
         Route::post('order/create_teacher_order', 'OrderController@createTeacherOrder');
+        
+        
+        
     });
     
     //训练营
