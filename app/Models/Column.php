@@ -222,8 +222,8 @@ class Column extends Base
 
     // 训练营学习  相关
     public function campStudy($camp_id,$user_id,$os_type){
-
-        $column_data = Column::find($camp_id);
+ 
+        $column_data = Column::select('id','info_column_id','end_time','show_info_num')->find($camp_id);
         if (empty($column_data)) {
             return ['code'=>0,'msg'=> '参数有误：无此信息'];
         }
@@ -238,18 +238,19 @@ class Column extends Base
         // if($is_sub ==0){
         //     return ['code'=>0,'msg'=> '您当前尚未加入该训练营'];
         // }
+        $week_count = (($column_data['show_info_num']-1) / 6);  //去除先导片  开了几周课  其他周为未开始发放奖励状态
 
         //仅限于训练营  因为多期训练营共用同一章节
         $getInfo_id = $column_data['info_column_id'] > 0 ? $column_data['info_column_id']:$column_data['id'];
 
-        //查询章节、
+        //查询总章节、
         $work_info_ids = WorksInfo::where([
             'column_id'=> $getInfo_id,
             'type'=> 1,
             'status'=> 4,
         ])->where('rank','>',0)->orderBy('rank','asc')->pluck('id')->toArray();;
 
-        // 查看每周的章节是否学习完成
+        // 查看总章节是否学习完成
         $his_data = History::where([
             'relation_id'   => $column_data['id'],
             'user_id'       => $user_id,
@@ -277,36 +278,35 @@ class Column extends Base
             'os_type'=>$os_type,
         ];
         foreach($info_ids as $key=>$val){
-            // dd($val);
+
             $is_end = 0;
-            //跟历史记录对比 交集和差集   一致说明学习完了
-            if(!array_diff($val,array_intersect($val,$his_data))){
-                // $week_day[$key+1]['is_end'] = 1;
+            $data['speed_status'] = 0;        // 未开始领取
+            //跟历史记录对比 交集和差集   一致说明本周学习完了
+            $diff_arr = array_diff($val,array_intersect($val,$his_data));
+            if( count($diff_arr) >0  ){
+                $data['speed_status'] = 1; //学习未完成
+            }else if(!$diff_arr){
                 $is_end = 1;
                 $data['end_time'] = date("Y-m-d H:i:s");
+                $data['speed_status'] = 2; //学习完成
             }
             $data['is_end'] = $is_end;
             $data['week_num'] = $key+1;
-            
+
+            if( $data['week_num'] > $week_count){
+                $data['speed_status'] = 0;  //学习奖励不开放领取
+            }
            
             $Reward = ColumnWeekReward::where([
-                'relation_id'=>$camp_id,
-                'user_id'=>$user_id,
-                'week_num' => $key+1,
+                'relation_id'   =>$camp_id,
+                'user_id'       =>$user_id,
+                'week_num'      => $key+1,
             ])->first();
             if(!empty($Reward)){
                 ColumnWeekReward::where(['id'=>$Reward->id])->update($data);
             }else{
                 ColumnWeekReward::create($data);
             }
-            // 记录完结时间   
-            // $res = ColumnWeekReward::updateOrCreate([
-            //         'relation_id'=>$camp_id,
-            //         'user_id'=>$user_id,
-            //         'week_num' => $key+1,
-            //         'is_end'=>$is_end,
-            //         'os_type'=>$os_type,
-            //     ]);
         }
     }
 

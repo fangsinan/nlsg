@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
+use App\Models\CampPrize;
 use App\Models\Column;
 use App\Models\ColumnEndShow;
 use App\Models\ColumnWeekReward;
@@ -13,6 +14,7 @@ use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CampController extends Controller
 {
@@ -352,39 +354,90 @@ class CampController extends Controller
      * }
      */
     public function campStudy(Request $request){
-        $camp_id = $request->input('id', 0);  //训练营id
-        $user_id = $this->user['id'] ?? 0;
 
+        $validator = Validator::make($request->all(), [
+            'id' => 'bail:required|numeric',
+            // 'info_id' => 'bail:numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first());
+        }
+        $camp_id = $request->input('id', 0);  //训练营id
+        // $camp_info_id = $request->input('info_id', 0);  
+        $user_id = $this->user['id'] ?? 0;
+        // is_show      结营后三天不显示奖励弹窗
+        // now_week     获得第几周的奖励 当前学习的章节是第N周 就显示获得第N周的奖励 
+        // 周奖励状态     status  0未领取  1待领取  2 需补卡 3没资格领取
+        // 奖品信息   
 
         $column_data = Column::find($camp_id);
         if (empty($column_data)) {
             return $this->error(0, '参数有误：无此信息');
         }
-        // 训练营 每周开放六节课程 周日不开课  
-        // 查询训练营目前开放的全部课程 ，没六个章节为一周，查询历史记录表是否完结
+
+        // 训练营 每周开放六节课程   
+        // 查询训练营目前开放的全部课程 ，每六个章节为一周，查询历史记录表是否完结
         $is_sub = Subscribe::isSubscribe($user_id, $column_data['id'], 7);
         if($is_sub ==0){
             return $this->error(0,'您当前尚未加入该训练营');
         }
-        
-        $reward = ColumnWeekReward::select('week_num','is_get','is_end','end_time')->where([
-            'user_id'       => $user_id,
-            'relation_id'   => $column_data['id'],
-            // 'is_get'        => 0,  //  未领取奖励
-            // 'is_end'        => 1,   // 已完成听课
-        ])->get()->toArray();
+        // crm_camp_prize  奖品
+        $prize = CampPrize::select('week_num','title as prize_title','cover_pic as prize_pic')->where(['camp_id'=>$column_data['id'],'status'=>1])->get()->toArray();
+        $prize = array_column($prize,null,'week_num');
 
-        $is_show = 0;
-        foreach($reward as $key=>$val){
-            if($val['is_get'] == 0&&$val['is_end']==1){
-                $is_show = 1;
-            }
+        
+
+        $res = [
+            'is_show'   =>0,
+            'now_week'  =>0,
+            'week_day'  =>(object)[],
+        ];
+        // 结营三天后  不显示弹窗
+        if( $column_data['is_start'] == 2 &&
+            strtotime("+3 day",strtotime($column_data['end_time'])) <= time() ){
+            return $this->success($res); 
         }
 
-        return $this->success([
-            'is_show' => $is_show,
-            'week_day' => $reward,
-        ]);
+
+        $reward = ColumnWeekReward::select('week_num','is_get','speed_status','end_time')->where([
+            'user_id'       => $user_id,
+            'relation_id'   => $column_data['id'],
+        ])->orderBy('week_num')->get()->toArray();
+
+        $is_show = 0;
+        $now_week = 1;
+        $new_reward = [];
+        foreach($reward as $key=>$val){
+
+
+            //3已领取，2待领取，1补卡领取，0未开始
+            if($val['speed_status'] == 2 && $val['is_get'] == 1){
+                $status = 3;
+                
+            }else if( $val['speed_status'] == 2 && $val['is_get'] == 0 ){
+                $status = 2;
+                $now_week = $val['week_num'];
+                $is_show = 1;
+            }else if( $val['speed_status'] == 1 && $val['is_get'] == 0 ){
+                $status = 1;
+            }else if( $val['speed_status'] == 0 ){
+                $status = 0;
+            }
+
+            $new_reward[$key] = [
+                'week_num' => $val['week_num'],
+                'status' => $status,
+                'prize_title' => $prize[$val['week_num']]['prize_title'] ??'',
+                'prize_pic' => $prize[$val['week_num']]['prize_pic'] ??'',
+            ];
+        }
+
+        $res = [
+            'is_show'   => $is_show,
+            'now_week'  => $now_week,
+            'week_day'  =>$new_reward,
+        ];
+        return $this->success($res);
     }
 
 
