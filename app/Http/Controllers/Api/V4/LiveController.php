@@ -310,7 +310,8 @@ class LiveController extends Controller
 
         $testers = explode(',', ConfigModel::getData(35, 1));
         $user = User::where('id', $uid)->first();
-
+		
+		$day_time=date("Y-m-d",strtotime("-1 day"));
         $query = Live::query();
         if (!$uid || ($user && !in_array($user->phone, $testers))) {
             $query->where('is_test', '=', 0);
@@ -321,6 +322,7 @@ class LiveController extends Controller
             ->select('id', 'user_id', 'title', 'describe', 'price',
                 'cover_img', 'begin_at', 'type', 'end_at','steam_begin_time',
                 'playback_price', 'is_free', 'password', 'order_num')
+			->where('begin_at','>', $day_time)
             ->where('status', 4)
             ->where('is_finish', 0)
             ->where('is_del', 0)
