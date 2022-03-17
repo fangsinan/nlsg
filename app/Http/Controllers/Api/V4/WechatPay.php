@@ -1970,7 +1970,7 @@ class WechatPay extends Controller
                         'user_id'   => $user_id, //会员id
                         'type'      => 8, //专题
                         'status'    => 1,
-                        'relation_id' => 40,
+                        'relation_id' => $orderInfo['relation_id'],
                     ])->update([
                         'end_time' => DB::raw("DATE_ADD(end_time, interval+1 year)"),
                         ]);
