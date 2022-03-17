@@ -589,6 +589,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         //训练营
         Route::any('camp/camp_end_show', 'CampController@campEndShow');
         Route::get('camp/camp_like', 'CampController@campLike');
+        Route::get('camp/camp_study_get', 'CampController@campStudyGet');
 
         Route::post('order/create_teacher_order', 'OrderController@createTeacherOrder');
         

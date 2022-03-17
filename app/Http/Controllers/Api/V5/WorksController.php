@@ -16,6 +16,7 @@ use App\Models\WorksInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class WorksController extends Controller
 {
@@ -488,6 +489,21 @@ class WorksController extends Controller
         $time_number= $request->input('time_number',0);
         $works_info_id = $request->input('works_info_id',0);
         $os_type = $request->input('os_type',0);
+        
+        $validator = Validator::make($request->all(), [
+            'relation_id' => 'required|numeric',
+            'relation_type' => 'required|numeric',
+            'time_leng' => 'required|numeric|max:100',
+            'time_number' => 'required|numeric|min:1',
+            'works_info_id' => 'required|numeric',
+            // 'info_id' => 'bail:numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first());
+        }
+
+
+
 
         if( empty($user_id) || empty($relation_id) || empty($relation_type)){
             return $this->success();

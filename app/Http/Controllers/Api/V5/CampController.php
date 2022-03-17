@@ -356,7 +356,7 @@ class CampController extends Controller
     public function campStudy(Request $request){
 
         $validator = Validator::make($request->all(), [
-            'id' => 'bail:required|numeric',
+            'id' => 'required|numeric',
             // 'info_id' => 'bail:numeric',
         ]);
         if ($validator->fails()) {
@@ -440,6 +440,28 @@ class CampController extends Controller
         return $this->success($res);
     }
 
+    // /api/v5/camp/camp_study_get  奖励领取操作
+    public function campStudyGet(Request $request)
+    {
+        $validator = Validator::make($request->input(), [
+            'id' => 'required|numeric',
+            // 'info_id' => 'bail:required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first());
+        }
+        $column_id = $request->input('id');
+        $user_id = $this->user['id'] ?? 0;
+        ColumnWeekReward::where([
+            'user_id'       => $user_id,
+            'relation_id'   => $column_id,
+            'speed_status'   => 2,
+        ])->update([
+            'is_get' =>1
+        ]);
+
+        return $this->success();
+    }
 
 
 
