@@ -73,9 +73,14 @@ class Comment extends Base
 
         if ($lists['data']) {
             foreach ($lists['data'] as &$v) {
+                $v['user']['new_vip'] = VipUser::newVipInfo($v['user']['id'])['vip_id'] ?1:0;
+
                 //需求变化需要展示回复【回复者】的评论内容
                 if(!empty($v['reply'])){
                     foreach ($v['reply'] as $rep_k=>$rep_v){
+                        $v['reply'][$rep_k]['from_user']['new_vip'] = VipUser::newVipInfo($rep_v['from_user']['id'])['vip_id'] ?1:0;
+                        $v['reply'][$rep_k]['to_user']['new_vip'] = VipUser::newVipInfo($rep_v['to_user']['id'])['vip_id'] ?1:0;
+
 //                        $rep_v = $this->getReplay($rep_v['id']);
                         $v['reply'][$rep_k]['is_like'] = Like::isLike($rep_v['id'],2,$uid,$like_type);
                         $v['reply'][$rep_k]['created_at'] = History::DateTime($rep_v['created_at']);
@@ -110,6 +115,9 @@ class Comment extends Base
         if(!empty($reply_data)){
             foreach ($reply_data as $getReplay_key=>$getReplay_val){
                 //是否喜欢
+                $getReplay_val['from_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['from_user']['id'])['vip_id'] ?1:0;
+                $getReplay_val['to_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['to_user']['id'])['vip_id'] ?1:0;
+
                 $getReplay_val['is_like'] = Like::isLike($getReplay_val['id'],2,$uid,$like_type);
                 $getReplay_val['created_at'] = History::DateTime($getReplay_val['created_at']);
                 $getReplay_val['reply'] = $this->getReplay($getReplay_val['id'],$uid,$like_type);
