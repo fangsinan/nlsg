@@ -45,7 +45,7 @@ class Comment extends Base
                     ->where('status', 1);
                 //->limit(5); limit是只显示列表评论总体的5条回复
             },
-            'reply.from_user:id,nickname,headimg', 'reply.to_user:id,nickname,headimg'
+            'reply.from_user:id,nickname,headimg,is_author', 'reply.to_user:id,nickname,headimg,is_author'
         ])
             ->select('id', 'pid', 'user_id', 'relation_id', 'info_id', 'content', 'forward_num',
                 'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality','is_top')
@@ -104,7 +104,7 @@ class Comment extends Base
         $subs = [];
 
         $reply_data = CommentReply::with([
-            'from_user:id,nickname,headimg', 'to_user:id,nickname,headimg'
+            'from_user:id,nickname,headimg,is_author', 'to_user:id,nickname,headimg,is_author'
         ])->where(['reply_pid'=>$pid,'status'=>1])->get()->toArray();
 
         if(!empty($reply_data)){
@@ -128,7 +128,7 @@ class Comment extends Base
             return false;
         }
         $comment = Comment::with([
-            'user:id,nickname,headimg',
+            'user:id,nickname,headimg,is_author',
             'quote:id,pid,content',
             'attach:id,relation_id,img',
             'reward' => function ($query) {
@@ -136,7 +136,7 @@ class Comment extends Base
                     ->where(['type' => 5, 'reward_type' => 3, 'status' => 1])
                     ->groupBy('user_id');
             },
-            'reward.user:id,nickname,headimg'
+            'reward.user:id,nickname,headimg,is_author'
         ])
             ->select('id', 'pid', 'user_id', 'relation_id', 'is_quality', 'content',
                 'forward_num', 'share_num', 'like_num', 'reply_num', 'reward_num', 'created_at', 'type')
@@ -165,8 +165,8 @@ class Comment extends Base
         }
 
         $reply = CommentReply::with([
-            'from_user:id,nickname,headimg',
-            'to_user:id,nickname,headimg'
+            'from_user:id,nickname,headimg,is_author',
+            'to_user:id,nickname,headimg,is_author'
         ])
             ->select(['id', 'from_uid', 'to_uid', 'content', 'created_at'])
             ->where('comment_id', $id)
