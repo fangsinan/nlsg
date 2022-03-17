@@ -596,13 +596,13 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         
     });
     //训练营
-    Route::any('camp/get_camp_list', 'CampController@getCampList')->middleware('replaceNull');
+    Route::any('camp/get_camp_list', 'CampController@getCampList');//->middleware('replaceNull');
     // Route::any('camp/get_camp_detail', 'CampController@getCampDetail')->middleware('ReplaceNull');
-    Route::any('camp/get_camp_detail', 'CampController@getCampDetail')->middleware('replaceNull');
-    Route::any('camp/get_lecture_list', 'CampController@getLectureList')->middleware('replaceNull');
-    Route::any('camp/camp_study', 'CampController@campStudy')->middleware('replaceNull');
+    Route::any('camp/get_camp_detail', 'CampController@getCampDetail');//->middleware('replaceNull');
+    Route::any('camp/get_lecture_list', 'CampController@getLectureList');//->middleware('replaceNull');
+    Route::any('camp/camp_study', 'CampController@campStudy');//->middleware('replaceNull');
     // 海报图
-    Route::any('image/get_qr_code', 'ImageController@GetQrCode')->middleware('replaceNull');
+    Route::any('image/get_qr_code', 'ImageController@GetQrCode');//->middleware('replaceNull');
     
     /**     5.0 API  END    ***/
 });
