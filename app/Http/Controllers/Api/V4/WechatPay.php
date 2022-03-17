@@ -65,7 +65,7 @@ class WechatPay extends Controller
             return self::mallOrder($data);
         } elseif ($data['attach'] == 9) { //精品课 OK  代理商返佣50%
             return self::PayExcellent($data);
-        } elseif ($data['attach'] == 10) { //过度到直播类型  
+        } elseif ($data['attach'] == 10) { //过度到直播类型
             return self::PayLive($data);
         } elseif ($data['attach'] == 11) { // 处理直播视频
             return self::PayLive($data);
@@ -633,7 +633,7 @@ class WechatPay extends Controller
         }
         Redis::rpush($key, $res);
 
-        if(in_array($type,[11,14,16,18])){
+        /*if(in_array($type,[11,14,16,18])){
 //            if($live_id==19) {
                 $redisConfig = config('database.redis.default');
                 $redis = new Client($redisConfig);
@@ -641,7 +641,7 @@ class WechatPay extends Controller
                 $publishMsg=json_encode(['live_id'=>$live_id,'order_id'=>$orderid,'msg'=>$res]);
                 $redis->publish('pushOrder', $publishMsg);
 //            }
-        }
+        }*/
 
 //        Redis::setex($key,600,json_encode($res,true));
         if ($orderid) {
