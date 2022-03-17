@@ -39,7 +39,7 @@ class Comment extends Base
 
         $order = $order == 1 ? 'reply_num' : 'created_at';
         $query = Comment::with([
-            'user:id,nickname,headimg', 'quote:id,pid,content', 'attach:id,relation_id,img',
+            'user:id,nickname,headimg,is_author', 'quote:id,pid,content', 'attach:id,relation_id,img',
             'reply' => function ($query) {
                 $query->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
                     ->where('status', 1);
