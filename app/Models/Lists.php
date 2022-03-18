@@ -96,6 +96,7 @@ class Lists extends Model
                                 $query->select('id','nickname', 'headimg','teacher_title');
                             }])
                             ->where('id', $vv['works_id'])
+                            ->where('status', 4)
                             ->first();
                         //->get()->toArray();
                         $v['list_works'][$kk]['works'] = $works;
