@@ -802,7 +802,7 @@ class WechatPay extends Controller
                         }
                     }
                 }
-                LiveCountDown::create($liveCountDown);
+                // LiveCountDown::create($liveCountDown);
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
