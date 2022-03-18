@@ -5,6 +5,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class History extends Base
 {
@@ -108,6 +109,70 @@ class History extends Base
     public function userInfo(){
         return $this->hasOne(User::class,'id','user_id');
     }
+
+
+
+
+
+    public static function HistorySize()
+    {
+        
+        $week_day       = getWeekDay();
+        $week_one       = $week_day['monday'];
+        $top_week_one   = $week_day['top_monday'];
+        $sizes = [3,20];
+        
+        foreach($sizes as $size){
+            $cache_key_name = 'user_his_len_list_'.$size.'_'.$top_week_one;
+            $result = Cache::get($cache_key_name);
+            if ($result) {
+                return $result;
+            }
+
+            //时间小于本周一    大于上周一
+            $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
+                ->where('created_at','>',$top_week_one)
+                ->where('created_at','<',$week_one)
+                ->where('is_del',0)
+                ->orderBy('num', 'desc')->GroupBy("user_id")->limit($size)->get()->toArray();
+            //重新统计num
+            if($size != 3){
+                Lists::where(['type'=>9])->update(['num'=>count($his_data)]);
+            }
+            $user = [];
+            if(!empty($his_data)){
+                $user_ids = array_column($his_data,'user_id');
+
+                $user = User::select('id','nickname', 'phone','headimg')
+                    ->whereIn('id', $user_ids)
+                    ->orderByRaw('FIELD(id,'.implode(',', $user_ids).')')
+                    ->get()->toArray();
+
+
+                foreach ($user as &$user_v){
+                    foreach ($his_data as $his_datum){
+                        if($user_v['id'] == $his_datum['user_id']){
+                            $user_v['his_num_n'] = $his_datum['num'];
+        //                    $user_v['his_num'] = (floor($his_datum['num'] / 3600))."小时".($his_datum['num']%3600).'分钟';
+                            $user_v['his_num'] = SecToTime($his_datum['num']);
+                        }
+                    }
+                }
+            }
+
+            Cache::put($cache_key_name, $user, 86400);
+        }
+        
+        
+    }
+
+
+
+
+
+
+
+
 
 
 }

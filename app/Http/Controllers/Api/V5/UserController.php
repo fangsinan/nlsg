@@ -86,7 +86,7 @@ class UserController extends Controller
                     ->where('created_at','<',$week_one)->where('is_del',0)
                     ->first()->toArray();
 
-                $sql = 'select count(*) as count from (select  sum(time_number) as num,user_id from nlsg_history where created_at > ? and created_at < ? and is_del = 0 group by user_id HAVING sum(time_number )>=?) as count_table';
+                $sql = 'select count(*) as count from (select  sum(time_number) as num,user_id from nlsg_history where created_at > ? and created_at < ? group by user_id HAVING sum(time_number )>=?) as count_table';
                 $his_data = DB::select($sql,[$top_week_one,$week_one,$user_data['num']]);
 
                 $u_data['nickname'] = $this->user['nickname']??'';

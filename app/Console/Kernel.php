@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V4\ImMsgController;
 use App\Http\Controllers\Api\V4\LiveController;
 use App\Http\Controllers\Api\V4\UserWechat;
 use App\Models\Coupon;
+use App\Models\History;
 use App\Models\LiveConsole;
 use App\Models\MallOrder;
 use App\Models\MallOrderFlashSale;
@@ -309,6 +310,7 @@ class Kernel extends ConsoleKernel
 //            UserWechat::AddUserWechat();//通过部门id获取企业客户
             UserWechat::UserWechatEdit(3);
             UserWechat::UserWechatEdit(11);
+            History::HistorySize();
         })->dailyAt('0:01');
     }
 
