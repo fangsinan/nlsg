@@ -17,11 +17,9 @@ use Illuminate\Support\Facades\DB;
 class UserWechatController extends ControllerBackend
 {
 
-//    public function test(){
-//        $UserWechatServers = new UserWechatServers();
-//        $res=$UserWechatServers->get_user_list('DongYue');
-//        var_dump($res);
-//    }
+    public function test(){
+
+    }
 
     /**
      * @api {get} api/admin_v4/user_wechat/search_wechat_user_list 获取微信客户列表
@@ -36,6 +34,7 @@ class UserWechatController extends ControllerBackend
      * @apiParam {string} phone 手机号
      * @apiParam {string} follow_user_userid 跟进客户员工userid
      * @apiParam {string} source_follow_user_userid 来源的客户员工id
+     * @apiParam {string} transfer_status  接替状态， 1-接替完毕 2-等待接替 3-客户拒绝 4-接替成员客户达到上限 5-无接替记录
      *
      * @apiSuccessExample  Success-Response:
      * HTTP/1.1 200 OK
@@ -60,6 +59,10 @@ class UserWechatController extends ControllerBackend
             ->when(!empty($params['name']), function ($query) use ($params) {
                 $query->where('name', $params['name']);
             })
+            ->when(!empty($params['transfer_status']), function ($query) use ($params) {
+                $query->where('transfer_status', $params['transfer_status']);
+            })
+
             ->when(!empty($params['phone']), function ($query) use ($params) {
                 $query->whereHas('user', function ($query) use ($params) {
                     $query->where('phone',  $params['phone'] );
@@ -86,7 +89,7 @@ class UserWechatController extends ControllerBackend
      * @api {get} api/admin_v4/user_wechat/search_wechat_staff_user_list 获取员工列表
      * @apiVersion 4.0.0
      * @apiName  user_wechat/search_wechat_staff_user_list
-     * @apiGroup 后台-获取员工列表
+     * @apiGroup 后台-微信客户管理
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/search_wechat_staff_user_list
      * @apiDescription 获取员工列表
      *
@@ -125,7 +128,7 @@ class UserWechatController extends ControllerBackend
      * @api {get} api/admin_v4/user_wechat/get_wechat_staff_user_list 获取员工列表
      * @apiVersion 4.0.0
      * @apiName  user_wechat/get_wechat_staff_user_list
-     * @apiGroup 后台-获取员工列表
+     * @apiGroup 后台-微信客户管理
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/get_wechat_staff_user_list
      * @apiDescription 获取员工列表
      *
@@ -160,7 +163,7 @@ class UserWechatController extends ControllerBackend
      * @api {get} api/admin_v4/user_wechat/transfer_customer 分配在职成员的客户
      * @apiVersion 4.0.0
      * @apiName  user_wechat/transfer_customer
-     * @apiGroup 后台-分配在职成员的客户
+     * @apiGroup 后台-微信客户管理
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/transfer_customer
      * @apiDescription 分配在职成员的客户
      *
@@ -182,11 +185,11 @@ class UserWechatController extends ControllerBackend
 
         $UserWechatServers = new UserWechatServers();
         $data=$request->input();
-        $data=[
-            'handover_userid'=>'DongYue',
-            'takeover_userid'=>'SunXia',
-            'userids'=>'137399,137400,137401',
-        ];
+//        $data=[
+//            'handover_userid'=>'DongYue',
+//            'takeover_userid'=>'SunXia',
+//            'userids'=>'137399,137400,137401',
+//        ];
         $res=$UserWechatServers->transfer_customer($data);
 
         if(!checkRes($res)){
@@ -200,7 +203,7 @@ class UserWechatController extends ControllerBackend
      * @api {get} api/admin_v4/user_wechat/transfer_result 查询转移客户结果
      * @apiVersion 4.0.0
      * @apiName  user_wechat/transfer_result
-     * @apiGroup 后台-查询转移客户结果
+     * @apiGroup 后台-微信客户管理
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/transfer_result
      * @apiDescription 分配在职成员的客户 定时任务 1小时执行一次
      * @apiSuccessExample  Success-Response:
@@ -228,7 +231,7 @@ class UserWechatController extends ControllerBackend
      * @api {get} api/admin_v4/user_wechat/search_transfer_record 客户转移记录
      * @apiVersion 4.0.0
      * @apiName  user_wechat/search_transfer_record
-     * @apiGroup 后台-客户转移记录
+     * @apiGroup 后台-微信客户管理
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/search_transfer_record
      * @apiDescription 客户转移记录
      * @apiSuccessExample  Success-Response:

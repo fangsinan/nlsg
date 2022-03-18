@@ -448,7 +448,7 @@ class UserWechatServers
 
         $detail_res = json_decode($detail_res, true);
 
-        var_dump($detail_res);
+//        var_dump($detail_res);
 
         $next_cursor = $detail_res['next_cursor'] ?? '';
 
@@ -539,7 +539,6 @@ class UserWechatServers
             $record_list=UserWechatTransferRecord::query()->where('status',UserWechatTransferRecord::STATUS_WAIT)->get();
             if($record_list){
                 foreach ($record_list as $record){
-
 
                     //完成转移的数量
                     $record->finish_total=UserWechatTransferLog::query()->where('transfer_record_id',$record->id)->where('status',UserWechat::TRANSFER_STATUS_FINISH)->count();
