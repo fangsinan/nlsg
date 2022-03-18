@@ -278,6 +278,8 @@ class IndexController extends Controller
 
         $recommendModel = new Recommend();
         $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
+        // 3月18日 直播更改显示当天最新的直播  时间不显示 时分秒   因为推荐直播时间不确定
+
         // $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
         //     'is_free', 'helper')
         //     ->where('begin_at', '>', date("Y-m-d"))
