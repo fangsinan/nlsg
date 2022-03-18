@@ -122,6 +122,7 @@ class Banner extends Base
             $res['jump_type'] = $data->jump_type;
             $res['url'] = $data->url;
             $res['img'] = 'https://image.nlsgapp.com/' . $data->pic;
+            $res['version'] = $data->version;
         }
 
         return $res;
@@ -196,6 +197,19 @@ class Banner extends Base
 //            ->where('start_time', '<=', $now_date)
 //            ->where('end_time', '>', $now_date)
             ->get()->toArray();
+        return $data;
+    }
+
+
+
+    public function CheckBannerVersion($data,$version)
+    {
+        if( !empty($data['version']) ){
+            if( $version < $data['version']){
+                return [];
+            }
+        }
+        unset($data['version']);
         return $data;
     }
 }

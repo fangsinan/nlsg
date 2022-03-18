@@ -351,10 +351,12 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function flashBanner()
+    public function flashBanner(Request $request)
     {
         $bannerModel = new Banner();
         $data = $bannerModel->appPopup(61);
+        $data = $bannerModel->CheckBannerVersion($data,$request->get('version') ?? 0);
+
         $data  = !empty($data) ? $data : new \StdClass();
         return success($data);
     }

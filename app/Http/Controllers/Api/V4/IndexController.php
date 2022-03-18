@@ -1238,10 +1238,14 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function market()
+    public function market(Request $request)
     {
         $bannerModel = new Banner();
         $data = $bannerModel->appPopup(60);
+        
+        $data = $bannerModel->CheckBannerVersion($data,$request->get('version') ?? 0);
+        
+
         $data  = !empty($data) ? $data : new \StdClass();
         return success($data);
         //(1).直播详情   (2).精品课  (3).商品  (4).h5页面  (5).讲座  (6).听书 7 专栏
@@ -1278,10 +1282,11 @@ class IndexController extends Controller
      *     }
      *
      */
-    public function flashBanner()
+    public function flashBanner(Request $request)
     {
         $bannerModel = new Banner();
         $data = $bannerModel->appPopup(61);
+        $data = $bannerModel->CheckBannerVersion($data,$request->get('version') ?? 0);
         $data  = !empty($data) ? $data : new \StdClass();
         return success($data);
     }
