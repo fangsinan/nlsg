@@ -29,6 +29,7 @@ use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
+use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -309,7 +310,8 @@ class LiveController extends Controller
 
         $testers = explode(',', ConfigModel::getData(35, 1));
         $user = User::where('id', $uid)->first();
-
+		
+		$day_time=date("Y-m-d",strtotime("-1 day"));
         $query = Live::query();
         if (!$uid || ($user && !in_array($user->phone, $testers))) {
             $query->where('is_test', '=', 0);
@@ -320,6 +322,7 @@ class LiveController extends Controller
             ->select('id', 'user_id', 'title', 'describe', 'price',
                 'cover_img', 'begin_at', 'type', 'end_at','steam_begin_time',
                 'playback_price', 'is_free', 'password', 'order_num')
+			->where('begin_at','>', $day_time)
             ->where('status', 4)
             ->where('is_finish', 0)
             ->where('is_del', 0)
@@ -1382,7 +1385,7 @@ class LiveController extends Controller
             }
         }
 
-        
+
 
         if( in_array($this->user['id'], [878644, 882057, 882861]) ){
             return error(0, '用户异常');
@@ -1451,6 +1454,31 @@ class LiveController extends Controller
             ]);
 
             Live::where(['id' => $live['live_pid']])->increment('order_num');
+
+            //334 团中央预约保护 18511111002
+            //276 电视渠道  18522222291
+            //添加关系保护
+            $twitter_id = (int)$twitter_id;
+            if (
+                ($info_id === 276 && $twitter_id === 884066) ||
+                ($info_id === 334 && $twitter_id === 5920535)
+            ){
+                if ($twitter_id == 884066){
+                    $t_phone = 18522222291;
+                }else{
+                    $t_phone = 18511111002;
+                }
+                VipUserBind::query()->firstOrCreate([
+                    'son'=>$this->user['phone'],
+                    'status'=>1
+                ],[
+                    'parent'   => $t_phone,
+                    'life'     => 2,
+                    'begin_at' => date('Y-m-d 00:00:00'),
+                    'end_at' => date('Y-m-d 23:59:59', strtotime("+1 years")),
+                    'channel'  => 4,
+                ]);
+            }
 
             return success('发送成功');
 

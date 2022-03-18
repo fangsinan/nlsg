@@ -684,6 +684,12 @@ class IndexController extends ControllerBackend
                     ]
                 );
             }
+        }else{
+            LivePoster::query()
+                ->where('live_id','=',$live_info_data['live_pid'])
+                ->update([
+                    'status'=>3
+                ]);
         }
 
 
@@ -1039,6 +1045,7 @@ class IndexController extends ControllerBackend
             ['title' => "李婷老师直播19.9", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/42798414387702291818027383/v.f100020.mp4',],
             ['title' => "王琨老师公益课", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd2ad1f6387702291813511887/v.f100020.mp4',],
             ['title' => "王琨老师公益课改版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/759d778d387702296506162026/v.f100020.mp4',],
+            ['title' => "王琨老师公益课0316", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/61c8e25e387702297598142528/v.f100020.mp4',],
             ['title' => "王琨老师公益课-哈弗凌晨4点半", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/a19c3d3b387702296741996015/v.f100020.mp4',],
             ['title' => "十商交付第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd3e6ccd387702291813524028/v.f100020.mp4',],
             ['title' => "十商交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/3bb9b74a387702292234507161/v.f100020.mp4',],
@@ -1052,6 +1059,7 @@ class IndexController extends ControllerBackend
             ['title' => "孟祥玲12.3", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/09098962387702292515310042/v.f100020.mp4',],
             ['title' => "六大能力交付第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/3e5b1780387702296648557660/v.f100020.mp4',],
             ['title' => "六大能力交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/39f66604387702296648392559/v.f100020.mp4',],
+            ['title' => "六大能力交付第二天0312", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/75a8b365387702297469168737/v.f100020.mp4',],
         ];
         return success($res);
     }

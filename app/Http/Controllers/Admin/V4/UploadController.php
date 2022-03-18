@@ -17,6 +17,8 @@ class UploadController extends ControllerBackend
             $data = $this->upload(320586);
         } elseif ($type == 'audio') {
             $data = $this->upload(459377, 0);
+        } elseif ($type == 'short_video') {
+            $data = $this->upload(867416, 0);
         }
         return success($data);
     }
@@ -45,7 +47,7 @@ class UploadController extends ControllerBackend
         }
         $arg_list['classId'] = $classId;//分类, 默认视频
 
-        if ($classId == 320586) {
+        if ($classId == 320586 || $classId == 867416) {
             //音频不转码
             //            $arg_list['procedure'] = 'QCVB_SimpleProcessFile({30},0,10,10)';
             $arg_list['procedure'] = 'rwl_ptzm';

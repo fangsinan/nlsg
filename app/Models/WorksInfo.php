@@ -84,12 +84,17 @@ class WorksInfo extends Base
                     'relation_id' => $relation_id,
                     'info_id' => $val['id'],
                     'user_id' => $user_id,
-                    'is_del' => 0,
+                    // 'is_del' => 0,
                 ])->orderBy('updated_at', 'desc')->first();
                 if ($his_data) {
                     $works_data[$key]['time_leng'] = $his_data->time_leng;
                     $works_data[$key]['time_number'] = $his_data->time_number;
                     $works_data[$key]['time_is_end'] = $his_data->is_end;
+                }
+
+                // 章节是否点赞
+                if($type ==4){
+                    $works_data[$key]['info_is_like'] = ContentLike::isLike(5,$relation_id,$user_id,$val['id']);
                 }
             }
         }

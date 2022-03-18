@@ -40,7 +40,8 @@ class Column extends Base
         $category = WorksCategory::select('name')->where(['id'=>$column['category_id'],'type'=>2])->first();
         $column['category_name'] = $category->name ??'';
         //作者信息
-        $user = User::find($column['user_id']);
+        $user = User::select('id','phone','nickname','openid','wxopenid','unionid','birthday','sex','teacher_title','province','city','headimg','headcover','intro','fan_num')
+                ->find($column['user_id']);
         $column['teacher_data'] = $user;
 
         //是否关注
@@ -215,6 +216,98 @@ class Column extends Base
        $list = $query->where($where)->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->paginate($page)->toArray();
         return $list;
+    }
+
+
+
+    // 训练营学习  相关
+    public function campStudy($camp_id,$user_id,$os_type){
+ 
+        $column_data = Column::select('id','info_column_id','end_time','show_info_num')->find($camp_id);
+        if (empty($column_data)) {
+            return ['code'=>0,'msg'=> '参数有误：无此信息'];
+        }
+        // 训练营 每周开放六节课程 周日不开课  
+        // 查询训练营目前开放的全部课程 ，没六个章节为一周，查询历史记录表是否完结
+        
+        // $type = 7;
+        // $history_type = 5; //训练营 历史记录type值
+        // $getInfo_type = 4; //训练营 info type值
+
+        // $is_sub = Subscribe::isSubscribe($user_id, $column_data['id'], $type);
+        // if($is_sub ==0){
+        //     return ['code'=>0,'msg'=> '您当前尚未加入该训练营'];
+        // }
+        $week_count = (($column_data['show_info_num']-1) / 6);  //去除先导片  开了几周课  其他周为未开始发放奖励状态
+
+        //仅限于训练营  因为多期训练营共用同一章节
+        $getInfo_id = $column_data['info_column_id'] > 0 ? $column_data['info_column_id']:$column_data['id'];
+
+        //查询总章节、
+        $work_info_ids = WorksInfo::where([
+            'column_id'=> $getInfo_id,
+            'type'=> 1,
+            'status'=> 4,
+        ])->where('rank','>',0)->orderBy('rank','asc')->pluck('id')->toArray();;
+
+        // 查看总章节是否学习完成
+        $his_data = History::where([
+            'relation_id'   => $column_data['id'],
+            'user_id'       => $user_id,
+            'relation_type' => 5,
+            'is_end'        => 1,
+        ])->groupBy('info_id')->pluck('info_id')->toArray();
+        
+        // 定义周数据
+        // $week_day = [
+        //     1=>['is_end'=>0,],
+        //     2=>['is_end'=>0,],
+        //     3=>['is_end'=>0,],
+        //     4=>['is_end'=>0,],
+        //     5=>['is_end'=>0,],
+        // ];
+        // dd($info_ids);
+        //匹配每周数据是否对应  info_ids 每六节课为一周 去除先导片
+        // array_pop($work_info_ids);
+        $info_ids = array_chunk($work_info_ids,6);
+        
+        $data = [
+            'relation_id'=>$camp_id,
+            'user_id'=>$user_id,
+            'end_time'=>'',
+            'os_type'=>$os_type,
+        ];
+        foreach($info_ids as $key=>$val){
+
+            $is_end = 0;
+            $data['speed_status'] = 0;        // 未开始领取
+            //跟历史记录对比 交集和差集   一致说明本周学习完了
+            $diff_arr = array_diff($val,array_intersect($val,$his_data));
+            if( count($diff_arr) >0  ){
+                $data['speed_status'] = 1; //学习未完成
+            }else if(!$diff_arr){
+                $is_end = 1;
+                $data['end_time'] = date("Y-m-d H:i:s");
+                $data['speed_status'] = 2; //学习完成
+            }
+            $data['is_end'] = $is_end;
+            $data['week_num'] = $key+1;
+
+            if( $data['week_num'] > $week_count){
+                $data['speed_status'] = 0;  //学习奖励不开放领取
+            }
+           
+            $Reward = ColumnWeekReward::where([
+                'relation_id'   =>$camp_id,
+                'user_id'       =>$user_id,
+                'week_num'      => $key+1,
+            ])->first();
+            if(!empty($Reward)){
+                ColumnWeekReward::where(['id'=>$Reward->id])->update($data);
+            }else{
+                ColumnWeekReward::create($data);
+            }
+        }
     }
 
 }

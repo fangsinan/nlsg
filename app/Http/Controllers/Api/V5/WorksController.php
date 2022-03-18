@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\CacheTools;
+use App\Models\Column;
+use App\Models\History;
 use App\Models\Lists;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -14,6 +16,7 @@ use App\Models\WorksInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class WorksController extends Controller
 {
@@ -443,6 +446,122 @@ class WorksController extends Controller
         $data = $model->neighbor($request->input(),$user);
         return $this->getRes($data);
     }
+
+
+
+
+
+
+    /**
+     * @api {get} api/v5/works/edit_history_time  更新学习进度 时长及百分比
+     * @apiName edit_history_time
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * @apiParam {int} relation_id  对应id
+     * @apiParam {int} relation_type 1专栏   2讲座   3听书    4精品课程    5训练营
+     * @apiParam {int} works_info_id 章节id
+     * @apiParam {int} time_leng  百分比
+     * @apiParam {int} time_number  章节分钟数
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     *{
+     *  "code": 200,
+     *  "msg": "成功",
+     *  "data": { }
+     *}
+     */
+    public function editHistoryTime(Request $request){
+
+        DB::table('nlsg_log_info')->insert([
+            'url'     => 'infoLog:'.$request->fullUrl(),
+            'parameter'    =>  json_encode($request->all()),
+            'user_id'    =>  $this->user['id'] ?? 0,
+            'created_at' =>date('Y-m-d H:i:s', time())
+        ]);
+
+
+        $user_id    = $this->user['id'] ?? 0;
+        $relation_id  = $request->input('relation_id',0);
+        $relation_type  = $request->input('relation_type',0);
+        $time_leng  = $request->input('time_leng',0);
+        $time_number= $request->input('time_number',0);
+        $works_info_id = $request->input('works_info_id',0);
+        $os_type = $request->input('os_type',0);
+        
+        $validator = Validator::make($request->all(), [
+            'relation_id' => 'required|numeric',
+            'relation_type' => 'required|numeric',
+            'time_leng' => 'required|numeric|max:100',
+            'time_number' => 'required|numeric|min:1',
+            'works_info_id' => 'required|numeric',
+            // 'info_id' => 'bail:numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first());
+        }
+
+
+
+
+        if( empty($user_id) || empty($relation_id) || empty($relation_type)){
+            return $this->success();
+        }
+
+        $check_his = History::where('relation_id','=',$relation_id)
+            ->where('relation_type','=',$relation_type)
+            ->where('info_id','=',$works_info_id)
+            ->where('user_id','=',$user_id)
+            // ->where('is_del','=',0)
+            ->first();
+
+
+        if( empty($check_his)){
+            //防止 show接口未请求
+            $his = History::firstOrCreate([
+                'relation_id' =>$relation_id,
+                'relation_type'  =>$relation_type,
+                'info_id' =>$works_info_id,
+                'user_id'   =>$user_id,
+                // 'is_del'    =>0,
+                'os_type'   =>$os_type ?? 0,
+            ]);
+            if( $his->wasRecentlyCreated){
+                // 学习记录数增一
+                User::where(['id'=>$user_id])->increment('history_num');
+            }
+            $id = $his->id;
+            $end_time = [];
+        }else{
+            $id = $check_his->id ?? 0;
+            $end_time = $check_his->end_time ?? '';
+        }
+
+
+
+        $edit_data = [
+            'time_leng'=>$time_leng,
+            'time_number'=>$time_number,
+            'os_type'   =>$os_type ?? 0,
+        ];
+        if( $time_leng >= 96 ){
+            $edit_data['is_end'] = 1;
+            //更新end时间
+            if( empty($end_time) ){
+                $edit_data['end_time'] = date("Y-m-d H:i:s");
+            }
+            // is_end 之后需要统计是否奖励
+            $column = new Column();
+            $column->campStudy($relation_id,$user_id,$os_type);
+            
+        }
+
+        //更新学习进度
+        History::where('id',$id)->update($edit_data);
+        return $this->success();
+    }
+
 
 
 }

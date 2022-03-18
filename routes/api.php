@@ -564,6 +564,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::get('comment/list', 'CommentController@index');
     
     Route::post('comment/destroy', 'CommentController@destroy');
+    Route::get('comment/top', 'CommentController@editTop');
 
     Route::get('index/recommend', 'IndexController@recommend');
 
@@ -582,14 +583,26 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
         //添加地址
         Route::get('order/create_order_address', 'OrderController@addOrderAddress');
+        
+        //课程
+        Route::get('works/edit_history_time', 'WorksController@editHistoryTime');
+        //训练营
+        Route::any('camp/camp_end_show', 'CampController@campEndShow');
+        Route::get('camp/camp_like', 'CampController@campLike');
+        Route::get('camp/camp_study_get', 'CampController@campStudyGet');
 
-
+        Route::post('order/create_teacher_order', 'OrderController@createTeacherOrder');
+        
+        
     });
-
     //训练营
+    Route::any('camp/get_camp_list', 'CampController@getCampList');//->middleware('replaceNull');
+    // Route::any('camp/get_camp_detail', 'CampController@getCampDetail')->middleware('ReplaceNull');
+    Route::any('camp/get_camp_detail', 'CampController@getCampDetail');//->middleware('replaceNull');
+    Route::any('camp/get_lecture_list', 'CampController@getLectureList');//->middleware('replaceNull');
+    Route::any('camp/camp_study', 'CampController@campStudy');//->middleware('replaceNull');
+    // 海报图
+    Route::any('image/get_qr_code', 'ImageController@GetQrCode');//->middleware('replaceNull');
     
-    Route::any('camp/get_camp_list', 'CampController@getCampList');
-    Route::any('camp/get_camp_detail', 'CampController@getCampDetail');
-    Route::any('camp/get_lecture_list', 'CampController@getLectureList');
     /**     5.0 API  END    ***/
 });

@@ -39,16 +39,16 @@ class Comment extends Base
 
         $order = $order == 1 ? 'reply_num' : 'created_at';
         $query = Comment::with([
-            'user:id,nickname,headimg', 'quote:id,pid,content', 'attach:id,relation_id,img',
+            'user:id,nickname,headimg,is_author', 'quote:id,pid,content', 'attach:id,relation_id,img',
             'reply' => function ($query) {
                 $query->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
                     ->where('status', 1);
                 //->limit(5); limit是只显示列表评论总体的5条回复
             },
-            'reply.from_user:id,nickname,headimg', 'reply.to_user:id,nickname,headimg'
+            'reply.from_user:id,nickname,headimg,is_author', 'reply.to_user:id,nickname,headimg,is_author'
         ])
             ->select('id', 'pid', 'user_id', 'relation_id', 'info_id', 'content', 'forward_num',
-                'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality')
+                'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality','is_top')
             ->where('relation_id', $id);
         if ($info_id) {
             $query->where('info_id', $info_id);
@@ -65,6 +65,7 @@ class Comment extends Base
                 return $query->where('user_id', $res['user_id']);
             })
 //            ->orderBy($order, 'desc')
+            ->orderBy('is_top', 'desc')            
             ->orderBy('reply_num', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -72,9 +73,14 @@ class Comment extends Base
 
         if ($lists['data']) {
             foreach ($lists['data'] as &$v) {
+                $v['user']['new_vip'] = VipUser::newVipInfo($v['user']['id'])['vip_id'] ?1:0;
+
                 //需求变化需要展示回复【回复者】的评论内容
                 if(!empty($v['reply'])){
                     foreach ($v['reply'] as $rep_k=>$rep_v){
+                        $v['reply'][$rep_k]['from_user']['new_vip'] = VipUser::newVipInfo($rep_v['from_user']['id'])['vip_id'] ?1:0;
+                        $v['reply'][$rep_k]['to_user']['new_vip'] = VipUser::newVipInfo($rep_v['to_user']['id'])['vip_id'] ?1:0;
+
 //                        $rep_v = $this->getReplay($rep_v['id']);
                         $v['reply'][$rep_k]['is_like'] = Like::isLike($rep_v['id'],2,$uid,$like_type);
                         $v['reply'][$rep_k]['created_at'] = History::DateTime($rep_v['created_at']);
@@ -103,12 +109,15 @@ class Comment extends Base
         $subs = [];
 
         $reply_data = CommentReply::with([
-            'from_user:id,nickname,headimg', 'to_user:id,nickname,headimg'
+            'from_user:id,nickname,headimg,is_author', 'to_user:id,nickname,headimg,is_author'
         ])->where(['reply_pid'=>$pid,'status'=>1])->get()->toArray();
 
         if(!empty($reply_data)){
             foreach ($reply_data as $getReplay_key=>$getReplay_val){
                 //是否喜欢
+                $getReplay_val['from_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['from_user']['id'])['vip_id'] ?1:0;
+                $getReplay_val['to_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['to_user']['id'])['vip_id'] ?1:0;
+
                 $getReplay_val['is_like'] = Like::isLike($getReplay_val['id'],2,$uid,$like_type);
                 $getReplay_val['created_at'] = History::DateTime($getReplay_val['created_at']);
                 $getReplay_val['reply'] = $this->getReplay($getReplay_val['id'],$uid,$like_type);
@@ -127,7 +136,7 @@ class Comment extends Base
             return false;
         }
         $comment = Comment::with([
-            'user:id,nickname,headimg',
+            'user:id,nickname,headimg,is_author',
             'quote:id,pid,content',
             'attach:id,relation_id,img',
             'reward' => function ($query) {
@@ -135,7 +144,7 @@ class Comment extends Base
                     ->where(['type' => 5, 'reward_type' => 3, 'status' => 1])
                     ->groupBy('user_id');
             },
-            'reward.user:id,nickname,headimg'
+            'reward.user:id,nickname,headimg,is_author'
         ])
             ->select('id', 'pid', 'user_id', 'relation_id', 'is_quality', 'content',
                 'forward_num', 'share_num', 'like_num', 'reply_num', 'reward_num', 'created_at', 'type')
@@ -164,8 +173,8 @@ class Comment extends Base
         }
 
         $reply = CommentReply::with([
-            'from_user:id,nickname,headimg',
-            'to_user:id,nickname,headimg'
+            'from_user:id,nickname,headimg,is_author',
+            'to_user:id,nickname,headimg,is_author'
         ])
             ->select(['id', 'from_uid', 'to_uid', 'content', 'created_at'])
             ->where('comment_id', $id)

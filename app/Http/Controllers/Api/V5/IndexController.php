@@ -172,24 +172,24 @@ class IndexController extends Controller
         
 
         $recommendModel = new Recommend();
-//        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
-        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
-            'is_free', 'helper')
-            ->where('begin_at', '>=', date("Y-m-d"))
-            ->where('end_at',   '<=', date('Y-m-d',strtotime('+1 day')))
-            ->where('is_del', 0)
-            ->where('is_show', 1)
-            ->where('is_test', 0)
-            ->orderBy('created_at', 'desc')
-            ->first();
-        if (!empty($list)){
-            $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
-            $list->begin_at =  date('H:i:s',strtotime($list->begin_at));
+       $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
+        // $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
+        //     'is_free', 'helper')
+        //     ->where('begin_at', '>=', date("Y-m-d"))
+        //     ->where('end_at',   '<=', date('Y-m-d',strtotime('+1 day')))
+        //     ->where('is_del', 0)
+        //     ->where('is_show', 1)
+        //     ->where('is_test', 0)
+        //     ->orderBy('created_at', 'desc')
+        //     ->first();
+        // if (!empty($list)){
+        //     $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
+        //     $list->begin_at =  date('H:i:s',strtotime($list->begin_at));
 
-            $lists = $recommendModel->getLiveRelation($user_id, $list);
-        }else{
-            $lists = (object)[];
-        }
+        //     $lists = $recommendModel->getLiveRelation($user_id, $list);
+        // }else{
+        //     $lists = (object)[];
+        // }
 
         return success($lists);
 

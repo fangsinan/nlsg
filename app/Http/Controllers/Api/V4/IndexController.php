@@ -277,22 +277,23 @@ class IndexController extends Controller
         
 
         $recommendModel = new Recommend();
-//        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
-        $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
-            'is_free', 'helper')
-            ->where('begin_at', '>', date("Y-m-d"))
-            ->where('end_at',   '<', date('Y-m-d',strtotime('+1 day')))
-            ->where('is_del', 0)
-            ->orderBy('created_at', 'desc')
-            ->first();
-        if (!empty($list)){
-            $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
-            $list->begin_at =  date('H:i:s',strtotime($list->begin_at));
+        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
+        // $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
+        //     'is_free', 'helper')
+        //     ->where('begin_at', '>', date("Y-m-d"))
+        //     ->where('end_at',   '<', date('Y-m-d',strtotime('+1 day')))
+        //     ->where('is_del', 0)
+        //     ->orderBy('created_at', 'desc')
+        //     ->first();  
+            
+        // if (!empty($list)){
+        //     $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
+        //     $list->begin_at =  date('H:i:s',strtotime($list->begin_at));
 
-            $lists = $recommendModel->getLiveRelation($user_id, $list);
-        }else{
-            $lists = (object)[];
-        }
+        //     $lists = $recommendModel->getLiveRelation($user_id, $list);
+        // }else{
+        //     $lists = (object)[];
+        // }
 
         return success($lists);
 
@@ -839,12 +840,17 @@ class IndexController extends Controller
     public function rank(Request $request)
     {
 
+
         $cache_key_name = 'index_rank_data';
         $data = Cache::get($cache_key_name);
 
         if (empty($data)) {
             $model = new Lists();
-            $data = $model->getRankWorks();
+            $data = [
+                'works' => $model->getRankWorks(),
+                'wiki' => $model->getRankWiki(),
+                'goods' => $model->getRankGoods()
+            ];
             $expire_num = CacheTools::getExpire($cache_key_name);
             Cache::put($cache_key_name, $data, $expire_num);
         }

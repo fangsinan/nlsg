@@ -347,7 +347,7 @@ class MallOrderServers
             });
         }
 
-        $query->where('is_del', '=', 0);
+//        $query->where('is_del', '=', 0);
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
@@ -487,7 +487,8 @@ class MallOrderServers
             });
         }
 
-        $query->where('nlsg_mall_order.order_type', '=', 3)->where('nlsg_mall_order.is_del', '=', 0);
+        $query->where('nlsg_mall_order.order_type', '=', 3);
+//        $query->where('nlsg_mall_order.is_del', '=', 0);
 
         switch (intval($params['status'] ?? 0)) {
             case 1:
