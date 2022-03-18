@@ -58,9 +58,9 @@ class VideoController extends Controller
         $uid = $this->user['id'] ?? 0;
 
         $page = $request->input('page') ??1;
-        $top_id = $request->input('top_id') ??0;
-        $is_home = $request->input('is_home');
-        $id = $request->input('id') ??0;
+        $top_id = $request->input('top_id') ??0;//上一次观看视频id
+        $is_home = $request->input('is_home');//是否首页
+        $id = $request->input('id') ??0;//具体id详情
 
         $videoObj = new ShortVideoModel();
         $relation_id = $videoObj->getVideo($uid,$id,$top_id,$page,3,$is_home);
