@@ -81,12 +81,13 @@ class UserController extends Controller
             $u_data = Cache::get($cache_key_name);
             if (empty($u_data)) {
                 $user_data = History::select("user_id")->selectRaw('sum(time_number) as num')
-                    ->where('user_id',$uid)
                     ->where('created_at','>',$top_week_one)
                     ->where('created_at','<',$week_one)//->where('is_del',0)
+                    ->where('user_id',$uid)
+                    ->where('time_number','>', 0)
                     ->first()->toArray();
 
-                $sql = 'select count(*) as count from (select  sum(time_number) as num,user_id from nlsg_history where created_at > ? and created_at < ? group by user_id HAVING sum(time_number )>=?) as count_table';
+                $sql = 'select count(*) as count from (select  sum(time_number) as num,user_id from nlsg_history where created_at > ? and created_at < ? AND time_number >0  group by user_id HAVING sum(time_number )>=?) as count_table';
                 $his_data = DB::select($sql,[$top_week_one,$week_one,$user_data['num']]);
 
                 $u_data['nickname'] = $this->user['nickname']??'';

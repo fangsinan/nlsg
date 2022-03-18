@@ -355,6 +355,7 @@ class User extends Authenticatable implements JWTSubject
         $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
             ->where('created_at','>',$top_week_one)
             ->where('created_at','<',$week_one)
+            ->where('time_number','>',0)
             // ->where('is_del',0)
             ->orderBy('num', 'desc')->GroupBy("user_id")->limit($size)->get()->toArray();
         //重新统计num

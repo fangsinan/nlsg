@@ -120,20 +120,20 @@ class History extends Base
         $week_day       = getWeekDay();
         $week_one       = $week_day['monday'];
         $top_week_one   = $week_day['top_monday'];
-        $sizes = [3,20];
+        $sizes = [20,3,];
         
         foreach($sizes as $size){
             $cache_key_name = 'user_his_len_list_'.$size.'_'.$top_week_one;
-            $result = Cache::get($cache_key_name);
-            if ($result) {
-                return $result;
-            }
+            // $result = Cache::get($cache_key_name);
+            // if ($result) {
+            //     return $result;
+            // }
 
             //时间小于本周一    大于上周一
             $his_data = History::select("user_id")->selectRaw('sum(time_number) as num')
                 ->where('created_at','>',$top_week_one)
                 ->where('created_at','<',$week_one)
-                ->where('is_del',0)
+                ->where('time_number','>', 0)
                 ->orderBy('num', 'desc')->GroupBy("user_id")->limit($size)->get()->toArray();
             //重新统计num
             if($size != 3){
