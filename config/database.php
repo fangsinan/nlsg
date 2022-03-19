@@ -75,7 +75,7 @@ return [
 //        'mysql' => [
 //            'driver' => 'mysql',
 //            'url' => env('DATABASE_URL'),
-//            'host' => 'rm-2ze0owc97gckfqz8q20210319.mysql.polardb.rds.aliyuncs.com',
+//            'host' => 'pc-2zez59c07f1cg80b5nlsg20220319.mysql.polardb.rds.aliyuncs.com',
 //            'port' => '3306',
 //            'database' => 'nlsg_v4',
 //            'username' => 'fangsinan',
