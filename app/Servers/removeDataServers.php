@@ -2440,4 +2440,77 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
 
     }
 
+    public function liveSubRemoveOtherLive(){
+        $page = 1;
+        $size = 500;
+        $source = 341;
+        $to = 343;
+        $remark = '341转进';
+        $begin_at = date('Y-m-d H:i:s');
+        $counts = 0;
+
+        $while_flag = true;
+        while ($while_flag){
+            $source_data = Subscribe::query()
+                ->where('relation_id','=',$source)
+                ->where('type','=',3)
+                ->where('status','=',1)
+                ->select(['user_id','order_id','start_time','end_time','pay_time','give','twitter_id'])
+                ->offset(($page-1) * $size)
+                ->limit($size)
+                ->get();
+
+            $page++;
+            if ($source_data->isNotEmpty()){
+                $source_user_id = $source_data->pluck('user_id')->toArray();
+                $source_data = $source_data->toArray();
+
+                $counts += count($source_user_id);
+                $insert_data = [];
+
+//                DB::beginTransaction();
+
+                Subscribe::query()
+                    ->where('relation_id','=',$to)
+                    ->where('type','=',3)
+                    ->where('status','=',1)
+                    ->whereIn('user_id',$source_user_id)
+                    ->update([
+                        'status'=>0
+                    ]);
+
+                foreach ($source_data as $v){
+                    $insert_data[] = [
+                        'type'=>3,
+                        'relation_id'=>$to,
+                        'user_id'=>$v['user_id'],
+                        'order_id'=>$v['order_id'],
+                        'start_time'=>$v['start_time'],
+                        'end_time'=>$v['end_time'],
+                        'pay_time'=>$v['pay_time'],
+                        'give'=>3,
+                        'twitter_id'=>$v['twitter_id'],
+                        'remark'=>$remark
+                    ];
+                }
+//                Subscribe::query()->insert($insert_data);
+                DB::table('nlsg_subscribe')->insert($insert_data);
+//                DB::rollBack();
+            }else{
+                $while_flag = false;
+            }
+        }
+
+
+        dd([
+            'begin'=>$begin_at,
+            'end'=>date('Y-m-d H:i:s'),
+            'counts'=>$counts,
+        ]);
+
+
+
+
+
+    }
 }

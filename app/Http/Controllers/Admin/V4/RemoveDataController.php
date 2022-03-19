@@ -15,6 +15,10 @@ class RemoveDataController extends ControllerBackend
         $servers = new removeDataServers();
 
         if (0){
+            $servers->liveSubRemoveOtherLive();
+        }
+
+        if (0){
             $servers->liveSubAddUserBind();
         }
 
