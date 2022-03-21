@@ -71,7 +71,7 @@ class UserWechatController extends ControllerBackend
                 });
             })
             ->when(!empty($params['follow_user_userid']), function ($query) use ($params) {
-                $query->whereHas('from_staff', function ($query) use ($params) {
+                $query->whereHas('follow_staff', function ($query) use ($params) {
                     $query->where('follow_user_userid',  $params['follow_user_userid'] );
                 });
             })
