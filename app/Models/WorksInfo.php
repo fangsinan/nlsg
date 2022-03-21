@@ -94,7 +94,7 @@ class WorksInfo extends Base
 
                 // 章节是否点赞
                 if($type ==4){
-                    $works_data[$key]['info_is_like'] = ContentLike::isLike(5,$relation_id,$user_id,$val['id']);
+                    $works_data[$key]['info_is_like'] = ContentLike::isLike([5],$relation_id,$user_id,$val['id']);
                 }
             }
         }
@@ -195,12 +195,12 @@ class WorksInfo extends Base
         if($type == 6 || $type == 7){
             $query = self::where(['column_id' => $get_info_id,'type'=>1,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img']);
+                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img','like_num']);
             $works_id = $column_id;  // 讲座直接关联info表
         }else{
             $query = self::where(['pid'=>$works_id,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section', 'size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3']);
+                    'introduce', 'section', 'size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3','like_num']);
         }
 
 
@@ -301,34 +301,43 @@ class WorksInfo extends Base
         if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
             $is_show_url = false;
         }
-        $works_info->is_collection = 0;
-
-        $collection_type = $type;
-        if($type == 6){
-            $collection_type = 7; //type 与收藏表类型有出入
-        }
+        // $works_info->is_collection = 0;
+        // $collection_type = $type;
+        // if($type == 6){
+        //     $collection_type = 7; //type 与收藏表类型有出入
+        // }
 
 
 
         //  收藏按总id走
-        $collectionObj = Collection::select()->where([
-            'user_id' => $user['id'],
-            //'info_id' => $works_info_id,
-            'relation_id' => $works_id,
-        ]);
+        // $collectionObj = Collection::select()->where([
+        //     'user_id' => $user['id'],
+        //     //'info_id' => $works_info_id,
+        //     'relation_id' => $works_id,
+        // ]);
+        // if($type == 1 || $type == 6 || $type == 7){
+        //     $collection = $collectionObj->whereIn('type',[1,7,8])->get();
+        // }else if($type == 2){
+        //     $collection = $collectionObj->whereIn('type',[2,6])->get();
+        // }else{
+        //     $collection = [];
+        // }
+        // if($collection){
+        //     $works_info->is_collection = 1;
+        // }
+        // 1 专栏  2作品  6讲座  7训练营
+        $collection_type = [0];
+        $like_type = [0];
         if($type == 1 || $type == 6 || $type == 7){
-            $collection = $collectionObj->whereIn('type',[1,7,8])->get();
+            $collection_type = [1,7,8];
+            $like_type = [1,4,5];
         }else if($type == 2){
-            $collection = $collectionObj->whereIn('type',[2,6])->get();
-        }else{
-            $collection = [];
-        }
-        if($collection){
-            $works_info->is_collection = 1;
+            $collection_type = [2,6];
+            $like_type = [2];
         }
 
-
-
+        $works_info->is_collection = Collection::isCollection($collection_type,$works_id,$works_info_id,$user['id']);
+        $works_info->is_like =ContentLike::isLike($like_type,$works_id,$user['id'],$works_info_id);
 
 
         $list['previous'] = $this->three2one($info_list[$info_key - 1], $is_show_url);

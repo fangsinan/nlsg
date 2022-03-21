@@ -7,6 +7,24 @@ class Collection extends Base
     protected $table = 'nlsg_collection';
     protected $fillable = ['type', 'user_id', 'relation_id', 'info_id', 'type'];
 
+
+    static public function isCollection($type=[],$relation_id,$info_id,$user_id)
+    {
+        //  收藏按总id走
+        $is_collection= 0;
+        $collectionObj = Collection::select()->where([
+            'user_id' => $user_id,
+            'info_id' => $info_id,
+            'relation_id' => $relation_id,
+        ]);
+        $collection = $collectionObj->whereIn('type',$type)->get();
+        if($collection){
+            $is_collection = 1;
+        }
+        return $is_collection;
+        
+
+    }
     //收藏 操作
     //$type   1：专栏  2：课程 3 :商品
     static function CollectionData($user_id = 0, $target_id = 0, $type = 0, $info_id = 0)
