@@ -94,8 +94,8 @@ class History extends Base
             $historyData['title'] = $title->title ?? '';
             $historyData['introduce'] = $title->introduce ?? '';
             $historyData['section'] = $title->section ?? '';
-            // $historyData['info_duration'] = $title->duration ?? '0:0';
-            // $historyData['his_duration'] = TimeToMinSec($historyData['time_number']);
+            $historyData['info_duration'] = $title->duration ?? '0:0';
+            $historyData['his_duration'] = TimeToMinSec($historyData['time_number']);
             
         }else{
             $historyData = (object)[];
