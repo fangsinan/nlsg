@@ -29,4 +29,5 @@ class UserWechat extends Base
         return $this->belongsTo(UserWechatName::class, 'follow_user_userid', 'follow_user_userid');
     }
 
+
 }
