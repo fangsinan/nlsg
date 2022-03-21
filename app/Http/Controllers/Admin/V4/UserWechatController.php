@@ -246,11 +246,15 @@ class UserWechatController extends ControllerBackend
      *   "code": 200,
      *   "msg" : '成功',
      *   "data": {
-     *
+     *          "status":"1已完成 2接替中",
+     *          "total":"总条数",
+     *          "finish_total":"完成转移数量",
+     *          "wait_total":"等待转移数量",
      *    }
      * }
      */
     public function search_transfer_record(Request $request){
+
         $params= $request->input();
 
         $query = UserWechatTransferRecord::with(
@@ -278,6 +282,10 @@ class UserWechatController extends ControllerBackend
      * @apiVersion 4.0.0
      * @apiName  user_wechat/search_transfer_log
      * @apiGroup 后台-客户转移日志
+     * @apiParam transfer_record_id 转移记录ID
+     * @apiParam user_wechat_id 用户ID
+     * @apiParam handover_user_id 原添加成员的id
+     * @apiParam takeover_user_id 接替成员的id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/search_transfer_log
      * @apiDescription 客户转移记录
      * @apiSuccessExample  Success-Response:
@@ -299,6 +307,9 @@ class UserWechatController extends ControllerBackend
                 'takeover_user:id,qw_name,follow_user_userid',
             ])
 
+            ->when(!empty($params['transfer_record_id']), function ($query) use ($params) {
+                $query->where('transfer_record_id', $params['transfer_record_id']);
+            })
             ->when(!empty($params['user_wechat_id']), function ($query) use ($params) {
                 $query->where('user_wechat_id', $params['user_wechat_id']);
             })
