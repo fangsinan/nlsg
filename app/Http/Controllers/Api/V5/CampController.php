@@ -191,6 +191,8 @@ class CampController extends Controller
 
         //历史记录
         $column['historyData'] = History::getHistoryData($column_id, $history_type, $user_id);
+
+
         return $this->success([
             'list' => $column
         ]);
@@ -382,7 +384,7 @@ class CampController extends Controller
             return $this->error(0,'您当前尚未加入该训练营');
         }
         // crm_camp_prize  奖品
-        $prize = CampPrize::select('week_num','title as prize_title','cover_pic as prize_pic')->where(['camp_id'=>$column_data['id'],'status'=>1])->get()->toArray();
+        $prize = CampPrize::select('week_num','title as prize_title','cover_pic as prize_pic')->where(['column_id'=>$column_data['id'],'status'=>1])->get()->toArray();
         $prize = array_column($prize,null,'week_num');
 
         

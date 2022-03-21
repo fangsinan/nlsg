@@ -17,15 +17,14 @@ class ContentLike extends Model
      * $uid    用户id
      * $like_type    1想法  2百科  3短视频
      * */
-    public static function isLike($type=0,$rid=1,$uid=0,$info_id){
+    public static function isLike($type=[],$rid=1,$uid=0,$info_id){
         $is_like = 0;
  
         $res = self::where([
-            'type'   =>$type,
             'relation_id' => $rid, 
             'info_id' => $info_id,
             'user_id' => $uid,
-            ])->first();
+            ])->whereIn('type',$type)->first();
         if($res){
             $is_like = 1;
         }

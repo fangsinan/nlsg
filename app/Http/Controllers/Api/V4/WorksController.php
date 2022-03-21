@@ -836,6 +836,10 @@ class WorksController extends Controller
             $id = $check_his->id ?? 0;
         }
 
+        //客户端传 负数 与 大数字 统一重置为 3000
+        if( $time_number <0 || $time_number > 9999 ){
+            $time_number = 3000;
+        }
 
 
         $edit_data = [
