@@ -828,7 +828,10 @@ class WechatPay extends Controller
                     self::PayTestLog($orderId,$userdata);
 
                     // 下单记录王琨老师的直播
-                    self::PayTeacherLives($user_id,$liveData,$orderInfo);
+                    if( !empty($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //
+                        self::PayTeacherLives($user_id,$liveData,$orderInfo);
+                    }
+                    
 
 
                     //暂时先不启用直接分账
