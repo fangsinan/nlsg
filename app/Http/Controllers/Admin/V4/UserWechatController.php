@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 class UserWechatController extends ControllerBackend
 {
 
+
     public function test(){
 
     }
@@ -80,6 +81,10 @@ class UserWechatController extends ControllerBackend
             });
 
         $lists = $query->paginate(10)->toArray();
+
+        foreach ($lists['data'] as &$val){
+            $val['follow_user_createtime'] =date('Y-m-d H:i:s',$val['follow_user_createtime']);
+        }
 
         return success($lists);
     }
