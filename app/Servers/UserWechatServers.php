@@ -233,6 +233,7 @@ class UserWechatServers
         return  true;
     }
 
+
     /**
      * 消费redis转移客户队列
      */
@@ -407,7 +408,7 @@ class UserWechatServers
 
 
     /**
-     * 查询分配结果
+     * 查询分配结果 定时任务 一小时执行一次
      */
     public function transfer_result()
     {
