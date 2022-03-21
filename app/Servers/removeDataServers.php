@@ -2490,7 +2490,8 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
                         'pay_time'=>$v['pay_time'],
                         'give'=>3,
                         'twitter_id'=>$v['twitter_id'],
-                        'remark'=>$remark
+                        'remark'=>$remark,
+                        'status'=>1,
                     ];
                 }
 //                Subscribe::query()->insert($insert_data);
