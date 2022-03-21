@@ -8,6 +8,7 @@ use App\Http\Controllers\ControllerBackend;
 use App\Models\User;
 use App\Models\UserWechat;
 use App\Models\UserWechatName;
+use App\Models\UserWechatTransferLog;
 use App\Models\UserWechatTransferRecord;
 use App\Servers\UserWechatServers;
 use Illuminate\Http\Request;
@@ -257,6 +258,50 @@ class UserWechatController extends ControllerBackend
                 'handover_user:id,qw_name,follow_user_userid',
                 'takeover_user:id,qw_name,follow_user_userid',
             ])
+            ->when(!empty($params['status']), function ($query) use ($params) {
+                $query->where('status', $params['status']);
+            })
+            ->when(!empty($params['handover_userid']), function ($query) use ($params) {
+                $query->where('handover_userid', $params['handover_userid']);
+            })
+            ->when(!empty($params['takeover_userid']), function ($query) use ($params) {
+                $query->where('takeover_userid', $params['takeover_userid']);
+            });
+
+        $lists = $query->orderBy('id','desc')->paginate(10)->toArray();
+
+        return success($lists);
+    }
+
+    /**
+     * @api {get} api/admin_v4/user_wechat/search_transfer_log 客户转移日志
+     * @apiVersion 4.0.0
+     * @apiName  user_wechat/search_transfer_log
+     * @apiGroup 后台-客户转移日志
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/search_transfer_log
+     * @apiDescription 客户转移记录
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function search_transfer_log(Request $request){
+        $params= $request->input();
+
+        $query = UserWechatTransferLog::with(
+            [
+                'handover_user:id,qw_name,follow_user_userid',
+                'takeover_user:id,qw_name,follow_user_userid',
+            ])
+
+            ->when(!empty($params['user_wechat_id']), function ($query) use ($params) {
+                $query->where('user_wechat_id', $params['user_wechat_id']);
+            })
             ->when(!empty($params['status']), function ($query) use ($params) {
                 $query->where('status', $params['status']);
             })
