@@ -57,7 +57,7 @@ class Lists extends Model
         }
 
         $lists = Lists::with(['listWorks:id,lists_id,type,works_id'])
-            ->select('id', 'title', 'subtitle', 'cover', 'num','details_pic','describe','price','type')
+            ->select('id', 'title', 'subtitle', 'cover', 'num','details_pic','describe','price','type','cover as cover_images')
             ->whereIn('id', $ids)
             ->whereIn('type', $type)
             ->where('status', 1)
@@ -91,7 +91,7 @@ class Lists extends Model
                 foreach ($v['list_works'] as $kk => &$vv) {
 
                     if ($vv['type']==1){
-                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','view_num',"chapter_num as info_num",])
+                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','view_num',"chapter_num as info_num","cover_img as cover_images"])
                             ->with(['user'=>function($query){
                                 $query->select('id','nickname', 'headimg','teacher_title');
                             }])
@@ -103,7 +103,7 @@ class Lists extends Model
                     }else if ($vv['type'] == 2) {
                         $listen = Works::select([
                             'id', 'user_id', 'type', 'title', 'subtitle', 'cover_img', 'original_price', 'price',
-                            'message', 'is_free','view_num',"chapter_num as info_num",
+                            'message', 'is_free','view_num',"chapter_num as info_num","cover_img as cover_images"
                         ])
                             ->with([
                                 'user' => function ($query) {
@@ -118,7 +118,7 @@ class Lists extends Model
                     } elseif ($vv['type'] == 4) {
                         $column = Column::select([
                             'id', 'user_id', 'title', 'subtitle', 'cover_pic', 'original_price', 'price', 'message',
-                            'is_free','view_num',"info_num",
+                            'is_free','view_num',"info_num","cover_pic as cover_images"
                         ])
                             ->with([
                                 'user' => function ($query) {

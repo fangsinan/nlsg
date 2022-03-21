@@ -112,13 +112,17 @@ class Order extends Base
                 break;
             case 10:
                 $liveinfo = LiveInfo::find($relation_id);
-                $result = Live::where(['id' => $liveinfo['live_pid']])->get()->toArray();
+                $result = Live::select("id","title",'describe','cover_img','teacher_img','banner_img','msg','content','user_id','reason','profit_sharing','twitter_money','price','playback_price','is_del',
+                'rank','type','begin_at','end_at','password','helper','is_free','is_show','can_push','check_time','is_finish','is_playback','order_num','need_virtual','need_virtual_num','virtual_online_num',
+                'is_forb','is_join','relation_live','status','is_test','flag','cover_img as cover_images'
+                        )->where(['id' => $liveinfo['live_pid']])->get()->toArray();
                 break;
             case 13:
                 $result = [];
                 break;
             case 14:
-                $result = OfflineProducts::where(['id' => $relation_id])->get()->toArray();
+                $result = OfflineProducts::select('id','title','subtitle','describe','total_price','price','cover_img','image','video_url','str_time','is_del','is_show','describe_type','url','off_line_pay_type',
+                'column_id','cover_img as cover_images')->where(['id' => $relation_id])->get()->toArray();
                 break;
             case 15:
                 $model = new Column();
@@ -127,7 +131,8 @@ class Order extends Base
             case 16:
                 $result[] = [
                     'id' => 1, 'type' => 6, 'text' => '幸福360会员',
-                    'img' => '/nlsg/works/20210105102849884378.png', 'price' => 360.00
+                    'img' => '/nlsg/works/20210105102849884378.png', 'price' => 360.00,
+                    'cover_images' => '/nlsg/works/20210105102849884378.png',
                 ];
                 break;
             case 17:
