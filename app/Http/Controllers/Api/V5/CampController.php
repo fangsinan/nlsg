@@ -503,7 +503,7 @@ class CampController extends Controller
 
 
     /**
-     * @api {get} /api/v5/camp/camp_like  点赞
+     * {get} /api/v5/camp/camp_like  点赞
      * 
      * @apiParam {int} relation_id  对应id
      * @apiParam {int} user_id  用户id
