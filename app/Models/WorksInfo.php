@@ -339,7 +339,7 @@ class WorksInfo extends Base
         $info_list[$info_key]['is_collection'] = Collection::isCollection($collection_type,$works_id,$works_info_id,$user['id']);
         $works_info->is_collection = $info_list[$info_key]['is_collection']; //兼容V4
         $info_list[$info_key]['is_like'] =ContentLike::isLike($like_type,$works_id,$user['id'],$works_info_id);
-        $info_list[$info_key]['column_banner'] = Column::getCampBanner($column_id,$this->user,$params['vresion']);
+        $info_list[$info_key]['column_banner'] = Column::getCampBanner($column_id,$this->user,$params);
 
         $list['previous'] = $this->three2one($info_list[$info_key - 1], $is_show_url);
         $list['current'] = $this->three2one($info_list[$info_key], $is_show_url);

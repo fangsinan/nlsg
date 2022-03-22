@@ -311,7 +311,7 @@ class Column extends Base
     }
 
 
-    public static function getCampBanner($column_id,$user,$version){
+    public static function getCampBanner($column_id,$user,$params){
 
         $column_banner = (object)[];
         if( !empty($params['version']) && version_compare($params['version'], "5.0.0", '>=') ){  //新版出现
