@@ -742,7 +742,7 @@ class WorksController extends Controller
             ->where('relation_type','=',$relation_type)
             ->where('user_id','=',$user_id)
             ->where('info_id','=',$works_info_id)
-            ->where('is_del','=',0)
+            // ->where('is_del','=',0)
             ->first();
 
 
@@ -752,7 +752,7 @@ class WorksController extends Controller
                 'relation_type'  =>$relation_type,
                 'info_id' =>$works_info_id,
                 'user_id'   =>$user_id,
-                'is_del'    =>0,
+                // 'is_del'    =>0,
                 'os_type'   =>$os_type??0,//  1 安卓 2ios 3微信
             ]);
             //学习记录条数会只按relation_id算   不根据章节走
