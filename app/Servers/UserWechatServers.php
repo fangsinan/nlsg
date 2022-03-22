@@ -443,7 +443,7 @@ class UserWechatServers
         foreach ($list as $transfer) {
 
             $res = $this->transfer_result_api($transfer, $transfer->next_cursor);
-            \Log::info('transfer_result:   ' . $res);
+            \Log::info('transfer_result_api_res:   ' . $res);
 
             if (!$res) {
                 DB::rollBack();
