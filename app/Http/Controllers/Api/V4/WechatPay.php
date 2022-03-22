@@ -556,7 +556,7 @@ class WechatPay extends Controller
             $textbook_id = $offdata['textbook_id'] ?? 0;
 
             //地址
-            $address_id = MallAddress::where(['is_default' => 1, 'is_del' => 0,"user_id"=>$orderInfo['user_id'],])->first();
+            $address_id = MallAddress::where([ 'is_del' => 0,"user_id"=>$orderInfo['user_id'],])->orderBy('is_default', 'desc')->first();
             //对应订单写三个值
             Order::where(['id' => $orderInfo['id'] ])->update([
                 'textbook_id'=> $textbook_id,
