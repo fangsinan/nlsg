@@ -1320,9 +1320,9 @@ class IndexController extends Controller
         ];
         $app = Factory::officialAccount($config);
 
-        $accessToken = $app->access_token;
-        $token = $accessToken->getToken();
-        dd($token);
+        // $accessToken = $app->access_token;
+        // $token = $accessToken->getToken();
+        // dd($token);
         // 创建缓存实例
         $cache = new RedisAdapter(app('redis')->connection()->client());
         $app->rebind('cache', $cache);
