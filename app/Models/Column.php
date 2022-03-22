@@ -320,7 +320,7 @@ class Column extends Base
             $column_banner = DB::table("nlsg_camp_banner")->select("id","column_id","jump_type","obj_id","h5_url", "image", "text")
                             ->where(['column_id'=>$column_id,'is_show'=>1])->first();
             // 如果是360类型  需要单独校验 开通\续费
-            if($column_banner->jump_type == 7){
+            if(!empty($column_banner) && $column_banner->jump_type == 7){
                 $is_vip = 0;
                 if(!empty($user)){
                     $is_vip = $user['new_vip']['vip_id'] ?1:0;
