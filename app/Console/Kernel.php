@@ -27,6 +27,7 @@ use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
 use App\Servers\LiveConsoleServers;
 use App\Servers\removeDataServers;
+use App\Servers\UserWechatServers;
 use App\Servers\V5\ShareServers;
 use EasyWeChat\Factory;
 use Illuminate\Console\Scheduling\Schedule;
@@ -312,6 +313,12 @@ class Kernel extends ConsoleKernel
             UserWechat::UserWechatEdit(11);
             History::HistorySize();
         })->dailyAt('0:01');
+
+        //每三十分钟查询一次企业微信客户转移接口
+        $schedule->call(function () {
+            (new UserWechatServers())->transfer_result();
+        })->everyThirtyMinutes();
+
     }
 
     /**
