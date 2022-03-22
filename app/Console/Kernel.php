@@ -314,10 +314,10 @@ class Kernel extends ConsoleKernel
             History::HistorySize();
         })->dailyAt('0:01');
 
-        //每三十分钟查询一次企业微信客户转移接口
+        //每小时查询一次企业微信客户转移接口
         $schedule->call(function () {
             (new UserWechatServers())->transfer_result();
-        })->everyThirtyMinutes();
+        })->hourly();
 
     }
 
