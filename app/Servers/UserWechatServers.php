@@ -428,7 +428,7 @@ class UserWechatServers
 
 
     /**
-     * 查询分配结果 定时任务 30分钟一次
+     * 查询分配结果 定时任务 每小时一次
      */
     public function transfer_result()
     {
