@@ -187,3 +187,12 @@ function TimeToMinSec($time)
         return '00:01';
     }
 }
+
+function add_log($url,$message='',$parameter=''){
+    Illuminate\Support\Facades\DB::table('nlsg_log')->insert([
+        'url'=>$url,
+        'message'=>$message,
+        'parameter'=>$parameter,
+        'created_at'=>date('Y-m-d H:i:s'),
+    ]);
+}

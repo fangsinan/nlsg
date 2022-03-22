@@ -367,7 +367,7 @@ class UserWechatServers
 
             $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_customer?access_token=' . $this->token, json_encode($data));
 
-            \Log::info('transfer_customer:   ' . $detail_res);
+            add_log('transfer_customer','迁移微信客户', $detail_res);
 
 //            var_dump($detail_res);
 
@@ -433,13 +433,12 @@ class UserWechatServers
     public function transfer_result()
     {
 
-
-        Log::channel('wechat')->info('transfer_result:   start-'.date('Y-m-d H:i:s') );
+       add_log('transfer_result',  'start',date('Y-m-d H:i:s') );
 
         //查询需要监测的转移客户任务
         $list = UserWechatTransfer::query()->where('status', UserWechatTransfer::STATUS_WAIT)->get();
 
-        Log::channel('wechat')->info('transfer_result:   list-'.json_encode($list) );
+        add_log('transfer_result',  '查询需要监测的转移客户任务',json_encode($list) );
 
         DB::beginTransaction();
 
@@ -456,7 +455,7 @@ class UserWechatServers
 
         DB::commit();
 
-        Log::channel('wechat')->info('transfer_result:   end-'.date('Y-m-d H:i:s') );
+        add_log('transfer_result',  'end',date('Y-m-d H:i:s'));
 
         return true;
     }
@@ -482,6 +481,7 @@ class UserWechatServers
 
         $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_result?access_token=' . $this->token, json_encode($data));
         Log::channel('wechat')->info('transfer_result_api:   ' . $detail_res);
+        add_log('transfer_result_api', '查询客户转移结果', $detail_res);
 
         $detail_res = json_decode($detail_res, true);
 
@@ -601,7 +601,6 @@ class UserWechatServers
             return false;
 
         }
-
 
         //递归查询下一页
         if ($next_cursor) {
