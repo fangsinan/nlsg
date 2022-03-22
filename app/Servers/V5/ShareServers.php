@@ -67,7 +67,7 @@ class ShareServers
             LiveConsoleServers::LogIo('accesstoken','wechat_error','WechatToken：' . $e->getMessage());
         }
 
-
+        
     }
 
 }

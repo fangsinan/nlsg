@@ -5,6 +5,7 @@ namespace App\Servers;
 
 use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
+use App\Models\MallAddress;
 use App\Models\MallErpList;
 use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
@@ -495,6 +496,36 @@ class ErpServers
         return true;
     }
 
+    public function orderUpdateAddressId(){
+
+        $list = DB::table('nlsg_order_erp_list as oel')
+            ->join('nlsg_order as o','oel.order_id','=','o.id')
+            ->where('oel.flag','=',1)
+            ->where('o.address_id','=',0)
+            ->select(['oel.*','o.user_id','o.address_id'])
+            ->get();
+
+        if ($list->isEmpty()){
+            return true;
+        }
+
+        foreach ($list as $v){
+            $temp_address = MallAddress::query()
+                ->where('user_id','=',$v->user_id)
+                ->where('is_default','=',1)
+                ->where('is_del','=',0)
+                ->first();
+
+            if ($temp_address){
+                Order::query()
+                    ->where('id','=',$v->order_id)
+                    ->update([
+                        'address_id'=>$temp_address->id
+                    ]);
+            }
+        }
+    }
+
     public function __construct() {
 
         $this->sid                  = config('env.ERP_SID');
@@ -504,7 +535,7 @@ class ErpServers
         $this->trade_push           = config('env.ERP_TRADE_PUSH');
         $this->logistics_sync_query = config('env.ERP_LOGISTICS_SYNC_QUERY');
         $this->logistics_sync_ack   = config('env.ERP_LOGISTICS_SYNC_ACK');
-        
+
 //        $this->sid                  = 'nlsg2';
 //        $this->shop_no              = '04';
 //        $this->appkey               = 'nlsg2-gw';
