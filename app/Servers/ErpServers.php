@@ -503,6 +503,7 @@ class ErpServers
             ->where('oel.flag','=',1)
             ->where('o.address_id','=',0)
             ->select(['oel.*','o.user_id','o.address_id'])
+            ->limit(100)
             ->get();
 
         if ($list->isEmpty()){
