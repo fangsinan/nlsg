@@ -111,6 +111,13 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'userwechat' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/userwechat/laravel.log'),
+            'level' => 'info',
+
+        ],
     ],
 
 ];
