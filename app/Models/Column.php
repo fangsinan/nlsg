@@ -272,10 +272,10 @@ class Column extends Base
         $info_ids = array_chunk($work_info_ids,6);
         
         $data = [
-            'relation_id'=>$camp_id,
-            'user_id'=>$user_id,
-            'end_time'=>'',
-            'os_type'=>$os_type,
+            'relation_id'   => $camp_id,
+            'user_id'       => $user_id,
+            'end_time'      => null,
+            'os_type'       => $os_type,
         ];
         foreach($info_ids as $key=>$val){
 
@@ -309,5 +309,35 @@ class Column extends Base
             }
         }
     }
+
+
+    public static function getCampBanner($column_id,$user,$version){
+
+        $column_banner = (object)[];
+        if( !empty($params['version']) && version_compare($params['version'], "5.0.0", '>=') ){  //新版出现
+            // 需要针对每个训练营进行一对一管、
+            
+            $column_banner = DB::table("nlsg_camp_banner")->select("id","column_id","jump_type","obj_id","h5_url", "image", "text")
+                            ->where(['column_id'=>$column_id,'is_show'=>1])->first();
+            // 如果是360类型  需要单独校验 开通\续费
+            if($column_banner->jump_type == 7){
+                $is_vip = 0;
+                if(!empty($user)){
+                    $is_vip = $user['new_vip']['vip_id'] ?1:0;
+                }
+                $column_banner = DB::table("nlsg_camp_banner")->select("id","column_id","jump_type","obj_id","h5_url", "image", "text")
+                ->where(['column_id'=>$column_id,'is_show'=>1,'is_vip'=>$is_vip])->first();
+            }
+            if(empty($column_banner)){
+                $column_banner =  (object)[];
+            }
+        }
+
+
+        return $column_banner;
+    }
+
+
+
 
 }
