@@ -192,8 +192,8 @@ class UserWechatController extends ControllerBackend
         $UserWechatServers = new UserWechatServers();
         $data=$request->input();
 //        $data=[
-//            'handover_userid'=>'DongYue',
-//            'takeover_userid'=>'SunXia',
+//            'handover_userid'=>'SunXia',
+//            'takeover_userid'=>'DongYue',
 //            'userids'=>'137399,137400,137401',
 //        ];
         $res=$UserWechatServers->transfer_customer($data);
@@ -232,13 +232,13 @@ class UserWechatController extends ControllerBackend
 
         $UserWechatServers = new UserWechatServers();
         $data=$request->input();
-        $data=[
-            'handover_userid'=>'DongYue',
-            'takeover_userid'=>'SunXia',
-            'start_time'=>'2021-07-27 20:30:09',
-            'end_time'=>'2021-10-02 20:26:40',
-            'is_transfer'=>1
-        ];
+//        $data=[
+//            'handover_userid'=>'DongYue',
+//            'takeover_userid'=>'SunXia',
+//            'start_time'=>'2021-07-27 20:30:09',
+//            'end_time'=>'2021-10-02 20:26:40',
+//            'is_transfer'=>1
+//        ];
         $res=$UserWechatServers->transfer_customer_batch($data);
 
         if(!checkRes($res)){

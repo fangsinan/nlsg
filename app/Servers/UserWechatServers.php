@@ -273,6 +273,7 @@ class UserWechatServers
         if (empty($staff_user)) {
             return '被分配的企业成员不存在';
         }
+
         if ($data['handover_userid'] == $data['takeover_userid']) {
             return '被分配的企业成员不能和原来的企业成员相同';
         }
@@ -292,16 +293,17 @@ class UserWechatServers
             ->get(['id', 'external_userid'])->toArray();
 
         $user_list_count = count($user_list);
-        if ($user_list_count != count($userids_arr)) {
-            return '客户参数错误';
+
+        if (empty($user_list_count)) {
+            return '请选择转移客户';
         }
 
-        if ($user_list_count > 100) {
-            return '每次最多分配100个客户';
+        if ($user_list_count > 500) {
+            return '每次最多分配500个客户';
         }
-
 
         DB::beginTransaction();
+
         $transfer_record_id = $data['transfer_record_id'] ?? '';
 
         //添加转移记录
@@ -313,14 +315,18 @@ class UserWechatServers
             $UserWechatTransferRecord->handover_userid = $old_staff_user->follow_user_userid;
             $UserWechatTransferRecord->takeover_userid = $staff_user->follow_user_userid;
             $UserWechatTransferRecord->total = $user_list_count;
+
             $res = $UserWechatTransferRecord->save();
+
             if (!$res) {
                 DB::rollBack();
                 return '操作失败';
             }
 
             $transfer_record_id = $UserWechatTransferRecord->id;
+
         }
+
 
         //查询是否存在客户转移任务
         $UserWechatTransfer = UserWechatTransfer::query()->where('handover_user_id', $old_staff_user->id)->where('takeover_user_id', $staff_user->id)->first();
@@ -340,68 +346,82 @@ class UserWechatServers
             return '操作失败';
         }
 
-        //调用企业微信接口
-        $data = [
-            'handover_userid' => $data['handover_userid'],
-            'takeover_userid' => $data['takeover_userid'],
-            'external_userid' => array_column($user_list, 'external_userid'),
-            "transfer_success_msg" => "您好，您的服务已升级，后续将由我的同事" . $staff_user->qw_name . "接替我的工作，继续为您服务。"
-        ];
-
-        $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_customer?access_token=' . $this->token, json_encode($data));
-        \Log::info('transfer_customer:   ' . $detail_res);
-
-        $detail_res = json_decode($detail_res, true);
-
-
-        if ($detail_res['errcode'] != 0) {
-            DB::rollBack();
-            return false;
-        }
-
         $format_user = [];
         foreach ($user_list as $user) {
             $format_user[$user['external_userid']] = $user;
         }
 
-        foreach ($detail_res['customer'] as $customer) {
+        $external_userid_arr=array_column($user_list, 'external_userid');
+        $external_userid_chunk=array_chunk($external_userid_arr,100);
 
-            $save_data = [
+        foreach ($external_userid_chunk as $external_userid){
 
-                'transfer_id' => $UserWechatTransfer->id,
-                'transfer_record_id' => $transfer_record_id,
-
-                'user_wechat_id' => $format_user[$customer['external_userid']]['id'],
-                'external_userid' => $customer['external_userid'],
-
-                'handover_user_id' => $old_staff_user->id,
-                'takeover_user_id' => $staff_user->id,
-
-                'handover_userid' => $old_staff_user->follow_user_userid,
-                'takeover_userid' => $staff_user->follow_user_userid,
-                'takeover_time' => time(),
-
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-
+            //调用企业微信接口
+            $data = [
+                'handover_userid' => $data['handover_userid'],
+                'takeover_userid' => $data['takeover_userid'],
+                'external_userid' => $external_userid,
+                "transfer_success_msg" => "您好，您的服务已升级，后续将由我的同事" . $staff_user->qw_name . "接替我的工作，继续为您服务。"
             ];
 
-            if ($customer['errcode'] == 0) {
-                //修改客户的接替状态为 等待接替
-                UserWechat::query()->where('external_userid', $customer['external_userid'])->update(['transfer_status' => UserWechat::TRANSFER_STATUS_WAIT, 'updated_at' => date('Y-m-d H:i:s')]);
-            } else {
-                //转移失败
-                $save_data['status'] = -1;
-                $save_data['errcode'] = $customer['errcode'];
-                $save_data['return_info'] = json_encode($customer);
+            $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_customer?access_token=' . $this->token, json_encode($data));
+
+            \Log::channel('userwechat')->info('transfer_customer:   ' . $detail_res);
+
+//            var_dump($detail_res);
+
+            $detail_res = json_decode($detail_res, true);
+
+            if ($detail_res['errcode'] != 0) {
+                DB::rollBack();
+                return false;
             }
 
-            DB::table(UserWechatTransferLog::DB_TABLE)->insert($save_data);
+            foreach ($detail_res['customer'] as $customer) {
 
+                $save_data = [
+
+                    'transfer_id' => $UserWechatTransfer->id,
+                    'transfer_record_id' => $transfer_record_id,
+
+                    'user_wechat_id' => $format_user[$customer['external_userid']]['id'],
+                    'external_userid' => $customer['external_userid'],
+
+                    'handover_user_id' => $old_staff_user->id,
+                    'takeover_user_id' => $staff_user->id,
+
+                    'handover_userid' => $old_staff_user->follow_user_userid,
+                    'takeover_userid' => $staff_user->follow_user_userid,
+                    'takeover_time' => time(),
+
+                    'created_at' => date('Y-m-d H:i:s'),
+
+                    'updated_at' => date('Y-m-d H:i:s'),
+
+                ];
+
+                if (in_array($customer['errcode'],[0,40129])) {
+
+                    //修改客户的接替状态为 等待接替
+                    UserWechat::query()->where('external_userid', $customer['external_userid'])->update(['transfer_status' => UserWechat::TRANSFER_STATUS_WAIT, 'updated_at' => date('Y-m-d H:i:s')]);
+
+                } else {
+
+                    //转移失败
+                    $save_data['status'] = -1;
+                }
+
+                $save_data['errcode'] = $customer['errcode'];
+                $save_data['return_info'] = json_encode($customer);
+
+                DB::table(UserWechatTransferLog::DB_TABLE)->insert($save_data);
+            }
         }
 
+
         DB::commit();
-        return true;
+
+        return $user_list_count;
 
     }
 
