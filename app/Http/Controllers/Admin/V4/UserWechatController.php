@@ -34,6 +34,8 @@ class UserWechatController extends ControllerBackend
      * @apiParam {number} page 分页
      * @apiParam {string} name 客户名称
      * @apiParam {string} phone 手机号
+     * @apiParam {string} start_time 开始时间
+     * @apiParam {string} end_time 结束时间
      * @apiParam {string} follow_user_userid 跟进客户员工userid
      * @apiParam {string} source_follow_user_userid 来源的客户员工id
      * @apiParam {string} transfer_status  接替状态， 1-接替完毕 2-等待接替 3-客户拒绝 4-接替成员客户达到上限 5-无接替记录
@@ -63,6 +65,10 @@ class UserWechatController extends ControllerBackend
             })
             ->when(!empty($params['transfer_status']), function ($query) use ($params) {
                 $query->where('transfer_status', $params['transfer_status']);
+            })
+
+            ->when(!empty($params['start_time']) && !empty($params['end_time']), function ($query) use ($params) {
+                $query->whereBetween('follow_user_createtime',[strtotime($params['start_time']),strtotime($params['end_time'])]);
             })
 
             ->when(!empty($params['phone']), function ($query) use ($params) {
