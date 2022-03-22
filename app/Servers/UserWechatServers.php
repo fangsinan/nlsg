@@ -431,7 +431,7 @@ class UserWechatServers
      */
     public function transfer_result()
     {
-        \Log::info('transfer_result:   start-'.date('Y-m-d') );
+        \Log::info('transfer_result:   start-'.date('Y-m-d H:i:s') );
 
         //查询需要监测的转移客户任务
         $list = UserWechatTransfer::query()->where('status', UserWechatTransfer::STATUS_WAIT)->get();
@@ -453,7 +453,7 @@ class UserWechatServers
 
         DB::commit();
 
-        \Log::info('transfer_result:   end-'.date('Y-m-d') );
+        \Log::info('transfer_result:   end-'.date('Y-m-d H:i:s') );
 
         return true;
     }
