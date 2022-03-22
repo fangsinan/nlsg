@@ -556,7 +556,7 @@ class WechatPay extends Controller
             $textbook_id = $offdata['textbook_id'] ?? 0;
 
             //地址
-            $address_id = MallAddress::where(['is_default' => 1, 'is_del' => 0,"user_id"=>$orderInfo['user_id'],])->first();
+            $address_id = MallAddress::where([ 'is_del' => 0,"user_id"=>$orderInfo['user_id'],])->orderBy('is_default', 'desc')->first();
             //对应订单写三个值
             Order::where(['id' => $orderInfo['id'] ])->update([
                 'textbook_id'=> $textbook_id,
@@ -809,30 +809,27 @@ class WechatPay extends Controller
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $Profit_Rst) {
                     DB::commit();
 
-                    //更新预约人数
-
-                    //SMS_211275363
-                    //短信
-                    if ($userdata['phone'] && $live_id == 12 && strlen($userdata['phone']) == 11) {
-                        $easySms = app('easysms');
-                        $easySms->send($userdata['phone'], [
-                            'template' => 'SMS_211275363',
-                        ], ['aliyun']);
-                    }
+					// 下单记录王琨老师的直播
+					if( !empty($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //刷单用户排除
+						self::PayTeacherLives($user_id,$liveData,$orderInfo);
+					}
+					
+					// 内容刷单记录
+					self::PayTestLog($orderId,$userdata);
+					
                     //9.9刷单推送
                     if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
                         self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
                     }
 
-                    // 内容刷单记录
-                    self::PayTestLog($orderId,$userdata);
-
-                    // 下单记录王琨老师的直播
-                    // self::PayTeacherLives($user_id,$liveData,$orderInfo);
-					if( !empty($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //刷单用户排除
-						self::PayTeacherLives($user_id,$liveData,$orderInfo);
+					//SMS_211275363
+					//短信
+					if ($userdata['phone'] && $live_id == 12 && strlen($userdata['phone']) == 11) {
+					    $easySms = app('easysms');
+					    $easySms->send($userdata['phone'], [
+					        'template' => 'SMS_211275363',
+					    ], ['aliyun']);
 					}
-
 
                     //暂时先不启用直接分账
 //                    //调用直播分账
