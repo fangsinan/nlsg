@@ -13,6 +13,7 @@ use App\Models\UserWechatTransfer;
 use App\Models\UserWechatTransferLog;
 use App\Models\UserWechatTransferRecord;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Libraries\ImClient;
 use Predis\Client;
@@ -431,19 +432,21 @@ class UserWechatServers
      */
     public function transfer_result()
     {
-        \Log::info('transfer_result:   start-'.date('Y-m-d H:i:s') );
+
+
+        Log::channel('wechat')->info('transfer_result:   start-'.date('Y-m-d H:i:s') );
 
         //查询需要监测的转移客户任务
         $list = UserWechatTransfer::query()->where('status', UserWechatTransfer::STATUS_WAIT)->get();
 
-        \Log::info('transfer_result:   list-'.json_encode($list) );
+        Log::channel('wechat')->info('transfer_result:   list-'.json_encode($list) );
 
         DB::beginTransaction();
 
         foreach ($list as $transfer) {
 
             $res = $this->transfer_result_api($transfer, $transfer->next_cursor);
-            \Log::info('transfer_result_api_res:   ' . $res);
+            Log::channel('wechat')->info('transfer_result_api_res:   ' . $res);
 
             if (!$res) {
                 DB::rollBack();
@@ -453,7 +456,7 @@ class UserWechatServers
 
         DB::commit();
 
-        \Log::info('transfer_result:   end-'.date('Y-m-d H:i:s') );
+        Log::channel('wechat')->info('transfer_result:   end-'.date('Y-m-d H:i:s') );
 
         return true;
     }
@@ -478,7 +481,7 @@ class UserWechatServers
         ];
 
         $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_result?access_token=' . $this->token, json_encode($data));
-        \Log::info('transfer_result_api:   ' . $detail_res);
+        Log::channel('wechat')->info('transfer_result_api:   ' . $detail_res);
 
         $detail_res = json_decode($detail_res, true);
 
