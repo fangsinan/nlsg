@@ -279,18 +279,18 @@ class Column extends Base
         ];
         foreach($info_ids as $key=>$val){
 
-            $is_end = 0;
+            // $is_end = 0;
             $data['speed_status'] = 0;        // 未开始领取
             //跟历史记录对比 交集和差集   一致说明本周学习完了
             $diff_arr = array_diff($val,array_intersect($val,$his_data));
             if( count($diff_arr) >0  ){
                 $data['speed_status'] = 1; //学习未完成
             }else if(!$diff_arr){
-                $is_end = 1;
+                // $is_end = 1;
                 $data['end_time'] = date("Y-m-d H:i:s");
                 $data['speed_status'] = 2; //学习完成
             }
-            $data['is_end'] = $is_end;
+            // $data['is_end'] = $is_end;
             $data['week_num'] = $key+1;
 
             if( $data['week_num'] > $week_count){
