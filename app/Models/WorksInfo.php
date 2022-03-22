@@ -341,7 +341,7 @@ class WorksInfo extends Base
         $info_list[$info_key]['is_like'] =ContentLike::isLike($like_type,$works_id,$user['id'],$works_info_id);
         if( !empty($params['version']) && version_compare($params['version'], "5.0.0", '>=') ){  //新版出现
             // 需要针对每个训练营进行一对一管
-            $column_banner = DB::table("nlsg_camp_banner")->select("id","column_id","jump_type","obj_id","h5_url", "image", "text",)
+            $column_banner = DB::table("nlsg_camp_banner")->select("id","column_id","jump_type","obj_id","h5_url", "image", "text")
                             ->where(['column_id'=>$column_id,'is_show'=>1])->first();
             if(empty($column_banner)){
                 $info_list[$info_key]['column_banner'] =  (object)[];
