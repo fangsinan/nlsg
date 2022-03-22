@@ -13,6 +13,7 @@ use App\Models\Poster;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\WorksInfo;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -191,8 +192,16 @@ class CampController extends Controller
 
         //历史记录
         $column['historyData'] = History::getHistoryData($column_id, $history_type, $user_id);
+        
+        // 需要针对每个训练营进行一对一管
+        $column_banner = DB::table("nlsg_camp_banner")->where(['column_id'=>$column_id])->first();
+        if(empty($column_banner)){
+            $column['column_banner'] =  (object)[];
+        }else{
+             $column_banner->is_vip = $this->user['new_vip']['vip_id'] ?1:0;
+            $column['column_banner'] = $column_banner;
 
-
+        }
         return $this->success([
             'list' => $column
         ]);
