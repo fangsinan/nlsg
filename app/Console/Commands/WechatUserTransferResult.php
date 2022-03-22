@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Servers\UserWechatServers;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class WechatUserTransferResult extends Command
 {
@@ -38,6 +39,7 @@ class WechatUserTransferResult extends Command
      */
     public function handle()
     {
+
         (new UserWechatServers())->transfer_result();
     }
 }
