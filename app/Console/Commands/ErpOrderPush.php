@@ -39,6 +39,7 @@ class ErpOrderPush extends Command
     public function handle()
     {
         $s = new ErpServers();
+        $s->orderUpdateAddressId();
         $s->pushRunForOrder();
     }
 }
