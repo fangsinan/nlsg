@@ -203,61 +203,18 @@ class UserWechatController extends ControllerBackend
         $UserWechatServers = new UserWechatServers();
         $data=$request->input();
 //        $data=[
-//            'handover_userid'=>'SunXia',
-//            'takeover_userid'=>'DongYue',
-//            'userids'=>'137399,137400,137401',
+//            'handover_userid'=>'DongYue',
+//            'takeover_userid'=>'SunXia',
+//            'userids'=>'137728,137984,138240',
 //        ];
         $res=$UserWechatServers->transfer_customer($data);
-
         if(!checkRes($res)){
             return error(0,$res);
         }
 
         return success();
     }
-    /**
-     * @api {get} api/admin_v4/user_wechat/transfer_customer_batch 批量转移客户
-     * @apiVersion 4.0.0
-     * @apiName  user_wechat/transfer_customer_batch
-     * @apiGroup 后台-微信客户管理
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/transfer_customer_batch
-     * @apiDescription 批量转移客户
-     *
-     * @apiParam {number} handover_userid 原跟进成员的userid
-     * @apiParam {string} takeover_userid 接替成员的userid
-     * @apiParam {string} start_time 开始时间
-     * @apiParam {string} end_time  结束时间
-     * @apiParam {string} is_transfer  是否转移 0否 1是 等于0是返回转移的客户数量
-     *
-     * @apiSuccessExample  Success-Response:
-     * HTTP/1.1 200 OK
-     * {
-     *   "code": 200,
-     *   "msg" : '成功',
-     *   "data": {
-     *
-     *    }
-     * }
-     */
-    public function transfer_customer_batch(Request $request){
 
-        $UserWechatServers = new UserWechatServers();
-        $data=$request->input();
-//        $data=[
-//            'handover_userid'=>'DongYue',
-//            'takeover_userid'=>'SunXia',
-//            'start_time'=>'2021-07-27 20:30:09',
-//            'end_time'=>'2021-10-02 20:26:40',
-//            'is_transfer'=>1
-//        ];
-        $res=$UserWechatServers->transfer_customer_batch($data);
-
-        if(!checkRes($res)){
-            return error(0,$res);
-        }
-
-        return success($res);
-    }
 
 
     /**

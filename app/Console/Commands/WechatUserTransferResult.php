@@ -32,6 +32,7 @@ class WechatUserTransferResult extends Command
         parent::__construct();
     }
 
+
     /**
      * Execute the console command.
      *
@@ -39,7 +40,8 @@ class WechatUserTransferResult extends Command
      */
     public function handle()
     {
-
+        (new UserWechatServers())->consume_redis_transfer_customer();
         (new UserWechatServers())->transfer_result();
     }
+
 }

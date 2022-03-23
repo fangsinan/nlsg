@@ -14,6 +14,7 @@ class UserWechat extends Base
     const DB_TABLE = 'nlsg_user_wechat';
     protected $table = 'nlsg_user_wechat';
 
+    const TRANSFER_STATUS_FAIL=-1;//分配失败
     const TRANSFER_STATUS_FINISH=1;//接替完毕
     const TRANSFER_STATUS_WAIT=2; //等待接替
 
