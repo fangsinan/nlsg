@@ -196,6 +196,14 @@ class Comment extends Base
         $comment['reply'] = $reply['data'];
         $comment['reward_num'] = $comment['reward'] ? count($comment['reward']) : 0;
 
+        $like_type = 1;
+        if ($comment['type'] == 5 ) {
+            $like_type = 2;
+        } elseif ($comment['type'] == 7 ) {  //短视频
+            $like_type = 3;
+        }
+
+        $comment['is_like'] = Like::isLike($comment['id'],1,$uid,$like_type);
         $comment['user']['new_vip'] = VipUser::newVipInfo($comment['user_id'])['vip_id'] ?1:0;
         return $comment;
 
