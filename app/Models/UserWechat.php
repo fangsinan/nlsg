@@ -19,7 +19,7 @@ class UserWechat extends Base
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'unionid', 'unionid');
+        return $this->belongsTo(User::class, 'unionid', 'unionid')->where('unionid','<>','');
     }
     public function source_staff(){
         return $this->belongsTo(UserWechatName::class, 'source_follow_user_userid', 'follow_user_userid');

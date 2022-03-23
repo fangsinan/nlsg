@@ -54,12 +54,15 @@ class UserWechatController extends ControllerBackend
 
         $params= $request->input();
 
+//        DB::connection()->enableQueryLog();
+
         $query = UserWechat::with(
             [
                 'user:id,nickname,phone,unionid',
                 'follow_staff:id,qw_name,follow_user_userid',
                 'source_staff:id,qw_name,follow_user_userid',
             ])
+//            ->where('unionid','<>','')
             ->when(!empty($params['name']), function ($query) use ($params) {
                 $query->where('name', $params['name']);
             })
@@ -87,7 +90,9 @@ class UserWechatController extends ControllerBackend
                 });
             });
 
-        $lists = $query->paginate(10)->toArray();
+        $lists = $query->paginate()->toArray();
+//        $logs = \Illuminate\Support\Facades\DB::getQueryLog();
+//        dd($logs);
 
         foreach ($lists['data'] as &$val){
             $val['follow_user_createtime'] =date('Y-m-d H:i:s',$val['follow_user_createtime']);
