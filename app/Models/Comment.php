@@ -189,11 +189,14 @@ class Comment extends Base
                 }
                 $isLike = Like::where(['relation_id' => $v['id'], 'type' => $like_type, 'user_id' => $uid])->first();
                 $v['is_like'] = $isLike ? 1 : 0;
+                $v['from_user']['new_vip'] = VipUser::newVipInfo($v['from_user']['id'])['vip_id'] ?1:0;
+                $v['to_user']['new_vip'] = VipUser::newVipInfo($v['to_user']['id'])['vip_id'] ?1:0;
             }
         }
         $comment['reply'] = $reply['data'];
         $comment['reward_num'] = $comment['reward'] ? count($comment['reward']) : 0;
 
+        $comment['user']['new_vip'] = VipUser::newVipInfo($comment['user_id'])['vip_id'] ?1:0;
         return $comment;
 
     }
