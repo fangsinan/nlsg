@@ -135,7 +135,7 @@ class UserWechatController extends ControllerBackend
                 $query->where('follow_user_userid', $params['userid']);
             });
 
-        $lists = $query->paginate(10)->toArray();
+        $lists = $query->paginate()->toArray();
 
         return success($lists);
     }
