@@ -90,7 +90,7 @@ class UserWechatController extends ControllerBackend
                 });
             });
 
-        $lists = $query->paginate()->toArray();
+        $lists = $query->paginate(get_page_size($params))->toArray();
 //        $logs = \Illuminate\Support\Facades\DB::getQueryLog();
 //        dd($logs);
 

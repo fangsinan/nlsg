@@ -197,3 +197,11 @@ function add_log($url,$message='',$parameter=''){
         'created_at'=>date('Y-m-d H:i:s'),
     ]);
 }
+
+
+function get_page_size($data){
+    if(empty($data['size']) || !is_numeric($data['size']) || $data['size']<=0){
+        return 10;
+    }
+    return  $data['size'];
+}
