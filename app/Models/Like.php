@@ -24,7 +24,7 @@ class Like extends Model
     public static function isLike($cid=0,$ctype=1,$uid=0,$like_type=3){
         $is_like = 0;
 
-        $res = Like::where(['comment_type'=>$ctype,'relation_id' => $cid, 'type' => $like_type, 'user_id' => $uid])->first();
+        $res = Like::where(['comment_type'=>$ctype,'relation_id' => $cid,  'user_id' => $uid])->first();
         if($res){
             $is_like = 1;
         }
