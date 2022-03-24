@@ -296,8 +296,8 @@ class UserWechatController extends ControllerBackend
      * @apiGroup 后台-客户转移日志
      * @apiParam transfer_record_id 转移记录ID
      * @apiParam user_wechat_id 用户ID
-     * @apiParam handover_user_id 原添加成员的id
-     * @apiParam takeover_user_id 接替成员的id
+     * @apiParam handover_userid 原添加成员的id
+     * @apiParam takeover_userid 接替成员的id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/search_transfer_log
      * @apiDescription 客户转移记录
      * @apiSuccessExample  Success-Response:

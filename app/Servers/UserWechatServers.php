@@ -458,14 +458,13 @@ class UserWechatServers
                     //添加新的跟进记录
                     $UserWechatFollow = new UserWechatFollow();
                     $UserWechatFollow->user_wechat_id = $UserWechat->id;
-                    $UserWechatFollow->follow_user_id = $transfer->takeover_user_id;
+//                    $UserWechatFollow->follow_user_id = $transfer->takeover_user_id;
                     $UserWechatFollow->external_userid = $customer['external_userid'];
                     $UserWechatFollow->follow_user_userid = $transfer->takeover_userid;
                     $res = $UserWechatFollow->save();
                     if (!$res) {
                         return false;
                     }
-
                 }
 
                 //同步日志转移状态
@@ -483,7 +482,6 @@ class UserWechatServers
                     if (!$res) {
                         return false;
                     }
-
                 }
             }
 
