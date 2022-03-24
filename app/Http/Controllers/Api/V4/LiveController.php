@@ -739,6 +739,9 @@ class LiveController extends Controller
             ->where('id', $id)
             ->first();
 
+        if( isset($list['user']['intro']) ){
+            $list['user']['intro'] = ''; //  直播间不显示讲师简介  3月24日需求
+        }
         //初始化人气值
         $redisConfig = config('database.redis.default');
         $redis = new Client($redisConfig);
