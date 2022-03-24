@@ -66,8 +66,8 @@ class WorksInfo extends Base
             unset($works_data[$key]['url']);
 
 
-            $works_data[$key]['time_leng'] = 0;
-            $works_data[$key]['time_number'] = 0;
+            $works_data[$key]['time_leng'] = (string)0;
+            $works_data[$key]['time_number'] = (string)0;
             $works_data[$key]['time_is_end'] = 0;
 
             if ($user_id) {
@@ -87,8 +87,8 @@ class WorksInfo extends Base
                     // 'is_del' => 0,
                 ])->orderBy('updated_at', 'desc')->first();
                 if ($his_data) {
-                    $works_data[$key]['time_leng'] = (int)$his_data->time_leng;
-                    $works_data[$key]['time_number'] = (int)$his_data->time_number;
+                    $works_data[$key]['time_leng'] = $his_data->time_leng;
+                    $works_data[$key]['time_number'] = $his_data->time_number;
                     $works_data[$key]['time_is_end'] = $his_data->is_end;
                 }
 
