@@ -543,4 +543,13 @@ class UserWechatServers
             return true;
         }
     }
+
+    /**
+     * 清理微信客户数据
+     * 1、清楚长时间等待转移的客户
+     * 2、清理转移失败的客户
+     */
+    public function clear_user_wechat_data(){
+
+    }
 }
