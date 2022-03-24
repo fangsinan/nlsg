@@ -333,6 +333,7 @@ class Kernel extends ConsoleKernel
         })->dailyAt('0:01');
 
 
+
         //每小时查询一次企业微信客户转移接口
         $schedule->call(function () {
             (new UserWechatServers())->consume_redis_transfer_customer();
