@@ -757,9 +757,6 @@ class AuthController extends Controller
     //登录返回字段
     function get_data($user, $token)
     {
-        //  添加公共字段  
-        $backendUser = BackendUser::where(['username'=>$user->phone])->first();
-
         return [
             'id' => $user->id,
             'token' => $token,
@@ -770,7 +767,6 @@ class AuthController extends Controller
             'sex' => $user->sex,
             'is_community_admin' => $user->is_community_admin,
             'children_age' => 10,//$user->children_age,
-            'is_admin_user' => empty($backendUser)?0:1,
         ];
     }
 
