@@ -184,7 +184,6 @@ class UserWechatController extends ControllerBackend
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/transfer_customer
      * @apiDescription 分配在职成员的客户
      *
-     * @apiParam {number} handover_userid 原跟进成员的userid
      * @apiParam {string} takeover_userid 接替成员的userid
      * @apiParam {string} userids 客户id 多个逗号拼接
      *
@@ -214,7 +213,6 @@ class UserWechatController extends ControllerBackend
 
         return success();
     }
-
 
 
     /**

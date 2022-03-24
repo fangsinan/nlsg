@@ -339,7 +339,8 @@ class UserWechatServers
                     //修改客户的接替状态为 等待接替
                     UserWechat::query()->where('external_userid', $customer['external_userid'])->update([
                         'transfer_status' => UserWechat::TRANSFER_STATUS_FAIL,//分配失败
-                        'updated_at' => date('Y-m-d H:i:s')
+                        'updated_at' => date('Y-m-d H:i:s'),
+                        'errcode'=>$customer['errcode']
                     ]);
 
                 }
@@ -378,6 +379,7 @@ class UserWechatServers
         foreach ($list as $transfer) {
 
             $res = $this->transfer_result_api($transfer, $transfer->next_cursor);
+
             Log::channel('wechat')->info('transfer_result_api_res:   ' . $res);
 
             if (!$res) {
@@ -542,5 +544,14 @@ class UserWechatServers
         } else {
             return true;
         }
+    }
+
+    /**
+     * 清理微信客户数据
+     * 1、清楚长时间等待转移的客户
+     * 2、清理转移失败的客户
+     */
+    public function clear_user_wechat_data(){
+
     }
 }
