@@ -558,5 +558,11 @@ class UserWechatServers
      */
     public function clear_user_wechat_data(){
 
+        $time=date('Y-m-d H:i:s',time()-3*24*60*60);
+        $user_list=UserWechat::query()
+            ->where('transfer_record_id','>',0)
+            ->where('transfer_start_time','<=',$time)->get();
+        var_dump($user_list);
+
     }
 }

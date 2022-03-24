@@ -20,6 +20,8 @@ class UserWechatController extends ControllerBackend
 
 
     public function test(){
+        $UserWechatServers = new UserWechatServers();
+        $UserWechatServers->clear_user_wechat_data();
 
     }
 
@@ -66,7 +68,7 @@ class UserWechatController extends ControllerBackend
             ->when(!empty($params['name']), function ($query) use ($params) {
                 $query->where('name', $params['name']);
             })
-            ->when(!empty($params['transfer_status']), function ($query) use ($params) {
+            ->when(isset($params['transfer_status']), function ($query) use ($params) {
                 $query->where('transfer_status', $params['transfer_status']);
             })
 
