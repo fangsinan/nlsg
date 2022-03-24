@@ -970,4 +970,12 @@ class Order extends Base
 
         return $res;
     }
+
+    public function pushErpInfo(){
+        return $this->hasOne(OrderErpList::class,'order_id','id');
+    }
+
+    public function expressInfo(){
+        return $this->hasOne(ExpressInfo::class,'id','express_info_id');
+    }
 }
