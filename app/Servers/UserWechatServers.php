@@ -260,7 +260,7 @@ class UserWechatServers
                 $this->transfer_customer_api($transfer_record_id,$handover_userid,$takeover_userid,$user_list);
             }
         }
-        add_log('consume_redis_transfer_customer-3','end');
+        add_log('consume_redis_transfer_customer-3','执行完成');
 
     }
 
