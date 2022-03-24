@@ -242,9 +242,13 @@ class UserWechatServers
      */
     public function consume_redis_transfer_customer(){
 
+        add_log('consume_redis_transfer_customer-1','开始请求客户转移');
+
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
         while ($msg = $Redis->rPop('user_wechat_transfer_customer')) {
+
+            add_log('consume_redis_transfer_customer-2',$msg);
 
             $data=json_decode($msg,true);
 
@@ -461,7 +465,6 @@ class UserWechatServers
                     $UserWechatFollow = new UserWechatFollow();
                     $UserWechatFollow->user_wechat_id = $UserWechat->id;
 
-//                    $UserWechatFollow->follow_user_id = $transfer->takeover_user_id;
 
                     $UserWechatFollow->external_userid = $customer['external_userid'];
                     $UserWechatFollow->follow_user_userid = $transfer->takeover_userid;
@@ -534,7 +537,6 @@ class UserWechatServers
 
             var_dump($detail_res);
             return false;
-
         }
 
         //递归查询下一页
@@ -545,6 +547,7 @@ class UserWechatServers
             return true;
         }
     }
+
 
     /**
      * 清理微信客户数据
