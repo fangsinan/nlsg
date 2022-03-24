@@ -810,7 +810,7 @@ class WechatPay extends Controller
                     DB::commit();
 
 					// 下单记录王琨老师的直播
-					if( !empty($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //刷单用户排除
+					if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //刷单用户排除
 						self::PayTeacherLives($user_id,$liveData,$orderInfo);
 					}
 					
