@@ -1345,6 +1345,7 @@ class IndexController extends Controller
         $data = [
             'h5_url' => ConfigModel::getData(45),
             'img_url' => ConfigModel::getData(44),
+            'nlsg_tel' => ConfigModel::getData(64),
         ];
         return success($data);
 

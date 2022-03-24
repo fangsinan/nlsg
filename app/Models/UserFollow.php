@@ -26,5 +26,10 @@ class UserFollow extends Model
     {
         return $this->belongsTo('App\Models\User','to_uid','id');
     }
+    public static function IsFollow($from_uid, $to_uid)
+    {
+        $follow = UserFollow::where(['from_uid' => $from_uid, 'to_uid' => $to_uid])->first();
+        return !empty($follow) ? 1 : 0;
+    }
 
 }

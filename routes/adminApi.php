@@ -356,6 +356,11 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
         Route::get('temp_tools/live_tools', 'TempToolsController@liveTools');
 
+
+        Route::get('erp_order/list', 'ErpOrderController@erpOrderList');//虚拟订单需发货列表
+        Route::post('address/add', 'AddressController@create');
+        Route::post('erp_order/bind_address', 'ErpOrderController@bindAddress');
+
     });
 });
 

@@ -543,7 +543,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('column/get_camp_list', 'ColumnController@getCampList');
 
 
-
+    Route::get('config', 'IndexController@config');
     Route::any('video/get_random_video', 'VideoController@getRandomVideo');
 
     Route::any('video/show', 'VideoController@show');
