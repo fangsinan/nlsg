@@ -314,8 +314,10 @@ class Kernel extends ConsoleKernel
             History::HistorySize();
         })->dailyAt('0:01');
 
+
         //每小时查询一次企业微信客户转移接口
         $schedule->call(function () {
+            (new UserWechatServers())->consume_redis_transfer_customer();
             (new UserWechatServers())->transfer_result();
         })->everyThirtyMinutes();
 //        })->hourly();
