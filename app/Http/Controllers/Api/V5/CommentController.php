@@ -324,9 +324,11 @@ class CommentController extends Controller
     public function editTop(Request $request)
     {
         $id = $request->input('id');
+        $is_top = $request->input('is_top');
 
         $validator = Validator::make($request->all(), [
-            'id' => 'bail:required|numeric',
+            'id' => 'required|numeric',
+            'is_top' => 'required|boolean',
         ]);
         if ($validator->fails()) {
             return $this->error(0,$validator->messages()->first());
@@ -342,7 +344,7 @@ class CommentController extends Controller
             return $this->error(1000,'评论不存在');
         }
        
-        $res = Comment::where('id', $id)->update(['is_top' => 1]);
+        $res = Comment::where('id', $id)->update(['is_top' => $is_top]);
         if(empty($res)){
             return $this->error(0,'操作失败');
         }
