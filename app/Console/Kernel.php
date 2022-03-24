@@ -29,6 +29,7 @@ use App\Servers\LiveConsoleServers;
 use App\Servers\removeDataServers;
 use App\Servers\UserWechatServers;
 use App\Servers\V5\ShareServers;
+use App\Servers\V5\WechatServers;
 use EasyWeChat\Factory;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -151,6 +152,23 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
         })->everyFiveMinutes()->runInBackground();//每5分
+
+        $schedule->call(function () {
+            WechatServers::GetOpenId(); //抓取微信公众号关注用户
+        })->everyMinute()->between('22:40', '23:59')->runInBackground();//每分钟执行一次
+
+//        $schedule->call(function () {
+//            WechatServers::SetAccessToken(); //生成token
+//        })->everyFiveMinutes()->runInBackground();//每5分
+
+        $schedule->call(function () {
+            WechatServers::TemplateLiveDesc(); //发送模板消息
+        })->dailyAt('09:55');
+
+        $schedule->call(function () {
+            WechatServers::TemplateLiveAsc(); //发送模板消息升序
+        })->dailyAt('09:55');
+
 
         $schedule->call(function () {
             $m = new LiveConsole();
