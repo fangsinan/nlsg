@@ -260,6 +260,8 @@ class UserWechatServers
                 $this->transfer_customer_api($transfer_record_id,$handover_userid,$takeover_userid,$user_list);
             }
         }
+        add_log('consume_redis_transfer_customer-3','end');
+
     }
 
 
@@ -303,7 +305,7 @@ class UserWechatServers
 
 //            var_dump($detail_res);
 
-            add_log('transfer_customer','迁移微信客户', $detail_res);
+            add_log('transfer_customer_api','迁移微信客户', $detail_res);
 
             $detail_res = json_decode($detail_res, true);
 
