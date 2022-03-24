@@ -19,11 +19,10 @@ class UserWechatController extends ControllerBackend
 {
 
 
-    public function test(){
-        $UserWechatServers = new UserWechatServers();
-        $UserWechatServers->clear_user_wechat_data();
-
-    }
+//    public function test(){
+//        $UserWechatServers = new UserWechatServers();
+//        $UserWechatServers->clear_user_wechat_data();
+//    }
 
     /**
      * @api {get} api/admin_v4/user_wechat/search_wechat_user_list 获取微信客户列表
@@ -130,6 +129,7 @@ class UserWechatController extends ControllerBackend
     public function search_wechat_staff_user_list(Request $request){
 
         $params= $request->input();
+
         $query = UserWechatName::query()
             ->when(!empty($params['name']), function ($query) use ($params) {
                 $query->where('qw_name', 'like', '%' . $params['name'] . '%');
@@ -138,7 +138,7 @@ class UserWechatController extends ControllerBackend
                 $query->where('follow_user_userid', $params['userid']);
             });
 
-        $lists = $query->paginate()->toArray();
+        $lists = $query->paginate(get_page_size($params))->toArray();
 
         return success($lists);
     }
