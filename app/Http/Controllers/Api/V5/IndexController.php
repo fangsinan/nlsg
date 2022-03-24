@@ -361,4 +361,20 @@ class IndexController extends Controller
         return success($data);
     }
 
+
+
+        //api/v4/index/config
+        public function config(Request $request)
+        {
+            //分享H5域名
+            //图片域名
+            $data = [
+                'h5_url' => ConfigModel::getData(45),
+                'img_url' => ConfigModel::getData(44),
+                'nlsg_tel' => ConfigModel::getData(64),
+            ];
+            return success($data);
+    
+        }
+
 }
