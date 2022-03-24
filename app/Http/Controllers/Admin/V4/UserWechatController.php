@@ -215,7 +215,6 @@ class UserWechatController extends ControllerBackend
     }
 
 
-
     /**
      * @api {get} api/admin_v4/user_wechat/transfer_result 查询转移客户结果
      * @apiVersion 4.0.0
