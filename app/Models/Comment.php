@@ -78,10 +78,13 @@ class Comment extends Base
                 //需求变化需要展示回复【回复者】的评论内容
                 if(!empty($v['reply'])){
                     foreach ($v['reply'] as $rep_k=>$rep_v){
+                        // 是否会员
                         $v['reply'][$rep_k]['from_user']['new_vip'] = VipUser::newVipInfo($rep_v['from_user']['id'])['vip_id'] ?1:0;
                         $v['reply'][$rep_k]['to_user']['new_vip'] = VipUser::newVipInfo($rep_v['to_user']['id'])['vip_id'] ?1:0;
+                        // 是否关注
+                        $v['reply'][$rep_k]['from_user']['is_follow'] = UserFollow::IsFollow($uid, $rep_v['from_user']['id']);
+                        $v['reply'][$rep_k]['to_user']['is_follow'] = UserFollow::IsFollow($uid, $rep_v['to_user']['id']);
 
-//                        $rep_v = $this->getReplay($rep_v['id']);
                         $v['reply'][$rep_k]['is_like'] = Like::isLike($rep_v['id'],2,$uid,$like_type);
                         $v['reply'][$rep_k]['created_at'] = History::DateTime($rep_v['created_at']);
                         $v['reply'][$rep_k]['reply'] = $this->getReplay($rep_v['id'],$uid,$like_type);
@@ -90,8 +93,8 @@ class Comment extends Base
                 }
 
 
-                $follow = UserFollow::where(['from_uid' => $uid, 'to_uid' => $v['user_id']])->first();
-                $v['is_follow'] = $follow ? 1 : 0;
+                $v['is_follow'] = UserFollow::IsFollow($uid, $v['user_id']);
+                // $v['is_follow'] = $follow ? 1 : 0;
                 $v['is_like'] = Like::isLike($v['id'],1,$uid,$like_type);
                 if($type != 7){
                     //只展示五条
@@ -114,12 +117,17 @@ class Comment extends Base
 
         if(!empty($reply_data)){
             foreach ($reply_data as $getReplay_key=>$getReplay_val){
-                //是否喜欢
+                //是否会员
                 $getReplay_val['from_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['from_user']['id'])['vip_id'] ?1:0;
                 $getReplay_val['to_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['to_user']['id'])['vip_id'] ?1:0;
+                //是否关注
+                $getReplay_val['from_user']['is_follow'] = UserFollow::IsFollow($uid, $getReplay_val['from_user']['id']);
+                $getReplay_val['to_user']['is_follow'] = UserFollow::IsFollow($uid, $getReplay_val['to_user']['id']);
 
-                $getReplay_val['is_like'] = Like::isLike($getReplay_val['id'],2,$uid,$like_type);
-                $getReplay_val['created_at'] = History::DateTime($getReplay_val['created_at']);
+
+
+                $getReplay_val['is_like']       = Like::isLike($getReplay_val['id'],2,$uid,$like_type);
+                $getReplay_val['created_at']    = History::DateTime($getReplay_val['created_at']);
                 $getReplay_val['reply'] = $this->getReplay($getReplay_val['id'],$uid,$like_type);
                 $subs[] = $getReplay_val;
             }
@@ -183,17 +191,31 @@ class Comment extends Base
             ->toArray();
         if ($reply['data']) {
             foreach ($reply['data'] as &$v) {
-                $like_type = 1;
-                if ($comment['type'] == 5) { //百科
-                    $like_type = 2;
-                }
-                $isLike = Like::where(['relation_id' => $v['id'], 'type' => $like_type, 'user_id' => $uid])->first();
-                $v['is_like'] = $isLike ? 1 : 0;
+                // $like_type = 1;
+                // if ($comment['type'] == 5) { //百科
+                //     $like_type = 2;
+                // } elseif ($comment['type'] == 7 ) {  //短视频
+                //     $like_type = 3;
+                // }
+                $v['is_like'] = Like::isLike($v['id'],2,$uid);
+                // $isLike = Like::where(['relation_id' => $v['id'], 'type' => $like_type, 'user_id' => $uid])->first();
+                // $v['is_like'] = $isLike ? 1 : 0;
+                $v['from_user']['new_vip'] = VipUser::newVipInfo($v['from_user']['id'])['vip_id'] ?1:0;
+                $v['to_user']['new_vip'] = VipUser::newVipInfo($v['to_user']['id'])['vip_id'] ?1:0;
             }
         }
         $comment['reply'] = $reply['data'];
         $comment['reward_num'] = $comment['reward'] ? count($comment['reward']) : 0;
 
+        // $like_type = 1;
+        // if ($comment['type'] == 5 ) {
+        //     $like_type = 2;
+        // } elseif ($comment['type'] == 7 ) {  //短视频
+        //     $like_type = 3;
+        // }
+
+        $comment['is_like'] = Like::isLike($comment['id'],1,$uid);
+        $comment['user']['new_vip'] = VipUser::newVipInfo($comment['user_id'])['vip_id'] ?1:0;
         return $comment;
 
     }

@@ -54,12 +54,15 @@ class UserWechatController extends ControllerBackend
 
         $params= $request->input();
 
+//        DB::connection()->enableQueryLog();
+
         $query = UserWechat::with(
             [
                 'user:id,nickname,phone,unionid',
                 'follow_staff:id,qw_name,follow_user_userid',
                 'source_staff:id,qw_name,follow_user_userid',
             ])
+//            ->where('unionid','<>','')
             ->when(!empty($params['name']), function ($query) use ($params) {
                 $query->where('name', $params['name']);
             })
@@ -87,7 +90,9 @@ class UserWechatController extends ControllerBackend
                 });
             });
 
-        $lists = $query->paginate(10)->toArray();
+        $lists = $query->paginate(get_page_size($params))->toArray();
+//        $logs = \Illuminate\Support\Facades\DB::getQueryLog();
+//        dd($logs);
 
         foreach ($lists['data'] as &$val){
             $val['follow_user_createtime'] =date('Y-m-d H:i:s',$val['follow_user_createtime']);
@@ -130,7 +135,7 @@ class UserWechatController extends ControllerBackend
                 $query->where('follow_user_userid', $params['userid']);
             });
 
-        $lists = $query->paginate(10)->toArray();
+        $lists = $query->paginate()->toArray();
 
         return success($lists);
     }
@@ -179,7 +184,6 @@ class UserWechatController extends ControllerBackend
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/transfer_customer
      * @apiDescription 分配在职成员的客户
      *
-     * @apiParam {number} handover_userid 原跟进成员的userid
      * @apiParam {string} takeover_userid 接替成员的userid
      * @apiParam {string} userids 客户id 多个逗号拼接
      *
@@ -198,60 +202,16 @@ class UserWechatController extends ControllerBackend
         $UserWechatServers = new UserWechatServers();
         $data=$request->input();
 //        $data=[
-//            'handover_userid'=>'SunXia',
-//            'takeover_userid'=>'DongYue',
-//            'userids'=>'137399,137400,137401',
+//            'handover_userid'=>'DongYue',
+//            'takeover_userid'=>'SunXia',
+//            'userids'=>'137728,137984,138240',
 //        ];
         $res=$UserWechatServers->transfer_customer($data);
-
         if(!checkRes($res)){
             return error(0,$res);
         }
 
         return success();
-    }
-    /**
-     * @api {get} api/admin_v4/user_wechat/transfer_customer_batch 批量转移客户
-     * @apiVersion 4.0.0
-     * @apiName  user_wechat/transfer_customer_batch
-     * @apiGroup 后台-微信客户管理
-     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/transfer_customer_batch
-     * @apiDescription 批量转移客户
-     *
-     * @apiParam {number} handover_userid 原跟进成员的userid
-     * @apiParam {string} takeover_userid 接替成员的userid
-     * @apiParam {string} start_time 开始时间
-     * @apiParam {string} end_time  结束时间
-     * @apiParam {string} is_transfer  是否转移 0否 1是 等于0是返回转移的客户数量
-     *
-     * @apiSuccessExample  Success-Response:
-     * HTTP/1.1 200 OK
-     * {
-     *   "code": 200,
-     *   "msg" : '成功',
-     *   "data": {
-     *
-     *    }
-     * }
-     */
-    public function transfer_customer_batch(Request $request){
-
-        $UserWechatServers = new UserWechatServers();
-        $data=$request->input();
-//        $data=[
-//            'handover_userid'=>'DongYue',
-//            'takeover_userid'=>'SunXia',
-//            'start_time'=>'2021-07-27 20:30:09',
-//            'end_time'=>'2021-10-02 20:26:40',
-//            'is_transfer'=>1
-//        ];
-        $res=$UserWechatServers->transfer_customer_batch($data);
-
-        if(!checkRes($res)){
-            return error(0,$res);
-        }
-
-        return success($res);
     }
 
 
@@ -334,8 +294,8 @@ class UserWechatController extends ControllerBackend
      * @apiGroup 后台-客户转移日志
      * @apiParam transfer_record_id 转移记录ID
      * @apiParam user_wechat_id 用户ID
-     * @apiParam handover_user_id 原添加成员的id
-     * @apiParam takeover_user_id 接替成员的id
+     * @apiParam handover_userid 原添加成员的id
+     * @apiParam takeover_userid 接替成员的id
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/search_transfer_log
      * @apiDescription 客户转移记录
      * @apiSuccessExample  Success-Response:

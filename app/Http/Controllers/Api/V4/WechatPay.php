@@ -556,7 +556,7 @@ class WechatPay extends Controller
             $textbook_id = $offdata['textbook_id'] ?? 0;
 
             //地址
-            $address_id = MallAddress::where([ 'is_del' => 0,"user_id"=>$orderInfo['user_id'],])->orderBy('is_default', 'desc')->first();
+            $address_id = MallAddress::where(['is_default' => 1, 'is_del' => 0,"user_id"=>$orderInfo['user_id'],])->first();
             //对应订单写三个值
             Order::where(['id' => $orderInfo['id'] ])->update([
                 'textbook_id'=> $textbook_id,
@@ -810,7 +810,7 @@ class WechatPay extends Controller
                     DB::commit();
 
 					// 下单记录王琨老师的直播
-					if( !empty($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //刷单用户排除
+					if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //刷单用户排除
 						self::PayTeacherLives($user_id,$liveData,$orderInfo);
 					}
 					
