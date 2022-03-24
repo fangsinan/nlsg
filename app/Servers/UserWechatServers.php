@@ -99,8 +99,11 @@ class UserWechatServers
         $detail_res = json_decode($detail_res, true);
 
         if ($detail_res['errcode'] == 0) {
+
             $UserWechat = UserWechat::query()->where('external_userid', $external_userid)->first();
+
             if (!$UserWechat) {
+
                 $created_at = date('Y-m-d H:i:s', $detail_res['follow_user'][0]['createtime']);
                 $UserWechat = new UserWechat();
                 $UserWechat->created_at = $created_at;
@@ -121,9 +124,11 @@ class UserWechatServers
             $UserWechat->avatar = $detail_res['external_contact']['avatar'] ?? "";
             $UserWechat->gender = $detail_res['external_contact']['gender'] ?? "";
             $UserWechat->unionid = $detail_res['external_contact']['unionid'] ?? "";
+
             $UserWechat->save();
 
             $detail_res['external_contact']['follow_user'] = $detail_res['follow_user'];
+
             return $detail_res['external_contact'];
         }
 
@@ -559,10 +564,17 @@ class UserWechatServers
     public function clear_user_wechat_data(){
 
         $time=date('Y-m-d H:i:s',time()-3*24*60*60);
+
         $user_list=UserWechat::query()
+            ->whereIn('transfer_status',[-1,2])
             ->where('transfer_record_id','>',0)
             ->where('transfer_start_time','<=',$time)->get();
-        var_dump($user_list);
 
+        foreach ($user_list as $user){
+
+            $this->get_user_info($user->external_userid);
+            $user->transfer_status=0;
+            $user->save();
+        }
     }
 }
