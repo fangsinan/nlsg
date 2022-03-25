@@ -451,7 +451,7 @@ class ErpServers
                 );
                 $temp_trade_list['buyer_message']    = '';
                 $temp_trade_list['post_amount']      = 0;
-                $temp_trade_list['paid']             = 0;
+                $temp_trade_list['paid']             = $v->orderInfo->textbookInfo->price;
                 $temp_trade_list['delivery_term']    = 1;
                 $temp_trade_list['cod_amount']       = 0;
                 $temp_trade_list['ext_cod_fee']      = 0;
@@ -500,11 +500,12 @@ class ErpServers
                 if (!empty($error_data)) {
                     DB::table('nlsg_mall_order_erp_error')->insert($error_data);
                 }
+            }else{
+                OrderErpList::query()
+                    ->whereIn('id', $list_ids)
+                    ->update(['flag' => 2]);
             }
 
-            OrderErpList::query()
-                ->whereIn('id', $list_ids)
-                ->update(['flag' => 2]);
         }
         return true;
     }
