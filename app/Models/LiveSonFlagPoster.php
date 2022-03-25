@@ -64,7 +64,8 @@ class LiveSonFlagPoster extends Model {
         $bg_colour='#fff';
         $count=count($temp_bg_img);
         if($count>0){
-            $bg_img[]=$temp_bg_img[0];
+            $temp_data['image'] = $temp_bg_img[0];
+            $bg_img[]=$temp_data;
         }
         if($count==2){
             $bg_colour=$temp_bg_img[1];
