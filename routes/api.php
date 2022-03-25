@@ -603,6 +603,8 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('camp/camp_study', 'CampController@campStudy');//->middleware('replaceNull');
     // 海报图
     Route::any('image/get_qr_code', 'ImageController@GetQrCode');//->middleware('replaceNull');
+    // 直播
     
+    Route::any('live/list', 'LiveController@getLiveLists');//->middleware('replaceNull');
     /**     5.0 API  END    ***/
 });
