@@ -496,35 +496,65 @@ class ErpServers
         return true;
     }
 
-    public function orderUpdateAddressId(){
+    public function orderUpdateAddressId() {
 
         $list = DB::table('nlsg_order_erp_list as oel')
-            ->join('nlsg_order as o','oel.order_id','=','o.id')
-            ->where('oel.flag','=',1)
-            ->where('o.address_id','=',0)
-            ->select(['oel.*','o.user_id','o.address_id'])
-            ->limit(100)
+            ->join('nlsg_order as o', 'oel.order_id', '=', 'o.id')
+            ->where('oel.flag', '=', 1)
+            ->where('o.address_id', '=', 0)
+            ->select(['oel.*', 'o.user_id', 'o.address_id'])
+            ->limit(400)
             ->get();
 
-        if ($list->isEmpty()){
-            return true;
-        }
+        if ($list->isNotEmpty()){
+            foreach ($list as $v) {
+                $temp_address = MallAddress::query()
+                    ->where('user_id', '=', $v->user_id)
+                    ->where('is_default', '=', 1)
+                    ->where('is_del', '=', 0)
+                    ->first();
 
-        foreach ($list as $v){
-            $temp_address = MallAddress::query()
-                ->where('user_id','=',$v->user_id)
-                ->where('is_default','=',1)
-                ->where('is_del','=',0)
-                ->first();
-
-            if ($temp_address){
-                Order::query()
-                    ->where('id','=',$v->order_id)
-                    ->update([
-                        'address_id'=>$temp_address->id
-                    ]);
+                if ($temp_address) {
+                    Order::query()
+                        ->where('id', '=', $v->order_id)
+                        ->update([
+                            'address_id' => $temp_address->id
+                        ]);
+                }
             }
         }
+
+
+//        $while_flag = true;
+//        while ($while_flag) {
+//            $list = DB::table('nlsg_order_erp_list as oel')
+//                ->join('nlsg_order as o', 'oel.order_id', '=', 'o.id')
+//                ->where('oel.flag', '=', 1)
+//                ->where('o.address_id', '=', 0)
+//                ->select(['oel.*', 'o.user_id', 'o.address_id'])
+//                ->limit(100)
+//                ->get();
+//            if ($list->isEmpty()) {
+//                $while_flag = false;
+//            } else {
+//                foreach ($list as $v) {
+//                    $temp_address = MallAddress::query()
+//                        ->where('user_id', '=', $v->user_id)
+//                        ->where('is_default', '=', 1)
+//                        ->where('is_del', '=', 0)
+//                        ->first();
+//
+//                    if ($temp_address) {
+//                        Order::query()
+//                            ->where('id', '=', $v->order_id)
+//                            ->update([
+//                                'address_id' => $temp_address->id
+//                            ]);
+//                    }
+//                }
+//            }
+//        }
+
     }
 
     public function __construct() {

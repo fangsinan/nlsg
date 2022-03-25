@@ -105,6 +105,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:ErpOrderPush')
             ->everyMinute()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
+        $schedule->command('command:ErpOrderAddAddress')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
 
         //mall order表推送到erp
         $schedule->command('command:ErpMallOrderPush')

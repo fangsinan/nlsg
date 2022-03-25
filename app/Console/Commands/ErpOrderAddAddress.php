@@ -5,14 +5,14 @@ namespace App\Console\Commands;
 use App\Servers\ErpServers;
 use Illuminate\Console\Command;
 
-class ErpOrderPush extends Command
+class ErpOrderAddAddress extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:ErpOrderPush';
+    protected $signature = 'command:ErpOrderAddAddress';
 
     /**
      * The console command description.
@@ -39,7 +39,6 @@ class ErpOrderPush extends Command
     public function handle()
     {
         $s = new ErpServers();
-        $s->pushRunForOrder();
+        $s->orderUpdateAddressId();
     }
 }
-
