@@ -401,9 +401,9 @@ class ErpServers
 
             $list = OrderErpList::query()
                 ->with([
-                    'orderInfo:id,type,live_num,user_id,status,ordernum,pay_price,created_at,pay_time,express_info_id,textbook_id,address_id',
+                    'orderInfo:id,type,live_num,user_id,status,ordernum,pay_price,created_at,pay_time,express_info_id,textbook_id,address_id,is_shill',
                     'orderInfo.addressInfo:id,name,phone,details,user_id,province,city,area',
-                    'orderInfo.textbookInfo:id,erp_sku,title,sub_title',
+                    'orderInfo.textbookInfo:id,erp_sku,title,sub_title,price',
                     'orderInfo.user:id,nickname,phone',
                     'orderInfo.addressInfo.area_province:id,fullname',
                     'orderInfo.addressInfo.area_city:id,fullname',
@@ -433,7 +433,13 @@ class ErpServers
                 $temp_trade_list['trade_time']       = date('Y-m-d H:i:s', strtotime($v->orderInfo->created_at));
                 $temp_trade_list['pay_time']         = date('Y-m-d H:i:s', strtotime($v->orderInfo->pay_time));
                 $temp_trade_list['buyer_nick']       = $this->filterEmoji($v->orderInfo->user->nickname);
-                $temp_trade_list['trade_status']     = 30;
+
+                if (empty($v->orderInfo->is_shill)){
+                    $temp_trade_list['trade_status']     = 30;
+                }else{
+                    $temp_trade_list['trade_status']     = 80;
+                }
+
                 $temp_trade_list['pay_status']       = 2;
                 $temp_trade_list['receiver_name']    = $v->orderInfo->addressInfo->name;
                 $temp_trade_list['receiver_mobile']  = $v->orderInfo->addressInfo->phone;
@@ -451,7 +457,15 @@ class ErpServers
                 $temp_trade_list['ext_cod_fee']      = 0;
 
                 $temp_order_list['oid']           = $v->id . '_' . $v->order_id;
-                $temp_order_list['status']        = 30;//子订单状态
+
+
+                if (empty($v->orderInfo->is_shill)){
+                    $temp_order_list['status']        = 30;//子订单状态
+                }else{
+                    $temp_order_list['status']        = 80;//子订单状态
+                }
+
+
                 $temp_order_list['refund_status'] = 0;//0是无退款
 
                 $temp_order_list['goods_id'] = $v->orderInfo->textbook_id;//平台货品id
@@ -459,7 +473,7 @@ class ErpServers
 
                 $temp_order_list['spec_no']        = strval($v->orderInfo->textbookInfo->erp_sku);//平台货品SKU唯一码，对应ERP商家编码，goods_no和spec_no不能同时为空
                 $temp_order_list['goods_name']     = strval($v->orderInfo->textbookInfo->title);//商品名称
-                $temp_order_list['price']          = 0;
+                $temp_order_list['price']          = $v->orderInfo->textbookInfo->price;
                 $temp_order_list['spec_name']      = strval($v->orderInfo->textbookInfo->sub_title);
                 $temp_order_list['num']            = max($v->orderInfo->live_num, 1);
                 $temp_order_list['adjust_amount']  = '0'; //手工调整;特别注意:正的表示加价;负的表示减价
@@ -469,7 +483,6 @@ class ErpServers
                 $temp_trade_list['order_list'][] = $temp_order_list;
                 $trade_list[]                    = $temp_trade_list;
             }
-
             $res = $this->pushOrderJob($trade_list);
 
             if ($res['code'] != true) {
