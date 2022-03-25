@@ -70,10 +70,10 @@ class LiveSonFlagPoster extends Model {
             $bg_colour=$temp_bg_img[1];
         }
 
-        foreach ($temp_bg_img as $v) {
+        /*foreach ($temp_bg_img as $v) {
             $temp_data['image'] = $v;
             $bg_img[]           = $temp_data;
-        }
+        }*/
 
         $res    = $query->paginate($size);
         $custom = collect(['bg_img' => $bg_img,'bg_colour'=>$bg_colour]);
