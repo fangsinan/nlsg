@@ -19,10 +19,12 @@ class UserWechatController extends ControllerBackend
 {
 
 
-//    public function test(){
-//        $UserWechatServers = new UserWechatServers();
-//        $UserWechatServers->clear_user_wechat_data();
-//    }
+    public function test(){
+
+        $UserWechatServers = new UserWechatServers();
+        $res=$UserWechatServers->get_user_info('wmk8dJEQAAdlUbejLnmJA2zI8MExNZ4g');
+        var_dump($res);
+    }
 
     /**
      * @api {get} api/admin_v4/user_wechat/search_wechat_user_list 获取微信客户列表
