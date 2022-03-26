@@ -349,6 +349,12 @@ class UserWechat extends Controller {
                     if(!empty($detail_res['follow_user'][0]['createtime'])){
                         $created_at=date('Y-m-d H:i:s',$detail_res['follow_user'][0]['createtime']);
                     }
+
+                    if(count($detail_res['follow_user'])==1){
+                        $add_data['is_multiple_staff']=1;
+                    }else{
+                        $add_data['is_multiple_staff']=2;
+                    }
                     $add_data['source_follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
                     $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
                     $add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';

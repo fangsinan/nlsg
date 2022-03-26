@@ -114,11 +114,9 @@ class UserWechatServers
 
         if ($detail_res['errcode'] == 0) {
 
-
             $UserWechat = UserWechat::query()->where('external_userid', $external_userid)->first();
 
             $follow_user_arr=$detail_res['follow_user'];
-
 
             if ($UserWechat) {
 
@@ -190,7 +188,13 @@ class UserWechatServers
             $UserWechat->avatar = $detail_res['external_contact']['avatar'] ?? "";
             $UserWechat->gender = $detail_res['external_contact']['gender'] ?? "";
             $UserWechat->unionid = $detail_res['external_contact']['unionid'] ?? "";
+            $UserWechat->follow_user_userid_list = implode(',',array_column($follow_user_arr,'userid'));
+            if(count($follow_user_arr)==1){
+                $UserWechat->is_multiple_staff=1;
 
+            }else{
+                $UserWechat->is_multiple_staff=2;
+            }
             $UserWechat->save();
 
             $detail_res['external_contact']['follow_user'] = $detail_res['follow_user'];
