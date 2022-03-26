@@ -35,6 +35,7 @@ class erpOrderServers
             'addressInfo.area_area:id,name',
             'pushErpInfo:id,order_id,flag',
             'expressInfo:id,express_id,express_num,history',
+            'payRefundInfo:id,order_id,created_at',
         ]);
 
         $query->whereHas('user', function ($q) {
@@ -103,6 +104,12 @@ class erpOrderServers
 
         foreach ($res as $v) {
             $v->send_status = (int)($v->pushErpInfo->flag ?? 0);
+
+            if (isset($v->payRefundInfo->created_at )){
+                $v->refund_time = date('Y-m-d H:i:s',strtotime($v->payRefundInfo->created_at));
+            }else{
+                $v->refund_time = '';
+            }
 
             if ($v->is_shill === 0) {
                 $v->shill_status = 1;
