@@ -27,6 +27,19 @@ class UserWechatServers
         $this->token = $this->getAccess_token();
     }
 
+//    public function test(){
+//
+//        $data = [
+//            'handover_userid' => "WangShaoWei",
+//            'takeover_userid' => "HanJian",
+//            'cursor' => '',
+//        ];
+//
+//        $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_result?access_token=' . $this->token, json_encode($data));
+//
+//        var_dump($detail_res);
+//    }
+
     /**
      * @return mixed
      * 获取token
@@ -89,10 +102,11 @@ class UserWechatServers
      * @return bool|mixed
      * 获取客户详情
      */
-    public function get_user_info($external_userid)
+    public function get_user_info($external_userid,$follow_user_userid='')
     {
 
         $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=" . $this->token . '&external_userid=' . $external_userid;
+
         $detail_res = ImClient::curlGet($getDetail_url);
 
 
@@ -100,23 +114,70 @@ class UserWechatServers
 
         if ($detail_res['errcode'] == 0) {
 
+
             $UserWechat = UserWechat::query()->where('external_userid', $external_userid)->first();
 
-            if (!$UserWechat) {
+            $follow_user_arr=$detail_res['follow_user'];
 
-                $created_at = date('Y-m-d H:i:s', $detail_res['follow_user'][0]['createtime']);
+
+            if ($UserWechat) {
+
+                //获取销售列表
+
+                $saleArr=UserWechatName::query()->where('is_sale',2)->pluck('follow_user_userid')->toArray();
+
+                $first_follow_user=[];
+
+                $farmat_follow_user=[];
+                foreach ($follow_user_arr as $val){
+                    $farmat_follow_user[$val['userid']]=$val;
+                    if(empty($first_follow_user) && in_array($val['userid'],$saleArr)){
+                        $first_follow_user=$val;
+                    }
+                }
+
+
+                if($follow_user_userid && isset($farmat_follow_user[$follow_user_userid])){
+                    //分配员工
+                    $follow_user=$farmat_follow_user[$follow_user_userid];
+
+                }elseif(empty($follow_user) && isset($farmat_follow_user[$UserWechat->source_follow_user_userid])){
+                    //来源员工
+                    $follow_user=$farmat_follow_user[$UserWechat->source_follow_user_userid];
+
+                } elseif(empty($follow_user) && isset($farmat_follow_user[$UserWechat->follow_user_userid])){
+                    //当前用户所属员工
+                    $follow_user=$farmat_follow_user[$UserWechat->follow_user_userid];
+
+                }elseif (empty($follow_user) && $first_follow_user){
+
+                    //最早添加的业务员企业微信
+                    $follow_user=$first_follow_user;
+
+                }
+
+                if(empty($follow_user)){
+                    //第一个员工
+                    $follow_user=$follow_user_arr[0];
+                }
+
+            }else{
+
+                $follow_user=$follow_user_arr[0];
+
                 $UserWechat = new UserWechat();
+                $created_at = date('Y-m-d H:i:s', $follow_user['createtime']);
                 $UserWechat->created_at = $created_at;
-                $UserWechat->source_follow_user_tags_add_way = $detail_res['follow_user'][0]['add_way'] ?? '';
-                $UserWechat->source_follow_user_userid = $detail_res['follow_user'][0]['userid'] ?? '';
+                $UserWechat->source_follow_user_tags_add_way = $follow_user['add_way'] ?? '';
+                $UserWechat->source_follow_user_userid = $follow_user['userid'] ?? '';
             }
 
-            $UserWechat->follow_user_userid = $detail_res['follow_user'][0]['userid'] ?? '';
-            $UserWechat->follow_user_remark = $detail_res['follow_user'][0]['remark'] ?? '';
-            $UserWechat->follow_user_description = $detail_res['follow_user'][0]['description'] ?? '';
-            $UserWechat->follow_user_createtime = $detail_res['follow_user'][0]['createtime'] ?? '';
-            $UserWechat->follow_user_tags_oper_userid = $detail_res['follow_user'][0]['oper_userid'] ?? '';
-            $UserWechat->follow_user_tags_add_way = $detail_res['follow_user'][0]['add_way'] ?? '';
+            $UserWechat->follow_user_userid = $follow_user['userid'] ?? '';
+            $UserWechat->follow_user_remark = $follow_user['remark'] ?? '';
+            $UserWechat->follow_user_description = $follow_user['description'] ?? '';
+            $UserWechat->follow_user_createtime = $follow_user['createtime'] ?? '';
+            $UserWechat->follow_user_tags_oper_userid = $follow_user['oper_userid'] ?? '';
+            $UserWechat->follow_user_tags_add_way = $follow_user['add_way'] ?? '';
 
             $UserWechat->external_userid = $detail_res['external_contact']['external_userid'] ?? "";
             $UserWechat->name = $detail_res['external_contact']['name'] ?? "";
@@ -460,7 +521,7 @@ class UserWechatServers
                 if ($customer['status'] == UserWechat::TRANSFER_STATUS_FINISH && $UserWechat) {
 
                     //更新微信客户信息
-                    $this->get_user_info($customer['external_userid']);
+                    $this->get_user_info($customer['external_userid'],$takeover_userid);
 
                     //修改之前的跟进记录
                     UserWechatFollow::query()->where('external_userid', $customer['external_userid'])->where('status', UserWechatFollow::STATUS_ING)->update([
@@ -577,4 +638,5 @@ class UserWechatServers
             $user->save();
         }
     }
+
 }
