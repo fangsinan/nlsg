@@ -4,11 +4,10 @@ namespace App\Servers\V5;
 
 use App\Models\MallAddress;
 use App\Models\Order;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class erpOrderServers
 {
-    public function list($params): LengthAwarePaginator {
+    public function list($params, $is_excel = 0) {
         $search_relation_id = [7, 8, 10];
         $size               = $params['size'] ?? 10;
         $ordernum           = $params['ordernum'] ?? '';
@@ -94,7 +93,13 @@ class erpOrderServers
             $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
         }
 
-        $res = $query->paginate($size);
+        if ($is_excel === 1) {
+            $page = $params['page'] ?? 1;
+            $res  = $query->limit($size)->offset(($page - 1) * $size)->get();
+        } else {
+            $res = $query->paginate($size);
+        }
+
 
         foreach ($res as $v) {
             $v->send_status = (int)($v->pushErpInfo->flag ?? 0);
