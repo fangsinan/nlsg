@@ -60,13 +60,24 @@ class LiveSonFlagPoster extends Model {
         $temp_bg_img = ConfigModel::getData(57);
         $temp_bg_img = explode(',', $temp_bg_img);
         $bg_img      = [];
-        foreach ($temp_bg_img as $v) {
-            $temp_data['image'] = $v;
-            $bg_img[]           = $temp_data;
+
+        $bg_colour='#fff';
+        $count=count($temp_bg_img);
+        if($count>0){
+            $temp_data['image'] = $temp_bg_img[0];
+            $bg_img[]=$temp_data;
+        }
+        if($count==2){
+            $bg_colour=$temp_bg_img[1];
         }
 
+        /*foreach ($temp_bg_img as $v) {
+            $temp_data['image'] = $v;
+            $bg_img[]           = $temp_data;
+        }*/
+
         $res    = $query->paginate($size);
-        $custom = collect(['bg_img' => $bg_img]);
+        $custom = collect(['bg_img' => $bg_img,'bg_colour'=>$bg_colour]);
         return $custom->merge($res);
     }
 

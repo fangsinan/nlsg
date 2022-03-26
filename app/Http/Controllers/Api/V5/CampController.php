@@ -362,7 +362,7 @@ class CampController extends Controller
             // 'info_id' => 'bail:numeric',
         ]);
         if ($validator->fails()) {
-            return $this->error(0,$validator->messages()->first());
+            return $this->error(1000,$validator->messages()->first(),(object)[]);
         }
         $camp_id = $request->input('id', 0);  //训练营id
         // $camp_info_id = $request->input('info_id', 0);  
@@ -374,14 +374,14 @@ class CampController extends Controller
 
         $column_data = Column::find($camp_id);
         if (empty($column_data)) {
-            return $this->error(0, '参数有误：无此信息');
+            return $this->error(1000, '参数有误：无此信息',(object)[]);
         }
 
         // 训练营 每周开放六节课程   
         // 查询训练营目前开放的全部课程 ，每六个章节为一周，查询历史记录表是否完结
         $is_sub = Subscribe::isSubscribe($user_id, $column_data['id'], 7);
         if($is_sub ==0){
-            return $this->error(0,'您当前尚未加入该训练营');
+            return $this->error(1000,'您当前尚未加入该训练营',(object)[]);
         }
         // crm_camp_prize  奖品
         $prize = CampPrize::select('week_num','title as prize_title','cover_pic as prize_pic')->where(['column_id'=>$column_data['id'],'status'=>1])->get()->toArray();

@@ -66,8 +66,8 @@ class WorksInfo extends Base
             unset($works_data[$key]['url']);
 
 
-            $works_data[$key]['time_leng'] = 0;
-            $works_data[$key]['time_number'] = 0;
+            $works_data[$key]['time_leng'] = (string)0;
+            $works_data[$key]['time_number'] = (string)0;
             $works_data[$key]['time_is_end'] = 0;
 
             if ($user_id) {
@@ -340,6 +340,12 @@ class WorksInfo extends Base
         $works_info->is_collection = $info_list[$info_key]['is_collection']; //兼容V4
         $info_list[$info_key]['is_like'] =ContentLike::isLike($like_type,$works_id,$user['id'],$works_info_id);
         $info_list[$info_key]['column_banner'] = Column::getCampBanner($column_id,$this->user,$params);
+
+        //  统计章节的评论数   由于训练营是共用章节 所以需要单独统计评论表和回复表
+        $CommentIds = Comment::where(['type'=>6,'relation_id'=>1,'info_id'=>2,])->pluck("id")->toArray() ?? [];
+        $replay_num = CommentReply::whereIn('comment_id',$CommentIds)->count();
+        $info_list[$info_key]['comment_num'] = (int)(count($CommentIds) + $replay_num);
+
 
         $list['previous'] = $this->three2one($info_list[$info_key - 1], $is_show_url);
         $list['current'] = $this->three2one($info_list[$info_key], $is_show_url);

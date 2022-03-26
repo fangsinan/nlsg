@@ -457,7 +457,7 @@ class CommentController extends Controller
             $comment =  Comment::where('id', $id)->first();
             $c_type = $comment['type'];
         }else{
-            $comment = CommentReply::where('id', $input['comment_id'])->first();
+            $comment = CommentReply::where('id', $id)->first();
 
             $main_comment = Comment::where('id', $comment['comment_id'])->first();
             $c_type = $main_comment['type'];

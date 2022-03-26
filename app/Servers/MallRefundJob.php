@@ -521,6 +521,12 @@ class MallRefundJob
             ->whereIn('id', $id_list)
             ->update(['is_refund' => 1]);
 
+        //order_erp重新推送
+        DB::table('nlsg_order_erp_list')
+            ->whereIn('order_id',$id_list)
+            ->where('flag','=',2)
+            ->update(['flag'=>1]);
+
         foreach ($list as $v) {
             $temp_res = [];
             switch ($v->client) {
