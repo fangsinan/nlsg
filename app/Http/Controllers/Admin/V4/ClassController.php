@@ -1736,6 +1736,7 @@ class ClassController extends ControllerBackend
         if(empty($data['id'])){
             return error('参数错误');
         }
+
         $id=$data['id'];
 
         $Column = Column::query()->where('id', '=',$id)
@@ -1748,34 +1749,50 @@ class ClassController extends ControllerBackend
         }
 
         $column_id = $Column->info_column_id === 0 ? $Column->id : $Column->info_column_id;
-        $query = WorksInfo::query()
-            ->where('column_id', '=', $column_id)
-            ->where('status', '=', 4)
-            ->select(['id', 'title', DB::raw("$id as works_id"), 'id as works_info_id'])
-            ->orderBy('rank')
-            ->orderBy('id');;
 
-        $list = $query->get()->toArray();
+        $query_sql="
+            SELECT
+             works_info.title as works_info_title,
+                            sub.id AS sub_id,
+                            his.id AS history_id,
+                            sub.user_id,
+                            u.nickname,
+                            u.phone,
+                            works_info.status,
+                            IF
+                            ( his.is_end = 1, 1, 0 ) AS is_end,
+                        IF
+                            ( his.is_end = 1,( IF ( his.end_time IS NULL, his.updated_at, his.end_time )), '-' ) AS end_time
+
+
+            from nlsg_works_info as  works_info
+
+            LEFT JOIN nlsg_history his on his.info_id=works_info.id and his.relation_type = 5 and his.relation_id=".$id."
+
+            LEFT JOIN nlsg_subscribe sub on sub.user_id=his.user_id and sub.type=7 and sub.relation_id=".$id."
+
+            left join nlsg_user as u on u.id=his.user_id
+
+            where  works_info.status=4 and works_info.column_id=".$column_id." and his.is_end=1 and sub.`status` = 1 and sub.is_del = 0
+
+            order by works_info.rank,works_info.id";
+
+        $list  = DB::select($query_sql);
 
         $exprotData=[];
-        $servers = new CampServers();
 
         foreach ($list as $val){
-            $data = $servers->CampClockInInfo(['is_no_page'=>1,'is_end'=>1,'works_id'=>$val['works_id'],'works_info_id'=>$val['works_info_id']]);
-            foreach ($data['data'] as $sub){
-                $exprotData[]=[
-                    'works_info_title'=>$val['title'],
-                    'nickname'=>$sub->nickname,
-                    'phone'=>strval($sub->phone),
-                    'is_end'=>'已打卡',
-                    'end_time'=>$sub->end_time,
-                ];
-            }
+            $exprotData[]=[
+                'works_info_title'=>$val->works_info_title,
+                'nickname'=>$val->nickname,
+                'phone'=>strval($val->phone),
+                'is_end'=>'已打卡',
+                'end_time'=>$val->end_time,
+            ];
         }
 
-
         $columns = ['章节名称', '姓名', '联系方式', '打卡状态', '打卡时间'];
-        $fileName = '学员打卡详情'.date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
+        $fileName = '学员打卡详情-'.date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
