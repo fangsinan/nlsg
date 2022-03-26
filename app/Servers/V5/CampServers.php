@@ -137,7 +137,11 @@ where sub.relation_id = $works_id and sub.type = 7 and sub.`status` = 1 and sub.
         }
 
         $count_sql = 'select count(*) as counts ' . $sql;
-        $query_sql = 'select *  ' . $sql . ' limit ' . $size . ' offset ' . $offset;
+        if(empty($params['is_no_page'])){
+            $query_sql = 'select *  ' . $sql . ' limit ' . $size . ' offset ' . $offset;
+        }else{
+            $query_sql = 'select *  ' . $sql;
+        }
 
         $total = DB::select($count_sql);
         $data  = DB::select($query_sql);
