@@ -978,4 +978,8 @@ class Order extends Base
     public function expressInfo(){
         return $this->hasOne(ExpressInfo::class,'id','express_info_id');
     }
+
+    public function payRefundInfo(){
+        return $this->hasOne(OrderPayRefund::class,'order_id','ordernum');
+    }
 }

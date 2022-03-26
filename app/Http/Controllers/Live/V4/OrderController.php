@@ -192,7 +192,7 @@ class OrderController extends ControllerBackend
                             $temp_v['p_status'] = '待支付';
                             break;
                         default:
-                            $temp_v['type'] = '错误';
+                            $temp_v['p_status'] = '错误';
                     }
                     $temp_v['p_status'] = '已支付' ?? '';
                     switch (intval($v->pay_type)) {
@@ -209,7 +209,7 @@ class OrderController extends ControllerBackend
                             $temp_v['pay_type'] = '苹果';
                             break;
                         default:
-                            $temp_v['type'] = '错误';
+                            $temp_v['pay_type'] = '错误';
                     }
 
                     $temp_v['time'] = $v->pay_time ?? '';

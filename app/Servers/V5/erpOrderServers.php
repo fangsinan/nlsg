@@ -4,11 +4,10 @@ namespace App\Servers\V5;
 
 use App\Models\MallAddress;
 use App\Models\Order;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class erpOrderServers
 {
-    public function list($params): LengthAwarePaginator {
+    public function list($params, $is_excel = 0) {
         $search_relation_id = [7, 8, 10];
         $size               = $params['size'] ?? 10;
         $ordernum           = $params['ordernum'] ?? '';
@@ -36,6 +35,7 @@ class erpOrderServers
             'addressInfo.area_area:id,name',
             'pushErpInfo:id,order_id,flag',
             'expressInfo:id,express_id,express_num,history',
+            'payRefundInfo:id,order_id,created_at',
         ]);
 
         $query->whereHas('user', function ($q) {
@@ -94,10 +94,22 @@ class erpOrderServers
             $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
         }
 
-        $res = $query->paginate($size);
+        if ($is_excel === 1) {
+            $page = $params['page'] ?? 1;
+            $res  = $query->limit($size)->offset(($page - 1) * $size)->get();
+        } else {
+            $res = $query->paginate($size);
+        }
+
 
         foreach ($res as $v) {
             $v->send_status = (int)($v->pushErpInfo->flag ?? 0);
+
+            if (isset($v->payRefundInfo->created_at )){
+                $v->refund_time = date('Y-m-d H:i:s',strtotime($v->payRefundInfo->created_at));
+            }else{
+                $v->refund_time = '';
+            }
 
             if ($v->is_shill === 0) {
                 $v->shill_status = 1;
