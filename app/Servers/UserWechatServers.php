@@ -123,12 +123,12 @@ class UserWechatServers
             if ($UserWechat) {
 
                 //获取销售列表
-
                 $saleArr=UserWechatName::query()->where('is_sale',2)->pluck('follow_user_userid')->toArray();
 
                 $first_follow_user=[];
 
                 $farmat_follow_user=[];
+
                 foreach ($follow_user_arr as $val){
                     $farmat_follow_user[$val['userid']]=$val;
                     if(empty($first_follow_user) && in_array($val['userid'],$saleArr)){
@@ -138,27 +138,32 @@ class UserWechatServers
 
 
                 if($follow_user_userid && isset($farmat_follow_user[$follow_user_userid])){
+
                     //分配员工
                     $follow_user=$farmat_follow_user[$follow_user_userid];
 
+                }elseif (empty($follow_user) && $first_follow_user){
+
+                    //最早添加的销售员工的企业微信
+                    $follow_user=$first_follow_user;
+
                 }elseif(empty($follow_user) && isset($farmat_follow_user[$UserWechat->source_follow_user_userid])){
+
                     //来源员工
                     $follow_user=$farmat_follow_user[$UserWechat->source_follow_user_userid];
 
                 } elseif(empty($follow_user) && isset($farmat_follow_user[$UserWechat->follow_user_userid])){
+
                     //当前用户所属员工
                     $follow_user=$farmat_follow_user[$UserWechat->follow_user_userid];
-
-                }elseif (empty($follow_user) && $first_follow_user){
-
-                    //最早添加的业务员企业微信
-                    $follow_user=$first_follow_user;
 
                 }
 
                 if(empty($follow_user)){
+
                     //第一个员工
                     $follow_user=$follow_user_arr[0];
+
                 }
 
             }else{
