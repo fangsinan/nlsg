@@ -2514,4 +2514,78 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
 
 
     }
+
+    public function hafoOrderBind(){
+        $page = 1;
+        $size = 100;
+        $begin_at = date('Y-m-d 00:00:00');
+        $end_at = date('Y-m-d 23:59:59', strtotime("+1 years"));
+
+        $while_flag = true;
+
+        while ($while_flag){
+            $list = DB::table('nlsg_order as o')
+                ->join('nlsg_user as u','o.user_id','=','u.id')
+                ->where('o.type','=',14)
+                ->where('o.relation_id','=',10)
+                ->where('o.status','=',1)
+                ->where('o.is_shill','=',0)
+                ->where('u.is_test_pay','=',0)
+                ->where('o.pay_price','=',4.99)
+                ->where('o.remark','=','')
+                ->select(['u.phone','o.id'])
+                ->limit($size)
+                ->offset(($page-1)*$size)
+                ->get();
+
+            $page++;
+
+            if ($list->isNotEmpty()){
+                foreach ($list as $v){
+                    if (strlen($v->phone) !== 11){
+                        Order::query()
+                            ->where('id','=',$v->id)
+                            ->update([
+                                'remark'=>'220326哈佛导入关系保护失败:账号不合法'
+                            ]);
+                    }else{
+                        $temp_res = VipUserBind::query()->firstOrCreate([
+                            'son'=>$v->phone,
+                            'status'=>1
+                        ],[
+                            'parent'   => 18512378959,
+                            'life'     => 2,
+                            'begin_at' => $begin_at,
+                            'end_at' => $end_at,
+                            'channel'  => 5,
+                        ]);
+
+                        if ($temp_res->wasRecentlyCreated){
+                            Order::query()
+                                ->where('id','=',$v->id)
+                                ->update([
+                                    'remark'=>'220326哈佛导入关系保护成功'
+                                ]);
+                        }else{
+                            Order::query()
+                                ->where('id','=',$v->id)
+                                ->update([
+                                    'remark'=>'220326哈佛导入关系保护失败:已有'
+                                ]);
+                        }
+
+                    }
+
+
+                }
+            }else{
+                $while_flag = false;
+            }
+        }
+
+
+
+
+
+    }
 }
