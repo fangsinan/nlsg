@@ -114,21 +114,19 @@ class UserWechatServers
 
         if ($detail_res['errcode'] == 0) {
 
-
             $UserWechat = UserWechat::query()->where('external_userid', $external_userid)->first();
 
             $follow_user_arr=$detail_res['follow_user'];
 
-
             if ($UserWechat) {
 
                 //获取销售列表
-
                 $saleArr=UserWechatName::query()->where('is_sale',2)->pluck('follow_user_userid')->toArray();
 
                 $first_follow_user=[];
 
                 $farmat_follow_user=[];
+
                 foreach ($follow_user_arr as $val){
                     $farmat_follow_user[$val['userid']]=$val;
                     if(empty($first_follow_user) && in_array($val['userid'],$saleArr)){
@@ -138,27 +136,32 @@ class UserWechatServers
 
 
                 if($follow_user_userid && isset($farmat_follow_user[$follow_user_userid])){
+
                     //分配员工
                     $follow_user=$farmat_follow_user[$follow_user_userid];
 
+                }elseif (empty($follow_user) && $first_follow_user){
+
+                    //最早添加的销售员工的企业微信
+                    $follow_user=$first_follow_user;
+
                 }elseif(empty($follow_user) && isset($farmat_follow_user[$UserWechat->source_follow_user_userid])){
+
                     //来源员工
                     $follow_user=$farmat_follow_user[$UserWechat->source_follow_user_userid];
 
                 } elseif(empty($follow_user) && isset($farmat_follow_user[$UserWechat->follow_user_userid])){
+
                     //当前用户所属员工
                     $follow_user=$farmat_follow_user[$UserWechat->follow_user_userid];
-
-                }elseif (empty($follow_user) && $first_follow_user){
-
-                    //最早添加的业务员企业微信
-                    $follow_user=$first_follow_user;
 
                 }
 
                 if(empty($follow_user)){
+
                     //第一个员工
                     $follow_user=$follow_user_arr[0];
+
                 }
 
             }else{
@@ -185,7 +188,13 @@ class UserWechatServers
             $UserWechat->avatar = $detail_res['external_contact']['avatar'] ?? "";
             $UserWechat->gender = $detail_res['external_contact']['gender'] ?? "";
             $UserWechat->unionid = $detail_res['external_contact']['unionid'] ?? "";
+            $UserWechat->follow_user_userid_list = implode(',',array_column($follow_user_arr,'userid'));
+            if(count($follow_user_arr)==1){
+                $UserWechat->is_multiple_staff=1;
 
+            }else{
+                $UserWechat->is_multiple_staff=2;
+            }
             $UserWechat->save();
 
             $detail_res['external_contact']['follow_user'] = $detail_res['follow_user'];

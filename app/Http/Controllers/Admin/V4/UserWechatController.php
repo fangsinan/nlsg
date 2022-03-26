@@ -21,9 +21,10 @@ class UserWechatController extends ControllerBackend
 
     public function test(){
 
-        $UserWechatServers = new UserWechatServers();
-        $res=$UserWechatServers->get_user_info('wmk8dJEQAAdlUbejLnmJA2zI8MExNZ4g');
-        var_dump($res);
+//        $UserWechatServers = new UserWechatServers();
+//        $res=$UserWechatServers->get_user_info('wok8dJEQAAdOT37rRpX-CUZCuFYPWt5Q');
+//        $res=\App\Http\Controllers\Api\V4\UserWechat::getUserDetail(['wok8dJEQAAdOT37rRpX-CUZCuFYPWt5Q'],$UserWechatServers->token);
+//        var_dump($res);
     }
 
     /**

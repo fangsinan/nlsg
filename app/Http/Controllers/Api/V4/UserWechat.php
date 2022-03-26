@@ -344,11 +344,21 @@ class UserWechat extends Controller {
 
             if( $detail_res['errcode'] == 0 ){
                 $userr=DB::table($table)->where('external_userid',$detail_res['external_contact']['external_userid'])->first();
-                if(empty($userr)) {  //只保留第一个数据
+                if(empty($userr)) {
+                    //只保留第一个数据
                     $created_at=date('Y-m-d H:i:s',time());
                     if(!empty($detail_res['follow_user'][0]['createtime'])){
                         $created_at=date('Y-m-d H:i:s',$detail_res['follow_user'][0]['createtime']);
                     }
+
+                    if(count($detail_res['follow_user'])==1){
+                        $add_data['is_multiple_staff']=1;
+                    }else{
+                        $add_data['is_multiple_staff']=2;
+                    }
+
+                    $add_data['follow_user_userid_list']= implode(',',array_column($detail_res['follow_user'],'userid'));
+
                     $add_data['source_follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
                     $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
                     $add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';

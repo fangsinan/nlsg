@@ -15,6 +15,7 @@ use App\Models\WorksInfoContent;
 use App\Servers\V5\CampServers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ClassController extends ControllerBackend
 {
@@ -1710,5 +1711,92 @@ class ClassController extends ControllerBackend
     }
 
 
+    /**
+     * @api {post} api/admin_v4/class/export_camp_clock_in_info 训练营打卡导出
+     * @apiVersion 4.0.0
+     * @apiName  class/export_camp_clock_in_info
+     * @apiGroup 后台-虚拟课程
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/class/export_camp_clock_in_info
+     * @apiDescription  训练营打卡导出
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function ExportCampClockInInfo(Request $request){
+
+        $data=$request->input();
+
+        if(empty($data['id'])){
+            return error('参数错误');
+        }
+        $id=$data['id'];
+
+        $Column = Column::query()->where('id', '=',$id)
+            ->where('type', '=', 3)
+            ->select(['id', 'name', 'real_subscribe_num', 'info_column_id'])
+            ->first();
+
+        if (empty($Column)) {
+            return error('参数错误');
+        }
+
+        $column_id = $Column->info_column_id === 0 ? $Column->id : $Column->info_column_id;
+        $query = WorksInfo::query()
+            ->where('column_id', '=', $column_id)
+            ->where('status', '=', 4)
+            ->select(['id', 'title', DB::raw("$id as works_id"), 'id as works_info_id'])
+            ->orderBy('rank')
+            ->orderBy('id');;
+
+        $list = $query->get()->toArray();
+
+        $exprotData=[];
+        $servers = new CampServers();
+
+        foreach ($list as $val){
+            $data = $servers->CampClockInInfo(['is_no_page'=>1,'is_end'=>1,'works_id'=>$val['works_id'],'works_info_id'=>$val['works_info_id']]);
+            foreach ($data['data'] as $sub){
+                $exprotData[]=[
+                    'works_info_title'=>$val['title'],
+                    'nickname'=>$sub->nickname,
+                    'phone'=>strval($sub->phone),
+                    'is_end'=>'已打卡',
+                    'end_time'=>$sub->end_time,
+                ];
+            }
+        }
+
+
+        $columns = ['章节名称', '姓名', '联系方式', '打卡状态', '打卡时间'];
+        $fileName = '学员打卡详情'.date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header("Access-Control-Allow-Origin: *");
+        $fp = fopen('php://output', 'a');//打开output流
+        mb_convert_variables('GBK', 'UTF-8', $columns);
+        fputcsv($fp, $columns);     //将数据格式化为CSV格式并写入到output流中
+
+        foreach ($exprotData as $export){
+
+            mb_convert_variables('GBK', 'UTF-8', $export);
+            fputcsv($fp, $export);
+            ob_flush();     //刷新输出缓冲到浏览器
+            flush();        //必须同时使用 ob_flush() 和flush() 函数来刷新输出缓冲。
+        }
+
+        fclose($fp);
+
+    }
 
 }
