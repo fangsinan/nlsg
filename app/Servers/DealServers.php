@@ -1,6 +1,7 @@
 <?php
 namespace App\Servers;
 
+use App\Models\Live;
 use App\Models\LiveDeal;
 use App\Models\Order;
 use App\Models\Subscribe;
@@ -43,7 +44,7 @@ class DealServers
             return;
         }
         $Redis->setex($key_minute,60,1);//10分钟
-
+        $is_free=0;
         if(!empty($crontab)){ //定时任务执行
             $now = date('Y-m-d', time());
             if(empty($live_id)) {
@@ -52,6 +53,7 @@ class DealServers
                     ->where(['type' => 14, 'status' => 1, 'is_deal' => 0])->select(['live_id'])->where('pay_price', '>', 1)->first();
                 if (!empty($LiveOrderObj)) {
                     $live_id = $LiveOrderObj->live_id;
+                    $is_free=Live::query()->where(['id'=>$live_id])->first()->is_free;
                 } else {
                     return ['status' => 1, 'data' => [], 'msg' => '没有直播间开播'];
                 }
@@ -89,11 +91,17 @@ class DealServers
         $query->where('O.is_deal',0); //抓取完更新为1
 
         $query->select($fields)
-            ->leftJoin('nlsg_user as U','O.user_id','=','U.id')
-            ->leftjoin('nlsg_order as invite',function($query)use($live_id){
-                $query->on('O.user_id','=','invite.user_id')->where('invite.live_id','=',$live_id)->where('invite.type','=',10)->where('invite.status','=',1);
-            })
-            ->leftJoin('nlsg_user as TJ','TJ.id','=','invite.twitter_id')
+            ->leftJoin('nlsg_user as U','O.user_id','=','U.id');
+        if($is_free==1) {//免费
+            $query->leftjoin('nlsg_subscribe as invite', function ($query) use ($live_id) {
+                $query->on('O.user_id', '=', 'invite.user_id')->where('invite.relation_id', '=', $live_id)->where('invite.type', '=', 3)->where('invite.status', '=', 1);
+            });
+        }else{//收费
+            $query->leftjoin('nlsg_order as invite', function ($query) use ($live_id) {
+                $query->on('O.user_id', '=', 'invite.user_id')->where('invite.live_id', '=', $live_id)->where('invite.type', '=', 10)->where('invite.status', '=', 1);
+            });
+        }
+        $query->leftJoin('nlsg_user as TJ','TJ.id','=','invite.twitter_id')
             ->leftJoin('nlsg_vip_user_bind as B',function($query){ //查看用户是否被绑定
                 $query->on('B.son','=','U.phone')->where('B.status','=',1); //排除绑定失效
             })
