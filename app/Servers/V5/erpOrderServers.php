@@ -38,9 +38,9 @@ class erpOrderServers
             'payRefundInfo:id,order_id,created_at',
         ]);
 
-//        $query->whereHas('user', function ($q) {
+        $query->whereHas('user', function ($q) {
 //            $q->where('is_test_pay', '=', 0);
-//        });
+        });
 
         //订单编号
         $query->when($ordernum, function ($q, $ordernum) {
