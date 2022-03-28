@@ -37,7 +37,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
         Route::get('class/camp_clock_in', 'ClassController@CampClockIn');
         Route::get('class/camp_clock_in_info', 'ClassController@CampClockInInfo');
-        Route::get('class/export_camp_clock_in_info', 'ClassController@ExportCampClockInInfo');
+//        Route::get('class/export_camp_clock_in_info', 'ClassController@ExportCampClockInInfo');
 
 
         Route::post('class/add-column', 'ClassController@addColumn');
@@ -289,7 +289,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     });
 
 
-//    Route::get('class/export_camp_clock_in_info', 'ClassController@ExportCampClockInInfo');
+    Route::get('class/export_camp_clock_in_info', 'ClassController@ExportCampClockInInfo');
 
     Route::post('vip/create_vip', 'VipController@createVip');
 
