@@ -168,7 +168,7 @@ class Comment extends Base
         }
 
         if (in_array($comment['type'], [1, 2, 6])) {
-            $comment['column'] = Column::find($comment['relation_id'], ['name as title', 'subtitle', 'cover_pic', "user_id"]);
+            $comment['column'] = Column::find($comment['relation_id'], ['name as title', 'subtitle', 'cover_pic', 'user_id']);
 
             $user = User::select('nickname', 'teacher_title', 'headimg', 'headcover','intro',)->find($comment['column']['user_id']);
             $comment['column']['teacher_nickname'] = $user['nickname'];
