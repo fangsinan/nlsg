@@ -289,6 +289,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     });
 
 
+//    Route::get('class/export_camp_clock_in_info', 'ClassController@ExportCampClockInInfo');
 
     Route::post('vip/create_vip', 'VipController@createVip');
 

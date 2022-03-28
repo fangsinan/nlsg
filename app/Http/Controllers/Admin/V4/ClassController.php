@@ -1752,6 +1752,7 @@ class ClassController extends ControllerBackend
 
         $query_sql="
             SELECT
+
              works_info.title as works_info_title,
                             sub.id AS sub_id,
                             his.id AS history_id,
