@@ -135,16 +135,13 @@ class erpOrderServers
             }
 
             if (!empty($v->expressInfo)) {
-                try {
-                    if (is_string($v->expressInfo->history )){
-                        $v->expressInfo->history = json_decode($v->expressInfo->history ?? '');
-                    }else{
-                        $v->expressInfo->history = $v->expressInfo->history;
-                    }
+//                try {
 
-                }catch (\Exception $e){
-                    $v->expressInfo->history = [];
-                }
+                        $v->expressInfo->history = json_decode($v->expressInfo->history ?? '');
+
+//                }catch (\Exception $e){
+//                    dd($v->toArray());
+//                }
 
             }
 
