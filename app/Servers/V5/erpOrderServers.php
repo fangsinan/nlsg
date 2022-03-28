@@ -94,6 +94,8 @@ class erpOrderServers
             $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
         }
 
+        $query->orderBy('id','desc');
+
         if ($is_excel === 1) {
             $page = $params['page'] ?? 1;
             $res  = $query->limit($size)->offset(($page - 1) * $size)->get();
