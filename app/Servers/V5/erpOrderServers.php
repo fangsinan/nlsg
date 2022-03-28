@@ -135,7 +135,7 @@ class erpOrderServers
             }
 
             if (!empty($v->expressInfo)) {
-                $v->expressInfo->history = json_decode($v->expressInfo->history);
+                $v->expressInfo->history = json_decode($v->expressInfo->history ?? '');
             }
 
             unset($v->addressInfo);
