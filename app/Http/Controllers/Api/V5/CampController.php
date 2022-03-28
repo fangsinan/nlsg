@@ -142,7 +142,7 @@ class CampController extends Controller
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
             'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'
-        ,'comment_num'];
+        ,'comment_num','info_column_id'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
             return $this->error(0, '内容不存在不能为空');
@@ -193,6 +193,11 @@ class CampController extends Controller
         //历史记录
         $column['historyData'] = History::getHistoryData($column_id, $history_type, $user_id);
         
+        // 获取第一章节 info_id
+        $get_id = $column['info_column_id'] ?? $column['id'];
+        
+        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4 ])->orderBy('rank','asc')->first();
+        $column['first_info_id'] = $first_info_id['id'] ?? 0;
         return $this->success([
             'list' => $column
         ]);

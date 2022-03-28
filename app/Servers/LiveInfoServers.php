@@ -255,7 +255,8 @@ class LiveInfoServers {
 
         if ($admin['role_id'] !== 1) {
             $twitter_id_list = $this->twitterIdList($admin['username']);
-            $query->whereIn('ld.invite_user_id', $twitter_id_list);
+//            $query->whereIn('ld.invite_user_id', $twitter_id_list);
+            $query->whereIn('ld.protect_user_id', $twitter_id_list);
             $query->where('ld.type','<>',8);
         }
 

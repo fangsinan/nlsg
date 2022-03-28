@@ -168,14 +168,23 @@ class Comment extends Base
         }
 
         if (in_array($comment['type'], [1, 2, 6])) {
-            $comment['column'] = Column::find($comment['relation_id'], ['name as title', 'subtitle', 'cover_pic']);
+            $comment['column'] = Column::find($comment['relation_id'], ['name as title', 'subtitle', 'cover_pic', 'user_id']);
+
+            $user = User::select('nickname', 'teacher_title', 'headimg', 'headcover','intro')->find($comment['column']['user_id']);
+            $comment['column']['teacher_nickname'] = $user['nickname'];
+            $comment['column']['teacher_title'] = $user['teacher_title'];
+
         } elseif (in_array($comment['type'], [3, 4])) {
-            $comment['works'] = Works::find($comment['relation_id'], ['title', 'subtitle', 'cover_img']);
+            $comment['works'] = Works::find($comment['relation_id'], ['title', 'subtitle', 'cover_img','user_id']);
 //            $workinfo = WorksInfo::select('pid')->where('id', $comment['relation_id'])->first();
 //            if ($workinfo){
 //                $works   = Works::select('title','subtitle','cover_img')->where('id', $workinfo['pid'])->first();
 //                $comment['works']  = $works;
 //            }
+            $user = User::select('nickname', 'teacher_title', 'headimg', 'headcover','intro')
+                ->find($comment['works']['user_id']);
+            $comment['works']['teacher_nickname'] = $user['nickname'];
+            $comment['works']['teacher_title'] = $user['teacher_title'];
         } else {
             $comment['wiki'] = Wiki::find($comment['relation_id'], ['name', 'cover']);
         }
