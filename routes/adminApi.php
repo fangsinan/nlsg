@@ -287,7 +287,6 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     });
 
 
-    Route::get('class/export_camp_clock_in_info', 'ClassController@ExportCampClockInInfo');
 
     Route::post('vip/create_vip', 'VipController@createVip');
 
@@ -322,6 +321,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('order/col_list_excel', 'OrderController@colListExcel');
     Route::get('order/campListExcel', 'OrderController@campListExcel');
 
+    //打卡到处和微信客户管理
     Route::get('user_wechat/test', 'UserWechatController@test');
     Route::get('user_wechat/search_wechat_user_list', 'UserWechatController@search_wechat_user_list');
     Route::get('user_wechat/search_wechat_staff_user_list', 'UserWechatController@search_wechat_staff_user_list');
@@ -331,6 +331,9 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('user_wechat/search_transfer_record', 'UserWechatController@search_transfer_record');
     Route::get('user_wechat/search_transfer_log', 'UserWechatController@search_transfer_log');
     Route::get('user_wechat/transfer_customer_batch', 'UserWechatController@transfer_customer_batch');
+
+    Route::get('class/export_camp_clock_in_info', 'ClassController@ExportCampClockInInfo');
+
 
 });
 
