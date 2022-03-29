@@ -54,12 +54,13 @@ class ImageController extends Controller
             'relation_type' => $relation_type,
             'relation_id'   => $relation_id,
             'status'   => 1,
-        ])->get();
+        ])->get()->toArray();
+        
+        $qr_urls = array_column($res,'qr_url');
+        // if(empty($res)){
+        //     $res=[];
+        // }
 
-        if(empty($res)){
-            $res=[];
-        }
-
-        return success($res);
+        return success($qr_urls);
     }
 }
