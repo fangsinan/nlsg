@@ -1748,6 +1748,7 @@ class ClassController extends ControllerBackend
             return error('参数错误');
         }
 
+        $id=$Column->id;
         $column_id = $Column->info_column_id === 0 ? $Column->id : $Column->info_column_id;
 
         $query_sql="

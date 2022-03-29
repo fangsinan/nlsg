@@ -58,14 +58,16 @@ class erpOrderServers
         switch ($send_status) {
             //1没发货 2发货了
             case 1:
-                $query->whereHas('pushErpInfo', function ($q) {
-                    $q->where('flag', '=', 1);
-                });
+//                $query->whereHas('pushErpInfo', function ($q) {
+//                    $q->where('flag', '=', 1);
+//                });
+                $query->where('express_info_id','=',0);
                 break;
             case 2:
-                $query->whereHas('pushErpInfo', function ($q) {
-                    $q->where('flag', '=', 2);
-                });
+//                $query->whereHas('pushErpInfo', function ($q) {
+//                    $q->where('flag', '=', 2);
+//                });
+                $query->where('express_info_id','>',0);
                 break;
         }
 
@@ -105,7 +107,11 @@ class erpOrderServers
 
 
         foreach ($res as $v) {
-            $v->send_status = (int)($v->pushErpInfo->flag ?? 0);
+            if ($v->express_info_id){
+                $v->send_status = 2;
+            }else{
+                $v->send_status = 1;
+            }
 
             if (isset($v->payRefundInfo->created_at )){
                 $v->refund_time = date('Y-m-d H:i:s',strtotime($v->payRefundInfo->created_at));
