@@ -142,6 +142,7 @@ class DealServers
 
         $OrderIdArr = array_column($list, 'id'); //用于更新订单状态
         $map=[];
+        $now_date = date('Y-m-d H:i:s');
         foreach ($list as $key=>$val){
 
             //查询第一次预约时间
@@ -206,8 +207,15 @@ class DealServers
                 'tiktok_time'=>$QdInfo['tiktok_time'],
                 'qd'=>$QdInfo['qd']
             ];
+
+            //抓取更新订单表保护id
+            $map = [
+                'protect_user_id' => (empty($val->protect_user_id))?0:$val->protect_user_id,
+                'updated_at' => $now_date
+            ];
+            Order::where(['ordernum' => $val->ordernum])->update($map);
         }
-        $now_date = date('Y-m-d H:i:s');
+
         DB::beginTransaction();
         try {
             $DealAddRst = LiveDeal::Add($map, true);
