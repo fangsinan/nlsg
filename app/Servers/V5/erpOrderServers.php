@@ -18,6 +18,7 @@ class erpOrderServers
         $order_info_flag    = $params['order_info_flag'] ?? '';
 
         $query = Order::query()
+            ->where('id','>',1822808)
             ->where('type', '=', 14)
             ->whereIn('relation_id', $search_relation_id)
             ->where('status', '=', 1)
