@@ -161,7 +161,7 @@ class Comment extends Base
         if ( ! $comment) {
             return false;
         }
-
+        $comment['is_follow'] = 0;
         if ($uid) {
             $follow = UserFollow::where(['from_uid' => $uid, 'to_uid' => $comment->user_id])->first();
             $comment['is_follow'] = $follow ? 1 : 0;
@@ -211,6 +211,11 @@ class Comment extends Base
                 // $v['is_like'] = $isLike ? 1 : 0;
                 $v['from_user']['new_vip'] = VipUser::newVipInfo($v['from_user']['id'])['vip_id'] ?1:0;
                 $v['to_user']['new_vip'] = VipUser::newVipInfo($v['to_user']['id'])['vip_id'] ?1:0;
+                
+                // 是否关注
+                $v['from_user']['is_follow'] = UserFollow::IsFollow($uid, $v['from_user']['id']);
+                $v['to_user']['is_follow'] = UserFollow::IsFollow($uid, $v['to_user']['id']);
+
             }
         }
         $comment['reply'] = $reply['data'];
