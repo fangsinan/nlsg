@@ -11,7 +11,7 @@ class ImageController extends Controller
 {
 
    /**
-     * @api {get} api/v5/image/get_qr_poster 弹窗
+     * @api {get} api/v5/image/get_qr_code 支付成功弹窗
      * @apiVersion 5.0.0
      * @apiName  get_qr_code
      * @apiGroup FiveCode
@@ -50,16 +50,16 @@ class ImageController extends Controller
             $relation_id = 0;
         }
 
-        $res = Qrcodeimg::select("id","qr_url")->where([
+        $qr_url = Qrcodeimg::select("id","qr_url")->where([
             'relation_type' => $relation_type,
             'relation_id'   => $relation_id,
             'status'   => 1,
-        ])->get();
+        ])->first();
+        // $qr_urls = array_column($res,'qr_url');
+        // if(empty($res)){
+        //     $res=[];
+        // }
 
-        if(empty($res)){
-            $res=[];
-        }
-
-        return success($res);
+        return success($qr_url['qr_url']??'');
     }
 }

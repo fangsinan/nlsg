@@ -32,7 +32,7 @@ class ErpOrderController extends ControllerBackend
 //        订单ID、订单编号、商品信息、数量、金额、支付时间、发货状态（待发货、已发货）、用户信息（姓名、手机号）、收货地址、退款状态（未退款、退款中、已退款）
 
         $columns  = [
-            '订单ID', '订单编号', '商品信息', '数量', '金额', '支付时间', '发货状态', '收货人', '收货人电话', '收货地址', '退款状态',
+            '订单ID', '订单编号', '商品信息', '数量', '金额', '支付时间', '账号', '发货状态', '收货人', '收货人电话', '收货地址', '退款状态',
         ];
         $fileName = date('Y-m-d H:i') . '-' . rand(100, 999) . '.csv';
         header('Content-Description: File Transfer');
@@ -65,6 +65,7 @@ class ErpOrderController extends ControllerBackend
                     $temp_put_data['goods_num']   = $v['live_num'];
                     $temp_put_data['pay_price']   = $v['pay_price'];
                     $temp_put_data['pay_time']    = $v['pay_time'];
+                    $temp_put_data['username']    = $v['user']['phone'];
 
                     switch ($v['send_status']) {
                         case 1:
@@ -81,9 +82,9 @@ class ErpOrderController extends ControllerBackend
                     $temp_put_data['address_phone']  = '`' . $v['address_phone'];
                     $temp_put_data['address_detail'] = $v['address_detail'];
                     if ($v['shill_status'] === 1) {
-                        $temp_put_data['shill_status'] = '已退款';
-                    } else {
                         $temp_put_data['shill_status'] = '未退款';
+                    } else {
+                        $temp_put_data['shill_status'] = '已退款';
                     }
 
                     mb_convert_variables('GBK', 'UTF-8', $temp_put_data);

@@ -769,7 +769,8 @@ class Order extends Base
             $liServers       = new LiveInfoServers();
             $twitter_id_list = $liServers->twitterIdList($this_user['username']);
             if ($twitter_id_list !== null) {
-                $query->whereIn('twitter_id', $twitter_id_list);
+//                $query->whereIn('twitter_id', $twitter_id_list);
+                $query->whereIn('protect_user_id', $twitter_id_list);
             }
         }
 
