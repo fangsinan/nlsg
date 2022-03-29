@@ -756,7 +756,7 @@ class Order extends Base
             ->where('pay_price', '>', 0.01)
             ->select([
                 'id', 'type', 'relation_id', 'pay_time', 'price', 'user_id', 'pay_price', 'pay_type', 'ordernum',
-                'live_id', 'os_type', 'remark', 'status', 'twitter_id'
+                'live_id', 'os_type', 'remark', 'status', 'twitter_id','protect_user_id',
             ])
             ->orderBy('id', 'desc');
 

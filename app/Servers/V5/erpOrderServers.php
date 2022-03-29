@@ -13,12 +13,13 @@ class erpOrderServers
         $size               = $params['size'] ?? 10;
         $ordernum           = $params['ordernum'] ?? '';
         $goods_name         = $params['goods_name'] ?? '';
+        $phone  = $params['phone'] ?? '';
         $send_status        = (int)($params['send_status'] ?? 0);  //1没发货 2发货了
         $shill_status       = (int)($params['shill_status'] ?? 0); //1没退款  2退款中 3退款完毕
         $order_info_flag    = $params['order_info_flag'] ?? '';
 
         $query = Order::query()
-            ->where('id','>',1822808)
+//            ->where('id','>',1822808)
             ->where('type', '=', 14)
             ->whereIn('relation_id', $search_relation_id)
             ->where('status', '=', 1)
@@ -78,6 +79,14 @@ class erpOrderServers
         //订单编号
         $query->when($ordernum, function ($q, $ordernum) {
             $q->where('ordernum', 'like', "%$ordernum%");
+        });
+
+        //账号
+        $query->when($phone, function ($q, $phone) {
+            $q->wherehas('user',function($q)use($phone){
+                $q->where('phone','like',"%$phone%");
+            });
+//            $q->where('ordernum', 'like', "%$ordernum%");
         });
 
         //商品名称
