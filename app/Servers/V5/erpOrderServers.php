@@ -14,7 +14,7 @@ class erpOrderServers
         $goods_name         = $params['goods_name'] ?? '';
         $send_status        = (int)($params['send_status'] ?? 0);  //1没发货 2发货了
         $shill_status       = (int)($params['shill_status'] ?? 0); //1没退款  2退款中 3退款完毕
-        $order_info_flag    = $page['order_info_flag'] ?? '';
+        $order_info_flag    = $params['order_info_flag'] ?? '';
 
         $query = Order::query()
             ->where('type', '=', 14)
