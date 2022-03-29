@@ -283,6 +283,17 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //后台训练营订单
         Route::get('order/campList', 'OrderController@campList');
 
+        //微信客户管理sgl0329
+        Route::get('user_wechat/test', 'UserWechatController@test');
+        Route::get('user_wechat/search_wechat_user_list', 'UserWechatController@search_wechat_user_list');
+        Route::get('user_wechat/search_wechat_staff_user_list', 'UserWechatController@search_wechat_staff_user_list');
+        Route::get('user_wechat/get_wechat_staff_user_list', 'UserWechatController@get_wechat_staff_user_list');
+        Route::get('user_wechat/transfer_customer', 'UserWechatController@transfer_customer');
+        Route::get('user_wechat/transfer_result', 'UserWechatController@transfer_result');
+        Route::get('user_wechat/search_transfer_record', 'UserWechatController@search_transfer_record');
+        Route::get('user_wechat/search_transfer_log', 'UserWechatController@search_transfer_log');
+        Route::get('user_wechat/transfer_customer_batch', 'UserWechatController@transfer_customer_batch');
+
 
     });
 
@@ -321,17 +332,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('order/col_list_excel', 'OrderController@colListExcel');
     Route::get('order/campListExcel', 'OrderController@campListExcel');
 
-    //打卡到处和微信客户管理
-    Route::get('user_wechat/test', 'UserWechatController@test');
-    Route::get('user_wechat/search_wechat_user_list', 'UserWechatController@search_wechat_user_list');
-    Route::get('user_wechat/search_wechat_staff_user_list', 'UserWechatController@search_wechat_staff_user_list');
-    Route::get('user_wechat/get_wechat_staff_user_list', 'UserWechatController@get_wechat_staff_user_list');
-    Route::get('user_wechat/transfer_customer', 'UserWechatController@transfer_customer');
-    Route::get('user_wechat/transfer_result', 'UserWechatController@transfer_result');
-    Route::get('user_wechat/search_transfer_record', 'UserWechatController@search_transfer_record');
-    Route::get('user_wechat/search_transfer_log', 'UserWechatController@search_transfer_log');
-    Route::get('user_wechat/transfer_customer_batch', 'UserWechatController@transfer_customer_batch');
 
+    //打卡导出sgl0329
     Route::get('class/export_camp_clock_in_info', 'ClassController@ExportCampClockInInfo');
 
 
