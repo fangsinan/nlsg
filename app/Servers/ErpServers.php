@@ -441,7 +441,12 @@ class ErpServers
                 }
 
                 $temp_trade_list['pay_status']       = 2;
-                $temp_trade_list['receiver_name']    = $v->orderInfo->addressInfo->name;
+                $temp_address_name = $this->filterEmoji($v->orderInfo->addressInfo->name);
+                if (empty($temp_address_name)){
+                    $temp_trade_list['receiver_name']    = substr_replace($v->orderInfo->addressInfo->phone, '****', 3, 4);
+                }else{
+                    $temp_trade_list['receiver_name']    = $temp_address_name;
+                }
                 $temp_trade_list['receiver_mobile']  = $v->orderInfo->addressInfo->phone;
                 $temp_trade_list['receiver_address'] = trim(
                     ($v->orderInfo->addressInfo->area_province->fullname ?? '') . ' ' .
