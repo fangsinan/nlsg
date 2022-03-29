@@ -451,7 +451,7 @@ class CommentController extends Controller
     {
         $id = $request->input('id');
         $input = $request->input();
-
+        $input['comment_type'] = $request->input("comment_type") ??1;  //默认1 
 
         if(!empty($input['comment_type']) && $input['comment_type'] == 1){
             $comment =  Comment::where('id', $id)->first();
