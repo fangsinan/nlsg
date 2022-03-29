@@ -108,9 +108,9 @@ class erpOrderServers
 
         foreach ($res as $v) {
             if ($v->express_info_id){
-                $v->send_status = 1;
+                $v->send_status = 2;
             }else{
-                $v->send_status = 0;
+                $v->send_status = 1;
             }
 
             if (isset($v->payRefundInfo->created_at )){
