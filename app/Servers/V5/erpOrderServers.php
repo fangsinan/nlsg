@@ -2,6 +2,7 @@
 
 namespace App\Servers\V5;
 
+use App\Models\ConfigModel;
 use App\Models\MallAddress;
 use App\Models\Order;
 
@@ -58,9 +59,20 @@ class erpOrderServers
                 break;
         }
 
-        $query->whereHas('user', function ($q) {
-            $q->where('is_test_pay', '=', 0);
-        });
+        $erp_push_order_flag = ConfigModel::getData(56, 1);
+        switch (intval($erp_push_order_flag)) {
+            case 1:
+                $query->whereHas('user', function ($q) {
+                    $q->where('is_test_pay', '=', 0);
+                });
+                break;
+            case 2:
+                $query->whereHas('user', function ($q) {
+                    $q->where('is_test_pay', '=', 1);
+                });
+                break;
+        }
+
 
         //订单编号
         $query->when($ordernum, function ($q, $ordernum) {
