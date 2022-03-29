@@ -314,16 +314,17 @@ class LiveController extends Controller
 		
 		$day_time=date("Y-m-d",strtotime("-1 day"));
         // 获取用户管理员权限
-        $provilege_liveids = LiveUserPrivilege::where(['user_id'=>$uid,'pri_level'=>1,'is_del'=>0])->pluck("live_id")->toArray();
+        // $provilege_liveids = LiveUserPrivilege::where(['user_id'=>$uid,'pri_level'=>1,'is_del'=>0])->pluck("live_id")->toArray();
         $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort'];
         $query = Live::query();
-        $is_all = 0;
         if (!$uid || ($user && !in_array($user->phone, $testers))) {
             $query->where('is_test', '=', 0);
-            $is_all = 1;
+            $is_test = 0;
         } else {
             $query->whereIn('is_test', [0, 1]);
+            $is_test = 1;
         }
+    
         $query->with('user:id,nickname')
             ->select($fills)
 			->where('begin_at','>', $day_time)
@@ -333,8 +334,8 @@ class LiveController extends Controller
 
             // 不查询测试直播的情况下 
             // 需要查询当前用户是否管理员  单独查询管理员的
-            if($is_all == 1 && !empty($provilege_liveids)){
-                $query->unionAll(Live::select($fills)->whereIn('id', $provilege_liveids));
+            if($is_test == 0 && !empty($this->user['phone'])){
+                $query->unionAll(Live::select($fills)->where('helper', 'like', '%'.$this->user['phone'].'%'));
             }
             
             $lists = $query->orderBy('sort', 'asc')
