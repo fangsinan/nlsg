@@ -188,6 +188,7 @@ function TimeToMinSec($time)
     }
 }
 
+
 function add_log($url,$message='',$parameter=''){
     Illuminate\Support\Facades\DB::table('nlsg_log')->insert([
         'url'=>$url,
@@ -200,9 +201,12 @@ function add_log($url,$message='',$parameter=''){
 }
 
 
+
 function get_page_size($data){
     if(empty($data['size']) || !is_numeric($data['size']) || $data['size']<=0){
         return 10;
     }
     return  $data['size'];
 }
+
+
