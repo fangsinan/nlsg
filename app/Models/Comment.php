@@ -176,11 +176,11 @@ class Comment extends Base
 
         } elseif (in_array($comment['type'], [3, 4])) {
             $comment['works'] = Works::find($comment['relation_id'], ['title', 'subtitle', 'cover_img','user_id']);
-//            $workinfo = WorksInfo::select('pid')->where('id', $comment['relation_id'])->first();
-//            if ($workinfo){
-//                $works   = Works::select('title','subtitle','cover_img')->where('id', $workinfo['pid'])->first();
-//                $comment['works']  = $works;
-//            }
+        //    $workinfo = WorksInfo::select('pid')->where('id', $comment['relation_id'])->first();
+        //    if ($workinfo){
+        //        $works   = Works::select('title','subtitle','cover_img')->where('id', $workinfo['pid'])->first();
+        //        $comment['works']  = $works;
+        //    }
             $user = User::select('nickname', 'teacher_title', 'headimg', 'headcover','intro')
                 ->find($comment['works']['user_id']);
             $comment['works']['teacher_nickname'] = $user['nickname'];
