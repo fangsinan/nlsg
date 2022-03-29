@@ -311,8 +311,8 @@ class LiveController extends Controller
 
         $testers = explode(',', ConfigModel::getData(35, 1));
         $user = User::where('id', $uid)->first();
-		
-		$day_time=date("Y-m-d",strtotime("-1 day"));
+
+        $day_time=date("Y-m-d",strtotime("-1 day"));
         // 获取用户管理员权限
         // $provilege_liveids = LiveUserPrivilege::where(['user_id'=>$uid,'pri_level'=>1,'is_del'=>0])->pluck("live_id")->toArray();
         $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort'];
@@ -324,26 +324,101 @@ class LiveController extends Controller
             $query->whereIn('is_test', [0, 1]);
             $is_test = 1;
         }
-    
+
         $query->with('user:id,nickname')
             ->select($fills)
-			->where('begin_at','>', $day_time)
+            ->where('begin_at','>', $day_time)
             ->where('status', 4)
             ->where('is_finish', 0)
             ->where('is_del', 0);
 
-            // 不查询测试直播的情况下 
-            // 需要查询当前用户是否管理员  单独查询管理员的
-            if($is_test == 0 && !empty($this->user['phone'])){
-                $query->unionAll(Live::select($fills)
-                            ->where('begin_at','>', $day_time)
-                            ->where('status', 4)
-                            ->where('is_finish', 0)
-                            ->where('is_del', 0)
-                            ->where('helper', 'like', '%'.$this->user['phone'].'%'));
+        // 不查询测试直播的情况下
+        // 需要查询当前用户是否管理员  单独查询管理员的
+        if($is_test == 0 && !empty($this->user['phone'])){
+            $query->unionAll(Live::select($fills)
+                ->where('begin_at','>', $day_time)
+                ->where('status', 4)
+                ->where('is_finish', 0)
+                ->where('is_del', 0)
+                ->where('helper', 'like', '%'.$this->user['phone'].'%'));
+        }
+
+        $lists = $query->orderBy('sort', 'asc')
+            ->orderBy('begin_at', 'asc')
+            ->paginate(10)
+            ->toArray();
+
+        if (!empty($lists['data'])) {
+            foreach ($lists['data'] as &$v) {
+                $channel = LiveInfo::where('live_pid', $v['id'])
+                    ->where('status', 1)
+                    ->orderBy('id', 'desc')
+                    ->first();
+                if ($channel) {
+//                    1未开始  2已结束  3直播中
+                    if ($channel->is_begin == 0 && $channel->is_finish == 0) {
+                        $v['live_status'] = 1;
+                    } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
+                        $v['live_status'] = 3;
+                    } elseif ($channel->is_begin == 0 && $channel->is_finish == 1) {
+                        $v['live_status'] = 2;
+                    }
+                    $v['info_id'] = $channel->id;
+                }
+                $isSub = Subscribe::isSubscribe($uid, $v['id'], 3);
+                $isAdmin = LiveConsole::isAdmininLive($uid, $v['id']);
+                $v['is_sub'] = $isSub ?? 0;
+                $v['is_admin'] = $isAdmin ? 1 : 0;
+
+                $v['is_password'] = $v['password'] ? 1 : 0;
+
+                //判断显示
+                $begin_at_time = strtotime($v['begin_at']);
+                $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+                if( $begin_at_time > strtotime(date("Y-1-1")) &&  $begin_at_time < strtotime(date("Y-1-1",strtotime("+1 year")))){
+                    $v['live_time'] = date('m.d H:i', strtotime($v['begin_at']));
+                }
+
+//                if (empty($v['steam_begin_time'])){
+//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['begin_at']));
+//                }else{
+//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['steam_begin_time']));
+//                }
+
+//                if($v['live_status'] == 3){
+//                    $v['live_time'] = "正在直播";
+//                }
+
+
             }
-            
-            $lists = $query->orderBy('sort', 'asc')
+        }
+
+        return success($lists['data']);
+    }
+
+    public function getLiveLists_0329()
+    {
+        $uid = $this->user['id'] ?? 0;
+
+        $testers = explode(',', ConfigModel::getData(35, 1));
+        $user = User::where('id', $uid)->first();
+
+		$day_time=date("Y-m-d",strtotime("-1 day"));
+        $query = Live::query();
+        if (!$uid || ($user && !in_array($user->phone, $testers))) {
+            $query->where('is_test', '=', 0);
+        } else {
+            $query->whereIn('is_test', [0, 1]);
+        }
+        $lists = $query->with('user:id,nickname')
+            ->select('id', 'user_id', 'title', 'describe', 'price',
+                'cover_img', 'begin_at', 'type', 'end_at','steam_begin_time',
+                'playback_price', 'is_free', 'password', 'order_num')
+			->where('begin_at','>', $day_time)
+            ->where('status', 4)
+            ->where('is_finish', 0)
+            ->where('is_del', 0)
+            ->orderBy('sort', 'asc')
             ->orderBy('begin_at', 'asc')
             ->paginate(10)
             ->toArray();
@@ -759,7 +834,7 @@ class LiveController extends Controller
 		if( isset($list['user']['intro']) ){
 			$list['user']['intro'] = ''; //  直播间不显示讲师简介  3月24日需求
 		}
-				
+
         //初始化人气值
         $redisConfig = config('database.redis.default');
         $redis = new Client($redisConfig);
