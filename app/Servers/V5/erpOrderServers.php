@@ -14,6 +14,7 @@ class erpOrderServers
         $goods_name         = $params['goods_name'] ?? '';
         $send_status        = (int)($params['send_status'] ?? 0);  //1没发货 2发货了
         $shill_status       = (int)($params['shill_status'] ?? 0); //1没退款  2退款中 3退款完毕
+        $order_info_flag    = $page['order_info_flag'] ?? '';
 
         $query = Order::query()
             ->where('type', '=', 14)
@@ -38,6 +39,25 @@ class erpOrderServers
             'payRefundInfo:id,order_id,created_at',
         ]);
 
+        switch ($order_info_flag) {
+            case 'no_address':
+                //没有地址
+                $query->where('address_id', '=', 0);
+                break;
+            case 'not_push_erp':
+                //未推送erp
+                $query->whereHas('pushErpInfo', function ($q) {
+                    $q->where('flag', '=', 1);
+                });
+                break;
+            case 'push_erp':
+                //已推送erp
+                $query->whereHas('pushErpInfo', function ($q) {
+                    $q->where('flag', '=', 2);
+                });
+                break;
+        }
+
         $query->whereHas('user', function ($q) {
 //            $q->where('is_test_pay', '=', 0);
         });
@@ -61,13 +81,13 @@ class erpOrderServers
 //                $query->whereHas('pushErpInfo', function ($q) {
 //                    $q->where('flag', '=', 1);
 //                });
-                $query->where('express_info_id','=',0);
+                $query->where('express_info_id', '=', 0);
                 break;
             case 2:
 //                $query->whereHas('pushErpInfo', function ($q) {
 //                    $q->where('flag', '=', 2);
 //                });
-                $query->where('express_info_id','>',0);
+                $query->where('express_info_id', '>', 0);
                 break;
         }
 
@@ -96,7 +116,7 @@ class erpOrderServers
             $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
         }
 
-        $query->orderBy('id','desc');
+        $query->orderBy('id', 'desc');
 
         if ($is_excel === 1) {
             $page = $params['page'] ?? 1;
@@ -107,15 +127,15 @@ class erpOrderServers
 
 
         foreach ($res as $v) {
-            if ($v->express_info_id){
+            if ($v->express_info_id) {
                 $v->send_status = 2;
-            }else{
+            } else {
                 $v->send_status = 1;
             }
 
-            if (isset($v->payRefundInfo->created_at )){
-                $v->refund_time = date('Y-m-d H:i:s',strtotime($v->payRefundInfo->created_at));
-            }else{
+            if (isset($v->payRefundInfo->created_at)) {
+                $v->refund_time = date('Y-m-d H:i:s', strtotime($v->payRefundInfo->created_at));
+            } else {
                 $v->refund_time = '';
             }
 
@@ -145,7 +165,7 @@ class erpOrderServers
             if (!empty($v->expressInfo)) {
 //                try {
 
-                        $v->expressInfo->history = json_decode($v->expressInfo->history ?? '');
+                $v->expressInfo->history = json_decode($v->expressInfo->history ?? '');
 
 //                }catch (\Exception $e){
 //                    dd($v->toArray());
