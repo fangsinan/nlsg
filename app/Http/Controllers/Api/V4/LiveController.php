@@ -29,7 +29,6 @@ use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
-use App\Models\LiveUserPrivilege;
 use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
@@ -313,8 +312,6 @@ class LiveController extends Controller
         $user = User::where('id', $uid)->first();
 
         $day_time=date("Y-m-d",strtotime("-1 day"));
-        // 获取用户管理员权限
-        // $provilege_liveids = LiveUserPrivilege::where(['user_id'=>$uid,'pri_level'=>1,'is_del'=>0])->pluck("live_id")->toArray();
         $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort'];
         $query = Live::query();
         if (!$uid || ($user && !in_array($user->phone, $testers))) {
