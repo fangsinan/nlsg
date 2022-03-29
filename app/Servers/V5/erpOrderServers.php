@@ -59,7 +59,7 @@ class erpOrderServers
         }
 
         $query->whereHas('user', function ($q) {
-//            $q->where('is_test_pay', '=', 0);
+            $q->where('is_test_pay', '=', 0);
         });
 
         //订单编号
