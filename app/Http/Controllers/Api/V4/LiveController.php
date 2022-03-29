@@ -335,7 +335,12 @@ class LiveController extends Controller
             // 不查询测试直播的情况下 
             // 需要查询当前用户是否管理员  单独查询管理员的
             if($is_test == 0 && !empty($this->user['phone'])){
-                $query->unionAll(Live::select($fills)->where('helper', 'like', '%'.$this->user['phone'].'%'));
+                $query->unionAll(Live::select($fills)
+                            ->where('begin_at','>', $day_time)
+                            ->where('status', 4)
+                            ->where('is_finish', 0)
+                            ->where('is_del', 0)
+                            ->where('helper', 'like', '%'.$this->user['phone'].'%'));
             }
             
             $lists = $query->orderBy('sort', 'asc')

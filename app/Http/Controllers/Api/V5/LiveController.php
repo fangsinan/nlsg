@@ -140,7 +140,7 @@ class LiveController extends Controller
     }
 
     /**
-     *  api/v4/live/lists  直播更多列表
+     *  api/v4/live/lists  直播更多列表 
      * @apiVersion 4.0.0
      * @apiName  lists
      * @apiGroup 直播
@@ -158,16 +158,17 @@ class LiveController extends Controller
 		
 		$day_time=date("Y-m-d",strtotime("-1 day"));
         // 获取用户管理员权限
-        $provilege_liveids = LiveUserPrivilege::where(['user_id'=>$uid,'pri_level'=>1,'is_del'=>0])->pluck("live_id")->toArray();
+        // $provilege_liveids = LiveUserPrivilege::where(['user_id'=>$uid,'pri_level'=>1,'is_del'=>0])->pluck("live_id")->toArray();
         $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort'];
         $query = Live::query();
-        $is_all = 0;
         if (!$uid || ($user && !in_array($user->phone, $testers))) {
             $query->where('is_test', '=', 0);
-            $is_all = 1;
+            $is_test = 0;
         } else {
             $query->whereIn('is_test', [0, 1]);
+            $is_test = 1;
         }
+    
         $query->with('user:id,nickname')
             ->select($fills)
 			->where('begin_at','>', $day_time)
@@ -177,8 +178,13 @@ class LiveController extends Controller
 
             // 不查询测试直播的情况下 
             // 需要查询当前用户是否管理员  单独查询管理员的
-            if($is_all == 1 && !empty($provilege_liveids)){
-                $query->unionAll(Live::select($fills)->whereIn('id', $provilege_liveids));
+            if($is_test == 0 && !empty($this->user['phone'])){
+                $query->unionAll(Live::select($fills)
+                            ->where('begin_at','>', $day_time)
+                            ->where('status', 4)
+                            ->where('is_finish', 0)
+                            ->where('is_del', 0)
+                            ->where('helper', 'like', '%'.$this->user['phone'].'%'));
             }
             
             $lists = $query->orderBy('sort', 'asc')
@@ -193,7 +199,7 @@ class LiveController extends Controller
                     ->orderBy('id', 'desc')
                     ->first();
                 if ($channel) {
-                    // 1未开始  2已结束  3直播中
+                //    1未开始  2已结束  3直播中
                     if ($channel->is_begin == 0 && $channel->is_finish == 0) {
                         $v['live_status'] = 1;
                     } elseif ($channel->is_begin == 1 && $channel->is_finish == 0) {
@@ -216,9 +222,6 @@ class LiveController extends Controller
                 if( $begin_at_time > strtotime(date("Y-1-1")) &&  $begin_at_time < strtotime(date("Y-1-1",strtotime("+1 year")))){
                     $v['live_time'] = date('m.d H:i', strtotime($v['begin_at']));
                 }
-
-
-
 
             }
         }
