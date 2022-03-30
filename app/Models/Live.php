@@ -7,7 +7,7 @@ class Live extends Base
     protected $table = 'nlsg_live';
 
     protected $fillable = ['user_id', 'cover_img', 'title', 'describe', 'price', 'twitter_money', 'begin_at',
-        'end_at', 'helper','is_free','content','need_virtual','need_virtual_num','steam_end_time','steam_begin_time'];
+        'end_at', 'helper','is_free','content','need_virtual','need_virtual_num','steam_end_time','steam_begin_time','classify'];
     public function getIndexLive($ids)
     {
         if (!$ids) {
@@ -66,8 +66,7 @@ class Live extends Base
         }
 
         $liveLists = $query->with('user:id,nickname')
-            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img',
-                'begin_at', 'type', 'end_at','steam_begin_time',
+            ->select('id', 'user_id', 'title', 'describe', 'price', 'cover_img', 'begin_at', 'type', 'end_at','steam_begin_time',
                 'playback_price', 'is_free', 'password')
             ->where('status', 4)
             ->where('is_finish', 0)
@@ -82,7 +81,7 @@ class Live extends Base
 
         if (!empty($liveLists)) {
             foreach ($liveLists as &$v) {
-                $channel = LiveInfo::query()->where('live_pid', $v['id'])
+                $channel = LiveInfo::where('live_pid', $v['id'])
                     ->where('status', 1)
                     ->orderBy('id', 'desc')
                     ->first();
@@ -104,13 +103,6 @@ class Live extends Base
 
                 $v['is_password'] = $v['password'] ? 1 : 0;
                 $v['live_time'] = date('Y.m.d H:i', strtotime($v['begin_at']));
-
-//                if (empty($v['steam_begin_time'])){
-//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['begin_at']));
-//                }else{
-//                    $v['begin_at'] = date('Y.m.d H:i', strtotime($v['steam_begin_time']));
-//                }
-
             }
         }
         return $liveLists;
