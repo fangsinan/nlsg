@@ -567,5 +567,20 @@ class WorksController extends Controller
     }
 
 
+    // 配合客户端排查用户黑屏问题
+    public function playinfo(Request $request){
+
+       
+        DB::table('nlsg_log_info')->insert([
+            'url'           =>  'infoLog:'.$request->fullUrl(),
+            'parameter'     =>  json_encode($request->all()),
+            'user_id'       =>  $this->user['id'] ?? 0,
+            'created_at'    =>  date('Y-m-d H:i:s', time())
+        ]);
+
+        return $this->success();
+    }
+
+
 
 }

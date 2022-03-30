@@ -529,6 +529,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
+    Route::any('playlog', 'WorksController@playinfo');
 
     /**   5.0 API  START   ***/
 
