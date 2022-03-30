@@ -209,11 +209,11 @@ class DealServers
             ];
 
             //抓取更新订单表保护id
-            $map = [
+            $pro_map = [
                 'protect_user_id' => (empty($val->protect_user_id))?0:$val->protect_user_id,
                 'updated_at' => $now_date
             ];
-            Order::where(['ordernum' => $val->ordernum])->update($map);
+            Order::where(['ordernum' => $val->ordernum])->update($pro_map);
         }
 
         DB::beginTransaction();
