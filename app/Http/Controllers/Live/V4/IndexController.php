@@ -1060,6 +1060,7 @@ class IndexController extends ControllerBackend
             ['title' => "六大能力交付第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/3e5b1780387702296648557660/v.f100020.mp4',],
             ['title' => "六大能力交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/39f66604387702296648392559/v.f100020.mp4',],
             ['title' => "六大能力交付第二天0312", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/75a8b365387702297469168737/v.f100020.mp4',],
+            ['title' => "电视频道同步转播", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d8ce9bf1387702298372242370/v.f100030.mp4',],
         ];
         return success($res);
     }
