@@ -569,8 +569,16 @@ class WorksController extends Controller
 
     // 配合客户端排查用户黑屏问题
     public function playinfo(Request $request){
-
-       
+        $type = $request->input('type',0);
+        if( !empty($type) && $type == 1 ){
+            $data = DB::table('nlsg_log_info')->select("url","parameter",'user_id','created_at')->where("url",'like','playinfoLog%')
+            ->get()->toArray();
+            foreach($data as &$val){
+                $val->parameter = json_decode($val->parameter,true);
+            }
+            return $this->success($data);
+        }
+        
         DB::table('nlsg_log_info')->insert([
             'url'           =>  'playinfoLog:'.$request->fullUrl(),
             'parameter'     =>  json_encode($request->all()),
