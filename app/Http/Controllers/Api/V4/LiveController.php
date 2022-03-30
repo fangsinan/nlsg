@@ -819,7 +819,7 @@ class LiveController extends Controller
         }
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro,honor',
-            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num','classify',
+            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify',
             'live.livePoster'=>function($q){
                 $q->where('status','=',1);
             }
