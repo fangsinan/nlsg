@@ -125,7 +125,7 @@ class Subscribe extends Base
 					$res = LivePayCheck::where([
 						'teacher_id'    => $result['user_id'],
 						'user_id'       => $user_id,
-					])->first();
+					])->where("begin_at",'<=',date("Y-m-d H:i:s"))->first();
 
 					if(!empty($res)){
 						$is_sub = 1;
