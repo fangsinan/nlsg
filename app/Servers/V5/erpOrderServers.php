@@ -18,8 +18,9 @@ class erpOrderServers
         $shill_status       = (int)($params['shill_status'] ?? 0); //1没退款  2退款中 3退款完毕
         $order_info_flag    = $params['order_info_flag'] ?? '';
 
+        $erp_push_order_flag = (int)ConfigModel::getData(56, 1);//0全部 1正常 2只测试
+
         $query = Order::query()
-//            ->where('id','>',1822808)
             ->where('type', '=', 14)
             ->whereIn('relation_id', $search_relation_id)
             ->where('status', '=', 1)
@@ -29,6 +30,10 @@ class erpOrderServers
                 'pay_time', 'pay_price', 'is_shill', 'shill_refund_sum', 'is_refund', 'refund_no',
                 'created_at', 'express_info_id', 'textbook_id', 'address_id'
             ]);
+
+        if ($erp_push_order_flag === 1){
+            $query->where('id','>',1869289);
+        }
 
         $query->with([
             'user:id,phone,nickname',
@@ -61,8 +66,8 @@ class erpOrderServers
                 break;
         }
 
-        $erp_push_order_flag = ConfigModel::getData(56, 1);
-        switch (intval($erp_push_order_flag)) {
+
+        switch ($erp_push_order_flag) {
             case 1:
                 $query->whereHas('user', function ($q) {
                     $q->where('is_test_pay', '=', 0);
