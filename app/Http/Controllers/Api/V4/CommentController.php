@@ -468,10 +468,8 @@ class CommentController extends Controller
         if (!$comment){
             return error(1000,'评论不存在');
         }
-        if( $this->user['is_community_admin']==0 ){
-            if ($comment->user_id !== $this->user['id']){
-                return error(1000,'没有权限删除');
-            }
+        if($comment->user_id !== $this->user['id'] || $this->user['is_community_admin']==0 ){
+            return error(1000,'没有权限删除');
         }
 
 
