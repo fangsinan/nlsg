@@ -498,7 +498,7 @@ class CommentController extends Controller
 
         }else{
             CommentReply::where('id', $id)->update(['status' => 0]);
-            Comment::where('id', $comment->comment_id??0)->decrement('comment_num');
+            Comment::where('id', $main_comment['id'] ?? 0)->decrement('comment_num');
             if($c_type == 7){
                 ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num');
             }
