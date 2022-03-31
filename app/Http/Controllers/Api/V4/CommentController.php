@@ -457,7 +457,9 @@ class CommentController extends Controller
             $comment =  Comment::where('id', $id)->first();
             $c_type = $comment['type'];
         }else{
-            $comment = CommentReply::where('id', $id)->first();
+            $comment = CommentReply::select([
+                'id','comment_id','reply_pid','from_uid','to_uid','content','status','from_uid as user_id'
+                ])->where('id', $id)->first();
 
             $main_comment = Comment::where('id', $comment['comment_id'])->first();
             $c_type = $main_comment['type'];
@@ -468,7 +470,7 @@ class CommentController extends Controller
         if (!$comment){
             return error(1000,'评论不存在');
         }
-        if($comment->user_id !== $this->user['id'] && $this->user['is_community_admin']==0 ){
+        if($comment->user_id != $this->user['id'] && $this->user['is_community_admin']==0 ){
             return error(1000,'没有权限删除');
         }
 
@@ -485,6 +487,9 @@ class CommentController extends Controller
                     case 5:
                         Wiki::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
                         break;
+                    case 6:
+                        Column::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
+                        break;
                     case 7:
                         ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
                         break;
@@ -493,7 +498,7 @@ class CommentController extends Controller
 
         }else{
             CommentReply::where('id', $id)->update(['status' => 0]);
-            
+            Comment::where('id', $comment->comment_id??0)->decrement('comment_num');
             if($c_type == 7){
                 ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num');
             }
