@@ -22,7 +22,7 @@ class ReplyController extends Controller
      * @apiGroup Reply
      * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/v4/reply/store
      *
-     * @apiParam {number} type 1主评论  2 次级评论
+     * @apiParam {number} comment_type 1主评论  2 次级评论
      * @apiParam {number} comment_id 评论id
      * @apiParam {string} content    回复内容
      *
@@ -40,8 +40,8 @@ class ReplyController extends Controller
     {
         $user_id  = $this->user['id'];
         $input    = $request->all();
-        $input['type'] = $input['type']??1;
-        if(!empty($input['type']) && $input['type'] == 1){
+        $input['comment_type'] = $input['comment_type']??1;
+        if(!empty($input['comment_type']) && $input['comment_type'] == 1){
             $comment = Comment::where('id', $input['comment_id'])->first();
             if(empty($comment)){
                 return error(1000,'评论不存在');
