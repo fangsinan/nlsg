@@ -747,8 +747,13 @@ class Order extends Base
         $page     = $params['page'] ?? 1;
         $now_date = date('Y-m-d H:i:s');
 
+        $max_id = 341864;
+        if ($this_user['id'] === 997){
+            $max_id = 1869384;
+        }
+
         $query = self::query()
-            ->where('id', '>', 341864)
+            ->where('id', '>', $max_id)
             ->whereIn('type', [10, 14])
             ->where('status', '=', 1)
             ->where('live_id', '<>', 0)
