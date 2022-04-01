@@ -68,6 +68,8 @@ class UserWechatController extends ControllerBackend
      * @apiDescription 微信客户列表
      *
      * @apiParam {number} page 分页
+     * @apiParam {string} is_shill 是否退款 0否 1是
+     * @apiParam {string} offline_id 线下产品id
      * @apiParam {string} name 客户名称
      * @apiParam {string} phone 手机号
      * @apiParam {string} start_time 开始时间
