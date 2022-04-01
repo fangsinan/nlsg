@@ -65,7 +65,7 @@ class WechatPay extends Controller
             return self::mallOrder($data);
         } elseif ($data['attach'] == 9) { //精品课 OK  代理商返佣50%
             return self::PayExcellent($data);
-        } elseif ($data['attach'] == 10) { //过度到直播类型  
+        } elseif ($data['attach'] == 10) { //过度到直播类型
             return self::PayLive($data);
         } elseif ($data['attach'] == 11) { // 处理直播视频
             return self::PayLive($data);
@@ -813,10 +813,10 @@ class WechatPay extends Controller
 					if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //刷单用户排除
 						self::PayTeacherLives($user_id,$liveData,$orderInfo);
 					}
-					
+
 					// 内容刷单记录
 					self::PayTestLog($orderId,$userdata);
-					
+
                     //9.9刷单推送
                     if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
                         self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
@@ -866,6 +866,7 @@ class WechatPay extends Controller
         DB::table(LivePayCheck::$table_name)->insert([
             'live_id' =>$liveData['id'],
             'teacher_id' =>$liveData['user_id'],
+            'begin_at'=>$liveData['begin_at'],
             'user_id' =>$user_id,
             'order_id' =>$order['id'],
             'ordernum' =>$order['ordernum'],
