@@ -748,8 +748,14 @@ class Order extends Base
         $now_date = date('Y-m-d H:i:s');
 
         $max_id = 341864;
-        if ($this_user['id'] === 997){
-            $max_id = 1869384;
+        if ($this_user['username'] == '16612348888'){
+            $max_id = Order::query()
+                ->where('pay_time','>=','2022-04-06 00:00:00')
+                ->min('id');
+
+            if (!$max_id){
+                $max_id = Order::query()->max('id');
+            }
         }
 
         $query = self::query()
