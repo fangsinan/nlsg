@@ -339,10 +339,13 @@ class Kernel extends ConsoleKernel
 
         //每小时查询一次企业微信客户转移接口
         $schedule->call(function () {
+
             $UserWechatServers=new UserWechatServers();
             $UserWechatServers->consume_redis_transfer_customer();
             $UserWechatServers->transfer_result();
             $UserWechatServers->clear_user_wechat_data();
+            $UserWechatServers->set_wechat_user_id();
+
         })->everyThirtyMinutes();
 //        })->hourly();
     }
