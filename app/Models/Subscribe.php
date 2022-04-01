@@ -117,7 +117,7 @@ class Subscribe extends Base
                     $is_sub = 1;
                 }
             }
-			
+
 			//判断直播是否购买过该老师的直播  目前只有购买过王琨老师的直播才可以免费听他之后的直播
 			if($type == 3 && $is_sub==0){
 				$result = Live::find($target_id);
@@ -125,7 +125,7 @@ class Subscribe extends Base
 					$res = LivePayCheck::where([
 						'teacher_id'    => $result['user_id'],
 						'user_id'       => $user_id,
-					])->where("begin_at",'<=',date("Y-m-d H:i:s"))->first();
+					])->where("begin_at",'<=',$result['begin_at'])->orderBy('id', 'desc')->first();;
 
 					if(!empty($res)){
 						$is_sub = 1;
