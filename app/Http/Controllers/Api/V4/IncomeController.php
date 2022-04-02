@@ -11,6 +11,7 @@ use App\Models\MallGoods;
 use App\Models\MallOrderDetails;
 use App\Models\OfflineProducts;
 use App\Models\Order;
+use App\Models\PayIncome;
 use App\Models\PayRecord;
 use App\Models\PayRecordDetail;
 use App\Models\SendInvoice;
@@ -97,11 +98,15 @@ class IncomeController extends Controller
         }
 
         $is_withdrawal=1;
-        if (in_array($user_id, [317437,60895,92931,158291,164463,171507,174858,215209,229413,233148,234965,238291,247036,250593,303717,306448,314220,
+        $withdrawalInfo=PayIncome::query()->where(['user_id'=>$user_id,'status'=>1])->first();
+        if(!empty($withdrawalInfo)){
+            $is_withdrawal=0;
+        }
+        /*if (in_array($user_id, [317437,60895,92931,158291,164463,171507,174858,215209,229413,233148,234965,238291,247036,250593,303717,306448,314220,
             303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291,167756,159015,
             184911,234586,242322,271061,177506])) { //禁止提现
             $is_withdrawal=0;
-        }
+        }*/
 
         $data = [
             'is_pass'           => $is_pass,//-1信息未认证  1已认证 2 拒绝
@@ -527,11 +532,15 @@ class IncomeController extends Controller
         $os_type = $request->input('os_type', 1);//  1 安卓 2ios 3微信
 
 
-        if (in_array($user_id, [317437,60895,92931,158291,164463,171507,174858,215209,229413,233148,234965,238291,247036,250593,303717,306448,314220,
+        $withdrawalInfo=PayIncome::query()->where(['user_id'=>$user_id,'status'=>1])->first();
+        if(!empty($withdrawalInfo)){
+            return $this->error(0,'此账号被锁定提现,请联系客服');
+        }
+        /*if (in_array($user_id, [317437,60895,92931,158291,164463,171507,174858,215209,229413,233148,234965,238291,247036,250593,303717,306448,314220,
             303717,247036,164463,60895,171507,323009,233148,250593,229413,174858,215209,92931,158291,167756,159015,
             184911,234586,242322,271061,177506])) { //禁止提现
             return $this->error(0,'此账号被锁定提现,请联系客服');
-        }
+        }*/
 
         //加锁操作  防止多端口同时提现
         //提现操作加锁
