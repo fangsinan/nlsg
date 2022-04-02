@@ -344,10 +344,17 @@ class Kernel extends ConsoleKernel
             $UserWechatServers->consume_redis_transfer_customer();
             $UserWechatServers->transfer_result();
             $UserWechatServers->clear_user_wechat_data();
-            $UserWechatServers->set_wechat_user_id();
 
         })->everyThirtyMinutes();
-//        })->hourly();
+
+        //企业微信客户user_id获取
+        $schedule->call(function () {
+
+            $UserWechatServers=new UserWechatServers();
+            $UserWechatServers->set_wechat_user_id();
+
+        })->between('1:00', '6:00')->everyThirtyMinutes();
+
     }
 
     /**
