@@ -113,7 +113,7 @@ class UserWechatController extends ControllerBackend
             })
 
 
-            ->when(!empty($params['is_shill']), function ($query) use ($params) {
+            ->when(isset($params['is_shill']), function ($query) use ($params) {
                 $query->whereHas('user_orders', function ($query) use ($params) {
                     $query->where('is_shill',  $params['is_shill'] );
                 });
