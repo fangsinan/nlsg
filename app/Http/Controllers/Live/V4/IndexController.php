@@ -201,6 +201,9 @@ class IndexController extends ControllerBackend
         $status = $request->get('status');
         $start = $request->get('start');
         $end = $request->get('end');
+
+        $classify = $request->input('classify','');
+
         $query = Live::with('user:id,nickname')
             ->when($title, function ($query) use ($title) {
                 $query->where('title', 'like', '%' . $title . '%');
@@ -214,6 +217,11 @@ class IndexController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
+
+
+        if (!empty($classify)){
+            $query->where('classify','=',$classify);
+        }
 
         //非超管角色可看live
         $live_id_role = self::getLiveRoleIdList($this->user);
@@ -244,7 +252,7 @@ class IndexController extends ControllerBackend
         if ($this->user['live_role'] !== 0) {
             $query->where('id', '>', 51);
         }
-        $lists = $query->select('id', 'user_id', 'title', 'price',
+        $lists = $query->select('id', 'user_id', 'title', 'price','classify',
             'order_num', 'status', 'steam_begin_time as begin_at', 'cover_img')
             ->where('is_del', 0)
             ->orderBy('sort', 'asc')
@@ -501,6 +509,7 @@ class IndexController extends ControllerBackend
         $steam_end_time   = $input['steam_end_time'] ?? '';
         $steam_begin_time  = $input['steam_begin_time'] ?? '';
         $pre_push_time  = $input['pre_push_time'] ?? 60;
+        $classify = $input['classify'] ?? 0;
 
         $poster_list = $input['poster'] ?? [];
         if (is_string($poster_list)){
@@ -512,6 +521,10 @@ class IndexController extends ControllerBackend
         }
         if (!$begin_at) {
             return error(1000, '开始时间不能为空');
+        }
+
+        if (empty($classify)){
+            return error(1000, '请选择类型');
         }
 
         if(!empty($steam_begin_time)){
