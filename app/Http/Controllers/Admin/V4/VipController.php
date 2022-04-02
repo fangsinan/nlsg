@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Servers\VipServers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class VipController extends ControllerBackend
@@ -14,7 +15,7 @@ class VipController extends ControllerBackend
     /**
      * 列表与详情
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @api {get} /api/admin_v4/vip/list 列表与详情
      * @apiVersion 4.0.0
      * @apiName /api/admin_v4/vip/list
@@ -29,17 +30,22 @@ class VipController extends ControllerBackend
      * @apiSuccess {string} assign_count 配额总数
      * @apiSuccess {string} assign_history 配额记录
      */
-    public function list(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function list(Request $request): JsonResponse {
         $servers = new VipServers();
-        $data = $servers->list($request->input(), $this->user['id'] ?? 0);
+        $data    = $servers->list($request->input(), $this->user['id'] ?? 0);
+        return $this->getRes($data);
+    }
+
+    public function change360ExpireTime(Request $request): JsonResponse {
+        $servers = new VipServers();
+        $data    = $servers->change360ExpireTime($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 
     /**
      * 360兑换码配额修改
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @api {get} /api/admin_v4/vip/assign 兑换码配额修改
      * @apiVersion 4.0.0
      * @apiName /api/admin_v4/vip/assign
@@ -54,17 +60,16 @@ class VipController extends ControllerBackend
      * @apiParam {string=edit,add} flag 添加或修改
      * @apiParam {string} assign_history_id 历史记录的id
      */
-    public function assign(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function assign(Request $request): JsonResponse {
         $servers = new VipServers();
-        $data = $servers->assign($request->input(), $this->user['id'] ?? 0);
+        $data    = $servers->assign($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 
     /**
      * 开通360或钻石
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @api {get} /api/admin_v4/vip/create_vip 开通360或钻石
      * @apiVersion 4.0.0
      * @apiName /api/admin_v4/vip/create_vip
@@ -80,10 +85,9 @@ class VipController extends ControllerBackend
      * @apiSuccess {string[]} success_msg 操作信息
      *
      */
-    public function createVip(Request $request)
-    {
+    public function createVip(Request $request) {
         $servers = new VipServers();
-        $data = $servers->createVip($request->input(), $this->user['id'] ?? 0);
+        $data    = $servers->createVip($request->input(), $this->user['id'] ?? 0);
         return $this->getRes($data);
     }
 

@@ -151,6 +151,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
         //360模块
         Route::get('vip/list', 'VipController@list');
         Route::post('vip/assign', 'VipController@assign');
+        Route::post('vip/change_360_expire_time', 'VipController@change360ExpireTime');
 
         //直播
         Route::get('live/index', 'LiveController@index');
