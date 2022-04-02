@@ -61,4 +61,25 @@ class SelectDataController extends ControllerBackend
         return $this->getRes((new sds())->teacherList($request->input()));
     }
 
+    public function liveClassify(): JsonResponse {
+        return $this->getRes([
+            [
+                'key'=>1,
+                'value'=>'交付课',
+            ],
+            [
+                'key'=>2,
+                'value'=>'公益课',
+            ],
+            [
+                'key'=>3,
+                'value'=>'分公司专场',
+            ],
+            [
+                'key'=>4,
+                'value'=>'电视渠道',
+            ],
+        ]);
+    }
+
 }
