@@ -6,6 +6,7 @@ namespace App\Servers;
 
 use App\Jobs\jobOfCytx;
 use App\Jobs\JobOfSocket;
+use App\Models\User;
 use App\Models\UserWechat;
 use App\Models\UserWechatFollow;
 use App\Models\UserWechatName;
@@ -633,6 +634,8 @@ class UserWechatServers
      */
     public function clear_user_wechat_data(){
 
+        add_log('clear_user_wechat_data', '清理微信客户数据');
+
         $time=date('Y-m-d H:i:s',time()-3*24*60*60);
 
         $user_list=UserWechat::query()
@@ -648,4 +651,28 @@ class UserWechatServers
         }
     }
 
+
+    /**
+     * 批量查询企业微信客户的用户id
+     */
+    public function set_wechat_user_id(){
+
+        $userModel=new User();
+
+        $list=UserWechat::query()
+            ->from(UserWechat::DB_TABLE.' as UserWechat')
+            ->leftJoin($userModel->getTable().' as User','User.unionid','=','UserWechat.unionid')
+            ->select(['UserWechat.id','User.id as u_id'])
+            ->whereNotNull('User.id')
+            ->where('UserWechat.user_id',0)
+            ->where('UserWechat.unionid','<>','')->limit(50000)->get();
+
+        foreach ($list as $UserWechat){
+            $UserWechat->user_id=$UserWechat->u_id;
+            $UserWechat->save();
+        }
+
+        add_log('set_wechat_user_id', '批量查询企业微信客户的用户id-'.count($list));
+
+    }
 }

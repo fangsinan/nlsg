@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin\V4;
 
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\ConfigModel;
+use App\Models\OfflineProducts;
 use App\Models\User;
 use App\Models\UserWechat;
 use App\Models\UserWechatName;
@@ -19,14 +21,45 @@ class UserWechatController extends ControllerBackend
 {
 
 
+
     public function test(){
 
 //        $UserWechatServers = new UserWechatServers();
+//        $UserWechatServers->set_wechat_user_id();
 //        $res=$UserWechatServers->get_user_info('wok8dJEQAAdOT37rRpX-CUZCuFYPWt5Q');
 //        $res=\App\Http\Controllers\Api\V4\UserWechat::getUserDetail(['wok8dJEQAAdOT37rRpX-CUZCuFYPWt5Q'],$UserWechatServers->token);
 //        var_dump($res);
+
     }
 
+
+    /**
+     * @api {get} api/admin_v4/user_wechat/get_offline_products 获取线上训练营
+     * @apiVersion 4.0.0
+     * @apiName  user_wechat/get_offline_products
+     * @apiGroup 后台-微信客户管理
+     * @apiSampleRequest http://app.v4.api.nlsgapp.com/api/admin_v4/user_wechat/get_offline_products
+     * @apiDescription 获取线上训练营
+     *
+     * @apiSuccessExample  Success-Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "code": 200,
+     *   "msg" : '成功',
+     *   "data": {
+     *
+     *    }
+     * }
+     */
+    public function get_offline_products(){
+
+        $config=ConfigModel::getData(65, 1);
+        if($config){
+            $config=json_decode($config,true);
+        }
+        return success($config);
+
+    }
     /**
      * @api {get} api/admin_v4/user_wechat/search_wechat_user_list 获取微信客户列表
      * @apiVersion 4.0.0
@@ -36,6 +69,8 @@ class UserWechatController extends ControllerBackend
      * @apiDescription 微信客户列表
      *
      * @apiParam {number} page 分页
+     * @apiParam {string} is_shill 是否退款 0否 1是
+     * @apiParam {string} offline_id 线下产品id
      * @apiParam {string} name 客户名称
      * @apiParam {string} phone 手机号
      * @apiParam {string} start_time 开始时间
@@ -62,16 +97,32 @@ class UserWechatController extends ControllerBackend
 
         $query = UserWechat::with(
             [
+                'user_orders:id,user_id,relation_id,ordernum,pay_price,is_shill','user_orders.offline:id,title,subtitle',
                 'user:id,nickname,phone,unionid',
                 'follow_staff:id,qw_name,follow_user_userid',
                 'source_staff:id,qw_name,follow_user_userid',
             ])
+
 //            ->where('unionid','<>','')
             ->when(!empty($params['name']), function ($query) use ($params) {
                 $query->where('name', $params['name']);
             })
+
             ->when(isset($params['transfer_status']), function ($query) use ($params) {
                 $query->where('transfer_status', $params['transfer_status']);
+            })
+
+
+            ->when(isset($params['is_shill']), function ($query) use ($params) {
+                $query->whereHas('user_orders', function ($query) use ($params) {
+                    $query->where('is_shill',  $params['is_shill'] );
+                });
+            })
+
+            ->when(!empty($params['offline_id']), function ($query) use ($params) {
+                $query->whereHas('user_orders', function ($query) use ($params) {
+                    $query->where('relation_id',  $params['offline_id'] );
+                });
             })
 
             ->when(!empty($params['start_time']) && !empty($params['end_time']), function ($query) use ($params) {
@@ -83,6 +134,7 @@ class UserWechatController extends ControllerBackend
                     $query->where('phone',  $params['phone'] );
                 });
             })
+
             ->when(!empty($params['follow_user_userid']), function ($query) use ($params) {
                 $query->whereHas('follow_staff', function ($query) use ($params) {
                     $query->where('follow_user_userid',  $params['follow_user_userid'] );
@@ -94,7 +146,7 @@ class UserWechatController extends ControllerBackend
                 });
             });
 
-        $lists = $query->paginate(get_page_size($params))->toArray();
+        $lists = $query->orderBy('id','desc')->paginate(get_page_size($params))->toArray();
 
 //        $logs = \Illuminate\Support\Facades\DB::getQueryLog();
 //        dd($logs);
