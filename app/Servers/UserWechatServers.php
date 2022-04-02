@@ -665,7 +665,7 @@ class UserWechatServers
             ->select(['UserWechat.id','User.id as u_id'])
             ->whereNotNull('User.id')
             ->where('UserWechat.user_id',0)
-            ->where('UserWechat.unionid','<>','')->limit(10000)->get();
+            ->where('UserWechat.unionid','<>','')->limit(50000)->get();
 
         foreach ($list as $UserWechat){
             $UserWechat->user_id=$UserWechat->u_id;
