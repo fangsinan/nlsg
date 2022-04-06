@@ -273,10 +273,16 @@ class ErpServers
                         $express_company_info     = ExpressCompany::query()->find($send_data['express_id']);
                         $history                  = [];
                         $history['number']        = $v['logistics_no'];
-                        $history['type']          = $express_company_info->code;
-                        $history['typename']      = $express_company_info->name;
-                        $history['express_phone'] = $express_company_info->phone;
-                        $history['logo']          = $express_company_info->logo;
+
+                        $history['type']          = $express_company_info->code ?? '';
+                        $history['typename']      = $express_company_info->name ?? $v['logistics_name'];
+                        $history['express_phone'] = $express_company_info->phone ?? '';
+                        $history['logo']          = $express_company_info->logo ?? '';
+
+//                        $history['type']          = $express_company_info->code;
+//                        $history['typename']      = $express_company_info->name;
+//                        $history['express_phone'] = $express_company_info->phone;
+//                        $history['logo']          = $express_company_info->logo;
                         $history['list']          = [
                             [
                                 'time'   => $now_date,
