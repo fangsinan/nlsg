@@ -38,6 +38,9 @@ class UserWechat extends Base
     public function user_orders(){
         return $this->hasMany(Order::class,'user_id','user_id')
             ->whereIn('relation_id',[5,6,7])
+            ->whereHas('user',function ($query){
+                $query->where('is_test_pay',0);
+            })
             ->where('type',14)
             ->where('status',1);
     }
