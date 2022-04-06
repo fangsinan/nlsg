@@ -183,12 +183,13 @@ class WorksInfo extends Base
             }else{
                 $get_info_id = $column_id;
             }
-
+            $getBanner_id = $column_id;
         }else{
             if (empty($works_id) || empty($works_info_id)) {
                 return ['code' => false, 'msg' => '课程id不存在'];
             }
             $sub_relation_id = $works_id;
+            $getBanner_id = $works_id;
         }
 
 
@@ -339,7 +340,7 @@ class WorksInfo extends Base
         $info_list[$info_key]['is_collection'] = Collection::isCollection($collection_type,$works_id,$works_info_id,$user['id']);
         $works_info->is_collection = $info_list[$info_key]['is_collection']; //兼容V4
         $info_list[$info_key]['is_like'] =ContentLike::isLike($like_type,$works_id,$user['id'],$works_info_id);
-        $info_list[$info_key]['column_banner'] = Column::getCampBanner($column_id,$this->user,$params);
+        $info_list[$info_key]['column_banner'] = Column::getCampBanner($getBanner_id,$this->user,$params);
 
         //  统计章节的评论数   由于训练营是共用章节 所以需要单独统计评论表和回复表
         $CommentIds = Comment::where(['type'=>6,'relation_id'=>1,'info_id'=>2,])->pluck("id")->toArray() ?? [];
