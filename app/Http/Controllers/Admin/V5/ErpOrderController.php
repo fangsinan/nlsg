@@ -20,6 +20,10 @@ class ErpOrderController extends ControllerBackend
         return $this->getRes((new erpOrderServers())->bindAddress($request->input()));
     }
 
+    public function addRefundOrder(Request $request): JsonResponse {
+        return $this->getRes((new erpOrderServers())->addRefundOrder($request->input(),$this->user['id'] ?? 0));
+    }
+
     public function erpOrderListExcel(Request $request) {
         set_time_limit(600);
         $params         = $request->input();

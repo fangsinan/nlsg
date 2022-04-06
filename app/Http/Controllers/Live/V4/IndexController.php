@@ -260,8 +260,29 @@ class IndexController extends ControllerBackend
             ->paginate(10)
             ->toArray();
 
+
+        $classify_list = [
+            '1' => [
+                'key'   => 1,
+                'value' => '交付课',
+            ],
+            '2' => [
+                'key'   => 2,
+                'value' => '公益课',
+            ],
+            '3' => [
+                'key'   => 3,
+                'value' => '分公司专场',
+            ],
+            '4' => [
+                'key'   => 4,
+                'value' => '电视渠道',
+            ],
+        ];
+
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
+            $val['classify_name'] = $classify_list[$val['classify']]['value'] ?? '-';
             $val['live_status'] = 1;  //默认值
             $channel = LiveInfo::where('live_pid', $val['id'])
                 ->where('status', 1)
@@ -567,6 +588,7 @@ class IndexController extends ControllerBackend
             'steam_end_time'   => $steam_end_time,
             'steam_begin_time'  => $steam_begin_time,
             'pre_push_time'  => $pre_push_time,
+            'classify'  => $classify,
         ];
 
         $lcModel            = new LiveConsole();
@@ -978,7 +1000,7 @@ class IndexController extends ControllerBackend
         $live = Live::query()
             ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
                 'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test',
-                'steam_end_time', 'steam_begin_time','pre_push_time'
+                'steam_end_time', 'steam_begin_time','pre_push_time','classify'
             )
 //            ->with(['livePoster'])
             ->where('id', $id)->first();
@@ -1074,6 +1096,7 @@ class IndexController extends ControllerBackend
             ['title' => "六大能力交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/39f66604387702296648392559/v.f100020.mp4',],
             ['title' => "六大能力交付第二天0312", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/75a8b365387702297469168737/v.f100020.mp4',],
             ['title' => "电视频道同步转播", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d8ce9bf1387702298372242370/v.f100030.mp4',],
+            ['title' => "电视频道同步转播重播版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/577c2779387702298740716652/v.f100030.mp4',],
         ];
         return success($res);
     }

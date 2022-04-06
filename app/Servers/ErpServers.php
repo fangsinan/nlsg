@@ -400,12 +400,12 @@ class ErpServers
     }
 
     //训练营教材订单推送
-    public function pushRunForOrder(): bool {
+    public function pushRunForOrder($order_id_list = []): bool {
         $while_flag = true;
 
         while ($while_flag) {
 
-            $list = OrderErpList::query()
+            $list_query = OrderErpList::query()
                 ->with([
                     'orderInfo:id,type,live_num,user_id,status,ordernum,pay_price,created_at,pay_time,express_info_id,textbook_id,address_id,is_shill',
                     'orderInfo.addressInfo:id,name,phone,details,user_id,province,city,area',
@@ -421,9 +421,13 @@ class ErpServers
                         ->where('address_id', '>', 0)
                         ->where('express_info_id', '=', 0);
                 })
-                ->select(['id', 'order_id', 'flag'])
-                ->limit(50)
-                ->get();
+                ->select(['id', 'order_id', 'flag']);
+
+            if (!empty($order_id_list)) {
+                $list_query->whereIn('order_id', $order_id_list);
+            }
+
+            $list = $list_query->limit(50)->get();
 
             if ($list->isEmpty()) {
                 return true;
