@@ -588,6 +588,7 @@ class IndexController extends ControllerBackend
             'steam_end_time'   => $steam_end_time,
             'steam_begin_time'  => $steam_begin_time,
             'pre_push_time'  => $pre_push_time,
+            'classify'  => $classify,
         ];
 
         $lcModel            = new LiveConsole();
