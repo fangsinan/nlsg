@@ -260,8 +260,29 @@ class IndexController extends ControllerBackend
             ->paginate(10)
             ->toArray();
 
+
+        $classify_list = [
+            '1' => [
+                'key'   => 1,
+                'value' => '交付课',
+            ],
+            '2' => [
+                'key'   => 2,
+                'value' => '公益课',
+            ],
+            '3' => [
+                'key'   => 3,
+                'value' => '分公司专场',
+            ],
+            '4' => [
+                'key'   => 4,
+                'value' => '电视渠道',
+            ],
+        ];
+
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
+            $val['classify_name'] = $classify_list[$val['classify']]['value'] ?? '-';
             $val['live_status'] = 1;  //默认值
             $channel = LiveInfo::where('live_pid', $val['id'])
                 ->where('status', 1)
