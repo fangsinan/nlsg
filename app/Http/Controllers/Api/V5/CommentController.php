@@ -306,6 +306,9 @@ class CommentController extends Controller
                     case 5:
                         Wiki::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
                         break;
+                    case 6:
+                        Column::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
+                        break;
                     case 7:
                         ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
                         break;
