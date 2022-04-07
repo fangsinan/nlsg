@@ -218,6 +218,9 @@ class CommentController extends Controller
                 case  5:
                     Wiki::where('id', $input['id'])->increment('comment_num');
                     break;
+                case  6:
+                    Column::where('id', $input['id'])->increment('comment_num');
+                    break;
                 case  7:
                     ShortVideoModel::where('id', $input['id'])->increment('comment_num');
                     break;
