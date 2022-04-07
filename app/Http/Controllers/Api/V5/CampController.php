@@ -184,10 +184,10 @@ class CampController extends Controller
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($column_id, $history_type, $user_id);  //讲座
 
-
         $column['history_count'] = 0;
-        if ($column['info_num'] > 0) {
-            $column['history_count'] = round($hisCount / $column['info_num'] * 100);
+        $info_num  = $column['type'] == 3 ? $column['show_info_num']:$column['info_num'];
+        if ($info_num > 0) {
+            $column['history_count'] = round($hisCount / $info_num * 100);
         }
 
         //历史记录
