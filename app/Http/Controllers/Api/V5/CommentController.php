@@ -215,6 +215,9 @@ class CommentController extends Controller
 
         if ($result->id) {
             switch ($input['type']){
+                case  4:
+                    Works::where('id', $input['id'])->increment('comment_num');
+                    break;
                 case  5:
                     Wiki::where('id', $input['id'])->increment('comment_num');
                     break;
