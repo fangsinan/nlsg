@@ -227,11 +227,11 @@ class InfoController extends ControllerBackend
             '受益人id', '受益人金额',
             '钻石合伙人id', '钻石合伙人账号', '钻石合伙人昵称', '钻石合伙人身份',
             '是否抖音渠道', '抖音订单号', '抖音下单时间', '渠道类型', '渠道名称',
-            '用户第一次购买直播间id', '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款',
+            '用户第一次购买直播间id', '用户第一次购买直播间标题','用户第一次购买直播间老师',
+            '用户第一次购买直播间金额', '用户第一次购买直播间时间', '是否退款',
             '微信客服', '客服编号',
             '收货地址'
         ];
-//        $fileName = '直播间订单列表' . date('Y-m-d H:i') . '.csv';
         $fileName = date('Y-m-d H:i') . '-' . rand(10, 99) . '.csv';
         header('Content-Description: File Transfer');
         header('Content-Type: application/vnd.ms-excel');
