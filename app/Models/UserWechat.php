@@ -36,13 +36,16 @@ class UserWechat extends Base
 
 
     public function user_orders(){
+
+        $relation_ids=OfflineProducts::query()->where('type',2)->pluck('id')->toArray();
         return $this->hasMany(Order::class,'user_id','user_id')
-            ->whereIn('relation_id',[5,6,7])
+            ->whereIn('relation_id',$relation_ids)
             ->whereHas('user',function ($query){
                 $query->where('is_test_pay',0);
             })
             ->where('type',14)
             ->where('status',1);
     }
+
 
 }
