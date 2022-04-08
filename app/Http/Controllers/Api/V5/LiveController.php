@@ -462,7 +462,7 @@ class LiveController extends Controller
         ]);
         
         if ($validator->fails()) {
-            return $this->error(0,$validator->messages()->first());
+            return $this->error(0,$validator->messages()->first(),0);
         }
 
         $id = LivePushQrcode::create([
