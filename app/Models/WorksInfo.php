@@ -159,15 +159,18 @@ class WorksInfo extends Base
         $works_id = $params['works_id'] ?? 0;
         $works_info_id = $params['works_info_id'] ?? 0;
         $ob = $params['ob'] ?? '';
+        //1 专栏  2作品 3直播  4会员 5线下产品  6讲座   7训练营
+        $type = $params['type'] ?? 0;
+
+
         if($ob == ''){  //默认
             $ob = 'asc';
-            if($works_id == 566){
+            if($type == 2 && $works_id == 566){
                 $ob = 'desc';
             }
         }
 
-        //1 专栏  2作品 3直播  4会员 5线下产品  6讲座   7训练营
-        $type = $params['type'] ?? 0;
+       
         if($type == 1 || $type == 6 || $type == 7){
 
             $column_id = $params['column_id'] ?? 0;
