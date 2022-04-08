@@ -16,8 +16,9 @@ use App\Models\OfflineProducts;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
-use App\Models\LiveUserPrivilege;
+use App\Models\LivePushQrcode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Predis\Client;
 
 class LiveController extends Controller
@@ -443,4 +444,34 @@ class LiveController extends Controller
         return success($data);
 
     }
+
+
+
+
+    /**
+     * {get} api/v5/live/live_push_qrcode 直播推送二维码上传
+     */
+    public function livePushQrcode(Request $request)
+    { 
+        $user_id    = $this->user['id'] ?? 0;
+        $qr_image  = $request->input('qr_image',0);
+        $os_type = $request->input('os_type',0);
+        
+        $validator = Validator::make($request->all(), [
+            'qr_image' => 'required',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first());
+        }
+
+        $id = LivePushQrcode::create([
+            'qr_url' => 1,
+        ])->id;
+        return success($id);
+        
+    }
+
+
+
 }
