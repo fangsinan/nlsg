@@ -342,7 +342,7 @@ class LiveInfoServers {
                 DB::raw('(case ld.is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
                 'ld.tiktok_ordernum', 'ld.tiktok_time', 'ld.qd',
                 DB::raw('(case ld.qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" when 4 then "地推" else "--" end) as qd_name'), //1 抖音 2 李婷 3 自有平台 4地推
-                'ld.sub_live_id','live.title as live_title','lu.nickname as live_nickname',
+                'ld.sub_live_id','lu.nickname as live_nickname','live.title as live_title',
                 'ld.sub_live_pay_price', 'ld.sub_live_pay_time',
                 DB::raw('(case o.is_shill when 1 then "是"  else "否" end) as is_refund'),
             ]);
@@ -364,7 +364,7 @@ class LiveInfoServers {
                 DB::raw('(case ld.is_tiktok when 1 then "是"  else "否" end) as is_tiktok'),
                 'ld.tiktok_ordernum', 'ld.tiktok_time', 'qd',
                 DB::raw('(case ld.qd when 1 then "抖音" when 2 then "李婷" when 3 then "自有" when 4 then "地推" else "--" end) as qd_name'),
-                'ld.sub_live_id', 'live.title as live_title','lu.nickname as live_nickname',
+                'ld.sub_live_id','lu.nickname as live_nickname', 'live.title as live_title',
                 'ld.sub_live_pay_price', 'ld.sub_live_pay_time',
                 DB::raw('(case o.is_shill  when 1 then "是"  else "否" end) as is_refund'),
             ]);
