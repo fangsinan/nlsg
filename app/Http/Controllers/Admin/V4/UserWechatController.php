@@ -53,10 +53,7 @@ class UserWechatController extends ControllerBackend
      */
     public function get_offline_products(){
 
-        $config=ConfigModel::getData(65, 1);
-        if($config){
-            $config=json_decode($config,true);
-        }
+        $config=OfflineProducts::query()->where('type',2)->select(['id','title'])->get()->toArray();
         return success($config);
 
     }
