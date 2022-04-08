@@ -3,6 +3,7 @@
 namespace App\Servers\V5;
 
 use App\Models\Lists;
+use App\Models\Live;
 use App\Models\RecommendConfig;
 use App\Models\User;
 use App\Models\Works;
@@ -65,4 +66,15 @@ class SelectDataServers
             ->get();
     }
 
+
+    public function liveList($params){
+        return Live::query()
+            ->where('id','>',350)
+            ->where('status','=',4)
+            ->where('is_del','=',0)
+            ->where('is_test','=',0)
+            ->select(['id','title'])
+            ->orderBy('id','desc')
+            ->get();
+    }
 }

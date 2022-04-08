@@ -82,4 +82,8 @@ class SelectDataController extends ControllerBackend
         ]);
     }
 
+    public function liveList(Request $request): JsonResponse {
+        return $this->getRes((new sds())->liveList($request->input()));
+    }
+
 }
