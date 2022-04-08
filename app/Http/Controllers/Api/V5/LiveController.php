@@ -466,7 +466,7 @@ class LiveController extends Controller
         }
 
         $id = LivePushQrcode::create([
-            'qr_url' => 1,
+            'qr_url' => $qr_image,
         ])->id;
         return success($id);
         
