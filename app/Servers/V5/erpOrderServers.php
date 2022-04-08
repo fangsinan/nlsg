@@ -49,6 +49,7 @@ class erpOrderServers
             'pushErpInfo:id,order_id,flag',
             'expressInfo:id,express_id,express_num,history',
             'payRefundInfo:id,order_id,created_at',
+            'orderRefundLogInfo:ordernum,check_price',
         ]);
 
         switch ($order_info_flag) {
@@ -200,6 +201,10 @@ class erpOrderServers
                     ($v->addressInfo->area_city->name ?? '') . ' ' .
                     ($v->addressInfo->area_area->name ?? '') . ' ' .
                     $v->addressInfo->details);
+            }
+
+            if ($v->shill_refund_sum == 0 && isset($v->orderRefundLogInfo->check_price)) {
+                $v->shill_refund_sum = $v->orderRefundLogInfo->check_price;
             }
 
             if (!empty($v->expressInfo)) {

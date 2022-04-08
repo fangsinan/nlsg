@@ -502,18 +502,19 @@ class ErpServers
 
             if ($res['code'] != true) {
                 $error_message = json_decode($res['msg'], true);
-
-                $error_data = [];
-                foreach ($error_message as $v) {
-                    $temp_error_data               = [];
-                    $temp_error_data['ordernum']   = $v['tid'];
-                    $temp_error_data['error']      = $v['error'];
-                    $temp_error_data['type']       = 1;
-                    $temp_error_data['order_type'] = 2;
-                    $error_data[]                  = $temp_error_data;
-                }
-                if (!empty($error_data)) {
-                    DB::table('nlsg_mall_order_erp_error')->insert($error_data);
+                if (is_array($error_message)){
+                    $error_data = [];
+                    foreach ($error_message as $v) {
+                        $temp_error_data               = [];
+                        $temp_error_data['ordernum']   = $v['tid'];
+                        $temp_error_data['error']      = $v['error'];
+                        $temp_error_data['type']       = 1;
+                        $temp_error_data['order_type'] = 2;
+                        $error_data[]                  = $temp_error_data;
+                    }
+                    if (!empty($error_data)) {
+                        DB::table('nlsg_mall_order_erp_error')->insert($error_data);
+                    }
                 }
             }else{
                 OrderErpList::query()

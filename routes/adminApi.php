@@ -377,6 +377,11 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('teacher/info', 'TeacherController@info');
         Route::post('teacher/create', 'TeacherController@create');
 
+
+        Route::get('temp_live_excel/shou_ting_qing_kuang', 'TempLiveExcelController@shouTingQingKuang');
+        Route::get('temp_live_excel/wei_jin_zhi_bo', 'TempLiveExcelController@weiJinZhiBo');
+        Route::get('temp_live_excel/qi_ye_wei_xin', 'TempLiveExcelController@qiYeWeiXin');
+
     });
 });
 

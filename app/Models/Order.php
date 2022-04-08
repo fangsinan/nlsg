@@ -994,4 +994,8 @@ class Order extends Base
     public function payRefundInfo(){
         return $this->hasOne(OrderPayRefund::class,'order_id','ordernum');
     }
+
+    public function orderRefundLogInfo(){
+        return $this->hasOne(OrderRefundLog::class,'ordernum','ordernum');
+    }
 }

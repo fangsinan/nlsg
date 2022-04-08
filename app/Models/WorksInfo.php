@@ -159,15 +159,18 @@ class WorksInfo extends Base
         $works_id = $params['works_id'] ?? 0;
         $works_info_id = $params['works_info_id'] ?? 0;
         $ob = $params['ob'] ?? '';
+        //1 专栏  2作品 3直播  4会员 5线下产品  6讲座   7训练营
+        $type = $params['type'] ?? 0;
+
+
         if($ob == ''){  //默认
             $ob = 'asc';
-            if($works_id == 566){
+            if($type == 2 && $works_id == 566){
                 $ob = 'desc';
             }
         }
 
-        //1 专栏  2作品 3直播  4会员 5线下产品  6讲座   7训练营
-        $type = $params['type'] ?? 0;
+       
         if($type == 1 || $type == 6 || $type == 7){
 
             $column_id = $params['column_id'] ?? 0;
@@ -343,7 +346,7 @@ class WorksInfo extends Base
         $info_list[$info_key]['column_banner'] = Column::getCampBanner($getBanner_id,$this->user,$params);
 
         //  统计章节的评论数   由于训练营是共用章节 所以需要单独统计评论表和回复表
-        $CommentIds = Comment::where(['type'=>6,'relation_id'=>1,'info_id'=>2,])->pluck("id")->toArray() ?? [];
+        $CommentIds = Comment::where(['type'=>6,'relation_id'=>$works_id,'info_id'=>$works_info_id,])->pluck("id")->toArray() ?? [];
         $replay_num = CommentReply::whereIn('comment_id',$CommentIds)->count();
         $info_list[$info_key]['comment_num'] = (int)(count($CommentIds) + $replay_num);
 

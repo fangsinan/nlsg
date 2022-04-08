@@ -215,8 +215,14 @@ class CommentController extends Controller
 
         if ($result->id) {
             switch ($input['type']){
+                case  4:
+                    Works::where('id', $input['id'])->increment('comment_num');
+                    break;
                 case  5:
                     Wiki::where('id', $input['id'])->increment('comment_num');
+                    break;
+                case  6:
+                    Column::where('id', $input['id'])->increment('comment_num');
                     break;
                 case  7:
                     ShortVideoModel::where('id', $input['id'])->increment('comment_num');
@@ -299,6 +305,9 @@ class CommentController extends Controller
                 switch ($comment->type){
                     case 5:
                         Wiki::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
+                        break;
+                    case 6:
+                        Column::where('id', $comment->relation_id)->decrement('comment_num',$count+1);
                         break;
                     case 7:
                         ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num',$count+1);

@@ -1,0 +1,191 @@
+<?php
+
+namespace App\Servers\V5;
+
+use Illuminate\Support\Facades\DB;
+
+class TempLiveExcelServers
+{
+
+    public function shouTingQingKuang($params) {
+        $begin_time = $params['begin_time'] ?? '';
+        $end_time   = $params['end_time'] ?? '';
+        $live_id    = $params['live_id'] ?? 0;
+
+        if (empty($begin_time) || empty($end_time) || empty($live_id)) {
+            return [
+                'code' => false,
+                'msg'  => '参数错误',
+            ];
+        }
+
+        $sql = "SELECT
+	o.id order_id,
+	CONCAT( '`', o.ordernum ) ordernum,
+	CONCAT( '`', pay.transaction_id ) transaction_id,
+	o.live_id,
+	o.twitter_id,
+	o.pay_price,
+	o.pay_time ,
+	u.phone,
+	u.nickname,
+	u.unionid,
+	u.created_at u_created_at,
+	qw.`name` as qw_name,
+	wn.qw_name as wn_qw_name,
+	FROM_UNIXTIME( qw.follow_user_createtime, '%Y%m%d %H:%i:%s' ) as add_at,
+	qw.follow_user_userid
+FROM
+	nlsg_order AS o
+	LEFT JOIN nlsg_user u ON u.id = o.user_id
+	LEFT JOIN nlsg_user_wechat AS qw ON qw.unionid = u.unionid
+	AND qw.unionid <> ''
+	LEFT JOIN nlsg_user_wechat_name wn ON wn.follow_user_userid = qw.follow_user_userid
+	LEFT JOIN nlsg_pay_record pay ON pay.ordernum = o.ordernum
+	LEFT JOIN (
+	SELECT
+		id,
+		live_id,
+		user_id,
+		live_son_flag,
+		online_time
+	FROM
+		nlsg_live_online_user
+	WHERE
+	    live_id = $live_id AND
+		( online_time > '$begin_time' AND online_time < '$end_time' )
+	GROUP BY
+		user_id
+	) AS jrzb ON jrzb.user_id = o.user_id
+WHERE
+	o.live_id = 373
+	AND o.type = 10
+	AND o.`status` = 1
+	AND o.is_shill = 0
+	AND o.pay_price > 1
+	AND u.is_test_pay = 0
+	AND qw.follow_user_userid IS NOT NULL
+	AND jrzb.online_time IS NOT NULL
+GROUP BY
+	o.id
+ORDER BY
+	o.id DESC;";
+
+        return DB::select($sql);
+
+    }
+
+    public function weiJinZhiBo($params) {
+        $begin_time_d1 = $params['begin_time_d1'] ?? '';
+        $end_time_d1   = $params['end_time_d1'] ?? '';
+
+        $begin_time_d2 = $params['begin_time_d2'] ?? '';
+        $end_time_d2   = $params['end_time_d2'] ?? '';
+
+        $is_watch = $params['is_watch'] ?? 0;
+        $live_id  = $params['live_id'] ?? 0;
+
+        if (empty($live_id)) {
+            return [
+                'code' => false,
+                'msg'  => '参数错误,请选择直播场次',
+            ];
+        }
+
+        if (empty($begin_time_d1) && empty($begin_time_d2)) {
+            return [
+                'code' => false,
+                'msg'  => '参数错误,请选择开始时间',
+            ];
+        }
+
+        if ((!empty($begin_time_d1) && empty($end_time_d1)) || (!empty($begin_time_d2) && empty($end_time_d2))) {
+            return [
+                'code' => false,
+                'msg'  => '参数错误,请选择结束时间',
+            ];
+        }
+
+
+        if (!empty($begin_time_d1) && !empty($begin_time_d2)) {
+            $time_str = "(
+                (online_time > '$begin_time_d1' AND online_time < '$end_time_d1')
+                OR
+                (online_time > '$begin_time_d2' AND online_time < '$end_time_d2')
+            )";
+
+        } else {
+            $time_str = '(online_time > \''.
+                ($begin_time_d1?:$begin_time_d2).'\' AND online_time < \''.
+                ($end_time_d1?:$end_time_d2).'\')';
+        }
+
+        $sql = "
+SELECT
+	o.id as order_id,
+	CONCAT( '`', o.ordernum ) ordernum,
+	CONCAT( '`', pay.transaction_id ) transaction_id,
+	o.live_id,
+	o.twitter_id,
+	o.pay_price,
+	o.pay_time,
+	u.phone,
+	u.nickname,
+	u.unionid,
+	u.created_at,
+	qw.name as qname,
+	wn.qw_name,
+	FROM_UNIXTIME( qw.follow_user_createtime, '%Y%m%d %H:%i:%s' ) follow_user_createtime,
+	qw.follow_user_userid
+FROM
+	nlsg_order AS o
+	LEFT JOIN nlsg_user u ON u.id = o.user_id
+	LEFT JOIN nlsg_user_wechat AS qw ON qw.unionid = u.unionid
+	AND qw.unionid <> ''
+	LEFT JOIN nlsg_user_wechat_name wn ON wn.follow_user_userid = qw.follow_user_userid
+	LEFT JOIN nlsg_pay_record pay ON pay.ordernum = o.ordernum
+	LEFT JOIN (
+	SELECT
+		id,
+		live_id,
+		user_id,
+		live_son_flag,
+		online_time
+	FROM
+		nlsg_live_online_user
+	WHERE
+		live_id = $live_id
+		AND $time_str
+	GROUP BY
+		user_id
+	) AS jrzb ON jrzb.user_id = o.user_id
+WHERE
+	o.live_id = $live_id
+	AND o.type = 10
+	AND o.`status` = 1
+	AND o.is_shill = 0
+	AND o.pay_price > 1
+	AND u.is_test_pay = 0 ";
+
+
+        if ($is_watch) {
+            $sql .= ' AND jrzb.online_time is not NULL ';
+        } else {
+            $sql .= ' AND jrzb.online_time IS NULL ';
+        }
+
+        $sql .= 'GROUP BY o.id  ORDER BY o.id DESC';
+
+        return DB::select($sql);
+    }
+
+    public function qiYeWeiXin($params) {
+        $begin_time = $params['begin_time'] ?? '';
+        $end_time = $params['end_time'] ?? '';
+        $live_id = $params['live_id'] ?? '';
+
+
+
+    }
+
+}

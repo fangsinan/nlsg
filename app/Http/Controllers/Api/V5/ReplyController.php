@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
 use App\Models\Comment;
 use App\Models\CommentReply;
 use App\Models\ShortVideoModel;
@@ -79,6 +80,9 @@ class ReplyController extends Controller
             Comment::where('id', $replay_num_id)->increment('reply_num');
             if($c_type == 7){
                 ShortVideoModel::where('id', $Video_id)->increment('comment_num');
+            }
+            if($c_type == 6){
+                Column::where('id', $Video_id)->increment('comment_num');
             }
             return success();
         }

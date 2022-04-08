@@ -541,6 +541,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('index/flash_banner', 'IndexController@flashBanner');
     Route::any('index/lives', 'IndexController@lives');
 
+
     Route::any('column/get_camp_list', 'ColumnController@getCampList');
 
 
@@ -606,6 +607,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('image/get_qr_code', 'ImageController@GetQrCode');//->middleware('replaceNull');
     // 直播
     
-    Route::any('live/list', 'LiveController@getLiveLists');//->middleware('replaceNull');
+    Route::any('live/list', 'LiveController@getLiveLists');
+    Route::any('live/live_push_qrcode', 'LiveController@livePushQrcode');
     /**     5.0 API  END    ***/
 });
