@@ -464,7 +464,7 @@ class LiveController extends Controller
         if ($validator->fails()) {
             return $this->error(0,$validator->messages()->first(),0);
         }
-
+        $qr_image = str_replace("http://nlsgapp.oss-cn-beijing.aliyuncs.com","",$qr_image);
         $id = LivePushQrcode::create([
             'qr_url' => $qr_image,
         ])->id;
