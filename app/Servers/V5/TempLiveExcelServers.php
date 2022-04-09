@@ -11,6 +11,7 @@ class TempLiveExcelServers
         $begin_time = $params['begin_time'] ?? '';
         $end_time   = $params['end_time'] ?? '';
         $live_id    = $params['live_id'] ?? 0;
+        $is_watch   = $params['is_watch'] ?? 0;
 
         if (empty($begin_time) || empty($end_time) || empty($live_id)) {
             return [
@@ -64,12 +65,15 @@ WHERE
 	AND o.is_shill = 0
 	AND o.pay_price > 1
 	AND u.is_test_pay = 0
-	AND qw.follow_user_userid IS NOT NULL
-	AND jrzb.online_time IS NOT NULL
-GROUP BY
-	o.id
-ORDER BY
-	o.id DESC;";
+	AND qw.follow_user_userid IS NOT NULL ";
+
+        if ($is_watch) {
+            $sql .= " AND jrzb.online_time IS NOT NULL ";
+        } else {
+            $sql .= " AND jrzb.online_time IS NULL ";
+        }
+
+        $sql .= "GROUP BY o.id ORDER BY o.id DESC;";
 
         return DB::select($sql);
 
@@ -115,57 +119,57 @@ ORDER BY
             )";
 
         } else {
-            $time_str = '(online_time > \''.
-                ($begin_time_d1?:$begin_time_d2).'\' AND online_time < \''.
-                ($end_time_d1?:$end_time_d2).'\')';
+            $time_str = '(online_time > \'' .
+                ($begin_time_d1 ?: $begin_time_d2) . '\' AND online_time < \'' .
+                ($end_time_d1 ?: $end_time_d2) . '\')';
         }
 
         $sql = "
-SELECT
-	o.id as order_id,
-	CONCAT( '`', o.ordernum ) ordernum,
-	CONCAT( '`', pay.transaction_id ) transaction_id,
-	o.live_id,
-	o.twitter_id,
-	o.pay_price,
-	o.pay_time,
-	u.phone,
-	u.nickname,
-	u.unionid,
-	u.created_at,
-	qw.name as qname,
-	wn.qw_name,
-	FROM_UNIXTIME( qw.follow_user_createtime, '%Y%m%d %H:%i:%s' ) follow_user_createtime,
-	qw.follow_user_userid
-FROM
-	nlsg_order AS o
-	LEFT JOIN nlsg_user u ON u.id = o.user_id
-	LEFT JOIN nlsg_user_wechat AS qw ON qw.unionid = u.unionid
-	AND qw.unionid <> ''
-	LEFT JOIN nlsg_user_wechat_name wn ON wn.follow_user_userid = qw.follow_user_userid
-	LEFT JOIN nlsg_pay_record pay ON pay.ordernum = o.ordernum
-	LEFT JOIN (
-	SELECT
-		id,
-		live_id,
-		user_id,
-		live_son_flag,
-		online_time
-	FROM
-		nlsg_live_online_user
-	WHERE
-		live_id = $live_id
-		AND $time_str
-	GROUP BY
-		user_id
-	) AS jrzb ON jrzb.user_id = o.user_id
-WHERE
-	o.live_id = $live_id
-	AND o.type = 10
-	AND o.`status` = 1
-	AND o.is_shill = 0
-	AND o.pay_price > 1
-	AND u.is_test_pay = 0 ";
+    SELECT
+        o.id as order_id,
+        CONCAT( '`', o.ordernum ) ordernum,
+        CONCAT( '`', pay.transaction_id ) transaction_id,
+        o.live_id,
+        o.twitter_id,
+        o.pay_price,
+        o.pay_time,
+        u.phone,
+        u.nickname,
+        u.unionid,
+        u.created_at,
+        qw.name as qname,
+        wn.qw_name,
+        FROM_UNIXTIME( qw.follow_user_createtime, '%Y%m%d %H:%i:%s' ) follow_user_createtime,
+        qw.follow_user_userid
+    FROM
+        nlsg_order AS o
+        LEFT JOIN nlsg_user u ON u.id = o.user_id
+        LEFT JOIN nlsg_user_wechat AS qw ON qw.unionid = u.unionid
+        AND qw.unionid <> ''
+        LEFT JOIN nlsg_user_wechat_name wn ON wn.follow_user_userid = qw.follow_user_userid
+        LEFT JOIN nlsg_pay_record pay ON pay.ordernum = o.ordernum
+        LEFT JOIN (
+        SELECT
+            id,
+            live_id,
+            user_id,
+            live_son_flag,
+            online_time
+        FROM
+            nlsg_live_online_user
+        WHERE
+            live_id = $live_id
+            AND $time_str
+        GROUP BY
+            user_id
+        ) AS jrzb ON jrzb.user_id = o.user_id
+    WHERE
+        o.live_id = $live_id
+        AND o.type = 10
+        AND o.`status` = 1
+        AND o.is_shill = 0
+        AND o.pay_price > 1
+        AND u.is_test_pay = 0 ";
 
 
         if ($is_watch) {
@@ -181,10 +185,64 @@ WHERE
 
     public function qiYeWeiXin($params) {
         $begin_time = $params['begin_time'] ?? '';
-        $end_time = $params['end_time'] ?? '';
-        $live_id = $params['live_id'] ?? '';
+        $end_time   = $params['end_time'] ?? '';
+        $live_id    = (int)($params['live_id'] ?? 0);
+        $is_bind    = $params['is_bind'] ?? 0;
+
+        if (empty($begin_time) || empty($end_time)) {
+            return [
+                'code' => false,
+                'msg'  => '参数错误,请选择开始时间',
+            ];
+        }
 
 
+        $sql = "SELECT
+o.id order_id,
+CONCAT( '`', o.ordernum ) ordernum,
+CONCAT( '`', pay.transaction_id ) transaction_id,
+o.live_id,
+o.twitter_id,
+o.pay_price,
+o.pay_time ,
+u.phone,
+u.nickname ,
+u.unionid,
+u.created_at,
+qw.name as qname,
+wn.qw_name,
+FROM_UNIXTIME( qw.follow_user_createtime, '%Y-%m-%d %H:%i:%s' ) follow_user_createtime,
+qw.follow_user_userid
+FROM
+	nlsg_order AS o
+	LEFT JOIN nlsg_user u ON u.id = o.user_id
+	LEFT JOIN nlsg_user_wechat AS qw ON qw.unionid = u.unionid
+	AND qw.unionid <> ''
+	LEFT JOIN nlsg_user_wechat_name wn ON wn.follow_user_userid = qw.follow_user_userid
+	LEFT JOIN nlsg_pay_record pay ON pay.ordernum = o.ordernum
+WHERE
+	o.pay_time > '$begin_time'  AND o.pay_time < '$end_time' ";
+
+        if (!empty($live_id)) {
+            $sql .= " AND o.live_id = $live_id ";
+        }
+
+        $sql .= " AND o.type = 10 AND o.`status` = 1 AND o.is_shill = 0 AND o.pay_price > 1
+	AND u.is_test_pay = 0
+	AND u.phone NOT IN ( 13311111111 ) ";
+
+        if ($is_bind) {
+            $sql .= " AND (qw.follow_user_userid is not null and
+            qw.follow_user_userid not in ('JiaZhengZe','DongRuiXia','SunYiHao','XuHongRu',
+            'ZhangJing','LiuDanHua','ShenShuJing','ZhangShiHao','ZhangQi01')) ";
+        } else {
+            $sql .= ' AND qw.follow_user_userid IS NULL ';
+        }
+
+
+        $sql .= " GROUP BY o.id ORDER BY o.id DESC";
+
+        return DB::select($sql);
 
     }
 

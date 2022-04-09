@@ -361,6 +361,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('select_data/works_lists_list', 'SelectDataController@worksListsList');
         Route::get('select_data/teacher_list', 'SelectDataController@teacherList');
         Route::get('select_data/live_classify', 'SelectDataController@liveClassify');
+        Route::get('select_data/live_list', 'SelectDataController@liveList');
 
         Route::get('temp_tools/live_tools', 'TempToolsController@liveTools');
 
