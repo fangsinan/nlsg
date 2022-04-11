@@ -260,6 +260,8 @@ class LiveInfoServers {
 //            $query->whereIn('ld.invite_user_id', $twitter_id_list);
             $query->whereIn('ld.protect_user_id', $twitter_id_list);
             $query->where('ld.type','<>',8);
+
+            $query->where('channel_show','=',1);
         }
 
 //        if ($twitter_id_list !== null) {
