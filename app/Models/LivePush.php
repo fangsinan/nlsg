@@ -142,7 +142,7 @@ WHERE
             $data=json_encode(['status'=>0,'time'=>$time]);
             foreach ($IpLoadArr as $key => $val) {
                 $ip_str=str_replace(".","_",$val);
-                $push_key_name='11111livepush:'.$ip_str . ':' . $model->id;
+                $push_key_name='Productlivepush:'.$ip_str . ':' . $model->id;
                 $redis->setex($push_key_name,3600*5,$data);
             }
         }
