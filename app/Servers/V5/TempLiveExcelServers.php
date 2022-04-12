@@ -59,7 +59,7 @@ FROM
 		user_id
 	) AS jrzb ON jrzb.user_id = o.user_id
 WHERE
-	o.live_id = 373
+	o.live_id = $live_id
 	AND o.type = 10
 	AND o.`status` = 1
 	AND o.is_shill = 0
