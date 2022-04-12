@@ -357,6 +357,7 @@ WHERE
 
         $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del')
             ->where('live_id', $live_id)
+            ->where('push_type', '!= ',12)
             ->orderBy('push_at', 'desc')
             ->groupBy('push_type', 'push_gid')
             ->get()
