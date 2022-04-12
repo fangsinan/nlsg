@@ -432,6 +432,11 @@ WHERE
                     $res->type = 10;
                     $res = $res->toArray();
                 }
+                if(!empty($res)){
+                    $res['push_id'] = $v['id'];
+                    $res['is_sell_short'] = $v['is_sell_short'];
+                }
+                
                 $data[] = $res ?? [];
             }
             $expire_num = CacheTools::getExpire('live_push_works');
