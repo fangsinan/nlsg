@@ -113,7 +113,7 @@ WHERE
 
         $sql = " from (
 SELECT
-sub.id as sub_id,his.id as history_id,sub.user_id,u.nickname,u.phone,
+sub.id as sub_id,his.id as history_id,sub.user_id,u.nickname,u.phone,his.time_leng,
 if(his.is_end = 1,1,0) as is_end,
 if(his.is_end = 1,(IF(his.end_time is NULL,his.updated_at,his.end_time)),'-') as end_time
 from
@@ -147,6 +147,12 @@ where sub.relation_id = $works_id and sub.type = 7 and sub.`status` = 1 and sub.
         $data  = DB::select($query_sql);
 
         foreach ($data as &$v) {
+            if ($v->is_end === 1) {
+                $v->time_leng = '100%';
+            } else {
+                $v->time_leng = $v->time_leng.'%';
+            }
+
             $v->user_info = [
                 'id'       => $v->user_id ?? '',
                 'nickname' => $v->nickname ?? '',
