@@ -150,7 +150,7 @@ where sub.relation_id = $works_id and sub.type = 7 and sub.`status` = 1 and sub.
             if ($v->is_end === 1) {
                 $v->time_leng = '100%';
             } else {
-                $v->time_leng = $v->time_leng.'%';
+                $v->time_leng = ($v->time_leng ?? 0).'%';
             }
 
             $v->user_info = [
