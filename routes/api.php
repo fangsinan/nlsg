@@ -609,5 +609,6 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     
     Route::any('live/list', 'LiveController@getLiveLists');
     Route::any('live/live_push_qrcode', 'LiveController@livePushQrcode');
+    Route::any('live/sell_short_state', 'LiveController@SellShortState');
     /**     5.0 API  END    ***/
 });

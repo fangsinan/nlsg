@@ -471,7 +471,40 @@ class LiveController extends Controller
         return success($id);
         
     }
+    /**
+     * {get} api/v5/live/sell_short_state 修改权限
+     */
+    public function SellShortState(Request $request)
+    { 
+        
+        $user_id    = $this->user['id'] ?? 0;
+        $pushid  = $request->input('id',0);
+        $is_sell_short  = $request->input('is_sell_short',0);
+        
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric',
+            'is_sell_short' => 'required|numeric',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first(),0);
+        }
+        $pushData = LivePush::where('id', $pushid)->first();
 
+        $check_is_admin = LiveConsole::isAdmininLive($user_id, $pushData['live_id']);
+        if ($check_is_admin === false) {
+            return $this->error(0,'需要管理员权限','');
+        }
 
+        LivePush::where([
+            'push_type' => $pushData['push_type'],
+            'push_gid'  => $pushData['push_gid'],
+        ])->update([
+            'is_sell_short' => $is_sell_short ?? 0,
+        ]);
+        return success('');
+        
+    }
+    
 
 }

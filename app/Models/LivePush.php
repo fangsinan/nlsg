@@ -355,7 +355,7 @@ WHERE
         $cache_live_name = 'live_push_works_'.$live_id;
         $data = Cache::get($cache_live_name);
 
-        $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del')
+        $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del','is_sell_short')
             ->where('live_id', $live_id)
             ->where('push_type','<>', 12)
             ->orderBy('push_at', 'desc')
