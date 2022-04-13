@@ -1023,7 +1023,7 @@ class Order extends Base
         if( isset($order_type) && in_array($order_type,[10, 14]) ){
             //Push
             switch($order_type){
-                case 10: $push_type = 10;
+                case 10: $push_type = 9;
                     break;
                 case 14: $push_type = 4;   
                     break;
