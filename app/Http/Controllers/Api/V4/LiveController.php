@@ -339,12 +339,19 @@ class LiveController extends Controller
                 ->where('is_del', 0)
                 ->where('helper', 'like', '%'.$this->user['phone'].'%'));
         }
-        $query->groupBy('id');
-        $lists = $query->orderBy('sort', 'asc')
-            ->orderBy('begin_at', 'asc')
-            ->paginate(10)
-            ->toArray();
 
+        $lists = Live::fromSub($query,'table')->select('*')
+        ->groupBy('id')
+        ->orderBy('sort', 'asc')
+        ->orderBy('begin_at', 'asc')
+        ->paginate(10)
+        ->toArray();
+
+        //原来写法
+        // $lists = $query->orderBy('sort', 'asc')
+        //     ->orderBy('begin_at', 'asc')->groupBy('id')
+        //     ->paginate(10)
+        //     ->toArray();
         if (!empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
                 $channel = LiveInfo::where('live_pid', $v['id'])
