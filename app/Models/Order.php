@@ -998,4 +998,45 @@ class Order extends Base
     public function orderRefundLogInfo(){
         return $this->hasOne(OrderRefundLog::class,'ordernum','ordernum');
     }
+
+    //校验下单业务是否有效
+    // 5 打赏 6分享赚钱  9精品课  10直播    13能量币充值  14 线下产品(门票类)   15讲座  16新vip  17 赠送下单   18训练营
+    public static function CheckAddOrder($relation_id,$order_type,$user,$os_type){
+        $uid = $user['id'];
+        $phone = $user['phone'];
+
+        if(empty($uid)){
+            return ['code'=>0, 'msg'=>'用户id为空'];
+        }
+
+        //一个校验过程 进行一个if判断
+
+
+        //  虚拟用户校验的类型
+        if( isset($order_type) && in_array($order_type,[10, 14]) ){
+            if($os_type ==3 && (empty($phone) || substr($phone,0,1) == 2) ){
+                return ['code'=>4000, 'msg'=>'请修改手机号'];
+            }
+        }
+
+        //  下单物品是否售空 类型  直播和线下产品
+        if( isset($order_type) && in_array($order_type,[10, 14]) ){
+            //Push
+            switch($order_type){
+                case 10: $push_type = 10;
+                    break;
+                case 14: $push_type = 4;   
+                    break;
+            }
+            $pushdata = LivePush::where(['push_type'=>$push_type,'push_gid'=>$relation_id,'is_sell_short'=>0])->first();
+            if( empty($pushdata) ){
+                return ['code'=>4000, 'msg'=>'该商品已售空'];
+            }
+
+        }
+     
+        
+
+        return ['code'=>true, 'msg'=>''];
+    }
 }

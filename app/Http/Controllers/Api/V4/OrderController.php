@@ -1244,10 +1244,17 @@ class OrderController extends Controller
         $tweeter_code = $request->input('inviter', 0);  //推客id
         $num = $request->input('num', 1);  //
         $user_id = $this->user['id'];
-        //虚拟用户
-        if($os_type ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
-            return error(4000, '请修改手机号');
+        // //虚拟用户
+        // if($os_type ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
+        //     return error(4000, '请修改手机号');
+        // }
+        //限制其下单业务
+        $checkAddOrder = Order::CheckAddOrder($product_id,14,$this->user,$os_type);
+        if($checkAddOrder['code'] != true){
+            return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
         }
+
+
         if( $tweeter_code > 0 && $live_id > 0 ){  //需要校验推客id
             $info = LiveInfo::where(['live_pid'=>$live_id])->first();
             $count_data = LiveCountDown::where(['user_id'=>$user_id,'live_id'=>$info['id']])->first();
