@@ -745,6 +745,20 @@ class MallRefundJob
                                 ->update(['status' => 0]);
                         }
                     }
+                }elseif ($v->order_type == 14){
+                    if($v->relation_id == 8){
+                            Subscribe::query()->where('user_id','=',$v->user_id)
+                                ->where('type','=',2)
+                                ->where('relation_id','=',594)
+                                ->where('give','=',3)
+                                ->update(['status'=>0]);
+
+                            Subscribe::query()->where('user_id','=',$v->user_id)
+                                ->where('type','=',6)
+                                ->where('relation_id','=',440)
+                                ->where('give','=',3)
+                                ->update(['status'=>0]);
+                    }
                 }
 
             }
