@@ -497,6 +497,7 @@ class LiveController extends Controller
         }
 
         LivePush::where([
+            'live_id'   => $pushData['live_id'],
             'push_type' => $pushData['push_type'],
             'push_gid'  => $pushData['push_gid'],
         ])->update([

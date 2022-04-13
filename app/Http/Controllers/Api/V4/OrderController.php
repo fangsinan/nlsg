@@ -1249,7 +1249,7 @@ class OrderController extends Controller
         //     return error(4000, '请修改手机号');
         // }
         //限制其下单业务
-        $checkAddOrder = Order::CheckAddOrder($product_id,14,$this->user,$os_type);
+        $checkAddOrder = Order::CheckAddOrder($product_id,14,$this->user,$os_type,$live_id);
         if($checkAddOrder['code'] != true){
             return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
         }

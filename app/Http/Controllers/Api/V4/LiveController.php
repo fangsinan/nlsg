@@ -1641,12 +1641,12 @@ class LiveController extends Controller
         //     return error(4000, '请修改手机号');
         // }
         //限制其下单业务
-        $checkAddOrder = Order::CheckAddOrder($liveId,10,$this->user,$osType);
+        $checkAddOrder = Order::CheckAddOrder($liveId,10,$this->user,$osType,$liveId);
         if($checkAddOrder['code'] != true){
             return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
         }
 
-        
+
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();
         if ( !empty($list) ) {

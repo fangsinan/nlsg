@@ -1001,7 +1001,7 @@ class Order extends Base
 
     //校验下单业务是否有效
     // 5 打赏 6分享赚钱  9精品课  10直播    13能量币充值  14 线下产品(门票类)   15讲座  16新vip  17 赠送下单   18训练营
-    public static function CheckAddOrder($relation_id,$order_type,$user,$os_type){
+    public static function CheckAddOrder($relation_id,$order_type,$user,$os_type,$live_id){
         $uid = $user['id'];
         $phone = $user['phone'];
 
@@ -1028,7 +1028,7 @@ class Order extends Base
                 case 14: $push_type = 4;   
                     break;
             }
-            $pushdata = LivePush::where(['push_type'=>$push_type,'push_gid'=>$relation_id,'is_sell_short'=>0])->first();
+            $pushdata = LivePush::where(['live_id'=>$live_id,'push_type'=>$push_type,'push_gid'=>$relation_id,'is_sell_short'=>0])->first();
             if( empty($pushdata) ){
                 return ['code'=>4000, 'msg'=>'该商品已售空'];
             }
