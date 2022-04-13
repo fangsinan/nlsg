@@ -63,7 +63,7 @@ WHERE
 	AND o.type = 10
 	AND o.`status` = 1
 	AND o.is_shill = 0
-	AND o.pay_price > 1
+	AND o.pay_price > 0.01
 	AND u.is_test_pay = 0
 	AND qw.follow_user_userid IS NOT NULL ";
 
@@ -168,7 +168,7 @@ WHERE
         AND o.type = 10
         AND o.`status` = 1
         AND o.is_shill = 0
-        AND o.pay_price > 1
+        AND o.pay_price > 0.01
         AND u.is_test_pay = 0 ";
 
 
@@ -227,7 +227,7 @@ WHERE
             $sql .= " AND o.live_id = $live_id ";
         }
 
-        $sql .= " AND o.type = 10 AND o.`status` = 1 AND o.is_shill = 0 AND o.pay_price > 1
+        $sql .= " AND o.type = 10 AND o.`status` = 1 AND o.is_shill = 0 AND o.pay_price > 0.01
 	AND u.is_test_pay = 0
 	AND u.phone NOT IN ( 13311111111 ) ";
 
