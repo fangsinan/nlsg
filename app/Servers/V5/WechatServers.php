@@ -205,7 +205,7 @@ class WechatServers
 
     //模板发送
     public static function TemplateLiveAsc(){
-
+//        return ;
         try {
             $flag = true;
             while ($flag) {
@@ -261,12 +261,12 @@ class WechatServers
     //模板配置
     public  static function sendBespeakClass($Url,$val){
         //周三早7点  &tweeter_code=211370
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=351&time=1647945182&inviter=211370';
-        $hello='你好，今晚有免费直播课程，讲孩子学业规划';
+        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=391&time=1649815037309&inviter=211370';
+        $hello='你好，今晚有免费直播课程，讲孩子的学习~';
         $title='让孩子主动学习的“6个秘密”';
-        $place='能量时光直播间';
+        $category='家庭教育直播课';
         $teacher='汤蓓老师';
-        $time='2022年3月23日 19:30';
+        $time='2022年4月13日 19:30';
         $remarks="※针对主动学习，父母和孩子如何“使劲”？
 ※真正拉开孩子成绩的原因是什么，如何提升？
 ※孩子写作业，父母正确的陪伴方式是什么？
@@ -274,23 +274,23 @@ class WechatServers
 
         $data=[
             'touser'=>$val['open_id'],
-            'template_id'=>'JHTH1MgvKXM_niUvQfzHSNowVdQX4R4JEQVCbi6rd_Y',
+            'template_id'=>'EOEBu_V_bYvyl4YQZ_0Zgij5I_2TfJQMXlRUz0VZwr0',
             'url'=>$hrefurl, #抖音直播不需要跳转
             'topcolor'=>"#FF0000",
             'data'=>[
                 "first"=>[
                     "value"=>$hello,
                 ],
-                "keyword1"=>[ //课程：少儿心理辅导
+                "keyword1"=>[ //课程名称
                     "value"=>$title,
                 ],
-                "keyword2"=>[ //地点：国际宾馆二楼多共更能厅
-                    "value"=>$place,
+                "keyword2"=>[ //课程类别
+                    "value"=>$category,
                 ],
-                "keyword3"=>[ //讲师：李小龙
+                "keyword3"=>[ //课程老师
                     "value"=>$teacher,
                 ],
-                "keyword4"=>[ //时间：2016年7月21日 18:36
+                "keyword4"=>[ //课程时间
                     "value"=>$time,
                 ],
                 "remark"=>[
