@@ -1002,6 +1002,7 @@ class Order extends Base
     //校验下单业务是否有效
     // 5 打赏 6分享赚钱  9精品课  10直播    13能量币充值  14 线下产品(门票类)   15讲座  16新vip  17 赠送下单   18训练营
     public static function CheckAddOrder($relation_id,$order_type,$user,$os_type,$live_id){
+        //$live_id 在那个直播间购买
         $uid = $user['id'];
         $phone = $user['phone'];
 

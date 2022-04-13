@@ -187,7 +187,7 @@ class LiveController extends Controller
                             ->where('is_del', 0)
                             ->where('helper', 'like', '%'.$this->user['phone'].'%'));
             }
-            
+            $query->groupBy('id');
             $lists = $query->orderBy('sort', 'asc')
             ->orderBy('begin_at', 'asc')
             ->paginate(10)
