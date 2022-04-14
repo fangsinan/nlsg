@@ -29,6 +29,7 @@ use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
+use App\Models\LivePushQrcode;
 use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
@@ -2007,7 +2008,6 @@ class LiveController extends Controller
             "is_done"       => 1,
         ])->where('done_at','>',date("Y-m-d",time()))->orderBy('done_at', 'desc')->first();
 
-
         //push_type 产品type  1专栏 2精品课 3商品 4 经营能量 5 一代天骄 6 演说能量 7:讲座 8:听书  9直播   10 直播外链  11 训练营
         //push_gid 推送产品id，专栏id  精品课id  商品id
         if(!empty($res['push_gid'])){
@@ -2050,6 +2050,17 @@ class LiveController extends Controller
                 case 10:
 
                     $Info=LiveUrl::select('id','name','describe','url','image','img')->where(['id'=>$res['push_gid']])->first();
+                    break;
+                case 12:
+
+                    $qr_code=LivePushQrcode::select('id','qr_url',)->where(['id'=>$res['push_gid']])->first();
+                    $Info=[
+                        'name'  =>'二维码弹窗',
+                        'price' =>0,
+                        'subtitle'  =>'',
+                        'image' =>$qr_code['qr_url'], //方图
+                        'img'   =>['qr_url']  //长图
+                    ];
                     break;
             }
             if(!empty($Info)){
