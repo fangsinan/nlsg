@@ -2059,7 +2059,7 @@ class LiveController extends Controller
                         'price' =>0,
                         'subtitle'  =>'',
                         'image' =>$qr_code['qr_url'], //方图
-                        'img'   =>['qr_url']  //长图
+                        'img'   =>$qr_code['qr_url']  //长图
                     ];
                     break;
             }
