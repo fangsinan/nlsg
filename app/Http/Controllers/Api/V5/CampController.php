@@ -119,7 +119,7 @@ class CampController extends Controller
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
             'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'
-        ,'comment_num','info_column_id'];
+        ,'comment_num','info_column_id','classify_column_id'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
             return $this->error(0, '内容不存在不能为空');
@@ -157,6 +157,9 @@ class CampController extends Controller
 
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $type);
         $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image');
+        if(empty($column['poster'])){ // 如果为空则取用父级
+            $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column['classify_column_id']])->pluck('image');
+        }
         $column['is_sub'] = $is_sub;
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($column_id, $history_type, $user_id);  //讲座
