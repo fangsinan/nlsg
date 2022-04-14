@@ -2053,7 +2053,7 @@ class LiveController extends Controller
                     break;
                 case 12:
 
-                    $qr_code=LivePushQrcode::select('id','qr_url',)->where(['id'=>$res['push_gid']])->first();
+                    $qr_code=LivePushQrcode::select('id','qr_url')->where(['id'=>$res['push_gid']])->first();
                     $Info=[
                         'name'  =>'二维码弹窗',
                         'price' =>0,
