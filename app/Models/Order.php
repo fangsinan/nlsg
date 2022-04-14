@@ -1032,7 +1032,7 @@ class Order extends Base
             }
             $pushdata = LivePush::where(['live_id'=>$live_id,'push_type'=>$push_type,'push_gid'=>$relation_id,'is_sell_short'=>1])->first();
             if( !empty($pushdata) ){
-                return ['code'=>4000, 'msg'=>'该商品已售空'];
+                return ['code'=>4001, 'msg'=>'该商品已售空'];
             }
 
         }
