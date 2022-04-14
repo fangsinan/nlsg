@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\LivePush;
 use App\Models\LivePushQrcode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Predis\Client;
 
@@ -488,7 +489,7 @@ class LiveController extends Controller
         ]);
         
         if ($validator->fails()) {
-            return $this->error(0,$validator->messages()->first(),0);
+            return $this->error(0,$validator->messages()->first(),'');
         }
         $pushData = LivePush::where('id', $pushid)->first();
 
@@ -504,6 +505,11 @@ class LiveController extends Controller
         ])->update([
             'is_sell_short' => $is_sell_short ?? 0,
         ]);
+        
+        //删除缓存
+        $cache_live_name = 'live_push_works_'.$pushData['live_id'];
+        Cache::delete($cache_live_name);
+        
         return success('');
         
     }
