@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\CampPrize;
+use App\Models\Collection;
 use App\Models\Column;
 use App\Models\ColumnEndShow;
 use App\Models\ColumnWeekReward;
@@ -496,5 +497,35 @@ class CampController extends Controller
         return $this->success();
     }
 
+
+
+
+    /**
+     *  {get} /api/v5/camp/collection  收藏[专栏、课程、商品]
+     *
+     * @apiParam {int} type  type 1专栏  2课程  3商品  4书单 5百科 6听书 7讲座  8训练营
+     * @apiParam {int} target_id  对应id
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} info_id 如果是课程 需要传当前章节
+     */
+    public function Collection(Request $request)
+    {
+        $type = $request->input('type', 0);
+        $target_id = $request->input('target_id', 0);
+        $info_id = $request->input('info_id', 0);
+        $user_id = $this->user['id'] ?? 0;
+
+        if (empty($target_id) || empty($user_id)) {
+            return $this->error(0, 'column_id 或者 user_id 不能为空');
+        }
+        //  type 1：专栏  2：课程 3 :商品
+        if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 8])) {
+            return $this->error(0, 'type类型错误');
+        }
+        $is_collection = Collection::CollectionData($user_id, $target_id, $type, $info_id);
+
+
+        return $this->success($is_collection);
+    }
 
 }
