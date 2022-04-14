@@ -1029,8 +1029,8 @@ class Order extends Base
                 case 14: $push_type = 4;   
                     break;
             }
-            $pushdata = LivePush::where(['live_id'=>$live_id,'push_type'=>$push_type,'push_gid'=>$relation_id,'is_sell_short'=>0])->first();
-            if( empty($pushdata) ){
+            $pushdata = LivePush::where(['live_id'=>$live_id,'push_type'=>$push_type,'push_gid'=>$relation_id,'is_sell_short'=>1])->first();
+            if( !empty($pushdata) ){
                 return ['code'=>4000, 'msg'=>'该商品已售空'];
             }
 
