@@ -1023,6 +1023,7 @@ class Order extends Base
         //  下单物品是否售空 类型  直播和线下产品
         if( isset($order_type) && in_array($order_type,[10, 14]) ){
             //Push
+            $push_type = 0;
             switch($order_type){
                 case 10: $push_type = 9;
                     break;

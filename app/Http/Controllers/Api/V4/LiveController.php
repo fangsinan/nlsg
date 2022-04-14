@@ -1649,10 +1649,9 @@ class LiveController extends Controller
         // }
         //限制其下单业务
         $checkAddOrder = Order::CheckAddOrder($liveId,10,$this->user,$osType,$input['from_live_info_id']);
-        if($checkAddOrder['code'] != true){
+        if($checkAddOrder['code'] !== true){
             return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
         }
-
 
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();
