@@ -5,6 +5,7 @@ namespace App\Servers\V5;
 use App\Models\Live;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
+use Predis\Client;
 
 class TempToolsServers
 {
@@ -327,6 +328,100 @@ where mu.meikan = 0 and mu.day_flag = 1 and ou.live_id = ' .
             }
         }
 
+
+    }
+
+    public function insertOnlineUserTest(){
+        $this->createTestRedisData();
+
+
+        $begin_time = time();
+
+        $redisConfig = config('database.redis.default');
+        $Redis = new Client($redisConfig);
+        $Redis->select(0);
+        $all_count = $Redis->scard('test_user_id_set_1');
+
+
+        $while_flag = true;
+        $time_str = date('Y-m-d H:i');
+
+        while($while_flag){
+            $temp_list = $Redis->srandmember('test_user_id_set_1', 10000);
+            if (empty($temp_list)) {
+                $while_flag = false;
+            }else{
+
+                $add_data = [];
+                foreach ($temp_list as $v){
+                    $add_data[] = [
+                        'live_id'=>999,
+                        'user_id' => $v,
+                        'live_son_flag' => 168934,
+                        'online_time_str' => $time_str,
+                    ];
+                }
+
+                DB::table('nlsg_live_online_user_innodb')->insert($add_data);
+                $Redis->srem('test_user_id_set_1', $temp_list);
+            }
+        }
+
+        $begin_time_2 = time();
+        $all_count_2 = $Redis->scard('test_user_id_set_2');
+        $while_flag = true;
+        $time_str = date('Y-m-d H:i');
+
+        while($while_flag){
+            $temp_list = $Redis->srandmember('test_user_id_set_2', 10000);
+            if (empty($temp_list)) {
+                $while_flag = false;
+            }else{
+                $add_data = [];
+                foreach ($temp_list as $v){
+                    $add_data[] = [
+                        'live_id'=>999,
+                        'user_id' => $v,
+                        'live_son_flag' => 168934,
+                        'online_time_str' => $time_str,
+                    ];
+                }
+                DB::table('nlsg_live_online_user_myisam')->insert($add_data);
+                $Redis->srem('test_user_id_set_2', $temp_list);
+            }
+        }
+
+
+        dd([
+            '条数_1'=>$all_count,
+            '开始_1'=>$begin_time,
+            '结束_1'=>time(),
+            '使用_1'=>time() - $begin_time,
+            '条数_2'=>$all_count_2,
+            '开始_2'=>$begin_time_2,
+            '结束_2'=>time(),
+            '使用_2'=>time() - $begin_time_2,
+        ]);
+
+
+
+
+
+    }
+
+    public function createTestRedisData(){
+        $redisConfig = config('database.redis.default');
+        $Redis = new Client($redisConfig);
+        $Redis->select(0);
+
+        //生成100个随机数的数组
+
+        $user_id_array = [];
+        for ($i = 1; $i <= 100000; $i++) {
+            $user_id_array[] = $i;
+        }
+        $Redis->sadd('test_user_id_set_1', $user_id_array);
+        $Redis->sadd('test_user_id_set_2', $user_id_array);
 
     }
 
