@@ -1025,10 +1025,10 @@ class Order extends Base
             //Push
             $push_type = 0;
             switch($order_type){
-                case 10: $push_type = 9;
-                    break;
-                case 14: $push_type = 4;   
-                    break;
+                case 10: $push_type = 9;    break;
+                case 14: $push_type = 4;    break;
+                case 18: $push_type = 11;   break;
+                    
             }
             $pushdata = LivePush::where(['live_id'=>$live_id,'push_type'=>$push_type,'push_gid'=>$relation_id,'is_sell_short'=>1])->first();
             if( !empty($pushdata) ){

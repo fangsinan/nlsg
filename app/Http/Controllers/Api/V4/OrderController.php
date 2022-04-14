@@ -187,8 +187,16 @@ class OrderController extends Controller
         }else if ($column_data['type'] == 3) { // 训练营类型
             $sub_type = 7;
             $coupon_type = 8;
+
+            //训练营单独限制其下单业务
+            $checkAddOrder = Order::CheckAddOrder($column_id,18,$this->user,$os_type,$live_id);
+            if($checkAddOrder['code'] !== true){
+                return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
+            }
+
         }
 
+        
 
         //检测下单参数有效性
         $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $sub_type);
