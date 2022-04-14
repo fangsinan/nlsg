@@ -417,7 +417,7 @@ where mu.meikan = 0 and mu.day_flag = 1 and ou.live_id = ' .
         //生成100个随机数的数组
 
         $user_id_array = [];
-        for ($i = 1; $i <= 100000; $i++) {
+        for ($i = 1; $i <= 200000; $i++) {
             $user_id_array[] = $i;
         }
         $Redis->sadd('test_user_id_set_1', $user_id_array);
