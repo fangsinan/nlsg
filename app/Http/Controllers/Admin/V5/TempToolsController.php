@@ -21,8 +21,8 @@ class TempToolsController extends ControllerBackend
     }
 
     public function insertOnlineUserTest(){
-        $res = (new TempToolsServers())->insertOnlineUserTest();
-        return $this->getRes($res);
+//        $res = (new TempToolsServers())->insertOnlineUserTest();
+//        return $this->getRes($res);
     }
 
 }
