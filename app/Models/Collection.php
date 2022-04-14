@@ -33,7 +33,7 @@ class Collection extends Base
         if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 8])) {
             return 0;
         }
-        $where = ['type' => $type, 'user_id' => $user_id, 'relation_id' => $target_id,];
+        $where = ['type' => $type, 'user_id' => $user_id, 'relation_id' => $target_id,'info_id'=>$info_id];
         $data = Collection::where($where)->first();
         //用户商品收藏缓存清理
 
