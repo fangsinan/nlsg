@@ -85,7 +85,7 @@ class TempLiveExcelController extends ControllerBackend
         //直播间id   推荐人手机号  收听时间范围 是否观看
         $begin_time    = $request->input('begin_time', '');
         $end_time      = $request->input('end_time', '');
-        $is_watch      = $request->input('is_watch', 0);
+        $is_watch      = (int)($request->input('is_watch', 0));
         $live_id       = $request->input('live_id', 0);
         $twitter_phone = $request->input('twitter_phone', '');
 
