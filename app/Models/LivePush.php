@@ -144,6 +144,10 @@ WHERE
                 $ip_str=str_replace(".","_",$val);
                 $push_key_name='111Productlivepush:'.$ip_str . ':' . $model->id;
                 $redis->setex($push_key_name,3600*5,$data);
+                
+                //删除购物车缓存
+                $cache_live_name = 'live_push_works_'.$live_id;
+                Cache::delete($cache_live_name);
             }
         }
         //删除购物车缓存
