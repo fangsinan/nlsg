@@ -1641,7 +1641,7 @@ class LiveController extends Controller
         $activity_tag   = $input['activity_tag'] ??'';
 
         if( in_array($this->user['id'], [878644, 882057, 882861]) ){
-            return error(0, '用户异常');
+            return error(0, '用户异常', (object)[]);
         }
 
         // //虚拟用户
@@ -1651,7 +1651,7 @@ class LiveController extends Controller
         //限制其下单业务
         $checkAddOrder = Order::CheckAddOrder($liveId,10,$this->user,$osType,$input['from_live_info_id']??0);
         if($checkAddOrder['code'] !== true){
-            return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
+            return $this->error($checkAddOrder['code'], $checkAddOrder['msg'], (object)[] );
         }
 
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
