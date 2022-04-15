@@ -183,6 +183,32 @@ WHERE
         return DB::select($sql);
     }
 
+    public function weiJinZhiBoFree($params){
+        //直播间id   推荐人手机号  收听时间范围 是否观看
+        if ($params['is_watch'] === 0){
+            $exists_str = ' NOT EXISTS ';
+        }else{
+            $exists_str = ' EXISTS ';
+        }
+
+        $sql = 'SELECT
+u.phone,u.nickname,s.created_at
+from nlsg_subscribe as s
+join nlsg_user as u on s.user_id = u.id
+where
+s.id BETWEEN '.$params['begin_id'].' and '.$params['end_id'].' and
+s.relation_id = '.$params['live_id'].' and s.type = 3 and s.`status` = 1
+AND u.is_test_pay = 0 and s.twitter_id =  '.$params['twitter_id'].'
+and '.$exists_str.' (
+SELECT id from nlsg_live_online_user as lou where
+lou.live_id =  '.$params['live_id'].'  and lou.user_id = s.user_id
+and lou.online_time  BETWEEN \' '.$params['begin_time'].' \' AND \' '.$params['end_time'].' \'
+)';
+
+        return DB::select($sql);
+
+    }
+
     public function qiYeWeiXin($params) {
         $begin_time = $params['begin_time'] ?? '';
         $end_time   = $params['end_time'] ?? '';

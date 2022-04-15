@@ -68,11 +68,13 @@ class SelectDataServers
 
 
     public function liveList($params){
+        $is_free = (int)($params['is_free'] ?? 0);
         return Live::query()
             ->where('id','>',350)
             ->where('status','=',4)
             ->where('is_del','=',0)
             ->where('is_test','=',0)
+            ->where('is_free','=',$is_free)
             ->select(['id','title'])
             ->orderBy('id','desc')
             ->get();
