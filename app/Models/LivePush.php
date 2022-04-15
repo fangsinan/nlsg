@@ -146,6 +146,9 @@ WHERE
                 $redis->setex($push_key_name,3600*5,$data);
             }
         }
+        //删除购物车缓存
+        $cache_live_name = 'live_push_works_'.$live_id;
+        Cache::delete($cache_live_name);
 
         if ($res) {
             JobServers::pushToSocket($live_id, $live_info_id, 6);
@@ -438,7 +441,7 @@ WHERE
                     $res['push_id'] = $v['id'];
                     $res['is_sell_short'] = $v['is_sell_short'];
                 }
-                
+
                 $data[] = $res ?? [];
             }
             $expire_num = CacheTools::getExpire('live_push_works');
