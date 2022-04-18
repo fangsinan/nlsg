@@ -10,7 +10,7 @@ class LiveGetExcelLog extends Model
 
     protected $fillable = [
         'mothed','admin_id','begin_time','end_time','live_id','is_watch','begin_time_d1','end_time_d1',
-        'begin_time_d2','end_time_d2','is_bind'
+        'begin_time_d2','end_time_d2','is_bind','twitter_id'
     ];
 
 }
