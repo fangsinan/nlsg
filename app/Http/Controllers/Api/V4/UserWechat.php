@@ -484,6 +484,8 @@ class UserWechat extends Controller {
 
 
 
+
+
     public static function UserWechatEdit($id){
 
 
