@@ -592,6 +592,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         Route::any('camp/camp_end_show', 'CampController@campEndShow');
         Route::get('camp/camp_like', 'CampController@campLike');
         Route::get('camp/camp_study_get', 'CampController@campStudyGet');
+        Route::get('camp/collection', 'CampController@Collection');
 
         Route::post('order/create_teacher_order', 'OrderController@createTeacherOrder');
         
@@ -609,5 +610,10 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     
     Route::any('live/list', 'LiveController@getLiveLists');
     Route::any('live/live_push_qrcode', 'LiveController@livePushQrcode');
+    Route::any('live/sell_short_state', 'LiveController@SellShortState');
+
+    //线下课
+    Route::get('offline/info', 'OfflineController@getOfflineInfo');
+    Route::get('offline/order', 'OfflineController@getOfflineOrder');
     /**     5.0 API  END    ***/
 });

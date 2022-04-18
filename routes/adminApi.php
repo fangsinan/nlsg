@@ -342,6 +342,8 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 
 
 Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
+    Route::get('temp_tools/iout', 'TempToolsController@insertOnlineUserTest');
+
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
 
         //推荐位
@@ -361,8 +363,10 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('select_data/works_lists_list', 'SelectDataController@worksListsList');
         Route::get('select_data/teacher_list', 'SelectDataController@teacherList');
         Route::get('select_data/live_classify', 'SelectDataController@liveClassify');
+        Route::get('select_data/live_list', 'SelectDataController@liveList');
 
         Route::get('temp_tools/live_tools', 'TempToolsController@liveTools');
+
 
 
         Route::get('erp_order/list', 'ErpOrderController@erpOrderList');//虚拟订单需发货列表
@@ -381,6 +385,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('temp_live_excel/shou_ting_qing_kuang', 'TempLiveExcelController@shouTingQingKuang');
         Route::get('temp_live_excel/wei_jin_zhi_bo', 'TempLiveExcelController@weiJinZhiBo');
         Route::get('temp_live_excel/qi_ye_wei_xin', 'TempLiveExcelController@qiYeWeiXin');
+        Route::get('temp_live_excel/shou_ting_qing_kuang_free', 'TempLiveExcelController@shouTingQingKuangFree');
 
     });
 });

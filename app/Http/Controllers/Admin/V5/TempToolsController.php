@@ -19,4 +19,10 @@ class TempToolsController extends ControllerBackend
                 exit('error');
         }
     }
+
+    public function insertOnlineUserTest(){
+//        $res = (new TempToolsServers())->insertOnlineUserTest();
+//        return $this->getRes($res);
+    }
+
 }

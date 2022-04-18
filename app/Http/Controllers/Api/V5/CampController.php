@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\CampPrize;
+use App\Models\Collection;
 use App\Models\Column;
 use App\Models\ColumnEndShow;
 use App\Models\ColumnWeekReward;
 use App\Models\ContentLike;
 use App\Models\History;
+use App\Models\OfflineProducts;
 use App\Models\Poster;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -35,31 +37,7 @@ class CampController extends Controller
      * {
      * "code": 200,
      * "msg": "成功",
-     * "data": [
-     * {
-            id: 519,
-            name: "测试创建训练营",
-            title: "",
-            subtitle: "副标题写啥呢",
-            message: "<p><img class="wscnph" src="https://image.nlsgapp.com/nlsg/works/20211202175302856576.png" /><img class="wscnph" src="https://image.nlsgapp.com/nlsg/works/20211202175312662092.png" /></p>",
-            column_type: 1,
-            user_id: 167204,
-            original_price: "10.00",
-            price: "0.01",
-            online_time: "2021-07-15 00:00:00",
-            works_update_time: null,
-            index_pic: "nlsg/other/20210602095339524870.jpg",
-            cover_pic: "nlsg/other/20210602094843678808.png",
-            details_pic: "nlsg/other/20210602095124839952.jpg",
-            subscribe_num: 17,
-            info_num: 5,
-            is_free: 0,
-            is_start: 1,
-            show_info_num: 3,
-            is_sub: 0,
-            nickname: "柠檬维c"
-     *     }
-     * ]
+     * "data": []
      * }
      */
     public function getCampList(Request $request)
@@ -96,13 +74,14 @@ class CampController extends Controller
             $v['nickname'] = $user_info['nickname'] ?? '';
             $v['title'] = $user_info['honor'] ?? '';
             $new_res['start_list'][] = $v;
-        //    if($v['is_start'] == 0){
-        //        $new_res['start_list'][] = $v;
-        //    }else{
-        //        //  5.0.1 暂时不需要线下课
-        //        $new_res['list'][] = $v;
-        //    }
         }
+
+
+        //线下课类型
+        $offline_list = OfflineProducts::select(['id','title','subtitle','describe','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num'])
+            ->where([ 'type'=>3, 'is_del' => 0])->get()->toArray();
+        $new_res['list'] = $offline_list;
+
         return $this->success($new_res);
     }
 
@@ -142,7 +121,7 @@ class CampController extends Controller
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
             'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'
-        ,'comment_num','info_column_id'];
+        ,'comment_num','info_column_id','classify_column_id'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
             return $this->error(0, '内容不存在不能为空');
@@ -180,6 +159,9 @@ class CampController extends Controller
 
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $type);
         $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image');
+        if(empty($column['poster'])){ // 如果为空则取用父级
+            $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column['classify_column_id']])->pluck('image');
+        }
         $column['is_sub'] = $is_sub;
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($column_id, $history_type, $user_id);  //讲座
@@ -235,8 +217,7 @@ class CampController extends Controller
      * "info_num": 2       //现有章节数
      * "history_ount": 2%       //总进度
      * },
-     * "info": [
-     * {
+     * "info": [{
      * "id": 2,
      * "type": 1,
      * "title": "02坚毅品格的重要性",
@@ -248,21 +229,7 @@ class CampController extends Controller
      * "href_url": "",
      * "time_leng": "10",      //观看 百分比
      * "time_number": "5"      //观看 分钟数
-     * },
-     * {
-     * "id": 3,
-     * "type": 2,
-     * "title": "03培养坚毅品格的方法",
-     * "section": "第三章",
-     * "introduce": "第三章",
-     * "view_num": 106,
-     * "duration": "09:09",
-     * "free_trial": 0,
-     * "href_url": "",
-     * "time_leng": "10",
-     * "time_number": "5"
-     * }
-     * ]
+     * }]
      * }
      * }
      */
@@ -535,5 +502,35 @@ class CampController extends Controller
         return $this->success();
     }
 
+
+
+
+    /**
+     *  {get} /api/v5/camp/collection  收藏[专栏、课程、商品]
+     *
+     * @apiParam {int} type  type 1专栏  2课程  3商品  4书单 5百科 6听书 7讲座  8训练营
+     * @apiParam {int} target_id  对应id
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} info_id 如果是课程 需要传当前章节
+     */
+    public function Collection(Request $request)
+    {
+        $type = $request->input('type', 0);
+        $target_id = $request->input('target_id', 0);
+        $info_id = $request->input('info_id', 0);
+        $user_id = $this->user['id'] ?? 0;
+
+        if (empty($target_id) || empty($user_id)) {
+            return $this->error(0, 'column_id 或者 user_id 不能为空');
+        }
+        //  type 1：专栏  2：课程 3 :商品
+        if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 8])) {
+            return $this->error(0, 'type类型错误');
+        }
+        $is_collection = Collection::CollectionData($user_id, $target_id, $type, $info_id);
+
+
+        return $this->success($is_collection);
+    }
 
 }

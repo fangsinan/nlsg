@@ -58,7 +58,7 @@ class LiveNotice extends Base
         if (empty($check_live_info)) {
             return ['code' => false, 'msg' => '直播不存在'];
         }
-
+        /* 4月18号 电视直播 去除直播开始结束校验
         if ($check_live_info->is_begin == 0) {
             return ['code' => false, 'msg' => '直播未开始'];
         }
@@ -66,7 +66,7 @@ class LiveNotice extends Base
         if ($check_live_info->is_finish == 1) {
             return ['code' => false, 'msg' => '直播已结束'];
         }
-
+        */
         $check_is_admin = LiveConsole::isAdmininLive($user_id, $live_id);
         if ($check_is_admin === false) {
             return ['code' => false, 'msg' => '需要管理员权限'];

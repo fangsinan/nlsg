@@ -53,6 +53,7 @@ class LivePush extends Base
             return ['code' => false, 'msg' => '直播不存在'];
         }
 
+        /*4月18号 电视直播 去除直播开始结束校验
         if ($check_live_info->is_begin == 0) {
             return ['code' => false, 'msg' => '直播未开始'];
         }
@@ -60,7 +61,7 @@ class LivePush extends Base
         if ($check_live_info->is_finish == 1) {
             return ['code' => false, 'msg' => '直播已结束'];
         }
-
+        */
         $check_is_admin = LiveConsole::isAdmininLive($user_id, $live_id);
         if ($check_is_admin === false) {
             return ['code' => false, 'msg' => '需要管理员权限'];
@@ -142,10 +143,17 @@ WHERE
             $data=json_encode(['status'=>0,'time'=>$time]);
             foreach ($IpLoadArr as $key => $val) {
                 $ip_str=str_replace(".","_",$val);
-                $push_key_name='11111livepush:'.$ip_str . ':' . $model->id;
+                $push_key_name='111Productlivepush:'.$ip_str . ':' . $model->id;
                 $redis->setex($push_key_name,3600*5,$data);
+                
+                //删除购物车缓存
+                $cache_live_name = 'live_push_works_'.$live_id;
+                Cache::delete($cache_live_name);
             }
         }
+        //删除购物车缓存
+        $cache_live_name = 'live_push_works_'.$live_id;
+        Cache::delete($cache_live_name);
 
         if ($res) {
             JobServers::pushToSocket($live_id, $live_info_id, 6);
@@ -354,9 +362,12 @@ WHERE
         }
         $cache_live_name = 'live_push_works_'.$live_id;
         $data = Cache::get($cache_live_name);
-
-        $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del')
+        if(!empty($data)){
+            return $data;
+        }
+        $lists = LivePush::select('id', 'live_id', 'push_type', 'push_gid', 'is_del','is_sell_short')
             ->where('live_id', $live_id)
+            ->where('push_type','<>', 12)
             ->orderBy('push_at', 'desc')
             ->groupBy('push_type', 'push_gid')
             ->get()
@@ -431,6 +442,11 @@ WHERE
                     $res->type = 10;
                     $res = $res->toArray();
                 }
+                if(!empty($res)){
+                    $res['push_id'] = $v['id'];
+                    $res['is_sell_short'] = $v['is_sell_short'];
+                }
+
                 $data[] = $res ?? [];
             }
             $expire_num = CacheTools::getExpire('live_push_works');

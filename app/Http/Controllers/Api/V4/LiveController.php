@@ -29,6 +29,7 @@ use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
+use App\Models\LivePushQrcode;
 use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
@@ -340,11 +341,18 @@ class LiveController extends Controller
                 ->where('helper', 'like', '%'.$this->user['phone'].'%'));
         }
 
-        $lists = $query->orderBy('sort', 'asc')
-            ->orderBy('begin_at', 'asc')
-            ->paginate(10)
-            ->toArray();
+        $lists = Live::fromSub($query,'table')->select('*')
+        ->groupBy('id')
+        ->orderBy('sort', 'asc')
+        ->orderBy('begin_at', 'asc')
+        ->paginate(10)
+        ->toArray();
 
+        //原来写法
+        // $lists = $query->orderBy('sort', 'asc')
+        //     ->orderBy('begin_at', 'asc')->groupBy('id')
+        //     ->paginate(10)
+        //     ->toArray();
         if (!empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
                 $channel = LiveInfo::where('live_pid', $v['id'])
@@ -1633,13 +1641,19 @@ class LiveController extends Controller
         $activity_tag   = $input['activity_tag'] ??'';
 
         if( in_array($this->user['id'], [878644, 882057, 882861]) ){
-            return error(0, '用户异常');
+            return error(0, '用户异常', (object)[]);
         }
 
-        //虚拟用户
-        if($osType ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
-            return error(4000, '请修改手机号');
+        // //虚拟用户
+        // if($osType ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
+        //     return error(4000, '请修改手机号');
+        // }
+        //限制其下单业务
+        $checkAddOrder = Order::CheckAddOrder($liveId,10,$this->user,$osType,$input['from_live_info_id']??0);
+        if($checkAddOrder['code'] !== true){
+            return $this->error($checkAddOrder['code'], $checkAddOrder['msg'], (object)[] );
         }
+
         $list = Subscribe::where(['relation_id' => $input['info_id'], 'type'=>3,'user_id' => $this->user['id']])
             ->first();
         if ( !empty($list) ) {
@@ -1994,7 +2008,6 @@ class LiveController extends Controller
             "is_done"       => 1,
         ])->where('done_at','>',date("Y-m-d",time()))->orderBy('done_at', 'desc')->first();
 
-
         //push_type 产品type  1专栏 2精品课 3商品 4 经营能量 5 一代天骄 6 演说能量 7:讲座 8:听书  9直播   10 直播外链  11 训练营
         //push_gid 推送产品id，专栏id  精品课id  商品id
         if(!empty($res['push_gid'])){
@@ -2037,6 +2050,17 @@ class LiveController extends Controller
                 case 10:
 
                     $Info=LiveUrl::select('id','name','describe','url','image','img')->where(['id'=>$res['push_gid']])->first();
+                    break;
+                case 12:
+
+                    $qr_code=LivePushQrcode::select('id','qr_url')->where(['id'=>$res['push_gid']])->first();
+                    $Info=[
+                        'name'  =>'二维码弹窗',
+                        'price' =>0,
+                        'subtitle'  =>'',
+                        'image' =>$qr_code['qr_url'], //方图
+                        'img'   =>$qr_code['qr_url']  //长图
+                    ];
                     break;
             }
             if(!empty($Info)){

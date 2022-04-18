@@ -1081,6 +1081,7 @@ class IndexController extends ControllerBackend
             ['title' => "王琨老师公益课", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd2ad1f6387702291813511887/v.f100020.mp4',],
             ['title' => "王琨老师公益课改版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/759d778d387702296506162026/v.f100020.mp4',],
             ['title' => "王琨老师公益课0316", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/61c8e25e387702297598142528/v.f100020.mp4',],
+            ['title' => "王琨老师公益课0413", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/6f393eb5387702299112478604/v.f100020.mp4',],
             ['title' => "王琨老师公益课-哈弗凌晨4点半", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/a19c3d3b387702296741996015/v.f100020.mp4',],
             ['title' => "十商交付第一天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/cd3e6ccd387702291813524028/v.f100020.mp4',],
             ['title' => "十商交付第二天", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/3bb9b74a387702292234507161/v.f100020.mp4',],

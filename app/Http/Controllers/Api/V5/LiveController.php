@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\LivePush;
 use App\Models\LivePushQrcode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Predis\Client;
 
@@ -187,11 +188,12 @@ class LiveController extends Controller
                             ->where('is_del', 0)
                             ->where('helper', 'like', '%'.$this->user['phone'].'%'));
             }
-            
-            $lists = $query->orderBy('sort', 'asc')
-            ->orderBy('begin_at', 'asc')
-            ->paginate(10)
-            ->toArray();
+            $lists = Live::fromSub($query,'table')->select('*')
+                ->groupBy('id')
+                ->orderBy('sort', 'asc')
+                ->orderBy('begin_at', 'asc')
+                ->paginate(10)
+                ->toArray();
 
         if (!empty($lists['data'])) {
             foreach ($lists['data'] as &$v) {
@@ -462,16 +464,55 @@ class LiveController extends Controller
         ]);
         
         if ($validator->fails()) {
-            return $this->error(0,$validator->messages()->first());
+            return $this->error(0,$validator->messages()->first(),0);
         }
-
+        $qr_image = str_replace("http://nlsgapp.oss-cn-beijing.aliyuncs.com","",$qr_image);
         $id = LivePushQrcode::create([
             'qr_url' => $qr_image,
         ])->id;
         return success($id);
         
     }
+    /**
+     * {get} api/v5/live/sell_short_state 修改权限
+     */
+    public function SellShortState(Request $request)
+    { 
+        
+        $user_id    = $this->user['id'] ?? 0;
+        $pushid  = $request->input('id',0);
+        $is_sell_short  = $request->input('is_sell_short',0);
+        
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric',
+            'is_sell_short' => 'required|numeric',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first(),'');
+        }
+        $pushData = LivePush::where('id', $pushid)->first();
 
+        $check_is_admin = LiveConsole::isAdmininLive($user_id, $pushData['live_id']);
+        if ($check_is_admin === false) {
+            return $this->error(0,'需要管理员权限','');
+        }
 
+        LivePush::where([
+            'live_id'   => $pushData['live_id'],
+            'push_type' => $pushData['push_type'],
+            'push_gid'  => $pushData['push_gid'],
+        ])->update([
+            'is_sell_short' => $is_sell_short ?? 0,
+        ]);
+        
+        //删除缓存
+        $cache_live_name = 'live_push_works_'.$pushData['live_id'];
+        Cache::delete($cache_live_name);
+        
+        return success('');
+        
+    }
+    
 
 }

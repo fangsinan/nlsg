@@ -91,8 +91,8 @@ class LiveInfoServers {
         if (empty($excel_flag)){
             $res   = $query->paginate($size);
             foreach ($res as $v){
-                $v->phone = $v->UserInfo->phone;
-                $v->nickname = $v->UserInfo->nickname;
+                $v->phone = $v->UserInfo->phone ?? '-';
+                $v->nickname = $v->UserInfo->nickname ?? '-';
                 $v->t_user_id = $v->twitterUser->id ?? 0;
                 $v->t_phone = $v->twitterUser->phone ?? '';
 //                $v->t_nickname = $v->twitterUser->internal_remarks ?: ($v->twitterUser->nickname??'');
@@ -260,6 +260,8 @@ class LiveInfoServers {
 //            $query->whereIn('ld.invite_user_id', $twitter_id_list);
             $query->whereIn('ld.protect_user_id', $twitter_id_list);
             $query->where('ld.type','<>',8);
+
+            $query->where('ld.channel_show','=',1);
         }
 
 //        if ($twitter_id_list !== null) {
