@@ -10,6 +10,7 @@ use App\Models\ColumnEndShow;
 use App\Models\ColumnWeekReward;
 use App\Models\ContentLike;
 use App\Models\History;
+use App\Models\OfflineProducts;
 use App\Models\Poster;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -73,13 +74,14 @@ class CampController extends Controller
             $v['nickname'] = $user_info['nickname'] ?? '';
             $v['title'] = $user_info['honor'] ?? '';
             $new_res['start_list'][] = $v;
-        //    if($v['is_start'] == 0){
-        //        $new_res['start_list'][] = $v;
-        //    }else{
-        //        //  5.0.1 暂时不需要线下课
-        //        $new_res['list'][] = $v;
-        //    }
         }
+
+
+        //线下课类型
+        $offline_list = OfflineProducts::select(['id','title','subtitle','describe','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num'])
+            ->where([ 'type'=>3, 'is_del' => 0])->get()->toArray();
+        $new_res['list'] = $offline_list;
+
         return $this->success($new_res);
     }
 
