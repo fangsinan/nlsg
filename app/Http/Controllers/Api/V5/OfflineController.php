@@ -31,7 +31,7 @@ class OfflineController extends Controller
         if ($validator->fails()) {
             return $this->error(0,$validator->messages()->first(),(object)[]);
         }
-        $list = OfflineProducts::select(['id','title','subtitle','describe','total_price','price','cover_img','off_line_pay_type','is_show'])
+        $list = OfflineProducts::select(['id','title','subtitle','describe','total_price','price','cover_img','off_line_pay_type','is_show','subscribe_num'])
         ->where(['id' => $id, 'type'=>3, 'is_del' => 0])
             ->first();
         if (!$list) {
