@@ -34,7 +34,7 @@ class OfflineController extends Controller
         $list = OfflineProducts::select(['id','title','subtitle','describe','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num'])
         ->where(['id' => $id, 'type'=>3, 'is_del' => 0])
             ->first();
-        $list['detaile_image'] = $list['video_url'] ?? $list['image'];
+            
         if ( empty($list) ) {
             return $this->error(1000,'没有数据',(object)[]);
         }
