@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V5;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\ConfigModel;
 use App\Models\Live;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -11,10 +12,23 @@ use Illuminate\Http\Request;
 
 class TempLiveExcelController extends ControllerBackend
 {
+    public function __construct() {
+        parent::__construct();
+
+        $temp_phone_list = ConfigModel::getData(66,1);
+        $temp_phone_list   = preg_replace('/[^0-9]/i', ',', $temp_phone_list);
+        $temp_phone_list = explode(',',$temp_phone_list);
+        $temp_phone_list = array_filter($temp_phone_list);
+
+        if (!in_array($this->user['username'],$temp_phone_list)){
+            //抛出异常
+            throw new \Exception('您没有权限');
+        }
+    }
+
 
     public function shouTingQingKuang(Request $request) {
-
-        $list = (new TempLiveExcelServers())->shouTingQingKuang($request->input());
+        $list = (new TempLiveExcelServers())->shouTingQingKuang($request->input(),$this->user['id']);
         if (($list['code'] ?? '') === false) {
             return $this->getRes($list);
         }
@@ -48,7 +62,7 @@ class TempLiveExcelController extends ControllerBackend
 
     public function weiJinZhiBo(Request $request) {
 
-        $list = (new TempLiveExcelServers())->weiJinZhiBo($request->input());
+        $list = (new TempLiveExcelServers())->weiJinZhiBo($request->input(),$this->user['id']);
 
         if (($list['code'] ?? '') === false) {
             return $this->getRes($list);
@@ -163,7 +177,7 @@ class TempLiveExcelController extends ControllerBackend
                 'end_time'   => $end_time,
                 'begin_id'   => $begin_id,
                 'end_id'     => $end_id,
-            ]);
+            ],$this->user['id']);
 
             foreach ($list as $v) {
                 $v = [
@@ -187,7 +201,7 @@ class TempLiveExcelController extends ControllerBackend
     }
 
     public function qiYeWeiXin(Request $request) {
-        $list = (new TempLiveExcelServers())->qiYeWeiXin($request->input());
+        $list = (new TempLiveExcelServers())->qiYeWeiXin($request->input(),$this->user['id']);
         if (($list['code'] ?? '') === false) {
             return $this->getRes($list);
         }

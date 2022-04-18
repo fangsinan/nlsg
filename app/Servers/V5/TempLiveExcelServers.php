@@ -2,12 +2,20 @@
 
 namespace App\Servers\V5;
 
+use App\Models\LiveGetExcelLog;
 use Illuminate\Support\Facades\DB;
 
 class TempLiveExcelServers
 {
 
-    public function shouTingQingKuang($params) {
+    public function insertLog($params){
+        LiveGetExcelLog::query()->create($params);
+    }
+
+    public function shouTingQingKuang($params,$admin_id) {
+        $params['mothed'] = 1;
+        $params['admin_id'] = $admin_id;
+
         $begin_time = $params['begin_time'] ?? '';
         $end_time   = $params['end_time'] ?? '';
         $live_id    = $params['live_id'] ?? 0;
@@ -75,11 +83,16 @@ WHERE
 
         $sql .= "GROUP BY o.id ORDER BY o.id DESC;";
 
+        $this->insertLog($params);
+
         return DB::select($sql);
 
     }
 
-    public function weiJinZhiBo($params) {
+    public function weiJinZhiBo($params,$admin_id) {
+        $params['mothed'] = 2;
+        $params['admin_id'] = $admin_id;
+
         $begin_time_d1 = $params['begin_time_d1'] ?? '';
         $end_time_d1   = $params['end_time_d1'] ?? '';
 
@@ -179,11 +192,14 @@ WHERE
         }
 
         $sql .= 'GROUP BY o.id  ORDER BY o.id DESC';
-
+        $this->insertLog($params);
         return DB::select($sql);
     }
 
-    public function weiJinZhiBoFree($params){
+    public function weiJinZhiBoFree($params,$admin_id){
+        $params['mothed'] = 3;
+        $params['admin_id'] = $admin_id;
+
         //直播间id   推荐人手机号  收听时间范围 是否观看
         if ($params['is_watch'] === 0){
             $exists_str = ' NOT EXISTS ';
@@ -204,12 +220,16 @@ SELECT id from nlsg_live_online_user as lou where
 lou.live_id =  '.$params['live_id'].'  and lou.user_id = s.user_id
 and lou.online_time  BETWEEN \' '.$params['begin_time'].' \' AND \' '.$params['end_time'].' \'
 )';
-
+        $this->insertLog($params);
         return DB::select($sql);
 
     }
 
-    public function qiYeWeiXin($params) {
+    public function qiYeWeiXin($params,$admin_id) {
+
+        $params['mothed'] = 4;
+        $params['admin_id'] = $admin_id;
+
         $begin_time = $params['begin_time'] ?? '';
         $end_time   = $params['end_time'] ?? '';
         $live_id    = (int)($params['live_id'] ?? 0);
@@ -267,7 +287,7 @@ WHERE
 
 
         $sql .= " GROUP BY o.id ORDER BY o.id DESC";
-
+        $this->insertLog($params);
         return DB::select($sql);
 
     }
