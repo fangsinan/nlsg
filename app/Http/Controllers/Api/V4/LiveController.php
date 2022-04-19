@@ -1716,6 +1716,7 @@ class LiveController extends Controller
             'pay_type' => $payType,
             'activity_tag' => $activity_tag,
             'remark' => $from_live_info_id,
+            'protect_user_id' => $tweeter_code??0,
 
         ];
         $order = Order::firstOrCreate($data);
