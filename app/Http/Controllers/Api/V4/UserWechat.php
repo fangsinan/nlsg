@@ -484,6 +484,8 @@ class UserWechat extends Controller {
 
 
 
+
+
     public static function UserWechatEdit($id){
 
 
@@ -493,7 +495,7 @@ class UserWechat extends Controller {
 
         //通过部门id 获取成员id  唐山部门 id为3
         $department_id = $id;
-        $department_url = "https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token=$access_token&department_id=$department_id&fetch_child=0";
+        $department_url = "https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token=$access_token&department_id=$department_id&fetch_child=1";
         $department_res = ImClient::curlGet($department_url);
         $department_res = json_decode($department_res,true);
 
