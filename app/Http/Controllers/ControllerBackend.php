@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auth;
+use App\Models\BackendUserAuthLog;
 use App\Models\ConfigModel;
 use App\Models\Role;
 use App\Models\User;
@@ -26,7 +27,7 @@ class ControllerBackend extends BaseController
     protected $show_ps = true;
     public $user;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
         $this->user = auth('backendApi')->user();
 
@@ -41,6 +42,15 @@ class ControllerBackend extends BaseController
             $url_2 = explode('/',$route->uri);
             $url_2 = array_slice($url_2,-2);
             $url_2 = '/'.trim(implode('/',$url_2),'/');
+
+            BackendUserAuthLog::query()
+                ->firstOrCreate(
+                    [
+                        'admin_id' => $this->user['user_id'],
+                        'log_time_str'=>date('Y-m-d H'),
+                        'ip'      => $this->getIp($request),
+                    ]
+                );
 
             if (1 == $this->user['role_id']) {
                 return  true;
