@@ -104,7 +104,7 @@ class PayController extends Controller
 
 
         $data = [
-            'body' => $pay_info['body'],
+            'body' => strlen($pay_info['body']) > 120 ? mb_substr($pay_info['body'],0,33):$pay_info['body'],
             'out_trade_no' => $pay_info['ordernum'],
             'total_fee' => $pay_info['price'] * 100,
             'trade_type' => $trade_type, // 请对应换成你的支付方式对应的值类型
