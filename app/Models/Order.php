@@ -749,13 +749,14 @@ class Order extends Base
 
         $max_id = 341864;
         if ($this_user['username'] == '16612348888'){
-            $max_id = Order::query()
-                ->where('pay_time','>=','2022-04-06 00:00:00')
-                ->min('id');
-
-            if (!$max_id){
-                $max_id = Order::query()->max('id');
-            }
+//            $max_id = Order::query()
+//                ->where('pay_time','>=','2022-04-06 00:00:00')
+//                ->min('id');
+//
+//            if (!$max_id){
+//                $max_id = Order::query()->max('id');
+//            }
+            $max_id = 1890445;
         }
 
         $query = self::query()
@@ -770,6 +771,10 @@ class Order extends Base
                 'live_id', 'os_type', 'remark', 'status', 'twitter_id','protect_user_id',
             ])
             ->orderBy('id', 'desc');
+
+        if ($this_user['username'] == '16612348888'){
+            $query->where('pay_price','=',49.9);
+        }
 
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
@@ -1028,7 +1033,7 @@ class Order extends Base
                 case 10: $push_type = 9;    break;
                 case 14: $push_type = 4;    break;
                 case 18: $push_type = 11;   break;
-                    
+
             }
             $pushdata = LivePush::where(['live_id'=>$live_id,'push_type'=>$push_type,'push_gid'=>$relation_id,'is_sell_short'=>1])->first();
             if( !empty($pushdata) ){
@@ -1036,8 +1041,8 @@ class Order extends Base
             }
 
         }
-     
-        
+
+
 
         return ['code'=>true, 'msg'=>''];
     }
