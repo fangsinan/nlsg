@@ -12,8 +12,8 @@ use Illuminate\Http\Request;
 
 class TempLiveExcelController extends ControllerBackend
 {
-    public function __construct() {
-        parent::__construct();
+    public function __construct(Request $request) {
+        parent::__construct($request);
 
         $temp_phone_list = ConfigModel::getData(66,1);
         $temp_phone_list   = preg_replace('/[^0-9]/i', ',', $temp_phone_list);
@@ -22,7 +22,6 @@ class TempLiveExcelController extends ControllerBackend
 
         if (!in_array($this->user['username'],$temp_phone_list)){
 //            throw new \Exception('您没有权限');
-            
             $columns  = ['您没有权限'];
             $fileName = 'error-' . date('Y-m-d H:i:s') . '-' . rand(100, 999) . '.csv';
             header('Content-Description: File Transfer');
