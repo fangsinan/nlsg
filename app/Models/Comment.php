@@ -73,17 +73,17 @@ class Comment extends Base
 
         if ($lists['data']) {
             foreach ($lists['data'] as &$v) {
-                $v['user']['new_vip'] = VipUser::newVipInfo($v['user']['id'])['vip_id'] ?1:0;
+                $v['user']['new_vip'] = VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
 
                 //需求变化需要展示回复【回复者】的评论内容
                 if(!empty($v['reply'])){
                     foreach ($v['reply'] as $rep_k=>$rep_v){
                         // 是否会员
-                        $v['reply'][$rep_k]['from_user']['new_vip'] = VipUser::newVipInfo($rep_v['from_user']['id'])['vip_id'] ?1:0;
-                        $v['reply'][$rep_k]['to_user']['new_vip'] = VipUser::newVipInfo($rep_v['to_user']['id'])['vip_id'] ?1:0;
+                        $v['reply'][$rep_k]['from_user']['new_vip'] = VipUser::newVipInfo($rep_v['from_user']['id']??0)['vip_id'] ?1:0;
+                        $v['reply'][$rep_k]['to_user']['new_vip'] = VipUser::newVipInfo($rep_v['to_user']['id']??0)['vip_id'] ?1:0;
                         // 是否关注
-                        $v['reply'][$rep_k]['from_user']['is_follow'] = UserFollow::IsFollow($uid, $rep_v['from_user']['id']);
-                        $v['reply'][$rep_k]['to_user']['is_follow'] = UserFollow::IsFollow($uid, $rep_v['to_user']['id']);
+                        $v['reply'][$rep_k]['from_user']['is_follow'] = UserFollow::IsFollow($uid, $rep_v['from_user']['id']??0);
+                        $v['reply'][$rep_k]['to_user']['is_follow'] = UserFollow::IsFollow($uid, $rep_v['to_user']['id']??0);
 
                         $v['reply'][$rep_k]['is_like'] = Like::isLike($rep_v['id'],2,$uid,$like_type);
                         $v['reply'][$rep_k]['created_at'] = History::DateTime($rep_v['created_at']);
@@ -118,11 +118,11 @@ class Comment extends Base
         if(!empty($reply_data)){
             foreach ($reply_data as $getReplay_key=>$getReplay_val){
                 //是否会员
-                $getReplay_val['from_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['from_user']['id'])['vip_id'] ?1:0;
-                $getReplay_val['to_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['to_user']['id'])['vip_id'] ?1:0;
+                $getReplay_val['from_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['from_user']['id']??0)['vip_id'] ?1:0;
+                $getReplay_val['to_user']['new_vip'] = VipUser::newVipInfo($getReplay_val['to_user']['id']??0)['vip_id'] ?1:0;
                 //是否关注
-                $getReplay_val['from_user']['is_follow'] = UserFollow::IsFollow($uid, $getReplay_val['from_user']['id']);
-                $getReplay_val['to_user']['is_follow'] = UserFollow::IsFollow($uid, $getReplay_val['to_user']['id']);
+                $getReplay_val['from_user']['is_follow'] = UserFollow::IsFollow($uid, $getReplay_val['from_user']['id']??0);
+                $getReplay_val['to_user']['is_follow'] = UserFollow::IsFollow($uid, $getReplay_val['to_user']['id']??0);
 
 
 
@@ -209,12 +209,11 @@ class Comment extends Base
                 $v['is_like'] = Like::isLike($v['id'],2,$uid);
                 // $isLike = Like::where(['relation_id' => $v['id'], 'type' => $like_type, 'user_id' => $uid])->first();
                 // $v['is_like'] = $isLike ? 1 : 0;
-                $v['from_user']['new_vip'] = VipUser::newVipInfo($v['from_user']['id'])['vip_id'] ?1:0;
-                $v['to_user']['new_vip'] = VipUser::newVipInfo($v['to_user']['id'])['vip_id'] ?1:0;
-                
+                $v['from_user']['new_vip'] = VipUser::newVipInfo($v['from_user']['id']??0)['vip_id'] ?1:0;
+                $v['to_user']['new_vip'] = VipUser::newVipInfo($v['to_user']['id']??0)['vip_id'] ?1:0;
                 // 是否关注
-                $v['from_user']['is_follow'] = UserFollow::IsFollow($uid, $v['from_user']['id']);
-                $v['to_user']['is_follow'] = UserFollow::IsFollow($uid, $v['to_user']['id']);
+                $v['from_user']['is_follow'] = UserFollow::IsFollow($uid, $v['from_user']['id']??0);
+                $v['to_user']['is_follow'] = UserFollow::IsFollow($uid, $v['to_user']['id']??0);
 
             }
         }
