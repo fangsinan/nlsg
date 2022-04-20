@@ -36,7 +36,7 @@ class ControllerBackend extends BaseController
             $this->user['user_id'] = User::where('phone', '=', $this->user['username'])->value('id');
 
             $route = Route::current();
-            $url = substr($route->uri, 12);
+//            $url = substr($route->uri, 12);
 
             //临时添加,解决直播后台和普通后台域名前缀长度不一致问题
             $url_2 = explode('/',$route->uri);
@@ -49,7 +49,7 @@ class ControllerBackend extends BaseController
                         'admin_id' => $this->user['user_id'],
                         'log_time_str'=>date('Y-m-d H:i'),
                         'ip'      => $this->getIp($request),
-                        'uri' => $route->uri,
+                        'uri' => $url_2,
                     ]
                 );
 
