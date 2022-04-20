@@ -202,7 +202,6 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('comment/like/user', 'CommentController@getLikeUser');
 
     //评论
-    Route::post('reply/store', 'ReplyController@store');
     Route::post('reply/update', 'ReplyController@update');
     Route::post('reply/destroy', 'ReplyController@destroy');
 
@@ -503,6 +502,10 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::get('im_doc/category/product', 'ImDocController@getCategoryProduct');
 
         Route::post('im/report', 'ImController@report');
+
+        //想法
+        Route::post('reply/store', 'ReplyController@store');
+
 
     });
     Route::post('im_group/forbid_msg_list', 'ImGroupController@forbidMsgList');
