@@ -44,11 +44,12 @@ class ControllerBackend extends BaseController
             $url_2 = '/'.trim(implode('/',$url_2),'/');
 
             BackendUserAuthLog::query()
-                ->firstOrCreate(
+                ->insertOrIgnore(
                     [
                         'admin_id' => $this->user['user_id'],
-                        'log_time_str'=>date('Y-m-d H'),
+                        'log_time_str'=>date('Y-m-d H:i'),
                         'ip'      => $this->getIp($request),
+                        'uri' => $route->uri,
                     ]
                 );
 
