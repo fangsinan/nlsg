@@ -763,12 +763,19 @@ class WechatPay extends Controller
 //                    if ($check_bind == 0) {
                     //没有绑定记录,则绑定
                     if (($check_bind === 0) && strlen($twitter_data['phone']) === 11 && strlen($userdata['phone']) === 11) {
+
+                        if($total_fee==1){
+                            $bind_end=date('Y-m-d 23:59:59', strtotime('+1 months'));
+                        }else{
+                            $bind_end=date('Y-m-d 23:59:59', strtotime('+1 years'));
+                        }
+
                         $bind_data = [
                             'parent' => $twitter_data['phone'],
                             'son' => $userdata['phone'],
                             'life' => 2,
                             'begin_at' => date('Y-m-d H:i:s'),
-                            'end_at' => date('Y-m-d 23:59:59', strtotime('+1 years')),
+                            'end_at' => $bind_end,
                             'channel' => 2
                         ];
                         DB::table('nlsg_vip_user_bind')->insert($bind_data);
