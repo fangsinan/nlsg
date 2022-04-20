@@ -151,7 +151,7 @@ class UserController extends Controller
                 },
 
             ])
-            ->find($id)->toArray();
+            ->find($id);
         $user['columns'] = []; //不显示专栏
 
         if ($user) {
