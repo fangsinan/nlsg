@@ -346,7 +346,7 @@ class WorksInfo extends Base
         $info_list[$info_key]['column_banner'] = Column::getCampBanner($getBanner_id,$this->user,$params);
 
         //  统计章节的评论数   由于训练营是共用章节 所以需要单独统计评论表和回复表
-        $CommentIds = Comment::where(['type'=>6,'relation_id'=>$works_id,'info_id'=>$works_info_id,])->pluck("id")->toArray() ?? [];
+        $CommentIds = Comment::where(['type'=>6,'relation_id'=>$works_id,'info_id'=>$works_info_id,'status'=>1])->pluck("id")->toArray() ?? [];
         $replay_num = CommentReply::whereIn('comment_id',$CommentIds)->count();
         $info_list[$info_key]['comment_num'] = (int)(count($CommentIds) + $replay_num);
 
