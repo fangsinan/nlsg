@@ -10,7 +10,7 @@ class WorksInfo extends Base
     protected $table = 'nlsg_works_info';
 
     protected $fillable = [
-         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time','share_img'
+         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time','share_img','like_num'
     ];
 
 
