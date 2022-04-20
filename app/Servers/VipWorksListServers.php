@@ -72,6 +72,7 @@ and (`level` = 1 or (`level` = 2 and is_open_360 = 1))';
                     $temp_data['start_time'] = $v->time_begin_360;
                     $temp_data['end_time'] = $v->time_end_360;
                 }
+                $temp_data['status'] = 1;
                 $temp_data['give'] = 3;
                 $add_data[] = $temp_data;
         }
