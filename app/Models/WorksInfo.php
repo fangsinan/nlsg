@@ -10,7 +10,7 @@ class WorksInfo extends Base
     protected $table = 'nlsg_works_info';
 
     protected $fillable = [
-         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time','share_img'
+         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time','share_img','like_num'
     ];
 
 
@@ -346,7 +346,7 @@ class WorksInfo extends Base
         $info_list[$info_key]['column_banner'] = Column::getCampBanner($getBanner_id,$this->user,$params);
 
         //  统计章节的评论数   由于训练营是共用章节 所以需要单独统计评论表和回复表
-        $CommentIds = Comment::where(['type'=>6,'relation_id'=>$works_id,'info_id'=>$works_info_id,])->pluck("id")->toArray() ?? [];
+        $CommentIds = Comment::where(['type'=>6,'relation_id'=>$works_id,'info_id'=>$works_info_id,'status'=>1])->pluck("id")->toArray() ?? [];
         $replay_num = CommentReply::whereIn('comment_id',$CommentIds)->count();
         $info_list[$info_key]['comment_num'] = (int)(count($CommentIds) + $replay_num);
 
