@@ -16,7 +16,7 @@ class LikeController extends Controller
 {
 
 
-    // 内容章节点赞
+    // 内容章节点赞 （未使用）
     public function Infolike(Request $request)
     {
         $id   = $request->input('id');
