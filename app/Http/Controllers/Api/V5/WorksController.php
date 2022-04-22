@@ -441,7 +441,7 @@ class WorksController extends Controller
     public function neighbor(Request $request){
 
 
-        $user = $this->user ?? ["id" =>0, "level" =>0, "expire_time" =>0, "new_vip" =>[], ];
+        $user = $this->user ?? ["id" =>0, "level" =>0, "expire_time" =>0, "new_vip" =>['vip_id'=>0], ];
         $model = new WorksInfo();
         $data = $model->neighbor($request->input(),$user);
         return $this->getRes($data);
