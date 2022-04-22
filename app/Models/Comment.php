@@ -49,7 +49,10 @@ class Comment extends Base
         ])
             ->select('id', 'pid', 'user_id', 'relation_id', 'info_id', 'content', 'forward_num',
                 'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality','is_top')
-            ->where('relation_id', $id);
+            ->where('relation_id', $id)
+            ->where('type', $type)
+            ->where('status', 1);
+
         if ($info_id) {
             $query->where('info_id', $info_id);
         }
@@ -59,8 +62,6 @@ class Comment extends Base
         });
 
         $lists = $query
-            ->where('type', $type)
-            ->where('status', 1)
             ->when($self, function ($query) use ($res) {
                 return $query->where('user_id', $res['user_id']);
             })
