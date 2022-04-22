@@ -46,6 +46,7 @@ Route::group(['namespace' => 'Live\V4', 'prefix' => 'live_v4'], function () {
         Route::get('live_info/online_num_info_excel', 'InfoController@onlineNumInfoExcel');
 
         Route::get('live_index/channel_s', 'IndexController@channelSelect');
+        Route::post('live_index/order_channel_show', 'IndexController@orderChannelShow');
 
     });
     //导出

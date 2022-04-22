@@ -8,6 +8,7 @@ use App\Models\BackendLiveRole;
 use App\Models\ConfigModel;
 use App\Models\Live;
 use App\Models\LiveConsole;
+use App\Models\LiveDeal;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveNumber;
@@ -1103,4 +1104,48 @@ class IndexController extends ControllerBackend
         ];
         return success($res);
     }
+
+    public function orderChannelShow(Request $request) {
+        $live_id = $request->input('live_id', 0);
+        $flag    = $request->input('flag', '');
+
+        if (empty($live_id) || empty($flag) || $flag !== 'show') {
+            return $this->getRes(['code' => false, 'msg' => '参数错误']);
+        }
+
+        $check_id = Live::query()->where('id', '=', $live_id)->first();
+        if (empty($check_id) || $check_id->status <> 4) {
+            return $this->getRes(['code' => false, 'msg' => '直播不存在']);
+        }
+
+        if ($check_id->is_finish <> 4) {
+            return $this->getRes(['code' => false, 'msg' => '直播未结束']);
+        }
+        
+        LiveDeal::query()
+            ->where('live_id', '=', $live_id)
+            ->where('channel_show', '=', 0)
+            ->update([
+                'channel_show' => 1
+            ]);
+
+        Order::query()
+            ->whereIn('type', [10, 14])
+            ->where('relation_id', '<>', 8)
+            ->where('status', '=', 1)
+            ->where('live_id', '<>', 0)
+            ->where('is_shill', '=', 0)
+            ->where('pay_price', '>', 0.01)
+            ->where('channel_show', '=', 0)
+            ->update([
+                'channel_show' => 1
+            ]);
+
+        return $this->getRes([
+            'code' => true,
+            'msg'  => '操作成功'
+        ]);
+
+    }
+
 }
