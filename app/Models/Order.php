@@ -782,6 +782,7 @@ class Order extends Base
 
         if ($this_user['role_id'] !== 1) {
             $query->where('relation_id', '<>', 8);
+            $query->where('channel_show', '=', 1);
             $liServers       = new LiveInfoServers();
             $twitter_id_list = $liServers->twitterIdList($this_user['username']);
             if ($twitter_id_list !== null) {
