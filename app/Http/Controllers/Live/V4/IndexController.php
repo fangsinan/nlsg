@@ -1118,10 +1118,10 @@ class IndexController extends ControllerBackend
             return $this->getRes(['code' => false, 'msg' => '直播不存在']);
         }
 
-        if ($check_id->is_finish <> 4) {
+        if ($check_id->is_finish <> 1) {
             return $this->getRes(['code' => false, 'msg' => '直播未结束']);
         }
-        
+
         LiveDeal::query()
             ->where('live_id', '=', $live_id)
             ->where('channel_show', '=', 0)
