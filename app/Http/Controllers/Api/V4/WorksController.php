@@ -758,7 +758,8 @@ class WorksController extends Controller
             //学习记录条数会只按relation_id算   不根据章节走
             if($his->wasRecentlyCreated){
                 // 学习记录数增一
-                User::where(['id'=>$user_id])->increment('history_num');
+                //4.24号  如果有当前课程id的记录  不累加历史记录数（在edit——histtory接口中体现）
+                // User::where(['id'=>$user_id])->increment('history_num');
             }
         }
 
