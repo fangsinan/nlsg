@@ -79,6 +79,10 @@ class SelectDataController extends ControllerBackend
                 'key'=>4,
                 'value'=>'电视渠道',
             ],
+            [
+                'key'=>5,
+                'value'=>'其他',
+            ],
         ]);
     }
 

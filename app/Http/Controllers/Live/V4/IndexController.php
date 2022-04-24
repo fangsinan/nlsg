@@ -279,6 +279,10 @@ class IndexController extends ControllerBackend
                 'key'   => 4,
                 'value' => '电视渠道',
             ],
+            '5' => [
+                'key'   => 5,
+                'value' => '其他',
+            ],
         ];
 
         //  直播收益   直播推广收益
