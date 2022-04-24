@@ -771,6 +771,28 @@ class AuthController extends Controller
         ];
     }
 
+    //生成13位虚拟手机号
+    public function VirtualUser(){
+
+        $time = time();
+        $redis_phone = 'phone_' . date('Ymd', $time);
+
+        $key = 'phone_lock';
+        self::lock($key); //加锁
+        $num = Redis::get($redis_phone);
+        if (empty($num) || $num <= 0) {
+            $num = 1;
+        }
+        Redis::setex($redis_phone, 86400, $num + 1);
+        self::unlock($key); //释放锁
+
+        $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
+        $phone = date('ymd', $time) . $str_num; //6+7
+
+        return $phone;
+
+    }
+
     // JWT 验证
     public function jwtApple(Request $request)
     {
@@ -792,9 +814,10 @@ class AuthController extends Controller
             $user = User::where('appleid', $appleid)->first();
             if (!$user) {
                 $rand = uniqid();
+                $phone=$this->VirtualUser();
                 $list = User::create([
                     'nickname' => '苹果用户' . $rand,
-                    'phone' => '苹果用户' . $rand,
+                    'phone' => $phone,
                     'appleid' => $appleid ?? ''
                 ]);
                 $user = User::find($list->id);
@@ -948,8 +971,11 @@ class AuthController extends Controller
         $rand = substr(uniqid(), -5);
         $user = User::where(["is_staff" => 2, 'unionid' => $unionid])->first();
         if (empty($user)) {
+
+            $phone=$this->VirtualUser();
+
             $list = User::create([
-                'phone' => '游客' . $nicke . "_" . $rand,
+                'phone' => $phone,
                 'unionid' => $unionid,
                 'nickname' => '游客' . $nicke . "_" . $rand,
                 'is_staff' => 2,
