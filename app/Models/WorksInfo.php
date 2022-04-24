@@ -170,6 +170,15 @@ class WorksInfo extends Base
             }
         }
 
+        //历史记录类型
+        switch($type){
+            case 1: $his_type = 1;    break;
+            case 2: $his_type = 4;    break;
+            case 6: $his_type = 2;    break;
+            case 7: $his_type = 5;    break;
+            default :$his_type=0;   break;
+        }
+
        
         if($type == 1 || $type == 6 || $type == 7){
 
@@ -187,6 +196,7 @@ class WorksInfo extends Base
                 $get_info_id = $column_id;
             }
             $getBanner_id = $column_id;
+            
         }else{
             if (empty($works_id) || empty($works_info_id)) {
                 return ['code' => false, 'msg' => '课程id不存在'];
@@ -210,8 +220,8 @@ class WorksInfo extends Base
 
 
 
-        $query->with(['infoHistory' => function ($query) use ($works_id, $user) {
-            $query->where('relation_id', '=', $works_id)->where('user_id', '=', $user['id'])->where('is_del', 0);
+        $query->with(['infoHistory' => function ($query) use ($works_id, $user, $his_type) {
+            $query->where('user_id', '=', $user['id'])->where('relation_id', '=', $works_id)->where('relation_type','=',$his_type)->where('is_del', 0);
         }]);
 
         if ($ob == 'desc') {
