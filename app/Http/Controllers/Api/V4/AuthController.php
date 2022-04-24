@@ -757,6 +757,7 @@ class AuthController extends Controller
     //登录返回字段
     function get_data($user, $token)
     {
+
         return [
             'id' => $user->id,
             'token' => $token,
@@ -768,6 +769,28 @@ class AuthController extends Controller
             'is_community_admin' => $user->is_community_admin,
             'children_age' => 10,//$user->children_age,
         ];
+    }
+
+    //生成13位虚拟手机号
+    public function VirtualUser(){
+
+        $time = time();
+        $redis_phone = 'phone_' . date('Ymd', $time);
+
+        $key = 'phone_lock';
+        self::lock($key); //加锁
+        $num = Redis::get($redis_phone);
+        if (empty($num) || $num <= 0) {
+            $num = 1;
+        }
+        Redis::setex($redis_phone, 86400, $num + 1);
+        self::unlock($key); //释放锁
+
+        $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
+        $phone = date('ymd', $time) . $str_num; //6+7
+
+        return $phone;
+
     }
 
     // JWT 验证
@@ -791,9 +814,10 @@ class AuthController extends Controller
             $user = User::where('appleid', $appleid)->first();
             if (!$user) {
                 $rand = uniqid();
+                $phone=$this->VirtualUser();
                 $list = User::create([
                     'nickname' => '苹果用户' . $rand,
-                    'phone' => '苹果用户' . $rand,
+                    'phone' => $phone,
                     'appleid' => $appleid ?? ''
                 ]);
                 $user = User::find($list->id);
@@ -845,11 +869,11 @@ class AuthController extends Controller
             } else if (preg_match($g3, $phone)) {
                 return $this->getRes(['code' => true, 'msg' => '正确']);
             } */
-			
+
 			$g = "/^1\d{10}$/";
 			if (preg_match($g, $phone)) {
 				return $this->getRes(['code' => true, 'msg' => '正确']);
-			}	
+			}
             return $this->getRes(['code' => false, 'msg' => '号码错误']);
         }
 
@@ -947,8 +971,11 @@ class AuthController extends Controller
         $rand = substr(uniqid(), -5);
         $user = User::where(["is_staff" => 2, 'unionid' => $unionid])->first();
         if (empty($user)) {
+
+            $phone=$this->VirtualUser();
+
             $list = User::create([
-                'phone' => '游客' . $nicke . "_" . $rand,
+                'phone' => $phone,
                 'unionid' => $unionid,
                 'nickname' => '游客' . $nicke . "_" . $rand,
                 'is_staff' => 2,

@@ -221,7 +221,7 @@ class WorksInfo extends Base
 
 
         $query->with(['infoHistory' => function ($query) use ($works_id, $user, $his_type) {
-            $query->where('user_id', '=', $user['id'])->where('relation_id', '=', $works_id)->where('relation_type','=',$his_type)->where('is_del', 0);
+            $query->where('user_id', '=', $user['id'])->where('relation_id', '=', $works_id)->where('relation_type','=',$his_type);
         }]);
 
         if ($ob == 'desc') {
