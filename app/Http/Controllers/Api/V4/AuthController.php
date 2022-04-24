@@ -757,6 +757,7 @@ class AuthController extends Controller
     //登录返回字段
     function get_data($user, $token)
     {
+
         return [
             'id' => $user->id,
             'token' => $token,
@@ -845,11 +846,11 @@ class AuthController extends Controller
             } else if (preg_match($g3, $phone)) {
                 return $this->getRes(['code' => true, 'msg' => '正确']);
             } */
-			
+
 			$g = "/^1\d{10}$/";
 			if (preg_match($g, $phone)) {
 				return $this->getRes(['code' => true, 'msg' => '正确']);
-			}	
+			}
             return $this->getRes(['code' => false, 'msg' => '号码错误']);
         }
 
