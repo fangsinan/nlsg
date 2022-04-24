@@ -756,6 +756,14 @@ class WechatPay extends Controller
                 if (in_array($liveData['user_id'] ?? 0, [161904, 250550, 423403])) {
                     Subscribe::appendSub([$user_id], 1);
                 }
+
+                //写入关系保护
+                if($total_fee==1){
+                    $bind_end=date('Y-m-d 23:59:59', strtotime('+1 months'));
+                }else{
+                    $bind_end=date('Y-m-d 23:59:59', strtotime('+1 years'));
+                }
+
                 //写入关系保护
                 if (!empty($orderInfo['twitter_id'])) {
                     $twitter_data = User::find($orderInfo['twitter_id']);
@@ -763,13 +771,6 @@ class WechatPay extends Controller
 //                    if ($check_bind == 0) {
                     //没有绑定记录,则绑定
                     if (($check_bind === 0) && strlen($twitter_data['phone']) === 11 && strlen($userdata['phone']) === 11) {
-
-                        if($total_fee==1){
-                            $bind_end=date('Y-m-d 23:59:59', strtotime('+1 months'));
-                        }else{
-                            $bind_end=date('Y-m-d 23:59:59', strtotime('+1 years'));
-                        }
-
                         $bind_data = [
                             'parent' => $twitter_data['phone'],
                             'son' => $userdata['phone'],
@@ -818,7 +819,7 @@ class WechatPay extends Controller
 
 					// 下单记录王琨老师的直播
 					if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0){ //刷单用户排除
-						self::PayTeacherLives($user_id,$liveData,$orderInfo);
+						self::PayTeacherLives($user_id,$liveData,$orderInfo,$bind_end);
 					}
 
 					// 内容刷单记录
@@ -866,14 +867,18 @@ class WechatPay extends Controller
             return true;
         }
     }
-    static function PayTeacherLives($user_id,$liveData,$order){
+    static function PayTeacherLives($user_id,$liveData,$order,$bind_end=''){
         if(empty($user_id) || empty($liveData) || empty($order)){
             return ;
+        }
+        if(empty($bind_end)){
+            $bind_end=date('Y-m-d 23:59:59', strtotime('+1 months'));
         }
         DB::table(LivePayCheck::$table_name)->insert([
             'live_id' =>$liveData['id'],
             'teacher_id' =>$liveData['user_id'],
             'begin_at'=>$liveData['begin_at'],
+            'protect_end_time'=>$bind_end,
             'user_id' =>$user_id,
             'order_id' =>$order['id'],
             'ordernum' =>$order['ordernum'],
