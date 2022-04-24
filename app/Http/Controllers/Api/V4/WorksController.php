@@ -625,7 +625,7 @@ class WorksController extends Controller
         }
 
 
-        $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$works_id,'type'=>2])->first();
+        $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$works_id,'info_id'=>0, 'type'=>2])->first();
 
         if($works_data['is_audio_book'] == 0){
             $relation_type = 4;
