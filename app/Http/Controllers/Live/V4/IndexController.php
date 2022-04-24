@@ -1109,7 +1109,11 @@ class IndexController extends ControllerBackend
         $live_id = $request->input('live_id', 0);
         $flag    = $request->input('flag', '');
 
-        if (empty($live_id) || empty($flag) || $flag !== 'show') {
+        if (empty($live_id) || empty($flag)) {
+            return $this->getRes(['code' => false, 'msg' => '参数错误']);
+        }
+
+        if (!in_array($flag, ['show', 'hide'])) {
             return $this->getRes(['code' => false, 'msg' => '参数错误']);
         }
 
@@ -1126,7 +1130,7 @@ class IndexController extends ControllerBackend
             ->where('live_id', '=', $live_id)
             ->where('channel_show', '=', 0)
             ->update([
-                'channel_show' => 1
+                'channel_show' => $flag === 'show' ? 1 : 0,
             ]);
 
         Order::query()
@@ -1138,7 +1142,7 @@ class IndexController extends ControllerBackend
             ->where('pay_price', '>', 0.01)
             ->where('channel_show', '=', 0)
             ->update([
-                'channel_show' => 1
+                'channel_show' => $flag === 'show' ? 1 : 0,
             ]);
 
         return $this->getRes([
