@@ -165,8 +165,8 @@ class WechatServers
                     $flag = false;
                 } else {
                     $time=time();
-                    $day_time=date('Y-m-d H:i:s',$time);
                     foreach ($dataAll as $key => $val) {
+                        $day_time=date('Y-m-d H:i:s',$time);
 //                        if($order==1 && $key==1){
 //                            sleep(20);
 //                        }
@@ -220,8 +220,8 @@ class WechatServers
                     $flag = false;
                 } else {
                     $time=time();
-                    $day_time=date('Y-m-d H:i:s',$time);
                     foreach ($dataAll as $key => $val) {
+                        $day_time=date('Y-m-d H:i:s',$time);
 //                        if($order==1 && $key==1){
 //                            sleep(20);
 //                        }
