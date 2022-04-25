@@ -352,6 +352,15 @@ class CommentController extends Controller
         if (!$comment){
             return $this->error(1000,'评论不存在');
         }
+        if($is_top == 1){ 
+            //  当前设置置顶操作时 取消置顶 之前的记录
+            $res = Comment::where([
+                'relation_id'=> $comment['relation_id'],
+                'info_id'    => $comment['info_id'],
+                'type'       => $comment['type'],
+                'is_top'     => 1,
+             ])->update(['is_top' => 0]);
+        }
        
         $res = Comment::where('id', $id)->update(['is_top' => $is_top]);
         if(empty($res)){
