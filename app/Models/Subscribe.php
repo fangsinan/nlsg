@@ -125,10 +125,16 @@ class Subscribe extends Base
 					$res = LivePayCheck::where([
 						'teacher_id'    => $result['user_id'],
 						'user_id'       => $user_id,
-					])->where("begin_at",'<=',$result['begin_at'])->orderBy('id', 'desc')->first();;
+					])->where("begin_at",'<=',$result['begin_at'])->orderBy('id', 'desc')->first();
 
 					if(!empty($res)){
 						$is_sub = 1;
+                        if(isset($res->protect_end_time) && !empty($res->protect_end_time)){
+                            $now_time=date('Y-m-d H:i:s');
+                            if($now_time>$res->protect_end_time){//保护时间过期，取消免费观看权限，需重新购买
+                                $is_sub = 0;
+                            }
+                        }
 					}
 				}
 			}
