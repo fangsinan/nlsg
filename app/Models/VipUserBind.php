@@ -45,8 +45,11 @@ class VipUserBind extends Base
     public static function clear()
     {
         $clear_sql = "update  nlsg_vip_user_bind set status = 2 where status in (0,1) and end_at <= SYSDATE()";
-        $res = DB::select($clear_sql);
-        dd($res);
+        DB::select($clear_sql);
+
+        $clear_vip_sql = "UPDATE nlsg_vip_user SET `status` = 0,is_default=0 where is_default = 1 AND `status` = 1 AND expire_time < now();";
+        DB::select($clear_vip_sql);
+      
     }
 
 }
