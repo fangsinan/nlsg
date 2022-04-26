@@ -128,85 +128,79 @@
             'top_monday'=>$top_monday,
         ];
     }
-
-/**
- * @param $res
- * @return bool
- * 检查返回结果
- */
-function checkRes($res){
-
-    if($res === true ||  is_array($res) ||is_object($res)){
-        return true;
-    }
-    if(is_numeric($res)){
-        return true;
-    }
-
-    return false;
-
-}
-
-
-
-/**
- * 秒数 转换成 1:01
- */
-function TimeToMinSec($time)
-{
-    if (is_numeric($time)) {
-        if($time <=0 ){
-            return '00:01';
-        }
-        $value = array(
-            "years" => 0, "days" => 0, "hours" => 0,
-            "minutes" => 0, "seconds" => 0,
-        );
-        $t = '';
-
-        if ($time >= 60) {
-            $value["minutes"] = floor($time / 60);
-            $time = ($time % 60);
-            $t .= $value["minutes"] . ":";
-        }else{
-            $t .= "00:";
-        }
-        //分钟数如果都为空 则单独显示秒
-        if($t == ''){
-            $value["seconds"] = floor($time);
-
-            $t .= $value["seconds"] . ":";
-        }else{
-            $t .= "01";
-        }
-
-        return $t;
-
-
-    } else {
-        return '00:01';
-    }
-}
-
-
-function add_log($url,$message='',$parameter=''){
-    Illuminate\Support\Facades\DB::table('nlsg_log')->insert([
-        'url'=>$url,
-        'code'=>'info',
-        'type'=>2,
-        'message'=>$message,
-        'parameter'=>$parameter,
-        'created_at'=>date('Y-m-d H:i:s'),
-    ]);
-}
-
-
-
-function get_page_size($data){
-    if(empty($data['size']) || !is_numeric($data['size']) || $data['size']<=0){
-        return 10;
-    }
-    return  $data['size'];
-}
-
-
+	
+	/**
+	 * @param $res
+	 * @return bool
+	 * 检查返回结果
+	 */
+	function checkRes($res){
+	
+	    if($res === true ||  is_array($res) ||is_object($res)){
+	        return true;
+	    }
+	    if(is_numeric($res)){
+	        return true;
+	    }
+	
+	    return false;
+	
+	}
+	
+	/**
+	 * 秒数 转换成 1:01
+	 */
+	function TimeToMinSec($time)
+	{
+	    if (is_numeric($time)) {
+	        if($time <=0 ){
+	            return '00:01';
+	        }
+	        $value = array(
+	            "years" => 0, "days" => 0, "hours" => 0,
+	            "minutes" => 0, "seconds" => 0,
+	        );
+	        $t = '';
+	
+	        if ($time >= 60) {
+	            $value["minutes"] = floor($time / 60);
+	            $time = ($time % 60);
+	            $t .= $value["minutes"] . ":";
+	        }else{
+	            $t .= "00:";
+	        }
+	        //分钟数如果都为空 则单独显示秒
+	        if($t == ''){
+	            $value["seconds"] = floor($time);
+	
+	            $t .= $value["seconds"] . ":";
+	        }else{
+	            $t .= "01";
+	        }
+	
+	        return $t;
+	
+	
+	    } else {
+	        return '00:01';
+	    }
+	}
+	
+	function add_log($url,$message='',$parameter=''){
+	    Illuminate\Support\Facades\DB::table('nlsg_log')->insert([
+	        'url'=>$url,
+	        'code'=>'info',
+	        'type'=>2,
+	        'message'=>$message,
+	        'parameter'=>$parameter,
+	        'created_at'=>date('Y-m-d H:i:s'),
+	    ]);
+	}
+	
+	
+	function get_page_size($data){
+	    if(empty($data['size']) || !is_numeric($data['size']) || $data['size']<=0){
+	        return 10;
+	    }
+	    return  $data['size'];
+	}
