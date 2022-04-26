@@ -1132,7 +1132,6 @@ class IndexController extends ControllerBackend
 
         LiveDeal::query()
             ->where('live_id', '=', $live_id)
-            ->where('channel_show', '=', 0)
             ->update([
                 'channel_show' => $flag === 'show' ? 1 : 0,
             ]);
@@ -1144,7 +1143,6 @@ class IndexController extends ControllerBackend
             ->where('live_id', '<>', 0)
             ->where('is_shill', '=', 0)
             ->where('pay_price', '>', 0.01)
-            ->where('channel_show', '=', 0)
             ->update([
                 'channel_show' => $flag === 'show' ? 1 : 0,
             ]);
