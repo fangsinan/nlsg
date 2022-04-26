@@ -1105,6 +1105,7 @@ class IndexController extends ControllerBackend
             ['title' => "电视频道同步转播", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/d8ce9bf1387702298372242370/v.f100030.mp4',],
             ['title' => "电视频道同步转播重播版", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/577c2779387702298740716652/v.f100030.mp4',],
             ['title' => "电视频道同步3连播", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/c2e984a0387702299470727539/v.f100020.mp4',],
+            ['title' => "晓东老师20220426", 'video_url' => 'http://1308168117.vod2.myqcloud.com/c520858evodtranscq1308168117/762547ac387702299859971656/v.f100020.mp4',],
         ];
         return success($res);
     }
