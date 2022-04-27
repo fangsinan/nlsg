@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BackendUser;
 use App\Models\VipUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -36,8 +35,6 @@ class Controller extends BaseController
             }
             $this->user['level'] = $this->user['true_level'];
             $this->user['new_vip'] = VipUser::newVipInfo($this->user['id']);
-            $backend_user = BackendUser::select('id','role_id')->where(['username'=>$this->user['phone']])->first();
-            $this->user['backend_user'] = !empty($backend_user)?$backend_user->toArray():[];
         }else{
 //            exit(json_encode(['msg'=>'没有登陆','code'=>401]));
             return response()->json(['msg' => '没有登录','code'=> 401]);
