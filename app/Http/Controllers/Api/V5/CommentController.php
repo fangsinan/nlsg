@@ -344,7 +344,7 @@ class CommentController extends Controller
         }
 
 
-        if( empty($this->user['backend_user']) ){
+        if( empty($this->user['is_community_admin']) || $this->user['is_community_admin'] != 1 ){
             return $this->error(1000,'没有权限操作');
         }
 
