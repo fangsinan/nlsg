@@ -19,7 +19,7 @@ class CrontabCommentRedis extends Command
      *
      * @var string
      */
-    protected $description = '加入直播间记录入库';
+    protected $description = '评论入库';
 
     /**
      * Create a new command instance.
@@ -38,6 +38,6 @@ class CrontabCommentRedis extends Command
      */
     public function handle()
     {
-        LiveConsoleServers::CrontabJoinRedis();//加入直播间记录入库
+        LiveConsoleServers::CrontabCommentRedis();//评论入库
     }
 }

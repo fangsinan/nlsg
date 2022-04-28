@@ -156,21 +156,22 @@ class Kernel extends ConsoleKernel
 //            LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
 //        })->everyFiveMinutes()->runInBackground();//每5分
 
-        $schedule->command('command:CrontabCommentRedis')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-        $schedule->command('command:CrontabGiftRedis')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-        $schedule->command('command:CrontabJoinRedis')
+        $schedule->command('command:CrontabOnlineUserRedis')
             ->everyMinute()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
         $schedule->command('command:CrontabOnlineUser')
             ->everyMinute()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
-        $schedule->command('command:CrontabOnlineUserRedis')
+        $schedule->command('command:CrontabJoinRedis')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabCommentRedis')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabGiftRedis')
             ->everyFiveMinutes()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
+
 
 
 
