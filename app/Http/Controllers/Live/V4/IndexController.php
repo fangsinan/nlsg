@@ -14,6 +14,7 @@ use App\Models\LiveLogin;
 use App\Models\LiveNumber;
 use App\Models\LivePoster;
 use App\Models\LiveStatistics;
+use App\Models\LiveStreaming;
 use App\Models\LiveUserPrivilege;
 use App\Models\Order;
 use App\Models\Qrcodeimg;
@@ -1054,6 +1055,8 @@ class IndexController extends ControllerBackend
     public function getBackVideos(Request $request)
     {
 
+        $res=LiveStreaming::query()->select(['id','title','video_url'])->where('status','=',1)->get()->toArray();
+        return success($res);
         //3701925925345062697 王琨老师19.9第一天新版 http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/2f548dea3701925925345062697/v.f100020.mp4    674M
         //3701925925345105941 王琨老师19.9第二天改版 http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/313ed4c03701925925345105941/v.f100020.mp4    838M
 
