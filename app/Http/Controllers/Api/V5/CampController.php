@@ -158,7 +158,7 @@ class CampController extends Controller
 
 
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $type);
-        $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image');
+        $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image')->toArray();
         if(empty($column['poster'])){ // 如果为空则取用父级
             $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column['classify_column_id']])->pluck('image');
         }
