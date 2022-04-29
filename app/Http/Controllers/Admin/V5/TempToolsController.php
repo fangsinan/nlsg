@@ -25,4 +25,9 @@ class TempToolsController extends ControllerBackend
 //        return $this->getRes($res);
     }
 
+    public function liveOnlineUserCountsTest(){
+        $res = (new TempToolsServers())->liveOnlineUserCountsTest();
+        return $this->getRes($res);
+    }
+
 }

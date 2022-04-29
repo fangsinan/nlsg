@@ -170,7 +170,7 @@ where mu.meikan = 0 and mu.day_flag = 2 and ou.live_id = ' .
                     ->where('status', '=', 1)
                     ->where('live_id', '>', 89)
                     ->where('live_id', '<=', 300)
-                    ->select(['user_id', 'live_id','pay_price'])
+                    ->select(['user_id', 'live_id', 'pay_price'])
                     ->limit($size)
                     ->offset(($page - 1) * $size)
                     ->get();
@@ -180,8 +180,8 @@ where mu.meikan = 0 and mu.day_flag = 2 and ou.live_id = ' .
                     $temp_query      = $temp_query->toArray();
                     $temp_live_array = [];
                     foreach ($temp_query as $v) {
-                        $temp_live_array[] = ['live_id' => $v['live_id'], 'day_flag' => 1,'pay_price'=>$v['pay_price']];
-                        $temp_live_array[] = ['live_id' => $v['live_id'], 'day_flag' => 2,'pay_price'=>$v['pay_price']];
+                        $temp_live_array[] = ['live_id' => $v['live_id'], 'day_flag' => 1, 'pay_price' => $v['pay_price']];
+                        $temp_live_array[] = ['live_id' => $v['live_id'], 'day_flag' => 2, 'pay_price' => $v['pay_price']];
                     }
                     DB::table('temp_tool_meikan_live')->insertOrIgnore($temp_live_array);
                 }
@@ -228,10 +228,10 @@ where mu.meikan = 0 and mu.day_flag = 2 and ou.live_id = ' .
             ];
 
             $live_id_array = DB::table('temp_tool_meikan_live')
-                ->where(function($q){
-                    $q->where('pay_price','=',49.9)->whereIn('week', [1, 2, 4, 5]);
+                ->where(function ($q) {
+                    $q->where('pay_price', '=', 49.9)->whereIn('week', [1, 2, 4, 5]);
                 })
-                ->orWhere('pay_price','=',9.9)
+                ->orWhere('pay_price', '=', 9.9)
                 ->get();
 
 
@@ -261,7 +261,7 @@ where mu.meikan = 0 and mu.day_flag = 2 and ou.live_id = ' .
         return ['code' => true, 'msg' => 'ok', 'begin' => $begin_time, 'end' => date('Y-m-d H:i:s')];
     }
 
-    public function meikan3(){
+    public function meikan3() {
         $while_flag = true;
         $size       = 1000;
         $page       = 1;
@@ -273,7 +273,7 @@ where mu.meikan = 0 and mu.day_flag = 2 and ou.live_id = ' .
                     ->where('type', '=', 10)
                     ->where('is_shill', '=', 0)
                     ->where('status', '=', 1)
-                    ->whereIn('pay_price',[9.9,49.9])
+                    ->whereIn('pay_price', [9.9, 49.9])
                     ->where('live_id', '>', 100)
                     ->select(['user_id', 'live_id'])
                     ->limit($size)
@@ -331,33 +331,33 @@ where mu.meikan = 0 and mu.day_flag = 1 and ou.live_id = ' .
 
     }
 
-    public function insertOnlineUserTest(){
+    public function insertOnlineUserTest() {
         $this->createTestRedisData();
 
 
         $begin_time = time();
 
         $redisConfig = config('database.redis.default');
-        $Redis = new Client($redisConfig);
+        $Redis       = new Client($redisConfig);
         $Redis->select(0);
         $all_count = $Redis->scard('test_user_id_set_1');
 
 
         $while_flag = true;
-        $time_str = date('Y-m-d H:i');
+        $time_str   = date('Y-m-d H:i');
 
-        while($while_flag){
+        while ($while_flag) {
             $temp_list = $Redis->srandmember('test_user_id_set_1', 10000);
             if (empty($temp_list)) {
                 $while_flag = false;
-            }else{
+            } else {
 
                 $add_data = [];
-                foreach ($temp_list as $v){
+                foreach ($temp_list as $v) {
                     $add_data[] = [
-                        'live_id'=>999,
-                        'user_id' => $v,
-                        'live_son_flag' => 168934,
+                        'live_id'         => 999,
+                        'user_id'         => $v,
+                        'live_son_flag'   => 168934,
                         'online_time_str' => $time_str,
                     ];
                 }
@@ -368,21 +368,21 @@ where mu.meikan = 0 and mu.day_flag = 1 and ou.live_id = ' .
         }
 
         $begin_time_2 = time();
-        $all_count_2 = $Redis->scard('test_user_id_set_2');
-        $while_flag = true;
-        $time_str = date('Y-m-d H:i');
+        $all_count_2  = $Redis->scard('test_user_id_set_2');
+        $while_flag   = true;
+        $time_str     = date('Y-m-d H:i');
 
-        while($while_flag){
+        while ($while_flag) {
             $temp_list = $Redis->srandmember('test_user_id_set_2', 10000);
             if (empty($temp_list)) {
                 $while_flag = false;
-            }else{
+            } else {
                 $add_data = [];
-                foreach ($temp_list as $v){
+                foreach ($temp_list as $v) {
                     $add_data[] = [
-                        'live_id'=>999,
-                        'user_id' => $v,
-                        'live_son_flag' => 168934,
+                        'live_id'         => 999,
+                        'user_id'         => $v,
+                        'live_son_flag'   => 168934,
                         'online_time_str' => $time_str,
                     ];
                 }
@@ -393,25 +393,22 @@ where mu.meikan = 0 and mu.day_flag = 1 and ou.live_id = ' .
 
 
         dd([
-            '条数_1'=>$all_count,
-            '开始_1'=>$begin_time,
-            '结束_1'=>time(),
-            '使用_1'=>time() - $begin_time,
-            '条数_2'=>$all_count_2,
-            '开始_2'=>$begin_time_2,
-            '结束_2'=>time(),
-            '使用_2'=>time() - $begin_time_2,
+            '条数_1' => $all_count,
+            '开始_1' => $begin_time,
+            '结束_1' => time(),
+            '使用_1' => time() - $begin_time,
+            '条数_2' => $all_count_2,
+            '开始_2' => $begin_time_2,
+            '结束_2' => time(),
+            '使用_2' => time() - $begin_time_2,
         ]);
-
-
-
 
 
     }
 
-    public function createTestRedisData(){
+    public function createTestRedisData() {
         $redisConfig = config('database.redis.default');
-        $Redis = new Client($redisConfig);
+        $Redis       = new Client($redisConfig);
         $Redis->select(0);
 
         //生成100个随机数的数组
@@ -422,6 +419,47 @@ where mu.meikan = 0 and mu.day_flag = 1 and ou.live_id = ' .
         }
         $Redis->sadd('test_user_id_set_1', $user_id_array);
         $Redis->sadd('test_user_id_set_2', $user_id_array);
+
+    }
+
+    public function liveOnlineUserCountsTest() {
+        $temp_time_str = '2022-04-28 18:00';
+
+        //循环 temp_time_str每次增加一分钟
+        for ($i = 0; $i < 240; $i++) {
+            $temp_time_str = date('Y-m-d H:i', strtotime($temp_time_str) + 60);
+
+            $temp_list = DB::table('nlsg_live_online_user')
+                ->where('live_id', '=', 436)
+                ->where('online_time_str', '=', $temp_time_str)
+                ->get();
+
+            if ($temp_list->isEmpty()) {
+                continue;
+            }
+
+            $temp_list = $temp_list->toArray();
+
+            $all_login_counts = [];
+            foreach ($temp_list as $val) {
+                $temp_v_key = 999 . '_' . $val->live_son_flag;
+
+                if (!isset($all_login_counts[$temp_v_key])) {
+                    $all_login_counts[$temp_v_key] = [
+                        'live_id'         => 999,
+                        'live_son_flag'   => $val->live_son_flag,
+                        'online_time_str' => $val->online_time_str,
+                        'counts'          => 1
+                    ];
+                } else {
+                    $all_login_counts[$temp_v_key]['counts'] += 1;
+                }
+            }
+
+            DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
+
+        }
+
 
     }
 
