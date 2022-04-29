@@ -423,41 +423,44 @@ where mu.meikan = 0 and mu.day_flag = 1 and ou.live_id = ' .
     }
 
     public function liveOnlineUserCountsTest() {
-        $temp_time_str = '2022-04-28 18:00';
 
-        //循环 temp_time_str每次增加一分钟
-        for ($i = 0; $i < 240; $i++) {
-            $temp_time_str = date('Y-m-d H:i', strtotime($temp_time_str) + 60);
+        if (0) {
+            $temp_time_str = '2022-04-28 18:00';
 
-            $temp_list = DB::table('nlsg_live_online_user')
-                ->where('live_id', '=', 436)
-                ->where('online_time_str', '=', $temp_time_str)
-                ->get();
+            //循环 temp_time_str每次增加一分钟
+            for ($i = 0; $i < 240; $i++) {
+                $temp_time_str = date('Y-m-d H:i', strtotime($temp_time_str) + 60);
 
-            if ($temp_list->isEmpty()) {
-                continue;
-            }
+                $temp_list = DB::table('nlsg_live_online_user')
+                    ->where('live_id', '=', 436)
+                    ->where('online_time_str', '=', $temp_time_str)
+                    ->get();
 
-            $temp_list = $temp_list->toArray();
-
-            $all_login_counts = [];
-            foreach ($temp_list as $val) {
-                $temp_v_key = 999 . '_' . $val->live_son_flag;
-
-                if (!isset($all_login_counts[$temp_v_key])) {
-                    $all_login_counts[$temp_v_key] = [
-                        'live_id'         => 999,
-                        'live_son_flag'   => $val->live_son_flag,
-                        'online_time_str' => $val->online_time_str,
-                        'counts'          => 1
-                    ];
-                } else {
-                    $all_login_counts[$temp_v_key]['counts'] += 1;
+                if ($temp_list->isEmpty()) {
+                    continue;
                 }
+
+                $temp_list = $temp_list->toArray();
+
+                $all_login_counts = [];
+                foreach ($temp_list as $val) {
+                    $temp_v_key = 999 . '_' . $val->live_son_flag;
+
+                    if (!isset($all_login_counts[$temp_v_key])) {
+                        $all_login_counts[$temp_v_key] = [
+                            'live_id'         => 999,
+                            'live_son_flag'   => $val->live_son_flag,
+                            'online_time_str' => $val->online_time_str,
+                            'counts'          => 1
+                        ];
+                    } else {
+                        $all_login_counts[$temp_v_key]['counts'] += 1;
+                    }
+                }
+
+                DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
+
             }
-
-            DB::table('nlsg_live_online_user_counts')->insert($all_login_counts);
-
         }
 
 
