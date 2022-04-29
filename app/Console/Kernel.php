@@ -136,25 +136,44 @@ class Kernel extends ConsoleKernel
 
 //        $schedule->exec('php artisan imJob')->everyMinute();
 
-        $schedule->call(function () {
-            LiveConsoleServers::CrontabOnlineUserRedis();//直播间在线人数存入redis
-        })->everyMinute()->runInBackground();//每分
+//        $schedule->call(function () {
+//            LiveConsoleServers::CrontabOnlineUserRedis();//直播间在线人数存入redis
+//        })->everyMinute()->runInBackground();//每分
+//
+//        $schedule->call(function () {
+//            LiveConsoleServers::CrontabOnlineUser();//直播间在线人数入库，方便调试
+//        })->everyMinute()->runInBackground();//每分
+//
+//        $schedule->call(function () {
+//            LiveConsoleServers::CrontabJoinRedis();//加入直播间记录入库
+//        })->everyMinute()->runInBackground();//每分
+//
+//        $schedule->call(function () {
+//            LiveConsoleServers::CrontabCommentRedis();//评论入库
+//        })->everyMinute()->runInBackground();//每分
+//
+//        $schedule->call(function () {
+//            LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
+//        })->everyFiveMinutes()->runInBackground();//每5分
 
-        $schedule->call(function () {
-            LiveConsoleServers::CrontabOnlineUser();//直播间在线人数入库，方便调试
-        })->everyMinute()->runInBackground();//每分
+        $schedule->command('command:CrontabOnlineUserRedis')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabOnlineUser')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabJoinRedis')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabCommentRedis')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabGiftRedis')
+            ->everyFiveMinutes()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
 
-        $schedule->call(function () {
-            LiveConsoleServers::CrontabJoinRedis();//加入直播间记录入库
-        })->everyMinute()->runInBackground();//每分
 
-        $schedule->call(function () {
-            LiveConsoleServers::CrontabCommentRedis();//评论入库
-        })->everyMinute()->runInBackground();//每分
 
-        $schedule->call(function () {
-            LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
-        })->everyFiveMinutes()->runInBackground();//每5分
 
         $schedule->call(function () {
             WechatServers::GetOpenId(); //抓取微信公众号关注用户
