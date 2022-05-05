@@ -253,6 +253,10 @@ class erpOrderServers
             return ['code'=>false,'msg'=>'退款金额不能大于支付金额'];
         }
 
+        if ($refund_money > ($check_order->pay_price - $check_order->shill_refund_sum)){
+            return ['code'=>false,'msg'=>'退款金额不能大于可退金额'];
+        }
+
         $now = time();
         $temp_pay_days = floor(($now - strtotime($check_order->pay_time)) / 86400);
         if ($temp_pay_days > 90) {
