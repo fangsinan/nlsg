@@ -276,6 +276,7 @@ class erpOrderServers
         }
 
         $check_order->is_shill = 1;
+        $check_order->shill_job_price = $refund_money;
         $order_res = $check_order->save();
         if ($order_res === false) {
             DB::rollBack();
