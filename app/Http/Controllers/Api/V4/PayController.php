@@ -243,7 +243,7 @@ class PayController extends Controller
 
         $userInfo = User::find($OrderInfo['user_id']);
         if ($userInfo['is_test_pay'] == 1) {
-            if (empty($userInfo['test_pay_price'])) {
+            if (empty((float)$userInfo['test_pay_price'])) {
                 $OrderInfo['price'] = 0.01;
             }else{
                 $OrderInfo['price'] = $userInfo['test_pay_price'];
