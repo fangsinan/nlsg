@@ -7,4 +7,5 @@ class DoudianOpConfig
     public $httpConnectTimeout = 1000;
     public $httpReadTimeout = 5000;
     public $openRequestUrl = "https://openapi-fxg.jinritemai.com";
+    public $accessTokenStr;
 }
