@@ -344,7 +344,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
     Route::get('temp_tools/iout', 'TempToolsController@insertOnlineUserTest');
     Route::get('temp_tools/iouct', 'TempToolsController@liveOnlineUserCountsTest');
-
+    Route::get('erp_order/dtest', 'ErpOrderController@douTest');
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
 
         //推荐位
@@ -376,6 +376,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('address/add', 'AddressController@create');
         Route::post('erp_order/bind_address', 'ErpOrderController@bindAddress');
         Route::get('address/get_data', 'AddressController@getData');//收货地址详情
+
 
 
         Route::get('teacher/list', 'TeacherController@list');

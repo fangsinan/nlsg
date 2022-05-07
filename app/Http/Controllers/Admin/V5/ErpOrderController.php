@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V5;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Servers\V5\DouDianServers;
 use App\Servers\V5\erpOrderServers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -103,4 +104,7 @@ class ErpOrderController extends ControllerBackend
         exit();
     }
 
+    public function douTest(){
+        (new DouDianServers())->test();
+    }
 }
