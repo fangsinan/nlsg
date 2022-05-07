@@ -839,6 +839,35 @@ class WechatPay extends Controller
 					    ], ['aliyun']);
 					}
 
+                    //赠送记忆力课程
+                    if($liveData['user_id']=161904 && $liveData['classify']==1 && $liveData['price']>=49.9){
+
+                        $now_date = date('Y-m-d H:i:s');
+                        $end_date = date('Y-m-d 23:59:59', strtotime('+1 years'));
+
+                        $WorksArr=['id'=>435,'type'=>6];
+                        $check = Subscribe::where('user_id', '=', $user_id)
+                            ->where('relation_id', '=',$WorksArr['id'])
+                            ->where('type', '=', $WorksArr['type'])
+                            ->where('status', '=', 1)
+                            ->where('end_time', '>=', $now_date)
+                            ->first();
+
+                        if (empty($check)){
+                            $add_data = [];
+                            $add_data['type'] = $WorksArr['type'];
+                            $add_data['user_id'] = $user_id;
+                            $add_data['relation_id'] = $WorksArr['id'];
+                            $add_data['pay_time'] = $now_date;
+                            $add_data['start_time'] = $now_date;
+                            $add_data['end_time'] = $end_date;
+                            $add_data['status'] = 1;
+                            $add_data['give'] = 3;
+                            DB::table('nlsg_subscribe')->insert($add_data);
+                        }
+
+                    }
+
                     //暂时先不启用直接分账
 //                    //调用直播分账
 //                    if ( !empty($twitter_id) && $twitter_id != $user_id ) {
