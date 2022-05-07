@@ -170,8 +170,8 @@ class OrderController extends Controller
 
         if(empty($tweeter_code)){
             $tweeter_code = !empty($params['inviter']) ? intval($params['inviter']) : 0;
-        } 
-
+        }
+        
         //虚拟用户
         if($os_type ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
             return error(4000, '请修改手机号');
@@ -200,7 +200,7 @@ class OrderController extends Controller
 
         }
 
-        
+
 
         //检测下单参数有效性
         $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $sub_type);
