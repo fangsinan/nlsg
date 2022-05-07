@@ -115,17 +115,17 @@ class OrderController extends Controller
             return ['code' => 0, 'msg' => '您已订阅过'];
         }
 
-        //校验推客信息有效
-        $tweeter_level = User::getLevel($tweeter_code);
-        if ($tweeter_level > 0) {
-            //推客是否订阅
-            $is_sub = Subscribe::isSubscribe($tweeter_code, $target_id, $type);
-            if ($is_sub == 0) {
-                $tweeter_code = 0;
-            }
-        } else {
-            $tweeter_code = 0;
-        }
+        //校验推客信息有效  5月7日 已经取消了等级层级
+        // $tweeter_level = User::getLevel($tweeter_code);
+        // if ($tweeter_level > 0) {
+        //     //推客是否订阅
+        //     $is_sub = Subscribe::isSubscribe($tweeter_code, $target_id, $type);
+        //     if ($is_sub == 0) {
+        //         $tweeter_code = 0;
+        //     }
+        // } else {
+        //     $tweeter_code = 0;
+        // }
         return ['code' => 1, 'tweeter_code' => $tweeter_code];
 
     }
