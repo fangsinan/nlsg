@@ -589,19 +589,66 @@ class ErpServers
 
     //订单主动查询
     public function tradeQuery() {
-        $c             = new WdtClient();
-        $c->sid        = $this->sid;
-        $c->appkey     = $this->appkey;
-        $c->appsecret  = $this->appsecret;
-        $c->gatewayUrl = 'https://api.wangdian.cn/openapi2/trade_query.php';
+//        $c             = new WdtClient();
+//        $c->sid        = $this->sid;
+//        $c->appkey     = $this->appkey;
+//        $c->appsecret  = $this->appsecret;
+//        $c->gatewayUrl = 'https://api.wangdian.cn/openapi2/trade_query.php';
+//
+//        $c->putApiParam('shop_no', $this->shop_no);
+//        $c->putApiParam('is_part_sync_able', 1);
+//        $c->putApiParam('limit', 100);
+//        $c->putApiParam('src_tid', '22040813074328797437103');
+//        $json = $c->wdtOpenApi();
+//        $json = json_decode($json, true);
+//        dd($json);
 
-        $c->putApiParam('shop_no', $this->shop_no);
-        $c->putApiParam('is_part_sync_able', 1);
-        $c->putApiParam('limit', 100);
-        $c->putApiParam('src_tid', '22040813074328797437103');
-        $json = $c->wdtOpenApi();
-        $json = json_decode($json, true);
-        dd($json);
+
+
+        if(0){
+            $list = Order::query()->where('express_info_id','=',5649)
+                ->where('created_at','>','2022-04-06 00:00:00')
+                ->select(['id','express_info_id','created_at'])
+                ->get()
+                ->toArray();
+
+            $log = [];
+
+            DB::beginTransaction();
+            foreach ($list as $v) {
+                $now_date = date('Y-m-d 10',strtotime($v['created_at'] .' +1 day'));
+                $now_date = $now_date.':'.rand(10,50).':'.rand(10,50);
+
+                $history                  = [];
+                $history['number']        = '';
+                $history['type']          = '';
+                $history['typename']      = '无单号物流';
+                $history['express_phone'] = '';
+                $history['logo']          = '';
+                $history['list']          = [
+                    [
+                        'time'   => $now_date,
+                        'status' => '商家发货'
+                    ]
+                ];
+                $ex_data['express_id']  = 0;
+                $ex_data['express_num'] = '';
+                $ex_data['history'] = json_encode($history);
+
+                $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
+
+                $express_info_id       = DB::table('nlsg_express_info')->insertGetId($ex_data);
+                Order::query()->where('id', '=', $v['id'])
+                    ->update([
+                        'express_info_id' => $express_info_id
+                    ]);
+
+                $log[] = $v['id'].'-'.$express_info_id;
+            }
+            DB::commit();
+            dd($log);
+        }
+
     }
 
     public function __construct() {
