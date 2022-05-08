@@ -255,7 +255,7 @@ class ErpServers
                     $now_date = date('Y-m-d H:i:s');
                     //训练营教材订单
                     $send_data['express_id']      = $expressCompany[$v['logistics_type']] ?? 0;
-                    $send_data['num']             = $v['logistics_no'];
+                    $send_data['num']             = $v['logistics_no'] ?? '';
                     $send_data['order_id']        = $tid->id ?? 0;
                     $send_data['order_detail_id'] = 0;
 
@@ -264,7 +264,7 @@ class ErpServers
                         ->where('express_num', '=', $send_data['num'])
                         ->first();
 
-                    if ($check_ex) {
+                    if ($check_ex && !empty($send_data['num'])) {
                         $express_info_id = $check_ex->id;
                     } else {
                         $ex_data['express_id']  = $send_data['express_id'];
@@ -587,23 +587,40 @@ class ErpServers
 
     }
 
+    //订单主动查询
+    public function tradeQuery() {
+        $c             = new WdtClient();
+        $c->sid        = $this->sid;
+        $c->appkey     = $this->appkey;
+        $c->appsecret  = $this->appsecret;
+        $c->gatewayUrl = 'https://api.wangdian.cn/openapi2/trade_query.php';
+
+        $c->putApiParam('shop_no', $this->shop_no);
+        $c->putApiParam('is_part_sync_able', 1);
+        $c->putApiParam('limit', 100);
+        $c->putApiParam('src_tid', '22040813074328797437103');
+        $json = $c->wdtOpenApi();
+        $json = json_decode($json, true);
+        dd($json);
+    }
+
     public function __construct() {
 
-        $this->sid                  = config('env.ERP_SID');
-        $this->shop_no              = config('env.ERP_SHOP_NO');
-        $this->appkey               = config('env.ERP_APPKEY');
-        $this->appsecret            = config('env.ERP_APPSECRET');
-        $this->trade_push           = config('env.ERP_TRADE_PUSH');
-        $this->logistics_sync_query = config('env.ERP_LOGISTICS_SYNC_QUERY');
-        $this->logistics_sync_ack   = config('env.ERP_LOGISTICS_SYNC_ACK');
+//        $this->sid                  = config('env.ERP_SID');
+//        $this->shop_no              = config('env.ERP_SHOP_NO');
+//        $this->appkey               = config('env.ERP_APPKEY');
+//        $this->appsecret            = config('env.ERP_APPSECRET');
+//        $this->trade_push           = config('env.ERP_TRADE_PUSH');
+//        $this->logistics_sync_query = config('env.ERP_LOGISTICS_SYNC_QUERY');
+//        $this->logistics_sync_ack   = config('env.ERP_LOGISTICS_SYNC_ACK');
 
-//        $this->sid                  = 'nlsg2';
-//        $this->shop_no              = '04';
-//        $this->appkey               = 'nlsg2-gw';
-//        $this->appsecret            = 'c93045fe195cc51977ad8daab2e4b664';
-//        $this->trade_push           = 'https://api.wangdian.cn/openapi2/trade_push.php';
-//        $this->logistics_sync_query = 'https://api.wangdian.cn/openapi2/logistics_sync_query.php';
-//        $this->logistics_sync_ack   = 'https://api.wangdian.cn/openapi2/logistics_sync_ack.php';
+        $this->sid                  = 'nlsg2';
+        $this->shop_no              = '04';
+        $this->appkey               = 'nlsg2-gw';
+        $this->appsecret            = 'c93045fe195cc51977ad8daab2e4b664';
+        $this->trade_push           = 'https://api.wangdian.cn/openapi2/trade_push.php';
+        $this->logistics_sync_query = 'https://api.wangdian.cn/openapi2/logistics_sync_query.php';
+        $this->logistics_sync_ack   = 'https://api.wangdian.cn/openapi2/logistics_sync_ack.php';
 
     }
 
