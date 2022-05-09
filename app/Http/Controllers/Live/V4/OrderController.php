@@ -257,11 +257,10 @@ class OrderController extends ControllerBackend
             exit();
         }
         $this->user = BackendUser::where('id', '=', $user_id)->first()->toArray();
-
         $request->offsetSet('excel_flag', '1');
 
         $columns = ['订单编号', '直播标题', '用户昵称', '用户手机', '商品', '类型',
-            '商品价格', '支付价格', '源账户', '源直播', '源推荐账户', '支付状态', '支付方式', '下单时间', '订单来源'];
+            '商品价格', '支付价格', '推荐账户', '源直播', '源推荐账户', '支付状态', '支付方式', '下单时间', '订单来源'];
         $fileName = 'XiaoShouLieBiao' . date('Y-m-d H:i') . '.csv';
 
         header('Content-Description: File Transfer');
@@ -318,9 +317,14 @@ class OrderController extends ControllerBackend
 
                     $temp_v['g_p'] = $v->goods['price'] ?? '';
                     $temp_v['p_p'] = $v->pay_price ?? '';
-                    $temp_v['t_p'] = $v->t_phone ?? '';
-                    $temp_v['t_t'] = $v->t_title ?? '';
-                    $temp_v['t_l'] = $v->live_phone ?? '';
+
+//                    $temp_v['t_p'] = $v->t_phone ?? '';
+//                    $temp_v['t_t'] = $v->t_title ?? '';
+//                    $temp_v['t_l'] = $v->live_phone ?? '';
+
+                    $temp_v['t_p'] = $v->twitter->phone ?? '';
+                    $temp_v['t_t'] = $v->inviter_info['title'] ?? '';
+                    $temp_v['t_l'] = $v->inviter_info['username'] ?? '';
 
                     switch ((int)$v->status) {
                         case 1:
