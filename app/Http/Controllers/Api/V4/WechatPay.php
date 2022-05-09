@@ -681,6 +681,7 @@ class WechatPay extends Controller
                     'pay_time' => date("Y-m-d H:i:s", $time),
                     'pay_price' => $total_fee,
                     'pay_type' => $pay_type,
+                    'channel_show' => 1, //默认渠道显示
                 ];
                 $orderRst = Order::where(['ordernum' => $out_trade_no])->update($data1);
 
