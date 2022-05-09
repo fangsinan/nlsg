@@ -10,13 +10,14 @@ class WorksInfo extends Base
     protected $table = 'nlsg_works_info';
 
     protected $fillable = [
-         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time','share_img','like_num'
+         'pid', 'column_id','type', 'title','rank','view_num', 'section', 'introduce', 'url', 'status','video_id','free_trial','timing_online','duration', 'online_time', 'timing_time','share_img','like_num','old_share_img'
     ];
 
 
     // $type  1 单课程  2 多课程  3讲座 4训练营
-    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$column_data = [],$os_type=1)
+    public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$column_data = [],$os_type=1,$version='5.0.0')
     {
+        
         $is_free = $column_data['is_free']??0;
         $where = ['status' => 4];
         if ($type == 1) {
@@ -32,7 +33,7 @@ class WorksInfo extends Base
         }
         $query = WorksInfo::select([
             'id','pid', 'type', 'title', 'section', 'introduce', 'url', 'callback_url1', 'callback_url1', 'callback_url2',
-            'callback_url3', 'view_num', 'duration', 'free_trial','rank','share_img','like_num'
+            'callback_url3', 'view_num', 'duration', 'free_trial','rank','share_img','like_num','old_share_img'
         ])->where($where)->orderBy('rank',$order)->orderBy('id', $order);
         //->paginate($page_per_page)->toArray();
 
@@ -65,7 +66,11 @@ class WorksInfo extends Base
 
             unset($works_data[$key]['url']);
 
-
+            //根据版本号 获取新旧训练营图 5.4.3
+            if ( version_compare($version, '5.0.4', '<')) {
+                $works_data[$key]['share_img'] = $val['old_share_img'];
+            }
+            unset($works_data[$key]['old_share_img']);
             $works_data[$key]['time_leng'] = (string)0;
             $works_data[$key]['time_number'] = (string)0;
             $works_data[$key]['time_is_end'] = 0;

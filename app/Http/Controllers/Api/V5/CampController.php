@@ -240,6 +240,7 @@ class CampController extends Controller
         $flag = $request->input('flag', '');
         $page = $request->input('page', 1);
         $size = $request->input('size', 10);
+        $version = $request->input('version')??'5.0.0';
         $order = $order ?? 'asc';
 
         $page = intval($page) <= 0 ?1:$page;
@@ -284,7 +285,7 @@ class CampController extends Controller
         }
         //查询章节、
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($getInfo_id, $is_sub, $user_id, $getInfo_type, $order, $page_per_page, $page, $size, $column_data,$os_type);
+        $info = $infoObj->getInfo($getInfo_id, $is_sub, $user_id, $getInfo_type, $order, $page_per_page, $page, $size, $column_data,$os_type,$version);
         if($column_data['type'] == 3) {
             //训练营规定展示章节
             $info = array_reverse($info);
