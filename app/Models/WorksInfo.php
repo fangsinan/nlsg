@@ -214,12 +214,12 @@ class WorksInfo extends Base
         if($type == 6 || $type == 7){
             $query = self::where(['column_id' => $get_info_id,'type'=>1,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img','like_num']);
+                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img','like_num','old_share_img']);
             $works_id = $column_id;  // 讲座直接关联info表
         }else{
             $query = self::where(['pid'=>$works_id,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section', 'size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3','like_num']);
+                    'introduce', 'section', 'size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3','like_num','share_img','old_share_img']);
         }
 
 
@@ -365,6 +365,10 @@ class WorksInfo extends Base
         $replay_num = CommentReply::whereIn('comment_id',$CommentIds)->count();
         $info_list[$info_key]['comment_num'] = (int)(count($CommentIds) + $replay_num);
 
+        //根据版本号 获取新旧训练营图 5.4.3
+        if ( version_compare($params['version']??'0', '5.0.4', '<')) {
+            $info_list[$info_key]['share_img'] = $info_list[$info_key]['old_share_img'];
+        }
 
         $list['previous'] = $this->three2one($info_list[$info_key - 1], $is_show_url);
         $list['current'] = $this->three2one($info_list[$info_key], $is_show_url);
