@@ -740,7 +740,7 @@ class WorksController extends Controller
         $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works_id, 'status' => 4,'free_trial'=>1])->first();
 
         $res = [
-            // 'column_info'  => $column,
+            'column_info'  => $column,
             'works_data'   => $works_data,
             'works_info'   => $info,
             'history_data'   => $history_data,
