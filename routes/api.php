@@ -560,6 +560,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     //切歌
     Route::any('works/neighbor', 'WorksController@neighbor');
     Route::any('works/get_lists_works', 'WorksController@getListsWorks');
+    Route::get('works/get_works_detail', 'WorksController@getWorksDetail');
 
 
 
@@ -591,6 +592,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         
         //课程
         Route::get('works/edit_history_time', 'WorksController@editHistoryTime');
+        Route::get('works/works_sub_works', 'WorksController@worksSubWorks');
         //训练营
         Route::any('camp/camp_end_show', 'CampController@campEndShow');
         Route::get('camp/camp_like', 'CampController@campLike');

@@ -38,8 +38,13 @@ class ReplyController extends Controller
     {
         $user_id  = $this->user['id'];
         $input    = $request->all();
-        $input['type'] = $input['type']??1;
-        if(!empty($input['type']) && $input['type'] == 1){
+        //兼容老版本comment_type   v5所有次级评论相关以comment_type为主
+        if(isset($input['comment_type'])){
+            $comment_type = $input['comment_type']??1;
+        }else{
+            $comment_type = $input['type']??1;
+        }
+        if(!empty($comment_type) && $comment_type == 1){
             $comment = Comment::where('id', $input['comment_id'])->first();
             if(empty($comment)){
                 return error(1000,'评论不存在');

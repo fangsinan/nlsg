@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\CacheTools;
+use App\Models\ChannelWorksList;
+use App\Models\Collection;
 use App\Models\Column;
+use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Lists;
 use App\Models\Subscribe;
@@ -598,6 +601,206 @@ class WorksController extends Controller
         return $this->success();
     }
 
+
+
+
+
+
+
+
+
+    /**
+     *  {get} api/v5/works/get_works_detail   课程详情
+     * @apiName get_works_detail
+     * @apiVersion 5.0.0
+     * @apiGroup works
+     *
+     * @apiParam {int} works_id 课程id
+     * @apiParam {int} user_id 用户id
+     * @apiParam {int} order 排序  asc默认正序 desc
+     *
+     */
+    public function getWorksDetail(Request $request){
+
+        $works_id = $request->input('works_id',0);
+        $flag = $request->input('flag','');
+        $page = $request->input('page',1);
+        $size = $request->input('size',10);
+        $user_id   = $this->user['id'] ?? 0;
+        $order   = $request->input('order','');
+        $activity_tag = $request->input('activity_tag', '');
+        //服务器配置了header参数过滤 不能用下划线
+        $channel_tag = $request->header('channel-tag','');
+
+        if($order == ''){  //默认
+            $order = 'asc';
+            if($works_id == 566){
+                $order = 'desc';
+            }
+        }
+
+        if( empty($works_id) ){
+            return $this->error(0,'works_id 不能为空');
+        }
+        //是否订阅
+        $is_sub = Subscribe::isSubscribe($user_id,$works_id,2);
+        if( $is_sub ==1 ){
+            $where = [];
+        }else{
+            $where = ['status'=>4];
+        }
+
+        //查询当前课程
+        $works_data = Works::select(['id','column_id','user_id' ,'type','title','subtitle', 'original_price', 'price',
+            'cover_img','detail_img','message','content','is_pay','is_end','is_free','subscribe_num',
+            'collection_num','comment_num','chapter_num','is_free','is_audio_book','view_num'])
+            ->where($where)
+            ->find($works_id);
+        if ($channel_tag === 'cytx') {
+            $temp_price = ChannelWorksList::getPrice(2, $works_id);
+            if (!empty($temp_price)) {
+                $works_data->price = $temp_price;
+                $works_data->original_price = $temp_price;
+            }
+        }
+
+        if(empty($works_data)){
+            return $this->error(0,'课程不存在或已下架');
+        }
+        $works_data = $works_data->toArray();
+
+        //查询章节
+        $infoObj = new WorksInfo();
+        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size,$works_data);
+        if ($flag === 'catalog'){
+            $res = [
+                'works_info'          => $info,
+            ];
+            return $this->success($res);
+        }
+ 
+        // 身份价格   转换成string保证json_encode 精确度
+        $works_data['twitter_price'] = (string)GetPriceTools::Income(1,2,0,2,$works_data['user_id'],$works_id);
+        $works_data['black_price']   = (string)GetPriceTools::Income(1,3,0,2,$works_data['user_id'],$works_id);
+        $works_data['emperor_price'] = (string)GetPriceTools::Income(1,4,0,2,$works_data['user_id'],$works_id);
+        $works_data['service_price'] = (string)GetPriceTools::Income(1,5,0,2,$works_data['user_id'],$works_id);
+        $works_data['content']       = $works_data['content'];
+
+        //查询所属专栏
+        $field = ['id', 'name', 'type', 'user_id', 'title', 'subtitle', 'message', 'original_price', 'price', 'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
+        $field = ['id', 'name', 'type', 'user_id', 'title', 'subtitle', 'message',  'online_time', 'works_update_time', 'cover_pic', 'details_pic', 'is_end', 'subscribe_num'];
+        $column = Column::where('id',$works_data['column_id'])
+                    ->first($field);
+        if($column){
+            $column = $column->toArray();
+        }
+
+        $userInfo = User::find($works_data['user_id']);
+        $column['title'] = $userInfo['honor'] ?? '';
+
+        $works_data['info_num'] = WorksInfo::where('pid','=',$works_id)->where('status','=',4)->count();
+
+        //作者信息
+        //查询课程分类
+        $category = WorksCategoryRelation::select('category_id')->with([
+            'categoryName'=>function($query) use($works_id){
+                $query->select('id','name')->where('status',1);
+            }])->where(['work_id'=>$works_id])->first();
+        $works_data['category_name'] = $category->CategoryName->name ??'';
+        $works_data['user_info'] = User::find($works_data['user_id']);
+
+
+        //查询总的历史记录进度`
+        $hisCount = History::getHistoryCount($works_data['id'],4,$user_id);  //讲座
+        $works_data['history_count'] = 0;
+        if($works_data['info_num'] > 0 ){
+            $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
+        }
+
+        $isCollect = Collection::where(['user_id'=>$user_id,'relation_id'=>$works_id,'info_id'=>0, 'type'=>2])->first();
+
+        if($works_data['is_audio_book'] == 0){
+            $relation_type = 4;
+        }else{
+            $relation_type = 3;
+        }
+        $history_data = History::getHistoryData($works_data['id'],$relation_type,$user_id);
+        //免费试听的章节
+        $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works_id, 'status' => 4,'free_trial'=>1])->first();
+
+        $res = [
+            // 'column_info'  => $column,
+            'works_data'   => $works_data,
+            'works_info'   => $info,
+            'history_data'   => $history_data,
+            'is_sub'         => $is_sub ? 1: 0,
+            'is_collection'  => $isCollect ? 1 : 0,
+            'free_trial_id'  => (string)$free_trial['id'] ?? '',
+            'c'=>$channel_tag,
+        ];
+        return $this->success($res);
+    }
+
+
+
+    /**
+     * {get} /api/v4/works/works_sub_works  免费课程静默订阅操作
+     * @apiName works_sub_works
+     * @apiVersion 1.0.0
+     * @apiGroup works
+     *
+     * apiParam {int} relation_id  订阅id、
+     * apiParam {int} sub_type  订阅对象类型  1 专栏  2作品 3直播  4会员 5线下产品  6讲座
+     *
+     */
+    public  function worksSubWorks(Request $request) {
+
+        $relation_id = $request->input('relation_id',0);
+        $sub_type = $request->input('sub_type',0);
+        $user_id = $this->user['id'] ?? 0;
+
+        if( !is_numeric($relation_id) ){
+            return $this->success();
+        }
+        //校验是否免费
+        if($sub_type == 1 || $sub_type ==6){
+            $model = new Column();
+            $result = $model->getIndexColumn([$relation_id]);
+        }
+        if($sub_type == 2){
+            $model = new Works();
+            $result = $model->getIndexWorks([$relation_id]);
+        }
+
+        if(empty($result[0]['is_free']) || $result[0]['is_free'] == 0 ){
+            return $this->success();
+        }
+
+        $starttime = strtotime(date('Y-m-d', time()));
+        $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
+
+        $subscribe = [
+            'user_id' => $user_id, //会员id
+            'pay_time' => date("Y-m-d H:i:s", $starttime), //支付时间
+            'type' => $sub_type,
+            'order_id' => 0, //订单id
+            'status' => 1,
+            'start_time' => date("Y-m-d H:i:s", $starttime),
+            'end_time' => date("Y-m-d H:i:s", $endtime),
+            'relation_id' => $relation_id,
+        ];
+        $sub_res = Subscribe::firstOrCreate($subscribe);
+        if($sub_res->wasRecentlyCreated){
+            if($sub_type == 1 || $sub_type ==6){
+                Column::where(['id' => $relation_id])->increment('subscribe_num');
+            }else if($sub_type == 2){
+                Works::where(['id' => $relation_id])->increment('subscribe_num', 1);
+            }
+        }
+
+
+        return $this->success();
+    }
 
 
 }
