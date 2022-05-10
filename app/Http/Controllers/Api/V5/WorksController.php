@@ -631,6 +631,17 @@ class WorksController extends Controller
         $activity_tag = $request->input('activity_tag', '');
         //服务器配置了header参数过滤 不能用下划线
         $channel_tag = $request->header('channel-tag','');
+        $os_type = $request->input('os_type',0);
+        $version = $request->input('version','5.0.0');
+
+
+        $validator = Validator::make($request->all(), [
+            'works_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first());
+        }
+
 
         if($order == ''){  //默认
             $order = 'asc';
@@ -668,11 +679,11 @@ class WorksController extends Controller
             return $this->error(0,'课程不存在或已下架');
         }
         $works_data = $works_data->toArray();
-
+        
         //查询章节
         $infoObj = new WorksInfo();
-        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size,$works_data);
-        if ($flag === 'catalog'){
+        $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size,$works_data,$os_type,$version);
+        if ($flag === 'catalog'){           
             $res = [
                 'works_info'          => $info,
             ];

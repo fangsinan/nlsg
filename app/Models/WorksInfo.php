@@ -66,8 +66,8 @@ class WorksInfo extends Base
 
             unset($works_data[$key]['url']);
 
-            //根据版本号 获取新旧训练营图 5.4.3
-            if ( version_compare($version, '5.0.4', '<')) {
+            //类型是训练营 根据版本号 获取新旧训练营图 5.4.3
+            if ($type == 4 && version_compare($version, '5.0.4', '<')) {
                 $works_data[$key]['share_img'] = $val['old_share_img'];
             }
             unset($works_data[$key]['old_share_img']);
