@@ -32,47 +32,6 @@ class WorksController extends Controller
      * @apiGroup works
      *
      * @apiParam {int} lists_id  集合id
-     *
-     * @apiSuccess {string} result json
-     * @apiSuccessExample Success-Response:
-    {
-    code: 200,
-    msg: "成功",
-    now: 1639637821,
-    data: [
-    {
-    id: 37,
-    title: "亲子团购专题",
-    subtitle: "精品专题",
-    cover: "nlsg/goods/20191122172217903514.png",
-    num: 1,
-    list_works: [
-    {
-    id: 76,
-    lists_id: 37,
-    type: 1,
-    works_id: 104,
-    works: {
-    id: 104,
-    user_id: 162021,
-    type: 3,
-    title: "不要让手机毁了你的孩子！",
-    subtitle: "",
-    cover_img: "/wechat/works/video/161627/2017071017423885933.jpg",
-    original_price: "0.00",
-    price: "0.00",
-    message: null,
-    is_free: 1,
-    user: {
-    id: 162021,
-    nickname: "能量 君",
-    headimg: "/wechat/logo.png"
-    }
-    }
-    }
-    ]
-    }
-    ]}
      */
     function getListsWorks(Request $request){
         $lists_id = $request->input("lists_id");

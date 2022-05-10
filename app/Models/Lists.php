@@ -133,6 +133,14 @@ class Lists extends Model
                     } else {
                         unset($lists[$k]['list_works'][$kk]);
                     }
+
+                    // 获取第一章节 info_id
+                    $first_info_id = WorksInfo::select('id')->where(['pid'=>$vv['works_id'],'type'=>2,'status'=>4 ])->orderBy('rank','asc')->first();
+                    $vv['first_info_id'] = $first_info_id['id'] ?? 0;
+
+
+
+                    
                     $vv['historyData'] = History::getHistoryData($vv['id'], 4, $uid);
 
 
