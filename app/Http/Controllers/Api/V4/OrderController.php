@@ -188,7 +188,7 @@ class OrderController extends Controller
         if ($column_data['type'] == 2) {   //讲座类型
             $sub_type = 6;
             $coupon_type = 7;
-        }else if ($column_data['type'] == 3) { // 训练营类型
+        }else if ($column_data['type'] == 3 || $column_data['type'] == 4) { // 训练营类型
             $sub_type = 7;
             $coupon_type = 8;
 
@@ -237,7 +237,7 @@ class OrderController extends Controller
         $type = 1;
         if ($column_data['type'] == 2) {
             $type = 15;
-        }else if ($column_data['type'] == 3) {
+        }else if ($column_data['type'] == 3 || $column_data['type'] == 4) {
             $type = 18;
         }
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
