@@ -293,26 +293,33 @@ class WorksInfo extends Base
             }
 
         }else{
+
             $works_info = DB::table('nlsg_works as w')
-                ->leftJoin('nlsg_subscribe as s', function ($join) use ($user,$now_date) {
-                    $join->on('s.relation_id', '=', 'w.id')
-                        ->whereRaw('s.user_id = ' . $user['id'])
-                        ->where('s.type', '=', 2)
-                        ->where('s.start_time','<',$now_date)
-                        ->where('s.end_time','>',$now_date)
-                        ->where('s.status', '=', 1)
-                        ->where('s.is_del', '=', 0);
-                })
-                ->where('w.id', '=', $works_id)
-                ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num','w.collection_num','w.is_audio_book',
-                    DB::raw('if(s.id > 0,1,0) as is_sub')])
-                ->first();
+            ->leftJoin('nlsg_subscribe as s', function ($join) use ($user,$now_date) {
+                $join->on('s.relation_id', '=', 'w.id')
+                    ->whereRaw('s.user_id = ' . $user['id'])
+                    ->where('s.type', '=', 2)
+                    ->where('s.start_time','<',$now_date)
+                    ->where('s.end_time','>',$now_date)
+                    ->where('s.status', '=', 1)
+                    ->where('s.is_del', '=', 0);
+            })
+            ->where('w.id', '=', $works_id)
+            ->select(['w.id', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num','w.collection_num','w.is_audio_book',
+                DB::raw('if(s.id > 0,1,0) as is_sub')])
+            ->first();
+     
             $sub_type = 2;
         }
 //        if($user['level'] > 2){
 //            $works_info->is_sub = 1;
 //        }
-
+        //是否大咖讲书
+        $works_info->is_teacherBook = self::IsTeacherBook($works_id);
+        if($works_info->is_teacherBook == 1){  // 大咖讲书是组合售卖
+            $works_info->id = 40;
+            $sub_type = 8;
+        }
         $works_info->is_sub = Subscribe::isSubscribe($user['id'],$works_info->id,$sub_type);
 
 
