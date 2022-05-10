@@ -860,7 +860,7 @@ class UserController extends Controller
             $val['works_name'] = '';
             $val['works_cover_img'] = '';
             $val['worksInfo_name'] = '';
-
+            $val['is_teacherBook'] = 0;
 
             if ($val['relation_type'] == 1 or $val['relation_type'] == 2 or $val['relation_type'] == 5) {
 //                $column = Column::find($val['relation_id']);
@@ -871,6 +871,7 @@ class UserController extends Controller
             if ($val['relation_type'] == 3 or $val['relation_type'] == 4) {
 //                $works = Works::find($val['relation_id']);
                 $works = Works::where(['id'=>$val['relation_id'],'status'=>4])->first();
+                $val['is_teacherBook'] = WorksInfo::IsTeacherBook($val['relation_id']);
                 $val['works_name'] = $works['title'] ?? '';
                 $val['works_cover_img'] = $works['cover_img'] ?? '';
             }

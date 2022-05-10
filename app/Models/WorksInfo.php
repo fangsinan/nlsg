@@ -665,4 +665,17 @@ class WorksInfo extends Base
         return $this->hasMany(History::class,'info_id','id');
     }
 
+    // 当前课程是否属于大咖讲书
+    public static function IsTeacherBook($works_id=0) {
+        if($works_id == 0){
+            return 0;
+        }
+        $is_data = ListsWork::select('id')->where([
+                'type'      => 1,    
+                'lists_id'  => 40,
+                'works_id'  => $works_id,
+                'state'     => 1,
+            ])->first();
+        return  empty($is_data) ?0 :1;
+    }
 }
