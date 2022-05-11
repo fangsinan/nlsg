@@ -4,11 +4,12 @@ namespace App\Servers\V5;
 
 use AccessTokenBuilder;
 use App\Models\ConfigModel;
-use App\Models\DouDian\DouDianProductList;
 use App\Models\DouDian\DouDianOrder;
 use App\Models\DouDian\DouDianOrderList;
 use App\Models\DouDian\DouDianOrderLog;
 use App\Models\DouDian\DouDianOrderLogistics;
+use App\Models\DouDian\DouDianProductList;
+use App\Models\DouDian\DouDianSkuList;
 use GlobalConfig;
 use OrderBatchDecryptParam;
 use OrderBatchDecryptRequest;
@@ -16,6 +17,8 @@ use OrderSearchListParam;
 use OrderSearchListRequest;
 use ProductListV2Param;
 use ProductListV2Request;
+use SkuListParam;
+use SkuListRequest;
 
 class DouDianServers
 {
@@ -36,69 +39,50 @@ class DouDianServers
         $this->productListJob();
     }
 
+    public function skuList($begin_create_time) {
+        $begin_created_at  = date('Y-m-d H:i:s', $begin_create_time);
+
+        $product_list = DouDianProductList::query()
+            ->where('create_time', '>', $begin_create_time)
+            ->orWhere('created_at', '>', $begin_created_at)
+            ->select(['id', 'product_id'])
+            ->get();
+
+        $request = new SkuListRequest();
+
+        foreach ($product_list as $product) {
+            $param = new SkuListParam();
+            $request->setParam($param);
+            $param->product_id = $product->product_id;
+            $response           = $request->execute('');
+            $response->job_type = 4;
+            DouDianOrderLog::query()->create((array)$response);
+
+            foreach ($response->data as $sku) {
+                DouDianSkuList::query()->updateOrCreate(
+                    [
+                        'id' => $sku->id
+                    ],
+                    (array)$sku
+                );
+            }
+
+        }
+
+    }
+
+
+    //同步商品任务和sku 每十分钟一次
     public function productListJob() {
         $end_time   = time();
         $begin_time = $end_time - 3600;
 
-        $begin_time = strtotime('2022-05-11 00:00:00');
-        $end_time = strtotime('2022-05-12 00:00:00');
+
+        dd([$begin_time,$end_time,]);
 
 
-        $this->productList($begin_time,$end_time);
-    }
-
-    //商品列表
-    public function productList($begin_time,$end_time) {
-
-        $page = 1;
-        $while_flag = true;
-
-        $request = new ProductListV2Request();
-        $param = new ProductListV2Param();
-
-
-        while ($while_flag) {
-            $request->setParam($param);
-            $param->page = $page;
-            $param->size = $this->pageSize;
-            $param->update_start_time = $begin_time;
-            $param->update_end_time = $end_time;
-
-
-            $response = $request->execute('');
-            $response->job_type = 3;
-            $response->page     = $response->data->page ?? 0;
-            $response->size     = $response->data->size ?? 0;
-            $response->total    = $response->data->total ?? 0;
-
-            if ($response->size < $this->pageSize || empty($response->data->data)) {
-                $while_flag = false;
-            }
-            DouDianOrderLog::query()->create((array)$response);
-
-            if ($response->code !== 10000) {
-                if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
-                    $this->accessTokenJob();
-                }
-                return true;
-            }
-
-            foreach ($response->data->data as $item) {
-                DouDianProductList::query()->updateOrCreate(
-                    [
-                        'product_id' => $item->product_id
-                    ],
-                    (array)$item
-                );
-            }
-
-            $page++;
-            if ($page > 100) {
-                $while_flag = false;
-            }
-            sleep(1);
-        }
-
+        $this->productList($begin_time, $end_time);
+        $this->skuList($begin_time);
     }
 
     //解密任务 1分一次
@@ -134,6 +118,60 @@ class DouDianServers
         }
 
         $this->orderSearchList($begin_time, $end_time);
+
+    }
+
+    //商品列表
+    public function productList($begin_time, $end_time) {
+
+        $page       = 1;
+        $while_flag = true;
+
+        $request = new ProductListV2Request();
+        $param   = new ProductListV2Param();
+
+
+        while ($while_flag) {
+            $request->setParam($param);
+            $param->page              = $page;
+            $param->size              = $this->pageSize;
+            $param->update_start_time = $begin_time;
+            $param->update_end_time   = $end_time;
+
+
+            $response           = $request->execute('');
+            $response->job_type = 3;
+            $response->page     = $response->data->page ?? 0;
+            $response->size     = $response->data->size ?? 0;
+            $response->total    = $response->data->total ?? 0;
+
+            if ($response->size < $this->pageSize || empty($response->data->data)) {
+                $while_flag = false;
+            }
+            DouDianOrderLog::query()->create((array)$response);
+
+            if ($response->code !== 10000) {
+                if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
+                    $this->accessTokenJob();
+                }
+                return true;
+            }
+
+            foreach ($response->data->data as $item) {
+                DouDianProductList::query()->updateOrCreate(
+                    [
+                        'product_id' => $item->product_id
+                    ],
+                    (array)$item
+                );
+            }
+
+            $page++;
+            if ($page > 100) {
+                $while_flag = false;
+            }
+            sleep(1);
+        }
 
     }
 
