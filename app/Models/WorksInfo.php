@@ -326,8 +326,9 @@ class WorksInfo extends Base
         $follow = UserFollow::where(['from_uid'=>$user['id'],'to_uid'=>$works_info->user_id])->first();
         $works_info->is_follow = $follow ? 1 :0;
         //作者头像
-        $works_user = User::select('id','headimg')->find($works_info->user_id);
+        $works_user = User::select('id','headimg','nickname')->find($works_info->user_id);
         $works_info->teacher_headimg = $works_user['headimg'];
+        $works_info->teacher_nickname = $works_user['nickname'];
 
         $is_show_url = true;
         if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
