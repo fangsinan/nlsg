@@ -322,9 +322,12 @@ class WorksInfo extends Base
         }
         $works_info->is_sub = Subscribe::isSubscribe($user['id'],$works_info->id,$sub_type);
         
-        //是否关注坐着
+        //是否关注作者
         $follow = UserFollow::where(['from_uid'=>$user['id'],'to_uid'=>$works_info->user_id])->first();
         $works_info->is_follow = $follow ? 1 :0;
+        //作者头像
+        $works_user = User::select('id','headimg')->find($works_info->user_id);
+        $works_info->user_headimg = $works_user['headimg'];
 
         $is_show_url = true;
         if ($works_info->is_free == 0 && $works_info->is_sub == 0) {
