@@ -3,6 +3,7 @@
 namespace App\Models\DouDian;
 
 use App\Models\Base;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class DouDianOrderList extends Base
 {
@@ -14,5 +15,13 @@ class DouDianOrderList extends Base
         'product_id', 'goods_type', 'out_sku_id', 'supplier_id',
         'item_num', 'receive_type',
     ];
+
+    public function productInfo(): HasOne {
+        return $this->hasOne(DouDianProductList::class, 'product_id', 'product_id');
+    }
+
+    public function skuInfo(): HasOne {
+        return $this->hasOne(DouDianSkuList::class, 'id', 'sku_id');
+    }
 
 }

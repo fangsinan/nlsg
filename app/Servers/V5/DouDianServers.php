@@ -8,6 +8,7 @@ use App\Models\DouDian\DouDianOrder;
 use App\Models\DouDian\DouDianOrderList;
 use App\Models\DouDian\DouDianOrderLog;
 use App\Models\DouDian\DouDianOrderLogistics;
+use App\Models\DouDian\DouDianOrderStatus;
 use App\Models\DouDian\DouDianProductList;
 use App\Models\DouDian\DouDianSkuList;
 use GlobalConfig;
@@ -90,6 +91,9 @@ class DouDianServers
         }
 
         $this->orderSearchList($begin_time, $end_time);
+
+        //临时使用  补充订单状态
+        $this->orderStatusData();
 
     }
 
@@ -262,6 +266,44 @@ class DouDianServers
 
             $page++;
             sleep(1);
+        }
+
+    }
+
+    public function orderStatusData() {
+
+        $main_status = DouDianOrder::query()
+            ->select(['main_status', 'main_status_desc'])
+            ->groupBy('main_status')
+            ->get();
+
+        foreach ($main_status as $ms) {
+            DouDianOrderStatus::query()->firstOrCreate(
+                [
+                    'key'  => $ms->main_status,
+                    'type' => 2
+                ], [
+                    'value' => $ms->main_status_desc
+                ]
+            );
+        }
+
+        $order_status = DouDianOrder::query()
+            ->select([
+                'order_status','order_status_desc',
+            ])
+            ->groupBy('order_status')
+            ->get();
+
+        foreach ($order_status as $os) {
+            DouDianOrderStatus::query()->firstOrCreate(
+                [
+                    'key'  => $os->order_status,
+                    'type' => 1
+                ], [
+                    'value' => $os->order_status_desc
+                ]
+            );
         }
 
     }

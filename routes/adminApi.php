@@ -390,6 +390,8 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('temp_live_excel/shou_ting_qing_kuang_free', 'TempLiveExcelController@shouTingQingKuangFree');
 
         Route::get('dou_dian/order_list','DouDianController@orderList');
+        Route::get('dou_dian/select_goods_list','DouDianController@selectGoodsList');
+        Route::get('dou_dian/select_order_status','DouDianController@selectOrderStatus');
 
     });
 });
