@@ -214,12 +214,12 @@ class WorksInfo extends Base
         if($type == 6 || $type == 7){
             $query = self::where(['column_id' => $get_info_id,'type'=>1,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img','like_num','old_share_img']);
+                    'introduce', 'section','size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3', 'share_img','like_num','old_share_img','book_video_url']);
             $works_id = $column_id;  // 讲座直接关联info表
         }else{
             $query = self::where(['pid'=>$works_id,'status'=>4])
                 ->select(['id as works_info_id', 'pid as works_id', 'title', 'duration', 'free_trial', 'url',
-                    'introduce', 'section', 'size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3','like_num','share_img','old_share_img']);
+                    'introduce', 'section', 'size','type', 'view_num', 'callback_url1', 'callback_url2', 'callback_url3','like_num','share_img','old_share_img','book_video_url']);
         }
 
 
