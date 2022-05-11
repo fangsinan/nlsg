@@ -4,15 +4,18 @@ namespace App\Servers\V5;
 
 use AccessTokenBuilder;
 use App\Models\ConfigModel;
-use App\Models\DouDianOrder;
-use App\Models\DouDianOrderList;
-use App\Models\DouDianOrderLog;
-use App\Models\DouDianOrderLogistics;
+use App\Models\DouDian\DouDianProductList;
+use App\Models\DouDian\DouDianOrder;
+use App\Models\DouDian\DouDianOrderList;
+use App\Models\DouDian\DouDianOrderLog;
+use App\Models\DouDian\DouDianOrderLogistics;
 use GlobalConfig;
 use OrderBatchDecryptParam;
 use OrderBatchDecryptRequest;
 use OrderSearchListParam;
 use OrderSearchListRequest;
+use ProductListV2Param;
+use ProductListV2Request;
 
 class DouDianServers
 {
@@ -28,15 +31,85 @@ class DouDianServers
         $this->shopId                                   = ConfigModel::getData(67, 1);
     }
 
+
     public function test() {
+        $this->productListJob();
+    }
+
+    public function productListJob() {
+        $end_time   = time();
+        $begin_time = $end_time - 3600;
+
+        $begin_time = strtotime('2022-05-11 00:00:00');
+        $end_time = strtotime('2022-05-12 00:00:00');
+
+
+        $this->productList($begin_time,$end_time);
+    }
+
+    //商品列表
+    public function productList($begin_time,$end_time) {
+
+        $page = 1;
+        $while_flag = true;
+
+        $request = new ProductListV2Request();
+        $param = new ProductListV2Param();
+
+
+        while ($while_flag) {
+            $request->setParam($param);
+            $param->page = $page;
+            $param->size = $this->pageSize;
+            $param->update_start_time = $begin_time;
+            $param->update_end_time = $end_time;
+
+
+            $response = $request->execute('');
+            $response->job_type = 3;
+            $response->page     = $response->data->page ?? 0;
+            $response->size     = $response->data->size ?? 0;
+            $response->total    = $response->data->total ?? 0;
+
+            if ($response->size < $this->pageSize || empty($response->data->data)) {
+                $while_flag = false;
+            }
+            DouDianOrderLog::query()->create((array)$response);
+
+            if ($response->code !== 10000) {
+                if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
+                    $this->accessTokenJob();
+                }
+                return true;
+            }
+
+            foreach ($response->data->data as $item) {
+                DouDianProductList::query()->updateOrCreate(
+                    [
+                        'product_id' => $item->product_id
+                    ],
+                    (array)$item
+                );
+            }
+
+            $page++;
+            if ($page > 100) {
+                $while_flag = false;
+            }
+            sleep(1);
+        }
 
     }
 
     //解密任务 1分一次
     public function decryptJob() {
-        //0-2
+        //收件人手机解密
         $this->toDecrypt();
+
+        //收件人姓名解密
         $this->toDecrypt(1);
+
+        //收件人详细地址解密
         $this->toDecrypt(2);
     }
 
@@ -88,7 +161,7 @@ class DouDianServers
             $response->size     = $response->data->size ?? 0;
             $response->total    = $response->data->total ?? 0;
 
-            if ($response->size < $this->pageSize) {
+            if ($response->size < $this->pageSize || empty($response->data->shop_order_list)) {
                 $while_flag = false;
             }
 

@@ -105,6 +105,7 @@ class ErpOrderController extends ControllerBackend
     }
 
     public function douTest(){
+        set_time_limit(0);
         (new DouDianServers())->test();
     }
 }

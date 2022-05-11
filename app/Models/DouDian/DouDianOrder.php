@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\DouDian;
+
+use App\Models\Base;
 
 class DouDianOrder extends Base
 {
