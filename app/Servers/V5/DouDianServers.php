@@ -35,7 +35,7 @@ class DouDianServers
         $this->shopId                                   = ConfigModel::getData(67, 1);
     }
 
-    //同步商品任务和sku 每十分钟一次
+    //同步商品任务和sku 10分钟一次
     public function productListJob() {
         $time_flag = ConfigModel::getData(71, 1);
 
@@ -70,7 +70,7 @@ class DouDianServers
         $this->toDecrypt(2);
     }
 
-    //拉订单任务 十分钟一次
+    //拉订单任务 5分钟一次
     public function getOrderJob() {
 
         $time_flag = ConfigModel::getData(70, 1);
@@ -290,7 +290,7 @@ class DouDianServers
 
         $order_status = DouDianOrder::query()
             ->select([
-                'order_status','order_status_desc',
+                'order_status', 'order_status_desc',
             ])
             ->groupBy('order_status')
             ->get();

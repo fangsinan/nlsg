@@ -111,7 +111,7 @@ class DouDianDataServers
             ->select(['key', 'value'])
             ->where('type', '=', $type === 1 ? 1 : 2)
             ->get();
-        
+
     }
 
 }
