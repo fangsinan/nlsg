@@ -103,10 +103,6 @@ class DouDianDataServers
             ->paginate($size);
     }
 
-    public function selectGoodsList() {
-
-    }
-
     public function selectOrderStatus($params) {
 
         $type = (int)($params['type'] ?? 1);
@@ -115,18 +111,7 @@ class DouDianDataServers
             ->select(['key', 'value'])
             ->where('type', '=', $type === 1 ? 1 : 2)
             ->get();
-
-
-//        return [
-//            1   => '待确认/待支付-订单创建完毕',
-//            105 => '已支付',
-//            2   => '备货中',
-//            101 => '部分发货',
-//            3   => '已发货（全部发货）',
-//            4   => '已取消',
-//            5   => '已完成（已收货）',
-//        ];
-
+        
     }
 
 }
