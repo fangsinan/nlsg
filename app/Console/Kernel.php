@@ -55,6 +55,21 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
+        //抖音订单测试部分
+        $schedule->command('command:DouDianOrder')
+            ->everyFiveMinutes()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:DouDianOrderDecrypt')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:DouDianProduct')
+            ->everyTenMinutes()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+
+
+
+
+
         //im社群的发送任务
 //        $schedule->command('imJob')
 //            ->everyMinute()->withoutOverlapping(2)
