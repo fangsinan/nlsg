@@ -41,7 +41,7 @@ class DouDianServers
 
         if (!empty($time_flag) && strtotime($time_flag)) {
             $begin_time = strtotime($time_flag);
-            $end_time   = $begin_time + 3600;
+            $end_time   = $begin_time + 86400;
 
             ConfigModel::query()
                 ->where('id', 71)
@@ -77,7 +77,7 @@ class DouDianServers
 
         if (!empty($time_flag) && strtotime($time_flag)) {
             $begin_time = strtotime($time_flag);
-            $end_time   = $begin_time + 3600;
+            $end_time   = $begin_time + 86400;
 
             ConfigModel::query()
                 ->where('id', 70)
