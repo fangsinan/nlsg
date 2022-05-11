@@ -344,7 +344,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
     Route::get('temp_tools/iout', 'TempToolsController@insertOnlineUserTest');
     Route::get('temp_tools/iouct', 'TempToolsController@liveOnlineUserCountsTest');
-    Route::get('erp_order/dtest', 'ErpOrderController@douTest');
+
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
 
         //推荐位
@@ -388,6 +388,8 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('temp_live_excel/wei_jin_zhi_bo', 'TempLiveExcelController@weiJinZhiBo');
         Route::get('temp_live_excel/qi_ye_wei_xin', 'TempLiveExcelController@qiYeWeiXin');
         Route::get('temp_live_excel/shou_ting_qing_kuang_free', 'TempLiveExcelController@shouTingQingKuangFree');
+
+        Route::get('dou_dian/order_list','DouDianController@orderList');
 
     });
 });

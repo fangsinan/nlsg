@@ -17,7 +17,7 @@ class erpOrderServers
         $size               = $params['size'] ?? 10;
         $ordernum           = $params['ordernum'] ?? '';
         $goods_name         = $params['goods_name'] ?? '';
-        $phone  = $params['phone'] ?? '';
+        $phone              = $params['phone'] ?? '';
         $send_status        = (int)($params['send_status'] ?? 0);  //1没发货 2发货了
         $shill_status       = (int)($params['shill_status'] ?? 0); //1没退款  2退款中 3退款完毕
         $order_info_flag    = $params['order_info_flag'] ?? '';
@@ -35,8 +35,8 @@ class erpOrderServers
                 'created_at', 'express_info_id', 'textbook_id', 'address_id'
             ]);
 
-        if ($erp_push_order_flag === 1){
-            $query->where('id','>',1869289);
+        if ($erp_push_order_flag === 1) {
+            $query->where('id', '>', 1869289);
         }
 
         $query->with([
@@ -93,8 +93,8 @@ class erpOrderServers
 
         //账号
         $query->when($phone, function ($q, $phone) {
-            $q->wherehas('user',function($q)use($phone){
-                $q->where('phone','like',"%$phone%");
+            $q->wherehas('user', function ($q) use ($phone) {
+                $q->where('phone', 'like', "%$phone%");
             });
 //            $q->where('ordernum', 'like', "%$ordernum%");
         });
@@ -226,83 +226,83 @@ class erpOrderServers
     }
 
 
-    public function addRefundOrder($params,$admin_id){
-        $order_id = $params['order_id'] ?? 0;
-        $ordernum = $params['ordernum'] ?? '';
+    public function addRefundOrder($params, $admin_id) {
+        $order_id     = $params['order_id'] ?? 0;
+        $ordernum     = $params['ordernum'] ?? '';
         $refund_money = (float)($params['refund_money'] ?? 0);
 
         if (empty($order_id) || empty($refund_money) || empty($ordernum)) {
-            return ['code'=>false,'msg'=>'参数错误'];
+            return ['code' => false, 'msg' => '参数错误'];
         }
 
         $check_order = Order::query()
-            ->where('id','=',$order_id)
-            ->where('ordernum','=',$ordernum)
-            ->where('status','=',1)
+            ->where('id', '=', $order_id)
+            ->where('ordernum', '=', $ordernum)
+            ->where('status', '=', 1)
             ->first();
 
         if (empty($check_order)) {
-            return ['code'=>false,'msg'=>'订单不存在'];
+            return ['code' => false, 'msg' => '订单不存在'];
         }
 
         if ($check_order->is_shill === 1) {
-            return ['code'=>false,'msg'=>'该订单已经退款'];
+            return ['code' => false, 'msg' => '该订单已经退款'];
         }
 
         if ($check_order->pay_price < $refund_money) {
-            return ['code'=>false,'msg'=>'退款金额不能大于支付金额'];
+            return ['code' => false, 'msg' => '退款金额不能大于支付金额'];
         }
 
-        if ($refund_money > ($check_order->pay_price - $check_order->shill_refund_sum)){
-            return ['code'=>false,'msg'=>'退款金额不能大于可退金额'];
+        if ($refund_money > ($check_order->pay_price - $check_order->shill_refund_sum)) {
+            return ['code' => false, 'msg' => '退款金额不能大于可退金额'];
         }
 
-        $now = time();
+        $now           = time();
         $temp_pay_days = floor(($now - strtotime($check_order->pay_time)) / 86400);
         if ($temp_pay_days > 90) {
-            return ['code'=>false,'msg'=>'订单已过期，不能退款'];
+            return ['code' => false, 'msg' => '订单已过期，不能退款'];
         }
 
 
         DB::beginTransaction();
 
-        $log_data['ordernum'] = $check_order->ordernum;
+        $log_data['ordernum']    = $check_order->ordernum;
         $log_data['check_price'] = $refund_money;
-        $log_data['status'] = 1;
-        $log_data['excel_id'] = 0;
-        $log_data['admin_id'] = $admin_id;
-        $log_data['remark'] = '直播订单列表申请退款:'.$refund_money.'元;'.$admin_id;
+        $log_data['status']      = 1;
+        $log_data['excel_id']    = 0;
+        $log_data['admin_id']    = $admin_id;
+        $log_data['remark']      = '直播订单列表申请退款:' . $refund_money . '元;' . $admin_id;
 
         $log_res = OrderRefundLog::query()->insert($log_data);
         if ($log_res === false) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'添加退款记录失败'];
+            return ['code' => false, 'msg' => '添加退款记录失败'];
         }
 
-        $check_order->is_shill = 1;
-        $check_order->is_refund = 0;
+        $check_order->is_shill        = 1;
+        $check_order->is_refund       = 0;
         $check_order->shill_job_price = $refund_money;
-        $order_res = $check_order->save();
+        $order_res                    = $check_order->save();
         if ($order_res === false) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'更新订单状态失败'];
+            return ['code' => false, 'msg' => '更新订单状态失败'];
         }
 
         $list_res = OrderErpList::query()
             ->insert([
                 'order_id' => $order_id,
-                'flag' => 1,
+                'flag'     => 1,
             ]);
         if ($list_res === false) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'添加订单列表失败'];
+            return ['code' => false, 'msg' => '添加订单列表失败'];
         }
         DB::commit();
 
         $es = new ErpServers();
         $es->pushRunForOrder([$order_id]);
 
-        return ['code'=>true,'msg'=>'操作成功'];
+        return ['code' => true, 'msg' => '操作成功'];
     }
 
 
