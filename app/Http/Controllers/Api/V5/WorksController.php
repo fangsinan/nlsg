@@ -492,7 +492,7 @@ class WorksController extends Controller
                 'info_id' =>$works_info_id,
                 'user_id'   =>$user_id,
                 // 'is_del'    =>0,
-                'os_type'   =>$os_type ?? 0,
+                // 'os_type'   =>$os_type ?? 0,
             ]);
             if( $his->wasRecentlyCreated){
                 // 学习记录数增一
