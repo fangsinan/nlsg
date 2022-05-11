@@ -270,39 +270,41 @@ class ErpServers
                         $ex_data['express_id']  = $send_data['express_id'];
                         $ex_data['express_num'] = $send_data['num'];
 
-                        $express_company_info     = ExpressCompany::query()->find($send_data['express_id']);
-                        $history                  = [];
-                        $history['number']        = $v['logistics_no'];
+                        if (!empty($send_data['num'])) {
+                            $express_company_info     = ExpressCompany::query()->find($send_data['express_id']);
+                            $history                  = [];
+                            $history['number']        = $v['logistics_no'];
 
-                        $history['type']          = $express_company_info->code ?? '';
-                        $history['typename']      = $express_company_info->name ?? $v['logistics_name'];
-                        $history['express_phone'] = $express_company_info->phone ?? '';
-                        $history['logo']          = $express_company_info->logo ?? '';
+                            $history['type']          = $express_company_info->code ?? '';
+                            $history['typename']      = $express_company_info->name ?? $v['logistics_name'];
+                            $history['express_phone'] = $express_company_info->phone ?? '';
+                            $history['logo']          = $express_company_info->logo ?? '';
 
-//                        $history['type']          = $express_company_info->code;
-//                        $history['typename']      = $express_company_info->name;
-//                        $history['express_phone'] = $express_company_info->phone;
-//                        $history['logo']          = $express_company_info->logo;
-                        $history['list']          = [
-                            [
-                                'time'   => $now_date,
-                                'status' => '商家发货'
-                            ]
-                        ];
+                            $history['list']          = [
+                                [
+                                    'time'   => $now_date,
+                                    'status' => '商家发货'
+                                ]
+                            ];
 
-                        $ex_data['history'] = json_encode($history);
+                            $ex_data['history'] = json_encode($history);
 
-                        $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
-                        $express_info_id       = DB::table('nlsg_express_info')->insertGetId($ex_data);
-                        if (!$express_info_id) {
-                            continue;
+                            $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
+                            $express_info_id       = DB::table('nlsg_express_info')->insertGetId($ex_data);
+                            if (!$express_info_id) {
+                                continue;
+                            }
                         }
                     }
 
-                    $order_express_info_res = Order::query()->where('ordernum', '=', $v['tid'])
-                        ->update([
-                            'express_info_id' => $express_info_id
-                        ]);
+                    if (!empty($send_data['num']) && isset($express_info_id)) {
+                        $order_express_info_res = Order::query()->where('ordernum', '=', $v['tid'])
+                            ->update([
+                                'express_info_id' => $express_info_id
+                            ]);
+                    }else{
+                        $order_express_info_res = true;
+                    }
 
                     $temp_ack_data           = [];
                     $temp_ack_data['rec_id'] = $v['rec_id'];
@@ -315,7 +317,6 @@ class ErpServers
                     }
                     $ack_data[] = $temp_ack_data;
                 }
-
 
             }
             if (!empty($ack_data)) {
