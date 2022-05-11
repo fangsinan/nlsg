@@ -284,7 +284,7 @@ class WorksInfo extends Base
                         ->where('s.is_del', '=', 0);
                 })
                 ->where('w.id', '=', $column_id)
-                ->select(['title','subtitle', 'subscribe_num', 'w.user_id','w.des', 'w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img','w.comment_num','w.collection_num',
+                ->select(['title','subtitle', 'subscribe_num', 'w.user_id','w.content', 'w.id', 'w.price', 'w.original_price' ,  'w.is_free', 'w.status','w.cover_pic as cover_img','w.comment_num','w.collection_num',
                     DB::raw('if(s.id > 0,1,0) as is_sub')])
                 ->first();
             $sub_type = 6;
@@ -305,7 +305,7 @@ class WorksInfo extends Base
                     ->where('s.is_del', '=', 0);
             })
             ->where('w.id', '=', $works_id)
-            ->select(['title','subtitle', 'subscribe_num', 'w.user_id', 'w.id','w.des', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num','w.collection_num','w.is_audio_book',
+            ->select(['title','subtitle', 'subscribe_num', 'w.user_id', 'w.id','w.content', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num','w.collection_num','w.is_audio_book',
                 DB::raw('if(s.id > 0,1,0) as is_sub')])
             ->first();
      
