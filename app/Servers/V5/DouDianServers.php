@@ -34,52 +34,24 @@ class DouDianServers
         $this->shopId                                   = ConfigModel::getData(67, 1);
     }
 
-
-    public function test() {
-        $this->productListJob();
-    }
-
-    public function skuList($begin_create_time) {
-        $begin_created_at  = date('Y-m-d H:i:s', $begin_create_time);
-
-        $product_list = DouDianProductList::query()
-            ->where('create_time', '>', $begin_create_time)
-            ->orWhere('created_at', '>', $begin_created_at)
-            ->select(['id', 'product_id'])
-            ->get();
-
-        $request = new SkuListRequest();
-
-        foreach ($product_list as $product) {
-            $param = new SkuListParam();
-            $request->setParam($param);
-            $param->product_id = $product->product_id;
-            $response           = $request->execute('');
-            $response->job_type = 4;
-            DouDianOrderLog::query()->create((array)$response);
-
-            foreach ($response->data as $sku) {
-                DouDianSkuList::query()->updateOrCreate(
-                    [
-                        'id' => $sku->id
-                    ],
-                    (array)$sku
-                );
-            }
-
-        }
-
-    }
-
-
     //同步商品任务和sku 每十分钟一次
     public function productListJob() {
-        $end_time   = time();
-        $begin_time = $end_time - 3600;
+        $time_flag = ConfigModel::getData(71, 1);
 
+        if (!empty($time_flag) && strtotime($time_flag)) {
+            $begin_time = strtotime($time_flag);
+            $end_time   = $begin_time + 3600;
 
-        dd([$begin_time,$end_time,]);
+            ConfigModel::query()
+                ->where('id', 71)
+                ->update([
+                    'value' => date('Y-m-d H:i:00', $end_time)
+                ]);
 
+        } else {
+            $end_time   = time();
+            $begin_time = $end_time - 3600;
+        }
 
         $this->productList($begin_time, $end_time);
         $this->skuList($begin_time);
@@ -121,6 +93,39 @@ class DouDianServers
 
     }
 
+    //sku列表
+    public function skuList($begin_create_time) {
+        $begin_created_at = date('Y-m-d H:i:s', $begin_create_time);
+
+        $product_list = DouDianProductList::query()
+            ->where('create_time', '>', $begin_create_time)
+            ->orWhere('created_at', '>', $begin_created_at)
+            ->select(['id', 'product_id'])
+            ->get();
+
+        $request = new SkuListRequest();
+
+        foreach ($product_list as $product) {
+            $param = new SkuListParam();
+            $request->setParam($param);
+            $param->product_id  = $product->product_id;
+            $response           = $request->execute('');
+            $response->job_type = 4;
+            DouDianOrderLog::query()->create((array)$response);
+
+            foreach ($response->data as $sku) {
+                DouDianSkuList::query()->updateOrCreate(
+                    [
+                        'id' => $sku->id
+                    ],
+                    (array)$sku
+                );
+            }
+
+        }
+
+    }
+
     //商品列表
     public function productList($begin_time, $end_time) {
 
@@ -130,14 +135,12 @@ class DouDianServers
         $request = new ProductListV2Request();
         $param   = new ProductListV2Param();
 
-
         while ($while_flag) {
             $request->setParam($param);
             $param->page              = $page;
             $param->size              = $this->pageSize;
             $param->update_start_time = $begin_time;
             $param->update_end_time   = $end_time;
-
 
             $response           = $request->execute('');
             $response->job_type = 3;

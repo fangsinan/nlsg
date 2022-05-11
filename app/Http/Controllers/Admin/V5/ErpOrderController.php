@@ -103,9 +103,5 @@ class ErpOrderController extends ControllerBackend
         fclose($fp);
         exit();
     }
-
-    public function douTest(){
-        set_time_limit(0);
-        (new DouDianServers())->test();
-    }
+    
 }
