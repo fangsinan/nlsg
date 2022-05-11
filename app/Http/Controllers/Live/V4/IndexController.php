@@ -1143,7 +1143,7 @@ class IndexController extends ControllerBackend
             ]);
 
         Order::query()
-            ->whereIn('type', [10, 14])
+            ->where('type','=',14)
             ->where('relation_id', '<>', 8)
             ->where('status', '=', 1)
             ->where('live_id', '<>', 0)
