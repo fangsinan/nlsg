@@ -206,6 +206,9 @@ class ErpServers
             $ack_data     = [];//需要回传的id
 
             foreach ($list as $v) {
+
+                DB::table('nlsg_erp_logistics_log')->insert(['info'=>json_encode($v)]);
+
                 $send_data_temp = [];
 
                 $check_order_type = substr($v['tid'], -2);
