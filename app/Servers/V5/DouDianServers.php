@@ -57,6 +57,8 @@ class DouDianServers
 
         $this->productList($begin_time, $end_time);
         $this->skuList($begin_time);
+
+        return true;
     }
 
     //解密任务 1分一次
@@ -79,6 +81,8 @@ class DouDianServers
 
         //收件人详细地址解密
 //        $this->toDecrypt(2);
+
+        return true;
     }
 
     //拉订单任务 5分钟一次
@@ -107,6 +111,8 @@ class DouDianServers
 
         //临时使用  补充订单状态
         $this->orderStatusData();
+
+        return true;
     }
 
     //sku列表
