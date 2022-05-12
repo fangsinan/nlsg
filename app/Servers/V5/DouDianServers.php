@@ -5,6 +5,7 @@ namespace App\Servers\V5;
 use AccessTokenBuilder;
 use App\Models\ConfigModel;
 use App\Models\DouDian\DouDianOrder;
+use App\Models\DouDian\DouDianOrderDecryptQuota;
 use App\Models\DouDian\DouDianOrderList;
 use App\Models\DouDian\DouDianOrderLog;
 use App\Models\DouDian\DouDianOrderLogistics;
@@ -60,6 +61,16 @@ class DouDianServers
 
     //解密任务 1分一次
     public function decryptJob() {
+        $decrypt_quota = DouDianOrderDecryptQuota::query()
+            ->orderBy('id', 'desc')
+            ->first();
+        if (!empty($decrypt_quota)) {
+            $expire = $decrypt_quota->expire;
+            if ($expire > date('Y-m-d H:i:s')) {
+                return true;
+            }
+        }
+
         //收件人手机解密
         $this->toDecrypt();
 
@@ -376,6 +387,14 @@ class DouDianServers
             if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
                 $this->accessTokenJob();
             }
+
+            if($response->code === 50002){
+                DouDianOrderDecryptQuota::query()->create([
+                    'flag' => 1,
+                    'expire' => date('Y-m-d H:i:00',strtotime("+1 hour"))
+                ]);
+            }
+
             return true;
         }
 
