@@ -851,6 +851,7 @@ class WorksController extends Controller
             'time_leng'=>$time_leng,
             'time_number'=>$time_number,
             'os_type'   =>$os_type ?? 0,
+            'is_del'    =>0,
         ];
         if( $time_leng >= 96 ){
             $edit_data['is_end'] = 1;
