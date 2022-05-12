@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V5;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Servers\V5\DouDianServers;
 use App\Servers\V5\TempToolsServers;
 use Illuminate\Http\Request;
 
@@ -28,6 +29,10 @@ class TempToolsController extends ControllerBackend
     public function liveOnlineUserCountsTest(){
         $res = (new TempToolsServers())->liveOnlineUserCountsTest();
         return $this->getRes($res);
+    }
+
+    public function douDianTest(){
+        (new DouDianServers())->getOrderJob();
     }
 
 }

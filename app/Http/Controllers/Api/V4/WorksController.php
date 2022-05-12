@@ -10,9 +10,11 @@ use App\Models\Column;
 use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Lists;
+use App\Models\ListsWork;
 use App\Models\Materials;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\UserFollow;
 use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
@@ -567,7 +569,7 @@ class WorksController extends Controller
             return $this->error(0,'课程不存在或已下架');
         }
         $works_data = $works_data->toArray();
-
+        $works_data['book_works_text'] = $is_sub == 1 ? '点击文稿查看视频文字版精彩内容' :'解锁大咖讲书即可查看精彩文稿';
 
 
 //        if($works_data['is_free'] == 1){
@@ -576,6 +578,20 @@ class WorksController extends Controller
         //查询章节
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size,$works_data);
+        $durations = array_column($info,'duration');
+        $book_work_totle_time = 0;
+        foreach($durations as $duration_val){
+            // 计算大咖讲书总时长
+            $times = explode(':',$duration_val);
+            $len = count($times);
+            // m 245
+            if(!empty($times[$len-1])) $book_work_totle_time += intval($times[$len-1]);
+            if(!empty($times[$len-2])) $book_work_totle_time += intval($times[$len-2]*60);
+            if(!empty($times[$len-3])) $book_work_totle_time += intval($times[$len-3]*3600);
+        }
+        //52:01
+        $works_data['total_time'] = TimeToMinSec($book_work_totle_time);
+        
         if ($flag === 'catalog'){
             $res = [
                 'works_info'          => $info,
@@ -615,7 +631,9 @@ class WorksController extends Controller
             }])->where(['work_id'=>$works_id])->first();
         $works_data['category_name'] = $category->CategoryName->name ??'';
         $works_data['user_info'] = User::find($works_data['user_id']);
-
+        //是否关注作者
+        $follow = UserFollow::where(['from_uid'=>$user_id,'to_uid'=>$works_data['user_id']])->first();
+        $works_data['is_follow'] = $follow ? 1 :0;
 
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($works_data['id'],4,$user_id);  //讲座
@@ -635,7 +653,16 @@ class WorksController extends Controller
         $history_data = History::getHistoryData($works_data['id'],$relation_type,$user_id);
         //免费试听的章节
         $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works_id, 'status' => 4,'free_trial'=>1])->first();
-
+        
+        //大咖讲书
+        $is_teacherBook = WorksInfo::IsTeacherBook($works_id);
+        $works_data['teacher_book_msg'] = '开通大咖讲书VIP';
+        if($is_teacherBook){
+            $listsWork = ListsWork::select('id','lists_id')->where(['type'=>1,'works_id'=>$works_id])->first();
+            $listsdata = Lists::select('id','price')->where(['id'=>$listsWork['lists_id'],'type' => 10,'status'=> 1])->first();
+            $works_data['teacher_book_price'] = $listsdata['price'];
+            
+        }
         $res = [
             'column_info'  => $column,
             'works_data'   => $works_data,
@@ -643,7 +670,7 @@ class WorksController extends Controller
             'history_data'   => $history_data,
             'is_sub'         => $is_sub ? 1: 0,
             'is_collection'  => $isCollect ? 1 : 0,
-            'free_trial_id'  => (string)$free_trial['id'] ?? '',
+            'free_trial_id'  => (string)($free_trial['id'] ?? ''),
             'c'=>$channel_tag,
         ];
         return $this->success($res);
@@ -851,6 +878,7 @@ class WorksController extends Controller
             'time_leng'=>$time_leng,
             'time_number'=>$time_number,
             'os_type'   =>$os_type ?? 0,
+            'is_del'    =>0,
         ];
         if( $time_leng >= 96 ){
             $edit_data['is_end'] = 1;

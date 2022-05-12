@@ -316,10 +316,10 @@ class WorksInfo extends Base
 //        }
         //是否大咖讲书
         $works_info->is_teacherBook = self::IsTeacherBook($works_id);
-        if($works_info->is_teacherBook == 1){  // 大咖讲书是组合售卖
-            $works_info->id = 40;
-            $sub_type = 8;
-        }
+        // if($works_info->is_teacherBook == 1){  // 大咖讲书是组合售卖
+        //     $works_info->id = 40;
+        //     $sub_type = 8;
+        // }
         $works_info->is_sub = Subscribe::isSubscribe($user['id'],$works_info->id,$sub_type);
         
         //是否关注作者

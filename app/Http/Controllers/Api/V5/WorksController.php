@@ -633,7 +633,7 @@ class WorksController extends Controller
                 $works_data->original_price = $temp_price;
             }
         }
-
+        $works_data->book_works_text = $is_sub == 1 ? '点击文稿查看视频文字版精彩内容' :'解锁大咖讲书即可查看精彩文稿';
         if(empty($works_data)){
             return $this->error(0,'课程不存在或已下架');
         }
