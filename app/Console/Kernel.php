@@ -57,13 +57,13 @@ class Kernel extends ConsoleKernel
 
         //抖音订单测试部分
         $schedule->command('command:DouDianOrder')
-            ->everyMinute()->withoutOverlapping(1)
+            ->everyFiveMinutes()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
         $schedule->command('command:DouDianOrderDecrypt')
-            ->everyMinute()->withoutOverlapping(1)
+            ->everyFiveMinutes()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
         $schedule->command('command:DouDianProduct')
-            ->everyMinute()->withoutOverlapping(1)
+            ->everyFifteenMinutes()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
 
 
