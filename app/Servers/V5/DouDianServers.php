@@ -337,7 +337,7 @@ class DouDianServers
         $list = DouDianOrder::query()
             ->where('decrypt_step', $step)
             ->select([
-                'id', 'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
+                'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
             ])
             ->limit(50)
