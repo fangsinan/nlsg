@@ -71,13 +71,15 @@ class DouDianServers
     }
 
     //拉订单任务 5分钟一次
-    public function getOrderJob() {
+    public function getOrderJob($type) {
 
         $time_flag = ConfigModel::getData(70, 1);
 
         if (!empty($time_flag) && strtotime($time_flag)) {
+
             $begin_time = strtotime($time_flag);
-            $end_time   = $begin_time + 86400;
+            $begin_time = min(time() - 7200, $begin_time);
+            $end_time   = $begin_time + 7200;
 
             ConfigModel::query()
                 ->where('id', 70)
@@ -90,11 +92,10 @@ class DouDianServers
             $begin_time = $end_time - 3600;
         }
 
-        $this->orderSearchList($begin_time, $end_time);
+        $this->orderSearchList($begin_time, $end_time,$type);
 
         //临时使用  补充订单状态
         $this->orderStatusData();
-
     }
 
     //sku列表
@@ -183,7 +184,7 @@ class DouDianServers
     }
 
     //订单
-    public function orderSearchList(int $begin, int $end) {
+    public function orderSearchList(int $begin, int $end,$type) {
 
         $page       = 0;
         $while_flag = true;
@@ -191,17 +192,26 @@ class DouDianServers
         $request = new OrderSearchListRequest();
         $param   = new OrderSearchListParam();
 
+        if ($type == 1){
+            $order_by = 'create_time';
+            $job_type = 11;
+        }else{
+            $order_by = 'update_time';
+            $job_type = 12;
+        }
+
+
         while ($while_flag) {
             $request->setParam($param);
             $param->update_time_start = $begin;
             $param->update_time_end   = $end;
             $param->size              = $this->pageSize;
             $param->page              = $page;
-            $param->order_by          = "update_time";
+            $param->order_by          = $order_by;
             $param->order_asc         = false;
 
             $response           = $request->execute('');
-            $response->job_type = 1;
+            $response->job_type = $job_type;
             $response->page     = $response->data->page ?? 0;
             $response->size     = $response->data->size ?? 0;
             $response->total    = $response->data->total ?? 0;
@@ -232,6 +242,12 @@ class DouDianServers
                 $order->post_addr_town_id        = $order->post_addr->town->id ?? 0;
                 $order->post_addr_street_id      = 0;
 
+                if ($order->order_status === 4){
+                    $order->decrypt_step = 9;
+                    $order->decrypt_err_no = 0;
+                    $order->decrypt_err_msg = $order->order_status_desc;
+                }
+
                 DouDianOrder::query()->updateOrCreate(
                     [
                         'order_id' => $order->order_id
@@ -240,6 +256,9 @@ class DouDianServers
                 );
 
                 foreach ($order->sku_order_list as $sku) {
+                    $sku->after_sale_info_status = $sku->after_sale_info->after_sale_status ?? 0;
+                    $sku->after_sale_info_type = $sku->after_sale_info->after_sale_type ?? 0;
+                    $sku->after_sale_info_refund_status = $sku->after_sale_info->refund_status ?? 0;
                     DouDianOrderList::query()->updateOrCreate(
                         [
                             'order_id' => $sku->order_id

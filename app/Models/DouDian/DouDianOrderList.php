@@ -14,6 +14,7 @@ class DouDianOrderList extends Base
         'order_id', 'parent_order_id', 'create_time', 'update_time', 'sku_id',
         'product_id', 'goods_type', 'out_sku_id', 'supplier_id',
         'item_num', 'receive_type',
+        'after_sale_info_status', 'after_sale_info_type', 'after_sale_info_refund_status'
     ];
 
     public function productInfo(): HasOne {

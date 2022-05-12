@@ -344,6 +344,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
 Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
     Route::get('temp_tools/iout', 'TempToolsController@insertOnlineUserTest');
     Route::get('temp_tools/iouct', 'TempToolsController@liveOnlineUserCountsTest');
+    Route::get('temp_tools/dou_dian_test', 'TempToolsController@douDianTest');
 
     Route::group(['middleware' => ['auth.backend.jwt']], function () {
 

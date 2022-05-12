@@ -12,7 +12,7 @@ class DouDianOrder extends Command
      *
      * @var string
      */
-    protected $signature = 'command:DouDianOrder';
+    protected $signature = 'command:DouDianOrder {type}';
 
     /**
      * The console command description.
@@ -38,6 +38,7 @@ class DouDianOrder extends Command
      */
     public function handle()
     {
-        (new DouDianServers())->getOrderJob();
+        $type = $this->argument('type');
+        (new DouDianServers())->getOrderJob($type);
     }
 }
