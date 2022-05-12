@@ -576,6 +576,20 @@ class WorksController extends Controller
         //查询章节
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size,$works_data);
+        $durations = array_column($info,'duration');
+        $book_work_totle_time = 0;
+        foreach($durations as $duration_val){
+            // 计算大咖讲书总时长
+            $times = explode(':',$duration_val);
+            $len = count($times);
+            // m 245
+            if(!empty($times[$len-1])) $book_work_totle_time += intval($times[$len-1]);
+            if(!empty($times[$len-2])) $book_work_totle_time += intval($times[$len-2]*60);
+            if(!empty($times[$len-3])) $book_work_totle_time += intval($times[$len-3]*3600);
+        }
+        //52:01
+        $works_data['total_time'] = TimeToMinSec($book_work_totle_time);
+        
         if ($flag === 'catalog'){
             $res = [
                 'works_info'          => $info,
