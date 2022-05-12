@@ -13,6 +13,7 @@ use App\Models\Lists;
 use App\Models\Materials;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\UserFollow;
 use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
@@ -629,7 +630,9 @@ class WorksController extends Controller
             }])->where(['work_id'=>$works_id])->first();
         $works_data['category_name'] = $category->CategoryName->name ??'';
         $works_data['user_info'] = User::find($works_data['user_id']);
-
+        //是否关注作者
+        $follow = UserFollow::where(['from_uid'=>$user_id,'to_uid'=>$works_data['user_id']])->first();
+        $works_data['is_follow'] = $follow ? 1 :0;
 
         //查询总的历史记录进度`
         $hisCount = History::getHistoryCount($works_data['id'],4,$user_id);  //讲座
