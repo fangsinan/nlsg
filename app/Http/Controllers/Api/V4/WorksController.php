@@ -567,7 +567,7 @@ class WorksController extends Controller
             return $this->error(0,'课程不存在或已下架');
         }
         $works_data = $works_data->toArray();
-
+        $works_data['book_works_text'] = $is_sub == 1 ? '点击文稿查看视频文字版精彩内容' :'解锁大咖讲书即可查看精彩文稿';
 
 
 //        if($works_data['is_free'] == 1){
