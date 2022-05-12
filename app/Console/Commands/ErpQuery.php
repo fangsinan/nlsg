@@ -38,7 +38,7 @@ class ErpQuery extends Command
      */
     public function handle()
     {
-        $s = new ErpServers();
-        $s->logisticsSync();
+//        $s = new ErpServers();
+//        $s->logisticsSync();
     }
 }
