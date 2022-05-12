@@ -10,6 +10,7 @@ use App\Models\Column;
 use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Lists;
+use App\Models\ListsWork;
 use App\Models\Materials;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -652,7 +653,16 @@ class WorksController extends Controller
         $history_data = History::getHistoryData($works_data['id'],$relation_type,$user_id);
         //免费试听的章节
         $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works_id, 'status' => 4,'free_trial'=>1])->first();
-
+        
+        //大咖讲书
+        $is_teacherBook = WorksInfo::IsTeacherBook($works_id);
+        $works_data['sub_book_msg'] = '开通大咖讲书VIP';
+        if($is_teacherBook){
+            $listsWork = ListsWork::select('id','lists_id')->where(['type'=>1,'works_id'=>$works_id])->first();
+            $listsdata = Lists::select('id','price')->where(['id'=>$listsWork['lists_id'],'type' => 10,'status'=> 1])->first();
+            $works_data['teacher_book_price'] = $listsdata['price'];
+            
+        }
         $res = [
             'column_info'  => $column,
             'works_data'   => $works_data,
@@ -660,7 +670,7 @@ class WorksController extends Controller
             'history_data'   => $history_data,
             'is_sub'         => $is_sub ? 1: 0,
             'is_collection'  => $isCollect ? 1 : 0,
-            'free_trial_id'  => (string)$free_trial['id'] ?? '',
+            'free_trial_id'  => (string)($free_trial['id'] ?? ''),
             'c'=>$channel_tag,
         ];
         return $this->success($res);
