@@ -654,21 +654,21 @@ class ErpServers
 
     public function __construct() {
 
-//        $this->sid                  = config('env.ERP_SID');
-//        $this->shop_no              = config('env.ERP_SHOP_NO');
-//        $this->appkey               = config('env.ERP_APPKEY');
-//        $this->appsecret            = config('env.ERP_APPSECRET');
-//        $this->trade_push           = config('env.ERP_TRADE_PUSH');
-//        $this->logistics_sync_query = config('env.ERP_LOGISTICS_SYNC_QUERY');
-//        $this->logistics_sync_ack   = config('env.ERP_LOGISTICS_SYNC_ACK');
+        $this->sid                  = config('env.ERP_SID');
+        $this->shop_no              = config('env.ERP_SHOP_NO');
+        $this->appkey               = config('env.ERP_APPKEY');
+        $this->appsecret            = config('env.ERP_APPSECRET');
+        $this->trade_push           = config('env.ERP_TRADE_PUSH');
+        $this->logistics_sync_query = config('env.ERP_LOGISTICS_SYNC_QUERY');
+        $this->logistics_sync_ack   = config('env.ERP_LOGISTICS_SYNC_ACK');
 
-        $this->sid                  = 'nlsg2';
-        $this->shop_no              = '04';
-        $this->appkey               = 'nlsg2-gw';
-        $this->appsecret            = 'c93045fe195cc51977ad8daab2e4b664';
-        $this->trade_push           = 'https://api.wangdian.cn/openapi2/trade_push.php';
-        $this->logistics_sync_query = 'https://api.wangdian.cn/openapi2/logistics_sync_query.php';
-        $this->logistics_sync_ack   = 'https://api.wangdian.cn/openapi2/logistics_sync_ack.php';
+//        $this->sid                  = 'nlsg2';
+//        $this->shop_no              = '04';
+//        $this->appkey               = 'nlsg2-gw';
+//        $this->appsecret            = 'c93045fe195cc51977ad8daab2e4b664';
+//        $this->trade_push           = 'https://api.wangdian.cn/openapi2/trade_push.php';
+//        $this->logistics_sync_query = 'https://api.wangdian.cn/openapi2/logistics_sync_query.php';
+//        $this->logistics_sync_ack   = 'https://api.wangdian.cn/openapi2/logistics_sync_ack.php';
 
     }
 
