@@ -62,9 +62,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:DouDianOrder 2')
             ->everyTenMinutes()->withoutOverlapping(5)
             ->runInBackground()->onOneServer();
-//        $schedule->command('command:DouDianOrderDecrypt')
-//            ->everyThirtyMinutes()->withoutOverlapping(1)
-//            ->runInBackground()->onOneServer();
+        $schedule->command('command:DouDianOrderDecrypt')
+            ->everyThirtyMinutes()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
         $schedule->command('command:DouDianProduct')
             ->everyFifteenMinutes()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();

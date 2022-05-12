@@ -61,7 +61,7 @@ class DouDianServers
     //解密任务 1分一次
     public function decryptJob() {
         //收件人手机解密
-//        $this->toDecrypt();
+        $this->toDecrypt();
 
         //收件人姓名解密
 //        $this->toDecrypt(1);
