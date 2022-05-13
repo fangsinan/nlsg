@@ -3,13 +3,13 @@
 namespace App\Servers\V5;
 
 use App\Models\DouDian\DouDianOrder;
+use App\Models\DouDian\DouDianOrderDecryptQuota;
 use App\Models\DouDian\DouDianOrderStatus;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class DouDianDataServers
 {
-    public function list($params): LengthAwarePaginator {
+    public function list($params, $is_excel = 0) {
         $size                   = $params['size'] ?? 10;
         $order_status           = $params['order_status'] ?? 0;
         $main_status            = $params['main_status'] ?? 0;
@@ -21,7 +21,7 @@ class DouDianDataServers
 
         $query = DouDianOrder::query()
             ->select([
-                'id', 'user_id', 'order_id', 'order_status', 'order_status_desc', 'main_status', 'main_status_desc',
+                'user_id', 'order_id', 'order_status', 'order_status_desc', 'main_status', 'main_status_desc',
                 'pay_time', DB::raw('FROM_UNIXTIME(pay_time,"%Y-%m-%d %H:%i") as pay_time_date'),
                 'finish_time', DB::raw('FROM_UNIXTIME(finish_time,"%Y-%m-%d %H:%i") as finish_time_date'),
                 'create_time', DB::raw('FROM_UNIXTIME(create_time,"%Y-%m-%d %H:%i") as create_time_date'),
@@ -96,11 +96,15 @@ class DouDianDataServers
             $q->where('order_id', '=', $order_id);
         });
 
+        $query->orderBy('created_at', 'desc');
+        $query->orderBy('order_id', 'desc');
 
-        return $query
-            ->orderBy('created_at', 'desc')
-            ->orderBy('id', 'desc')
-            ->paginate($size);
+        if ($is_excel === 1) {
+            $page = $params['page'] ?? 1;
+            return $query->limit($size)->offset(($page - 1) * $size)->get();
+        }
+
+        return $query->paginate($size);
     }
 
     public function selectOrderStatus($params) {
@@ -110,8 +114,41 @@ class DouDianDataServers
         return DouDianOrderStatus::query()
             ->select(['key', 'value'])
             ->where('type', '=', $type === 1 ? 1 : 2)
+            ->orderBy('key')
             ->get();
 
+    }
+
+    public function orderDecryptQuota(): array {
+        $decrypt_quota = DouDianOrderDecryptQuota::query()
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $now_date = date('Y-m-d H:i:s');
+
+        if (!empty($decrypt_quota) && $decrypt_quota->flag === 1 && $decrypt_quota->expire > $now_date) {
+            return [
+                'status' => 1,
+                'msg'    => '解密配额已满,请重新申请.下次尝试解密时间:' . $decrypt_quota->expire . '.请即使申请配额.'
+            ];
+        }
+
+        return [
+            'status' => 0,
+            'msg'    => '',
+        ];
+
+    }
+
+    public function orderDecryptQuotaReset(): array {
+        $decrypt_quota = DouDianOrderDecryptQuota::query()
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $decrypt_quota->flag = 2;
+        $decrypt_quota->save();
+
+        return ['code' => true, 'msg' => '成功'];
     }
 
 }
