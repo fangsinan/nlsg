@@ -1079,32 +1079,12 @@ class CreatePosterController extends Controller
                 } else {
                     $m_t_type = 3;
                     $u_type = 6;
-//                    if ($temp_work['is_pay']) {
-//                        switch (intval($temp_work['type'])) {
-//                            case 1:
-//                                $u_type = 6;
-//                                break;
-//                            case 2:
-//                                $u_type = 7;
-//                                break;
-//                            case 3:
-//                                $u_type = 4;
-//                                break;
-//                        }
-//                    } else {
-//                        switch (intval($temp_work['type'])) {
-//                            case 1:
-//                                $u_type = 2;
-//                                break;
-//                            case 2:
-//                                $u_type = 3;
-//                                break;
-//                            case 3:
-//                                $u_type = 4;
-//                                break;
-//                        }
-//                    }
-
+                }
+                // 校验大咖讲书
+                $is_teacherBook = WorksInfo::IsTeacherBook($gid);
+                if($is_teacherBook == 1){
+                    $u_type = 25;
+                    $m_t_type = 0;
                 }
                 break;
             case 7://商品
@@ -1146,10 +1126,7 @@ class CreatePosterController extends Controller
                 return ConfigModel::getData(45) .$url_temp. '?time=' . time() . '&inviter=' . $uid .
                     '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
 
-            case 25://大咖讲书单独用
-                $u_type = 25;
-                $m_t_type = 0;
-                break;
+            
         }
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
