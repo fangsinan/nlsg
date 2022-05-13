@@ -37,7 +37,7 @@ class DouDianServers
     }
 
     //同步商品任务和sku 10分钟一次
-    public function productListJob() {
+    public function productListJob(): bool {
         $time_flag = ConfigModel::getData(71, 1);
 
         if (!empty($time_flag) && strtotime($time_flag)) {
@@ -62,11 +62,11 @@ class DouDianServers
     }
 
     //解密任务 1分一次
-    public function decryptJob() {
+    public function decryptJob(): bool {
         $decrypt_quota = DouDianOrderDecryptQuota::query()
             ->orderBy('id', 'desc')
             ->first();
-        if (!empty($decrypt_quota)) {
+        if (!empty($decrypt_quota) && $decrypt_quota->flag === 1) {
             $expire = $decrypt_quota->expire;
             if ($expire > date('Y-m-d H:i:s')) {
                 return true;
@@ -86,7 +86,7 @@ class DouDianServers
     }
 
     //拉订单任务 5分钟一次
-    public function getOrderJob($type) {
+    public function getOrderJob($type): bool {
 
         $time_flag = ConfigModel::getData(70, 1);
 
@@ -107,7 +107,7 @@ class DouDianServers
             $begin_time = $end_time - 3600;
         }
 
-        $this->orderSearchList($begin_time, $end_time,$type);
+        $this->orderSearchList($begin_time, $end_time, $type);
 
         //临时使用  补充订单状态
         $this->orderStatusData();
@@ -201,7 +201,7 @@ class DouDianServers
     }
 
     //订单
-    public function orderSearchList(int $begin, int $end,$type) {
+    public function orderSearchList(int $begin, int $end, $type) {
 
         $page       = 0;
         $while_flag = true;
@@ -209,10 +209,10 @@ class DouDianServers
         $request = new OrderSearchListRequest();
         $param   = new OrderSearchListParam();
 
-        if ($type == 1){
+        if ($type == 1) {
             $order_by = 'create_time';
             $job_type = 11;
-        }else{
+        } else {
             $order_by = 'update_time';
             $job_type = 12;
         }
@@ -259,9 +259,9 @@ class DouDianServers
                 $order->post_addr_town_id        = $order->post_addr->town->id ?? 0;
                 $order->post_addr_street_id      = 0;
 
-                if ($order->order_status === 4){
-                    $order->decrypt_step = 9;
-                    $order->decrypt_err_no = 0;
+                if ($order->order_status === 4) {
+                    $order->decrypt_step    = 9;
+                    $order->decrypt_err_no  = 0;
                     $order->decrypt_err_msg = $order->order_status_desc;
                 }
 
@@ -273,8 +273,8 @@ class DouDianServers
                 );
 
                 foreach ($order->sku_order_list as $sku) {
-                    $sku->after_sale_info_status = $sku->after_sale_info->after_sale_status ?? 0;
-                    $sku->after_sale_info_type = $sku->after_sale_info->after_sale_type ?? 0;
+                    $sku->after_sale_info_status        = $sku->after_sale_info->after_sale_status ?? 0;
+                    $sku->after_sale_info_type          = $sku->after_sale_info->after_sale_type ?? 0;
                     $sku->after_sale_info_refund_status = $sku->after_sale_info->refund_status ?? 0;
                     DouDianOrderList::query()->updateOrCreate(
                         [
@@ -394,10 +394,10 @@ class DouDianServers
                 $this->accessTokenJob();
             }
 
-            if($response->code === 50002){
+            if ($response->code === 50002) {
                 DouDianOrderDecryptQuota::query()->create([
-                    'flag' => 1,
-                    'expire' => date('Y-m-d H:i:00',strtotime("+1 hour"))
+                    'flag'   => 1,
+                    'expire' => date('Y-m-d H:i:00', strtotime("+5 hour"))
                 ]);
             }
 
