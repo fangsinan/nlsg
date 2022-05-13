@@ -1146,6 +1146,10 @@ class CreatePosterController extends Controller
                 return ConfigModel::getData(45) .$url_temp. '?time=' . time() . '&inviter=' . $uid .
                     '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
 
+            case 25://大咖讲书单独用
+                $u_type = 25;
+                $m_t_type = 0;
+                break;
         }
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
