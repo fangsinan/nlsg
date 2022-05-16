@@ -665,7 +665,9 @@ class WorksController extends Controller
             $works_data['teacher_book_title'] = $listsdata['title'];
             $works_data['teacher_book_cover'] = $listsdata['cover'];
             $works_data['teacher_book_lists_id'] = $listsdata['id'];
-            
+            // 获取第一章节 info_id
+            $first_info_id = WorksInfo::select('id')->where(['pid'=>$works_id,'type'=>2,'status'=>4 ])->orderBy('rank','asc')->first();
+            $works_data['teacher_book_first_info_id'] = $first_info_id['id'] ?? 0;
         }
         $res = [
             'column_info'  => $column,
