@@ -34,7 +34,7 @@ class DouDianServers
         GlobalConfig::getGlobalConfig()->appSecret      = $this->appSecret;
         GlobalConfig::getGlobalConfig()->accessTokenStr = ConfigModel::getData(68, 1);
         $this->shopId                                   = ConfigModel::getData(67, 1);
-        if ($this->shopId === '0'){
+        if ($this->shopId === '0') {
             exit('没有设置店铺ID');
         }
     }
@@ -360,6 +360,7 @@ class DouDianServers
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
             ])
             ->limit(50)
+            ->orderBy('id', 'desc')
             ->get()
             ->toArray();
 
