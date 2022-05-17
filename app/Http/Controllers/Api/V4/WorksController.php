@@ -659,7 +659,7 @@ class WorksController extends Controller
         $works_data['teacher_book_msg'] = '开通大咖讲书VIP';
         $works_data['is_teacherBook'] = $is_teacherBook;
         if($is_teacherBook){
-            $listsWork = ListsWork::select('id','lists_id')->where(['type'=>1,'works_id'=>$works_id])->first();
+            $listsWork = ListsWork::select('id','lists_id')->where(['type'=>1,'works_id'=>$works_id,'lists_id'=>40])->first();
             $listsdata = Lists::select('id','title','price','cover')->where(['id'=>$listsWork['lists_id'],'type' => 10,'status'=> 1])->first();
             $works_data['teacher_book_price'] = $listsdata['price'];
             $works_data['teacher_book_title'] = $listsdata['title'];
