@@ -50,13 +50,13 @@ class DouDianDataServers
                     'id', 'product_id', 'img', 'name'
                 ]);
             },
-            'orderList.skuInfo'     => function ($q) {
-                $q->select([
-                    'id', 'product_id',
-                    'spec_detail_name1', 'spec_detail_name2', 'spec_detail_name3',
-                    'price', 'settlement_price', 'spec_id',
-                ]);
-            },
+//            'orderList.skuInfo'     => function ($q) {
+//                $q->select([
+//                    'id', 'product_id',
+//                    'spec_detail_name1', 'spec_detail_name2', 'spec_detail_name3',
+//                    'price', 'settlement_price', 'spec_id',
+//                ]);
+//            },
         ]);
 
         //订单状态
