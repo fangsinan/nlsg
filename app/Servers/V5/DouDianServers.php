@@ -34,6 +34,9 @@ class DouDianServers
         GlobalConfig::getGlobalConfig()->appSecret      = $this->appSecret;
         GlobalConfig::getGlobalConfig()->accessTokenStr = ConfigModel::getData(68, 1);
         $this->shopId                                   = ConfigModel::getData(67, 1);
+        if ($this->shopId === '0'){
+            exit('没有设置店铺ID');
+        }
     }
 
     //同步商品任务和sku 10分钟一次
@@ -54,7 +57,6 @@ class DouDianServers
             $end_time   = time();
             $begin_time = $end_time - 3600;
         }
-
         $this->productList($begin_time, $end_time);
         $this->skuList($begin_time);
 
