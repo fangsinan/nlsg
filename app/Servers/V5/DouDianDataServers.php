@@ -18,6 +18,7 @@ class DouDianDataServers
         $order_id               = $params['order_id'] ?? '';
         $create_time_date_begin = $params['create_time_date_begin'] ?? '';
         $create_time_date_end   = $params['create_time_date_end'] ?? '';
+        $decrypt_step           = (int)($params['decrypt_step'] ?? -1);
 
         $query = DouDianOrder::query()
             ->select([
@@ -58,6 +59,11 @@ class DouDianDataServers
 //                ]);
 //            },
         ]);
+
+        //解密状态
+        if ($decrypt_step !== -1) {
+            $query->where('decrypt_step', $decrypt_step);
+        }
 
         //订单状态
         $query->when($order_status, function ($q, $order_status) {
