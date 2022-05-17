@@ -21,32 +21,29 @@ class MallAddress extends Base
     protected $table = 'nlsg_mall_address';
 
 
-
-    public function area_province()
-    {
+    public function area_province() {
         return $this->belongsTo(Area::class, 'province', 'id');
     }
-    public function area_city()
-    {
+
+    public function area_city() {
         return $this->belongsTo(Area::class, 'city', 'id');
     }
-    public function area_area()
-    {
+
+    public function area_area() {
         return $this->belongsTo(Area::class, 'area', 'id');
     }
 
 
-    public function create($params, $user_id)
-    {
+    public function create($params, $user_id) {
         $province = $params['province'] ?? 0;
-        $city = $params['city'] ?? 0;
-        $area = $params['area'] ?? 0;
-        $details = $params['details'] ?? '';
-        $name = $params['name'] ?? '';
-        $phone = $params['phone'] ?? '';
+        $city     = $params['city'] ?? 0;
+        $area     = $params['area'] ?? 0;
+        $details  = $params['details'] ?? '';
+        $name     = $params['name'] ?? '';
+        $phone    = $params['phone'] ?? '';
 
 
-        if (substr($city,-2) !== '00' && empty($area)){
+        if (substr($city, -2) !== '00' && empty($area)) {
             $area = $city;
             $city = $province;
         }
@@ -56,6 +53,19 @@ class MallAddress extends Base
             empty($details) || empty($name) ||
             empty($phone)) {
             return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        if (
+            substr($province, 0, 2) !== substr($city, 0, 2)
+            ||
+            substr($province, 0, 2) !== substr($area, 0, 2)
+        ) {
+            return ['code' => false, 'msg' => '地址格式错误,请重新选择'];
+        }
+
+        //判断字符串内是否有'省'
+        if (strpos(mb_substr($details, 0, 5), '省') !== false) {
+            return ['code' => false, 'msg' => '详细地址请勿包含省市区'];
         }
 
         if (strlen($phone) > 11) {
@@ -92,34 +102,32 @@ class MallAddress extends Base
             }
         }
 
-        $address->name = $name;
-        $address->phone = $phone;
-        $address->details = $details;
+        $address->name       = $name;
+        $address->phone      = $phone;
+        $address->details    = $details;
         $address->is_default = $params['is_default'] ?? 0;
-        $address->is_del = 0;
-        $address->province = $province;
-        $address->city = $city;
-        $address->area = $area;
-        $address->user_id = $user_id;
-        $res = $address->save();
+        $address->is_del     = 0;
+        $address->province   = $province;
+        $address->city       = $city;
+        $address->area       = $area;
+        $address->user_id    = $user_id;
+        $res                 = $address->save();
 
         if ($res) {
             DB::commit();
-            return ['code' => true, 'msg' => '成功','address_id'=>$address->id];
+            return ['code' => true, 'msg' => '成功', 'address_id' => $address->id];
         } else {
             DB::rollBack();
             return ['code' => false, 'msg' => '失败'];
         }
     }
 
-    public static function getNameById($id)
-    {
+    public static function getNameById($id) {
         $res = Area::find($id);
         return $res->name ?? '';
     }
 
-    public function getList($user_id, $id = 0, $limit = 0)
-    {
+    public function getList($user_id, $id = 0, $limit = 0) {
 
         $query = self::where('user_id', '=', $user_id);
 
@@ -141,15 +149,14 @@ class MallAddress extends Base
 
         foreach ($res as $v) {
             $v->province_name = self::getNameById($v->province);
-            $v->city_name = self::getNameById($v->city);
-            $v->area_name = self::getNameById($v->area);
+            $v->city_name     = self::getNameById($v->city);
+            $v->area_name     = self::getNameById($v->area);
         }
 
         return $res;
     }
 
-    public function statusChange($id, $flag, $user_id)
-    {
+    public function statusChange($id, $flag, $user_id) {
 
         if (!is_array($id)) {
             $id = explode(',', $id);
