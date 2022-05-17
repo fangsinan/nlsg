@@ -91,7 +91,7 @@ class Lists extends Model
                 foreach ($v['list_works'] as $kk => &$vv) {
 
                     if ($vv['type']==1){
-                        $works = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','view_num',"chapter_num as info_num","cover_img as cover_images"])
+                        $works_data = Works::select(['id','user_id','type', 'title', 'subtitle', 'cover_img','original_price','price', 'message','is_free','view_num',"chapter_num as info_num","cover_img as cover_images"])
                             ->with(['user'=>function($query){
                                 $query->select('id','nickname', 'headimg','teacher_title');
                             }])
@@ -99,9 +99,8 @@ class Lists extends Model
                             ->where('status', 4)
                             ->first();
                         //->get()->toArray();
-                        $v['list_works'][$kk]['works'] = $works;
                     }else if ($vv['type'] == 2) {
-                        $listen = Works::select([
+                        $works_data = Works::select([
                             'id', 'user_id', 'type', 'title', 'subtitle', 'cover_img', 'original_price', 'price',
                             'message', 'is_free','view_num',"chapter_num as info_num","cover_img as cover_images"
                         ])
@@ -114,9 +113,8 @@ class Lists extends Model
                             ->where('is_audio_book', 1)
                             ->where('status', 4)
                             ->first();
-                        $v['list_works'][$kk]['works'] = $listen;
                     } elseif ($vv['type'] == 4) {
-                        $column = Column::select([
+                        $works_data = Column::select([
                             'id', 'user_id', 'title', 'subtitle', 'cover_pic', 'original_price', 'price', 'message',
                             'is_free','view_num',"info_num","cover_pic as cover_images"
                         ])
@@ -129,10 +127,15 @@ class Lists extends Model
                             ->where('type', 2)
                             ->where('status', 1)
                             ->first();
-                        $v['list_works'][$kk]['works'] = $column;
                     } else {
                         unset($lists[$k]['list_works'][$kk]);
                     }
+                    if(empty($works_data)){
+                        unset($lists[$k]['list_works'][$kk]);
+                        continue;
+                    }
+                    $v['list_works'][$kk]['works'] = $works_data;
+
 
                     // 获取第一章节 info_id
                     $first_info_id = WorksInfo::select('id')->where(['pid'=>$vv['works_id'],'type'=>2,'status'=>4 ])->orderBy('rank','asc')->first();
