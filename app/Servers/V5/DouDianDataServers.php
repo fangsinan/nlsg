@@ -96,8 +96,9 @@ class DouDianDataServers
             $q->where('order_id', '=', $order_id);
         });
 
-        $query->orderBy('created_at', 'desc');
+
         $query->orderBy('order_id', 'desc');
+//        $query->orderBy('create_time', 'desc');
 
         if ($is_excel === 1) {
             $page = $params['page'] ?? 1;
