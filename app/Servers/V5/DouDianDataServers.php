@@ -111,7 +111,20 @@ class DouDianDataServers
             return $query->limit($size)->offset(($page - 1) * $size)->get();
         }
 
-        return $query->paginate($size);
+
+        $res = $query->paginate($size);
+
+        foreach ($res as $v) {
+            if ($v->finish_time === 0) {
+                $v->finish_time_date = '';
+            }
+
+            if ($v->pay_time === 0) {
+                $v->pay_time_date = '';
+            }
+            
+        }
+        return $res;
     }
 
     public function selectOrderStatus($params) {
