@@ -32,7 +32,7 @@ class erpOrderServers
             ->select([
                 'id', 'ordernum', 'type', 'live_num', 'live_id', 'user_id', 'status',
                 'pay_time', 'pay_price', 'is_shill', 'shill_refund_sum', 'is_refund', 'refund_no',
-                'created_at', 'express_info_id', 'textbook_id', 'address_id'
+                'created_at', 'express_info_id', 'textbook_id', 'address_id','can_refund'
             ]);
 
         if ($erp_push_order_flag === 1) {
@@ -188,6 +188,10 @@ class erpOrderServers
                 } else {
                     $v->shill_status = 2;
                 }
+            }
+
+            if ($v->can_refund !== 0 && $v->can_refund_button === 1) {
+                $v->can_refund_button = 0;
             }
 
             $v->address_detail = '';
