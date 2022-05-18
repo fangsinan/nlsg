@@ -37,6 +37,8 @@ class DouDianDataServers
                 'cancel_reason', 'buyer_words',
             ]);
 
+        $query->where('create_time', '>=', 1652803200);
+
         $query->with([
             'orderList'             => function ($q) {
                 $q->select([
@@ -122,7 +124,19 @@ class DouDianDataServers
             if ($v->pay_time === 0) {
                 $v->pay_time_date = '';
             }
-            
+
+
+//            DB::raw('order_amount/100 as order_amount_yuan'),
+//                DB::raw('pay_amount/100 as pay_amount_yuan'),
+//                DB::raw('post_amount/100 as post_amount_yuan'),
+            //
+
+            //float保留两位小数
+            $v->order_amount_yuan = sprintf("%01.2f", $v->order_amount_yuan);
+            $v->pay_amount_yuan = sprintf("%01.2f", $v->pay_amount_yuan);
+            $v->post_amount_yuan = sprintf("%01.2f", $v->post_amount_yuan);
+
+
         }
         return $res;
     }
