@@ -78,11 +78,14 @@ class DouDianServers
         //收件人手机解密
         $this->toDecrypt();
 
-        //收件人姓名解密
-//        $this->toDecrypt(1);
+        if (date('H') > 12) {
+            //收件人姓名解密
+            $this->toDecrypt(1);
 
-        //收件人详细地址解密
-//        $this->toDecrypt(2);
+            //收件人详细地址解密
+            $this->toDecrypt(2);
+        }
+
 
         return true;
     }
@@ -355,7 +358,7 @@ class DouDianServers
 
         $list = DouDianOrder::query()
             ->where('decrypt_step', $step)
-            ->where('create_time','>',1652803200)
+            ->where('create_time', '>', 1652803200)
             ->select([
                 'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',

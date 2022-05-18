@@ -68,9 +68,17 @@ class DouDianDataServers
         }
 
         //订单状态
-        $query->when($order_status, function ($q, $order_status) {
-            $q->where('order_status', '=', $order_status);
-        });
+        if (!is_array($order_status)) {
+            $order_status = explode(',', $order_status);
+        }
+        $order_status = array_filter($order_status);
+        if (!empty($order_status)) {
+            $query->whereIn('order_status', $order_status);
+        }
+
+//        $query->when($order_status, function ($q, $order_status) {
+//            $q->where('order_status', '=', $order_status);
+//        });
 
         //主要状态
         $query->when($main_status, function ($q, $main_status) {
@@ -133,8 +141,8 @@ class DouDianDataServers
 
             //float保留两位小数
             $v->order_amount_yuan = sprintf("%01.2f", $v->order_amount_yuan);
-            $v->pay_amount_yuan = sprintf("%01.2f", $v->pay_amount_yuan);
-            $v->post_amount_yuan = sprintf("%01.2f", $v->post_amount_yuan);
+            $v->pay_amount_yuan   = sprintf("%01.2f", $v->pay_amount_yuan);
+            $v->post_amount_yuan  = sprintf("%01.2f", $v->post_amount_yuan);
 
 
         }
