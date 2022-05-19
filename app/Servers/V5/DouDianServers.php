@@ -358,8 +358,8 @@ class DouDianServers
 
         $list = DouDianOrder::query()
             ->where('decrypt_step', $step)
-            ->where('order_status','>',1)
-            ->where('create_time', '>', 1652803200)
+            ->whereNotIn('order_status', [1, 4, 5])
+            ->where('order_id','>','4933714072054765432')
             ->select([
                 'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',

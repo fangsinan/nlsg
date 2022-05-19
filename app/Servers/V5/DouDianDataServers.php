@@ -37,7 +37,7 @@ class DouDianDataServers
                 'cancel_reason', 'buyer_words',
             ]);
 
-        $query->where('create_time', '>=', 1652803200);
+        $query->where('order_id','>','4933714072054765432');
 
         $query->with([
             'orderList'             => function ($q) {
