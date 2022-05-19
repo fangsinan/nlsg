@@ -659,6 +659,9 @@ class VipServers
                 return $this->createVip_1($params, $admin_id);
             case 2:
                 return $this->createVip_2($params, $admin_id);
+            case 3:
+                //临时360权限
+                return $this->createVip_3($params, $admin_id);
             default:
                 return ['code' => false, 'msg' => '开通类型错误'];
         }
@@ -672,6 +675,88 @@ class VipServers
             ->update([
                 'status' => 2
             ]);
+    }
+
+    public function createVip_3($params, $admin_id) {
+        $phone = $params['phone'] ?? 0;
+        if (empty($phone)) {
+            return ['code' => false, 'msg' => '开通人不能为空'];
+        }
+
+        $now_date = date('Y-m-d H:i:s');
+        $end_date = date('Y-m-d 23:59:59', strtotime("+1 months"));
+
+        $check_phone = User::query()
+            ->firstOrCreate([
+                'phone' => $phone,
+            ], [
+                'nickname' => substr_replace($phone, '****', 3, 4),
+            ]);
+
+        if (!$check_phone) {
+            return ['code' => false, 'msg' => $phone . '没注册'];
+        }
+
+        $check_son = VipUser::query()
+            ->where('username', '=', $phone)
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->where('expire_time', '>=', $now_date)
+            ->first();
+
+        if (!empty($check_son)) {
+            return ['code' => false, 'msg' => '已经是360幸福大师,无法继续开通体验会员.'];
+        }
+
+        DB::beginTransaction();
+
+        $this_vip_data                   = [];
+        $this_vip_data['user_id']        = $check_phone->id;
+        $this_vip_data['nickname']       = substr_replace($phone, '****', 3, 4);
+        $this_vip_data['username']       = $phone;
+        $this_vip_data['level']          = 1;
+        $this_vip_data['inviter']        = 0;
+        $this_vip_data['inviter_vip_id'] = 0;
+        $this_vip_data['source']         = 0;
+        $this_vip_data['source_vip_id']  = 0;
+        $this_vip_data['is_default']     = 1;
+        $this_vip_data['start_time']     = $now_date;
+        $this_vip_data['channel']        = 'backend_open';
+        $this_vip_data['expire_time']    = $end_date;
+
+        $success_msg[] = $phone . '开通360体验会员.有效期' . $now_date . '至' . $this_vip_data['expire_time'];
+        if (!empty($inviter_username)) {
+            $success_msg[] = '上级:' . $inviter_username;
+        }
+
+        $this_vip_res = DB::table('nlsg_vip_user')->insertGetId($this_vip_data);
+        if ($this_vip_res) {
+            $check_son = VipUser::query()->where('id', '=', $this_vip_res)->first();
+        }
+
+        if (!$this_vip_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败,请重试.' . __LINE__];
+        }
+
+        VipRedeemUser::subWorksOrGetRedeemCode($check_phone->id, 'backend_open_temp_360');
+
+        $log_data             = [];
+        $log_data['admin_id'] = $admin_id;
+        $log_data['phone']    = $phone;
+        $log_data['user_id']  = $check_son->user_id;
+        $log_data['vip_id']   = $check_son->id;
+        $log_data['record']   = implode(';', $success_msg);
+
+        $log_res = DB::table('nlsg_vip_admin_log')->insert($log_data);
+        if (!$log_res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '日志写入失败'];
+        }
+
+        DB::commit();
+        return ['code' => true, 'msg' => '成功', 'success_msg' => $success_msg];
+
     }
 
 }
