@@ -42,4 +42,3 @@ class SubListClose extends Command
         $servers->worksListOfDelSub();
     }
 }
-
