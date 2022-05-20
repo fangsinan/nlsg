@@ -705,7 +705,7 @@ class VipServers
             ->first();
 
         if (!empty($check_son)) {
-            return ['code' => false, 'msg' => '已经是360幸福大师,无法继续开通体验会员.'];
+            return ['code' => false, 'msg' => '已经是会员,无法继续开通体验会员.'];
         }
 
         DB::beginTransaction();
