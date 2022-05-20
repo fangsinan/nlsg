@@ -39,6 +39,7 @@ use EasyWeChat\Factory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Predis\Client;
+use App\Models\PayIncome;
 
 class WechatPay extends Controller
 {
