@@ -228,7 +228,7 @@ class ClassController extends ControllerBackend
             ->when($type, function ($query) use ($type) {
                 $query->where('type', $type);
             })
-            ->when($is_end, function ($query) use ($title) {
+            ->when($is_end, function ($query) use ($is_end) {
                 $query->where('is_end', $is_end);
             })
             ->when($title, function ($query) use ($title) {
