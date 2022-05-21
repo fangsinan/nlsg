@@ -7,6 +7,7 @@ use App\Models\Column;
 use App\Models\Comment;
 use App\Models\Live;
 use App\Models\Order;
+use App\Models\User;
 use App\Models\Wiki;
 use App\Models\Works;
 use Carbon\Carbon;
@@ -65,11 +66,14 @@ class OrderController extends ControllerBackend
         $page = $request->input('page', 1);
         $size = $request->input('size', 10);
         $teacher_name = $request->input('teacher_name','');
+        $twitter_phone = $request->input('twitter_phone','');
+
         $query = Order::with(
             [
                 'user:id,nickname,phone',
                 'works:id,title,user_id',
-                'works.user:id,nickname,phone'
+                'works.user:id,nickname,phone',
+                'twitter:id,nickname,phone',
             ])
             ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
@@ -119,6 +123,15 @@ class OrderController extends ControllerBackend
             });
         }
 
+        if (!empty($twitter_phone)){
+            $twitter_id = User::query()->where('phone','like',"%$twitter_phone%")->pluck('id');
+            if (empty($twitter_id)){
+                $query->where('id','=',0);
+            }else{
+                $query->whereIn('twitter_id',$twitter_id);
+            }
+        }
+
         if ($activity_tag === 'cytx_on') {
             $query->where('activity_tag', '=', 'cytx');
         }
@@ -134,7 +147,7 @@ class OrderController extends ControllerBackend
 
         $direction = $sort === 'asc' ? 'asc' : 'desc';
         $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price',
-            'os_type', 'pay_type', 'created_at', 'status', 'activity_tag', 'is_shill')
+            'os_type', 'pay_type', 'created_at', 'status', 'activity_tag', 'is_shill','twitter_id')
             ->where('type', 9)->orderBy('id', $direction);
 
         if ($flag === 1) {
@@ -174,7 +187,10 @@ class OrderController extends ControllerBackend
     public function listExcel(Request $request)
     {
 
-        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称','老师', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
+        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称','老师', '支付金额',
+            '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源',
+            '推客账号','推客昵称',
+        ];
 
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -253,6 +269,10 @@ class OrderController extends ControllerBackend
                         $temp_v[] = '-';
                 }
 
+                $temp_v[] = $v['twitter']['phone'] ?? '';
+                $temp_v[] = $v['twitter']['nickname'] ?? '';
+
+
                 mb_convert_variables('GBK', 'UTF-8', $temp_v);
                 fputcsv($fp, $temp_v);
                 ob_flush();     //刷新输出缓冲到浏览器
@@ -270,7 +290,10 @@ class OrderController extends ControllerBackend
     }
 
     public function colListExcel(Request $request){
-        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称','老师', '支付金额', '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源'];
+        $columns = ['订单编号', '购买人账号', '购买人昵称', '课程名称','老师', '支付金额',
+            '支付时间', '支付方式', '渠道', '是否退款', '订单状态', '订单来源',
+            '推客账号','推客昵称',
+        ];
 
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -350,7 +373,10 @@ class OrderController extends ControllerBackend
                     default:
                         $temp_v[] = '-';
                 }
-                
+
+                $temp_v[] = $v['twitter']['phone'] ?? '';
+                $temp_v[] = $v['twitter']['nickname'] ?? '';
+
                 mb_convert_variables('GBK', 'UTF-8', $temp_v);
                 fputcsv($fp, $temp_v);
                 ob_flush();     //刷新输出缓冲到浏览器
@@ -385,6 +411,7 @@ class OrderController extends ControllerBackend
         $page = $request->input('page', 1);
         $size = $request->input('size', 10);
         $teacher_name = $request->input('teacher_name','');
+        $twitter_phone = $request->input('twitter_phone','');
 
         $query = Order::with(
             [
@@ -392,7 +419,8 @@ class OrderController extends ControllerBackend
                 'column' => function ($q) {
                     $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img','user_id']);
                 },
-                'column.user:id,nickname,phone'
+                'column.user:id,nickname,phone',
+                'twitter:id,nickname,phone',
             ])
             ->whereHas('column', function ($q) {
                 $q->where('type', '=', 2);
@@ -443,6 +471,16 @@ class OrderController extends ControllerBackend
                 $q->where('nickname','like',"%$teacher_name%");
             });
         }
+
+        if (!empty($twitter_phone)){
+            $twitter_id = User::query()->where('phone','like',"%$twitter_phone%")->pluck('id');
+            if (empty($twitter_id)){
+                $query->where('id','=',0);
+            }else{
+                $query->whereIn('twitter_id',$twitter_id);
+            }
+        }
+
         if ($activity_tag === 'cytx_on') {
             $query->where('activity_tag', '=', 'cytx');
         }
@@ -458,7 +496,7 @@ class OrderController extends ControllerBackend
 
         $direction = $sort === 'asc' ? 'asc' : 'desc';
         $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
-            'created_at', 'status', 'activity_tag','is_shill')
+            'created_at', 'status', 'activity_tag','is_shill','twitter_id')
             ->where('type', 15)
             ->orderBy('id', $direction);
 
