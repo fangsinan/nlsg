@@ -325,7 +325,7 @@ class ClassController extends ControllerBackend
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when($is_end, function ($query) use ($title) {
+            ->when($is_end, function ($query) use ($is_end) {
                 $query->where('is_end', $is_end);
             })
             ->when($title, function ($query) use ($title) {
@@ -750,7 +750,8 @@ class ClassController extends ControllerBackend
             'content'        => $content,
             'is_pay'         => $is_pay,
             'is_free'        => $price == 0 ? 1 : 0,
-            'type'           => $type
+            'type'           => $type,
+            'is_audio_book'  => 0,
         ];
         //是否自动上架
         if ($timing_online == 1) {
