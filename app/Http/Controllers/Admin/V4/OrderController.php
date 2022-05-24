@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\CacheTools;
 use App\Models\Column;
 use App\Models\Comment;
 use App\Models\Live;
@@ -12,6 +13,7 @@ use App\Models\Wiki;
 use App\Models\Works;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends ControllerBackend
@@ -91,7 +93,7 @@ class OrderController extends ControllerBackend
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', '=', $phone);
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -124,7 +126,9 @@ class OrderController extends ControllerBackend
         }
 
         if (!empty($twitter_phone)){
-            $twitter_id = User::query()->where('phone','like',"%$twitter_phone%")->pluck('id');
+            $twitter_id = User::query()
+                ->where('phone','=',$twitter_phone)
+                ->pluck('id');
             if (empty($twitter_id)){
                 $query->where('id','=',0);
             }else{
@@ -163,18 +167,24 @@ class OrderController extends ControllerBackend
 
         }
 
-        $rank = Order::with('works:id,title,cover_img')
-            ->select([
-                DB::raw('count(*) as total'),
-                'user_id',
-                'relation_id'
-            ])
-            ->where('type', 9)
-            ->where('status', 1)
-            ->orderBy('total', 'desc')
-            ->groupBy('relation_id')
-            ->limit(10)
-            ->get();
+        $cache_key_name = 'order_list_works_rank_list';
+        $expire_num = CacheTools::getExpire('channel_works_list');
+        $rank = Cache::get($cache_key_name);
+        if (empty($rank)) {
+            $rank = Order::with('works:id,title,cover_img')
+                ->select([
+                    DB::raw('count(*) as total'),
+                    'user_id',
+                    'relation_id'
+                ])
+                ->where('type', 9)
+                ->where('status', 1)
+                ->orderBy('total', 'desc')
+                ->groupBy('relation_id')
+                ->limit(10)
+                ->get();
+            Cache::put($cache_key_name, $rank, $expire_num);
+        }
 
         $data = [
             'lists' => $lists,
@@ -441,7 +451,7 @@ class OrderController extends ControllerBackend
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', '=',  $phone);
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -473,7 +483,9 @@ class OrderController extends ControllerBackend
         }
 
         if (!empty($twitter_phone)){
-            $twitter_id = User::query()->where('phone','like',"%$twitter_phone%")->pluck('id');
+            $twitter_id = User::query()
+                ->where('phone','=',$twitter_phone)
+                ->pluck('id');
             if (empty($twitter_id)){
                 $query->where('id','=',0);
             }else{
@@ -512,20 +524,26 @@ class OrderController extends ControllerBackend
             return $lists->toArray();
         }
 
-        $rank = Order::with(['column' => function ($q) {
-            $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
-        }])->whereHas('column', function ($q) {
-            $q->where('type', '=', 2);
-        })->select([
-            DB::raw('count(*) as total'),
-            'user_id',
-            'relation_id'
-        ])->where('type', 15)
-            ->where('status', 1)
-            ->orderBy('total', 'desc')
-            ->groupBy('relation_id')
-            ->limit(10)
-            ->get();
+        $cache_key_name = 'col_list_col_rank_list';
+        $expire_num = CacheTools::getExpire('channel_works_list');
+        $rank = Cache::get($cache_key_name);
+        if (empty($rank)) {
+            $rank = Order::with(['column' => function ($q) {
+                $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
+            }])->whereHas('column', function ($q) {
+                $q->where('type', '=', 2);
+            })->select([
+                DB::raw('count(*) as total'),
+                'user_id',
+                'relation_id'
+            ])->where('type', 15)
+                ->where('status', 1)
+                ->orderBy('total', 'desc')
+                ->groupBy('relation_id')
+                ->limit(10)
+                ->get();
+            Cache::put($cache_key_name, $rank, $expire_num);
+        }
 
         $data = [
             'lists' => $lists,
