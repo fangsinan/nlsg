@@ -1000,6 +1000,12 @@ class IncomeController extends Controller
                     if($OrderInfo){
                         $works_id=$OrderInfo['relation_id'];
 
+                        $withdrawalObj=PayIncome::query()->where(['user_id'=>$OrderInfo['user_id'],'status'=>2])->first();
+                        if(!empty($withdrawalObj)) { //允许提现
+                            $userInfo = User::find($OrderInfo['user_id']);
+                            $res['o_nick_name'] = $userInfo['phone'];
+                        }
+
                         $workName = Works::find($works_id);
                         //$val['name']=Tool::SubStr($workName,8); //截取名称13
                         $res['name']=$workName['title']; //截取名称13
