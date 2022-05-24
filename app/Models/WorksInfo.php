@@ -684,9 +684,10 @@ class WorksInfo extends Base
         if($works_id == 0){
             return 0;
         }
+        $id = Lists::select('id')->where(['type'=>10])->first();
         $is_data = ListsWork::select('id')->where([
                 'type'      => 1,    
-                'lists_id'  => 40,
+                'lists_id'  => $id['id']??0,
                 'works_id'  => $works_id,
                 'state'     => 1,
             ])->first();
