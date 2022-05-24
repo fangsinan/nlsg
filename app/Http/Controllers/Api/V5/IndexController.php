@@ -88,6 +88,16 @@ class IndexController extends Controller
             }
         }
 
+        //仅针对大咖讲书
+        if (!empty($version) && version_compare($version, "5.0.5") < 0){
+            foreach ($head as $head_key=>$head_value){   //导航栏
+                if( $head_value['jump_type'] == 11 ){ //icon
+                    unset($head[$head_key]);
+                }
+            }
+            $head = array_values($head);
+        }
+
         $res = [
             'head' => $head,
             'bottom' => $bottom,

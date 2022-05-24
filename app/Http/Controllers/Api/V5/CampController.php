@@ -160,7 +160,8 @@ class CampController extends Controller
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $type);
         $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image')->toArray();
         if(empty($column['poster'])){ // 如果为空则取用父级
-            $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column['classify_column_id']])->pluck('image');
+            $f_columnID = !empty($column['classify_column_id']) ?$column['classify_column_id']: $column['info_column_id'];
+            $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$f_columnID])->pluck('image');
         }
         $column['is_sub'] = $is_sub;
         //查询总的历史记录进度`
