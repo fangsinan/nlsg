@@ -626,6 +626,9 @@ class WechatPay extends Controller
                 case 10: //哈佛凌晨四点半--抖音陪读教材
                     $res = $nickname . ':您已支付' . $live_num . '哈佛凌晨四点半--抖音陪读教材';
                     break;
+                case 12: //30天演讲口才(亲子)训练营
+                    $res = $nickname . ':您已支付' . $live_num . '单30天演讲口才(亲子)训练营';
+                    break;
             }
         } else if ($type == 18) {
             $data = Column::find($relation_id);
