@@ -100,7 +100,7 @@ class Lists extends Model
                             ->where('id', $vv['works_id'])
                             ->where('status', 4)
                             ->first();
-                            $works_data["is_teacherBook"] = WorksInfo::IsTeacherBook($vv['works_id']);
+                            // $works_data["is_teacherBook"] = WorksInfo::IsTeacherBook($vv['works_id']);
                         //->get()->toArray();
                     }else if ($vv['type'] == 2) {
                         $works_data = Works::select([
@@ -116,7 +116,7 @@ class Lists extends Model
                             ->where('is_audio_book', 1)
                             ->where('status', 4)
                             ->first();
-                        $works_data["is_teacherBook"] = WorksInfo::IsTeacherBook($vv['works_id']);
+                        // $works_data["is_teacherBook"] = WorksInfo::IsTeacherBook($vv['works_id']);
                     } elseif ($vv['type'] == 4) {
                         $works_data = Column::select([
                             'id', 'user_id', 'title', 'subtitle', 'cover_pic', 'original_price', 'price', 'message',
