@@ -91,8 +91,15 @@ class IndexController extends Controller
         //仅针对大咖讲书
         if (!empty($version) && version_compare($version, "5.0.5") < 0){
             foreach ($head as $head_key=>$head_value){   //导航栏
+                // 不显示大咖讲书顶部按钮
                 if( $head_value['jump_type'] == 11 ){ //icon
                     unset($head[$head_key]);
+                }
+
+                // 活动图片小于5.0.5的显示老的
+                if( $head_value['jump_type'] == 18 ){ //icon
+                    $head[$head_key]['icon_pic'] = "/nlsg/icon/xin.png";
+                    $head[$head_key]['jump_url'] = "https://wechat.nlsgapp.com/active/";
                 }
             }
             $head = array_values($head);
