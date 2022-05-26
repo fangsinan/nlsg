@@ -239,7 +239,7 @@ class LiveInfoServers {
 //        if ($check_live_id->user_id != 161904) {
 //            return ['code' => false, 'msg' => '不是王琨的直播间'];
 //        }
-        if (!in_array($check_live_id->user_id, [161904, 185689], true)) {
+        if (!in_array($check_live_id->user_id, [161904, 185689,167861], true)) {
             return ['code' => false, 'msg' => '直播间归属错误'];
         }
 
