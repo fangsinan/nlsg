@@ -36,6 +36,7 @@ class WorksController extends Controller
     function getListsWorks(Request $request){
         $lists_id = $request->input("lists_id");
         $page = $request->input("page");
+        $os_type = $request->input("os_type");
         if(empty($lists_id)){
             return $this->error(0,'参数错误');
         }
@@ -45,7 +46,7 @@ class WorksController extends Controller
             return $this->success([]);
         }
         $model = new Lists();
-        $result = $model->getIndexListWorks([$lists_id], [7,10],$user_id);
+        $result = $model->getIndexListWorks([$lists_id], [7,10],$user_id,$os_type);
 
         $re = $result[0] ?? [];
         return $this->success($re);

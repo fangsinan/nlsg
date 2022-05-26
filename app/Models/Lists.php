@@ -50,7 +50,7 @@ class Lists extends Model
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexListWorks($ids, $type = [1],$uid=0)
+    public function getIndexListWorks($ids, $type = [1],$uid=0,$os_type=0)
     {
         if ( ! $ids) {
             return false;
@@ -70,9 +70,11 @@ class Lists extends Model
         if ($lists) {
             foreach ($lists as $k => &$v) {
 
-
-
+                
                 if(!empty($v['type']) && $v['type'] == 10){ //大咖讲书 单独判断   因为需要返回时间
+                    if($os_type == 2){//
+                        $v['describe'] = str_replace("元",'币',$v['describe']);
+                    }
                     //专题订阅
                     $where = ['relation_id' => $v['id'], 'type' => 8, 'user_id' => $uid,'status'=>1,];
                     $sub_data = Subscribe::where($where)
