@@ -996,11 +996,11 @@ class IncomeController extends Controller
 
                     break;
                 case 7:$res['content'] = '精品课收益';
-                    $OrderInfo = Order::where(['ordernum'=>$ordernum])->first('relation_id');
+                    $OrderInfo = Order::where(['ordernum'=>$ordernum])->select(['relation_id','twitter_id','user_id'])->first();
                     if($OrderInfo){
                         $works_id=$OrderInfo['relation_id'];
 
-                        $withdrawalObj=PayIncome::query()->where(['user_id'=>$OrderInfo['user_id'],'status'=>2])->first();
+                        $withdrawalObj=PayIncome::query()->where(['user_id'=>$OrderInfo['twitter_id'],'status'=>2])->first();
                         if(!empty($withdrawalObj)) { //允许提现
                             $userInfo = User::find($OrderInfo['user_id']);
                             $res['o_nick_name'] = $userInfo['phone'];
