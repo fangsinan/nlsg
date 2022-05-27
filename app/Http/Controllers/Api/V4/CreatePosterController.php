@@ -10,6 +10,7 @@ use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\CreatePost;
 use App\Models\CreateQRcode;
+use App\Models\Lists;
 use App\Models\Live;
 use App\Models\MallGoods;
 use App\Models\MallSku;
@@ -1083,8 +1084,10 @@ class CreatePosterController extends Controller
                 // 校验大咖讲书
                 $is_teacherBook = WorksInfo::IsTeacherBook($gid);
                 if($is_teacherBook == 1){
+                    $id = Lists::select('id')->where(['type'=>10])->first();
                     $u_type = 25;
                     $m_t_type = 0;
+                    $gid=$id['id']??0;
                 }
                 break;
             case 7://商品
