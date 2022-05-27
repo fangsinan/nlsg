@@ -743,7 +743,11 @@ class WorksController extends Controller
         }
 
         $res = WorksInfoContent::where('works_info_id',$info_id)->first();
-        $res->top_img = $top_img;
+        if(!empty( $res)){
+            $res->top_img = $top_img;
+        }else{
+            $res = (object)[];
+        }
         return $this->success($res);
     }
 
