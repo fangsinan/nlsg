@@ -91,7 +91,7 @@ class MallTwitter extends Base
                 break;
 
             case 25:  //大咖讲书
-                $url = 'activeShare?time='.time();
+                $url = 'activeShare?id='. $gid .'&time='.time();
                 break;
         }
 

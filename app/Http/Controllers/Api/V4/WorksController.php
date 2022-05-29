@@ -20,6 +20,7 @@ use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
 use App\Models\WorksInfoContent;
+use Doctrine\Inflector\Rules\Word;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -717,11 +718,36 @@ class WorksController extends Controller
     }
      */
     public function getWorksContent(Request $request){
+        // $works_id = $request->input('works_id',0);
         $info_id = $request->input('info_id',0);
         if( empty($info_id) ){
             return $this->error(0,'info_id 1不能为空');
         }
+
+        $infoData = WorksInfo::find($info_id);
+        $works_id = $infoData->pid;
+        $IsTeacherBook = WorksInfo::IsTeacherBook($works_id);
+        $works = Works::select("user_id","detail_img")->find($works_id);
+        if($IsTeacherBook == 1){
+            
+            // 因为大咖讲书无横图  临时处理 获取老师课程详情的横图
+            $img = Works::select("user_id","detail_img")->where([
+                "user_id" => $works->user_id,
+                "type" => 1,
+                "status" => 4,
+                "is_show" => 1,
+            ])->first();
+            $top_img = $img->detail_img??"";
+        }else{
+            $top_img = $works->detail_img;
+        }
+
         $res = WorksInfoContent::where('works_info_id',$info_id)->first();
+        if(!empty( $res)){
+            $res->top_img = $top_img;
+        }else{
+            $res = (object)[];
+        }
         return $this->success($res);
     }
 
