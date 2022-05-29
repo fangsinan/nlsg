@@ -50,6 +50,7 @@ class LiveInfoServers {
             ])
             ->where('type','=',3)
             ->where('relation_id','=',$live_id)
+            ->where('is_del','=',0)
             ->orderBy('id','desc');
 
         if ($twitter_id_list !== null) {
