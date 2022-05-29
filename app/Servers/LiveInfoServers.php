@@ -52,10 +52,6 @@ class LiveInfoServers {
             ->where('relation_id','=',$live_id)
             ->orderBy('id','desc');
 
-        $query->whereHas('UserInfo',function ($q){
-            $q->where('phone','like',"1%");
-        });
-
         if ($twitter_id_list !== null) {
             $query->whereIn('twitter_id', $twitter_id_list);
         }
