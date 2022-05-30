@@ -443,9 +443,6 @@ class DouDianServers
             $check_order->save();
 
         }
-
-
-        dd([$cipher_infos, $decrypt_infos]);
     }
 
     public function accessTokenJob($job = 1) {
