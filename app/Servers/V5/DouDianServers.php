@@ -365,7 +365,7 @@ class DouDianServers
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
             ])
             ->limit(50)
-            ->orderBy('order_id', 'desc')
+            ->orderBy('order_id')
             ->get()
             ->toArray();
 
