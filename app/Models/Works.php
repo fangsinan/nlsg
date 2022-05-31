@@ -85,7 +85,7 @@ class Works extends Base
             ->where('works.status', 4)
             ->where('works.type', 2)
             ->where('works.is_audio_book', $is_audio_book)
-            ->where('info.status', 4)
+            // ->where('info.status', 4)
             ->where(function ($query) use ($keywords) {
                 $query->orwhere('works.title', 'like', "%{$keywords}%");
                 $query->orwhere('user.nickname', 'like', "%{$keywords}%");

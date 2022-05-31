@@ -73,7 +73,7 @@ class Lists extends Model
                 
                 if(!empty($v['type']) && $v['type'] == 10){ //大咖讲书 单独判断   因为需要返回时间
                     if($os_type == 2){//
-                        $v['describe'] = str_replace("元",'币',$v['describe']);
+                        $v['describe'] = str_replace("元",'能量币',$v['describe']);
                     }
                     //专题订阅
                     $where = ['relation_id' => $v['id'], 'type' => 8, 'user_id' => $uid,'status'=>1,];
