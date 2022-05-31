@@ -9,6 +9,6 @@ class DouDianOrderDecryptQuota extends Base
 
     protected $table = 'nlsg_dou_dian_order_decrypt_quota';
 
-    protected $fillable = ['flag','expire'];
+    protected $fillable = ['flag','expire','check'];
 
 }

@@ -68,24 +68,29 @@ class DouDianServers
         $decrypt_quota = DouDianOrderDecryptQuota::query()
             ->orderBy('id', 'desc')
             ->first();
-        if (!empty($decrypt_quota) && $decrypt_quota->flag === 1) {
+        if (!empty($decrypt_quota) && $decrypt_quota->flag === 1 && $decrypt_quota->check === 0) {
             $expire = $decrypt_quota->expire;
             if ($expire > date('Y-m-d H:i:s')) {
                 return true;
             }
         }
 
+        $size = 50;
+
+        if ($decrypt_quota->check === 1) {
+            $size = 1;
+        }
+
         //收件人手机解密
-        $this->toDecrypt();
+        $this->toDecrypt(0, $size);
 
         if (date('H') > 12) {
             //收件人姓名解密
-            $this->toDecrypt(1);
+            $this->toDecrypt(1,$size);
 
             //收件人详细地址解密
-            $this->toDecrypt(2);
+            $this->toDecrypt(2,$size);
         }
-
 
         return true;
     }
@@ -350,7 +355,7 @@ class DouDianServers
     }
 
     //解密
-    public function toDecrypt($step = 0) {
+    public function toDecrypt($step = 0,int $size = 50) {
 
         if (!in_array($step, [0, 1, 2])) {
             return true;
@@ -364,7 +369,7 @@ class DouDianServers
                 'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
             ])
-            ->limit(50)
+            ->limit($size)
             ->orderBy('order_id')
             ->get()
             ->toArray();
@@ -405,7 +410,8 @@ class DouDianServers
             if ($response->code === 50002) {
                 DouDianOrderDecryptQuota::query()->create([
                     'flag'   => 1,
-                    'expire' => date('Y-m-d H:i:00', strtotime("+5 hour"))
+                    'expire' => date('Y-m-d H:i:00', strtotime("+5 hour")),
+                    'check' => $size === 1 ? 1 : 0,
                 ]);
             }
 
