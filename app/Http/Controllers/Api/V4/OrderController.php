@@ -115,6 +115,9 @@ class OrderController extends Controller
             return ['code' => 0, 'msg' => '您已订阅过'];
         }
 
+        //唐山只允许 直播 训练营 微课686
+
+
         //校验推客信息有效  5月7日 已经取消了等级层级
 //        $tweeter_level = User::getLevel($tweeter_code);
 //        if ($tweeter_level > 0) {
@@ -199,9 +202,7 @@ class OrderController extends Controller
             }
 
         }
-
-
-
+        
         //检测下单参数有效性
         $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $sub_type);
 
@@ -210,11 +211,6 @@ class OrderController extends Controller
         }
         // 校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
-
-
-
-
-
 
         if ($activity_tag === 'cytx') {
             $price = ChannelWorksList::getPrice(1, $column_id);
@@ -237,7 +233,7 @@ class OrderController extends Controller
         $type = 1;
         if ($column_data['type'] == 2) {
             $type = 15;
-        }else if ($column_data['type'] == 3 || $column_data['type'] == 4) {
+        }else if ($column_data['type'] == 3 || $column_data['type'] == 4) { //新增训练营大类
             $type = 18;
         }
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
