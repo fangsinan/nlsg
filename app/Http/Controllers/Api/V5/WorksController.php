@@ -527,9 +527,10 @@ class WorksController extends Controller
             if( empty($end_time) ){
                 $edit_data['end_time'] = date("Y-m-d H:i:s");
             }
-            // is_end 之后需要统计是否奖励
-            $column = new Column();
-            $column->campStudy($relation_id,$user_id,$os_type);
+            if($relation_type == 5){
+                // is_end 之后需要统计是否奖励
+                $column = new Column();
+                $column->campStudy($relation_id,$user_id,$os_type);
             
         }
 
