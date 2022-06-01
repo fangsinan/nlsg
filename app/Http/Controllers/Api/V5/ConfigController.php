@@ -41,7 +41,7 @@ class ConfigController extends Controller
         ];
 
         switch($type){
-            case 71:
+            case 171:
                 $res_share = [
                     "title"         => "大咖讲书",
                     "share_image"   => "/nlsg/lists/dakajiangshu_pic.jpg",
