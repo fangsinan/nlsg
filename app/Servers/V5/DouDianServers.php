@@ -24,12 +24,13 @@ use SkuListRequest;
 
 class DouDianServers
 {
-    protected $appKey = '6857846430543906317';
+    protected $appKey    = '6857846430543906317';
     protected $appSecret = '2f3af110-3aef-4bf0-8641-f00840b8e87f';
     protected $shopId;
-    protected $pageSize = 50;//100以内
+    protected $pageSize  = 50;//100以内
 
-    public function __construct() {
+    public function __construct()
+    {
         GlobalConfig::getGlobalConfig()->appKey         = $this->appKey;
         GlobalConfig::getGlobalConfig()->appSecret      = $this->appSecret;
         GlobalConfig::getGlobalConfig()->accessTokenStr = ConfigModel::getData(68, 1);
@@ -40,7 +41,8 @@ class DouDianServers
     }
 
     //同步商品任务和sku 10分钟一次
-    public function productListJob(): bool {
+    public function productListJob(): bool
+    {
         $time_flag = ConfigModel::getData(71, 1);
 
         if (!empty($time_flag) && strtotime($time_flag)) {
@@ -50,8 +52,8 @@ class DouDianServers
             ConfigModel::query()
                 ->where('id', 71)
                 ->update([
-                    'value' => date('Y-m-d H:i:00', $end_time)
-                ]);
+                             'value' => date('Y-m-d H:i:00', $end_time)
+                         ]);
 
         } else {
             $end_time   = time();
@@ -64,39 +66,60 @@ class DouDianServers
     }
 
     //解密任务 1分一次
-    public function decryptJob(): bool {
+    public function decryptJob(): bool
+    {
         $decrypt_quota = DouDianOrderDecryptQuota::query()
             ->orderBy('id', 'desc')
             ->first();
-        if (!empty($decrypt_quota) && $decrypt_quota->flag === 1 && $decrypt_quota->check === 0) {
-            $expire = $decrypt_quota->expire;
-            if ($expire > date('Y-m-d H:i:s')) {
+
+        $now_date   = date('Y-m-d H:i:s');
+        $check_flag = 0;//解密任务中,0表示正常请求  1表示单条请求
+
+        if (!empty($decrypt_quota) && $decrypt_quota->flag !== 2) {
+            //如果check是1 会继续解密
+            //如果check是2 表示真上限,任务会校验expire时间决定是否继续
+
+            if (
+                $decrypt_quota->flag == 1
+                &&
+                $decrypt_quota->check === 2
+                &&
+                $decrypt_quota->expire > $now_date
+            ) {
                 return true;
+            }
+
+            if ($decrypt_quota->flag == 1
+                &&
+                $decrypt_quota->check === 1
+                &&
+                $decrypt_quota->expire > $now_date
+            ) {
+                $check_flag = 1;
             }
         }
 
-        $size = 50;
-
-        if ($decrypt_quota->check === 1) {
-            $size = 1;
-        }
-
         //收件人手机解密
-        $this->toDecrypt(0, $size);
-
+        $this->toDecrypt(0, $this->pageSize, $check_flag);
         if (date('H') > 12) {
-            //收件人姓名解密
-            $this->toDecrypt(1,$size);
 
-            //收件人详细地址解密
-            $this->toDecrypt(2,$size);
+            //当前分钟数如果是奇数执行1 如果偶数执行2
+            if (date('i') % 2 === 1) {
+                //收件人手机解密
+                $this->toDecrypt(1, $this->pageSize, $check_flag);
+            } else {
+                //收件人姓名解密
+                $this->toDecrypt(2, $this->pageSize, $check_flag);
+            }
+
         }
 
         return true;
     }
 
     //拉订单任务 5分钟一次
-    public function getOrderJob($type): bool {
+    public function getOrderJob($type): bool
+    {
 
         $time_flag = ConfigModel::getData(70, 1);
 
@@ -109,8 +132,8 @@ class DouDianServers
             ConfigModel::query()
                 ->where('id', 70)
                 ->update([
-                    'value' => date('Y-m-d H:i:00', $end_time)
-                ]);
+                             'value' => date('Y-m-d H:i:00', $end_time)
+                         ]);
 
         } else {
             $end_time   = time();
@@ -126,7 +149,8 @@ class DouDianServers
     }
 
     //sku列表
-    public function skuList($begin_create_time) {
+    public function skuList($begin_create_time)
+    {
         $begin_created_at = date('Y-m-d H:i:s', $begin_create_time);
 
         $product_list = DouDianProductList::query()
@@ -159,7 +183,8 @@ class DouDianServers
     }
 
     //商品列表
-    public function productList($begin_time, $end_time) {
+    public function productList($begin_time, $end_time)
+    {
 
         $page       = 1;
         $while_flag = true;
@@ -211,7 +236,8 @@ class DouDianServers
     }
 
     //订单
-    public function orderSearchList(int $begin, int $end, $type) {
+    public function orderSearchList(int $begin, int $end, $type)
+    {
 
         $page       = 0;
         $while_flag = true;
@@ -316,7 +342,8 @@ class DouDianServers
 
     }
 
-    public function orderStatusData() {
+    public function orderStatusData()
+    {
 
         $main_status = DouDianOrder::query()
             ->select(['main_status', 'main_status_desc'])
@@ -325,37 +352,38 @@ class DouDianServers
 
         foreach ($main_status as $ms) {
             DouDianOrderStatus::query()->firstOrCreate(
-                [
-                    'key'  => $ms->main_status,
-                    'type' => 2
-                ], [
-                    'value' => $ms->main_status_desc
-                ]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     'key'  => $ms->main_status,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     'type' => 2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ], [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        'value' => $ms->main_status_desc
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ]
             );
         }
 
         $order_status = DouDianOrder::query()
             ->select([
-                'order_status', 'order_status_desc',
-            ])
+                         'order_status', 'order_status_desc',
+                     ])
             ->groupBy('order_status')
             ->get();
 
         foreach ($order_status as $os) {
             DouDianOrderStatus::query()->firstOrCreate(
-                [
+                   [
                     'key'  => $os->order_status,
                     'type' => 1
                 ], [
-                    'value' => $os->order_status_desc
-                ]
+                       'value' => $os->order_status_desc
+                   ]
             );
         }
 
     }
 
     //解密
-    public function toDecrypt($step = 0,int $size = 50) {
+    public function toDecrypt($step = 0, int $size = 50, $check_flag = 0)
+    {
 
         if (!in_array($step, [0, 1, 2])) {
             return true;
@@ -364,11 +392,11 @@ class DouDianServers
         $list = DouDianOrder::query()
             ->where('decrypt_step', $step)
             ->whereNotIn('order_status', [1, 4, 5])
-            ->where('order_id','>','4933714072054765432')
+            ->where('order_id', '>', '4933714072054765432')
             ->select([
-                'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
-                'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
-            ])
+                         'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
+                         'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
+                     ])
             ->limit($size)
             ->orderBy('order_id')
             ->get()
@@ -395,63 +423,152 @@ class DouDianServers
 
         $request = new OrderBatchDecryptRequest();
         $param   = new OrderBatchDecryptParam();
+
         $request->setParam($param);
-        $param->cipher_infos = $cipher_infos;
-        $response            = $request->execute('');
 
-        $response->job_type = 2;
-        DouDianOrderLog::query()->create((array)$response);
+        if ($check_flag === 0) {
+            $param->cipher_infos = $cipher_infos;
+            $response            = $request->execute('');
 
-        if ($response->code !== 10000) {
-            if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
-                $this->accessTokenJob();
-            }
+            $response->job_type = 2;
+            DouDianOrderLog::query()->create((array)$response);
 
-            if ($response->code === 50002) {
-                DouDianOrderDecryptQuota::query()->create([
-                    'flag'   => 1,
-                    'expire' => date('Y-m-d H:i:00', strtotime("+5 hour")),
-                    'check' => $size === 1 ? 1 : 0,
-                ]);
-            }
-
-            return true;
-        }
-
-        $decrypt_infos = $response->data->decrypt_infos;
-
-        foreach ($decrypt_infos as $decrypt_info) {
-            $check_order = DouDianOrder::query()
-                ->where('order_id', $decrypt_info->auth_id)
-                ->first();
-
-            if ($decrypt_info->err_no == 0) {
-                switch ($step) {
-                    case 0:
-                        $check_order->post_tel     = $decrypt_info->decrypt_text;
-                        $check_order->decrypt_step = 1;
-                        break;
-                    case 1:
-                        $check_order->post_receiver = $decrypt_info->decrypt_text;
-                        $check_order->decrypt_step  = 2;
-                        break;
-                    case 2:
-                        $check_order->post_addr_detail = $decrypt_info->decrypt_text;
-                        $check_order->decrypt_step     = 3;
-                        break;
+            if ($response->code !== 10000) {
+                if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
+                    $this->accessTokenJob();
                 }
-            } else {
-                $check_order->decrypt_step    = 9;
-                $check_order->decrypt_err_no  = $decrypt_info->err_no;
-                $check_order->decrypt_err_msg = $decrypt_info->err_msg;
+
+                //80000 您的环境存在安全风险，请稍后再试  暂停半小时
+                if ($response->err_no === 80000) {
+                    DouDianOrderDecryptQuota::query()
+                        ->create([
+                                     'flag'     => 1,
+                                     'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
+                                     'check'  => 2,
+                                     'err_type' => 2
+                                 ]);
+                }
+
+                //90000或50002 已达到店铺解密上限 暂停五小时,申请配额后可在后台人工重置 (原来是5002)
+                if ($response->code === 90000 || $response->code === 50002) {
+                    DouDianOrderDecryptQuota::query()
+                        ->create([
+                                     'flag'     => 1,
+                                     'expire' => date('Y-m-d H:i:00', strtotime("+5 hour")),
+                                     'check'  => 1,
+                                     'err_type' => 1
+                                 ]);
+                }
+                return true;
             }
 
-            $check_order->save();
+            $decrypt_infos = $response->data->decrypt_infos;
+
+            foreach ($decrypt_infos as $decrypt_info) {
+                $check_order = DouDianOrder::query()
+                    ->where('order_id', $decrypt_info->auth_id)
+                    ->first();
+
+                if ($decrypt_info->err_no == 0) {
+                    switch ($step) {
+                        case 0:
+                            $check_order->post_tel     = $decrypt_info->decrypt_text;
+                            $check_order->decrypt_step = 1;
+                            break;
+                        case 1:
+                            $check_order->post_receiver = $decrypt_info->decrypt_text;
+                            $check_order->decrypt_step  = 2;
+                            break;
+                        case 2:
+                            $check_order->post_addr_detail = $decrypt_info->decrypt_text;
+                            $check_order->decrypt_step     = 3;
+                            break;
+                    }
+                } else {
+                    $check_order->decrypt_step    = 9;
+                    $check_order->decrypt_err_no = $decrypt_info->err_no;
+                    $check_order->decrypt_err_msg = $decrypt_info->err_msg;
+                }
+
+                $check_order->save();
+
+            }
+        } else {
+            foreach ($cipher_infos as $ci) {
+                $param->cipher_infos = [$ci];
+                $response            = $request->execute('');
+
+                $response->job_type = 2;
+                DouDianOrderLog::query()->create((array)$response);
+
+                if ($response->code !== 10000) {
+                    if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
+                        $this->accessTokenJob();
+                    }
+
+                    //80000 您的环境存在安全风险，请稍后再试  暂停半小时
+                    if ($response->err_no === 80000) {
+                        DouDianOrderDecryptQuota::query()
+                            ->create([
+                                         'flag'     => 1,
+                                         'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
+                                         'check'  => 2,
+                                         'err_type' => 2
+                                     ]);
+                    }
+
+                    //90000或50002 已达到店铺解密上限 暂停五小时,申请配额后可在后台人工重置 (原来是5002)
+                    if ($response->code === 90000 || $response->code === 50002) {
+                        DouDianOrderDecryptQuota::query()
+                            ->create([
+                                         'flag'     => 1,
+                                         'expire' => date('Y-m-d H:i:00', strtotime("+5 hour")),
+                                         'check'  => 2,
+                                         'err_type' => 1
+                                     ]);
+                    }
+                    break;
+                }
+
+                $decrypt_infos = $response->data->decrypt_infos;
+
+                foreach ($decrypt_infos as $decrypt_info) {
+                    $check_order = DouDianOrder::query()
+                        ->where('order_id', $decrypt_info->auth_id)
+                        ->first();
+
+                    if ($decrypt_info->err_no == 0) {
+                        switch ($step) {
+                            case 0:
+                                $check_order->post_tel     = $decrypt_info->decrypt_text;
+                                $check_order->decrypt_step = 1;
+                                break;
+                            case 1:
+                                $check_order->post_receiver = $decrypt_info->decrypt_text;
+                                $check_order->decrypt_step  = 2;
+                                break;
+                            case 2:
+                                $check_order->post_addr_detail = $decrypt_info->decrypt_text;
+                                $check_order->decrypt_step     = 3;
+                                break;
+                        }
+                    } else {
+                        $check_order->decrypt_step    = 9;
+                        $check_order->decrypt_err_no = $decrypt_info->err_no;
+                        $check_order->decrypt_err_msg = $decrypt_info->err_msg;
+                    }
+
+                    $check_order->save();
+                }
+            }
 
         }
+
+
     }
 
-    public function accessTokenJob($job = 1) {
+    public function accessTokenJob($job = 1)
+    {
 
         if ($job == 1) {
             $accessToken = AccessTokenBuilder::build($this->shopId, ACCESS_TOKEN_SHOP_ID);
