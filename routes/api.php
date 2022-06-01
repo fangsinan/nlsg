@@ -620,5 +620,10 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     //线下课
     Route::get('offline/info', 'OfflineController@getOfflineInfo');
     Route::get('offline/order', 'OfflineController@getOfflineOrder');
+
+    // 收藏
+    Route::any('collection/list', 'CollectionController@list');//->middleware('replaceNull');
+    Route::any('config/share', 'ConfigController@share');//->middleware('replaceNull');
+    
     /**     5.0 API  END    ***/
 });
