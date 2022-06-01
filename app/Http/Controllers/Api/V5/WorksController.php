@@ -531,6 +531,8 @@ class WorksController extends Controller
                 // is_end 之后需要统计是否奖励
                 $column = new Column();
                 $column->campStudy($relation_id,$user_id,$os_type);
+            }
+            
             
         }
 
