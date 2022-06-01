@@ -18,6 +18,7 @@ use App\Models\MeetingSales;
 use App\Models\MeetingSalesBind;
 use App\Models\OfflineProducts;
 use App\Models\Order;
+use App\Models\PayIncome;
 use App\Models\PayRecord;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -115,8 +116,13 @@ class OrderController extends Controller
             return ['code' => 0, 'msg' => '您已订阅过'];
         }
 
-        //唐山只允许 直播 训练营 微课686
-
+        //唐山只允许 直播 训练营 微课686   type 精品课 2 讲座 6 训练营 7
+        $PayIncomeObj=PayIncome::query()->where(['user_id'=>$tweeter_code,'status'=>2])->first();
+        if(!empty($PayIncomeObj)){ //唐山客服  type=2&&$target_id=686
+            if(!($type==2 && in_array($target_id,[686]))){
+                $tweeter_code=0;
+            }
+        }
 
         //校验推客信息有效  5月7日 已经取消了等级层级
 //        $tweeter_level = User::getLevel($tweeter_code);
@@ -202,7 +208,7 @@ class OrderController extends Controller
             }
 
         }
-        
+
         //检测下单参数有效性
         $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $sub_type);
 
