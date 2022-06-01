@@ -98,7 +98,6 @@ class DouDianServers
                 $check_flag = 1;
             }
         }
-
         //收件人手机解密
         $this->toDecrypt(0, $this->pageSize, $check_flag);
         if (date('H') > 12) {
@@ -439,7 +438,7 @@ class DouDianServers
                 }
 
                 //80000 您的环境存在安全风险，请稍后再试  暂停半小时
-                if ($response->err_no === 80000) {
+                if ($response->code === 80000) {
                     DouDianOrderDecryptQuota::query()
                         ->create([
                                      'flag'     => 1,
@@ -507,7 +506,7 @@ class DouDianServers
                     }
 
                     //80000 您的环境存在安全风险，请稍后再试  暂停半小时
-                    if ($response->err_no === 80000) {
+                    if ($response->code === 80000) {
                         DouDianOrderDecryptQuota::query()
                             ->create([
                                          'flag'     => 1,
