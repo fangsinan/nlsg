@@ -19,7 +19,7 @@ class ConfigController extends Controller
      * @apiVersion 5.0.0
      *
      * @apiParam {string} user_id  用户id
-     * @apiParam {string} type     默认1  10专栏  20课程  30讲座  50训练营  60 商品  70集合（71 大咖讲书） 
+     * @apiParam {string} type     默认1   110专栏  120课程  130讲座  140训练营  150 商品  160集合（161 大咖讲书） 
      */
     public function share(Request $request)
     {
