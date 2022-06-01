@@ -46,7 +46,7 @@ class ConfigController extends Controller
                     "title"         => "大咖讲书",
                     "share_image"   => "/nlsg/lists/dakajiangshu_pic.jpg",
                     "subtitle"      => "大咖讲书副标题",
-                    "share_url"     => "https://wechat.nlsgapp.com/activeTest/ ",
+                    "share_url"     => "https://wechat.nlsgapp.com/activeShare?id=40",
                 ];
                 break;
             default:
