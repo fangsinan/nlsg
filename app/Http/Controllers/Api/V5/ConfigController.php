@@ -29,6 +29,7 @@ class ConfigController extends Controller
         if ($validator->fails()) {
             return $this->error(1000,$validator->messages()->first(),(object)[]);
         }
+        $uid = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
         $version = $request->input('version', 0);
         $os_type = $request->input('os_type', 0);
@@ -42,11 +43,14 @@ class ConfigController extends Controller
 
         switch($type){
             case 161:
+                $id = Lists::where(['type'=>10])->value("id");
                 $res_share = [
                     "title"         => "大咖讲书",
                     "share_image"   => "/nlsg/lists/dakajiangshu_pic.jpg",
                     "subtitle"      => "大咖讲书副标题",
-                    "share_url"     => "https://wechat.nlsgapp.com/activeShare?id=95",
+                    // "share_url"     => "https://wechat.nlsgapp.com/activeShare?id=".$id."&user_id=".$uid,
+                    "share_url"     => "http://wechat.test.nlsgapp.com/activeShare?id=".$id."&user_id=".$uid,
+                    
                 ];
                 break;
             default:
