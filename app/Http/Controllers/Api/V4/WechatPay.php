@@ -552,7 +552,7 @@ class WechatPay extends Controller
 
     //同步地址
     static private function MallAddress($orderInfo){
-        if(in_array($orderInfo['relation_id'],[7,8,10])){
+        if(in_array($orderInfo['relation_id'],[6,7,8,10,12])){
             $offdata  =OfflineProducts::find($orderInfo['relation_id']);
             $textbook_id = $offdata['textbook_id'] ?? 0;
 
