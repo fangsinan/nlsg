@@ -1250,7 +1250,7 @@ class IncomeController extends Controller
     }
 
 
-
+    //   /api/v4/ToTwitter
     public function  ToTwitter(){
 
         $to_twitters = DB::table('nlsg_pay_to_twitter')->where([
