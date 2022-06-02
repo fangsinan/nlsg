@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V5;
 use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use App\Models\Column;
+use App\Models\ConfigModel;
 use App\Models\Lists;
 use App\Models\Subscribe;
 use App\Models\WorksInfo;
@@ -40,6 +41,7 @@ class ConfigController extends Controller
             "subtitle"      => "",
             "share_url"     => "",
         ];
+        $host_url = ConfigModel::getData(45)?? 'https://wechat.nlsgapp.com/';
 
         switch($type){
             case 161:
@@ -49,7 +51,7 @@ class ConfigController extends Controller
                     "share_image"   => "/nlsg/lists/dakajiangshu_pic.jpg",
                     "subtitle"      => "大咖讲书副标题",
                     // "share_url"     => "https://wechat.nlsgapp.com/activeShare?id=".$id."&user_id=".$uid,
-                    "share_url"     => "http://wechat.test.nlsgapp.com/activeShare?id=".$id."&user_id=".$uid,
+                    "share_url"     => $host_url."activeShare?id=".$id."&user_id=".$uid,
                     
                 ];
                 break;

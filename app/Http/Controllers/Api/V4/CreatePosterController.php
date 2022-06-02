@@ -1139,7 +1139,7 @@ class CreatePosterController extends Controller
         //添加 mallTwitter Twitter_add
         // 1：专栏   2：商品  3：精品课 4听书 5线下课 6邀请卡(有且只有一条记录当前用户)
         $m_t_data['user_id'] = $uid;
-        $m_t_data['type'] = $m_t_type;
+        $m_t_data['type'] = $m_t_type??0;
         $m_t_data['cpid'] = $gid;
         $twitterObj::Twitter_Add($m_t_data);
         return $res;
