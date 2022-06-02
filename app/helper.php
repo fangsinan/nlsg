@@ -204,3 +204,76 @@
 	    }
 	    return  $data['size'];
 	}
+
+    // 统一全局 种类 类型 [ 配置对各个表进行类型对应 ]
+    // 110专栏  120课程  130讲座  140训练营  150 商品  160集合（161 大咖讲书） 170 直播
+
+    // 收藏表类型  nlsg_collection => 1专栏  2课程  3商品  4书单 5百科 6听书 7讲座  8训练营',
+    // 历史记录表类型 nlsg_history => 1专栏   2讲座  3听书  4精品课程   5训练营
+    // 订阅表类型 nlsg_subscribe  => 1 专栏  2作品  3 直播  4会员 5线下产品  6讲座  7训练营  8专题
+    function FuncType($type=0)
+    {
+        
+        switch($type){
+            case 110:    // 110专栏 
+                $res = [
+                    'col_type' => 1,    // 收藏表类型  nlsg_collection
+                    'his_type' => 1,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 1,    // 订阅表类型
+                ];
+                break;
+            case 120: // 120课程
+                $res = [
+                    'col_type' => 2,    // 收藏表类型  nlsg_collection
+                    'his_type' => 4,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 2,    // 订阅表类型
+                ];
+                break;
+            case 130:  // 130讲座 
+                $res = [
+                    'col_type' => 7,    // 收藏表类型  nlsg_collection
+                    'his_type' => 2,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 6,    // 订阅表类型
+                ];
+                break;;break;
+            case 140:  // 140训练营
+                $res = [
+                    'col_type' => 8,    // 收藏表类型  nlsg_collection
+                    'his_type' => 5,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 7,    // 订阅表类型
+                ];
+                break;
+            case 150: // 150 商品
+                $res = [
+                    'col_type' => 3,    // 收藏表类型  nlsg_collection
+                    'his_type' => 0,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 0,    // 订阅表类型
+                ];
+                break;
+            case 160: // 160 集合
+            case 161: //大咖讲书
+                $res = [
+                    'col_type' => 4,    // 收藏表类型  nlsg_collection
+                    'his_type' => 0,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 8,    // 订阅表类型
+                ];
+                break;
+            
+            case 170:  // 170 直播
+                $res = [
+                    'col_type' => 0,    // 收藏表类型  nlsg_collection
+                    'his_type' => 0,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 3,    // 订阅表类型
+                ];
+                break;
+            default:
+                $res = [
+                    'col_type' => 0,    // 收藏表类型  nlsg_collection
+                    'his_type' => 0,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 0,    // 订阅表类型
+                ];
+                break;
+        }
+
+        return $res;
+    }

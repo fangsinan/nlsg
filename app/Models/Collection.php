@@ -5,7 +5,7 @@ namespace App\Models;
 class Collection extends Base
 {
     protected $table = 'nlsg_collection';
-    protected $fillable = ['type', 'user_id', 'relation_id', 'info_id', 'type'];
+    protected $fillable = ['type', 'user_id', 'relation_id', 'info_id', 'type','fid'];
 
 
     static public function isCollection($type=[],$relation_id,$info_id,$user_id)
@@ -60,6 +60,11 @@ class Collection extends Base
                 Lists::where(['id' => $target_id])->increment('collection_num');
             } else if ($type == 5) {
                 Wiki::where(['id' => $target_id])->increment('collection_num');
+            }
+
+            if($type == 8){ // 训练营添加父类id
+                $fid=Column::select("classify_column_id")->where(['id' => $target_id])->first();
+                $where['fid'] = $fid->classify_column_id??0;
             }
 
             $where['info_id'] = $info_id;

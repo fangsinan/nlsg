@@ -693,4 +693,79 @@ class WorksInfo extends Base
             ])->first();
         return  empty($is_data) ?0 :1;
     }
+
+
+
+        // 根据id 获取章节数 $type  1 单课程  2 多课程  3讲座 4训练营
+        public function getInfoFromID($infoIds, $is_sub = 0, $user_id = 0, $input_type = 1, $os_type=1,$version='5.0.0')
+        {
+            
+            $is_free = 0;
+            $where = ['status' => 4];
+            $works_data = WorksInfo::select([
+                'id','pid','column_id', 'type', 'title', 'section', 'introduce', 'url', 'callback_url1', 'callback_url1', 'callback_url2',
+                'callback_url3', 'view_num', 'duration', 'free_trial','rank','share_img','like_num','old_share_img'
+            ])->where($where)->whereIn("id",$infoIds)
+            ->orderByRaw('FIELD(id,'.implode(',', $infoIds).')')->get()->toArray();
+    
+            foreach ($works_data as $key => $val) {
+                //训练营H5  不返回视频地址
+                if($input_type == 140 && $os_type == 3){
+                    unset($works_data[$key]['callback_url3']);
+                    unset($works_data[$key]['callback_url2']);
+                    unset($works_data[$key]['callback_url1']);
+                }else{
+                    //处理url  关注或试听
+                    $works_data[$key]['href_url'] = '';
+                    if ($is_sub == 1 || $val['free_trial'] == 1 || $is_free == 1) {
+                        $works_data[$key]['href_url'] = self::GetWorksUrl($val);
+                    } else {
+                        unset($works_data[$key]['callback_url3']);
+                        unset($works_data[$key]['callback_url2']);
+                        unset($works_data[$key]['callback_url1']);
+                    }
+                }
+                unset($works_data[$key]['url']);
+
+                //类型是训练营 根据版本号 获取新旧训练营图 5.4.3
+                if ($input_type == 140 && version_compare($version, '5.0.4', '<')) {
+                    $works_data[$key]['share_img'] = $val['old_share_img'];
+                }
+                unset($works_data[$key]['old_share_img']);
+                $works_data[$key]['time_leng'] = (string)0;
+                $works_data[$key]['time_number'] = (string)0;
+                $works_data[$key]['time_is_end'] = 0;
+    
+                if ($user_id) {
+                    //训练营共用章节id
+                    if( in_array($input_type ,[130,140])){
+                        $relation_id = $val['column_id'];
+                    }else{
+                        $relation_id = $val['pid'];
+                    }
+                    $fun_types = FuncType($input_type);
+
+
+                    //单章节 学习记录 百分比
+                    // relation_type = 1专栏   2讲座   3听书  4精品课程   5训练营
+                    $his_data = History::select('time_leng', 'time_number','is_end')->where([
+                        'relation_type' => $fun_types["his_type"],
+                        'relation_id' => $relation_id,
+                        'info_id' => $val['id'],
+                        'user_id' => $user_id,
+                    ])->orderBy('updated_at', 'desc')->first();
+                    if ($his_data) {
+                        $works_data[$key]['time_leng'] = $his_data->time_leng;
+                        $works_data[$key]['time_number'] = $his_data->time_number;
+                        $works_data[$key]['time_is_end'] = $his_data->is_end;
+                    }
+                    // 章节是否点赞
+                    if($input_type == 140){
+                        $works_data[$key]['info_is_like'] = ContentLike::isLike([5],$relation_id,$user_id,$val['id']);
+                    }
+                }
+            }
+    
+            return $works_data;
+        }
 }

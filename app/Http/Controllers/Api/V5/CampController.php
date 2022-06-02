@@ -503,12 +503,12 @@ class CampController extends Controller
         }
         return $this->success();
     }
-
+ 
 
 
 
     /**
-     *  {get} /api/v5/camp/collection  收藏[专栏、课程、商品]
+     * {get} /api/v5/camp/collection  收藏[专栏、课程、商品]
      *
      * @apiParam {int} type  type 1专栏  2课程  3商品  4书单 5百科 6听书 7讲座  8训练营
      * @apiParam {int} target_id  对应id
@@ -517,7 +517,7 @@ class CampController extends Controller
      */
     public function Collection(Request $request)
     {
-        $type = $request->input('type', 0);
+        $input_type = $request->input('type', 0);
         $target_id = $request->input('target_id', 0);
         $info_id = $request->input('info_id', 0);
         $user_id = $this->user['id'] ?? 0;
@@ -525,6 +525,7 @@ class CampController extends Controller
         if (empty($target_id) || empty($user_id)) {
             return $this->error(0, 'column_id 或者 user_id 不能为空');
         }
+        $type = FuncType($input_type)['col_type']??0;
         //  type 1：专栏  2：课程 3 :商品
         if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 8])) {
             return $this->error(0, 'type类型错误');
