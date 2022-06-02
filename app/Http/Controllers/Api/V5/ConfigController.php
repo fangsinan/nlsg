@@ -49,7 +49,7 @@ class ConfigController extends Controller
                 $res_share = [
                     "title"         => "大咖讲书",
                     "share_image"   => "/nlsg/lists/dakajiangshu_pic.jpg",
-                    "subtitle"      => "大咖讲书副标题",
+                    "subtitle"      => "让听书成为一种生活方式",
                     // "share_url"     => "https://wechat.nlsgapp.com/activeShare?id=".$id."&user_id=".$uid,
                     "share_url"     => $host_url."activeShare?id=".$id."&user_id=".$uid,
                     
