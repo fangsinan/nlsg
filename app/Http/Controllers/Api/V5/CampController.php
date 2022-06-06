@@ -110,6 +110,17 @@ class CampController extends Controller
 
     public function getCampDetail(Request $request)
     {
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric',
+            // 'info_id' => 'bail:numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->error(1000,$validator->getMessageBag(),(object)[]);
+        }
+
+
+
         $column_id = $request->input('id', 0);
         $activity_tag = $request->input('activity_tag', '');
 

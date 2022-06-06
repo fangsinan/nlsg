@@ -35,7 +35,7 @@ class CollectionController extends Controller
             'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->error(1000,$validator->messages()->first(),(object)[]);
+            return $this->error(1000,$validator->getMessageBag()->first(),(object)[]);
         }
         $user_id = 211172;//$this->user['id'] ?? 0;
         $input_type = $request->input('type', 1);
@@ -74,7 +74,7 @@ class CollectionController extends Controller
                     ];
 
                     // 组装父类
-                    $filed = "title,desc,cover_img,sub_num";
+                    $filed = ["title","message","cover_pic","subscribe_num"];
                     $res_one['parent_column'] = Column::select($filed)->find($val['fid']);
                     $res_one['column']  = Column::select($filed)->find($val['relation_id']);
                     
