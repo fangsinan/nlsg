@@ -348,7 +348,7 @@ class CampController extends Controller
             // 'info_id' => 'bail:numeric',
         ]);
         if ($validator->fails()) {
-            return $this->error(1000,$validator->messages()->first(),(object)[]);
+            return $this->error(1000,$validator->getMessageBag()->first(),(object)[]);
         }
         $camp_id = $request->input('id', 0);  //训练营id
         // $camp_info_id = $request->input('info_id', 0);  
@@ -436,7 +436,7 @@ class CampController extends Controller
             // 'info_id' => 'bail:required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->error(0,$validator->messages()->first());
+            return $this->error(0,$validator->getMessageBag()->first());
         }
         $column_id = $request->input('id');
         $user_id = $this->user['id'] ?? 0;

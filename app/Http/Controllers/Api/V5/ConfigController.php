@@ -28,7 +28,7 @@ class ConfigController extends Controller
             'type' => 'required|numeric',
         ]);
         if ($validator->fails()) {
-            return $this->error(1000,$validator->messages()->first(),(object)[]);
+            return $this->error(1000,$validator->getMessageBag()->first(),(object)[]);
         }
         $uid = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
