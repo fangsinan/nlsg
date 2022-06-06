@@ -74,7 +74,7 @@ class CollectionController extends Controller
                     ];
 
                     // 组装父类
-                    $filed = ["title","message","cover_pic","subscribe_num"];
+                    $filed = ["name as title","message","cover_pic","subscribe_num"];
                     $res_one['parent_column'] = Column::select($filed)->find($val['fid']) ?? (object)[];
                     $res_one['column']  = Column::select($filed)->find($val['relation_id']) ?? (object)[];
                     
