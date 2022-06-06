@@ -75,8 +75,8 @@ class CollectionController extends Controller
 
                     // 组装父类
                     $filed = ["title","message","cover_pic","subscribe_num"];
-                    $res_one['parent_column'] = Column::select($filed)->find($val['fid']);
-                    $res_one['column']  = Column::select($filed)->find($val['relation_id']);
+                    $res_one['parent_column'] = Column::select($filed)->find($val['fid']) ?? (object)[];
+                    $res_one['column']  = Column::select($filed)->find($val['relation_id']) ?? (object)[];
                     
                     $is_sub = Subscribe::isSubscribe($user_id,$val['relation_id'],7);
                     $info_ids = Collection::where($where)->where("relation_id",$val['relation_id'])->pluck('info_id');
