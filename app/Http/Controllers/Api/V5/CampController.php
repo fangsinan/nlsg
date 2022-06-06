@@ -177,7 +177,8 @@ class CampController extends Controller
         $column['historyData'] = History::getHistoryData($column_id, $history_type, $user_id);
         
         // 获取第一章节 info_id
-        $get_id = $column['info_column_id'] ?? $column['id'];
+        $get_id = $column['classify_column_id'] ?? $column['id'];
+        
         
         $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4 ])->orderBy('rank','asc')->first();
         $column['first_info_id'] = $first_info_id['id'] ?? 0;
