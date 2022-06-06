@@ -13,9 +13,8 @@ class ColumnController extends Controller
 
 
 
-
     /**
-     * @api {get} /api/v5/column/get_camp_list 训练营
+     * @api {get} /api/v5/column/get_camp_list 训练营(暂时废弃)
      * @apiName v5 get_camp_list
      * @apiVersion 5.0.0
      * @apiGroup five_Column
@@ -30,31 +29,7 @@ class ColumnController extends Controller
      * {
      * "code": 200,
      * "msg": "成功",
-     * "data": [
-     * {
-            id: 519,
-            name: "测试创建训练营",
-            title: "",
-            subtitle: "副标题写啥呢",
-            message: "<p><img class="wscnph" src="https://image.nlsgapp.com/nlsg/works/20211202175302856576.png" /><img class="wscnph" src="https://image.nlsgapp.com/nlsg/works/20211202175312662092.png" /></p>",
-            column_type: 1,
-            user_id: 167204,
-            original_price: "10.00",
-            price: "0.01",
-            online_time: "2021-07-15 00:00:00",
-            works_update_time: null,
-            index_pic: "nlsg/other/20210602095339524870.jpg",
-            cover_pic: "nlsg/other/20210602094843678808.png",
-            details_pic: "nlsg/other/20210602095124839952.jpg",
-            subscribe_num: 17,
-            info_num: 5,
-            is_free: 0,
-            is_start: 1,
-            show_info_num: 3,
-            is_sub: 0,
-            nickname: "柠檬维c"
-            }
-     * ]
+     * "data": []
      * }
      */
     public function getCampList(Request $request)
