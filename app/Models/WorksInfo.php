@@ -696,7 +696,7 @@ class WorksInfo extends Base
 
 
 
-        // 根据id 获取章节数 $type  1 单课程  2 多课程  3讲座 4训练营
+        // 根据id 获取章节数 $type  1 单课程  2 多课程  3讲座 140训练营
         public function getInfoFromID($infoIds, $is_sub = 0, $user_id = 0, $input_type = 1, $os_type=1,$version='5.0.0')
         {
             
