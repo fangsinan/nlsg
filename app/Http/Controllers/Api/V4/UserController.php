@@ -1049,19 +1049,20 @@ class UserController extends Controller
                     $res_one = [
                         "parent_column" => (object)[],
                         "column"        => (object)[],
-                        "info"          => [],
+                        "info"          => (object)[],
                     ];
 
                     // 组装父类
-                    $filed = ["name as title","subtitle","cover_pic","subscribe_num"];
+                    $filed = ["id","name as title","subtitle","cover_pic","subscribe_num"];
                     $res_one['parent_column'] = Column::select($filed)->find($val['fid']) ?? (object)[];
                     $res_one['column']  = Column::select($filed)->find($val['relation_id']) ?? (object)[];
                     
                     $is_sub = Subscribe::isSubscribe($user_id,$val['relation_id'],7);
                     $info_ids = Collection::where($where)->where("relation_id",$val['relation_id'])->pluck('info_id');
                     if(!empty($info_ids)) $info_ids = $info_ids->toArray();
-
-                    $res_one['info']  = $infoObj->getInfoFromID($info_ids,$is_sub,$user_id,140,$os_type,$version);
+                    $res_one['info']['id']     = $res_one['column']['id'] ??0;
+                    $res_one['info']['title']  = $res_one['column']['title'] ??0;
+                    $res_one['info']['list']   = $infoObj->getInfoFromID($info_ids,$is_sub,$user_id,140,$os_type,$version);
                     $res[] = $res_one;
                 }
                 return $this->success($res);
