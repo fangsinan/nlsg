@@ -568,7 +568,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     //评论
     // Route::post('reply/store', 'ReplyController@store');
     Route::get('comment/list', 'CommentController@index');
-    
+
     Route::post('comment/destroy', 'CommentController@destroy');
     Route::get('comment/top', 'CommentController@editTop');
 
@@ -589,7 +589,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
         //添加地址
         Route::get('order/create_order_address', 'OrderController@addOrderAddress');
-        
+
         //课程
         Route::get('works/edit_history_time', 'WorksController@editHistoryTime');
         Route::get('works/works_sub_works', 'WorksController@worksSubWorks');
@@ -600,8 +600,8 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         Route::get('camp/collection', 'CampController@Collection');
 
         Route::post('order/create_teacher_order', 'OrderController@createTeacherOrder');
-        
-        
+
+
     });
     //训练营
     Route::any('camp/get_camp_list', 'CampController@getCampList');//->middleware('replaceNull');
@@ -612,7 +612,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     // 海报图
     Route::any('image/get_qr_code', 'ImageController@GetQrCode');//->middleware('replaceNull');
     // 直播
-    
+
     Route::any('live/list', 'LiveController@getLiveLists');
     Route::any('live/live_push_qrcode', 'LiveController@livePushQrcode');
     Route::any('live/sell_short_state', 'LiveController@SellShortState');
@@ -624,6 +624,9 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     // 收藏
     Route::any('collection/list', 'CollectionController@list');//->middleware('replaceNull');
     Route::any('config/share', 'ConfigController@share');//->middleware('replaceNull');
-    
+
+    //微信url link&scheme
+    Route::get('wechat_tools/get_url_link', 'WeChatToolsController@getUrlLink');
+
     /**     5.0 API  END    ***/
 });
