@@ -52,14 +52,17 @@ class CampController extends Controller
         //我的订阅 id
         $relation_id = $subObj->getMySub($uid,7);
         $my_list = $columnObj->getColumn([
-                            ['type','In',[3, 4]],
                             ['id','In',$relation_id],
+                            ['type','=',3],  //我的报名只显示期数
+                            ['status','=',1],
                         ],$order_str);
-        //非我的订阅
+        
+        //非我的订阅 显示所有父类
         $list = $columnObj->getColumn([
-                        ['type','In',[3, 4]],
-                        ['is_start','=',0],
-                        ['id','NotIn',$relation_id],
+                        ['type','=',4],
+                        ['status','=',1],
+                        // ['is_starwt','=',0],
+                        // ['id','NotIn',$relation_id],
                     ],$order_str);
 
         $new_res = [
