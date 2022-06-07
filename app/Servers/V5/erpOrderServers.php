@@ -25,8 +25,13 @@ class erpOrderServers
         $erp_push_order_flag = (int)ConfigModel::getData(56, 1);//0全部 1正常 2只测试
 
         $query = Order::query()
-            ->where('type', '=', 14)
-            ->whereIn('relation_id', $search_relation_id)
+//            ->where('type', '=', 14)
+//            ->whereIn('relation_id', $search_relation_id)
+            ->whereRaw('((
+                type = 14 and relation_id in (7, 8, 10)
+            ) or (
+                type = 18 and pay_price = 2980
+            ))')
             ->where('status', '=', 1)
             ->where('textbook_id', '>', 0)
             ->select([
@@ -34,7 +39,6 @@ class erpOrderServers
                 'pay_time', 'pay_price', 'is_shill', 'shill_refund_sum', 'is_refund', 'refund_no',
                 'created_at', 'express_info_id', 'textbook_id', 'address_id','can_refund'
             ]);
-
         if ($erp_push_order_flag === 1) {
             $query->where('id', '>', 1869289);
         }
