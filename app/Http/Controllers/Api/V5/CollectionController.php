@@ -68,21 +68,32 @@ class CollectionController extends Controller
                 foreach($col as $val){
                     // 初始化数据格式
                     $res_one = [
-                        "parent_column" => (object)[],
-                        "column"        => (object)[],
+                        "parent_column" => [],
+                        "column"        => [],
                         "info"          => [],
                     ];
 
                     // 组装父类
-                    $filed = ["name as title","subtitle","cover_pic","subscribe_num"];
-                    $res_one['parent_column'] = Column::select($filed)->find($val['fid']) ?? (object)[];
-                    $res_one['column']  = Column::select($filed)->find($val['relation_id']) ?? (object)[];
+                    $filed = ["id","name as title","subtitle","cover_pic","subscribe_num"];
+                    $parent_column = Column::select($filed)->find($val['fid']) ?? [];
+                    $column  = Column::select($filed)->find($val['relation_id']) ?? [];
                     
                     $is_sub = Subscribe::isSubscribe($user_id,$val['relation_id'],7);
                     $info_ids = Collection::where($where)->where("relation_id",$val['relation_id'])->pluck('info_id');
                     if(!empty($info_ids)) $info_ids = $info_ids->toArray();
 
-                    $res_one['info']  = $infoObj->getInfoFromID($info_ids,$is_sub,$user_id,$input_type,$os_type,$version);
+                    $list = $infoObj->getInfoFromID($info_ids,$is_sub,$user_id,$input_type,$os_type,$version);
+                    if(!empty($list)){
+                        $res_one['info']['id']    = empty($column) ?0:$column['id'];
+                        $res_one['info']['title'] = empty($column) ?"":$column['title'];
+                        $res_one['info']['list']  = $list;
+                    }else{
+                        $res_one['info'] = (object)[];
+                    }
+                    $res_one['parent_column']   = empty($parent_column) ?(object)[]:$parent_column;
+                    $res_one['column']          = empty($column)?(object)[]:$column;
+                    
+                    $res[] = $res_one;
                     $res[] = $res_one;
                 }
                 return $this->success($res);

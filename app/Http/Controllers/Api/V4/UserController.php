@@ -1070,7 +1070,11 @@ class UserController extends Controller
                         $res_one['info'] = (object)[];
                     }
                     $res_one['parent_column']   = empty($parent_column) ?(object)[]:$parent_column;
-                    $res_one['column']          = empty($column)?(object)[]:$column;
+                    $res_one['column'] = (object)[];
+                    if(!empty($column) && $column['info_id'] == 0){
+                        $res_one['column'] = $column;
+                    }
+                        
                     
                     $res[] = $res_one;
                 }
