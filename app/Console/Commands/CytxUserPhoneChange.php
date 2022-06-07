@@ -64,7 +64,7 @@ class CytxUserPhoneChange extends Command
                     $check_p1->phone = $p[1];
                     $check_p1->save();
                 }else{
-                    $check_p2->phone = $p[0].'x';
+                    $check_p2->phone = $check_p2->id;
                     $check_p2->save();
 
                     $check_p1->phone = $p[1];
