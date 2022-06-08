@@ -605,8 +605,8 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         Route::get('camp/collection', 'CampController@Collection');
 
         Route::post('order/create_teacher_order', 'OrderController@createTeacherOrder');
-
-
+        // Ali sts 鉴权
+        Route::any('config/get_ali_proof', 'ConfigController@getAliProof');
     });
     //训练营
     Route::any('camp/get_camp_list', 'CampController@getCampList');//->middleware('replaceNull');
@@ -629,7 +629,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     // 收藏
     Route::any('collection/list', 'CollectionController@list');//->middleware('replaceNull');
     Route::any('config/share', 'ConfigController@share');//->middleware('replaceNull');
-    Route::any('config/get_ali_proof', 'ConfigController@getAliProof');
+    
     //微信url link&scheme
     Route::get('wechat_tools/get_url_link', 'WeChatToolsController@getUrlLink');
     /**     5.0 API  END    ***/
