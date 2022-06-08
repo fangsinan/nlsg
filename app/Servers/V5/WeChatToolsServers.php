@@ -20,7 +20,7 @@ class WeChatToolsServers
         $product_id = $params['productId'] ?? '';
         switch ($flag) {
             case 'shop':
-                if (empty($product_id)){
+                if (empty($product_id) || !is_numeric($product_id)) {
                     $post_params = [
                         'path'=>'',
                         'query'=>'',
