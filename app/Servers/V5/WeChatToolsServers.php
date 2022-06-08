@@ -17,14 +17,22 @@ class WeChatToolsServers
     public function getUrlLink($params)
     {
         $flag = $params['flag'] ?? '';
+        $product_id = $params['productId'] ?? '';
         switch ($flag) {
             case 'shop':
+                if (empty($product_id)){
+                    $post_params = [
+                        'path'=>'',
+                    ];
+                }else{
+                    $post_params =  [
+                        'path'=>'__plugin__/wx34345ae5855f892d/pages/productDetail/productDetail',
+                        'query'=>'productId='.intval($product_id),
+                    ];
+                }
                 $res = Http::post(
                     self::XCX_SHOP_URL_LINK_URL . '?access_token=' . $this->xcx_access_token,
-                    [
-                        'path'  => '',
-                        'query' => '',
-                    ]
+                    $post_params
                 );
                 $res = json_decode($res, true);
                 if ($res['errcode'] !== 0) {
@@ -58,8 +66,7 @@ class WeChatToolsServers
             $expires_in = $data['expires_in'];
         }
         $now = time();
-
-        if (empty($token) || $expires_in < ($now - 600)) {
+        if (empty($token) || $expires_in > ($now - 600)) {
             $job_flag = ConfigModel::getData(73, 1);
             if ($job_flag !== '1') {
                 return '';
@@ -78,7 +85,6 @@ class WeChatToolsServers
                                                     ])
                          ]);
         }
-
         return $token;
 
 
