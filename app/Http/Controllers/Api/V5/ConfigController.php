@@ -3,14 +3,10 @@
 namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
-use App\Models\Collection;
-use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Lists;
-use App\Models\Subscribe;
-use App\Models\WorksInfo;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class ConfigController extends Controller
@@ -59,6 +55,25 @@ class ConfigController extends Controller
                 break; 
         }
         return $this->success($res_share);
+    }
+
+    /**
+     * {get} api/v5/config/get_ali_proof  获取 Ali STS临时授权
+     * @apiVersion 5.0.0
+     */
+    public function getAliProof()
+    {
+        $cache_key_name = 'ali_proof_key';
+        $res = Cache::get($cache_key_name);
+        if(empty($res)){
+            $res = ConfigModel::AliProof();
+            if(empty($res)){
+                return $this->success((object)[]); 
+            }
+            $res['timestamp'] = strtotime($res['Expiration']);
+            Cache::put($cache_key_name, $res, 3000);
+        }
+        return $this->success($res);
     }
 
 }

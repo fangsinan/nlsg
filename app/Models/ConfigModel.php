@@ -10,6 +10,9 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\Cache;
 use OSS\OssClient;
+use AlibabaCloud\Client\AlibabaCloud;
+use ClientException;
+use ServerException;
 
 /**
  * Description of Config
@@ -147,6 +150,37 @@ class ConfigModel extends Base
         } else {
             return ['code' => 1, 'msg' => 'base64码解析错误'];
         }
+    }
+
+    public static function AliProof(){
+        $regionId = "cn-beijing";
+        // 设置调用者（RAM用户或RAM角色）的AccessKey ID和AccessKey Secret。
+        AlibabaCloud::accessKeyClient(Config('web.Ali.ACCESS_KEY_ALI'), Config('web.Ali.SECRET_KEY_ALI'))
+                    ->regionId($regionId)->asDefaultClient();
+        try {
+            $result = AlibabaCloud::rpc()
+                                  ->product('Sts')
+                                  ->scheme('https') // https | http
+                                  ->version('2015-04-01')
+                                  ->action('AssumeRole')
+                                  ->method('POST')
+                                  ->host('sts.aliyuncs.com')
+                                  ->options([
+                                                'query' => [
+                                                  'RegionId' => $regionId,
+                                                  'RoleArn' => "acs:ram::1255787033270118:role/ramosstest",
+                                                  'RoleSessionName' => "RamOssTest",
+                                                ],
+                                            ])
+                                  ->request();
+            $ali = $result->toArray();
+            return $ali['Credentials'];
+        } catch (ClientException $e) {
+            echo $e->getErrorMessage() . PHP_EOL;
+        } catch (ServerException $e) {
+            echo $e->getErrorMessage() . PHP_EOL;
+        }
+        return [];
     }
 
 

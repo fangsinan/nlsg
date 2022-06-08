@@ -4,10 +4,10 @@ return [
 
 
     'Ali' =>[
-        'ACCESS_KEY_ALI'=>'LTAIIjgUHVU6rbFx',
-        'SECRET_KEY_ALI'=>'UuX8gATLBpaXUjWeArwMfwxpaW48KD',
-        'BUCKET_ALI'=>'nlsgapp',
-        'IMAGES_URL' => 'https://image.nlsgapp.com/', //阿里图片地址
+        'ACCESS_KEY_ALI'=>env('ACCESS_KEY_ALI'),
+        'SECRET_KEY_ALI'=>env('SECRET_KEY_ALI'),
+        'BUCKET_ALI'=>env('BUCKET_ALI'),
+        'IMAGES_URL' => env('IMAGES_URL'), //阿里图片地址
     ],
     'is_new_time' => date('Y-m-d H:i:s',strtotime("-1 week")),
 
