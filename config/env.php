@@ -96,5 +96,6 @@ return [
 //    'OPENIM_APPID'   => env('OPENIM_APPID'),
 //    'OPENIM_SECRETKEY'   => env('OPENIM_SECRETKEY'),
 
-
+    'XCX_APPID' => env('XCX_APPID'),
+    'XCX_APPSECRET' => env('XCX_APPSECRET'),
 ];

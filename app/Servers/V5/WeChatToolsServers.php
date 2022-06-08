@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Http;
 class WeChatToolsServers
 {
     //小程序
-    const XCX_APPID             = 'wxff27413cdd2db48c';
-    const XCX_APPSECRET         = '391b29e9f74e02f8ebb5a59bbf8cff4b';
     const XCX_URL               = 'https://api.weixin.qq.com/cgi-bin/token';
     const XCX_SHOP_URL_LINK_URL = 'https://api.weixin.qq.com/wxa/generate_urllink';
     private $xcx_access_token;
@@ -117,8 +115,8 @@ class WeChatToolsServers
     {
         $params = [
             'grant_type' => 'client_credential',
-            'appid'      => self::XCX_APPID,
-            'secret'     => self::XCX_APPSECRET,
+            'appid'      => config('env.XCX_APPID'),
+            'secret'     => config('env.XCX_APPSECRET'),
         ];
 
         $res = Http::get(self::XCX_URL, $params);
