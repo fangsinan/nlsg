@@ -54,6 +54,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        //微信小程序获取access_token
+        $schedule->command('command:WeChatTools')
+            ->everyFiveMinutes()->withoutOverlapping(5)
+            ->runInBackground()->onOneServer();
+
 
         //抖音订单测试部分
         $schedule->command('command:DouDianOrder 1')
