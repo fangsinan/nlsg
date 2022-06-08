@@ -476,6 +476,8 @@ class WechatPay extends Controller
 //
 //                }else{
 //                }
+                $column_id = OfflineProducts::where(['id'=>$orderInfo['relation_id']])
+                ->value("column_id");
                 $subscribe = [
                     'user_id' => $user_id, //会员id
                     'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
@@ -483,6 +485,7 @@ class WechatPay extends Controller
                     'status' => 1,
                     'order_id' => $orderId, //订单id
                     'relation_id' => $orderInfo['relation_id'],
+                    'parent_column_id' => $column_id??0,
                 ];
 
 
@@ -1398,6 +1401,7 @@ class WechatPay extends Controller
                     'relation_id' => $teacher_id,
                     'service_id' => $orderInfo['service_id'],
                     'channel_works_list_id' => $channel_works_list_id,
+                    'parent_column_id' => $teacher_id,
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
 

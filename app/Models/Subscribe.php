@@ -41,6 +41,29 @@ class Subscribe extends Base
         return $this->belongsTo(Order::class, 'order_id', 'id')->where('status',1)->where( 'type', 10);
     }
 
+    static function CampIsSub($camp_id,$uid)
+    {
+        // $data = Column::select(['type'])->where(['id'=>$camp_id])->first();
+        $camp_type = Column::where(['id'=>$camp_id])->value("type");
+        if(empty($camp_type)) return 0;
+
+
+        $where = ['user_id' =>$uid,'status' =>1,'type' =>7];
+        if( $camp_type == 4){       //父级
+            $where['parent_column_id'] = $camp_id;
+        }
+        if( $camp_type == 3){
+            $where['relation_id'] = $camp_id;
+        }
+
+        $sub_data = self::where($where)->first();
+        if(!empty($sub_data)){
+            return 1;
+        }
+
+        return 0;
+    }
+
     /**
      * $user_id  登录者用户
      * $target_id  目标id  1为专栏的id  2作品id ....
@@ -138,7 +161,9 @@ class Subscribe extends Base
 					}
 				}
 			}
-
+            if($type == 7 && $is_sub==0){
+                return self::CampIsSub($target_id,$user_id);
+            }
 
         }
         return $is_sub;
