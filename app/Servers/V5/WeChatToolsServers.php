@@ -23,6 +23,7 @@ class WeChatToolsServers
                 if (empty($product_id)){
                     $post_params = [
                         'path'=>'',
+                        'query'=>'',
                     ];
                 }else{
                     $post_params =  [
