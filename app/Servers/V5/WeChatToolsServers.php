@@ -67,12 +67,12 @@ class WeChatToolsServers
             $expires_in = $data['expires_in'];
         }
         $now = time();
-        if (empty($token) || $expires_in > ($now - 600)) {
+        if (empty($token) || ($expires_in - 600) < $now) {
+
             $job_flag = ConfigModel::getData(73, 1);
             if ($job_flag !== '1') {
                 return '';
             }
-
             //刷新
             $get_token  = $this->getXcxAccessToken();
             $token      = $get_token['access_token'];
@@ -86,6 +86,7 @@ class WeChatToolsServers
                                                     ])
                          ]);
         }
+
         return $token;
 
 
