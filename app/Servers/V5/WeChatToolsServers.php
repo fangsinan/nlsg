@@ -17,22 +17,6 @@ class WeChatToolsServers
 
     public function getUrlLink($params)
     {
-
-//        dd([
-//               [
-//                   'grant_type' => 'client_credential',
-//                   'appid'      => config('env.XCX_SHOP_APPID'),
-//                   'secret'     => config('env.XCX_SHOP_APPSECRET'),
-//               ],
-//               [
-//                   'grant_type' => 'client_credential',
-//                   'appid'      => config('env.XCX_APPID'),
-//                   'secret'     => config('env.XCX_APPSECRET'),
-//               ],
-//               $this->xcx_shop_access_token,
-//               $this->xcx_access_token,
-//           ]);
-
         $flag       = $params['flag'] ?? '';
         $product_id = $params['productId'] ?? '';
         switch ($flag) {
