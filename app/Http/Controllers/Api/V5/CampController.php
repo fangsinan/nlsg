@@ -184,13 +184,17 @@ class CampController extends Controller
         if ($info_num > 0) {
             $column['history_count'] = round($hisCount / $info_num * 100);
         }
-
+        
         //历史记录
         $column['historyData'] = History::getHistoryData($column_id, $types['his_type'], $user_id);
         // 是否收藏
         
-        $column['is_collection'] = Collection::isCollection($types['col_type'],$column_id,0,$user_id);
-        
+        $column['is_collection'] = Collection::isCollection([$types['col_type']],$column_id,0,$user_id);
+        // 是否父类
+        $column['is_parent'] = 0;
+        if($column['type'] == 4){
+            $column['is_parent'] = 1;
+        }
         // 获取第一章节 info_id
         $get_id = $column['classify_column_id'] ?? $column['id'];
         
