@@ -9,6 +9,10 @@ return [
         'BUCKET_ALI'=>env('BUCKET_ALI'),
         'IMAGES_URL' => env('IMAGES_URL'), //阿里图片地址
     ],
+    'STSAli' =>[
+        'ACCESS_KEY_ALI'=>env('STS_ACCESS_KEY_ALI'),
+        'SECRET_KEY_ALI'=>env('STS_SECRET_KEY_ALI'),
+    ],
     'is_new_time' => date('Y-m-d H:i:s',strtotime("-1 week")),
 
     //提现

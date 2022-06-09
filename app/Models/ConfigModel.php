@@ -155,7 +155,7 @@ class ConfigModel extends Base
     public static function AliProof(){
         $regionId = "cn-beijing";
         // 设置调用者（RAM用户或RAM角色）的AccessKey ID和AccessKey Secret。
-        AlibabaCloud::accessKeyClient(Config('web.Ali.ACCESS_KEY_ALI'), Config('web.Ali.SECRET_KEY_ALI'))
+        AlibabaCloud::accessKeyClient(Config('web.STSAli.ACCESS_KEY_ALI'), Config('web.STSAli.SECRET_KEY_ALI'))
                     ->regionId($regionId)->asDefaultClient();
         try {
             $result = AlibabaCloud::rpc()
