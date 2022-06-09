@@ -888,7 +888,7 @@ class OrderController extends Controller
                         $hist_type = 2;
                         break;
                     case 7:
-                        $hist_type = 2;
+                        $hist_type = 5;
                         break;
                     default:
                         $hist_type = 0;
