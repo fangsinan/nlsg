@@ -166,12 +166,10 @@ class CampController extends Controller
                 $column['end_show'] = 1;
             }
         }
-        $type = 7;
-        $history_type = 5; //训练营 历史记录type值
-        $getInfo_type = 4; //训练营 info type值
-
-
-        $is_sub = Subscribe::isSubscribe($user_id, $column_id, $type);
+        // 统一全局type
+        $types = FuncType(140);
+        
+        $is_sub = Subscribe::isSubscribe($user_id, $column_id, $types['sub_type']);
         $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image')->toArray();
         if(empty($column['poster'])){ // 如果为空则取用父级
             $f_columnID = !empty($column['classify_column_id']) ?$column['classify_column_id']: $column['info_column_id'];
@@ -179,7 +177,7 @@ class CampController extends Controller
         }
         $column['is_sub'] = $is_sub;
         //查询总的历史记录进度`
-        $hisCount = History::getHistoryCount($column_id, $history_type, $user_id);  //讲座
+        $hisCount = History::getHistoryCount($column_id, $types['his_type'], $user_id);  //讲座
 
         $column['history_count'] = 0;
         $info_num  = $column['type'] == 3 ? $column['show_info_num']:$column['info_num'];
@@ -188,7 +186,10 @@ class CampController extends Controller
         }
 
         //历史记录
-        $column['historyData'] = History::getHistoryData($column_id, $history_type, $user_id);
+        $column['historyData'] = History::getHistoryData($column_id, $types['his_type'], $user_id);
+        // 是否收藏
+        
+        $column['is_collection'] = Collection::isCollection($types['col_type'],$column_id,0,$user_id);
         
         // 获取第一章节 info_id
         $get_id = $column['classify_column_id'] ?? $column['id'];

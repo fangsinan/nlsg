@@ -113,7 +113,7 @@ class Column extends Base
         if($is_free !== false ){
             $where['is_free'] = $is_free;
         }
-        $lists= $this->select('id','name', 'column_type', 'title','subtitle', 'message','price','index_pic', 'cover_pic','details_pic','info_num as chapter_num','is_free','is_start','cover_pic as cover_images')
+        $lists= $this->select('id','type','name', 'column_type', 'title','subtitle', 'message','price','index_pic', 'cover_pic','details_pic','info_num as chapter_num','is_free','is_start','cover_pic as cover_images')
             ->whereIn('id', $ids)
             ->where($where)
             ->orderBy('created_at', 'desc')
@@ -121,6 +121,10 @@ class Column extends Base
             ->get()
             ->toArray();
         foreach ($lists as &$v){
+            $v['is_parent'] = 0;
+            if($v == 4){
+                $v['is_parent'] = 0;
+            }
             $v['is_new'] =1;
         }
         return $lists;

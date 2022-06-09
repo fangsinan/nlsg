@@ -629,6 +629,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     // 收藏
     Route::any('collection/list', 'CollectionController@list');//->middleware('replaceNull');
     Route::any('config/share', 'ConfigController@share');//->middleware('replaceNull');
+    Route::any('config/pay_finish_view', 'ConfigController@payFinishView');
     
     //微信url link&scheme
     Route::get('wechat_tools/get_url_link', 'WeChatToolsController@getUrlLink');
