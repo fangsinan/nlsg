@@ -38,6 +38,8 @@ class WeChatTools extends Command
      */
     public function handle()
     {
-        (new WeChatToolsServers())->XcxAccessTokenJob();
+        $s = new WeChatToolsServers();
+        $s->XcxAccessTokenJob();
+        $s->XcxShopAccessTokenJob();
     }
 }
