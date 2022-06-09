@@ -123,7 +123,7 @@ class Column extends Base
         foreach ($lists as &$v){
             $v['is_parent'] = 0;
             if($v == 4){
-                $v['is_parent'] = 0;
+                $v['is_parent'] = 1;
             }
             $v['is_new'] =1;
         }
