@@ -15,8 +15,8 @@ class ShortVideoModel extends Base
         'comment_num', 'size', 'duration', 'url', 'like_num', 'share_num', 'attribute_url',
         'video_adopt','callback_url','callback_attribute','video_type',
     ];
-    //获取短视频
-    function getVideo ($uid,$id=0,$not_id=0,$page=1,$size=3,$is_home=0){
+    //获取短视频 $uid,$id,$top_id,$page,3,$is_home
+    function getVideo ($uid,$id=0,$not_id=0,$page=1,$size=3,$is_home=0){//用户id 短视频id 上一次观看视频id 分页 数量 是否首页
 
         $re_data = [];
         $flag_data_len = 0;
@@ -100,7 +100,7 @@ class ShortVideoModel extends Base
 
             //推荐
             $re_value["recomment"] = $recomObj->getRecommend($re_value['id']);
-            
+
         }
 
 
