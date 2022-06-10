@@ -41,18 +41,26 @@ class ColumnController extends Controller
         $uid = $this->user['id'] ?? 0;
         $columnObj = new Column();
         $subObj = new Subscribe();
+
+        $is_test=[0];
+        if(!empty($this->user['is_test_pay'])){
+            $is_test=[0,1];
+        }
+
         //我的订阅 id
         $relation_id = $subObj->getMySub($uid,7);
         $my_list = $columnObj->getColumn([
                             ['type','In',[3, 4]],
                             ['id','In',$relation_id],
-                        ],$order_str);
+                            ['is_test','In',$is_test],
+        ],$order_str);
         //非我的订阅
         $list = $columnObj->getColumn([
                         ['type','In',[3, 4]],
                         ['is_start','=',0],
                         ['id','NotIn',$relation_id],
-                    ],$order_str);
+                        ['is_test','In',$is_test],
+        ],$order_str);
 //        dd($list);
 
 

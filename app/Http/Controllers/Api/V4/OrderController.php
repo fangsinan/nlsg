@@ -108,13 +108,16 @@ class OrderController extends Controller
             if ($rst > 2) {
                 return ['code' => 0, 'msg' => '您已是vip用户,可免费观看'];
             }
+            // 训练营可重复购买
+            //校验下单用户是否关注
+            $is_sub = Subscribe::isSubscribe($user_id, $target_id, $type);
+            if ($is_sub) {
+                return ['code' => 0, 'msg' => '您已订阅过'];
+            }
+
         }
 
-        //校验下单用户是否关注
-        $is_sub = Subscribe::isSubscribe($user_id, $target_id, $type);
-        if ($is_sub) {
-            return ['code' => 0, 'msg' => '您已订阅过'];
-        }
+        
 
         //唐山只允许 直播 训练营 微课686   type 精品课 2 讲座 6 训练营 7
         $PayIncomeObj=PayIncome::query()->where(['user_id'=>$tweeter_code,'status'=>2])->first();
@@ -888,7 +891,7 @@ class OrderController extends Controller
                         $hist_type = 2;
                         break;
                     case 7:
-                        $hist_type = 2;
+                        $hist_type = 5;
                         break;
                     default:
                         $hist_type = 0;

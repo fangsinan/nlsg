@@ -113,7 +113,7 @@ class Column extends Base
         if($is_free !== false ){
             $where['is_free'] = $is_free;
         }
-        $lists= $this->select('id','type','name', 'column_type', 'title','subtitle', 'message','price','index_pic', 'cover_pic','details_pic','info_num as chapter_num','is_free','is_start','cover_pic as cover_images')
+        $lists= $this->select('id','type','name', 'column_type', 'title','subtitle', 'message','price','index_pic', 'cover_pic','details_pic','info_num as chapter_num','is_free','is_start','cover_pic as cover_images','classify_column_id')
             ->whereIn('id', $ids)
             ->where($where)
             ->orderBy('created_at', 'desc')
@@ -126,6 +126,8 @@ class Column extends Base
                 $v['is_parent'] = 1;
             }
             $v['is_new'] =1;
+            // 获取第一章节 info_id
+            $v['first_info_id'] = Column::getFirstInfo($v['classify_column_id'] ?? $v['id']);
         }
         return $lists;
     }
@@ -339,6 +341,13 @@ class Column extends Base
 
 
         return $column_banner;
+    }
+
+    // 获取训练营第一章节id
+    static function getFirstInfo($get_id){
+
+        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4 ])->orderBy('rank','asc')->first();
+        return  $first_info_id['id'] ?? 0;
     }
 
 

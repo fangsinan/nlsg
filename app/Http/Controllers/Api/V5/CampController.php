@@ -49,19 +49,28 @@ class CampController extends Controller
         $uid = $this->user['id'] ?? 0;
         $columnObj = new Column();
         $subObj = new Subscribe();
+
+        $is_test=[0];
+        if(!empty($this->user['is_test_pay'])){
+            $is_test=[0,1];
+        }
+
         //我的订阅 id
         $relation_id = $subObj->getMySub($uid,7);
         $my_list = $columnObj->getColumn([
                             ['id','In',$relation_id],
                             ['type','=',3],  //我的报名只显示期数
                             ['status','=',1],
+                            ['is_test','In',$is_test],
                         ],$order_str);
-        
+
         //非我的订阅 显示所有父类
         $list = $columnObj->getColumn([
                         ['type','=',4],
                         ['status','=',1],
-                        // ['is_starwt','=',0],
+                        ['is_test','In',$is_test],
+
+            // ['is_starwt','=',0],
                         // ['id','NotIn',$relation_id],
                     ],$order_str);
 
@@ -131,7 +140,7 @@ class CampController extends Controller
         if (empty($column_id)) {
             return $this->error(0, 'column_id 不能为空');
         }
-        
+
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
             'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'
@@ -151,7 +160,7 @@ class CampController extends Controller
         // $column['emperor_price'] = (string)GetPriceTools::Income(1, 4, 0, 1, $column_id);
         // $column['service_price'] = (string)GetPriceTools::Income(1, 5, 0, 1, $column_id);
         $column['online_time'] = date('Y-m-d',strtotime($column['online_time']));
-        
+
 
         $user = User::find($column['user_id']);
         $column['title'] = $user['honor'] ?? '';
@@ -168,7 +177,7 @@ class CampController extends Controller
         }
         // 统一全局type
         $types = FuncType(140);
-        
+
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $types['sub_type']);
         $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image')->toArray();
         if(empty($column['poster'])){ // 如果为空则取用父级
@@ -184,23 +193,21 @@ class CampController extends Controller
         if ($info_num > 0) {
             $column['history_count'] = round($hisCount / $info_num * 100);
         }
-        
+
         //历史记录
         $column['historyData'] = History::getHistoryData($column_id, $types['his_type'], $user_id);
         // 是否收藏
-        
+
         $column['is_collection'] = Collection::isCollection([$types['col_type']],$column_id,0,$user_id);
         // 是否父类
         $column['is_parent'] = 0;
         if($column['type'] == 4){
             $column['is_parent'] = 1;
         }
+
         // 获取第一章节 info_id
-        $get_id = $column['classify_column_id'] ?? $column['id'];
+        $column['first_info_id'] = Column::getFirstInfo($column['classify_column_id'] ?? $column['id']);
         
-        
-        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4 ])->orderBy('rank','asc')->first();
-        $column['first_info_id'] = $first_info_id['id'] ?? 0;
         return $this->success([
             'list' => $column
         ]);
@@ -208,7 +215,7 @@ class CampController extends Controller
 
 
     /**
-     * @api {get} /api/v5/camp/get_lecture_list  训练营目录 
+     * @api {get} /api/v5/camp/get_lecture_list  训练营目录
      * @apiName get_lecture_list
      * @apiVersion 5.0.0
      * @apiGroup five_Camp
@@ -359,19 +366,19 @@ class CampController extends Controller
             return $this->error(1000,$validator->getMessageBag()->first(),(object)[]);
         }
         $camp_id = $request->input('id', 0);  //训练营id
-        // $camp_info_id = $request->input('info_id', 0);  
+        // $camp_info_id = $request->input('info_id', 0);
         $user_id = $this->user['id'] ?? 0;
         // is_show      结营后三天不显示奖励弹窗
-        // now_week     获得第几周的奖励 当前学习的章节是第N周 就显示获得第N周的奖励 
+        // now_week     获得第几周的奖励 当前学习的章节是第N周 就显示获得第N周的奖励
         // 周奖励状态     status  0未领取  1待领取  2 需补卡 3没资格领取
-        // 奖品信息   
+        // 奖品信息
 
         $column_data = Column::find($camp_id);
         if (empty($column_data)) {
             return $this->error(1000, '参数有误：无此信息',(object)[]);
         }
 
-        // 训练营 每周开放六节课程   
+        // 训练营 每周开放六节课程
         // 查询训练营目前开放的全部课程 ，每六个章节为一周，查询历史记录表是否完结
         $is_sub = Subscribe::isSubscribe($user_id, $column_data['id'], 7);
         if($is_sub ==0){
@@ -381,7 +388,7 @@ class CampController extends Controller
         $prize = CampPrize::select('week_num','title as prize_title','cover_pic as prize_pic')->where(['column_id'=>$column_data['id'],'status'=>1])->get()->toArray();
         $prize = array_column($prize,null,'week_num');
 
-        
+
 
         $res = [
             'is_show'   =>0,
@@ -391,7 +398,7 @@ class CampController extends Controller
         // 结营三天后  不显示弹窗
         if( $column_data['is_start'] == 2 &&
             strtotime("+3 day",strtotime($column_data['end_time'])) <= time() ){
-            return $this->success($res); 
+            return $this->success($res);
         }
 
 
@@ -409,7 +416,7 @@ class CampController extends Controller
             //3已领取，2待领取，1补卡领取，0未开始
             if($val['speed_status'] == 2 && $val['is_get'] == 1){
                 $status = 3;
-                
+
             }else if( $val['speed_status'] == 2 && $val['is_get'] == 0 ){
                 $status = 2;
                 $now_week = $val['week_num'];
@@ -484,7 +491,7 @@ class CampController extends Controller
     public function campEndShow(Request $request)
     {
         $column_id = $request->input('id', 0);
-       
+
         $user_id = $this->user['id'] ?? 0;
         if (empty($column_id)) {
             return $this->error(0, 'column_id 不能为空');
@@ -500,7 +507,7 @@ class CampController extends Controller
 
     /**
      * {get} /api/v5/camp/camp_like  点赞
-     * 
+     *
      * @apiParam {int} relation_id  对应id
      * @apiParam {int} user_id  用户id
      * @apiParam {int} info_id  当前章节
@@ -523,7 +530,7 @@ class CampController extends Controller
         }
         return $this->success();
     }
- 
+
 
 
 
