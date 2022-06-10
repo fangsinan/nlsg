@@ -10,3 +10,4 @@ bootstrap/
 vendor/mews/captcha/.gitignore
 storage/logs
 apidoc
+.env
