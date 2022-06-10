@@ -204,12 +204,10 @@ class CampController extends Controller
         if($column['type'] == 4){
             $column['is_parent'] = 1;
         }
+
         // 获取第一章节 info_id
-        $get_id = $column['classify_column_id'] ?? $column['id'];
-
-
-        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4 ])->orderBy('rank','asc')->first();
-        $column['first_info_id'] = $first_info_id['id'] ?? 0;
+        $column['first_info_id'] = Column::getFirstInfo($column['classify_column_id'] ?? $column['id']);
+        
         return $this->success([
             'list' => $column
         ]);
