@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Servers\VipServers;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -39,6 +40,27 @@ class CytxUserPhoneChange extends Command
      */
     public function handle()
     {
+        if (true){
+            $list = [
+                '18624078563',
+            ];
+
+            $vip_temp_res = [];
+            $vs = new VipServers();
+            foreach ($list as $v){
+                $p = [
+                    "flag"=>1,
+                    "parent"=>'',
+                    "phone"=>$v,
+                    "send_money"=>0
+                ];
+                $vip_temp_res[] = $vs->createVip_1($p,1);
+            }
+
+            dd($vip_temp_res);
+        }
+        return 0;
+
         $list = [
 //            ['18198080359','13369423657'],
 //            ['18877762860','13684118715'],
