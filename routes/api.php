@@ -28,7 +28,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('index/get_top_img', 'IndexController@getTopImg');
     Route::get('index/flash_banner', 'IndexController@flashBanner');
 
-    Route::get('column/get_camp_list', 'CampController@getCampList');
+    Route::get('column/get_camp_list', 'ColumnController@getCampList');
     Route::get('vip/new_home_page', 'VipController@newHomePage');
 
 
@@ -550,7 +550,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('index/lives', 'IndexController@lives');
 
 
-    Route::any('column/get_camp_list', 'ColumnController@getCampList');
+    Route::any('column/get_camp_list', 'CampController@getCampList');
 
 
     Route::get('config', 'IndexController@config');
