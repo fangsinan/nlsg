@@ -18,7 +18,7 @@ class Collection extends Base
             'info_id' => $info_id,
             'relation_id' => $relation_id,
         ]);
-        $collection = $collectionObj->whereIn('type',$type)->get();
+        $collection = $collectionObj->whereIn('type',$type)->get()->toArray();
         if(!empty($collection)){
             $is_collection = 1;
         }
