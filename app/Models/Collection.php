@@ -10,6 +10,7 @@ class Collection extends Base
 
     static public function isCollection($type=[],$relation_id,$info_id,$user_id)
     {
+
         //  收藏按总id走
         $is_collection= 0;
         
