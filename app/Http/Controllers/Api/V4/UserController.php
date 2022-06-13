@@ -1053,10 +1053,17 @@ class UserController extends Controller
                     ];
 
                     // 组装父类
+                    // 校验父类是否收藏
                     $filed = ["id","name as title","subtitle","cover_pic","subscribe_num"];
-                    $parent_column = Column::select($filed)->find($val['fid']) ?? [];
-                    $column  = Column::select($filed)->find($val['relation_id']) ?? [];
-                    
+
+                    $col_fid = Collection::where(["relation_id"=>$val['fid'],"user_id"=>$user_id,"type"=>8])->value("id");
+                    if(!empty($col_fid)){
+                        $parent_column = Column::select($filed)->where("type",4)->find($val['fid']) ?? [];
+                    }else{
+                        $parent_column = [];
+                    }
+
+                    $column  = Column::select($filed)->where("type",3)->find($val['relation_id']) ?? [];
                     $is_sub = Subscribe::isSubscribe($user_id,$val['relation_id'],7);
                     $info_ids = Collection::where($where)->where("relation_id",$val['relation_id'])->pluck('info_id');
                     if(!empty($info_ids)) $info_ids = $info_ids->toArray();

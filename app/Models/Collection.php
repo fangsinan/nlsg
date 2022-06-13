@@ -13,7 +13,7 @@ class Collection extends Base
         //  收藏按总id走
         $is_collection= 0;
         
-        $collectionObj = Collection::select()->where([
+        $collectionObj = Collection::select("id")->where([
             'user_id' => $user_id,
             'info_id' => $info_id,
             'relation_id' => $relation_id,
