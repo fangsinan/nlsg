@@ -1087,12 +1087,12 @@ class UserController extends Controller
                     $parent_collection = Collection::select("*")->where($where)->where("fid",$fid)->get()->toArray();
                     $info_ids = array_column($parent_collection,'info_id');
                     $column_ids = array_column($parent_collection,'relation_id');
-
+                    $column_id = $column_ids[0]??0;
                     // 处理期数id
-                    $is_column  = Column::select($filed)->where("type",3)->find($column_ids[0]) ?? [];
+                    $is_column  = Column::select($filed)->where("type",3)->find($column_id) ?? [];
 
 
-                    $is_coll_column = Collection::where(["relation_id"=>$column_ids[0],"user_id"=>$user_id,"type"=>8,"info_id"=>0])->value("id");
+                    $is_coll_column = Collection::where(["relation_id"=>$column_id,"user_id"=>$user_id,"type"=>8,"info_id"=>0])->value("id");
                     if(!empty($is_coll_column)){
                         $column = $is_column;
                     }
@@ -1100,8 +1100,8 @@ class UserController extends Controller
 
                     // 处理章节 
                     // $info_ids = Collection::where($where)->where("relation_id",$val['relation_id'])->pluck('info_ids');
-                    $info_ids = Collection::where($where)->where("fid",$fid)->pluck('info_id');
-                    if(!empty($info_ids)) $info_ids = $info_ids->toArray();
+                    // $info_ids = Collection::where($where)->where("fid",$fid)->pluck('info_id');
+                    // if(!empty($info_ids)) $info_ids = $info_ids->toArray();
 
                     $list = $infoObj->getInfoFromID($info_ids,$is_sub,$user_id,140,$os_type,$version);
                     if(!empty($list)){
