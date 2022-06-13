@@ -12,13 +12,14 @@ class Collection extends Base
     {
         //  收藏按总id走
         $is_collection= 0;
+        
         $collectionObj = Collection::select()->where([
             'user_id' => $user_id,
             'info_id' => $info_id,
             'relation_id' => $relation_id,
         ]);
         $collection = $collectionObj->whereIn('type',$type)->get();
-        if(empty($collection)){
+        if(!empty($collection)){
             $is_collection = 1;
         }
         return $is_collection;
