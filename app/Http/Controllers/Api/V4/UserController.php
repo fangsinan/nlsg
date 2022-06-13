@@ -1095,6 +1095,8 @@ class UserController extends Controller
                     $is_coll_column = Collection::where(["relation_id"=>$column_id,"user_id"=>$user_id,"type"=>8,"info_id"=>0])->value("id");
                     if(!empty($is_coll_column)){
                         $column = $is_column;
+                    }else{
+                        $column=[];
                     }
                     $is_sub = Subscribe::isSubscribe($user_id,$val['relation_id'],7);
 
