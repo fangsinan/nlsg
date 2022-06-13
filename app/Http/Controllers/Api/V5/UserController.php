@@ -13,6 +13,7 @@ use App\Models\MeetingSales;
 use App\Models\UserInvite;
 use App\Models\Works;
 use App\Models\WorksInfo;
+use App\Servers\V5\UserServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -127,6 +128,10 @@ class UserController extends Controller
 
 
         return success();
+    }
+
+    public function settings(Request $request){
+        return $this->getRes((new UserServers())->settings($request->input(),$this->user['id']));
     }
 
 }

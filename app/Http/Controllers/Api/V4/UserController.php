@@ -1036,7 +1036,7 @@ class UserController extends Controller
                     'user_id' => $user_id,
                     'type' => $type,
                 ];
-                
+
                 // 根据收藏时间排序
                 $collection_maxid = Collection::select("fid",DB::raw('max(id) as id'))->where($where)->where("fid",">","0")->groupBy("fid")->paginate($this->page_per_page)->toArray();
                 $collection_ids = array_column($collection_maxid['data'], 'id');
@@ -1081,14 +1081,14 @@ class UserController extends Controller
                     if(!empty($column) && $column['info_id'] == 0){
                         $res_one['column'] = $column;
                     }
-                        
-                    
+
+
                     $res[] = $res_one;
                 }
                 return $this->success($res);
         }
 
-        
+
 
 
 
@@ -1170,6 +1170,7 @@ class UserController extends Controller
             $res['is_vip'] = $this->user['new_vip']['level'] ?? 0;
             $res['sex'] = $this->user['sex'];
             $res['is_community_admin'] = $this->user['is_community_admin'];  // im管理员
+            $res['ad_switch'] = $this->user['ad_switch'];
 
             if ($res['id']) {
                 $is_live = LiveUserPrivilege::where('user_id', $this->user['id'])
