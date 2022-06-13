@@ -1038,13 +1038,18 @@ class UserController extends Controller
                 ];
                 
                 // 根据收藏时间排序
-                $collection_maxid = Collection::select("fid",DB::raw('max(id) as id'))->where($where)->where("fid",">","0")->groupBy("fid")->paginate($this->page_per_page)->toArray();
-                $collection_ids = array_column($collection_maxid['data'], 'id');
+                // $collection_maxid = Collection::select("fid",DB::raw('max(id) as id'))->where($where)->where("fid",">","0")->groupBy("fid")->paginate($this->page_per_page)->toArray();
+                $collection_maxid = Collection::select("id","relation_id","fid")->where($where)->orderBy('id','desc')->paginate(50)->toArray();
+                // $collection_ids = array_column($collection_maxid['data'], 'id');
 
-                // 获取最新的fid的收藏数据   根据最新的收藏数据查询期数
-                $col = Collection::select("*")->whereIn("id",$collection_ids)->orderBy('id','desc')->get()->toArray();
+                // // 获取最新的fid的收藏数据   根据最新的收藏数据查询期数
+                // $col = Collection::select("*")->whereIn("id",$collection_ids)->orderBy('id','desc')->get()->toArray();
                 $res = [];
-                foreach($col as $val){
+                $parent_column_ids = [];
+                // foreach($collection_maxid as $val){
+                foreach($collection_maxid['data'] as $val){
+                    
+
                     // 初始化数据格式
                     $res_one = [
                         "parent_column" => [],
@@ -1052,18 +1057,33 @@ class UserController extends Controller
                         "info"          => [],
                     ];
 
-                    // 组装父类
                     // 校验父类是否收藏
                     $filed = ["id","name as title","subtitle","cover_pic","subscribe_num"];
-
-                    $col_fid = Collection::where(["relation_id"=>$val['fid'],"user_id"=>$user_id,"type"=>8])->value("id");
-                    if(!empty($col_fid)){
-                        $parent_column = Column::select($filed)->where("type",4)->find($val['fid']) ?? [];
+                    if($val['fid'] == 0){
+                        $fid = $val['relation_id'];
                     }else{
-                        $parent_column = [];
+                        $fid = $val['fid'];
                     }
+                    if( in_array( $fid,$parent_column_ids) ){
+                        continue;
+                    }
+                    // $col_fid = Collection::where(["relation_id"=>$fid,"user_id"=>$user_id,"type"=>8,"info_id"=>0,"fid"=>0])->value("id");
+                    $parent_column = Column::select($filed)->where("type",4)->find($fid) ?? [];
+                    $parent_column_ids[] = $fid;
 
-                    $column  = Column::select($filed)->where("type",3)->find($val['relation_id']) ?? [];
+                    // if(!empty($col_fid)){
+                    //     $parent_column = Column::select($filed)->where("type",4)->find($fid) ?? [];
+                    //     $parent_column_ids[] = $val['fid'];
+                    // }else{
+                    //     $parent_column = Column::select($filed)->where("type",4)->find($val['relation_id']) ?? [];
+                    //     $parent_column_ids[] = $val['relation_id'];
+                    // }
+
+                    // 处理期数id
+                    $is_column = Collection::where(["relation_id"=>$val['relation_id'],"user_id"=>$user_id,"type"=>8,"info_id"=>0])->value("id");
+                    if(!empty($is_column)){
+                        $column  = Column::select($filed)->where("type",3)->find($val['relation_id']) ?? [];
+                    }
                     $is_sub = Subscribe::isSubscribe($user_id,$val['relation_id'],7);
                     $info_ids = Collection::where($where)->where("relation_id",$val['relation_id'])->pluck('info_id');
                     if(!empty($info_ids)) $info_ids = $info_ids->toArray();
@@ -1082,8 +1102,8 @@ class UserController extends Controller
                         $res_one['column'] = $column;
                     }
                         
-                    
                     $res[] = $res_one;
+
                 }
                 return $this->success($res);
         }
