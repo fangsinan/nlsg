@@ -1078,11 +1078,14 @@ class UserController extends Controller
                     //     $parent_column = Column::select($filed)->where("type",4)->find($val['relation_id']) ?? [];
                     //     $parent_column_ids[] = $val['relation_id'];
                     // }
-
+                    
                     // 处理期数id
-                    $is_column = Collection::where(["relation_id"=>$val['relation_id'],"user_id"=>$user_id,"type"=>8,"info_id"=>0])->value("id");
-                    if(!empty($is_column)){
-                        $column  = Column::select($filed)->where("type",3)->find($val['relation_id']) ?? [];
+                    $is_column  = Column::select($filed)->where("type",3)->find($val['relation_id']) ?? [];
+
+
+                    $is_coll_column = Collection::where(["relation_id"=>$val['relation_id'],"user_id"=>$user_id,"type"=>8,"info_id"=>0])->value("id");
+                    if(!empty($is_coll_column)){
+                        $column = $is_column;
                     }
                     $is_sub = Subscribe::isSubscribe($user_id,$val['relation_id'],7);
                     $info_ids = Collection::where($where)->where("relation_id",$val['relation_id'])->pluck('info_id');
@@ -1090,8 +1093,8 @@ class UserController extends Controller
 
                     $list = $infoObj->getInfoFromID($info_ids,$is_sub,$user_id,140,$os_type,$version);
                     if(!empty($list)){
-                        $res_one['info']['id']    = empty($column) ?0:$column['id'];
-                        $res_one['info']['title'] = empty($column) ?"":$column['title'];
+                        $res_one['info']['id']    = empty($is_column) ?0:$is_column['id'];
+                        $res_one['info']['title'] = empty($is_column) ?"":$is_column['title'];
                         $res_one['info']['list']  = $list;
                     }else{
                         $res_one['info'] = (object)[];
