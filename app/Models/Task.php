@@ -66,6 +66,7 @@ class Task extends Base
             case 5:
                 $data = [
                     'subject'=> '发布了直播课'.$title,
+//                    'subject'=> '能量时光-发布了汤蓓老师直播课【'.$title.'】，点击进入直播间吧！',
                     'user_id'=> $user_id,
                     'source_id' => $source_id,
                     'type'   => 5
