@@ -335,7 +335,15 @@ class Subscribe extends Base
         if( !in_array($type,[3,5,7]) ){  // 3直播  5线下产品  7训练营 不需判断end_time
             $query->where('end_time', '>', date('Y-m-d H:i:s'));
         }
-        return $query->pluck("relation_id")->toArray();
+
+        $relation_id=$query->pluck("relation_id")->toArray();
+        if($relation_id){
+            $classify_column_id=Column::query()->whereIn('id',$relation_id)
+                ->where('classify_column_id','>',0)
+                ->pluck("classify_column_id")->toArray();
+            $relation_id=array_merge($relation_id,$classify_column_id);
+        }
+        return $relation_id;
     }
 
     public function historyInfo(){
