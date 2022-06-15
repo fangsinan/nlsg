@@ -619,8 +619,9 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('camp/camp_study', 'CampController@campStudy');//->middleware('replaceNull');
     // 海报图
     Route::any('image/get_qr_code', 'ImageController@GetQrCode');//->middleware('replaceNull');
-    // 直播
+    Route::any('image/get_user_qrcode', 'ImageController@GetUserQrCode');//->middleware('replaceNull');
 
+    // 直播
     Route::any('live/list', 'LiveController@getLiveLists');
     Route::any('live/live_push_qrcode', 'LiveController@livePushQrcode');
     Route::any('live/sell_short_state', 'LiveController@SellShortState');
