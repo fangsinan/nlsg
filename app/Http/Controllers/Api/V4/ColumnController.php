@@ -728,7 +728,7 @@ class ColumnController extends Controller
         }
         //IOS 通过审核后修改  并删除返回值works_data
         $column_data = Column::select(['id', 'name', 'name as title','type' , 'title', 'subtitle','index_pic', 'cover_pic as cover_img', 'details_pic as detail_img', 'message','details_pic','cover_pic',
-            'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num','show_info_num','info_column_id','status'])
+            'view_num', 'price', 'subscribe_num', 'is_free', 'is_end', 'info_num','show_info_num','info_column_id','status','can_h5'])
 //            ->where(['id' => $lecture_id, 'status' => 1])->first();
             ->where(['id' => $lecture_id, ])->first();
 
@@ -745,7 +745,7 @@ class ColumnController extends Controller
         $getInfo_type = 3;
         if($column_data['type'] == 2 ){
             $type = 6;
-        }else if ($column_data['type'] == 3 ){
+        }else if ($column_data['type'] == 3 || $column_data['type'] == 4 ){
             $type = 7;
             $history_type = 5; //训练营
             $getInfo_type = 4; //训练营
