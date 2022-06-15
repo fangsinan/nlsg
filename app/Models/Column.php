@@ -122,7 +122,7 @@ class Column extends Base
             ->toArray();
         foreach ($lists as &$v){
             $v['is_parent'] = 0;
-            if($v == 4){
+            if($v['type']  == 4){
                 $v['is_parent'] = 1;
             }
             $v['is_new'] =1;
