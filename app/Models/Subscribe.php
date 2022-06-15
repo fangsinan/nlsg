@@ -337,12 +337,16 @@ class Subscribe extends Base
         }
 
         $relation_id=$query->pluck("relation_id")->toArray();
-        if($relation_id){
-            $classify_column_id=Column::query()->whereIn('id',$relation_id)
-                ->where('classify_column_id','>',0)
-                ->pluck("classify_column_id")->toArray();
-            $relation_id=array_merge($relation_id,$classify_column_id);
+
+        if($type==7){
+            if($relation_id){
+                $classify_column_id=Column::query()->whereIn('id',$relation_id)
+                    ->where('classify_column_id','>',0)
+                    ->pluck("classify_column_id")->toArray();
+                $relation_id=array_merge($relation_id,$classify_column_id);
+            }
         }
+
         return $relation_id;
     }
 
