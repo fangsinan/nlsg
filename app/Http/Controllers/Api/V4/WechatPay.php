@@ -620,8 +620,8 @@ class WechatPay extends Controller
                 case 7: //30天智慧父母(亲子)训练营-直播专享
                     $res = $nickname . ':您已支付' . $live_num . '张30天智慧父母(亲子)训练营-直播专享';
                     break;
-                case 8: //抖音直播内部教材
-                    $res = $nickname . ':您已支付' . $live_num . '套抖音直播内部教材';
+                case 8: //家庭教育内部教材
+                    $res = $nickname . ':您已支付' . $live_num . '套家庭教育内部教材';
                     break;
                 case 9: //经营幸福人生
                     $res = $nickname . ':您已支付' . $live_num . '张经营幸福人生';

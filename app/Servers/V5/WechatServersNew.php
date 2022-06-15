@@ -144,7 +144,7 @@ class WechatServersNew
                 $map_all_temp['created_at'] = $day_time;
                 $map_all[] = $map_all_temp;
                 //加入队列等待执行
-//                $Redis->rpush('push_wechat_openid_list', $fv);
+                $Redis->rpush('push_wechat_openid_list', $fv);
             }
 
             //一次拉取10000条数据
@@ -241,11 +241,11 @@ class WechatServersNew
         开始时间：2017年8月1日 20:00
         请留言直播课程开始时间，以免错过课程*/
         //周三早7点  &tweeter_code=211370
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=534&time=1654608905&inviter=211370';
-        $hello='孩子怎么拥有好口才，家长如何做？';
-        $title='让孩子学会演讲口才的“8大技巧”';
-        $teacher='吴岩老师';
-        $time='2022年6月8日 19:30';
+        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=536&time=1655214730018&inviter=211370';
+        $hello='如何让孩子高效学习，自动自发自主？';
+        $title='4招激活孩子学习动力，让孩子爱上学习';
+        $teacher='汤蓓老师';
+        $time='2022年6月15日 19:30';
         $remarks="点击下面详情按钮，免费预约直播课学习~";
 
         $data=[
