@@ -42,7 +42,6 @@ class CampController extends Controller
      */
     public function getCampList(Request $request)
     {
-
         //排序
         $order_str = $request->input('order') ??"desc";
 
@@ -144,7 +143,7 @@ class CampController extends Controller
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
             'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'
-        ,'comment_num','info_column_id','classify_column_id'];
+        ,'comment_num','info_column_id','classify_column_id','can_h5'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
             return $this->error(0, '内容不存在不能为空');
@@ -197,19 +196,17 @@ class CampController extends Controller
         //历史记录
         $column['historyData'] = History::getHistoryData($column_id, $types['his_type'], $user_id);
         // 是否收藏
-
+        
         $column['is_collection'] = Collection::isCollection([$types['col_type']],$column_id,0,$user_id);
         // 是否父类
         $column['is_parent'] = 0;
         if($column['type'] == 4){
             $column['is_parent'] = 1;
         }
+
         // 获取第一章节 info_id
-        $get_id = $column['classify_column_id'] ?? $column['id'];
-
-
-        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4 ])->orderBy('rank','asc')->first();
-        $column['first_info_id'] = $first_info_id['id'] ?? 0;
+        $column['first_info_id'] = Column::getFirstInfo($column['classify_column_id'] ?? $column['id']);
+        
         return $this->success([
             'list' => $column
         ]);

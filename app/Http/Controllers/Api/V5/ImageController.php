@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
+use App\Models\ConfigModel;
 use App\Models\Order;
 use App\Models\Qrcodeimg;
 use Illuminate\Http\Request;
@@ -61,5 +62,21 @@ class ImageController extends Controller
         // }
 
         return success($qr_url['qr_url']??'');
+    }
+
+    /**
+     *  * @api {get} api/v5/image/GetUserQrCode 获取客服二维码
+     * @apiVersion 5.0.0
+     * @apiName  get_qr_code
+     * @apiGroup FiveCode
+     *
+     * @apiParam {number} relation_type 类型 1.精品课程2.商城3.直播   4 购买360   5 大咖讲书  6训练营
+     * @apiParam {number} relation_id   数据id 课程id  商品id  直播id
+     */
+    public function GetUserQrCode(Request $request)
+    {
+        
+        $image= $version_config = ConfigModel::getData(76);
+        return success($image);
     }
 }

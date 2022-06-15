@@ -498,7 +498,9 @@ class MallGoods extends Base
         $kind = 5;//可能性
         $key = substr(time(), 9);
         $key = $key % $kind;
-
+        if (($user['ad_switch'] ?? 1) == 2) {
+            return [];
+        }
         $cache_key_name = 'fyr_' . $key;
         $id_list = Cache::get($cache_key_name);
 
