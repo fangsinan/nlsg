@@ -69,7 +69,7 @@ class CampController extends Controller
                         ['is_test','In',$is_test],
 
             // ['is_starwt','=',0],
-                        ['id','NotIn',$relation_id],
+                // ['id','NotIn',$relation_id],
                     ],$order_str);
 
         $new_res = [
