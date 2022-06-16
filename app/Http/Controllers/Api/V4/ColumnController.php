@@ -752,6 +752,7 @@ class ColumnController extends Controller
             $type = 7;
             $history_type = 5; //训练营
             $getInfo_type = 4; //训练营
+            $order = "asc";
 
         }
         $is_sub = Subscribe::isSubscribe($user_id, $lecture_id, $type);
