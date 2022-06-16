@@ -364,7 +364,7 @@ class WorksController extends Controller
             $id = $check_his->id ?? 0;
             $end_time = $check_his->end_time ?? '';
             // 之前为删除状态
-            if($check_his->is_del ==0){
+            if($check_his->is_del == 1){
                 User::where(['id'=>$user_id])->increment('history_num');
             }
         }
