@@ -815,9 +815,11 @@ class ColumnController extends Controller
 //        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
 
+        
         $column_data['history_count'] = 0;
-        if ($column_data['info_num'] > 0) {
-            $column_data['history_count'] = round($hisCount / $column_data['info_num'] * 100);
+        $info_num  = $column_data['type'] == 3 ? $column_data['show_info_num']:$column_data['info_num'];
+        if ($info_num > 0) {
+            $column_data['history_count'] = round($hisCount / $info_num * 100);
         }
 
         //继续学习的章节[时间倒序 第一条为最近学习的章节]
