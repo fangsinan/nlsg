@@ -638,6 +638,9 @@ class ColumnController extends Controller
 
         if($column['type'] == 3){  //训练营  开营时间
             $column['online_time'] = date('Y-m-d',strtotime($column['online_time']));
+        }else if($column['type'] == 4){
+            $column['is_parent'] = 1;
+            $column['online_time'] = Column::getColumnNewStartTime($column['id']);
         }
 
         $user = User::find($column['user_id']);
