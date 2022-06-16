@@ -629,7 +629,7 @@ class ColumnController extends Controller
 //        $works = Works::select(['id'])->where(['column_id'=>$column_id, 'status' => 4])->first();
 
         $free_trial = WorksInfo::select(['id'])->where(['column_id' => $column_id, 'type' => 1, 'status' => 4, 'free_trial' => 1])->first();
-        $column['free_trial_id'] = (string)$free_trial['id'] ?? '';
+        $column['free_trial_id'] = (string)($free_trial['id'] ?? '');
 
         $column['twitter_price'] = (string)GetPriceTools::Income(1, 2, 0, 1, $column_id);
 //        $column['black_price']   = GetPriceTools::Income(1,3,0,1,$column_id);
@@ -638,9 +638,11 @@ class ColumnController extends Controller
 
         if($column['type'] == 3){  //训练营  开营时间
             $column['online_time'] = date('Y-m-d',strtotime($column['online_time']));
+            $column['info_num'] = $column['show_info_num'];
         }else if($column['type'] == 4){
             $column['is_parent'] = 1;
             $column['online_time'] = Column::getColumnNewStartTime($column['id']);
+            $column['info_num'] = $column['show_info_num'];
         }
 
         $user = User::find($column['user_id']);
