@@ -351,6 +351,13 @@ class Column extends Base
     }
 
 
+    static function getColumnNewStartTime($id) {
+        $online_time = Column::where(["type"=>3,"column_type"=>1,"classify_column_id"=>$id,"is_start"=>0])->OrderBy("online_time","asc")->value("online_time");
+        return $online_time ?? '';
+
+    }
+
+
 
 
 }
