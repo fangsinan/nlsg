@@ -352,7 +352,7 @@ class ErpServers
             $temp_error_data['type']     = 2;
             DB::table('nlsg_mall_order_erp_error')->insert($temp_error_data);
         }
-
+        DB::table('nlsg_erp_logistics_log')->insert(['info'=>json_encode($json)]);
         return $json['trades'] ?? [];
     }
 
