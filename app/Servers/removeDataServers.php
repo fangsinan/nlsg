@@ -24,6 +24,7 @@ use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Models\VipUserBind;
 use App\Models\WorksListOfSub;
+use App\Servers\V5\erpOrderServers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -2587,5 +2588,88 @@ CONCAT(type,'_',relation_id) in ('2_404', '2_419', '2_567', '2_568', '2_569', '2
 
 
 
+    }
+
+    public function erp_fahuo_buquan(){
+        $params = [
+            'send_status'=>1,
+            'shill_status'=>0,
+            'page'=>1,
+            'size'=>1500,
+        ];
+
+        $eos = new erpOrderServers();
+        $list = $eos->list($params)->toArray();
+        $list = $list['data'];
+
+        $res_ordernum = [];
+
+        foreach ($list as $v){
+            $temp_check = DB::table('www_erp_chukudan')
+                ->where('ordernum','=',$v['ordernum'])
+                ->where('danhao','<>','')
+                ->whereIn('type',[1,2])
+                ->first();
+
+            if(empty($temp_check)){
+                continue;
+            }
+
+            $now_date = date('Y-m-d H:i:s');
+            $send_data = [];
+            //训练营教材订单
+            $send_data['express_id']      = 3;
+            $send_data['num']             = $temp_check->danhao;
+            $send_data['order_id']        = $v['id'];
+            $send_data['order_detail_id'] = 0;
+
+            $check_ex = ExpressInfo::query()
+                ->where('express_id', '=', $send_data['express_id'])
+                ->where('express_num', '=', $send_data['num'])
+                ->first();
+
+            if ($check_ex && !empty($send_data['num'])) {
+                $express_info_id = $check_ex->id;
+            } else {
+                $ex_data['express_id']  = $send_data['express_id'];
+                $ex_data['express_num'] = $send_data['num'];
+
+                if (!empty($send_data['num'])) {
+                    $express_company_info     = ExpressCompany::query()->find($send_data['express_id']);
+                    $history                  = [];
+                    $history['number']        = $temp_check->danhao;
+
+                    $history['type']          = $express_company_info->code ?? 'YTO';
+                    $history['typename']      = $express_company_info->name ?? $v['logistics_name'];
+                    $history['express_phone'] = $express_company_info->phone ?? '';
+                    $history['logo']          = $express_company_info->logo ?? '';
+
+                    $history['list']          = [
+                        [
+                            'time'   => $now_date,
+                            'status' => '商家发货'
+                        ]
+                    ];
+
+                    $ex_data['history'] = json_encode($history);
+                    $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
+                    $express_info_id       = DB::table('nlsg_express_info')->insertGetId($ex_data);
+                    if (!$express_info_id) {
+                        continue;
+                    }
+                }
+            }
+
+            if (!empty($send_data['num']) && isset($express_info_id)) {
+                Order::query()->where('ordernum', '=', $v['ordernum'])
+                    ->update([
+                                 'express_info_id' => $express_info_id
+                             ]);
+                $res_ordernum[] = $v['ordernum'];
+            }
+
+        }
+
+        dd($res_ordernum);
     }
 }
