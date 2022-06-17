@@ -438,7 +438,7 @@ class DouDianServers
                 }
 
                 //80000 您的环境存在安全风险，请稍后再试  暂停半小时
-                if ($response->code === 80000) {
+                if ($response->code === 80000 || $response->err_no === 300008) {
                     DouDianOrderDecryptQuota::query()
                         ->create([
                                      'flag'     => 1,
@@ -484,9 +484,11 @@ class DouDianServers
                             break;
                     }
                 } else {
-                    $check_order->decrypt_step    = 9;
-                    $check_order->decrypt_err_no = $decrypt_info->err_no;
-                    $check_order->decrypt_err_msg = $decrypt_info->err_msg;
+                    if ($decrypt_info->err_no !== 300008) {
+                        $check_order->decrypt_step    = 9;
+                        $check_order->decrypt_err_no = $decrypt_info->err_no;
+                        $check_order->decrypt_err_msg = $decrypt_info->err_msg;
+                    }
                 }
 
                 $check_order->save();
@@ -506,7 +508,7 @@ class DouDianServers
                     }
 
                     //80000 您的环境存在安全风险，请稍后再试  暂停半小时
-                    if ($response->code === 80000) {
+                    if ($response->code === 80000 || $response->err_no === 300008) {
                         DouDianOrderDecryptQuota::query()
                             ->create([
                                          'flag'     => 1,
@@ -552,9 +554,11 @@ class DouDianServers
                                 break;
                         }
                     } else {
-                        $check_order->decrypt_step    = 9;
-                        $check_order->decrypt_err_no = $decrypt_info->err_no;
-                        $check_order->decrypt_err_msg = $decrypt_info->err_msg;
+                        if ($decrypt_info->err_no !== 300008) {
+                            $check_order->decrypt_step    = 9;
+                            $check_order->decrypt_err_no = $decrypt_info->err_no;
+                            $check_order->decrypt_err_msg = $decrypt_info->err_msg;
+                        }
                     }
 
                     $check_order->save();
