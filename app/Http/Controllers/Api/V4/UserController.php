@@ -1109,7 +1109,7 @@ class UserController extends Controller
                     // $info_ids = Collection::where($where)->where("fid",$fid)->pluck('info_id');
                     // if(!empty($info_ids)) $info_ids = $info_ids->toArray();
 
-                    $list = $infoObj->getInfoFromID($info_ids,$is_sub,$user_id,140,$os_type,$version);
+                    $list = $infoObj->getInfoFromID($column_id,$info_ids,$is_sub,$user_id,140,$os_type,$version);
                     if(!empty($list)){
                         $res_one['info']['id']    = empty($is_column) ?0:$is_column['id'];
                         $res_one['info']['title'] = empty($is_column) ?"":$is_column['title'];

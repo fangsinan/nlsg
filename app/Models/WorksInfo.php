@@ -697,7 +697,7 @@ class WorksInfo extends Base
 
 
         // 根据id 获取章节数 $type  1 单课程  2 多课程  3讲座 140训练营
-        public function getInfoFromID($infoIds, $is_sub = 0, $user_id = 0, $input_type = 1, $os_type=1,$version='5.0.0')
+        public function getInfoFromID($column_id,$infoIds, $is_sub = 0, $user_id = 0, $input_type = 1, $os_type=1,$version='5.0.0')
         {
             if(empty($infoIds)){
                 return [];
@@ -752,10 +752,11 @@ class WorksInfo extends Base
                     // relation_type = 1专栏   2讲座   3听书  4精品课程   5训练营
                     $his_data = History::select('time_leng', 'time_number','is_end')->where([
                         'relation_type' => $fun_types["his_type"],
-                        'relation_id' => $relation_id,
+                        'relation_id' => $column_id,
                         'info_id' => $val['id'],
                         'user_id' => $user_id,
                     ])->orderBy('updated_at', 'desc')->first();
+                    
                     if ($his_data) {
                         $works_data[$key]['time_leng'] = $his_data->time_leng;
                         $works_data[$key]['time_number'] = $his_data->time_number;
