@@ -206,6 +206,7 @@ class ColumnController extends Controller
         $list = Column::select($field)->where([
             "status" => 1,
             "type" => $type,
+            "is_start"=>0
         ])->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->paginate($this->page_per_page)->toArray();
         //->get($field);
