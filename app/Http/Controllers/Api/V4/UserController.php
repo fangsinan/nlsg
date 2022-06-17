@@ -788,6 +788,7 @@ class UserController extends Controller
      * }
      * }
      */
+    // 弃用  用new_history
     public function history(Request $request)
     {
         $user_id = $request->input('user_id', 0);
@@ -809,7 +810,7 @@ class UserController extends Controller
             $val['works_name'] = '';
             $val['works_cover_img'] = '';
             $val['worksInfo_name'] = '';
-            $val['column_can_h5'] = 0;
+            
 
 
             if ($val['relation_type'] == 1 or $val['relation_type'] == 2 or $val['relation_type'] == 5) {
@@ -817,7 +818,6 @@ class UserController extends Controller
                 $column = Column::where(['id'=>$val['relation_id'],'status'=>1])->first();
                 $val['column_name'] = $column['name'] ?? '';
                 $val['column_cover_img'] = $column['cover_pic'] ?? '';
-                $val['column_can_h5'] = $column['can_h5'] ?? 0;
             }
             if ($val['relation_type'] == 3 or $val['relation_type'] == 4) {
 //                $works = Works::find($val['relation_id']);
@@ -865,12 +865,14 @@ class UserController extends Controller
             $val['works_cover_img'] = '';
             $val['worksInfo_name'] = '';
             $val['is_teacherBook'] = 0;
+            $val['column_can_h5'] = 0;
 
             if ($val['relation_type'] == 1 or $val['relation_type'] == 2 or $val['relation_type'] == 5) {
 //                $column = Column::find($val['relation_id']);
                 $column = Column::where(['id'=>$val['relation_id'],'status'=>1])->first();
                 $val['column_name'] = $column['name'] ?? '';
                 $val['column_cover_img'] = $column['cover_pic'] ?? '';
+                $val['column_can_h5'] = $column['can_h5'] ?? 0;
             }
             if ($val['relation_type'] == 3 or $val['relation_type'] == 4) {
 //                $works = Works::find($val['relation_id']);
