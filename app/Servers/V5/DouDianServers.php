@@ -430,6 +430,7 @@ class DouDianServers
             $response            = $request->execute('');
 
             $response->job_type = 2;
+            $response->decrypt_text = json_encode($response->decrypt_infos ?? '');
             DouDianOrderLog::query()->create((array)$response);
 
             if ($response->code !== 10000) {
