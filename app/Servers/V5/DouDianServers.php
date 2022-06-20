@@ -391,8 +391,8 @@ class DouDianServers
 
         $list = DouDianOrder::query()
             ->where('decrypt_step', $step)
-            ->whereNotIn('order_status', [1, 4, 5])
-            ->where('order_id', '>', '4933714072054765432')
+            ->whereNotIn('order_status', [1, 4])
+//            ->where('order_id', '>', '4933714072054765432')
             ->where('dou_dian_type', '=', 1)
             ->select([
                          'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
