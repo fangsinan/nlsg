@@ -39,7 +39,7 @@ class DouDianDataServers
                          'cancel_reason', 'buyer_words',
                      ]);
 
-        $query->where('order_id', '>', '4933714072054765432');
+//        $query->where('order_id', '>', '4933714072054765432');
         $query->where('dou_dian_type', '=', $dou_dian_type);
 
         $query->with([

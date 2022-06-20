@@ -40,6 +40,6 @@ class DouDianOrderDecrypt extends Command
     public function handle()
     {
         (new DouDianServers())->decryptJob();
-        (new DouDianXueXiJiServers())->decryptJob();
+//        (new DouDianXueXiJiServers())->decryptJob();
     }
 }
