@@ -337,17 +337,17 @@ class Subscribe extends Base
         }
 
         $relation_id=$query->pluck("relation_id")->toArray();
+        // 我的报名只显示期数  不需要处理父类
+        // if($type==7 && $relation_id){
 
-        if($type==7 && $relation_id){
+        //     $classify_column_id=Column::query()->whereIn('id',$relation_id)
+        //         ->where('classify_column_id','>',0)
+        //         ->pluck("classify_column_id")->toArray();
 
-            $classify_column_id=Column::query()->whereIn('id',$relation_id)
-                ->where('classify_column_id','>',0)
-                ->pluck("classify_column_id")->toArray();
+        //     $relation_id=array_merge($relation_id,$classify_column_id);
+        //     $relation_id=array_unique($relation_id);
 
-            $relation_id=array_merge($relation_id,$classify_column_id);
-            $relation_id=array_unique($relation_id);
-
-        }
+        // }
 
         return $relation_id;
     }
