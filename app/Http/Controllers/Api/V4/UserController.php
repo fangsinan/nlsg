@@ -1034,7 +1034,7 @@ class UserController extends Controller
 
         $infoObj = new WorksInfo();
         // 根据版本号 单独处理训练营收藏
-        if ( (!empty($version) && version_compare($version, "5.0.5") > 0)
+        if ( (!empty($version) && version_compare($version, "5.0.7") > 0)
             && $type == 8 ){
                 $where = [
                     'user_id' => $user_id,
