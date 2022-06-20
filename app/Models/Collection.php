@@ -84,7 +84,7 @@ class Collection extends Base
                 break;
             case 2: //课程
                 $model = new Works();
-                $result = $model->getIndexWorks($ids, '', $user_id);
+                $result = $model->getIndexWorks($ids, '', $user_id,false,1,count($ids));
                 break;
             case 3:
                 $model = new MallGoods();
