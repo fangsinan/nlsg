@@ -1122,7 +1122,12 @@ class UserController extends Controller
                     if(!empty($column) && $column['info_id'] == 0){
                         $res_one['column'] = $column;
                     }
-
+                    // 旧数据 无父类的收藏
+                    if($res_one['parent_column'] == (object)[]  && 
+                        $res_one['column'] == (object)[] && 
+                        $res_one['info'] == (object)[] ){
+                        continue;
+                    }
                     $res[] = $res_one;
 
                 }
