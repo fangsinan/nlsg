@@ -20,6 +20,7 @@ class DouDianDataServers
         $create_time_date_begin = $params['create_time_date_begin'] ?? '';
         $create_time_date_end   = $params['create_time_date_end'] ?? '';
         $decrypt_step           = (int)($params['decrypt_step'] ?? -1);
+        $dou_dian_type          = (int)($params['dou_dian_type'] ?? 1);
 
         $query = DouDianOrder::query()
             ->select([
@@ -39,6 +40,7 @@ class DouDianDataServers
                      ]);
 
         $query->where('order_id', '>', '4933714072054765432');
+        $query->where('dou_dian_type', '=', $dou_dian_type);
 
         $query->with([
                          'orderList'             => function ($q) {
@@ -62,6 +64,11 @@ class DouDianDataServers
                          //                ]);
                          //            },
                      ]);
+
+
+        if ($dou_dian_type === 2){
+            //todo 只看学习机
+        }
 
         //解密状态
         if ($decrypt_step !== -1) {
@@ -157,9 +164,12 @@ class DouDianDataServers
 
     }
 
-    public function orderDecryptQuota(): array
+    public function orderDecryptQuota($params): array
     {
+        $dou_dian_type = (int)($params['dou_dian_type'] ?? 1);
+
         $decrypt_quota = DouDianOrderDecryptQuota::query()
+            ->where('dou_dian_type', '=', $dou_dian_type)
             ->orderBy('id', 'desc')
             ->first();
 
@@ -188,9 +198,12 @@ class DouDianDataServers
 
     }
 
-    public function orderDecryptQuotaReset(): array
+    public function orderDecryptQuotaReset($params): array
     {
+        $dou_dian_type = (int)($params['dou_dian_type'] ?? 1);
+
         $decrypt_quota = DouDianOrderDecryptQuota::query()
+            ->where('dou_dian_type', '=', $dou_dian_type)
             ->orderBy('id', 'desc')
             ->first();
 

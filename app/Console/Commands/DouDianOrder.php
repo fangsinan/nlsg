@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Servers\V5\DouDianServers;
+use App\Servers\V5\DouDianXueXiJiServers;
 use Illuminate\Console\Command;
 
 class DouDianOrder extends Command
@@ -40,5 +41,6 @@ class DouDianOrder extends Command
     {
         $type = $this->argument('type');
         (new DouDianServers())->getOrderJob($type);
+        (new DouDianXueXiJiServers())->getOrderJob($type);
     }
 }
