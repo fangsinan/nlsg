@@ -25,7 +25,7 @@ class Works extends Base
      * @param $ids 相关作品id
      * @return bool
      */
-    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0, $is_free = false,$check_offline=1)
+    public function getIndexWorks($ids, $is_audio_book = 2, $user_id = 0, $is_free = false,$check_offline=1,$size = 4)
     {
         if ( ! $ids) {
             return false;
@@ -56,7 +56,7 @@ class Works extends Base
 
         $lists = $WorksObj
             ->orderByRaw('FIELD(id,'.implode(',', $ids).')')
-            ->take(4)
+            ->take($size)
             ->get()
             ->toArray();
 
