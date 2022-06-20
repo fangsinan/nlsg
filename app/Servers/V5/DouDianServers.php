@@ -69,6 +69,7 @@ class DouDianServers
     public function decryptJob(): bool
     {
         $decrypt_quota = DouDianOrderDecryptQuota::query()
+            ->where('dou_dian_type', '=', 1)
             ->orderBy('id', 'desc')
             ->first();
 
@@ -98,16 +99,16 @@ class DouDianServers
                 $check_flag = 1;
             }
         }
-        //收件人手机解密
+        //手机解密
         $this->toDecrypt(0, $this->pageSize, $check_flag);
         if (date('H') > 12) {
 
             //当前分钟数如果是奇数执行1 如果偶数执行2
             if (date('i') % 2 === 1) {
-                //收件人手机解密
+                //姓名解密
                 $this->toDecrypt(1, $this->pageSize, $check_flag);
             } else {
-                //收件人姓名解密
+                //地址解密
                 $this->toDecrypt(2, $this->pageSize, $check_flag);
             }
 
@@ -299,7 +300,7 @@ class DouDianServers
                     $order->decrypt_err_no  = 0;
                     $order->decrypt_err_msg = $order->order_status_desc;
                 }
-
+                $order->dou_dian_type = 1;
                 DouDianOrder::query()->updateOrCreate(
                     [
                         'order_id' => $order->order_id
@@ -351,12 +352,12 @@ class DouDianServers
 
         foreach ($main_status as $ms) {
             DouDianOrderStatus::query()->firstOrCreate(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    [
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     'key'  => $ms->main_status,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     'type' => 2
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ], [
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        'value' => $ms->main_status_desc
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     'key'  => $ms->main_status,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     'type' => 2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ], [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        'value' => $ms->main_status_desc
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ]
             );
         }
 
@@ -390,14 +391,15 @@ class DouDianServers
 
         $list = DouDianOrder::query()
             ->where('decrypt_step', $step)
-            ->whereNotIn('order_status', [1, 4, 5])
-            ->where('order_id', '>', '4933714072054765432')
+            ->whereNotIn('order_status', [1, 4])
+//            ->where('order_id', '>', '4933714072054765432')
+            ->where('dou_dian_type', '=', 1)
             ->select([
                          'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
                          'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
                      ])
             ->limit($size)
-            ->orderBy('order_id','desc')
+            ->orderBy('order_id', 'desc')
             ->get()
             ->toArray();
 
@@ -429,7 +431,7 @@ class DouDianServers
             $param->cipher_infos = $cipher_infos;
             $response            = $request->execute('');
 
-            $response->job_type = 2;
+            $response->job_type     = 2;
             $response->decrypt_text = json_encode($response->decrypt_infos ?? '');
             DouDianOrderLog::query()->create((array)$response);
 
@@ -442,10 +444,11 @@ class DouDianServers
                 if ($response->code === 80000 || $response->err_no === 300008) {
                     DouDianOrderDecryptQuota::query()
                         ->create([
-                                     'flag'     => 1,
+                                     'flag'          => 1,
                                      'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
                                      'check'  => 2,
-                                     'err_type' => 2
+                                     'err_type' => 2,
+                                     'dou_dian_type' => 1,
                                  ]);
                 }
 
@@ -453,10 +456,11 @@ class DouDianServers
                 if ($response->code === 90000 || $response->code === 50002) {
                     DouDianOrderDecryptQuota::query()
                         ->create([
-                                     'flag'     => 1,
+                                     'flag'          => 1,
                                      'expire' => date('Y-m-d H:i:00', strtotime("+5 hour")),
                                      'check'  => 1,
-                                     'err_type' => 1
+                                     'err_type' => 1,
+                                     'dou_dian_type' => 1,
                                  ]);
                 }
                 return true;
@@ -465,6 +469,19 @@ class DouDianServers
             $decrypt_infos = $response->data->decrypt_infos;
 
             foreach ($decrypt_infos as $decrypt_info) {
+
+                if ($decrypt_info->err_no === 300008) {
+                    DouDianOrderDecryptQuota::query()
+                        ->create([
+                                     'flag'          => 1,
+                                     'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
+                                     'check'  => 2,
+                                     'err_type' => 2,
+                                     'dou_dian_type' => 1,
+                                 ]);
+                    continue;
+                }
+
                 $check_order = DouDianOrder::query()
                     ->where('order_id', $decrypt_info->auth_id)
                     ->first();
@@ -512,10 +529,11 @@ class DouDianServers
                     if ($response->code === 80000 || $response->err_no === 300008) {
                         DouDianOrderDecryptQuota::query()
                             ->create([
-                                         'flag'     => 1,
+                                         'flag'          => 1,
                                          'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
                                          'check'  => 2,
-                                         'err_type' => 2
+                                         'err_type' => 2,
+                                         'dou_dian_type' => 1,
                                      ]);
                     }
 
@@ -523,10 +541,11 @@ class DouDianServers
                     if ($response->code === 90000 || $response->code === 50002) {
                         DouDianOrderDecryptQuota::query()
                             ->create([
-                                         'flag'     => 1,
+                                         'flag'          => 1,
                                          'expire' => date('Y-m-d H:i:00', strtotime("+5 hour")),
                                          'check'  => 2,
-                                         'err_type' => 1
+                                         'err_type' => 1,
+                                         'dou_dian_type' => 1,
                                      ]);
                     }
                     break;
@@ -535,6 +554,19 @@ class DouDianServers
                 $decrypt_infos = $response->data->decrypt_infos;
 
                 foreach ($decrypt_infos as $decrypt_info) {
+
+                    if ($decrypt_info->err_no === 300008) {
+                        DouDianOrderDecryptQuota::query()
+                            ->create([
+                                         'flag'          => 1,
+                                         'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
+                                         'check'  => 2,
+                                         'err_type' => 2,
+                                         'dou_dian_type' => 1,
+                                     ]);
+                        continue;
+                    }
+
                     $check_order = DouDianOrder::query()
                         ->where('order_id', $decrypt_info->auth_id)
                         ->first();

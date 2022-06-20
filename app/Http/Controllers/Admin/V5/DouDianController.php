@@ -25,11 +25,11 @@ class DouDianController extends ControllerBackend
 
 
     public function orderDecryptQuota(Request $request): JsonResponse {
-        return $this->getRes((new DouDianDataServers())->orderDecryptQuota());
+        return $this->getRes((new DouDianDataServers())->orderDecryptQuota($request->input()));
     }
 
     public function orderDecryptQuotaReset(Request $request): JsonResponse {
-        return $this->getRes((new DouDianDataServers())->orderDecryptQuotaReset());
+        return $this->getRes((new DouDianDataServers())->orderDecryptQuotaReset($request->input()));
     }
 
     public function orderListExcel(Request $request) {
