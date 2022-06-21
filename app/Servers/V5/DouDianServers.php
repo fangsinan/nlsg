@@ -400,8 +400,13 @@ class DouDianServers
                      ])
             ->limit($size)
             ->orderBy('order_id', 'desc')
-            ->get()
-            ->toArray();
+            ->get();
+
+        if ($list->isEmpty()){
+            return true;
+        }
+
+        $list = $list->toArray();
 
         $cipher_infos = [];
         foreach ($list as $item) {
