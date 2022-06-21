@@ -1102,8 +1102,11 @@ class CreatePosterController extends Controller
                 if ($temp_work['type'] == 2) {//讲座
                     $u_type = 12;
                 }
-                if ($temp_work['type'] == 3) {//训练营
+                if ($temp_work['type'] == 3 || $temp_work['type'] == 4) {//训练营
                     $u_type = 13;
+                }
+                if( !empty($temp_work['classify_column_id']) ){
+                    $gid = $temp_work['classify_column_id'];
                 }
 
                 break;
