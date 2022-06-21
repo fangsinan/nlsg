@@ -101,18 +101,18 @@ class DouDianServers
         }
         //手机解密
         $this->toDecrypt(0, $this->pageSize, $check_flag);
-        if (date('H') > 12) {
-
-            //当前分钟数如果是奇数执行1 如果偶数执行2
-            if (date('i') % 2 === 1) {
-                //姓名解密
-                $this->toDecrypt(1, $this->pageSize, $check_flag);
-            } else {
-                //地址解密
-                $this->toDecrypt(2, $this->pageSize, $check_flag);
-            }
-
-        }
+//        if (date('H') > 12) {
+//
+//            //当前分钟数如果是奇数执行1 如果偶数执行2
+//            if (date('i') % 2 === 1) {
+//                //姓名解密
+//                $this->toDecrypt(1, $this->pageSize, $check_flag);
+//            } else {
+//                //地址解密
+//                $this->toDecrypt(2, $this->pageSize, $check_flag);
+//            }
+//
+//        }
 
         return true;
     }
@@ -437,7 +437,7 @@ class DouDianServers
             $response            = $request->execute('');
 
             $response->job_type     = 2;
-            $response->decrypt_text = json_encode($response->decrypt_infos ?? '');
+            $response->decrypt_text = json_encode($response);
             DouDianOrderLog::query()->create((array)$response);
 
             if ($response->code !== 10000) {
@@ -523,6 +523,7 @@ class DouDianServers
                 $response            = $request->execute('');
 
                 $response->job_type = 2;
+                $response->decrypt_text = json_encode($response);
                 DouDianOrderLog::query()->create((array)$response);
 
                 if ($response->code !== 10000) {
