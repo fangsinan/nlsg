@@ -85,7 +85,7 @@ class MallTwitter extends Base
                 // }else{
                 //     $url = 'appv4/lecture-introduce?type=2&id='. $gid .'&time='.time();
                 // }
-                'activeConsulting?share=1&id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
+                $url = 'activeConsulting?share=1&id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
 
                 break;
             case 22: //三八邀请app注册
