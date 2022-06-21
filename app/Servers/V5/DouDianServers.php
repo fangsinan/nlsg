@@ -445,6 +445,11 @@ class DouDianServers
                     $this->accessTokenJob();
                 }
 
+                //flag 状态 1表示已经到达解密上限 2表示重置任务,会继续执行
+                //check 1是假上限,会继续使用单条尝试.  2是真上限,任务会暂停
+                //err_type 1是解密配额  2是安全风险
+                //dou_dian_type 默认1能量时光 2是学习机
+                
                 //80000 您的环境存在安全风险，请稍后再试  暂停半小时
                 if ($response->code === 80000 || $response->err_no === 300008) {
 
