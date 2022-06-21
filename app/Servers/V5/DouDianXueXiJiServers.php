@@ -24,15 +24,13 @@ use SkuListRequest;
 
 class DouDianXueXiJiServers
 {
-    protected $appKey    = '6857846430543906317';
-    protected $appSecret = '2f3af110-3aef-4bf0-8641-f00840b8e87f';
     protected $shopId;
-    protected $pageSize  = 50;//100以内
+    protected $pageSize = 50;//100以内
 
     public function __construct()
     {
-        GlobalConfig::getGlobalConfig()->appKey         = $this->appKey;
-        GlobalConfig::getGlobalConfig()->appSecret      = $this->appSecret;
+        GlobalConfig::getGlobalConfig()->appKey         = config('env.DOU_DIAN_XXJ_APP_KEY');
+        GlobalConfig::getGlobalConfig()->appSecret      = config('env.DOU_DIAN_XXJ_APP_SECRET');
         GlobalConfig::getGlobalConfig()->accessTokenStr = ConfigModel::getData(78, 1);
         $this->shopId                                   = ConfigModel::getData(77, 1);
         if ($this->shopId === '0') {
@@ -52,8 +50,8 @@ class DouDianXueXiJiServers
             ConfigModel::query()
                 ->where('id', 81)
                 ->update([
-                             'value' => date('Y-m-d H:i:00', $end_time)
-                         ]);
+                    'value' => date('Y-m-d H:i:00', $end_time)
+                ]);
 
         } else {
             $end_time   = time();
@@ -101,11 +99,26 @@ class DouDianXueXiJiServers
         }
         //手机解密
         $this->toDecrypt(0, $this->pageSize, $check_flag);
-        //姓名解密
-        $this->toDecrypt(1, $this->pageSize, $check_flag);
-        //地址解密
-        $this->toDecrypt(2, $this->pageSize, $check_flag);
+        if (date('i') % 2 === 1) {
+            //姓名解密
+            $this->toDecrypt(1, $this->pageSize, $check_flag);
+        } else {
+            //地址解密
+            $this->toDecrypt(2, $this->pageSize, $check_flag);
+        }
 
+//        if (date('H') > 12) {
+//
+//            //当前分钟数如果是奇数执行1 如果偶数执行2
+//            if (date('i') % 2 === 1) {
+//                //姓名解密
+//                $this->toDecrypt(1, $this->pageSize, $check_flag);
+//            } else {
+//                //地址解密
+//                $this->toDecrypt(2, $this->pageSize, $check_flag);
+//            }
+//
+//        }
 
         return true;
     }
@@ -125,8 +138,8 @@ class DouDianXueXiJiServers
             ConfigModel::query()
                 ->where('id', 80)
                 ->update([
-                             'value' => date('Y-m-d H:i:00', $end_time)
-                         ]);
+                    'value' => date('Y-m-d H:i:00', $end_time)
+                ]);
 
         } else {
             $end_time   = time();
@@ -134,10 +147,6 @@ class DouDianXueXiJiServers
         }
 
         $this->orderSearchList($begin_time, $end_time, $type);
-
-        //临时使用  补充订单状态
-        $this->orderStatusData();
-
         return true;
     }
 
@@ -211,10 +220,10 @@ class DouDianXueXiJiServers
             }
 
             foreach ($response->data->data as $item) {
-                $item->dou_dian_type = 2;
                 DouDianProductList::query()->updateOrCreate(
                     [
-                        'product_id' => $item->product_id
+                        'product_id'    => $item->product_id,
+                        'dou_dian_type' => 2
                     ],
                     (array)$item
                 );
@@ -357,19 +366,19 @@ class DouDianXueXiJiServers
 
         $order_status = DouDianOrder::query()
             ->select([
-                         'order_status', 'order_status_desc',
-                     ])
+                'order_status', 'order_status_desc',
+            ])
             ->groupBy('order_status')
             ->get();
 
         foreach ($order_status as $os) {
             DouDianOrderStatus::query()->firstOrCreate(
-                   [
+                [
                     'key'  => $os->order_status,
                     'type' => 1
                 ], [
-                       'value' => $os->order_status_desc
-                   ]
+                    'value' => $os->order_status_desc
+                ]
             );
         }
 
@@ -389,9 +398,9 @@ class DouDianXueXiJiServers
 //            ->where('order_id', '>', '4933714072054765432')
             ->where('dou_dian_type', '=', 2)
             ->select([
-                         'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
-                         'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
-                     ])
+                'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
+                'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
+            ])
             ->limit($size)
             ->orderBy('order_id', 'desc')
             ->get();
@@ -401,7 +410,6 @@ class DouDianXueXiJiServers
         }
 
         $list = $list->toArray();
-
 
         $cipher_infos = [];
         foreach ($list as $item) {
@@ -440,28 +448,19 @@ class DouDianXueXiJiServers
                     $this->accessTokenJob();
                 }
 
+                //flag 状态 1表示已经到达解密上限 2表示重置任务,会继续执行
+                //check 1是假上限,会继续使用单条尝试.  2是真上限,任务会暂停
+                //err_type 1是解密配额  2是安全风险
+                //dou_dian_type 默认1能量时光 2是学习机
+
                 //80000 您的环境存在安全风险，请稍后再试  暂停半小时
                 if ($response->code === 80000 || $response->err_no === 300008) {
-                    DouDianOrderDecryptQuota::query()
-                        ->create([
-                                     'flag'          => 1,
-                                     'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
-                                     'check'  => 2,
-                                     'err_type' => 2,
-                                     'dou_dian_type' => 2,
-                                 ]);
+                    $this->DecryptQuotaInsert(1, 2, 2);
                 }
 
                 //90000或50002 已达到店铺解密上限 暂停五小时,申请配额后可在后台人工重置 (原来是5002)
                 if ($response->code === 90000 || $response->code === 50002) {
-                    DouDianOrderDecryptQuota::query()
-                        ->create([
-                                     'flag'          => 1,
-                                     'expire' => date('Y-m-d H:i:00', strtotime("+5 hour")),
-                                     'check'  => 1,
-                                     'err_type' => 1,
-                                     'dou_dian_type' => 2,
-                                 ]);
+                    $this->DecryptQuotaInsert(1, 1, 2);
                 }
                 return true;
             }
@@ -499,22 +498,17 @@ class DouDianXueXiJiServers
                 } else {
                     if ($decrypt_info->err_no !== 300008) {
                         $check_order->decrypt_step    = 9;
-                        $check_order->decrypt_err_no = $decrypt_info->err_no;
+                        $check_order->decrypt_err_no  = $decrypt_info->err_no;
                         $check_order->decrypt_err_msg = $decrypt_info->err_msg;
                     }
                 }
+
                 $check_order->save();
+
             }
 
             if ($err_no_300008_count > 30) {
-                DouDianOrderDecryptQuota::query()
-                    ->create([
-                                 'flag'          => 1,
-                                 'expire' => date('Y-m-d H:i:00', strtotime("+5 minutes")),
-                                 'check'  => 2,
-                                 'err_type' => 2,
-                                 'dou_dian_type' => 2,
-                             ]);
+                $this->DecryptQuotaInsert(1, 2, 2);
 
             }
 
@@ -523,7 +517,8 @@ class DouDianXueXiJiServers
                 $param->cipher_infos = [$ci];
                 $response            = $request->execute('');
 
-                $response->job_type = 2;
+                $response->job_type     = 2;
+                $response->decrypt_text = json_encode($response);
                 DouDianOrderLog::query()->create((array)$response);
 
                 if ($response->code !== 10000) {
@@ -533,26 +528,12 @@ class DouDianXueXiJiServers
 
                     //80000 您的环境存在安全风险，请稍后再试  暂停半小时
                     if ($response->code === 80000 || $response->err_no === 300008) {
-                        DouDianOrderDecryptQuota::query()
-                            ->create([
-                                         'flag'          => 1,
-                                         'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
-                                         'check'  => 2,
-                                         'err_type' => 2,
-                                         'dou_dian_type' => 2,
-                                     ]);
+                        $this->DecryptQuotaInsert(1, 2, 2);
                     }
 
                     //90000或50002 已达到店铺解密上限 暂停五小时,申请配额后可在后台人工重置 (原来是5002)
                     if ($response->code === 90000 || $response->code === 50002) {
-                        DouDianOrderDecryptQuota::query()
-                            ->create([
-                                         'flag'          => 1,
-                                         'expire' => date('Y-m-d H:i:00', strtotime("+5 hour")),
-                                         'check'  => 2,
-                                         'err_type' => 1,
-                                         'dou_dian_type' => 2,
-                                     ]);
+                        $this->DecryptQuotaInsert(1, 1, 2);
                     }
                     break;
                 }
@@ -562,14 +543,7 @@ class DouDianXueXiJiServers
                 foreach ($decrypt_infos as $decrypt_info) {
 
                     if ($decrypt_info->err_no === 300008) {
-                        DouDianOrderDecryptQuota::query()
-                            ->create([
-                                         'flag'          => 1,
-                                         'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
-                                         'check'  => 2,
-                                         'err_type' => 2,
-                                         'dou_dian_type' => 2,
-                                     ]);
+                        $this->DecryptQuotaInsert(1, 2, 2);
                         continue;
                     }
 
@@ -595,17 +569,35 @@ class DouDianXueXiJiServers
                     } else {
                         if ($decrypt_info->err_no !== 300008) {
                             $check_order->decrypt_step    = 9;
-                            $check_order->decrypt_err_no = $decrypt_info->err_no;
+                            $check_order->decrypt_err_no  = $decrypt_info->err_no;
                             $check_order->decrypt_err_msg = $decrypt_info->err_msg;
                         }
                     }
 
                     $check_order->save();
+                    sleep(1);
                 }
             }
 
         }
 
+
+    }
+
+    //解密配额记录
+    public function DecryptQuotaInsert($check, $err_type, $dou_dian_type)
+    {
+        //如果err_type=1 暂停2小时  如果是2 暂停半小时
+        $time = $err_type == 1 ? 7200 : 1800;
+
+        DouDianOrderDecryptQuota::query()
+            ->create([
+                'flag'          => 1,
+                'expire'        => date('Y-m-d H:i:s', time() + $time),
+                'check'         => $check,
+                'err_type'      => $err_type,
+                'dou_dian_type' => $dou_dian_type,
+            ]);
 
     }
 
