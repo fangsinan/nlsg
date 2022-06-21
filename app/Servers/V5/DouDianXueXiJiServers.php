@@ -346,12 +346,12 @@ class DouDianXueXiJiServers
 
         foreach ($main_status as $ms) {
             DouDianOrderStatus::query()->firstOrCreate(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       [
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        'key'  => $ms->main_status,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        'type' => 2
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ], [
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           'value' => $ms->main_status_desc
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ]
+                [
+                    'key'  => $ms->main_status,
+                    'type' => 2
+                ], [
+                    'value' => $ms->main_status_desc
+                ]
             );
         }
 
@@ -396,12 +396,12 @@ class DouDianXueXiJiServers
             ->orderBy('order_id', 'desc')
             ->get();
 
-        if ($list->isEmpty()){
+        if ($list->isEmpty()) {
             return true;
         }
 
         $list = $list->toArray();
-        
+
 
         $cipher_infos = [];
         foreach ($list as $item) {
@@ -432,7 +432,7 @@ class DouDianXueXiJiServers
             $response            = $request->execute('');
 
             $response->job_type     = 2;
-            $response->decrypt_text = json_encode($response->decrypt_infos ?? '');
+            $response->decrypt_text = json_encode($response);
             DouDianOrderLog::query()->create((array)$response);
 
             if ($response->code !== 10000) {
@@ -468,17 +468,12 @@ class DouDianXueXiJiServers
 
             $decrypt_infos = $response->data->decrypt_infos;
 
+            $err_no_300008_count = 0;
+
             foreach ($decrypt_infos as $decrypt_info) {
 
                 if ($decrypt_info->err_no === 300008) {
-                    DouDianOrderDecryptQuota::query()
-                        ->create([
-                                     'flag'          => 1,
-                                     'expire' => date('Y-m-d H:i:00', strtotime("+30 minutes")),
-                                     'check'  => 2,
-                                     'err_type' => 2,
-                                     'dou_dian_type' => 2,
-                                 ]);
+                    $err_no_300008_count++;
                     continue;
                 }
 
@@ -508,10 +503,21 @@ class DouDianXueXiJiServers
                         $check_order->decrypt_err_msg = $decrypt_info->err_msg;
                     }
                 }
-
                 $check_order->save();
+            }
+
+            if ($err_no_300008_count > 30) {
+                DouDianOrderDecryptQuota::query()
+                    ->create([
+                                 'flag'          => 1,
+                                 'expire' => date('Y-m-d H:i:00', strtotime("+5 minutes")),
+                                 'check'  => 2,
+                                 'err_type' => 2,
+                                 'dou_dian_type' => 2,
+                             ]);
 
             }
+
         } else {
             foreach ($cipher_infos as $ci) {
                 $param->cipher_infos = [$ci];
