@@ -589,6 +589,7 @@ class DouDianServers
         $list = DouDianOrder::query()
             ->whereNotIn('order_status', [1, 4])
             ->where('decrypt_step', '<>', 9)
+            ->where('decrypt_step','<>',3)
             ->where('dou_dian_type', '=', 1)
             ->select([
                 'order_id', 'order_status', 'decrypt_step',
@@ -605,6 +606,11 @@ class DouDianServers
         $list = $list->toArray();
 
         foreach ($list as $v) {
+
+            $can_to_decrypt = $this->canToDecrypt(1);
+            if ($can_to_decrypt === 0){
+                break;
+            }
 
             for ($i = 1; $i <= self::DECRYPT_JOB_TYPE; $i++) {
                 $cipher_infos            = [];
@@ -672,6 +678,8 @@ class DouDianServers
                         $check_this_order->decrypt_err_no  = $temp_res['data']['err_no'];
                         $check_this_order->decrypt_err_msg = $temp_res['data']['err_msg'];
                         $check_this_order->save();
+                    }else{
+                        $this->DecryptQuotaInsert(1, 2, 1);
                     }
 
                     break;
