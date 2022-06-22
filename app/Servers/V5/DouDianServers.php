@@ -589,7 +589,7 @@ class DouDianServers
         $list = DouDianOrder::query()
             ->whereNotIn('order_status', [1, 4])
             ->where('decrypt_step', '<>', 9)
-            ->where('decrypt_step','<>',3)
+            ->where('decrypt_step','<',self::DECRYPT_JOB_TYPE)
             ->where('dou_dian_type', '=', 1)
             ->select([
                 'order_id', 'order_status', 'decrypt_step',
