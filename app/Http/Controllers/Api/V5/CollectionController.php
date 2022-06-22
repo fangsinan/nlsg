@@ -55,7 +55,7 @@ class CollectionController extends Controller
             && $input_type == 8 ){
                 $where = [
                     'user_id' => $user_id,
-                    'type' => $type,
+                    'type' => $types['col_type'],
                 ];
 
                 // 根据收藏时间排序
