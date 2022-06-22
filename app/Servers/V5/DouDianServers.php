@@ -63,6 +63,33 @@ class DouDianServers
         return true;
     }
 
+    //查询当前是否可以进行解密动作
+//    public function canToDecrypt($dou_dian_type = 1){
+//        $decrypt_quota = DouDianOrderDecryptQuota::query()
+//            ->where('dou_dian_type', '=', $dou_dian_type)
+//            ->orderBy('id', 'desc')
+//            ->first();
+//
+//        if (empty($decrypt_quota)){
+//            return 1;
+//        }
+//
+//        $now_date = date('Y-m-d H:i:s');
+//
+//        if ($decrypt_quota->flag === 2 || $decrypt_quota->expire <= $now_date){
+//            return 1;
+//        }
+//
+//        if ($decrypt_quota->check === 1){
+//            return 2;
+//        }
+//
+//        //expire 大于现在并且flag = 2 可以
+//
+//        //expire 大于现在并且flag = 1 并且check = 2 不可以
+//
+//    }
+
     //解密任务 1分一次
     public function decryptJob(): bool
     {
@@ -524,6 +551,7 @@ class DouDianServers
                     //80000 您的环境存在安全风险，请稍后再试  暂停半小时
                     if ($response->code === 80000 || $response->err_no === 300008) {
                         $this->DecryptQuotaInsert(1, 2, 1);
+                        exit('环境风险,推出当前任务');
                     }
 
                     //90000或50002 已达到店铺解密上限 暂停五小时,申请配额后可在后台人工重置 (原来是5002)
@@ -539,7 +567,8 @@ class DouDianServers
 
                     if ($decrypt_info->err_no === 300008) {
                         $this->DecryptQuotaInsert(1, 2, 1);
-                        continue;
+                        exit('环境风险,推出当前任务');
+//                        continue;
                     }
 
                     $check_order = DouDianOrder::query()
