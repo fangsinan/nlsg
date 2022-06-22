@@ -690,6 +690,7 @@ class DouDianServers
                         $check_this_order->save();
                     }else{
                         $this->DecryptQuotaInsert(1, 2, 1);
+                        exit('风控');
                     }
 
                     break;
