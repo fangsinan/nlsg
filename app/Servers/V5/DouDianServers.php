@@ -594,6 +594,7 @@ class DouDianServers
             ->select([
                 'order_id', 'order_status', 'decrypt_step',
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
+                'post_tel','post_receiver','post_addr_detail'
             ])
             ->limit($this->runPageSize)
             ->orderBy('order_id', 'desc')
@@ -616,18 +617,27 @@ class DouDianServers
                 $cipher_infos            = [];
                 $cipher_infos['auth_id'] = $v['order_id'];
 
+                if ($i === 1 && !empty($v['post_tel'])){
+                    continue;
+                }
+
+                if ($i === 2 && !empty($v['post_receiver'])){
+                    continue;
+                }
+
+                if ($i === 3 && !empty($v['post_addr_detail'])){
+                    continue;
+                }
+
                 switch ($i) {
                     case 1:
                         $cipher_infos['cipher_text'] = $v['encrypt_post_tel'];
-                        $cipher_infos['desc']        = '手机';
                         break;
                     case 2:
                         $cipher_infos['cipher_text'] = $v['encrypt_post_receiver'];
-                        $cipher_infos['desc']        = '姓名';
                         break;
                     default:
                         $cipher_infos['cipher_text'] = $v['encrypt_post_addr_detail'];
-                        $cipher_infos['desc']        = '地址';
                         break;
                 }
 
