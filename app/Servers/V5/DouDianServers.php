@@ -583,7 +583,8 @@ class DouDianServers
     public function DecryptQuotaInsert($check, $err_type, $dou_dian_type)
     {
         //如果err_type=1 暂停2小时  如果是2 暂停半小时
-        $time = $err_type == 1 ? 7200 : 1800;
+//        $time = $err_type == 1 ? 7200 : 1800;
+        $time = $err_type == 1 ? 600 : 300;
 
         DouDianOrderDecryptQuota::query()
             ->create([
