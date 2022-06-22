@@ -127,8 +127,8 @@ class DouDianServers
         if (!empty($time_flag) && strtotime($time_flag)) {
 
             $begin_time = strtotime($time_flag);
-            $begin_time = min(time() - 7200, $begin_time);
-            $end_time   = $begin_time + 7200;
+            $begin_time = min(time() - 43200, $begin_time);
+            $end_time   = $begin_time + 43200;
 
             ConfigModel::query()
                 ->where('id', 70)
