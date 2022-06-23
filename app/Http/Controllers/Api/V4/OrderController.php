@@ -845,16 +845,16 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')->paginate(50)->toArray();
 
         $data = $data['data'];
-        
+
         // 安卓5.0.8 课程传参错误  临时处理
-        $version = $request->input('version', 1);
+        $version = $request->input('version');
+        
         if (!empty($version) && version_compare($version, "5.0.8") == 0){
             $os_type = $request->input('os_type', 1);
             if($type == 2 && $os_type == 1){
-                $is_audio_book = 1;
+                $is_audio_book = 0;
             }
         }
-       
 
         foreach ($data as $key => $val) {
             switch ($val['type']) {
