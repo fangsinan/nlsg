@@ -15,6 +15,8 @@ use App\Models\DouDian\DouDianSkuList;
 use GlobalConfig;
 use OrderBatchDecryptParam;
 use OrderBatchDecryptRequest;
+use OrderOrderDetailParam;
+use OrderOrderDetailRequest;
 use OrderSearchListParam;
 use OrderSearchListRequest;
 use ProductListV2Param;
@@ -147,6 +149,37 @@ class DouDianServers
         $this->orderStatusData();
 
         return true;
+    }
+
+    public function testGetOrder(){
+        return 0;
+        $order_id = '4811666301390772052';
+
+        $request = new OrderOrderDetailRequest();
+        $param = new OrderOrderDetailParam();
+        $request->setParam($param);
+        $param->shop_order_id = $order_id;
+        $response = $request->execute('');
+
+        $encrypt_post_receiver = $response->data->shop_order_detail->encrypt_post_tel;
+
+        $cipher_infos[] = [
+            'auth_id'=>$order_id,
+            'cipher_text'=>$encrypt_post_receiver
+        ];
+
+        $request = new OrderBatchDecryptRequest();
+        $param   = new OrderBatchDecryptParam();
+
+        $request->setParam($param);
+        $param->cipher_infos = $cipher_infos;
+        $response_1            = $request->execute('');
+
+
+        dd([
+            $response,
+            $response_1
+        ]);
     }
 
     //sku列表
