@@ -769,7 +769,7 @@ class DouDianServers
     {
         //如果err_type=1 暂停2小时  如果是2 暂停半小时
 //        $time = $err_type == 1 ? 7200 : 1800;
-        $time = $err_type == 1 ? 600 : 120;
+        $time = $err_type == 1 ? 180 : 120;
 
         DouDianOrderDecryptQuota::query()
             ->create([
