@@ -254,11 +254,17 @@ class DouDianServers
             $job_type = 12;
         }
 
-
         while ($while_flag) {
             $request->setParam($param);
-            $param->update_time_start = $begin;
-            $param->update_time_end   = $end;
+
+            if ($type == 1){
+                $param->create_time_start = $begin;
+                $param->create_time_end   = $end;
+            }else{
+                $param->update_time_start = $begin;
+                $param->update_time_end   = $end;
+            }
+
             $param->size              = $this->pageSize;
             $param->page              = $page;
             $param->order_by          = $order_by;
