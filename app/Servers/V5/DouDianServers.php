@@ -25,7 +25,9 @@ use SkuListRequest;
 class DouDianServers
 {
     protected $shopId;
-    protected $pageSize  = 50;//100以内
+    protected $pageSize = 50;
+    protected $runPageSize = 100;
+    const DECRYPT_JOB_TYPE = 1;//1只解手机 2解手机和姓名  3接手机姓名地址
 
     public function __construct()
     {
@@ -50,8 +52,8 @@ class DouDianServers
             ConfigModel::query()
                 ->where('id', 71)
                 ->update([
-                             'value' => date('Y-m-d H:i:00', $end_time)
-                         ]);
+                    'value' => date('Y-m-d H:i:00', $end_time)
+                ]);
 
         } else {
             $end_time   = time();
@@ -62,6 +64,7 @@ class DouDianServers
 
         return true;
     }
+
 
     //解密任务 1分一次
     public function decryptJob(): bool
@@ -124,14 +127,14 @@ class DouDianServers
         if (!empty($time_flag) && strtotime($time_flag)) {
 
             $begin_time = strtotime($time_flag);
-            $begin_time = min(time() - 7200, $begin_time);
-            $end_time   = $begin_time + 7200;
+            $begin_time = min(time() - 43200, $begin_time);
+            $end_time   = $begin_time + 43200;
 
             ConfigModel::query()
                 ->where('id', 70)
                 ->update([
-                             'value' => date('Y-m-d H:i:00', $end_time)
-                         ]);
+                    'value' => date('Y-m-d H:i:00', $end_time)
+                ]);
 
         } else {
             $end_time   = time();
@@ -361,19 +364,19 @@ class DouDianServers
 
         $order_status = DouDianOrder::query()
             ->select([
-                         'order_status', 'order_status_desc',
-                     ])
+                'order_status', 'order_status_desc',
+            ])
             ->groupBy('order_status')
             ->get();
 
         foreach ($order_status as $os) {
             DouDianOrderStatus::query()->firstOrCreate(
-                   [
+                [
                     'key'  => $os->order_status,
                     'type' => 1
                 ], [
-                       'value' => $os->order_status_desc
-                   ]
+                    'value' => $os->order_status_desc
+                ]
             );
         }
 
@@ -393,9 +396,9 @@ class DouDianServers
 //            ->where('order_id', '>', '4933714072054765432')
             ->where('dou_dian_type', '=', 1)
             ->select([
-                         'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
-                         'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
-                     ])
+                'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
+                'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
+            ])
             ->limit($size)
             ->orderBy('order_id', 'desc')
             ->get();
@@ -493,7 +496,7 @@ class DouDianServers
                 } else {
                     if ($decrypt_info->err_no !== 300008) {
                         $check_order->decrypt_step    = 9;
-                        $check_order->decrypt_err_no = $decrypt_info->err_no;
+                        $check_order->decrypt_err_no  = $decrypt_info->err_no;
                         $check_order->decrypt_err_msg = $decrypt_info->err_msg;
                     }
                 }
@@ -524,6 +527,7 @@ class DouDianServers
                     //80000 您的环境存在安全风险，请稍后再试  暂停半小时
                     if ($response->code === 80000 || $response->err_no === 300008) {
                         $this->DecryptQuotaInsert(1, 2, 1);
+                        exit('环境风险,推出当前任务');
                     }
 
                     //90000或50002 已达到店铺解密上限 暂停五小时,申请配额后可在后台人工重置 (原来是5002)
@@ -539,7 +543,8 @@ class DouDianServers
 
                     if ($decrypt_info->err_no === 300008) {
                         $this->DecryptQuotaInsert(1, 2, 1);
-                        continue;
+                        exit('环境风险,推出当前任务');
+//                        continue;
                     }
 
                     $check_order = DouDianOrder::query()
@@ -564,7 +569,7 @@ class DouDianServers
                     } else {
                         if ($decrypt_info->err_no !== 300008) {
                             $check_order->decrypt_step    = 9;
-                            $check_order->decrypt_err_no = $decrypt_info->err_no;
+                            $check_order->decrypt_err_no  = $decrypt_info->err_no;
                             $check_order->decrypt_err_msg = $decrypt_info->err_msg;
                         }
                     }
@@ -579,20 +584,201 @@ class DouDianServers
 
     }
 
+    public function runDecrypt(): bool
+    {
+        $list = DouDianOrder::query()
+            ->whereNotIn('order_status', [1, 4])
+            ->where('decrypt_step', '<>', 9)
+            ->where('decrypt_step','<',self::DECRYPT_JOB_TYPE)
+            ->where('dou_dian_type', '=', 1)
+            ->select([
+                'order_id', 'order_status', 'decrypt_step',
+                'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
+                'post_tel','post_receiver','post_addr_detail'
+            ])
+            ->limit($this->runPageSize)
+            ->orderBy('order_id', 'desc')
+            ->get();
+
+        if ($list->isEmpty()) {
+            return true;
+        }
+
+        $list = $list->toArray();
+
+        foreach ($list as $v) {
+
+            $can_to_decrypt = $this->canToDecrypt(1);
+            if ($can_to_decrypt === 0){
+                break;
+            }
+
+            for ($i = 1; $i <= self::DECRYPT_JOB_TYPE; $i++) {
+                $cipher_infos            = [];
+                $cipher_infos['auth_id'] = $v['order_id'];
+
+                if ($i === 1 && !empty($v['post_tel'])){
+                    continue;
+                }
+
+                if ($i === 2 && !empty($v['post_receiver'])){
+                    continue;
+                }
+
+                if ($i === 3 && !empty($v['post_addr_detail'])){
+                    continue;
+                }
+
+                switch ($i) {
+                    case 1:
+                        $cipher_infos['cipher_text'] = $v['encrypt_post_tel'];
+                        break;
+                    case 2:
+                        $cipher_infos['cipher_text'] = $v['encrypt_post_receiver'];
+                        break;
+                    default:
+                        $cipher_infos['cipher_text'] = $v['encrypt_post_addr_detail'];
+                        break;
+                }
+
+                //解密
+                $temp_res = $this->runDecryptApi([$cipher_infos]);
+                if ($temp_res['code'] === false) {
+                    break;
+                }
+                $temp_res['data'] = (array)$temp_res['data'][0];
+
+                $check_this_order = DouDianOrder::query()
+                    ->where('order_id', '=', $temp_res['data']['auth_id'])
+                    ->first();
+
+                if ($temp_res['data']['err_no'] == 0) {
+                    //没错误
+                    switch ($i) {
+                        case 1:
+                            $check_this_order->post_tel     = $temp_res['data']['decrypt_text'];
+                            $check_this_order->decrypt_step = 1;
+                            break;
+                        case 2:
+                            $check_this_order->post_receiver = $temp_res['data']['decrypt_text'];
+                            $check_this_order->decrypt_step  = 2;
+                            break;
+                        default:
+                            $check_this_order->post_addr_detail = $temp_res['data']['decrypt_text'];
+                            $check_this_order->decrypt_step     = 3;
+                            break;
+                    }
+                    $check_this_order->save();
+                } else {
+                    //300008包含 安全风险 和  隐私保护 ,暂定通过msg修改
+                    // 基于消费者隐私保护，该订单状态禁止查看 重复请求不会改变结果,改成9
+                    //安全风险 无需改成9
+
+                    DouDianOrderStatus::query()->firstOrCreate(
+                        [
+                            'key'   => $temp_res['data']['err_no'],
+                            'value' => $temp_res['data']['err_msg'],
+                            'type'  => 3,
+                        ]
+                    );
+
+                    $check_msg = mb_strstr($temp_res['data']['err_msg'], '请稍后再试');
+                    if ($check_msg === false) {
+                        $check_this_order->decrypt_step    = 9;
+                        $check_this_order->decrypt_err_no  = $temp_res['data']['err_no'];
+                        $check_this_order->decrypt_err_msg = $temp_res['data']['err_msg'];
+                        $check_this_order->save();
+                    }else{
+                        $this->DecryptQuotaInsert(1, 2, 1);
+                        exit('风控');
+                    }
+
+                    break;
+                }
+                //1000000  1秒
+                usleep(300000);
+            }
+        }
+
+        return true;
+    }
+
+    public function runDecryptApi(array $cipher_infos)
+    {
+        $request = new OrderBatchDecryptRequest();
+        $param   = new OrderBatchDecryptParam();
+        $request->setParam($param);
+        $param->cipher_infos = $cipher_infos;
+        $response            = $request->execute('');
+
+        $response->job_type     = 2;
+        $response->decrypt_text = json_encode($response);
+        DouDianOrderLog::query()->create((array)$response);
+
+        if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
+            $this->accessTokenJob();
+            return ['code' => false, 'msg' => 'token错误', 'data' => []];
+        }
+
+        if ($response->code === 80000 || $response->err_no === 300008) {
+            $this->DecryptQuotaInsert(1, 2, 1);
+            return ['code' => false, 'msg' => '安全风险', 'data' => []];
+        }
+
+        if ($response->code === 90000 || $response->code === 50002) {
+            $this->DecryptQuotaInsert(1, 1, 1);
+            return ['code' => false, 'msg' => '配额上限', 'data' => []];
+        }
+
+        return ['code' => true, 'msg' => '成功', 'data' => $response->data->decrypt_infos];
+
+    }
+
+
+    /**
+     * 查询当前是否可以进行解密动作
+     * @param int $dou_dian_type
+     * @return int 0停止请求 1可以请求多条 2可以请求单挑
+     */
+    public function canToDecrypt(int $dou_dian_type = 1): int
+    {
+        $decrypt_quota = DouDianOrderDecryptQuota::query()
+            ->where('dou_dian_type', '=', $dou_dian_type)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (empty($decrypt_quota)) {
+            return 1;
+        }
+
+        $now_date = date('Y-m-d H:i:s');
+
+        if ($decrypt_quota->flag === 2 || $decrypt_quota->expire <= $now_date) {
+            return 1;
+        }
+
+        if ($decrypt_quota->check === 1) {
+            return 2;
+        }
+
+        return 0;
+    }
+
     //解密配额记录
     public function DecryptQuotaInsert($check, $err_type, $dou_dian_type)
     {
         //如果err_type=1 暂停2小时  如果是2 暂停半小时
-        $time = $err_type == 1 ? 7200 : 1800;
+//        $time = $err_type == 1 ? 7200 : 1800;
+        $time = $err_type == 1 ? 180 : 120;
 
         DouDianOrderDecryptQuota::query()
             ->create([
-                         'flag'          => 1,
-                         'expire' => date('Y-m-d H:i:s', time() + $time),
-                         'check'  => $check,
-                         'err_type' => $err_type,
-                         'dou_dian_type' => $dou_dian_type,
-                     ]);
+                'flag'          => 1,
+                'expire'        => date('Y-m-d H:i:s', time() + $time),
+                'check'         => $check,
+                'err_type'      => $err_type,
+                'dou_dian_type' => $dou_dian_type,
+            ]);
 
     }
 
