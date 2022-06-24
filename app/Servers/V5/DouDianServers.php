@@ -683,6 +683,9 @@ class DouDianServers
                 //解密
                 $temp_res = $this->runDecryptApi([$cipher_infos]);
                 if ($temp_res['code'] === false) {
+                    if ($temp_res['msg'] === '配额上限'){
+                        exit('配额上限,停止请求');
+                    }
                     break;
                 }
                 $temp_res['data'] = (array)$temp_res['data'][0];
