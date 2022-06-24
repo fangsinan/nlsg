@@ -336,11 +336,11 @@ class DouDianServers
                 $order->post_addr_town_id        = $order->post_addr->town->id ?? 0;
                 $order->post_addr_street_id      = 0;
 
-                if ($order->order_status === 4) {
-                    $order->decrypt_step    = 9;
-                    $order->decrypt_err_no  = 0;
-                    $order->decrypt_err_msg = $order->order_status_desc;
-                }
+//                if ($order->order_status === 4) {
+//                    $order->decrypt_step    = 9;
+//                    $order->decrypt_err_no  = 0;
+//                    $order->decrypt_err_msg = $order->order_status_desc;
+//                }
                 $order->dou_dian_type = 1;
                 DouDianOrder::query()->updateOrCreate(
                     [
