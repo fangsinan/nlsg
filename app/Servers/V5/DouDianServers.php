@@ -653,18 +653,28 @@ class DouDianServers
             }
 
             for ($i = 1; $i <= self::DECRYPT_JOB_TYPE; $i++) {
+                $check_this_order = DouDianOrder::query()
+                    ->where('order_id', '=', $v['order_id'])
+                    ->first();
+
                 $cipher_infos            = [];
                 $cipher_infos['auth_id'] = $v['order_id'];
 
                 if ($i === 1 && !empty($v['post_tel'])){
+                    $check_this_order->decrypt_step = 1;
+                    $check_this_order->save();
                     continue;
                 }
 
                 if ($i === 2 && !empty($v['post_receiver'])){
+                    $check_this_order->decrypt_step = 2;
+                    $check_this_order->save();
                     continue;
                 }
 
                 if ($i === 3 && !empty($v['post_addr_detail'])){
+                    $check_this_order->decrypt_step = 3;
+                    $check_this_order->save();
                     continue;
                 }
 
@@ -689,10 +699,6 @@ class DouDianServers
                     break;
                 }
                 $temp_res['data'] = (array)$temp_res['data'][0];
-
-                $check_this_order = DouDianOrder::query()
-                    ->where('order_id', '=', $temp_res['data']['auth_id'])
-                    ->first();
 
                 if ($temp_res['data']['err_no'] == 0) {
                     //没错误
