@@ -151,21 +151,22 @@ class DouDianServers
         return true;
     }
 
-    public function testGetOrder(){
+    public function testGetOrder()
+    {
         return 0;
         $order_id = '4811666301390772052';
 
         $request = new OrderOrderDetailRequest();
-        $param = new OrderOrderDetailParam();
+        $param   = new OrderOrderDetailParam();
         $request->setParam($param);
         $param->shop_order_id = $order_id;
-        $response = $request->execute('');
+        $response             = $request->execute('');
 
         $encrypt_post_receiver = $response->data->shop_order_detail->encrypt_post_tel;
 
         $cipher_infos[] = [
-            'auth_id'=>$order_id,
-            'cipher_text'=>$encrypt_post_receiver
+            'auth_id'     => $order_id,
+            'cipher_text' => $encrypt_post_receiver
         ];
 
         $request = new OrderBatchDecryptRequest();
@@ -173,7 +174,7 @@ class DouDianServers
 
         $request->setParam($param);
         $param->cipher_infos = $cipher_infos;
-        $response_1            = $request->execute('');
+        $response_1          = $request->execute('');
 
 
         dd([
@@ -290,18 +291,18 @@ class DouDianServers
         while ($while_flag) {
             $request->setParam($param);
 
-            if ($type == 1){
+            if ($type == 1) {
                 $param->create_time_start = $begin;
                 $param->create_time_end   = $end;
-            }else{
+            } else {
                 $param->update_time_start = $begin;
                 $param->update_time_end   = $end;
             }
 
-            $param->size              = $this->pageSize;
-            $param->page              = $page;
-            $param->order_by          = $order_by;
-            $param->order_asc         = false;
+            $param->size      = $this->pageSize;
+            $param->page      = $page;
+            $param->order_by  = $order_by;
+            $param->order_asc = false;
 
             $response           = $request->execute('');
             $response->job_type = $job_type;
@@ -625,15 +626,24 @@ class DouDianServers
 
     public function runDecrypt(): bool
     {
+        DouDianOrder::query()
+            ->where('decrypt_step', '<>', 3)
+            ->where('post_tel', '<>', '')
+            ->where('post_receiver', '<>', '')
+            ->where('post_addr_detail', '<>', '')
+            ->update([
+                'decrypt_step' => 3
+            ]);
+
         $list = DouDianOrder::query()
             ->whereNotIn('order_status', [1, 4])
             ->where('decrypt_step', '<>', 9)
-            ->where('decrypt_step','<',self::DECRYPT_JOB_TYPE)
+            ->where('decrypt_step', '<', self::DECRYPT_JOB_TYPE)
             ->where('dou_dian_type', '=', 1)
             ->select([
                 'order_id', 'order_status', 'decrypt_step',
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
-                'post_tel','post_receiver','post_addr_detail'
+                'post_tel', 'post_receiver', 'post_addr_detail'
             ])
             ->limit($this->runPageSize)
             ->orderBy('order_id', 'desc')
@@ -648,7 +658,7 @@ class DouDianServers
         foreach ($list as $v) {
 
             $can_to_decrypt = $this->canToDecrypt(1);
-            if ($can_to_decrypt === 0){
+            if ($can_to_decrypt === 0) {
                 break;
             }
 
@@ -660,19 +670,19 @@ class DouDianServers
                 $cipher_infos            = [];
                 $cipher_infos['auth_id'] = $v['order_id'];
 
-                if ($i === 1 && !empty($v['post_tel'])){
+                if ($i === 1 && !empty($v['post_tel'])) {
                     $check_this_order->decrypt_step = 1;
                     $check_this_order->save();
                     continue;
                 }
 
-                if ($i === 2 && !empty($v['post_receiver'])){
+                if ($i === 2 && !empty($v['post_receiver'])) {
                     $check_this_order->decrypt_step = 2;
                     $check_this_order->save();
                     continue;
                 }
 
-                if ($i === 3 && !empty($v['post_addr_detail'])){
+                if ($i === 3 && !empty($v['post_addr_detail'])) {
                     $check_this_order->decrypt_step = 3;
                     $check_this_order->save();
                     continue;
@@ -693,7 +703,7 @@ class DouDianServers
                 //解密
                 $temp_res = $this->runDecryptApi([$cipher_infos]);
                 if ($temp_res['code'] === false) {
-                    if ($temp_res['msg'] === '配额上限'){
+                    if ($temp_res['msg'] === '配额上限') {
                         exit('配额上限,停止请求');
                     }
                     break;
@@ -736,7 +746,7 @@ class DouDianServers
                         $check_this_order->decrypt_err_no  = $temp_res['data']['err_no'];
                         $check_this_order->decrypt_err_msg = $temp_res['data']['err_msg'];
                         $check_this_order->save();
-                    }else{
+                    } else {
                         $this->DecryptQuotaInsert(1, 2, 1);
                         exit('风控');
                     }
