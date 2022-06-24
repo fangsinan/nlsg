@@ -27,7 +27,7 @@ class DouDianServers
     protected $shopId;
     protected $pageSize = 50;
     protected $runPageSize = 100;
-    const DECRYPT_JOB_TYPE = 1;//1只解手机 2解手机和姓名  3接手机姓名地址
+    const DECRYPT_JOB_TYPE = 3;//1只解手机 2解手机和姓名  3接手机姓名地址
 
     public function __construct()
     {
@@ -775,7 +775,7 @@ class DouDianServers
     {
         //如果err_type=1 暂停2小时  如果是2 暂停半小时
 //        $time = $err_type == 1 ? 7200 : 1800;
-        $time = $err_type == 1 ? 180 : 120;
+        $time = $err_type == 1 ? 80 : 60;
 
         DouDianOrderDecryptQuota::query()
             ->create([
