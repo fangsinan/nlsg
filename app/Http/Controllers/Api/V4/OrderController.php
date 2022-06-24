@@ -117,14 +117,14 @@ class OrderController extends Controller
 
         }
 
-        
+
 
         //唐山只允许 直播 训练营 微课686   type 精品课 2 讲座 6 训练营 7
         $PayIncomeObj=PayIncome::query()->where(['user_id'=>$tweeter_code,'status'=>2])->first();
         if(!empty($PayIncomeObj)){ //唐山客服  type=2&&$target_id=686
-            if(!($type==2 && in_array($target_id,[686]))){
+//            if(!($type==2 && in_array($target_id,[686]))){
                 $tweeter_code=0;
-            }
+//            }
         }
 
         //校验推客信息有效  5月7日 已经取消了等级层级
@@ -848,7 +848,7 @@ class OrderController extends Controller
 
         // 安卓5.0.8 课程传参错误  临时处理
         $version = $request->input('version');
-        
+
         if (!empty($version) && version_compare($version, "5.0.8") == 0){
             $os_type = $request->input('os_type', 1);
             if($type == 2 && $os_type == 1){
