@@ -201,7 +201,7 @@ class CampController extends Controller
         $column['is_parent'] = 0;
         if($column['type'] == 4){
             $column['is_parent'] = 1;
-            $column['online_time'] = Column::getColumnNewStartTime($column['id']);
+            // $column['online_time'] = Column::getColumnNewStartTime($column['id']);
         }
 
         // 获取第一章节 info_id
