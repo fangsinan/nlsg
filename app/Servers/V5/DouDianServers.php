@@ -646,7 +646,7 @@ class DouDianServers
                 'post_tel', 'post_receiver', 'post_addr_detail'
             ])
             ->limit($this->runPageSize)
-            ->orderBy('order_id', 'desc')
+            ->orderBy('order_id')
             ->get();
 
         if ($list->isEmpty()) {
