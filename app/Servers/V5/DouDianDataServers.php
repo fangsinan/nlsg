@@ -22,6 +22,9 @@ class DouDianDataServers
         $decrypt_step           = (int)($params['decrypt_step'] ?? -1);
         $dou_dian_type          = (int)($params['dou_dian_type'] ?? 1);
 
+        //解密结果  0全部,1未解密,2解密完毕,3解密失败
+        $decrypt_res = (int)($params['decrypt_res'] ?? 0);
+
         $query = DouDianOrder::query()
             ->select([
                          'user_id', 'order_id', 'order_status', 'order_status_desc', 'main_status', 'main_status_desc',
@@ -73,6 +76,24 @@ class DouDianDataServers
         //解密状态
         if ($decrypt_step !== -1) {
             $query->where('decrypt_step', $decrypt_step);
+        }
+
+        //新解密状态
+        if (in_array($decrypt_res, [1, 2, 3])) {
+            switch ($decrypt_res) {
+                case 1:
+                    //未解密
+                    $query->whereIn('decrypt_step', [0, 1, 2]);
+                    break;
+                case 2:
+                    //解密完毕
+                    $query->where('decrypt_step', '=', 3);
+                    break;
+                case 3:
+                    //解密失败
+                    $query->where('decrypt_step', '=', 9);
+                    break;
+            }
         }
 
         //订单状态
@@ -133,6 +154,18 @@ class DouDianDataServers
         $res = $query->paginate($size);
 
         foreach ($res as $v) {
+            if ($v->decrypt_step === 3){
+                $v->decrypt_res = 2;
+                $v->decrypt_res_desc = '解密完毕';
+            }elseif ($v->decrypt_step === 9){
+                $v->decrypt_res = 3;
+                $v->decrypt_res_desc = '解密失败';
+            }else{
+                $v->decrypt_res = 1;
+                $v->decrypt_res_desc = '未解密';
+            }
+
+
             if ($v->finish_time === 0) {
                 $v->finish_time_date = '';
             }
