@@ -127,7 +127,7 @@ class Column extends Base
             }
             $v['is_new'] =1;
             // 获取第一章节 info_id
-            $v['first_info_id'] = Column::getFirstInfo($v['classify_column_id'] ?? $v['id']);
+            $v['first_info_id'] = Column::getFirstInfo($v['info_column_id'] ?? $v['id']);
         }
         return $lists;
     }

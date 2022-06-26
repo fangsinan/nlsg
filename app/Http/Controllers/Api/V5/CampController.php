@@ -205,7 +205,7 @@ class CampController extends Controller
         }
 
         // 获取第一章节 info_id
-        $column['first_info_id'] = Column::getFirstInfo($column['classify_column_id'] ?? $column['id']);
+        $column['first_info_id'] = Column::getFirstInfo($column['info_column_id'] ?? $column['id']);
         
         return $this->success([
             'list' => $column

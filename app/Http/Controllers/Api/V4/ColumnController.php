@@ -644,7 +644,8 @@ class ColumnController extends Controller
             $column['info_num'] = $column['show_info_num'];
         }else if($column['type'] == 4){
             $column['is_parent'] = 1;
-            $column['online_time'] = Column::getColumnNewStartTime($column['id']);
+            // $column['online_time'] = Column::getColumnNewStartTime($column['id']);
+            $column['online_time'] = date('Y-m-d',strtotime($column['online_time']));
             $column['info_num'] = $column['show_info_num'];
         }
 
