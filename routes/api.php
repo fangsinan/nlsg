@@ -637,5 +637,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
     //微信url link&scheme
     Route::get('wechat_tools/get_url_link', 'WeChatToolsController@getUrlLink');
+    
+    Route::get('notIndex', 'LiveNoEnterController@index');
     /**     5.0 API  END    ***/
 });
