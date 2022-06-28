@@ -8,11 +8,15 @@ use App\Models\LiveInfo;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
+use App\Models\Subscribe;
+use App\Models\User;
+use App\Models\UserFollow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class OfflineController extends Controller
 {
+
 
 
     /**
@@ -24,6 +28,7 @@ class OfflineController extends Controller
     public function getOfflineInfo(Request $request)
     {
         $id = $request->get('id');
+        $uid = $this->user['id'] ?? 0;
         $validator = Validator::make($request->input(), [
             'id' => 'required|numeric',
             // 'info_id' => 'bail:required|numeric',
@@ -31,14 +36,21 @@ class OfflineController extends Controller
         if ($validator->fails()) {
             return $this->error(0,$validator->messages()->first(),(object)[]);
         }
-        $list = OfflineProducts::select(['id','title','subtitle','describe','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num'])
-        ->where(['id' => $id, 'type'=>3, 'is_del' => 0])
-            ->first();
-            
-        if ( empty($list) ) {
+        // 如果视频url存在  就显示视频
+        $model = new OfflineProducts();
+        $result = $model->getOfflineProducts([$id]);
+        if ( empty($result) ) {
             return $this->error(1000,'没有数据',(object)[]);
         }
-        return success($list);
+        $info = $result[0];
+        
+
+        $types = FuncType(config('web.GlobalType.INPUT_TYPE.OfflineType'));
+        $info['is_sub'] = Subscribe::isSubscribe($uid,$id,$types['sub_type']);
+        $info['teacher_data'] = User::getTeacherInfo($info['user_id']);
+        // 老师信息
+        $info['is_follow'] = UserFollow::IsFollow($uid,$info['user_id']);
+        return success($info);
     }
 
 
@@ -46,10 +58,10 @@ class OfflineController extends Controller
 
 
     /**
-     * {post} /api/v4/order/create_products_order 线下课下单
+     * {post} /api/v5/order/create_products_order 线下课下单
      * @apiName create_products_order
      *
-     * @apiParam {int} product_id      产品id
+     * @apiParam {int} product_id      线下产品id
      * @apiParam {int} os_type os_type 1 安卓 2ios
      * @apiParam {int} live_id 直播id
      * @apiParam {int} inviter 推客id
