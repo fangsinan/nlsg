@@ -207,7 +207,7 @@
 
     /**
      * 统一全局  类型 [ 返回对应各个表的类型 ]
-     * @param  int $type 全局type 110专栏  120课程  130讲座  140训练营  150 商品  160集合（161 大咖讲书） 170 直播
+     * @param  int $type 全局type 110专栏  120课程  130讲座  140训练营  150 商品  160集合（161 大咖讲书） 170 直播  180线下产品
      * @return int[] col_type, his_type, sub_type, qrcode_type
      * */
     function FuncType($type=0)
@@ -216,64 +216,82 @@
         // 历史记录表类型 nlsg_history => 1专栏   2讲座  3听书  4精品课程   5训练营
         // 订阅表类型 nlsg_subscribe  => 1 专栏  2作品  3 直播  4会员 5线下产品  6讲座  7训练营  8专题
         // 二维码 Qrcodeimg表 => 1.课程 2.商城 3.直播 4.360会员   5大咖讲书专题。6训练营
-    
+        // 评论表  1.专栏 2.讲座 3.听书 4.精品课 5 百科 6训练营  7短视频
+        // 订单nlsg_order表  1 专栏  2作品 3直播  4会员 5线下产品  6讲座  7训练营  8专题
+        $types = config('web.GlobalType.INPUT_TYPE');
         switch($type){
-            case 110:    // 110专栏 
+            case $types['CollumnType']:    // 110专栏 
                 $res = [
                     'col_type' => 1,    // 收藏表类型  nlsg_collection
                     'his_type' => 1,    // 历史记录表类型 nlsg_history
                     'sub_type' => 1,    // 订阅表类型
                     'qrcode_type' => 0,    // 二维码表类型
+                    'order_type' => 1,    // 二维码表类型
                 ];
                 break;
-            case 120: // 120课程
+            case $types['WorksType']: // 120课程
                 $res = [
                     'col_type' => 2,    // 收藏表类型  nlsg_collection
                     'his_type' => 4,    // 历史记录表类型 nlsg_history
                     'sub_type' => 2,    // 订阅表类型
                     'qrcode_type' => 1,    // 二维码表类型
+                    'order_type' => 2,
                 ];
                 break;
-            case 130:  // 130讲座 
+            case $types['LectureType']:  // 130讲座 
                 $res = [
                     'col_type' => 7,    // 收藏表类型  nlsg_collection
                     'his_type' => 2,    // 历史记录表类型 nlsg_history
                     'sub_type' => 6,    // 订阅表类型
                     'qrcode_type' => 0,    // 二维码表类型
+                    'order_type' => 6,
                 ];
                 break;;break;
-            case 140:  // 140训练营
+            case $types['CampType']:  // 140训练营
                 $res = [
                     'col_type' => 8,    // 收藏表类型  nlsg_collection
                     'his_type' => 5,    // 历史记录表类型 nlsg_history
                     'sub_type' => 7,    // 订阅表类型
                     'qrcode_type' => 6,    // 二维码表类型
+                    'order_type' => 7,
                 ];
                 break;
-            case 150: // 150 商品
+            case $types['GoodsType']: // 150 商品
                 $res = [
                     'col_type' => 3,    // 收藏表类型  nlsg_collection
                     'his_type' => 0,    // 历史记录表类型 nlsg_history
                     'sub_type' => 0,    // 订阅表类型
                     'qrcode_type' => 2,    // 二维码表类型
+                    'order_type' => 0,
                 ];
                 break;
-            case 160: // 160 集合
-            case 161: //大咖讲书
+            case $types['ListType']: // 160 集合
+            case $types['ListBookType']: //大咖讲书
                 $res = [
                     'col_type' => 4,    // 收藏表类型  nlsg_collection
                     'his_type' => 0,    // 历史记录表类型 nlsg_history
                     'sub_type' => 8,    // 订阅表类型
                     'qrcode_type' => 5,    // 二维码表类型
+                    'order_type' => 8,
                 ];
                 break;
             
-            case 170:  // 170 直播
+            case $types['LiveType']:  // 170 直播
                 $res = [
                     'col_type' => 0,    // 收藏表类型  nlsg_collection
                     'his_type' => 0,    // 历史记录表类型 nlsg_history
                     'sub_type' => 3,    // 订阅表类型
                     'qrcode_type' => 3,    // 二维码表类型
+                    'order_type' => 3,
+                ];
+                break;
+            case $types['OfflineType']:  // 180 线下产品
+                $res = [
+                    'col_type' => 0,    // 收藏表类型  nlsg_collection
+                    'his_type' => 0,    // 历史记录表类型 nlsg_history
+                    'sub_type' => 5,    // 订阅表类型
+                    'qrcode_type' => 0,    // 二维码表类型
+                    'order_type' => 5,
                 ];
                 break;
             default:
