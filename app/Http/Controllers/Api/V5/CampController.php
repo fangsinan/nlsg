@@ -88,9 +88,8 @@ class CampController extends Controller
 
 
         //线下课类型
-        $offline_list = OfflineProducts::select(['id','title','subtitle','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num'])
+        $new_res['offline_list'] = OfflineProducts::select(['id','title','subtitle','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num'])
             ->where([ 'type'=>3, 'is_del' => 0])->get()->toArray();
-        $new_res['list'] = $offline_list;
 
         return $this->success($new_res);
     }
