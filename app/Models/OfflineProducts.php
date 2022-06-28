@@ -44,4 +44,21 @@ class OfflineProducts extends Base
         return $offline;
 
     }
+
+    /**
+     * getOfflineProducts get offline from ids
+     * 
+     * @return array $offline
+     * */
+    public function getOfflineProducts($ids=[]){
+        if(empty($ids)){
+            return [];
+        }
+        $fields = ['id','title','subtitle','describe','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num','user_id','cover_img as cover_images'];
+        $offline = OfflineProducts::select($fields)
+                      ->whereIn('id', $ids)
+                      ->where([ 'type'=>3, 'is_del' => 0])
+                      ->orderBy('created_at', 'desc')->get()->toArray();
+        return $offline;
+    }
 }

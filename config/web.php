@@ -49,5 +49,21 @@ return [
         'admin' => "administrator",
 
     ],
+    
+    // $type 全局type 110专栏  120课程  130讲座  140训练营  150 商品  160集合（161 大咖讲书） 170 直播  180线下产品
+    'GlobalType' =>[
+        'INPUT_TYPE' =>[
+            'CollumnType'   => 110,
+            'WorksType'     => 120,
+            'LectureType'   => 130,
+            'CampType'      => 140,
+            'GoodsType'     => 150,
+            'ListType'      => 160,
+            'ListBookType'  => 161,
+            'LiveType'      => 170,
+            'OfflineType'   => 180,
+        ],
+    ],
+    
 
 ];

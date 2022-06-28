@@ -840,9 +840,18 @@ class OrderController extends Controller
         $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
         $is_audio_book = $request->input('is_audio_book', 2);
-        $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
+        // 训练营会加入线下课类型
+        if($type == 7){
+            $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
+            ->where(['user_id' => $user_id,'status'=>1,])
+            ->whereIn("type",[5,7])
+            ->orderBy('created_at', 'desc')->paginate(50)->toArray();
+        }else{
+            $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
             ->where(['type' => $type, 'user_id' => $user_id,'status'=>1,])
             ->orderBy('created_at', 'desc')->paginate(50)->toArray();
+        }
+        
 
         $data = $data['data'];
 
@@ -868,6 +877,10 @@ class OrderController extends Controller
                     $model = new Works();
                     $result = $model->getIndexWorks([$val['relation_id']], $is_audio_book, $user_id, 0,0);
                     break;
+                case 5:
+                    $model = new OfflineProducts();
+                    $result = $model->getOfflineProducts([$val['relation_id']]);
+                    break;
                 case 8:
                     $model = new Lists();
                     $result = $model->getIndexListWorks([$val['relation_id']], [7,10],$user_id);
@@ -881,6 +894,7 @@ class OrderController extends Controller
 //                    }
 
                     break;
+                
             }
             if ($result == false) {
                 unset($data[$key]);
