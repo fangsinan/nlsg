@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Live;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\UserWechat;
+use App\Models\UserWechatName;
 use Illuminate\Http\Request;
 
 class LiveNoEnterController extends Controller
@@ -111,7 +113,7 @@ class LiveNoEnterController extends Controller
     {
 
 
-        $columns = ['用户id', '用户手机号', '用户昵称', '直播名称',];
+        $columns = ['用户id', '用户手机号', '用户昵称', '直播名称','客服'];
 
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
@@ -134,6 +136,13 @@ class LiveNoEnterController extends Controller
             $new_live[$val['id']] = $val['title']."--交付课";
         }
 
+        // 客服names
+        $nlsg_user_wechat_name = UserWechatName::select("qw_name","follow_user_userid")->get()->toArray();
+        $new_nlsg_user_wechat_name = [];
+        foreach($nlsg_user_wechat_name as $val){
+            $new_nlsg_user_wechat_name[$val['follow_user_userid']] = $val['qw_name'];
+        }
+        
         $of_user_ids = Subscribe::select("user_id")->whereIn("relation_id",[4,5,6,7])->where([
             "type" => 5,
             "status"=>1,
@@ -161,18 +170,31 @@ class LiveNoEnterController extends Controller
                 $new_user_e[$val['id']]['phone'] = $val['phone'];
                 $new_user_e[$val['id']]['nickname'] = $val['nickname'];
             }
+
+            $userWechats = UserWechat::select("id","follow_user_userid","user_id")->whereIn("user_id",$uids)->get()->toArray();
+            $new_userWechats = [];
+            foreach($userWechats as $key=>$val){
+                $new_userWechats[$val['user_id']] = $val['follow_user_userid'];
+            }
             foreach($not_uids as $key=>$nval){
                 // 过滤线下课
                 if(!in_array($val,$of_user_ids)){
+                    $follow_user_userid = $new_userWechats[$nval['user_id']] ??0;
+                    $follo_name = '';
+                    if(!empty($follow_user_userid)){
+                        $follo_name = $new_nlsg_user_wechat_name[$follow_user_userid]??"";
+                    }
                     $ex_user = [
                         "user_id" => $nval['user_id'],
                         "phone" => $new_user_e[$nval['user_id']]['phone']??"",
                         "nickname" => $new_user_e[$nval['user_id']]['nickname']??'',
                         "live_title" => $new_live[$nval['live_id']]??'',
+                        "follo_name" => $follo_name,
                     ];
+                    
                     $temp_v = [
                         '`'.$ex_user['user_id'],'`'.$ex_user['phone'],$ex_user['nickname'],
-                        $ex_user['live_title'],
+                        $ex_user['live_title'],$ex_user['follo_name'],
                     ];
     
                     mb_convert_variables('GBK', 'UTF-8', $temp_v);
