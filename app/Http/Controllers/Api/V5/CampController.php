@@ -75,7 +75,7 @@ class CampController extends Controller
         $new_res = [
             "my_list"=>$my_list['data'],
             "start_list"=>[],
-            "list"=>[],
+            "offline_list"=>[],
         ];
         foreach ($list['data'] as $v) {
 
