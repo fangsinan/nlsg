@@ -54,7 +54,7 @@ class OfflineProducts extends Base
         if(empty($ids)){
             return [];
         }
-        $fields = ['id','title','subtitle','describe','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num','user_id','cover_img as cover_images'];
+        $fields = ['id','title','subtitle','describe','total_price','price','cover_img','image','video_url', 'off_line_pay_type','is_show','subscribe_num','user_id','cover_img as cover_images','title as name'];
         $offline = OfflineProducts::select($fields)
                       ->whereIn('id', $ids)
                       ->where([ 'type'=>3, 'is_del' => 0])
