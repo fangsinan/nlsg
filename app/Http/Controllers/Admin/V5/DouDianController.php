@@ -45,7 +45,7 @@ class DouDianController extends ControllerBackend
             '抖音订单编号', '订单状态', '支付时间', '订单完成时间', '订单创建时间',
             '订单金额', '支付金额',
             '收件人电话', '收件人姓名', '收件人地址', '收件人详细地址',
-            '解密进度', '解密错误信息', '商品名称'
+            '解密进度', '解密错误信息', '商品名称','购买数量'
         ];
 
         $fileName = 'dou_dian_' . date('Y-m-d H:i') . '-' . rand(100, 999) . '.csv';
@@ -108,6 +108,7 @@ class DouDianController extends ControllerBackend
 
                         $temp_put_data['decrypt_err_msg'] = $v['decrypt_err_msg'];
                         $temp_put_data['product_name']    = $vv['product_info']['name'] ?? '-';
+                        $temp_put_data['item_num'] = $vv['item_num'] ?? '-';
 
                         mb_convert_variables('GBK', 'UTF-8', $temp_put_data);
                         fputcsv($fp, $temp_put_data);
