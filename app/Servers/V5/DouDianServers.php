@@ -640,6 +640,9 @@ class DouDianServers
             ->where('decrypt_step', '<>', 9)
             ->where('decrypt_step', '<', self::DECRYPT_JOB_TYPE)
             ->where('dou_dian_type', '=', 1)
+            ->where('encrypt_post_tel','<>','')
+            ->where('encrypt_post_receiver','<>','')
+            ->where('encrypt_post_addr_detail','<>','')
             ->select([
                 'order_id', 'order_status', 'decrypt_step',
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
