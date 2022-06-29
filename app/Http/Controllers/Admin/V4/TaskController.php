@@ -75,8 +75,8 @@ class TaskController extends ControllerBackend
             }
             Task::send($input['type'], $user->id, $input['id'],0, $input['title']);
         } elseif($input['send_type'] ==2){
-            if($input['type']==5 && $input['id']==536){
-                JPush::pushNow('all', '如何让孩子高效学习，自动自发自主？正在直播中—汤蓓老师教你4招激活孩子学习动力，让孩子爱上学习>>', ['type'=>$input['type'], 'id'=>$input['id']]);
+            if($input['type']==5 && $input['id']==552){
+                JPush::pushNow('all', '如何让孩子有好口才？正在直播中—吴岩老师教你：让孩子学会演讲口才的8大技巧>>', ['type'=>$input['type'], 'id'=>$input['id']]);
             }else{
                 JPush::pushNow('all', $input['title'], ['type'=>$input['type'], 'id'=>$input['id']]);
             }
