@@ -842,7 +842,7 @@ class OrderController extends Controller
         $is_audio_book = $request->input('is_audio_book', 2);
         // 训练营会加入线下课类型
         if($type == 7){
-            $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
+            $data = Subscribe::select('*')//->where('end_time', '>=', date('Y-m-d H:i:s'))
             ->where(['user_id' => $user_id,'status'=>1,])
             ->whereIn("type",[5,7])
             ->orderBy('created_at', 'desc')->paginate(50)->toArray();

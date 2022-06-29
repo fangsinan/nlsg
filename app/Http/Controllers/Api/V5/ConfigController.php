@@ -92,7 +92,8 @@ class ConfigController extends Controller
         $relation_id = $request->input('relation_id')??0;
         $order_id = $request->input('order_id')??0;
         $is_wechat = $request->input('is_wechat')??0;
-        if($input_type == 170){
+        
+        if($input_type == config('web.GlobalType.INPUT_TYPE.LiveType')){
 
             if(empty($order_id) && empty($is_wechat)){ //免费并且是渠道不弹
                 return success((object)[] );
