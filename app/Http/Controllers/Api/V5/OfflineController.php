@@ -50,6 +50,7 @@ class OfflineController extends Controller
         $info['teacher_data'] = User::getTeacherInfo($info['user_id']);
         // 老师信息
         $info['is_follow'] = UserFollow::IsFollow($uid,$info['user_id']);
+        $info['price'] = (string)intval($info['price']);
         return success($info);
     }
 
