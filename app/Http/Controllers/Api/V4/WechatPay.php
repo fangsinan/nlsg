@@ -533,10 +533,17 @@ class WechatPay extends Controller
                     // 内容刷单记录
                     self::PayTestLog($orderId,$AdminInfo);
 
-
                     //  下单需要显示地址
                     self::MallAddress($orderInfo);
 
+                    // 线下课购买  发短信
+                    $type = OfflineProducts::where(['id'=>$orderInfo['relation_id']])->value("type");
+                    if($type == 3 && ($AdminInfo['phone'] && strlen($AdminInfo['phone']) == 11)){
+                        $easySms = app('easysms');
+                        $result = $easySms->send($AdminInfo['phone'], [
+                            'template' => 'SMS_244505083',
+                        ], ['aliyun']);
+                    }
 
                     return true;
 
