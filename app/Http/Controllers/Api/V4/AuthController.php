@@ -360,20 +360,8 @@ class AuthController extends Controller
                     $user=$UserOld;
                     $phone = $UserOld->phone;
                 }else {
-                    $time = time();
-                    $redis_phone = 'phone_' . date('Ymd', $time);
 
-                    $key = 'phone_lock';
-                    self::lock($key); //加锁
-                    $num = Redis::get($redis_phone);
-                    if (empty($num) || $num <= 0) {
-                        $num = 1;
-                    }
-                    Redis::setex($redis_phone, 86400, $num + 1);
-                    self::unlock($key); //释放锁
-
-                    $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
-                    $phone = date('ymd', $time) . $str_num; //6+7
+                    $phone=$this->getUniquePhone();
 
                     $data = [
                         'nickname' => (!empty($input['nickname'])) ? $input['nickname'] : 'nlsg' . rand(100000, 999999),
@@ -394,6 +382,25 @@ class AuthController extends Controller
             } else {
                 $phone = $user->phone;
             }
+        }else if(!empty($input['is_browser'])){ //浏览器访问
+
+            $phone=$this->getUniquePhone();
+
+            $data = [
+                'nickname' => 'nlsg' . rand(100000, 999999),
+                'phone' => $phone,
+                'isNoLogin' => 1,
+                'wxopenid' => '',
+                'is_browser' => 1,
+            ];
+            $res = User::create($data);
+            if ($res) {
+                $user = User::find($res->id);
+                if (empty($user)) {
+                    return success($arra);
+                }
+            }
+
         } else {
             if (empty($input['wx_openid'])) {
                 return success($arra);
@@ -401,20 +408,7 @@ class AuthController extends Controller
             $user = User::where('wxopenid', $input['wx_openid'])->first();
             if ($input['wx_openid'] && empty($user)) {
 
-                $time = time();
-                $redis_phone = 'phone_' . date('Ymd', $time);
-
-                $key = 'phone_lock';
-                self::lock($key); //加锁
-                $num = Redis::get($redis_phone);
-                if (empty($num) || $num <= 0) {
-                    $num = 1;
-                }
-                Redis::setex($redis_phone, 86400, $num + 1);
-                self::unlock($key); //释放锁
-
-                $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
-                $phone = date('ymd', $time) . $str_num; //6+7
+                $phone=$this->getUniquePhone();
 
                 $data = [
                     'nickname' => 'nlsg' . rand(100000, 999999),
@@ -443,6 +437,30 @@ class AuthController extends Controller
             'children_age' => 10,//$user->children_age,
         ];
         return success($arra);
+
+    }
+
+    //注册用户
+    //$request->session()->put('user',[]);//存session信息
+    //$request->session()->get('user')；//获取session信息
+    private function getUniquePhone(){
+
+        $time = time();
+        $redis_phone = 'phone_' . date('Ymd', $time);
+
+        $key = 'phone_lock';
+        self::lock($key); //加锁
+        $num = Redis::get($redis_phone);
+        if (empty($num) || $num <= 0) {
+            $num = 1;
+        }
+        Redis::setex($redis_phone, 86400, $num + 1);
+        self::unlock($key); //释放锁
+
+        $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
+        $phone = date('ymd', $time) . $str_num; //6+7
+
+        return $phone;
 
     }
 
