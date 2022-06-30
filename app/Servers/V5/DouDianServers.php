@@ -174,7 +174,7 @@ class DouDianServers
 
         foreach ($list as $v){
 
-//            echo '开始:'.$v['order_id'].' : '.date('Y-m-d H:i:s').PHP_EOL;
+            echo '开始:'.$v['order_id'].' : '.date('Y-m-d H:i:s').PHP_EOL;
 
             $param->shop_order_id = $v['order_id'];
             $response = $request->execute('');
@@ -226,6 +226,7 @@ class DouDianServers
                         );
                 }
             }catch (\Exception $e){
+                print_r($e);
                 continue;
             }
 
