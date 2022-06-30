@@ -41,7 +41,7 @@ class DouDianOrder extends Command
     {
         $type = $this->argument('type');
         if ($type == 3){
-        (new DouDianServers())->tempGetOrderDetails();//根据单号获取订单详情
+            (new DouDianServers())->tempGetOrderDetails();//根据单号获取订单详情
 //        (new DouDianServers())->tempExcelAddOrder();//临时导入订单号
         }else{
             (new DouDianServers())->getOrderJob($type);
