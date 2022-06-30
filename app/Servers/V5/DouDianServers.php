@@ -38,8 +38,9 @@ class DouDianServers
         GlobalConfig::getGlobalConfig()->appSecret      = config('env.DOU_DIAN_APP_SECRET');
         GlobalConfig::getGlobalConfig()->accessTokenStr = ConfigModel::getData(68, 1);
         $this->shopId                                   = ConfigModel::getData(67, 1);
+        echo PHP_EOL.'商铺id:'.$this->shopId.PHP_EOL;
         if ($this->shopId === '0') {
-            exit('没有设置店铺ID');
+            exit('没有设置店铺ID:抖店');
         }
     }
 
