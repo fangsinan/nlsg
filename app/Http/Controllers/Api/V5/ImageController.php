@@ -32,7 +32,11 @@ class ImageController extends Controller
      */
     public function GetQrCode(Request $request){
 
-        $relation_type = $request->input('relation_type')??0;
+        $input_type = $request->input('relation_type')??0;
+
+        $types = FuncType($input_type);
+        $relation_type = empty($types['qrcode_type']) ? $input_type:$types['qrcode_type'];
+
         $relation_id = $request->input('relation_id')??0;
         $order_id = $request->input('order_id')??0;
         $is_wechat = $request->input('is_wechat')??0;

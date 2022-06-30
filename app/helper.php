@@ -227,6 +227,7 @@
                     'sub_type' => 1,    // 订阅表类型
                     'qrcode_type' => 0,    // 二维码表类型
                     'order_type' => 1,    // 二维码表类型
+                    'qrcode_type' => 0,
                 ];
                 break;
             case $types['WorksType']: // 120课程
@@ -245,6 +246,7 @@
                     'sub_type' => 6,    // 订阅表类型
                     'qrcode_type' => 0,    // 二维码表类型
                     'order_type' => 6,
+                    'qrcode_type' => 0,
                 ];
                 break;;break;
             case $types['CampType']:  // 140训练营
@@ -290,7 +292,7 @@
                     'col_type' => 0,    // 收藏表类型  nlsg_collection
                     'his_type' => 0,    // 历史记录表类型 nlsg_history
                     'sub_type' => 5,    // 订阅表类型
-                    'qrcode_type' => 0,    // 二维码表类型
+                    'qrcode_type' => 7,    // 二维码表类型
                     'order_type' => 5,
                 ];
                 break;
