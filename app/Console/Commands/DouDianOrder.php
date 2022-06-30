@@ -40,7 +40,12 @@ class DouDianOrder extends Command
     public function handle()
     {
         $type = $this->argument('type');
-        (new DouDianServers())->getOrderJob($type);
-        (new DouDianXueXiJiServers())->getOrderJob($type);
+        if ($type == 3){
+        (new DouDianServers())->tempGetOrderDetails();//根据单号获取订单详情
+//        (new DouDianServers())->tempExcelAddOrder();//临时导入订单号
+        }else{
+            (new DouDianServers())->getOrderJob($type);
+        }
+
     }
 }
