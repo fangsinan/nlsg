@@ -515,6 +515,8 @@ class WechatPay extends Controller
                         }
                     }
                 }
+                // 添加订阅记录
+                OfflineProducts::where(['id' => $orderInfo['relation_id']])->increment('real_subscribe_num');
 
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $vip_res) {
