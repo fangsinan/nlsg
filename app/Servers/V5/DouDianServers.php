@@ -194,6 +194,7 @@ class DouDianServers
                 $order->post_addr_street_id      = 0;
 
                 $order->dou_dian_type = 1;
+                $order->created_at = date('Y-m-d H:i:s',$order->create_time);
                 DouDianOrder::query()->updateOrCreate(
                     [
                         'order_id' => $order->order_id
