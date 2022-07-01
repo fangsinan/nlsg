@@ -396,6 +396,7 @@ class AuthController extends Controller
             }
         }else if(!empty($input['is_browser'])){ //浏览器访问
 
+            //注册虚拟用户
             $phone=$this->getUniquePhone();
 
             $data = [
@@ -411,8 +412,10 @@ class AuthController extends Controller
                 if (empty($user)) {
                     return success($arra);
                 }
+            }else{
+                return success($arra);
             }
-            
+
         } else {
             if (empty($input['wx_openid'])) {
                 return success($arra);
@@ -465,7 +468,7 @@ class AuthController extends Controller
 
     }
 
-    //注册用户
+    //注册虚拟用户
     //$request->session()->put('user',[]);//存session信息
     //$request->session()->get('user')；//获取session信息
     private function getUniquePhone(){
