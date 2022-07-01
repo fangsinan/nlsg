@@ -13,6 +13,7 @@ use App\Models\DouDian\DouDianOrderStatus;
 use App\Models\DouDian\DouDianProductList;
 use App\Models\DouDian\DouDianSkuList;
 use GlobalConfig;
+use Illuminate\Support\Facades\DB;
 use OrderBatchDecryptParam;
 use OrderBatchDecryptRequest;
 use OrderOrderDetailParam;
@@ -38,7 +39,7 @@ class DouDianServers
         GlobalConfig::getGlobalConfig()->accessTokenStr = ConfigModel::getData(68, 1);
         $this->shopId                                   = ConfigModel::getData(67, 1);
         if ($this->shopId === '0') {
-            exit('没有设置店铺ID');
+            exit('没有设置店铺ID:抖店');
         }
     }
 
@@ -149,6 +150,131 @@ class DouDianServers
         $this->orderStatusData();
 
         return true;
+    }
+
+
+    //根据订单号获取订单详情
+    public function tempGetOrderDetails(){
+        $list = DouDianOrder::query()
+            ->where('dou_dian_type', '=', 3)
+            ->limit(50)
+            ->select('order_id')
+            ->get();
+
+        if ($list->isEmpty()){
+            return true;
+        }
+
+        $list = $list->toArray();
+
+        $request = new OrderOrderDetailRequest();
+        $param = new OrderOrderDetailParam();
+        $request->setParam($param);
+
+
+        foreach ($list as $v){
+
+//            echo '开始:'.$v['order_id'].' : '.date('Y-m-d H:i:s').PHP_EOL;
+
+            $param->shop_order_id = $v['order_id'];
+            $response = $request->execute('');
+
+            try {
+                $order = $response->data->shop_order_detail;
+
+                $order->encrypt_post_addr_detail = $order->post_addr->encrypt_detail;
+                $order->post_addr_detail         = $order->post_addr->detail;
+                $order->post_addr_province_name  = $order->post_addr->province->name ?? '';
+                $order->post_addr_city_name      = $order->post_addr->city->name ?? '';
+                $order->post_addr_town_name      = $order->post_addr->town->name ?? '';
+                $order->post_addr_street_name    = $order->post_addr->street->name ?? '';
+                $order->post_addr_province_id    = $order->post_addr->province->id ?? 0;
+                $order->post_addr_city_id        = $order->post_addr->city->id ?? 0;
+                $order->post_addr_town_id        = $order->post_addr->town->id ?? 0;
+                $order->post_addr_street_id      = 0;
+
+                $order->dou_dian_type = 1;
+                $order->created_at = date('Y-m-d H:i:s',$order->create_time);
+                DouDianOrder::query()->updateOrCreate(
+                    [
+                        'order_id' => $order->order_id
+                    ],
+                    (array)$order
+                );
+
+                foreach ($order->sku_order_list as $sku) {
+                    $sku->after_sale_info_status        = $sku->after_sale_info->after_sale_status ?? 0;
+                    $sku->after_sale_info_type          = $sku->after_sale_info->after_sale_type ?? 0;
+                    $sku->after_sale_info_refund_status = $sku->after_sale_info->refund_status ?? 0;
+                    DouDianOrderList::query()->updateOrCreate(
+                        [
+                            'order_id' => $sku->order_id
+                        ],
+                        (array)$sku
+                    );
+                }
+
+                foreach ($order->logistics_info as $logistics) {
+                    $logistics->order_id = $order->order_id;
+
+                    DouDianOrderLogistics::query()
+                        ->updateOrCreate(
+                            [
+                                'tracking_no' => $logistics->tracking_no,
+                                'company'     => $logistics->company,
+                            ],
+                            (array)$logistics
+                        );
+                }
+            }catch (\Exception $e){
+                print_r($e->getMessage());
+                continue;
+            }
+
+            usleep(500000);
+
+        }
+
+    }
+
+    //临时用于导入列表接口不能抓取的订单
+    public function tempExcelAddOrder(){
+        $list = DB::table('wwwwww_douyin')
+//            ->limit(20000)
+            ->get()
+            ->toArray();
+
+        $count = 0;
+
+        foreach ($list as $v){
+            $vid = $v->id;
+            $v = trim($v->phone);
+
+            $temp_check = DouDianOrder::query()
+                ->where('order_id','=',$v)
+                ->first();
+
+            if(empty($temp_check)){
+                DouDianOrder::query()
+                    ->insert([
+                        'order_id'=>$v,
+                        'dou_dian_type'=>3,
+                        'order_status'=>1,
+                        'order_status_desc'=>1,
+                        'main_status'=>1,
+                        'main_status_desc'=>1,
+                    ]);
+                $count++;
+                echo $v.'不存在,写入...'.PHP_EOL;
+            }
+
+            DB::table('wwwwww_douyin')
+                ->where('id','=',$vid)
+                ->delete();
+
+        }
+
+        dd('写入成功:'.$count);
     }
 
     public function testGetOrder()
@@ -641,8 +767,6 @@ class DouDianServers
             ->where('decrypt_step', '<', self::DECRYPT_JOB_TYPE)
             ->where('dou_dian_type', '=', 1)
             ->where('encrypt_post_tel','<>','')
-            ->where('encrypt_post_receiver','<>','')
-            ->where('encrypt_post_addr_detail','<>','')
             ->select([
                 'order_id', 'order_status', 'decrypt_step',
                 'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
@@ -650,7 +774,6 @@ class DouDianServers
             ])
             ->limit($this->runPageSize)
             ->orderBy('order_id', 'desc')
-//            ->orderBy('order_id', 'asc')
             ->get();
 
         if ($list->isEmpty()) {

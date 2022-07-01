@@ -22,6 +22,7 @@ class DouDianOrder extends Base
         'post_addr_town_id', 'post_addr_street_id',
         'cancel_reason','buyer_words',
         'decrypt_step','decrypt_err_no','decrypt_err_msg','dou_dian_type',
+        'created_at',
     ];
 
     public function orderList(): HasMany {

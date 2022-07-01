@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Servers\V5\DouDianServers;
-use App\Servers\V5\DouDianXueXiJiServers;
 use Illuminate\Console\Command;
 
 class DouDianOrder extends Command
@@ -40,7 +39,12 @@ class DouDianOrder extends Command
     public function handle()
     {
         $type = $this->argument('type');
-        (new DouDianServers())->getOrderJob($type);
-        (new DouDianXueXiJiServers())->getOrderJob($type);
+        if ($type == 3) {
+            (new DouDianServers())->tempGetOrderDetails();//根据单号获取订单详情
+//        (new DouDianServers())->tempExcelAddOrder();//临时导入订单号
+        } else {
+            (new DouDianServers())->getOrderJob($type);
+        }
+
     }
 }

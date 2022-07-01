@@ -24,7 +24,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'phone', 'nickname', 'openid', 'sex', 'province', 'city', 'headimg','appleid','is_wx','unionid','inviter','login_flag','isNoLogin','wxopenid','push','is_staff'
+        'phone', 'nickname', 'openid', 'sex', 'province', 'city', 'headimg','appleid','is_wx','unionid','inviter','login_flag','isNoLogin','wxopenid','push','is_staff','is_browser'
     ];
 
     /**
@@ -277,7 +277,7 @@ class User extends Authenticatable implements JWTSubject
         }
 
         if (!empty($col)){
-            // $res['title'] = $col->title;
+            $res['title'] = $col->title;
             $res['subtitle'] = $col->subtitle;
         }
 

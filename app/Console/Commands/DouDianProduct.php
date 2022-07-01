@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Servers\V5\DouDianServers;
-use App\Servers\V5\DouDianXueXiJiServers;
 use Illuminate\Console\Command;
 
 class DouDianProduct extends Command
@@ -40,6 +39,5 @@ class DouDianProduct extends Command
     public function handle()
     {
         (new DouDianServers())->productListJob();
-        (new DouDianXueXiJiServers())->productListJob();
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Servers\V5\DouDianServers;
-use App\Servers\V5\DouDianXueXiJiServers;
 use Illuminate\Console\Command;
 
 class DouDianOrderDecrypt extends Command
@@ -40,7 +39,5 @@ class DouDianOrderDecrypt extends Command
     public function handle()
     {
         (new DouDianServers())->runDecrypt();
-//        (new DouDianServers())->decryptJob();
-//        (new DouDianXueXiJiServers())->decryptJob();
     }
 }
