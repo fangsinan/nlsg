@@ -74,13 +74,23 @@ class ImageController extends Controller
      * @apiName  get_qr_code
      * @apiGroup FiveCode
      *
-     * @apiParam {number} relation_type 类型 1.精品课程2.商城3.直播   4 购买360   5 大咖讲书  6训练营
-     * @apiParam {number} relation_id   数据id 课程id  商品id  直播id
+     * @apiParam {number} relation_type 类型 走统一类型  help.php FuncType()
      */
     public function GetUserQrCode(Request $request)
     {
-        
-        $image= $version_config = ConfigModel::getData(76);
+        $input_type = $request->input('relation_type')??0;
+
+        // $types = FuncType($input_type);
+        switch ($input_type){
+            case config('web.GlobalType.INPUT_TYPE.CampType'):
+                $image = ConfigModel::getData(76);
+                break;
+            case config('web.GlobalType.INPUT_TYPE.OfflineType'):
+                $image = ConfigModel::getData(82);
+                break;
+            default:
+                $image = ConfigModel::getData(76);
+        }
         return success($image);
     }
 }
