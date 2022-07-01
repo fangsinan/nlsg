@@ -177,8 +177,10 @@ class LiveNoEnterController extends Controller
                 $new_userWechats[$val['user_id']] = $val['follow_user_userid'];
             }
             foreach($not_uids as $key=>$nval){
+                // 过滤代理商
+
                 // 过滤线下课
-                if(!in_array($val,$of_user_ids)){
+                if(!in_array($nval['user_id'],$of_user_ids)){
                     $follow_user_userid = $new_userWechats[$nval['user_id']] ??0;
                     $follo_name = '';
                     if(!empty($follow_user_userid)){
