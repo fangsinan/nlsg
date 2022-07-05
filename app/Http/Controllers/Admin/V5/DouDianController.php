@@ -81,7 +81,7 @@ class DouDianController extends ControllerBackend
                         $temp_put_data['create_time_date']  = $v['create_time_date'];
                         $temp_put_data['order_amount_yuan'] = $v['order_amount_yuan'];
                         $temp_put_data['pay_amount_yuan']   = $v['pay_amount_yuan'];
-                        $temp_put_data['post_tel']          = $v['post_tel'];
+                        $temp_put_data['post_tel']          = $v['post_tel']."\t";
                         $temp_put_data['post_receiver']     = $v['post_receiver'];
                         $temp_put_data['post_addr']         = $v['post_addr_province_name'] . $v['post_addr_city_name'] . $v['post_addr_town_name'];
                         $temp_put_data['post_addr_detail']  = $v['post_addr_detail'];
