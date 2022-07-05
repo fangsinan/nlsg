@@ -74,7 +74,7 @@ class DouDianController extends ControllerBackend
                     foreach ($v['order_list'] as $vv) {
 
                         $temp_put_data                      = [];
-                        $temp_put_data['order_id']          = $v['order_id'];
+                        $temp_put_data['order_id']          = "'".$v['order_id'];
                         $temp_put_data['order_status_desc'] = $v['order_status_desc'];
                         $temp_put_data['pay_time_date']     = $v['pay_time_date'];
                         $temp_put_data['finish_time_date']  = $v['finish_time_date'];
