@@ -44,7 +44,7 @@ class DouDianController extends ControllerBackend
         $columns = [
             '抖音订单编号', '订单状态', '支付时间', '订单完成时间', '订单创建时间',
             '订单金额', '支付金额',
-            '收件人电话', '收件人姓名', '收件人地址', '收件人详细地址',
+            '收件人电话', '收件人姓名', '收件人地址', '收件人详细地址','收件人完整地址',
             '解密进度', '解密错误信息', '商品名称','购买数量'
         ];
 
@@ -74,18 +74,18 @@ class DouDianController extends ControllerBackend
                     foreach ($v['order_list'] as $vv) {
 
                         $temp_put_data                      = [];
-                        $temp_put_data['order_id']          = '`' . $v['order_id'];
+                        $temp_put_data['order_id']          = $v['order_id']."\t";
                         $temp_put_data['order_status_desc'] = $v['order_status_desc'];
                         $temp_put_data['pay_time_date']     = $v['pay_time_date'];
                         $temp_put_data['finish_time_date']  = $v['finish_time_date'];
                         $temp_put_data['create_time_date']  = $v['create_time_date'];
                         $temp_put_data['order_amount_yuan'] = $v['order_amount_yuan'];
                         $temp_put_data['pay_amount_yuan']   = $v['pay_amount_yuan'];
-                        $temp_put_data['post_tel']          = $v['post_tel'];
+                        $temp_put_data['post_tel']          = $v['post_tel']."\t";
                         $temp_put_data['post_receiver']     = $v['post_receiver'];
                         $temp_put_data['post_addr']         = $v['post_addr_province_name'] . $v['post_addr_city_name'] . $v['post_addr_town_name'];
                         $temp_put_data['post_addr_detail']  = $v['post_addr_detail'];
-
+                        $temp_put_data['post_addr_full']    =  $temp_put_data['post_addr'] . $temp_put_data['post_addr_detail'];
                         switch ($v['decrypt_step']) {
                             case 0:
                                 $temp_put_data['decrypt_step_desc'] = '未解密';

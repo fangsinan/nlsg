@@ -51,6 +51,10 @@ class SubHelperController  extends ControllerBackend
 
     public function open(Request $request){
         $servers = new SubHelperServers();
+        $type = (int)$request->input('type',0);
+        if ($type === 7 && ($this->user['role_id'] ?? 0) !== 1){
+            return $this->getRes(['code'=>false,'msg'=>'没有权限']);
+        }
         $data = $servers->addOpenList($request->input(),$this->user['id'] ?? 0);
         return $this->getRes($data);
     }
