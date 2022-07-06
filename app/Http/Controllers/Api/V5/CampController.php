@@ -345,8 +345,8 @@ class CampController extends Controller
             return $this->error(1000,'您当前尚未加入该训练营',(object)[]);
         }
         // crm_camp_prize  奖品
-        $prize = CampPrize::select('title as prize_title','cover_pic as prize_pic','week_id')->where(['column_id'=>$camp_id,'status'=>1])->get()->toArray();
-        $prize = array_column($prize,null,'week_id');
+        $prize = CampPrize::getPrize($column_data['classify_column_id']);
+        $prize = array_column($prize,null,"id");
 
         $res = [
             'is_show'   =>0,
@@ -366,9 +366,9 @@ class CampController extends Controller
         ])->orderBy('week_id')->get()->toArray();
 
         // 对应周
-        $weeks = ColumnWeekModel::select('id','title','start_at','end_at')->where('relation_id',$camp_id)->get()->ToArray();
+        $weeks = ColumnWeekModel::select('id','prize_id','start_at','end_at')->where('relation_id',$camp_id)->get()->ToArray();
         $weeks = array_column($weeks,null,'id');
-        
+
 
         $is_show = 0;
         $now_week = "";
@@ -384,7 +384,7 @@ class CampController extends Controller
 
             }else if( $val['speed_status'] == 2 && $val['is_get'] == 0 ){
                 $status = 2;
-                // 当前周
+                // 当前周   
                 $now_week = $weeks[$val['week_id']]['title'] ??'';
                 $is_show = 1;
             }else if( $val['speed_status'] == 1 && $val['is_get'] == 0 ){
@@ -392,13 +392,13 @@ class CampController extends Controller
             }else if( $val['speed_status'] == 0 ){
                 $status = 0;
             }
-
+            $prize_id = $weeks[$val['week_id']]['prize_id'];
             $new_reward[$key] = [
                 'week_id' => $val['week_id'],
                 'week_title' =>  $weeks[$val['week_id']]['title']??'',
                 'status' => $status,
-                'prize_title' => $prize[$val['week_id']]['prize_title'] ??'',
-                'prize_pic' => $prize[$val['week_id']]['prize_pic'] ??'',
+                'prize_title' => $prize[$prize_id]['prize_title']??'',
+                'prize_pic' => $prize[$prize_id]['prize_pic']??'',
             ];
         }
 
