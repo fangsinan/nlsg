@@ -1047,4 +1047,11 @@ class Order extends Base
 
         return ['code'=>true, 'msg'=>''];
     }
+
+    //最新一条跟进记录
+    public function offlineLastLog(){
+        return $this->hasOne(OfflineProductsOrderLog::class,'order_id','id')
+            ->orderBy('log_date','desc')
+            ->orderBy('id','desc');
+    }
 }

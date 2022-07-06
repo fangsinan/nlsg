@@ -397,6 +397,10 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('dou_dian/order_decrypt_quota_reset','DouDianController@orderDecryptQuotaReset');
         Route::get('dou_dian/order_list_excel','DouDianController@orderListExcel');
 
+        Route::get('offline_order/order_list','OfflineOrderController@orderList');
+        Route::get('offline_order/order_log_list','OfflineOrderController@orderLogList');
+        Route::post('offline_order/order_log_add','OfflineOrderController@orderLogAdd');
+
     });
 });
 
