@@ -480,6 +480,10 @@ class CampController extends Controller
                     'relation_id'   =>$column_id,
                     'is_letter'     =>1,
                 ];
+                if($end_show['is_letter'] == 0){
+                    $edit_data['letter_at']=date("Y-m-d H:i:s",time());
+                }
+                
                 break;
             case 2:
                 $edit_data = [
@@ -487,6 +491,9 @@ class CampController extends Controller
                     'relation_id'   =>$column_id,
                     'is_cer'=>1,
                 ];
+                if($end_show['is_cer'] == 0){
+                    $edit_data['cer_at']=date("Y-m-d H:i:s",time());
+                }
                 break;
             default :
             return $this->success();
