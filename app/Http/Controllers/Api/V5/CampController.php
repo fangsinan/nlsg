@@ -351,7 +351,7 @@ class CampController extends Controller
         $res = [
             'is_show'   =>0,
             'now_week'  =>"",
-            'week_day'  =>(object)[],
+            'week_day'  =>[],
         ];
         // 结营三天后  不显示弹窗
         if( $column_data['is_start'] == 2 &&
@@ -393,7 +393,7 @@ class CampController extends Controller
                 $status = 0;
             }
             $prize_id = $weeks[$val['week_id']]['prize_id'];
-            $new_reward[$key] = [
+            $new_reward[] = [
                 'week_id' => $val['week_id'],
                 'week_title' =>  $weeks[$val['week_id']]['title']??'',
                 'status' => $status,
