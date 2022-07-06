@@ -7,6 +7,7 @@ use App\Models\CampPrize;
 use App\Models\Collection;
 use App\Models\Column;
 use App\Models\ColumnEndShow;
+use App\Models\ColumnWeekModel;
 use App\Models\ColumnWeekReward;
 use App\Models\ContentLike;
 use App\Models\History;
@@ -128,8 +129,6 @@ class CampController extends Controller
             return $this->error(1000,$validator->getMessageBag(),(object)[]);
         }
 
-
-
         $column_id = $request->input('id', 0);
         $activity_tag = $request->input('activity_tag', '');
 
@@ -161,20 +160,18 @@ class CampController extends Controller
 
         $user = User::find($column['user_id']);
         $column['title'] = $user['honor'] ?? '';
+        // 训练营奖励和证书 获取
+        $Letter = ColumnEndShow::GetShowLetter($column_id);
+        $column['letter_img']   = $Letter['letter_img'];
+        $column['cer_img']      = $Letter['cer_img'];
+
         // 结营后是否弹学习证书
-        $column['end_show'] = 0;
-        if($column['is_start'] == 2){
-            $show = ColumnEndShow::where([
-                'user_id' =>$user_id,
-                'relation_id' =>$column_id,
-            ])->first();
-            if(!empty($show)){
-                $column['end_show'] = 1;
-            }
-        }
+        $end_start = ColumnEndShow::EndShow($user_id,$column_id);
+        $column['end_show_letter']  = $end_start['is_letter']; //是否拆开信件 结营当天必弹  弹完点击就算拆开信件
+        $column['end_show']         = $end_start['is_cer']; //是否领取奖励  需要结营后 手动点击
+       
         // 统一全局type
         $types = FuncType(140);
-
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $types['sub_type']);
         $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image')->toArray();
         if(empty($column['poster'])){ // 如果为空则取用父级
@@ -224,40 +221,6 @@ class CampController extends Controller
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
-     * {
-     * "code": 200,
-     * "msg": "成功",
-     * "data": {
-     * "works_data": {
-     * "id": 16,
-     * "title": "如何经营幸福婚姻",  //标题
-     * "subtitle": "",             //副标题
-     * "cover_img": "/nlsg/works/20190822150244797760.png",   //封面
-     * "detail_img": "/nlsg/works/20191023183946478177.png",   //详情图
-     * "content": "<p>幸福的婚姻是“同床同梦”，悲情的婚姻是“同床异梦”。两个相爱的人因为一时的爱慕之情走到一起，但在经过柴米油盐酱醋茶的考验后他们未必会幸福、未必会长久；两个不相爱的人走到一起，但在长时间的磨合之后他们未必不幸福、未必不长久。</p>",
-     * "view_num": 1295460,     //浏览数
-     * "price": "29.90",
-     * "subscribe_num": 287,       关注数
-     * "is_free": 0,
-     * "is_end": 1,
-     * "info_num": 2       //现有章节数
-     * "history_ount": 2%       //总进度
-     * },
-     * "info": [{
-     * "id": 2,
-     * "type": 1,
-     * "title": "02坚毅品格的重要性",
-     * "section": "第二章",       //章节数
-     * "introduce": "第二章",     //章节简介
-     * "view_num": 246,        //观看数
-     * "duration": "03:47",
-     * "free_trial": 0,     //是否可以免费试听
-     * "href_url": "",
-     * "time_leng": "10",      //观看 百分比
-     * "time_number": "5"      //观看 分钟数
-     * }]
-     * }
-     * }
      */
     public function getLectureList(Request $request)
     {
@@ -358,7 +321,6 @@ class CampController extends Controller
 
         $validator = Validator::make($request->all(), [
             'id' => 'required|numeric',
-            // 'info_id' => 'bail:numeric',
         ]);
         if ($validator->fails()) {
             return $this->error(1000,$validator->getMessageBag()->first(),(object)[]);
@@ -368,8 +330,8 @@ class CampController extends Controller
         $user_id = $this->user['id'] ?? 0;
         // is_show      结营后三天不显示奖励弹窗
         // now_week     获得第几周的奖励 当前学习的章节是第N周 就显示获得第N周的奖励
-        // 周奖励状态     status  0未领取  1待领取  2 需补卡 3没资格领取
-        // 奖品信息
+        // 周奖励状态     status  3已领取，2待领取，1补卡领取，0未开始
+        // 奖品信息             
 
         $column_data = Column::find($camp_id);
         if (empty($column_data)) {
@@ -378,19 +340,17 @@ class CampController extends Controller
 
         // 训练营 每周开放六节课程
         // 查询训练营目前开放的全部课程 ，每六个章节为一周，查询历史记录表是否完结
-        $is_sub = Subscribe::isSubscribe($user_id, $column_data['id'], 7);
+        $is_sub = Subscribe::isSubscribe($user_id, $camp_id, 7);
         if($is_sub ==0){
             return $this->error(1000,'您当前尚未加入该训练营',(object)[]);
         }
         // crm_camp_prize  奖品
-        $prize = CampPrize::select('week_num','title as prize_title','cover_pic as prize_pic')->where(['column_id'=>$column_data['id'],'status'=>1])->get()->toArray();
-        $prize = array_column($prize,null,'week_num');
-
-
+        $prize = CampPrize::select('title as prize_title','cover_pic as prize_pic','week_id')->where(['column_id'=>$camp_id,'status'=>1])->get()->toArray();
+        $prize = array_column($prize,null,'week_id');
 
         $res = [
             'is_show'   =>0,
-            'now_week'  =>0,
+            'now_week'  =>"",
             'week_day'  =>(object)[],
         ];
         // 结营三天后  不显示弹窗
@@ -399,25 +359,33 @@ class CampController extends Controller
             return $this->success($res);
         }
 
-
-        $reward = ColumnWeekReward::select('week_num','is_get','speed_status','end_time')->where([
+        // 用户学习进度 获取奖励
+        $reward = ColumnWeekReward::select('is_get','speed_status','end_time','week_id')->where([
             'user_id'       => $user_id,
             'relation_id'   => $column_data['id'],
-        ])->orderBy('week_num')->get()->toArray();
+        ])->orderBy('week_id')->get()->toArray();
+
+        // 对应周
+        $weeks = ColumnWeekModel::select('id','title','start_at','end_at')->where('relation_id',$camp_id)->get()->ToArray();
+        $weeks = array_column($weeks,null,'id');
+        
 
         $is_show = 0;
-        $now_week = 1;
+        $now_week = "";
         $new_reward = [];
         foreach($reward as $key=>$val){
 
-
+            if(empty($weeks[$val['week_id']])){
+                continue;
+            }
             //3已领取，2待领取，1补卡领取，0未开始
             if($val['speed_status'] == 2 && $val['is_get'] == 1){
                 $status = 3;
 
             }else if( $val['speed_status'] == 2 && $val['is_get'] == 0 ){
                 $status = 2;
-                $now_week = $val['week_num'];
+                // 当前周
+                $now_week = $weeks[$val['week_id']]['title'] ??'';
                 $is_show = 1;
             }else if( $val['speed_status'] == 1 && $val['is_get'] == 0 ){
                 $status = 1;
@@ -426,10 +394,11 @@ class CampController extends Controller
             }
 
             $new_reward[$key] = [
-                'week_num' => $val['week_num'],
+                'week_id' => $val['week_id'],
+                'week_title' =>  $weeks[$val['week_id']]['title']??'',
                 'status' => $status,
-                'prize_title' => $prize[$val['week_num']]['prize_title'] ??'',
-                'prize_pic' => $prize[$val['week_num']]['prize_pic'] ??'',
+                'prize_title' => $prize[$val['week_id']]['prize_title'] ??'',
+                'prize_pic' => $prize[$val['week_id']]['prize_pic'] ??'',
             ];
         }
 
@@ -453,6 +422,7 @@ class CampController extends Controller
         }
         $column_id = $request->input('id');
         $user_id = $this->user['id'] ?? 0;
+        // 全部重置为已领取
         ColumnWeekReward::where([
             'user_id'       => $user_id,
             'relation_id'   => $column_id,
@@ -466,13 +436,14 @@ class CampController extends Controller
 
 
 
-        /**
-     * @api {get} /api/v5/camp/camp_end_show 训练营结营弹窗
+    /**
+     * @api {get} /api/v5/camp/camp_end_show 训练营结营弹窗 (拆信和领取证书)
      * @apiName camp_end_show
      * @apiVersion 5.0.0
      * @apiGroup five_Camp
      *
      * @apiParam {int} id  训练营id
+     * @apiParam {int} end_type 1 拆信   2领证书
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -489,18 +460,47 @@ class CampController extends Controller
     public function campEndShow(Request $request)
     {
         $column_id = $request->input('id', 0);
+        $end_type = $request->input('end_type', 0);
 
         $user_id = $this->user['id'] ?? 0;
-        if (empty($column_id)) {
-            return $this->error(0, 'column_id 不能为空');
+        if (empty($column_id) || empty($end_type) ) {
+            return $this->error(0, 'column_id or end_type 不能为空');
         }
-        ColumnEndShow::firstOrCreate([
-            'user_id' =>$user_id,
-            'relation_id' =>$column_id,
-        ]);
+
+        // $end_show = ColumnEndShow::where([
+        //     'user_id' =>$user_id,
+        //     'relation_id' =>$column_id,
+        // ])->first();
+        $end_show = ColumnEndShow::EndShow($user_id,$column_id);
+
+        switch ($end_type){
+            case 1:
+                $edit_data = [
+                    'user_id'       =>$user_id,
+                    'relation_id'   =>$column_id,
+                    'is_letter'     =>1,
+                ];
+                break;
+            case 2:
+                $edit_data = [
+                    'user_id'       =>$user_id,
+                    'relation_id'   =>$column_id,
+                    'is_cer'=>1,
+                ];
+                break;
+            default :
+            return $this->success();
+        }
+        if($end_show['id'] ==0){
+            ColumnEndShow::Create($edit_data);
+        }else{
+            ColumnEndShow::where('id',$end_show['id'])->update($edit_data);
+        }
 
         return $this->success();
     }
+
+
 
 
     /**
