@@ -9,7 +9,7 @@ class ColumnEndShow extends Base
     protected $table = 'nlsg_column_end_show';
 
     // 允许批量赋值
-    protected  $fillable = ['relation_id','user_id','end_type'];
+    protected  $fillable = ['relation_id','user_id','is_letter','letter_at','is_cer','cer_at',];
 
 
     static function EndShow($uid,$col_id){
