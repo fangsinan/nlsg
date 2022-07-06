@@ -48,6 +48,7 @@ class BannerController extends ControllerBackend
         $type = $request->get('type');
         $start = $request->get('start');
         $end = $request->get('end');
+        $status = $request->get('status',0);
         $query = Banner::when($title, function ($query) use ($title) {
             $query->where('name', 'like', '%' . $title . '%');
         })
@@ -59,6 +60,9 @@ class BannerController extends ControllerBackend
                     Carbon::parse($start)->startOfDay()->toDateTimeString(),
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
+            })
+            ->when($status,function ($query) use ($status){
+                $query->where('status',$status);
             });
 
         $lists = $query->select('id', 'title', 'pic', 'rank', 'url', 'type', 'jump_type', 'obj_id', 'created_at', 'status')
