@@ -162,7 +162,7 @@ class CampController extends Controller
         $column['title'] = $user['honor'] ?? '';
         // 训练营奖励和证书 获取
         $Letter = ColumnEndShow::GetShowLetter($column_id);
-        $column['letter_img']   = $Letter['letter_img'];
+        $column['letter']   = $Letter['letter_img'];
         $column['cer_img']      = $Letter['cer_img'];
 
         // 结营后是否弹学习证书
@@ -364,43 +364,70 @@ class CampController extends Controller
             'user_id'       => $user_id,
             'relation_id'   => $column_data['id'],
         ])->orderBy('week_id')->get()->toArray();
+        $reward = array_column($reward,null,'week_id');
 
-        // 对应周
+        // 对应所有的周
         $weeks = ColumnWeekModel::select('id','prize_id','start_at','end_at')->where('relation_id',$camp_id)->get()->ToArray();
         $weeks = array_column($weeks,null,'id');
-
-
         $is_show = 0;
         $now_week = "";
         $new_reward = [];
-        foreach($reward as $key=>$val){
-
-            if(empty($weeks[$val['week_id']])){
-                continue;
-            }
-            //3已领取，2待领取，1补卡领取，0未开始
-            if($val['speed_status'] == 2 && $val['is_get'] == 1){
+        foreach($weeks as $key=>$week_val){
+            $prize_id = $week_val['prize_id'];
+            $status = 0;
+            if($reward[$key]["speed_status"] == 2 && $reward[$key]["is_get"] == 1){
                 $status = 3;
-
-            }else if( $val['speed_status'] == 2 && $val['is_get'] == 0 ){
+            }else if( $reward[$key]['speed_status'] == 2 && $reward[$key]['is_get'] == 0 ){
                 $status = 2;
                 // 当前周   
-                $now_week = $weeks[$val['week_id']]['title'] ??'';
+                $now_week = $prize[$prize_id]['period_num_name']??'';
                 $is_show = 1;
-            }else if( $val['speed_status'] == 1 && $val['is_get'] == 0 ){
+            }else if( $reward[$key]['speed_status'] == 1 && ['is_get'] == 0 ){
                 $status = 1;
-            }else if( $val['speed_status'] == 0 ){
+            }else if( $reward[$key]['speed_status'] == 0 ){
                 $status = 0;
             }
-            $prize_id = $weeks[$val['week_id']]['prize_id'];
             $new_reward[] = [
-                'week_id' => $val['week_id'],
-                'week_title' =>  $weeks[$val['week_id']]['title']??'',
+                'week_id' => $reward[$key]['week_id'],
+                'week_title' => $prize[$prize_id]['period_num_name']??'',
                 'status' => $status,
                 'prize_title' => $prize[$prize_id]['prize_title']??'',
                 'prize_pic' => $prize[$prize_id]['prize_pic']??'',
             ];
         }
+        
+
+        // $is_show = 0;
+        // $now_week = "";
+        // $new_reward = [];
+        // foreach($reward as $key=>$val){
+
+        //     if(empty($weeks[$val['week_id']])){
+        //         continue;
+        //     }
+        //     //3已领取，2待领取，1补卡领取，0未开始
+        //     if($val['speed_status'] == 2 && $val['is_get'] == 1){
+        //         $status = 3;
+
+        //     }else if( $val['speed_status'] == 2 && $val['is_get'] == 0 ){
+        //         $status = 2;
+        //         // 当前周   
+        //         $now_week = $weeks[$val['week_id']]['title'] ??'';
+        //         $is_show = 1;
+        //     }else if( $val['speed_status'] == 1 && $val['is_get'] == 0 ){
+        //         $status = 1;
+        //     }else if( $val['speed_status'] == 0 ){
+        //         $status = 0;
+        //     }
+        //     $prize_id = $weeks[$val['week_id']]['prize_id'];
+        //     $new_reward[] = [
+        //         'week_id' => $val['week_id'],
+        //         'week_title' =>  $weeks[$val['week_id']]['title']??'',
+        //         'status' => $status,
+        //         'prize_title' => $prize[$prize_id]['prize_title']??'',
+        //         'prize_pic' => $prize[$prize_id]['prize_pic']??'',
+        //     ];
+        // }
 
         $res = [
             'is_show'   => $is_show,

@@ -2,7 +2,7 @@
 
 
 namespace App\Models;
-
+use Illuminate\Support\Facades\DB;
 
 class ColumnEndShow extends Base
 {
@@ -44,9 +44,16 @@ class ColumnEndShow extends Base
      * @return string[] letter_img 信, cer_img 证书,
      * */
     static function GetShowLetter($col_id){
+
+        $img = DB::table("crm_camp_certificate")->select("img_url")->where([
+            'column_id' => $col_id,
+            'status' => 1
+        ])->first();
+
+        
         return [
-            "letter_img" => "/nlsg/other/20220519192426252543.png",
-            "cer_img" => "/nlsg/other/20220519192426252543.png",
+            "letter" => "/nlsg/other/20220519192426252543.png",
+            "cer_img" => $img->img_url,
         ];
     }
 

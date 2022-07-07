@@ -226,7 +226,7 @@ class Column extends Base
 
 
 
-    // 训练营学习  相关
+    // 训练营 历史记录 学习奖励发放  相关
     public function campStudy($camp_id,$user_id,$os_type){
  
         $column_data = Column::select('id','info_column_id','end_time','show_info_num')->find($camp_id);
@@ -265,13 +265,7 @@ class Column extends Base
         ])->groupBy('info_id')->pluck('info_id')->toArray();
         
         // 定义周数据
-        // $week_day = [
-        //     1=>['is_end'=>0,],
-        //     2=>['is_end'=>0,],
-        //     3=>['is_end'=>0,],
-        //     4=>['is_end'=>0,],
-        //     5=>['is_end'=>0,],
-        // ];
+
         // dd($info_ids);
         //匹配每周数据是否对应  info_ids 每六节课为一周 去除先导片
         // array_pop($work_info_ids);

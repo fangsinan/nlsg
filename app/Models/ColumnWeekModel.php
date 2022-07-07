@@ -8,4 +8,5 @@ class ColumnWeekModel extends Base
 
 
     protected  $fillable = ['relation_id','title','start_at','end_at','reward_id','is_del'];
+
 }
