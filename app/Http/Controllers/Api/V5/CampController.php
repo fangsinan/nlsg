@@ -360,12 +360,27 @@ class CampController extends Controller
         $res = [
             'is_show'   =>0,
             'now_week'  =>"",
+            'count_down'=>"",
             'week_day'  =>[],
         ];
         // 结营三天后  不显示弹窗
-        if( $column_data['is_start'] == 2 &&
-            strtotime("+3 day",strtotime($column_data['end_time'])) <= time() ){
-            return $this->success($res);
+        // if( $column_data['is_start'] == 2 &&
+        //     strtotime("+3 day",strtotime($column_data['end_time'])) <= time() ){
+        //     return $this->success($res);
+        // }
+        
+         if( $column_data['is_start'] == 2){
+            // 第四天的零点 截止
+            // $column_data['end_time'] = "2022-7-3 1:20";
+            $end_time = strtotime("+4 day",strtotime($column_data['end_time']));
+            if( $end_time <= time() ){
+                return $this->success($res);
+            }
+            // 显示倒计时几天 三天内显示
+            $day = floor(($end_time-time())/3600/24);
+            if($day > 0 && $day < 3){
+                $res['count_down'] = (string)$day;
+            }  
         }
 
         // 用户学习进度 获取奖励
