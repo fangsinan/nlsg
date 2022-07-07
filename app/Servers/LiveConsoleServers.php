@@ -552,4 +552,68 @@ class LiveConsoleServers
         file_put_contents($dir . "/$name.log",$content,FILE_APPEND|LOCK_EX);
     }
 
+    //直播在线听课记录写入
+    public  static function LiveOnline()
+    {
+
+        try {
+            $while_flag = true;
+            while ($while_flag) {
+                $his_table = 'nlsg_live_online_user20211110';
+                $onlineList = DB::table($his_table)->select("id", "live_id", "user_id", "live_son_flag", 'online_time', 'online_time_str')
+                    ->orderBy('id', 'asc')->limit(10000)->get()->toArray();
+
+//            echo '<pre>';
+//            var_dump($onlineList);
+                if (empty($onlineList)) {
+                    $while_flag = false;
+                    LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
+                    break;
+                }
+                if (!empty($onlineList)) {
+                    $data = [];
+                    $IdArr = [];
+                    foreach ($onlineList as $k => $val) {
+                        $data[] = [
+                            "live_id" => $val->live_id,
+                            "user_id" => $val->user_id,
+                            "live_son_flag" => $val->live_son_flag,
+                            "online_time" => $val->online_time,
+                            "online_time_str" => $val->online_time_str
+                        ];
+                        $IdArr[] = $val->id;
+                    }
+
+                    $inser_rst = 0;
+                    DB::beginTransaction();
+                    //插入数据
+                    $rst = DB::table('nlsg_live_online_user20220131')->insert($data);
+                    if ($rst === false) {
+                        DB::rollBack();
+                        $inser_rst = 1;
+                    }
+                    //删除数据
+                    $id_res = DB::table($his_table)->whereIn('id', $IdArr)->delete();
+                    if (!$id_res) {
+                        DB::rollBack();
+                        $inser_rst = 1;
+                    }
+                    if ($inser_rst == 1) {
+                        LiveConsoleServers::LogIo('liveonlineanalysis', 'online_error', '写入失败' . $rst);
+                        break;
+                    }
+                    DB::commit();
+                    LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '执行成功');
+
+                } else {
+                    LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
+                }
+
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            LiveConsoleServers::LogIo('liveonlineanalysis', 'online_error', '写入异常' . $e->getMessage());
+        }
+    }
+
 }
