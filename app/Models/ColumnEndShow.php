@@ -57,7 +57,7 @@ class ColumnEndShow extends Base
                 "第二段",
                 "第三段",
             ],
-            "cer_img" => $img->img_url,
+            "cer_img" => $img->img_url??'',
         ];
     }
 
