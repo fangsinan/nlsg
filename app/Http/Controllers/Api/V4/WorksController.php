@@ -592,7 +592,7 @@ class WorksController extends Controller
         }
         //52:01
         $works_data['total_time'] = TimeToMinSec($book_work_totle_time);
-        
+
         if ($flag === 'catalog'){
             $res = [
                 'works_info'          => $info,
@@ -654,7 +654,7 @@ class WorksController extends Controller
         $history_data = History::getHistoryData($works_data['id'],$relation_type,$user_id);
         //免费试听的章节
         $free_trial = WorksInfo::select(['id'])->where(['pid'=>$works_id, 'status' => 4,'free_trial'=>1])->first();
-        
+
         //大咖讲书
         $is_teacherBook = WorksInfo::IsTeacherBook($works_id);
         $works_data['teacher_book_msg'] = '开通大咖讲书VIP';
@@ -669,7 +669,7 @@ class WorksController extends Controller
                ->where('lw.works_id','=',$works_id)
                ->where('l.status','=',1)
                ->where('l.type','=',10)->first();
-            
+
             // $listsWork = ListsWork::select('id','lists_id')->where(['type'=>1,'works_id'=>$works_id,'lists_id'=>40])->first();
             // $listsdata = Lists::select('id','title','price','cover')->where(['id'=>$listsWork['lists_id'],'type' => 10,'status'=> 1])->first();
             $works_data['teacher_book_price'] = $listsdata->price??'0';
@@ -729,7 +729,7 @@ class WorksController extends Controller
         $IsTeacherBook = WorksInfo::IsTeacherBook($works_id);
         $works = Works::select("user_id","detail_img")->find($works_id);
         if($IsTeacherBook == 1){
-            
+
             // 因为大咖讲书无横图  临时处理 获取老师课程详情的横图
             $img = Works::select("user_id","detail_img")->where([
                 "user_id" => $works->user_id,
@@ -811,7 +811,7 @@ class WorksController extends Controller
                     ->where('relation_type','=',$relation_type)
                     ->where('user_id','=',$user_id)
                     ->first();
-        
+
         $check_his = History::where('relation_id','=',$relation_id)
             ->where('relation_type','=',$relation_type)
             ->where('user_id','=',$user_id)
@@ -863,12 +863,12 @@ class WorksController extends Controller
      */
     public function editHistoryTime(Request $request){
 
-        DB::table('nlsg_log_info')->insert([
-            'url'     => 'infoLog:'.$request->fullUrl(),
-            'parameter'    =>  json_encode($request->all()),
-            'user_id'    =>  $this->user['id'] ?? 0,
-            'created_at' =>date('Y-m-d H:i:s', time())
-        ]);
+//        DB::table('nlsg_log_info')->insert([
+//            'url'     => 'infoLog:'.$request->fullUrl(),
+//            'parameter'    =>  json_encode($request->all()),
+//            'user_id'    =>  $this->user['id'] ?? 0,
+//            'created_at' =>date('Y-m-d H:i:s', time())
+//        ]);
 
 
         $user_id    = $this->user['id'] ?? 0;

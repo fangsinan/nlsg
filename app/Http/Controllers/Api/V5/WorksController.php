@@ -294,12 +294,12 @@ class WorksController extends Controller
      */
     public function editHistoryTime(Request $request){
 
-        DB::table('nlsg_log_info')->insert([
-            'url'     => 'infoLog:'.$request->fullUrl(),
-            'parameter'    =>  json_encode($request->all()),
-            'user_id'    =>  $this->user['id'] ?? 0,
-            'created_at' =>date('Y-m-d H:i:s', time())
-        ]);
+//        DB::table('nlsg_log_info')->insert([
+//            'url'     => 'infoLog:'.$request->fullUrl(),
+//            'parameter'    =>  json_encode($request->all()),
+//            'user_id'    =>  $this->user['id'] ?? 0,
+//            'created_at' =>date('Y-m-d H:i:s', time())
+//        ]);
 
 
         $user_id    = $this->user['id'] ?? 0;
@@ -309,7 +309,7 @@ class WorksController extends Controller
         $time_number= $request->input('time_number',0);
         $works_info_id = $request->input('works_info_id',0);
         $os_type = $request->input('os_type',0);
-        
+
         $validator = Validator::make($request->all(), [
             'relation_id' => 'required|numeric',
             'relation_type' => 'required|numeric',
@@ -392,8 +392,8 @@ class WorksController extends Controller
                 // is_end 之后需要统计是否奖励
                 ColumnWeekReward::CampStudy($relation_id,$user_id,$os_type,$works_info_id);
             }
-            
-            
+
+
         }
 
         //更新学习进度
@@ -413,7 +413,7 @@ class WorksController extends Controller
             }
             return $this->success($data);
         }
-        
+
         DB::table('nlsg_log_info')->insert([
             'url'           =>  'playinfoLog:'.$request->fullUrl(),
             'parameter'     =>  json_encode($request->all()),
@@ -502,17 +502,17 @@ class WorksController extends Controller
             return $this->error(0,'课程不存在或已下架');
         }
         $works_data = $works_data->toArray();
-        
+
         //查询章节
         $infoObj = new WorksInfo();
         $info = $infoObj->getInfo($works_data['id'],$is_sub,$user_id,1,$order,$this->page_per_page,$page,$size,$works_data,$os_type,$version);
-        if ($flag === 'catalog'){           
+        if ($flag === 'catalog'){
             $res = [
                 'works_info'          => $info,
             ];
             return $this->success($res);
         }
- 
+
         // 身份价格   转换成string保证json_encode 精确度
         $works_data['twitter_price'] = (string)GetPriceTools::Income(1,2,0,2,$works_data['user_id'],$works_id);
         $works_data['black_price']   = (string)GetPriceTools::Income(1,3,0,2,$works_data['user_id'],$works_id);
