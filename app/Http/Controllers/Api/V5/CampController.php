@@ -140,7 +140,7 @@ class CampController extends Controller
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
             'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'
-        ,'comment_num','info_column_id','classify_column_id','can_h5'];
+        ,'comment_num','info_column_id','classify_column_id','can_h5','end_time'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
             return $this->error(0, '内容不存在不能为空');
@@ -170,6 +170,14 @@ class CampController extends Controller
         $column['end_show_letter']  = $end_start['is_letter']; //是否拆开信件 结营当天必弹  弹完点击就算拆开信件
         $column['end_show']         = $end_start['is_cer']; //是否领取奖励  需要结营后 手动点击
        
+        $real_user = DB::table("crm_camp_user")->select("real_name")->where(['user_id' => $user_id])->first();
+        if(empty($real_user)){
+            $real_name = $this->user['nickename'] ?? "";
+        }else{
+            $real_name = $real_user->real_name ?? "";
+        }
+        $column['camp_user_name'] = $real_name;
+
         // 统一全局type
         $types = FuncType(140);
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $types['sub_type']);
