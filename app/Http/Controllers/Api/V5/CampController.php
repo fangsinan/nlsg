@@ -453,11 +453,9 @@ class CampController extends Controller
         //     ];
         // }
 
-        $res = [
-            'is_show'   => $is_show,
-            'now_week'  => $now_week,
-            'week_day'  =>$new_reward,
-        ];
+        $res['is_show'] = $is_show;
+        $res['now_week']= $now_week;
+        $res['week_day']= $new_reward;
         return $this->success($res);
     }
 
