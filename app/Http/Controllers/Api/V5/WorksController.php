@@ -7,6 +7,7 @@ use App\Models\CacheTools;
 use App\Models\ChannelWorksList;
 use App\Models\Collection;
 use App\Models\Column;
+use App\Models\ColumnWeekReward;
 use App\Models\GetPriceTools;
 use App\Models\History;
 use App\Models\Lists;
@@ -389,8 +390,7 @@ class WorksController extends Controller
             }
             if($relation_type == 5){
                 // is_end 之后需要统计是否奖励
-                $column = new Column();
-                $column->campStudy($relation_id,$user_id,$os_type);
+                ColumnWeekReward::CampStudy($relation_id,$user_id,$os_type,$works_info_id);
             }
             
             

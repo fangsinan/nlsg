@@ -16,7 +16,7 @@ class CampPrize extends Base
      * @return string[] prize_title,cover_image
      * */
     static function getPrize($col_id){
-        $prize = CampPrize::select('id','type','relation_id','info_ids','title','cover_pic')->where(['column_id'=>$col_id,'status'=>1,'source_type'=>1])->get()->toArray();
+        $prize = CampPrize::select('id','type','relation_id','info_ids','title','cover_pic','period_num_name')->where(['column_id'=>$col_id,'status'=>1,'source_type'=>1])->get()->toArray();
         // $prize = array_column($prize,null,"id");
 
         foreach($prize as &$prize_val){
