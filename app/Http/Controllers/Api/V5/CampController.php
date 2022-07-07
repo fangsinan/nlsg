@@ -162,7 +162,7 @@ class CampController extends Controller
         $column['title'] = $user['honor'] ?? '';
         // 训练营奖励和证书 获取
         $Letter = ColumnEndShow::GetShowLetter($column_id);
-        $column['letter']   = $Letter['letter_img'];
+        $column['letter']   = $Letter['letter'];
         $column['cer_img']      = $Letter['cer_img'];
 
         // 结营后是否弹学习证书

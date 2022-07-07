@@ -52,7 +52,11 @@ class ColumnEndShow extends Base
 
         
         return [
-            "letter" => "/nlsg/other/20220519192426252543.png",
+            "letter" => [
+                "第一段",
+                "第二段",
+                "第三段",
+            ],
             "cer_img" => $img->img_url,
         ];
     }
