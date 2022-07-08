@@ -359,16 +359,3 @@ class Column extends Base
 
 
 }
-else if($type == 2){
-    // 课程是永久的  give=30 是训练营领取奖励赠送的一年
-    $query = Subscribe::select('*');
-    $where = ['type' => $type, 'user_id' => $user_id,'status'=>1,];
-    if($give > 0){
-        $where['give'] = $give;
-        $query->where('end_time', '>=', date('Y-m-d H:i:s'));
-    }
-    $data = $query->where($where)->orderBy('created_at', 'desc')->paginate(50)->toArray();
-}
-        $give = $request->input('give', 0);  //是否训练营赠送
-
-        * @apiParam {int} give  当 is_send == 30 时  为训练营赠送课程

@@ -825,7 +825,7 @@ class OrderController extends Controller
      * @apiParam {int} user_id 用户id
      * @apiParam {int} type  1 专栏  2作品 3直播  4会员 5线下产品  6讲座 7训练营  8专题
      * @apiParam {int} is_audio_book  当type == 2(作品)时  0课程  1 听书  2全部
-     *
+     * @apiParam {int} give  当 is_send == 30 时  为训练营赠送课程
      *
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
@@ -840,12 +840,25 @@ class OrderController extends Controller
         $user_id = $this->user['id'] ?? 0;
         $type = $request->input('type', 1);
         $is_audio_book = $request->input('is_audio_book', 2);
+
+        $give = $request->input('give', 0);  //是否训练营赠送
+
+        
         // 训练营会加入线下课类型
         if($type == 7){
             $data = Subscribe::select('*')//->where('end_time', '>=', date('Y-m-d H:i:s'))
             ->where(['user_id' => $user_id,'status'=>1,])
             ->whereIn("type",[5,7])
             ->orderBy('created_at', 'desc')->paginate(50)->toArray();
+        }else if($type == 2){
+            // 课程是永久的  give=30 是训练营领取奖励赠送的一年
+            $query = Subscribe::select('*');
+            $where = ['type' => $type, 'user_id' => $user_id,'status'=>1,];
+            if($give > 0){
+                $where['give'] = $give;
+                $query->where('end_time', '>=', date('Y-m-d H:i:s'));
+            }
+            $data = $query->where($where)->orderBy('created_at', 'desc')->paginate(50)->toArray();
         }else{
             $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
             ->where(['type' => $type, 'user_id' => $user_id,'status'=>1,])
