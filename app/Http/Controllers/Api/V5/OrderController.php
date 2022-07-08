@@ -9,6 +9,7 @@ use App\Models\Lists;
 use App\Models\MallAddress;
 use App\Models\MallOrder;
 use App\Models\Order;
+use App\Models\OrderErpList;
 use Illuminate\Http\Request;
 
 
@@ -58,6 +59,11 @@ class OrderController extends Controller
             $res = Order::where(['id' => $order_id,'user_id'=>$user_id ])->update([
                 'address_id'=>$address_id,
             ]);
+
+            //同时添加推送队列
+            OrderErpList::query()
+                ->firstOrCreate(['order_id' => $order_id,'flag'=>1]);
+
             if(!empty($res)){
                 return $this->success((object)[]);
             }

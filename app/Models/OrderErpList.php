@@ -6,6 +6,10 @@ class OrderErpList extends Base
 {
     protected $table = 'nlsg_order_erp_list';
 
+    protected $fillable = [
+        'order_id', 'flag', 'created_at', 'updated_at'
+    ];
+
     public function orderInfo() {
         return $this->hasOne(Order::class, 'id', 'order_id');
     }
