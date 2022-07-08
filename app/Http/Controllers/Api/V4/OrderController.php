@@ -845,25 +845,36 @@ class OrderController extends Controller
 
         
         // 训练营会加入线下课类型
-        if($type == 7){
-            $data = Subscribe::select('*')//->where('end_time', '>=', date('Y-m-d H:i:s'))
-            ->where(['user_id' => $user_id,'status'=>1,])
-            ->whereIn("type",[5,7])
-            ->orderBy('created_at', 'desc')->paginate(50)->toArray();
-        }else if($type == 2){
-            // 课程是永久的  give=30 是训练营领取奖励赠送的一年
-            $query = Subscribe::select('*');
-            $where = ['type' => $type, 'user_id' => $user_id,'status'=>1,];
-            if($give > 0){
-                $where['give'] = $give;
-                $query->where('end_time', '>=', date('Y-m-d H:i:s'));
-            }
-            $data = $query->where($where)->orderBy('created_at', 'desc')->paginate(50)->toArray();
+        if($give > 0){
+           //  give=30 是训练营领取奖励赠送的一年
+           $query = Subscribe::select('*');
+           $where = ['give' => $give, 'user_id' => $user_id,'status'=>1,];
+            $query->where('end_time', '>=', date('Y-m-d H:i:s'));
+           $data = $query->where($where)->orderBy('created_at', 'desc')->paginate(50)->toArray();
         }else{
-            $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
-            ->where(['type' => $type, 'user_id' => $user_id,'status'=>1,])
-            ->orderBy('created_at', 'desc')->paginate(50)->toArray();
+            if($type == 7){
+                $data = Subscribe::select('*')//->where('end_time', '>=', date('Y-m-d H:i:s'))
+                ->where(['user_id' => $user_id,'status'=>1,])
+                ->whereIn("type",[5,7])
+                ->orderBy('created_at', 'desc')->paginate(50)->toArray();
+            }else if($type == 2){
+                // 课程是永久的  give=30 是训练营领取奖励赠送的一年
+                $query = Subscribe::select('*');
+                $where = ['type' => $type, 'user_id' => $user_id,'status'=>1,];
+                // if($give > 0){
+                //     $where['give'] = $give;
+                //     $query->where('end_time', '>=', date('Y-m-d H:i:s'));
+                // }
+                $data = $query->where($where)->orderBy('created_at', 'desc')->paginate(50)->toArray();
+            }else{
+                $data = Subscribe::select('*')->where('end_time', '>=', date('Y-m-d H:i:s'))
+                ->where(['type' => $type, 'user_id' => $user_id,'status'=>1,])
+                ->orderBy('created_at', 'desc')->paginate(50)->toArray();
+            }
         }
+        
+
+       
         
 
         $data = $data['data'];
