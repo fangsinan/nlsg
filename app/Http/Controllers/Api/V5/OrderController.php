@@ -61,8 +61,8 @@ class OrderController extends Controller
             ]);
 
             //同时添加推送队列
-            OrderErpList::query()
-                ->firstOrCreate(['order_id' => $order_id,'flag'=>1]);
+//            OrderErpList::query()
+//                ->firstOrCreate(['order_id' => $order_id,'flag'=>1]);
 
             if(!empty($res)){
                 return $this->success((object)[]);
