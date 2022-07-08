@@ -167,9 +167,9 @@ class CampController extends Controller
 
         // 结营后是否弹学习证书
         $end_start = ColumnEndShow::EndShow($user_id,$column_id);
-        $column['end_show_letter']  = $end_start['is_letter']; //是否拆开信件 结营当天必弹  弹完点击就算拆开信件
-        $column['end_show']         = $end_start['is_cer']; //是否领取奖励  需要结营后 手动点击
-        $column['cer_is_show']      = 0; // 是否有资格显示
+        // $column['end_show_letter']  = $end_start['is_letter']; //是否拆开信件 结营当天必弹  弹完点击就算拆开信件
+        $column['end_show']         = $end_start['is_cer']; // 是否领取奖励  需要结营后 手动点击
+        $column['cer_is_show']      = 0; // 是否有资格显示   1、结营后  2、学完
        
         $real_user = DB::table("crm_camp_user")->select("real_name")->where(['user_id' => $user_id])->first();
         if(empty($real_user)){
@@ -336,7 +336,7 @@ class CampController extends Controller
         }
         $camp_id = $request->input('id', 0);  //训练营id
         // $camp_info_id = $request->input('info_id', 0);
-        $user_id = $this->user['id'] ?? 0;
+        $user_id = 211172;//$this->user['id'] ?? 0;
         // is_show      结营后三天不显示奖励弹窗
         // now_week     获得第几周的奖励 当前学习的章节是第N周 就显示获得第N周的奖励
         // 周奖励状态     status  3已领取，2待领取，1补卡领取，0未开始
@@ -346,7 +346,7 @@ class CampController extends Controller
         if (empty($column_data)) {
             return $this->error(1000, '参数有误：无此信息',(object)[]);
         }
-
+        
         // 训练营 每周开放六节课程
         // 查询训练营目前开放的全部课程 ，每六个章节为一周，查询历史记录表是否完结
         $is_sub = Subscribe::isSubscribe($user_id, $camp_id, 7);
@@ -354,7 +354,7 @@ class CampController extends Controller
             return $this->error(1000,'您当前尚未加入该训练营',(object)[]);
         }
         // crm_camp_prize  奖品
-        $prize = CampPrize::getPrize($column_data['classify_column_id']);
+        $prize = CampPrize::getPrizeByclassifyId($column_data['classify_column_id']);
         $prize = array_column($prize,null,"id");
 
         $res = [
@@ -421,38 +421,6 @@ class CampController extends Controller
         }
         
 
-        // $is_show = 0;
-        // $now_week = "";
-        // $new_reward = [];
-        // foreach($reward as $key=>$val){
-
-        //     if(empty($weeks[$val['week_id']])){
-        //         continue;
-        //     }
-        //     //3已领取，2待领取，1补卡领取，0未开始
-        //     if($val['speed_status'] == 2 && $val['is_get'] == 1){
-        //         $status = 3;
-
-        //     }else if( $val['speed_status'] == 2 && $val['is_get'] == 0 ){
-        //         $status = 2;
-        //         // 当前周   
-        //         $now_week = $weeks[$val['week_id']]['title'] ??'';
-        //         $is_show = 1;
-        //     }else if( $val['speed_status'] == 1 && $val['is_get'] == 0 ){
-        //         $status = 1;
-        //     }else if( $val['speed_status'] == 0 ){
-        //         $status = 0;
-        //     }
-        //     $prize_id = $weeks[$val['week_id']]['prize_id'];
-        //     $new_reward[] = [
-        //         'week_id' => $val['week_id'],
-        //         'week_title' =>  $weeks[$val['week_id']]['title']??'',
-        //         'status' => $status,
-        //         'prize_title' => $prize[$prize_id]['prize_title']??'',
-        //         'prize_pic' => $prize[$prize_id]['prize_pic']??'',
-        //     ];
-        // }
-
         $res['is_show'] = $is_show;
         $res['now_week']= $now_week;
         $res['week_day']= $new_reward;
@@ -470,7 +438,53 @@ class CampController extends Controller
             return $this->error(0,$validator->getMessageBag()->first());
         }
         $column_id = $request->input('id');
-        $user_id = $this->user['id'] ?? 0;
+        $user_id = 211172;//$this->user['id'] ?? 0;
+        // 发放奖励到课程
+
+        // 查看当前所需要领取的奖励  ( 已经学完 未领取的数据 )
+        $week_ids = ColumnWeekReward::where([
+            'user_id'       => $user_id,
+            'relation_id'   => $column_id,
+            'speed_status'   => 2,
+            'is_get'   => 0,
+        ])->pluck("week_id")->toArray();
+        $camp = CampPrize::getPrizeByWeekId($week_ids);
+        if(!empty($camp) ){
+            // 添加至sub表
+            $time = time();
+            $starttime = strtotime(date('Y-m-d', $time));
+            $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
+            foreach($camp as $sub_val){
+                if($sub_val['sub_type'] > 0){
+                    // 校验是否存在
+                    $sub = Subscribe::where([
+                        'relation_id'   => $sub_val['relation_id'],
+                        'type'      => $sub_val['sub_type'], 
+                        'user_id'   => $user_id,
+                        'status'    => 1,
+                    ])->first();
+                    if(empty($sub)){
+                         $subscribes[] = [
+                            'relation_id'   => $sub_val['relation_id'],
+                            'type'      => $sub_val['sub_type'], 
+                            'user_id'   => $user_id,
+                            'pay_time'  => date("Y-m-d H:i:s", $time),
+                            'start_time'=> date("Y-m-d H:i:s", $starttime),
+                            'end_time'  => date("Y-m-d H:i:s", $endtime),
+                            'give'      => 30, 
+                            'status'    => 1,
+                        ];
+                    }
+                   
+                }
+            }
+            if(!empty($subscribes)){
+                Subscribe::insert($subscribes);
+            }
+            
+        }
+
+
         // 全部重置为已领取
         ColumnWeekReward::where([
             'user_id'       => $user_id,
