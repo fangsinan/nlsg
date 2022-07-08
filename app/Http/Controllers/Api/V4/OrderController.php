@@ -940,8 +940,8 @@ class OrderController extends Controller
 
                 if ($val['type'] == 2) {
                     //专栏头衔
-                    $column = Column::find($result[0]['column_id']);
-                    $result[0]['column_title'] = $column['title'];
+                    $column = Column::find($result[0]['column_id']??0);
+                    $result[0]['column_title'] = $column['title']??'';
 //                    //学至最新章节
 //                    $history_data = History::getHistoryData($result[0]['id'], 2, $user_id);
 //                    $result[0]['info_introduce'] = '';
