@@ -115,6 +115,32 @@ class MallAddress extends Base
 
         if ($res) {
             DB::commit();
+
+            //查询是否有erp推送订单没有更正地址
+            $order_id_list = Order::query()
+                ->where('user_id', '=', $user_id)
+                ->where('type', '=', 14)
+                ->whereIn('relation_id', [6, 7, 8, 10, 12])
+                ->where('status', '=', 1)
+                ->where('textbook_id', '<>', 0)
+                ->where('address_id', '=', 0)
+                ->pluck('id')
+                ->toArray();
+
+            if (!empty($order_id_list)) {
+                $erp_order_list = [];
+                foreach ($order_id_list as $order_id) {
+                    $erp_order_list[] = [
+                        'order_id' => $order_id,
+                        'flag'     => 1,
+                    ];
+                }
+                OrderErpList::query()->insert($erp_order_list);
+                Order::query()
+                    ->whereIn('id', $order_id_list)
+                    ->update(['address_id' => $address->id]);
+            }
+
             return ['code' => true, 'msg' => '成功', 'address_id' => $address->id];
         } else {
             DB::rollBack();
