@@ -556,64 +556,78 @@ class LiveConsoleServers
     public  static function LiveOnline()
     {
 
-        try {
-            $while_flag = true;
-            while ($while_flag) {
-                $his_table = 'nlsg_live_online_user20211110';
-                $onlineList = DB::table($his_table)->select("id", "live_id", "user_id", "live_son_flag", 'online_time', 'online_time_str')
-                    ->orderBy('id', 'asc')->limit(10000)->get()->toArray();
-
+        $while_flag = true;
+        while ($while_flag) {
+            $his_table = 'nlsg_live_online_user20220207';
+            $onlineList = DB::table($his_table)->select("id", "live_id", "user_id", "live_son_flag", 'online_time', 'online_time_str')
+                ->orderBy('id', 'asc')->limit(10000)->get()->toArray();
 //            echo '<pre>';
 //            var_dump($onlineList);
-                if (empty($onlineList)) {
-                    $while_flag = false;
-                    LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
-                    break;
-                }
-                if (!empty($onlineList)) {
-                    $data = [];
-                    $IdArr = [];
-                    foreach ($onlineList as $k => $val) {
-                        $data[] = [
-                            "live_id" => $val->live_id,
-                            "user_id" => $val->user_id,
-                            "live_son_flag" => $val->live_son_flag,
-                            "online_time" => $val->online_time,
-                            "online_time_str" => $val->online_time_str
-                        ];
-                        $IdArr[] = $val->id;
-                    }
+            if (empty($onlineList)) {
+                $while_flag = false;
+                LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
+                break;
+            }
 
-                    $inser_rst = 0;
-                    DB::beginTransaction();
+            if (!empty($onlineList)) {
+                $data = [];
+                $IdArr = [];
+                foreach ($onlineList as $k => $val) {
+                    $map[] = [
+                        "live_id" => $val->live_id,
+                        "user_id" => $val->user_id,
+                        "live_son_flag" => $val->live_son_flag,
+                        "online_time" => $val->online_time,
+                        "online_time_str" => $val->online_time_str
+                    ];
+                    $IdArr[] = $val->id;
+                    if(($k+1)%10000==0){
+                        $data[]=$map;
+                        $map=[]; //初始化
+                    }
+                }
+                if(!empty($map)){ //取余剩下的数据
+                    $data[]=$map;
+                }
+                $inser_rst = 0;
+                DB::beginTransaction();
+                try {
                     //插入数据
-                    $rst = DB::table('nlsg_live_online_user20220131')->insert($data);
-                    if ($rst === false) {
-                        DB::rollBack();
-                        $inser_rst = 1;
+                    foreach ($data as $k => $v) {
+                        $rst = DB::table('nlsg_live_online_user20220131')->insert($v);
+                        if ($rst === false) {
+                            $inser_rst = 1;
+                            DB::rollBack();
+                            break;
+                        }
                     }
                     //删除数据
-                    $id_res = DB::table($his_table)->whereIn('id', $IdArr)->delete();
-                    if (!$id_res) {
-                        DB::rollBack();
-                        $inser_rst = 1;
+                    if($inser_rst !=1) {
+                        $id_res = DB::table($his_table)->whereIn('id', $IdArr)->delete();
+                        if (!$id_res) {
+                            $inser_rst = 1;
+                            DB::rollBack();
+                        }
                     }
                     if ($inser_rst == 1) {
                         LiveConsoleServers::LogIo('liveonlineanalysis', 'online_error', '写入失败' . $rst);
-                        break;
+                        $while_flag = false;
+                    }else {
+                        DB::commit();
+                        LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '执行成功');
                     }
-                    DB::commit();
-                    LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '执行成功');
-
-                } else {
-                    LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    $while_flag = false;
+                    LiveConsoleServers::LogIo('liveonlineanalysis', 'online_error', '写入异常' . $e->getMessage());
                 }
 
+            } else {
+                LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
             }
-        } catch (\Exception $e) {
-            DB::rollBack();
-            LiveConsoleServers::LogIo('liveonlineanalysis', 'online_error', '写入异常' . $e->getMessage());
+
         }
+
     }
 
 }
