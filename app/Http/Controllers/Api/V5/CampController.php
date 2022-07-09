@@ -336,7 +336,7 @@ class CampController extends Controller
         }
         $camp_id = $request->input('id', 0);  //训练营id
         // $camp_info_id = $request->input('info_id', 0);
-        $user_id = 211172;//$this->user['id'] ?? 0;
+        $user_id = $this->user['id'] ?? 0;
         // is_show      结营后三天不显示奖励弹窗
         // now_week     获得第几周的奖励 当前学习的章节是第N周 就显示获得第N周的奖励
         // 周奖励状态     status  3已领取，2待领取，1补卡领取，0未开始
