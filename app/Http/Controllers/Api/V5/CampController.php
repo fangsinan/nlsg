@@ -369,20 +369,6 @@ class CampController extends Controller
         //     return $this->success($res);
         // }
         
-         if( $column_data['is_start'] == 2){
-            // 第四天的零点 截止
-            // $column_data['end_time'] = "2022-7-3 1:20";
-            $end_time = strtotime("+4 day",strtotime($column_data['end_time']));
-            if( $end_time <= time() ){
-                return $this->success($res);
-            }
-            // 显示倒计时几天 三天内显示
-            $day = floor(($end_time-time())/3600/24);
-            if($day > 0 && $day < 3){
-                $res['count_down'] = (string)$day;
-            }  
-        }
-
         // 用户学习进度 获取奖励
         $reward = ColumnWeekReward::select('is_get','speed_status','end_time','week_id')->where([
             'user_id'       => $user_id,
@@ -405,6 +391,7 @@ class CampController extends Controller
                 $status = 2;
                 // 当前周   
                 $now_week = $prize[$prize_id]['period_num_name']??'';
+                $now_week="恭喜您！获得".$now_week."学习奖励";
                 $is_show = 1;
             }else if( $reward[$key]['speed_status'] == 1 && ['is_get'] == 0 ){
                 $status = 1;
@@ -419,7 +406,24 @@ class CampController extends Controller
                 'prize_pic' => $prize[$prize_id]['prize_pic']??'',
             ];
         }
-        
+
+        // 结营后
+        if( $column_data['is_start'] == 2){
+            // 第四天的零点 截止
+            // $column_data['end_time'] = "2022-7-3 1:20";
+            $end_time = strtotime("+4 day",strtotime($column_data['end_time']));
+            if( $end_time <= time() ){
+                return $this->success($res);
+            }
+            // 显示倒计时几天 三天内显示
+            $day = intval(($end_time-time())/3600/24);
+            if($day > 0 && $day <= 3){
+                $now_week = "补卡倒计时".$day."天";
+                $res['count_down'] = (string)$day;
+            } else{
+                $res['is_show'] = 0;  // 结营三天后不显示此奖励弹窗
+            }
+        }
 
         $res['is_show'] = $is_show;
         $res['now_week']= $now_week;
