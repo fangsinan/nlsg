@@ -1177,8 +1177,17 @@ class IndexController extends Controller
             ->where('platform_type', $platform_type)
             ->orderBy('created_at', 'desc')
             ->first();
+        if(empty($list)){
+            $list = Versions::select('id', 'number', 'content', 'url', 'is_force', 'str_at','down_type')
+                ->where(['status'=> 1,'os_type'=> $os_type,'platform_type'=> 0,])
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
+        if(empty($list)){
+            return success(['is_force' => 0]);
+        }
 
-        if ($list && version_compare($version, $list->number, '>=')) {
+        if (!empty($list) && version_compare($version, $list->number, '>=')) {
             //当实际版本大于储存版本号时   默认不更新
             return success(['is_force' => 0]);
         }
