@@ -196,7 +196,7 @@ class CampController extends Controller
         if ($info_num > 0) {
             $column['history_count'] = round($hisCount / $info_num * 100);
         }
-
+        
         //历史记录
         $column['historyData'] = History::getHistoryData($column_id, $types['his_type'], $user_id);
         // 是否收藏
@@ -212,6 +212,9 @@ class CampController extends Controller
         // 获取第一章节 info_id
         $column['first_info_id'] = Column::getFirstInfo($column['info_column_id'] ?? $column['id']);
         
+        // 时间 
+        $column['start_time_str'] = strtotime($column["online_time"]);
+        $column['end_time_str'] = strtotime($column["end_time"]);
         return $this->success([
             'list' => $column
         ]);
