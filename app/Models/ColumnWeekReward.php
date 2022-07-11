@@ -50,6 +50,7 @@ class ColumnWeekReward extends Base
             'relation_id'   => $camp_id,
             'user_id'       => $user_id,
             'os_type'       => $os_type,
+            'week_id'       => $weeks['id'],
          ];
         $data['speed_status'] = 1; //未学完
         // 数量相等 说明学完了本周课程
