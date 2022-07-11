@@ -388,21 +388,24 @@ class CampController extends Controller
         foreach($weeks as $key=>$week_val){
             $prize_id = $week_val['prize_id'];
             $status = 0;
-            if($reward[$key]["speed_status"] == 2 && $reward[$key]["is_get"] == 1){
-                $status = 3;
-            }else if( $reward[$key]['speed_status'] == 2 && $reward[$key]['is_get'] == 0 ){
-                $status = 2;
-                // 当前周   
-                $now_week = $prize[$prize_id]['period_num_name']??'';
-                $now_week="恭喜您！获得".$now_week."学习奖励";
-                $is_show = 1;
-            }else if( $reward[$key]['speed_status'] == 1 && ['is_get'] == 0 ){
-                $status = 1;
-            }else if( $reward[$key]['speed_status'] == 0 ){
-                $status = 0;
+            if(!empty($reward[$key])){
+                if($reward[$key]["speed_status"] == 2 && $reward[$key]["is_get"] == 1){
+                    $status = 3;
+                }else if( $reward[$key]['speed_status'] == 2 && $reward[$key]['is_get'] == 0 ){
+                    $status = 2;
+                    // 当前周   
+                    $now_week = $prize[$prize_id]['period_num_name']??'';
+                    $now_week="恭喜您！获得".$now_week."学习奖励";
+                    $is_show = 1;
+                }else if( $reward[$key]['speed_status'] == 1 && ['is_get'] == 0 ){
+                    $status = 1;
+                }else if( $reward[$key]['speed_status'] == 0 ){
+                    $status = 0;
+                }
             }
+            
             $new_reward[] = [
-                'week_id' => $reward[$key]['week_id'],
+                // 'week_id' => $reward[$key]['week_id'],
                 'week_title' => $prize[$prize_id]['period_num_name']??'',
                 'status' => $status,
                 'prize_title' => $prize[$prize_id]['prize_title']??'',
@@ -445,7 +448,7 @@ class CampController extends Controller
             return $this->error(0,$validator->getMessageBag()->first());
         }
         $column_id = $request->input('id');
-        $user_id = 211172;//$this->user['id'] ?? 0;
+        $user_id = $this->user['id'] ?? 0;
         // 发放奖励到课程
 
         // 查看当前所需要领取的奖励  ( 已经学完 未领取的数据 )
