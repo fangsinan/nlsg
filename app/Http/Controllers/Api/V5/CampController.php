@@ -213,8 +213,8 @@ class CampController extends Controller
         $column['first_info_id'] = Column::getFirstInfo($column['info_column_id'] ?? $column['id']);
         
         // 时间 
-        $column['start_time_str'] = strtotime($column["online_time"]);
-        $column['end_time_str'] = strtotime($column["end_time"]);
+        $column['start_time_str'] = strtotime($column["online_time"])??"0";
+        $column['end_time_str'] = strtotime($column["end_time"]) ??"0";
         return $this->success([
             'list' => $column
         ]);
