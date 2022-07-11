@@ -448,7 +448,7 @@ class CampController extends Controller
             return $this->error(0,$validator->getMessageBag()->first());
         }
         $column_id = $request->input('id');
-        $user_id = 211172;//$this->user['id'] ?? 0;
+        $user_id = $this->user['id'] ?? 0;
         // 发放奖励到课程
 
         // 查看当前所需要领取的奖励  ( 已经学完 未领取的数据 )
