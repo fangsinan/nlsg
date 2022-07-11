@@ -733,7 +733,7 @@ class Order extends Base
         return $list;
     }
 
-    public function inviterLiveListNew($params, $this_user = []) {
+    public function   inviterLiveListNew($params, $this_user = []) {
         /**
          * select * from nlsg_user where phone=15278464531;
          * select * from nlsg_subscribe where type=3 and user_id=5171282;
@@ -820,20 +820,17 @@ class Order extends Base
         //用户账号
         if (!empty($params['phone'] ?? '')) {
             $phone = $params['phone'];
-            if(strlen($phone) >= 8){
+            if(strlen($phone) === 11){
+                $query->whereHas('user', function ($q) use ($phone) {
+                    $q->where('phone', '=', $phone);
+                });
+            }else{
                 $where_user_id = User::query()
                     ->where('phone','like',"%$phone%")
                     ->pluck('id')
                     ->toArray();
                 $query->whereIn('user_id',$where_user_id);
-            }else{
-                $query->whereHas('user', function ($q) use ($phone) {
-                    $q->where('phone', 'like', "%$phone%");
-                });
             }
-
-
-
         }
         //订单来源
         if (!empty($params['os_type'] ?? 0)) {
