@@ -169,7 +169,7 @@ class CampController extends Controller
         $end_start = ColumnEndShow::EndShow($user_id,$column_id);
         // $column['end_show_letter']  = $end_start['is_letter']; //是否拆开信件 结营当天必弹  弹完点击就算拆开信件
         $column['end_show']         = $end_start['is_cer']; // 是否领取奖励  需要结营后 手动点击
-        $column['cer_is_show']      = 0; // 是否有资格显示   1、结营后  2、学完
+        $column['cer_is_show']      = $end_start['cer_is_show']; // 是否有资格显示   1、结营后  2、学完
        
         $real_user = DB::table("crm_camp_user")->select("real_name")->where(['user_id' => $user_id])->first();
         if(empty($real_user)){

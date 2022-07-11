@@ -14,7 +14,7 @@ class ColumnEndShow extends Base
 
     static function EndShow($uid,$col_id){
         
-        $res = ["id"=>0,"is_letter"=>0,"is_cer"=>0,];
+        $res = ["id"=>0,"is_letter"=>0,"is_cer"=>0,"cer_is_show"=>0];
         $col = Column::select('is_start')->find($col_id);
         if(empty($col)){
             return $res;
@@ -28,10 +28,29 @@ class ColumnEndShow extends Base
         $res['id'] = $show->id??0;
         $res['is_cer'] = 0; //是否领取奖励  需要结营后 手动点击
         $res['is_letter'] = 0; //是否拆开信件 结营当天必弹  弹完点击就算拆开信件
-        // 未结营全部为待领取状态   结营后进行处理
-        if($col['is_start'] == 2 && !empty($show)){
-            $res['is_letter']   = $show->is_letter;
-            $res['is_cer']      = $show->is_cer;
+        
+        
+
+
+        // cer_is_show
+        if($col['is_start'] == 2){
+            // 未结营 全部为待领取状态   结营后进行 状态处理
+            if( !empty($show)){
+                $res['is_letter']   = $show->is_letter;
+                $res['is_cer']      = $show->is_cer;
+            }
+
+
+            // 是否有资格领取  学完 并且结营
+            $res['cer_is_show'] = 0;  
+            $reward = ColumnWeekReward::select("id","is_letter","is_cer")->where([
+                'user_id' =>$uid,
+                'relation_id' =>$col_id,
+                'speed_status' =>1,
+            ])->first();
+            if(empty($reward)){
+                $res['cer_is_show'] = 1;
+            }
         }
         return $res;
     }
