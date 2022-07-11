@@ -40,23 +40,19 @@ class ColumnEndShow extends Base
     
     /**
      * 获取证书和信件模板
-     * @param  int $col_id 训练营id
+     * @param  int $classify_id 训练营父类id
      * @return string[] letter_img 信, cer_img 证书,
      * */
-    static function GetShowLetter($col_id){
+    static function GetShowLetter($classify_id){
 
-        $img = DB::table("crm_camp_certificate")->select("img_url")->where([
-            'column_id' => $col_id,
+        $img = DB::table("crm_camp_certificate")->select("img_url",'letter')->where([
+            'column_id' => $classify_id,
             'status' => 1
         ])->first();
 
         
         return [
-            "letter" => [
-                "第一段",
-                "第二段",
-                "第三段",
-            ],
+            "letter" => $img->letter??'',
             "cer_img" => $img->img_url??'',
         ];
     }

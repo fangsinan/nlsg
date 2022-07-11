@@ -161,7 +161,7 @@ class CampController extends Controller
         $user = User::find($column['user_id']);
         $column['title'] = $user['honor'] ?? '';
         // 训练营奖励和证书 获取
-        $Letter = ColumnEndShow::GetShowLetter($column_id);
+        $Letter = ColumnEndShow::GetShowLetter($column['classify_column_id']);
         $column['letter']   = $Letter['letter'];
         $column['cer_img']      = $Letter['cer_img'];
 
