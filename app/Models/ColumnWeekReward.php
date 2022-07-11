@@ -7,14 +7,15 @@ class ColumnWeekReward extends Base
     protected $table = 'nlsg_column_week_reward';
 
 
-    protected  $fillable = ['relation_id','user_id','is_get','is_end','end_time','os_type','week_id'];
+    protected  $fillable = ['relation_id','user_id','is_get','is_end','end_time','os_type','week_id','speed_status','camp_id','week_num'];
 
 
 
     // 学习进度 奖励发放机制
     static function CampStudy($camp_id,$user_id,$os_type,$info_id){
  
-        $column_data = Column::select('id','info_column_id','end_time','show_info_num','is_start')->find($camp_id);
+        $column_data = Column::select('id','classify_column_id', 'info_column_id','end_time','show_info_num','is_start')->find($camp_id);
+        
         if (empty($column_data)) {
             return ;
         }
@@ -23,10 +24,11 @@ class ColumnWeekReward extends Base
             strtotime("+3 day",strtotime($column_data['end_time'])) <= time() ){
             return ;
         }
+        
         // 查询当前章节所在周的所有章节是否学完   学完后添加nlsg_column_week_reward 表记录
         
         // 查看当前章节所在奖励信息
-        $prize=CampPrize::where('status',1)->whereRaw('FIND_IN_SET('.$info_id.',`info_ids`)')->first();
+        $prize=CampPrize::where(['status'=>1,"column_id"=>$column_data['classify_column_id']])->whereRaw('FIND_IN_SET('.$info_id.',`info_ids`)')->first();
         if(empty($prize)){
             return ;
         }
