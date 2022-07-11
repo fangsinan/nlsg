@@ -43,7 +43,7 @@ class ColumnEndShow extends Base
 
             // 是否有资格领取  学完 并且结营
             $res['cer_is_show'] = 0;  
-            $reward = ColumnWeekReward::select("id","is_letter","is_cer")->where([
+            $reward = ColumnWeekReward::select("id")->where([
                 'user_id' =>$uid,
                 'relation_id' =>$col_id,
                 'speed_status' =>1,
