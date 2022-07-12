@@ -407,32 +407,31 @@ class CampController extends Controller
         // 获取所学最大周的时间
         $start_at = $weeks[$max_id]['start_at'] ??0;
 
-
         $is_show = 0;
         $now_week = "";
         $new_reward = [];
+
         foreach($weeks as $key=>$week_val){
             $prize_id = $week_val['prize_id'];
             $status = 0;
-            // 将最大周之前的数据全部置为补卡
-            if($start_at > $week_val['start_at']){
+             // 将最大周之前的数据全部置为补卡
+            //  只要不是领取状态则都是补卡领取状态
+            if($reward[$key]['speed_status'] != 2 && $start_at > $week_val['start_at']){
                 $status = 1;
             }
-
             if(!empty($reward[$key])){
                 if($reward[$key]["speed_status"] == 2 && $reward[$key]["is_get"] == 1){
                     $status = 3;
                 }else if( $reward[$key]['speed_status'] == 2 && $reward[$key]['is_get'] == 0 ){
                     $key = array_search($key,$weeksData);
-                    $status = 2;
                     // 当前周   
                     $now_week = $prize[$prize_id]['period_num_name']??'';
                     $now_week="恭喜您！获得".$now_week."学习奖励";
                     $is_show = 1;
-                }else if( $reward[$key]['speed_status'] == 1 && ['is_get'] == 0 ){
-                    $status = 1;
-                }else if( $reward[$key]['speed_status'] == 0 ){
-                    $status = 0;
+                // }else if( $reward[$key]['speed_status'] == 1 && ['is_get'] == 0 ){
+                //     $status = 1;
+                // }else if( $reward[$key]['speed_status'] == 0 ){
+                //     $status = 0;
                 }
             }
             
