@@ -173,7 +173,7 @@ class CampController extends Controller
        
         $real_user = DB::table("crm_camp_user")->select("real_name")->where(['user_id' => $user_id])->first();
         if(empty($real_user)){
-            $real_name = $this->user['nickename'] ?? "";
+            $real_name = $this->user['nickname'] ?? "";
         }else{
             $real_name = $real_user->real_name ?? "";
         }
