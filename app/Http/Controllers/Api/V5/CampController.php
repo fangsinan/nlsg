@@ -380,18 +380,50 @@ class CampController extends Controller
         $reward = array_column($reward,null,'week_id');
 
         // 对应所有的周
-        $weeks = ColumnWeekModel::select('id','prize_id','start_at','end_at')->where('relation_id',$camp_id)->get()->ToArray();
-        $weeks = array_column($weeks,null,'id');
+        $weeksData = ColumnWeekModel::select('id','prize_id','start_at','end_at')->where('relation_id',$camp_id)
+            ->orderBy("start_at")->get()->ToArray();
+        $weeks = array_column($weeksData,null,'id');
+
+        //   首先定位所学的最大周
+        //  对所有周进行排序   排序后剔除未学过的周 
+        $week_ids = array_column($reward,"week_id");    // 已学周id
+        $weeksData = array_column($weeksData,'id');  // 该训练营所有周id
+        $weeksDataDiff = array_diff($weeksData,$week_ids);
+        $new_reward_id = array_diff($weeksData,$weeksDataDiff);
+        $max_id = empty($new_reward_id) ? 0 : end($new_reward_id);   //获取最大周id
+
+
+        // 将已学周id  按照所有周的顺序排序
+        // $new_reward_id = [];
+        // $max_reward_id = 0;
+        // foreach ($weeksData as $key=>$value){
+        //     $kk = array_search($value,$week_ids);
+        //     if($kk !== false){
+        //         $new_reward_id[] = $value;
+        //         $max_reward_id = $value;
+        //     }
+        // }
+        
+        // 获取所学最大周的时间
+        $start_at = $weeks[$max_id]['start_at'] ??0;
+
+
         $is_show = 0;
         $now_week = "";
         $new_reward = [];
         foreach($weeks as $key=>$week_val){
             $prize_id = $week_val['prize_id'];
             $status = 0;
+            // 将最大周之前的数据全部置为补卡
+            if($start_at > $week_val['start_at']){
+                $status = 1;
+            }
+
             if(!empty($reward[$key])){
                 if($reward[$key]["speed_status"] == 2 && $reward[$key]["is_get"] == 1){
                     $status = 3;
                 }else if( $reward[$key]['speed_status'] == 2 && $reward[$key]['is_get'] == 0 ){
+                    $key = array_search($key,$weeksData);
                     $status = 2;
                     // 当前周   
                     $now_week = $prize[$prize_id]['period_num_name']??'';
