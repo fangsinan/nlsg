@@ -83,6 +83,10 @@ class SelectDataController extends ControllerBackend
                 'key'=>5,
                 'value'=>'其他',
             ],
+            [
+                'key'=>6,
+                'value'=>'新疆',
+            ]
         ]);
     }
 
