@@ -425,8 +425,8 @@ class CampController extends Controller
                 if($reward[$key]["speed_status"] == 2 && $reward[$key]["is_get"] == 1){
                     $status = 3;
                 }else if( $reward[$key]['speed_status'] == 2 && $reward[$key]['is_get'] == 0 ){
-                    $key = array_search($key,$weeksData);
                     // 当前周   
+                    $status = 2;
                     $now_week = $prize[$prize_id]['period_num_name']??'';
                     $now_week="恭喜您！获得".$now_week."学习奖励";
                     $is_show = 1;
