@@ -424,7 +424,7 @@ class CampController extends Controller
             // 显示倒计时几天 三天内显示
             $day = intval(($end_time-time())/3600/24);
             if($day > 0 && $day <= 3){
-                $now_week = "补卡倒计时".$day."天";
+                $now_week = "补卡倒计时 ".$day."天";
                 $res['count_down'] = (string)$day;
             } else{
                 $res['is_show'] = 0;  // 结营三天后不显示此奖励弹窗
