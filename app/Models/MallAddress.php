@@ -128,14 +128,20 @@ class MallAddress extends Base
                 ->toArray();
 
             if (!empty($order_id_list)) {
-                $erp_order_list = [];
+//                $erp_order_list = [];
                 foreach ($order_id_list as $order_id) {
-                    $erp_order_list[] = [
-                        'order_id' => $order_id,
-                        'flag'     => 1,
-                    ];
+//                    $erp_order_list[] = [
+//                        'order_id' => $order_id,
+//                        'flag'     => 1,
+//                    ];
+                    OrderErpList::query()
+                        ->firstOrCreate([
+                            'order_id' => $order_id,
+                            'flag'=>1
+                        ]);
                 }
-                OrderErpList::query()->insert($erp_order_list);
+//                OrderErpList::query()->insert($erp_order_list);
+
                 Order::query()
                     ->whereIn('id', $order_id_list)
                     ->update(['address_id' => $address->id]);
