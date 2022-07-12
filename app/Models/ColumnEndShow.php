@@ -41,14 +41,11 @@ class ColumnEndShow extends Base
             }
 
 
-            // 是否有资格领取  学完 并且结营
+            // 是否有资格领取  学完 并且结营  如果状态为学完的周 与 总周数 相同则学完
             $res['cer_is_show'] = 0;  
-            $reward = ColumnWeekReward::select("id")->where([
-                'user_id' =>$uid,
-                'relation_id' =>$col_id,
-                'speed_status' =>1,
-            ])->first();
-            if(empty($reward)){
+            $reward_count = ColumnWeekReward::where(['user_id' =>$uid,'relation_id' =>$col_id,'speed_status' =>2,])->count();
+            $week_count = ColumnWeekModel::where(['relation_id' =>$col_id,'is_del' =>0,])->count();
+            if($reward_count == $week_count){
                 $res['cer_is_show'] = 1;
             }
         }
