@@ -416,10 +416,12 @@ class CampController extends Controller
             $status = 0;
              // 将最大周之前的数据全部置为补卡
             //  只要不是领取状态则都是补卡领取状态
-            if($reward[$key]['speed_status'] != 2 && $start_at > $week_val['start_at']){
-                $status = 1;
+            if( $start_at > $week_val['start_at']){
+                    $status = 1;
             }
+            
             if(!empty($reward[$key])){
+
                 if($reward[$key]["speed_status"] == 2 && $reward[$key]["is_get"] == 1){
                     $status = 3;
                 }else if( $reward[$key]['speed_status'] == 2 && $reward[$key]['is_get'] == 0 ){
