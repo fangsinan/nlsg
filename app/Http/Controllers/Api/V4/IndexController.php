@@ -1169,6 +1169,7 @@ class IndexController extends Controller
         $platform_type = 0;
         if(!empty($os_type) && $os_type==1){
             $platform_type = $request->get('platform_type') ?? 0;
+            $platform_type = strtolower($platform_type);  //转小写
         }
         
         $list = Versions::select('id', 'number', 'content', 'url', 'is_force', 'str_at','down_type')
