@@ -42,7 +42,7 @@ class OfflineOrderServers
             ->select([
                 'id', 'ordernum', 'type', 'live_num', 'relation_id', 'user_id', 'status', 'pay_time', 'price',
                 'twitter_id', 'pay_type', 'os_type', 'is_shill', 'shill_job_price', 'shill_refund_sum',
-                'is_refund', 'refund_no', 'created_at', 'full_payment', 'offline_status',
+                'is_refund', 'refund_no', 'created_at', 'full_payment', 'offline_status','pay_price',
             ]);
 
         $query->with([
