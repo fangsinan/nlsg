@@ -195,11 +195,11 @@ class CampController extends Controller
         if ($info_num > 0) {
             $column['history_count'] = round($hisCount / $info_num * 100);
         }
-        
+
         //历史记录
         $column['historyData'] = History::getHistoryData($column_id, $types['his_type'], $user_id);
         // 是否收藏
-        
+
         $column['is_collection'] = Collection::isCollection([$types['col_type']],$column_id,0,$user_id);
         // 是否父类
         $column['is_parent'] = 0;
@@ -210,8 +210,8 @@ class CampController extends Controller
 
         // 获取第一章节 info_id
         $column['first_info_id'] = Column::getFirstInfo($column['info_column_id'] ?? $column['id']);
-        
-        // 时间 
+
+        // 时间
         $column['start_time_str'] = empty($column["online_time"]) ?"0":strtotime($column["online_time"]);
         $column['end_time_str'] = empty($column["end_time"]) ?"0":strtotime($column["end_time"]);
         return $this->success([
@@ -342,13 +342,13 @@ class CampController extends Controller
         // is_show      结营后三天不显示奖励弹窗
         // now_week     获得第几周的奖励 当前学习的章节是第N周 就显示获得第N周的奖励
         // 周奖励状态     status  3已领取，2待领取，1补卡领取，0未开始
-        // 奖品信息             
+        // 奖品信息
 
         $column_data = Column::find($camp_id);
         if (empty($column_data)) {
             return $this->error(1000, '参数有误：无此信息',(object)[]);
         }
-        
+
         // 训练营 每周开放六节课程
         // 查询训练营目前开放的全部课程 ，每六个章节为一周，查询历史记录表是否完结
         $is_sub = Subscribe::isSubscribe($user_id, $camp_id, 7);
@@ -370,7 +370,7 @@ class CampController extends Controller
         //     strtotime("+3 day",strtotime($column_data['end_time'])) <= time() ){
         //     return $this->success($res);
         // }
-        
+
         // 用户学习进度 获取奖励
         $reward = ColumnWeekReward::select('is_get','speed_status','end_time','week_id')->where([
             'user_id'       => $user_id,
@@ -379,12 +379,15 @@ class CampController extends Controller
         $reward = array_column($reward,null,'week_id');
 
         // 对应所有的周
-        $weeksData = ColumnWeekModel::select('id','prize_id','start_at','end_at')->where('relation_id',$camp_id)
+        $weeksData = ColumnWeekModel::query()
+            ->select('id','prize_id','start_at','end_at')
+            ->where('relation_id',$camp_id)
+            ->where('is_del','=',0)
             ->orderBy("start_at")->get()->ToArray();
         $weeks = array_column($weeksData,null,'id');
 
         //   首先定位所学的最大周
-        //  对所有周进行排序   排序后剔除未学过的周 
+        //  对所有周进行排序   排序后剔除未学过的周
         $week_ids = array_column($reward,"week_id");    // 已学周id
         $weeksData = array_column($weeksData,'id');  // 该训练营所有周id
         $weeksDataDiff = array_diff($weeksData,$week_ids);
@@ -402,7 +405,7 @@ class CampController extends Controller
         //         $max_reward_id = $value;
         //     }
         // }
-        
+
         // 获取所学最大周的时间
         $start_at = $weeks[$max_id]['start_at'] ??0;
 
@@ -418,13 +421,13 @@ class CampController extends Controller
             if( $start_at > $week_val['start_at']){
                     $status = 1;
             }
-            
+
             if(!empty($reward[$key])){
 
                 if($reward[$key]["speed_status"] == 2 && $reward[$key]["is_get"] == 1){
                     $status = 3;
                 }else if( $reward[$key]['speed_status'] == 2 && $reward[$key]['is_get'] == 0 ){
-                    // 当前周   
+                    // 当前周
                     $status = 2;
                     $now_week = $prize[$prize_id]['period_num_name']??'';
                     $now_week="恭喜您！获得".$now_week."学习奖励";
@@ -435,7 +438,7 @@ class CampController extends Controller
                 //     $status = 0;
                 }
             }
-            
+
             $new_reward[] = [
                 // 'week_id' => $reward[$key]['week_id'],
                 'week_title' => $prize[$prize_id]['period_num_name']??'',
@@ -501,29 +504,29 @@ class CampController extends Controller
                     // 校验是否存在
                     $sub = Subscribe::where([
                         'relation_id'   => $sub_val['relation_id'],
-                        'type'      => $sub_val['sub_type'], 
+                        'type'      => $sub_val['sub_type'],
                         'user_id'   => $user_id,
                         'status'    => 1,
                     ])->first();
                     if(empty($sub)){
                          $subscribes[] = [
                             'relation_id'   => $sub_val['relation_id'],
-                            'type'      => $sub_val['sub_type'], 
+                            'type'      => $sub_val['sub_type'],
                             'user_id'   => $user_id,
                             'pay_time'  => date("Y-m-d H:i:s", $time),
                             'start_time'=> date("Y-m-d H:i:s", $starttime),
                             'end_time'  => date("Y-m-d H:i:s", $endtime),
-                            'give'      => 30, 
+                            'give'      => 30,
                             'status'    => 1,
                         ];
                     }
-                   
+
                 }
             }
             if(!empty($subscribes)){
                 Subscribe::insert($subscribes);
             }
-            
+
         }
 
 
@@ -588,7 +591,7 @@ class CampController extends Controller
                 if($end_show['is_letter'] == 0){
                     $edit_data['letter_at']=date("Y-m-d H:i:s",time());
                 }
-                
+
                 break;
             case 2:
                 $edit_data = [
