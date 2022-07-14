@@ -41,10 +41,12 @@ class ColumnWeekReward extends Base
         }
 
         $info_ids = explode(',',$prize['info_ids']);
+
         // 查看章节所在周 历史记录
         $count = History::where([
             "user_id" => $user_id,"relation_type" => 5,"relation_id" => $camp_id,"is_end" => 1,
         ])->whereIn("info_id",$info_ids)->count();
+
         // 查询是否有记录
         $Reward = ColumnWeekReward::where([
             'relation_id' =>$camp_id, 'user_id' =>$user_id,'week_id' => $weeks['id'],])->first();
@@ -54,7 +56,10 @@ class ColumnWeekReward extends Base
             'user_id'       => $user_id,
             'os_type'       => $os_type,
             'week_id'       => $weeks['id'],
+            'prize_id'       => $prize['id'],
          ];
+
+
         $data['speed_status'] = 1; //未学完
         // 数量相等 说明学完了本周课程
         if($count == count($info_ids)){
