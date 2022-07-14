@@ -21,7 +21,7 @@ class OfflineOrderServers
         $pay_type               = $params['pay_type'] ?? 0;
         $os_type                = $params['os_type'] ?? 0;
         $full_payment           = $params['full_payment'] ?? 0;
-        $offline_status         = $params['offline_status'] ?? 0;
+        $offline_status         = $params['offline_status'] ?? -1;
         $create_time_date_begin = $params['create_time_date_begin'] ?? '';
         $create_time_date_end   = $params['create_time_date_end'] ?? '';
 
@@ -80,7 +80,7 @@ class OfflineOrderServers
         }
 
         //状态
-        if (!empty($offline_status)) {
+        if ($offline_status != -1) {
             $query->where('offline_status', '=', $offline_status);
         }
 
