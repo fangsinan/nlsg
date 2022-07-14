@@ -50,6 +50,7 @@ class OfflineOrderServers
             'offline:id,title,cover_img,is_del,is_show,price,total_price',
             'offlineLastLog',
             'offlineLastLog.adminInfo:id,username,user_remark',
+            'payRefundInfo:id,order_id,refund_id,refund_price,created_at',
         ]);
 
         //订单编号
