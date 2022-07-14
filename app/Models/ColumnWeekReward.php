@@ -58,6 +58,7 @@ class ColumnWeekReward extends Base
             'prize_id'       => $prize['id'],
          ];
 
+
         $data['speed_status'] = 1; //未学完
         // 数量相等 说明学完了本周课程
         if($count == count($info_ids)){
