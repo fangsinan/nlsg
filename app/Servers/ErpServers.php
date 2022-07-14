@@ -423,7 +423,8 @@ class ErpServers
                 ->whereHas('orderInfo', function ($q) {
                     $q->where('textbook_id', '>', 0)
                         ->where('address_id', '>', 0)
-                        ->where('express_info_id', '=', 0);
+                        ->where('express_info_id', '=', 0)
+                        ->where('pay_price','>',0.01);
                 })
                 ->select(['id', 'order_id', 'flag']);
 
