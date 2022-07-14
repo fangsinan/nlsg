@@ -137,7 +137,7 @@ class OfflineOrderServers
                 'remark'         => 'bail|required|string|max:255',
                 'log_date'       => 'bail|required|date|date_format:Y-m-d H:i:s',
                 'full_payment'   => 'bail|required|integer|in:1,2',
-                'offline_status' => 'bail|required|integer|in:0,1,2,3,4',
+                'offline_status' => 'bail|required|integer|in:1,2,3,4',
             ]
         );
 
