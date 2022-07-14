@@ -1072,7 +1072,7 @@ class DouDianServers
                         exit('额度已用完');
                     }
 
-                    if (strpos($err_msg,'安全') !== false){
+                    if (strpos($err_msg,'安全风险') !== false){
                         $this->DecryptQuotaInsert(1, 2, 1);
                         exit('环境风险');
                     }
