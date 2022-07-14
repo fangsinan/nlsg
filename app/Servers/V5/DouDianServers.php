@@ -941,7 +941,7 @@ class DouDianServers
         $limit = (int)(300 / ($c_s_2 * 3));
 
         if ($limit < 1){
-            exit('错误');
+            $limit = 10;
         }
 
         $list = DouDianOrder::query()
@@ -1082,12 +1082,6 @@ class DouDianServers
         }
 
         return true;
-
-
-
-
-//        $can_to = $this->canToDecryptNew(1);
-
     }
 
     //抖店配额和风险改版 新开关查询

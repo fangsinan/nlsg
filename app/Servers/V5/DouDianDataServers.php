@@ -201,33 +201,52 @@ class DouDianDataServers
     {
         $dou_dian_type = (int)($params['dou_dian_type'] ?? 1);
 
-        $decrypt_quota = DouDianOrderDecryptQuota::query()
-            ->where('dou_dian_type', '=', $dou_dian_type)
-            ->orderBy('id', 'desc')
+        $temp = DouDianOrderDecryptQuota::query()
+            ->where('expire','>',date('Y-m-d H:i:s'))
+            ->where('flag','=',1)
+            ->where('dou_dian_type','=', $dou_dian_type)
             ->first();
 
-        $now_date = date('Y-m-d H:i:s');
-
-        if (
-            !empty($decrypt_quota)
-            &&
-            $decrypt_quota->flag === 1
-            &&
-            $decrypt_quota->expire > $now_date
-            &&
-            $decrypt_quota->check === 2
-        ) {
-            $msg_str = $decrypt_quota->err_type === 1 ? '解密配额已满,请重新申请' : '您的环境存在安全风险，请稍后再试';
+        if(empty($temp)){
+            return [
+                'status' => 0,
+                'msg'    => '',
+            ];
+        }else{
+            $msg_str = $temp->err_type === 1 ? '解密配额已满,请重新申请' : '您的环境存在安全风险，请稍后再试';
             return [
                 'status' => 1,
-                'msg'    => $msg_str . '.下次尝试解密时间:' . $decrypt_quota->expire,
+                'msg'    => $msg_str . '.下次尝试解密时间:' . $temp->expire,
             ];
         }
 
-        return [
-            'status' => 0,
-            'msg'    => '',
-        ];
+//        $decrypt_quota = DouDianOrderDecryptQuota::query()
+//            ->where('dou_dian_type', '=', $dou_dian_type)
+//            ->orderBy('id', 'desc')
+//            ->first();
+//
+//        $now_date = date('Y-m-d H:i:s');
+//
+//        if (
+//            !empty($decrypt_quota)
+//            &&
+//            $decrypt_quota->flag === 1
+//            &&
+//            $decrypt_quota->expire > $now_date
+//            &&
+//            $decrypt_quota->check === 2
+//        ) {
+//            $msg_str = $decrypt_quota->err_type === 1 ? '解密配额已满,请重新申请' : '您的环境存在安全风险，请稍后再试';
+//            return [
+//                'status' => 1,
+//                'msg'    => $msg_str . '.下次尝试解密时间:' . $decrypt_quota->expire,
+//            ];
+//        }
+//
+//        return [
+//            'status' => 0,
+//            'msg'    => '',
+//        ];
 
     }
 
@@ -235,9 +254,15 @@ class DouDianDataServers
     {
         $dou_dian_type = (int)($params['dou_dian_type'] ?? 1);
 
+//        $decrypt_quota = DouDianOrderDecryptQuota::query()
+//            ->where('dou_dian_type', '=', $dou_dian_type)
+//            ->orderBy('id', 'desc')
+//            ->first();
+
         $decrypt_quota = DouDianOrderDecryptQuota::query()
-            ->where('dou_dian_type', '=', $dou_dian_type)
-            ->orderBy('id', 'desc')
+            ->where('expire','>',date('Y-m-d H:i:s'))
+            ->where('flag','=',1)
+            ->where('dou_dian_type','=', $dou_dian_type)
             ->first();
 
         $decrypt_quota->flag = 2;
