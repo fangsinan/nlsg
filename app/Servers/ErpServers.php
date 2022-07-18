@@ -26,7 +26,8 @@ class ErpServers
     public $logistics_sync_ack;//物流同步回写
 
     //推送触发时机:支付,取消订单,确认收货
-    public function startPush($id) {
+    public function startPush($id)
+    {
         if (!is_array($id)) {
             $id = explode(',', $id);
         }
@@ -159,7 +160,8 @@ class ErpServers
     }
 
     //订单推送动作
-    private function pushOrderJob($trade_list) {
+    private function pushOrderJob($trade_list)
+    {
         if (empty($trade_list) || !is_array($trade_list)) {
             return ['code' => false, 'msg' => '数据不正确'];
         }
@@ -192,7 +194,8 @@ class ErpServers
     }
 
     //物流同步
-    public function logisticsSync() {
+    public function logisticsSync()
+    {
 
         $list = $this->logisticsSyncQuery();
 
@@ -274,16 +277,16 @@ class ErpServers
                         $ex_data['express_num'] = $send_data['num'];
 
                         if (!empty($send_data['num'])) {
-                            $express_company_info     = ExpressCompany::query()->find($send_data['express_id']);
-                            $history                  = [];
-                            $history['number']        = $v['logistics_no'];
+                            $express_company_info = ExpressCompany::query()->find($send_data['express_id']);
+                            $history              = [];
+                            $history['number']    = $v['logistics_no'];
 
                             $history['type']          = $express_company_info->code ?? '';
                             $history['typename']      = $express_company_info->name ?? $v['logistics_name'];
                             $history['express_phone'] = $express_company_info->phone ?? '';
                             $history['logo']          = $express_company_info->logo ?? '';
 
-                            $history['list']          = [
+                            $history['list'] = [
                                 [
                                     'time'   => $now_date,
                                     'status' => '商家发货'
@@ -305,7 +308,7 @@ class ErpServers
                             ->update([
                                 'express_info_id' => $express_info_id
                             ]);
-                    }else{
+                    } else {
                         $order_express_info_res = true;
                     }
 
@@ -333,7 +336,8 @@ class ErpServers
     }
 
     //物流查询动作
-    private function logisticsSyncQuery() {
+    private function logisticsSyncQuery()
+    {
         $c             = new WdtClient();
         $c->sid        = $this->sid;
         $c->appkey     = $this->appkey;
@@ -357,7 +361,8 @@ class ErpServers
     }
 
     //物流回写动作
-    private function logisticsSyncAck($ack_data) {
+    private function logisticsSyncAck($ack_data)
+    {
         $c             = new WdtClient();
         $c->sid        = $this->sid;
         $c->appkey     = $this->appkey;
@@ -375,7 +380,8 @@ class ErpServers
     }
 
     //商城订单推送
-    public function pushRun() {
+    public function pushRun()
+    {
         $while_flag = true;
 
         while ($while_flag) {
@@ -404,7 +410,8 @@ class ErpServers
     }
 
     //训练营教材订单推送
-    public function pushRunForOrder($order_id_list = []): bool {
+    public function pushRunForOrder($order_id_list = []): bool
+    {
         $while_flag = true;
 
         while ($while_flag) {
@@ -424,7 +431,7 @@ class ErpServers
                     $q->where('textbook_id', '>', 0)
                         ->where('address_id', '>', 0)
                         ->where('express_info_id', '=', 0)
-                        ->where('pay_price','>',0.01);
+                        ->where('pay_price', '>', 0.01);
                 })
                 ->select(['id', 'order_id', 'flag']);
 
@@ -444,28 +451,28 @@ class ErpServers
                 $temp_trade_list = [];
                 $temp_order_list = [];
 
-                $temp_trade_list['tid']              = $v->OrderInfo->ordernum;
-                $temp_trade_list['trade_time']       = date('Y-m-d H:i:s', strtotime($v->orderInfo->created_at));
-                $temp_trade_list['pay_time']         = date('Y-m-d H:i:s', strtotime($v->orderInfo->pay_time));
-                $temp_trade_list['buyer_nick']       = $this->filterEmoji($v->orderInfo->user->nickname);
+                $temp_trade_list['tid']        = $v->OrderInfo->ordernum;
+                $temp_trade_list['trade_time'] = date('Y-m-d H:i:s', strtotime($v->orderInfo->created_at));
+                $temp_trade_list['pay_time']   = date('Y-m-d H:i:s', strtotime($v->orderInfo->pay_time));
+                $temp_trade_list['buyer_nick'] = $this->filterEmoji($v->orderInfo->user->nickname);
 
-                if (empty($v->orderInfo->is_shill)){
-                    $temp_trade_list['trade_status']     = 30;
-                }else{
-                    $temp_trade_list['trade_status']     = 80;
+                if (empty($v->orderInfo->is_shill)) {
+                    $temp_trade_list['trade_status'] = 30;
+                } else {
+                    $temp_trade_list['trade_status'] = 80;
                 }
 
-                $temp_trade_list['pay_status']       = 2;
-                $temp_address_name = $this->filterEmoji($v->orderInfo->addressInfo->name);
-                if (empty($temp_address_name)){
-                    $temp_trade_list['receiver_name']    = substr_replace($v->orderInfo->addressInfo->phone, '****', 3, 4);
-                }else{
-                    $temp_trade_list['receiver_name']    = $temp_address_name;
+                $temp_trade_list['pay_status'] = 2;
+                $temp_address_name             = $this->filterEmoji($v->orderInfo->addressInfo->name);
+                if (empty($temp_address_name)) {
+                    $temp_trade_list['receiver_name'] = substr_replace($v->orderInfo->addressInfo->phone, '****', 3, 4);
+                } else {
+                    $temp_trade_list['receiver_name'] = $temp_address_name;
                 }
                 $temp_trade_list['receiver_mobile']  = $v->orderInfo->addressInfo->phone;
                 $temp_trade_list['receiver_address'] = trim(
                     ($v->orderInfo->addressInfo->area_province->fullname ?? '') . ' ' .
-                    ($v->orderInfo->addressInfo->area_city->fullname ?? ''). ' ' .
+                    ($v->orderInfo->addressInfo->area_city->fullname ?? '') . ' ' .
                     ($v->orderInfo->addressInfo->area_area->fullname ?? '') . ' ' .
                     $v->orderInfo->addressInfo->details
                 );
@@ -475,14 +482,13 @@ class ErpServers
                 $temp_trade_list['delivery_term']    = 1;
                 $temp_trade_list['cod_amount']       = 0;
                 $temp_trade_list['ext_cod_fee']      = 0;
+                $temp_order_list['oid']              = $v->order_id;
 
-                $temp_order_list['oid']           = $v->id . '_' . $v->order_id;
 
-
-                if (empty($v->orderInfo->is_shill)){
-                    $temp_order_list['status']        = 30;//子订单状态
-                }else{
-                    $temp_order_list['status']        = 80;//子订单状态
+                if (empty($v->orderInfo->is_shill)) {
+                    $temp_order_list['status'] = 30;//子订单状态
+                } else {
+                    $temp_order_list['status'] = 80;//子订单状态
                 }
 
 
@@ -507,7 +513,7 @@ class ErpServers
 
             if ($res['code'] != true) {
                 $error_message = json_decode($res['msg'], true);
-                if (is_array($error_message)){
+                if (is_array($error_message)) {
                     $error_data = [];
                     foreach ($error_message as $v) {
                         $temp_error_data               = [];
@@ -521,7 +527,7 @@ class ErpServers
                         DB::table('nlsg_mall_order_erp_error')->insert($error_data);
                     }
                 }
-            }else{
+            } else {
                 OrderErpList::query()
                     ->whereIn('id', $list_ids)
                     ->update(['flag' => 2]);
@@ -531,7 +537,8 @@ class ErpServers
         return true;
     }
 
-    public function orderUpdateAddressId() {
+    public function orderUpdateAddressId()
+    {
 
         $list = DB::table('nlsg_order_erp_list as oel')
             ->join('nlsg_order as o', 'oel.order_id', '=', 'o.id')
@@ -541,7 +548,7 @@ class ErpServers
             ->limit(400)
             ->get();
 
-        if ($list->isNotEmpty()){
+        if ($list->isNotEmpty()) {
             foreach ($list as $v) {
                 $temp_address = MallAddress::query()
                     ->where('user_id', '=', $v->user_id)
@@ -593,7 +600,8 @@ class ErpServers
     }
 
     //订单主动查询
-    public function tradeQuery() {
+    public function tradeQuery()
+    {
 //        $c             = new WdtClient();
 //        $c->sid        = $this->sid;
 //        $c->appkey     = $this->appkey;
@@ -609,11 +617,10 @@ class ErpServers
 //        dd($json);
 
 
-
-        if(0){
-            $list = Order::query()->where('express_info_id','=',5649)
-                ->where('created_at','>','2022-04-06 00:00:00')
-                ->select(['id','express_info_id','created_at'])
+        if (0) {
+            $list = Order::query()->where('express_info_id', '=', 5649)
+                ->where('created_at', '>', '2022-04-06 00:00:00')
+                ->select(['id', 'express_info_id', 'created_at'])
                 ->get()
                 ->toArray();
 
@@ -621,8 +628,8 @@ class ErpServers
 
             DB::beginTransaction();
             foreach ($list as $v) {
-                $now_date = date('Y-m-d 10',strtotime($v['created_at'] .' +1 day'));
-                $now_date = $now_date.':'.rand(10,50).':'.rand(10,50);
+                $now_date = date('Y-m-d 10', strtotime($v['created_at'] . ' +1 day'));
+                $now_date = $now_date . ':' . rand(10, 50) . ':' . rand(10, 50);
 
                 $history                  = [];
                 $history['number']        = '';
@@ -636,19 +643,19 @@ class ErpServers
                         'status' => '商家发货'
                     ]
                 ];
-                $ex_data['express_id']  = 0;
-                $ex_data['express_num'] = '';
-                $ex_data['history'] = json_encode($history);
+                $ex_data['express_id']    = 0;
+                $ex_data['express_num']   = '';
+                $ex_data['history']       = json_encode($history);
 
                 $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
 
-                $express_info_id       = DB::table('nlsg_express_info')->insertGetId($ex_data);
+                $express_info_id = DB::table('nlsg_express_info')->insertGetId($ex_data);
                 Order::query()->where('id', '=', $v['id'])
                     ->update([
                         'express_info_id' => $express_info_id
                     ]);
 
-                $log[] = $v['id'].'-'.$express_info_id;
+                $log[] = $v['id'] . '-' . $express_info_id;
             }
             DB::commit();
             dd($log);
@@ -656,7 +663,8 @@ class ErpServers
 
     }
 
-    public function __construct() {
+    public function __construct()
+    {
 
         $this->sid                  = config('env.ERP_SID');
         $this->shop_no              = config('env.ERP_SHOP_NO');
@@ -677,7 +685,8 @@ class ErpServers
     }
 
     //去掉昵称的emoji
-    function filterEmoji($str) {
+    function filterEmoji($str)
+    {
         return preg_replace_callback(
             '/./u',
             function (array $match) {
