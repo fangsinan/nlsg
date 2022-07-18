@@ -7,12 +7,12 @@ class CampPrize extends Base
     protected $table = 'crm_camp_prize';
 
     protected $fillable = [
-        'title', 'cover_pic',  'column_id', 'works_info_id', 'info_ids','relation_id','type','source_type','status','period_num'
+        'title', 'cover_pic',  'column_id', 'works_info_id', 'info_ids','relation_id','type','source_type','status'
     ];
 
 
     static function prizeToRes($query){
-        $prize = $query->select('id','type','relation_id','info_ids','title','cover_pic','period_num_name')->get();
+        $prize = $query->select('id','type','relation_id','info_ids','title','cover_pic','period_num_name','period_num')->get();
         if(empty($prize)){
             return [];
         }
