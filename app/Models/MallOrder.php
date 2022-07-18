@@ -162,6 +162,7 @@ class MallOrder extends Base
                 $sku_list[$k]['sku_value'] = $check_temp_res->sku_value;
                 $sku_list[$k]['sales_num'] = $check_temp_res->sales_num;
                 $sku_list[$k]['picture'] = $check_temp_res->sku_picture ?? $check_temp_res->goods_picture;
+                $sku_list[$k]['min_buy_num'] = $check_temp_res->min_buy_num;
             }
 
             if (empty($v['inviter'])) {

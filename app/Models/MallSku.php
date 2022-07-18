@@ -84,7 +84,7 @@ class MallSku extends Base {
                     'nmg.name', 'nmg.subtitle', 'sku.stock',
                     'sku.picture as sku_picture',
                     'nmg.picture as goods_picture',
-                    'sku.weight', 'sku.volume', 'sku.sales_num'
+                    'sku.weight', 'sku.volume', 'sku.sales_num','min_buy_num',
                 ])
                 ->first();
 
