@@ -476,6 +476,13 @@ class MallOrder extends Base
         //level_price 当前用户的购买价格
         //t_money 当前推客的收益 没有0
         foreach ($sku_list as $sl_k => $sl_v) {
+            //校验购买数量
+            if ($sl_v['num'] < $sl_v['min_buy_num']){
+                return ['code' => false, 'msg' => $sl_v['name'] . '购买数量不能小于' . $sl_v['min_buy_num'],
+                    'ps' => $sl_v['sku_id'] . 'num error'];
+            }
+
+
             //获取商品各规格的售价和推客收益
             $temp_sl_v = $priceTools->getGoodsPrice(
                 $sl_v, $user['level'], $user['id'], $user['is_staff'], true
