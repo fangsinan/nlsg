@@ -53,6 +53,11 @@ class OfflineOrderServers
             'payRefundInfo:id,order_id,refund_id,refund_price,created_at',
         ]);
 
+        //过滤测试订单
+        $query->wherehas('user', function ($q) use ($phone) {
+            $q->where('is_test_pay', '=', 0);
+        })->where('pay_price','>',0.01);
+
         //订单编号
         if (!empty($ordernum)) {
             $query->where('ordernum', 'like', '%' . $ordernum . '%');
