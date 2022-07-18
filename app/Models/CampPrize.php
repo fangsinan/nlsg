@@ -7,7 +7,7 @@ class CampPrize extends Base
     protected $table = 'crm_camp_prize';
 
     protected $fillable = [
-        'title', 'cover_pic',  'column_id', 'works_info_id', 'info_ids','relation_id','type','source_type','status'
+        'title', 'cover_pic',  'column_id', 'works_info_id', 'info_ids','relation_id','type','source_type','status','period_num'
     ];
 
 
@@ -19,7 +19,7 @@ class CampPrize extends Base
         $prize = $prize->toArray();
         foreach($prize as &$prize_val){
             switch($prize_val['type']){
-                case 1:   
+                case 1:
                     // 课程
                     $res=Works::select("title as prize_title","cover_img as cover_image")->find($prize_val['relation_id']);
                     $types = FuncType(config('web.GlobalType.INPUT_TYPE.WorksType'));
@@ -29,12 +29,12 @@ class CampPrize extends Base
                     $types = FuncType(config('web.GlobalType.INPUT_TYPE.LectureType'));
                     $res=Column::select("name as prize_title","cover_pic as cover_image")->find($prize_val['relation_id']);
                     break;
-                case 3: 
+                case 3:
                     $res=["prize_title"=>$prize['title'],"cover_image"=>$prize['cover_pic'],];
                     break;
-                default: 
+                default:
                     $res=["prize_title"=>"","cover_image"=>"",];
-                    break;   
+                    break;
             }
             $prize_val['prize_title'] = $res['prize_title']??'';
             $prize_val['prize_pic']  = $res['cover_image']??'';
