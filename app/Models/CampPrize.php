@@ -12,14 +12,14 @@ class CampPrize extends Base
 
 
     static function prizeToRes($query){
-        $prize = $query->select('id','type','relation_id','info_ids','title','cover_pic','period_num_name')->get();
+        $prize = $query->select('id','type','relation_id','info_ids','title','cover_pic','period_num_name','period_num')->get();
         if(empty($prize)){
             return [];
         }
         $prize = $prize->toArray();
         foreach($prize as &$prize_val){
             switch($prize_val['type']){
-                case 1:   
+                case 1:
                     // 课程
                     $res=Works::select("title as prize_title","cover_img as cover_image")->find($prize_val['relation_id']);
                     $types = FuncType(config('web.GlobalType.INPUT_TYPE.WorksType'));
@@ -29,12 +29,12 @@ class CampPrize extends Base
                     $types = FuncType(config('web.GlobalType.INPUT_TYPE.LectureType'));
                     $res=Column::select("name as prize_title","cover_pic as cover_image")->find($prize_val['relation_id']);
                     break;
-                case 3: 
+                case 3:
                     $res=["prize_title"=>$prize['title'],"cover_image"=>$prize['cover_pic'],];
                     break;
-                default: 
+                default:
                     $res=["prize_title"=>"","cover_image"=>"",];
-                    break;   
+                    break;
             }
             $prize_val['prize_title'] = $res['prize_title']??'';
             $prize_val['prize_pic']  = $res['cover_image']??'';

@@ -441,6 +441,7 @@ class CampController extends Controller
 
             $new_reward[] = [
                 // 'week_id' => $reward[$key]['week_id'],
+                'period_num' => $prize[$prize_id]['period_num']??'',
                 'week_title' => $prize[$prize_id]['period_num_name']??'',
                 'status' => $status,
                 'prize_title' => $prize[$prize_id]['prize_title']??'',
@@ -465,6 +466,8 @@ class CampController extends Controller
                 $res['is_show'] = 0;  // 结营三天后不显示此奖励弹窗
             }
         }
+
+        array_multisort(array_column($new_reward,'period_num'),SORT_ASC,$new_reward);
 
         $res['is_show'] = $is_show;
         $res['now_week']= $now_week;
