@@ -147,6 +147,18 @@ class CampController extends Controller
             return $this->error(0, '内容不存在不能为空');
         }
 
+        //获取训练营父类的 视频和视频封面
+        if($column->type==3){
+
+            $parentColumn=Column::query()->where('id',$column->classify_column_id)->first();
+            if(!empty($parentColumn->video_id)){
+                $column->video_id=$parentColumn->video_id;
+                $column->video_url=$parentColumn->video_url;
+                $column->video_cover_pic=$parentColumn->video_cover_pic;
+            }
+
+        }
+
         //获取视频
         if($column->video_id){
             $VideoModel=VideoModel::query()->where('video_id',$column['video_id'])->first();
