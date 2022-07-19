@@ -316,7 +316,7 @@ class erpOrderServers
 
     public function bindAddress($params): array {
         $order_id   = $params['order_id'] ?? 0;
-        $address_id = $params['address_id'] ?? 0;
+        $address_id = (int)($params['address_id'] ?? 0);
 
         if (empty($order_id) || empty($address_id)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -331,6 +331,10 @@ class erpOrderServers
 
         if (empty($check_order)) {
             return ['code' => false, 'msg' => '订单错误'];
+        }
+
+        if ($check_order->address_id === $address_id) {
+            return ['code' => true, 'msg' => '成功'];
         }
 
         if (!empty($check_order->address_id)) {
