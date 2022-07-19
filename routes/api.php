@@ -15,6 +15,11 @@ include __DIR__ . '/liveApi.php';
   |
  */
 
+Route::group(['namespace' => 'Api\V5', 'prefix' => 'v'], function () {
+    //短链接跳转
+    Route::get('a/{param1}', 'ShortLinkController@Jump');
+
+});
 
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
@@ -536,6 +541,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
     Route::any('es/index', 'EsController@index');
+    Route::any('live/notlisten', 'LiveNotListeningController@LiveNot');
+    Route::any('live/LiveOnlineAdd', 'LiveNotListeningController@LiveOnline');
 
     Route::any('playlog', 'WorksController@playinfo');
 
@@ -637,7 +644,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
     //微信url link&scheme
     Route::get('wechat_tools/get_url_link', 'WeChatToolsController@getUrlLink');
-    
+
     Route::get('notIndex', 'LiveNoEnterController@index');
     /**     5.0 API  END    ***/
 });
