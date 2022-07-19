@@ -558,7 +558,7 @@ class LiveConsoleServers
 
         $while_flag = true;
         while ($while_flag) {
-            $his_table = 'nlsg_live_online_user20220207';
+            $his_table = 'nlsg_live_online_user';
             $onlineList = DB::table($his_table)->select("id", "live_id", "user_id", "live_son_flag", 'online_time', 'online_time_str')
                 ->orderBy('id', 'asc')->limit(10000)->get()->toArray();
 //            echo '<pre>';
