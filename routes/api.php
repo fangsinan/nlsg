@@ -15,11 +15,11 @@ include __DIR__ . '/liveApi.php';
   |
  */
 
-Route::group(['namespace' => 'Api\V5', 'prefix' => 'v'], function () {
-    //短链接跳转
-    Route::get('a/{param1}', 'ShortLinkController@Jump');
-
-});
+//Route::group(['namespace' => 'Api\V5', 'prefix' => 'v'], function () {
+//    //短链接跳转
+//    Route::get('a/{param1}', 'ShortLinkController@Jump');
+//
+//});
 
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 

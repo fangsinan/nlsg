@@ -17,3 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get("public/image/{file_name}","FileController@browse");
+
+//短链接跳转
+Route::get('a/{param1}', 'Api\V5\ShortLinkController@Jump');
