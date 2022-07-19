@@ -149,9 +149,15 @@ class CampController extends Controller
 
         //获取视频
         if($column->video_id){
-            $column->video=VideoModel::query()->where('video_id',$column['video_id'])->first();
+            $VideoModel=VideoModel::query()->where('video_id',$column['video_id'])->first();
+            if(!empty($VideoModel->callback_url3)){
+                $column->video_url=$VideoModel->callback_url3;
+            }elseif (!empty($VideoModel->callback_url2)){
+                $column->video_url=$VideoModel->callback_url2;
+            }elseif (!empty($VideoModel->callback_url1)){
+                $column->video_url=$VideoModel->callback_url1;
+            }
         }
-
 
         //免费试听的章节
         // $free_trial = WorksInfo::select(['id'])->where(['column_id' => $column_id, 'type' => 1, 'status' => 4, 'free_trial' => 1])->first();
