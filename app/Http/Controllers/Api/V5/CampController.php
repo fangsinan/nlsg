@@ -15,6 +15,7 @@ use App\Models\OfflineProducts;
 use App\Models\Poster;
 use App\Models\Subscribe;
 use App\Models\User;
+use App\Models\VideoModel;
 use App\Models\WorksInfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -140,11 +141,17 @@ class CampController extends Controller
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
             'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num'
-        ,'comment_num','info_column_id','classify_column_id','can_h5','end_time'];
+        ,'comment_num','info_column_id','classify_column_id','can_h5','end_time','video_id','video_url','video_cover_pic'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
             return $this->error(0, '内容不存在不能为空');
         }
+
+        //获取视频
+        if($column->video_id){
+            $column->video=VideoModel::query()->where('video_id',$column['video_id'])->first();
+        }
+
 
         //免费试听的章节
         // $free_trial = WorksInfo::select(['id'])->where(['column_id' => $column_id, 'type' => 1, 'status' => 4, 'free_trial' => 1])->first();
@@ -359,6 +366,19 @@ class CampController extends Controller
         $prize = CampPrize::getPrizeByclassifyId($column_data['classify_column_id']);
         $prize = array_column($prize,null,"id");
 
+        $all_week_prize=[];
+        foreach ($prize as $p){
+            $all_week_prize[$p['period_num']??'']=[
+                'period_num' => $p['period_num']??'',
+                'week_title' => $p['period_num_name']??'',
+                'status' => 0,
+                'prize_id' => $p['id'],
+                'prize_title' => $p['prize_title']??'',
+                'prize_pic' => $p['prize_pic']??'',
+            ];
+        }
+
+
         $res = [
             'is_show'   =>0,
             'now_week'  =>"",
@@ -411,7 +431,7 @@ class CampController extends Controller
 
         $is_show = 0;
         $now_week = "";
-        $new_reward = [];
+//        $new_reward = [];
 
         foreach($weeks as $key=>$week_val){
             $prize_id = $week_val['prize_id'];
@@ -439,11 +459,12 @@ class CampController extends Controller
                 }
             }
 
-            $new_reward[] = [
+            $all_week_prize[$prize[$prize_id]['period_num']??''] = [
                 // 'week_id' => $reward[$key]['week_id'],
                 'period_num' => $prize[$prize_id]['period_num']??'',
                 'week_title' => $prize[$prize_id]['period_num_name']??'',
                 'status' => $status,
+                'prize_id' => $prize_id,
                 'prize_title' => $prize[$prize_id]['prize_title']??'',
                 'prize_pic' => $prize[$prize_id]['prize_pic']??'',
             ];
@@ -467,11 +488,11 @@ class CampController extends Controller
             }
         }
 
-        array_multisort(array_column($new_reward,'period_num'),SORT_ASC,$new_reward);
+        array_multisort(array_column($all_week_prize,'period_num'),SORT_ASC,$all_week_prize);
 
         $res['is_show'] = $is_show;
         $res['now_week']= $now_week;
-        $res['week_day']= $new_reward;
+        $res['week_day']= $all_week_prize;
         return $this->success($res);
     }
 
