@@ -9,6 +9,7 @@ use App\Models\Live;
 use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
+use App\Models\PayRecord;
 use App\Models\User;
 use EasyWeChat\Factory;
 use GuzzleHttp\Client;
@@ -429,7 +430,8 @@ class PayController extends Controller
     {
 
         $params = $request->input();
-        Log::debug('ApplePay notify', [$params]);
+        // Log::debug('ApplePay notify', [$params]);
+        PayRecord::PayLog('ApplePay notify',json_encode([$params]));
         if (empty($params['ordernum']) || empty($params['receipt-data'])) {
             return $this->error(0, 'ordernum 或者 receipt-data 为空');
         }

@@ -516,6 +516,7 @@ class OrderController extends Controller
             'price' => $price,        //打赏金额
             'pay_type' => 4,   //1 微信端 2app微信 3app支付宝 4ios
             'os_type' => 2,    //只有ios支持能量币
+            'remark' =>$coin_id, 
         ];
 
         $rst = Order::firstOrCreate($data);
