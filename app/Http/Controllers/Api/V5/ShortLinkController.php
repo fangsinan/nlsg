@@ -14,8 +14,8 @@ use Predis\Client;
 class ShortLinkController extends Controller
 {
 
-    //http://127.0.0.1:8000/api/v/a
-    //https://a.nlsgapp.net/api/v/a/iS6
+    //http://127.0.0.1:8000/a/iS6
+    //https://a.nlsgapp.net/a/iS6
     public function Jump(Request $request,$arg1)
     {
 
