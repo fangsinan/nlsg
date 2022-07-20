@@ -16,6 +16,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Yansongda\Pay\Log;
 use Yansongda\Pay\Pay;
+use Illuminate\Support\Facades\DB;
 
 class PayController extends Controller
 {
@@ -456,7 +457,16 @@ class PayController extends Controller
             }
         }
         $data = $check_data['data'];
-
+        // 充值 记录
+        DB::table('nlsg_apple_log')->insert([
+            "ordernum"    => $params['ordernum'],
+            "user_id"    => $params['user_id'],
+            "product_id"   => $data['receipt']['in_app'][0]['product_id']??'',
+            "environment"   => $data['environment']??'',
+            "message"   => json_encode($data)??'',
+            "receipt_data"   => $params['receipt-data']??'',
+            "created_at"=> date("Y-m-d H:i:s"),
+        ]);
 
         //成功后获取数据
         preg_match('/(\d)+/', $data['receipt']['in_app'][0]['product_id'], $arr);
