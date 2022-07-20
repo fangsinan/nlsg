@@ -33,7 +33,7 @@ class ShortLinkController extends Controller
         if($flag==1) {
             $url=$Redis->get($arg1);
         }else{
-            $info = DB::table($table_name)->select("id","code", "url")->where('code',$flag)->first();
+            $info = DB::table($table_name)->select("id","code", "url")->where('code',$arg1)->first();
             if(empty($info)){
                 echo '数据异常'; exit;
             }
