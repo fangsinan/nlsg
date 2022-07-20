@@ -647,6 +647,9 @@ class WechatPay extends Controller
 				case 14: //5天学习力诊断课
 				    $res = $nickname . ':您已支付' . $live_num . '单 5天学习力诊断课';
 				    break;
+                case 21: //超级记忆线上训练营
+                    $res = $nickname . ':您已支付' . $live_num . '单 超级记忆线上训练营';
+                    break;
             }
         } else if ($type == 18) {
             $data = Column::find($relation_id);
