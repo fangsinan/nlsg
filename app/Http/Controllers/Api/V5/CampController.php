@@ -577,7 +577,8 @@ class CampController extends Controller
         ColumnWeekReward::where([
             'user_id'       => $user_id,
             'relation_id'   => $column_id,
-            'speed_status'   => 2,
+            'speed_status'  => 2,
+            'is_get'        => 0,
         ])->update([
             'is_get' =>1
         ]);
