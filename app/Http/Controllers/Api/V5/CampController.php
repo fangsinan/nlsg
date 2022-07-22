@@ -194,7 +194,7 @@ class CampController extends Controller
         $end_start = ColumnEndShow::EndShow($user_id,$column_id);
         // $column['end_show_letter']  = $end_start['is_letter']; //是否拆开信件 结营当天必弹  弹完点击就算拆开信件
         $column['end_show']         = $end_start['is_cer']; // 是否领取奖励   需要结营后 手动点击
-        $column['cer_is_show']      = empty($column['letter'])?0 :$end_start['cer_is_show']; // 是否有资格显示  条件  (前提是信件存在) 1、结营后  2、学完所有周的课程
+        $column['cer_is_show']      = empty($column['letter'])?0 :$end_start['cer_is_show']; // 是否有资格显示 条件 1、设置了结营信   2、结营后  3、学完所有周的课程
         $real_user = DB::table("crm_camp_user")->select("real_name")->where(['user_id' => $user_id])->first();
         if(empty($real_user->real_name)){
             $real_name = $this->user['nickname'] ?? "";
