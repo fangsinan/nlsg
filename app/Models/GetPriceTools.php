@@ -238,7 +238,7 @@ class GetPriceTools extends Base
     //计算返利金额
     protected function getTwitterMoneyBySku($data): array
     {
-        if ($data->twitter_price_off === 0) {
+        if ($data->twitter_price_off === 1) {
             return [
                 't_money'        => 0,
                 't_money_black'  => 0,
