@@ -739,7 +739,7 @@ class WorksController extends Controller
             ])->first();
             $top_img = $img->detail_img??"";
         }else{
-            $top_img = $works->detail_img;
+            $top_img = $works->detail_img??"";
         }
 
         $res = WorksInfoContent::where('works_info_id',$info_id)->first();
