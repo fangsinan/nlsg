@@ -197,46 +197,73 @@ class GetPriceTools extends Base
     //计算推客的常规购买价格和收益
     public function getPriceDataFromDb($goods_id)
     {
-        $res = DB::table('nlsg_mall_goods')
+        $res       = DB::table('nlsg_mall_goods')
             ->select(['id', 'price'])->find($goods_id);
         $sku_price = DB::table('nlsg_mall_sku')
             ->where('goods_id', '=', $goods_id)
             ->where('status', '=', 1)
-            ->select(['id', 'sku_number', 'price', 'original_price', 'cost', 'promotion_cost'])
+            ->select([
+                'id', 'sku_number', 'price', 'original_price', 'cost', 'promotion_cost',
+                'level_price_off', 'twitter_price_off'
+            ])
             ->get();
 
-        $res->level_3 = self::PriceCalc('*', $res->price, $this->level_3_off);
-        $res->level_4 = self::PriceCalc('*', $res->price, $this->level_4_off);
-        $res->level_5 = self::PriceCalc('*', $res->price, $this->level_5_off);
+        $goods_level_price_off = 0;
+
         foreach ($sku_price as $v) {
-            $v->level_3 = self::PriceCalc('*', $v->price, $this->level_3_off);
-            $v->level_4 = self::PriceCalc('*', $v->price, $this->level_4_off);
-            $v->level_5 = self::PriceCalc('*', $v->price, $this->level_5_off);
+            if ($v->level_price_off === 0) {
+                $v->level_3 = self::PriceCalc('*', $v->price, $this->level_3_off);
+                $v->level_4 = self::PriceCalc('*', $v->price, $this->level_4_off);
+                $v->level_5 = self::PriceCalc('*', $v->price, $this->level_5_off);
+            } else {
+                $goods_level_price_off = 1;
+                $v->level_3 = $v->level_4 = $v->level_5 = $v->price;
+            }
+
             $v->twitter_money = $this->getTwitterMoneyBySku($v);
         }
+
+        if ($goods_level_price_off === 0){
+            $res->level_3 = self::PriceCalc('*', $res->price, $this->level_3_off);
+            $res->level_4 = self::PriceCalc('*', $res->price, $this->level_4_off);
+            $res->level_5 = self::PriceCalc('*', $res->price, $this->level_5_off);
+        }else{
+            $res->level_3 = $res->level_4 = $res->level_5 = $res->price;
+        }
+
         $res->sku_price_list = $sku_price;
         return $res;
     }
 
     //计算返利金额
-    protected function getTwitterMoneyBySku($data)
+    protected function getTwitterMoneyBySku($data): array
     {
+        if ($data->twitter_price_off === 0) {
+            return [
+                't_money'        => 0,
+                't_money_black'  => 0,
+                't_money_yellow' => 0,
+                't_money_dealer' => 0,
+                't_staff_money'  => 0,
+            ];
+        }
+
         $Percentage = intval(($data->original_price - $data->cost) / $data->original_price * 100); //百分比
-        $temp_data = [];
+        $temp_data  = [];
         if ($Percentage >= 50) {
-            $temp_data['t_money_black'] = self::PriceCalc('*', $data->original_price, 0.1);
+            $temp_data['t_money_black']  = self::PriceCalc('*', $data->original_price, 0.1);
             $temp_data['t_money_yellow'] = self::PriceCalc('*', $data->original_price, 0.15);
             $temp_data['t_money_dealer'] = self::PriceCalc('*', $data->original_price, 0.25);
-        } else if ($Percentage >= 30 && $Percentage < 50) {
-            $temp_data['t_money_black'] = self::PriceCalc('*', $data->original_price, 0.05);
+        } else if ($Percentage >= 30) {
+            $temp_data['t_money_black']  = self::PriceCalc('*', $data->original_price, 0.05);
             $temp_data['t_money_yellow'] = self::PriceCalc('*', $data->original_price, 0.1);
             $temp_data['t_money_dealer'] = self::PriceCalc('*', $data->original_price, 0.15);
         } else {
-            $temp_data['t_money_black'] = self::PriceCalc('*', $data->original_price, 0.03);
+            $temp_data['t_money_black']  = self::PriceCalc('*', $data->original_price, 0.03);
             $temp_data['t_money_yellow'] = self::PriceCalc('*', $data->original_price, 0.05);
             $temp_data['t_money_dealer'] = self::PriceCalc('*', $data->original_price, 0.1);
         }
-        $temp_data['t_money'] = $temp_data['t_money_black'];
+        $temp_data['t_money']       = $temp_data['t_money_black'];
         $temp_data['t_staff_money'] = self::PriceCalc('*', $temp_data['t_money'], 0.5);
         if ($data->promotion_cost > 0) {
             foreach ($temp_data as &$v) {
