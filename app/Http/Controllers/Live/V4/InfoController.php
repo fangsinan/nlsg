@@ -39,7 +39,10 @@ class InfoController extends ControllerBackend
     public function liveSubOrderExcel(Request $request)
     {
         set_time_limit(240);
-        $columns = ['预约id','用户id', '用户账号', '用户昵称', '推客id', '推客账号', '推客昵称', '推客别名', '邀约时间', '直播id'];
+        $columns = [
+            '预约id','用户id', '用户账号', '用户昵称', '推客id', '推客账号',
+            '推客昵称', '推客别名', '邀约时间', '直播id','客服姓名','客服账号'
+        ];
         $fileName = date('Y-m-d H:i') . '-' . random_int(10, 99) . '.csv';
         header('Content-Description: File Transfer');
         header('Content-Type: application/vnd.ms-excel');

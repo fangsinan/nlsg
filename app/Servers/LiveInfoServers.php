@@ -32,7 +32,7 @@ class LiveInfoServers {
         if (empty($live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
-        $check_live_id = Live::where('id', '=', $live_id)->first();
+        $check_live_id = Live::query()->where('id', '=', $live_id)->first();
         if (empty($check_live_id)) {
             return ['code' => false, 'msg' => 'live_id错误'];
         }
@@ -44,7 +44,9 @@ class LiveInfoServers {
 
         $query = Subscribe::query()
             ->with([
-                'UserInfo:id,phone,nickname',
+                'UserInfo:id,phone,nickname,unionid',
+                'UserInfo.userWechat:id,user_id,unionid,follow_user_remark,follow_user_userid',
+                'UserInfo.userWechat.userWechatName:id,qw_name,follow_user_userid,is_sale',
                 'twitterUser:id,phone,nickname,internal_remarks',
                 'twitterUser.getLName:id,son,son_id,son_flag'
             ])
@@ -56,7 +58,6 @@ class LiveInfoServers {
         if ($twitter_id_list !== null) {
             $query->whereIn('twitter_id', $twitter_id_list);
         }
-
         if (!empty($user_id)) {
             $query->whereHas('UserInfo',function ($q)use($user_id){
                 $q->where('id','=',$user_id);
@@ -133,6 +134,8 @@ class LiveInfoServers {
             $temp_data['son_flag'] = $v->twitterUser->getLName->son_flag ?? '';
             $temp_data['created_at'] = date('Y-m-d H:i:s',strtotime($v->created_at));
             $temp_data['relation_id'] = $v->relation_id;
+            $temp_data['wx_kefu'] = $v->UserInfo->userWechat->userWechatName->qw_name ?? '';
+            $temp_data['wx_kefu_id'] = $v->UserInfo->userWechat->userWechatName->follow_user_userid ?? '';
             $data[] = $temp_data;
         }
 

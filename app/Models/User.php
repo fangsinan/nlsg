@@ -388,4 +388,14 @@ class User extends Authenticatable implements JWTSubject
         return $user;
     }
 
+    public function userWechat(){
+        return $this->hasOne('App\Models\UserWechat','unionid','unionid')
+//            ->whereNotNull('follow_user_userid')
+            ->whereNotIn('follow_user_userid',[
+                'JiaZhengZe', 'DongRuiXia', 'SunYiHao',
+                'XuHongRu', 'ZhangJing', 'LiuDanHua', 'ShenShuJing',
+                'ZhangShiHao', 'ZhangQi01'
+            ]);
+    }
+
 }

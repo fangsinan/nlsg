@@ -47,5 +47,8 @@ class UserWechat extends Base
             ->where('status',1);
     }
 
+    public function userWechatName(){
+        return $this->hasOne(UserWechatName::class,'follow_user_userid','follow_user_userid');
+    }
 
 }
