@@ -196,11 +196,11 @@ class CampController extends Controller
         $column['end_show']         = $end_start['is_cer']; // 是否领取奖励   需要结营后 手动点击
         // $column['cer_is_show']      = $end_start['cer_is_show']; // 是否有资格显示 条件 1、设置了结营信   2、结营后  3、学完所有周的课程
         $column['cer_is_show']      = empty($column['letter'])?0 :$end_start['cer_is_show']; // 是否有资格显示 条件 1、设置了结营信   2、结营后  3、学完所有周的课程
-        $real_user = DB::table("crm_camp_user")->select("real_name")->where(['user_id' => $user_id])->first();
+        $real_user = DB::table("crm_camp_user")->select("real_name","child_name")->where(['user_id' => $user_id])->first();
         if(empty($real_user->real_name)){
             $real_name = $this->user['nickname'] ?? "";
         }else{
-            $real_name = $real_user->real_name ?? "";
+            $real_name = ($real_user->real_name ?? "")." ".($real_user->child_name??"");
         }
         $column['camp_user_name'] = $real_name;
 
