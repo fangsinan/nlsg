@@ -180,6 +180,13 @@ class GoodsServers
 
         $edit_sku_id_arr = [];
         foreach ($params['sku_list'] as $v) {
+            if (empty($v['erp_goods_code'])) {
+                return ['code' => false, 'msg' => '货品编号不能为空'];
+            }
+            if (empty($v['erp_enterprise_code'])) {
+                return ['code' => false, 'msg' => '商家编码不能为空'];
+            }
+
             if (($v['id'] ?? 0) !== 0) {
                 //如果有是编辑,sku_number不变
                 $sku = MallSku::where('goods_id', '=', $goods_id)
