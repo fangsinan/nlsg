@@ -703,6 +703,7 @@ class MallRefundJob
                         'status' => 20
                     ]);
 
+                //9精品课  15讲座
                 if ($v->order_type == 9 || $v->order_type == 15) {
                     $check_sub = Subscribe::where('user_id', '=', $v->user_id)
                         ->where('relation_id', '=', $v->relation_id)
@@ -725,7 +726,7 @@ class MallRefundJob
                         }
                     }
                 } elseif ($v->order_type == 16) {
-                    //360
+                    //360 16新vip
                     $check_sub = VipUser::where('user_id', '=', $v->user_id)
                         ->where('level', '=', 1)
                         ->where('status', '=', 1)
@@ -746,6 +747,7 @@ class MallRefundJob
                         }
                     }
                 }elseif ($v->order_type == 14){
+                    //14 线下产品(门票类)
                     if($v->relation_id == 8){
                             Subscribe::query()->where('user_id','=',$v->user_id)
                                 ->where('type','=',2)
@@ -759,6 +761,12 @@ class MallRefundJob
                                 ->where('give','=',3)
                                 ->update(['status'=>0]);
                     }
+                }elseif ($v->order_type == 10){
+                    //直播
+                    Subscribe::query()->where('type', '=', 3)
+                        ->where('order_id', '=', $v->id)
+                        ->where('status', '=', 1)
+                        ->update(['status' => 0]);
                 }
 
             }

@@ -39,10 +39,6 @@ class shillJob extends Command
      */
     public function handle()
     {
-        DB::table('wwtest')->insert([
-            'phone'=>time(),
-            'twitter'=>rand(1,999999),
-        ]);
 //        MallRefundJob::shillJob(1);
 //        MallRefundJob::shillJob(2);
     }
