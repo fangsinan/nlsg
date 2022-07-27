@@ -1712,7 +1712,7 @@ class LiveController extends Controller
             'coupon_id' => 0,
             'ip' => $this->getIp($request),
             'os_type' => $osType,
-            'live_id' => $liveId,
+            'live_id' => $from_live_info_id,
             'pay_type' => $payType,
             'activity_tag' => $activity_tag,
             'remark' => $from_live_info_id,
