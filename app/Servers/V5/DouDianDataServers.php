@@ -127,7 +127,7 @@ class DouDianDataServers
             $q->where('create_time', '>=', $create_time_date_begin);
         });
         $query->when($create_time_date_end, function ($q, $create_time_date_end) {
-            $create_time_date_end = strtotime($create_time_date_end) + 86400;
+            $create_time_date_end = strtotime($create_time_date_end) + 86399;
             $q->where('create_time', '<=', $create_time_date_end);
         });
 

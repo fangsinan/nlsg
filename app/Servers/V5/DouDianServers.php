@@ -141,7 +141,7 @@ class DouDianServers
 
         } else {
             $end_time   = time();
-            $begin_time = $end_time - 3600;
+            $begin_time = $end_time - 720;
         }
 
         $this->orderSearchList($begin_time, $end_time, $type);
@@ -504,7 +504,6 @@ class DouDianServers
             }
 
             $page++;
-            sleep(1);
         }
 
     }
