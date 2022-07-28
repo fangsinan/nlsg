@@ -1705,7 +1705,7 @@ class LiveController extends Controller
             'ordernum' => $ordernum,
             'type' => 10,
             'user_id' => $this->user['id'],
-            'relation_id' => $liveInfoId,
+            'relation_id' => $liveId,
             'cost_price' => $list['price'],
             'price' => $list['price'],
             'twitter_id' => $tweeter_code??0,
