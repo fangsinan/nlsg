@@ -659,6 +659,7 @@ where a.user_id = ' . $user_id . ' and a.status = 2
             }
 
         }
+        $card_data['expire_time']  = empty($card_data['expire_time']) ? 0 : strtotime($card_data['expire_time']);
         return  $card_data;
     }
 
