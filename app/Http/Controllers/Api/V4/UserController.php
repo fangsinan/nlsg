@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\FeedBack;
 use App\Models\UserFollow;
 use App\Models\Comment;
+use App\Models\PayRecordDetail;
 use App\Models\Subscribe;
 use App\Models\Wiki;
 use App\Models\VipUser;
@@ -1247,6 +1248,18 @@ class UserController extends Controller
             if( strtotime($this->user['cancel_time'])+(86400*15) > time() ){
                 $res['cancel_days'] = ceil((strtotime($this->user['cancel_time'])+(86400*15) - time()) / 86400);
             }
+            // 360信息
+            $res["vip_info"] = VipUser::getLoginUser($this->user);
+            // 钱包信息
+            $res["Profit"] =[
+                    'sum_earn'  => PayRecordDetail::getSumProfit($this->user['id'], 2),
+                    'cash_money' => PayRecordDetail::getSumProfit($this->user['id'],5),
+            ];
+            $res['time_nuimber'] = History::where([
+                "user_id"=>$this->user['id'],
+                "is_del"=>0,
+            ])->sum("time_number");
+            
 
             return success($res);
 

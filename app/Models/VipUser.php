@@ -614,6 +614,54 @@ where a.user_id = ' . $user_id . ' and a.status = 2
 
     }
 
+    public static function getLoginUser($user){
+        //卡片(昵称,是否开通,到期天数,价格)
+        $card_data['nickname']     = $user['nickname'] ?? '';
+        $card_data['headimg']      = $user['headimg'] ?? '/image/202009/13f952e04c720a550193e5655534be86.jpg';
+        $card_data['level']        = 0;
+        $card_data['expire_time']  = $user['new_vip']['expire_time'] ?? '';
+        $card_data['surplus_days'] = 0;//剩余多少天
+        $card_data['price']        = ConfigModel::getData(25);
+        $card_data['is_login']     = empty($user) ? 0 : 1;
+        $now_date                  = date('Y-m-d H:i:s');
+
+        if (empty($user['new_vip']['level'] ?? 0)) {
+            $card_data['is_open'] = 0;
+        } else {
+            $card_data['level'] = $user['new_vip']['level'];
+
+            if ($user['new_vip']['level'] == 1) {
+                $card_data['is_open']      = 1;
+                $card_data['surplus_days'] = intval((strtotime($user['new_vip']['expire_time']) - time()) / 86400);
+                $card_data['expire_time']  = $user['new_vip']['expire_time'];
+            } else {
+                if ($user['new_vip']['is_open_360'] == 1) {
+                    if ($user['new_vip']['time_end_360'] > $now_date) {
+                        $card_data['is_open']      = 1;
+                        $card_data['surplus_days'] = intval((strtotime($user['new_vip']['time_end_360']) - time()) / 86400);
+                        $card_data['expire_time']  = $user['new_vip']['time_end_360'];
+                    } else {
+                        $card_data['is_open'] = 0;
+                    }
+                } else {
+                    $card_data['is_open'] = 0;
+                }
+            }
+        }
+
+        $card_data['overdue_time'] = 0;//过期多少天
+        if ($card_data['is_open'] == 0 && !empty($user['id'])) { //查询过期几天
+            $newVip = VipUser::where('user_id', $user['id'])->first();
+            if (empty($newVip['expire_time'])) {
+                $card_data['overdue_time'] = 0;
+            } else {
+                $card_data['overdue_time'] = intval((strtotime(date("Y-m-d 23:59:59")) - strtotime($newVip['expire_time'])) / 86400);
+            }
+
+        }
+        return  $card_data;
+    }
+
 
 
 }
