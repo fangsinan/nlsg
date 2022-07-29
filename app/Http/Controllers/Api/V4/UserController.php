@@ -1255,7 +1255,7 @@ class UserController extends Controller
                     'sum_earn'  => PayRecordDetail::getSumProfit($this->user['id'], 2),
                     'cash_money' => PayRecordDetail::getSumProfit($this->user['id'],5),
             ];
-            $res['time_nuimber'] = History::where([
+            $res['time_number'] = History::where([
                 "user_id"=>$this->user['id'],
                 "is_del"=>0,
             ])->sum("time_number");
