@@ -1089,7 +1089,7 @@ GROUP BY
                     'lr.son_flag',
                     'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title',
                     'o.id as order_id', 'o.pay_type', 'os_type',
-                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id', 'o.ordernum', 'o.live_id'
+                    'cd.new_vip_uid', 'activity_tag', 'cd.id as cd_id', 'o.ordernum', 'o.remark'
                 ]);
             $res = $query->paginate($size);
 
@@ -1103,7 +1103,7 @@ GROUP BY
 //                    'lt.nickname as t_nickname',
                     DB::raw('if(lt.internal_remarks = "",lt.nickname,lt.internal_remarks) as t_nickname'),
                     'lr.son_flag',
-                    'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title', 'o.live_id'
+                    'pay_price', 'pay_time', 'o.live_id', 'l.title as live_title', 'o.remark'
                 ]);
             $res = $query->get();
         }
