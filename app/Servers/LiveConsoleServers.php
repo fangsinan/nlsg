@@ -553,7 +553,7 @@ class LiveConsoleServers
     }
 
     //直播在线听课记录写入
-    public  static function LiveOnline()
+    /*public  static function LiveOnline()
     {
 
         $while_flag = true;
@@ -624,6 +624,202 @@ class LiveConsoleServers
 
             } else {
                 LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
+            }
+
+        }
+
+    }*/
+
+    //处理重复数据
+    /*public  static function LiveOnline()
+    {
+
+        $while_flag = true;
+        while ($while_flag) {
+            $his_table = 'nlsg_live_online_user';
+            $onlineList = DB::table($his_table)->select("id", "live_id", "user_id", "live_son_flag", 'online_time', 'online_time_str')->where('id','<=',30000000)
+                ->orderBy('id', 'asc')->limit(10000)->get()->toArray();
+//            echo '<pre>';
+//            var_dump($onlineList);
+            if (empty($onlineList)) {
+                $while_flag = false;
+                LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
+                break;
+            }
+
+            foreach ($onlineList as $k => $val) {
+                $map = [
+                    "live_id" => $val->live_id,
+                    "user_id" => $val->user_id,
+                    "live_son_flag" => $val->live_son_flag,
+                    "online_time" => $val->online_time,
+                    "online_time_str" => $val->online_time_str
+                ];
+
+                //插入数据
+                try {
+                    $rst = DB::table('nlsg_live_online_user22')->insert($map);
+                } catch (\Exception $e) {
+                    $rst=DB::table('nlsg_live_online_user22_bf')->insert($map);; //标记重复数据
+                    LiveConsoleServers::LogIo('liveonlineanalysis', 'online_error', '写入异常' . $e->getMessage());
+                }
+                if($rst) {
+                    DB::table($his_table)->where('id', $val->id)->delete();
+                }
+            }
+
+            LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '执行成功');
+
+        }
+
+    }*/
+
+    //加入执行队列
+    public static function OnlineRedisPush(){
+
+        $redisConfig = config('database.redis.default');
+        $Redis = new Client($redisConfig);
+        $Redis->select(3);
+        $list_name='online_id_list_in';
+        $num=$Redis->llen($list_name);
+        if($num<=0) {
+
+            $start_time=date("Y-m-d H:i:s",time());
+            $Redis->setex('id_start',60*60*48,$start_time);
+
+            $while_flag = true;
+            while ($while_flag) {
+
+                $id_key_name = 'key_end_id';
+                $end_id = $Redis->get($id_key_name);
+                if (empty($end_id)) {
+                    $end_id = 1;
+                }
+                if($end_id>=101000000){
+                    $while_flag = false;
+                    break;
+                }
+                $his_table = 'nlsg_live_online_user';
+                $onlineList = DB::table($his_table)->select("id")->where('id', '>=', $end_id)
+                    ->orderBy('id', 'asc')->limit(100000)->get()->toArray();
+                if (!empty($onlineList)) {
+                    $num = count($onlineList);
+                    $id_arr = [];
+                    foreach ($onlineList as $k => $val) {
+                        $id_arr[] = $val->id;
+                        if (($k + 1) % 100 == 0) {
+                            $Redis->rpush('online_id_list_in', $id_arr); //从队尾插入  先进先出
+                            $id_arr = [];
+                        }
+                        if (($k + 1) == $num) {
+                            $Redis->setex($id_key_name, 60 * 60 * 48, $val->id); //设置最后一个元素id
+                        }
+                    }
+                    if (!empty($id_arr)) { //处理剩余数据
+                        $Redis->rpush('online_id_list_in', $id_arr); //从队尾插入  先进先出
+                    }
+                }
+            }
+
+            $end_time=date("Y-m-d H:i:s",time());
+            $Redis->setex('id_end',60*60*48,$end_time);
+            echo '执行成功';
+        }else{
+            echo '任务执行成功';
+        }
+    }
+
+    //处理重复数据
+    public  static function LiveOnline($flag=1)
+    {
+
+        $redisConfig = config('database.redis.default');
+        $Redis = new Client($redisConfig);
+        $Redis->select(3);
+        $list_name='online_id_list_in';
+
+        $start_time=date("Y-m-d H:i:s",time());
+        $Redis->setex('lpop_start_15_'.$flag,60*60*48,$start_time);
+
+        $while_flag = true;
+        while ($while_flag) {
+
+            $id = $Redis->lPop($list_name); //获取队列执行id
+            if(empty($id)){
+                $while_flag = false;
+                LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '数据为空');
+                break;
+            }
+            $his_table = 'nlsg_live_online_user';
+            $onlineObj = DB::table($his_table)->select("id", "live_id", "user_id", "live_son_flag", 'online_time', 'online_time_str')
+                          ->where('id',$id)->first();
+            if (!empty($onlineObj)) {
+                $map = [
+                    "id" => $onlineObj->id,
+                    "live_id" => $onlineObj->live_id,
+                    "user_id" => $onlineObj->user_id,
+                    "online_time_str" => $onlineObj->online_time_str,
+                    "live_son_flag" => $onlineObj->live_son_flag,
+                    "online_time" => $onlineObj->online_time
+                ];
+                try {
+                    $rst = DB::table('nlsg_live_online_user22')->insert($map); //插入数据
+                } catch (\Exception $e) {
+                    $message=$e->getMessage();
+                    if(strpos($message,'live_user_online_flag') !== false){ //判断报错信息是否包含唯一索引
+                        $rst = DB::table('nlsg_live_online_user22_bf')->insert($map);; //标记重复数据
+                        LiveConsoleServers::LogIo('liveonlineanalysis', 'online_error_unique_', '抛出异常' . $message);
+                    }else{
+                        $Redis->rpush($list_name, $id); //未处理恢复队尾
+                        $rst=false;
+                        LiveConsoleServers::LogIo('liveonlineanalysis', 'online_error_key_', '抛出异常' . $message);
+                    }
+                }
+                if ($rst) {
+                    DB::table($his_table)->where('id', $onlineObj->id)->delete();
+                }
+            }
+
+        }
+        $start_time=date("Y-m-d H:i:s",time());
+        $Redis->setex('lpop_end_15_'.$flag,60*60*48,$start_time);
+        LiveConsoleServers::LogIo('liveonlineanalysis', 'online', '执行成功---结束循环');
+    }
+
+    public function clearLiveOnlineUser()
+    {
+
+        $redisConfig = config('database.redis.default');
+        $Redis = new Client($redisConfig);
+        $Redis->select(3);
+        $key_begin_id = 'key_begin_id';
+        $begin_id = $Redis->get($key_begin_id);
+        if (empty($begin_id)) {
+            $begin_id = 1;
+        }
+
+        for ($i = 1; $i < 100; $i++) {
+            $size     = 10000;
+            $end_id   = $begin_id + $size;
+
+            $list = DB::table('nlsg_live_online_user')
+                ->where('id', '>=', $begin_id)
+                ->where('id', '<', $end_id)
+                ->get();
+
+            if ($list->isEmpty()) {
+                exit('没数据了');
+            }
+
+            $list = $list->toArray();
+            foreach ($list as &$v) {
+                unset($v->id);
+                $v = (array)$v;
+            }
+            //批量插入排除重复数据
+            $rst=DB::table('nlsg_live_online_user22')->insertOrIgnore($list);
+            if($rst){
+                $Redis->setex($key_begin_id,60*60*48,$end_id);
             }
 
         }

@@ -241,30 +241,30 @@ class WechatServersNew
         开始时间：2017年8月1日 20:00
         请留言直播课程开始时间，以免错过课程*/
         //周三早7点  &tweeter_code=211370
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=536&time=1655214730018&inviter=211370';
-        $hello='如何让孩子高效学习，自动自发自主？';
-        $title='4招激活孩子学习动力，让孩子爱上学习';
-        $teacher='汤蓓老师';
-        $time='2022年6月15日 19:30';
-        $remarks="点击下面详情按钮，免费预约直播课学习~";
+        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=598&time=1658717687&inviter=211370';
+        $hello='提高孩子记忆力的好方法。免费直播课如下：';
+        $title='解密最强大脑，科学高效记忆';
+        $number='JYL-0726-27';
+        $abstract='帮助孩子提高记忆力，记单词、记数字、记文章，掌握高效的记忆力方法，详见链接';
+        $remarks="温馨提示：一定要带着孩子一起学习，一起训练效果好";
 
         $data=[
             'touser'=>$open_id,
-            'template_id'=>'aKg8ZrSfkimD_hg3QWLJsP5V2dfumONx4DpfgKWWXtA',
+            'template_id'=>'W4eXPP0iI3iNGHvyrCOTfUvPpNFXwgP0uULl_0ZyK7s',
             'url'=>$hrefurl, #抖音直播不需要跳转
             'topcolor'=>"#FF0000",
             'data'=>[
                 "first"=>[
                     "value"=>$hello,
                 ],
-                "keyword1"=>[ //课程标题
+                "keyword1"=>[ //名称
                     "value"=>$title,
                 ],
-                "keyword2"=>[ //主讲老师
-                    "value"=>$teacher,
+                "keyword2"=>[ //编号
+                    "value"=>$number,
                 ],
-                "keyword3"=>[ //时间
-                    "value"=>$time,
+                "keyword3"=>[ //摘要
+                    "value"=>$abstract,
                 ],
                 "remark"=>[
                     "value"=>$remarks,
