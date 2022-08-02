@@ -1056,7 +1056,7 @@ GROUP BY
                 $temp_order_begin_id = Order::query()->max('id');
             }
             $query->where('o.id', '>=', $temp_order_begin_id);
-            $query->where('o.remark', '=', $live_id);
+            $query->where('o.live_id', '=', $live_id);
             $query->where('o.relation_id','<>',8);
         }
 
