@@ -696,7 +696,7 @@ class WechatPay extends Controller
             DB::beginTransaction();
             try {
                 $orderId = $orderInfo['id'];
-                $live_id = $orderInfo['live_id'];
+                $live_id = $orderInfo['relation_id'];
                 //更新订单状态
 
                 $user_id = $orderInfo['user_id']; //用户
