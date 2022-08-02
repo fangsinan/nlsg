@@ -517,30 +517,31 @@ class IndexController extends ControllerBackend
      * }
      */
     public function create(Request $request) {
-        $input             = $request->all();
-        $cover             = !empty($input['cover']) ? covert_img($input['cover']) : '';
-        $title             = $input['title'] ?? '';
-        $describe          = $input['describe'] ?? '';
-        $userId            = (int)($input['user_id'] ?? 0);
-        $begin_at          = $input['begin_at'] ?? date('Y-m-d H:i:s');
-        $end_at            = $input['end_at'] ?? date('Y-m-d H:i:s');
-        $price             = $input['price'] ?? 0;
-        $twitter           = $input['twitter_money'] ?? 0;
-        $helper            = $input['helper'] ?? '';
-        $helper            = preg_replace('/[^0-9]/i', ',', $helper);
-        $content           = $input['content'] ?? '';
-        $playback_url      = $input['playback_url'] ?? '';
-        $back_video_url    = $input['back_video_url'] ?? '';
-        $need_virtual      = $input['need_virtual'] ?? 0;
-        $need_virtual_num  = $input['need_virtual_num'] ?? 0;
+        $input            = $request->all();
+        $cover            = !empty($input['cover']) ? covert_img($input['cover']) : '';
+        $title            = $input['title'] ?? '';
+        $describe         = $input['describe'] ?? '';
+        $userId           = (int)($input['user_id'] ?? 0);
+        $begin_at         = $input['begin_at'] ?? date('Y-m-d H:i:s');
+        $end_at           = $input['end_at'] ?? date('Y-m-d H:i:s');
+        $price            = $input['price'] ?? 0;
+        $twitter          = $input['twitter_money'] ?? 0;
+        $helper           = $input['helper'] ?? '';
+        $helper           = preg_replace('/[^0-9]/i', ',', $helper);
+        $content          = $input['content'] ?? '';
+        $playback_url     = $input['playback_url'] ?? '';
+        $back_video_url   = $input['back_video_url'] ?? '';
+        $need_virtual     = $input['need_virtual'] ?? 0;
+        $need_virtual_num = $input['need_virtual_num'] ?? 0;
         $steam_end_time   = $input['steam_end_time'] ?? '';
-        $steam_begin_time  = $input['steam_begin_time'] ?? '';
-        $pre_push_time  = $input['pre_push_time'] ?? 60;
-        $classify = $input['classify'] ?? 0;
+        $steam_begin_time = $input['steam_begin_time'] ?? '';
+        $pre_push_time    = $input['pre_push_time'] ?? 60;
+        $classify         = $input['classify'] ?? 0;
+        $valid_time_range = $input['valid_time_range'] ?? 0;
 
         $poster_list = $input['poster'] ?? [];
-        if (is_string($poster_list)){
-            $poster_list = explode(',',$poster_list);
+        if (is_string($poster_list)) {
+            $poster_list = explode(',', $poster_list);
         }
 
         if (!$title) {
@@ -550,20 +551,20 @@ class IndexController extends ControllerBackend
             return error(1000, '开始时间不能为空');
         }
 
-        if (empty($classify)){
+        if (empty($classify)) {
             return error(1000, '请选择类型');
         }
 
-        if(!empty($steam_begin_time)){
-            $Y=substr($steam_begin_time,0,1);
-            if($Y!=2){
+        if (!empty($steam_begin_time)) {
+            $Y = substr($steam_begin_time, 0, 1);
+            if ($Y != 2) {
                 return error(1000, '拉流开始时间不能为空');
             }
         }
 
-        if(!empty($steam_end_time)){
-            $Y=substr($steam_end_time,0,1);
-            if($Y!=2){
+        if (!empty($steam_end_time)) {
+            $Y = substr($steam_end_time, 0, 1);
+            if ($Y != 2) {
                 return error(1000, '拉流结束时间不能为空');
             }
         }
@@ -572,29 +573,34 @@ class IndexController extends ControllerBackend
             return error(1000, '拉流时间范围不能为空');
         }
 
+        if (empty($valid_time_range)) {
+            return error(1000, '有效统计时间范围不能为空');
+        }
+
         $is_test      = (int)($input['is_test'] ?? 0);
         $qr_code      = $input['qr_code'] ?? '';
         $channel_show = $input['channel_show'] ?? [];
 
         $data = [
-            'user_id'           => $userId,
-            'cover_img'         => $cover,
-            'title'             => $title,
-            'describe'          => $describe,
-            'begin_at'          => $begin_at,
-            'end_at'            => $end_at,
-            'price'             => $price,
-            'twitter_money'     => $twitter,
-            'helper'            => $helper,
-            'content'           => $content,
-            'need_virtual'      => $need_virtual,
-            'need_virtual_num'  => $need_virtual_num,
-            'is_free'           => $price < '0.01' ? 1 : 0,
-            'is_test'           => $is_test,
+            'user_id'          => $userId,
+            'cover_img'        => $cover,
+            'title'            => $title,
+            'describe'         => $describe,
+            'begin_at'         => $begin_at,
+            'end_at'           => $end_at,
+            'price'            => $price,
+            'twitter_money'    => $twitter,
+            'helper'           => $helper,
+            'content'          => $content,
+            'need_virtual'     => $need_virtual,
+            'need_virtual_num' => $need_virtual_num,
+            'is_free'          => $price < '0.01' ? 1 : 0,
+            'is_test'          => $is_test,
             'steam_end_time'   => $steam_end_time,
-            'steam_begin_time'  => $steam_begin_time,
-            'pre_push_time'  => $pre_push_time,
-            'classify'  => $classify,
+            'steam_begin_time' => $steam_begin_time,
+            'pre_push_time'    => $pre_push_time,
+            'classify'         => $classify,
+            'valid_time_range' => $valid_time_range,
         ];
 
         $lcModel            = new LiveConsole();
@@ -1006,7 +1012,7 @@ class IndexController extends ControllerBackend
         $live = Live::query()
             ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
                 'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test',
-                'steam_end_time', 'steam_begin_time','pre_push_time','classify'
+                'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range'
             )
 //            ->with(['livePoster'])
             ->where('id', $id)->first();
