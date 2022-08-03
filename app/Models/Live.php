@@ -7,7 +7,8 @@ class Live extends Base
     protected $table = 'nlsg_live';
 
     protected $fillable = ['user_id', 'cover_img', 'title', 'describe', 'price', 'twitter_money', 'begin_at',
-        'end_at', 'helper','is_free','content','need_virtual','need_virtual_num','steam_end_time','steam_begin_time','classify'];
+        'end_at', 'helper','is_free','content','need_virtual','need_virtual_num','steam_end_time',
+                           'steam_begin_time','classify','valid_time_range'];
     public function getIndexLive($ids)
     {
         if (!$ids) {
