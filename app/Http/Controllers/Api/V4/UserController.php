@@ -1251,15 +1251,18 @@ class UserController extends Controller
             // 360信息
             $res["vip_info"] = VipUser::getLoginUser($this->user);
             // 钱包信息
+            $sum_earn   = PayRecordDetail::getSumProfit($this->user['id'], 2);
+            $cash_money = PayRecordDetail::getSumProfit($this->user['id'],5);
             $res["Profit"] =[
-                    'sum_earn'  => PayRecordDetail::getSumProfit($this->user['id'], 2),
-                    'cash_money' => PayRecordDetail::getSumProfit($this->user['id'],5),
+                    'sum_earn'      => sprintf("%1\$.2f", $sum_earn),
+                    'cash_money'    => sprintf("%1\$.2f", $cash_money),
             ];
+
             $res['time_number'] = History::where([
                 "user_id"=>$this->user['id'],
                 "is_del"=>0,
             ])->sum("time_number");
-            
+
 
             return success($res);
 
