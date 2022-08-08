@@ -86,7 +86,7 @@ class Subscribe extends Base
                 return 0;
             }
 
-            if( in_array($type,[3,5,7]) ){  //直播永久有效不需 判断end_time
+            if( in_array($type,[2,3,5,6,7]) ){  //直播永久有效不需 判断end_time
                 $sub_data = Subscribe::where($where)
                     ->first();
             }else{
