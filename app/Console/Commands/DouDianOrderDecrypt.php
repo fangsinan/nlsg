@@ -38,7 +38,7 @@ class DouDianOrderDecrypt extends Command
      */
     public function handle()
     {
-//        (new DouDianServers())->runDecryptNew();
+        (new DouDianServers())->runDecryptNew();
 
         return 0;
     }

@@ -923,6 +923,7 @@ class DouDianServers
 
     //抖店配额和风险改版 新任务
     public function runDecryptNew(){
+        $search_product_type = [3];//允许解密的订单类型
         DouDianOrder::query()
             ->where('decrypt_step', '<>', 3)
             ->where('post_tel', '<>', '')
@@ -944,6 +945,13 @@ class DouDianServers
         }
 
         $list = DouDianOrder::query()
+            ->with([
+                'orderList:order_id,product_id,parent_order_id',
+                'orderList.productInfo:id,product_type,product_id'
+            ])
+            ->whereHas('orderList.productInfo', function ($query) use ($search_product_type) {
+                $query->whereIn('product_type', $search_product_type);
+            })
             ->whereNotIn('order_status', [1, 4])
             ->where('decrypt_step', '<>', 9)
             ->where('decrypt_step', '<', self::DECRYPT_JOB_TYPE)
