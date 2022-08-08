@@ -45,6 +45,6 @@ class DouDianOrder extends Command
         } else {
             (new DouDianServers())->getOrderJob($type);
         }
-
+        return 0;
     }
 }

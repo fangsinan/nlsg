@@ -10,7 +10,7 @@ class DouDianProductList extends Base
 
     protected $fillable = [
         'product_id', 'status', 'check_status', 'market_price', 'discount_price',
-        'img', 'name', 'create_time', 'update_time', 'out_product_id','dou_dian_type',
+        'img', 'name', 'create_time', 'update_time', 'out_product_id','dou_dian_type','product_type',
     ];
 
 }
