@@ -135,7 +135,7 @@ class WechatServersNew
 
             $redisConfig = config('database.redis.default');
             $Redis = new Client($redisConfig);
-            $Redis->select(3);
+            $Redis->select(5);
 
             $map_all = [];
             foreach ($data['data']['openid'] as $fv) {
@@ -160,7 +160,7 @@ class WechatServersNew
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
-        $Redis->select(3);
+        $Redis->select(5);
 
         $time=time();
         $day_time=date('Y-m-d H:i:s',$time);
@@ -187,7 +187,7 @@ class WechatServersNew
 
             $redisConfig = config('database.redis.default');
             $Redis = new Client($redisConfig);
-            $Redis->select(3);
+            $Redis->select(5);
             $key_name='push_wechat_openid_list';
             $flag = true;
             while ($flag) {
@@ -241,10 +241,10 @@ class WechatServersNew
         开始时间：2017年8月1日 20:00
         请留言直播课程开始时间，以免错过课程*/
         //周三早7点  &tweeter_code=211370
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=598&time=1658717687&inviter=211370';
+        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=612&live_id=612&time=1659426045965&inviter=211370';
         $hello='提高孩子记忆力的好方法。免费直播课如下：';
         $title='解密最强大脑，科学高效记忆';
-        $number='JYL-0726-27';
+        $number='JYL-0803-04';
         $abstract='帮助孩子提高记忆力，记单词、记数字、记文章，掌握高效的记忆力方法，详见链接';
         $remarks="温馨提示：一定要带着孩子一起学习，一起训练效果好";
 

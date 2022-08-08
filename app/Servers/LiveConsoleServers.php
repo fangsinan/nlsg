@@ -679,7 +679,7 @@ class LiveConsoleServers
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
-        $Redis->select(3);
+        $Redis->select(5);
         $list_name='online_id_list_in';
         $num=$Redis->llen($list_name);
         if($num<=0) {
@@ -735,7 +735,7 @@ class LiveConsoleServers
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
-        $Redis->select(3);
+        $Redis->select(5);
         $list_name='online_id_list_in';
 
         $start_time=date("Y-m-d H:i:s",time());
