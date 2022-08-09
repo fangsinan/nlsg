@@ -21,56 +21,58 @@ class DouDianDataServers
         $create_time_date_end   = $params['create_time_date_end'] ?? '';
         $decrypt_step           = (int)($params['decrypt_step'] ?? -1);
         $dou_dian_type          = (int)($params['dou_dian_type'] ?? 1);
+        $product_type           = (int)($params['product_type'] ?? -1);
 
         //解密结果  0全部,1未解密,2解密完毕,3解密失败
         $decrypt_res = (int)($params['decrypt_res'] ?? 0);
 
         $query = DouDianOrder::query()
             ->select([
-                         'user_id', 'order_id', 'order_status', 'order_status_desc', 'main_status', 'main_status_desc',
-                         'pay_time', DB::raw('FROM_UNIXTIME(pay_time,"%Y-%m-%d %H:%i") as pay_time_date'),
-                         'finish_time', DB::raw('FROM_UNIXTIME(finish_time,"%Y-%m-%d %H:%i") as finish_time_date'),
-                         'create_time', DB::raw('FROM_UNIXTIME(create_time,"%Y-%m-%d %H:%i") as create_time_date'),
-                         'update_time', DB::raw('FROM_UNIXTIME(update_time,"%Y-%m-%d %H:%i") as update_time_date'),
-                         'order_amount', 'pay_amount', 'post_amount',
-                         DB::raw('order_amount/100 as order_amount_yuan'),
-                         DB::raw('pay_amount/100 as pay_amount_yuan'),
-                         DB::raw('post_amount/100 as post_amount_yuan'),
-                         'post_addr_province_name', 'post_addr_city_name', 'post_addr_town_name', 'post_addr_street_name',
-                         'post_addr_detail', 'post_tel', 'post_receiver',
-                         'decrypt_step', 'decrypt_err_no', 'decrypt_err_msg',
-                         'cancel_reason', 'buyer_words',
-                     ]);
+                'user_id', 'order_id', 'order_status', 'order_status_desc', 'main_status', 'main_status_desc',
+                'pay_time', DB::raw('FROM_UNIXTIME(pay_time,"%Y-%m-%d %H:%i") as pay_time_date'),
+                'finish_time', DB::raw('FROM_UNIXTIME(finish_time,"%Y-%m-%d %H:%i") as finish_time_date'),
+                'create_time', DB::raw('FROM_UNIXTIME(create_time,"%Y-%m-%d %H:%i") as create_time_date'),
+                'update_time', DB::raw('FROM_UNIXTIME(update_time,"%Y-%m-%d %H:%i") as update_time_date'),
+                'order_amount', 'pay_amount', 'post_amount',
+                DB::raw('order_amount/100 as order_amount_yuan'),
+                DB::raw('pay_amount/100 as pay_amount_yuan'),
+                DB::raw('post_amount/100 as post_amount_yuan'),
+                'post_addr_province_name', 'post_addr_city_name', 'post_addr_town_name', 'post_addr_street_name',
+                'post_addr_detail', 'post_tel', 'post_receiver',
+                'decrypt_step', 'decrypt_err_no', 'decrypt_err_msg',
+                'cancel_reason', 'buyer_words',
+            ]);
 
 //        $query->where('order_id', '>', '4933714072054765432');
         $query->where('dou_dian_type', '=', $dou_dian_type);
 
         $query->with([
-                         'orderList'             => function ($q) {
-                             $q->select([
-                                            'id', 'order_id', 'parent_order_id',
-                                            'create_time', DB::raw('FROM_UNIXTIME(create_time,"%Y-%m-%d %H:%i") as create_time_date'),
-                                            'update_time', DB::raw('FROM_UNIXTIME(update_time,"%Y-%m-%d %H:%i") as update_time_date'),
-                                            'sku_id', 'product_id', 'goods_type', 'item_num'
-                                        ]);
-                         },
-                         'orderList.productInfo' => function ($q) {
-                             $q->select([
-                                            'id', 'product_id', 'img', 'name'
-                                        ]);
-                         },
-                         //            'orderList.skuInfo'     => function ($q) {
-                         //                $q->select([
-                         //                    'id', 'product_id',
-                         //                    'spec_detail_name1', 'spec_detail_name2', 'spec_detail_name3',
-                         //                    'price', 'settlement_price', 'spec_id',
-                         //                ]);
-                         //            },
-                     ]);
+            'orderList'             => function ($q) {
+                $q->select([
+                    'id', 'order_id', 'parent_order_id', 'create_time', 'update_time',
+                    DB::raw('FROM_UNIXTIME(create_time,"%Y-%m-%d %H:%i") as create_time_date'),
+                    DB::raw('FROM_UNIXTIME(update_time,"%Y-%m-%d %H:%i") as update_time_date'),
+                    'sku_id', 'product_id', 'goods_type', 'item_num'
+                ]);
+            },
+            'orderList.productInfo' => function ($q) {
+                $q->select([
+                    'id', 'product_id', 'img', 'name', 'product_type',
+                ]);
+            }
+        ]);
 
-
-        if ($dou_dian_type === 2){
-            //todo 只看学习机
+        //虚拟,实物
+        if ($product_type != -1) {
+            if ($product_type === 3) {
+                $query->whereHas('orderList.productInfo', function ($q) {
+                    $q->where('product_type', '=', 3);
+                });
+            } else {
+                $query->whereHas('orderList.productInfo', function ($q) {
+                    $q->where('product_type', '<>', 3);
+                });
+            }
         }
 
         //解密状态
@@ -154,15 +156,24 @@ class DouDianDataServers
         $res = $query->paginate($size);
 
         foreach ($res as $v) {
-            if ($v->decrypt_step === 3){
-                $v->decrypt_res = 2;
+
+            if ($v->decrypt_step === 3) {
+                $v->decrypt_res      = 2;
                 $v->decrypt_res_desc = '解密完毕';
-            }elseif ($v->decrypt_step === 9){
-                $v->decrypt_res = 3;
+            } elseif ($v->decrypt_step === 9) {
+                $v->decrypt_res      = 3;
                 $v->decrypt_res_desc = '解密失败';
-            }else{
-                $v->decrypt_res = 1;
+            } else {
+                $v->decrypt_res      = 1;
                 $v->decrypt_res_desc = '未解密';
+            }
+
+            $v->product_type = 0;
+            foreach ($v->orderList as $ol) {
+                if ($ol->productInfo->product_type === 3) {
+                    $v->product_type = 3;
+                    break;
+                }
             }
 
 
@@ -202,17 +213,17 @@ class DouDianDataServers
         $dou_dian_type = (int)($params['dou_dian_type'] ?? 1);
 
         $temp = DouDianOrderDecryptQuota::query()
-            ->where('expire','>',date('Y-m-d H:i:s'))
-            ->where('flag','=',1)
-            ->where('dou_dian_type','=', $dou_dian_type)
+            ->where('expire', '>', date('Y-m-d H:i:s'))
+            ->where('flag', '=', 1)
+            ->where('dou_dian_type', '=', $dou_dian_type)
             ->first();
 
-        if(empty($temp)){
+        if (empty($temp)) {
             return [
                 'status' => 0,
                 'msg'    => '',
             ];
-        }else{
+        } else {
             $msg_str = $temp->err_type === 1 ? '解密配额已满,请重新申请' : '您的环境存在安全风险，请稍后再试';
             return [
                 'status' => 1,
@@ -260,9 +271,9 @@ class DouDianDataServers
 //            ->first();
 
         $decrypt_quota = DouDianOrderDecryptQuota::query()
-            ->where('expire','>',date('Y-m-d H:i:s'))
-            ->where('flag','=',1)
-            ->where('dou_dian_type','=', $dou_dian_type)
+            ->where('expire', '>', date('Y-m-d H:i:s'))
+            ->where('flag', '=', 1)
+            ->where('dou_dian_type', '=', $dou_dian_type)
             ->first();
 
         $decrypt_quota->flag = 2;
