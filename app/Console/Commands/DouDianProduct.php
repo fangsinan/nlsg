@@ -39,5 +39,6 @@ class DouDianProduct extends Command
     public function handle()
     {
         (new DouDianServers())->productListJob();
+        return 0;
     }
 }
