@@ -1051,4 +1051,27 @@ class Order extends Base
             ->orderBy('log_date','desc')
             ->orderBy('id','desc');
     }
+
+    /**
+     * get_show_image_type 根据订单类型校验显示尺寸
+     *
+     * @param     $order_type
+     * @param int $relation_id
+     *
+     * @return int|string  $res_type 1 竖图  2方图  3横图
+     */
+    public static function get_show_image_type($order_type, $relation_id=0){
+        $res_type =1;
+        if($order_type == 14){ //线下课
+            $of_type = OfflineProducts::where("id",$relation_id)->value("type");
+            if($of_type != 3){
+                $res_type ="2";
+            }
+        }
+
+        if($order_type == 14){ //直播
+            $res_type =3;
+        }
+        return $res_type;
+    }
 }

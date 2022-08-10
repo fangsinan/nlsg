@@ -693,6 +693,10 @@ class OrderController extends Controller
             $data[$key]['express_num'] = $express_data->express_num ??'';
             $data[$key]['history'] = $express_data->history ??'';
 
+
+            //根据类型  显示不同尺寸的图片
+            $data[$key]['show_image_type'] = Order::get_show_image_type($val['type'],$val['relation_id']);
+
         }
         $data = array_values($data);
 
