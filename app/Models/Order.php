@@ -122,7 +122,7 @@ class Order extends Base
                 break;
             case 14:
                 $result = OfflineProducts::select('id','title','subtitle','describe','total_price','price','cover_img','image','video_url','str_time','is_del','is_show','describe_type','url','off_line_pay_type',
-                'column_id','cover_img as cover_images')->where(['id' => $relation_id])->get()->toArray();
+                'column_id','image as cover_images')->where(['id' => $relation_id])->get()->toArray();
                 break;
             case 15:
                 $model = new Column();
@@ -1063,10 +1063,11 @@ class Order extends Base
     public static function get_show_image_type($order_type, $relation_id=0){
         $res_type =1;
         if($order_type == 14){ //线下课
-            $of_type = OfflineProducts::where("id",$relation_id)->value("type");
-            if($of_type != 3){
-                $res_type =2;
-            }
+            $res_type =3;
+            // $of_type = OfflineProducts::where("id",$relation_id)->value("type");
+            // if($of_type != 3){
+            //
+            // }
         }
 
         if($order_type == 10){ //直播
