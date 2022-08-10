@@ -775,6 +775,7 @@ class OrderController extends Controller
 
         $data['created_time'] = strtotime($data['created_at']);
         $data['end_time'] = $data['created_time'] + 1800;
+        $data['show_image_type'] = Order::get_show_image_type($data['type'],$data['relation_id']);
 
         // 训练营订单 物流信息
         $sendInfo = Order::getSendInfo($data);
