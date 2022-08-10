@@ -1065,12 +1065,12 @@ class Order extends Base
         if($order_type == 14){ //线下课
             $of_type = OfflineProducts::where("id",$relation_id)->value("type");
             if($of_type != 3){
-                $res_type ="2";
+                $res_type =2;
             }
         }
 
-        if($order_type == 14){ //直播
-            $res_type =3;
+        if($order_type == 10){ //直播
+            $res_type = 3;
         }
         return $res_type;
     }
