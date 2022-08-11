@@ -411,21 +411,24 @@ WHERE
                         'title'         => '幸福360会员',
                         'price'         => 360.00,
                         'cover_img'     => '/live/recommend/360_xhc.png',
+                        'cover_img'     => '/nlsg/works/20210105102849884378.png',
                         'cover_details' => '/live/recommend/360_tc.png',
                         'type'          => 4
                     ];
                 } elseif ($v['push_type'] == 4) {
-                    $res = OfflineProducts::select('id', 'title', 'subtitle', 'cover_img',
+                    // cover_vertical_img  与直播类型 统一只上传竖图
+                    $res = OfflineProducts::select('id', 'title', 'subtitle', 'cover_vertical_img as cover_img',
                         'image as cover_details', 'total_price as original_price', 'price','off_line_pay_type')
                         ->where('id', $v['push_gid'])
                         ->first();
                     $res->type = 5;
                     $res = $res->toArray();
                 } elseif ($v['push_type'] == 9) {
-                    $res = Live::select('id', 'title', 'describe as subtitle', 'cover_img','is_free','price as original_price','price')
+                    $res = Live::select('id', 'title', 'describe as subtitle','cover_vertical_img', 'cover_img','is_free','price as original_price','price')
                         ->where('id', $v['push_gid'])
                         ->first();
                     if ($res){
+                        $res->cover_img = empty($res->cover_vertical_img)?$res->cover_img :$res->cover_vertical_img;
                         $infoid =LiveInfo::where('live_pid', $res->id)->value('id');
                         $res->live_info_id = $infoid ??  0;
                     }
