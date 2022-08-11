@@ -99,6 +99,24 @@ class ShortLinkServers
 
     }
 
+    //查看短链接
+    public function linkShow($params)
+    {
+        $id = (int)($params['id'] ?? 0);
+
+        $query=ShortLink::query()->where('id', '=', $id);
+        $query->with([
+            'backendUser:id,username,user_remark',
+        ]);
+        $info=$query->first()->toArray();
+
+        if(empty($info)){
+            return ['code' => false, 'msg' => '无此信息'];
+        }else{
+            return $info;
+        }
+    }
+
     //添加编辑短链接
     public function LinkAddEdit($params, $admin): array
     {
@@ -123,31 +141,36 @@ class ShortLinkServers
             return ['code' => false, 'msg' => $validator->messages()->first()];
         }
 
-        if($flag==1){
-            $p['admin_id']       = $admin['id'] ?? 0; //管理员id
-            $p['code']=self::getUniqueCode();
-            $p['created_at']=date('Y-m-d H:i:s',time());
+        try {
+            if ($flag == 1) {
+                $p['admin_id'] = $admin['id'] ?? 0; //管理员id
+                $p['code'] = $this->getUniqueCode();
+                $p['created_at'] = date('Y-m-d H:i:s', time());
+//            return ['code' => false, 'msg' => var_dump($p)];
 
-            $add_res = ShortLink::query()->create($p);
-            if (!$add_res) {
-                return ['code' => false, 'msg' => '添加失败'];
-            }
+                $add_res = ShortLink::query()->create($p);
+                if (!$add_res) {
+                    return ['code' => false, 'msg' => '添加失败'];
+                }
 
-        }else{
-            $id=(int)($params['id'] ?? 0);
-            if(empty($id)){
-                return ['code' => false, 'msg' => '编辑信息id为空'];
-            }
-            $LinkInfo=ShortLink::query()->where('id',$id)->select(['id'])->first();
-            if(empty($LinkInfo)){
-                return ['code' => false, 'msg' => '编辑信息id有误'];
-            }
-            $p['updated_at']=date('Y-m-d H:i:s',time());
+            } else {
+                $id = (int)($params['id'] ?? 0);
+                if (empty($id)) {
+                    return ['code' => false, 'msg' => '编辑信息id为空'];
+                }
+                $LinkInfo = ShortLink::query()->where('id', $id)->select(['id'])->first();
+                if (empty($LinkInfo)) {
+                    return ['code' => false, 'msg' => '编辑信息id有误'];
+                }
+                $p['updated_at'] = date('Y-m-d H:i:s', time());
 
-            $update_res = ShortLink::query()->where('id', $id)->update($p);
-            if (!$update_res) {
-                return ['code' => false, 'msg' => '更新失败'];
+                $update_res = ShortLink::query()->where('id', $id)->update($p);
+                if (!$update_res) {
+                    return ['code' => false, 'msg' => '更新失败'];
+                }
             }
+        }catch (\Exception $e){
+            return ['code' => false, 'msg' => $e->getMessage()];
         }
 
 //        DB::beginTransaction();
@@ -158,7 +181,7 @@ class ShortLinkServers
     }
 
     //获取唯一code
-    private function getUniqueCode(){
+    public function getUniqueCode(){
 
         $while_flag = true;
         while ($while_flag) {
@@ -174,7 +197,7 @@ class ShortLinkServers
     }
 
     //生成随机字符串
-    private function getRandomString($num)
+    public function getRandomString($num)
     {
 
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

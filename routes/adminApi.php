@@ -406,6 +406,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('short_link/link_get','ShortLinkController@linkGet'); //获取短链接
         Route::post('short_link/link_list','ShortLinkController@linkList');  //短链接列表
         Route::post('short_link/link_sdd_edit','ShortLinkController@linkAddEdit'); //添加编辑短链接
+        Route::post('short_link/link_show','ShortLinkController@linkShow'); //查看短链接
 
     });
 

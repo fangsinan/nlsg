@@ -30,6 +30,11 @@ class ShortLinkController extends ControllerBackend
         return $this->getRes((new ShortLinkServers())->LinkAddEdit($request->input(),$this->user));
     }
 
+    //查看短链接
+    public function linkShow(Request $request): JsonResponse {
+        return $this->getRes((new ShortLinkServers())->linkShow($request->input()));
+    }
+
 
 
 }
