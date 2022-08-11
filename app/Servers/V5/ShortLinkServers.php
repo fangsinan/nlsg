@@ -146,7 +146,6 @@ class ShortLinkServers
                 $p['admin_id'] = $admin['id'] ?? 0; //管理员id
                 $p['code'] = $this->getUniqueCode();
                 $p['created_at'] = date('Y-m-d H:i:s', time());
-//            return ['code' => false, 'msg' => var_dump($p)];
 
                 $add_res = ShortLink::query()->create($p);
                 if (!$add_res) {
