@@ -8,7 +8,7 @@ class Live extends Base
 
     protected $fillable = ['user_id', 'cover_img', 'title', 'describe', 'price', 'twitter_money', 'begin_at',
         'end_at', 'helper','is_free','content','need_virtual','need_virtual_num','steam_end_time',
-                           'steam_begin_time','classify','valid_time_range'];
+                           'steam_begin_time','classify','valid_time_range','cover_vertical_img'];
     public function getIndexLive($ids)
     {
         if (!$ids) {

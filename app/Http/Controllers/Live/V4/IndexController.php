@@ -539,6 +539,8 @@ class IndexController extends ControllerBackend
         $classify         = $input['classify'] ?? 0;
         $valid_time_range = $input['valid_time_range'] ?? 0;
 
+        $cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
+
         $poster_list = $input['poster'] ?? [];
         if (is_string($poster_list)) {
             $poster_list = explode(',', $poster_list);
@@ -601,6 +603,8 @@ class IndexController extends ControllerBackend
             'pre_push_time'    => $pre_push_time,
             'classify'         => $classify,
             'valid_time_range' => $valid_time_range,
+
+            'cover_vertical_img'=> $cover_vertical_img,
         ];
 
         $lcModel            = new LiveConsole();
