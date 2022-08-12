@@ -376,9 +376,10 @@ WHERE
         if ($lists) {
             $data = [];
             foreach ($lists as $v) {
+                // cover_img  封面   cover_details 详情
                 if ($v['push_type'] == 7 || $v['push_type'] == 11) {
                     $res = Column::select('id', 'name as title', 'subtitle', 'original_price', 'price',
-                        'cover_pic as cover_img','index_pic','details_pic')
+                        'cover_pic as cover_img','index_pic','details_pic','details_pic as cover_details')
                         ->where('id', $v['push_gid'])
                         //->where('type', 2)
                         ->where('status', 1)
@@ -392,7 +393,7 @@ WHERE
                     }
                     $res = $res->toArray();
                 } elseif ($v['push_type'] == 2) {
-                    $res = Works::select('id', 'title', 'subtitle', 'cover_img', 'original_price', 'price')
+                    $res = Works::select('id', 'title', 'subtitle', 'cover_img', 'original_price', 'price','detail_img as cover_details')
                         ->where('id', $v['push_gid'])
                         ->where('status', 4)
                         ->first();
@@ -424,7 +425,7 @@ WHERE
                     $res->type = 5;
                     $res = $res->toArray();
                 } elseif ($v['push_type'] == 9) {
-                    $res = Live::select('id', 'title', 'describe as subtitle','cover_vertical_img', 'cover_img','is_free','price as original_price','price')
+                    $res = Live::select('id', 'title', 'describe as subtitle','cover_vertical_img as cover_img', 'cover_img as cover_details','is_free','price as original_price','price')
                         ->where('id', $v['push_gid'])
                         ->first();
                     if ($res){
@@ -435,7 +436,7 @@ WHERE
                     $res->type = 9;
                     $res = $res->toArray();
                 } elseif ($v['push_type'] == 10) {
-                    $res = LiveUrl::select('id', 'name', 'describe', 'url', 'image', 'img', 'user_id')
+                    $res = LiveUrl::select('id', 'name', 'describe', 'url', 'image', 'img', 'user_id','image as cover_img')
                         ->where('id', $v['push_gid'])
                         ->first();
                     if ($res){
