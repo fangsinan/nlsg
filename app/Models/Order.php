@@ -123,7 +123,7 @@ class Order extends Base
                 break;
             case 14:
                 $result = OfflineProducts::select('id','title','subtitle','describe','total_price','price','cover_img','image','video_url','str_time','is_del','is_show','describe_type','url','off_line_pay_type',
-                'column_id','image as cover_images')->where(['id' => $relation_id])->get()->toArray();
+                'column_id','cover_vertical_img as cover_images')->where(['id' => $relation_id])->get()->toArray();
                 break;
             case 16:
                 $result[] = [
