@@ -53,7 +53,7 @@ class ShortLinkServers
         $name        = $params['name'] ?? '';
         $code        = $params['code'] ?? '';
         $admin_id    = $params['admin_id'] ?? 0;
-        $status      = $params['status'] ?? 1;
+        $status      = $params['status'] ?? 0;
         $begin_at = $params['begin_at'] ?? '';
         $end_at   = $params['end_at'] ?? '';
 
