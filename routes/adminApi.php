@@ -401,6 +401,17 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('offline_order/order_log_list','OfflineOrderController@orderLogList');
         Route::post('offline_order/order_log_add','OfflineOrderController@orderLogAdd');
 
+        #短链接生成模块
+        Route::post('short_link/link_admin_list','ShortLinkController@linkAdminList'); //短链接管理员列表
+        Route::post('short_link/link_get','ShortLinkController@linkGet'); //获取短链接
+        Route::post('short_link/link_list','ShortLinkController@linkList');  //短链接列表
+        Route::post('short_link/link_sdd_edit','ShortLinkController@linkAddEdit'); //添加编辑短链接
+        Route::post('short_link/link_show','ShortLinkController@linkShow'); //查看短链接
+
     });
+
+
 });
+//内部使用，生成环境不用提交
+Route::post('auth/get_token','Admin\V4\AuthController@getToken');
 

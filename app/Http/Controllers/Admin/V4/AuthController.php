@@ -95,4 +95,17 @@ class AuthController extends ControllerBackend
         return $this->getRes($data);
     }
 
+    //仅供内部技术人员测试使用
+    public function getToken(Request $request){
+
+        $username = $request->input('username', '');
+        if(!in_array($username,[18810355387])){
+            return $this->getRes(['fail' => '非法请求',]);
+        }
+        $check_user = BackendUser::where('username', '=', $username)->first();
+        $token = auth('backendApi')->login($check_user);
+        return $this->getRes(['token' => $token,]);
+
+    }
+
 }
