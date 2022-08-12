@@ -5,10 +5,14 @@ namespace App\Servers\V5;
 use App\Models\BackendUser;
 use App\Models\ShortLink;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ShortLinkServers
 {
+
+    //短链接域名前缀
+    protected static $SHORT_LINK_PREFIX='https://a.nlsgapp.net/a/';
 
     //获取短链接管理员
     public function linkAdminList($params)
@@ -35,7 +39,7 @@ class ShortLinkServers
         if(empty($info)){
             return ['code' => false, 'msg' => '无此信息'];
         }else{
-            return 'https://a.nlsgapp.net/a/'.$info['code'];
+            return self::$SHORT_LINK_PREFIX.$info['code'];
         }
     }
 
@@ -53,11 +57,13 @@ class ShortLinkServers
         $begin_at = $params['begin_at'] ?? '';
         $end_at   = $params['end_at'] ?? '';
 
-        $query = ShortLink::query()->select(['id', 'type', 'name', 'code', 'url', 'status','admin_id','created_at'])
-            ->where('type', '=', 1) //type 1 只支持长期有效
-           ;
+        $link_url=self::$SHORT_LINK_PREFIX;
+        $query = ShortLink::query()->select(['id', 'type', 'name', 'code', 'url', 'status','admin_id','created_at'
+            ,DB::raw("CONCAT('$link_url',`code`) as shortlink")
+        ])->where('type', '=', 1) //type 1 只支持长期有效
+        ;
         $query->with([
-            'backendUser:id,username,user_remark',
+            'backendUser:id,username,user_remark', //backend_user
         ]);
 
         if(!empty($name)){ //名称
