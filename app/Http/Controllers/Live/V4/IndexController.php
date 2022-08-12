@@ -1016,7 +1016,7 @@ class IndexController extends ControllerBackend
         $live = Live::query()
             ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
                 'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test',
-                'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range'
+                'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img'
             )
 //            ->with(['livePoster'])
             ->where('id', $id)->first();
