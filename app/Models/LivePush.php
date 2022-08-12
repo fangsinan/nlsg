@@ -428,7 +428,7 @@ WHERE
                         ->where('id', $v['push_gid'])
                         ->first();
                     if ($res){
-                        $res->cover_img = empty($res->cover_vertical_img)?$res->cover_img :$res->cover_vertical_img;
+                        // $res->cover_img = empty($res->cover_vertical_img)?$res->cover_img :$res->cover_vertical_img;
                         $infoid =LiveInfo::where('live_pid', $res->id)->value('id');
                         $res->live_info_id = $infoid ??  0;
                     }
