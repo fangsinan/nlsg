@@ -328,7 +328,7 @@ class UserWechat extends Controller {
     }
 
 
-    public static function getUserDetail($getWechatIds = [], $access_token){
+    public static function getUserDetail_0329($getWechatIds = [], $access_token){
 
         if( empty($getWechatIds) || !is_array($getWechatIds) ){
             return '';
@@ -337,35 +337,22 @@ class UserWechat extends Controller {
 
         $insert_data = [];
         foreach ($getWechatIds as $u_key=>$u_val){
-
             $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=$access_token&external_userid=$u_val";
             $detail_res = ImClient::curlGet($getDetail_url);
             $detail_res = json_decode($detail_res,true);
 
             if( $detail_res['errcode'] == 0 ){
                 $userr=DB::table($table)->where('external_userid',$detail_res['external_contact']['external_userid'])->first();
-                if(empty($userr)) {
-                    //只保留第一个数据
+                if(empty($userr)) {  //只保留第一个数据
                     $created_at=date('Y-m-d H:i:s',time());
                     if(!empty($detail_res['follow_user'][0]['createtime'])){
                         $created_at=date('Y-m-d H:i:s',$detail_res['follow_user'][0]['createtime']);
                     }
-
-                    if(count($detail_res['follow_user'])==1){
-                        $add_data['is_multiple_staff']=1;
-                    }else{
-                        $add_data['is_multiple_staff']=2;
-                    }
-
-                    $add_data['follow_user_userid_list']= implode(',',array_column($detail_res['follow_user'],'userid'));
-
-                    $add_data['source_follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
                     $add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
                     $add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';
                     $add_data['follow_user_description']        = $detail_res['follow_user'][0]['description']??'';
                     $add_data['follow_user_createtime']         = $detail_res['follow_user'][0]['createtime']??'';
                     $add_data['follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
-                    $add_data['source_follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
                     $add_data['follow_user_tags_oper_userid']   = $detail_res['follow_user'][0]['oper_userid']??"";
                     $add_data['external_userid']                = $detail_res['external_contact']['external_userid']??"";
                     $add_data['name']                           = $detail_res['external_contact']['name']??"";
@@ -403,6 +390,82 @@ class UserWechat extends Controller {
 //        }
 
     }
+	
+	public static function getUserDetail($getWechatIds = [], $access_token){
+		
+			if( empty($getWechatIds) || !is_array($getWechatIds) ){
+				return '';
+			}
+			$table = 'nlsg_user_wechat';
+	
+			$insert_data = [];
+			foreach ($getWechatIds as $u_key=>$u_val){
+	
+				$getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=$access_token&external_userid=$u_val";
+				$detail_res = ImClient::curlGet($getDetail_url);
+				$detail_res = json_decode($detail_res,true);
+	
+				if( $detail_res['errcode'] == 0 ){
+					$userr=DB::table($table)->where('external_userid',$detail_res['external_contact']['external_userid'])->first();
+					if(empty($userr)) {
+						//只保留第一个数据
+						$created_at=date('Y-m-d H:i:s',time());
+						if(!empty($detail_res['follow_user'][0]['createtime'])){
+							$created_at=date('Y-m-d H:i:s',$detail_res['follow_user'][0]['createtime']);
+						}
+	
+						if(count($detail_res['follow_user'])==1){
+							$add_data['is_multiple_staff']=1;
+						}else{
+							$add_data['is_multiple_staff']=2;
+						}
+	
+						$add_data['follow_user_userid_list']= implode(',',array_column($detail_res['follow_user'],'userid'));
+	
+						$add_data['source_follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
+						$add_data['follow_user_userid']             = $detail_res['follow_user'][0]['userid'] ??'';
+						$add_data['follow_user_remark']             = $detail_res['follow_user'][0]['remark']??'';
+						$add_data['follow_user_description']        = $detail_res['follow_user'][0]['description']??'';
+						$add_data['follow_user_createtime']         = $detail_res['follow_user'][0]['createtime']??'';
+						$add_data['follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
+						$add_data['source_follow_user_tags_add_way']       = $detail_res['follow_user'][0]['add_way']??'';
+						$add_data['follow_user_tags_oper_userid']   = $detail_res['follow_user'][0]['oper_userid']??"";
+						$add_data['external_userid']                = $detail_res['external_contact']['external_userid']??"";
+						$add_data['name']                           = $detail_res['external_contact']['name']??"";
+						$add_data['type']                           = $detail_res['external_contact']['type']??"";
+						$add_data['avatar']                         = $detail_res['external_contact']['avatar']??"";
+						$add_data['gender']                         = $detail_res['external_contact']['gender']??"";
+						$add_data['unionid']                        = $detail_res['external_contact']['unionid']??"";
+						$add_data['created_at']                        = $created_at;
+						$insert_data[] = $add_data;
+	
+					}
+	
+	
+	//                //user_wechat_name
+	//                $add_name_data = [
+	//                    'follow_user_userid' => $detail_res['follow_user'][0]['userid'] ??'',
+	//                    'qw_name' => $detail_res['external_contact']['name']??"",
+	//
+	//                ];
+	//                $insert_name_data[] = $add_name_data;
+	
+				}
+	
+			}
+			//dump($insert_data);
+			if(!empty($insert_data)){
+				DB::table($table)->insert($insert_data);
+				$insert_data = [];
+			}
+	
+	//        //dump($insert_data);
+	//        if(!empty($insert_name_data)){
+	//            DB::table("nlsg_user_wechat_name")->insert($insert_name_data);
+	//            $insert_name_data = [];
+	//        }
+		
+		}
 
 
 
@@ -481,8 +544,6 @@ class UserWechat extends Controller {
         }
 
     }
-
-
 
 
 
