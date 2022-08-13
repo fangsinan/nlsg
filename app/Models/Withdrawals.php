@@ -58,7 +58,8 @@ class Withdrawals extends Base
             if($os_type == 1 ){  //1 安卓 2ios 3微信
                 $type = $order_type == 7?3:2;
             }else if($os_type == 2){
-                $type = 4;
+//                $type = 4;
+                $type = $order_type == 7?3:2;
             }else{
                 $type = 1;
             }
@@ -118,7 +119,8 @@ class Withdrawals extends Base
         if($os_type == 1 ){  //1 安卓 2ios 3微信
             $type = $order_type == 7?3:2;
         }else if($os_type == 2){
-            $type = 4;
+//            $type = 4;
+            $type = $order_type == 7?3:2;
         }else{
             $type = 1;
         }
