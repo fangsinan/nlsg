@@ -245,6 +245,7 @@ class OrderController extends Controller
         }else if ($column_data['type'] == 3 || $column_data['type'] == 4) { //新增训练营大类
             $type = 18;
         }
+        $live_admin_id = Order::getAdminIDByLiveID($user_id,$live_id);
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
             'ordernum' => $ordernum,
@@ -261,6 +262,7 @@ class OrderController extends Controller
             'pay_type' => $pay_type,
             'activity_tag' => $activity_tag ?? '',
             'live_num'=>$live_num,
+            'live_admin_id'=>$live_admin_id??0,
         ];
         $order = Order::firstOrCreate($data);
 
@@ -337,7 +339,7 @@ class OrderController extends Controller
             $coupon_price = Coupon::getCouponMoney($coupon_id, $user_id, $works_data->price, 3);
             $price = $works_data->price - $coupon_price;
         }
-
+        $live_admin_id = Order::getAdminIDByLiveID($user_id,$live_id);
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
             'ordernum' => $ordernum,
@@ -353,6 +355,7 @@ class OrderController extends Controller
             'live_id' => $live_id ?? 0,
             'pay_type' => $pay_type,
             'activity_tag' => $activity_tag ?? '',
+            'live_admin_id' => $live_admin_id ?? 0,
         ];
         $order = Order::firstOrCreate($data);
         return $this->success($order['id']);
@@ -516,7 +519,7 @@ class OrderController extends Controller
             'price' => $price,        //打赏金额
             'pay_type' => 4,   //1 微信端 2app微信 3app支付宝 4ios
             'os_type' => 2,    //只有ios支持能量币
-            'remark' =>$coin_id, 
+            'remark' =>$coin_id,
         ];
 
         $rst = Order::firstOrCreate($data);
@@ -849,7 +852,7 @@ class OrderController extends Controller
 
         $give = $request->input('give', 0);  //是否训练营赠送
 
-        
+
         // 训练营会加入线下课类型
         if($give > 0){
            //  give=30 是训练营领取奖励赠送的一年
@@ -878,10 +881,10 @@ class OrderController extends Controller
                 ->orderBy('created_at', 'desc')->paginate(50)->toArray();
             }
         }
-        
 
-       
-        
+
+
+
 
         $data = $data['data'];
 
@@ -924,7 +927,7 @@ class OrderController extends Controller
 //                    }
 
                     break;
-                
+
             }
             if ($result == false) {
                 unset($data[$key]);
@@ -1259,7 +1262,7 @@ class OrderController extends Controller
             }
         }
 
-
+        $live_admin_id = Order::getAdminIDByLiveID($user_id,$live_id);
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
             'ordernum' => $ordernum,
@@ -1278,6 +1281,7 @@ class OrderController extends Controller
             'twitter_id' => $tweeter_code,
             'sales_id' => $sales_id,
             'sales_bind_id' => $sales_bind_id,
+            "live_admin_id"=>$live_admin_id??0,
         ];
 
         $order = Order::firstOrCreate($data);
@@ -1357,7 +1361,7 @@ class OrderController extends Controller
         if($liveIdNum>1){
             $live_id=$liveIdArr[0];
         }
-
+        $live_admin_id = Order::getAdminIDByLiveID($user_id,$live_id);
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
             'ordernum' => $ordernum,
@@ -1372,6 +1376,7 @@ class OrderController extends Controller
             'live_id' => $live_id ?? 0,
             'live_num' => $num,
             'twitter_id' => $tweeter_code,
+            'live_admin_id' => $live_admin_id??0,
         ];
 
         $order = Order::firstOrCreate($data);
@@ -1447,7 +1452,7 @@ class OrderController extends Controller
 
 
         $price = $lists['price'];
-
+        $live_admin_id = Order::getAdminIDByLiveID($user_id,$live_id);
         $ordernum = MallOrder::createOrderNumber($user_id, 3);
         $data = [
             'ordernum' => $ordernum,
@@ -1462,6 +1467,7 @@ class OrderController extends Controller
             'live_id' => $live_id,
             'live_num' => $num,
             'twitter_id' => $tweeter_code,
+            'live_admin_id'=>$live_admin_id??0,
         ];
 
         $order = Order::firstOrCreate($data);

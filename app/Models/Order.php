@@ -1072,4 +1072,21 @@ class Order extends Base
         }
         return $res_type;
     }
+
+    /**
+     * getAdminIDByLiveID   通过直播id 获取客服id
+     *
+     * @param $user_id
+     * @param $live_id
+     *
+     * @return int|mixed
+     */
+    public static function getAdminIDByLiveID($user_id,$live_id){
+        $admin_id = DB::table('crm_live_order')
+            ->where('user_id','=',$user_id)
+            ->where('live_id','=',$live_id)
+            ->where('status','=',1)->value("admin_id");
+
+        return $admin_id ??0;
+    }
 }
