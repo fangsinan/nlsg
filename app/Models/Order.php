@@ -1082,9 +1082,13 @@ class Order extends Base
      * @return int|mixed
      */
     public static function getAdminIDByLiveID($user_id,$live_id){
+        $subId = Subscribe::where([
+            "user_id"=>$user_id,
+            "live_id"=>$live_id,
+            "state"=>1,
+        ])->value("id");
         $admin_id = DB::table('crm_live_order')
-            ->where('user_id','=',$user_id)
-            ->where('live_id','=',$live_id)
+            ->where('sub_id','=',$subId)
             ->where('status','=',1)->value("admin_id");
 
         return $admin_id ??0;
