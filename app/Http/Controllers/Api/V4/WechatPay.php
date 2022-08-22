@@ -650,6 +650,15 @@ class WechatPay extends Controller
                 case 21: //超级记忆线上训练营
                     $res = $nickname . ':您已支付' . $live_num . '单 超级记忆线上训练营';
                     break;
+                case 22: //学习力规划实操课（小学版）
+                    $res = $nickname . ':您已支付' . $live_num . '单 学习力规划实操课（小学版）';
+                    break;
+                case 23: //学习力规划实操课（初中版）
+                    $res = $nickname . ':您已支付' . $live_num . '单 学习力规划实操课（初中版）';
+                    break;
+                case 24: //论语--王琨老师抖音陪读教材
+                    $res = $nickname . ':您已支付' . $live_num . '单 论语--王琨老师抖音陪读教材';
+                    break;
             }
         } else if ($type == 18) {
             $data = Column::find($relation_id);
