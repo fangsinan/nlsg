@@ -241,7 +241,7 @@ class WechatServersNew
         开始时间：2017年8月1日 20:00
         请留言直播课程开始时间，以免错过课程*/
         //周三早7点  &tweeter_code=211370
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=613&time=1660025453639&inviter=211370';
+        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=614&time=1660568449095&inviter=211370';
         $hello='王琨老师2晚家庭教育直播课：';
         $title='卓越孩子必备的6大能力';
         $number='ZYHZ-0810-11';
