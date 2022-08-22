@@ -1342,7 +1342,7 @@ class OrderController extends Controller
             return $this->error(0, '产品id有误');
         }
 
-        if($product_id==10){ //限制每个用户只能买一单
+        if(in_array($product_id,[10,24])){ //限制每个用户只能买一单
             if($num>1){
                 return $this->error(0, '每个用户限购一本');
             }
