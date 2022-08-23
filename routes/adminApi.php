@@ -408,6 +408,13 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('short_link/link_sdd_edit','ShortLinkController@linkAddEdit'); //添加编辑短链接
         Route::post('short_link/link_show','ShortLinkController@linkShow'); //查看短链接
 
+
+        //message模块
+        Route::post('msg_console/job_list','MsgConsoleController@jobList');
+        Route::post('msg_console/create_job','MsgConsoleController@createJob');
+        Route::post('msg_console/template_list','MsgConsoleController@templateList');
+        Route::post('msg_console/create_template','MsgConsoleController@createTemplate');
+
     });
 
 
