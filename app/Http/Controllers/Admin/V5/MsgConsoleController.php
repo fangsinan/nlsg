@@ -27,6 +27,13 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
+    //todo 任务状态修改
+    public function jobStatus(Request $request): JsonResponse{
+        return $this->getRes(
+            (new MsgConsoleServers())->createJob($request->input(), $this->user)
+        );
+    }
+
     //人工推送,打开指定页面的类型列表
     public function jPushMsgTypeList(): JsonResponse
     {
