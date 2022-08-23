@@ -13,6 +13,6 @@ class MessageRelationType extends Base
     protected $table = 'nlsg_message_relation_type';
 
     protected $fillable = [
-        'title',
+        'title','group_name',
     ];
 }

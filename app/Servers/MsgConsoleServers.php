@@ -4,6 +4,7 @@
 namespace App\Servers;
 
 
+use App\Models\Message\MessageRelationType;
 use App\Models\Message\MessageType;
 use App\Models\Message\MessageView;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -22,6 +23,25 @@ class MsgConsoleServers
     public function createJob($params, $admin)
     {
         return [__LINE__];
+    }
+
+    public function jPushMsgTypeList(): array
+    {
+        $list = MessageRelationType::query()
+            ->where('status', '=', 1)
+            ->select(['id', 'title', 'group_name'])
+            ->get();
+
+        $temp = [];
+
+        foreach ($list as $v) {
+            if (!isset($temp[$v->group_name])) {
+                $temp[$v->group_name] = [];
+            }
+            $temp[$v->group_name][] = $v;
+        }
+
+        return $temp;
     }
 
     public function templateStatus($params, $admin): array

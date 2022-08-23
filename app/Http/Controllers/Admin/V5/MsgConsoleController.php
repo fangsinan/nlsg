@@ -27,6 +27,14 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
+    //人工推送,打开指定页面的类型列表
+    public function jPushMsgTypeList(): JsonResponse
+    {
+        return $this->getRes(
+            (new MsgConsoleServers())->jPushMsgTypeList()
+        );
+    }
+
     //消息模板列表
     public function templateList(Request $request): JsonResponse
     {
@@ -35,8 +43,9 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
-    //todo 消息模板状态修改
-    public function templateStatus(Request $request){
+    //消息模板状态修改
+    public function templateStatus(Request $request): JsonResponse
+    {
         return $this->getRes(
             (new MsgConsoleServers())->templateStatus($request->input(), $this->user)
         );
