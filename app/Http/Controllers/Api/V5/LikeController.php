@@ -53,7 +53,7 @@ class LikeController extends Controller
      * @api {post} api/v5/like 评论点赞
      * @apiVersion 5.0.0
      * @apiParam  id  评论id
-     * @apiParam  type  类型 1.想法 2.百科 3短视频 
+     * @apiParam  type  类型 1.想法 2.百科 3短视频
      * @apiParam  comment_type  类型 1.主评论 2 次级评论
      * @apiGroup Api
      *
@@ -126,9 +126,11 @@ class LikeController extends Controller
 
         if (empty($id) || empty($comment_type)){
             return error(1000, '参数不全');
-            
+
         }
-        $res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type])->delete();
+        // $res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type])->delete();
+        $res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type])
+            ->update(['status' => 2]);
         if($res){
             //减少喜欢
             Comment::where('id', $id)->decrement('like_num');
