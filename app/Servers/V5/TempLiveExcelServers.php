@@ -32,8 +32,8 @@ class TempLiveExcelServers
 
         $sql = "SELECT
 	o.id order_id,
-	CONCAT( '`', o.ordernum ) ordernum,
-	CONCAT( '`', pay.transaction_id ) transaction_id,
+	CONCAT( '`', o.ordernum ) as ordernum,
+	CONCAT( '`', pay.transaction_id ) as transaction_id,
 	o.live_id,
 	o.twitter_id,
 	o.pay_price,
@@ -143,8 +143,8 @@ WHERE
         $sql = "
     SELECT
         o.id as order_id,
-        CONCAT( '`', o.ordernum ) ordernum,
-        CONCAT( '`', pay.transaction_id ) transaction_id,
+        CONCAT( '`', o.ordernum ) as ordernum,
+        CONCAT( '`', pay.transaction_id ) as transaction_id,
         o.live_id,
         o.twitter_id,
         o.pay_price,
@@ -155,7 +155,7 @@ WHERE
         u.created_at,
         qw.name as qname,
         wn.qw_name,
-        FROM_UNIXTIME( qw.follow_user_createtime, '%Y%m%d %H:%i:%s' ) follow_user_createtime,
+        FROM_UNIXTIME( qw.follow_user_createtime, '%Y%m%d %H:%i:%s' ) as follow_user_createtime,
         qw.follow_user_userid
     FROM
         nlsg_order AS o
@@ -250,8 +250,8 @@ and lou.online_time  BETWEEN \' ' . $params['begin_time'] . ' \' AND \' ' . $par
 
         $sql = "SELECT
 o.id order_id,
-CONCAT( '`', o.ordernum ) ordernum,
-CONCAT( '`', pay.transaction_id ) transaction_id,
+CONCAT( '`', o.ordernum ) as ordernum,
+CONCAT( '`', pay.transaction_id ) as transaction_id,
 o.live_id,
 o.twitter_id,
 o.pay_price,
@@ -262,7 +262,7 @@ u.unionid,
 u.created_at,
 qw.name as qname,
 wn.qw_name,
-FROM_UNIXTIME( qw.follow_user_createtime, '%Y-%m-%d %H:%i:%s' ) follow_user_createtime,
+FROM_UNIXTIME( qw.follow_user_createtime, '%Y-%m-%d %H:%i:%s' ) as follow_user_createtime,
 qw.follow_user_userid
 FROM
 	nlsg_order AS o
