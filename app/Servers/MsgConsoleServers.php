@@ -36,10 +36,7 @@ class MsgConsoleServers
 
     public function msgTypeList()
     {
-        return MessageType::query()
-            ->where('pid', '=', 0)
-            ->with(['childList:id,title,pid'])
-            ->select(['id', 'title', 'pid'])
-            ->get();
+        $model = new MessageType();
+        return $model->getTypeList(1);
     }
 }

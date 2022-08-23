@@ -36,4 +36,36 @@ class MessageType extends Base
 
         return ['code' => true, 'msg' => 'ok'];
     }
+
+    public function getTypeList(int $flag = 1){
+        //1保留父子层级 2只返回可用
+
+        $list = self::query()
+            ->where('pid', '=', 0)
+            ->with(['childList:id,title,pid'])
+            ->select(['id', 'title', 'pid'])
+            ->get();
+        if ($flag === 1){
+            return $list;
+        }
+
+        $temp = [];
+        foreach ($list as $v){
+            if (empty($v->childList)){
+                $temp[] = [
+                    'id'=>$v->id,
+                    'title'=>$v->title,
+                ];
+            }else{
+                foreach ($v->childList as $vv){
+                    $temp[] = [
+                        'id'=>$vv->id,
+                        'title'=>$vv->title,
+                    ];
+                }
+            }
+        }
+        return $temp;
+    }
+
 }
