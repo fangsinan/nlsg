@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\DB;
 class TempLiveExcelServers
 {
 
-    public function insertLog($params){
+    public function insertLog($params)
+    {
         LiveGetExcelLog::query()->create($params);
     }
 
-    public function shouTingQingKuang($params,$admin_id) {
-        $params['mothed'] = 1;
+    public function shouTingQingKuang($params, $admin_id)
+    {
+        $params['mothed']   = 1;
         $params['admin_id'] = $admin_id;
 
         $begin_time = $params['begin_time'] ?? '';
@@ -67,7 +69,7 @@ FROM
 		user_id
 	) AS jrzb ON jrzb.user_id = o.user_id
 WHERE
-	o.live_id = $live_id
+	o.relation_id = $live_id
 	AND o.type = 10
 	AND o.`status` = 1
 	AND o.is_shill = 0
@@ -89,8 +91,9 @@ WHERE
 
     }
 
-    public function weiJinZhiBo($params,$admin_id) {
-        $params['mothed'] = 2;
+    public function weiJinZhiBo($params, $admin_id)
+    {
+        $params['mothed']   = 2;
         $params['admin_id'] = $admin_id;
 
         $begin_time_d1 = $params['begin_time_d1'] ?? '';
@@ -177,7 +180,7 @@ WHERE
             user_id
         ) AS jrzb ON jrzb.user_id = o.user_id
     WHERE
-        o.live_id = $live_id
+        o.relation_id = $live_id
         AND o.type = 10
         AND o.`status` = 1
         AND o.is_shill = 0
@@ -196,14 +199,15 @@ WHERE
         return DB::select($sql);
     }
 
-    public function weiJinZhiBoFree($params,$admin_id){
-        $params['mothed'] = 3;
+    public function weiJinZhiBoFree($params, $admin_id)
+    {
+        $params['mothed']   = 3;
         $params['admin_id'] = $admin_id;
 
         //直播间id   推荐人手机号  收听时间范围 是否观看
-        if ($params['is_watch'] === 0){
+        if ($params['is_watch'] === 0) {
             $exists_str = ' NOT EXISTS ';
-        }else{
+        } else {
             $exists_str = ' EXISTS ';
         }
 
@@ -212,22 +216,23 @@ u.phone,u.nickname,s.created_at
 from nlsg_subscribe as s
 join nlsg_user as u on s.user_id = u.id
 where
-s.id BETWEEN '.$params['begin_id'].' and '.$params['end_id'].' and
-s.relation_id = '.$params['live_id'].' and s.type = 3 and s.`status` = 1
-AND u.is_test_pay = 0 and s.twitter_id =  '.$params['twitter_id'].'
-and '.$exists_str.' (
+s.id BETWEEN ' . $params['begin_id'] . ' and ' . $params['end_id'] . ' and
+s.relation_id = ' . $params['live_id'] . ' and s.type = 3 and s.`status` = 1
+AND u.is_test_pay = 0 and s.twitter_id =  ' . $params['twitter_id'] . '
+and ' . $exists_str . ' (
 SELECT id from nlsg_live_online_user as lou where
-lou.live_id =  '.$params['live_id'].'  and lou.user_id = s.user_id
-and lou.online_time  BETWEEN \' '.$params['begin_time'].' \' AND \' '.$params['end_time'].' \'
+lou.live_id =  ' . $params['live_id'] . '  and lou.user_id = s.user_id
+and lou.online_time  BETWEEN \' ' . $params['begin_time'] . ' \' AND \' ' . $params['end_time'] . ' \'
 )';
         $this->insertLog($params);
         return DB::select($sql);
 
     }
 
-    public function qiYeWeiXin($params,$admin_id) {
+    public function qiYeWeiXin($params, $admin_id)
+    {
 
-        $params['mothed'] = 4;
+        $params['mothed']   = 4;
         $params['admin_id'] = $admin_id;
 
         $begin_time = $params['begin_time'] ?? '';
@@ -270,7 +275,7 @@ WHERE
 	o.pay_time > '$begin_time'  AND o.pay_time < '$end_time' ";
 
         if (!empty($live_id)) {
-            $sql .= " AND o.live_id = $live_id ";
+            $sql .= " AND o.relation_id = $live_id ";
         }
 
         $sql .= " AND o.type = 10 AND o.`status` = 1 AND o.is_shill = 0 AND o.pay_price > 0.01

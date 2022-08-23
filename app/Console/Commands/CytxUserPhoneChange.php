@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\PayRecordDetail;
 use App\Models\User;
+use App\Servers\V5\TempLiveExcelServers;
 use App\Servers\VipServers;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -211,6 +212,16 @@ class CytxUserPhoneChange extends Command
             }
         }
 
+        if (0) {
+            //临时调试用
+            $r = (new TempLiveExcelServers())->qiYeWeiXin([
+                'live_id'    => 617,
+                'is_bind'    => 0,
+                'begin_time' => '2022-08-22 00:00:00',
+                'end_time'   => '2022-08-22 23:59:59'
+            ], 168934);
+            dd($r);
+        }
 
     }
 }
