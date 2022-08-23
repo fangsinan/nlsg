@@ -6,6 +6,7 @@ namespace App\Servers;
 
 use App\Models\Message\MessageType;
 use App\Models\Message\MessageView;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Validator;
 
 class MsgConsoleServers
@@ -24,9 +25,13 @@ class MsgConsoleServers
     }
 
     //消息模板列表
-    public function templateList($params, $admin)
+    public function templateList($params, $admin): LengthAwarePaginator
     {
-        return [__LINE__];
+        return MessageView::query()
+            ->with(['typeInfo:id,title'])
+            ->select(['id', 'title', 'message', 'created_at', 'type'])
+            ->orderBy('id', 'desc')
+            ->paginate($params['size'] ?? 10);
     }
 
     //创建模板

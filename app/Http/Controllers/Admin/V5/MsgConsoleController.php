@@ -35,6 +35,13 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
+    //todo 消息模板状态修改
+    public function templateStatus(Request $request){
+        return $this->getRes(
+            (new MsgConsoleServers())->templateStatus($request->input(), $this->user)
+        );
+    }
+
     //创建模板
     public function createTemplate(Request $request): JsonResponse
     {
