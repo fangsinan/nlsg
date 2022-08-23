@@ -4,10 +4,14 @@
 namespace App\Servers;
 
 
+use App\Models\Message\Message;
 use App\Models\Message\MessageRelationType;
 use App\Models\Message\MessageType;
+use App\Models\Message\MessageUser;
 use App\Models\Message\MessageView;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class MsgConsoleServers
@@ -22,7 +26,136 @@ class MsgConsoleServers
     //创建推送任务
     public function createJob($params, $admin)
     {
-        return [__LINE__];
+        $params['is_jpush'] = 1;
+
+        $validator = Validator::make($params,
+            [
+                'title'            => 'bail|required|string|max:255',
+                'message'          => 'bail|required|string|max:255',
+                'receive_type'     => 'bail|required|in:1,2',
+                'phone_list'       => 'exclude_unless:receive_type,1|required|array|max:1000',
+                'phone_list.*'     => 'distinct|size:11',
+                'open_type'        => 'bail|required|in:1,2,3,4',
+                'url'              => 'exclude_unless:open_type,2|required|url|max:255',
+                'rich_text'        => 'exclude_unless:open_type,4|required|string',
+                'relation_type'    => 'exclude_unless:open_type,3|required|integer|exists:nlsg_message_relation_type,id',
+                'relation_id'      => 'exclude_unless:open_type,3|required|integer|min:1',
+                'is_timing'        => 'bail|required|in:1,2',
+                'timing_send_time' => 'exclude_unless:is_timing,1|required|date',
+            ],
+            [
+                'phone_list.*.distinct' => '手机号内有重复值',
+                'phone_list.*.size'     => '手机号长度有误',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        if ($params['open_type'] != 3) {
+            $params['relation_type']    = 0;
+            $params['relation_id']      = 0;
+            $params['relation_info_id'] = 0;
+        }
+
+        //todo 编辑如何校验
+
+        //todo 立刻发送和plan_time如何写入
+
+        $is_old = $params['id'] ?? 0;
+
+        DB::beginTransaction();
+
+        //写入message
+        if ($is_old) {
+            //编辑
+            $msg = Message::query()->find($params['id']);
+            if (!$msg) {
+                return ['code' => false, 'msg' => 'id错误'];
+            }
+            $old_receive_type = $msg->receive_type;
+
+            $res = $msg->update($params);
+
+            if (!$res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败请重试'];
+            }
+            $msg_id = $params['id'];
+        } else {
+            //创建
+            $res    = Message::query()->create($params);
+            $msg_id = $res->id;
+
+            if (!$res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败请重试'];
+            }
+        }
+
+        if ($is_old) {
+            //如果发送目标类型改变,删除原有message_user记录
+            if ($old_receive_type == 1 && $params['receive_type'] == 2) {
+                MessageUser::query()
+                    ->where('message_id', '=', $msg_id)
+                    ->delete();
+            }
+        }
+
+        if ($params['receive_type'] == 1) {
+            //写入message_user
+            $user_list = User::query()
+                ->whereIn('phone', $params['phone_list'])
+                ->pluck('id')
+                ->toArray();
+
+            if (empty($user_list)) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '提供的手机号都未注册'];
+            }
+
+            $msg_user_ist = MessageUser::query()
+                ->where('message_id', '=', $msg_id)
+                ->pluck('receive_user')
+                ->toArray();
+
+
+            $del_array = array_diff($msg_user_ist, $user_list);
+            $add_array = array_diff($user_list, $msg_user_ist);
+
+            if ($del_array) {
+                MessageUser::query()
+                    ->where('message_id', '=', $msg_id)
+                    ->whereIn('receive_user', $del_array)
+                    ->delete();
+            }
+
+            if ($add_array) {
+                $user_data = [];
+
+                foreach ($add_array as $ul_v) {
+                    $user_data[] = [
+                        'send_user'    => 0,
+                        'receive_user' => $ul_v,
+                        'message_id'   => $msg_id
+                    ];
+                }
+
+                if ($user_data) {
+                    $res = MessageUser::query()->insert($user_data);
+
+                    if ($res === false) {
+                        DB::rollBack();
+                        return ['code' => false, 'msg' => '失败请重试'];
+                    }
+                }
+            }
+        }
+
+        DB::commit();
+        return ['code' => true, 'msg' => '成功'];
+
     }
 
     public function jPushMsgTypeList(): array
