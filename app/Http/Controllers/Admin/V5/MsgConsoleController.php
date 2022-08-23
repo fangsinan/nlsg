@@ -35,7 +35,7 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
-    //todo 创建模板
+    //创建模板
     public function createTemplate(Request $request): JsonResponse
     {
         return $this->getRes(

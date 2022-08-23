@@ -13,7 +13,7 @@ class MessageView extends Base
     protected $table = 'nlsg_message_view';
 
     protected $fillable = [
-        'title', 'message', 'type', 'created_at', 'updated_at', 'status',
+        'title', 'message', 'type', 'created_at', 'updated_at', 'status','create_admin_id',
     ];
 
 }
