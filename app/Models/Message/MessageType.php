@@ -68,4 +68,25 @@ class MessageType extends Base
         return $temp;
     }
 
+    /**
+     * getTypeView  获取消息模板
+     *
+     * @param $action_const
+     *
+     * @return array
+     */
+    static function getTypeView($action_const): array{
+        //查看消息类型是否存在
+        $type = MessageType::where(['action_const' =>$action_const,])->value('id');
+        if(empty($type)){
+            return [];
+        }
+
+        //获取消息类型模板
+        return MessageView::select("title","message","type")->where([
+            'type'      =>  $type,
+            'status'    =>  1,
+        ])->first();
+    }
+
 }
