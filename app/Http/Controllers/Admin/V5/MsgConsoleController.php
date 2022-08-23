@@ -43,9 +43,12 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
-    //todo 消息类型列表
-    public function msgTypeList(){
-
+    //消息类型列表
+    public function msgTypeList(Request $request): JsonResponse
+    {
+        return $this->getRes(
+            (new MsgConsoleServers())->msgTypeList()
+        );
     }
 
 
