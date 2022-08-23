@@ -415,6 +415,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('msg_console/template_list','MsgConsoleController@templateList');
         Route::post('msg_console/create_template','MsgConsoleController@createTemplate');
         Route::post('msg_console/msg_type_list','MsgConsoleController@msgTypeList');
+        Route::post('msg_console/template_status','MsgConsoleController@templateStatus');
 
     });
 

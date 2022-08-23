@@ -27,7 +27,7 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
-    //todo 消息模板列表
+    //消息模板列表
     public function templateList(Request $request): JsonResponse
     {
         return $this->getRes(

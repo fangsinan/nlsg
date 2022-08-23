@@ -24,10 +24,37 @@ class MsgConsoleServers
         return [__LINE__];
     }
 
+    public function templateStatus($params, $admin): array
+    {
+        $validator = Validator::make($params, [
+                'id'   => 'bail|required|integer|exists:nlsg_message_view',
+                'flag' => 'bail|required|in:delete',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+
+        $res = MessageView::query()->where('id', '=', $params['id'])
+            ->update([
+                'status' => 2
+            ]);
+
+        if (!$res) {
+            return ['code' => false, 'msg' => '失败,请重试.'];
+        }
+
+        return ['code' => true, 'msg' => '成功'];
+
+    }
+
     //消息模板列表
     public function templateList($params, $admin): LengthAwarePaginator
     {
         return MessageView::query()
+            ->where('status', '=', 1)
             ->with(['typeInfo:id,title'])
             ->select(['id', 'title', 'message', 'created_at', 'type'])
             ->orderBy('id', 'desc')
