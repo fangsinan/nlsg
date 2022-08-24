@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class MsgConsoleController extends ControllerBackend
 {
-    //todo 推送任务列表
+    //推送任务列表
     public function jobList(Request $request): JsonResponse
     {
         return $this->getRes(
@@ -19,7 +19,7 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
-    //todo 创建推送任务
+    //创建推送任务
     public function createJob(Request $request): JsonResponse
     {
         return $this->getRes(
@@ -27,10 +27,11 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
-    //todo 任务状态修改
-    public function jobStatus(Request $request): JsonResponse{
+    //任务状态修改
+    public function jobStatus(Request $request): JsonResponse
+    {
         return $this->getRes(
-            (new MsgConsoleServers())->createJob($request->input(), $this->user)
+            (new MsgConsoleServers())->jobStatus($request->input(), $this->user)
         );
     }
 

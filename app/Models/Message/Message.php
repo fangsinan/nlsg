@@ -16,7 +16,7 @@ class Message extends Base
     protected $fillable = [
         'title', 'message', 'type', 'receive_type', 'relation_id','relation_info_id', 'relation_type',
         'created_at', 'updated_at', 'plan_time', 'status','is_jpush','timing_send_time',
-        'is_timing','open_type','url','rich_text',
+        'is_timing','open_type','url','rich_text','send_count','get_count','read_count'
     ];
 
 }
