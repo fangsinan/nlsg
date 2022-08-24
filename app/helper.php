@@ -128,25 +128,25 @@
             'top_monday'=>$top_monday,
         ];
     }
-	
+
 	/**
 	 * @param $res
 	 * @return bool
 	 * 检查返回结果
 	 */
 	function checkRes($res){
-	
+
 	    if($res === true ||  is_array($res) ||is_object($res)){
 	        return true;
 	    }
 	    if(is_numeric($res)){
 	        return true;
 	    }
-	
+
 	    return false;
-	
+
 	}
-	
+
 	/**
 	 * 秒数 转换成 1:01
 	 */
@@ -161,7 +161,7 @@
 	            "minutes" => 0, "seconds" => 0,
 	        );
 	        $t = '';
-	
+
 	        if ($time >= 60) {
 	            $value["minutes"] = floor($time / 60);
 	            $time = ($time % 60);
@@ -172,20 +172,20 @@
 	        //分钟数如果都为空 则单独显示秒
 	        if($t == ''){
 	            $value["seconds"] = floor($time);
-	
+
 	            $t .= $value["seconds"] . ":";
 	        }else{
 	            $t .= "01";
 	        }
-	
+
 	        return $t;
-	
-	
+
+
 	    } else {
 	        return '00:01';
 	    }
 	}
-	
+
 	function add_log($url,$message='',$parameter=''){
 	    Illuminate\Support\Facades\DB::table('nlsg_log')->insert([
 	        'url'=>$url,
@@ -196,8 +196,8 @@
 	        'created_at'=>date('Y-m-d H:i:s'),
 	    ]);
 	}
-	
-	
+
+
 	function get_page_size($data){
 	    if(empty($data['size']) || !is_numeric($data['size']) || $data['size']<=0){
 	        return 10;
@@ -220,7 +220,7 @@
         // 订单nlsg_order表  1 专栏  2作品 3直播  4会员 5线下产品  6讲座  7训练营  8专题
         $types = config('web.GlobalType.INPUT_TYPE');
         switch($type){
-            case $types['CollumnType']:    // 110专栏 
+            case $types['CollumnType']:    // 110专栏
                 $res = [
                     'col_type' => 1,    // 收藏表类型  nlsg_collection
                     'his_type' => 1,    // 历史记录表类型 nlsg_history
@@ -239,7 +239,7 @@
                     'order_type' => 2,
                 ];
                 break;
-            case $types['LectureType']:  // 130讲座 
+            case $types['LectureType']:  // 130讲座
                 $res = [
                     'col_type' => 7,    // 收藏表类型  nlsg_collection
                     'his_type' => 2,    // 历史记录表类型 nlsg_history
@@ -277,7 +277,7 @@
                     'order_type' => 8,
                 ];
                 break;
-            
+
             case $types['LiveType']:  // 170 直播
                 $res = [
                     'col_type' => 0,    // 收藏表类型  nlsg_collection
@@ -308,3 +308,11 @@
 
         return $res;
     }
+
+function db_log(){
+    \Illuminate\Support\Facades\DB::connection()->enableQueryLog();
+}
+function dd_db_log(){
+    $logs = \Illuminate\Support\Facades\DB::getQueryLog();
+    dd($logs);
+}

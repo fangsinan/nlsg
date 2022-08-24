@@ -98,7 +98,6 @@ class CampController extends Controller
 
 
 
-
     /**
      * @api {get} /api/v5/camp/get_camp_detail 训练营详情
      * @apiName get_camp_detail
