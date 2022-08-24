@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Validator;
 
 class MsgConsoleServers
 {
+    const GROUP_SIZE = 1000;
 
     //推送任务列表
     public function jobList($params, $admin): LengthAwarePaginator
@@ -111,7 +112,7 @@ class MsgConsoleServers
                 'title'            => 'bail|required|string|max:255',
                 'message'          => 'bail|required|string|max:255',
                 'receive_type'     => 'bail|required|in:1,2',
-                'phone_list'       => 'exclude_unless:receive_type,1|required|array|max:1000',
+                'phone_list'       => 'exclude_unless:receive_type,1|required|array|max:20000',
                 'phone_list.*'     => 'distinct|size:11',
                 'open_type'        => 'bail|required|in:1,2,3,4',
                 'url'              => 'exclude_unless:open_type,2|required|url|max:255',
@@ -185,56 +186,95 @@ class MsgConsoleServers
         }
 
         if ($params['receive_type'] == 1) {
-            //写入message_user
-            $user_list = User::query()
-                ->whereIn('phone', $params['phone_list'])
-                ->pluck('id')
-                ->toArray();
 
-            if (empty($user_list)) {
-                DB::rollBack();
-                return ['code' => false, 'msg' => '提供的手机号都未注册'];
-            }
-
-            $send_count = count($user_list);
-            Message::query()->where('id', '=', $msg_id)->update(['send_count' => $send_count]);
-
-            $msg_user_ist = MessageUser::query()
+            //删掉之前的记录
+            MessageUser::query()
                 ->where('message_id', '=', $msg_id)
-                ->pluck('receive_user')
-                ->toArray();
+                ->delete();
 
 
-            $del_array = array_diff($msg_user_ist, $user_list);
-            $add_array = array_diff($user_list, $msg_user_ist);
-
-            if ($del_array) {
-                MessageUser::query()
-                    ->where('message_id', '=', $msg_id)
-                    ->whereIn('receive_user', $del_array)
-                    ->delete();
-            }
-
-            if ($add_array) {
+            DB::rollBack();
+            $phone_list = array_chunk($params['phone_list'], self::GROUP_SIZE);
+            foreach ($phone_list as $pl_k => $pl_v) {
+                $user_list = User::query()
+                    ->whereIn('phone', $pl_v)
+                    ->pluck('id')
+                    ->toArray();
+                if (empty($user_list)) {
+                    continue;
+                }
+                $group_id  = $msg_id . '-' . $pl_k;
                 $user_data = [];
-
-                foreach ($add_array as $ul_v) {
+                foreach ($user_list as $ul_v) {
                     $user_data[] = [
                         'send_user'    => 0,
                         'receive_user' => $ul_v,
-                        'message_id'   => $msg_id
+                        'message_id'   => $msg_id,
+                        'group_id'     => $group_id,
                     ];
                 }
 
-                if ($user_data) {
-                    $res = MessageUser::query()->insert($user_data);
+                $res = MessageUser::query()->insert($user_data);
 
-                    if ($res === false) {
-                        DB::rollBack();
-                        return ['code' => false, 'msg' => '失败请重试'];
+                if ($res === false) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '添加用户信息失败'];
+                }
+            }
+
+            if (0) {
+                //写入message_user
+                $user_list = User::query()
+                    ->whereIn('phone', $params['phone_list'])
+                    ->pluck('id')
+                    ->toArray();
+
+                if (empty($user_list)) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '提供的手机号都未注册'];
+                }
+
+                $send_count = count($user_list);
+                Message::query()->where('id', '=', $msg_id)->update(['send_count' => $send_count]);
+
+                $msg_user_ist = MessageUser::query()
+                    ->where('message_id', '=', $msg_id)
+                    ->pluck('receive_user')
+                    ->toArray();
+
+
+                $del_array = array_diff($msg_user_ist, $user_list);
+                $add_array = array_diff($user_list, $msg_user_ist);
+
+                if ($del_array) {
+                    MessageUser::query()
+                        ->where('message_id', '=', $msg_id)
+                        ->whereIn('receive_user', $del_array)
+                        ->delete();
+                }
+
+                if ($add_array) {
+                    $user_data = [];
+
+                    foreach ($add_array as $ul_v) {
+                        $user_data[] = [
+                            'send_user'    => 0,
+                            'receive_user' => $ul_v,
+                            'message_id'   => $msg_id
+                        ];
+                    }
+
+                    if ($user_data) {
+                        $res = MessageUser::query()->insert($user_data);
+
+                        if ($res === false) {
+                            DB::rollBack();
+                            return ['code' => false, 'msg' => '失败请重试'];
+                        }
                     }
                 }
             }
+
         }
 
         DB::commit();
@@ -435,6 +475,7 @@ class MsgConsoleServers
                 ];
                 break;
             case '172':
+                //todo 大咖讲述没有详情
                 break;
             default:
                 $res = [
@@ -489,44 +530,49 @@ class MsgConsoleServers
             ->get();
     }
 
-    public function getGoodsList(){
+    public function getGoodsList()
+    {
         return MallGoods::query()
-            ->where('status','=',2)
-            ->select(['id as relation_id','name as title'])
+            ->where('status', '=', 2)
+            ->select(['id as relation_id', 'name as title'])
             ->get();
     }
 
-    public function getLiveList(){
+    public function getLiveList()
+    {
         return Live::query()
-            ->where('is_finish','=',0)
-            ->where('is_del','=',0)
-            ->where('begin_at','>=',date('Y-m-d H:i:s'))
-            ->select(['id as relation_id','title'])
+            ->where('is_finish', '=', 0)
+            ->where('is_del', '=', 0)
+            ->where('begin_at', '>=', date('Y-m-d H:i:s'))
+            ->select(['id as relation_id', 'title'])
             ->get();
     }
 
-    public function getCampList(){
+    public function getCampList()
+    {
         return Column::query()
-            ->where('type','=',4)
-            ->where('status','=',1)
-            ->select(['id as relation_id','name as title'])
+            ->where('type', '=', 4)
+            ->where('status', '=', 1)
+            ->select(['id as relation_id', 'name as title'])
             ->get();
     }
 
-    public function getCampInfoList(){
+    public function getCampInfoList()
+    {
         return Column::query()
-            ->where('type','=',3)
-            ->where('status','=',1)
-            ->whereIn('is_start',[0,1])
-            ->select(['id as relation_id','name as title'])
+            ->where('type', '=', 3)
+            ->where('status', '=', 1)
+            ->whereIn('is_start', [0, 1])
+            ->select(['id as relation_id', 'name as title'])
             ->get();
     }
 
-    public function getExplainBookList(){
+    public function getExplainBookList()
+    {
         return Lists::query()
-            ->where('type','=',10)
-            ->where('status','=',1)
-            ->select(['id as relation_id','title'])
+            ->where('type', '=', 10)
+            ->where('status', '=', 1)
+            ->select(['id as relation_id', 'title'])
             ->get();
     }
 }
