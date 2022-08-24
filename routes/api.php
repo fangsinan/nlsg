@@ -590,7 +590,10 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::get('message/msg_commen_list', 'MessageController@msg_commen_list');
     Route::get('message/msg_follow_list', 'MessageController@msg_follow_list');
     Route::get('message/msg_commen_info', 'MessageController@msg_commen_info');
-
+    Route::get('message/msg_like_list', 'MessageController@msg_like_list');
+    Route::get('message/msg_work_new_list', 'MessageController@msg_work_new_list');
+    Route::get('message/msg_system_list', 'MessageController@msg_system_list');
+    Route::get('message/msg_profit_list', 'MessageController@msg_profit_list');
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::any('user/history_like', 'UserController@histLike');
