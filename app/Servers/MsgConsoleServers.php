@@ -4,12 +4,18 @@
 namespace App\Servers;
 
 
+use App\Models\Column;
+use App\Models\Lists;
+use App\Models\Live;
+use App\Models\MallGoods;
 use App\Models\Message\Message;
 use App\Models\Message\MessageRelationType;
 use App\Models\Message\MessageType;
 use App\Models\Message\MessageUser;
 use App\Models\Message\MessageView;
 use App\Models\User;
+use App\Models\Works;
+use App\Models\WorksInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -50,10 +56,10 @@ class MsgConsoleServers
         $query->orderBy('timing_send_time');
         $query->orderBy('id', 'desc');
         $query->select([
-            'id','title','message','receive_type','relation_type','relation_id',
-            'relation_info_id','plan_time','status','is_timing','timing_send_time',
-            'created_at','open_type','url','rich_text',
-            'send_count','get_count','read_count',
+            'id', 'title', 'message', 'receive_type', 'relation_type', 'relation_id',
+            'relation_info_id', 'plan_time', 'status', 'is_timing', 'timing_send_time',
+            'created_at', 'open_type', 'url', 'rich_text',
+            'send_count', 'get_count', 'read_count',
         ]);
 
 
@@ -340,5 +346,187 @@ class MsgConsoleServers
     {
         $model = new MessageType();
         return $model->getTypeList(1);
+    }
+
+    public function msgRelationTypeSearchData($params): array
+    {
+        $validator = Validator::make($params, [
+                'id' => 'bail|required|integer|exists:nlsg_message_relation_type',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        switch ($params['id']) {
+            //课程
+            case '101':
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getWorksList()
+                ];
+                break;
+            case '102':
+                if ($params['relation_id'] ?? 0) {
+                    $res = [
+                        'have_info' => 0,
+                        'data'      => $this->getWorksInfoList($params['relation_id']),
+                    ];
+                } else {
+                    $res = [
+                        'have_info' => 1,
+                        'data'      => $this->getWorksList(),
+                    ];
+                }
+                break;
+            //讲座
+            case '111':
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getColumnList()
+                ];
+                break;
+            case '112':
+                if ($params['relation_id'] ?? 0) {
+                    $res = [
+                        'have_info' => 0,
+                        'data'      => $this->getColumnInfoList($params['relation_id']),
+                    ];
+                } else {
+                    $res = [
+                        'have_info' => 1,
+                        'data'      => $this->getColumnList()
+                    ];
+                }
+                break;
+            //商品
+            case '122':
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getGoodsList()
+                ];
+                break;
+            //直播间
+            case '131':
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getLiveList()
+                ];
+                break;
+            //训练营
+            case '141':
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getCampList()
+                ];
+                break;
+            case '142':
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getCampInfoList()
+                ];
+                break;
+            //大咖讲书
+            case '171':
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getExplainBookList()
+                ];
+                break;
+            case '172':
+                break;
+            default:
+                $res = [
+                    'have_info' => 0,
+                    'data'      => []
+                ];
+        }
+
+
+        return $res;
+
+    }
+
+    public function getWorksList()
+    {
+        return Works::query()->where('type', '=', 2)
+            ->where('status', '=', 4)
+            ->select(['id as relation_id', 'title'])
+            ->get();
+    }
+
+    public function getWorksInfoList($id = 0)
+    {
+        if (empty($id)) {
+            return [];
+        }
+        return WorksInfo::query()->where('pid', '=', $id)
+            ->where('status', '=', 4)
+            ->select(['id as relation_info_id', 'title'])
+            ->get();
+
+    }
+
+    public function getColumnList()
+    {
+        return Column::query()
+            ->where('type', '=', 2)
+            ->where('status', '=', 1)
+            ->select(['id as relation_id', 'name as title'])
+            ->get();
+    }
+
+    public function getColumnInfoList($id = 0)
+    {
+        if (empty($id)) {
+            return [];
+        }
+
+        return WorksInfo::query()->where('column_id', '=', $id)
+            ->where('status', '=', 4)
+            ->select(['id as relation_info_id', 'title'])
+            ->get();
+    }
+
+    public function getGoodsList(){
+        return MallGoods::query()
+            ->where('status','=',2)
+            ->select(['id as relation_id','name as title'])
+            ->get();
+    }
+
+    public function getLiveList(){
+        return Live::query()
+            ->where('is_finish','=',0)
+            ->where('is_del','=',0)
+            ->where('begin_at','>=',date('Y-m-d H:i:s'))
+            ->select(['id as relation_id','title'])
+            ->get();
+    }
+
+    public function getCampList(){
+        return Column::query()
+            ->where('type','=',4)
+            ->where('status','=',1)
+            ->select(['id as relation_id','name as title'])
+            ->get();
+    }
+
+    public function getCampInfoList(){
+        return Column::query()
+            ->where('type','=',3)
+            ->where('status','=',1)
+            ->whereIn('is_start',[0,1])
+            ->select(['id as relation_id','name as title'])
+            ->get();
+    }
+
+    public function getExplainBookList(){
+        return Lists::query()
+            ->where('type','=',10)
+            ->where('status','=',1)
+            ->select(['id as relation_id','title'])
+            ->get();
     }
 }

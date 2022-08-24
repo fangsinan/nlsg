@@ -75,5 +75,12 @@ class MsgConsoleController extends ControllerBackend
         );
     }
 
+    //todo msg relation type的搜索配置
+    public function msgRelationTypeSearchData(Request $request): JsonResponse
+    {
+        return $this->getRes(
+            (new MsgConsoleServers())->msgRelationTypeSearchData($request->input())
+        );
+    }
 
 }
