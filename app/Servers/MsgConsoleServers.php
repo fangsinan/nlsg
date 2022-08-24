@@ -18,13 +18,85 @@ class MsgConsoleServers
 {
 
     //推送任务列表
-    public function jobList($params, $admin)
+    public function jobList($params, $admin): LengthAwarePaginator
     {
-        return [__LINE__];
+        $query = Message::query();
+
+        if ($params['id'] ?? 0) {
+            $query->where('id', '=', $params['id']);
+        }
+
+        if (in_array($params['status'] ?? 0, [1, 2, 3, 4])) {
+            $query->where('status', '=', $params['status']);
+        }
+
+        if ($params['begin_time'] ?? '') {
+            $query->where(
+                'timing_send_time',
+                '>=',
+                date('Y-m-d H:i:00', strtotime($params['begin_time']))
+            );
+        }
+
+        if ($params['end_time'] ?? '') {
+            $query->where(
+                'timing_send_time',
+                '<=',
+                date('Y-m-d H:i:59', strtotime($params['end_time']))
+            );
+        }
+
+        $query->orderBy('status');
+        $query->orderBy('timing_send_time');
+        $query->orderBy('id', 'desc');
+        $query->select([
+            'id','title','message','receive_type','relation_type','relation_id',
+            'relation_info_id','plan_time','status','is_timing','timing_send_time',
+            'created_at','open_type','url','rich_text',
+            'send_count','get_count','read_count',
+        ]);
+
+
+        return $query->paginate($params['size'] ?? 10);
+    }
+
+    public function jobStatus($params, $admin): array
+    {
+        $validator = Validator::make($params, [
+                'id'   => 'bail|required|integer',
+                'flag' => 'bail|required|in:cancel',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $check = Message::query()->find($params['id']);
+        if (!$check) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        if ($check->status !== 1) {
+            return ['code' => false, 'msg' => '只有待发送的任务能够取消'];
+        }
+
+        if (strtotime($check->timing_send_time) < (time() + 120)) {
+            return ['code' => false, 'msg' => '两分钟内的任务无法取消'];
+        }
+
+        $check->status = 4;
+        $res           = $check->save();
+
+        if (!$res) {
+            return ['code' => false, 'msg' => '失败,请重试.'];
+        }
+
+        return ['code' => true, 'msg' => '成功'];
     }
 
     //创建推送任务
-    public function createJob($params, $admin)
+    public function createJob($params, $admin): array
     {
         $params['is_jpush'] = 1;
 
@@ -59,9 +131,7 @@ class MsgConsoleServers
             $params['relation_info_id'] = 0;
         }
 
-        //todo 编辑如何校验
-
-        //todo 立刻发送和plan_time如何写入
+        $params['timing_send_time'] = date('Y-m-d H:i:00', strtotime($params['timing_send_time']));
 
         $is_old = $params['id'] ?? 0;
 
@@ -74,6 +144,11 @@ class MsgConsoleServers
             if (!$msg) {
                 return ['code' => false, 'msg' => 'id错误'];
             }
+
+            if ($msg->status !== 4) {
+                return ['code' => false, 'msg' => '请先取消任务,只有未生效状态的任务可以进行编辑'];
+            }
+
             $old_receive_type = $msg->receive_type;
 
             $res = $msg->update($params);
@@ -114,6 +189,9 @@ class MsgConsoleServers
                 DB::rollBack();
                 return ['code' => false, 'msg' => '提供的手机号都未注册'];
             }
+
+            $send_count = count($user_list);
+            Message::query()->where('id', '=', $msg_id)->update(['send_count' => $send_count]);
 
             $msg_user_ist = MessageUser::query()
                 ->where('message_id', '=', $msg_id)

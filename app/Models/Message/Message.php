@@ -18,7 +18,7 @@ class Message extends Base
     protected $fillable = [
         'title', 'message', 'type', 'receive_type', 'relation_id','relation_info_id', 'relation_type',
         'created_at', 'updated_at', 'plan_time', 'status','is_jpush','timing_send_time',
-        'is_timing','open_type','url','rich_text',
+        'is_timing','open_type','url','rich_text','send_count','get_count','read_count','action_id',
     ];
     /**
      * pushMessage 推送消息
@@ -33,8 +33,7 @@ class Message extends Base
         $relation_type  = $relation_data['relation_type'] ??0;
         $relation_id    = $relation_data['relation_id'] ??0;
         $relation_info  = $relation_data['relation_info'] ??0;
-        $comment_id     = $relation_data['comment_id'] ??0;
-
+        $action_id     = $relation_data['action_id'] ??0;
 
         //校验用户
         // $user = User::select("id","nickname")->whereIn('id',[$sendUid,$receiveUid])->get()->toArray();
@@ -55,7 +54,7 @@ class Message extends Base
             "relation_type" =>  $relation_type,
             "relation_id"   =>  $relation_id,
             "relation_info" =>  $relation_info,
-            "comment_id"    =>  $comment_id,
+            "action_id"    =>  $action_id,
             "plan_time"     =>  $time,
             "status"        =>  3,
             "is_jpush"      =>  2,
@@ -80,7 +79,7 @@ class Message extends Base
             // 记录日志
             DB::table('nlsg_log_info')->insert([
                 'url'     => 'pushMessage:',
-                'parameter'    =>  json_encode(["sendUid" => $sendUid, "receiveUid"=>$receiveUid, "push_type" => $push_type,]),
+                'parameter'    =>  json_encode(["sendUid" => $sendUid, "receiveUid"=>$receiveUid, "push_type" => $push_type_const,"relation_data"=>$relation_data]),
                 'user_id'    =>  $sendUid,
                 'created_at' =>$time
             ]);
