@@ -586,6 +586,11 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
     Route::get('index/recommend', 'IndexController@recommend');
 
+    Route::get('message/msg_type_list', 'MessageController@msg_type_list');
+    Route::get('message/msg_commen_list', 'MessageController@msg_commen_list');
+    Route::get('message/msg_follow_list', 'MessageController@msg_follow_list');
+    Route::get('message/msg_commen_info', 'MessageController@msg_commen_info');
+
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::any('user/history_like', 'UserController@histLike');
