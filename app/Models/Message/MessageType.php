@@ -5,6 +5,8 @@ namespace App\Models\Message;
 
 
 use App\Models\Base;
+use App\Models\Coupon;
+use App\Models\PayRecordDetail;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MessageType extends Base
@@ -75,18 +77,42 @@ class MessageType extends Base
      *
      * @return array
      */
-    static function getTypeView($action_const): array{
+    static function getTypeView($action_const,$relation_data): array{
         //查看消息类型是否存在
-        $type = MessageType::where(['action_const' =>$action_const,])->value('id');
-        if(empty($type)){
+        $messageType = MessageType::where(['action_const' =>$action_const,])->first();
+        if(empty($messageType)){
             return [];
         }
-
         //获取消息类型模板
-        return MessageView::select("title","message","type")->where([
-            'type'      =>  $type,
-            'status'    =>  1,
-        ])->first();
+        $res =  MessageView::select("title","message","type")->where(['type'=>$messageType['id'],'status'=>1,])->first();
+
+
+        // 收益通知   组装json
+        if($messageType['pid'] == 12){
+            $time = date("Y-m-d H:i:s");
+            $message = "";
+            if(empty($relation_data['action_id'])) return[];
+
+            switch ($action_const){
+                case "LIVE_PROFIT_REWARD":
+                    // 查询收益金额
+                    $price = PayRecordDetail::where("id",$relation_data['action_id'])->value('price');
+                    $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友-直播','type'=>'现金奖励','amount'=>$price,'time'=>$time];
+                    break;
+                case "COUPON_PROFIT_REWARD":
+                    $price = Coupon::where("id",$relation_data['action_id'])->value('price');
+                    $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友','type'=>'优惠券','amount'=>$price,'time'=>$time];
+                    break;
+                case "VIP_PROFIT_REWARD":
+                    $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友','type'=>'360会员邀请','amount'=>'108.00','time'=>$time];
+                    break;
+            }
+
+            $res['message'] = $message;
+        }
+
+        return  $res;
+
     }
 
 }
