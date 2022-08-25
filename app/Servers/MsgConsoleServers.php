@@ -189,6 +189,7 @@ class MsgConsoleServers
             }
         }
 
+        $send_count = 0;
         if ($params['receive_type'] == 1) {
 
             //删掉之前的记录
@@ -215,6 +216,8 @@ class MsgConsoleServers
                         'group_id'     => $group_id,
                     ];
                 }
+
+                $send_count += count($user_data);
 
                 $res = MessageUser::query()->insert($user_data);
 
@@ -277,6 +280,13 @@ class MsgConsoleServers
                 }
             }
 
+        }
+
+        if ($send_count > 0) {
+            Message::query()->where('id', '=', $msg_id)
+                ->update([
+                    'send_count' => $send_count
+                ]);
         }
 
         DB::commit();
