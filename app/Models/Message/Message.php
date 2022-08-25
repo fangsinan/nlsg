@@ -26,8 +26,8 @@ class Message extends Base
     /**
      * pushMessage 推送消息
      *
-     * @param int $sendUid    发送人id
-     * @param int $receiveUid 接收人id
+     * @param int $sendUid    发送人id   0 为系统消息
+     * @param int $receiveUid 接收人id   0为全部
      * @param string $push_type_const  发送的消息类型  新用户注册:REGISTER,   周奖励:WEEK_REWARD,   结营奖励:END_CAMP_REWARD,   课程上新:WORK_NEW,   大咖讲书上新:LISTS_NEW,   讲座上新:LECTURE_NEW,   训练营上新:CAMP_NEW,   评论:COMMENT,   回复:COMMENT_REPLY,   点赞:LIKE,   取消点赞:UNLIKE,   直播奖励:LIVE_PROFIT_REWARD,   优惠券奖励:COUPON_PROFIT_REWARD,   360会员奖励:VIP_PROFIT_REWARD,   即将到期:VIP_SOON_EXPIRE,   已经到期:VIP_EXPIRE   关注:FOLLOW
      * @param array $relation_data relation_type 跳转   relation_id  内容id  relation_info  章节id   action_id 行为表id（评论表 回复表 点赞表 收益表 优惠券表=）
      */
@@ -49,6 +49,10 @@ class Message extends Base
         if(empty($messageView)){
             return false;
         }
+        $receive_type = 1;
+        if($receiveUid == 0){
+            $receive_type = 2;  // 全员发送
+        }
 
         $time = date("Y-m-d H:i:s");
         // 将消息组装至message
@@ -56,7 +60,7 @@ class Message extends Base
             "title"         =>  $messageView['title'],
             "message"       =>  $messageView['message'],
             "type"          =>  $messageView['type'],
-            "receive_type"  =>  1,
+            "receive_type"  =>  $receive_type,
             "relation_type" =>  $relation_type,
             "relation_id"   =>  $relation_id,
             "relation_info" =>  $relation_info,
