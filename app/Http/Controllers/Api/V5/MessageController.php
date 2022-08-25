@@ -124,18 +124,10 @@ class MessageController extends Controller
             $items['created_at'] = History::DateTime($items['created_at']);
 
             //是否点赞
-            if($items['type']==9){
-                $items['is_like'] = Like::isLike($items['message']['action_id'],1,$items['send_user']['id'],1);
-            }else{
-                $items['is_like'] = Like::isLike($items['message']['action_id'],2,$items['send_user']['id'],1);
-            }
+            $items['is_like'] = Like::isLike($items['message']['action_id'],$items['type']==9?1:2,$items['send_user']['id'],1);
 
-            if($items['type']==9){
-
-                $items['comment_id']=$items['message']['action_id'];
-
-            }else{
-
+            $items['comment_id']=$items['message']['action_id'];
+            if($items['type']==10){
                 //获取回复
                 $CommentReply = CommentReply::query()
                     ->with([
@@ -208,18 +200,11 @@ class MessageController extends Controller
         $items['created_at'] = History::DateTime($items['created_at']);
 
         //是否点赞
-        if($items['type']==9){
-            $items['is_like'] = Like::isLike($items['message']['action_id'],1,$items['send_user']['id'],1);
-        }else{
-            $items['is_like'] = Like::isLike($items['message']['action_id'],2,$items['send_user']['id'],1);
-        }
+        $items['is_like'] = Like::isLike($items['message']['action_id'],$items['type']==9?1:2,$items['send_user']['id'],1);
 
-        if($items['type']==9){
-
-            $items['comment_id']=$items['message']['action_id'];
-
-        }else{
-
+        //获取评论
+        $items['comment_id']=$items['message']['action_id'];
+        if($items['type']==10){
             //获取回复
             $CommentReply = CommentReply::query()
                 ->with([
@@ -229,7 +214,6 @@ class MessageController extends Controller
             if (!$CommentReply) {
                 return $this->error(0, '参数错误1');
             }
-
             $items['comment_id'] = $CommentReply->comment_id;//评论id
             $items['reply_id'] = $CommentReply->id;//回复id
         }
@@ -358,8 +342,7 @@ class MessageController extends Controller
 
             $items['like'] = $like;
 
-
-            //获取回复
+                //获取回复
             if($like['comment_type']==2){
 
                 $CommentReply = CommentReply::query()
@@ -372,16 +355,20 @@ class MessageController extends Controller
                     return $this->error(0, '参数错误');
                 }
 
-                $items['comment_reply'] = $CommentReply;
+                $items['comment_id'] = $CommentReply->comment_id;
+                $items['reply_id'] = $CommentReply->reply_id;
                 $comment_id = $CommentReply->comment_id;
 
             }else{
                 $comment_id = $like->relation_id;
+                $items['comment_id'] = $comment_id;
             }
 
             //获取评论关联的课程内容
             $items=MessageServers::get_info_by_comment($comment_id,$items);
-
+            if($like['comment_type']==2){
+                $items['comment']=$CommentReply;
+            }
         }
 
         return success($lists);
@@ -418,7 +405,6 @@ class MessageController extends Controller
         foreach ($lists['data'] as &$items) {
             //格式化时间
             $items['created_at'] = History::DateTime($items['created_at']);
-
         }
 
         return success($lists);
@@ -445,7 +431,6 @@ class MessageController extends Controller
         $user_id = $this->user['id'] ?? 233785;
 
         //1=系统消息
-
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
@@ -497,18 +482,39 @@ class MessageController extends Controller
 
             $msg_arr=json_decode($items['message']['message'],true);
 
-            if(is_array($msg_arr)){
-                $items['message']['message']=$msg_arr;
-            }else{
-                $items['message']['message']=['content'=>$items['message']['message']];
-            }
-
+            $items['message']['message']=[
+                'content'=>$msg_arr['content']??'',
+                'source'=>$msg_arr['source']??'',
+                'type'=>$msg_arr['type']??'',
+                'amount'=>$msg_arr['amount']??'',
+                'time'=>$msg_arr['time']??''
+            ];
             //格式化时间
             $items['created_at'] = History::DateTime($items['created_at']);
-
         }
 
         return success($lists);
+    }
+
+    /**
+     * @api {get} /api/v5/message/clear_msg 清除未读消息
+     * @apiName clear_msg
+     * @apiVersion 1.0.0
+     * @apiGroup message
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": { }
+     * }
+     */
+    public function clear_msg(Request $request)
+    {
+        $user_id = $this->user['id'] ?? 233785;
+        MessageServers::clear_msg($user_id);
+        return success([]);
     }
 
 }

@@ -599,6 +599,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::get('message/msg_work_new_list', 'MessageController@msg_work_new_list');
     Route::get('message/msg_system_list', 'MessageController@msg_system_list');
     Route::get('message/msg_profit_list', 'MessageController@msg_profit_list');
+    Route::get('message/clear_msg', 'MessageController@clear_msg');
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::any('user/history_like', 'UserController@histLike');

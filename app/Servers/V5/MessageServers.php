@@ -14,6 +14,16 @@ use Illuminate\Support\Facades\Validator;
 class MessageServers
 {
 
+    static function clear_msg($user_id,$type=[]){
+
+        $query=MessageUser::query()->where('status',1)->where('receive_user', $user_id);
+        if($type){
+            $query->where('type', $type);
+        }
+
+        $query->update(['status'=>2]);
+    }
+
     static function get_user_unread_count($type,$user_id){
         return MessageUser::query()
             ->whereIn('type', $type)
