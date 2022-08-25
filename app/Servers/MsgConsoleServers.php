@@ -138,6 +138,10 @@ class MsgConsoleServers
             $params['relation_info_id'] = 0;
         }
 
+        if ($params['open_type'] == 4) {
+            $params['type'] = 23;
+        }
+
         $params['timing_send_time'] = date('Y-m-d H:i:00', strtotime($params['timing_send_time']));
 
         $is_old = $params['id'] ?? 0;
