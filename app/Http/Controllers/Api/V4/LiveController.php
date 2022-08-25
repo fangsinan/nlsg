@@ -1668,7 +1668,7 @@ class LiveController extends Controller
         //校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
 
-        $from_live_info_id = 0;
+		$from_live_info_id = 0;
         if (isset($input['from_live_info_id']) && $input['from_live_info_id'] > 0) {   //大于0 时说明在直播间买的
             //查看是否有免费直播间的推荐人
             $liveCountDown = LiveCountDown::select('live_id', 'user_id', 'new_vip_uid')
@@ -1700,25 +1700,25 @@ class LiveController extends Controller
             }
         }
 
-        $live_admin_id = Order::getAdminIDByLiveID($this->user['id'],$from_live_info_id);
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
         $data = [
             'ordernum' => $ordernum,
             'type' => 10,
             'user_id' => $this->user['id'],
-            'relation_id' => $liveId,
+            // 'relation_id' => $liveInfoId,
+			'relation_id' => $liveId,
             'cost_price' => $list['price'],
             'price' => $list['price'],
             'twitter_id' => $tweeter_code??0,
             'coupon_id' => 0,
             'ip' => $this->getIp($request),
             'os_type' => $osType,
-            'live_id' => $from_live_info_id,
+            // 'live_id' => $liveId,
+			'live_id' => $from_live_info_id,
             'pay_type' => $payType,
             'activity_tag' => $activity_tag,
             'remark' => $from_live_info_id,
             'protect_user_id' => $tweeter_code??0,
-            'live_admin_id'=>$live_admin_id??0,
 
         ];
         $order = Order::firstOrCreate($data);
