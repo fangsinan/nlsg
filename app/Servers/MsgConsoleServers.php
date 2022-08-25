@@ -196,8 +196,6 @@ class MsgConsoleServers
                 ->where('message_id', '=', $msg_id)
                 ->delete();
 
-
-            DB::rollBack();
             $phone_list = array_chunk($params['phone_list'], self::GROUP_SIZE);
             foreach ($phone_list as $pl_k => $pl_v) {
                 $user_list = User::query()
