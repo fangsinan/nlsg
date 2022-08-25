@@ -1031,21 +1031,10 @@ class LiveController extends Controller
 
         $live_son_flag_num=0;
         if ($list) {
-//            $column = Column::where('user_id', $list['user_id'])
-//                ->orderBy('created_at', 'desc')
-//                ->first();
             $userId = $this->user['id'] ?? 0;
             $user = new User();
 
-//            $columnId = $column ? $column->id : 0;
-            //专栏订阅
-//            $isSub = Subscribe::isSubscribe($userId, $columnId, 1);
             $subLive = Subscribe::isSubscribe($userId, $list->live_pid, 3);
-            //全员禁言
-            /*$is_forbid = LiveForbiddenWords::where('live_info_id', '=', $id)
-                ->where('user_id', '=', 0)->where('is_forbid', '=', 1)
-                ->first();
-            $list['is_forbid'] = $is_forbid ? 1 : 0;*/
             $list['is_forbid'] = 0;
 
             $is_silence = LiveForbiddenWords::where('live_info_id', '=', $id)
@@ -1065,11 +1054,8 @@ class LiveController extends Controller
             $is_admin = LiveConsole::isAdmininLive($userId ?? 0, $list['live_pid']);
             $list['is_admin'] = $is_admin ? 1 : 0;
 
-//            $list['column_id'] = $columnId;
             $list['column_id'] = 0;
             $list['is_sub'] = $subLive ?? 0;
-//            $list['is_sub_column'] = $isSub ?? 0;
-//            $list['level'] = $user->getLevel($userId);
             $list['is_sub_column'] = 0;
             $list['level'] = 0;
             $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
@@ -1094,13 +1080,6 @@ class LiveController extends Controller
                     $list['live_son_flag_count'] =  $key_num;
                 }else{
                     $list['live_son_flag_count']= LiveLogin::query()->where(['live_id'=>$list->live_pid,'live_son_flag'=>$live_son_flag])->count();
-                    /*$list['live_son_flag_count'] = Subscribe::where([
-                        "relation_id" => $list->live_pid,
-                        "type" => 3,
-                        "status" => 1,
-                        "twitter_id" => $live_son_flag,
-                    ])->count();*/
-
                     $redis->setex($key,3600*5,$list['live_son_flag_count']);
                 }
 
@@ -1154,24 +1133,7 @@ class LiveController extends Controller
 
             $is_push_goods = empty($push_gid) ? 0 : 1;
         }
-
-        /*$time=time();
-        if(in_array($id,[19])){
-            $start_time=strtotime(date("Y-m-d 09:00:0"));
-        }else {
-            $start_time = strtotime(date("Y-m-d 20:00:0"));
-        }
-        if( !empty($live_son_flag) &&  $time >= $start_time ){
-            $push_gid = LivePush::where([
-                'live_info_id'=>$id,
-                'push_type'=>9,
-            ])->orderBy('created_at', 'desc')->value('push_gid');
-
-            if(!empty($push_gid)){
-                $push_live = Live::select("id","title", "price","type","cover_img","is_free")->where(['id'=>$push_gid])->first();
-
-            }
-        }*/
+        
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
