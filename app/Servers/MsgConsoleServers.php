@@ -475,7 +475,17 @@ class MsgConsoleServers
                 ];
                 break;
             case '172':
-                //todo 大咖讲述没有详情
+                if ($params['relation_id'] ?? 0) {
+                    $res = [
+                        'have_info' => 0,
+                        'data'      => $this->getExplainBookWorksInfoList($params['relation_id']),
+                    ];
+                } else {
+                    $res = [
+                        'have_info' => 1,
+                        'data'      => $this->getExplainBookWorksList()
+                    ];
+                }
                 break;
             default:
                 $res = [
@@ -573,6 +583,26 @@ class MsgConsoleServers
             ->where('type', '=', 10)
             ->where('status', '=', 1)
             ->select(['id as relation_id', 'title'])
+            ->get();
+    }
+
+    public function getExplainBookWorksList()
+    {
+        return Works::query()->where('type', '=', 2)
+            ->where('is_show', '=', 0)
+            ->where('status', '=', 4)
+            ->select(['id as relation_id', 'title'])
+            ->get();
+    }
+
+    public function getExplainBookWorksInfoList($id = 0)
+    {
+        if (empty($id)) {
+            return [];
+        }
+        return WorksInfo::query()->where('pid', '=', $id)
+            ->where('status', '=', 4)
+            ->select(['id as relation_info_id', 'title'])
             ->get();
     }
 }
