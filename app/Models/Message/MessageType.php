@@ -85,21 +85,25 @@ class MessageType extends Base
         }
         //获取消息类型模板
         $res =  MessageView::select("title","message","type")->where(['type'=>$messageType['id'],'status'=>1,])->first();
+        if(empty($res)){
+            return [];
+        }
+        $res = $res->toArray();
 
 
         // 收益通知   组装json
         if($messageType['pid'] == 12){
             $time = date("Y-m-d H:i:s");
             $message = "";
-            if(empty($relation_data['action_id'])) return[];
-
             switch ($action_const){
                 case "LIVE_PROFIT_REWARD":
+                    if(empty($relation_data['action_id'])) return[];
                     // 查询收益金额
                     $price = PayRecordDetail::where("id",$relation_data['action_id'])->value('price');
                     $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友-直播','type'=>'现金奖励','amount'=>$price,'time'=>$time];
                     break;
                 case "COUPON_PROFIT_REWARD":
+                    if(empty($relation_data['action_id'])) return[];
                     $price = Coupon::where("id",$relation_data['action_id'])->value('price');
                     $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友','type'=>'优惠券','amount'=>$price,'time'=>$time];
                     break;
@@ -108,9 +112,8 @@ class MessageType extends Base
                     break;
             }
 
-            $res['message'] = $message;
+            $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
         }
-
         return  $res;
 
     }

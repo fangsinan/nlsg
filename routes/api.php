@@ -276,10 +276,15 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('work/convert', 'WorksController@convert');//获取订单详情
 
     Route::get('live/show_wechat', 'LiveController@showWechat');
+    //渠道微信授权单独使用
+    Route::get('live/show_wechat_auth', 'LiveController@showWechatAuth');
+
     Route::get('live_notice/list', 'LiveConsoleController@liveNoticeList');
     Route::post('channel/cytx_order_check', 'ChannelController@cytxOrderCheck');
 
     Route::get('redis/demo', 'RedisController@Demo');
+
+
 
     Route::group(['middleware' => ['auth.jwt']], function () {
         Route::get('user/coupon', 'UserController@getUserCoupon');

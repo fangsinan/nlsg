@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Validator;
 
 class MsgConsoleServers
 {
+    const GROUP_SIZE = 1000;
 
     //推送任务列表
     public function jobList($params, $admin): LengthAwarePaginator
@@ -108,10 +109,10 @@ class MsgConsoleServers
 
         $validator = Validator::make($params,
             [
-                'title'            => 'bail|required|string|max:255',
-                'message'          => 'bail|required|string|max:255',
+                'title'            => 'bail|required|string|max:20',
+                'message'          => 'bail|required|string|max:50',
                 'receive_type'     => 'bail|required|in:1,2',
-                'phone_list'       => 'exclude_unless:receive_type,1|required|array|max:1000',
+                'phone_list'       => 'exclude_unless:receive_type,1|required|array|max:20000',
                 'phone_list.*'     => 'distinct|size:11',
                 'open_type'        => 'bail|required|in:1,2,3,4',
                 'url'              => 'exclude_unless:open_type,2|required|url|max:255',
@@ -124,17 +125,23 @@ class MsgConsoleServers
             [
                 'phone_list.*.distinct' => '手机号内有重复值',
                 'phone_list.*.size'     => '手机号长度有误',
+                'title.max'             => '最多允许20个字',
+                'message.max'           => '最多允许50个字',
             ]
         );
 
         if ($validator->fails()) {
             return ['code' => false, 'msg' => $validator->messages()->first()];
         }
-
+       
         if ($params['open_type'] != 3) {
             $params['relation_type']    = 0;
             $params['relation_id']      = 0;
             $params['relation_info_id'] = 0;
+        }
+
+        if ($params['open_type'] == 4) {
+            $params['type'] = 23;
         }
 
         $params['timing_send_time'] = date('Y-m-d H:i:00', strtotime($params['timing_send_time']));
@@ -184,57 +191,103 @@ class MsgConsoleServers
             }
         }
 
+        $send_count = 0;
         if ($params['receive_type'] == 1) {
-            //写入message_user
-            $user_list = User::query()
-                ->whereIn('phone', $params['phone_list'])
-                ->pluck('id')
-                ->toArray();
 
-            if (empty($user_list)) {
-                DB::rollBack();
-                return ['code' => false, 'msg' => '提供的手机号都未注册'];
-            }
-
-            $send_count = count($user_list);
-            Message::query()->where('id', '=', $msg_id)->update(['send_count' => $send_count]);
-
-            $msg_user_ist = MessageUser::query()
+            //删掉之前的记录
+            MessageUser::query()
                 ->where('message_id', '=', $msg_id)
-                ->pluck('receive_user')
-                ->toArray();
+                ->delete();
 
-
-            $del_array = array_diff($msg_user_ist, $user_list);
-            $add_array = array_diff($user_list, $msg_user_ist);
-
-            if ($del_array) {
-                MessageUser::query()
-                    ->where('message_id', '=', $msg_id)
-                    ->whereIn('receive_user', $del_array)
-                    ->delete();
-            }
-
-            if ($add_array) {
+            $phone_list = array_chunk($params['phone_list'], self::GROUP_SIZE);
+            foreach ($phone_list as $pl_k => $pl_v) {
+                $user_list = User::query()
+                    ->whereIn('phone', $pl_v)
+                    ->pluck('id')
+                    ->toArray();
+                if (empty($user_list)) {
+                    continue;
+                }
+                $group_id  = $msg_id . '-' . $pl_k;
                 $user_data = [];
-
-                foreach ($add_array as $ul_v) {
+                foreach ($user_list as $ul_v) {
+                    $send_count++;
                     $user_data[] = [
                         'send_user'    => 0,
                         'receive_user' => $ul_v,
-                        'message_id'   => $msg_id
+                        'message_id'   => $msg_id,
+                        'group_id'     => $group_id,
                     ];
                 }
 
-                if ($user_data) {
-                    $res = MessageUser::query()->insert($user_data);
+                $res = MessageUser::query()->insert($user_data);
 
-                    if ($res === false) {
-                        DB::rollBack();
-                        return ['code' => false, 'msg' => '失败请重试'];
+                if ($res === false) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '添加用户信息失败'];
+                }
+            }
+
+            if (0) {
+                //写入message_user
+                $user_list = User::query()
+                    ->whereIn('phone', $params['phone_list'])
+                    ->pluck('id')
+                    ->toArray();
+
+                if (empty($user_list)) {
+                    DB::rollBack();
+                    return ['code' => false, 'msg' => '提供的手机号都未注册'];
+                }
+
+                $send_count = count($user_list);
+                Message::query()->where('id', '=', $msg_id)->update(['send_count' => $send_count]);
+
+                $msg_user_ist = MessageUser::query()
+                    ->where('message_id', '=', $msg_id)
+                    ->pluck('receive_user')
+                    ->toArray();
+
+
+                $del_array = array_diff($msg_user_ist, $user_list);
+                $add_array = array_diff($user_list, $msg_user_ist);
+
+                if ($del_array) {
+                    MessageUser::query()
+                        ->where('message_id', '=', $msg_id)
+                        ->whereIn('receive_user', $del_array)
+                        ->delete();
+                }
+
+                if ($add_array) {
+                    $user_data = [];
+
+                    foreach ($add_array as $ul_v) {
+                        $user_data[] = [
+                            'send_user'    => 0,
+                            'receive_user' => $ul_v,
+                            'message_id'   => $msg_id
+                        ];
+                    }
+
+                    if ($user_data) {
+                        $res = MessageUser::query()->insert($user_data);
+
+                        if ($res === false) {
+                            DB::rollBack();
+                            return ['code' => false, 'msg' => '失败请重试'];
+                        }
                     }
                 }
             }
+
+        }
+
+        if ($send_count > 0) {
+            Message::query()->where('id', '=', $msg_id)
+                ->update([
+                    'send_count' => $send_count
+                ]);
         }
 
         DB::commit();
@@ -272,7 +325,6 @@ class MsgConsoleServers
         if ($validator->fails()) {
             return ['code' => false, 'msg' => $validator->messages()->first()];
         }
-
 
         $res = MessageView::query()->where('id', '=', $params['id'])
             ->update([
@@ -323,9 +375,21 @@ class MsgConsoleServers
             if (!$check_id) {
                 return ['code' => false, 'msg' => '模板id不存在'];
             }
+
+            //不允许修改type
+            if ($check_id->type != $params['type']) {
+                return ['code' => false, 'msg' => '不允许修改类型'];
+            }
+
             $mv = MessageView::query()->find($params['id']);
         } else {
             $mv = new MessageView();
+
+            //新建,需要校验是否已经存在该type
+            $check_type = MessageView::query()->where('type', '=', $params['type'])->first();
+            if ($check_type) {
+                return ['code' => false, 'msg' => '该类型已经存在模板,不允许创建'];
+            }
         }
 
         $mv->title           = $params['title'];
@@ -435,6 +499,17 @@ class MsgConsoleServers
                 ];
                 break;
             case '172':
+                if ($params['relation_id'] ?? 0) {
+                    $res = [
+                        'have_info' => 0,
+                        'data'      => $this->getExplainBookWorksInfoList($params['relation_id']),
+                    ];
+                } else {
+                    $res = [
+                        'have_info' => 1,
+                        'data'      => $this->getExplainBookWorksList()
+                    ];
+                }
                 break;
             default:
                 $res = [
@@ -489,44 +564,69 @@ class MsgConsoleServers
             ->get();
     }
 
-    public function getGoodsList(){
+    public function getGoodsList()
+    {
         return MallGoods::query()
-            ->where('status','=',2)
-            ->select(['id as relation_id','name as title'])
+            ->where('status', '=', 2)
+            ->select(['id as relation_id', 'name as title'])
             ->get();
     }
 
-    public function getLiveList(){
+    public function getLiveList()
+    {
         return Live::query()
-            ->where('is_finish','=',0)
-            ->where('is_del','=',0)
-            ->where('begin_at','>=',date('Y-m-d H:i:s'))
-            ->select(['id as relation_id','title'])
+            ->where('is_finish', '=', 0)
+            ->where('is_del', '=', 0)
+            ->where('begin_at', '>=', date('Y-m-d H:i:s'))
+            ->select(['id as relation_id', 'title'])
             ->get();
     }
 
-    public function getCampList(){
+    public function getCampList()
+    {
         return Column::query()
-            ->where('type','=',4)
-            ->where('status','=',1)
-            ->select(['id as relation_id','name as title'])
+            ->where('type', '=', 4)
+            ->where('status', '=', 1)
+            ->select(['id as relation_id', 'name as title'])
             ->get();
     }
 
-    public function getCampInfoList(){
+    public function getCampInfoList()
+    {
         return Column::query()
-            ->where('type','=',3)
-            ->where('status','=',1)
-            ->whereIn('is_start',[0,1])
-            ->select(['id as relation_id','name as title'])
+            ->where('type', '=', 3)
+            ->where('status', '=', 1)
+            ->whereIn('is_start', [0, 1])
+            ->select(['id as relation_id', 'name as title'])
             ->get();
     }
 
-    public function getExplainBookList(){
+    public function getExplainBookList()
+    {
         return Lists::query()
-            ->where('type','=',10)
-            ->where('status','=',1)
-            ->select(['id as relation_id','title'])
+            ->where('type', '=', 10)
+            ->where('status', '=', 1)
+            ->select(['id as relation_id', 'title'])
+            ->get();
+    }
+
+    public function getExplainBookWorksList()
+    {
+        return Works::query()->where('type', '=', 2)
+            ->where('is_show', '=', 0)
+            ->where('status', '=', 4)
+            ->select(['id as relation_id', 'title'])
+            ->get();
+    }
+
+    public function getExplainBookWorksInfoList($id = 0)
+    {
+        if (empty($id)) {
+            return [];
+        }
+        return WorksInfo::query()->where('pid', '=', $id)
+            ->where('status', '=', 4)
+            ->select(['id as relation_info_id', 'title'])
             ->get();
     }
 }
