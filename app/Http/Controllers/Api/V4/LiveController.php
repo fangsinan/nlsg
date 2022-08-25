@@ -1133,7 +1133,7 @@ class LiveController extends Controller
 
             $is_push_goods = empty($push_gid) ? 0 : 1;
         }
-        
+
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
