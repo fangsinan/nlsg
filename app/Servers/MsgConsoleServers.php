@@ -324,7 +324,6 @@ class MsgConsoleServers
             return ['code' => false, 'msg' => $validator->messages()->first()];
         }
 
-
         $res = MessageView::query()->where('id', '=', $params['id'])
             ->update([
                 'status' => 2
@@ -374,9 +373,21 @@ class MsgConsoleServers
             if (!$check_id) {
                 return ['code' => false, 'msg' => '模板id不存在'];
             }
+
+            //不允许修改type
+            if ($check_id->type != $params['type']) {
+                return ['code' => false, 'msg' => '不允许修改类型'];
+            }
+
             $mv = MessageView::query()->find($params['id']);
         } else {
             $mv = new MessageView();
+
+            //新建,需要校验是否已经存在该type
+            $check_type = MessageView::query()->where('type','=',$params['type'])->first();
+            if ($check_type){
+                return ['code'=>false,'msg'=>'该类型已经存在模板,不允许创建'];
+            }
         }
 
         $mv->title           = $params['title'];
