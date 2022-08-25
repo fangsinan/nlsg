@@ -998,6 +998,152 @@ class LiveController extends Controller
 
     }
 
+    //公众号调用--校园渠道直播
+    public function showWechatAuth(Request $request)
+    {
+        $id = intval($request->get('live_id',0));
+        $live_son_flag = intval($request->get('live_son_flag',0));
+        $os_type = intval($request->input('os_type', 0)); //1 安卓 2ios 3微信
+        if(!empty($os_type) && $os_type==3){
+            $selectArr=['id','live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video'];
+        }else{
+            $selectArr=['id', 'push_live_url', 'live_url', 'live_url_flv', 'live_pid', 'user_id', 'begin_at', 'is_begin', 'length', 'playback_url', 'file_id', 'is_finish', 'pre_video'];
+        }
+        $list = LiveInfo::with([
+            'user:id,nickname,headimg,intro,honor',
+            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify',
+            'live.livePoster'=>function($q){
+                $q->where('status','=',1);
+            }
+        ])
+            ->select($selectArr)
+            ->where('id', $id)
+            ->first();
+
+        if( isset($list['user']['intro']) ){
+            $list['user']['intro'] = ''; //  直播间不显示讲师简介  3月24日需求
+        }
+
+        //初始化人气值
+        $redisConfig = config('database.redis.default');
+        $redis = new Client($redisConfig);
+        $redis->select(0);
+
+        $live_son_flag_num=0;
+        if ($list) {
+            $userId = $this->user['id'] ?? 0;
+            $user = new User();
+
+            $subLive = Subscribe::isSubscribe($userId, $list->live_pid, 3);
+            $list['is_forbid'] = 0;
+
+            $is_silence = LiveForbiddenWords::where('live_info_id', '=', $id)
+                ->where('user_id', '=', $userId)
+                ->where('is_forbid', '=', 1)
+                ->select(['id', 'forbid_at', 'length'])
+                ->first();
+            if ($is_silence) {
+                $list['is_silence'] = intval(strtotime($is_silence->forbid_at)) + intval($is_silence->length) - time();
+                $list['is_silence'] = $list['is_silence'] < 0 ? 0 : $list['is_silence'];
+            } else {
+                $list['is_silence'] = 0;
+            }
+
+            $is_appmt = LiveCountDown::where(['user_id' => $userId, 'live_id' => $id])->first();
+            $list['is_appmt'] = $is_appmt ? 1 : 0;
+            $is_admin = LiveConsole::isAdmininLive($userId ?? 0, $list['live_pid']);
+            $list['is_admin'] = $is_admin ? 1 : 0;
+
+            $list['column_id'] = 0;
+            $list['is_sub'] = $subLive ?? 0;
+            $list['is_sub_column'] = 0;
+            $list['level'] = 0;
+            $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
+            $list['nick_name'] = $this->user['nickname'] ?? '';
+
+            if ($list->user_id == $userId) {
+                $list['is_password'] = 0;
+            } elseif ($is_admin) {
+                $list['is_password'] = 0;
+            } else {
+                $list['is_password'] = $list->live->password ? 1 : 0;
+            }
+            $list['live_son_flag_count'] = 0;
+            $list['live_son_flag_status'] = 0;
+            $list['live_son_flag_brush_status'] = 1;
+            $list['show_wechat_button_status'] = 1;
+            if(!empty($live_son_flag)){
+
+                $key = "live_son_flag:".$list->live_pid . '_' . $live_son_flag;
+                $key_num=$redis->get($key);
+                if(!empty($key_num)){
+                    $list['live_son_flag_count'] =  $key_num;
+                }else{
+                    $list['live_son_flag_count']= LiveLogin::query()->where(['live_id'=>$list->live_pid,'live_son_flag'=>$live_son_flag])->count();
+                    $redis->setex($key,3600*5,$list['live_son_flag_count']);
+                }
+
+                $live_son_flag_num=$list['live_son_flag_count'];
+
+                //渠道是否开启直播
+                $SonFlagInfo= LiveSonFlagPoster::query()->where([
+                    'live_id'   =>$list->live_pid,
+                    'son_id'    =>$live_son_flag,
+                    'is_del'    =>0,
+                ])->first();
+                if(!empty($SonFlagInfo)){
+                    $list['show_wechat_button_status']=$SonFlagInfo->show_wechat_button;
+                    $list['live_son_flag_status']=$SonFlagInfo->status;
+                    $list['live_son_flag_brush_status'] = $SonFlagInfo->live_son_flag_brush_status;
+                }
+            }else{
+                $key="live_number:$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
+                $key_num=$redis->get($key);
+                if( empty($key_num) ){
+                    //数据库实时数据
+                    $live_son_flag_num = LiveLogin::where('live_id', '=', $id)->count();
+                    if(!empty($list['live']['virtual_online_num']) && $list['live']['virtual_online_num']>0){
+                        $live_son_flag_num=$live_son_flag_num+$list['live']['virtual_online_num']; //虚拟值
+                    }
+                    $redis->setex($key,3600*5,$live_son_flag_num);
+                }else{
+                    $live_son_flag_num = $key_num;
+                }
+
+            }
+
+        }
+
+        //微信端渠道直播结束,不会链接socket,人气值返回0
+        if(!empty($live_son_flag) && isset($list->is_finish) && $list->is_finish==1){
+            $list['live_son_flag_count']=0;
+            $live_son_flag_num=0;
+        }
+
+        //如果有推送则在show接口返回
+        $push_live = NULL;
+        $is_push_goods = 0;
+        if(time() > strtotime(date("Y-m-d 09:00:0"))){
+            $push_gid = LivePush::where([
+                'live_info_id'=>$id,
+                'push_type'=>4,
+                'push_gid'=>10,
+            ])->first();
+
+
+            $is_push_goods = empty($push_gid) ? 0 : 1;
+        }
+        
+        $data = [
+            'info' => $list,
+            'live_son_flag_num' => $live_son_flag_num,
+            'push_live' => $push_live,
+            'is_push_goods' => $is_push_goods,
+        ];
+        return success($data);
+
+    }
+
     //公众号调用
     public function showWechat(Request $request)
     {
@@ -1668,7 +1814,7 @@ class LiveController extends Controller
         //校验推客id是否有效
         $tweeter_code = $checked['tweeter_code'];
 
-        $from_live_info_id = 0;
+		$from_live_info_id = 0;
         if (isset($input['from_live_info_id']) && $input['from_live_info_id'] > 0) {   //大于0 时说明在直播间买的
             //查看是否有免费直播间的推荐人
             $liveCountDown = LiveCountDown::select('live_id', 'user_id', 'new_vip_uid')
@@ -1700,25 +1846,25 @@ class LiveController extends Controller
             }
         }
 
-        $live_admin_id = Order::getAdminIDByLiveID($this->user['id'],$from_live_info_id);
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
         $data = [
             'ordernum' => $ordernum,
             'type' => 10,
             'user_id' => $this->user['id'],
-            'relation_id' => $liveId,
+            // 'relation_id' => $liveInfoId,
+			'relation_id' => $liveId,
             'cost_price' => $list['price'],
             'price' => $list['price'],
             'twitter_id' => $tweeter_code??0,
             'coupon_id' => 0,
             'ip' => $this->getIp($request),
             'os_type' => $osType,
-            'live_id' => $from_live_info_id,
+            // 'live_id' => $liveId,
+			'live_id' => $from_live_info_id,
             'pay_type' => $payType,
             'activity_tag' => $activity_tag,
             'remark' => $from_live_info_id,
             'protect_user_id' => $tweeter_code??0,
-            'live_admin_id'=>$live_admin_id??0,
 
         ];
         $order = Order::firstOrCreate($data);
