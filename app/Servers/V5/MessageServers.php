@@ -31,6 +31,7 @@ class MessageServers
             ->where('is_del', 1)
             ->where('receive_user', $user_id)->count();
     }
+
     static function get_user_new_msg($type_arr,$user_id){
         return MessageUser::query()
             ->select(['id', 'type', 'message_id'])
