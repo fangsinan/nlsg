@@ -109,8 +109,8 @@ class MsgConsoleServers
 
         $validator = Validator::make($params,
             [
-                'title'            => 'bail|required|string|max:255',
-                'message'          => 'bail|required|string|max:255',
+                'title'            => 'bail|required|string|max:20',
+                'message'          => 'bail|required|string|max:50',
                 'receive_type'     => 'bail|required|in:1,2',
                 'phone_list'       => 'exclude_unless:receive_type,1|required|array|max:20000',
                 'phone_list.*'     => 'distinct|size:11',
@@ -125,13 +125,15 @@ class MsgConsoleServers
             [
                 'phone_list.*.distinct' => '手机号内有重复值',
                 'phone_list.*.size'     => '手机号长度有误',
+                'title.max'             => '最多允许20个字',
+                'message.max'           => '最多允许50个字',
             ]
         );
 
         if ($validator->fails()) {
             return ['code' => false, 'msg' => $validator->messages()->first()];
         }
-
+       
         if ($params['open_type'] != 3) {
             $params['relation_type']    = 0;
             $params['relation_id']      = 0;
@@ -384,9 +386,9 @@ class MsgConsoleServers
             $mv = new MessageView();
 
             //新建,需要校验是否已经存在该type
-            $check_type = MessageView::query()->where('type','=',$params['type'])->first();
-            if ($check_type){
-                return ['code'=>false,'msg'=>'该类型已经存在模板,不允许创建'];
+            $check_type = MessageView::query()->where('type', '=', $params['type'])->first();
+            if ($check_type) {
+                return ['code' => false, 'msg' => '该类型已经存在模板,不允许创建'];
             }
         }
 
