@@ -9,10 +9,13 @@ use App\Models\CommentReply;
 use App\Models\History;
 use App\Models\Like;
 use App\Models\Message\Message;
+use App\Models\Message\MessageType;
 use App\Models\Message\MessageUser;
 use App\Models\UserFollow;
 use App\Models\VipUser;
+use App\Models\Works;
 use App\Models\WorksInfo;
+use App\Servers\V5\MessageServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Predis\Client;
@@ -41,18 +44,50 @@ class MessageController extends Controller
      */
     public function msg_type_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 2;
-
-        //9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
+        $user_id = $this->user['id'] ?? 233785;
 
         $lists = [];
+
+        //点赞
+        $lists['like_count']=MessageServers::get_user_unread_count(MessageType::get_like_msg_type(),$user_id);
+
+        //关注
+        $lists['follow_count']=MessageServers::get_user_unread_count(MessageType::get_follow_msg_type(),$user_id);
+
+        //评论
+        $lists['comment_count']=MessageServers::get_user_unread_count(MessageType::get_comment_msg_type(),$user_id);
+
+        //收益
+        $type_arr=MessageType::get_profit_msg_type();
+        $lists['profit_count']=MessageServers::get_user_unread_count($type_arr,$user_id);
+        $profit=MessageServers::get_user_new_msg($type_arr,$user_id);
+        if($profit){
+            $message=json_decode($profit->message->message,true);
+            $lists['profit']=['title'=>$profit->message->title,'message'=>$message['content']??$message];
+        }
+
+        //内容上新type=4;
+        $type_arr=MessageType::get_work_new_msg_type();
+        $lists['work_new_count']=MessageServers::get_user_unread_count($type_arr,$user_id);;
+        $work_new=MessageServers::get_user_new_msg($type_arr,$user_id);
+        if($work_new){
+            $lists['work_new']=['title'=>$work_new->message->title,'message'=>$work_new->message->message];
+        }
+
+        //系统消息type=1;
+        $type_arr=MessageType::get_system_msg_type();
+        $lists['system_count']=MessageServers::get_user_unread_count($type_arr,$user_id);;
+        $system=MessageServers::get_user_new_msg($type_arr,$user_id);;
+        if($system){
+            $lists['system']=['title'=>$system->message->title,'message'=>$system->message->message];
+        }
 
         return success($lists);
     }
 
     /**
-     * @api {get} /api/v5/message/msg_commen_list 评论消息列表
-     * @apiName msg_commen_list
+     * @api {get} /api/v5/message/msg_comment_list 评论消息列表
+     * @apiName msg_comment_list
      * @apiVersion 1.0.0
      * @apiGroup message
      *
@@ -64,24 +99,24 @@ class MessageController extends Controller
      * "data": { }
      * }
      */
-    public function msg_commen_list(Request $request)
+    public function msg_comment_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 2;
+        $user_id = $this->user['id'] ?? 233785;
 
-        //type :9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
+        //type :9=评论 10=回复
         $lists = MessageUser::query()
-            ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
+            ->select(['id', 'send_user', 'type', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id',
                 'send_user:id,nickname,headimg,is_author',
-                'receive_user:id,nickname,headimg,is_author'
             ])
-            ->where('type', 0)
+            ->whereIn('type', MessageType::get_comment_msg_type())
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
+
             //是不是360vip
             $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
 
@@ -89,45 +124,39 @@ class MessageController extends Controller
             $items['created_at'] = History::DateTime($items['created_at']);
 
             //是否点赞
-            $items['is_like'] = 1;
-            //Like::isLike($rep_v['id'],2,$uid,$like_type);
-
-            //获取回复
-            $CommentReply = CommentReply::query()
-                ->with([
-                    'from_user:id,nickname,headimg,is_author',
-                    'to_user:id,nickname,headimg,is_author'
-                ])
-                ->where('id', 2397)->first();
-            if (!$CommentReply) {
-                return $this->error(0, '参数错误');
+            if($items['type']==9){
+                $items['is_like'] = Like::isLike($items['message']['action_id'],1,$items['send_user']['id'],1);
+            }else{
+                $items['is_like'] = Like::isLike($items['message']['action_id'],2,$items['send_user']['id'],1);
             }
-            $items['comment_reply'] = $CommentReply;
 
-            //获取评论
-            $comment_id = $CommentReply->comment_id;
-            $Comment = Comment::query()
-                ->with([
-                    'user:id,nickname,headimg,is_author', 'quote:id,pid,content', 'attach:id,relation_id,img',
-                ])
-                ->select('id', 'pid', 'user_id', 'relation_id', 'info_id', 'content', 'forward_num',
-                    'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality', 'is_top')
-                ->where('id', $comment_id)
-                ->whereIn('type', [1, 2, 6]) //类型 1.专栏 2.讲座 3.听书 4.精品课 5 百科 6训练营  7短视频
-                ->first();
-            if (!$Comment) {
-                return $this->error(0, '参数错误');
+            if($items['type']==9){
+
+                $items['comment_id']=$items['message']['action_id'];
+
+            }else{
+
+                //获取回复
+                $CommentReply = CommentReply::query()
+                    ->with([
+                        'from_user:id,nickname,headimg,is_author',
+                        'to_user:id,nickname,headimg,is_author'
+                    ])->where('id', $items['message']['action_id'])->first();
+                if (!$CommentReply) {
+                    return $this->error(0, '参数错误1');
+                }
+
+                $items['comment_id'] = $CommentReply->comment_id;//评论id
+                $items['reply_id'] = $CommentReply->id;//回复id
             }
-            $items['comment'] = $Comment;
 
-            //获取训练营或专栏
-            $Column = Column::query()->where('id', $Comment->relation_id)
-                ->select(['id', 'name', 'title', 'index_pic', 'cover_pic', 'details_pic'])->first();
-            $items['column'] = $Column;
+            //获取评论关联的课程内容
+            $items=MessageServers::get_info_by_comment( $items['comment_id'],$items);
 
-            //获取章节
-            if ($Comment->info_id) {
-                $items['works_info'] = WorksInfo::query()->where(['id' => $Comment->info_id])->select('id', 'title')->first();
+            if($items['type']==9){
+                $items['message']='评论了你：'.$items['comment']['content'];
+            }else{
+                $items['message']='回复了你：'.$CommentReply->content;
             }
         }
 
@@ -135,8 +164,8 @@ class MessageController extends Controller
     }
 
     /**
-     * @api {get} /api/v5/message/msg_commen_info 评论消息详情
-     * @apiName msg_commen_info
+     * @api {get} /api/v5/message/msg_comment_info 评论消息详情
+     * @apiName msg_comment_info
      * @apiVersion 1.0.0
      * @apiGroup message
      *
@@ -148,12 +177,18 @@ class MessageController extends Controller
      * "data": { }
      * }
      */
-    public function msg_commen_info(Request $request)
+    public function msg_comment_info(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 2;
+        $user_id = $this->user['id'] ?? 233785;
 
-        //type :9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
+        $id =$request->query('id',60);
+
+        if(empty($id)){
+            return $this->error(0, '参数错误');
+        }
+
+        //type :9=评论 10=回复
         $items = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
@@ -161,7 +196,8 @@ class MessageController extends Controller
                 'send_user:id,nickname,headimg,is_author',
                 'receive_user:id,nickname,headimg,is_author'
             ])
-            ->where('type', 0)
+            ->whereIn('type', MessageType::get_comment_msg_type())
+            ->where('id', $id)
             ->where('receive_user', $user_id)
             ->first()->toArray();
 
@@ -172,54 +208,47 @@ class MessageController extends Controller
         $items['created_at'] = History::DateTime($items['created_at']);
 
         //是否点赞
-        $items['is_like'] = 1;
-        //Like::isLike($rep_v['id'],2,$uid,$like_type);
+        if($items['type']==9){
+            $items['is_like'] = Like::isLike($items['message']['action_id'],1,$items['send_user']['id'],1);
+        }else{
+            $items['is_like'] = Like::isLike($items['message']['action_id'],2,$items['send_user']['id'],1);
+        }
 
-        //获取回复内容
-        $CommentReply = CommentReply::query()
+        if($items['type']==9){
+
+            $items['comment_id']=$items['message']['action_id'];
+
+        }else{
+
+            //获取回复
+            $CommentReply = CommentReply::query()
+                ->with([
+                    'from_user:id,nickname,headimg,is_author',
+                    'to_user:id,nickname,headimg,is_author'
+                ])->where('id', $items['message']['action_id'])->first();
+            if (!$CommentReply) {
+                return $this->error(0, '参数错误1');
+            }
+
+            $items['comment_id'] = $CommentReply->comment_id;//评论id
+            $items['reply_id'] = $CommentReply->id;//回复id
+        }
+
+        //获取评论关联的课程内容
+        $items=MessageServers::get_info_by_comment( $items['comment_id'],$items);
+
+        //获取评论列表
+        $items['reply_list']=CommentReply::query()
+            ->where('comment_id', $items['comment_id'])
+            ->whereRaw('(from_uid='.$items['send_user']['id'].' and to_uid='.$items['receive_user']['id'].') or (from_uid='.$items['receive_user']['id'].' and to_uid='.$items['send_user']['id'].')')
+            ->where('status', 1)
+            ->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
             ->with([
                 'from_user:id,nickname,headimg,is_author',
                 'to_user:id,nickname,headimg,is_author'
-            ])
-            ->where('id', 2397)->first();
-        if (!$CommentReply) {
-            return $this->error(0, '参数错误');
-        }
-        $items['comment_reply'] = $CommentReply;
+            ])->get();
 
-
-        //根据评论
-        $comment_id = $CommentReply->comment_id;
-        $Comment = Comment::query()
-            ->with([
-                'user:id,nickname,headimg,is_author', 'quote:id,pid,content', 'attach:id,relation_id,img',
-                'reply' => function ($query)  use ($items) {
-                    $query->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
-//                        ->whereRaw('(from_uid='.$items['send_user']['id'].' and to_uid='.$items['receive_user']['id'].') or (from_uid='.$items['receive_user']['id'].' and to_uid='.$items['send_user']['id'].')')
-                        ->where('status', 1);
-                },
-                'reply.from_user:id,nickname,headimg,is_author', 'reply.to_user:id,nickname,headimg,is_author'
-            ])
-            ->select('id', 'pid', 'user_id', 'relation_id', 'info_id', 'content', 'forward_num',
-                'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality', 'is_top')
-            ->where('id', $comment_id)
-            ->whereIn('type', [1, 2, 6]) //类型 1.专栏 2.讲座 3.听书 4.精品课 5 百科 6训练营  7短视频
-            ->first();
-
-        if (!$Comment) {
-            return $this->error(0, '参数错误');
-        }
-        $items['comment'] = $Comment;
-
-        //获取训练营或专栏
-        $Column = Column::query()->where('id', $Comment->relation_id)
-            ->select(['id', 'name', 'title', 'index_pic', 'cover_pic', 'details_pic'])->first();
-        $items['column'] = $Column;
-
-        //获取章节
-        if ($Comment->info_id) {
-            $items['works_info'] = WorksInfo::query()->where(['id' => $Comment->info_id])->select('id', 'title')->first();
-        }
+        $items['reply_count']=count($items['reply_list']);
 
         return success($items);
 
@@ -242,7 +271,7 @@ class MessageController extends Controller
     public function msg_follow_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 2;
+        $user_id = $this->user['id'] ?? 233785;
 
         //9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
         $lists=MessageUser::query()
@@ -251,7 +280,7 @@ class MessageController extends Controller
                 DB::raw('count(*) as count'),
                 DB::raw("date_format(created_at,'%Y-%m-%d') as time"),
             ])->groupBy(DB::raw("date_format(created_at,'%Y-%m-%d')"))
-            ->where('type', 0)
+            ->whereIn('type', MessageType::get_follow_msg_type())
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -263,10 +292,9 @@ class MessageController extends Controller
                 ->with([
                     'message:id,type,title,message,action_id',
                     'send_user:id,nickname,headimg,is_author',
-                    'receive_user:id,nickname,headimg,is_author'
                 ])
                 ->whereIn('id', $ids_arr)
-                ->where('type', 0)
+                ->whereIn('type', MessageType::get_follow_msg_type())
                 ->where('receive_user', $user_id)
                 ->get()->toArray();
 
@@ -286,7 +314,7 @@ class MessageController extends Controller
 
 
     /**
-     * @api {get} /api/v5/message/msg_like_list 评论消息列表
+     * @api {get} /api/v5/message/msg_like_list 点赞
      * @apiName msg_like_list
      * @apiVersion 1.0.0
      * @apiGroup message
@@ -301,18 +329,16 @@ class MessageController extends Controller
      */
     public function msg_like_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 2;
+        $user_id = $this->user['id'] ?? 233785;
 
-        //type :9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
-
+        // 11=点赞
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id',
                 'send_user:id,nickname,headimg,is_author',
-                'receive_user:id,nickname,headimg,is_author'
             ])
-            ->where('type', 0)
+            ->whereIn('type', MessageType::get_like_msg_type())
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -325,45 +351,37 @@ class MessageController extends Controller
             $items['created_at'] = History::DateTime($items['created_at']);
 
             //获取点赞
-            $items['like']=Like::query()->where('id',1083)->first();
+            $like=Like::query()->where('id',$items['message']['action_id'])->first();
+            if(empty($like)){
+                return $this->error(0, '参数错误');
+            }
+
+            $items['like'] = $like;
+
 
             //获取回复
-            $CommentReply = CommentReply::query()
-                ->with([
-                    'from_user:id,nickname,headimg,is_author',
-                    'to_user:id,nickname,headimg,is_author'
-                ])
-                ->where('id', 2397)->first();
-            if (!$CommentReply) {
-                return $this->error(0, '参数错误');
-            }
-            $items['comment_reply'] = $CommentReply;
+            if($like['comment_type']==2){
 
-            //获取评论
-            $comment_id = $CommentReply->comment_id;
-            $Comment = Comment::query()
-                ->with([
-                    'user:id,nickname,headimg,is_author', 'quote:id,pid,content', 'attach:id,relation_id,img',
-                ])
-                ->select('id', 'pid', 'user_id', 'relation_id', 'info_id', 'content', 'forward_num',
-                    'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality', 'is_top')
-                ->where('id', $comment_id)
-                ->whereIn('type', [1, 2, 6]) //类型 1.专栏 2.讲座 3.听书 4.精品课 5 百科 6训练营  7短视频
-                ->first();
-            if (!$Comment) {
-                return $this->error(0, '参数错误');
-            }
-            $items['comment'] = $Comment;
+                $CommentReply = CommentReply::query()
+                    ->with([
+                        'from_user:id,nickname,headimg,is_author',
+                        'to_user:id,nickname,headimg,is_author'
+                    ])
+                    ->where('id', $like->relation_id)->first();
+                if (!$CommentReply) {
+                    return $this->error(0, '参数错误');
+                }
 
-            //获取训练营或专栏
-            $Column = Column::query()->where('id', $Comment->relation_id)
-                ->select(['id', 'name', 'title', 'index_pic', 'cover_pic', 'details_pic'])->first();
-            $items['column'] = $Column;
+                $items['comment_reply'] = $CommentReply;
+                $comment_id = $CommentReply->comment_id;
 
-            //获取章节
-            if ($Comment->info_id) {
-                $items['works_info'] = WorksInfo::query()->where(['id' => $Comment->info_id])->select('id', 'title')->first();
+            }else{
+                $comment_id = $like->relation_id;
             }
+
+            //获取评论关联的课程内容
+            $items=MessageServers::get_info_by_comment($comment_id,$items);
+
         }
 
         return success($lists);
@@ -385,16 +403,15 @@ class MessageController extends Controller
      */
     public function msg_work_new_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 2;
+        $user_id = $this->user['id'] ?? 233785;
 
-        //type :9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
-
+        //4=内容上新
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id',
             ])
-            ->where('type', 0)
+            ->whereIn('type', MessageType::get_work_new_msg_type())
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -424,16 +441,17 @@ class MessageController extends Controller
      */
     public function msg_system_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 2;
 
-        //type :9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
+        $user_id = $this->user['id'] ?? 233785;
+
+        //1=系统消息
 
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id',
             ])
-            ->where('type', 0)
+            ->whereIn('type', MessageType::get_system_msg_type())
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -463,16 +481,15 @@ class MessageController extends Controller
     public function msg_profit_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 2;
+        $user_id = $this->user['id'] ?? 233785;
 
-        //type :9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
-
+        // 12=收益
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id',
             ])
-            ->where('type', 0)
+            ->whereIn('type', MessageType::get_profit_msg_type())
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -483,11 +500,12 @@ class MessageController extends Controller
             if(is_array($msg_arr)){
                 $items['message']['message']=$msg_arr;
             }else{
-                $items['message']['message']=['content'=>'内容','source'=>'奖励来源','type'=>'奖励类型','amount'=>'奖励数量','time'=>'奖励时间'];
+                $items['message']['message']=['content'=>$items['message']['message']];
             }
 
             //格式化时间
             $items['created_at'] = History::DateTime($items['created_at']);
+
         }
 
         return success($lists);

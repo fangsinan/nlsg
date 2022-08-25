@@ -587,9 +587,9 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::get('index/recommend', 'IndexController@recommend');
 
     Route::get('message/msg_type_list', 'MessageController@msg_type_list');
-    Route::get('message/msg_commen_list', 'MessageController@msg_commen_list');
+    Route::get('message/msg_comment_list', 'MessageController@msg_comment_list');
     Route::get('message/msg_follow_list', 'MessageController@msg_follow_list');
-    Route::get('message/msg_commen_info', 'MessageController@msg_commen_info');
+    Route::get('message/msg_comment_info', 'MessageController@msg_comment_info');
     Route::get('message/msg_like_list', 'MessageController@msg_like_list');
     Route::get('message/msg_work_new_list', 'MessageController@msg_work_new_list');
     Route::get('message/msg_system_list', 'MessageController@msg_system_list');

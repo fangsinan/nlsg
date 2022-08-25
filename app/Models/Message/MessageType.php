@@ -115,4 +115,23 @@ class MessageType extends Base
 
     }
 
+    static function get_like_msg_type(){
+        return  MessageType::query()->whereRaw('id=11 or pid=11')->pluck('id')->toArray();
+    }
+    static function get_follow_msg_type(){
+        return  MessageType::query()->whereRaw('id=22 or pid=22')->pluck('id')->toArray();
+    }
+    static function get_comment_msg_type(){
+        return  MessageType::query()->whereRaw('id=9 or pid=9')->pluck('id')->toArray();
+    }
+    static function get_profit_msg_type(){
+        return  MessageType::query()->whereRaw('id=12 or pid=12')->pluck('id')->toArray();
+    }
+    static function get_work_new_msg_type(){
+        return  MessageType::query()->whereRaw('id=4 or pid=4')->pluck('id')->toArray();
+    }
+    static function get_system_msg_type(){
+        return  MessageType::query()->whereRaw('id=1 or pid=1')->pluck('id')->toArray();
+    }
+
 }
