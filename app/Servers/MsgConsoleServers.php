@@ -209,6 +209,7 @@ class MsgConsoleServers
                 $group_id  = $msg_id . '-' . $pl_k;
                 $user_data = [];
                 foreach ($user_list as $ul_v) {
+                    $send_count++;
                     $user_data[] = [
                         'send_user'    => 0,
                         'receive_user' => $ul_v,
@@ -216,8 +217,6 @@ class MsgConsoleServers
                         'group_id'     => $group_id,
                     ];
                 }
-
-                $send_count += count($user_data);
 
                 $res = MessageUser::query()->insert($user_data);
 
