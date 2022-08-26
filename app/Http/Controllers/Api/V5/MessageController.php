@@ -430,7 +430,7 @@ class MessageController extends Controller
 
         foreach ($lists['data'] as &$items) {
             //格式化时间
-            $items['created_at'] = History::DateTime($items['created_at']);
+            $items['message']['created_at'] = '今日';
             $items['message']['cover_img'] = '/wechat/works/video/161910/5246_1525315796.png';//封面
         }
 
