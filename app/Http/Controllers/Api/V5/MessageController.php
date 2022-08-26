@@ -309,11 +309,12 @@ class MessageController extends Controller
 
                 if($is_follow1 && $is_follow2){
                     $items['is_follow']=2;
-                }elseif ($is_follow1){
+                }elseif ($is_follow2){
                     $items['is_follow']=1;
                 }else{
                     $items['is_follow']=0;
                 }
+
             }
 
             $msg['follow_list']=$follow_lists;
