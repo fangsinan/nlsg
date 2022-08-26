@@ -299,10 +299,21 @@ class MessageController extends Controller
                 ->get()->toArray();
 
             foreach ($follow_lists as &$items) {
+
                 //是不是360vip
                 $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
                 $items['created_at'] = History::DateTime($items['created_at']);
-                $items['is_follow'] = UserFollow::IsFollow($items['receive_user'], $items['send_user']);
+
+                $is_follow1=UserFollow::IsFollow( $items['send_user'],$items['receive_user']);
+                $is_follow2=UserFollow::IsFollow($items['receive_user'], $items['send_user']);
+
+                if($is_follow1 && $is_follow2){
+                    $items['is_follow']=2;
+                }elseif ($is_follow1){
+                    $items['is_follow']=1;
+                }else{
+                    $items['is_follow']=0;
+                }
             }
 
             $msg['follow_list']=$follow_lists;
