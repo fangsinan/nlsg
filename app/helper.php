@@ -333,6 +333,18 @@ function  WorkNewDateTime($param_time = '')
         return '昨日';
     }
 
-    return   date('Y-m-d ',$ptime);
+    return   date('m月d日 ',$ptime);
 
+}
+
+function formatDataTime($param_time, $type = 1)
+{
+    $time= strtotime($param_time);
+    if($type==2){
+        return date('m月d日', $time);
+    }
+    if(date('Y') !=date('Y',$time)){
+        return date('Y年m月d日 H:i', $time);
+    }
+    return date('m月d日 H:i', $time);
 }

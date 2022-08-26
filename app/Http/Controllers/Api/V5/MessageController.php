@@ -456,6 +456,8 @@ class MessageController extends Controller
 
             //格式化时间
             $items['message']['created_at'] = WorkNewDateTime( $items['created_at']);
+            $items['created_at'] =formatDataTime($items['created_at']);
+
         }
 
         return success($lists['data']);
@@ -490,7 +492,7 @@ class MessageController extends Controller
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
-                'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id,open_type,rich_text,url',
+                'message:id,type,title,message,action_id,created_at,relation_type,relation_id,relation_info_id,open_type,rich_text,url',
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
@@ -498,7 +500,8 @@ class MessageController extends Controller
 
         foreach ($lists['data'] as &$items) {
             //格式化时间
-            $items['created_at'] = History::DateTime($items['created_at']);
+            $items['message']['created_at'] = formatDataTime($items['created_at'],2);;
+            $items['created_at'] =formatDataTime($items['created_at']);
 
         }
 
@@ -549,8 +552,10 @@ class MessageController extends Controller
                 'amount'=>$msg_arr['amount']??'',
                 'time'=>$msg_arr['time']??''
             ];
+
             //格式化时间
-            $items['created_at'] = History::DateTime($items['created_at']);
+            $items['message']['created_at'] = formatDataTime($items['created_at'],2);;
+            $items['created_at'] =formatDataTime($items['created_at']);
         }
 
         return success($lists['data']);
