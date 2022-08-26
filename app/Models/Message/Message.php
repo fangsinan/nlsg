@@ -64,10 +64,11 @@ class Message extends Base
             "relation_type" =>  $relation_type,
             "relation_id"   =>  $relation_id,
             "relation_info" =>  $relation_info,
-            "action_id"    =>  $action_id,
+            "action_id"     =>  $action_id,
             "plan_time"     =>  $time,
             "status"        =>  3,
             "is_jpush"      =>  2,
+            "open_type"      =>  $relation_data['open_type'] ??0,
         ];
         // 开启事务
         DB::beginTransaction();
