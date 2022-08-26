@@ -215,10 +215,7 @@ class MessageController extends Controller
 
         $send_user=$items['send_user'];
 
-        //是否点赞
-        $ctype=$items['type']==9?1:2;
-        $items['is_like'] = Like::isLike($items['message']['action_id'],$ctype,$user_id,1);
-        $items['like_count'] = Like::like_count($items['message']['action_id'],$ctype);
+
 
         //获取评论
         $items['comment_id']=$items['message']['action_id'];
@@ -236,6 +233,10 @@ class MessageController extends Controller
         //获取评论关联的课程内容
         $items=MessageServers::get_info_by_comment( $items['comment_id'],$items);
 
+        //主评论是否点赞
+        $items['comment']['is_like'] = Like::isLike($items['comment']['id'],1,$user_id,1);
+        $items['comment']['like_count'] = Like::like_count($items['comment']['id'],1);
+
         //判断评论是否关注
         $items['comment']['is_own']=0;
         $items['comment']['is_follow']=0;
@@ -245,7 +246,7 @@ class MessageController extends Controller
             $items['comment']['is_follow']=UserFollow::IsFollow($user_id, $items['comment']['user']['id']);
         }
 
-        //获取评论列表
+        //获取回复列表
         $reply_list=CommentReply::query()
             ->where('comment_id', $items['comment_id'])
             ->whereRaw("(to_uid={$user_id} and from_uid={$send_user}) or (to_uid={$send_user} and from_uid={$user_id}) ")
@@ -257,6 +258,9 @@ class MessageController extends Controller
             ])->orderBy('id','asc')->get()->toArray();
 
         foreach ($reply_list as &$reply){
+
+            //是不是360vip
+            $reply['from_user']['is_vip']=VipUser::newVipInfo($reply['from_user']['id'])['vip_id'] ?1:0;
 
             $reply['is_like'] = Like::isLike($reply['id'],2,$user_id,1);
             $reply['created_at']=History::DateTime($reply['created_at']);
