@@ -304,12 +304,15 @@ class MessageController extends Controller
                 $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
                 $items['created_at'] = History::DateTime($items['created_at']);
 
-                $is_follow1=UserFollow::IsFollow( $items['send_user'],$items['receive_user']);
-                $is_follow2=UserFollow::IsFollow($items['receive_user'], $items['send_user']);
+                $is_follow_me=UserFollow::IsFollow( $items['send_user'],$items['receive_user']);
+                $is_follow_he=UserFollow::IsFollow($items['receive_user'], $items['send_user']);
 
-                if($is_follow1 && $is_follow2){
+                $items['is_follow_me']=$is_follow_me;
+                $items['is_follow_he']=$is_follow_he;
+
+                if($is_follow_me && $is_follow_he){
                     $items['is_follow']=2;
-                }elseif ($is_follow2){
+                }elseif ($is_follow_he){
                     $items['is_follow']=1;
                 }else{
                     $items['is_follow']=0;
