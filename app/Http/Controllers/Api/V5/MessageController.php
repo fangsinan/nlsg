@@ -213,6 +213,7 @@ class MessageController extends Controller
             ->where('receive_user', $user_id)
             ->first()->toArray();
 
+        $send_user=$items['send_user'];
 
         //是否点赞
         $ctype=$items['type']==9?1:2;
@@ -247,17 +248,17 @@ class MessageController extends Controller
         //获取评论列表
         $reply_list=CommentReply::query()
             ->where('comment_id', $items['comment_id'])
-            ->where('to_uid', $user_id)
+            ->whereRaw("(to_uid={$user_id} and from_uid={$send_user}) or (to_uid={$send_user} and from_uid={$user_id}) ")
             ->where('status', 1)
             ->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
             ->with([
                 'from_user:id,nickname,headimg,is_author',
                 'to_user:id,nickname,headimg,is_author'
-            ])->get()->toArray();
+            ])->orderBy('id','asc')->get()->toArray();
 
         foreach ($reply_list as &$reply){
 
-            $reply['is_like'] = Like::isLike($items['message']['action_id'],2,$user_id,1);
+            $reply['is_like'] = Like::isLike($reply['id'],2,$user_id,1);
             $reply['created_at']=History::DateTime($reply['created_at']);
 
             $reply['is_follow']=0; //判断是否关注 0否 1是
