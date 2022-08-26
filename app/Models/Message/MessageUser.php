@@ -14,7 +14,7 @@ class MessageUser extends Base
     protected $table = 'nlsg_message_user';
 
     protected $fillable = [
-        'send_user', 'receive_user', 'message_id', 'status', 'is_del', 'type',
+        'send_user', 'receive_user', 'message_id', 'status', 'is_del', 'type','is_send',
         'created_at', 'updated_at', 'read_at', 'del_at', 'group_id',
     ];
 
