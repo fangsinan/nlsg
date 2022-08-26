@@ -233,11 +233,8 @@ class MessageController extends Controller
         //获取评论关联的课程内容
         $items=MessageServers::get_info_by_comment( $items['comment_id'],$items);
 
-        //主评论是否点赞
-        $items['comment']['is_like'] = Like::isLike($items['comment']['id'],1,$user_id,1);
-        $items['comment']['like_count'] = Like::like_count($items['comment']['id'],1);
 
-        //判断评论是否关注
+        //主评论是否关注
         $items['comment']['is_own']=0;
         $items['comment']['is_follow']=0;
         if($items['comment']['user']['id']==$user_id){
@@ -245,6 +242,10 @@ class MessageController extends Controller
         }else{
             $items['comment']['is_follow']=UserFollow::IsFollow($user_id, $items['comment']['user']['id']);
         }
+        //主评论是否点赞
+        $items['comment']['is_like'] = Like::isLike($items['comment']['id'],1,$user_id,1);
+        $items['comment']['like_count'] = Like::like_count($items['comment']['id'],1);
+        $items['comment']['user']['is_vip']=VipUser::newVipInfo($items['comment']['user']['id'])['vip_id'] ?1:0;
 
         //获取回复列表
         $reply_list=CommentReply::query()
