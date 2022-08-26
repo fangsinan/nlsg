@@ -42,6 +42,7 @@ class MessageServers
             ->where('is_del', 1)
             ->where('receive_user', $user_id)->orderBy('id','desc')->first();
     }
+
     static function get_info_by_comment($comment_id,$items){
 
         //获取评论
@@ -61,19 +62,24 @@ class MessageServers
 
             //获取训练营、专栏、讲座
             $Column = Column::query()->where('id', $Comment->relation_id)
-                ->select(['id','title','subtitle', 'cover_pic', 'details_pic'])->first();
+                ->select(['id','title','subtitle', 'cover_pic'])->first();
             $items['content'] = $Column;
 
         }elseif(in_array($Comment->type,[3,4])){
             //获取听书、精品课
             $works = Works::query()->where('id', $Comment->relation_id)
-                ->select(['id', 'title','subtitle', 'cover_img as cover_pic ', 'detail_img as details_pic '])->first();
+                ->select(['id', 'title','subtitle', 'cover_img as cover_pic '])->first();
             $items['content'] = $works;
         }
 
         //获取章节
         if ($Comment->info_id) {
-            $items['works_info'] = WorksInfo::query()->where(['id' => $Comment->info_id])->select('id', 'title')->first();
+
+            $WorksInfo=WorksInfo::query()->where(['id' => $Comment->info_id])->select('id', 'title')->first();
+            if($WorksInfo){
+                $items['works_info'] = $WorksInfo;
+                $items['content']['subtitle']=$WorksInfo['title'];
+            }
         }
 
         return  $items;

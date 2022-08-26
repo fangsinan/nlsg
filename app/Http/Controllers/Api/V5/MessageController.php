@@ -391,7 +391,7 @@ class MessageController extends Controller
 
                 $items['comment_reply'] =$CommentReply;
                 $items['comment_id'] = $CommentReply->comment_id;
-                $items['reply_id'] = $CommentReply->reply_id;
+                $items['reply_id'] = $CommentReply->id;
                 $comment_id = $CommentReply->comment_id;
 
             }else{
@@ -402,6 +402,26 @@ class MessageController extends Controller
             //获取评论关联的课程内容
             $items=MessageServers::get_info_by_comment($comment_id,$items);
 
+
+            if($like['comment_type'] ==1 && $like['status']==1){
+                $items['msg']='点赞了你的评论';
+            }elseif ($like['comment_type'] ==1 && $like['status']==2){
+                $items['msg']='取消点赞了你的评论';
+            }elseif ($like['comment_type'] ==2 && $like['status']==1){
+                $items['msg']='点赞了你的回复';
+            }elseif ($like['comment_type'] ==2 && $like['status']==2){
+                $items['msg']='取消点赞了你的回复';
+            }
+
+            if($like['comment_type']==1){
+                $items['like_content']='评论：'.$items['comment']['content'];
+            }else{
+                $items['like_content']='回复：'.$CommentReply['content'];
+            }
+            unset($items['like']);
+            unset($items['comment']);
+            unset($items['works_info']);
+            unset($items['comment_reply']);
         }
 
         return success($lists['data']);
