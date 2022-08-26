@@ -96,7 +96,7 @@ class History extends Base
             $historyData['section'] = $title->section ?? '';
             $historyData['info_duration'] = $title->duration ?? '0:0';
             $historyData['his_duration'] = TimeToMinSec($historyData['time_number']);
-            
+
         }else{
             $historyData = (object)[];
         }
@@ -116,12 +116,12 @@ class History extends Base
 
     public static function HistorySize()
     {
-        
+
         $week_day       = getWeekDay();
         $week_one       = $week_day['monday'];
         $top_week_one   = $week_day['top_monday'];
         $sizes = [20,3,];
-        
+
         foreach($sizes as $size){
             $cache_key_name = 'user_his_len_list_'.$size.'_'.$top_week_one;
             // $result = Cache::get($cache_key_name);
@@ -162,8 +162,8 @@ class History extends Base
 
             Cache::put($cache_key_name, $user, 86400);
         }
-        
-        
+
+
     }
 
 

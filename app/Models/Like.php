@@ -30,4 +30,14 @@ class Like extends Model
         }
         return $is_like;
     }
+
+    /*
+    * cid   评论id
+    * $ctype   1主评 2次级评论
+    * $uid    用户id
+    * $like_type    1想法  2百科  3短视频
+    * */
+    public static function like_count($cid=0,$ctype=1){
+        return  Like::where(['comment_type'=>$ctype,'relation_id' => $cid,   'status'=>1])->count();
+    }
 }

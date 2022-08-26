@@ -77,9 +77,10 @@ class MessageServers
 
             $WorksInfo=WorksInfo::query()->where(['id' => $Comment->info_id])->select('id', 'title')->first();
             if($WorksInfo){
-                $items['works_info'] = $WorksInfo;
+                $items['works_info_id'] = $WorksInfo['id'];
                 $items['content']['subtitle']=$WorksInfo['title'];
             }
+
         }
 
         return  $items;

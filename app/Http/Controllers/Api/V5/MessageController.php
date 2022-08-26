@@ -135,9 +135,10 @@ class MessageController extends Controller
             $items['created_at'] = History::DateTime($items['created_at']);
 
             //是否点赞
-            $items['is_like'] = Like::isLike($items['message']['action_id'],$items['type']==9?1:2,$items['send_user']['id'],1);
+            $items['is_like'] = Like::isLike($items['message']['action_id'],$items['type']==9?1:2,$user_id,1);
 
             $items['comment_id']=$items['message']['action_id'];
+
             if($items['type']==10){
                 //获取回复
                 $CommentReply = CommentReply::query()
@@ -150,17 +151,26 @@ class MessageController extends Controller
                 }
 
                 $items['comment_id'] = $CommentReply->comment_id;//评论id
-                $items['reply_id'] = $CommentReply->id;//回复id
+                $items['comment_reply_id'] = $CommentReply->id;//回复id
             }
 
             //获取评论关联的课程内容
             $items=MessageServers::get_info_by_comment( $items['comment_id'],$items);
 
+
             if($items['type']==9){
-                $items['message']='评论了你：'.$items['comment']['content'];
+                $items['msg']='评论了你：'.$items['comment']['content'];
             }else{
-                $items['message']='回复了你：'.$CommentReply->content;
+                $items['msg']='回复了你：'.$CommentReply->content;
             }
+
+            $items['comment_con']='';
+            if(isset($items['comment']['content'])){
+                $items['comment_con']='评论：'.$items['comment']['content'];
+            }
+
+            unset($items['comment_reply']);
+
         }
 
         return success($lists['data']);
@@ -186,7 +196,7 @@ class MessageController extends Controller
 //        $user_id = $this->user['id'] ?? 233785;
         $user_id = 233785;
 
-        $id =$request->query('id',60);
+        $id =$request->query('id',61);
 
         if(empty($id)){
             return $this->error(0, '参数错误');
@@ -197,54 +207,71 @@ class MessageController extends Controller
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id',
-                'send_user:id,nickname,headimg,is_author',
-                'receive_user:id,nickname,headimg,is_author'
             ])
             ->whereIn('type', MessageType::get_comment_msg_type())
             ->where('id', $id)
             ->where('receive_user', $user_id)
             ->first()->toArray();
 
-        //是不是360vip
-        $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
-
-        //格式化时间
-        $items['created_at'] = History::DateTime($items['created_at']);
 
         //是否点赞
-        $items['is_like'] = Like::isLike($items['message']['action_id'],$items['type']==9?1:2,$items['send_user']['id'],1);
+        $ctype=$items['type']==9?1:2;
+        $items['is_like'] = Like::isLike($items['message']['action_id'],$ctype,$user_id,1);
+        $items['like_count'] = Like::like_count($items['message']['action_id'],$ctype);
 
         //获取评论
         $items['comment_id']=$items['message']['action_id'];
         if($items['type']==10){
             //获取回复
             $CommentReply = CommentReply::query()
-                ->with([
-                    'from_user:id,nickname,headimg,is_author',
-                    'to_user:id,nickname,headimg,is_author'
-                ])->where('id', $items['message']['action_id'])->first();
+               ->where('id', $items['message']['action_id'])->first();
             if (!$CommentReply) {
                 return $this->error(0, '参数错误1');
             }
             $items['comment_id'] = $CommentReply->comment_id;//评论id
-            $items['reply_id'] = $CommentReply->id;//回复id
+            $items['comment_reply_id'] = $CommentReply->id;//回复id
         }
 
         //获取评论关联的课程内容
         $items=MessageServers::get_info_by_comment( $items['comment_id'],$items);
 
+        //判断评论是否关注
+        $items['comment']['is_own']=0;
+        $items['comment']['is_follow']=0;
+        if($items['comment']['user']['id']==$user_id){
+            $items['comment']['is_own']=1;
+        }else{
+            $items['comment']['is_follow']=UserFollow::IsFollow($user_id, $items['comment']['user']['id']);
+        }
+
         //获取评论列表
-        $items['reply_list']=CommentReply::query()
+        $reply_list=CommentReply::query()
             ->where('comment_id', $items['comment_id'])
-            ->whereRaw('(from_uid='.$items['send_user']['id'].' and to_uid='.$items['receive_user']['id'].') or (from_uid='.$items['receive_user']['id'].' and to_uid='.$items['send_user']['id'].')')
+            ->where('to_uid', $user_id)
             ->where('status', 1)
             ->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
             ->with([
                 'from_user:id,nickname,headimg,is_author',
                 'to_user:id,nickname,headimg,is_author'
-            ])->get();
+            ])->get()->toArray();
 
-        $items['reply_count']=count($items['reply_list']);
+        foreach ($reply_list as &$reply){
+
+            $reply['is_like'] = Like::isLike($items['message']['action_id'],2,$user_id,1);
+            $reply['created_at']=History::DateTime($reply['created_at']);
+
+            $reply['is_follow']=0; //判断是否关注 0否 1是
+            $reply['is_own']=0;//是否是自己 0否 1是
+
+            if( $reply['from_user']['id']==$user_id){
+                $reply['is_own']=1;
+            }else{
+                $reply['is_follow']=UserFollow::IsFollow($user_id, $reply['from_user']['id']);
+            }
+        }
+
+        $items['reply_list']=$reply_list;
+        $items['reply_count']=count($reply_list);
 
         return success($items);
 
@@ -304,8 +331,8 @@ class MessageController extends Controller
                 $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
                 $items['created_at'] = History::DateTime($items['created_at']);
 
-                $is_follow_me=UserFollow::IsFollow( $items['send_user'],$items['receive_user']);
-                $is_follow_he=UserFollow::IsFollow($items['receive_user'], $items['send_user']);
+                $is_follow_me=UserFollow::IsFollow( $items['send_user'],$user_id);
+                $is_follow_he=UserFollow::IsFollow($user_id, $items['send_user']);
 
                 $items['is_follow_me']=$is_follow_me;
                 $items['is_follow_he']=$is_follow_he;
@@ -391,7 +418,7 @@ class MessageController extends Controller
 
                 $items['comment_reply'] =$CommentReply;
                 $items['comment_id'] = $CommentReply->comment_id;
-                $items['reply_id'] = $CommentReply->id;
+                $items['comment_reply_id'] = $CommentReply->id;
                 $comment_id = $CommentReply->comment_id;
 
             }else{
@@ -418,9 +445,9 @@ class MessageController extends Controller
             }else{
                 $items['like_comment']='回复：'.$CommentReply['content'];
             }
+
             unset($items['like']);
             unset($items['comment']);
-            unset($items['works_info']);
             unset($items['comment_reply']);
         }
 
