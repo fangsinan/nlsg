@@ -414,9 +414,9 @@ class MessageController extends Controller
             }
 
             if($like['comment_type']==1){
-                $items['like_content']='评论：'.$items['comment']['content'];
+                $items['like_comment']='评论：'.$items['comment']['content'];
             }else{
-                $items['like_content']='回复：'.$CommentReply['content'];
+                $items['like_comment']='回复：'.$CommentReply['content'];
             }
             unset($items['like']);
             unset($items['comment']);
