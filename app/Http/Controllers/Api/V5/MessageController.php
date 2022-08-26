@@ -44,7 +44,8 @@ class MessageController extends Controller
      */
     public function msg_type_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         // 1=系统消息 4=内容上新 9=评论 11=点赞 12=收益 22=关注
 
@@ -83,7 +84,7 @@ class MessageController extends Controller
             $lists['message'][]=['created_at'=>strtotime($system->created_at),'type'=>1,'title'=>$system->message->title,'message'=>$system->message->message];
         }
 
-        $message_arr=$lists['message'];
+        $message_arr=$lists['message']??[];
         $created_at=array_column($message_arr,'created_at');
         array_multisort($message_arr,SORT_DESC,$created_at);
 
@@ -110,8 +111,9 @@ class MessageController extends Controller
      */
     public function msg_comment_list(Request $request)
     {
+        $user_id = 233785;
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
 
         //type :9=评论 10=回复
         $type_arr=MessageType::get_comment_msg_type();
@@ -184,7 +186,8 @@ class MessageController extends Controller
     public function msg_comment_info(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         $id =$request->query('id',60);
 
@@ -267,7 +270,8 @@ class MessageController extends Controller
     public function msg_follow_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         //22=关注
         $type_arr=MessageType::get_follow_msg_type();
@@ -328,7 +332,8 @@ class MessageController extends Controller
      */
     public function msg_like_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         // 11=点赞
         $type_arr=MessageType::get_like_msg_type();
@@ -407,7 +412,8 @@ class MessageController extends Controller
      */
     public function msg_work_new_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         //4=内容上新
         $type_arr=MessageType::get_work_new_msg_type();
@@ -449,7 +455,8 @@ class MessageController extends Controller
     public function msg_system_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         //1=系统消息
 
@@ -491,7 +498,8 @@ class MessageController extends Controller
     public function msg_profit_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         // 12=收益
         $type_arr=MessageType::get_profit_msg_type();
