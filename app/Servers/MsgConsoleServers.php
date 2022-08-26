@@ -133,7 +133,7 @@ class MsgConsoleServers
         if ($validator->fails()) {
             return ['code' => false, 'msg' => $validator->messages()->first()];
         }
-       
+
         if ($params['open_type'] != 3) {
             $params['relation_type']    = 0;
             $params['relation_id']      = 0;
@@ -406,10 +406,10 @@ class MsgConsoleServers
     }
 
 
-    public function msgTypeList()
+    public function msgTypeList($params)
     {
         $model = new MessageType();
-        return $model->getTypeList(1);
+        return $model->getTypeList($params['flag'] ?? 1);
     }
 
     public function msgRelationTypeSearchData($params): array

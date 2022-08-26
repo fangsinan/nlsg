@@ -71,11 +71,11 @@ class MsgConsoleController extends ControllerBackend
     public function msgTypeList(Request $request): JsonResponse
     {
         return $this->getRes(
-            (new MsgConsoleServers())->msgTypeList()
+            (new MsgConsoleServers())->msgTypeList($request->input())
         );
     }
 
-    //todo msg relation type的搜索配置
+    //msg relation type的搜索配置
     public function msgRelationTypeSearchData(Request $request): JsonResponse
     {
         return $this->getRes(
