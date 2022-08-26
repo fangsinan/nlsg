@@ -40,7 +40,6 @@ class MessageServers
             ])
             ->whereIn('type', $type_arr)
             ->where('is_del', 1)
-//            ->where('type', '<>',0)
             ->where('receive_user', $user_id)->orderBy('id','desc')->first();
     }
     static function get_info_by_comment($comment_id,$items){
