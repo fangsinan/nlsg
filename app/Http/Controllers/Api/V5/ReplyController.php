@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Comment;
 use App\Models\CommentReply;
+use App\Models\Message\Message;
 use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
 
@@ -89,6 +90,11 @@ class ReplyController extends Controller
             if($c_type == 6){
                 Column::where('id', $Video_id)->increment('comment_num');
             }
+
+            if(!empty($add_data['from_uid']) && !empty($add_data['to_uid'])){
+                Message::pushMessage($add_data['from_uid'],$add_data['to_uid'],'COMMENT_REPLY',["action_id"=>$result->id,]);
+            }
+
             return success();
         }
     }

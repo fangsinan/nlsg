@@ -16,7 +16,7 @@ class MessageType extends Base
     protected $table = 'nlsg_message_type';
 
     protected $fillable = [
-        'title', 'created_at', 'updated_at',
+        'title', 'created_at', 'updated_at','action_const','show_in_create_job_page','pid'
     ];
 
     public function childList(): HasMany
@@ -40,16 +40,22 @@ class MessageType extends Base
     }
 
     public function getTypeList(int $flag = 1){
-        //1保留父子层级 2只返回可用
+        //1保留父子层级 2返回创建人工推送页面可用的 3只返回可用
 
-        $list = self::query()
+        $query = self::query()
             ->where('pid', '=', 0)
             ->with(['childList:id,title,pid'])
-            ->select(['id', 'title', 'pid'])
-            ->get();
-        if ($flag === 1){
-            return $list;
+            ->select(['id', 'title', 'pid']);
+
+        if ($flag == 1){
+            return $query->get();
         }
+
+        if ($flag == 2){
+            return $query->where('show_in_create_job_page','=',2)->get();
+        }
+
+        $list = $query->get();
 
         $temp = [];
         foreach ($list as $v){

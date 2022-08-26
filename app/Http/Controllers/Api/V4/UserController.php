@@ -10,6 +10,7 @@ use App\Models\Coupon;
 use App\Models\History;
 use App\Models\LiveUserPrivilege;
 use App\Models\MeetingSales;
+use App\Models\Message\Message;
 use App\Models\UserInvite;
 use App\Models\Works;
 use App\Models\WorksInfo;
@@ -378,13 +379,16 @@ class UserController extends Controller
             return error(1000, '不要重复关注');
         }
 
-        UserFollow::create([
+        $follow = UserFollow::create([
             'from_uid' => $this->user['id'],
             'to_uid' => $uid
         ]);
 
         User::where('id', $uid)->increment('fan_num');
         User::where('id', $this->user['id'])->increment('follow_num');
+
+        // 消息通知
+        Message::pushMessage($this->user['id'],$uid,'FOLLOW');
         return $this->getRes(['code' => true, 'msg' => '关注成功']);
         return success();
     }
@@ -811,7 +815,7 @@ class UserController extends Controller
             $val['works_name'] = '';
             $val['works_cover_img'] = '';
             $val['worksInfo_name'] = '';
-            
+
 
 
             if ($val['relation_type'] == 1 or $val['relation_type'] == 2 or $val['relation_type'] == 5) {
@@ -1124,8 +1128,8 @@ class UserController extends Controller
                         $res_one['column'] = $column;
                     }
                     // 旧数据 无父类的收藏
-                    if($res_one['parent_column'] == (object)[]  && 
-                        $res_one['column'] == (object)[] && 
+                    if($res_one['parent_column'] == (object)[]  &&
+                        $res_one['column'] == (object)[] &&
                         $res_one['info'] == (object)[] ){
                         continue;
                     }
