@@ -105,13 +105,16 @@ class MessageController extends Controller
         $user_id = $this->user['id'] ?? 233785;
 
         //type :9=评论 10=回复
+        $type_arr=MessageType::get_comment_msg_type();
+        MessageServers::clear_msg($user_id,$type_arr);
+
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id',
                 'send_user:id,nickname,headimg,is_author',
             ])
-            ->whereIn('type', MessageType::get_comment_msg_type())
+            ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -257,14 +260,17 @@ class MessageController extends Controller
 
         $user_id = $this->user['id'] ?? 233785;
 
-        //9=评论 22=关注 (以真实关注的数据为准) 11=点赞  1=系统消息 4=内容上新  12=收益
+        //22=关注
+        $type_arr=MessageType::get_follow_msg_type();
+        MessageServers::clear_msg($user_id,$type_arr);
+
         $lists=MessageUser::query()
             ->select([
                 DB::raw('GROUP_CONCAT(id) as ids'),
                 DB::raw('count(*) as count'),
                 DB::raw("date_format(created_at,'%Y-%m-%d') as time"),
             ])->groupBy(DB::raw("date_format(created_at,'%Y-%m-%d')"))
-            ->whereIn('type', MessageType::get_follow_msg_type())
+            ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -316,13 +322,16 @@ class MessageController extends Controller
         $user_id = $this->user['id'] ?? 233785;
 
         // 11=点赞
+        $type_arr=MessageType::get_like_msg_type();
+        MessageServers::clear_msg($user_id,$type_arr);
+
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id',
                 'send_user:id,nickname,headimg,is_author',
             ])
-            ->whereIn('type', MessageType::get_like_msg_type())
+            ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -392,18 +401,22 @@ class MessageController extends Controller
         $user_id = $this->user['id'] ?? 233785;
 
         //4=内容上新
+        $type_arr=MessageType::get_work_new_msg_type();
+        MessageServers::clear_msg($user_id,$type_arr);
+
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id',
             ])
-            ->whereIn('type', MessageType::get_work_new_msg_type())
+//            ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
             //格式化时间
             $items['created_at'] = History::DateTime($items['created_at']);
+            $items['message']['cover_img'] = '/wechat/works/video/161910/5246_1525315796.png';//封面
         }
 
         return success($lists);
@@ -430,12 +443,16 @@ class MessageController extends Controller
         $user_id = $this->user['id'] ?? 233785;
 
         //1=系统消息
+
+        $type_arr=MessageType::get_system_msg_type();
+        MessageServers::clear_msg($user_id,$type_arr);
+
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id',
             ])
-            ->whereIn('type', MessageType::get_system_msg_type())
+            ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
@@ -468,12 +485,15 @@ class MessageController extends Controller
         $user_id = $this->user['id'] ?? 233785;
 
         // 12=收益
+        $type_arr=MessageType::get_profit_msg_type();
+        MessageServers::clear_msg($user_id,$type_arr);
+
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id',
             ])
-            ->whereIn('type', MessageType::get_profit_msg_type())
+            ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
