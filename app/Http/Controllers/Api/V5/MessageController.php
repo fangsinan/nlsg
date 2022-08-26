@@ -586,7 +586,7 @@ class MessageController extends Controller
      * @apiName get_message_info
      * @apiVersion 1.0.0
      * @apiGroup message
-     * @apiParam message
+     * @apiParam message_id
      * @apiSuccess {string} result json
      * @apiSuccessExample Success-Response:
      * {
@@ -603,4 +603,5 @@ class MessageController extends Controller
         ];
         return success($data);
     }
+
 }
