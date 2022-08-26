@@ -355,6 +355,7 @@ class MessageController extends Controller
                     return $this->error(0, '参数错误');
                 }
 
+                $items['comment_reply'] =$CommentReply;
                 $items['comment_id'] = $CommentReply->comment_id;
                 $items['reply_id'] = $CommentReply->reply_id;
                 $comment_id = $CommentReply->comment_id;
@@ -366,9 +367,7 @@ class MessageController extends Controller
 
             //获取评论关联的课程内容
             $items=MessageServers::get_info_by_comment($comment_id,$items);
-            if($like['comment_type']==2){
-                $items['comment']=$CommentReply;
-            }
+
         }
 
         return success($lists);
