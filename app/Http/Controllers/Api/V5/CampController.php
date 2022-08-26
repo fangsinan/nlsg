@@ -11,6 +11,7 @@ use App\Models\ColumnWeekModel;
 use App\Models\ColumnWeekReward;
 use App\Models\ContentLike;
 use App\Models\History;
+use App\Models\Message\Message;
 use App\Models\OfflineProducts;
 use App\Models\Poster;
 use App\Models\Subscribe;
@@ -561,6 +562,14 @@ class CampController extends Controller
                             'give'      => 30,
                             'status'    => 1,
                         ];
+                        // 每次领取奖励需要发送消息
+                        Message::pushMessage(0,$user_id,"WEEK_REWARD",[
+                            "relation_type" => 101,
+                            "open_type"   => 3,
+                            "relation_id"   => $sub_val['relation_id'],
+                            "relation_info_id"   => 0,
+                        ]);
+
                     }
 
                 }
@@ -645,6 +654,14 @@ class CampController extends Controller
                 if($end_show['is_cer'] == 0){
                     $edit_data['cer_at']=date("Y-m-d H:i:s",time());
                 }
+                // 结营领取证书
+                // 每次领取奖励需要发送消息
+                Message::pushMessage(0,$user_id,"WEEK_REWARD",[
+                    "relation_type" => 142,
+                    "open_type"   => 3,
+                    "relation_id"   => $column_id,
+                    "relation_info_id"   => 0,
+                ]);
                 break;
             default :
             return $this->success();
