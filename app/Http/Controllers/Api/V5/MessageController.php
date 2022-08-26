@@ -291,7 +291,7 @@ class MessageController extends Controller
                 ->select(['id', 'send_user','type', 'receive_user', 'message_id', 'status', 'created_at'])
                 ->with([
                     'message:id,type,title,message,action_id',
-                    'send_user:id,nickname,headimg,is_author',
+                    'send_user:id,nickname,headimg,is_author,intro',
                 ])
                 ->whereIn('id', $ids_arr)
                 ->whereIn('type', MessageType::get_follow_msg_type())
