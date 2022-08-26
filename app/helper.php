@@ -348,3 +348,4 @@ function formatDataTime($param_time, $type = 1)
     }
     return date('m月d日 H:i', $time);
 }
+
