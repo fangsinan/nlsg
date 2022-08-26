@@ -61,27 +61,24 @@ class MessageController extends Controller
 
         //收益12
         $type_arr=MessageType::get_profit_msg_type();
-        $lists['profit_count']=MessageServers::get_user_unread_count($type_arr,$user_id);
         $profit=MessageServers::get_user_new_msg($type_arr,$user_id);
         if($profit){
             $message=json_decode($profit->message->message,true);
-            $lists['message'][]=['created_at'=>strtotime($profit->created_at),'type'=>12,'title'=>$profit->message->title,'message'=>$message['content']??$message];
+            $lists['message'][]=['count'=>MessageServers::get_user_unread_count($type_arr,$user_id),'created_at'=>strtotime($profit->created_at),'type'=>12,'title'=>$profit->message->title,'message'=>$message['content']??$message];
         }
 
         //内容上新type=4;
         $type_arr=MessageType::get_work_new_msg_type();
-        $lists['work_new_count']=MessageServers::get_user_unread_count($type_arr,$user_id);;
         $work_new=MessageServers::get_user_new_msg($type_arr,$user_id);
         if($work_new){
-            $lists['message'][]=['created_at'=>strtotime($work_new->created_at),'type'=>4,'title'=>$work_new->message->title,'message'=>$work_new->message->message];
+            $lists['message'][]=['count'=>MessageServers::get_user_unread_count($type_arr,$user_id),'created_at'=>strtotime($work_new->created_at),'type'=>4,'title'=>$work_new->message->title,'message'=>$work_new->message->message];
         }
 
         //系统消息type=1;
         $type_arr=MessageType::get_system_msg_type();
-        $lists['system_count']=MessageServers::get_user_unread_count($type_arr,$user_id);;
         $system=MessageServers::get_user_new_msg($type_arr,$user_id);;
         if($system){
-            $lists['message'][]=['created_at'=>strtotime($system->created_at),'type'=>1,'title'=>$system->message->title,'message'=>$system->message->message];
+            $lists['message'][]=['count'=>MessageServers::get_user_unread_count($type_arr,$user_id),'created_at'=>strtotime($system->created_at),'type'=>1,'title'=>$system->message->title,'message'=>$system->message->message];
         }
 
         $message_arr=$lists['message']??[];
@@ -424,14 +421,27 @@ class MessageController extends Controller
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id',
             ])
-//            ->whereIn('type', $type_arr)
+            ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
+
+            if(in_array($items['type'],[5,6])){
+                $works = Works::query()->where('id',  $items['message']['relation_id'])
+                    ->select(['id', 'title', 'cover_img'])->first();
+                $items['message']['cover_pic'] = $works->cover_img??'';//封面
+            }else{
+
+                //获取训练营、专栏、讲座
+                $Column = Column::query()->where('id',$items['message']['relation_id'])
+                    ->select(['id','title', 'cover_pic', 'details_pic'])->first();
+                $items['message']['cover_pic'] = $Column->cover_pic??'';//封面
+
+            }
+
             //格式化时间
-            $items['message']['created_at'] = '今日';
-            $items['message']['cover_img'] = '/wechat/works/video/161910/5246_1525315796.png';//封面
+            $items['message']['created_at'] = WorkNewDateTime( $items['created_at']);
         }
 
         return success($lists);

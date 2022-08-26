@@ -316,3 +316,23 @@ function dd_db_log(){
     $logs = \Illuminate\Support\Facades\DB::getQueryLog();
     dd($logs);
 }
+
+function  WorkNewDateTime($param_time = '')
+{
+    //date_default_timezone_set('PRC');
+    $ptime = strtotime($param_time);
+    $etime = time() - $ptime;
+    if($etime <= 0){  // 防止提前请求
+        return '今日';
+    }
+    if( $etime <= 24 * 60 * 60){
+        return '今日';
+    }
+
+    if( $etime <= 2 * 24 * 60 * 60){
+        return '昨日';
+    }
+
+    return   date('Y-m-d ',$ptime);
+
+}
