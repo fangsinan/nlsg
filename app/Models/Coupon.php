@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Message\Message;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -411,7 +412,7 @@ class Coupon extends Base
 //            $created_at = date('Y-m-d H:i:s');
 //        }
         $created_at = date('Y-m-d');
-        
+
         $res = Coupon::create([
             'name' => $rule->name,
             'number' => self::createCouponNum($rule->buffet, $cid),
@@ -425,6 +426,8 @@ class Coupon extends Base
             'user_id' => $user_id,
             'cr_id' => $cid
         ]);
+        // 发送消息
+        Message::pushMessage(0,$user_id,"COUPON_PROFIT_REWARD",["action_id"=>$res->id,]);
 
         return success($res);
     }

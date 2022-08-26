@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V5;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\CommentReply;
+use App\Models\Message\Message;
 use App\Models\Notify;
 use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
@@ -113,15 +114,18 @@ class CommentController extends Controller
             switch ($input['type']){
                 case  4:
                     Works::where('id', $input['id'])->increment('comment_num');
+                    $user_id = Works::where('id', $input['id'])->value('user_id');
                     break;
                 case  5:
                     Wiki::where('id', $input['id'])->increment('comment_num');
                     break;
                 case  6:
                     Column::where('id', $input['id'])->increment('comment_num');
+                    $user_id = Column::where('id', $input['id'])->value('user_id');
                     break;
                 case  7:
                     ShortVideoModel::where('id', $input['id'])->increment('comment_num');
+                    $user_id = ShortVideoModel::where('id', $input['id'])->value('user_id');
                     break;
             }
             if ( ! empty($img)) {
@@ -135,6 +139,9 @@ class CommentController extends Controller
                     ];
                 }
                 Attach::insert($data);
+            }
+            if(!empty($user_id)){
+                Message::pushMessage($this->user['id'],$user_id,'COMMENT',["action_id"=>$result->id,]);
             }
 
             return success();
@@ -213,7 +220,7 @@ class CommentController extends Controller
 
         }else{
             CommentReply::where('id', $id)->update(['status' => 0]);
-            
+
             if($c_type == 7){
                 ShortVideoModel::where('id', $comment->relation_id)->decrement('comment_num');
             }
@@ -248,7 +255,7 @@ class CommentController extends Controller
         if (!$comment){
             return $this->error(1000,'评论不存在');
         }
-        if($is_top == 1){ 
+        if($is_top == 1){
             //  当前设置置顶操作时 取消置顶 之前的记录
             $res = Comment::where([
                 'relation_id'=> $comment['relation_id'],
@@ -257,7 +264,7 @@ class CommentController extends Controller
                 'is_top'     => 1,
              ])->update(['is_top' => 0]);
         }
-       
+
         $res = Comment::where('id', $id)->update(['is_top' => $is_top]);
         if(empty($res)){
             return $this->error(0,'操作失败');

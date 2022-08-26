@@ -20,6 +20,7 @@ use App\Models\MallGroupBuyList;
 use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
 use App\Models\MeetingSales;
+use App\Models\Message\Message;
 use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\OrderErpList;
@@ -394,6 +395,12 @@ class WechatPay extends Controller
 //                    if($pay_record_flag == 1){
 //                        Task::send(11, $user_id, $orderInfo['relation_id'],'','360会员','','','',$AdminInfo['nickname']);
 //                    }
+
+
+                    if($pay_record_flag == 1 && !empty($map['user_id'])){
+                        Message::pushMessage(0,$map['user_id'],"VIP_PROFIT_REWARD",["action_id"=>$Sy_Rst->id,]);
+
+                    }
                     return true;
                 } else {
                     DB::rollBack();
@@ -841,7 +848,6 @@ class WechatPay extends Controller
                         if (empty($PrdInfo)) {
                             $pay_record_flag = 1;
                             $Profit_Rst = PayRecordDetail::create($map);
-
                         }
                     }
                 }
@@ -905,7 +911,7 @@ class WechatPay extends Controller
 
                     //暂时先不启用直接分账
 //                    //调用直播分账
-//                    if ( !empty($twitter_id) && $twitter_id != $user_id ) {
+//                    if ( !empty($twitter_id) && COUPON_PROFIT_REWARD$twitter_id != $user_id ) {
 //                        if( $liveData['profit_sharing'] == 1 && $liveData['twitter_money'] > 0 ){
 //                            self::OrderProfit($transaction_id,$out_trade_no,$liveData['twitter_money'],$twitter_id);
 //                        }
@@ -914,6 +920,13 @@ class WechatPay extends Controller
 //                    if($pay_record_flag == 1){
 //                        Task::send(11, $user_id, $orderInfo['relation_id'],'',$liveData['title'],'','','',$userdata['nickname']);
 //                    }
+
+                    // 发送消息
+                    if($pay_record_flag == 1 && !empty($map['user_id'])){
+                        Message::pushMessage(0,$map['user_id'],"LIVE_PROFIT_REWARD",["action_id"=>$Profit_Rst->id,]);
+                    }
+
+
                     return true;
 
                 } else {
