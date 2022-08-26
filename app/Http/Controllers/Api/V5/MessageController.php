@@ -44,10 +44,12 @@ class MessageController extends Controller
      */
     public function msg_type_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
+
+        // 1=系统消息 4=内容上新 9=评论 11=点赞 12=收益 22=关注
 
         $lists = [];
-
         //点赞
         $lists['like_count']=MessageServers::get_user_unread_count(MessageType::get_like_msg_type(),$user_id);
 
@@ -57,13 +59,13 @@ class MessageController extends Controller
         //评论
         $lists['comment_count']=MessageServers::get_user_unread_count(MessageType::get_comment_msg_type(),$user_id);
 
-        //收益
+        //收益12
         $type_arr=MessageType::get_profit_msg_type();
         $lists['profit_count']=MessageServers::get_user_unread_count($type_arr,$user_id);
         $profit=MessageServers::get_user_new_msg($type_arr,$user_id);
         if($profit){
             $message=json_decode($profit->message->message,true);
-            $lists['profit']=['title'=>$profit->message->title,'message'=>$message['content']??$message];
+            $lists['message'][]=['created_at'=>strtotime($profit->created_at),'type'=>12,'title'=>$profit->message->title,'message'=>$message['content']??$message];
         }
 
         //内容上新type=4;
@@ -71,7 +73,7 @@ class MessageController extends Controller
         $lists['work_new_count']=MessageServers::get_user_unread_count($type_arr,$user_id);;
         $work_new=MessageServers::get_user_new_msg($type_arr,$user_id);
         if($work_new){
-            $lists['work_new']=['title'=>$work_new->message->title,'message'=>$work_new->message->message];
+            $lists['message'][]=['created_at'=>strtotime($work_new->created_at),'type'=>4,'title'=>$work_new->message->title,'message'=>$work_new->message->message];
         }
 
         //系统消息type=1;
@@ -79,9 +81,17 @@ class MessageController extends Controller
         $lists['system_count']=MessageServers::get_user_unread_count($type_arr,$user_id);;
         $system=MessageServers::get_user_new_msg($type_arr,$user_id);;
         if($system){
-            $lists['system']=['title'=>$system->message->title,'message'=>$system->message->message];
+            $lists['message'][]=['created_at'=>strtotime($system->created_at),'type'=>1,'title'=>$system->message->title,'message'=>$system->message->message];
         }
 
+        $message_arr=$lists['message']??[];
+        $created_at=array_column($message_arr,'created_at');
+        array_multisort($message_arr,SORT_DESC,$created_at);
+
+        foreach ($message_arr as &$val){
+            $val['created_at']=History::DateTime(date('Y-m-d H:i:s',$val['created_at']));
+        }
+        $lists['message']=$message_arr;
         return success($lists);
     }
 
@@ -101,8 +111,9 @@ class MessageController extends Controller
      */
     public function msg_comment_list(Request $request)
     {
+        $user_id = 233785;
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
 
         //type :9=评论 10=回复
         $type_arr=MessageType::get_comment_msg_type();
@@ -175,7 +186,8 @@ class MessageController extends Controller
     public function msg_comment_info(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         $id =$request->query('id',60);
 
@@ -258,7 +270,8 @@ class MessageController extends Controller
     public function msg_follow_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         //22=关注
         $type_arr=MessageType::get_follow_msg_type();
@@ -319,7 +332,8 @@ class MessageController extends Controller
      */
     public function msg_like_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         // 11=点赞
         $type_arr=MessageType::get_like_msg_type();
@@ -398,7 +412,8 @@ class MessageController extends Controller
      */
     public function msg_work_new_list(Request $request)
     {
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         //4=内容上新
         $type_arr=MessageType::get_work_new_msg_type();
@@ -415,7 +430,7 @@ class MessageController extends Controller
 
         foreach ($lists['data'] as &$items) {
             //格式化时间
-            $items['created_at'] = History::DateTime($items['created_at']);
+            $items['message']['created_at'] = '今日';
             $items['message']['cover_img'] = '/wechat/works/video/161910/5246_1525315796.png';//封面
         }
 
@@ -440,7 +455,8 @@ class MessageController extends Controller
     public function msg_system_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         //1=系统消息
 
@@ -482,7 +498,8 @@ class MessageController extends Controller
     public function msg_profit_list(Request $request)
     {
 
-        $user_id = $this->user['id'] ?? 233785;
+//        $user_id = $this->user['id'] ?? 233785;
+        $user_id = 233785;
 
         // 12=收益
         $type_arr=MessageType::get_profit_msg_type();
